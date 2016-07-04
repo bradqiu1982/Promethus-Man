@@ -1,0 +1,46 @@
+﻿@model  Prometheus.Models.DashBoardViewModels
+
+@{
+    ViewBag.Title = "ViewAll";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-header">
+    <h1>System Dashboard</h1>
+</div>
+<div class="row">
+    <div class="col-sm-6">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">System Active</h3>
+            </div>
+            <div class="panel-body">
+
+            @foreach (var item in Model.ActiveInfoList)
+            {
+                <div class="panel panel-group">
+                    <div class="panel-body">
+                        @Html.Raw(item.MesgContent)
+                    </div>
+                </div>
+            }
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Assigned to Me</h3>
+            </div>
+            <div class="panel-body">
+                Panel content1
+            </div>
+            <div class="panel-body">
+                Panel content2
+            </div>
+        </div>
+    </div>
+</div>
+

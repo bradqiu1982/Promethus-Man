@@ -27,7 +27,7 @@ namespace Prometheus.Models
             this.StartDate = DateTime.Parse(startdate);
             this.Creator = creator;
             this.PM = pm;
-            this.FinishRate = finshrate;
+            this.FinishRating = finshrate;
             this.dbDescription = sdescription;
         }
 
@@ -54,7 +54,7 @@ namespace Prometheus.Models
         [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+).*")]
         public string Engineers { set; get; }
 
-        public decimal FinishRate { set; get; }
+        public decimal FinishRating { set; get; }
 
 
         private string sDescription = "";
@@ -77,12 +77,43 @@ namespace Prometheus.Models
         {
             get
             {
-                return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(sDescription));
+                if (string.IsNullOrEmpty(sDescription))
+                {
+                    return "";
+                }
+                else
+                {
+                    try
+                    {
+                        return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(sDescription));
+                    }
+                    catch (Exception)
+                    {
+                        return "";
+                    }
+                }
+                    
             }
 
             set
             {
-                sDescription = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(value));
+                if (string.IsNullOrEmpty(value))
+                {
+                    sDescription = "";
+                }
+                else
+                {
+                    try
+                    {
+                        sDescription = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(value));
+                    }
+                    catch (Exception)
+                    {
+                        sDescription = "";
+                    }
+
+                }
+                
             }
         }
 

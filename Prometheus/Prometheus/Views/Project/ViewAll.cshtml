@@ -1,8 +1,70 @@
 ﻿
+@model IEnumerable<Prometheus.Models.ProjectViewModels>
+
 @{
     ViewBag.Title = "Project View All";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>ViewAll</h2>
+
+
+<div class="page-header">
+    <h1>All Projects</h1>
+</div>
+
+@foreach (var item in Model)
+{
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                @Html.ActionLink(item.ProjectName, "ProjectDetail", "Project", new { ProjectKey = item.ProjectKey }, null)
+            </div>
+            <div class="panel-body col-md-12">
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="col-md-4">
+                            @Html.DisplayNameFor(model => model.StartDate)
+                        </div>
+                        <div class="col-md-8">
+                            @Html.DisplayFor(modelItem => item.StartDate)
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="col-md-4">
+                            @Html.DisplayNameFor(model => model.FinishRating)
+                        </div>
+                        <div class="col-md-8">
+                            @Html.DisplayFor(modelItem => item.FinishRating)%
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="col-md-4">
+                            @Html.DisplayNameFor(model => model.PM)
+                        </div>
+                        <div class="col-md-8">
+                            @{
+                                var emails = item.PM.Split(new char[] { ':' });
+                                foreach (var m in emails)
+                                {
+                                    if (!string.IsNullOrEmpty(m))
+                                    {
+                                        @Html.ActionLink(m.Split(new char[] { '@' })[0] + "|", "UserHome", "User", new { useraccount = m.Split(new char[] { '@' })[0] }, null);
+                                    }
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        @Html.Raw(item.Description)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+}
 

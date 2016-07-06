@@ -15,7 +15,22 @@ namespace Prometheus.Controllers
         // GET: Project
         public ActionResult ViewAll()
         {
-            return View();
+            var projlist = new List<ProjectViewModels>();
+
+            var pro = new ProjectViewModels();
+            pro.ProjectName = "CFP4-SR4";
+            var tempstr = RMSpectialCh(pro.ProjectName);
+            pro.ProjectKey = tempstr.Substring(0, (tempstr.Length > 20) ? 18 : tempstr.Length).ToUpper();
+            pro.StartDate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd"));
+            pro.PM = "brad.qiu@finisar.com:Alex.chen@finisar.com";
+            pro.FinishRating = 15;
+            pro.Description = "<h3><font color =\"red\">This is a test</font></h3>";
+            projlist.Add(pro);
+
+            pro.ProjectName = "QSFP-28G";
+            projlist.Add(pro);
+
+            return View(projlist);
         }
 
         public ActionResult CreateProject()
@@ -106,13 +121,28 @@ namespace Prometheus.Controllers
         {
             var projectmodel = new ProjectViewModels();
             projectmodel.ProjectName = Request.Form["ProjectName"];
-            var tempstr = RMSpectialCh(projectmodel.ProjectName);
-            projectmodel.ProjectKey = tempstr.Substring(0, (tempstr.Length > 20) ? 18 : tempstr.Length).ToUpper();
+
+            if (!string.IsNullOrEmpty(projectmodel.ProjectName))
+            {
+                var tempstr = RMSpectialCh(projectmodel.ProjectName);
+                projectmodel.ProjectKey = tempstr.Substring(0, (tempstr.Length > 20) ? 18 : tempstr.Length).ToUpper();
+            }
+            else
+                projectmodel.ProjectKey = "";
 
             projectmodel.PM = Request.Form["PM"];
             projectmodel.Engineers = Request.Form["Engineers"];
 
-            projectmodel.Description = Request.Form["editor1"];
+            var temphtml = Request.Form["editor1"];
+            if (string.IsNullOrEmpty(temphtml))
+            {
+                projectmodel.Description = "";
+            }
+            else
+            {
+                projectmodel.Description = Server.HtmlDecode(temphtml);
+            }
+            
 
             if (!ProjectValidate(projectmodel))
             {
@@ -144,10 +174,8 @@ namespace Prometheus.Controllers
             //return RedirectToAction("ProjectDetail", dict);
         }
 
-
         public ActionResult ProjectDetail(string ProjectKey)
         {
-            System.Windows.MessageBox.Show("get project detail: "+ ProjectKey);
             return View();
         }
 
@@ -155,8 +183,17 @@ namespace Prometheus.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult ProjectPostDetail()
         {
-            System.Windows.MessageBox.Show("post project detail");
-            return View();
+            if (Request.Form["update"] != null)
+            {
+                System.Windows.MessageBox.Show("try to update");
+            }
+
+            if (Request.Form["delete"] != null)
+            {
+                System.Windows.MessageBox.Show("try to delete");
+            }
+
+            return RedirectToAction("ViewAll");
         }
     }
 }

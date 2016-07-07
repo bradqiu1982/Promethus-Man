@@ -12,6 +12,7 @@
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
+    <hr />
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
     <div class="form-horizontal">

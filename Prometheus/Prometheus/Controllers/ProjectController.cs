@@ -116,7 +116,50 @@ namespace Prometheus.Controllers
             return true;
         }
 
-        private string StoreMesConfig(Controller ctrl)
+        private Dictionary<string, string> RetriveMesTables(string mesfilepath)
+        {
+            var ret = new Dictionary<string, string>();
+            try
+            {
+                if (System.IO.File.Exists(mesfilepath))
+                {
+                    string[] lines = System.IO.File.ReadAllLines(mesfilepath);
+                    bool tableseg = false;
+                    foreach (var line in lines)
+                    {
+                        if (line.Contains(";"))
+                        {
+                            continue;
+                        }
+
+                        if (line.ToUpper().Contains("[MESTABLENAME]"))
+                        {
+                            tableseg = true;
+                            continue;
+                        }
+
+                        if (tableseg && line.Contains("[") && line.Contains("]"))
+                        {
+                            tableseg = false;
+                        }
+
+                        if (tableseg && line.Contains("="))
+                        {
+                            ret.Add(line.Split(new char[] { '=' })[0].Trim(), line.Split(new char[] { '=' })[1].Trim().Replace("\"", ""));
+                        }
+                    }
+                }
+
+                return ret;
+            }
+            catch (Exception ex)
+            {
+                ret.Clear();
+                return ret;
+            }
+        }
+
+        private Dictionary<string, string> StoreMesConfig(Controller ctrl)
         {
             try
             {
@@ -139,9 +182,11 @@ namespace Prometheus.Controllers
                         fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
                         ctrl.Request.Files[fl].SaveAs(imgdir + fn);
 
-
-
-                        return "/userfiles/docs/" + datestring + "/" + fn;
+                        var ret = RetriveMesTables(imgdir + fn);
+                        if (ret.Count > 0)
+                            return ret;
+                        else
+                            return null;
                     }
                 }
                 return null;
@@ -150,6 +195,27 @@ namespace Prometheus.Controllers
             catch (Exception ex)
             {
                 return null;
+            }
+        }
+
+        private List<string> RetrieveProjectBondingInfo(string key,int count, Controller ctrl)
+        {
+            var ret = new List<string>();
+            try
+            {
+                for (var i = 0; i < count; i++)
+                {
+                    if (!string.IsNullOrEmpty(ctrl.Request.Form[key + i]))
+                    {
+                        ret.Add(ctrl.Request.Form[key + i]);
+                    }
+                }
+                return ret;
+            }
+            catch (Exception ex)
+            {
+                ret.Clear();
+                return ret;
             }
         }
 
@@ -206,6 +272,28 @@ namespace Prometheus.Controllers
             }
 
             StoreMesConfig(this);
+
+            var pns = RetrieveProjectBondingInfo("PN", 9, this);
+            if (pns.Count > 0)
+            {
+                var lpn = new List<ProjectPn>();
+                foreach(var p in pns)
+                {
+                    lpn.Add(new ProjectPn(projectmodel.ProjectKey,p));
+                }
+                projectmodel.PNList = lpn;
+            }
+
+            var stats = RetrieveProjectBondingInfo("Station", 9, this);
+            if (stats.Count > 0)
+            {
+                var lstat = new List<ProjectStation>();
+                foreach (var s in stats)
+                {
+                    lstat.Add(new ProjectStation(projectmodel.ProjectKey, s));
+                }
+                projectmodel.StationList = lstat;
+            }
 
             return RedirectToAction("ViewAll");
 

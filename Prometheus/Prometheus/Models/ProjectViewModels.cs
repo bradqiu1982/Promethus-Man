@@ -33,6 +33,7 @@ namespace Prometheus.Models
 
         public string ProjectKey { set; get; }
 
+        [Display(Name = "Project")]
         [StringLength(180, MinimumLength = 6)]
         [Required]
         public string ProjectName { set; get; }

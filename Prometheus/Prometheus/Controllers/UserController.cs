@@ -42,7 +42,7 @@ namespace Prometheus.Controllers
                 client.Timeout = 10000;
                 client.DeliveryMethod = SmtpDeliveryMethod.Network;
                 client.UseDefaultCredentials = false;
-                client.Credentials = new NetworkCredential("brad.qiu@finisar.com", "wangle@321");
+                client.Credentials = new NetworkCredential("brad.qiu@finisar.com", "wangle@432");
                 client.Send(message);
 
             }
@@ -106,5 +106,56 @@ namespace Prometheus.Controllers
         {
             return View();
         }
+
+        [HttpPost, ActionName("LoginUser")]
+        [ValidateAntiForgeryToken]
+        public ActionResult LoginUserPOST()
+        {
+            var username = Request.Form["Email"];
+            var password = Request.Form["Password"];
+
+            //verify user information
+
+            string ckstr = username +"||"+ DateTime.Now.ToString();
+
+            var ck = new HttpCookie("activenpi");
+            ck.Value = Convert.ToBase64String(UTF8Encoding.UTF8.GetBytes(ckstr));
+            Response.Cookies.Add(ck);
+            return RedirectToAction("UserCenter", "User");
+        }
+
+        public string UnpackCookie(Controller ctrl)
+        {
+
+            if (ctrl.Request.Cookies["activenpi"] != null)
+            {
+                try
+                {
+                    var ck = ctrl.Request.Cookies["activenpi"].Value;
+                    var bs = Convert.FromBase64String(ck);
+                    var val = UTF8Encoding.UTF8.GetString(bs);
+                    return val;
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public ActionResult UserCenter()
+        {
+            var val = UnpackCookie(this);
+            if(val != null)
+            { 
+                System.Windows.MessageBox.Show(val);
+            }
+            return View();
+        }
+
     }
 }

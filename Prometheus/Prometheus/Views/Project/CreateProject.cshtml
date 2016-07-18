@@ -8,42 +8,50 @@
 
 <h2>Create Project</h2>
 @Html.Raw(string.IsNullOrEmpty(ViewBag.CreateError) ? "&nbsp;" : ViewBag.CreateError)
-@if(!string.IsNullOrEmpty(ViewBag.CreateError))
+@if (!string.IsNullOrEmpty(ViewBag.CreateError))
 {
     ViewBag.CreateError = "";
 }
 
 <script src="../../ckeditor/ckeditor.js"></script>
 
-@using (Html.BeginForm())
+@using (Html.BeginForm("CreateProject","Project",FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
     <hr />
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-    <div class="form-horizontal">
-            <div class="form-group">
-                <div class="col-md-12">
-                    @Html.Label("     ")
-                </div>
-            </div>
+    <div class="form-group">
+        <ul class="nav nav-pills nav-stacked col-md-2">
+            <li class="active"><a href="#tab_a" data-toggle="pill">Base Info</a></li>
+            <li><a href="#tab_b" data-toggle="pill">MES Bonding</a></li>
+        </ul>
+        <div class="tab-content col-md-10">
+            <div class="tab-pane active" id="tab_a">
 
-            <div class="form-group">
-                <div class="col-md-6">
-                    @Html.LabelFor(model => model.ProjectName, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.EditorFor(model => model.ProjectName, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.ProjectName, "", new { @class = "text-danger" })
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            @Html.Label("     ")
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    @Html.LabelFor(model => model.StartDate, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.EditorFor(model => model.StartDate, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-                <script type="text/javascript">
+
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            @Html.LabelFor(model => model.ProjectName, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.EditorFor(model => model.ProjectName, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.ProjectName, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            @Html.LabelFor(model => model.StartDate, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.EditorFor(model => model.StartDate, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <script type="text/javascript">
                     $(document).ready(function () {
                         $("#StartDate").datepicker({
                             changeMonth: true,
@@ -51,178 +59,28 @@
                             dateFormat: 'yy-mm-dd'
                         });
                     });
-                </script>
-            </div>
-
-            <div class="form-group">
-                <div class="col-md-6">
-                    @Html.LabelFor(model => model.PM, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10"  data-toggle="tooltip" data-placement="bottom" title="Exampel: brad@finisar.com:john@finisar.com.....">
-                        @Html.EditorFor(model => model.PM, new { htmlAttributes = new { @class = "form-control" } }) EMAIL ADDRESS:EMAIL ADDRESS....
-                        @Html.ValidationMessageFor(model => model.PM, "", new { @class = "text-danger" })
+                        </script>
                     </div>
+
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            @Html.LabelFor(model => model.PM, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10" data-toggle="tooltip" data-placement="bottom" title="Exampel: brad@finisar.com:john@finisar.com.....">
+                                @Html.EditorFor(model => model.PM, new { htmlAttributes = new { @class = "form-control" } }) EMAIL ADDRESS:EMAIL ADDRESS....
+                                @Html.ValidationMessageFor(model => model.PM, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            @Html.LabelFor(model => model.Engineers, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10" data-toggle="tooltip" data-placement="bottom" title="Exampel: brad@finisar.com:john@finisar.com.....">
+                                @Html.EditorFor(model => model.Engineers, new { htmlAttributes = new { @class = "form-control" } }) EMAIL ADDRESS:EMAIL ADDRESS....
+                                @Html.ValidationMessageFor(model => model.Engineers, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
-
-                <div class="col-md-6">
-                    @Html.LabelFor(model => model.Engineers, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10" data-toggle="tooltip" data-placement="bottom" title="Exampel: brad@finisar.com:john@finisar.com.....">
-                        @Html.EditorFor(model => model.Engineers, new { htmlAttributes = new { @class = "form-control" } }) EMAIL ADDRESS:EMAIL ADDRESS....
-                        @Html.ValidationMessageFor(model => model.Engineers, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-    <div class="col-md-12">
-        <div class="form-group">
-            <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#collapseExample">
-                Bonding MES
-            </button>
-         </div>
-        <div class="modal fade" id="collapseExample" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="myModalLabel">MES SQL</h4>
-                    </div>
-
-                    <div class="modal-body">
-
-                        <div class="form-group">
-                            @Html.Label("Retrieve Data should follow below order:SN,STATION,ERRABBR,TESTER,TIMESTAMP")
-                        </div>
-
-                        <div class="form-group">
-                            <div class="col-md-5">
-                                <label class="control-label col-md-5" for="whichtest1">Station</label>
-                                <div class="col-md-7">
-                                    <input class="form-control text-box single-line" id="whichtest1" name="whichtest1" type="text" value="PRE-BURN" />
-                                </div>
-                            </div>
-                            <div class="col-md-7">
-                                <label class="control-label col-md-2" for="sql1">SQL</label>
-                                <div class="col-md-10">
-                                    <input class="form-control text-box single-line" id="sql1" name="sql1" type="text" value="" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="col-md-5">
-                                <label class="control-label col-md-5" for="whichtest2">Station</label>
-                                <div class="col-md-7">
-                                    <input class="form-control text-box single-line" id="whichtest2" name="whichtest2" type="text" value="POST-BURN" />
-                                </div>
-                            </div>
-                            <div class="col-md-7">
-                                <label class="control-label col-md-2" for="sql2">SQL</label>
-                                <div class="col-md-10">
-                                    <input class="form-control text-box single-line" id="sql2" name="sql2" type="text" value="" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="col-md-5">
-                                <label class="control-label col-md-5" for="whichtest3">Station</label>
-                                <div class="col-md-7">
-                                    <input data-val="true" class="form-control text-box single-line" id="whichtest3" name="whichtest3" type="text" value="ERTC" />
-                                </div>
-                            </div>
-                            <div class="col-md-7">
-                                <label class="control-label col-md-2" for="sql3">SQL</label>
-                                <div class="col-md-10">
-                                    <input data-val="true" class="form-control text-box single-line" id="sql3" name="sql3" type="text" value="" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="col-md-5">
-                                <label class="control-label col-md-5" for="whichtest4">Station</label>
-                                <div class="col-md-7">
-                                    <input class="form-control text-box single-line" id="whichtest4" name="whichtest4" type="text" value="Sensitivity" />
-                                </div>
-                            </div>
-                            <div class="col-md-7">
-                                <label class="control-label col-md-2" for="sql4">SQL</label>
-                                <div class="col-md-10">
-                                    <input class="form-control text-box single-line" id="sql4" name="sql4" type="text" value="" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="col-md-5">
-                                <label class="control-label col-md-5" for="whichtest5">Station</label>
-                                <div class="col-md-7">
-                                    <input class="form-control text-box single-line" id="whichtest5" name="whichtest5" type="text" value="Final-TX" />
-                                </div>
-                            </div>
-                            <div class="col-md-7">
-                                <label class="control-label col-md-2" for="sql5">SQL</label>
-                                <div class="col-md-10">
-                                    <input class="form-control text-box single-line" id="sql5" name="sql5" type="text" value="" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="col-md-5">
-                                <label class="control-label col-md-5" for="whichtest6">Station</label>
-                                <div class="col-md-7">
-                                    <input class="form-control text-box single-line" id="whichtest6" name="whichtest6" type="text" value="Final-RX" />
-                                </div>
-                            </div>
-                            <div class="col-md-7">
-                                <label class="control-label col-md-2" for="sql6">SQL</label>
-                                <div class="col-md-10">
-                                    <input class="form-control text-box single-line" id="sql6" name="sql6" type="text" value="" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="col-md-5">
-                                <label class="control-label col-md-5" for="whichtest7">Station</label>
-                                <div class="col-md-7">
-                                    <input class="form-control text-box single-line" id="whichtest7" name="whichtest7" type="text" value="" />
-                                </div>
-                            </div>
-                            <div class="col-md-7">
-                                <label class="control-label col-md-2" for="sql7">SQL</label>
-                                <div class="col-md-10">
-                                    <input class="form-control text-box single-line" id="sql7" name="sql7" type="text" value="" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="col-md-5">
-                                <label class="control-label col-md-5" for="whichtest8">Station</label>
-                                <div class="col-md-7">
-                                    <input class="form-control text-box single-line" id="whichtest8" name="whichtest8" type="text" value="" />
-                                </div>
-                            </div>
-                            <div class="col-md-7">
-                                <label class="control-label col-md-2" for="sql8">SQL</label>
-                                <div class="col-md-10">
-                                    <input class="form-control text-box single-line" id="sql8" name="sql8" type="text" value="" />
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Save</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-                </div>
-
 
                 <div class="col-md-12">
                     <div class="form-group">
@@ -231,17 +89,46 @@
 
                     <div class="form-group">
                         <div>
-                            <textarea  name="editor1" id="editor1" rows="10" cols="80"></textarea>
+                            <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
                             <script>
-                                CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserImageUploadUrl: '/userfiles/Upload.ashx' });
+                            CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserImageUploadUrl: '/userfiles/Upload.ashx' });
                             </script>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <div>
-                            <input type="submit" value="Submit" class="btn btn-default" />
+                </div>
+
+            </div>
+
+            <div class="tab-pane" id="tab_b">
+                
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label class="control-label col-md-3">Upload MESConfig.ini</label>
+                        <div class="col-md-9">
+                            <input type="file" name="files" id="file1"/>
                         </div>
                     </div>
+                 </div>
+               
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label class="control-label col-md-1" for="sql1">SQL</label>
+                        <div class="col-md-11">
+                            <input class="form-control text-box single-line" id="sql1" name="sql1" type="text" value="" />
+                        </div>
+                    </div>
+
+                    </div>
                 </div>
-                }
+
+        </div>
+    </div>
+ 
+        <div class="form-group">
+            <div>
+                <input type="submit" value="Submit" class="btn btn-default" />
+            </div>
+        </div>
+
+}

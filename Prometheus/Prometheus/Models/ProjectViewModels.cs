@@ -6,11 +6,27 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Prometheus.Models
 {
-    public class ProjectMES
+    public class ProjectStation
     {
+        public ProjectStation(string key, string stat)
+        {
+            ProjectKey = key;
+            Station = stat;
+        }
+
         public string ProjectKey { set; get; }
         public string Station { set; get; }
-        public string SQL { set; get; }
+    }
+
+    public class ProjectPn
+    {
+        public ProjectPn(string key, string p)
+        {
+            ProjectKey = key;
+            p = Pn;
+        }
+        public string ProjectKey { set; get; }
+        public string Pn { set; get; }
     }
 
     public class ProjectViewModels
@@ -20,12 +36,11 @@ namespace Prometheus.Models
             
         }
 
-        public ProjectViewModels(string prokey, string proname, string startdate, string creator, string pm, decimal finshrate, string sdescription)
+        public ProjectViewModels(string prokey, string proname, string startdate, string pm, decimal finshrate, string sdescription)
         {
             this.ProjectKey = prokey;
             this.ProjectName = proname;
             this.StartDate = DateTime.Parse(startdate);
-            this.Creator = creator;
             this.PM = pm;
             this.FinishRating = finshrate;
             this.dbDescription = sdescription;
@@ -42,12 +57,8 @@ namespace Prometheus.Models
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime StartDate { set; get; }
 
-        [StringLength(90, MinimumLength = 6)]
-        public string Creator { set; get; }
 
-        [StringLength(180, MinimumLength = 6)]
-        [Required]
-        [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+).*")]
+        [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)")]
         public string PM { set; get; }
 
         [StringLength(260, MinimumLength = 6)]
@@ -118,18 +129,29 @@ namespace Prometheus.Models
             }
         }
 
-        private List<ProjectMES> lmes = new List<ProjectMES>();
-        public List<ProjectMES> MESList
+        private List<ProjectStation> lstation = new List<ProjectStation>();
+        public List<ProjectStation> StationList
         {
             get
-            { return lmes; }
+            { return lstation; }
             set
             {
-                lmes.Clear();
-                lmes.AddRange(value);
+                lstation.Clear();
+                lstation.AddRange(value);
             }
         }
 
+        private List<ProjectPn> lpn = new List<ProjectPn>();
+        public List<ProjectPn> PNList
+        {
+            get
+            { return lpn; }
+            set
+            {
+                lpn.Clear();
+                lpn.AddRange(value);
+            }
+        }
 
     }
 }

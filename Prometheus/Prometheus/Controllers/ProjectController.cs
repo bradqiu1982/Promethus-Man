@@ -118,28 +118,39 @@ namespace Prometheus.Controllers
 
         private string StoreMesConfig(Controller ctrl)
         {
-            foreach (string fl in ctrl.Request.Files)
+            try
             {
-                if (fl != null && ctrl.Request.Files[fl].ContentLength > 0 
-                    && string.Compare(Path.GetExtension(Path.GetFileName(ctrl.Request.Files[fl].FileName)), ".ini", true) == 0)
+                foreach (string fl in ctrl.Request.Files)
                 {
-                    string fn = System.IO.Path.GetFileName(ctrl.Request.Files[fl].FileName);
-                    string datestring = DateTime.Now.ToString("yyyyMMdd");
-                    string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
-
-                    System.Windows.MessageBox.Show(imgdir);
-
-                    if (!Directory.Exists(imgdir))
+                    if (fl != null && ctrl.Request.Files[fl].ContentLength > 0
+                        && string.Compare(Path.GetExtension(Path.GetFileName(ctrl.Request.Files[fl].FileName)), ".ini", true) == 0)
                     {
-                        Directory.CreateDirectory(imgdir);
-                    }
+                        string fn = System.IO.Path.GetFileName(ctrl.Request.Files[fl].FileName);
+                        string datestring = DateTime.Now.ToString("yyyyMMdd");
+                        string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
 
-                    fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
-                    ctrl.Request.Files[fl].SaveAs(imgdir + fn);
-                    return "/userfiles/docs/" + datestring + "/" + fn;
+                        System.Windows.MessageBox.Show(imgdir);
+
+                        if (!Directory.Exists(imgdir))
+                        {
+                            Directory.CreateDirectory(imgdir);
+                        }
+
+                        fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
+                        ctrl.Request.Files[fl].SaveAs(imgdir + fn);
+
+
+
+                        return "/userfiles/docs/" + datestring + "/" + fn;
+                    }
                 }
+                return null;
+
             }
-            return null;
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
 
         [HttpPost, ActionName("CreateProject")]

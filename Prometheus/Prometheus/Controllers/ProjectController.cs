@@ -7,6 +7,7 @@ using Prometheus.Models;
 using System.Web.Routing;
 using System.Text;
 using System.Net.Mail;
+using System.IO;
 
 namespace Prometheus.Controllers
 {
@@ -115,6 +116,32 @@ namespace Prometheus.Controllers
             return true;
         }
 
+        private string StoreMesConfig(Controller ctrl)
+        {
+            foreach (string fl in ctrl.Request.Files)
+            {
+                if (fl != null && ctrl.Request.Files[fl].ContentLength > 0 
+                    && string.Compare(Path.GetExtension(Path.GetFileName(ctrl.Request.Files[fl].FileName)), ".ini", true) == 0)
+                {
+                    string fn = System.IO.Path.GetFileName(ctrl.Request.Files[fl].FileName);
+                    string datestring = DateTime.Now.ToString("yyyyMMdd");
+                    string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+
+                    System.Windows.MessageBox.Show(imgdir);
+
+                    if (!Directory.Exists(imgdir))
+                    {
+                        Directory.CreateDirectory(imgdir);
+                    }
+
+                    fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
+                    ctrl.Request.Files[fl].SaveAs(imgdir + fn);
+                    return "/userfiles/docs/" + datestring + "/" + fn;
+                }
+            }
+            return null;
+        }
+
         [HttpPost, ActionName("CreateProject")]
         [ValidateAntiForgeryToken]
         public ActionResult CreatePostProject()
@@ -166,6 +193,8 @@ namespace Prometheus.Controllers
                 ViewBag.CreateError = ViewBag.CreateError = "<h3><font color=\"red\">Fail to create project: StartDate is empty</font></h3>";
                 return View(projectmodel);
             }
+
+            StoreMesConfig(this);
 
             return RedirectToAction("ViewAll");
 

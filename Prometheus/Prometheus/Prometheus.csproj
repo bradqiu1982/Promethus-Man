@@ -674,6 +674,7 @@
     <Content Include="Views\Project\ProjectDetail.cshtml" />
     <Content Include="Views\User\RegisterUser.cshtml" />
     <Content Include="Views\User\LoginUser.cshtml" />
+    <Content Include="Views\User\UserCenter.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

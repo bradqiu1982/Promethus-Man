@@ -23,10 +23,24 @@ namespace Prometheus.Models
         public ProjectPn(string key, string p)
         {
             ProjectKey = key;
-            p = Pn;
+            Pn = p;
         }
         public string ProjectKey { set; get; }
         public string Pn { set; get; }
+    }
+
+    public class ProjectMesTable
+    {
+        public ProjectMesTable(string key,string stat,string table)
+        {
+            ProjectKey = key;
+            Station = stat;
+            TableName = table;
+        }
+
+        public string ProjectKey { set; get; }
+        public string Station { set; get; }
+        public string TableName { set; get; }
     }
 
     public class ProjectViewModels
@@ -153,5 +167,17 @@ namespace Prometheus.Models
             }
         }
 
+        private List<ProjectMesTable> ltab = new List<ProjectMesTable>();
+        public List<ProjectMesTable> TabList
+        {
+            get
+            { return ltab; }
+            set
+            {
+                ltab.Clear();
+                ltab.AddRange(value);
+            }
+        }
     }
-}
+
+    }

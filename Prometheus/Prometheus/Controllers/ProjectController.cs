@@ -116,9 +116,9 @@ namespace Prometheus.Controllers
             return true;
         }
 
-        private Dictionary<string, string> RetriveMesTables(string mesfilepath)
+        private List<ProjectMesTable> RetriveMesTables(string mesfilepath)
         {
-            var ret = new Dictionary<string, string>();
+            var ret = new List<ProjectMesTable>();
             try
             {
                 if (System.IO.File.Exists(mesfilepath))
@@ -145,7 +145,7 @@ namespace Prometheus.Controllers
 
                         if (tableseg && line.Contains("="))
                         {
-                            ret.Add(line.Split(new char[] { '=' })[0].Trim(), line.Split(new char[] { '=' })[1].Trim().Replace("\"", ""));
+                            ret.Add(new ProjectMesTable("",line.Split(new char[] { '=' })[0].Trim(), line.Split(new char[] { '=' })[1].Trim().Replace("\"", "")));
                         }
                     }
                 }
@@ -159,7 +159,7 @@ namespace Prometheus.Controllers
             }
         }
 
-        private Dictionary<string, string> StoreMesConfig(Controller ctrl)
+        private List<ProjectMesTable> StoreMesConfig(Controller ctrl)
         {
             try
             {
@@ -171,8 +171,6 @@ namespace Prometheus.Controllers
                         string fn = System.IO.Path.GetFileName(ctrl.Request.Files[fl].FileName);
                         string datestring = DateTime.Now.ToString("yyyyMMdd");
                         string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
-
-                        System.Windows.MessageBox.Show(imgdir);
 
                         if (!Directory.Exists(imgdir))
                         {
@@ -217,6 +215,53 @@ namespace Prometheus.Controllers
                 ret.Clear();
                 return ret;
             }
+        }
+
+        public string PNCondition(List<ProjectPn> pns)
+        {
+            string ret = "('";
+            foreach(var pn in pns)
+            {
+                ret = ret + RMSpectialCh(pn.Pn) + "',";
+            }
+
+            if (pns.Count > 0)
+            {
+                ret = ret.Substring(0, ret.Length - 1) + ")";
+            }
+            else
+            {
+                ret = "('')";
+            }
+
+            return ret;
+        }
+
+        private List<string> RetrieveSqlFromProjectModel(ProjectViewModels projectmodel)
+        {
+            var tables = new List<string>();
+            foreach(var s in projectmodel.StationList)
+            {
+                foreach(var m in projectmodel.TabList)
+                {
+                    if (string.Compare(s.Station.ToUpper(),m.Station.ToUpper()) == 0)
+                    {
+                        tables.Add(m.TableName);
+                        break;
+                    }
+                }
+            }
+
+            string pncond = PNCondition(projectmodel.PNList);
+
+            var sql = "select ModuleSerialNum, WhichTest, ModuleType, ErrAbbr, TestTimeStamp, TestStation from  #DCTABLE#  where assemblypartnum in  #COND#   #TIMECOND#  order by  moduleserialnum,testtimestamp";
+
+            var ret = new List<string>();
+            foreach (var tb in tables)
+            {
+                ret.Add(sql.Replace("#DCTABLE#", ("insite.dc_" + tb)).Replace("#COND#", pncond));
+            }
+            return ret;
         }
 
         [HttpPost, ActionName("CreateProject")]
@@ -271,7 +316,7 @@ namespace Prometheus.Controllers
                 return View(projectmodel);
             }
 
-            StoreMesConfig(this);
+            var tables = StoreMesConfig(this);
 
             var pns = RetrieveProjectBondingInfo("PN", 9, this);
             if (pns.Count > 0)
@@ -293,6 +338,21 @@ namespace Prometheus.Controllers
                     lstat.Add(new ProjectStation(projectmodel.ProjectKey, s));
                 }
                 projectmodel.StationList = lstat;
+            }
+
+            foreach (var tb in tables)
+            {
+                tb.ProjectKey = projectmodel.ProjectKey;
+            }
+            if (tables.Count > 0)
+            {
+                projectmodel.TabList = tables;
+            }
+
+            var sqls = RetrieveSqlFromProjectModel(projectmodel);
+            foreach (var sql in sqls)
+            {
+                System.Windows.MessageBox.Show(sql);
             }
 
             return RedirectToAction("ViewAll");

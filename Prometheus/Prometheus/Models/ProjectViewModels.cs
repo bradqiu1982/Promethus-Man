@@ -64,6 +64,7 @@ namespace Prometheus.Models
 
         [Display(Name = "Project")]
         [StringLength(180, MinimumLength = 6)]
+        [RegularExpression("^(?!.*\').*$")]
         [Required]
         public string ProjectName { set; get; }
 

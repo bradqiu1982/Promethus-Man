@@ -159,18 +159,18 @@ namespace Prometheus.Controllers
             }
         }
 
-        private List<ProjectMesTable> StoreMesConfig(Controller ctrl)
+        private bool StoreMesConfig(ProjectViewModels projectmodel)
         {
             try
             {
-                foreach (string fl in ctrl.Request.Files)
+                foreach (string fl in Request.Files)
                 {
-                    if (fl != null && ctrl.Request.Files[fl].ContentLength > 0
-                        && string.Compare(Path.GetExtension(Path.GetFileName(ctrl.Request.Files[fl].FileName)), ".ini", true) == 0)
+                    if (fl != null && Request.Files[fl].ContentLength > 0
+                        && string.Compare(Path.GetExtension(Path.GetFileName(Request.Files[fl].FileName)), ".ini", true) == 0)
                     {
-                        string fn = System.IO.Path.GetFileName(ctrl.Request.Files[fl].FileName);
+                        string fn = System.IO.Path.GetFileName(Request.Files[fl].FileName);
                         string datestring = DateTime.Now.ToString("yyyyMMdd");
-                        string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+                        string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
 
                         if (!Directory.Exists(imgdir))
                         {
@@ -178,21 +178,29 @@ namespace Prometheus.Controllers
                         }
 
                         fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
-                        ctrl.Request.Files[fl].SaveAs(imgdir + fn);
+                        Request.Files[fl].SaveAs(imgdir + fn);
 
                         var ret = RetriveMesTables(imgdir + fn);
                         if (ret.Count > 0)
-                            return ret;
+                        {
+                            foreach (var tb in ret)
+                            {
+                                tb.ProjectKey = projectmodel.ProjectKey;
+                            }
+
+                            projectmodel.TabList = ret;
+                            return true;
+                        }
                         else
-                            return null;
+                            return false;
                     }
                 }
-                return null;
+                return false;
 
             }
             catch (Exception ex)
             {
-                return null;
+                return false;
             }
         }
 
@@ -222,12 +230,12 @@ namespace Prometheus.Controllers
             string ret = "('";
             foreach(var pn in pns)
             {
-                ret = ret + RMSpectialCh(pn.Pn) + "',";
+                ret = ret + RMSpectialCh(pn.Pn) + "','";
             }
 
             if (pns.Count > 0)
             {
-                ret = ret.Substring(0, ret.Length - 1) + ")";
+                ret = ret.Substring(0, ret.Length - 2) + ")";
             }
             else
             {
@@ -264,13 +272,8 @@ namespace Prometheus.Controllers
             return ret;
         }
 
-        [HttpPost, ActionName("CreateProject")]
-        [ValidateAntiForgeryToken]
-        public ActionResult CreatePostProject()
+        private void RetrievePorjectKey(ProjectViewModels projectmodel)
         {
-            var projectmodel = new ProjectViewModels();
-            projectmodel.ProjectName = Request.Form["ProjectName"];
-
             if (!string.IsNullOrEmpty(projectmodel.ProjectName))
             {
                 var tempstr = RMSpectialCh(projectmodel.ProjectName);
@@ -278,10 +281,10 @@ namespace Prometheus.Controllers
             }
             else
                 projectmodel.ProjectKey = "";
+        }
 
-            projectmodel.PM = Request.Form["PM"];
-            projectmodel.Engineers = Request.Form["Engineers"];
-
+        private void RetrieveProjectDesc(ProjectViewModels projectmodel)
+        {
             var temphtml = Request.Form["editor1"];
             if (string.IsNullOrEmpty(temphtml))
             {
@@ -291,44 +294,46 @@ namespace Prometheus.Controllers
             {
                 projectmodel.Description = Server.HtmlDecode(temphtml);
             }
-            
+        }
 
-            if (!ProjectValidate(projectmodel))
-            {
-                return View(projectmodel);
-            }
-
+        private bool RetrieveProjectDate(ProjectViewModels projectmodel)
+        {
             if (!string.IsNullOrEmpty(Request.Form["StartDate"].Trim()))
             {
                 try
                 {
                     projectmodel.StartDate = DateTime.Parse(Request.Form["StartDate"]);
+                    return true;
                 }
                 catch (Exception ex)
                 {
                     ViewBag.CreateError = "<h3><font color=\"red\">Fail to create project: "+ RMSpectialCh(ex.ToString())+"</font></h3>";
-                    return View(projectmodel);
+                    return false;
                 }
             }
             else
             {
                 ViewBag.CreateError = ViewBag.CreateError = "<h3><font color=\"red\">Fail to create project: StartDate is empty</font></h3>";
-                return View(projectmodel);
+                return false;
             }
+        }
 
-            var tables = StoreMesConfig(this);
-
+        private void RetrievePNs(ProjectViewModels projectmodel)
+        {
             var pns = RetrieveProjectBondingInfo("PN", 9, this);
             if (pns.Count > 0)
             {
                 var lpn = new List<ProjectPn>();
-                foreach(var p in pns)
+                foreach (var p in pns)
                 {
-                    lpn.Add(new ProjectPn(projectmodel.ProjectKey,p));
+                    lpn.Add(new ProjectPn(projectmodel.ProjectKey, p));
                 }
                 projectmodel.PNList = lpn;
             }
+        }
 
+        private void RetrieveStation(ProjectViewModels projectmodel)
+        {
             var stats = RetrieveProjectBondingInfo("Station", 9, this);
             if (stats.Count > 0)
             {
@@ -339,20 +344,47 @@ namespace Prometheus.Controllers
                 }
                 projectmodel.StationList = lstat;
             }
+        }
 
-            foreach (var tb in tables)
-            {
-                tb.ProjectKey = projectmodel.ProjectKey;
-            }
-            if (tables.Count > 0)
-            {
-                projectmodel.TabList = tables;
-            }
+        [HttpPost, ActionName("CreateProject")]
+        [ValidateAntiForgeryToken]
+        public ActionResult CreatePostProject()
+        {
+            var projectmodel = new ProjectViewModels();
+            projectmodel.ProjectName = Request.Form["ProjectName"];
+            RetrievePorjectKey(projectmodel);
 
-            var sqls = RetrieveSqlFromProjectModel(projectmodel);
-            foreach (var sql in sqls)
+            projectmodel.PM = Request.Form["PM"];
+            projectmodel.Engineers = Request.Form["Engineers"];
+
+            RetrieveProjectDesc(projectmodel);
+
+            if (!ProjectValidate(projectmodel))
+                return View(projectmodel);
+
+
+            if (!RetrieveProjectDate(projectmodel))
+                return View(projectmodel);
+
+            StoreMesConfig(projectmodel);
+            RetrievePNs(projectmodel);
+            RetrieveStation(projectmodel);
+
+            if(projectmodel.StationList.Count > 0
+                && projectmodel.TabList.Count >0
+                && projectmodel.PNList.Count > 0)
             {
-                System.Windows.MessageBox.Show(sql);
+                var sqls = RetrieveSqlFromProjectModel(projectmodel);
+                foreach (var s in sqls)
+                {
+                    var sql = s.Replace("#TIMECOND#", "and TestTimeStamp > '"+DateTime.Parse("2016-7-18 4:00:00").ToString()+"'");
+                    System.Windows.MessageBox.Show(sql);
+                    var res = DBUtility.ExeMESSqlWithRes(sql);
+                    foreach (var r in res)
+                    {
+                        var l = r;
+                    }
+                }
             }
 
             return RedirectToAction("ViewAll");

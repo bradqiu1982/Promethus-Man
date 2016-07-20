@@ -9,12 +9,12 @@ namespace Prometheus.Models
 {
     public class DBUtility
     {
-        private static string escape(string oldstr)
+        public static string escapedbstr(string oldstr)
         {
             return oldstr.Replace("'", "\"");
         }
 
-        private static SqlConnection GetConnector()
+        private static SqlConnection GetLocalConnector()
         {
             var conn = new SqlConnection();
             try
@@ -44,16 +44,16 @@ namespace Prometheus.Models
             }
         }
 
-        public static bool ExeSqlNoRes(string sql)
+        public static bool ExeLocalSqlNoRes(string sql)
         {
-            var conn = GetConnector();
+            var conn = GetLocalConnector();
             if (conn == null)
                 return false;
 
             try
             {
                 var command = conn.CreateCommand();
-                command.CommandText = sql;
+                command.CommandText = escapedbstr(sql);
                 command.ExecuteNonQuery();
                 CloseConnector(conn);
                 return true;
@@ -66,21 +66,53 @@ namespace Prometheus.Models
             }
         }
 
-        public static SqlDataReader ExeSqlWithRes(SqlConnection conn, string sql)
+        public static List<List<object>> ExeLocalSqlWithRes( string sql)
         {
+            var ret = new List<List<object>>();
+            var conn = GetLocalConnector();
             try
             {
+                if (conn == null)
+                    return ret;
+
                 var command = conn.CreateCommand();
-                command.CommandText = sql;
+                command.CommandText = escapedbstr(sql);
                 var sqlreader = command.ExecuteReader();
                 if (sqlreader.HasRows)
                 {
-                    return sqlreader;
+
+                    while (sqlreader.Read())
+                    {
+                        var newline = new List<object>();
+                        for (var i = 0; i < sqlreader.FieldCount; i++)
+                        {
+                            newline.Add(sqlreader.GetValue(i));
+                        }
+                        ret.Add(newline);
+                    }
                 }
-                else
-                {
-                    return null;
-                }
+
+                sqlreader.Close();
+                CloseConnector(conn);
+                return ret;
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.ToString());
+                CloseConnector(conn);
+                ret.Clear();
+                return ret;
+            }
+        }
+
+        private static SqlConnection GetMESConnector()
+        {
+            var conn = new SqlConnection();
+            try
+            {
+                conn.ConnectionString = "Server=CN-CSSQL;uid=SHG_Read;pwd=shgread;Database=InsiteDB;";
+                conn.Open();
+                return conn;
             }
             catch (Exception ex)
             {
@@ -88,6 +120,68 @@ namespace Prometheus.Models
                 return null;
             }
         }
+
+        public static bool ExeMESSqlNoRes(string sql)
+        {
+            var conn = GetMESConnector();
+            if (conn == null)
+                return false;
+
+            try
+            {
+                var command = conn.CreateCommand();
+                command.CommandText = escapedbstr(sql);
+                command.ExecuteNonQuery();
+                CloseConnector(conn);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                CloseConnector(conn);
+                System.Windows.MessageBox.Show(ex.ToString());
+                return false;
+            }
+        }
+
+        public static List<List<object>> ExeMESSqlWithRes(string sql)
+        {
+            var ret = new List<List<object>>();
+            var conn = GetMESConnector();
+            try
+            {
+                if (conn == null)
+                    return ret;
+
+                var command = conn.CreateCommand();
+                command.CommandText = sql;
+                var sqlreader = command.ExecuteReader();
+                if (sqlreader.HasRows)
+                {
+
+                    while (sqlreader.Read())
+                    {
+                        var newline = new List<object>();
+                        for (var i = 0; i < sqlreader.FieldCount; i++)
+                        {
+                            newline.Add(sqlreader.GetValue(i));
+                        }
+                        ret.Add(newline);
+                    }
+                }
+
+                sqlreader.Close();
+                CloseConnector(conn);
+                return ret;
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.ToString());
+                CloseConnector(conn);
+                ret.Clear();
+                return ret;
+            }
+        }
+
 
         /*
         public static bool AddMovie(string title, string releasedate, string genre, float price, string rate)

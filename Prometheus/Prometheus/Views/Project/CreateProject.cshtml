@@ -31,54 +31,120 @@
             <div class="tab-pane active" id="tab_a">
 
                 <div class="form-horizontal">
-                    @*<div class="form-group">
-                        <div class="col-md-12">
-                            @Html.Label("     ")
-                        </div>
-                    </div>*@
 
                     <div class="form-group">
                         <div class="col-md-6">
-                            @Html.LabelFor(model => model.ProjectName, htmlAttributes: new { @class = "control-label col-md-2" })
+                            @*@Html.LabelFor(model => model.ProjectName, htmlAttributes: new { @class = "control-label col-md-2" })
                             <div class="col-md-10">
                                 @Html.EditorFor(model => model.ProjectName, new { htmlAttributes = new { @class = "form-control" } })
                                 @Html.ValidationMessageFor(model => model.ProjectName, "", new { @class = "text-danger" })
+                            </div>*@
+
+                            <label class="control-label col-md-2" for="ProjectName">Project</label>
+                            <div class="col-md-10">
+                                @if (Model != null && !string.IsNullOrEmpty(Model.ProjectName))
+                                {
+                                    <input class="form-control text-box single-line" value="@Model.ProjectName" data-val="true" data-val-length="The field Project must be a string with a minimum length of 6 and a maximum length of 180." data-val-length-max="180" data-val-length-min="6" data-val-regex="The field Project must match the regular expression &#39;^(?!.*&#39;).*$&#39;." data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The Project field is required." id="ProjectName" name="ProjectName" type="text" />
+                                }
+                                else
+                                {
+                                    <input class="form-control text-box single-line" data-val="true" data-val-length="The field Project must be a string with a minimum length of 6 and a maximum length of 180." data-val-length-max="180" data-val-length-min="6" data-val-regex="The field Project must match the regular expression &#39;^(?!.*&#39;).*$&#39;." data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The Project field is required." id="ProjectName" name="ProjectName" type="text" value="" />
+                                }
+
+                                <span class="field-validation-valid text-danger" data-valmsg-for="ProjectName" data-valmsg-replace="true"></span>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            @Html.LabelFor(model => model.StartDate, htmlAttributes: new { @class = "control-label col-md-2" })
+                            @*@Html.LabelFor(model => model.StartDate, htmlAttributes: new { @class = "control-label col-md-2" })
                             <div class="col-md-10">
                                 @Html.EditorFor(model => model.StartDate, new { htmlAttributes = new { @class = "form-control" } })
                                 @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "text-danger" })
+                            </div>*@
+
+                            <label class="control-label col-md-2" for="StartDate">StartDate</label>
+                            <div class="col-md-10">
+                                @if (Model != null && !string.IsNullOrEmpty(Model.StartDate.ToString()))
+                                {
+                                    <input class="form-control text-box single-line" value="@Model.StartDate.ToString()" data-val="true" data-val-date="The field StartDate must be a date." data-val-required="The StartDate field is required." id="StartDate" name="StartDate" type="date" />
+                                }
+                                else
+                                {
+                                    <input class="form-control text-box single-line" data-val="true" data-val-date="The field StartDate must be a date." data-val-required="The StartDate field is required." id="StartDate" name="StartDate" type="date" value="" />
+                                }
+                                <span class="field-validation-valid text-danger" data-valmsg-for="StartDate" data-valmsg-replace="true"></span>
                             </div>
                         </div>
                         <script type="text/javascript">
-                    $(document).ready(function () {
-                        $("#StartDate").datepicker({
-                            changeMonth: true,
-                            changeYear: true,
-                            dateFormat: 'yy-mm-dd'
-                        });
-                    });
+                            $(document).ready(function () {
+                                $("#StartDate").datepicker({
+                                    changeMonth: true,
+                                    changeYear: true,
+                                    dateFormat: 'yy-mm-dd'
+                                });
+                            });
                         </script>
                     </div>
 
                     <hr />
 
-                    <div class="form-group">
+                    @{
+                        var PMList = new List<Prometheus.Models.ProjectMembers>();
+                        if (Model != null)
+                        {
+                            foreach (var pm in Model.MemberList)
+                            {
+                                if (string.Compare(pm.Role, Prometheus.Models.ProjectViewModels.PMROLE) == 0)
+                                {
+                                    PMList.Add(pm);
+                                }
+                            }
+                        }
+
+                        var ENGList = new List<Prometheus.Models.ProjectMembers>();
+                        if (Model != null)
+                        {
+                            foreach (var pm in Model.MemberList)
+                            {
+                                if (string.Compare(pm.Role, Prometheus.Models.ProjectViewModels.ENGROLE) == 0)
+                                {
+                                    ENGList.Add(pm);
+                                }
+                            }
+                        }
+                    }
+
+                    @for (var i = 0; i < 1; i++)
+                    {
+                     <div class="form-group">
                         <div class="col-md-6">
-                            <label class="control-label col-md-2" for="PM1">PM1</label>
-                            <div class="col-md-10" data-toggle="tooltip" data-placement="bottom" title="Exampel: brad@finisar.com:john@finisar.com.....">
-                                <input class="form-control text-box single-line" id="PM1" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" data-val-required="The Field is required"  name="PM1" type="text" value="" />
-                                <span class="field-validation-valid text-danger" data-valmsg-for="PM1" data-valmsg-replace="true"></span>
+                            <label class="control-label col-md-2" for="PM@(i*2 + 1)">PM@(i * 2 + 1)</label>
+                                <div class="col-md-10" data-toggle="tooltip" data-placement="bottom" title="Exampel: brad@finisar.com:john@finisar.com.....">
+                                @if (Model != null && PMList.Count > (i * 2))
+                                {
+                                    <input class="form-control text-box single-line" value="@(PMList[(i * 2)].Name)"  id="PM@(i * 2 + 1)" name="PM@(i * 2 + 1)" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" data-val-required="The Field is required" type="text" />
+                                }
+                                else
+                                {
+                                    <input class="form-control text-box single-line" id="PM@(i * 2 + 1)" name="PM@(i * 2 + 1)" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" data-val-required="The Field is required" type="text" value="" />
+                                }
+
+                                <span class="field-validation-valid text-danger" data-valmsg-for="PM@(i*2 + 1)" data-valmsg-replace="true"></span>
                             </div>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="control-label col-md-2" for="PM1">PM2</label>
+                            <label class="control-label col-md-2" for="PM@(i*2 + 2)">PM@(i * 2 + 2)</label>
                             <div class="col-md-10" data-toggle="tooltip" data-placement="bottom" title="Exampel: brad@finisar.com:john@finisar.com.....">
-                                <input class="form-control text-box single-line" id="PM2" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" name="PM2" type="text" value="" />
-                                <span class="field-validation-valid text-danger" data-valmsg-for="PM2" data-valmsg-replace="true"></span>
+                            @if (Model != null && PMList.Count > (i * 2 + 1))
+                            {
+                                <input class="form-control text-box single-line" value="@(PMList[(i * 2+1)].Name)"  id="PM@(i*2 + 2)" name="PM@(i*2 + 2)" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" type="text" />
+                            }
+                            else
+                            {
+                                <input class="form-control text-box single-line" id="PM@(i*2 + 2)" name="PM@(i*2 + 2)" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" type="text" value="" />
+                            }
+                                
+                                <span class="field-validation-valid text-danger" data-valmsg-for="PM@(i*2 + 2)" data-valmsg-replace="true"></span>
                             </div>
                         </div>
 
@@ -90,9 +156,8 @@
                             </div>
                         </div>*@
 
-
                     </div>
-
+                    }
                     <hr />
 
                     <div class="form-group">
@@ -117,8 +182,7 @@
                                 @Html.ValidationMessageFor(model => model.Engineers, "", new { @class = "text-danger" })
                             </div>
                         </div>*@
-                    </div>
-
+                     </div>
                     <div class="form-group">
                         <div class="col-md-6">
                             <label class="control-label col-md-2" for="Engineer3">Engineer3</label>
@@ -151,7 +215,6 @@
                             </div>
                         </div>
                     </div>
-
                   </div>
 
                 <hr />
@@ -171,8 +234,8 @@
                     </div>
 
                 </div>
-            </div>
 
+            </div>
             <div class="tab-pane" id="tab_b">
                 <div class="form-horizontal">
 

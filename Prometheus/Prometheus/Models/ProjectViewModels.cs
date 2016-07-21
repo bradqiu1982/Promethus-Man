@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Prometheus.Models
 {
+    
     public class ProjectStation
     {
         public ProjectStation(string key, string stat)
@@ -16,6 +17,20 @@ namespace Prometheus.Models
 
         public string ProjectKey { set; get; }
         public string Station { set; get; }
+    }
+
+    public class ProjectMembers
+    {
+        public ProjectMembers(string key, string sname,string srole)
+        {
+            ProjectKey = key;
+            Name = sname;
+            Role = srole;
+        }
+
+        public string ProjectKey { set; get; }
+        public string Name { set; get; }
+        public string Role { set; get; }
     }
 
     public class ProjectPn
@@ -45,17 +60,19 @@ namespace Prometheus.Models
 
     public class ProjectViewModels
     {
+        public static string PMROLE = "PM";
+        public static string ENGROLE = "ENG";
+
         public ProjectViewModels()
         {
             
         }
 
-        public ProjectViewModels(string prokey, string proname, string startdate, string pm, decimal finshrate, string sdescription)
+        public ProjectViewModels(string prokey, string proname, string startdate, decimal finshrate, string sdescription)
         {
             this.ProjectKey = prokey;
             this.ProjectName = proname;
             this.StartDate = DateTime.Parse(startdate);
-            this.PM = pm;
             this.FinishRating = finshrate;
             this.dbDescription = sdescription;
         }
@@ -76,10 +93,10 @@ namespace Prometheus.Models
         [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)")]
         public string PM { set; get; }
 
-        [StringLength(260, MinimumLength = 6)]
-        [Required]
-        [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+).*")]
-        public string Engineers { set; get; }
+        //[StringLength(260, MinimumLength = 6)]
+        //[Required]
+        //[RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+).*")]
+        //public string Engineers { set; get; }
 
         public decimal FinishRating { set; get; }
 
@@ -177,6 +194,18 @@ namespace Prometheus.Models
             {
                 ltab.Clear();
                 ltab.AddRange(value);
+            }
+        }
+
+        private List<ProjectMembers> lmeb = new List<ProjectMembers>();
+        public List<ProjectMembers> MemberList
+        {
+            get
+            { return lmeb; }
+            set
+            {
+                lmeb.Clear();
+                lmeb.AddRange(value);
             }
         }
     }

@@ -214,7 +214,7 @@ namespace Prometheus.Controllers
             var ret = new List<string>();
             try
             {
-                for (var i = 0; i < count; i++)
+                for (var i = 1; i < count+1; i++)
                 {
                     if (!string.IsNullOrEmpty(Request.Form[key + i]))
                     {
@@ -391,11 +391,10 @@ namespace Prometheus.Controllers
 
             RetrieveProjectDesc(projectmodel);
 
-            if (!ProjectValidate(projectmodel))
+            if (!RetrieveProjectDate(projectmodel))
                 return View(projectmodel);
 
-
-            if (!RetrieveProjectDate(projectmodel))
+            if (!ProjectValidate(projectmodel))
                 return View(projectmodel);
 
             StoreMesConfig(projectmodel);

@@ -88,11 +88,13 @@ namespace Prometheus.Controllers
                 return false;
             }
 
-            if (string.IsNullOrEmpty(projectmodel.PM.Trim())
-                || string.IsNullOrEmpty(projectmodel.Engineers.Trim()))
+            foreach(var eg in projectmodel.MemberList)
             {
-                ViewBag.CreateError = createerror.Replace("<ErrorMsg>", "PM or Engineer email address is empty");
-                return false;
+                if (string.IsNullOrEmpty(eg.Name.Trim()))
+                {
+                    ViewBag.CreateError = createerror.Replace("<ErrorMsg>", "PM or Engineer email address is empty");
+                    return false;
+                }
             }
 
             if (string.IsNullOrEmpty(projectmodel.Description.Trim()))
@@ -107,12 +109,15 @@ namespace Prometheus.Controllers
                 return false;
             }
 
-            if (!EmailAddressValidate(projectmodel.PM) || !EmailAddressValidate(projectmodel.Engineers))
+            foreach (var eg in projectmodel.MemberList)
             {
-                ViewBag.CreateError = createerror.Replace("<ErrorMsg>", "PM or Engineer email address is wrong");
-                return false;
+                if (!EmailAddressValidate(eg.Name.Trim()))
+                {
+                    ViewBag.CreateError = createerror.Replace("<ErrorMsg>", "PM or Engineer email address is wrong");
+                    return false;
+                }
             }
-
+                
             return true;
         }
 
@@ -204,16 +209,16 @@ namespace Prometheus.Controllers
             }
         }
 
-        private List<string> RetrieveProjectBondingInfo(string key,int count, Controller ctrl)
+        private List<string> RetrieveProjectInfo(string key,int count)
         {
             var ret = new List<string>();
             try
             {
                 for (var i = 0; i < count; i++)
                 {
-                    if (!string.IsNullOrEmpty(ctrl.Request.Form[key + i]))
+                    if (!string.IsNullOrEmpty(Request.Form[key + i]))
                     {
-                        ret.Add(ctrl.Request.Form[key + i]);
+                        ret.Add(Request.Form[key + i]);
                     }
                 }
                 return ret;
@@ -283,6 +288,31 @@ namespace Prometheus.Controllers
                 projectmodel.ProjectKey = "";
         }
 
+        private void RetrieveProjectMember(ProjectViewModels projectmodel)
+        {
+            var pns = RetrieveProjectInfo("PM", 2);
+            var lpm = new List<ProjectMembers>();
+
+            if (pns.Count > 0)
+            {
+                foreach (var p in pns)
+                {
+                    lpm.Add(new ProjectMembers(projectmodel.ProjectKey, p, ProjectViewModels.PMROLE));
+                }
+            }
+
+            pns = RetrieveProjectInfo("Engineer", 6);
+            if (pns.Count > 0)
+            {
+                foreach (var p in pns)
+                {
+                    lpm.Add(new ProjectMembers(projectmodel.ProjectKey, p, ProjectViewModels.ENGROLE));
+                }
+            }
+
+            projectmodel.MemberList = lpm;
+        }
+
         private void RetrieveProjectDesc(ProjectViewModels projectmodel)
         {
             var temphtml = Request.Form["editor1"];
@@ -320,7 +350,7 @@ namespace Prometheus.Controllers
 
         private void RetrievePNs(ProjectViewModels projectmodel)
         {
-            var pns = RetrieveProjectBondingInfo("PN", 9, this);
+            var pns = RetrieveProjectInfo("PN", 9);
             if (pns.Count > 0)
             {
                 var lpn = new List<ProjectPn>();
@@ -334,7 +364,7 @@ namespace Prometheus.Controllers
 
         private void RetrieveStation(ProjectViewModels projectmodel)
         {
-            var stats = RetrieveProjectBondingInfo("Station", 9, this);
+            var stats = RetrieveProjectInfo("Station", 9);
             if (stats.Count > 0)
             {
                 var lstat = new List<ProjectStation>();
@@ -354,8 +384,10 @@ namespace Prometheus.Controllers
             projectmodel.ProjectName = Request.Form["ProjectName"];
             RetrievePorjectKey(projectmodel);
 
-            projectmodel.PM = Request.Form["PM"];
-            projectmodel.Engineers = Request.Form["Engineers"];
+            //projectmodel.PM = Request.Form["PM"];
+            //projectmodel.Engineers = Request.Form["Engineers"];
+
+            RetrieveProjectMember(projectmodel);
 
             RetrieveProjectDesc(projectmodel);
 

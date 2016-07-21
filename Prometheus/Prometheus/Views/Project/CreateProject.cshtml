@@ -26,15 +26,16 @@
             <li class="active"><a href="#tab_a" data-toggle="pill">Base Info*</a></li>
             <li><a href="#tab_b" data-toggle="pill">MES Bonding</a></li>
         </ul>
+
         <div class="tab-content col-md-10">
             <div class="tab-pane active" id="tab_a">
 
                 <div class="form-horizontal">
-                    <div class="form-group">
+                    @*<div class="form-group">
                         <div class="col-md-12">
                             @Html.Label("     ")
                         </div>
-                    </div>
+                    </div>*@
 
                     <div class="form-group">
                         <div class="col-md-6">
@@ -62,33 +63,96 @@
                         </script>
                     </div>
 
+                    <hr />
+
                     <div class="form-group">
-                        @*<div class="col-md-6">
-                            <label class="control-label col-md-2" for="PM">PM</label>
+                        <div class="col-md-6">
+                            <label class="control-label col-md-2" for="PM1">PM1</label>
                             <div class="col-md-10" data-toggle="tooltip" data-placement="bottom" title="Exampel: brad@finisar.com:john@finisar.com.....">
-                                <input class="form-control text-box single-line" data-val="true" data-val-regex="The field PM must match the regular expression &#39;^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)&#39;." data-val-regex-pattern="^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)" id="PM" name="PM" type="text" value="" /> EMAIL ADDRESS:EMAIL ADDRESS....
-                                <span class="field-validation-valid text-danger" data-valmsg-for="PM" data-valmsg-replace="true"></span>
+                                <input class="form-control text-box single-line" id="PM1" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" data-val-required="The Field is required"  name="PM1" type="text" value="" />
+                                <span class="field-validation-valid text-danger" data-valmsg-for="PM1" data-valmsg-replace="true"></span>
                             </div>
-                        </div>*@
+                        </div>
 
                         <div class="col-md-6">
+                            <label class="control-label col-md-2" for="PM1">PM2</label>
+                            <div class="col-md-10" data-toggle="tooltip" data-placement="bottom" title="Exampel: brad@finisar.com:john@finisar.com.....">
+                                <input class="form-control text-box single-line" id="PM2" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" name="PM2" type="text" value="" />
+                                <span class="field-validation-valid text-danger" data-valmsg-for="PM2" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+
+                        @*<div class="col-md-6">
                             @Html.LabelFor(model => model.PM, htmlAttributes: new { @class = "control-label col-md-2" })
                             <div class="col-md-10" data-toggle="tooltip" data-placement="bottom" title="Exampel: brad@finisar.com:john@finisar.com.....">
                                 @Html.EditorFor(model => model.PM, new { htmlAttributes = new { @class = "form-control" } }) EMAIL ADDRESS:EMAIL ADDRESS....
                                 @Html.ValidationMessageFor(model => model.PM, "", new { @class = "text-danger" })
                             </div>
-                        </div>
+                        </div>*@
 
+
+                    </div>
+
+                    <hr />
+
+                    <div class="form-group">
                         <div class="col-md-6">
+                            <label class="control-label col-md-2" for="Engineer1">Engineer1</label>
+                            <div class="col-md-10" data-toggle="tooltip" data-placement="bottom" title="Exampel: brad@finisar.com:john@finisar.com.....">
+                                <input class="form-control text-box single-line" id="Engineer1" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" data-val-required="The Field is required" name="Engineer1" type="text" value="" />
+                                <span class="field-validation-valid text-danger" data-valmsg-for="Engineer1" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="control-label col-md-2" for="Engineer2">Engineer2</label>
+                            <div class="col-md-10" data-toggle="tooltip" data-placement="bottom" title="Exampel: brad@finisar.com:john@finisar.com.....">
+                                <input class="form-control text-box single-line" id="Engineer2" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" name="Engineer2" type="text" value="" />
+                                <span class="field-validation-valid text-danger" data-valmsg-for="Engineer2" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                        @*<div class="col-md-6">
                             @Html.LabelFor(model => model.Engineers, htmlAttributes: new { @class = "control-label col-md-2" })
                             <div class="col-md-10" data-toggle="tooltip" data-placement="bottom" title="Exampel: brad@finisar.com:john@finisar.com.....">
                                 @Html.EditorFor(model => model.Engineers, new { htmlAttributes = new { @class = "form-control" } }) EMAIL ADDRESS:EMAIL ADDRESS....
                                 @Html.ValidationMessageFor(model => model.Engineers, "", new { @class = "text-danger" })
                             </div>
+                        </div>*@
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <label class="control-label col-md-2" for="Engineer3">Engineer3</label>
+                            <div class="col-md-10" data-toggle="tooltip" data-placement="bottom" title="Exampel: brad@finisar.com:john@finisar.com.....">
+                                <input class="form-control text-box single-line" id="Engineer3" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" name="Engineer3" type="text" value="" />
+                                <span class="field-validation-valid text-danger" data-valmsg-for="Engineer3" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="control-label col-md-2" for="Engineer4">Engineer4</label>
+                            <div class="col-md-10" data-toggle="tooltip" data-placement="bottom" title="Exampel: brad@finisar.com:john@finisar.com.....">
+                                <input class="form-control text-box single-line" id="Engineer4" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" name="Engineer4" type="text" value="" />
+                                <span class="field-validation-valid text-danger" data-valmsg-for="Engineer4" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <label class="control-label col-md-2" for="Engineer5">Engineer5</label>
+                            <div class="col-md-10" data-toggle="tooltip" data-placement="bottom" title="Exampel: brad@finisar.com:john@finisar.com.....">
+                                <input class="form-control text-box single-line" id="Engineer5" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" name="Engineer5" type="text" value="" />
+                                <span class="field-validation-valid text-danger" data-valmsg-for="Engineer5" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="control-label col-md-2" for="Engineer6">Engineer6</label>
+                            <div class="col-md-10" data-toggle="tooltip" data-placement="bottom" title="Exampel: brad@finisar.com:john@finisar.com.....">
+                                <input class="form-control text-box single-line" id="Engineer6" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" name="Engineer6" type="text" value="" />
+                                <span class="field-validation-valid text-danger" data-valmsg-for="Engineer6" data-valmsg-replace="true"></span>
+                            </div>
                         </div>
                     </div>
 
-                </div>
+                  </div>
 
                 <hr />
 
@@ -112,11 +176,11 @@
             <div class="tab-pane" id="tab_b">
                 <div class="form-horizontal">
 
-                    <div class="form-group">
+                    @*<div class="form-group">
                         <div class="col-md-12">
                             @Html.Label("     ")
                         </div>
-                    </div>
+                    </div>*@
 
                     <div class="form-group">
                         <div class="col-md-12">

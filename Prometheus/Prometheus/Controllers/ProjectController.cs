@@ -36,7 +36,19 @@ namespace Prometheus.Controllers
 
         public ActionResult CreateProject()
         {
-            return View();
+            var ckdict = UserController.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser"))
+            {
+                return View();
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "Project");
+                ck.Add("logonredirectact", "CreateProject");
+                UserController.SetCookie(this,ck);
+                return RedirectToAction("LoginUser", "User");
+            }
         }
 
         private static string RMSpectialCh(string str)
@@ -384,22 +396,18 @@ namespace Prometheus.Controllers
             projectmodel.ProjectName = Request.Form["ProjectName"];
             RetrievePorjectKey(projectmodel);
 
-            //projectmodel.PM = Request.Form["PM"];
-            //projectmodel.Engineers = Request.Form["Engineers"];
-
             RetrieveProjectMember(projectmodel);
-
             RetrieveProjectDesc(projectmodel);
+
+            StoreMesConfig(projectmodel);
+            RetrievePNs(projectmodel);
+            RetrieveStation(projectmodel);
 
             if (!RetrieveProjectDate(projectmodel))
                 return View(projectmodel);
 
             if (!ProjectValidate(projectmodel))
                 return View(projectmodel);
-
-            StoreMesConfig(projectmodel);
-            RetrievePNs(projectmodel);
-            RetrieveStation(projectmodel);
 
             if(projectmodel.StationList.Count > 0
                 && projectmodel.TabList.Count >0

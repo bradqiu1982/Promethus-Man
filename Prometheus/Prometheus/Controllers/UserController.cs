@@ -7,6 +7,7 @@ using System.Text;
 using System.Net;
 using System.Net.Mail;
 using System.Web.Routing;
+using System.Collections.Specialized;
 
 namespace Prometheus.Controllers
 {
@@ -102,7 +103,12 @@ namespace Prometheus.Controllers
             return RedirectToAction("ViewAll","DashBoard");
         }
 
-        public ActionResult LoginUser()
+        //public ActionResult LoginUser()
+        //{
+        //    return View();
+        //}
+
+        public ActionResult LoginUser(string ctrl,string action)
         {
             return View();
         }
@@ -114,36 +120,106 @@ namespace Prometheus.Controllers
             var username = Request.Form["Email"];
             var password = Request.Form["Password"];
 
-            //verify user information
+            
 
-            string ckstr = username +"||"+ DateTime.Now.ToString();
-
-            var ck = new HttpCookie("activenpi");
-            ck.Value = Convert.ToBase64String(UTF8Encoding.UTF8.GetBytes(ckstr));
-            Response.Cookies.Add(ck);
-            return RedirectToAction("UserCenter", "User");
+            var ckdict = UnpackCookie(this);
+            if (ckdict.ContainsKey("logonredirectctrl") && ckdict.ContainsKey("logonredirectact"))
+            {
+                //verify user information
+                string logonuser = username + "||" + DateTime.Now.ToString();
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonuser", logonuser);
+                SetCookie(this, ck);
+                return RedirectToAction(ckdict["logonredirectact"], ckdict["logonredirectctrl"]);
+            }
+            else
+            {
+                //verify user information
+                string logonuser = username +"||"+ DateTime.Now.ToString();
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonuser", logonuser);
+                SetCookie(this, ck);
+                return RedirectToAction("UserCenter", "User");
+            }
+           
         }
 
-        public string UnpackCookie(Controller ctrl)
+        public static bool SetCookie(Controller ctrl, Dictionary<string, string> values)
         {
+            try
+            {
+                HttpCookie ck = null;
+
+                if (ctrl.Request.Cookies["activenpi"] != null)
+                {
+                    ck = ctrl.Request.Cookies["activenpi"];
+                    foreach (var item in values)
+                    {
+                        ck.Values[item.Key] = Convert.ToBase64String(UTF8Encoding.UTF8.GetBytes(item.Value));
+                    }
+
+                    if (ctrl.Response.Cookies["activenpi"] != null)
+                    {
+                        ctrl.Response.SetCookie(ck);
+                    }
+                    else
+                    {
+                        ctrl.Response.AppendCookie(ck);
+                    }
+                    
+                }
+                else
+                {
+                    ck = new HttpCookie("activenpi");
+                    foreach (var item in values)
+                    {
+                        ck.Values[item.Key] = Convert.ToBase64String(UTF8Encoding.UTF8.GetBytes(item.Value));
+                    }
+
+                    if (ctrl.Response.Cookies["activenpi"] != null)
+                    {
+                        ctrl.Response.SetCookie(ck);
+                    }
+                    else
+                    {
+                        ctrl.Response.AppendCookie(ck);
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public static Dictionary<string,string> UnpackCookie(Controller ctrl)
+        {
+
+            var ret = new Dictionary<string, string>();
 
             if (ctrl.Request.Cookies["activenpi"] != null)
             {
                 try
                 {
-                    var ck = ctrl.Request.Cookies["activenpi"].Value;
-                    var bs = Convert.FromBase64String(ck);
-                    var val = UTF8Encoding.UTF8.GetString(bs);
-                    return val;
+                    var ck = ctrl.Request.Cookies["activenpi"];
+                    foreach(var key in ck.Values.AllKeys)
+                    {
+                        ret.Add(key, UTF8Encoding.UTF8.GetString(Convert.FromBase64String(ck.Values[key])));
+                    }
+                    return ret;
                 }
                 catch (Exception ex)
                 {
-                    return null;
+                    ret.Clear();
+                    return ret;
                 }
             }
             else
             {
-                return null;
+                ret.Clear();
+                return ret;
             }
         }
 
@@ -152,7 +228,7 @@ namespace Prometheus.Controllers
             var val = UnpackCookie(this);
             if(val != null)
             { 
-                System.Windows.MessageBox.Show(val);
+                System.Windows.MessageBox.Show(val["logonuser"]);
             }
             return View();
         }

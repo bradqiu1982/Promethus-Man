@@ -37,7 +37,7 @@ namespace Prometheus.Controllers
         public ActionResult CreateProject()
         {
             var ckdict = UserController.UnpackCookie(this);
-            if (ckdict.ContainsKey("logonuser"))
+            if (ckdict.ContainsKey("logonuser") && ckdict["logonuser"] != "")
             {
                 return View();
             }

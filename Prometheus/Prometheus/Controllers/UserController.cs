@@ -196,15 +196,20 @@ namespace Prometheus.Controllers
 
         public static Dictionary<string,string> UnpackCookie(Controller ctrl)
         {
+            return UnpackCookie(ctrl.Request);
+        }
+
+        public static Dictionary<string, string> UnpackCookie(HttpRequestBase req)
+        {
 
             var ret = new Dictionary<string, string>();
 
-            if (ctrl.Request.Cookies["activenpi"] != null)
+            if (req.Cookies["activenpi"] != null)
             {
                 try
                 {
-                    var ck = ctrl.Request.Cookies["activenpi"];
-                    foreach(var key in ck.Values.AllKeys)
+                    var ck = req.Cookies["activenpi"];
+                    foreach (var key in ck.Values.AllKeys)
                     {
                         ret.Add(key, UTF8Encoding.UTF8.GetString(Convert.FromBase64String(ck.Values[key])));
                     }
@@ -221,6 +226,14 @@ namespace Prometheus.Controllers
                 ret.Clear();
                 return ret;
             }
+        }
+
+        public ActionResult LoginOutUser(string ctrl, string action)
+        {
+            var val = UnpackCookie(this);
+            val["logonuser"] = "";
+            SetCookie(this, val);
+            return RedirectToAction("ViewAll", "DashBoard");
         }
 
         public ActionResult UserCenter()

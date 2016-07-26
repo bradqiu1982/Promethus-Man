@@ -660,6 +660,8 @@
     <Content Include="Views\User\LoginUser.cshtml" />
     <Content Include="Views\User\UserCenter.cshtml" />
     <Content Include="Views\Issue\CreateIssue.cshtml" />
+    <Content Include="Views\User\ValidateNoticeA.cshtml" />
+    <Content Include="Views\User\ValidateNoticeB.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

@@ -8,6 +8,14 @@
 
 <h2>Register User</h2>
 
+@Html.Raw(string.IsNullOrEmpty(ViewBag.CreateError) ? "&nbsp;" : ViewBag.CreateError)
+@if (!string.IsNullOrEmpty(ViewBag.CreateError))
+{
+    ViewBag.CreateError = "";
+}
+
+<hr/>
+
 @using (Html.BeginForm("RegisterUser", "User", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
 {
     @Html.AntiForgeryToken()

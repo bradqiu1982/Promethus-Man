@@ -68,10 +68,10 @@ namespace Prometheus.Models
             
         }
 
-        public ProjectViewModels(string prokey, string proname, string startdate, decimal finshrate, string sdescription)
+        public ProjectViewModels(string prokey, string proname, string startdate, double finshrate, string sdescription)
         {
             this.ProjectKey = prokey;
-            this.ProjectName = proname;
+            this.dbProjectName = proname;
             this.StartDate = DateTime.Parse(startdate);
             this.FinishRating = finshrate;
             this.dbDescription = sdescription;
@@ -143,7 +143,7 @@ namespace Prometheus.Models
         //[RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+).*")]
         //public string Engineers { set; get; }
 
-        public decimal FinishRating { set; get; }
+        public double FinishRating { set; get; }
 
 
         private string sDescription = "";
@@ -252,6 +252,189 @@ namespace Prometheus.Models
                 lmeb.Clear();
                 lmeb.AddRange(value);
             }
+        }
+
+
+        private void StoreProjectBaseInfo()
+        {
+            var sql = "insert into Project(ProjectKey,ProjectName,StartDate,Description) values('<ProjectKey>','<ProjectName>','<StartDate>','<Description>')";
+            sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ProjectName>", dbProjectName).Replace("<StartDate>", StartDate.ToString("yyyy-MM-dd")).Replace("<Description>", dbDescription);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        private void StoreProjectMembers()
+        {
+            foreach (var item in MemberList)
+            {
+                var sql = "insert into ProjectMembers(ProjectKey,Name,Role) values('<ProjectKey>','<Name>','<Role>')";
+                sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<Name>", item.Name).Replace("<Role>", item.Role);
+                DBUtility.ExeLocalSqlNoRes(sql);
+            }
+        }
+
+        private void StoreProjectMesTable()
+        {
+            foreach (var item in TabList)
+            {
+                var sql = "insert into ProjectMembers(ProjectKey,Station,TableName) values('<ProjectKey>','<Station>','<TableName>')";
+                sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<Station>", item.Station).Replace("<TableName>", item.TableName);
+                DBUtility.ExeLocalSqlNoRes(sql);
+            }
+        }
+
+        private void StoreProjectPN()
+        {
+            foreach (var item in PNList)
+            {
+                var sql = "insert into ProjectMembers(ProjectKey,PN) values('<ProjectKey>','<PN>')";
+                sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<PN>", item.Pn);
+                DBUtility.ExeLocalSqlNoRes(sql);
+            }
+        }
+
+        private void StoreProjectStation()
+        {
+            foreach (var item in StationList)
+            {
+                var sql = "insert into ProjectMembers(ProjectKey,Station) values('<ProjectKey>','<Station>')";
+                sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<Station>", item.Station);
+                DBUtility.ExeLocalSqlNoRes(sql);
+            }
+        }
+
+        public void StoreProject()
+        {
+            StoreProjectBaseInfo();
+            StoreProjectMembers();
+            StoreProjectMesTable();
+            StoreProjectPN();
+            StoreProjectStation();
+        }
+
+        public bool CheckExistProject()
+        {
+            var sql = "select * from Project where ProjectKey = '<ProjectKey>'";
+            sql = sql.Replace("<ProjectKey>", ProjectKey);
+            var ret = DBUtility.ExeLocalSqlWithRes(sql);
+            if (ret.Count > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public static List<string> RetrieveAllProjectKey()
+        {
+            var sql = "select ProjectKey from Project";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var ret = new List<string>();
+            foreach (var line in dbret)
+            {
+                ret.Add(Convert.ToString( line[0]));
+            }
+            return ret;
+        }
+
+        private static List<ProjectMembers> RetrieveProjectMembers(string key)
+        {
+            var ret = new List<ProjectMembers>();
+
+            var sql = "select Name,Role from ProjectMembers where ProjectKey = '<ProjectKey>'";
+            sql = sql.Replace("<ProjectKey>", key);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                var m = new ProjectMembers(key, Convert.ToString(line[0]), Convert.ToString(line[1]));
+                ret.Add(m);
+            }
+
+            return ret;
+        }
+        private static List<ProjectMesTable> RetrieveProjectMesTable(string key)
+        {
+            var ret = new List<ProjectMesTable>();
+
+            var sql = "select Station,TableName from ProjectMesTable where ProjectKey = '<ProjectKey>'";
+            sql = sql.Replace("<ProjectKey>", key);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                var m = new ProjectMesTable(key, Convert.ToString(line[0]), Convert.ToString(line[1]));
+                ret.Add(m);
+            }
+            return ret;
+        }
+
+        private static List<ProjectPn> RetrieveProjectPn(string key)
+        {
+            var ret = new List<ProjectPn>();
+
+            var sql = "select PN from ProjectPn where ProjectKey = '<ProjectKey>'";
+            sql = sql.Replace("<ProjectKey>", key);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+
+            foreach (var line in dbret)
+            {
+                var m = new ProjectPn(key, Convert.ToString(line[0]));
+                ret.Add(m);
+            }
+            return ret;
+        }
+
+        private static List<ProjectStation> RetrieveProjectStation(string key)
+        {
+            var ret = new List<ProjectStation>();
+
+            var sql = "select Station from ProjectStation where ProjectKey = '<ProjectKey>'";
+            sql = sql.Replace("<ProjectKey>", key);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+
+            foreach (var line in dbret)
+            {
+                var m = new ProjectStation(key, Convert.ToString(line[0]));
+                ret.Add(m);
+            }
+            return ret;
+        }
+
+        public static ProjectViewModels RetrieveOneProject(string key)
+        {
+            var sql = "select ProjectKey,ProjectName,StartDate,FinishRate,Description from Project where ProjectKey = '<ProjectKey>' and validate = 1";
+            sql = sql.Replace("<ProjectKey>", key);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            if (dbret.Count > 0)
+            {
+                var ret = new ProjectViewModels(Convert.ToString(dbret[0][0])
+                    , Convert.ToString(dbret[0][1]), Convert.ToString(dbret[0][2])
+                    , Convert.ToDouble(dbret[0][3]), Convert.ToString(dbret[0][4]));
+
+                ret.MemberList = RetrieveProjectMembers(key);
+                ret.TabList = RetrieveProjectMesTable(key);
+                ret.PNList = RetrieveProjectPn(key);
+                ret.StationList = RetrieveProjectStation(key);
+                return ret;
+            }
+            else
+                return null;
+
+        }
+
+        public static List<ProjectViewModels> RetrieveAllProject()
+        {
+            var ret = new List<ProjectViewModels>();
+            var keys = RetrieveAllProjectKey();
+            foreach (var key in keys)
+            {
+                var r = RetrieveOneProject(key);
+                if (r != null)
+                {
+                    ret.Add(r);
+                }
+            }
+            return ret;
         }
     }
 

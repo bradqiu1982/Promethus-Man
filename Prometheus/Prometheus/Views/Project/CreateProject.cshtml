@@ -64,11 +64,11 @@
                             <div class="col-md-10">
                                 @if (Model != null && !string.IsNullOrEmpty(Model.ProjectName))
                                 {
-                                    <input class="form-control text-box single-line" value="@Model.ProjectName" data-val="true" data-val-length="The field Project must be a string with a minimum length of 6 and a maximum length of 180." data-val-length-max="180" data-val-length-min="6" data-val-regex="The field Project must match the regular expression &#39;^(?!.*&#39;).*$&#39;." data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The Project field is required." id="ProjectName" name="ProjectName" type="text" />
+                                    <input class="form-control text-box single-line" value="@Model.ProjectName" data-val="true" data-val-length="The field Project must be a string with a minimum length of 6 and a maximum length of 100." data-val-length-max="100" data-val-length-min="6" data-val-regex="The field Project must match the regular expression &#39;^(?!.*&#39;).*$&#39;." data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The Project field is required." id="ProjectName" name="ProjectName" type="text" />
                                 }
                                 else
                                 {
-                                    <input class="form-control text-box single-line" data-val="true" data-val-length="The field Project must be a string with a minimum length of 6 and a maximum length of 180." data-val-length-max="180" data-val-length-min="6" data-val-regex="The field Project must match the regular expression &#39;^(?!.*&#39;).*$&#39;." data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The Project field is required." id="ProjectName" name="ProjectName" type="text" value="" />
+                                    <input class="form-control text-box single-line" data-val="true" data-val-length="The field Project must be a string with a minimum length of 6 and a maximum length of 100." data-val-length-max="180" data-val-length-min="6" data-val-regex="The field Project must match the regular expression &#39;^(?!.*&#39;).*$&#39;." data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The Project field is required." id="ProjectName" name="ProjectName" type="text" value="" />
                                 }
 
                                 <span class="field-validation-valid text-danger" data-valmsg-for="ProjectName" data-valmsg-replace="true"></span>
@@ -117,11 +117,11 @@
                                 <div class="col-md-10" data-toggle="tooltip" data-placement="bottom" title="Exampel: brad@finisar.com:john@finisar.com.....">
                                 @if (Model != null && PMList.Count > (i * 2))
                                 {
-                                    <input class="form-control text-box single-line" value="@(PMList[(i * 2)].Name)"  id="PM@(i * 2 + 1)" name="PM@(i * 2 + 1)" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" data-val-required="The Field is required" type="text" />
+                                    <input class="form-control text-box single-line" value="@(PMList[(i * 2)].Name)"  id="PM@(i * 2 + 1)" name="PM@(i * 2 + 1)" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" data-val-required="The Field is required" type="text" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
                                 }
                                 else
                                 {
-                                    <input class="form-control text-box single-line" id="PM@(i * 2 + 1)" name="PM@(i * 2 + 1)" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" data-val-required="The Field is required" type="text" value="" />
+                                    <input class="form-control text-box single-line" id="PM@(i * 2 + 1)" name="PM@(i * 2 + 1)" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" data-val-required="The Field is required" type="text" value="" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
                                 }
 
                                 <span class="field-validation-valid text-danger" data-valmsg-for="PM@(i*2 + 1)" data-valmsg-replace="true"></span>
@@ -133,11 +133,11 @@
                             <div class="col-md-10" data-toggle="tooltip" data-placement="bottom" title="Exampel: brad@finisar.com:john@finisar.com.....">
                             @if (Model != null && PMList.Count > (i * 2 + 1))
                             {
-                                <input class="form-control text-box single-line" value="@(PMList[(i * 2+1)].Name)"  id="PM@(i*2 + 2)" name="PM@(i*2 + 2)" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" type="text" />
+                                <input class="form-control text-box single-line" value="@(PMList[(i * 2+1)].Name)"  id="PM@(i*2 + 2)" name="PM@(i*2 + 2)" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" type="text" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
                             }
                             else
                             {
-                                <input class="form-control text-box single-line" id="PM@(i*2 + 2)" name="PM@(i*2 + 2)" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" type="text" value="" />
+                                <input class="form-control text-box single-line" id="PM@(i*2 + 2)" name="PM@(i*2 + 2)" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" type="text" value="" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
                             }
                                 
                                 <span class="field-validation-valid text-danger" data-valmsg-for="PM@(i*2 + 2)" data-valmsg-replace="true"></span>
@@ -166,22 +166,22 @@
                                 {
                                     if (i == 0)
                                     {
-                                        <input class="form-control text-box single-line" id="Engineer@(i * 2 + 1)" value="@(ENGList[(i * 2)].Name)" name="Engineer@(i * 2 + 1)" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" data-val-required="The Field is required" type="text" />
+                                        <input class="form-control text-box single-line" id="Engineer@(i * 2 + 1)" value="@(ENGList[(i * 2)].Name)" name="Engineer@(i * 2 + 1)" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" data-val-required="The Field is required" type="text" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
                                     }
                                     else
                                     {
-                                        <input class="form-control text-box single-line" id="Engineer@(i * 2 + 1)" value="@(ENGList[(i * 2)].Name)" name="Engineer@(i * 2 + 1)" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)"  type="text" />
+                                        <input class="form-control text-box single-line" id="Engineer@(i * 2 + 1)" value="@(ENGList[(i * 2)].Name)" name="Engineer@(i * 2 + 1)" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)"  type="text" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
                                     }
                                 }
                                 else
                                 {
                                     if (i == 0)
                                     {
-                                        <input class="form-control text-box single-line" id="Engineer@(i * 2 + 1)" value="" name="Engineer@(i * 2 + 1)" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" data-val-required="The Field is required" type="text" />
+                                        <input class="form-control text-box single-line" id="Engineer@(i * 2 + 1)" value="" name="Engineer@(i * 2 + 1)" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" data-val-required="The Field is required" type="text" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
                                     }
                                     else
                                     {
-                                        <input class="form-control text-box single-line" id="Engineer@(i * 2 + 1)" value="" name="Engineer@(i * 2 + 1)" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" type="text" />
+                                        <input class="form-control text-box single-line" id="Engineer@(i * 2 + 1)" value="" name="Engineer@(i * 2 + 1)" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" type="text" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
                                     }
 
                                 }
@@ -193,11 +193,11 @@
                             <div class="col-md-10" data-toggle="tooltip" data-placement="bottom" title="Exampel: brad@finisar.com:john@finisar.com.....">
                                 @if (Model != null && ENGList.Count > (i * 2 + 1))
                                 {
-                                    <input class="form-control text-box single-line" id="Engineer@(i*2 + 2)" value="@(ENGList[(i * 2+1)].Name)" name="Engineer@(i*2 + 2)" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" type="text" />
+                                    <input class="form-control text-box single-line" id="Engineer@(i*2 + 2)" value="@(ENGList[(i * 2+1)].Name)" name="Engineer@(i*2 + 2)" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" type="text" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
                                 }
                                 else
                                 {
-                                    <input class="form-control text-box single-line" id="Engineer@(i*2 + 2)" value="" name="Engineer@(i*2 + 2)" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" type="text" />
+                                    <input class="form-control text-box single-line" id="Engineer@(i*2 + 2)" value="" name="Engineer@(i*2 + 2)" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" type="text" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
                                 }
                                 <span class="field-validation-valid text-danger" data-valmsg-for="Engineer@(i*2 + 2)" data-valmsg-replace="true"></span>
                             </div>
@@ -266,11 +266,11 @@
                             <div class="col-md-10">
                                 @if (Model != null && Model.PNList.Count > (i * 3))
                                 {
-                                    <input class="form-control text-box single-line" id="PN@(i*3 + 1)" name="PN@(i*3 + 1)" type="text" value="@(Model.PNList[(i * 3)].Pn)" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" />
+                                    <input class="form-control text-box single-line" id="PN@(i*3 + 1)" name="PN@(i*3 + 1)" type="text" value="@(Model.PNList[(i * 3)].Pn)" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
                                 }
                                 else
                                 {
-                                    <input class="form-control text-box single-line" id="PN@(i*3 + 1)" name="PN@(i*3 + 1)" type="text" value="" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" />
+                                    <input class="form-control text-box single-line" id="PN@(i*3 + 1)" name="PN@(i*3 + 1)" type="text" value="" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
                                 }
                                 <span class="field-validation-valid text-danger" data-valmsg-for="PN@(i*3 + 1)" data-valmsg-replace="true"></span>
                             </div>
@@ -280,7 +280,7 @@
                             <div class="col-md-10">
                                 @if (Model != null && Model.PNList.Count > (i * 3 + 1))
                                 {
-                                    <input class="form-control text-box single-line" id="PN@(i*3 + 2)" name="PN@(i*3 + 2)" type="text" value="@(Model.PNList[(i *3+1)].Pn)" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" />
+                                    <input class="form-control text-box single-line" id="PN@(i*3 + 2)" name="PN@(i*3 + 2)" type="text" value="@(Model.PNList[(i *3+1)].Pn)" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
                                 }
                                 else
                                 {
@@ -294,7 +294,7 @@
                             <div class="col-md-10">
                                 @if (Model != null && Model.PNList.Count > (i * 3 + 2))
                                 {
-                                    <input class="form-control text-box single-line" id="PN@(i*3 + 3)" name="PN@(i*3 + 3)" type="text" value="@(Model.PNList[(i * 3+2)].Pn)" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" />
+                                    <input class="form-control text-box single-line" id="PN@(i*3 + 3)" name="PN@(i*3 + 3)" type="text" value="@(Model.PNList[(i * 3+2)].Pn)" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
                                 }
                                 else
                                 {
@@ -316,11 +316,11 @@
                             <div class="col-md-9">
                                 @if (Model != null && Model.StationList.Count > (i * 3))
                                 {
-                                    <input class="form-control text-box single-line" id="Station@(i*3 + 1)" name="Station@(i*3 + 1)" type="text" value="@(Model.StationList[(i * 3)].Station)" data-toggle="tooltip" title="Use spec file's station name" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" />
+                                    <input class="form-control text-box single-line" id="Station@(i*3 + 1)" name="Station@(i*3 + 1)" type="text" value="@(Model.StationList[(i * 3)].Station)" data-toggle="tooltip" title="Use spec file's station name" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
                                 }
                                 else
                                 {
-                                    <input class="form-control text-box single-line" id="Station@(i*3 + 1)" name="Station@(i*3 + 1)" type="text" value="" data-toggle="tooltip" title="Use spec file's station name" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" />
+                                    <input class="form-control text-box single-line" id="Station@(i*3 + 1)" name="Station@(i*3 + 1)" type="text" value="" data-toggle="tooltip" title="Use spec file's station name" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
                                 }
                                 <span class="field-validation-valid text-danger" data-valmsg-for="Station@(i*3 + 1)" data-valmsg-replace="true"></span>
                             </div>
@@ -330,11 +330,11 @@
                             <div class="col-md-9">
                                 @if (Model != null && Model.StationList.Count > (i * 3 + 1))
                                 {
-                                    <input class="form-control text-box single-line" id="Station@(i*3 + 2)" name="Station@(i*3 + 2)" type="text" value="@(Model.StationList[(i * 3+1)].Station)" data-toggle="tooltip" title="Use spec file's station name" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" />
+                                    <input class="form-control text-box single-line" id="Station@(i*3 + 2)" name="Station@(i*3 + 2)" type="text" value="@(Model.StationList[(i * 3+1)].Station)" data-toggle="tooltip" title="Use spec file's station name" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
                                 }
                                 else
                                 {
-                                    <input class="form-control text-box single-line" id="Station@(i*3 + 2)" name="Station@(i*3 + 2)" type="text" value="" data-toggle="tooltip" title="Use spec file's station name" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" />
+                                    <input class="form-control text-box single-line" id="Station@(i*3 + 2)" name="Station@(i*3 + 2)" type="text" value="" data-toggle="tooltip" title="Use spec file's station name" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
                                 }
                                 <span class="field-validation-valid text-danger" data-valmsg-for="Station@(i*3 + 2)" data-valmsg-replace="true"></span>
                             </div>
@@ -344,11 +344,11 @@
                             <div class="col-md-9">
                                 @if (Model != null && Model.StationList.Count > (i * 3 + 2))
                                 {
-                                    <input class="form-control text-box single-line" id="Station@(i*3 + 3)" name="Station@(i*3 + 3)" type="text" value="@(Model.StationList[(i * 3+2)].Station)" data-toggle="tooltip" title="Use spec file's station name" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" />
+                                    <input class="form-control text-box single-line" id="Station@(i*3 + 3)" name="Station@(i*3 + 3)" type="text" value="@(Model.StationList[(i * 3+2)].Station)" data-toggle="tooltip" title="Use spec file's station name" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
                                 }
                                 else
                                 {
-                                    <input class="form-control text-box single-line" id="Station@(i*3 + 3)" name="Station@(i*3 + 3)" type="text" value="" data-toggle="tooltip" title="Use spec file's station name" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" />
+                                    <input class="form-control text-box single-line" id="Station@(i*3 + 3)" name="Station@(i*3 + 3)" type="text" value="" data-toggle="tooltip" title="Use spec file's station name" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
                                 }
                                 <span class="field-validation-valid text-danger" data-valmsg-for="Station@(i*3 + 3)" data-valmsg-replace="true"></span>
                             </div>

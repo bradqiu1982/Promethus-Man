@@ -85,10 +85,7 @@ namespace Prometheus.Controllers
             }
         }
 
-        private bool checkExistProject(string projectkey)
-        {
-            return false;
-        }
+
 
         private bool ProjectValidate(ProjectViewModels projectmodel)
         {
@@ -115,7 +112,7 @@ namespace Prometheus.Controllers
                 return false;
             }
 
-            if (checkExistProject(projectmodel.ProjectKey))
+            if (projectmodel.CheckExistProject())
             {
                 ViewBag.CreateError = createerror.Replace("<ErrorMsg>", "Project exist");
                 return false;
@@ -388,6 +385,8 @@ namespace Prometheus.Controllers
             }
         }
 
+
+
         [HttpPost, ActionName("CreateProject")]
         [ValidateAntiForgeryToken]
         public ActionResult CreatePostProject()
@@ -426,11 +425,9 @@ namespace Prometheus.Controllers
                 }
             }
 
-            return RedirectToAction("ViewAll");
+            projectmodel.StoreProject();
 
-            //var dict = new RouteValueDictionary();
-            //dict.Add("ProjectKey", projectmodel.ProjectKey);
-            //return RedirectToAction("ProjectDetail", dict);
+            return RedirectToAction("ViewAll");
         }
 
         public ActionResult ProjectDetail(string ProjectKey)

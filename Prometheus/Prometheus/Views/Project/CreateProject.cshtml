@@ -216,7 +216,15 @@
 
                     <div class="form-group">
                         <div>
-                            <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
+                            @if (Model != null && !string.IsNullOrEmpty(Model.Description))
+                            {
+                                 <textarea name="editor1" id="editor1" rows="10" cols="80">@Model.Description</textarea>
+                            }
+                            else
+                            {
+                                <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
+                            }
+                            
                             <script>
                             CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserImageUploadUrl: '/userfiles/Upload.ashx' });
                             </script>

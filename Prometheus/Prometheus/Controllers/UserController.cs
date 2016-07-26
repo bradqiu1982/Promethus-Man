@@ -8,16 +8,12 @@ using System.Net;
 using System.Net.Mail;
 using System.Web.Routing;
 using System.Collections.Specialized;
+using Prometheus.Models;
 
 namespace Prometheus.Controllers
 {
     public class UserController : Controller
     {
-        // GET: User
-        public ActionResult Home()
-        {
-            return View();
-        }
 
         private bool checkexistuser(string user)
         {
@@ -64,15 +60,23 @@ namespace Prometheus.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult RegisterUserPOST()
         {
-           if (this.checkexistuser(Request.Form["Email"]))
+
+           if (UserViewModels.CheckUserExist(Request.Form["Email"]))
             {
+                var createerror = "<h3><font color=\"red\">Fail to create User: User Exist</font></h3>";
+                ViewBag.CreateError = createerror;
+                return View();
             }
 
             var username = Request.Form["Email"];
             var password = Request.Form["Password"];
-
-            //Store user Info
             string updatetime = DateTime.Now.ToString();
+
+            var user = new UserViewModels();
+            user.Email = username;
+            user.Password = password;
+            user.UpdateDate = DateTime.Parse(updatetime);
+            user.RegistUser();
 
             var routevalue = new RouteValueDictionary();
             routevalue.Add("validatestr", Convert.ToBase64String(UTF8Encoding.UTF8.GetBytes(username + "||" + updatetime)));
@@ -84,6 +88,16 @@ namespace Prometheus.Controllers
             toaddrs.Add(username);
             sendemail(toaddrs, validatestr);
 
+            return RedirectToAction("ValidateNoticeA");
+        }
+
+        public ActionResult ValidateNoticeA()
+        {
+            return View();
+        }
+
+        public ActionResult ValidateNoticeB()
+        {
             return View();
         }
 
@@ -91,22 +105,18 @@ namespace Prometheus.Controllers
         {
             if (string.IsNullOrEmpty(validatestr))
             {
-                //something wrong
-                return RedirectToAction("ViewAll", "DashBoard");
+                var createerror = "<h3><font color=\"red\">Fail to active User: active string is empty</font></h3>";
+                ViewBag.CreateError = createerror;
+                RedirectToAction("RegisterUser");
             }
             
             var bs = Convert.FromBase64String(validatestr);
             var val = UTF8Encoding.UTF8.GetString(bs);
-
-            System.Windows.MessageBox.Show(val);
-
-            return RedirectToAction("ViewAll","DashBoard");
+            var username = val.Split(new char[] { '|' })[0];
+            var updatetime = val.Split(new char[] { '|' })[1];
+            UserViewModels.ValidateUser(username);
+            return RedirectToAction("ValidateNoticeB");
         }
-
-        //public ActionResult LoginUser()
-        //{
-        //    return View();
-        //}
 
         public ActionResult LoginUser(string ctrl,string action)
         {

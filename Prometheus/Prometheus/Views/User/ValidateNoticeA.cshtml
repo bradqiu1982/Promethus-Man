@@ -5,7 +5,12 @@
 }
 
 <h2>Notice</h2>
-
+@Html.Raw(string.IsNullOrEmpty(ViewBag.loginerror) ? "&nbsp;" : ViewBag.loginerror)
+@if (!string.IsNullOrEmpty(ViewBag.loginerror))
+{
+    ViewBag.loginerror = "";
+}
+<hr/>
 <h3> Welcome on the board.</h3>
 <h3> A validate email has been send to your email address.</h3>
 <h3> Please check your email and click the validate link to active your account.</h3>

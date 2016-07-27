@@ -662,6 +662,9 @@
     <Content Include="Views\Issue\CreateIssue.cshtml" />
     <Content Include="Views\User\ValidateNoticeA.cshtml" />
     <Content Include="Views\User\ValidateNoticeB.cshtml" />
+    <Content Include="Views\User\ResetNoticeB.cshtml" />
+    <Content Include="Views\User\ResetNoticeA.cshtml" />
+    <Content Include="Views\User\ResetUser.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

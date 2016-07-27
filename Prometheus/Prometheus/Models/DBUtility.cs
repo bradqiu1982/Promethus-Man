@@ -3,25 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Data.SqlClient;
-
+using System.IO;
 
 namespace Prometheus.Models
 {
     public class DBUtility
     {
-        public static string escapedbstr(string oldstr)
-        {
-            return oldstr.Replace("'", "\"");
-        }
 
         private static SqlConnection GetLocalConnector()
         {
             var conn = new SqlConnection();
             try
             {
-                conn.ConnectionString = "Data Source = (LocalDb)\\MSSQLLocalDB; AttachDbFilename = \"~/App_Data/Prometheus.mdf\"; Integrated Security = True";
+                //conn.ConnectionString = "Data Source = (LocalDb)\\MSSQLLocalDB; AttachDbFilename = ~\\App_Data\\Prometheus.mdf; Integrated Security = True";
+                conn.ConnectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=" + Path.Combine(HttpRuntime.AppDomainAppPath, "App_Data\\Prometheus.mdf") + ";Integrated Security=True;";
                 conn.Open();
                 return conn;
+            }
+            catch (SqlException ex)
+            {
+                System.Windows.MessageBox.Show(ex.ToString());
+                return null;
             }
             catch (Exception ex)
             {
@@ -39,6 +41,10 @@ namespace Prometheus.Models
             {
                 conn.Close();
             }
+            catch (SqlException ex)
+            {
+                System.Windows.MessageBox.Show(ex.ToString());
+            }
             catch (Exception ex)
             {
             }
@@ -53,10 +59,15 @@ namespace Prometheus.Models
             try
             {
                 var command = conn.CreateCommand();
-                command.CommandText = escapedbstr(sql);
+                command.CommandText = sql;
                 command.ExecuteNonQuery();
                 CloseConnector(conn);
                 return true;
+            }
+            catch (SqlException ex)
+            {
+                System.Windows.MessageBox.Show(ex.ToString());
+                return false;
             }
             catch (Exception ex)
             {
@@ -76,7 +87,7 @@ namespace Prometheus.Models
                     return ret;
 
                 var command = conn.CreateCommand();
-                command.CommandText = escapedbstr(sql);
+                command.CommandText = sql;
                 var sqlreader = command.ExecuteReader();
                 if (sqlreader.HasRows)
                 {
@@ -94,6 +105,13 @@ namespace Prometheus.Models
 
                 sqlreader.Close();
                 CloseConnector(conn);
+                return ret;
+            }
+            catch (SqlException ex)
+            {
+                System.Windows.MessageBox.Show(ex.ToString());
+                CloseConnector(conn);
+                ret.Clear();
                 return ret;
             }
             catch (Exception ex)
@@ -114,6 +132,11 @@ namespace Prometheus.Models
                 conn.Open();
                 return conn;
             }
+            catch (SqlException ex)
+            {
+                System.Windows.MessageBox.Show(ex.ToString());
+                return null;
+            }
             catch (Exception ex)
             {
                 System.Windows.MessageBox.Show(ex.ToString());
@@ -130,10 +153,16 @@ namespace Prometheus.Models
             try
             {
                 var command = conn.CreateCommand();
-                command.CommandText = escapedbstr(sql);
+                command.CommandText = sql;
                 command.ExecuteNonQuery();
                 CloseConnector(conn);
                 return true;
+            }
+            catch (SqlException ex)
+            {
+                CloseConnector(conn);
+                System.Windows.MessageBox.Show(ex.ToString());
+                return false;
             }
             catch (Exception ex)
             {
@@ -173,6 +202,13 @@ namespace Prometheus.Models
                 CloseConnector(conn);
                 return ret;
             }
+            catch (SqlException ex)
+            {
+                System.Windows.MessageBox.Show(ex.ToString());
+                CloseConnector(conn);
+                ret.Clear();
+                return ret;
+            }
             catch (Exception ex)
             {
                 System.Windows.MessageBox.Show(ex.ToString());
@@ -183,64 +219,5 @@ namespace Prometheus.Models
         }
 
 
-        /*
-        public static bool AddMovie(string title, string releasedate, string genre, float price, string rate)
-        {
-            string sqlstr = "insert into Movies(Title,ReleaseDate,Genre,Price,Rate) values('<title>','<releasedate>','<genre>',<price>,'<rate>')";
-            sqlstr = sqlstr.Replace("<title>", escape(title))
-                .Replace("<releasedate>", escape(releasedate))
-                .Replace("<genre>", escape(genre))
-                .Replace("<price>", price.ToString())
-                .Replace("<rate>", escape(rate));
-            return DBUtility.ExeSqlNoRes(sqlstr);
-        }
-
-        public static bool UpdateMovie(long id, string title, string releasedate, string genre, float price, string rate)
-        {
-            string sqlstr = "Update Movies Set Title = '<title>',ReleaseDate = '<releasedate>',Genre = '<genre>',price = <price>,rate = '<rate>' where Id = <id>";
-            sqlstr = sqlstr.Replace("<id>", id.ToString())
-                .Replace("<title>", escape(title))
-                .Replace("<releasedate>", escape(releasedate))
-                .Replace("<genre>", escape(genre))
-                .Replace("<price>", price.ToString())
-                .Replace("<rate>", escape(rate));
-            return DBUtility.ExeSqlNoRes(sqlstr);
-        }
-
-        public static bool DeleteMovie(long id)
-        {
-            string sqlstr = "Delete from Movies where Id =" + id.ToString();
-            return DBUtility.ExeSqlNoRes(sqlstr);
-        }
-
-        public static List<Movie> GetMovies(string sql)
-        {
-            var mvlist = new List<Movie>();
-            var conn = GetConnector();
-            if (conn == null)
-                return new List<Movie>();
-            var reader = ExeSqlWithRes(conn, sql);
-            if (reader == null)
-                return new List<Movie>();
-            try
-            {
-                while (reader.Read())
-                {
-                    mvlist.Add(new Movie(reader.GetInt64(0), reader.GetString(1), reader.GetDateTime(2).ToString(), reader.GetString(3), (float)reader.GetDouble(4), reader.GetString(5)));
-                }
-                reader.Close();
-                CloseConnector(conn);
-                return mvlist;
-            }
-            catch (Exception ex)
-            {
-                mvlist.Clear();
-                reader.Close();
-                CloseConnector(conn);
-                System.Windows.MessageBox.Show(ex.ToString());
-                return new List<Movie>();
-            }
-        }
-        */
     }
 }

@@ -46,14 +46,14 @@ namespace Prometheus.Models
 
         public void RegistUser()
         {
-            var sql = "insert into User(UserName,PassWD,UpdateDate) values('<UserName>','<PassWD>','<UpdateDate>')";
+            var sql = "insert into UserTable(UserName,PassWD,UpdateDate) values('<UserName>','<PassWD>','<UpdateDate>')";
             sql = sql.Replace("<UserName>", Email.ToUpper()).Replace("<PassWD>", Password).Replace("<UpdateDate>", UpdateDate.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
         public static UserViewModels RetrieveUser(string username)
         {
-            var sql = "select PassWD,Validated,Priority,UpdateDate from User where UserName = '<UserName>'";
+            var sql = "select PassWD,Validated,Priority,UpdateDate from UserTable where UserName = '<UserName>'";
             sql = sql.Replace("<UserName>", username.ToUpper());
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             if (dbret.Count > 0)
@@ -69,31 +69,31 @@ namespace Prometheus.Models
             return null;
         }
 
-        public static void ValidateUser(string username)
+        public static void ActiveUser(string username)
         {
-            var sql = "update User set Validated = 1 where UserName = '<UserName>'";
+            var sql = "update UserTable set Validated = 1 where UserName = '<UserName>'";
             sql = sql.Replace("<UserName>", username.ToUpper());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
         public static void ValidateUserWithDate(string username, DateTime date)
         {
-            var sql = "update User set Validated = 1 where UserName = '<UserName>' and UpdateDate = '<UpdateDate>'";
+            var sql = "update UserTable set Validated = 1 where UserName = '<UserName>' and UpdateDate = '<UpdateDate>'";
             sql = sql.Replace("<UpdateDate>", date.ToString()).Replace("<UserName>", username.ToUpper());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
         public static void UpdateUserTime(string username,DateTime date)
         {
-            var sql = "update User set UpdateDate = '<UpdateDate>' where UserName = '<UserName>'";
+            var sql = "update UserTable set UpdateDate = '<UpdateDate>' where UserName = '<UserName>'";
             sql = sql.Replace("<UpdateDate>", date.ToString()).Replace("<UserName>", username.ToUpper());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
-        public static void RestPwd(string username)
+        public static void RestPwd(string username, string pwd)
         {
-            var sql = "update User set PassWD = 'abc@123' where UserName = '<UserName>'";
-            sql = sql.Replace("<UserName>", username.ToUpper());
+            var sql = "update UserTable set PassWD = '<PassWD>' where UserName = '<UserName>'";
+            sql = sql.Replace("<UserName>", username.ToUpper()).Replace("<PassWD>", pwd);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
     }

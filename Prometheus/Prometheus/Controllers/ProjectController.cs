@@ -16,21 +16,7 @@ namespace Prometheus.Controllers
         // GET: Project
         public ActionResult ViewAll()
         {
-            var projlist = new List<ProjectViewModels>();
-
-            var pro = new ProjectViewModels();
-            pro.ProjectName = "CFP4-SR4";
-            var tempstr = RMSpectialCh(pro.ProjectName);
-            pro.ProjectKey = tempstr.Substring(0, (tempstr.Length > 20) ? 18 : tempstr.Length).ToUpper();
-            pro.StartDate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd"));
-            pro.PM = "brad.qiu@finisar.com:Alex.chen@finisar.com";
-            pro.FinishRating = 15;
-            pro.Description = "<h3><font color =\"red\">This is a test</font></h3>";
-            projlist.Add(pro);
-
-            pro.ProjectName = "QSFP-28G";
-            projlist.Add(pro);
-
+            var projlist = ProjectViewModels.RetrieveAllProject();
             return View(projlist);
         }
 
@@ -84,7 +70,6 @@ namespace Prometheus.Controllers
                 return false;
             }
         }
-
 
 
         private bool ProjectValidate(ProjectViewModels projectmodel)
@@ -432,7 +417,35 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectDetail(string ProjectKey)
         {
-            return View();
+            var ckdict = UserController.UnpackCookie(this);
+            if (!string.IsNullOrEmpty(ProjectKey) || ckdict.ContainsKey("ProjectKey"))
+            {
+                var realkey = "";
+                if (!string.IsNullOrEmpty(ProjectKey))
+                    realkey = ProjectKey;
+                else
+                    realkey = ckdict["ProjectKey"];
+
+                if (ckdict.ContainsKey("logonuser") && ckdict["logonuser"] != "")
+                {
+                    var vm = ProjectViewModels.RetrieveOneProject(realkey);
+                    return View(vm);
+                }
+                else
+                {
+                    var ck = new Dictionary<string, string>();
+                    ck.Add("logonredirectctrl", "Project");
+                    ck.Add("logonredirectact", "ProjectDetail");
+                    ck.Add("ProjectKey", realkey);
+                    UserController.SetCookie(this, ck);
+                    return RedirectToAction("LoginUser", "User");
+                }
+
+            }
+            else
+            {
+                return RedirectToAction("CreateProject","Project");
+            }
         }
 
         [HttpPost, ActionName("ProjectDetail")]

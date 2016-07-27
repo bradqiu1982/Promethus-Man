@@ -13,16 +13,41 @@
 
 @foreach (var item in Model)
 {
+
+        var PMList = new List<Prometheus.Models.ProjectMembers>();
+        if (Model != null)
+        {
+            foreach (var pm in item.MemberList)
+            {
+                if (string.Compare(pm.Role, Prometheus.Models.ProjectViewModels.PMROLE) == 0)
+                {
+                    PMList.Add(pm);
+                }
+            }
+        }
+
+        var ENGList = new List<Prometheus.Models.ProjectMembers>();
+        if (Model != null)
+        {
+            foreach (var pm in item.MemberList)
+            {
+                if (string.Compare(pm.Role, Prometheus.Models.ProjectViewModels.ENGROLE) == 0)
+                {
+                    ENGList.Add(pm);
+                }
+            }
+        }
+
 <div class="row">
     <div class="col-md-12">
         <div class="panel panel-default">
             <div class="panel-heading">
                 @Html.ActionLink(item.ProjectName, "ProjectDetail", "Project", new { ProjectKey = item.ProjectKey }, null)
             </div>
-            <div class="panel-body col-md-12">
+            <div class="panel-body col-md-12 " style="overflow-x: scroll;">
 
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-6">
                         <div class="col-md-4">
                             @Html.DisplayNameFor(model => model.StartDate)
                         </div>
@@ -30,7 +55,7 @@
                             @Html.DisplayFor(modelItem => item.StartDate)
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6">
                         <div class="col-md-4">
                             @Html.DisplayNameFor(model => model.FinishRating)
                         </div>
@@ -38,30 +63,73 @@
                             @Html.DisplayFor(modelItem => item.FinishRating)%
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="col-md-4">
-                            @Html.DisplayNameFor(model => model.PM)
-                        </div>
-                        <div class="col-md-8">
-                            @{
-                                var emails = item.PM.Split(new char[] { ':' });
-                                foreach (var m in emails)
-                                {
-                                    if (!string.IsNullOrEmpty(m))
+                </div>
+
+                <hr/>
+                
+                    @for (var i = 0; i < 1; i++)
+                    {
+                        <div class="row">
+                            <div class="col-md-6">
+                                
+                                    @if (Model != null && PMList.Count > (i * 2))
                                     {
-                                        @Html.ActionLink(m.Split(new char[] { '@' })[0] + "|", "UserHome", "User", new { useraccount = m.Split(new char[] { '@' })[0] }, null);
+                                        <label class="control-label col-md-2" for="PM@(i*2 + 1)">PM@(i * 2 + 1)</label>
+                                        <div class="col-md-10">
+                                            @Html.ActionLink(@PMList[(i * 2)].Name, "UserCenter", "User", new { username = @PMList[(i * 2)].Name }, null)
+                                            @*<input class="form-control text-box single-line" value="@(PMList[(i * 2)].Name)" id="PM@(i * 2 + 1)" name="PM@(i * 2 + 1)" readonly="readonly" />*@
+                                        </div>
                                     }
+                            </div>
+                            <div class="col-md-6">
+                                    @if (Model != null && PMList.Count > (i * 2 + 1))
+                                    {
+                                        <label class="control-label col-md-2" for="PM@(i*2 + 2)">PM@(i * 2 + 2)</label>
+                                        <div class="col-md-10">
+                                            @Html.ActionLink(@PMList[(i * 2+1)].Name, "UserCenter", "User", new { username = @PMList[(i * 2+1)].Name }, null)
+                                            @*<input class="form-control text-box single-line" value="@(PMList[(i * 2+1)].Name)" id="PM@(i*2 + 2)" name="PM@(i*2 + 2)" readonly="readonly" />*@
+                                        </div>
+                                    }
+                               </div>
+                        </div>
+                    }
+                
+                <hr />
+
+                @for (var i = 0; i < 3; i++)
+                {
+                    <div class="row">
+                        <div class="col-md-6">
+                                @if (Model != null && ENGList.Count > (i * 2))
+                                {
+                                    <label class="control-label col-md-2" for="Engineer@(i*2 + 1)">Engineer@(i * 2 + 1)</label>
+                                    <div class="col-md-10">
+                                        @Html.ActionLink(@ENGList[(i * 2)].Name, "UserCenter", "User", new { username = @ENGList[(i * 2)].Name }, null)
+                                        @*<input class="form-control text-box single-line" id="Engineer@(i * 2 + 1)" value="@(ENGList[(i * 2)].Name)" name="Engineer@(i * 2 + 1)" readonly="readonly" />*@
+                                    </div>
                                 }
-                            }
+                        </div>
+                        <div class="col-md-6">
+                                @if (Model != null && ENGList.Count > (i * 2 + 1))
+                                {
+                                    <label class="control-label col-md-2" for="Engineer@(i*2 + 2)">Engineer@(i * 2 + 2)</label>
+                                    <div class="col-md-10">
+                                        @Html.ActionLink(@ENGList[(i * 2+1)].Name, "UserCenter", "User", new { username = @ENGList[(i * 2+1)].Name }, null)
+                                        @*<input class="form-control text-box single-line" id="Engineer@(i*2 + 2)" value="@(ENGList[(i * 2+1)].Name)" name="Engineer@(i*2 + 2)" readonly="readonly" />*@
+                                    </div>
+                                }
+                        </div>
+                    </div>
+                }
+
+                <hr/>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            @Html.Raw(item.Description)
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        @Html.Raw(item.Description)
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>

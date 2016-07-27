@@ -276,7 +276,7 @@ namespace Prometheus.Models
         {
             foreach (var item in TabList)
             {
-                var sql = "insert into ProjectMembers(ProjectKey,Station,TableName) values('<ProjectKey>','<Station>','<TableName>')";
+                var sql = "insert into ProjectMesTable(ProjectKey,Station,TableName) values('<ProjectKey>','<Station>','<TableName>')";
                 sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<Station>", item.Station).Replace("<TableName>", item.TableName);
                 DBUtility.ExeLocalSqlNoRes(sql);
             }
@@ -286,7 +286,7 @@ namespace Prometheus.Models
         {
             foreach (var item in PNList)
             {
-                var sql = "insert into ProjectMembers(ProjectKey,PN) values('<ProjectKey>','<PN>')";
+                var sql = "insert into ProjectPn(ProjectKey,PN) values('<ProjectKey>','<PN>')";
                 sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<PN>", item.Pn);
                 DBUtility.ExeLocalSqlNoRes(sql);
             }
@@ -296,7 +296,7 @@ namespace Prometheus.Models
         {
             foreach (var item in StationList)
             {
-                var sql = "insert into ProjectMembers(ProjectKey,Station) values('<ProjectKey>','<Station>')";
+                var sql = "insert into ProjectStation(ProjectKey,Station) values('<ProjectKey>','<Station>')";
                 sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<Station>", item.Station);
                 DBUtility.ExeLocalSqlNoRes(sql);
             }

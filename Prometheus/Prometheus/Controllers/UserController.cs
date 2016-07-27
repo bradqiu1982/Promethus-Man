@@ -370,12 +370,12 @@ namespace Prometheus.Controllers
             return RedirectToAction("ViewAll", "DashBoard");
         }
 
-        public ActionResult UserCenter()
+        public ActionResult UserCenter(string username)
         {
             var val = UnpackCookie(this);
             if(val != null)
             { 
-                System.Windows.MessageBox.Show(val["logonuser"]);
+                //System.Windows.MessageBox.Show(val["logonuser"]);
             }
             return View();
         }

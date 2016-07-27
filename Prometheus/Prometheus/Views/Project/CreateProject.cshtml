@@ -85,7 +85,7 @@
                             <div class="col-md-10">
                                 @if (Model != null && !string.IsNullOrEmpty(Model.StartDate.ToString()))
                                 {
-                                    <input class="form-control text-box single-line" value="@Model.StartDate.ToString()" data-val="true" data-val-date="The field StartDate must be a date." data-val-required="The StartDate field is required." id="StartDate" name="StartDate" type="date" />
+                                    <input class="form-control text-box single-line" value="@Model.StartDate.ToString("yyyy-MM-dd")" data-val="true" data-val-date="The field StartDate must be a date." data-val-required="The StartDate field is required." id="StartDate" name="StartDate" type="date" />
                                 }
                                 else
                                 {
@@ -246,7 +246,7 @@
                                 </span>
                              </div>
                             <div class="col-md-6">
-                                @Html.Label("", new { @id = "showfilename", @name = "showfilename", @readonly = false })
+                                @Html.Label("", new { @id = "showfilename", @name = "showfilename", @readonly = "readonly" })
                             </div>
                         </div>
                         <script type="text/javascript">

@@ -45,51 +45,55 @@
 
     <div class="form-group">
         <ul class="nav nav-pills nav-stacked col-md-2">
-            <li class="active"><a href="#tab_a" data-toggle="pill">Base Info<font color="red">*</font></a></li>
+            <li class="active"><a href="#tab_c" data-toggle="pill">Project News</a></li>
+            <li><a href="#tab_a" data-toggle="pill">Base Info<font color="red">*</font></a></li>
             <li><a href="#tab_b" data-toggle="pill">MES Bonding</a></li>
         </ul>
 
         <div class="tab-content col-md-10">
-            <div class="tab-pane active" id="tab_a">
+            <div class="tab-pane active" id="tab_c">
+            </div>
+            
+            <div class="tab-pane" id="tab_a">
 
-                <div class="form-horizontal">
+                    <div class="form-horizontal">
 
-                    <div class="form-group">
-                        <div class="col-md-6">
-                            <label class="control-label col-md-2" for="ProjectName">Project</label>
-                            <div class="col-md-10">
-                                @if (Model != null && !string.IsNullOrEmpty(Model.ProjectName))
-                                {
-                                    <input class="form-control text-box single-line" value="@Model.ProjectName" readonly="readonly" data-val="true" data-val-length="The field Project must be a string with a minimum length of 6 and a maximum length of 100." data-val-length-max="100" data-val-length-min="6" data-val-regex="The field Project must match the regular expression &#39;^(?!.*&#39;).*$&#39;." data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The Project field is required." id="ProjectName" name="ProjectName" type="text" />
-                                }
+                        <div class="form-group">
+                            <div class="col-md-6">
+                                <label class="control-label col-md-2" for="ProjectName">Project</label>
+                                <div class="col-md-10">
+                                    @if (Model != null && !string.IsNullOrEmpty(Model.ProjectName))
+                                    {
+                                        <input class="form-control text-box single-line" value="@Model.ProjectName" readonly="readonly" data-val="true" data-val-length="The field Project must be a string with a minimum length of 6 and a maximum length of 100." data-val-length-max="100" data-val-length-min="6" data-val-regex="The field Project must match the regular expression &#39;^(?!.*&#39;).*$&#39;." data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The Project field is required." id="ProjectName" name="ProjectName" type="text" />
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="control-label col-md-2" for="StartDate">StartDate</label>
+                                <div class="col-md-10">
+                                    @if (Model != null && !string.IsNullOrEmpty(Model.StartDate.ToString()))
+                                    {
+                                        <input class="form-control text-box single-line" value="@Model.StartDate.ToString("yyyy-MM-dd")" readonly="readonly" data-val="true" data-val-date="The field StartDate must be a date." data-val-required="The StartDate field is required." id="StartDate" name="StartDate" type="date" />
+                                    }
+
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="control-label col-md-2" for="StartDate">StartDate</label>
-                            <div class="col-md-10">
-                                @if (Model != null && !string.IsNullOrEmpty(Model.StartDate.ToString()))
-                                {
-                                    <input class="form-control text-box single-line" value="@Model.StartDate.ToString("yyyy-MM-dd")" readonly="readonly" data-val="true" data-val-date="The field StartDate must be a date." data-val-required="The StartDate field is required." id="StartDate" name="StartDate" type="date" />
-                                }
+                        <div class="form-group">
+                            <div class="col-md-6">
+                                <label class="control-label col-md-2" for="FinishRating">FinishRate</label>
+                                <div class="col-md-10" data-toggle="tooltip" data-placement="bottom" title="Finish Percent">
+                                    @if (Model != null && !string.IsNullOrEmpty(Model.FinishRating.ToString()))
+                                    {
+                                        <input class="form-control text-box single-line" value="@Model.FinishRating.ToString()" data-val="true" data-val-length="The field Project must be a string with a minimum length of 1 and a maximum length of 2." data-val-length-max="2" data-val-length-min="1" data-val-required="The FinishRating field is required." id="FinishRating" name="FinishRating" type="text" />
+                                    }
+                                    <span class="field-validation-valid text-danger" data-valmsg-for="FinishRating" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6"></div>
+                        </div>
 
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-md-6">
-                            <label class="control-label col-md-2" for="FinishRating">FinishRate</label>
-                            <div class="col-md-10" data-toggle="tooltip" data-placement="bottom" title="Finish Percent">
-                                @if (Model != null && !string.IsNullOrEmpty(Model.FinishRating.ToString()))
-                                {
-                                    <input class="form-control text-box single-line" value="@Model.FinishRating.ToString()" data-val="true" data-val-length="The field Project must be a string with a minimum length of 1 and a maximum length of 2." data-val-length-max="2" data-val-length-min="1" data-val-required="The FinishRating field is required." id="FinishRating" name="FinishRating" type="text" />
-                                }
-                                <span class="field-validation-valid text-danger" data-valmsg-for="FinishRating" data-valmsg-replace="true"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-6"></div>
-                   </div>
-                   
-                    <hr />
+                        <hr />
 
 
                         @for (var i = 0; i < 1; i++)
@@ -182,159 +186,159 @@
 
                     </div>
 
-                <hr />
+                    <hr />
 
-                <div class="col-md-12">
-                    <div class="form-group">
-                        @Html.Label("Description")
-                    </div>
-
-                    <div class="form-group">
-                        <div>
-                            @if (Model != null && !string.IsNullOrEmpty(Model.Description))
-                            {
-                                <textarea name="editor1" id="editor1" rows="10" cols="80">@Model.Description</textarea>
-                            }
-                            else
-                            {
-                                <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
-                            }
-
-                            <script>
-                            CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserImageUploadUrl: '/userfiles/Upload.ashx' });
-                            </script>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            @Html.Label("Description")
                         </div>
+
+                        <div class="form-group">
+                            <div>
+                                @if (Model != null && !string.IsNullOrEmpty(Model.Description))
+                                {
+                                    <textarea name="editor1" id="editor1" rows="10" cols="80">@Model.Description</textarea>
+                                }
+                                else
+                                {
+                                    <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
+                                }
+
+                                <script>
+                                    CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserImageUploadUrl: '/userfiles/Upload.ashx' });
+                                </script>
+                            </div>
+                        </div>
+
                     </div>
 
                 </div>
 
-            </div>
-
             <div class="tab-pane" id="tab_b">
-                <div class="form-horizontal">
+                    <div class="form-horizontal">
 
-                    <div class="form-group">
-                        <div class="col-md-6">
+                        <div class="form-group">
                             <div class="col-md-6">
-                                <span class="btn btn-default btn-file" id="choosefile">
-                                    Upload MESConfig.ini <input type="file" name="files" id="file1" runat="server" onchange="ShowFileNames(this)" />
-                                </span>
+                                <div class="col-md-6">
+                                    <span class="btn btn-default btn-file" id="choosefile">
+                                        Upload MESConfig.ini <input type="file" name="files" id="file1" runat="server" onchange="ShowFileNames(this)" />
+                                    </span>
+                                </div>
+                                <div class="col-md-6">
+                                    @Html.Label("", new { @id = "showfilename", @name = "showfilename", @readonly = "readonly" })
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                @Html.Label("", new { @id = "showfilename", @name = "showfilename", @readonly = "readonly" })
-                            </div>
-                        </div>
-                        <script type="text/javascript">
+                            <script type="text/javascript">
                             function ShowFileNames(oFile) {
                                 $('#showfilename').text(oFile.value);
                                 }
-                        </script>
+                            </script>
+                        </div>
+
+                        <hr />
+
+                        @for (var i = 0; i < 3; i++)
+                {
+                    <div class="form-group">
+                        <div class="col-md-4">
+                            <label class="control-label col-md-2" for="PN@(i*3 + 1)">PN@(i * 3 + 1)</label>
+                            <div class="col-md-10">
+                                @if (Model != null && Model.PNList.Count > (i * 3))
+                                    {
+                                    <input class="form-control text-box single-line" id="PN@(i*3 + 1)" name="PN@(i*3 + 1)" type="text" value="@(Model.PNList[(i * 3)].Pn)" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
+                                    }
+                                    else
+                                    {
+                                    <input class="form-control text-box single-line" id="PN@(i*3 + 1)" name="PN@(i*3 + 1)" type="text" value="" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
+                                    }
+                                <span class="field-validation-valid text-danger" data-valmsg-for="PN@(i*3 + 1)" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="control-label col-md-2" for="PN@(i*3 + 2)">PN@(i * 3 + 2)</label>
+                            <div class="col-md-10">
+                                @if (Model != null && Model.PNList.Count > (i * 3 + 1))
+                                    {
+                                    <input class="form-control text-box single-line" id="PN@(i*3 + 2)" name="PN@(i*3 + 2)" type="text" value="@(Model.PNList[(i *3+1)].Pn)" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
+                                    }
+                                    else
+                                    {
+                                    <input class="form-control text-box single-line" id="PN@(i*3 + 2)" name="PN@(i*3 + 2)" type="text" value="" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" />
+                                    }
+                                <span class="field-validation-valid text-danger" data-valmsg-for="PN@(i*3 + 2)" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="control-label col-md-2" for="PN@(i*3 + 3)">PN@(i * 3 + 3)</label>
+                            <div class="col-md-10">
+                                @if (Model != null && Model.PNList.Count > (i * 3 + 2))
+                                    {
+                                    <input class="form-control text-box single-line" id="PN@(i*3 + 3)" name="PN@(i*3 + 3)" type="text" value="@(Model.PNList[(i * 3+2)].Pn)" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
+                                    }
+                                    else
+                                    {
+                                    <input class="form-control text-box single-line" id="PN@(i*3 + 3)" name="PN@(i*3 + 3)" type="text" value="" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" />
+                                    }
+                                <span class="field-validation-valid text-danger" data-valmsg-for="PN@(i*3 + 3)" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
                     </div>
-
-                    <hr />
-
-                    @for (var i = 0; i < 3; i++)
-                {
-                        <div class="form-group">
-                            <div class="col-md-4">
-                                <label class="control-label col-md-2" for="PN@(i*3 + 1)">PN@(i * 3 + 1)</label>
-                                <div class="col-md-10">
-                                    @if (Model != null && Model.PNList.Count > (i * 3))
-                                    {
-                                        <input class="form-control text-box single-line" id="PN@(i*3 + 1)" name="PN@(i*3 + 1)" type="text" value="@(Model.PNList[(i * 3)].Pn)" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
-                                    }
-                                    else
-                                    {
-                                        <input class="form-control text-box single-line" id="PN@(i*3 + 1)" name="PN@(i*3 + 1)" type="text" value="" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
-                                    }
-                                    <span class="field-validation-valid text-danger" data-valmsg-for="PN@(i*3 + 1)" data-valmsg-replace="true"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="control-label col-md-2" for="PN@(i*3 + 2)">PN@(i * 3 + 2)</label>
-                                <div class="col-md-10">
-                                    @if (Model != null && Model.PNList.Count > (i * 3 + 1))
-                                    {
-                                        <input class="form-control text-box single-line" id="PN@(i*3 + 2)" name="PN@(i*3 + 2)" type="text" value="@(Model.PNList[(i *3+1)].Pn)" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
-                                    }
-                                    else
-                                    {
-                                        <input class="form-control text-box single-line" id="PN@(i*3 + 2)" name="PN@(i*3 + 2)" type="text" value="" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" />
-                                    }
-                                    <span class="field-validation-valid text-danger" data-valmsg-for="PN@(i*3 + 2)" data-valmsg-replace="true"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="control-label col-md-2" for="PN@(i*3 + 3)">PN@(i * 3 + 3)</label>
-                                <div class="col-md-10">
-                                    @if (Model != null && Model.PNList.Count > (i * 3 + 2))
-                                    {
-                                        <input class="form-control text-box single-line" id="PN@(i*3 + 3)" name="PN@(i*3 + 3)" type="text" value="@(Model.PNList[(i * 3+2)].Pn)" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
-                                    }
-                                    else
-                                    {
-                                        <input class="form-control text-box single-line" id="PN@(i*3 + 3)" name="PN@(i*3 + 3)" type="text" value="" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" />
-                                    }
-                                    <span class="field-validation-valid text-danger" data-valmsg-for="PN@(i*3 + 3)" data-valmsg-replace="true"></span>
-                                </div>
-                            </div>
-                        </div>
                     }
 
-                    <hr />
+                        <hr />
 
-                    @for (var i = 0; i < 3; i++)
+                        @for (var i = 0; i < 3; i++)
                 {
-                        <div class="form-group">
-                            <div class="col-md-4">
-                                <label class="control-label col-md-3" for="Station@(i*3 + 1)">STATION@(i * 3 + 1)</label>
-                                <div class="col-md-9">
-                                    @if (Model != null && Model.StationList.Count > (i * 3))
+                    <div class="form-group">
+                        <div class="col-md-4">
+                            <label class="control-label col-md-3" for="Station@(i*3 + 1)">STATION@(i * 3 + 1)</label>
+                            <div class="col-md-9">
+                                @if (Model != null && Model.StationList.Count > (i * 3))
                                     {
-                                        <input class="form-control text-box single-line" id="Station@(i*3 + 1)" name="Station@(i*3 + 1)" type="text" value="@(Model.StationList[(i * 3)].Station)" data-toggle="tooltip" title="Use spec file's station name" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
+                                    <input class="form-control text-box single-line" id="Station@(i*3 + 1)" name="Station@(i*3 + 1)" type="text" value="@(Model.StationList[(i * 3)].Station)" data-toggle="tooltip" title="Use spec file's station name" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
                                     }
                                     else
                                     {
-                                        <input class="form-control text-box single-line" id="Station@(i*3 + 1)" name="Station@(i*3 + 1)" type="text" value="" data-toggle="tooltip" title="Use spec file's station name" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
+                                    <input class="form-control text-box single-line" id="Station@(i*3 + 1)" name="Station@(i*3 + 1)" type="text" value="" data-toggle="tooltip" title="Use spec file's station name" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
                                     }
-                                    <span class="field-validation-valid text-danger" data-valmsg-for="Station@(i*3 + 1)" data-valmsg-replace="true"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="control-label col-md-3" for="Station@(i*3 + 2)">STATION@(i * 3 + 2)</label>
-                                <div class="col-md-9">
-                                    @if (Model != null && Model.StationList.Count > (i * 3 + 1))
-                                    {
-                                        <input class="form-control text-box single-line" id="Station@(i*3 + 2)" name="Station@(i*3 + 2)" type="text" value="@(Model.StationList[(i * 3+1)].Station)" data-toggle="tooltip" title="Use spec file's station name" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
-                                    }
-                                    else
-                                    {
-                                        <input class="form-control text-box single-line" id="Station@(i*3 + 2)" name="Station@(i*3 + 2)" type="text" value="" data-toggle="tooltip" title="Use spec file's station name" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
-                                    }
-                                    <span class="field-validation-valid text-danger" data-valmsg-for="Station@(i*3 + 2)" data-valmsg-replace="true"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="control-label col-md-3" for="Station@(i*3 + 3)">STATION@(i * 3 + 3)</label>
-                                <div class="col-md-9">
-                                    @if (Model != null && Model.StationList.Count > (i * 3 + 2))
-                                    {
-                                        <input class="form-control text-box single-line" id="Station@(i*3 + 3)" name="Station@(i*3 + 3)" type="text" value="@(Model.StationList[(i * 3+2)].Station)" data-toggle="tooltip" title="Use spec file's station name" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
-                                    }
-                                    else
-                                    {
-                                        <input class="form-control text-box single-line" id="Station@(i*3 + 3)" name="Station@(i*3 + 3)" type="text" value="" data-toggle="tooltip" title="Use spec file's station name" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
-                                    }
-                                    <span class="field-validation-valid text-danger" data-valmsg-for="Station@(i*3 + 3)" data-valmsg-replace="true"></span>
-                                </div>
+                                <span class="field-validation-valid text-danger" data-valmsg-for="Station@(i*3 + 1)" data-valmsg-replace="true"></span>
                             </div>
                         </div>
+                        <div class="col-md-4">
+                            <label class="control-label col-md-3" for="Station@(i*3 + 2)">STATION@(i * 3 + 2)</label>
+                            <div class="col-md-9">
+                                @if (Model != null && Model.StationList.Count > (i * 3 + 1))
+                                    {
+                                    <input class="form-control text-box single-line" id="Station@(i*3 + 2)" name="Station@(i*3 + 2)" type="text" value="@(Model.StationList[(i * 3+1)].Station)" data-toggle="tooltip" title="Use spec file's station name" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
+                                    }
+                                    else
+                                    {
+                                    <input class="form-control text-box single-line" id="Station@(i*3 + 2)" name="Station@(i*3 + 2)" type="text" value="" data-toggle="tooltip" title="Use spec file's station name" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
+                                    }
+                                <span class="field-validation-valid text-danger" data-valmsg-for="Station@(i*3 + 2)" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="control-label col-md-3" for="Station@(i*3 + 3)">STATION@(i * 3 + 3)</label>
+                            <div class="col-md-9">
+                                @if (Model != null && Model.StationList.Count > (i * 3 + 2))
+                                    {
+                                    <input class="form-control text-box single-line" id="Station@(i*3 + 3)" name="Station@(i*3 + 3)" type="text" value="@(Model.StationList[(i * 3+2)].Station)" data-toggle="tooltip" title="Use spec file's station name" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
+                                    }
+                                    else
+                                    {
+                                    <input class="form-control text-box single-line" id="Station@(i*3 + 3)" name="Station@(i*3 + 3)" type="text" value="" data-toggle="tooltip" title="Use spec file's station name" data-val="true" data-val-regex="The field should not contains '" data-val-regex-pattern="^(?!.*\').*$" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 90." data-val-length-max="90" data-val-length-min="2" />
+                                    }
+                                <span class="field-validation-valid text-danger" data-valmsg-for="Station@(i*3 + 3)" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                    </div>
                     }
 
-                    <hr />
+                        <hr />
 
+                    </div>
                 </div>
-            </div>
         </div>
     </div>
 

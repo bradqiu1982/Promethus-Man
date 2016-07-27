@@ -9,6 +9,9 @@ using System.Net.Mail;
 using System.Web.Routing;
 using System.Collections.Specialized;
 using Prometheus.Models;
+using System.Security.Cryptography.X509Certificates;
+using System.Net.Security;
+using System.Threading;
 
 namespace Prometheus.Controllers
 {
@@ -20,7 +23,7 @@ namespace Prometheus.Controllers
             return false;
         }
 
-        private bool sendemail(List<string> tolist, string content)
+        private bool sendemail(string title,List<string> tolist, string content)
         {
             try
             {
@@ -30,18 +33,29 @@ namespace Prometheus.Controllers
                 {
                     message.To.Add(item);
                 }
-                message.Subject = "This is a test";
+                message.Subject = title;
                 message.Body = content;
 
                 SmtpClient client = new SmtpClient();
                 client.Host = "wmail.finisar.com";
                 client.EnableSsl = true;
-                client.Timeout = 10000;
+                client.Timeout = 30000;
                 client.DeliveryMethod = SmtpDeliveryMethod.Network;
                 client.UseDefaultCredentials = false;
                 client.Credentials = new NetworkCredential("brad.qiu@finisar.com", "wangle@432");
-                client.Send(message);
 
+                ServicePointManager.ServerCertificateValidationCallback 
+                    = delegate (object s, X509Certificate certificate,X509Chain chain
+                    , SslPolicyErrors sslPolicyErrors){ return true; };
+
+                new Thread(() => {
+                    try
+                    {
+                        client.Send(message);
+                    }
+                    catch (Exception ex)
+                    { }
+                }).Start();
             }
             catch (Exception ex)
             {
@@ -54,6 +68,19 @@ namespace Prometheus.Controllers
         public ActionResult RegisterUser()
         {
             return View();
+        }
+         
+        private void SendActiveEmail(string username,string updatetime)
+        {
+            var routevalue = new RouteValueDictionary();
+            routevalue.Add("validatestr", Convert.ToBase64String(UTF8Encoding.UTF8.GetBytes(username + "||" + updatetime)));
+            //send validate email
+            string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+            string validatestr = this.Url.Action("ActiveUser", "User", routevalue, scheme);
+
+            var toaddrs = new List<string>();
+            toaddrs.Add(username);
+            sendemail("NPI Website Active Link",toaddrs, validatestr);
         }
 
         [HttpPost, ActionName("RegisterUser")]
@@ -78,15 +105,7 @@ namespace Prometheus.Controllers
             user.UpdateDate = DateTime.Parse(updatetime);
             user.RegistUser();
 
-            var routevalue = new RouteValueDictionary();
-            routevalue.Add("validatestr", Convert.ToBase64String(UTF8Encoding.UTF8.GetBytes(username + "||" + updatetime)));
-            //send validate email
-            string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
-            string validatestr = this.Url.Action("ValidateUser","User", routevalue, scheme);
-
-            var toaddrs = new List<string>();
-            toaddrs.Add(username);
-            sendemail(toaddrs, validatestr);
+            SendActiveEmail(username, updatetime);
 
             return RedirectToAction("ValidateNoticeA");
         }
@@ -101,7 +120,17 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        public ActionResult ValidateUser(string validatestr)
+        public ActionResult ResetNoticeA()
+        {
+            return View();
+        }
+
+        public ActionResult ResetNoticeB()
+        {
+            return View();
+        }
+
+        public ActionResult ActiveUser(string validatestr)
         {
             if (string.IsNullOrEmpty(validatestr))
             {
@@ -112,25 +141,82 @@ namespace Prometheus.Controllers
             
             var bs = Convert.FromBase64String(validatestr);
             var val = UTF8Encoding.UTF8.GetString(bs);
-            var username = val.Split(new char[] { '|' })[0];
-            var updatetime = val.Split(new char[] { '|' })[1];
-            UserViewModels.ValidateUser(username);
+            var username = val.Split(new string[] { "||" },StringSplitOptions.None)[0];
+            var updatetime = val.Split(new string[] { "||" }, StringSplitOptions.None)[1];
+            UserViewModels.ActiveUser(username);
             return RedirectToAction("ValidateNoticeB");
         }
 
-        public ActionResult LoginUser(string ctrl,string action)
+        public ActionResult ResetUser(string resetstr)
+        {
+            if (string.IsNullOrEmpty(resetstr))
+            {
+                var createerror = "<h3><font color=\"red\">Fail to reset User: reset string is empty</font></h3>";
+                ViewBag.CreateError = createerror;
+                return RedirectToAction("RegisterUser");
+            }
+
+            try
+            {
+                var bs = Convert.FromBase64String(resetstr);
+                var val = UTF8Encoding.UTF8.GetString(bs);
+                var username = val.Split(new string[] { "||" }, StringSplitOptions.None)[0];
+                var updatetime = val.Split(new string[] { "||" }, StringSplitOptions.None)[1];
+                var vm = new UserViewModels();
+                vm.Email = username;
+                vm.Password = "";
+                vm.ConfirmPassword = "";
+                return View(vm);
+            }
+            catch (Exception ex)
+            {
+                var createerror = "<h3><font color=\"red\">Fail to reset User: reset string is wrong</font></h3>";
+                ViewBag.CreateError = createerror;
+                return RedirectToAction("RegisterUser");
+            }
+
+        }
+
+        [HttpPost, ActionName("ResetUser")]
+        [ValidateAntiForgeryToken]
+        public ActionResult ResetUserPOST()
+        {
+            var username = Request.Form["Email"];
+            var password = Request.Form["Password"];
+            UserViewModels.RestPwd(username, password);
+            UserViewModels.ActiveUser(username);
+            return RedirectToAction("ResetNoticeB");
+        }
+
+
+        private ActionResult SendResetEmail(string username)
+        {
+            string updatetime = DateTime.Now.ToString();
+            var routevalue = new RouteValueDictionary();
+            routevalue.Add("resetstr", Convert.ToBase64String(UTF8Encoding.UTF8.GetBytes(username + "||" + updatetime)));
+            //send validate email
+            string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+            string validatestr = this.Url.Action("ResetUser", "User", routevalue, scheme);
+
+            var toaddrs = new List<string>();
+            toaddrs.Add(username);
+            sendemail("NPI Website Active Link", toaddrs, validatestr);
+            return RedirectToAction("ResetNoticeA");
+        }
+
+        public ActionResult LoginUser()
         {
             return View();
         }
 
-        [HttpPost, ActionName("LoginUser")]
-        [ValidateAntiForgeryToken]
-        public ActionResult LoginUserPOST()
+        private ActionResult NormalLogin(string username,string dbpwd,string inputpwd)
         {
-            var username = Request.Form["Email"];
-            var password = Request.Form["Password"];
-
-            
+            if (string.Compare(dbpwd, inputpwd) != 0)
+            {
+                var loginerror = "<h3><font color=\"red\">Fail to login: password not correct</font></h3>";
+                ViewBag.loginerror = loginerror;
+                return RedirectToAction("LoginUser");
+            }
 
             var ckdict = UnpackCookie(this);
             if (ckdict.ContainsKey("logonredirectctrl") && ckdict.ContainsKey("logonredirectact"))
@@ -145,13 +231,51 @@ namespace Prometheus.Controllers
             else
             {
                 //verify user information
-                string logonuser = username +"||"+ DateTime.Now.ToString();
+                string logonuser = username + "||" + DateTime.Now.ToString();
                 var ck = new Dictionary<string, string>();
                 ck.Add("logonuser", logonuser);
                 SetCookie(this, ck);
                 return RedirectToAction("UserCenter", "User");
             }
-           
+        }
+
+        [HttpPost, ActionName("LoginUser")]
+        [ValidateAntiForgeryToken]
+        public ActionResult LoginUserPOST()
+        {
+            var username = Request.Form["Email"];
+            var password = Request.Form["Password"];
+
+            var dbret = UserViewModels.RetrieveUser(username);
+            if (dbret == null)
+            {
+                var loginerror = "<h3><font color=\"red\">Fail to login: user not exist</font></h3>";
+                ViewBag.loginerror = loginerror;
+                return View();
+            }
+
+            if (dbret.Validated == 0)
+            {
+                var loginerror = "<h3><font color=\"red\">Fail to login: user is not actived</font></h3>";
+                ViewBag.loginerror = loginerror;
+                string updatetime = DateTime.Now.ToString();
+                UserViewModels.UpdateUserTime(username, DateTime.Parse(updatetime));
+                SendActiveEmail(username, updatetime);
+                return RedirectToAction("ValidateNoticeA");
+            }
+
+            if (Request.Form["Login"] != null)
+            {
+                return NormalLogin(username, dbret.Password, password);
+            }
+            else if (Request.Form["ForgetPassword"] != null)
+            {
+                return SendResetEmail(username);
+            }
+            else
+            {
+                return View();
+            }
         }
 
         public static bool SetCookie(Controller ctrl, Dictionary<string, string> values)

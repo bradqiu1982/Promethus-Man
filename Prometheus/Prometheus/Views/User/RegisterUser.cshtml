@@ -19,7 +19,7 @@
 @using (Html.BeginForm("RegisterUser", "User", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
 {
     @Html.AntiForgeryToken()
-    <hr />
+
     @Html.ValidationSummary("", new { @class = "text-danger" })
     <div class="form-group">
         @Html.LabelFor(model => model.Email, new { @class = "col-md-2 control-label" })

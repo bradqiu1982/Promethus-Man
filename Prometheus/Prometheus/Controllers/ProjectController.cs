@@ -72,9 +72,9 @@ namespace Prometheus.Controllers
         }
 
 
-        private bool ProjectValidate(ProjectViewModels projectmodel)
+        private bool ProjectValidate(ProjectViewModels projectmodel,bool updateproject = false)
         {
-            var createerror = "<h3><font color=\"red\">Fail to create project: <ErrorMsg></font></h3>";
+            var createerror = "<h3><font color=\"red\">Fail to create/modify project: <ErrorMsg></font></h3>";
             if (string.IsNullOrEmpty(projectmodel.ProjectName.Trim())
                 || string.IsNullOrEmpty(projectmodel.ProjectKey.Trim()))
             {
@@ -97,10 +97,13 @@ namespace Prometheus.Controllers
                 return false;
             }
 
-            if (projectmodel.CheckExistProject())
+            if(!updateproject)
             {
-                ViewBag.CreateError = createerror.Replace("<ErrorMsg>", "Project exist");
-                return false;
+                if (projectmodel.CheckExistProject())
+                {
+                    ViewBag.CreateError = createerror.Replace("<ErrorMsg>", "Project exist");
+                    return false;
+                }
             }
 
             foreach (var eg in projectmodel.MemberList)
@@ -331,13 +334,13 @@ namespace Prometheus.Controllers
                 }
                 catch (Exception ex)
                 {
-                    ViewBag.CreateError = "<h3><font color=\"red\">Fail to create project: "+ RMSpectialCh(ex.ToString())+"</font></h3>";
+                    ViewBag.CreateError = "<h3><font color=\"red\">Fail to create/modify project: " + RMSpectialCh(ex.ToString())+"</font></h3>";
                     return false;
                 }
             }
             else
             {
-                ViewBag.CreateError = ViewBag.CreateError = "<h3><font color=\"red\">Fail to create project: StartDate is empty</font></h3>";
+                ViewBag.CreateError = ViewBag.CreateError = "<h3><font color=\"red\">Fail to create/modify project: StartDate is empty</font></h3>";
                 return false;
             }
         }
@@ -378,6 +381,7 @@ namespace Prometheus.Controllers
         {
             var projectmodel = new ProjectViewModels();
             projectmodel.ProjectName = Request.Form["ProjectName"];
+            projectmodel.FinishRating = 0;
             RetrievePorjectKey(projectmodel);
 
             RetrieveProjectMember(projectmodel);
@@ -393,24 +397,28 @@ namespace Prometheus.Controllers
             if (!ProjectValidate(projectmodel))
                 return View(projectmodel);
 
-            if(projectmodel.StationList.Count > 0
-                && projectmodel.TabList.Count >0
+            if (projectmodel.StationList.Count > 0
+                && projectmodel.TabList.Count > 0
                 && projectmodel.PNList.Count > 0)
             {
                 var sqls = RetrieveSqlFromProjectModel(projectmodel);
                 foreach (var s in sqls)
                 {
-                    var sql = s.Replace("#TIMECOND#", "and TestTimeStamp > '"+DateTime.Parse("2016-7-18 4:00:00").ToString()+"'");
-                    System.Windows.MessageBox.Show(sql);
-                    var res = DBUtility.ExeMESSqlWithRes(sql);
-                    foreach (var r in res)
-                    {
-                        var l = r;
-                    }
+                    var sql = s.Replace("#TIMECOND#", "and TestTimeStamp > '" + DateTime.Parse("2016-7-18 4:00:00").ToString() + "'");
+                    //System.Windows.MessageBox.Show(sql);
+                    //var res = DBUtility.ExeMESSqlWithRes(sql);
+                    //foreach (var r in res)
+                    //{
+                    //    var l = r;
+                    //}
                 }
             }
 
             projectmodel.StoreProject();
+
+            var ckdict = UserController.UnpackCookie(this);
+            var who = (ckdict["logonuser"]).Split(new string[]{ "||"},StringSplitOptions.None)[0];
+            ProjectEvent.CreateProjectEvent(who, projectmodel.ProjectKey, projectmodel.ProjectName);
 
             return RedirectToAction("ViewAll");
         }
@@ -452,17 +460,50 @@ namespace Prometheus.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult EditProjectPost()
         {
-            if (Request.Form["update"] != null)
-            {
-                System.Windows.MessageBox.Show("try to update");
-            }
+            var projectmodel = new ProjectViewModels();
+            projectmodel.ProjectName = Request.Form["ProjectName"];
+            try {projectmodel.FinishRating = Convert.ToDouble(Request.Form["FinishRating"])%100; }
+            catch(Exception ex) { projectmodel.FinishRating = 0; }
+            RetrievePorjectKey(projectmodel);
 
-            if (Request.Form["delete"] != null)
-            {
-                System.Windows.MessageBox.Show("try to delete");
-            }
+            RetrieveProjectMember(projectmodel);
+            RetrieveProjectDesc(projectmodel);
+
+            StoreMesConfig(projectmodel);
+            RetrievePNs(projectmodel);
+            RetrieveStation(projectmodel);
+
+            if (!RetrieveProjectDate(projectmodel))
+                return View(projectmodel);
+
+            if (!ProjectValidate(projectmodel,true))
+                return View(projectmodel);
+
+            projectmodel.StoreProject();
+            
+            //TODO retrive bondinged table and retrieve new bonding table data from MES
+            
+            var ckdict = UserController.UnpackCookie(this);
+            var who = (ckdict["logonuser"]).Split(new string[] { "||" }, StringSplitOptions.None)[0];
+            ProjectEvent.UpdateProjectEvent(who, projectmodel.ProjectKey, projectmodel.ProjectName);
 
             return RedirectToAction("ViewAll");
         }
-    }
+
+        public ActionResult ProjectIssues(string ProjectKey)
+        {
+            if(ProjectKey != null)
+            {
+                var list1 = ProjectEvent.RetrieveProjectEvent(ProjectKey, ProjectEvent.Pending, 30);
+                var list2 = ProjectEvent.RetrieveProjectEvent(ProjectKey, ProjectEvent.Working, 30);
+                var list3 = ProjectEvent.RetrieveProjectEvent(ProjectKey, ProjectEvent.Done, 30);
+                list1.AddRange(list2);
+                list1.AddRange(list3);
+                return View(list1);
+            }
+            
+            return View();
+        }
+
+      }
 }

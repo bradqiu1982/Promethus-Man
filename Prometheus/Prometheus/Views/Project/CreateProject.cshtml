@@ -13,6 +13,8 @@
     ViewBag.CreateError = "";
 }
 
+<hr />
+
 @{
     var PMList = new List<Prometheus.Models.ProjectMembers>();
     if (Model != null)
@@ -44,7 +46,7 @@
 @using (Html.BeginForm("CreateProject","Project",FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
-    <hr />
+
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
     <div class="form-group">

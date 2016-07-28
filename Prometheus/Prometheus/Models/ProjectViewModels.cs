@@ -58,6 +58,146 @@ namespace Prometheus.Models
         public string TableName { set; get; }
     }
 
+    public class ProjectEvent
+    {
+        public static string Pending = "Pending";
+        public static string Working = "Working";
+        public static string Done = "Done";
+
+        public ProjectEvent()
+        {
+        }
+
+        public ProjectEvent(string key, string ekey, string devent, string estatus, string bdate)
+        {
+            ProjectKey = key;
+            EventKey = ekey;
+            dbEvent = devent;
+            EventStatus = estatus;
+            BuildDate = DateTime.Parse(bdate);
+        }
+
+        public string ProjectKey { set; get; }
+        public string EventKey { set; get; }
+
+        private string sEvent = "";
+
+        public string Event
+        {
+            set { sEvent = value; }
+            get { return sEvent; }
+        }
+
+        public string dbEvent
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(sEvent))
+                {
+                    return "";
+                }
+                else
+                {
+                    try
+                    {
+                        return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(sEvent));
+                    }
+                    catch (Exception)
+                    {
+                        return "";
+                    }
+                }
+
+            }
+
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    sEvent = "";
+                }
+                else
+                {
+                    try
+                    {
+                        sEvent = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(value));
+                    }
+                    catch (Exception)
+                    {
+                        sEvent = "";
+                    }
+
+                }
+
+            }
+        }
+
+        public string EventStatus { set; get; }
+
+        public DateTime BuildDate { set; get; }
+
+        public static string GetUniqKey()
+        {
+            return Guid.NewGuid().ToString("N");
+        }
+
+        public void StoreProjectEvent()
+        {
+            var sql = "insert into ProjectEvent(ProjectKey,EventKey,Event,EventStatus,BuildDate) values('<ProjectKey>','<EventKey>','<Event>','<EventStatus>','<BuildDate>')";
+            sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<EventKey>", EventKey).Replace("<Event>", dbEvent).Replace("<EventStatus>", EventStatus).Replace("<BuildDate>", BuildDate.ToString());
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        public static List<ProjectEvent> RetrieveProjectEvent(string pkey,string estatus,int topnum)
+        {
+            var ret = new List<ProjectEvent>();
+
+            var sql = "select top <num> ProjectKey,EventKey,Event,EventStatus,BuildDate from ProjectEvent where ProjectKey = '<ProjectKey>' and EventStatus = '<EventStatus>' order by BuildDate DESC";
+            sql = sql.Replace("<ProjectKey>", pkey).Replace("<EventStatus>", estatus).Replace("<num>", Convert.ToString(topnum));
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            foreach (var item in dbret)
+            {
+                var e = new ProjectEvent(Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])
+                    , Convert.ToString(item[3]), Convert.ToString(item[4]));
+                ret.Add(e);
+            }
+
+            return ret;
+        }
+
+        public static void UpdateEventStatus(string ekey, string estaus)
+        {
+            var sql = "update ProjectEvent set EventStatus = '<EventStatus>' where EventKey = '<EventKey>'";
+            sql = sql.Replace("<EventStatus>", estaus).Replace("<EventKey>", ekey);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        private static void BuildProjectEvent(string who, string projectkey, string projectname,string operate)
+        {
+            var wholink = "< a href = \"/User/UserCenter?username=" + who + "\" >"+who.Split(new char[] {'@'})[0]+"</a>";
+            var projectlink = "< a href = \"/Project/ProjectIssues?ProjectKey=" + projectkey + "\" >"+ projectname + "</a>";
+
+            var vm = new ProjectEvent();
+            vm.ProjectKey = projectkey;
+            vm.EventKey = GetUniqKey();
+            vm.Event = wholink + " " + operate + " " + projectlink;
+            vm.EventStatus = ProjectEvent.Done;
+            vm.BuildDate = DateTime.Now;
+            vm.StoreProjectEvent();
+        }
+
+        public static void CreateProjectEvent(string who,string projectkey,string projectname)
+        {
+            BuildProjectEvent(who, projectkey, projectname, "create");
+        }
+
+        public static void UpdateProjectEvent(string who, string projectkey, string projectname)
+        {
+            BuildProjectEvent(who, projectkey, projectname, "update");
+        }
+
+    }
+
     public class ProjectViewModels
     {
         public static string PMROLE = "PM";
@@ -257,13 +397,24 @@ namespace Prometheus.Models
 
         private void StoreProjectBaseInfo()
         {
-            var sql = "insert into Project(ProjectKey,ProjectName,StartDate,Description) values('<ProjectKey>','<ProjectName>','<StartDate>','<Description>')";
-            sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ProjectName>", dbProjectName).Replace("<StartDate>", StartDate.ToString("yyyy-MM-dd")).Replace("<Description>", dbDescription);
+            var sql = "delete from Project where ProjectKey = '<ProjectKey>'";
+            sql = sql.Replace("<ProjectKey>", ProjectKey);
+            DBUtility.ExeLocalSqlNoRes(sql);
+
+            sql = "insert into Project(ProjectKey,ProjectName,StartDate,Description,FinishRate) values('<ProjectKey>','<ProjectName>','<StartDate>','<Description>',<FinishRate>)";
+            sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ProjectName>", dbProjectName).Replace("<StartDate>", StartDate.ToString("yyyy-MM-dd")).Replace("<Description>", dbDescription).Replace("<FinishRate>", Convert.ToString(FinishRating));
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
         private void StoreProjectMembers()
         {
+            if (MemberList.Count > 0)
+            {
+                var sql = "delete from ProjectMembers where ProjectKey = '<ProjectKey>'";
+                sql = sql.Replace("<ProjectKey>", ProjectKey);
+                DBUtility.ExeLocalSqlNoRes(sql);
+            }
+
             foreach (var item in MemberList)
             {
                 var sql = "insert into ProjectMembers(ProjectKey,Name,Role) values('<ProjectKey>','<Name>','<Role>')";
@@ -274,6 +425,13 @@ namespace Prometheus.Models
 
         private void StoreProjectMesTable()
         {
+            if (TabList.Count > 0)
+            {
+                var sql = "delete from ProjectMesTable where ProjectKey = '<ProjectKey>'";
+                sql = sql.Replace("<ProjectKey>", ProjectKey);
+                DBUtility.ExeLocalSqlNoRes(sql);
+            }
+
             foreach (var item in TabList)
             {
                 var sql = "insert into ProjectMesTable(ProjectKey,Station,TableName) values('<ProjectKey>','<Station>','<TableName>')";
@@ -284,6 +442,13 @@ namespace Prometheus.Models
 
         private void StoreProjectPN()
         {
+            if (PNList.Count > 0)
+            {
+                var sql = "delete from ProjectPn where ProjectKey = '<ProjectKey>'";
+                sql = sql.Replace("<ProjectKey>", ProjectKey);
+                DBUtility.ExeLocalSqlNoRes(sql);
+            }
+
             foreach (var item in PNList)
             {
                 var sql = "insert into ProjectPn(ProjectKey,PN) values('<ProjectKey>','<PN>')";
@@ -294,6 +459,13 @@ namespace Prometheus.Models
 
         private void StoreProjectStation()
         {
+            if (StationList.Count > 0)
+            {
+                var sql = "delete from ProjectStation where ProjectKey = '<ProjectKey>'";
+                sql = sql.Replace("<ProjectKey>", ProjectKey);
+                DBUtility.ExeLocalSqlNoRes(sql);
+            }
+
             foreach (var item in StationList)
             {
                 var sql = "insert into ProjectStation(ProjectKey,Station) values('<ProjectKey>','<Station>')";

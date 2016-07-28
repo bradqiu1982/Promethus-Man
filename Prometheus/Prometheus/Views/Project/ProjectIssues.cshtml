@@ -1,0 +1,86 @@
+﻿@model IEnumerable<Prometheus.Models.ProjectEvent>
+
+@{
+    ViewBag.Title = "ProjectIssues";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Project Issues</h2>
+
+<hr/>
+
+@{
+    var pendinglist = new List<Prometheus.Models.ProjectEvent>();
+    var workinglist = new List<Prometheus.Models.ProjectEvent>();
+    var donelist = new List<Prometheus.Models.ProjectEvent>();
+}
+
+@if (Model != null)
+{
+    foreach (var item in Model)
+    {
+        if (string.Compare(item.EventStatus, Prometheus.Models.ProjectEvent.Pending) == 0)
+        {
+            pendinglist.Add(item);
+        }
+        if (string.Compare(item.EventStatus, Prometheus.Models.ProjectEvent.Working) == 0)
+        {
+            workinglist.Add(item);
+        }
+        if (string.Compare(item.EventStatus, Prometheus.Models.ProjectEvent.Done) == 0)
+        {
+            donelist.Add(item);
+        }
+    }
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Pending</h3>
+            </div>
+            <div class="panel-body" style="max-height:420px;min-height:420px;overflow-y: scroll;overflow-x: scroll;">
+                <div class="panel-body">
+                    Panel content1
+                </div>
+                <hr />
+                <div class="panel-body">
+                    Panel content2
+                </div>
+                </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Working</h3>
+            </div>
+            <div class="panel-body" style="max-height:420px;min-height:420px;overflow-y: scroll;overflow-x: scroll;">
+                <div class="panel-body">
+                    Panel content1
+                </div>
+                <hr />
+                <div class="panel-body">
+                    Panel content2
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Done</h3>
+            </div>
+            <div class="panel-body" style="max-height:420px;min-height:420px;overflow-y: scroll;overflow-x: scroll;">
+                <div class="panel-body">
+                    Panel content1
+                </div>
+                <hr />
+                <div class="panel-body">
+                    Panel content2
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -655,7 +655,7 @@
     <Content Include="Views\DashBoard\ViewAll.cshtml" />
     <Content Include="Views\Project\ViewAll.cshtml" />
     <Content Include="Views\Project\CreateProject.cshtml" />
-    <Content Include="Views\Project\ProjectDetail.cshtml" />
+    <Content Include="Views\Project\EditProject.cshtml" />
     <Content Include="Views\User\RegisterUser.cshtml" />
     <Content Include="Views\User\LoginUser.cshtml" />
     <Content Include="Views\User\UserCenter.cshtml" />

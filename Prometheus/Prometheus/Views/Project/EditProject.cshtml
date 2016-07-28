@@ -1,11 +1,11 @@
 ﻿@model Prometheus.Models.ProjectViewModels
 
 @{
-    ViewBag.Title = "ProjectDetail";
+    ViewBag.Title = "EditProject";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Project Detail</h2>
+<h2>Edit Project</h2>
 
 <script src="../../ckeditor/ckeditor.js"></script>
 
@@ -37,7 +37,7 @@
 
 <script src="../../ckeditor/ckeditor.js"></script>
 
-@using (Html.BeginForm("ProjectDetail", "Project", FormMethod.Post, new { enctype = "multipart/form-data" }))
+@using (Html.BeginForm("EditProject", "Project", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
     <hr />
@@ -45,16 +45,13 @@
 
     <div class="form-group">
         <ul class="nav nav-pills nav-stacked col-md-2">
-            <li class="active"><a href="#tab_c" data-toggle="pill">Project News</a></li>
-            <li><a href="#tab_a" data-toggle="pill">Base Info<font color="red">*</font></a></li>
+            <li class="active"><a href="#tab_a" data-toggle="pill">Base Info<font color="red">*</font></a></li>
             <li><a href="#tab_b" data-toggle="pill">MES Bonding</a></li>
         </ul>
 
         <div class="tab-content col-md-10">
-            <div class="tab-pane active" id="tab_c">
-            </div>
             
-            <div class="tab-pane" id="tab_a">
+            <div class="tab-pane active" id="tab_a">
 
                     <div class="form-horizontal">
 

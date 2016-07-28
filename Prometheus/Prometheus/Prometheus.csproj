@@ -665,6 +665,7 @@
     <Content Include="Views\User\ResetNoticeB.cshtml" />
     <Content Include="Views\User\ResetNoticeA.cshtml" />
     <Content Include="Views\User\ResetUser.cshtml" />
+    <Content Include="Views\Project\ProjectIssues.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

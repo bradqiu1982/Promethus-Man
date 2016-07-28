@@ -42,7 +42,7 @@
     <div class="col-md-12">
         <div class="panel panel-default">
             <div class="panel-heading">
-                @Html.ActionLink(item.ProjectName, "ProjectDetail", "Project", new { ProjectKey = item.ProjectKey }, null)
+                @Html.ActionLink(item.ProjectName, "EditProject", "Project", new { ProjectKey = item.ProjectKey }, null)
             </div>
             <div class="panel-body col-md-12 " style="overflow-x: scroll;">
 
@@ -76,8 +76,7 @@
                                     {
                                         <label class="control-label col-md-2" for="PM@(i*2 + 1)">PM@(i * 2 + 1)</label>
                                         <div class="col-md-10">
-                                            @Html.ActionLink(@PMList[(i * 2)].Name, "UserCenter", "User", new { username = @PMList[(i * 2)].Name }, null)
-                                            @*<input class="form-control text-box single-line" value="@(PMList[(i * 2)].Name)" id="PM@(i * 2 + 1)" name="PM@(i * 2 + 1)" readonly="readonly" />*@
+                                            @Html.ActionLink(@PMList[(i * 2)].Name.Split(new char[] { '@'})[0], "UserCenter", "User", new { username = @PMList[(i * 2)].Name }, null)
                                         </div>
                                     }
                             </div>
@@ -86,8 +85,7 @@
                                     {
                                         <label class="control-label col-md-2" for="PM@(i*2 + 2)">PM@(i * 2 + 2)</label>
                                         <div class="col-md-10">
-                                            @Html.ActionLink(@PMList[(i * 2+1)].Name, "UserCenter", "User", new { username = @PMList[(i * 2+1)].Name }, null)
-                                            @*<input class="form-control text-box single-line" value="@(PMList[(i * 2+1)].Name)" id="PM@(i*2 + 2)" name="PM@(i*2 + 2)" readonly="readonly" />*@
+                                            @Html.ActionLink(@PMList[(i * 2+1)].Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = @PMList[(i * 2+1)].Name }, null)
                                         </div>
                                     }
                                </div>
@@ -104,8 +102,7 @@
                                 {
                                     <label class="control-label col-md-2" for="Engineer@(i*2 + 1)">Engineer@(i * 2 + 1)</label>
                                     <div class="col-md-10">
-                                        @Html.ActionLink(@ENGList[(i * 2)].Name, "UserCenter", "User", new { username = @ENGList[(i * 2)].Name }, null)
-                                        @*<input class="form-control text-box single-line" id="Engineer@(i * 2 + 1)" value="@(ENGList[(i * 2)].Name)" name="Engineer@(i * 2 + 1)" readonly="readonly" />*@
+                                        @Html.ActionLink(@ENGList[(i * 2)].Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = @ENGList[(i * 2)].Name }, null)
                                     </div>
                                 }
                         </div>
@@ -114,8 +111,7 @@
                                 {
                                     <label class="control-label col-md-2" for="Engineer@(i*2 + 2)">Engineer@(i * 2 + 2)</label>
                                     <div class="col-md-10">
-                                        @Html.ActionLink(@ENGList[(i * 2+1)].Name, "UserCenter", "User", new { username = @ENGList[(i * 2+1)].Name }, null)
-                                        @*<input class="form-control text-box single-line" id="Engineer@(i*2 + 2)" value="@(ENGList[(i * 2+1)].Name)" name="Engineer@(i*2 + 2)" readonly="readonly" />*@
+                                        @Html.ActionLink(@ENGList[(i * 2+1)].Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = @ENGList[(i * 2+1)].Name }, null)
                                     </div>
                                 }
                         </div>

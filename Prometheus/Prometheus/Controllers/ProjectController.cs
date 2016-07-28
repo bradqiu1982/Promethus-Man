@@ -415,7 +415,7 @@ namespace Prometheus.Controllers
             return RedirectToAction("ViewAll");
         }
 
-        public ActionResult ProjectDetail(string ProjectKey)
+        public ActionResult EditProject(string ProjectKey)
         {
             var ckdict = UserController.UnpackCookie(this);
             if (!string.IsNullOrEmpty(ProjectKey) || ckdict.ContainsKey("ProjectKey"))
@@ -435,7 +435,7 @@ namespace Prometheus.Controllers
                 {
                     var ck = new Dictionary<string, string>();
                     ck.Add("logonredirectctrl", "Project");
-                    ck.Add("logonredirectact", "ProjectDetail");
+                    ck.Add("logonredirectact", "EditProject");
                     ck.Add("ProjectKey", realkey);
                     UserController.SetCookie(this, ck);
                     return RedirectToAction("LoginUser", "User");
@@ -448,9 +448,9 @@ namespace Prometheus.Controllers
             }
         }
 
-        [HttpPost, ActionName("ProjectDetail")]
+        [HttpPost, ActionName("EditProject")]
         [ValidateAntiForgeryToken]
-        public ActionResult ProjectPostDetail()
+        public ActionResult EditProjectPost()
         {
             if (Request.Form["update"] != null)
             {

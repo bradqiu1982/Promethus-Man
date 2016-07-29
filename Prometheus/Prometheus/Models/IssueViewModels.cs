@@ -75,6 +75,7 @@ namespace Prometheus.Models
         public string Priority { set; get; }
         public DateTime DueDate { set; get; }
         public DateTime ResolvedDate { set; get; }
+        public DateTime ReportDate { set; get; }
         public string Assignee { set; get; }
         public string Reporter { set; get; }
         public string Resolution { set; get; }
@@ -142,6 +143,11 @@ namespace Prometheus.Models
             {
                 return cemlist;
             }
+        }
+
+        public static string GetUniqKey()
+        {
+            return Guid.NewGuid().ToString("N");
         }
     }
 }

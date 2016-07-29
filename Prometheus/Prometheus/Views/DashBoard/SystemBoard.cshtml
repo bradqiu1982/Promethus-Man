@@ -1,0 +1,94 @@
+﻿@model IEnumerable<Prometheus.Models.ProjectEvent>
+
+@{
+    ViewBag.Title = "SystemDashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>System Dashboard</h1>
+<hr/>
+
+@{
+    var syslist = new List<Prometheus.Models.ProjectEvent>();
+    var ulist = new List<Prometheus.Models.ProjectEvent>();
+}
+
+@if (Model != null)
+{
+    foreach (var item in Model)
+    {
+        if (item.SystemEvent)
+        {
+            syslist.Add(item);
+        }
+        else
+        {
+            ulist.Add(item);
+        }
+    }
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Introduction</h3>
+            </div>
+            <div class="panel-body" style="max-height:120px;min-height:120px;">
+                <div class="row">
+                    <div class="col-md-12">
+                        <img src="~/Content/Finisar.PNG"/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4>Welcome to Finisar Parallel NPI Project Trace System</h4>
+                    </div>
+                </div>
+           </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Assigned to Me</h3>
+            </div>
+            <div class="panel-body" style="max-height:240px;min-height:240px;overflow-y: scroll;overflow-x: scroll;">
+                @foreach (var item in ulist)
+                {
+                    <div class="panel-body" style="max-height:20px;min-height:20px;">
+                        @Html.Raw(item.Event)
+                    </div>
+                    <div class="panel-body text-right" style="max-height:10px;min-height:10px;">
+                        @item.BuildDate.ToString()
+                    </div>
+                    <hr />
+                }
+                @if (ulist.Count == 0)
+                {
+                    <p> You can @Html.ActionLink("Log in", "LoginUser", "User") to review your asigned task</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Activity Stream</h3>
+            </div>
+            <div class="panel-body" style="max-height:415px;min-height:415px;overflow-y: scroll;overflow-x: scroll;">
+                @foreach (var item in syslist)
+                {
+                    <div class="panel-body" style="max-height:20px;min-height:20px;">
+                        @Html.Raw(item.Event)
+                    </div>
+                    <div class="panel-body text-right" style="max-height:10px;min-height:10px;">
+                        @item.BuildDate.ToString()
+                    </div>
+                    <hr />
+                }
+            </div>
+        </div>
+    </div>
+</div>
+

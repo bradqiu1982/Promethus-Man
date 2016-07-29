@@ -136,6 +136,13 @@ namespace Prometheus.Models
 
         public DateTime BuildDate { set; get; }
 
+        private bool bsysenvent = true;
+        public bool SystemEvent
+        {
+            set { bsysenvent = value; }
+            get { return bsysenvent; }
+        }
+
         public static string GetUniqKey()
         {
             return Guid.NewGuid().ToString("N");
@@ -165,6 +172,24 @@ namespace Prometheus.Models
             return ret;
         }
 
+
+        public static List<ProjectEvent> RetrieveProjectEvent(int topnum)
+        {
+            var ret = new List<ProjectEvent>();
+
+            var sql = "select top <num> ProjectKey,EventKey,Event,EventStatus,BuildDate from ProjectEvent order by BuildDate DESC";
+            sql = sql.Replace("<num>", Convert.ToString(topnum));
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            foreach (var item in dbret)
+            {
+                var e = new ProjectEvent(Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])
+                    , Convert.ToString(item[3]), Convert.ToString(item[4]));
+                ret.Add(e);
+            }
+
+            return ret;
+        }
+
         public static void UpdateEventStatus(string ekey, string estaus)
         {
             var sql = "update ProjectEvent set EventStatus = '<EventStatus>' where EventKey = '<EventKey>'";
@@ -174,8 +199,8 @@ namespace Prometheus.Models
 
         private static void BuildProjectEvent(string who, string projectkey, string projectname,string operate)
         {
-            var wholink = "< a href = \"/User/UserCenter?username=" + who + "\" >"+who.Split(new char[] {'@'})[0]+"</a>";
-            var projectlink = "< a href = \"/Project/ProjectIssues?ProjectKey=" + projectkey + "\" >"+ projectname + "</a>";
+            var wholink = "<a href = \"/User/UserCenter?username=" + who + "\" >"+who.Split(new char[] {'@'})[0]+"</a>";
+            var projectlink = "<a href = \"/Project/ProjectIssues?ProjectKey=" + projectkey + "\" >"+ projectname + "</a>";
 
             var vm = new ProjectEvent();
             vm.ProjectKey = projectkey;

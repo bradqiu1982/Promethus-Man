@@ -44,7 +44,10 @@
             <div class="panel-heading">
                 <div class="row">
                     <div class="col-md-2">
-                        @Html.ActionLink(item.ProjectName, "ProjectIssues", "Project", new { ProjectKey = item.ProjectKey }, null)
+                        <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey">
+                            <span class="glyphicon glyphicon-home" aria-hidden="true"></span> @item.ProjectName
+                        </a>
+                       @* @Html.ActionLink(item.ProjectName, "ProjectIssues", "Project", new { ProjectKey = item.ProjectKey }, null)*@
                     </div>
                     <div class="col-md-1">
                         <a href="/Project/EditProject?ProjectKey=@item.ProjectKey">

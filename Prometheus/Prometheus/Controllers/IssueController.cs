@@ -36,10 +36,9 @@ namespace Prometheus.Controllers
 
         private void CreateAllLists(IssueViewModels vm)
         {
-            var projlist = new List<string>();
-            string[] plist = { "CFP4-SR4", "QSFP28G", "EDR25G" };
-            projlist.AddRange(plist);
-            var slist = CreateSelectList(projlist, vm.ProjectName);
+
+            var projlist = ProjectViewModels.RetrieveAllProjectKey();
+            var slist = CreateSelectList(projlist, vm.ProjectKey);
             ViewBag.projectlist = slist;
 
             var typelist = new List<string>();
@@ -63,10 +62,7 @@ namespace Prometheus.Controllers
             slist = CreateSelectList(rsilist, vm.Resolution);
             ViewBag.resolutionlist = slist;
 
-            var asilist = new List<string>();
-            string[] alist = { "Brad.qiu@finisar.com", "Alex.chen@finisar.com"
-                    , "Sean.Peng@finisar.com"};
-            asilist.AddRange(alist);
+            var asilist = UserViewModels.RetrieveAllUser();
             slist = CreateSelectList(asilist, vm.Assignee);
             ViewBag.assigneelist = slist;
         }
@@ -76,6 +72,7 @@ namespace Prometheus.Controllers
         {
             var vm = new IssueViewModels();
             CreateAllLists(vm);
+
             var ckdict = UserController.UnpackCookie(this);
             if (ckdict.ContainsKey("logonuser") && ckdict["logonuser"] != "")
             {

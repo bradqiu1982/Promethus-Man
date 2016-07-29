@@ -96,6 +96,20 @@ namespace Prometheus.Models
             sql = sql.Replace("<UserName>", username.ToUpper()).Replace("<PassWD>", pwd);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
+
+        public static List<string> RetrieveAllUser()
+        {
+            var sql = "select UserName from UserTable";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var ret = new List<string>();
+
+            foreach (var line in dbret)
+            {
+                ret.Add(Convert.ToString(line[0]));
+            }
+            return ret;
+        }
+
     }
 
 }

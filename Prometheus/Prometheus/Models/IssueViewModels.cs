@@ -65,56 +65,9 @@ namespace Prometheus.Models
 
     public class IssueViewModels
     {
-        public string sProjectName = "";
-
-        public string ProjectName
+        public string ProjectKey
         {
-            set { sProjectName = value; }
-            get { return sProjectName; }
-        }
-
-        public string dbProjectName
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(sProjectName))
-                {
-                    return "";
-                }
-                else
-                {
-                    try
-                    {
-                        return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(sProjectName));
-                    }
-                    catch (Exception)
-                    {
-                        return "";
-                    }
-                }
-
-            }
-
-            set
-            {
-                if (string.IsNullOrEmpty(value))
-                {
-                    sProjectName = "";
-                }
-                else
-                {
-                    try
-                    {
-                        sProjectName = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(value));
-                    }
-                    catch (Exception)
-                    {
-                        sProjectName = "";
-                    }
-
-                }
-
-            }
+            set;get;
         }
 
         public string IssueType { set; get; }

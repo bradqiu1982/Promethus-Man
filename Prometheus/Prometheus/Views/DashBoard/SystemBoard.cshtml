@@ -55,11 +55,11 @@
             <div class="panel-body" style="max-height:240px;min-height:240px;overflow-y: scroll;overflow-x: scroll;">
                 @foreach (var item in ulist)
                 {
-                    <div class="panel-body" style="max-height:20px;min-height:20px;">
+                    <div class="panel-body">
                         @Html.Raw(item.Event)
                     </div>
                     <div class="panel-body text-right" style="max-height:10px;min-height:10px;">
-                        @item.BuildDate.ToString()
+                        @item.UpdateDate.ToString()
                     </div>
                     <hr />
                 }
@@ -79,11 +79,11 @@
             <div class="panel-body" style="max-height:415px;min-height:415px;overflow-y: scroll;overflow-x: scroll;">
                 @foreach (var item in syslist)
                 {
-                    <div class="panel-body" style="max-height:20px;min-height:20px;">
+                    <div class="panel-body">
                         @Html.Raw(item.Event)
                     </div>
                     <div class="panel-body text-right" style="max-height:10px;min-height:10px;">
-                        @item.BuildDate.ToString()
+                        @item.UpdateDate.ToString()
                     </div>
                     <hr />
                 }

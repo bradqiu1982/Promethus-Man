@@ -22,8 +22,8 @@ namespace Prometheus.Controllers
 
         public ActionResult CreateProject()
         {
-            var ckdict = UserController.UnpackCookie(this);
-            if (ckdict.ContainsKey("logonuser") && ckdict["logonuser"] != "")
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
             {
                 return View();
             }
@@ -32,7 +32,7 @@ namespace Prometheus.Controllers
                 var ck = new Dictionary<string, string>();
                 ck.Add("logonredirectctrl", "Project");
                 ck.Add("logonredirectact", "CreateProject");
-                UserController.SetCookie(this,ck);
+                CookieUtility.SetCookie(this,ck);
                 return RedirectToAction("LoginUser", "User");
             }
         }
@@ -416,7 +416,7 @@ namespace Prometheus.Controllers
 
             projectmodel.StoreProject();
 
-            var ckdict = UserController.UnpackCookie(this);
+            var ckdict = CookieUtility.UnpackCookie(this);
             var who = (ckdict["logonuser"]).Split(new string[]{ "||"},StringSplitOptions.None)[0];
             ProjectEvent.CreateProjectEvent(who, projectmodel.ProjectKey, projectmodel.ProjectName);
 
@@ -425,7 +425,7 @@ namespace Prometheus.Controllers
 
         public ActionResult EditProject(string ProjectKey)
         {
-            var ckdict = UserController.UnpackCookie(this);
+            var ckdict = CookieUtility.UnpackCookie(this);
             if (!string.IsNullOrEmpty(ProjectKey) || ckdict.ContainsKey("ProjectKey"))
             {
                 var realkey = "";
@@ -434,7 +434,7 @@ namespace Prometheus.Controllers
                 else
                     realkey = ckdict["ProjectKey"];
 
-                if (ckdict.ContainsKey("logonuser") && ckdict["logonuser"] != "")
+                if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
                 {
                     var vm = ProjectViewModels.RetrieveOneProject(realkey);
                     return View(vm);
@@ -445,7 +445,7 @@ namespace Prometheus.Controllers
                     ck.Add("logonredirectctrl", "Project");
                     ck.Add("logonredirectact", "EditProject");
                     ck.Add("ProjectKey", realkey);
-                    UserController.SetCookie(this, ck);
+                    CookieUtility.SetCookie(this, ck);
                     return RedirectToAction("LoginUser", "User");
                 }
 
@@ -483,7 +483,7 @@ namespace Prometheus.Controllers
             
             //TODO retrive bondinged table and retrieve new bonding table data from MES
             
-            var ckdict = UserController.UnpackCookie(this);
+            var ckdict = CookieUtility.UnpackCookie(this);
             var who = (ckdict["logonuser"]).Split(new string[] { "||" }, StringSplitOptions.None)[0];
             ProjectEvent.UpdateProjectEvent(who, projectmodel.ProjectKey, projectmodel.ProjectName);
 

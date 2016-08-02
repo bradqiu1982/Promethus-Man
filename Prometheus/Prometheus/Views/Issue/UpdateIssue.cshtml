@@ -1,0 +1,173 @@
+﻿@model Prometheus.Models.IssueViewModels
+
+@{
+    ViewBag.Title = "UpdateIssue";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Issue</h2>
+
+<hr />
+
+<script src="../../ckeditor/ckeditor.js"></script>
+
+@using (Html.BeginForm("UpdateIssue", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <div class="form-group">
+
+        <div class="form-horizontal">
+
+            <div class="form-group">
+                <div class="col-md-6">
+                    <label class="control-label col-md-2" for="ProjectName">Project<font color="red">*</font></label>
+                    <div class="col-md-10">
+                        @Html.DropDownList("projectlist", null, new { @id = "ProjectKey", @class = "form-control",@readonly="readonly" })
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="control-label col-md-2" for="IssueType">IssueType<font color="red">*</font></label>
+                    <div class="col-md-10">
+                        @Html.DropDownList("issuetypelist", null, new { @id = "IssueType", @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-6">
+                    <label class="control-label col-md-2" for="Summary">Summary<font color="red">*</font></label>
+                    <div class="col-md-10">
+                        @if (Model != null && !string.IsNullOrEmpty(Model.Summary))
+                        {
+                            <input class="form-control text-box single-line" value="@Model.Summary" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 180." data-val-length-max="180" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="Summary" name="Summary" type="text" />
+                        }
+                        else
+                        {
+                            <input class="form-control text-box single-line" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 180." data-val-length-max="180" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="Summary" name="Summary" type="text" value="" />
+                        }
+
+                        <span class="field-validation-valid text-danger" data-valmsg-for="Summary" data-valmsg-replace="true"></span>
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+                    <label class="control-label col-md-2" for="IssueType">Resolution<font color="red">*</font></label>
+                    <div class="col-md-10">
+                        @Html.DropDownList("resolutionlist", null, new { @id = "Resolution", @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-6">
+                    <label class="control-label col-md-2" for="IssueType">Priority</label>
+                    <div class="col-md-10">
+                        @Html.DropDownList("prioritylist", null, new { @id = "Priority", @class = "form-control" })
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="control-label col-md-2" for="Assignee">Assignee</label>
+                    <div class="col-md-10">
+                        @Html.DropDownList("assigneelist", null, new { @id = "Assignee", @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+
+                <div class="col-md-6">
+                    <label class="control-label col-md-2" for="Reporter">Reporter<font color="red">*</font></label>
+                    <div class="col-md-10" data-toggle="tooltip" data-placement="bottom" title="Exampel: brad@finisar.com:john@finisar.com.....">
+                        @if (Model != null && !string.IsNullOrEmpty(Model.Reporter))
+                        {
+                            <input class="form-control text-box single-line" value="@(Model.Reporter)" id="Reporter" name="Reporter" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" data-val-required="The Field is required" type="text" />
+                        }
+                        else
+                        {
+                            <input class="form-control text-box single-line" id="Reporter" name="Reporter" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" data-val-required="The Field is required" type="text" value="" />
+                        }
+
+                        <span class="field-validation-valid text-danger" data-valmsg-for="Reporter" data-valmsg-replace="true"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="control-label col-md-2" for="DueDate">DueDate<font color="red">*</font></label>
+                    <div class="col-md-10">
+                        @if (Model != null && string.Compare(Model.DueDate.ToString("yyyy-MM-dd"), "0001-01-01") != 0)
+                        {
+                            <input class="form-control text-box single-line" value="@Model.DueDate.ToString("yyyy-MM-dd")" data-val="true" data-val-date="The field DueDate must be a date." data-val-required="The DueDate field is required." id="DueDate" name="DueDate" type="date" />
+                        }
+                        else
+                        {
+                            <input class="form-control text-box single-line" data-val="true" data-val-date="The field DueDate must be a date." data-val-required="The DueDate field is required." id="DueDate" name="DueDate" type="date" value="" />
+                        }
+                        <span class="field-validation-valid text-danger" data-valmsg-for="DueDate" data-valmsg-replace="true"></span>
+                    </div>
+
+                </div>
+                <script type="text/javascript">
+                    $(document).ready(function () {
+                        $("#DueDate").datepicker({
+                            changeMonth: true,
+                            changeYear: true,
+                            dateFormat: 'yy-mm-dd'
+                        });
+                    });
+                </script>
+            </div>
+
+            @foreach (var item in Model.CommentList)
+            {
+                <hr />
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Comment</h3>
+                            </div>
+                            <div class="panel-body" style="max-height:48px;min-height:48px;overflow-y: scroll;overflow-x: scroll;">
+                                @Html.Raw(item.Comment);
+                            </div>
+                            <div class="panel-footer text-right">
+                                @item.Reporter @item.CommentDate.ToString()
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            <hr />
+        </div>
+
+
+        <div class="col-md-12">
+            <div class="form-group">
+                <label class="control-label">Description<font color="red">*</font></label>
+            </div>
+
+            <div class="form-group">
+                <div>
+                    @if (Model != null && !string.IsNullOrEmpty(Model.Description))
+                    {
+                    <textarea name="editor1" id="editor1" rows="10" cols="80">@(Model.Description)</textarea>
+                    }
+                    else
+                    {
+                    <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
+                    }
+                    <script>
+                        CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserImageUploadUrl: '/userfiles/Upload.ashx' });
+                    </script>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+        <div class="form-group">
+            <div>
+                <input type="submit" value="Submit" class="btn btn-default" />
+            </div>
+        </div>
+
+}

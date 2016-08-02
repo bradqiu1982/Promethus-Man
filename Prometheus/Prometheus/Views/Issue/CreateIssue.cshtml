@@ -6,6 +6,13 @@
 }
 
 <h2>Create Issue</h2>
+
+@Html.Raw(string.IsNullOrEmpty(ViewBag.CreateError) ? "&nbsp;" : ViewBag.CreateError)
+@if (!string.IsNullOrEmpty(ViewBag.CreateError))
+{
+    ViewBag.CreateError = "";
+}
+
 <hr/>
 
 <script src="../../ckeditor/ckeditor.js"></script>
@@ -23,7 +30,7 @@
                 <div class="col-md-6">
                     <label class="control-label col-md-2" for="ProjectName">Project<font color="red">*</font></label>
                     <div class="col-md-10">
-                        @Html.DropDownList("projectlist", null, new { @id = "ProjectName",@class = "form-control" })
+                        @Html.DropDownList("projectlist", null, new { @id = "ProjectKey", @class = "form-control" })
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -39,11 +46,11 @@
                     <div class="col-md-10">
                         @if (Model != null && !string.IsNullOrEmpty(Model.Summary))
                         {
-                            <input class="form-control text-box single-line" value="@Model.Summary" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 180." data-val-length-max="180" data-val-length-min="6" data-val-regex="The field must match the regular expression &#39;^(?!.*&#39;).*$&#39;." data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="Summary" name="Summary" type="text" />
+                            <input class="form-control text-box single-line" value="@Model.Summary" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 180." data-val-length-max="180" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="Summary" name="Summary" type="text" />
                         }
                         else
                         {
-                            <input class="form-control text-box single-line" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 180." data-val-length-max="180" data-val-length-min="6" data-val-regex="The field must match the regular expression &#39;^(?!.*&#39;).*$&#39;." data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="Summary" name="Summary" type="text" value="" />
+                            <input class="form-control text-box single-line" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 180." data-val-length-max="180" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="Summary" name="Summary" type="text" value="" />
                         }
 
                         <span class="field-validation-valid text-danger" data-valmsg-for="Summary" data-valmsg-replace="true"></span>

@@ -23,47 +23,6 @@ namespace Prometheus.Controllers
             return false;
         }
 
-        private bool sendemail(string title,List<string> tolist, string content)
-        {
-            try
-            {
-                var message = new MailMessage();
-                message.From = new MailAddress("brad.qiu@finisar.com");
-                foreach(var item in tolist)
-                {
-                    message.To.Add(item);
-                }
-                message.Subject = title;
-                message.Body = content;
-
-                SmtpClient client = new SmtpClient();
-                client.Host = "wmail.finisar.com";
-                client.EnableSsl = true;
-                client.Timeout = 30000;
-                client.DeliveryMethod = SmtpDeliveryMethod.Network;
-                client.UseDefaultCredentials = false;
-                client.Credentials = new NetworkCredential("brad.qiu@finisar.com", "wangle@432");
-
-                ServicePointManager.ServerCertificateValidationCallback 
-                    = delegate (object s, X509Certificate certificate,X509Chain chain
-                    , SslPolicyErrors sslPolicyErrors){ return true; };
-
-                new Thread(() => {
-                    try
-                    {
-                        client.Send(message);
-                    }
-                    catch (Exception ex)
-                    { }
-                }).Start();
-            }
-            catch (Exception ex)
-            {
-                System.Windows.MessageBox.Show(ex.ToString());
-                return false;
-            }
-            return true;
-        }
 
         public ActionResult RegisterUser()
         {
@@ -80,7 +39,7 @@ namespace Prometheus.Controllers
 
             var toaddrs = new List<string>();
             toaddrs.Add(username);
-            sendemail("NPI Website Active Link",toaddrs, validatestr);
+            EmailUtility.SendEmail("NPI Website Active Link",toaddrs, validatestr);
         }
 
         [HttpPost, ActionName("RegisterUser")]
@@ -200,7 +159,7 @@ namespace Prometheus.Controllers
 
             var toaddrs = new List<string>();
             toaddrs.Add(username);
-            sendemail("NPI Website Active Link", toaddrs, validatestr);
+            EmailUtility.SendEmail("NPI Website Active Link", toaddrs, validatestr);
             return RedirectToAction("ResetNoticeA");
         }
 
@@ -218,14 +177,16 @@ namespace Prometheus.Controllers
                 return RedirectToAction("LoginUser");
             }
 
-            var ckdict = UnpackCookie(this);
+            var ckdict = CookieUtility.UnpackCookie(this);
             if (ckdict.ContainsKey("logonredirectctrl") && ckdict.ContainsKey("logonredirectact"))
             {
                 //verify user information
                 string logonuser = username + "||" + DateTime.Now.ToString();
                 var ck = new Dictionary<string, string>();
                 ck.Add("logonuser", logonuser);
-                SetCookie(this, ck);
+
+                CookieUtility.SetCookie(this, ck);
+
                 return RedirectToAction(ckdict["logonredirectact"], ckdict["logonredirectctrl"]);
             }
             else
@@ -234,7 +195,7 @@ namespace Prometheus.Controllers
                 string logonuser = username + "||" + DateTime.Now.ToString();
                 var ck = new Dictionary<string, string>();
                 ck.Add("logonuser", logonuser);
-                SetCookie(this, ck);
+                CookieUtility.SetCookie(this, ck);
                 return RedirectToAction("UserCenter", "User");
             }
         }
@@ -278,106 +239,43 @@ namespace Prometheus.Controllers
             }
         }
 
-        public static bool SetCookie(Controller ctrl, Dictionary<string, string> values)
-        {
-            try
-            {
-                HttpCookie ck = null;
-
-                if (ctrl.Request.Cookies["activenpi"] != null)
-                {
-                    ck = ctrl.Request.Cookies["activenpi"];
-                    foreach (var item in values)
-                    {
-                        ck.Values[item.Key] = Convert.ToBase64String(UTF8Encoding.UTF8.GetBytes(item.Value));
-                    }
-
-                    if (ctrl.Response.Cookies["activenpi"] != null)
-                    {
-                        ctrl.Response.SetCookie(ck);
-                    }
-                    else
-                    {
-                        ctrl.Response.AppendCookie(ck);
-                    }
-                    
-                }
-                else
-                {
-                    ck = new HttpCookie("activenpi");
-                    foreach (var item in values)
-                    {
-                        ck.Values[item.Key] = Convert.ToBase64String(UTF8Encoding.UTF8.GetBytes(item.Value));
-                    }
-
-                    if (ctrl.Response.Cookies["activenpi"] != null)
-                    {
-                        ctrl.Response.SetCookie(ck);
-                    }
-                    else
-                    {
-                        ctrl.Response.AppendCookie(ck);
-                    }
-                }
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-        }
-
-        public static Dictionary<string,string> UnpackCookie(Controller ctrl)
-        {
-            return UnpackCookie(ctrl.Request);
-        }
-
-        public static Dictionary<string, string> UnpackCookie(HttpRequestBase req)
-        {
-
-            var ret = new Dictionary<string, string>();
-
-            if (req.Cookies["activenpi"] != null)
-            {
-                try
-                {
-                    var ck = req.Cookies["activenpi"];
-                    foreach (var key in ck.Values.AllKeys)
-                    {
-                        ret.Add(key, UTF8Encoding.UTF8.GetString(Convert.FromBase64String(ck.Values[key])));
-                    }
-                    return ret;
-                }
-                catch (Exception ex)
-                {
-                    ret.Clear();
-                    return ret;
-                }
-            }
-            else
-            {
-                ret.Clear();
-                return ret;
-            }
-        }
 
         public ActionResult LoginOutUser(string ctrl, string action)
         {
-            var val = UnpackCookie(this);
+            var val = CookieUtility.UnpackCookie(this);
             val["logonuser"] = "";
-            SetCookie(this, val);
+            CookieUtility.SetCookie(this, val);
             return RedirectToAction("SystemBoard", "DashBoard");
         }
 
         public ActionResult UserCenter(string username)
         {
-            var val = UnpackCookie(this);
-            if(val != null)
-            { 
-                //System.Windows.MessageBox.Show(val["logonuser"]);
+            var ckdict = CookieUtility.UnpackCookie(this);
+
+            var usernm = "";
+            if (!string.IsNullOrEmpty(username))
+            {
+                usernm = username;
             }
-            return View();
+            else if(ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+                usernm = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            }
+
+            if (!string.IsNullOrEmpty(usernm))
+            {
+                var list1 = ProjectEvent.RetrieveUserEvent(usernm, ProjectEvent.Pending, 30);
+                var list2 = ProjectEvent.RetrieveUserEvent(usernm, ProjectEvent.Working, 30);
+                var list3 = ProjectEvent.RetrieveUserEvent(usernm, ProjectEvent.Done, 30);
+                list1.AddRange(list2);
+                list1.AddRange(list3);
+                return View(list1);
+            }
+            else
+            {
+                var ret = new List<ProjectEvent>();
+                return View(ret);
+            }
         }
 
     }

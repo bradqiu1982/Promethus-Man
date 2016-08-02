@@ -66,11 +66,11 @@
                             <div class="col-md-10">
                                 @if (Model != null && !string.IsNullOrEmpty(Model.ProjectName))
                                 {
-                                    <input class="form-control text-box single-line" value="@Model.ProjectName" data-val="true" data-val-length="The field Project must be a string with a minimum length of 6 and a maximum length of 100." data-val-length-max="100" data-val-length-min="6" data-val-regex="The field Project must match the regular expression &#39;^(?!.*&#39;).*$&#39;." data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The Project field is required." id="ProjectName" name="ProjectName" type="text" />
+                                    <input class="form-control text-box single-line" value="@Model.ProjectName" data-val="true" data-val-length="The field Project must be a string with a minimum length of 6 and a maximum length of 100." data-val-length-max="100" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The Project field is required." id="ProjectName" name="ProjectName" type="text" />
                                 }
                                 else
                                 {
-                                    <input class="form-control text-box single-line" data-val="true" data-val-length="The field Project must be a string with a minimum length of 6 and a maximum length of 100." data-val-length-max="180" data-val-length-min="6" data-val-regex="The field Project must match the regular expression &#39;^(?!.*&#39;).*$&#39;." data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The Project field is required." id="ProjectName" name="ProjectName" type="text" value="" />
+                                    <input class="form-control text-box single-line" data-val="true" data-val-length="The field Project must be a string with a minimum length of 6 and a maximum length of 100." data-val-length-max="180" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The Project field is required." id="ProjectName" name="ProjectName" type="text" value="" />
                                 }
 
                                 <span class="field-validation-valid text-danger" data-valmsg-for="ProjectName" data-valmsg-replace="true"></span>

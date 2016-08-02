@@ -174,9 +174,12 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\CookieUtility.cs" />
     <Compile Include="Models\DashBoardViewModels.cs" />
     <Compile Include="Models\DBUtility.cs" />
+    <Compile Include="Models\EmailUtility.cs" />
     <Compile Include="Models\IssueViewModels.cs" />
+    <Compile Include="Models\ProjectEvent.cs" />
     <Compile Include="Models\ProjectViewModels.cs" />
     <Compile Include="Models\UserViewModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -669,6 +672,7 @@
     <Content Include="Views\User\ResetNoticeA.cshtml" />
     <Content Include="Views\User\ResetUser.cshtml" />
     <Content Include="Views\Project\ProjectIssues.cshtml" />
+    <Content Include="Views\Issue\UpdateIssue.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

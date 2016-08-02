@@ -51,11 +51,11 @@ else
             <div class="panel-body" style="max-height:420px;min-height:420px;overflow-y: scroll;overflow-x: scroll;">
                 @foreach (var item in pendinglist)
                 {
-                    <div class="panel-body" style="max-height:20px;min-height:20px;">
+                    <div class="panel-body">
                         @Html.Raw(item.Event)
                     </div>
                     <div class="panel-body text-right" style="max-height:10px;min-height:10px;">
-                        @item.BuildDate.ToString()
+                        @item.UpdateDate.ToString()
                     </div>
                     <hr />
                 }
@@ -71,11 +71,11 @@ else
             <div class="panel-body" style="max-height:420px;min-height:420px;overflow-y: scroll;overflow-x: scroll;">
                 @foreach (var item in workinglist)
                 {
-                    <div class="panel-body" style="max-height:20px;min-height:20px;">
+                    <div class="panel-body">
                         @Html.Raw(item.Event)
                     </div>
                     <div class="panel-body text-right" style="max-height:10px;min-height:10px;">
-                        @item.BuildDate.ToString()
+                        @item.UpdateDate.ToString()
                     </div>
                     <hr />
                 }
@@ -91,11 +91,11 @@ else
             <div class="panel-body" style="max-height:420px;min-height:420px;overflow-y: scroll;overflow-x: scroll;">
                 @foreach (var item in donelist)
                 {
-                    <div class="panel-body" style="max-height:20px;min-height:20px;">
+                    <div class="panel-body">
                         @Html.Raw(item.Event)
                     </div>
                     <div class="panel-body text-right" style="max-height:10px;min-height:10px;">
-                        @item.BuildDate.ToString()
+                        @item.UpdateDate.ToString()
                     </div>
                     <hr />
                 }

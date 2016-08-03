@@ -40,7 +40,7 @@
                     <div class="col-md-10">
                         @if (Model != null && !string.IsNullOrEmpty(Model.Summary))
                         {
-                            <input class="form-control text-box single-line" value="@Model.Summary" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 180." data-val-length-max="180" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="Summary" name="Summary" type="text" />
+                            <input class="form-control text-box single-line" value="@Model.Summary" readonly="readonly" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 180." data-val-length-max="180" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="Summary" name="Summary" type="text" />
                         }
                         else
                         {
@@ -116,6 +116,20 @@
                     });
                 </script>
             </div>
+            
+            <div class="form-group">
+                <div class="col-md-6">
+                        @if (Model != null && !string.IsNullOrEmpty(Model.IssueKey))
+                        {
+                            <input class="form-control text-box single-line" value="@(Model.IssueKey)" id="IssueKey" name="IssueKey" type="hidden" />
+                        }
+                        else
+                        {
+                            <input class="form-control text-box single-line" id="IssueKey" name="IssueKey" type="hidden" value="" />
+                        }
+                </div>
+                <div class="col-md-6"></div>
+            </div>
 
             @foreach (var item in Model.CommentList)
             {
@@ -126,40 +140,55 @@
                             <div class="panel-heading">
                                 <h3 class="panel-title">Comment</h3>
                             </div>
-                            <div class="panel-body" style="max-height:48px;min-height:48px;overflow-y: scroll;overflow-x: scroll;">
-                                @Html.Raw(item.Comment);
+                            <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
+                                @Html.Raw(item.Comment)
                             </div>
                             <div class="panel-footer text-right">
-                                @item.Reporter @item.CommentDate.ToString()
+                                Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.CommentDate.ToString()
                             </div>
                         </div>
                     </div>
                 </div>
             }
             <hr />
-        </div>
+            </div>
 
 
         <div class="col-md-12">
-            <div class="form-group">
-                <label class="control-label">Description<font color="red">*</font></label>
-            </div>
+            @if (Model != null)
+            {
+                if (!Model.IssueClosed())
+                {
+                    <div class="form-group">
+                        <label class="control-label">Description<font color="red">*</font></label>
+                    </div>
 
-            <div class="form-group">
-                <div>
-                    @if (Model != null && !string.IsNullOrEmpty(Model.Description))
-                    {
-                    <textarea name="editor1" id="editor1" rows="10" cols="80">@(Model.Description)</textarea>
-                    }
-                    else
-                    {
-                    <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
-                    }
-                    <script>
-                        CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserImageUploadUrl: '/userfiles/Upload.ashx' });
-                    </script>
+                    <div class="form-group">
+                        <div>
+                            <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
+                            <script>
+                                CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserImageUploadUrl: '/userfiles/Upload.ashx' });
+                            </script>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="form-group">
+                    <label class="control-label">Description<font color="red">*</font></label>
                 </div>
-            </div>
+
+                <div class="form-group">
+                    <div>
+                        <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
+                        <script>
+                        CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserImageUploadUrl: '/userfiles/Upload.ashx' });
+                        </script>
+                    </div>
+                </div>
+            }
+
         </div>
 
     </div>

@@ -494,9 +494,9 @@ namespace Prometheus.Controllers
         {
             if(ProjectKey != null)
             {
-                var list1 = ProjectEvent.RetrieveProjectEvent(ProjectKey, ProjectEvent.Pending, 30);
-                var list2 = ProjectEvent.RetrieveProjectEvent(ProjectKey, ProjectEvent.Working, 30);
-                var list3 = ProjectEvent.RetrieveProjectEvent(ProjectKey, ProjectEvent.Done, 30);
+                var list1 = IssueViewModels.RetrieveIssueByProjectKey(ProjectKey, Resolute.Pending, 60);
+                var list2 = IssueViewModels.RetrieveIssueByProjectKey(ProjectKey, Resolute.Working, 30);
+                var list3 = IssueViewModels.RetrieveIssueByProjectKey(ProjectKey, Resolute.Done, 30);
                 list1.AddRange(list2);
                 list1.AddRange(list3);
                 return View(list1);

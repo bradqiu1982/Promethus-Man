@@ -34,7 +34,6 @@ namespace Prometheus.Controllers
             return pslist;
         }
 
-
         private void CreateAllLists(IssueViewModels vm)
         {
 
@@ -57,8 +56,7 @@ namespace Prometheus.Controllers
             ViewBag.prioritylist = slist;
 
             var rsilist = new List<string>();
-            string[] rlist = { "Pending","Working", "Fixed", "Done"
-            ,"Will Not Fix","Unresolved","Cannot Reproduce"};
+            string[] rlist = { Resolute.Pending,Resolute.Working,Resolute.Reopen,Resolute.Fixed,Resolute.Done,Resolute.NotFix,Resolute.Unresolved, Resolute.NotReproduce};
             rsilist.AddRange(rlist);
             slist = CreateSelectList(rsilist, vm.Resolution);
             ViewBag.resolutionlist = slist;
@@ -103,7 +101,7 @@ namespace Prometheus.Controllers
             vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
             vm.ReportDate = DateTime.Now;
             vm.Assignee = Request.Form["assigneelist"].ToString();
-            vm.Reporter = Request.Form["Reporter"];
+            vm.Reporter = Request.Form["Reporter"].ToUpper();
             vm.Resolution = Request.Form["resolutionlist"].ToString();
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
 
@@ -117,7 +115,7 @@ namespace Prometheus.Controllers
 
             vm.StoreIssue();
 
-            ProjectEvent.CreateUserEvent(vm.ProjectKey,vm.Reporter,vm.Assignee,vm.Summary,vm.IssueKey);
+            ProjectEvent.CreateIssueEvent(vm.ProjectKey,vm.Reporter,vm.Assignee,vm.Summary,vm.IssueKey);
 
             var dict = new RouteValueDictionary();
             dict.Add("issuekey", vm.IssueKey);
@@ -170,9 +168,62 @@ namespace Prometheus.Controllers
 
         [HttpPost, ActionName("UpdateIssue")]
         [ValidateAntiForgeryToken]
-        public ActionResult UpdateIssuePost(string key)
+        public ActionResult UpdateIssuePost()
         {
-            return View();
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            var issuekey = Request.Form["IssueKey"];
+            var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+
+            var vm = new IssueViewModels();
+            vm.IssueKey = issuekey;
+            vm.Reporter = updater;
+            vm.IssueType = Request.Form["issuetypelist"].ToString();
+            vm.Priority = Request.Form["prioritylist"].ToString();
+            vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
+            vm.Assignee = Request.Form["assigneelist"].ToString();
+            vm.Resolution = Request.Form["resolutionlist"].ToString();
+            vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+
+            if (!string.IsNullOrEmpty(Request.Form["editor1"]))
+            {
+                vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
+            }
+            else
+                vm.Description = "";
+
+            vm.UpdateIssue();
+
+            ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Updated", originaldata.Summary, originaldata.IssueKey);
+
+            if (string.Compare(originaldata.Assignee, vm.Assignee, true) != 0)
+            {
+                ProjectEvent.AssignIssueEvent(originaldata.ProjectKey, updater, vm.Assignee, originaldata.Summary, originaldata.IssueKey);
+            }
+
+            if (string.Compare(originaldata.Resolution, vm.Resolution, true) != 0)
+            {
+                if (vm.IssueClosed())
+                {
+                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
+                    vm.CloseIssue();
+                }
+
+                if (string.Compare(vm.Resolution, Resolute.Working) == 0)
+                {
+                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Started", originaldata.Summary, originaldata.IssueKey);
+                }
+
+                if (string.Compare(vm.Resolution, Resolute.Reopen) == 0)
+                {
+                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Reopened", originaldata.Summary, originaldata.IssueKey);
+                }
+            }
+
+            var newdata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+            CreateAllLists(newdata);
+            return View(newdata);
         }
     }
 }

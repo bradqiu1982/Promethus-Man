@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Prometheus.Models.ProjectEvent>
+﻿@model IEnumerable<Prometheus.Models.IssueViewModels>
 
 @{
     ViewBag.Title = "ProjectIssues";
@@ -6,24 +6,24 @@
 }
 
 @{
-    var pendinglist = new List<Prometheus.Models.ProjectEvent>();
-    var workinglist = new List<Prometheus.Models.ProjectEvent>();
-    var donelist = new List<Prometheus.Models.ProjectEvent>();
+    var pendinglist = new List<Prometheus.Models.IssueViewModels>();
+    var workinglist = new List<Prometheus.Models.IssueViewModels>();
+    var donelist = new List<Prometheus.Models.IssueViewModels>();
 }
 
 @if (Model != null)
 {
     foreach (var item in Model)
     {
-        if (string.Compare(item.EventStatus, Prometheus.Models.ProjectEvent.Pending) == 0)
+        if (string.Compare(item.Resolution, Prometheus.Models.Resolute.Pending) == 0)
         {
             pendinglist.Add(item);
         }
-        if (string.Compare(item.EventStatus, Prometheus.Models.ProjectEvent.Working) == 0)
+        if (string.Compare(item.Resolution, Prometheus.Models.Resolute.Working) == 0)
         {
             workinglist.Add(item);
         }
-        if (string.Compare(item.EventStatus, Prometheus.Models.ProjectEvent.Done) == 0)
+        if (string.Compare(item.Resolution, Prometheus.Models.Resolute.Done) == 0)
         {
             donelist.Add(item);
         }
@@ -52,10 +52,10 @@ else
                 @foreach (var item in pendinglist)
                 {
                     <div class="panel-body">
-                        @Html.Raw(item.Event)
+                        <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a>
                     </div>
-                    <div class="panel-body text-right" style="max-height:10px;min-height:10px;">
-                        @item.UpdateDate.ToString()
+                    <div class="panel-body text-right" >
+                        Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString()
                     </div>
                     <hr />
                 }
@@ -72,10 +72,10 @@ else
                 @foreach (var item in workinglist)
                 {
                     <div class="panel-body">
-                        @Html.Raw(item.Event)
+                        <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a>
                     </div>
-                    <div class="panel-body text-right" style="max-height:10px;min-height:10px;">
-                        @item.UpdateDate.ToString()
+                    <div class="panel-body text-right" >
+                        Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString()
                     </div>
                     <hr />
                 }
@@ -92,10 +92,10 @@ else
                 @foreach (var item in donelist)
                 {
                     <div class="panel-body">
-                        @Html.Raw(item.Event)
+                        <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a>
                     </div>
-                    <div class="panel-body text-right" style="max-height:10px;min-height:10px;">
-                        @item.UpdateDate.ToString()
+                    <div class="panel-body text-right" >
+                        Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString()
                     </div>
                     <hr />
                 }

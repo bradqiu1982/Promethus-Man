@@ -59,7 +59,7 @@ namespace Prometheus.Controllers
             string updatetime = DateTime.Now.ToString();
 
             var user = new UserViewModels();
-            user.Email = username;
+            user.Email = username.ToUpper();
             user.Password = password;
             user.UpdateDate = DateTime.Parse(updatetime);
             user.RegistUser();
@@ -184,7 +184,6 @@ namespace Prometheus.Controllers
                 string logonuser = username + "||" + DateTime.Now.ToString();
                 var ck = new Dictionary<string, string>();
                 ck.Add("logonuser", logonuser);
-
                 CookieUtility.SetCookie(this, ck);
 
                 return RedirectToAction(ckdict["logonredirectact"], ckdict["logonredirectctrl"]);
@@ -204,7 +203,7 @@ namespace Prometheus.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult LoginUserPOST()
         {
-            var username = Request.Form["Email"];
+            var username = Request.Form["Email"].ToUpper();
             var password = Request.Form["Password"];
 
             var dbret = UserViewModels.RetrieveUser(username);
@@ -264,17 +263,16 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(usernm))
             {
-                var list1 = ProjectEvent.RetrieveUserEvent(usernm, ProjectEvent.Pending, 30);
-                var list2 = ProjectEvent.RetrieveUserEvent(usernm, ProjectEvent.Working, 30);
-                var list3 = ProjectEvent.RetrieveUserEvent(usernm, ProjectEvent.Done, 30);
+                var list1 = IssueViewModels.RetrieveIssueByAssignee(usernm, Resolute.Pending, 60);
+                var list2 = IssueViewModels.RetrieveIssueByAssignee(usernm, Resolute.Working, 30);
+                var list3 = IssueViewModels.RetrieveIssueByAssignee(usernm, Resolute.Done, 30);
                 list1.AddRange(list2);
                 list1.AddRange(list3);
                 return View(list1);
             }
             else
             {
-                var ret = new List<ProjectEvent>();
-                return View(ret);
+                return RedirectToAction("LoginUser", "User");
             }
         }
 

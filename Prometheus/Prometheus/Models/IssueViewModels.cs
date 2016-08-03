@@ -5,6 +5,19 @@ using System.Web;
 
 namespace Prometheus.Models
 {
+    public class Resolute
+    {
+        public static string Pending = "Pending";
+        public static string Working = "Working";
+        public static string Reopen = "Reopen";
+        public static string Fixed = "Fixed";
+        public static string Done = "Done";
+        public static string NotFix = "Will Not Fix";
+        public static string Unresolved = "Unresolved";
+        public static string NotReproduce ="Cannot Reproduce";
+        public static string Started = "Started";
+    }
+
     public class IssueComments
     {
         public string IssueKey { set; get; }
@@ -169,6 +182,20 @@ namespace Prometheus.Models
             return Guid.NewGuid().ToString("N");
         }
 
+        public bool IssueClosed()
+        {
+            if(string.Compare(Resolution, Resolute.Pending) != 0 
+                && string.Compare(Resolution, Resolute.Working) != 0
+                && string.Compare(Resolution, Resolute.Reopen) != 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public void StoreIssue()
         {
             var sql = "insert into Issue(ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution) values('<ProjectKey>','<IssueKey>','<IssueType>','<Summary>','<Priority>','<DueDate>','<ResolvedDate>','<ReportDate>','<Assignee>','<Reporter>','<Resolution>')";
@@ -202,20 +229,12 @@ namespace Prometheus.Models
             StoreIssueComment(DateTime.Now.ToString());
         }
 
-        //public static List<string> RetrieveIssueKeys(string projectkey, int topnum)
-        //{
-        //    var ret = new List<string>();
-
-        //    var sql = "select top <num> IssueKey from Issue where ProjectKey = '<ProjectKey>'  order by ReportDate DESC";
-        //    sql = sql.Replace("<num>", Convert.ToString(topnum)).Replace("<ProjectKey>", projectkey);
-        //    var dbret = DBUtility.ExeLocalSqlWithRes(sql);
-        //    foreach (var item in dbret)
-        //    {
-        //        ret.Add(Convert.ToString(item[0]));
-        //    }
-
-        //    return ret;
-        //}
+        public void CloseIssue()
+        {
+            var sql = "update Issue set ResolvedDate = '<ResolvedDate>' where IssueKey = '<IssueKey>'";
+            sql = sql.Replace("<IssueKey>", IssueKey).Replace("<ResolvedDate>", DateTime.Now.ToString());
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
 
         public static IssueViewModels RetrieveIssueByIssueKey(string issuekey)
         {
@@ -229,19 +248,20 @@ namespace Prometheus.Models
                     , Convert.ToString(dbret[0][3]), Convert.ToString(dbret[0][4])
                     , Convert.ToString(dbret[0][5]), Convert.ToString(dbret[0][6])
                     , Convert.ToString(dbret[0][7]), Convert.ToString(dbret[0][8])
-                    , Convert.ToString(dbret[0][8]), Convert.ToString(dbret[0][10]));
+                    , Convert.ToString(dbret[0][9]), Convert.ToString(dbret[0][10]));
 
 
                 var tempclist = new List<IssueComments>();
-                sql = "select IssueKey,Comment,Reporter,CommentDate from IssueComments where IssueKey = '<IssueKey>' order by CommentDate DESC";
+                sql = "select IssueKey,Comment,Reporter,CommentDate from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
                 sql = sql.Replace("<IssueKey>", issuekey);
                 dbret = DBUtility.ExeLocalSqlWithRes(sql);
                 foreach (var r in dbret)
                 {
                     var tempcomment = new IssueComments();
-                    tempcomment.dbComment = Convert.ToString(dbret[0][1]);
-                    tempcomment.Reporter = Convert.ToString(dbret[0][2]);
-                    tempcomment.CommentDate = DateTime.Parse(Convert.ToString(dbret[0][3]));
+                    tempcomment.IssueKey = Convert.ToString(r[0]);
+                    tempcomment.dbComment = Convert.ToString(r[1]);
+                    tempcomment.Reporter = Convert.ToString(r[2]);
+                    tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
                     tempclist.Add(tempcomment);
                 }
                 ret.CommentList = tempclist;
@@ -252,5 +272,85 @@ namespace Prometheus.Models
                 return null;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="projectkey"></param>
+        /// <param name="issuestatus"> comes from the resolution has pending,working,done three status</param>
+        /// <returns></returns>
+        /// 
+        public static List<IssueViewModels> RetrieveIssueByProjectKey(string projectkey,string issuestatus,int topnum)
+        {
+            var cond = "";
+            var fixresolve = "";
+            if (string.Compare(issuestatus, Resolute.Pending) == 0)
+            {
+                cond = "('" +Resolute.Pending+ "','"+Resolute.Reopen + "')";
+                fixresolve = Resolute.Pending;
+            }
+            else if (string.Compare(issuestatus, Resolute.Working) == 0)
+            {
+                cond = "('" + Resolute.Working + "')";
+                fixresolve = Resolute.Working;
+            }
+            else
+            {
+                cond = "('" + Resolute.Fixed + "','" + Resolute.Done + "','" + Resolute.NotFix + "','" + Resolute.NotReproduce + "','" + Resolute.Unresolved+ "')";
+                fixresolve = Resolute.Done;
+            }
+
+            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution from Issue where ProjectKey = '<ProjectKey>' and Resolution in <cond>";
+            sql = sql.Replace("<ProjectKey>", projectkey).Replace("<topnum>", Convert.ToString(topnum)).Replace("<cond>", cond);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var ret = new List<IssueViewModels>();
+            foreach (var line in dbret)
+            {
+                ret.Add(new IssueViewModels(Convert.ToString(line[0])
+                    , Convert.ToString(line[1]), Convert.ToString(line[2])
+                    , Convert.ToString(line[3]), Convert.ToString(line[4])
+                    , Convert.ToString(line[5]), Convert.ToString(line[6])
+                    , Convert.ToString(line[7]), Convert.ToString(line[8])
+                    , Convert.ToString(line[9]), fixresolve));
+            }
+
+            return ret;
+        }
+
+        public static List<IssueViewModels> RetrieveIssueByAssignee(string assignee, string issuestatus, int topnum)
+        {
+            var cond = "";
+            var fixresolve = "";
+            if (string.Compare(issuestatus, Resolute.Pending) == 0)
+            {
+                cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";
+                fixresolve = Resolute.Pending;
+            }
+            else if (string.Compare(issuestatus, Resolute.Working) == 0)
+            {
+                cond = "('" + Resolute.Working + "')";
+                fixresolve = Resolute.Working;
+            }
+            else
+            {
+                cond = "('" + Resolute.Fixed + "','" + Resolute.Done + "','" + Resolute.NotFix + "','" + Resolute.NotReproduce + "','" + Resolute.Unresolved + "')";
+                fixresolve = Resolute.Done;
+            }
+
+            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution from Issue where Assignee = '<Assignee>' and Resolution in <cond>";
+            sql = sql.Replace("<Assignee>", assignee).Replace("<topnum>", Convert.ToString(topnum)).Replace("<cond>", cond);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var ret = new List<IssueViewModels>();
+            foreach (var line in dbret)
+            {
+                ret.Add(new IssueViewModels(Convert.ToString(line[0])
+                    , Convert.ToString(line[1]), Convert.ToString(line[2])
+                    , Convert.ToString(line[3]), Convert.ToString(line[4])
+                    , Convert.ToString(line[5]), Convert.ToString(line[6])
+                    , Convert.ToString(line[7]), Convert.ToString(line[8])
+                    , Convert.ToString(line[9]), fixresolve));
+            }
+
+            return ret;
+        }
     }
 }

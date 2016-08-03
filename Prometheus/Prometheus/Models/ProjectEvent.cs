@@ -17,12 +17,11 @@ namespace Prometheus.Models
         {
         }
 
-        public ProjectEvent(string key, string ekey, string devent, string estatus, string bdate)
+        public ProjectEvent(string key, string ekey, string devent, string bdate)
         {
             ProjectKey = key;
             EventKey = ekey;
             dbEvent = devent;
-            EventStatus = estatus;
             UpdateDate = DateTime.Parse(bdate);
         }
 
@@ -81,99 +80,41 @@ namespace Prometheus.Models
             }
         }
 
-        public string EventStatus { set; get; }
-
         public DateTime UpdateDate { set; get; }
-
-        public string Asignee { set; get; }
-
-        private bool bsysenvent = true;
-        public bool SystemEvent
-        {
-            set { bsysenvent = value; }
-            get { return bsysenvent; }
-        }
 
         public static string GetUniqKey()
         {
             return Guid.NewGuid().ToString("N");
         }
 
-        public void StoreProjectEvent()
+        public void StoreEvent()
         {
-            var sql = "insert into ProjectEvent(ProjectKey,EventKey,Event,EventStatus,UpdateDate) values('<ProjectKey>','<EventKey>','<Event>','<EventStatus>','<UpdateDate>')";
-            sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<EventKey>", EventKey).Replace("<Event>", dbEvent).Replace("<EventStatus>", EventStatus).Replace("<UpdateDate>", UpdateDate.ToString());
+            var sql = "insert into ProjectEvent(ProjectKey,EventKey,Event,UpdateDate) values('<ProjectKey>','<EventKey>','<Event>','<UpdateDate>')";
+            sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<EventKey>", EventKey).Replace("<Event>", dbEvent).Replace("<UpdateDate>", UpdateDate.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
-        public void StoreUserEvent()
-        {
-            var sql = "insert into ProjectEvent(ProjectKey,EventKey,Event,EventStatus,UpdateDate,Asignee) values('<ProjectKey>','<EventKey>','<Event>','<EventStatus>','<UpdateDate>','<Asignee>')";
-            sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<EventKey>", EventKey)
-                .Replace("<Event>", dbEvent).Replace("<EventStatus>", EventStatus)
-                .Replace("<UpdateDate>", UpdateDate.ToString()).Replace("<Asignee>", Asignee.ToUpper());
-            DBUtility.ExeLocalSqlNoRes(sql);
-        }
-
-        public static List<ProjectEvent> RetrieveProjectEvent(string pkey, string estatus, int topnum)
+        public static List<ProjectEvent> RetrieveEvent(int topnum)
         {
             var ret = new List<ProjectEvent>();
 
-            var sql = "select top <num> ProjectKey,EventKey,Event,EventStatus,UpdateDate from ProjectEvent where ProjectKey = '<ProjectKey>' and EventStatus = '<EventStatus>' order by UpdateDate DESC";
-            sql = sql.Replace("<ProjectKey>", pkey).Replace("<EventStatus>", estatus).Replace("<num>", Convert.ToString(topnum));
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
-            foreach (var item in dbret)
-            {
-                var e = new ProjectEvent(Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])
-                    , Convert.ToString(item[3]), Convert.ToString(item[4]));
-                ret.Add(e);
-            }
-
-            return ret;
-        }
-
-
-
-
-        public static List<ProjectEvent> RetrieveSystemEvent(int topnum)
-        {
-            var ret = new List<ProjectEvent>();
-
-            var sql = "select top <num> ProjectKey,EventKey,Event,EventStatus,UpdateDate from ProjectEvent order by UpdateDate DESC";
+            var sql = "select top <num> ProjectKey,EventKey,Event,UpdateDate from ProjectEvent order by UpdateDate DESC";
             sql = sql.Replace("<num>", Convert.ToString(topnum));
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             foreach (var item in dbret)
             {
                 var e = new ProjectEvent(Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])
-                    , Convert.ToString(item[3]), Convert.ToString(item[4]));
+                    , Convert.ToString(item[3]));
                 ret.Add(e);
             }
 
             return ret;
         }
 
-        public static List<ProjectEvent> RetrieveUserEvent(string username, string estatus, int topnum)
+        private static void UpdateEvent(string ekey, string Event)
         {
-            var ret = new List<ProjectEvent>();
-
-            var sql = "select top <num> ProjectKey,EventKey,Event,EventStatus,UpdateDate,Asignee from ProjectEvent where Asignee = '<Asignee>' and EventStatus = '<EventStatus>' order by UpdateDate DESC";
-            sql = sql.Replace("<Asignee>", username.ToUpper()).Replace("<EventStatus>", estatus).Replace("<num>", Convert.ToString(topnum));
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
-            foreach (var item in dbret)
-            {
-                var e = new ProjectEvent(Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])
-                    , Convert.ToString(item[3]), Convert.ToString(item[4]));
-                e.SystemEvent = false;
-                ret.Add(e);
-            }
-
-            return ret;
-        }
-
-        public static void UpdateEventStatus(string ekey, string estaus)
-        {
-            var sql = "update ProjectEvent set EventStatus = '<EventStatus>' where EventKey = '<EventKey>'";
-            sql = sql.Replace("<EventStatus>", estaus).Replace("<EventKey>", ekey);
+            var sql = "update ProjectEvent set Event = '<Event>',UpdateDate='<UpdateDate>' where EventKey = '<EventKey>'";
+            sql = sql.Replace("<EventKey>", ekey).Replace("<Event>", Event).Replace("<UpdateDate>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
@@ -186,36 +127,55 @@ namespace Prometheus.Models
             vm.ProjectKey = projectkey;
             vm.EventKey = GetUniqKey();
             vm.Event = wholink + " " + operate + " " + projectlink;
-            vm.EventStatus = ProjectEvent.Done;
             vm.UpdateDate = DateTime.Now;
-            vm.StoreProjectEvent();
+            vm.StoreEvent();
         }
 
         public static void CreateProjectEvent(string who, string projectkey, string projectname)
         {
-            BuildProjectEvent(who, projectkey, projectname, "create");
+            BuildProjectEvent(who, projectkey, projectname, "created");
         }
 
         public static void UpdateProjectEvent(string who, string projectkey, string projectname)
         {
-            BuildProjectEvent(who, projectkey, projectname, "update");
+            BuildProjectEvent(who, projectkey, projectname, "updated");
         }
 
-        public static void CreateUserEvent(string projectkey, string reporter, string asignee, string summary, string evkey)
+        public static void CreateIssueEvent(string projectkey, string reporter, string asignee, string summary, string evkey)
         {
             var reportlink = "<a href = \"/User/UserCenter?username=" + reporter + "\" >" + reporter.Split(new char[] { '@' })[0] + "</a>";
             var asigneelink = "<a href = \"/User/UserCenter?username=" + asignee + "\" >" + asignee.Split(new char[] { '@' })[0] + "</a>";
-            var projectlink = "<a href = \"/Project/ProjectIssues?ProjectKey=" + projectkey + "\" >" + projectkey + "</a>";
+            var projectlink = "<a href = \"/Project/ProjectIssues?ProjectKey=" + projectkey + "\" >[" + projectkey + "] </a>";
             var issuelink = "<a href = \"/Issue/UpdateIssue?issuekey=" + evkey + "\" >" + summary + "</a>";
 
             var vm = new ProjectEvent();
             vm.ProjectKey = projectkey;
             vm.EventKey = evkey;
-            vm.Event = issuelink + " is create by "+ reportlink + " in project "+ projectlink+" and asigned to "+ asigneelink;
-            vm.EventStatus = ProjectEvent.Pending;
+            vm.Event = projectlink + issuelink + " is created by "+ reportlink +" and asigned to "+ asigneelink;
             vm.UpdateDate = DateTime.Now;
-            vm.Asignee = asignee;
-            vm.StoreUserEvent();
+            vm.StoreEvent();
+        }
+
+        public static void OperateIssueEvent(string projectkey, string who, string operate, string summary, string evkey)
+        {
+            var wholink = "<a href = \"/User/UserCenter?username=" + who + "\" >" + who.Split(new char[] { '@' })[0] + "</a>";
+            var projectlink = "<a href = \"/Project/ProjectIssues?ProjectKey=" + projectkey + "\" >[" + projectkey + "] </a>";
+            var issuelink = "<a href = \"/Issue/UpdateIssue?issuekey=" + evkey + "\" >" + summary + "</a>";
+
+            var vm = new ProjectEvent();
+            vm.Event = projectlink + issuelink + " is " + operate + " by " + wholink;
+            UpdateEvent(evkey,vm.dbEvent);
+        }
+
+        public static void AssignIssueEvent(string projectkey, string who, string asignee, string summary, string evkey)
+        {
+            var wholink = "<a href = \"/User/UserCenter?username=" + who + "\" >" + who.Split(new char[] { '@' })[0] + "</a>";
+            var aslink = "<a href = \"/User/UserCenter?username=" + asignee + "\" >" + asignee.Split(new char[] { '@' })[0] + "</a>";
+            var projectlink = "<a href = \"/Project/ProjectIssues?ProjectKey=" + projectkey + "\" >[" + projectkey + "] </a>";
+            var issuelink = "<a href = \"/Issue/UpdateIssue?issuekey=" + evkey + "\" >" + summary + "</a>";
+            var vm = new ProjectEvent();
+            vm.Event = projectlink + issuelink + " is assigned to " + aslink + " by " + wholink;
+            UpdateEvent(evkey, vm.dbEvent);
         }
 
     }

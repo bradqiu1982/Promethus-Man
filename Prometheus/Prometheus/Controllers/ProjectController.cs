@@ -642,9 +642,12 @@ namespace Prometheus.Controllers
                 var list3 = IssueViewModels.RetrieveIssueByProjectKey(ProjectKey, Resolute.Done, 30);
                 list1.AddRange(list2);
                 list1.AddRange(list3);
+
+                ViewBag.projectdata =  ProjectViewModels.RetrieveOneProject(ProjectKey);
+               
                 return View(list1);
             }
-            
+
             return View();
         }
 

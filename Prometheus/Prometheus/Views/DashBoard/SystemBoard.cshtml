@@ -10,7 +10,7 @@
 
 @{
     var syslist = new List<Prometheus.Models.ProjectEvent>();
-    var ulist = new List<Prometheus.Models.ProjectEvent>();
+    var ulist = (List<Prometheus.Models.IssueViewModels>)ViewBag.assignedtasklist;
 }
 
 @if (Model != null)
@@ -49,10 +49,10 @@
                 @foreach (var item in ulist)
                 {
                     <div class="panel-body">
-                        @Html.Raw(item.Event)
+                        <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey">[@item.ProjectKey]</a> <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a>
                     </div>
                     <div class="panel-body text-right" style="max-height:10px;min-height:10px;">
-                        @item.UpdateDate.ToString()
+                        Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString()
                     </div>
                     <hr />
                 }

@@ -41,64 +41,202 @@ else
 
 <hr />
 
-<div class="row">
-    <div class="col-md-4">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Pending</h3>
-            </div>
+@{
+    var PMList = new List<Prometheus.Models.ProjectMembers>();
+    var ENGList = new List<Prometheus.Models.ProjectMembers>();
+    var projectdata = (Prometheus.Models.ProjectViewModels)ViewBag.projectdata;
 
-            <div class="panel-body" style="max-height:420px;min-height:420px;overflow-y: scroll;overflow-x: scroll;">
-                @foreach (var item in pendinglist)
+    if (Model != null && projectdata != null)
+    {
+            foreach (var pm in projectdata.MemberList)
+            {
+                if (string.Compare(pm.Role, Prometheus.Models.ProjectViewModels.PMROLE) == 0)
                 {
-                    <div class="panel-body">
-                        <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a>
-                    </div>
-                    <div class="panel-body text-right" >
-                        Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString()
-                    </div>
-                    <hr />
+                    PMList.Add(pm);
                 }
+            }
+
+            foreach (var pm in projectdata.MemberList)
+            {
+                if (string.Compare(pm.Role, Prometheus.Models.ProjectViewModels.ENGROLE) == 0)
+                {
+                    ENGList.Add(pm);
+                }
+            }
+    }
+}
+
+<ul class="nav nav-pills nav-stacked col-md-2">
+    <li class="active"><a href="#tab_a" data-toggle="pill">Introduction</a></li>
+    <li><a href="#tab_b" data-toggle="pill">Project Issues</a></li>
+</ul>
+
+<div class="tab-content col-md-10">
+    <div class="tab-pane active" id="tab_a">
+        @if (projectdata != null)
+        {
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <span class="glyphicon glyphicon-home" aria-hidden="true"></span> @projectdata.ProjectName
+                        </div>
+                        <div class="col-md-2">
+                            <a href="/Project/EditProject?ProjectKey=@projectdata.ProjectKey">
+                                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Modify
+                            </a>
+                        </div>
+                        <div class="col-md-8">
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body col-md-12 " style="overflow-x: scroll;">
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="col-md-4">
+                                <label class="control-label">StartDate</label>
+                            </div>
+                            <div class="col-md-8">
+                                <input class="form-control text-box single-line" value="@projectdata.StartDate.ToString("yyyy-MM-dd")" readonly="readonly" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="col-md-4">
+                                <label class="control-label">FinishRate</label>
+                            </div>
+                            <div class="col-md-8">
+                                <input class="form-control text-box single-line" value="@projectdata.FinishRating.ToString()%" readonly="readonly" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    @for (var i = 0; i < 1; i++)
+                {
+                        <div class="row">
+                            <div class="col-md-6">
+
+                                @if (Model != null && PMList.Count > (i * 2))
+                                {
+                                    <label class="control-label col-md-2" for="PM@(i*2 + 1)">PM@(i * 2 + 1)</label>
+                                    <div class="col-md-10">
+                                        @Html.ActionLink(@PMList[(i * 2)].Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = @PMList[(i * 2)].Name }, null)
+                                    </div>
+                                }
+                            </div>
+                            <div class="col-md-6">
+                                @if (Model != null && PMList.Count > (i * 2 + 1))
+                                {
+                                    <label class="control-label col-md-2" for="PM@(i*2 + 2)">PM@(i * 2 + 2)</label>
+                                    <div class="col-md-10">
+                                        @Html.ActionLink(@PMList[(i * 2 + 1)].Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = @PMList[(i * 2 + 1)].Name }, null)
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    <hr />
+
+                    @for (var i = 0; i < 3; i++)
+                {
+                        <div class="row">
+                            <div class="col-md-6">
+                                @if (Model != null && ENGList.Count > (i * 2))
+                                {
+                                    <label class="control-label col-md-2" for="Engineer@(i*2 + 1)">Engineer@(i * 2 + 1)</label>
+                                    <div class="col-md-10">
+                                        @Html.ActionLink(@ENGList[(i * 2)].Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = @ENGList[(i * 2)].Name }, null)
+                                    </div>
+                                }
+                            </div>
+                            <div class="col-md-6">
+                                @if (Model != null && ENGList.Count > (i * 2 + 1))
+                                {
+                                    <label class="control-label col-md-2" for="Engineer@(i*2 + 2)">Engineer@(i * 2 + 2)</label>
+                                    <div class="col-md-10">
+                                        @Html.ActionLink(@ENGList[(i * 2 + 1)].Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = @ENGList[(i * 2 + 1)].Name }, null)
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    <hr />
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            @Html.Raw(projectdata.Description)
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        }
     </div>
-    <div class="col-md-4">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Working</h3>
-            </div>
 
-            <div class="panel-body" style="max-height:420px;min-height:420px;overflow-y: scroll;overflow-x: scroll;">
-                @foreach (var item in workinglist)
-                {
-                    <div class="panel-body">
-                        <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a>
+    <div class="tab-pane" id="tab_b">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Pending</h3>
                     </div>
-                    <div class="panel-body text-right" >
-                        Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString()
-                    </div>
-                    <hr />
-                }
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Done</h3>
-            </div>
 
-            <div class="panel-body" style="max-height:420px;min-height:420px;overflow-y: scroll;overflow-x: scroll;">
-                @foreach (var item in donelist)
-                {
-                    <div class="panel-body">
-                        <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a>
+                    <div class="panel-body" style="max-height:420px;min-height:420px;overflow-y: scroll;overflow-x: scroll;">
+                        @foreach (var item in pendinglist)
+                        {
+                            <div class="panel-body">
+                                <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a> Asingned To <a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a>
+                            </div>
+                            <div class="panel-body text-right">
+                                Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString()
+                            </div>
+                            <hr />
+                        }
                     </div>
-                    <div class="panel-body text-right" >
-                        Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString()
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Working</h3>
                     </div>
-                    <hr />
-                }
+
+                    <div class="panel-body" style="max-height:420px;min-height:420px;overflow-y: scroll;overflow-x: scroll;">
+                        @foreach (var item in workinglist)
+                        {
+                            <div class="panel-body">
+                                <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a> Asingned To <a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a>
+                            </div>
+                            <div class="panel-body text-right">
+                                Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString()
+                            </div>
+                            <hr />
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Done</h3>
+                    </div>
+
+                    <div class="panel-body" style="max-height:420px;min-height:420px;overflow-y: scroll;overflow-x: scroll;">
+                        @foreach (var item in donelist)
+                        {
+                            <div class="panel-body">
+                                <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a> Asingned To <a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a>
+                            </div>
+                            <div class="panel-body text-right">
+                                Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString()
+                            </div>
+                            <hr />
+                        }
+                    </div>
+                </div>
             </div>
         </div>
     </div>

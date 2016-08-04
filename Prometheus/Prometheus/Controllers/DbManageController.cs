@@ -22,7 +22,8 @@ namespace Prometheus.Controllers
             var querystr = Request.Form["querystring"];
             if (!querystr.Contains("select")
                 && !querystr.Contains("insert")
-                && !querystr.Contains("update"))
+                && !querystr.Contains("update")
+                && !querystr.Contains("delete"))
             {
                 ViewBag.ExecuteRes = "invalidate sql strings";
                 return View();

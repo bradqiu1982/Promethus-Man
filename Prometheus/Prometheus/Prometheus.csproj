@@ -167,6 +167,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\DashBoardController.cs" />
+    <Compile Include="Controllers\DBManageController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\IssueController.cs" />
     <Compile Include="Controllers\ProjectController.cs" />
@@ -673,6 +674,7 @@
     <Content Include="Views\User\ResetUser.cshtml" />
     <Content Include="Views\Project\ProjectIssues.cshtml" />
     <Content Include="Views\Issue\UpdateIssue.cshtml" />
+    <Content Include="Views\DbManage\ExecuteSQLs.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

@@ -20,6 +20,36 @@ namespace Prometheus.Controllers
             return View(projlist);
         }
 
+        private List<SelectListItem> CreateSelectList(List<string> valist, string defVal)
+        {
+            var pslist = new List<SelectListItem>();
+
+            var pitem = new SelectListItem();
+            pitem.Text = "NONE";
+            pitem.Value = "NONE";
+            pslist.Add(pitem);
+
+            foreach (var p in valist)
+            {
+                pitem = new SelectListItem();
+                pitem.Text = p;
+                pitem.Value = p;
+                if (!string.IsNullOrEmpty(defVal) && string.Compare(defVal, p) == 0)
+                {
+                    pitem.Selected = true;
+                }
+                pslist.Add(pitem);
+            }
+
+            if (string.IsNullOrEmpty(defVal) && pslist.Count > 0)
+            {
+                pslist[0].Selected = true;
+            }
+
+            return pslist;
+        }
+
+
         public ActionResult CreateProject()
         {
             var ckdict = CookieUtility.UnpackCookie(this);

@@ -174,7 +174,7 @@ namespace Prometheus.Controllers
             {
                 var loginerror = "<h3><font color=\"red\">Fail to login: password not correct</font></h3>";
                 ViewBag.loginerror = loginerror;
-                return RedirectToAction("LoginUser");
+                return View("LoginUser");
             }
 
             var ckdict = CookieUtility.UnpackCookie(this);
@@ -268,6 +268,9 @@ namespace Prometheus.Controllers
                 var list3 = IssueViewModels.RetrieveIssueByAssignee(usernm, Resolute.Done, 30);
                 list1.AddRange(list2);
                 list1.AddRange(list3);
+
+                ViewBag.UserName = usernm.Split(new char[] { '@' })[0];
+
                 return View(list1);
             }
             else

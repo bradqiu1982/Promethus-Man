@@ -49,12 +49,77 @@ namespace Prometheus.Controllers
             return pslist;
         }
 
+        private void CreateAllUserLists(ProjectViewModels vm)
+        {
+            var pmlist = new List<ProjectMembers>();
+            var eglist = new List<ProjectMembers>();
+
+            foreach (var pm in vm.MemberList)
+            {
+                if (string.Compare(pm.Role, Prometheus.Models.ProjectViewModels.PMROLE) == 0)
+                {
+                    pmlist.Add(pm);
+                }
+            }
+
+            foreach (var eg in vm.MemberList)
+            {
+                if (string.Compare(eg.Role, Prometheus.Models.ProjectViewModels.ENGROLE) == 0)
+                {
+                    eglist.Add(eg);
+                }
+            }
+
+
+            var asilist = UserViewModels.RetrieveAllUser();
+            if (pmlist.Count > 0)
+                ViewBag.PM1 = CreateSelectList(asilist, pmlist[0].Name);
+            else
+                ViewBag.PM1 = CreateSelectList(asilist,"");
+
+            if (pmlist.Count > 1)
+                ViewBag.PM2 = CreateSelectList(asilist, pmlist[1].Name);
+            else
+                ViewBag.PM2 = CreateSelectList(asilist, "");
+
+            if (eglist.Count > 0)
+                ViewBag.Engineer1 = CreateSelectList(asilist, eglist[0].Name);
+            else
+                ViewBag.Engineer1 = CreateSelectList(asilist, "");
+
+            if (eglist.Count > 1)
+                ViewBag.Engineer2 = CreateSelectList(asilist, eglist[1].Name);
+            else
+                ViewBag.Engineer2 = CreateSelectList(asilist, "");
+
+            if (eglist.Count > 2)
+                ViewBag.Engineer3 = CreateSelectList(asilist, eglist[2].Name);
+            else
+                ViewBag.Engineer3 = CreateSelectList(asilist, "");
+
+            if (eglist.Count > 3)
+                ViewBag.Engineer4 = CreateSelectList(asilist, eglist[3].Name);
+            else
+                ViewBag.Engineer4 = CreateSelectList(asilist, "");
+
+            if (eglist.Count > 4)
+                ViewBag.Engineer5 = CreateSelectList(asilist, eglist[4].Name);
+            else
+                ViewBag.Engineer5 = CreateSelectList(asilist, "");
+
+            if (eglist.Count > 5)
+                ViewBag.Engineer6 = CreateSelectList(asilist, eglist[5].Name);
+            else
+                ViewBag.Engineer6 = CreateSelectList(asilist, "");
+        }
 
         public ActionResult CreateProject()
         {
             var ckdict = CookieUtility.UnpackCookie(this);
             if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
             {
+                var vm = new ProjectViewModels();
+                CreateAllUserLists(vm);
                 return View();
             }
             else
@@ -112,14 +177,14 @@ namespace Prometheus.Controllers
                 return false;
             }
 
-            foreach(var eg in projectmodel.MemberList)
-            {
-                if (string.IsNullOrEmpty(eg.Name.Trim()))
-                {
-                    ViewBag.CreateError = createerror.Replace("<ErrorMsg>", "PM or Engineer email address is empty");
-                    return false;
-                }
-            }
+            //foreach(var eg in projectmodel.MemberList)
+            //{
+            //    if (string.IsNullOrEmpty(eg.Name.Trim()))
+            //    {
+            //        ViewBag.CreateError = createerror.Replace("<ErrorMsg>", "PM or Engineer email address is empty");
+            //        return false;
+            //    }
+            //}
 
             if (string.IsNullOrEmpty(projectmodel.Description.Trim()))
             {
@@ -136,15 +201,46 @@ namespace Prometheus.Controllers
                 }
             }
 
-            foreach (var eg in projectmodel.MemberList)
+            var pmlist = new List<ProjectMembers>();
+            var eglist = new List<ProjectMembers>();
+
+            foreach (var pm in projectmodel.MemberList)
             {
-                if (!EmailAddressValidate(eg.Name.Trim()))
+                if (string.Compare(pm.Role, Prometheus.Models.ProjectViewModels.PMROLE) == 0)
                 {
-                    ViewBag.CreateError = createerror.Replace("<ErrorMsg>", "PM or Engineer email address is wrong");
-                    return false;
+                    pmlist.Add(pm);
                 }
             }
-                
+
+            foreach (var eg in projectmodel.MemberList)
+            {
+                if (string.Compare(eg.Role, Prometheus.Models.ProjectViewModels.ENGROLE) == 0)
+                {
+                    eglist.Add(eg);
+                }
+            }
+
+            if (pmlist.Count == 0)
+            {
+                ViewBag.CreateError = createerror.Replace("<ErrorMsg>", "At least one PM should be choosed");
+                return false;
+            }
+
+            if(eglist.Count == 0)
+            {
+                ViewBag.CreateError = createerror.Replace("<ErrorMsg>", "At least one Engineer should be choosed");
+                return false;
+            }
+
+            //foreach (var eg in projectmodel.MemberList)
+            //{
+            //    if (!EmailAddressValidate(eg.Name.Trim()))
+            //    {
+            //        ViewBag.CreateError = createerror.Replace("<ErrorMsg>", "PM or Engineer email address is wrong");
+            //        return false;
+            //    }
+            //}
+
             return true;
         }
 
@@ -243,9 +339,10 @@ namespace Prometheus.Controllers
             {
                 for (var i = 1; i < count+1; i++)
                 {
-                    if (!string.IsNullOrEmpty(Request.Form[key + i]))
+                    if (!string.IsNullOrEmpty(Request.Form[key + i].ToString()) 
+                        && string.Compare(Request.Form[key + i].ToString(), "NONE") != 0)
                     {
-                        ret.Add(Request.Form[key + i]);
+                        ret.Add(Request.Form[key + i].ToString());
                     }
                 }
                 return ret;
@@ -422,10 +519,18 @@ namespace Prometheus.Controllers
             RetrieveStation(projectmodel);
 
             if (!RetrieveProjectDate(projectmodel))
+            {
+                CreateAllUserLists(projectmodel);
                 return View(projectmodel);
+            }
+
 
             if (!ProjectValidate(projectmodel))
+            {
+                CreateAllUserLists(projectmodel);
                 return View(projectmodel);
+            }
+                
 
             if (projectmodel.StationList.Count > 0
                 && projectmodel.TabList.Count > 0
@@ -467,6 +572,7 @@ namespace Prometheus.Controllers
                 if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
                 {
                     var vm = ProjectViewModels.RetrieveOneProject(realkey);
+                    CreateAllUserLists(vm);
                     return View(vm);
                 }
                 else
@@ -504,10 +610,17 @@ namespace Prometheus.Controllers
             RetrieveStation(projectmodel);
 
             if (!RetrieveProjectDate(projectmodel))
+            {
+                CreateAllUserLists(projectmodel);
                 return View(projectmodel);
+            }
+                
 
             if (!ProjectValidate(projectmodel,true))
+            {
+                CreateAllUserLists(projectmodel);
                 return View(projectmodel);
+            }
 
             projectmodel.StoreProject();
             

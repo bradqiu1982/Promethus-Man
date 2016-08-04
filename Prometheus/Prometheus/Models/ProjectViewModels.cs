@@ -136,9 +136,6 @@ namespace Prometheus.Models
         public DateTime StartDate { set; get; }
 
 
-        [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)")]
-        public string PM { set; get; }
-
         //[StringLength(260, MinimumLength = 6)]
         //[Required]
         //[RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+).*")]

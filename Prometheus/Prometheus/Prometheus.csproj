@@ -180,7 +180,9 @@
     <Compile Include="Models\DBUtility.cs" />
     <Compile Include="Models\EmailUtility.cs" />
     <Compile Include="Models\IssueViewModels.cs" />
+    <Compile Include="Models\MESUtility.cs" />
     <Compile Include="Models\ProjectEvent.cs" />
+    <Compile Include="Models\ProjectTestData.cs" />
     <Compile Include="Models\ProjectViewModels.cs" />
     <Compile Include="Models\UserViewModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

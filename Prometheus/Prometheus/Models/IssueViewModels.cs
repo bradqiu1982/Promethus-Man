@@ -5,6 +5,24 @@ using System.Web;
 
 namespace Prometheus.Models
 {
+    public class ISSUETP
+    {
+        public static string Bug = "Bug";
+        public static string NewFeature = "New Feature";
+        public static string Task = "Task";
+        public static string Improvement = "Improvement";
+        public static string Document = "Document";
+    }
+
+    public class ISSUEPR
+    {
+        public static string Major = "Major";
+        public static string Blocker = "Blocker";
+        public static string Critical = "Critical";
+        public static string Minor = "Minor";
+        public static string Trivial = "Trivial";
+    }
+
     public class Resolute
     {
         public static string Pending = "Pending";
@@ -208,7 +226,7 @@ namespace Prometheus.Models
             StoreIssueComment(DateTime.Now.ToString());
         }
 
-        public void StoreIssueComment(string CommentDate)
+        private void StoreIssueComment(string CommentDate)
         {
             if (!string.IsNullOrEmpty(Description))
             {

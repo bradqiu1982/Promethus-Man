@@ -178,15 +178,23 @@ namespace Prometheus.Controllers
             }
 
             var ckdict = CookieUtility.UnpackCookie(this);
-            if (ckdict.ContainsKey("logonredirectctrl") && ckdict.ContainsKey("logonredirectact"))
+            if (ckdict.ContainsKey("logonredirectctrl") 
+                && ckdict.ContainsKey("logonredirectact")
+                && !string.IsNullOrEmpty(ckdict["logonredirectact"])
+                && !string.IsNullOrEmpty(ckdict["logonredirectctrl"]))
             {
+                var logonredirectact = ckdict["logonredirectact"];
+                var logonredirectctrl = ckdict["logonredirectctrl"];
+
                 //verify user information
                 string logonuser = username + "||" + DateTime.Now.ToString();
                 var ck = new Dictionary<string, string>();
                 ck.Add("logonuser", logonuser);
+                ck.Add("logonredirectact","");
+                ck.Add("logonredirectctrl","");
                 CookieUtility.SetCookie(this, ck);
 
-                return RedirectToAction(ckdict["logonredirectact"], ckdict["logonredirectctrl"]);
+                return RedirectToAction(logonredirectact, logonredirectctrl);
             }
             else
             {

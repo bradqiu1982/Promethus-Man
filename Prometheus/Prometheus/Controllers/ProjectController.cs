@@ -8,6 +8,7 @@ using System.Web.Routing;
 using System.Text;
 using System.Net.Mail;
 using System.IO;
+using System.Threading;
 
 namespace Prometheus.Controllers
 {
@@ -354,52 +355,6 @@ namespace Prometheus.Controllers
             }
         }
 
-        public string PNCondition(List<ProjectPn> pns)
-        {
-            string ret = "('";
-            foreach(var pn in pns)
-            {
-                ret = ret + RMSpectialCh(pn.Pn) + "','";
-            }
-
-            if (pns.Count > 0)
-            {
-                ret = ret.Substring(0, ret.Length - 2) + ")";
-            }
-            else
-            {
-                ret = "('')";
-            }
-
-            return ret;
-        }
-
-        private List<string> RetrieveSqlFromProjectModel(ProjectViewModels projectmodel)
-        {
-            var tables = new List<string>();
-            foreach(var s in projectmodel.StationList)
-            {
-                foreach(var m in projectmodel.TabList)
-                {
-                    if (string.Compare(s.Station.ToUpper(),m.Station.ToUpper()) == 0)
-                    {
-                        tables.Add(m.TableName);
-                        break;
-                    }
-                }
-            }
-
-            string pncond = PNCondition(projectmodel.PNList);
-
-            var sql = "select ModuleSerialNum, WhichTest, ModuleType, ErrAbbr, TestTimeStamp, TestStation from  #DCTABLE#  where assemblypartnum in  #COND#   #TIMECOND#  order by  moduleserialnum,testtimestamp";
-
-            var ret = new List<string>();
-            foreach (var tb in tables)
-            {
-                ret.Add(sql.Replace("#DCTABLE#", ("insite.dc_" + tb)).Replace("#COND#", pncond));
-            }
-            return ret;
-        }
 
         private void RetrievePorjectKey(ProjectViewModels projectmodel)
         {
@@ -530,30 +485,21 @@ namespace Prometheus.Controllers
                 CreateAllUserLists(projectmodel);
                 return View(projectmodel);
             }
-                
-
-            if (projectmodel.StationList.Count > 0
-                && projectmodel.TabList.Count > 0
-                && projectmodel.PNList.Count > 0)
-            {
-                var sqls = RetrieveSqlFromProjectModel(projectmodel);
-                foreach (var s in sqls)
-                {
-                    var sql = s.Replace("#TIMECOND#", "and TestTimeStamp > '" + DateTime.Parse("2016-7-18 4:00:00").ToString() + "'");
-                    //System.Windows.MessageBox.Show(sql);
-                    //var res = DBUtility.ExeMESSqlWithRes(sql);
-                    //foreach (var r in res)
-                    //{
-                    //    var l = r;
-                    //}
-                }
-            }
 
             projectmodel.StoreProject();
 
             var ckdict = CookieUtility.UnpackCookie(this);
             var who = (ckdict["logonuser"]).Split(new string[]{ "||"},StringSplitOptions.None)[0];
             ProjectEvent.CreateProjectEvent(who, projectmodel.ProjectKey, projectmodel.ProjectName);
+
+            new Thread(() => {
+                try
+                {
+                    MESUtility.StartProjectBonding(projectmodel);
+                }
+                catch (Exception ex)
+                { }
+            }).Start();
 
             return RedirectToAction("ViewAll");
         }

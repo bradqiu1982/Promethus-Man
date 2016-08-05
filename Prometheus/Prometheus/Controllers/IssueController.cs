@@ -42,15 +42,17 @@ namespace Prometheus.Controllers
             ViewBag.projectlist = slist;
 
             var typelist = new List<string>();
-            string[] tlist = { "Bug", "New Feature", "Task"
-            ,"Improvement","Document"};
+            string[] tlist = { ISSUETP.Bug, ISSUETP.NewFeature, ISSUETP.Task
+            ,ISSUETP.Improvement,ISSUETP.Document};
+
             typelist.AddRange(tlist);
             slist = CreateSelectList(typelist, vm.IssueType);
             ViewBag.issuetypelist = slist;
 
             var prilist = new List<string>();
-            string[] prlist = { "Major", "Blocker", "Critical"
-            ,"Minor","Trivial"};
+            string[] prlist = { ISSUEPR.Major, ISSUEPR.Blocker,ISSUEPR.Critical
+            ,ISSUEPR.Minor,ISSUEPR.Trivial};
+
             prilist.AddRange(prlist);
             slist = CreateSelectList(prilist, vm.Priority);
             ViewBag.prioritylist = slist;

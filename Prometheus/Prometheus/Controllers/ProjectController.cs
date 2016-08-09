@@ -538,6 +538,46 @@ namespace Prometheus.Controllers
             }
         }
 
+        private bool DataBondingChanged(ProjectViewModels oldpjdata, ProjectViewModels newpjdata)
+        {
+            var pndict = new Dictionary<string, bool>();
+            foreach (var pn in oldpjdata.PNList)
+            {
+                pndict.Add(pn.Pn, true);
+            }
+
+            bool changed = false;
+
+            foreach (var pn in newpjdata.PNList)
+            {
+                if (!pndict.ContainsKey(pn.Pn))
+                {
+                    changed = true;
+                    break;
+                }
+            }
+
+            if (changed)
+                return changed;
+
+            var stationdict = new Dictionary<string, bool>();
+            foreach (var stat in oldpjdata.StationList)
+            {
+                stationdict.Add(stat.Station, true);
+            }
+
+            foreach (var stat in newpjdata.StationList)
+            {
+                if (!stationdict.ContainsKey(stat.Station))
+                {
+                    changed = true;
+                    break;
+                }
+            }
+
+            return changed;
+        }
+
         [HttpPost, ActionName("EditProject")]
         [ValidateAntiForgeryToken]
         public ActionResult EditProjectPost()
@@ -568,13 +608,35 @@ namespace Prometheus.Controllers
                 return View(projectmodel);
             }
 
+            var oldpjdata = ProjectViewModels.RetrieveOneProject(projectmodel.ProjectKey);
+
+            bool databondingchange = DataBondingChanged(oldpjdata, projectmodel);
+
             projectmodel.StoreProject();
+
+            if (projectmodel.TabList.Count == 0)
+            {
+                projectmodel.TabList = oldpjdata.TabList;
+            }
             
             //TODO retrive bondinged table and retrieve new bonding table data from MES
             
             var ckdict = CookieUtility.UnpackCookie(this);
             var who = (ckdict["logonuser"]).Split(new string[] { "||" }, StringSplitOptions.None)[0];
             ProjectEvent.UpdateProjectEvent(who, projectmodel.ProjectKey, projectmodel.ProjectName);
+
+            if(databondingchange)
+            {
+                new Thread(() =>
+                {
+                    try
+                    {
+                        MESUtility.StartProjectBonding(projectmodel);
+                    }
+                    catch (Exception ex)
+                    { }
+                }).Start();
+            }
 
             return RedirectToAction("ViewAll");
         }

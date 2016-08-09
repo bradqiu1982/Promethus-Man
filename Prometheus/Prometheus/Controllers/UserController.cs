@@ -279,6 +279,8 @@ namespace Prometheus.Controllers
 
                 ViewBag.UserName = usernm.Split(new char[] { '@' })[0];
 
+                ViewBag.iassignlist = IssueViewModels.RetrieveIssueByCreator(usernm, 100);
+
                 return View(list1);
             }
             else

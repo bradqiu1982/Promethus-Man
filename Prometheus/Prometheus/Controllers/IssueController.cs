@@ -66,18 +66,21 @@ namespace Prometheus.Controllers
             var asilist = UserViewModels.RetrieveAllUser();
             slist = CreateSelectList(asilist, vm.Assignee);
             ViewBag.assigneelist = slist;
+
+            var rpilist = UserViewModels.RetrieveAllUser();
+            slist = CreateSelectList(rpilist, vm.Reporter);
+            ViewBag.reporterlist = slist;
         }
 
         // GET: Issue
         public ActionResult CreateIssue()
         {
-            var vm = new IssueViewModels();
-            CreateAllLists(vm);
-
             var ckdict = CookieUtility.UnpackCookie(this);
             if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
             {
+                var vm = new IssueViewModels();
                 vm.Reporter = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                CreateAllLists(vm);
                 return View(vm);
             }
             else
@@ -103,7 +106,7 @@ namespace Prometheus.Controllers
             vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
             vm.ReportDate = DateTime.Now;
             vm.Assignee = Request.Form["assigneelist"].ToString();
-            vm.Reporter = Request.Form["Reporter"].ToUpper();
+            vm.Reporter = Request.Form["reporterlist"].ToString();
             vm.Resolution = Request.Form["resolutionlist"].ToString();
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
 
@@ -227,5 +230,64 @@ namespace Prometheus.Controllers
             CreateAllLists(newdata);
             return View(newdata);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult PrepareSubIssue()
+        {
+            var parentkey = Request.Form["HIssueKey"];
+            var projectkey = Request.Form["HProjectKey"];
+            var dict = new RouteValueDictionary();
+            dict.Add("parentkey", parentkey);
+            dict.Add("projectkey", projectkey);
+            return RedirectToAction("CreateSubIssue", dict);
+        }
+
+        public ActionResult CreateSubIssue(string parentkey,string projectkey)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var vm = new IssueViewModels();
+            vm.Reporter = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            vm.ParentIssueKey = parentkey;
+            vm.ProjectKey = projectkey;
+            CreateAllLists(vm);
+            return View(vm);
+        }
+
+        [HttpPost, ActionName("CreateSubIssue")]
+        [ValidateAntiForgeryToken]
+        public ActionResult CreatePostSubIssue()
+        {
+            var vm = new IssueViewModels();
+            vm.ProjectKey = Request.Form["projectlist"].ToString();
+            vm.IssueKey = IssueViewModels.GetUniqKey();
+            vm.ParentIssueKey = Request.Form["HParentIssueKey"];
+            vm.IssueType = Request.Form["issuetypelist"].ToString();
+            vm.Summary = Request.Form["Summary"];
+            vm.Priority = Request.Form["prioritylist"].ToString();
+            vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
+            vm.ReportDate = DateTime.Now;
+            vm.Assignee = Request.Form["assigneelist"].ToString();
+            vm.Reporter = Request.Form["reporterlist"].ToString();
+            vm.Resolution = Request.Form["resolutionlist"].ToString();
+            vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+
+            if (string.IsNullOrEmpty(Request.Form["editor1"]))
+            {
+                var createerror = "<h3><font color=\"red\">Fail to create/modify Issue: Description can not be empty</font></h3>";
+                ViewBag.CreateError = createerror;
+                return View(vm);
+            }
+            vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
+
+            vm.StoreSubIssue();
+
+            ProjectEvent.CreateIssueEvent(vm.ProjectKey, vm.Reporter, vm.Assignee, vm.Summary, vm.IssueKey);
+
+            var dict = new RouteValueDictionary();
+            dict.Add("issuekey", vm.ParentIssueKey);
+            return RedirectToAction("UpdateIssue", "Issue", dict);
+        }
+
     }
 }

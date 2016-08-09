@@ -677,6 +677,7 @@
     <Content Include="Views\Project\ProjectIssues.cshtml" />
     <Content Include="Views\Issue\UpdateIssue.cshtml" />
     <Content Include="Views\DbManage\ExecuteSQLs.cshtml" />
+    <Content Include="Views\Issue\CreateSubIssue.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

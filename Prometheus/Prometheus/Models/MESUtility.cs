@@ -112,9 +112,17 @@ namespace Prometheus.Models
                     && vm.TabList.Count > 0
                     && vm.PNList.Count > 0)
                 {
+
                     var failurelist = new List<ProjectTestData>();
                     var sndict = new Dictionary<string, bool>();
 
+                    bool bondinged = ProjectTestData.RetrieveProjectTestData(1, vm.ProjectKey).Count > 0 ? true : false;
+                    var bondingeddatadict = new Dictionary<string, bool>();
+                    if (bondinged)
+                    {
+                        bondingeddatadict = ProjectTestData.RetrieveAllDataID(vm.ProjectKey);
+                    }
+                    
                     var sqls = RetrieveSqlFromProjectModel(vm);
                     foreach (var s in sqls)
                     {
@@ -124,21 +132,39 @@ namespace Prometheus.Models
                         {
                             try
                             {
-                                var isql = "insert into ProjectTestData(ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN) values('<ProjectKey>','<DataID>','<ModuleSerialNum>','<WhichTest>','<ModuleType>','<ErrAbbr>','<TestTimeStamp>','<TestStation>','<PN>')";
-                                isql = isql.Replace("<ProjectKey>", vm.ProjectKey).Replace("<DataID>", Convert.ToString(item[0])).Replace("<ModuleSerialNum>", Convert.ToString(item[1]))
-                                    .Replace("<WhichTest>", Convert.ToString(item[2])).Replace("<ModuleType>", Convert.ToString(item[3])).Replace("<ErrAbbr>", Convert.ToString(item[4]))
-                                    .Replace("<TestTimeStamp>", Convert.ToString(item[5])).Replace("<TestStation>", Convert.ToString(item[6])).Replace("<PN>", Convert.ToString(item[7]));
-                                DBUtility.ExeLocalSqlNoRes(isql);
-                                if (!sndict.ContainsKey(Convert.ToString(item[1])))
+
+                                var tempdata = new ProjectTestData(vm.ProjectKey, Convert.ToString(item[0]), Convert.ToString(item[1])
+                                        , Convert.ToString(item[2]), Convert.ToString(item[3]), Convert.ToString(item[4])
+                                        , Convert.ToString(item[5]), Convert.ToString(item[6]), Convert.ToString(item[7]));
+
+
+                                if (!bondinged)
                                 {
-                                    var tempdata = new ProjectTestData(vm.ProjectKey, Convert.ToString(item[0]), Convert.ToString(item[1])
-                                    , Convert.ToString(item[2]), Convert.ToString(item[3]), Convert.ToString(item[4])
-                                    , Convert.ToString(item[5]), Convert.ToString(item[6]), Convert.ToString(item[7]));
-                                    sndict.Add(tempdata.ModuleSerialNum, true);
-                                    if (string.Compare(tempdata.ErrAbbr, "PASS", true) != 0)
+                                    tempdata.StoreProjectTestData();
+
+                                    if (!sndict.ContainsKey(tempdata.ModuleSerialNum))
                                     {
-                                        failurelist.Add(tempdata);
+                                        sndict.Add(tempdata.ModuleSerialNum, true);
+                                        if (string.Compare(tempdata.ErrAbbr, "PASS", true) != 0)
+                                        {
+                                            failurelist.Add(tempdata);
+                                        }
                                     }
+                                }
+                                else
+                                {
+                                    if (!bondingeddatadict.ContainsKey(tempdata.DataID))
+                                    {
+                                        tempdata.StoreProjectTestData();
+                                        if (!sndict.ContainsKey(tempdata.ModuleSerialNum))
+                                        {
+                                            sndict.Add(tempdata.ModuleSerialNum, true);
+                                            if (string.Compare(tempdata.ErrAbbr, "PASS", true) != 0)
+                                            {
+                                                failurelist.Add(tempdata);
+                                            }
+                                        }
+                                }
                                 }
                             }
                             catch (Exception ex)

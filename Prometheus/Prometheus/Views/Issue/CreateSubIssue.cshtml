@@ -13,11 +13,11 @@
     ViewBag.CreateError = "";
 }
 
-<hr/>
+<hr />
 
 <script src="../../ckeditor/ckeditor.js"></script>
 
-@using (Html.BeginForm("CreateIssue", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
+@using (Html.BeginForm("CreateSubIssue", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
@@ -30,13 +30,13 @@
                 <div class="col-md-6">
                     <label class="control-label col-md-2" for="ProjectName">Project<font color="red">*</font></label>
                     <div class="col-md-10">
-                        @Html.DropDownList("projectlist", null, new { @id = "ProjectKey", @class = "form-control" })
+                        @Html.DropDownList("projectlist", null, new { @id = "ProjectKey", @class = "form-control", @readonly = "readonly" })
                     </div>
                 </div>
                 <div class="col-md-6">
                     <label class="control-label col-md-2" for="IssueType">IssueType<font color="red">*</font></label>
                     <div class="col-md-10">
-                        @Html.DropDownList("issuetypelist", null, new { @id = "IssueType", @class = "form-control" })                   
+                        @Html.DropDownList("issuetypelist", null, new { @id = "IssueType", @class = "form-control" })
                     </div>
                 </div>
             </div>
@@ -85,24 +85,13 @@
                 <div class="col-md-6">
                     <label class="control-label col-md-2" for="Reporter">Reporter<font color="red">*</font></label>
                     <div class="col-md-10">
-                        @Html.DropDownList("reporterlist", null, new { @id = "Reporter", @class = "form-control" })
-
-                        @*@if (Model != null && !string.IsNullOrEmpty(Model.Reporter))
-                        {
-                            <input class="form-control text-box single-line" value="@(Model.Reporter)" id="Reporter" name="Reporter" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" data-val-required="The Field is required" type="text" />
-                        }
-                        else
-                        {
-                            <input class="form-control text-box single-line" id="Reporter" name="Reporter" data-val="true" data-val-regex="The field must match email format" data-val-regex-pattern="^([\w\.\-]+)@@([\w\-]+)((\.(\w){2,3})+)" data-val-required="The Field is required" type="text" value="" />
-                        }
-
-                        <span class="field-validation-valid text-danger" data-valmsg-for="Reporter" data-valmsg-replace="true"></span>*@
+                        @Html.DropDownList("reporterlist", null, new { @id = "Assignee", @class = "form-control" })
                     </div>
                 </div>
                 <div class="col-md-6">
                     <label class="control-label col-md-2" for="DueDate">DueDate<font color="red">*</font></label>
                     <div class="col-md-10">
-                        @if (Model != null && string.Compare(Model.DueDate.ToString("yyyy-MM-dd"),"0001-01-01") != 0)
+                        @if (Model != null && string.Compare(Model.DueDate.ToString("yyyy-MM-dd"), "0001-01-01") != 0)
                         {
                             <input class="form-control text-box single-line" value="@Model.DueDate.ToString("yyyy-MM-dd")" data-val="true" data-val-date="The field DueDate must be a date." data-val-required="The DueDate field is required." id="DueDate" name="DueDate" type="date" />
                         }
@@ -123,7 +112,7 @@
                                 });
                             });
                 </script>
-           </div>
+            </div>
 
         </div>
 
@@ -153,6 +142,14 @@
 
         <div class="form-group">
             <div>
+                @if (Model != null && !string.IsNullOrEmpty(Model.ParentIssueKey))
+                {
+                    <input class="form-control text-box single-line" value="@(Model.ParentIssueKey)" id="HParentIssueKey" name="HParentIssueKey" type="hidden" />
+                }
+                else
+                {
+                    <input class="form-control text-box single-line" id="HParentIssueKey" name="HParentIssueKey" type="hidden" value="" />
+                }
                 <input type="submit" value="Submit" class="btn btn-default" />
             </div>
         </div>

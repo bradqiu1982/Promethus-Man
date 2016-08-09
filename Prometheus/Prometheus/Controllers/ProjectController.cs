@@ -619,8 +619,7 @@ namespace Prometheus.Controllers
                 projectmodel.TabList = oldpjdata.TabList;
             }
             
-            //TODO retrive bondinged table and retrieve new bonding table data from MES
-            
+                        
             var ckdict = CookieUtility.UnpackCookie(this);
             var who = (ckdict["logonuser"]).Split(new string[] { "||" }, StringSplitOptions.None)[0];
             ProjectEvent.UpdateProjectEvent(who, projectmodel.ProjectKey, projectmodel.ProjectName);

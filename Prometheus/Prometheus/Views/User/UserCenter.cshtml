@@ -7,7 +7,7 @@
 
 <h2>@ViewBag.UserName Center</h2>
 
-<hr/>
+<hr />
 
 @{
     var pendinglist = new List<Prometheus.Models.IssueViewModels>();
@@ -33,66 +33,100 @@
         }
     }
 }
+<ul class="nav nav-pills nav-stacked col-md-2">
+    <li class="active"><a href="#tab_a" data-toggle="pill">My Blog</a></li>
+    <li><a href="#tab_b" data-toggle="pill">Assigned To Me</a></li>
+    <li><a href="#tab_c" data-toggle="pill">I Assign</a></li>
+</ul>
+<div class="tab-content col-md-10">
+    <div class="tab-pane active" id="tab_a">
+        Tab A
+    </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Pending</h3>
+    <div class="tab-pane" id="tab_b">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Pending</h3>
+                    </div>
+
+                    <div class="panel-body" style="max-height:420px;min-height:420px;overflow-y: scroll;overflow-x: scroll;">
+                        @foreach (var item in pendinglist)
+                        {
+                            <div class="panel-body">
+                                <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey">[@item.ProjectKey]</a> <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a>
+                            </div>
+                            <div class="panel-body text-right" style="max-height:10px;min-height:10px;">
+                                Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString()
+                            </div>
+                            <hr />
+                        }
+                    </div>
+                </div>
             </div>
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Working</h3>
+                    </div>
 
-            <div class="panel-body" style="max-height:420px;min-height:420px;overflow-y: scroll;overflow-x: scroll;">
-                @foreach (var item in pendinglist)
-                {
-                    <div class="panel-body">
-                        <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey">[@item.ProjectKey]</a> <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a>
+                    <div class="panel-body" style="max-height:420px;min-height:420px;overflow-y: scroll;overflow-x: scroll;">
+                        @foreach (var item in workinglist)
+                        {
+                            <div class="panel-body">
+                                <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey">[@item.ProjectKey]</a> <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a>
+                            </div>
+                            <div class="panel-body text-right" style="max-height:10px;min-height:10px;">
+                                Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString()
+                            </div>
+                            <hr />
+                        }
                     </div>
-                    <div class="panel-body text-right" style="max-height:10px;min-height:10px;">
-                        Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString()
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Done</h3>
                     </div>
-                    <hr />
-                }
+
+                    <div class="panel-body" style="max-height:420px;min-height:420px;overflow-y: scroll;overflow-x: scroll;">
+                        @foreach (var item in donelist)
+                        {
+                            <div class="panel-body">
+                                <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey">[@item.ProjectKey]</a> <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a>
+                            </div>
+                            <div class="panel-body text-right" style="max-height:10px;min-height:10px;">
+                                Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString()
+                            </div>
+                            <hr />
+                        }
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Working</h3>
-            </div>
 
-            <div class="panel-body" style="max-height:420px;min-height:420px;overflow-y: scroll;overflow-x: scroll;">
-                @foreach (var item in workinglist)
-                {
-                    <div class="panel-body">
-                        <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey">[@item.ProjectKey]</a> <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a>
-                    </div>
-                    <div class="panel-body text-right" style="max-height:10px;min-height:10px;">
-                        Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString()
-                    </div>
-                    <hr />
-                }
-            </div>
+    <div class="tab-pane" id="tab_c">
+        <div class="row">
+            <div class="col-md-4">Summary</div>
+            <div class="col-md-2">Asignee</div>
+            <div class="col-md-3">Sub Issue</div>
+            <div class="col-md-1">Status</div>
+            <div class="col-md-2">DueDate</div>
         </div>
-    </div>
-    <div class="col-md-4">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Done</h3>
-            </div>
+        <hr/>
 
-            <div class="panel-body" style="max-height:420px;min-height:420px;overflow-y: scroll;overflow-x: scroll;">
-                @foreach (var item in donelist)
-                {
-                    <div class="panel-body" >
-                        <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey">[@item.ProjectKey]</a> <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a>
-                    </div>
-                    <div class="panel-body text-right" style="max-height:10px;min-height:10px;">
-                        Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@'})[0]</a> @item.ReportDate.ToString()
-                    </div>
-                    <hr />
-                }
-            </div>
-        </div>
+        @if(ViewBag.iassignlist != null && ViewBag.iassignlist.Count > 0)
+        {
+            foreach (Prometheus.Models.IssueViewModels item in ViewBag.iassignlist)
+            {
+
+            }
+        }
+
     </div>
 </div>
+
+       

@@ -1,0 +1,125 @@
+﻿@model IEnumerable<Prometheus.Models.IssueViewModels>
+
+@{
+    ViewBag.Title = "SearchIssue";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Search Issue</h2>
+
+@Html.Raw(string.IsNullOrEmpty(ViewBag.SearchError) ? "&nbsp;" : ViewBag.SearchError)
+@if (!string.IsNullOrEmpty(ViewBag.SearchError))
+{
+    ViewBag.SearchError = "";
+}
+
+<hr/>
+
+@using (Html.BeginForm("SearchIssue", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-group">
+        <div class="form-horizontal">
+            <div class="form-group">
+                <div class="col-md-6">
+                    <label class="control-label col-md-2" for="ProjectName">Project</label>
+                    <div class="col-md-10">
+                        @Html.DropDownList("projectlist", null, new { @id = "ProjectKey", @class = "form-control" })
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="control-label col-md-2" for="IssueType">IssueType</label>
+                    <div class="col-md-10">
+                        @Html.DropDownList("issuetypelist", null, new { @id = "IssueType", @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-6">
+                    <label class="control-label col-md-2" for="Assignee">Assignee</label>
+                    <div class="col-md-10">
+                        @Html.DropDownList("assigneelist", null, new { @id = "Assignee", @class = "form-control" })
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="control-label col-md-2" for="IssueType">Resolution</label>
+                    <div class="col-md-10">
+                        @Html.DropDownList("resolutionlist", null, new { @id = "Resolution", @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-6">
+                    <label class="control-label col-md-2" for="StartDate">StartDate</label>
+                    <div class="col-md-10">
+                        <input class="form-control text-box single-line" id="StartDate" name="StartDate" type="date" value="" />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="control-label col-md-2" for="EndDate">EndDate</label>
+                    <div class="col-md-10">
+                        <input class="form-control text-box single-line" id="EndDate" name="EndDate" type="date" value="" />
+                    </div>
+                </div>
+            </div>
+            <script type="text/javascript">
+                    $(document).ready(function () {
+                        $("#StartDate").datepicker({
+                            changeMonth: true,
+                            changeYear: true,
+                            dateFormat: 'yy-mm-dd'
+                        });
+                    });
+                    $(document).ready(function () {
+                        $("#EndDate").datepicker({
+                            changeMonth: true,
+                            changeYear: true,
+                            dateFormat: 'yy-mm-dd'
+                        });
+                    });
+            </script>
+            <div class="form-group">
+                <div>
+                    <input type="submit" value="Search" class="btn btn-default" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+
+<hr/>
+
+@if (Model != null)
+{
+    foreach (var item in Model)
+    {
+        <div class="panel panel-default">
+            <div class="panel-heading" style="min-height:40px;max-height:40px;">
+                <div class="col-md-3 text-left">
+                    <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey">
+                        <span class="glyphicon glyphicon-home" aria-hidden="true"></span> @item.ProjectKey
+                    </a>
+                </div>
+                <div class="col-md-10"></div>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-6 text-left">Summary</div>
+                    <div class="col-md-2 text-left">Asignee</div>
+                    <div class="col-md-2 text-left">Status</div>
+                    <div class="col-md-2 text-left">DueDate</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 text-left"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></div>
+                    <div class="col-md-2 text-left"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
+                    <div class="col-md-2 text-left">@item.Resolution</div>
+                    <div class="col-md-2 text-left">@item.DueDate.ToString("yyyy-MM-dd")</div>
+                </div>
+            </div>
+        </div>
+    }
+}

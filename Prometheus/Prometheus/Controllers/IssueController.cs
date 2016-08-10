@@ -298,5 +298,122 @@ namespace Prometheus.Controllers
             return RedirectToAction("UpdateIssue", "Issue", dict);
         }
 
+        private List<SelectListItem> CreateSearchSelectList(List<string> valist, string defVal)
+        {
+            var pslist = new List<SelectListItem>();
+            var pitem = new SelectListItem();
+            pitem.Text = "NONE";
+            pitem.Value = "NONE";
+            pslist.Add(pitem);
+
+            foreach (var p in valist)
+            {
+                pitem = new SelectListItem();
+                pitem.Text = p;
+                pitem.Value = p;
+                if (!string.IsNullOrEmpty(defVal) && string.Compare(defVal, p) == 0)
+                {
+                    pitem.Selected = true;
+                }
+                pslist.Add(pitem);
+            }
+
+            if (string.IsNullOrEmpty(defVal) && pslist.Count > 0)
+            {
+                pslist[0].Selected = true;
+            }
+
+            return pslist;
+        }
+
+        private void CreateAllSearchLists()
+        {
+            var projlist = ProjectViewModels.RetrieveAllProjectKey();
+            var slist = CreateSearchSelectList(projlist, "");
+            ViewBag.projectlist = slist;
+
+            var typelist = new List<string>();
+            string[] tlist = { ISSUETP.Bug, ISSUETP.NewFeature, ISSUETP.Task,ISSUETP.Improvement,ISSUETP.Document};
+            typelist.AddRange(tlist);
+            slist = CreateSearchSelectList(typelist,"");
+            ViewBag.issuetypelist = slist;
+
+            var rsilist = new List<string>();
+            string[] rlist = { Resolute.Pending, Resolute.Working, Resolute.Reopen, Resolute.Fixed, Resolute.Done, Resolute.NotFix, Resolute.Unresolved, Resolute.NotReproduce };
+            rsilist.AddRange(rlist);
+            slist = CreateSearchSelectList(rsilist, "");
+            ViewBag.resolutionlist = slist;
+
+            var asilist = UserViewModels.RetrieveAllUser();
+            slist = CreateSearchSelectList(asilist, "");
+            ViewBag.assigneelist = slist;
+
+        }
+
+        public ActionResult SearchIssue()
+        {
+            CreateAllSearchLists();
+            return View();
+        }
+
+        [HttpPost, ActionName("SearchIssue")]
+        [ValidateAntiForgeryToken]
+        public ActionResult SearchIssuePost()
+        {
+            var pj = "";
+            var tp = "";
+            var rs = "";
+            var asn = "";
+            var sd = "";
+            var ed = "";
+
+            if (string.Compare(Request.Form["projectlist"].ToString(), "NONE") != 0)
+            {
+                pj = Request.Form["projectlist"].ToString();
+            }
+
+            if (string.Compare(Request.Form["issuetypelist"].ToString(), "NONE") != 0)
+            {
+                tp = Request.Form["issuetypelist"].ToString();
+            }
+
+            if (string.Compare(Request.Form["resolutionlist"].ToString(), "NONE") != 0)
+            {
+                rs = Request.Form["resolutionlist"].ToString();
+            }
+
+            if (string.Compare(Request.Form["assigneelist"].ToString(), "NONE") != 0)
+            {
+                asn = Request.Form["assigneelist"].ToString();
+            }
+
+            if (!string.IsNullOrEmpty(Request.Form["StartDate"]))
+            {
+                sd = Request.Form["StartDate"];
+            }
+
+            if (!string.IsNullOrEmpty(Request.Form["EndDate"]))
+            {
+                ed = Request.Form["EndDate"];
+            }
+
+            if (string.IsNullOrEmpty(pj)
+                && string.IsNullOrEmpty(tp)
+                && string.IsNullOrEmpty(rs)
+                && string.IsNullOrEmpty(asn)
+                && string.IsNullOrEmpty(sd)
+                && string.IsNullOrEmpty(ed))
+            {
+                ViewBag.SearchError = "At least choose one condition to search issue";
+                CreateAllSearchLists();
+                return View();
+            }
+
+            var vmlist = IssueViewModels.SearchIssue(pj, tp, rs, asn, sd, ed, "", 100);
+
+            CreateAllSearchLists();
+            return View(vmlist);
+        }
+
     }
 }

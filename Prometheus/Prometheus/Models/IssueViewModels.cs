@@ -276,6 +276,13 @@ namespace Prometheus.Models
             StoreIssueComment(DateTime.Now.ToString());
         }
 
+        public void UpdateIAssign()
+        {
+            var sql = "update Issue set Reporter = '<Reporter>' where IssueKey = '<IssueKey>'";
+            sql = sql.Replace("<IssueKey>", IssueKey).Replace("<Reporter>", Reporter);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
         public void CloseIssue()
         {
             var sql = "update Issue set ResolvedDate = '<ResolvedDate>' where IssueKey = '<IssueKey>'";
@@ -442,7 +449,7 @@ namespace Prometheus.Models
 
         public static List<IssueViewModels> RetrieveIssueByCreator(string creator, int topnum)
         {
-            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution from Issue where Creator = '<Creator>' and ParentIssueKey = '' order by ReportDate DESC";
+            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution from Issue where (Creator = '<Creator>' or Reporter = '<Creator>') and ParentIssueKey = '' order by ReportDate DESC";
             sql = sql.Replace("<Creator>", creator).Replace("<topnum>", Convert.ToString(topnum));
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             var ret = new List<IssueViewModels>();
@@ -456,6 +463,101 @@ namespace Prometheus.Models
                     , Convert.ToString(line[9]), Convert.ToString(line[10]), "");
                 
                 tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey);
+                ret.Add(tempvm);
+            }
+
+            return ret;
+        }
+
+        public static List<IssueViewModels> SearchIssue(string pjkey,string type,string resolution,string asignee,string startdate,string enddate,string description, int topnum)
+        {
+            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution from Issue where <cond> order by ReportDate DESC";
+
+            bool withand = false;
+            var cond = "";
+            if (!string.IsNullOrEmpty(pjkey))
+            {
+                withand = true;
+                cond = cond + "ProjectKey = '"+ pjkey + "' ";
+            }
+
+            if (!string.IsNullOrEmpty(type))
+            {
+                if (withand)
+                {
+                    cond = cond + " and IssueType = '" + type + "' ";
+                }
+                else
+                {
+                    withand = true;
+                    cond = cond + "IssueType = '" + type + "' ";
+                }
+            }
+
+            if (!string.IsNullOrEmpty(resolution))
+            {
+                if (withand)
+                {
+                    cond = cond + " and Resolution = '" + resolution + "' ";
+                }
+                else
+                {
+                    withand = true;
+                    cond = cond + "Resolution = '" + resolution + "' ";
+                }
+            }
+
+            if (!string.IsNullOrEmpty(asignee))
+            {
+                if (withand)
+                {
+                    cond = cond + " and Assignee = '" + asignee + "' ";
+                }
+                else
+                {
+                    withand = true;
+                    cond = cond + "Assignee = '" + asignee + "' ";
+                }
+            }
+
+            if (!string.IsNullOrEmpty(startdate))
+            {
+                if (withand)
+                {
+                    cond = cond + " and ReportDate > '" + startdate + "' ";
+                }
+                else
+                {
+                    withand = true;
+                    cond = cond + "ReportDate > '" + startdate + "' ";
+                }
+            }
+
+            if (!string.IsNullOrEmpty(enddate))
+            {
+                if (withand)
+                {
+                    cond = cond + " and ReportDate < '" + enddate + "' ";
+                }
+                else
+                {
+                    withand = true;
+                    cond = cond + "ReportDate < '" + enddate + "' ";
+                }
+            }
+
+            sql = sql.Replace("<topnum>", Convert.ToString(topnum)).Replace("<cond>", cond);
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var ret = new List<IssueViewModels>();
+            foreach (var line in dbret)
+            {
+                var tempvm = new IssueViewModels(Convert.ToString(line[0])
+                    , Convert.ToString(line[1]), Convert.ToString(line[2])
+                    , Convert.ToString(line[3]), Convert.ToString(line[4])
+                    , Convert.ToString(line[5]), Convert.ToString(line[6])
+                    , Convert.ToString(line[7]), Convert.ToString(line[8])
+                    , Convert.ToString(line[9]), Convert.ToString(line[10]), "");
                 ret.Add(tempvm);
             }
 

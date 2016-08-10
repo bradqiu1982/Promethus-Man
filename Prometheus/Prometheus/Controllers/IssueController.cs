@@ -114,6 +114,7 @@ namespace Prometheus.Controllers
             {
                 var createerror = "<h3><font color=\"red\">Fail to create/modify Issue: Description can not be empty</font></h3>";
                 ViewBag.CreateError = createerror;
+                CreateAllLists(vm);
                 return View(vm);
             }
             vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
@@ -155,7 +156,11 @@ namespace Prometheus.Controllers
             }
 
             if (string.IsNullOrEmpty(key))
+            {
+                var tempvm = new IssueViewModels();
+                CreateAllLists(tempvm);
                 return View();
+            }
 
             var ret = IssueViewModels.RetrieveIssueByIssueKey(key);
             
@@ -167,6 +172,8 @@ namespace Prometheus.Controllers
             }
             else
             {
+                var tempvm = new IssueViewModels();
+                CreateAllLists(tempvm);
                 return View();
             }
         }
@@ -204,6 +211,7 @@ namespace Prometheus.Controllers
 
             if (string.Compare(originaldata.Assignee, vm.Assignee, true) != 0)
             {
+                vm.UpdateIAssign();
                 ProjectEvent.AssignIssueEvent(originaldata.ProjectKey, updater, vm.Assignee, originaldata.Summary, originaldata.IssueKey);
             }
 
@@ -276,6 +284,7 @@ namespace Prometheus.Controllers
             {
                 var createerror = "<h3><font color=\"red\">Fail to create/modify Issue: Description can not be empty</font></h3>";
                 ViewBag.CreateError = createerror;
+                CreateAllLists(vm);
                 return View(vm);
             }
             vm.Description = Server.HtmlDecode(Request.Form["editor1"]);

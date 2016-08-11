@@ -121,7 +121,7 @@ namespace Prometheus.Models
         private static void BuildProjectEvent(string who, string projectkey, string projectname, string operate)
         {
             var wholink = "<a href = \"/User/UserCenter?username=" + who + "\" >" + who.Split(new char[] { '@' })[0] + "</a>";
-            var projectlink = "<a href = \"/Project/ProjectIssues?ProjectKey=" + projectkey + "\" >" + projectname + "</a>";
+            var projectlink = "<a href = \"/Project/ProjectDetail?ProjectKey=" + projectkey + "\" >" + projectname + "</a>";
 
             var vm = new ProjectEvent();
             vm.ProjectKey = projectkey;
@@ -145,7 +145,7 @@ namespace Prometheus.Models
         {
             var reportlink = "<a href = \"/User/UserCenter?username=" + reporter + "\" >" + reporter.Split(new char[] { '@' })[0] + "</a>";
             var asigneelink = "<a href = \"/User/UserCenter?username=" + asignee + "\" >" + asignee.Split(new char[] { '@' })[0] + "</a>";
-            var projectlink = "<a href = \"/Project/ProjectIssues?ProjectKey=" + projectkey + "\" >[" + projectkey + "] </a>";
+            var projectlink = "<a href = \"/Project/ProjectDetail?ProjectKey=" + projectkey + "\" >[" + projectkey + "] </a>";
             var issuelink = "<a href = \"/Issue/UpdateIssue?issuekey=" + evkey + "\" >" + summary + "</a>";
 
             var vm = new ProjectEvent();
@@ -159,7 +159,7 @@ namespace Prometheus.Models
         public static void OperateIssueEvent(string projectkey, string who, string operate, string summary, string evkey)
         {
             var wholink = "<a href = \"/User/UserCenter?username=" + who + "\" >" + who.Split(new char[] { '@' })[0] + "</a>";
-            var projectlink = "<a href = \"/Project/ProjectIssues?ProjectKey=" + projectkey + "\" >[" + projectkey + "] </a>";
+            var projectlink = "<a href = \"/Project/ProjectDetail?ProjectKey=" + projectkey + "\" >[" + projectkey + "] </a>";
             var issuelink = "<a href = \"/Issue/UpdateIssue?issuekey=" + evkey + "\" >" + summary + "</a>";
 
             var vm = new ProjectEvent();
@@ -171,7 +171,7 @@ namespace Prometheus.Models
         {
             var wholink = "<a href = \"/User/UserCenter?username=" + who + "\" >" + who.Split(new char[] { '@' })[0] + "</a>";
             var aslink = "<a href = \"/User/UserCenter?username=" + asignee + "\" >" + asignee.Split(new char[] { '@' })[0] + "</a>";
-            var projectlink = "<a href = \"/Project/ProjectIssues?ProjectKey=" + projectkey + "\" >[" + projectkey + "] </a>";
+            var projectlink = "<a href = \"/Project/ProjectDetail?ProjectKey=" + projectkey + "\" >[" + projectkey + "] </a>";
             var issuelink = "<a href = \"/Issue/UpdateIssue?issuekey=" + evkey + "\" >" + summary + "</a>";
             var vm = new ProjectEvent();
             vm.Event = projectlink + issuelink + " is assigned to " + aslink + " by " + wholink;

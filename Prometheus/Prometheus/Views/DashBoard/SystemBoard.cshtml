@@ -49,7 +49,7 @@
                 @foreach (var item in ulist)
                 {
                     <div class="panel-body">
-                        <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey">[@item.ProjectKey]</a> <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a>
+                        <a href="/Project/ProjectDetail?ProjectKey=@item.ProjectKey">[@item.ProjectKey]</a> <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a>
                     </div>
                     <div class="panel-body text-right" style="max-height:10px;min-height:10px;">
                         Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString()

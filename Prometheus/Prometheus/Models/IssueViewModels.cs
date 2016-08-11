@@ -469,7 +469,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<IssueViewModels> SearchIssue(string pjkey,string type,string resolution,string asignee,string startdate,string enddate,string description, int topnum)
+        public static List<IssueViewModels> SearchIssue(string pjkey,string type,string resolution,string asignee,string startdate,string enddate,string summary, int topnum)
         {
             var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution from Issue where <cond> order by ReportDate DESC";
 
@@ -543,6 +543,19 @@ namespace Prometheus.Models
                 {
                     withand = true;
                     cond = cond + "ReportDate < '" + enddate + "' ";
+                }
+            }
+
+            if (!string.IsNullOrEmpty(summary))
+            {
+                if (withand)
+                {
+                    cond = cond + " and Summary like '%" + summary + "%' ";
+                }
+                else
+                {
+                    withand = true;
+                    cond = cond + "Summary like '%" + summary + "%' ";
                 }
             }
 

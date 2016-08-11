@@ -429,30 +429,32 @@ namespace Prometheus.Controllers
 
         private void RetrievePNs(ProjectViewModels projectmodel)
         {
-            var pns = RetrieveProjectInfo("PN", 9);
-            if (pns.Count > 0)
-            {
-                var lpn = new List<ProjectPn>();
-                foreach (var p in pns)
-                {
-                    lpn.Add(new ProjectPn(projectmodel.ProjectKey, p));
-                }
-                projectmodel.PNList = lpn;
-            }
+            //var pns = RetrieveProjectInfo("PN", 9);
+            //if (pns.Count > 0)
+            //{
+            //    var lpn = new List<ProjectPn>();
+            //    foreach (var p in pns)
+            //    {
+            //        lpn.Add(new ProjectPn(projectmodel.ProjectKey, p));
+            //    }
+            //    projectmodel.PNList = lpn;
+            //}
+            projectmodel.PNs = Request.Form["PNs"];
         }
 
         private void RetrieveStation(ProjectViewModels projectmodel)
         {
-            var stats = RetrieveProjectInfo("Station", 9);
-            if (stats.Count > 0)
-            {
-                var lstat = new List<ProjectStation>();
-                foreach (var s in stats)
-                {
-                    lstat.Add(new ProjectStation(projectmodel.ProjectKey, s));
-                }
-                projectmodel.StationList = lstat;
-            }
+            //var stats = RetrieveProjectInfo("Station", 9);
+            //if (stats.Count > 0)
+            //{
+            //    var lstat = new List<ProjectStation>();
+            //    foreach (var s in stats)
+            //    {
+            //        lstat.Add(new ProjectStation(projectmodel.ProjectKey, s));
+            //    }
+            //    projectmodel.StationList = lstat;
+            //}
+            projectmodel.Stations = Request.Form["Stations"];
         }
 
 

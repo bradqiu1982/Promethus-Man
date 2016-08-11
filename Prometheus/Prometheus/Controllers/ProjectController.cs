@@ -652,11 +652,19 @@ namespace Prometheus.Controllers
                 list1.AddRange(list2);
                 list1.AddRange(list3);
 
-                ViewBag.projectdata =  ProjectViewModels.RetrieveOneProject(ProjectKey);
-               
                 return View(list1);
             }
 
+            return View();
+        }
+
+        public ActionResult ProjectDetail(string ProjectKey)
+        {
+            if (ProjectKey != null)
+            {
+                var vm = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                return View(vm);
+            }
             return View();
         }
 

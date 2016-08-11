@@ -56,7 +56,7 @@
                         @foreach (var item in pendinglist)
                         {
                             <div class="panel-body">
-                                <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey">[@item.ProjectKey]</a> <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a>
+                                <a href="/Project/ProjectDetail?ProjectKey=@item.ProjectKey">[@item.ProjectKey]</a> <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a>
                             </div>
                             <div class="panel-body text-right" style="max-height:10px;min-height:10px;">
                                 Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString()
@@ -76,7 +76,7 @@
                         @foreach (var item in workinglist)
                         {
                             <div class="panel-body">
-                                <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey">[@item.ProjectKey]</a> <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a>
+                                <a href="/Project/ProjectDetail?ProjectKey=@item.ProjectKey">[@item.ProjectKey]</a> <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a>
                             </div>
                             <div class="panel-body text-right" style="max-height:10px;min-height:10px;">
                                 Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString()
@@ -96,7 +96,7 @@
                         @foreach (var item in donelist)
                         {
                             <div class="panel-body">
-                                <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey">[@item.ProjectKey]</a> <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a>
+                                <a href="/Project/ProjectDetail?ProjectKey=@item.ProjectKey">[@item.ProjectKey]</a> <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a>
                             </div>
                             <div class="panel-body text-right" style="max-height:10px;min-height:10px;">
                                 Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString()
@@ -119,7 +119,7 @@
                 <div class="panel panel-default">
                     <div class="panel-heading" style="min-height:40px;max-height:40px;">
                         <div class="col-md-3 text-left">
-                            <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey">
+                            <a href="/Project/ProjectDetail?ProjectKey=@item.ProjectKey">
                                 <span class="glyphicon glyphicon-home" aria-hidden="true"></span> @item.ProjectKey
                             </a>
                         </div>

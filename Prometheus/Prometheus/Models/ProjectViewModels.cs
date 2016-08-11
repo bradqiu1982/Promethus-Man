@@ -216,6 +216,37 @@ namespace Prometheus.Models
             }
         }
 
+        public string Stations
+        {
+            set
+            {
+                lstation.Clear();
+                if (!string.IsNullOrEmpty(value))
+                {
+                    var tempstat = value.Replace("'", "");
+                    var tempstats = tempstat.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var s in tempstats)
+                    {
+                        lstation.Add(new ProjectStation(ProjectKey, s));
+                    }
+                }
+            }
+
+            get
+            {
+                var ret = "";
+                foreach (var p in lstation)
+                {
+                    if (string.IsNullOrEmpty(ret))
+                        ret = p.Station;
+                    else
+                        ret = ret + ";" + p.Station;
+                }
+                return ret;
+            }
+        }
+
+
         private List<ProjectPn> lpn = new List<ProjectPn>();
         public List<ProjectPn> PNList
         {
@@ -225,6 +256,35 @@ namespace Prometheus.Models
             {
                 lpn.Clear();
                 lpn.AddRange(value);
+            }
+        }
+
+        public string PNs {
+            set
+            {
+                lpn.Clear();
+                if(!string.IsNullOrEmpty(value))
+                {
+                    var temppn = value.Replace("'", "");
+                    var temppns = temppn.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var p in temppns)
+                    {
+                        lpn.Add(new ProjectPn(ProjectKey, p));
+                    }
+                }
+            }
+
+            get
+            {
+                var ret = "";
+                foreach (var p in lpn)
+                {
+                    if (string.IsNullOrEmpty(ret))
+                        ret = p.Pn;
+                    else
+                        ret = ret + ";" + p.Pn;
+                }
+                return ret;
             }
         }
 

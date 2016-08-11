@@ -366,6 +366,7 @@ namespace Prometheus.Controllers
             var asn = "";
             var sd = "";
             var ed = "";
+            var desp = "";
 
             if (string.Compare(Request.Form["projectlist"].ToString(), "NONE") != 0)
             {
@@ -397,19 +398,25 @@ namespace Prometheus.Controllers
                 ed = Request.Form["EndDate"];
             }
 
+            if (!string.IsNullOrEmpty(Request.Form["Summary"]))
+            {
+                desp = Request.Form["Summary"];
+            }
+
             if (string.IsNullOrEmpty(pj)
                 && string.IsNullOrEmpty(tp)
                 && string.IsNullOrEmpty(rs)
                 && string.IsNullOrEmpty(asn)
                 && string.IsNullOrEmpty(sd)
-                && string.IsNullOrEmpty(ed))
+                && string.IsNullOrEmpty(ed)
+                && string.IsNullOrEmpty(desp))
             {
                 ViewBag.SearchError = "At least choose one condition to search issue";
                 CreateAllSearchLists();
                 return View();
             }
 
-            var vmlist = IssueViewModels.SearchIssue(pj, tp, rs, asn, sd, ed, "", 100);
+            var vmlist = IssueViewModels.SearchIssue(pj, tp, rs, asn, sd, ed, desp, 100);
 
             CreateAllSearchLists();
             return View(vmlist);

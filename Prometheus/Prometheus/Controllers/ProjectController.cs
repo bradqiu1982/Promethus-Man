@@ -668,5 +668,24 @@ namespace Prometheus.Controllers
             return View();
         }
 
-      }
+        public ActionResult ProjectFA(string ProjectKey)
+        {
+            if (!string.IsNullOrEmpty(ProjectKey))
+            {
+                var vm  = ProjectFAViewModules.RetrieveFAData(ProjectKey);
+                return View(vm);
+            }
+            return View();
+        }
+
+        public ActionResult ProjectErrAbbr(string ProjectKey, string ErrAbbr)
+        {
+            if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(ErrAbbr))
+            {
+                var vm = ProjectFAViewModules.RetrieveFADataWithErrAbbr(ProjectKey, ErrAbbr);
+                return View("ProjectFA",vm);
+            }
+            return View();
+        }
+    }
 }

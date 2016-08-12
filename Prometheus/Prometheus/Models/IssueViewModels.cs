@@ -362,7 +362,7 @@ namespace Prometheus.Models
                 return ret;
             }
             else
-                return new IssueViewModels();
+                return null;
         }
 
         /// <summary>

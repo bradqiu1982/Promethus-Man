@@ -227,7 +227,7 @@ namespace Prometheus.Models
                     var tempstats = tempstat.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (var s in tempstats)
                     {
-                        lstation.Add(new ProjectStation(ProjectKey, s));
+                        lstation.Add(new ProjectStation(ProjectKey, s.Trim()));
                     }
                 }
             }
@@ -269,7 +269,7 @@ namespace Prometheus.Models
                     var temppns = temppn.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (var p in temppns)
                     {
-                        lpn.Add(new ProjectPn(ProjectKey, p));
+                        lpn.Add(new ProjectPn(ProjectKey, p.Trim()));
                     }
                 }
             }

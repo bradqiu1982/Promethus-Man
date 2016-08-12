@@ -182,6 +182,7 @@
     <Compile Include="Models\IssueViewModels.cs" />
     <Compile Include="Models\MESUtility.cs" />
     <Compile Include="Models\ProjectEvent.cs" />
+    <Compile Include="Models\ProjectFAViewModules.cs" />
     <Compile Include="Models\ProjectTestData.cs" />
     <Compile Include="Models\ProjectViewModels.cs" />
     <Compile Include="Models\UserViewModels.cs" />
@@ -680,6 +681,7 @@
     <Content Include="Views\Issue\CreateSubIssue.cshtml" />
     <Content Include="Views\Issue\SearchIssue.cshtml" />
     <Content Include="Views\Project\ProjectDetail.cshtml" />
+    <Content Include="Views\Project\ProjectFA.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

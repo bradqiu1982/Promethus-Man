@@ -252,7 +252,7 @@ namespace Prometheus.Controllers
             var val = CookieUtility.UnpackCookie(this);
             val["logonuser"] = "";
             CookieUtility.SetCookie(this, val);
-            return RedirectToAction("SystemBoard", "DashBoard");
+            return RedirectToAction("ViewAll", "Project");
         }
 
         public ActionResult UserCenter(string username)

@@ -3,31 +3,76 @@
 @{
     ViewBag.Title = "ProjectFA";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var fadata = (List<Prometheus.Models.ProjectFAViewModules>)Model;
 }
-
-<h2>Project FA</h2>
-
-<hr/>
 
 <div class="row">
-    <div class="col-md-2 text-center">Module SN</div>
-    <div class="col-md-2 text-center">ErrAbbr</div>
-    <div class="col-md-2 text-center">FA Status</div>
-    <div class="col-md-2 text-center">Assignee</div>
-    <div class="col-md-4 text-center">Issue</div>
+    <div class="col-md-2">
+        <h2>Project FA</h2>
+    </div>
+    <div class="col-md-2">
+        @if (ViewBag.xxias == null && fadata != null && fadata.Count > 0)
+        {
+            <h2><a data-toggle="tooltip" title="Goto FA Page" href="/Project/ProjectFA?ProjectKey=@(fadata[0].TestData.ProjectKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+        }
+     </div>
+    <div class="col-md-9"></div>
 </div>
+
+
+
+@{
+    var base64str = "";
+    if(ViewBag.xxias != null)
+        {
+            var myChart = new Chart(300, 300).AddTitle("Failure")
+            .AddSeries(chartType: "Pie", xValue: ViewBag.xxias
+            , xField: "Error Code", yValues: ViewBag.yxias, yFields: "Count");
+            base64str = Convert.ToBase64String(myChart.GetBytes());
+        }
+}
+
 <hr/>
-@if (Model != null)
-{ 
-    foreach (var item in Model)
+
+    @if(ViewBag.xxias != null)
     {
         <div class="row">
-            <div class="col-md-2 text-center">@item.TestData.ModuleSerialNum</div>
-            <div class="col-md-2 text-center"><a href="/Project/ProjectErrAbbr?ProjectKey=@item.TestData.ProjectKey&ErrAbbr=@item.TestData.ErrAbbr">@item.TestData.ErrAbbr</a></div>
-            <div class="col-md-2 text-center">@item.IssueData.Resolution</div>
-            <div class="col-md-2 text-center"><a href="/User/UserCenter?username=@item.IssueData.Assignee">@item.IssueData.Assignee.Split(new char[] { '@' })[0]</a></div>
-            <div class="col-md-4 text-center"><a href="/Issue/UpdateIssue?issuekey=@item.IssueData.IssueKey">@item.IssueData.Summary</a></div>
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Failure</h3>
+                    </div>
+                    <div class="panel-body" style="max-height:320px;min-height:320px;">
+                        <div class="col-md-4"></div>
+                        <div class="col-md-6">
+                            <img class="text-center" src="data:image/jpg;base64,@Html.Raw(base64str)" alt="" />
+                        </div>
+                        <div class="col-md-2"></div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <hr/>
     }
-}
+
+    <div class="row">
+        <div class="col-md-2 text-center">Module SN</div>
+        <div class="col-md-2 text-center">ErrAbbr</div>
+        <div class="col-md-2 text-center">FA Status</div>
+        <div class="col-md-2 text-center">Assignee</div>
+        <div class="col-md-4 text-center">Issue</div>
+    </div>
+    <hr />
+    @if (Model != null)
+    {
+        foreach (var item in Model)
+        {
+            <div class="row">
+                <div class="col-md-2 text-center">@item.TestData.ModuleSerialNum</div>
+                <div class="col-md-2 text-center"><a href="/Project/ProjectErrAbbr?ProjectKey=@item.TestData.ProjectKey&ErrAbbr=@item.TestData.ErrAbbr">@item.TestData.ErrAbbr</a></div>
+                <div class="col-md-2 text-center">@item.IssueData.Resolution</div>
+                <div class="col-md-2 text-center"><a href="/User/UserCenter?username=@item.IssueData.Assignee">@item.IssueData.Assignee.Split(new char[] { '@' })[0]</a></div>
+                <div class="col-md-4 text-center"><a href="/Issue/UpdateIssue?issuekey=@item.IssueData.IssueKey">@item.IssueData.Summary</a></div>
+            </div>
+            <hr />
+        }
+    }

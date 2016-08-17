@@ -42,16 +42,17 @@ namespace Prometheus.Models
         }
 
 
-        private static List<string> RetrieveSqlFromProjectModel(ProjectViewModels projectmodel)
+        private static Dictionary<string, string> RetrieveSqlFromProjectModel(ProjectViewModels projectmodel)
         {
-            var tables = new List<string>();
+            var tables = new Dictionary<string,string>();
+
             foreach (var s in projectmodel.StationList)
             {
                 foreach (var m in projectmodel.TabList)
                 {
                     if (string.Compare(s.Station.ToUpper(), m.Station.ToUpper()) == 0)
                     {
-                        tables.Add(m.TableName);
+                        tables.Add(s.Station,m.TableName);
                         break;
                     }
                 }
@@ -61,10 +62,10 @@ namespace Prometheus.Models
 
             var sql = "select dc_<DCTABLE>HistoryId,ModuleSerialNum, WhichTest, ModuleType, ErrAbbr, TestTimeStamp, TestStation,assemblypartnum from  insite.dc_<DCTABLE>  where assemblypartnum in  <PNCOND>   <TIMECOND>  order by  moduleserialnum,testtimestamp DESC";
 
-            var ret = new List<string>();
+            var ret = new Dictionary<string, string>();
             foreach (var tb in tables)
             {
-                ret.Add(sql.Replace("<DCTABLE>",tb).Replace("<PNCOND>", pncond));
+                ret.Add(tb.Key,sql.Replace("<DCTABLE>",tb.Value).Replace("<PNCOND>", pncond));
             }
             return ret;
         }
@@ -90,7 +91,7 @@ namespace Prometheus.Models
                     vm.ProjectKey = item.ProjectKey;
                     vm.IssueKey = item.DataID;
                     vm.IssueType = ISSUETP.Bug;
-                    vm.Summary = "Module " + item.ModuleSerialNum + " failed for "+item.ErrAbbr;
+                    vm.Summary = "Module " + item.ModuleSerialNum + " failed for "+item.ErrAbbr + " @ "+item.WhichTest;
                     vm.Priority = ISSUEPR.Major;
                     vm.DueDate = DateTime.Now.AddDays(7);
                     vm.ReportDate = item.TestTimeStamp;
@@ -132,7 +133,7 @@ namespace Prometheus.Models
                     foreach (var s in sqls)
                     {
                         var sndict = new Dictionary<string, bool>();
-                        var sql = s.Replace("<TIMECOND>", "and TestTimeStamp > '" + vm.StartDate.ToString() + "'");
+                        var sql = s.Value.Replace("<TIMECOND>", "and TestTimeStamp > '" + vm.StartDate.ToString() + "'");
                         var dbret = DBUtility.ExeMESSqlWithRes(sql);
                         foreach (var item in dbret)
                         {
@@ -140,7 +141,7 @@ namespace Prometheus.Models
                             {
 
                                 var tempdata = new ProjectTestData(vm.ProjectKey, Convert.ToString(item[0]), Convert.ToString(item[1])
-                                        , Convert.ToString(item[2]), Convert.ToString(item[3]), Convert.ToString(item[4])
+                                        ,s.Key, Convert.ToString(item[3]), Convert.ToString(item[4])
                                         , Convert.ToString(item[5]), Convert.ToString(item[6]), Convert.ToString(item[7]));
 
 
@@ -210,7 +211,7 @@ namespace Prometheus.Models
                 foreach (var s in sqls)
                 {
                     var sndict = new Dictionary<string, bool>();
-                    var sql = s.Replace("<TIMECOND>", "and TestTimeStamp > '" + starttime + "' and TestTimeStamp < '"+ endtime + "'");
+                    var sql = s.Value.Replace("<TIMECOND>", "and TestTimeStamp > '" + starttime + "' and TestTimeStamp < '"+ endtime + "'");
                     var dbret = DBUtility.ExeMESSqlWithRes(sql);
                     foreach (var item in dbret)
                     {
@@ -218,7 +219,7 @@ namespace Prometheus.Models
                         {
 
                             var tempdata = new ProjectTestData(vm.ProjectKey, Convert.ToString(item[0]), Convert.ToString(item[1])
-                                    , Convert.ToString(item[2]), Convert.ToString(item[3]), Convert.ToString(item[4])
+                                    ,s.Key, Convert.ToString(item[3]), Convert.ToString(item[4])
                                     , Convert.ToString(item[5]), Convert.ToString(item[6]), Convert.ToString(item[7]));
 
 

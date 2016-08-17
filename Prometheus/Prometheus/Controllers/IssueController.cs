@@ -42,8 +42,8 @@ namespace Prometheus.Controllers
             ViewBag.projectlist = slist;
 
             var typelist = new List<string>();
-            string[] tlist = { ISSUETP.Bug, ISSUETP.NewFeature, ISSUETP.Task
-            ,ISSUETP.Improvement,ISSUETP.Document};
+            string[] tlist = { ISSUETP.Bug,ISSUETP.RMA, ISSUETP.NewFeature, ISSUETP.Task
+            ,ISSUETP.Improvement,ISSUETP.Document,ISSUETP.NPIPROC};
 
             typelist.AddRange(tlist);
             slist = CreateSelectList(typelist, vm.IssueType);
@@ -333,7 +333,7 @@ namespace Prometheus.Controllers
             ViewBag.projectlist = slist;
 
             var typelist = new List<string>();
-            string[] tlist = { ISSUETP.Bug, ISSUETP.NewFeature, ISSUETP.Task,ISSUETP.Improvement,ISSUETP.Document};
+            string[] tlist = { ISSUETP.Bug,ISSUETP.RMA, ISSUETP.NewFeature, ISSUETP.Task,ISSUETP.Improvement,ISSUETP.Document,ISSUETP.NPIPROC};
             typelist.AddRange(tlist);
             slist = CreateSearchSelectList(typelist,"");
             ViewBag.issuetypelist = slist;

@@ -16,7 +16,8 @@ namespace Prometheus
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}",
-                defaults: new { controller = "DashBoard", action = "SystemBoard" }
+                defaults: new { controller = "Project", action = "ViewAll" }
+                //defaults: new { controller = "DashBoard", action = "SystemBoard" }
             );
         }
     }

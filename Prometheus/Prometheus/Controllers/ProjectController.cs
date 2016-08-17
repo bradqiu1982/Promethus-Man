@@ -14,6 +14,7 @@ namespace Prometheus.Controllers
 {
     public class ProjectController : Controller
     {
+
         // GET: Project
         public ActionResult ViewAll()
         {
@@ -490,6 +491,8 @@ namespace Prometheus.Controllers
 
             projectmodel.StoreProject();
 
+            IssueViewModels.CreateNPIProcTasks(projectmodel.ProjectName, projectmodel.ProjectKey, projectmodel.MemberList[1].Name);
+
             var ckdict = CookieUtility.UnpackCookie(this);
             var who = (ckdict["logonuser"]).Split(new string[]{ "||"},StringSplitOptions.None)[0];
             ProjectEvent.CreateProjectEvent(who, projectmodel.ProjectKey, projectmodel.ProjectName);
@@ -673,6 +676,33 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(ProjectKey))
             {
                 var vm  = ProjectFAViewModules.RetrieveFAData(ProjectKey);
+
+                var piedatadict = new Dictionary<string, int>();
+                foreach (var item in vm)
+                {
+                    if (piedatadict.ContainsKey(item.TestData.ErrAbbr))
+                    {
+                        var preval = piedatadict[item.TestData.ErrAbbr];
+                        piedatadict[item.TestData.ErrAbbr] = preval + 1;
+                    }
+                    else
+                    {
+                        piedatadict.Add(item.TestData.ErrAbbr, 1);
+                    }
+                }
+
+                var yxias = new List<int>();
+                var xxias = new List<string>();
+                var keys = piedatadict.Keys;
+                foreach (var k in keys)
+                {
+                    yxias.Add(piedatadict[k]);
+                    xxias.Add(k + " " + ((float)piedatadict[k] / (float)vm.Count*100.0).ToString("0.00") + "%");
+                }
+
+                ViewBag.yxias = yxias;
+                ViewBag.xxias = xxias;
+
                 return View(vm);
             }
             return View();
@@ -684,6 +714,74 @@ namespace Prometheus.Controllers
             {
                 var vm = ProjectFAViewModules.RetrieveFADataWithErrAbbr(ProjectKey, ErrAbbr);
                 return View("ProjectFA",vm);
+            }
+            return View();
+        }
+
+        public ActionResult ProjectNPI(string ProjectKey)
+        {
+            if (ProjectKey != null)
+            {
+                var vmlist = IssueViewModels.RetrieveNPIPROCIssue(ProjectKey);
+                return View(vmlist);
+            }
+            return View();
+        }
+
+
+        public ActionResult ProjectYield(string ProjectKey)
+        {
+            if (ProjectKey != null)
+            {
+                var vmlist = ProjectYieldViewModule.GetYieldByWeeks(ProjectKey);
+
+                var ChartxAxisValues = "";
+                var ChartSearies = "";
+
+                var ftimelist = new List<string>();
+                var fvalues = new List<double>();
+                var cvalues = new List<double>();
+
+                foreach (var item in vmlist)
+                {
+                    ftimelist.Add(item.EndDate.ToString("yyyy-MM-dd"));
+                    fvalues.Add(item.FirstYield * 100.0);
+                    cvalues.Add(item.LastYield * 100.0);
+                }
+
+                foreach (var item in ftimelist)
+                {
+                    ChartxAxisValues = ChartxAxisValues + "'" + item + "',";
+                }
+                ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
+
+                ChartSearies = "{name:'First Yield',data:[<fvalue>]},{name:'Cumm Yield',data:[<cvalue>]}";
+
+                var tempvalue = "";
+                foreach (var item in fvalues)
+                {
+                    tempvalue = tempvalue + item.ToString("0.00") + ",";
+                }
+                tempvalue = tempvalue.Substring(0, tempvalue.Length - 1);
+                ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
+
+                tempvalue = "";
+                foreach (var item in cvalues)
+                {
+                    tempvalue = tempvalue + item.ToString("0.00") + ",";
+                }
+                tempvalue = tempvalue.Substring(0, tempvalue.Length - 1);
+                ChartSearies = ChartSearies.Replace("<cvalue>", tempvalue);
+
+                var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/userfiles/TempChart.xml"));
+                ViewBag.myscript = tempscript.Replace("#ElementID#", "weeklyyield")
+                    .Replace("#ChartType#", "column")
+                    .Replace("#Title#", "Weekly Yiled")
+                    .Replace("#ChartxAxisValues#", ChartxAxisValues)
+                    .Replace("#yAxisTitle#", "Yield Percent")
+                    .Replace("#ChartSearies#", ChartSearies);
+
+                return View();
             }
             return View();
         }

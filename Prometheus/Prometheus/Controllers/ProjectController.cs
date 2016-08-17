@@ -773,7 +773,7 @@ namespace Prometheus.Controllers
                 tempvalue = tempvalue.Substring(0, tempvalue.Length - 1);
                 ChartSearies = ChartSearies.Replace("<cvalue>", tempvalue);
 
-                var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/userfiles/TempChart.xml"));
+                var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ColumnChart.xml"));
                 ViewBag.myscript = tempscript.Replace("#ElementID#", "weeklyyield")
                     .Replace("#ChartType#", "column")
                     .Replace("#Title#", "Weekly Yiled")

@@ -760,7 +760,7 @@ namespace Prometheus.Controllers
 
 
                 //yaxis
-                ChartSearies = "{name:'First Yield',data:[<fvalue>]},{name:'Cumm Yield',data:[<cvalue>]}";
+                ChartSearies = "{name:'First Yield',data:[<fvalue>]},{name:'Retest Yield',data:[<cvalue>]}";
 
                 var tempvalue = "";
                 foreach (var item in fvalues)

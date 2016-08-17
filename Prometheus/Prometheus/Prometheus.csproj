@@ -665,7 +665,7 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
-    <Content Include="Scripts\Upload.ashx" />
+    <Content Include="userfiles\Upload.ashx" />
     <Content Include="Views\DashBoard\SystemBoard.cshtml" />
     <Content Include="Views\Project\ViewAll.cshtml" />
     <Content Include="Views\Project\CreateProject.cshtml" />

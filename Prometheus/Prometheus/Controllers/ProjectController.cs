@@ -733,6 +733,8 @@ namespace Prometheus.Controllers
         {
             if (ProjectKey != null)
             {
+                ViewBag.pjkey = ProjectKey;
+
                 var vmlist = ProjectYieldViewModule.GetYieldByWeeks(ProjectKey);
 
                 var ChartxAxisValues = "";
@@ -749,12 +751,15 @@ namespace Prometheus.Controllers
                     cvalues.Add(item.LastYield * 100.0);
                 }
 
+                //xaxis
                 foreach (var item in ftimelist)
                 {
                     ChartxAxisValues = ChartxAxisValues + "'" + item + "',";
                 }
                 ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
 
+
+                //yaxis
                 ChartSearies = "{name:'First Yield',data:[<fvalue>]},{name:'Cumm Yield',data:[<cvalue>]}";
 
                 var tempvalue = "";
@@ -773,15 +778,32 @@ namespace Prometheus.Controllers
                 tempvalue = tempvalue.Substring(0, tempvalue.Length - 1);
                 ChartSearies = ChartSearies.Replace("<cvalue>", tempvalue);
 
+                //rederect url
+                var reurl = "window.location.href = '/Project/ProjectWYield?ProjectKey='+document.getElementById(\"pjkey\").value+'&EndDate='+this.category";
+
                 var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ColumnChart.xml"));
-                ViewBag.myscript = tempscript.Replace("#ElementID#", "weeklyyield")
+                ViewBag.chartscript = tempscript.Replace("#ElementID#", "weeklyyield")
                     .Replace("#ChartType#", "column")
                     .Replace("#Title#", "Weekly Yiled")
                     .Replace("#ChartxAxisValues#", ChartxAxisValues)
                     .Replace("#yAxisTitle#", "Yield Percent")
-                    .Replace("#ChartSearies#", ChartSearies);
+                    .Replace("#ChartSearies#", ChartSearies)
+                    .Replace("#REDIRECTURL#", reurl);
 
                 return View();
+            }
+            return View();
+        }
+
+        public ActionResult ProjectWYield(string ProjectKey, string EndDate)
+        {
+            if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(EndDate))
+            {
+                var edate = DateTime.Parse(DateTime.Parse(EndDate).ToString("yyyy-MM-dd") + " 07:30:00");
+                var sdate = edate.AddDays(-7);
+                var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, sdate.ToString(), edate.ToString(),pvm);
+                return View(yieldvm);
             }
             return View();
         }

@@ -260,7 +260,7 @@ namespace Prometheus.Models
             }
         }
 
-        private static ProjectYieldViewModule GetYieldByDateRange(string pjkey, string startdate, string enddate, ProjectViewModels pvm)
+        public static ProjectYieldViewModule GetYieldByDateRange(string pjkey, string startdate, string enddate, ProjectViewModels pvm)
         {
             var ret = new ProjectYieldViewModule();
             ret.ProjectKey = pjkey;

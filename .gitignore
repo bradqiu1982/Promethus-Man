@@ -2,5 +2,7 @@ Prometheus/Prometheus.Tests/obj/Debug
 Prometheus/Prometheus/obj/Debug
 Prometheus/packages
 Prometheus/Prometheus.Tests/bin/
+Prometheus/Prometheus/userfiles/docs
+Prometheus/Prometheus/userfiles/images
 Prometheus/Prometheus/bin
-Prometheus/Prometheus/userfiles/
+Prometheus/Prometheus/Scripts/images

@@ -36,7 +36,7 @@
         }
         else if (Model != null && !string.IsNullOrEmpty(Model.ParentIssueKey))
         {
-           <h2><a data-toggle="tooltip" title="Goto Parent Issue" href="/Issue/UpdateIssue?issuekey=@(Model.ParentIssueKey)"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span></a></h2>
+           <h2><a data-toggle="tooltip" title="Goto Parent Issue" href="/Issue/UpdateIssue?issuekey=@(Model.ParentIssueKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
         }
 
 
@@ -180,7 +180,7 @@
                             <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
                                 <div class="row">
                                     <div class="col-md-4">Summary</div>
-                                    <div class="col-md-2">Reporter</div>
+                                    <div class="col-md-2">Status</div>
                                     <div class="col-md-2">Asignee</div>
                                     <div class="col-md-2">DueDate</div>
                                     <div class="col-md-2"></div>
@@ -189,7 +189,7 @@
                                 {
                                     <div class="row">
                                         <div class="col-md-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></div>
-                                        <div class="col-md-2"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a></div>
+                                        <div class="col-md-2">@item.Resolution</div>
                                         <div class="col-md-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
                                         <div class="col-md-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
                                         <div class="col-md-2"></div>

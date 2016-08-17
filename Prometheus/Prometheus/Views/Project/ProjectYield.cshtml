@@ -1,0 +1,75 @@
+﻿
+@{
+    ViewBag.Title = "ProjectYield";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<h2>Project Yield</h2>
+<hr/>
+
+@Html.Raw(ViewBag.myscript)
+
+<script src="~/Scripts/highcharts.js"></script>
+<script src="~/Scripts/exporting.js"></script>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Yield</h3>
+            </div>
+            <div class="panel-body">
+                <div class="col-md-12">
+                    <div id="weeklyyield" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*<div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Failure Pie</h3>
+                </div>
+                <div class="panel-body" style="max-height:320px;min-height:320px;">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-4">
+                        <img class="text-center" src="data:image/jpg;base64,@Html.Raw()" alt="" />
+                    </div>
+                    <div class="col-md-4">
+                        <img class="text-center" src="data:image/jpg;base64,@Html.Raw()" alt="" />
+                    </div>
+                    <div class="col-md-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>*@
+
+@*<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">First Failure</h3>
+            </div>
+            <div class="panel-body">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Cumm Failure</h3>
+            </div>
+            <div class="panel-body">
+
+            </div>
+        </div>
+    </div>
+</div>*@

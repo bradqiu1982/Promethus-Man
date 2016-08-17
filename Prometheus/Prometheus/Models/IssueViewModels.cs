@@ -8,6 +8,8 @@ namespace Prometheus.Models
     public class ISSUETP
     {
         public static string Bug = "Bug";
+        public static string RMA = "RMA";
+        public static string NPIPROC = "NPI PROCESS";
         public static string NewFeature = "New Feature";
         public static string Task = "Task";
         public static string Improvement = "Improvement";
@@ -392,8 +394,8 @@ namespace Prometheus.Models
                 fixresolve = Resolute.Done;
             }
 
-            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution from Issue where ProjectKey = '<ProjectKey>' and Resolution in <cond> and  ParentIssueKey = '' order by ReportDate DESC";
-            sql = sql.Replace("<ProjectKey>", projectkey).Replace("<topnum>", Convert.ToString(topnum)).Replace("<cond>", cond);
+            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution from Issue where ProjectKey = '<ProjectKey>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType <> '<IssueType>' order by ReportDate DESC";
+            sql = sql.Replace("<ProjectKey>", projectkey).Replace("<topnum>", Convert.ToString(topnum)).Replace("<cond>", cond).Replace("<IssueType>", ISSUETP.NPIPROC);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)
@@ -466,6 +468,27 @@ namespace Prometheus.Models
                 ret.Add(tempvm);
             }
 
+            return ret;
+        }
+
+        public static List<IssueViewModels> RetrieveNPIPROCIssue(string pjkey)
+        {
+            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution from Issue where ProjectKey = '<ProjectKey>' and ParentIssueKey = '' and IssueType = '<IssueType>' order by DueDate ASC";
+            sql = sql.Replace("<ProjectKey>", pjkey).Replace("<IssueType>", Convert.ToString(ISSUETP.NPIPROC));
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var ret = new List<IssueViewModels>();
+            foreach (var line in dbret)
+            {
+                var tempvm = new IssueViewModels(Convert.ToString(line[0])
+                    , Convert.ToString(line[1]), Convert.ToString(line[2])
+                    , Convert.ToString(line[3]), Convert.ToString(line[4])
+                    , Convert.ToString(line[5]), Convert.ToString(line[6])
+                    , Convert.ToString(line[7]), Convert.ToString(line[8])
+                    , Convert.ToString(line[9]), Convert.ToString(line[10]), "");
+
+                tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey);
+                ret.Add(tempvm);
+            }
             return ret;
         }
 
@@ -575,6 +598,178 @@ namespace Prometheus.Models
             }
 
             return ret;
+        }
+
+        private static void CreateNPISubIssue(string projectname, string pjkey,string parentkey, string firstengineer, string sum, string desc,int duemonth)
+        {
+            var vm = new IssueViewModels();
+            vm.ProjectKey = pjkey;
+            vm.IssueKey = IssueViewModels.GetUniqKey();
+            vm.ParentIssueKey = parentkey;
+            vm.IssueType = ISSUETP.NPIPROC;
+            vm.Summary = projectname+" "+sum;
+            vm.Priority = ISSUEPR.Major;
+            vm.DueDate = DateTime.Now.AddMonths(duemonth);
+            vm.ReportDate = DateTime.Now;
+            vm.Assignee = firstengineer;
+            vm.Reporter = "System";
+            vm.Resolution = Resolute.Pending;
+            vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+            vm.Description = desc;
+            vm.StoreSubIssue();
+        }
+
+        private static void CreateEVTIssues(string projectname, string pjkey, string firstengineer)
+        {
+            var parentkey = "";
+            var vm = new IssueViewModels();
+            vm.ProjectKey = pjkey;
+            vm.IssueKey = IssueViewModels.GetUniqKey();
+            parentkey = vm.IssueKey;
+            vm.IssueType = ISSUETP.NPIPROC;
+            vm.Summary = projectname + " EVT";
+            vm.Priority = ISSUEPR.Major;
+            vm.DueDate = DateTime.Now.AddMonths(3);
+            vm.ReportDate = DateTime.Now;
+            vm.Assignee = firstengineer;
+            vm.Reporter = "System";
+            vm.Resolution = Resolute.Pending;
+            vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+            vm.Description = "Build prototypes and prove feasibility";
+            vm.StoreIssue();
+
+            var sum = "Complete Firmware Architecture Review";
+            var desc = "Complete Firmware Architecture Review";
+            CreateNPISubIssue(projectname,pjkey, parentkey,firstengineer,sum,desc,3);
+
+            sum = "EVT Presentation Completed and ECO Approved";
+            desc = "EVT Presentation Completed and ECO Approved";
+            CreateNPISubIssue(projectname, pjkey, parentkey, firstengineer, sum, desc,3);
+
+            sum = "EVT Presentation Completed and ECO Approved";
+            desc = "EVT Presentation Completed and ECO Approved";
+            CreateNPISubIssue(projectname, pjkey, parentkey, firstengineer, sum, desc,3);
+
+            sum = "Design Review Completed and ECO Approved";
+            desc = "Design Review Completed and ECO Approved";
+            CreateNPISubIssue(projectname, pjkey, parentkey, firstengineer, sum, desc,3);
+
+            sum = "PVT type testing performed";
+            desc = "PVT type testing performed. Results pass or corrective actions identified for failures";
+            CreateNPISubIssue(projectname, pjkey, parentkey, firstengineer, sum, desc,3);
+
+            sum = "IC - Prototype released";
+            desc = "IC - Prototype released";
+            CreateNPISubIssue(projectname, pjkey, parentkey, firstengineer, sum, desc,3);
+
+            sum = "OSAs: internal passed EVT external Prototype released";
+            desc = "OSAs: internal passed EVT external Prototype released";
+            CreateNPISubIssue(projectname, pjkey, parentkey, firstengineer, sum, desc,3);
+        }
+
+
+        private static void CreateDVTIssues(string projectname, string pjkey, string firstengineer)
+        {
+            var parentkey = "";
+            var vm = new IssueViewModels();
+            vm.ProjectKey = pjkey;
+            vm.IssueKey = IssueViewModels.GetUniqKey();
+            parentkey = vm.IssueKey;
+            vm.IssueType = ISSUETP.NPIPROC;
+            vm.Summary = projectname + " DVT";
+            vm.Priority = ISSUEPR.Major;
+            vm.DueDate = DateTime.Now.AddMonths(6);
+            vm.ReportDate = DateTime.Now;
+            vm.Assignee = firstengineer;
+            vm.Reporter = "System";
+            vm.Resolution = Resolute.Pending;
+            vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+            vm.Description = "Build prototypes and prove feasibility";
+            vm.StoreIssue();
+
+            var sum = "DVT Presentation Completed and ECO Approved";
+            var desc = "DVT Presentation Completed and ECO Approved";
+            CreateNPISubIssue(projectname, pjkey, parentkey, firstengineer, sum, desc, 6);
+
+            sum = "Design Review Completed";
+            desc = "Design Review Completed";
+            CreateNPISubIssue(projectname, pjkey, parentkey, firstengineer, sum, desc, 6);
+
+            sum = "Standard and Logic/Firmware PVT report is a pass";
+            desc = "Standard and Logic/Firmware PVT report is a pass";
+            CreateNPISubIssue(projectname, pjkey, parentkey, firstengineer, sum, desc, 6);
+
+            sum = "Cpk from NPI Build Data shows Cpk > 0.7";
+            desc = "Cpk from NPI Build Data shows Cpk > 0.7";
+            CreateNPISubIssue(projectname, pjkey, parentkey, firstengineer, sum, desc, 6);
+
+            sum = "Yield Requirements";
+            desc = "Low Complexity : 1st Pass 50%, Cumulative without Rework 80%.Medium Complexity : 1st Pass 40%, Cumulative without Rework 75%.High Complexity : 1st Pass 25%, Cumulative without Rework 70%";
+            CreateNPISubIssue(projectname, pjkey, parentkey, firstengineer, sum, desc, 6);
+
+            sum = "IC - Pre-Production released";
+            desc = "IC - Pre-Production released";
+            CreateNPISubIssue(projectname, pjkey, parentkey, firstengineer, sum, desc, 6);
+
+            sum = "OSAs: internal passed DVT, external Pre-Production released";
+            desc = "OSAs: internal passed DVT, external Pre-Production released";
+            CreateNPISubIssue(projectname, pjkey, parentkey, firstengineer, sum, desc, 6);
+        }
+
+        private static void CreateMVTIssues(string projectname, string pjkey, string firstengineer)
+        {
+            var parentkey = "";
+            var vm = new IssueViewModels();
+            vm.ProjectKey = pjkey;
+            vm.IssueKey = IssueViewModels.GetUniqKey();
+            parentkey = vm.IssueKey;
+            vm.IssueType = ISSUETP.NPIPROC;
+            vm.Summary = projectname + " MVT";
+            vm.Priority = ISSUEPR.Major;
+            vm.DueDate = DateTime.Now.AddMonths(9);
+            vm.ReportDate = DateTime.Now;
+            vm.Assignee = firstengineer;
+            vm.Reporter = "System";
+            vm.Resolution = Resolute.Pending;
+            vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+            vm.Description = "Build prototypes and prove feasibility";
+            vm.StoreIssue();
+
+            var sum = "MVT Presentation Completed and ECO Approved";
+            var desc = "MVT Presentation Completed and ECO Approved";
+            CreateNPISubIssue(projectname, pjkey, parentkey, firstengineer, sum, desc, 9);
+
+            sum = "Standard and Logic/Firmware PVT report is a pass";
+            desc = "Standard and Logic/Firmware PVT report is a pass";
+            CreateNPISubIssue(projectname, pjkey, parentkey, firstengineer, sum, desc, 9);
+
+            sum = "Cpk from NPI Build Data shows Cpk > 1.0";
+            desc = "Cpk from NPI Build Data shows Cpk > 1.0";
+            CreateNPISubIssue(projectname, pjkey, parentkey, firstengineer, sum, desc, 9);
+
+            sum = "Yield Requirements";
+            desc = "Low Complexity : 1st Pass 70%, Cumulative without Rework 90%.Medium Complexity : 1st Pass 55% Cumulative w/o Rework 85%.High Complexity : 1st Pass 40%, Cumulative without Rework 80%";
+            CreateNPISubIssue(projectname, pjkey, parentkey, firstengineer, sum, desc, 9);
+
+            sum = "IC - Pre-Production released";
+            desc = "IC - Pre-Production released";
+            CreateNPISubIssue(projectname, pjkey, parentkey, firstengineer, sum, desc, 9);
+
+            sum = "OSAs: internal passed DVT, external Pre-Production released";
+            desc = "OSAs: internal passed DVT, external Pre-Production released";
+            CreateNPISubIssue(projectname, pjkey, parentkey, firstengineer, sum, desc, 9);
+
+            sum = "Rel - 1,000 Hours Complete";
+            desc = "Rel - 1,000 Hours Complete";
+            CreateNPISubIssue(projectname, pjkey, parentkey, firstengineer, sum, desc, 9);
+        }
+
+
+        public static void CreateNPIProcTasks(string projectname,string pjkey,string firstengineer)
+        {
+            CreateEVTIssues(projectname, pjkey, firstengineer);
+            CreateDVTIssues(projectname, pjkey, firstengineer);
+            CreateMVTIssues(projectname, pjkey, firstengineer);
         }
 
     }

@@ -8,26 +8,35 @@
 <h2>Project Yield</h2>
 <hr/>
 
-@Html.Raw(ViewBag.myscript)
+<form>
+    @if (ViewBag.pjkey != null)
+    {
+        <input  value="@(ViewBag.pjkey)" id="pjkey" name="pjkey" type="hidden" />
+    }
+</form>
 
-<script src="~/Scripts/highcharts.js"></script>
-<script src="~/Scripts/exporting.js"></script>
+@if (ViewBag.chartscript != null)
+{ 
+    @Html.Raw(ViewBag.chartscript)
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Yield</h3>
-            </div>
-            <div class="panel-body">
-                <div class="col-md-12">
-                    <div id="weeklyyield" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+    <script src="~/Scripts/highcharts.js"></script>
+    <script src="~/Scripts/exporting.js"></script>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Yield</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="col-md-12">
+                        <div id="weeklyyield" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-
+}
 @*<div class="row">
         <div class="col-md-12">
             <div class="panel panel-default">

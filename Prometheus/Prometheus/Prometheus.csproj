@@ -688,6 +688,7 @@
     <Content Include="Views\Project\ProjectFA.cshtml" />
     <Content Include="Views\Project\ProjectNPI.cshtml" />
     <Content Include="Views\Project\ProjectYield.cshtml" />
+    <Content Include="Views\Project\ProjectWYield.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

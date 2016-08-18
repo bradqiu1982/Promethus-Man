@@ -19,6 +19,33 @@ namespace Prometheus.Controllers
         public ActionResult ViewAll()
         {
             var projlist = ProjectViewModels.RetrieveAllProject();
+
+            foreach (var item in projlist)
+            {
+                var startdate = DateTime.Now.AddDays(-7).ToString();
+                var enddate = DateTime.Now.ToString();
+                var yvm = ProjectYieldViewModule.GetYieldByDateRange(item.ProjectKey, startdate, enddate, item);
+                if (yvm.FirstYields.Count > 0)
+                {
+                    item.FirstYield = yvm.FirstYield;
+                    item.RetestYield = yvm.LastYield;
+                }
+                else
+                {
+                    item.FirstYield = -1.0;
+                    item.RetestYield = -1.0;
+                }
+            }
+
+            //foreach (var item in projlist)
+            //{
+            //    var ivmlist = IssueViewModels.RetrieveNPIPROCIssue(item.ProjectKey);
+            //    foreach (var iv in ivmlist)
+            //    {
+            //        if(iv.Summary.Contains("DVT"))
+            //    }
+            //}
+
             return View(projlist);
         }
 
@@ -691,17 +718,31 @@ namespace Prometheus.Controllers
                     }
                 }
 
-                var yxias = new List<int>();
-                var xxias = new List<string>();
+                //var yxias = new List<int>();
+                //var xxias = new List<string>();
                 var keys = piedatadict.Keys;
+                //foreach (var k in keys)
+                //{
+                //    yxias.Add(piedatadict[k]);
+                //    xxias.Add(k + " " + ((float)piedatadict[k] / (float)vm.Count*100.0).ToString("0.00") + "%");
+                //}
+
+                //ViewBag.yxias = yxias;
+                //ViewBag.xxias = xxias;
+
+                var namevaluepair = "";
                 foreach (var k in keys)
                 {
-                    yxias.Add(piedatadict[k]);
-                    xxias.Add(k + " " + ((float)piedatadict[k] / (float)vm.Count*100.0).ToString("0.00") + "%");
+                    namevaluepair = namevaluepair+"{ name:'"+k+"',y:"+ piedatadict[k].ToString()+ "},";
                 }
 
-                ViewBag.yxias = yxias;
-                ViewBag.xxias = xxias;
+                namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                ViewBag.chartscript = tempscript.Replace("#ElementID#", "failurepie")
+                    .Replace("#Title#", ProjectKey + " Failure")
+                    .Replace("#SERIESNAME#", "Failure")
+                    .Replace("#NAMEVALUEPAIRS#", namevaluepair);
 
                 return View(vm);
             }

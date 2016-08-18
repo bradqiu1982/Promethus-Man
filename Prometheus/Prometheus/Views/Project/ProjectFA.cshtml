@@ -11,7 +11,7 @@
         <h2>Project FA</h2>
     </div>
     <div class="col-md-2">
-        @if (ViewBag.xxias == null && fadata != null && fadata.Count > 0)
+        @if (ViewBag.chartscript == null && fadata != null && fadata.Count > 0)
         {
             <h2><a data-toggle="tooltip" title="Goto FA Page" href="/Project/ProjectFA?ProjectKey=@(fadata[0].TestData.ProjectKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
         }
@@ -23,35 +23,30 @@
     <div class="col-md-9"></div>
 </div>
 
-
-
-@{
-    var base64str = "";
-    if(ViewBag.xxias != null)
-        {
-            var myChart = new Chart(300, 300).AddTitle("Failure")
-            .AddSeries(chartType: "Pie", xValue: ViewBag.xxias
-            , xField: "Error Code", yValues: ViewBag.yxias, yFields: "Count");
-            base64str = Convert.ToBase64String(myChart.GetBytes());
-        }
-}
-
 <hr/>
 
-    @if(ViewBag.xxias != null)
+    @if (ViewBag.chartscript != null)
     {
+        @Html.Raw(ViewBag.chartscript)
+
+        <script src="~/Scripts/highcharts.js"></script>
+        <script src="~/Scripts/exporting.js"></script>
+
         <div class="row">
             <div class="col-md-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h3 class="panel-title">Failure</h3>
                     </div>
-                    <div class="panel-body" style="max-height:320px;min-height:320px;">
-                        <div class="col-md-4"></div>
+                    <div class="panel-body">
+                        <div class="col-md-12">
+                            <div id="failurepie" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                        </div>
+                        @*<div class="col-md-4"></div>
                         <div class="col-md-6">
                             <img class="text-center" src="data:image/jpg;base64,@Html.Raw(base64str)" alt="" />
                         </div>
-                        <div class="col-md-2"></div>
+                        <div class="col-md-2"></div>*@
                     </div>
                 </div>
             </div>

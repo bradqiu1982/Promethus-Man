@@ -170,6 +170,7 @@ namespace Prometheus.Controllers
             if (ret != null)
             {
                 ret.Reporter = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                ret.RetrieveAttachment(ret.IssueKey);
                 CreateAllLists(ret);
                 return View(ret);
             }

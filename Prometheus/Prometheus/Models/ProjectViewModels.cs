@@ -312,6 +312,17 @@ namespace Prometheus.Models
             }
         }
 
+        public string DVTDate { set; get; }
+        public string DVTStatus { set; get; }
+        public string DVTIssueKey { set; get; }
+
+        public string MVTDate { set; get; }
+        public string MVTStatus { set; get; }
+        public string MVTIssueKey { set; get; }
+
+        public double FirstYield { set; get; }
+        public double RetestYield { set; get; }
+
 
         private void StoreProjectBaseInfo()
         {

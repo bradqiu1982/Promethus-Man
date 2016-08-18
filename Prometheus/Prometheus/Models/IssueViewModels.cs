@@ -198,6 +198,20 @@ namespace Prometheus.Models
             }
         }
 
+        private List<string> attachlist = new List<string>();
+        public List<string> AttachList
+        {
+            set
+            {
+                attachlist.Clear();
+                attachlist.AddRange(value);
+            }
+            get
+            {
+                return attachlist;
+            }
+        }
+
         public string ParentIssueKey { set; get; }
 
         private List<IssueViewModels> sissue = new List<IssueViewModels>();
@@ -265,6 +279,28 @@ namespace Prometheus.Models
                 sql = sql.Replace("<IssueKey>", IssueKey).Replace("<Comment>", dbDescription).Replace("<Reporter>", Reporter).Replace("<CommentDate>", CommentDate);
                 DBUtility.ExeLocalSqlNoRes(sql);
             }
+        }
+
+        public static void StoreIssueAttachment(string issuekey,string attachmenturl)
+        {
+            var sql = "insert into IssueAttachment(IssueKey,Attachment,UpdateTime) values('<IssueKey>','<Attachment>','<UpdateTime>')";
+            sql = sql.Replace("<IssueKey>", issuekey).Replace("<Attachment>", attachmenturl).Replace("<UpdateTime>", DateTime.Now.ToString());
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        public void RetrieveAttachment(string issuekey)
+        {
+            var ret = new List<string>();
+            var csql = "select Attachment from IssueAttachment where IssueKey = '<IssueKey>' order by UpdateTime ASC";
+            csql = csql.Replace("<IssueKey>", issuekey);
+
+            var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
+            foreach (var r in cdbret)
+            {
+                ret.Add(Convert.ToString(r[0]));
+            }
+
+            AttachList = ret;
         }
 
         public void UpdateIssue()

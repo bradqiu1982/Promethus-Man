@@ -54,11 +54,12 @@
     }
 
     <div class="row">
-        <div class="col-md-2 text-center">Module SN</div>
+        <div class="col-md-1 text-center">ModuleSN</div>
         <div class="col-md-2 text-center">ErrAbbr</div>
         <div class="col-md-2 text-center">FA Status</div>
         <div class="col-md-2 text-center">Assignee</div>
         <div class="col-md-4 text-center">Issue</div>
+        <div class="col-md-1 text-center">Attachment</div>
     </div>
     <hr />
     @if (Model != null)
@@ -66,11 +67,19 @@
         foreach (var item in Model)
         {
             <div class="row">
-                <div class="col-md-2 text-center">@item.TestData.ModuleSerialNum</div>
+                <div class="col-md-1 text-center">@item.TestData.ModuleSerialNum</div>
                 <div class="col-md-2 text-center"><a href="/Project/ProjectErrAbbr?ProjectKey=@item.TestData.ProjectKey&ErrAbbr=@item.TestData.ErrAbbr">@item.TestData.ErrAbbr</a></div>
                 <div class="col-md-2 text-center">@item.IssueData.Resolution</div>
                 <div class="col-md-2 text-center"><a href="/User/UserCenter?username=@item.IssueData.Assignee">@item.IssueData.Assignee.Split(new char[] { '@' })[0]</a></div>
                 <div class="col-md-4 text-center"><a href="/Issue/UpdateIssue?issuekey=@item.IssueData.IssueKey">@item.IssueData.Summary</a></div>
+                <div class="col-md-1 text-center">
+                    @if (item.IssueData.AttachList.Count > 0)
+                    {
+                        <a href="/Issue/IssueAttach?issuekey=@item.IssueData.IssueKey">
+                            <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>
+                        </a>
+                    }
+                </div>
             </div>
             <hr />
         }

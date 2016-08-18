@@ -148,6 +148,9 @@ namespace Prometheus.Controllers
             var key = "";
             if (!string.IsNullOrEmpty(issuekey))
             {
+                var ck = new Dictionary<string, string>();
+                ck.Add("issuekey", issuekey);
+                CookieUtility.SetCookie(this, ck);
                 key = issuekey;
             }
             else if (ckdict.ContainsKey("issuekey") && !string.IsNullOrEmpty(ckdict["issuekey"]))
@@ -420,6 +423,20 @@ namespace Prometheus.Controllers
 
             CreateAllSearchLists();
             return View(vmlist);
+        }
+
+        public ActionResult IssueAttach(string issuekey)
+        {
+            if (!string.IsNullOrEmpty(issuekey))
+            {
+                var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+                if (vm != null)
+                {
+                    vm.RetrieveAttachment(vm.IssueKey);
+                    return View(vm);
+                }
+            }
+            return View();
         }
 
     }

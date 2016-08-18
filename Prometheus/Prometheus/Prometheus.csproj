@@ -690,6 +690,7 @@
     <Content Include="Views\Project\ProjectNPI.cshtml" />
     <Content Include="Views\Project\ProjectYield.cshtml" />
     <Content Include="Views\Project\ProjectWYield.cshtml" />
+    <Content Include="Views\Issue\IssueAttach.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

@@ -27,6 +27,7 @@ namespace Prometheus.Models
                 var im = IssueViewModels.RetrieveIssueByIssueKey(d.DataID);
                 if (im != null)
                 {
+                    im.RetrieveAttachment(im.IssueKey);
                     ret.Add(new ProjectFAViewModules(im, d));
                 }
             }

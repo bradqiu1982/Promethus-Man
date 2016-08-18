@@ -3,13 +3,13 @@
 using System;
 using System.Web;
 using System.IO;
+using Prometheus.Models;
 
 public class Upload : IHttpHandler {
 
     public void ProcessRequest (HttpContext context) {
         try
         {
-
             HttpPostedFile uploads = context.Request.Files["upload"];
 
             string CKEditorFuncNum = context.Request["CKEditorFuncNum"];
@@ -26,7 +26,7 @@ public class Upload : IHttpHandler {
                 string imgdir = context.Server.MapPath(".") + "\\images\\" + datestring + "\\";
                 if (!Directory.Exists(imgdir))
                 {
-                        Directory.CreateDirectory(imgdir);
+                    Directory.CreateDirectory(imgdir);
                 }
 
                 fn = Path.GetFileNameWithoutExtension(fn)+"-"+DateTime.Now.ToString("yyyyMMddHHmmss")+Path.GetExtension(fn);
@@ -39,12 +39,18 @@ public class Upload : IHttpHandler {
                 string imgdir = context.Server.MapPath(".") + "\\docs\\" + datestring + "\\";
                 if (!Directory.Exists(imgdir))
                 {
-                        Directory.CreateDirectory(imgdir);
+                    Directory.CreateDirectory(imgdir);
                 }
 
                 fn = Path.GetFileNameWithoutExtension(fn)+"-"+DateTime.Now.ToString("yyyyMMddHHmmss")+Path.GetExtension(fn);
                 uploads.SaveAs(imgdir + fn);
                 url = "/userfiles/docs/" +datestring+"/"+ fn;
+
+                var dict = CookieUtility.UnpackCookie(new HttpRequestWrapper(context.Request));
+                if (dict.ContainsKey("issuekey") && !string.IsNullOrEmpty(dict["issuekey"]))
+                {
+                    IssueViewModels.StoreIssueAttachment(dict["issuekey"], url);
+                }
             }
             context.Response.Write("<script>window.parent.CKEDITOR.tools.callFunction(" + CKEditorFuncNum + ", \"" + url + "\""+");</script>");
             HttpContext.Current.ApplicationInstance.CompleteRequest();

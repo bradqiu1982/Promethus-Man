@@ -1,0 +1,57 @@
+﻿@model Prometheus.Models.IssueViewModels
+
+@{
+    ViewBag.Title = "IssueAttachment";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="row">
+    <div class="col-md-3">
+        <h2>Issue Attachment</h2>
+    </div>
+    <div class="col-md-2">
+        @if (Model != null)
+        {
+            <h2><a data-toggle="tooltip" title="Goto Issue" href="/Issue/UpdateIssue?issuekey=@(Model.IssueKey)"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span> Issue</a></h2>
+        }
+        
+    </div>
+
+    <div class="col-md-2">
+        @if (Model != null)
+        {
+            <h2><a data-toggle="tooltip" title="Goto FA Page" href="/Project/ProjectFA?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span> FA</a></h2>
+        }
+        
+    </div>
+    <div class="col-md-5"></div>
+</div>
+
+
+<hr />
+
+@if (Model != null && Model.AttachList.Count > 0)
+{
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Attachments for @Model.Summary</h3>
+                </div>
+                <div class="panel-body">
+                    @foreach (var item in Model.AttachList)
+                    {
+                        var fns = item.Split(new char[] { '/' });
+                        var fn = fns[fns.Length - 1];
+                        <div class="col-md-12">
+                            <a href="@item" target="_blank">
+                                <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>@fn
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}

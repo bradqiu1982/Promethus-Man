@@ -37,14 +37,25 @@ namespace Prometheus.Controllers
                 }
             }
 
-            //foreach (var item in projlist)
-            //{
-            //    var ivmlist = IssueViewModels.RetrieveNPIPROCIssue(item.ProjectKey);
-            //    foreach (var iv in ivmlist)
-            //    {
-            //        if(iv.Summary.Contains("DVT"))
-            //    }
-            //}
+            foreach (var item in projlist)
+            {
+                var ivmlist = IssueViewModels.RetrieveNPIPROCIssue(item.ProjectKey);
+                foreach (var iv in ivmlist)
+                {
+                    if (iv.Summary.Contains(" DVT"))
+                    {
+                        item.DVTIssueKey = iv.IssueKey;
+                        item.DVTDate = iv.DueDate.ToString("yyyy-MM-dd");
+                        item.DVTStatus = iv.Resolution;
+                    }
+                    if (iv.Summary.Contains(" MVT"))
+                    {
+                        item.MVTIssueKey = iv.IssueKey;
+                        item.MVTDate = iv.DueDate.ToString("yyyy-MM-dd");
+                        item.MVTStatus = iv.Resolution;
+                    }
+                }
+            }
 
             return View(projlist);
         }

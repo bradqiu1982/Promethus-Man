@@ -55,6 +55,9 @@ namespace Prometheus.Controllers
                         item.MVTStatus = iv.Resolution;
                     }
                 }
+
+                var list1 = IssueViewModels.RetrieveIssueByProjectKey(item.ProjectKey, Resolute.Pending, 100000);
+                item.PendingIssueCount = list1.Count;
             }
 
             return View(projlist);

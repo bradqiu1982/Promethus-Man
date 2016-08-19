@@ -403,6 +403,36 @@ namespace Prometheus.Models
                 return null;
         }
 
+        public static bool RetrieveFAStatusByIssueKey(string issuekey, string issuestatus)
+        {
+            var cond = "";
+            var fixresolve = "";
+            if (string.Compare(issuestatus, Resolute.Pending) == 0)
+            {
+                cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";
+                fixresolve = Resolute.Pending;
+            }
+            else if (string.Compare(issuestatus, Resolute.Working) == 0)
+            {
+                cond = "('" + Resolute.Working + "')";
+                fixresolve = Resolute.Working;
+            }
+            else
+            {
+                cond = "('" + Resolute.Fixed + "','" + Resolute.Done + "','" + Resolute.NotFix + "','" + Resolute.NotReproduce + "','" + Resolute.Unresolved + "')";
+                fixresolve = Resolute.Done;
+            }
+
+            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey from Issue where IssueKey = '<IssueKey>'  and Resolution in <cond>";
+            sql = sql.Replace("<IssueKey>", issuekey).Replace("<cond>", cond);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            if (dbret.Count > 0)
+            {
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -410,7 +440,7 @@ namespace Prometheus.Models
         /// <param name="issuestatus"> comes from the resolution has pending,working,done three status</param>
         /// <returns></returns>
         /// 
-        public static List<IssueViewModels> RetrieveIssueByProjectKey(string projectkey,string issuestatus,int topnum)
+        public static List<IssueViewModels> RetrieveTaskByProjectKey(string projectkey,string issuestatus)
         {
             var cond = "";
             var fixresolve = "";
@@ -430,8 +460,8 @@ namespace Prometheus.Models
                 fixresolve = Resolute.Done;
             }
 
-            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution from Issue where ProjectKey = '<ProjectKey>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType <> '<IssueType>' order by ReportDate DESC";
-            sql = sql.Replace("<ProjectKey>", projectkey).Replace("<topnum>", Convert.ToString(topnum)).Replace("<cond>", cond).Replace("<IssueType>", ISSUETP.NPIPROC);
+            var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution from Issue where ProjectKey = '<ProjectKey>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' and Creator <> 'System' order by ReportDate DESC";
+            sql = sql.Replace("<ProjectKey>", projectkey).Replace("<cond>", cond).Replace("<IssueType1>", ISSUETP.NPIPROC).Replace("<IssueType2>", ISSUETP.RMA);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)
@@ -446,6 +476,33 @@ namespace Prometheus.Models
 
             return ret;
         }
+
+        public static int RetrieveTaskCountByProjectKey(string projectkey, string issuestatus)
+        {
+            var cond = "";
+            var fixresolve = "";
+            if (string.Compare(issuestatus, Resolute.Pending) == 0)
+            {
+                cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";
+                fixresolve = Resolute.Pending;
+            }
+            else if (string.Compare(issuestatus, Resolute.Working) == 0)
+            {
+                cond = "('" + Resolute.Working + "')";
+                fixresolve = Resolute.Working;
+            }
+            else
+            {
+                cond = "('" + Resolute.Fixed + "','" + Resolute.Done + "','" + Resolute.NotFix + "','" + Resolute.NotReproduce + "','" + Resolute.Unresolved + "')";
+                fixresolve = Resolute.Done;
+            }
+
+            var sql = "select IssueKey from Issue where ProjectKey = '<ProjectKey>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' and Creator <> 'System' order by ReportDate DESC";
+            sql = sql.Replace("<ProjectKey>", projectkey).Replace("<cond>", cond).Replace("<IssueType1>", ISSUETP.NPIPROC).Replace("<IssueType2>", ISSUETP.RMA);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            return dbret.Count;
+        }
+
 
         public static List<IssueViewModels> RetrieveIssueByAssignee(string assignee, string issuestatus, int topnum)
         {

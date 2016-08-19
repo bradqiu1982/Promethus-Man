@@ -102,7 +102,7 @@ namespace Prometheus.Models
 
         private static DateTime RetrieveFirstWeek(string startdate)
         {
-            var sdate = DateTime.Parse(DateTime.Parse(startdate).ToString("yyyy-MM-dd") + " 00:00:01");
+            var sdate = DateTime.Parse(DateTime.Parse(startdate).ToString("yyyy-MM-dd") + " 07:30:00");
             if (sdate.DayOfWeek < DayOfWeek.Thursday)
             {
                 sdate = sdate.AddDays(4 - (int)sdate.DayOfWeek);
@@ -122,7 +122,7 @@ namespace Prometheus.Models
         private static List<DateTime> RetrieveDateSpanByWeek(string startdate, string enddate)
         {
             var ret = new List<DateTime>();
-            var sdate = DateTime.Parse(DateTime.Parse(startdate).ToString("yyyy-MM-dd") + " 00:00:01");
+            var sdate = DateTime.Parse(DateTime.Parse(startdate).ToString("yyyy-MM-dd") + " 07:30:00");
             ret.Add(sdate);
             var edate = DateTime.Parse(enddate);
             var firstweekend = RetrieveFirstWeek(startdate);
@@ -155,7 +155,7 @@ namespace Prometheus.Models
         private List<DateTime> RetrieveDateSpanByMonth(string startdate,string enddate)
         {
             var ret = new List<DateTime>();
-            var sdate = DateTime.Parse(DateTime.Parse(startdate).ToString("yyyy-MM-dd") + " 00:00:01");
+            var sdate = DateTime.Parse(DateTime.Parse(startdate).ToString("yyyy-MM-dd") + " 07:30:00");
             ret.Add(sdate);
 
             var temptimepoint = sdate;
@@ -165,20 +165,20 @@ namespace Prometheus.Models
                 temptimepoint = temptimepoint.AddMonths(1);
                 if (temptimepoint > edate)
                 {
-                    ret.Add(DateTime.Parse(DateTime.Parse(enddate).ToString("yyyy-MM-dd") + " 23:59:59"));
+                    ret.Add(DateTime.Parse(DateTime.Parse(enddate).ToString("yyyy-MM-dd") + " 07:30:00"));
                     return ret;
                 }
                 else
                 {
-                    ret.Add(DateTime.Parse(temptimepoint.ToString("yyyy-MM-dd") + " 23:59:59"));
+                    ret.Add(DateTime.Parse(temptimepoint.ToString("yyyy-MM-dd") + " 07:30:00"));
                 }
             }
             return ret;
         }
 
-        private static void RetrieveFirstYield(ProjectYieldViewModule pyvm, string pjkey, string startdate, string enddate, ProjectViewModels pvm)
+        private static void RetrieveFirstYield(ProjectYieldViewModule pyvm, List<ProjectTestData> plist, ProjectViewModels pvm)
         {
-            var plist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, enddate,true);
+
             var yielddict = new Dictionary<string, TestYield>();
             var sndict = new Dictionary<string, bool>();
             foreach (var p in plist)
@@ -218,9 +218,8 @@ namespace Prometheus.Models
             }
         }
 
-        private static void RetrieveCummYield(ProjectYieldViewModule pyvm, string pjkey, string startdate, string enddate, ProjectViewModels pvm)
+        private static void RetrieveCummYield(ProjectYieldViewModule pyvm, List<ProjectTestData> plist, ProjectViewModels pvm)
         {
-            var plist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, enddate, false);
             var yielddict = new Dictionary<string, TestYield>();
             var sndict = new Dictionary<string, bool>();
             foreach (var p in plist)
@@ -260,14 +259,54 @@ namespace Prometheus.Models
             }
         }
 
-        public static ProjectYieldViewModule GetYieldByDateRange(string pjkey, string startdate, string enddate, ProjectViewModels pvm)
+        public static ProjectYieldViewModule GetYieldByDateRange(string pjkey, string sdate, string edate, ProjectViewModels pvm)
         {
             var ret = new ProjectYieldViewModule();
             ret.ProjectKey = pjkey;
-            ret.StartDate = DateTime.Parse(startdate);
-            ret.EndDate = DateTime.Parse(enddate);
-            RetrieveFirstYield(ret, pjkey, startdate, enddate, pvm);
-            RetrieveCummYield(ret, pjkey, startdate, enddate, pvm);
+            ret.StartDate = DateTime.Parse(sdate);
+            ret.EndDate = DateTime.Parse(edate);
+
+            var startdate = DateTime.Parse(DateTime.Parse(sdate).ToString("yyyy-MM-dd") + " 07:30:00").ToString();
+            var enddate = DateTime.Parse(DateTime.Parse(edate).ToString("yyyy-MM-dd") + " 07:30:00").ToString();
+
+            if (startdate == enddate)
+            {
+                return ret;
+            }
+
+
+            var plist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, enddate, true);
+            var snlist = ProjectTestData.RetrieveSNBeforeDate(pjkey, startdate);
+
+            var validatedict = new Dictionary<string, bool>();
+            var filteredPjData = new List<ProjectTestData>();
+            foreach (var item in plist)
+            {
+                if (!snlist.ContainsKey(item.ModuleSerialNum))
+                {
+                    filteredPjData.Add(item);
+                    if (!validatedict.ContainsKey(item.ModuleSerialNum))
+                    {
+                        validatedict.Add(item.ModuleSerialNum,true);
+                    }
+                }
+            }
+
+            RetrieveFirstYield(ret, filteredPjData, pvm);
+
+
+            plist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, DateTime.Parse(enddate).AddYears(5).ToString(), false);
+            var filteredPjData2 = new List<ProjectTestData>();
+            foreach (var item in plist)
+            {
+                if (validatedict.ContainsKey(item.ModuleSerialNum))
+                {
+                    filteredPjData2.Add(item);
+                }
+            }
+
+            RetrieveCummYield(ret, filteredPjData2, pvm);
+
             return ret;
         }
 
@@ -277,7 +316,14 @@ namespace Prometheus.Models
 
             var pvm = ProjectViewModels.RetrieveOneProject(pjkey);
             var  ldate = RetrieveDateSpanByWeek(pvm.StartDate.ToString(), DateTime.Now.ToString());
-            for(int idx  = 0;idx < ldate.Count -1;idx++)
+
+            var startidx = 0;
+            if (ldate.Count > 28)
+            {
+                startidx = ldate.Count - 28;
+            }
+
+            for(int idx  = startidx; idx < ldate.Count -1;idx++)
             {
                 var temp  = GetYieldByDateRange(pjkey, ldate[idx].ToString(), ldate[idx+1].ToString(),pvm);
                 if (temp.FirstYields.Count > 0)

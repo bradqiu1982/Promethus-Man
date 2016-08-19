@@ -59,13 +59,19 @@
 
                     <div class="col-md-2 text-center">
                         <a href="/Project/ProjectFA?ProjectKey=@item.ProjectKey">
-                            <span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span> Project FA
+                            <span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span> Project FA <span class="badge alert-danger">@item.PendingFACount</span>
                         </a>
                     </div>
 
                     <div class="col-md-2 text-center">
                         <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey">
-                            <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span> Project Issues <span class="badge alert-danger">@item.PendingIssueCount</span>
+                            <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span> Project Tasks <span class="badge alert-danger">@item.PendingTaskCount</span>
+                        </a>
+                    </div>
+
+                    <div class="col-md-2 text-center">
+                        <a href="/Project/ProjectRMA?ProjectKey=@item.ProjectKey">
+                            <span class="glyphicon glyphicon-fire" aria-hidden="true"></span> Project RMA <span class="badge alert-danger">@item.PendingRMACount</span>
                         </a>
                     </div>
 
@@ -74,10 +80,7 @@
                             <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Project NPI Process
                         </a>
                     </div>
-
-                    <div class="col-md-2 text-center">
-
-                    </div>
+                    
                 </div>
                 <hr/>
                 <div class="row col-md-12">

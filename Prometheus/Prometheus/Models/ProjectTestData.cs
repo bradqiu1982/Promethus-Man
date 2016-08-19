@@ -143,6 +143,19 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static List<string> RetrieveProjectFailedDataID(string projectkey)
+        {
+            var ret = new List<string>();
+            var sql = "select DataID from ProjectTestData where ProjectKey = '<ProjectKey>' and ErrAbbr <> 'PASS' order by ErrAbbr,TestTimeStamp DESC";
+            sql = sql.Replace("<ProjectKey>", projectkey);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            foreach (var item in dbret)
+            {
+                ret.Add(Convert.ToString(item[0]));
+            }
+            return ret;
+        }
+
         public static List<ProjectTestData> RetrieveProjectTestDataWithErrAbbr(int topnum, string ProjectKey, string ErrAbbr)
         {
             ProjectTestData.PrePareLatestData(ProjectKey);
@@ -173,5 +186,24 @@ namespace Prometheus.Models
             }
             return ret;
         }
+
+        public static Dictionary<string, bool> RetrieveSNBeforeDate(string projectkey, string edate)
+        {
+            var ret = new Dictionary<string, bool>();
+            var sql = "select ModuleSerialNum from ProjectTestData where ProjectKey = '<ProjectKey>' and TestTimeStamp < '<ENDDATE>'";
+            sql = sql.Replace("<ProjectKey>", projectkey).Replace("<ENDDATE>", edate);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            foreach (var item in dbret)
+            {
+                var key = Convert.ToString(item[0]);
+                if (!ret.ContainsKey(key))
+                {
+                    ret.Add(key, true);
+                }
+            }
+            return ret;
+        }
+
+
     }
 }

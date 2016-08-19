@@ -56,8 +56,8 @@ namespace Prometheus.Controllers
                     }
                 }
 
-                var list1 = IssueViewModels.RetrieveIssueByProjectKey(item.ProjectKey, Resolute.Pending, 100000);
-                item.PendingIssueCount = list1.Count;
+                item.PendingTaskCount = IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Pending);
+                item.PendingFACount = ProjectFAViewModules.RetrieveFADataCount(item.ProjectKey);
             }
 
             return View(projlist);
@@ -690,9 +690,9 @@ namespace Prometheus.Controllers
         {
             if(ProjectKey != null)
             {
-                var list1 = IssueViewModels.RetrieveIssueByProjectKey(ProjectKey, Resolute.Pending, 60);
-                var list2 = IssueViewModels.RetrieveIssueByProjectKey(ProjectKey, Resolute.Working, 30);
-                var list3 = IssueViewModels.RetrieveIssueByProjectKey(ProjectKey, Resolute.Done, 30);
+                var list1 = IssueViewModels.RetrieveTaskByProjectKey(ProjectKey, Resolute.Pending);
+                var list2 = IssueViewModels.RetrieveTaskByProjectKey(ProjectKey, Resolute.Working);
+                var list3 = IssueViewModels.RetrieveTaskByProjectKey(ProjectKey, Resolute.Done);
                 list1.AddRange(list2);
                 list1.AddRange(list3);
 
@@ -856,10 +856,27 @@ namespace Prometheus.Controllers
             {
                 var edate = DateTime.Parse(DateTime.Parse(EndDate).ToString("yyyy-MM-dd") + " 07:30:00");
                 var sdate = edate.AddDays(-7);
+                if (sdate.DayOfWeek != DayOfWeek.Thursday)
+                {
+                    for (int i = 6; i > 0; i--)
+                    {
+                        sdate = edate.AddDays(0-i);
+                        if (sdate.DayOfWeek == DayOfWeek.Thursday)
+                        {
+                            break;
+                        }
+                    }
+                }
+
                 var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
                 var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, sdate.ToString(), edate.ToString(),pvm);
                 return View(yieldvm);
             }
+            return View();
+        }
+
+        public ActionResult ProjectRMA(string ProjectKey)
+        {
             return View();
         }
     }

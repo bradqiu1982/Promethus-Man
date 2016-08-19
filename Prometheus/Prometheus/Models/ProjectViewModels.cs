@@ -322,8 +322,9 @@ namespace Prometheus.Models
 
         public double FirstYield { set; get; }
         public double RetestYield { set; get; }
-        public int PendingIssueCount { set; get; }
-
+        public int PendingTaskCount { set; get; }
+        public int PendingFACount { set; get; }
+        public int PendingRMACount { set; get; }
 
         private void StoreProjectBaseInfo()
         {

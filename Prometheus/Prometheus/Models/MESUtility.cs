@@ -60,7 +60,7 @@ namespace Prometheus.Models
 
             string pncond = PNCondition(projectmodel.PNList);
 
-            var sql = "select dc_<DCTABLE>HistoryId,ModuleSerialNum, WhichTest, ModuleType, ErrAbbr, TestTimeStamp, TestStation,assemblypartnum from  insite.dc_<DCTABLE>  where assemblypartnum in  <PNCOND>   <TIMECOND>  order by  moduleserialnum,testtimestamp DESC";
+            var sql = "select dc_<DCTABLE>HistoryId,ModuleSerialNum, WhichTest, ModuleType, ErrAbbr, TestTimeStamp, TestStation,assemblypartnum from  insite.dc_<DCTABLE> (nolock) where assemblypartnum in  <PNCOND>   <TIMECOND>  order by  moduleserialnum,testtimestamp DESC";
 
             var ret = new Dictionary<string, string>();
             foreach (var tb in tables)

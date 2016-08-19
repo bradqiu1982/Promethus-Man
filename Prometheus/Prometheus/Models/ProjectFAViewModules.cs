@@ -34,6 +34,22 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static int RetrieveFADataCount(string pjkey)
+        {
+            int count = 0;
+            var ret = new List<ProjectFAViewModules>();
+            var pjdata = ProjectTestData.RetrieveProjectFailedDataID(pjkey);
+            foreach (var d in pjdata)
+            {
+                var im = IssueViewModels.RetrieveFAStatusByIssueKey(d, Resolute.Pending);
+                if (im)
+                {
+                    count = count + 1;
+                }
+            }
+            return count;
+        }
+
         public static List<ProjectFAViewModules> RetrieveFADataWithErrAbbr(string ProjectKey, string ErrAbbr)
         {
             var ret = new List<ProjectFAViewModules>();

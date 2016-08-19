@@ -524,7 +524,7 @@ namespace Prometheus.Models
                 fixresolve = Resolute.Done;
             }
 
-            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution from Issue where Assignee = '<Assignee>' and Resolution in <cond> and ParentIssueKey = '' order by ReportDate DESC";
+            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution from Issue where Assignee = '<Assignee>' and Resolution in <cond> order by ReportDate DESC";
             sql = sql.Replace("<Assignee>", assignee).Replace("<topnum>", Convert.ToString(topnum)).Replace("<cond>", cond);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             var ret = new List<IssueViewModels>();
@@ -544,7 +544,7 @@ namespace Prometheus.Models
 
         public static List<IssueViewModels> RetrieveIssueByCreator(string creator, int topnum)
         {
-            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution from Issue where (Creator = '<Creator>' or Reporter = '<Creator>') and ParentIssueKey = '' order by ReportDate DESC";
+            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution from Issue where (Creator = '<Creator>' or Reporter = '<Creator>') order by ReportDate DESC";
             sql = sql.Replace("<Creator>", creator).Replace("<topnum>", Convert.ToString(topnum));
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             var ret = new List<IssueViewModels>();

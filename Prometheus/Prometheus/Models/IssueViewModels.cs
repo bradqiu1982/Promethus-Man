@@ -38,6 +38,14 @@ namespace Prometheus.Models
         public static string Started = "Started";
     }
 
+    public class COMMENTTYPE
+    {
+        public static string Description = "Description";
+        public static string RootCause = "Root Cause";
+        public static string CustomReport = "Report for Customer";
+        public static string InternalReport = "Internal Report";
+    }
+
     public class IssueComments
     {
         public string IssueKey { set; get; }
@@ -48,6 +56,8 @@ namespace Prometheus.Models
             set { sComment = value; }
             get { return sComment; }
         }
+
+        public string CommentType { set; get; }
 
         public string dbComment
         {
@@ -103,7 +113,7 @@ namespace Prometheus.Models
         public IssueViewModels()
         { }
 
-        public IssueViewModels(string pk,string ik,string it,string sum,string pri,string ddate,string rsdate,string rtdate,string assign,string rt,string resolute,string pik)
+        public IssueViewModels(string pk,string ik,string it,string sum,string pri,string ddate,string rsdate,string rtdate,string assign,string rt,string resolute,string pik,string rpeople)
         {
             ProjectKey = pk;
             IssueKey = ik;
@@ -117,6 +127,7 @@ namespace Prometheus.Models
             Reporter = rt;
             Resolution = resolute;
             ParentIssueKey = pik;
+            RelativePeoples = rpeople;
         }
 
         public string ProjectKey{ set;get; }
@@ -183,6 +194,8 @@ namespace Prometheus.Models
             }
         }
 
+        public string CommentType { set; get; }
+
 
         private List<IssueComments> cemlist = new List<IssueComments>();
         public List<IssueComments> CommentList
@@ -191,12 +204,62 @@ namespace Prometheus.Models
             {
                 cemlist.Clear();
                 cemlist.AddRange(value);
+
+                generalcommentlist.Clear();
+                rootcausecommentlist.Clear();
+                repot4customercommentlist.Clear();
+                internalrepotcommentlist.Clear();
+                foreach (var item in cemlist)
+                {
+                    if (string.Compare(item.CommentType,COMMENTTYPE.Description) == 0)
+                    {
+                        generalcommentlist.Add(item);
+                    }
+                    if (string.Compare(item.CommentType, COMMENTTYPE.RootCause) == 0)
+                    {
+                        rootcausecommentlist.Add(item);
+                    }
+                    if (string.Compare(item.CommentType, COMMENTTYPE.CustomReport) == 0)
+                    {
+                        repot4customercommentlist.Add(item);
+                    }
+                    if (string.Compare(item.CommentType, COMMENTTYPE.InternalReport) == 0)
+                    {
+                        internalrepotcommentlist.Add(item);
+                    }
+                }
             }
             get
             {
                 return cemlist;
             }
         }
+
+        private List<IssueComments> generalcommentlist = new List<IssueComments>();
+        private List<IssueComments> rootcausecommentlist = new List<IssueComments>();
+        private List<IssueComments> repot4customercommentlist = new List<IssueComments>();
+        private List<IssueComments> internalrepotcommentlist = new List<IssueComments>();
+
+        public List<IssueComments> GeneralCommentList
+        {
+            get { return generalcommentlist; }
+        }
+
+        public List<IssueComments> RootCauseCommentList
+        {
+            get { return rootcausecommentlist; }
+        }
+
+        public List<IssueComments> Report4CustomerCommentList
+        {
+            get { return repot4customercommentlist; }
+        }
+
+        public List<IssueComments> InternalReportCommentList
+        {
+            get { return internalrepotcommentlist; }
+        }
+
 
         private List<string> attachlist = new List<string>();
         public List<string> AttachList
@@ -228,6 +291,65 @@ namespace Prometheus.Models
             }
         }
 
+
+        #region RMA
+
+        public string FinisarRMA { set; get; }
+
+        public string FinisarModel { set; get; }
+
+        public string ECustomer { set; get; }
+
+        public string CRMANUM { set; get; }
+
+        public string CReport { set; get; }
+
+        private List<string> relatpeople = new List<string>();
+        public List<string> RelativePeopleList
+        {
+            get
+            { return relatpeople; }
+            set
+            {
+                relatpeople.Clear();
+                relatpeople.AddRange(value);
+            }
+        }
+
+        public string RelativePeoples
+        {
+            set
+            {
+                relatpeople.Clear();
+                if (!string.IsNullOrEmpty(value))
+                {
+                    var temppn = value.Replace("'", "");
+                    var temppns = temppn.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var p in temppns)
+                    {
+                        relatpeople.Add(p.Trim());
+                    }
+                }
+            }
+
+            get
+            {
+                var ret = "";
+                foreach (var p in relatpeople)
+                {
+                    if (string.IsNullOrEmpty(ret))
+                        ret = p;
+                    else
+                        ret = ret + ";" + p;
+                }
+                return ret;
+            }
+        }
+
+        public DateTime AlertEmailUpdateDate { set; get; }
+        #endregion
+
+
         public static string GetUniqKey()
         {
             return Guid.NewGuid().ToString("N");
@@ -249,23 +371,47 @@ namespace Prometheus.Models
 
         public void StoreIssue()
         {
-            var sql = "insert into Issue(ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,Creator) values('<ProjectKey>','<IssueKey>','<IssueType>','<Summary>','<Priority>','<DueDate>','<ResolvedDate>','<ReportDate>','<Assignee>','<Reporter>','<Resolution>','<Creator>')";
+            var sql = "insert into Issue(ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,Creator,AlertEmailUpdateDate,RelativePeoples) values('<ProjectKey>','<IssueKey>','<IssueType>','<Summary>','<Priority>','<DueDate>','<ResolvedDate>','<ReportDate>','<Assignee>','<Reporter>','<Resolution>','<Creator>','<AlertEmailUpdateDate>','<RelativePeoples>')";
             sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<IssueKey>", IssueKey).Replace("<IssueType>", IssueType)
                 .Replace("<Summary>", Summary).Replace("<Priority>", Priority).Replace("<DueDate>", DueDate.ToString())
                 .Replace("<ResolvedDate>", ResolvedDate.ToString()).Replace("<ReportDate>", ReportDate.ToString()).Replace("<Assignee>", Assignee)
-                .Replace("<Reporter>", Reporter).Replace("<Resolution>", Resolution).Replace("<Creator>", Reporter);
+                .Replace("<Reporter>", Reporter).Replace("<Resolution>", Resolution).Replace("<Creator>", Reporter)
+                .Replace("<AlertEmailUpdateDate>", DateTime.Now.ToString()).Replace("<RelativePeoples>", RelativePeoples);
             DBUtility.ExeLocalSqlNoRes(sql);
 
             StoreIssueComment(DateTime.Now.ToString());
+
+            if (string.Compare(IssueType, ISSUETP.RMA) == 0)
+            {
+                StoreRMA();
+            }
+        }
+
+        private void StoreRMA()
+        {
+
+            var sql = "insert into IssueRMA(IssueKey,FinisarRMA,FinisarModel,ECustomer,CRMANUM,CReport) values('<IssueKey>','<FinisarRMA>','<FinisarModel>','<ECustomer>','<CRMANUM>','<CReport>')";
+            sql = sql.Replace("<IssueKey>", IssueKey).Replace("<FinisarRMA>", FinisarRMA)
+                .Replace("<FinisarModel>", FinisarModel).Replace("<ECustomer>", ECustomer)
+                .Replace("<CRMANUM>", CRMANUM).Replace("<CReport>", CReport);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        private void RetrieveRMA()
+        {
+            var sql = "select FinisarRMA,FinisarModel,ECustomer,CRMANUM,CReport from IssueRMA where IssueKey = '<IssueKey>'";
+            sql = sql.Replace("<IssueKey>", IssueKey);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
         }
 
         public void StoreSubIssue()
         {
-            var sql = "insert into Issue(ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,Creator) values('<ProjectKey>','<IssueKey>','<IssueType>','<Summary>','<Priority>','<DueDate>','<ResolvedDate>','<ReportDate>','<Assignee>','<Reporter>','<Resolution>','<ParentIssueKey>','<Creator>')";
+            var sql = "insert into Issue(ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,Creator,AlertEmailUpdateDate,RelativePeoples) values('<ProjectKey>','<IssueKey>','<IssueType>','<Summary>','<Priority>','<DueDate>','<ResolvedDate>','<ReportDate>','<Assignee>','<Reporter>','<Resolution>','<ParentIssueKey>','<Creator>','<AlertEmailUpdateDate>','<RelativePeoples>')";
             sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<IssueKey>", IssueKey).Replace("<IssueType>", IssueType)
                 .Replace("<Summary>", Summary).Replace("<Priority>", Priority).Replace("<DueDate>", DueDate.ToString())
                 .Replace("<ResolvedDate>", ResolvedDate.ToString()).Replace("<ReportDate>", ReportDate.ToString()).Replace("<Assignee>", Assignee)
-                .Replace("<Reporter>", Reporter).Replace("<Resolution>", Resolution).Replace("<ParentIssueKey>", ParentIssueKey).Replace("<Creator>", Reporter);
+                .Replace("<Reporter>", Reporter).Replace("<Resolution>", Resolution).Replace("<ParentIssueKey>", ParentIssueKey).Replace("<Creator>", Reporter)
+                .Replace("<AlertEmailUpdateDate>", DateTime.Now.ToString()).Replace("<RelativePeoples>", RelativePeoples);
             DBUtility.ExeLocalSqlNoRes(sql);
 
             StoreIssueComment(DateTime.Now.ToString());
@@ -275,8 +421,9 @@ namespace Prometheus.Models
         {
             if (!string.IsNullOrEmpty(Description))
             {
-                var sql = "insert into IssueComments(IssueKey,Comment,Reporter,CommentDate) values('<IssueKey>','<Comment>','<Reporter>','<CommentDate>')";
-                sql = sql.Replace("<IssueKey>", IssueKey).Replace("<Comment>", dbDescription).Replace("<Reporter>", Reporter).Replace("<CommentDate>", CommentDate);
+                var sql = "insert into IssueComments(IssueKey,Comment,Reporter,CommentDate,CommentType) values('<IssueKey>','<Comment>','<Reporter>','<CommentDate>','<CommentType>')";
+                sql = sql.Replace("<IssueKey>", IssueKey).Replace("<Comment>", dbDescription)
+                    .Replace("<Reporter>", Reporter).Replace("<CommentDate>", CommentDate).Replace("<CommentType>", CommentType);
                 DBUtility.ExeLocalSqlNoRes(sql);
             }
         }
@@ -305,10 +452,10 @@ namespace Prometheus.Models
 
         public void UpdateIssue()
         {
-            var sql = "update Issue set IssueType = '<IssueType>',Priority = '<Priority>',DueDate = '<DueDate>', Assignee = '<Assignee>',Resolution = '<Resolution>' where IssueKey = '<IssueKey>'";
+            var sql = "update Issue set IssueType = '<IssueType>',Priority = '<Priority>',DueDate = '<DueDate>', Assignee = '<Assignee>',Resolution = '<Resolution>',RelativePeoples='<RelativePeoples>' where IssueKey = '<IssueKey>'";
             sql = sql.Replace("<IssueKey>", IssueKey).Replace("<IssueType>", IssueType)
                 .Replace("<Priority>", Priority).Replace("<DueDate>", DueDate.ToString())
-                .Replace("<Assignee>", Assignee).Replace("<Resolution>", Resolution);
+                .Replace("<Assignee>", Assignee).Replace("<Resolution>", Resolution).Replace("<RelativePeoples>", RelativePeoples);
             DBUtility.ExeLocalSqlNoRes(sql);
 
             StoreIssueComment(DateTime.Now.ToString());
@@ -321,6 +468,26 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
+        public void UpdateAlertEmailDate()
+        {
+            var sql = "update Issue set AlertEmailUpdateDate = '<AlertEmailUpdateDate>' where IssueKey = '<IssueKey>'";
+            sql = sql.Replace("<IssueKey>", IssueKey).Replace("<AlertEmailUpdateDate>", DateTime.Now.ToString());
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        public string RetrieveAlertEmailDate(string issuekey)
+        {
+            var sql = "select AlertEmailUpdateDate from Issue where IssueKey = '<IssueKey>'";
+            sql = sql.Replace("<IssueKey>", issuekey);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            if (dbret.Count > 0)
+            {
+                return Convert.ToString(dbret[0][0]);
+            }
+            else
+                return string.Empty;
+        }
+
         public void CloseIssue()
         {
             var sql = "update Issue set ResolvedDate = '<ResolvedDate>' where IssueKey = '<IssueKey>'";
@@ -331,7 +498,7 @@ namespace Prometheus.Models
         public static List<IssueViewModels> RetrieveSubIssue(string parentkey)
         {
             var ret = new List<IssueViewModels>();
-            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution from Issue where ParentIssueKey = '<ParentIssueKey>'";
+            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where ParentIssueKey = '<ParentIssueKey>'";
             sql = sql.Replace("<ParentIssueKey>", parentkey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             foreach (var line in dbret)
@@ -341,11 +508,12 @@ namespace Prometheus.Models
                     , Convert.ToString(line[3]), Convert.ToString(line[4])
                     , Convert.ToString(line[5]), Convert.ToString(line[6])
                     , Convert.ToString(line[7]), Convert.ToString(line[8])
-                    , Convert.ToString(line[9]), Convert.ToString(line[10]), parentkey);
+                    , Convert.ToString(line[9]), Convert.ToString(line[10]), parentkey, Convert.ToString(line[11]));
+                
 
 
                 var tempclist = new List<IssueComments>();
-                var csql = "select IssueKey,Comment,Reporter,CommentDate from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
+                var csql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
                 csql = csql.Replace("<IssueKey>", tempvm.IssueKey);
 
                 var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
@@ -356,6 +524,7 @@ namespace Prometheus.Models
                     tempcomment.dbComment = Convert.ToString(r[1]);
                     tempcomment.Reporter = Convert.ToString(r[2]);
                     tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
+                    tempcomment.CommentType = Convert.ToString(r[4]);
                     tempclist.Add(tempcomment);
                 }
                 tempvm.CommentList = tempclist;
@@ -367,7 +536,7 @@ namespace Prometheus.Models
 
         public static IssueViewModels RetrieveIssueByIssueKey(string issuekey)
         {
-            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey from Issue where IssueKey = '<IssueKey>'";
+            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples from Issue where IssueKey = '<IssueKey>'";
             sql = sql.Replace("<IssueKey>", issuekey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             if (dbret.Count > 0)
@@ -377,11 +546,12 @@ namespace Prometheus.Models
                     , Convert.ToString(dbret[0][3]), Convert.ToString(dbret[0][4])
                     , Convert.ToString(dbret[0][5]), Convert.ToString(dbret[0][6])
                     , Convert.ToString(dbret[0][7]), Convert.ToString(dbret[0][8])
-                    , Convert.ToString(dbret[0][9]), Convert.ToString(dbret[0][10]), Convert.ToString(dbret[0][11]));
+                    , Convert.ToString(dbret[0][9]), Convert.ToString(dbret[0][10])
+                    , Convert.ToString(dbret[0][11]), Convert.ToString(dbret[0][12]));
 
 
                 var tempclist = new List<IssueComments>();
-                sql = "select IssueKey,Comment,Reporter,CommentDate from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
+                sql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
                 sql = sql.Replace("<IssueKey>", issuekey);
                 dbret = DBUtility.ExeLocalSqlWithRes(sql);
                 foreach (var r in dbret)
@@ -391,6 +561,7 @@ namespace Prometheus.Models
                     tempcomment.dbComment = Convert.ToString(r[1]);
                     tempcomment.Reporter = Convert.ToString(r[2]);
                     tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
+                    tempcomment.CommentType = Convert.ToString(r[4]);
                     tempclist.Add(tempcomment);
                 }
                 ret.CommentList = tempclist;
@@ -423,7 +594,7 @@ namespace Prometheus.Models
                 fixresolve = Resolute.Done;
             }
 
-            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey from Issue where IssueKey = '<IssueKey>'  and Resolution in <cond>";
+            var sql = "select IssueKey from Issue where IssueKey = '<IssueKey>'  and Resolution in <cond>";
             sql = sql.Replace("<IssueKey>", issuekey).Replace("<cond>", cond);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             if (dbret.Count > 0)
@@ -460,7 +631,7 @@ namespace Prometheus.Models
                 fixresolve = Resolute.Done;
             }
 
-            var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution from Issue where ProjectKey = '<ProjectKey>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' and Creator <> 'System' order by ReportDate DESC";
+            var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where ProjectKey = '<ProjectKey>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' and Creator <> 'System' order by ReportDate DESC";
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<cond>", cond).Replace("<IssueType1>", ISSUETP.NPIPROC).Replace("<IssueType2>", ISSUETP.RMA);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             var ret = new List<IssueViewModels>();
@@ -471,7 +642,7 @@ namespace Prometheus.Models
                     , Convert.ToString(line[3]), Convert.ToString(line[4])
                     , Convert.ToString(line[5]), Convert.ToString(line[6])
                     , Convert.ToString(line[7]), Convert.ToString(line[8])
-                    , Convert.ToString(line[9]), fixresolve, ""));
+                    , Convert.ToString(line[9]), fixresolve, "", Convert.ToString(line[11])));
             }
 
             return ret;
@@ -504,6 +675,76 @@ namespace Prometheus.Models
         }
 
 
+        public static List<IssueViewModels> RetrieveRMAByProjectKey(string projectkey, string issuestatus)
+        {
+            var cond = "";
+            var fixresolve = "";
+            if (string.Compare(issuestatus, Resolute.Pending) == 0)
+            {
+                cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";
+                fixresolve = Resolute.Pending;
+            }
+            else if (string.Compare(issuestatus, Resolute.Working) == 0)
+            {
+                cond = "('" + Resolute.Working + "')";
+                fixresolve = Resolute.Working;
+            }
+            else
+            {
+                cond = "('" + Resolute.Fixed + "','" + Resolute.Done + "','" + Resolute.NotFix + "','" + Resolute.NotReproduce + "','" + Resolute.Unresolved + "')";
+                fixresolve = Resolute.Done;
+            }
+
+            var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where ProjectKey = '<ProjectKey>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType = '<IssueType>' order by ReportDate DESC";
+            sql = sql.Replace("<ProjectKey>", projectkey).Replace("<cond>", cond).Replace("<IssueType>", ISSUETP.RMA);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var ret = new List<IssueViewModels>();
+            foreach (var line in dbret)
+            {
+                var tempvm = new IssueViewModels(Convert.ToString(line[0])
+                    , Convert.ToString(line[1]), Convert.ToString(line[2])
+                    , Convert.ToString(line[3]), Convert.ToString(line[4])
+                    , Convert.ToString(line[5]), Convert.ToString(line[6])
+                    , Convert.ToString(line[7]), Convert.ToString(line[8])
+                    , Convert.ToString(line[9]), fixresolve, "", Convert.ToString(line[11]));
+
+                tempvm.RetrieveRMA();
+
+                ret.Add(tempvm);
+            }
+
+            return ret;
+        }
+
+
+
+        public static int RetrieveRMACountByProjectKey(string projectkey, string issuestatus)
+        {
+            var cond = "";
+            var fixresolve = "";
+            if (string.Compare(issuestatus, Resolute.Pending) == 0)
+            {
+                cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";
+                fixresolve = Resolute.Pending;
+            }
+            else if (string.Compare(issuestatus, Resolute.Working) == 0)
+            {
+                cond = "('" + Resolute.Working + "')";
+                fixresolve = Resolute.Working;
+            }
+            else
+            {
+                cond = "('" + Resolute.Fixed + "','" + Resolute.Done + "','" + Resolute.NotFix + "','" + Resolute.NotReproduce + "','" + Resolute.Unresolved + "')";
+                fixresolve = Resolute.Done;
+            }
+
+            var sql = "select IssueKey from Issue where ProjectKey = '<ProjectKey>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType = '<IssueType>' order by ReportDate DESC";
+            sql = sql.Replace("<ProjectKey>", projectkey).Replace("<cond>", cond).Replace("<IssueType>", ISSUETP.RMA);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            return dbret.Count;
+        }
+
+
         public static List<IssueViewModels> RetrieveIssueByAssignee(string assignee, string issuestatus, int topnum)
         {
             var cond = "";
@@ -524,7 +765,7 @@ namespace Prometheus.Models
                 fixresolve = Resolute.Done;
             }
 
-            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution from Issue where Assignee = '<Assignee>' and Resolution in <cond> order by ReportDate DESC";
+            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where Assignee = '<Assignee>' and Resolution in <cond> order by ReportDate DESC";
             sql = sql.Replace("<Assignee>", assignee).Replace("<topnum>", Convert.ToString(topnum)).Replace("<cond>", cond);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             var ret = new List<IssueViewModels>();
@@ -535,7 +776,7 @@ namespace Prometheus.Models
                     , Convert.ToString(line[3]), Convert.ToString(line[4])
                     , Convert.ToString(line[5]), Convert.ToString(line[6])
                     , Convert.ToString(line[7]), Convert.ToString(line[8])
-                    , Convert.ToString(line[9]), fixresolve,""));
+                    , Convert.ToString(line[9]), fixresolve,"", Convert.ToString(line[11])));
             }
 
             return ret;
@@ -544,7 +785,7 @@ namespace Prometheus.Models
 
         public static List<IssueViewModels> RetrieveIssueByCreator(string creator, int topnum)
         {
-            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution from Issue where (Creator = '<Creator>' or Reporter = '<Creator>') order by ReportDate DESC";
+            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where (Creator = '<Creator>' or Reporter = '<Creator>') order by ReportDate DESC";
             sql = sql.Replace("<Creator>", creator).Replace("<topnum>", Convert.ToString(topnum));
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             var ret = new List<IssueViewModels>();
@@ -555,7 +796,7 @@ namespace Prometheus.Models
                     , Convert.ToString(line[3]), Convert.ToString(line[4])
                     , Convert.ToString(line[5]), Convert.ToString(line[6])
                     , Convert.ToString(line[7]), Convert.ToString(line[8])
-                    , Convert.ToString(line[9]), Convert.ToString(line[10]), "");
+                    , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
                 
                 tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey);
                 ret.Add(tempvm);
@@ -566,7 +807,7 @@ namespace Prometheus.Models
 
         public static List<IssueViewModels> RetrieveNPIPROCIssue(string pjkey)
         {
-            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution from Issue where ProjectKey = '<ProjectKey>' and ParentIssueKey = '' and IssueType = '<IssueType>' order by DueDate ASC";
+            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where ProjectKey = '<ProjectKey>' and ParentIssueKey = '' and IssueType = '<IssueType>' order by DueDate ASC";
             sql = sql.Replace("<ProjectKey>", pjkey).Replace("<IssueType>", Convert.ToString(ISSUETP.NPIPROC));
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             var ret = new List<IssueViewModels>();
@@ -577,7 +818,7 @@ namespace Prometheus.Models
                     , Convert.ToString(line[3]), Convert.ToString(line[4])
                     , Convert.ToString(line[5]), Convert.ToString(line[6])
                     , Convert.ToString(line[7]), Convert.ToString(line[8])
-                    , Convert.ToString(line[9]), Convert.ToString(line[10]), "");
+                    , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
 
                 tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey);
                 ret.Add(tempvm);
@@ -587,7 +828,7 @@ namespace Prometheus.Models
 
         public static List<IssueViewModels> SearchIssue(string pjkey,string type,string resolution,string asignee,string startdate,string enddate,string summary, int topnum)
         {
-            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution from Issue where <cond> order by ReportDate DESC";
+            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where <cond> order by ReportDate DESC";
 
             bool withand = false;
             var cond = "";
@@ -686,7 +927,7 @@ namespace Prometheus.Models
                     , Convert.ToString(line[3]), Convert.ToString(line[4])
                     , Convert.ToString(line[5]), Convert.ToString(line[6])
                     , Convert.ToString(line[7]), Convert.ToString(line[8])
-                    , Convert.ToString(line[9]), Convert.ToString(line[10]), "");
+                    , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
                 ret.Add(tempvm);
             }
 

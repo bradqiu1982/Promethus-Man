@@ -692,6 +692,7 @@
     <Content Include="Views\Project\ProjectWYield.cshtml" />
     <Content Include="Views\Issue\IssueAttach.cshtml" />
     <Content Include="Views\Project\ProjectRMA.cshtml" />
+    <Content Include="Views\Issue\CreateRMA.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

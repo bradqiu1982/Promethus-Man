@@ -42,7 +42,7 @@ namespace Prometheus.Controllers
             ViewBag.projectlist = slist;
 
             var typelist = new List<string>();
-            string[] tlist = { ISSUETP.Bug,ISSUETP.RMA, ISSUETP.NewFeature, ISSUETP.Task
+            string[] tlist = { ISSUETP.Bug, ISSUETP.NewFeature, ISSUETP.Task
             ,ISSUETP.Improvement,ISSUETP.Document,ISSUETP.NPIPROC};
 
             typelist.AddRange(tlist);
@@ -109,15 +109,12 @@ namespace Prometheus.Controllers
             vm.Reporter = Request.Form["reporterlist"].ToString();
             vm.Resolution = Request.Form["resolutionlist"].ToString();
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+            vm.RelativePeoples = Request.Form["RPeopleAddr"];
 
-            if (string.IsNullOrEmpty(Request.Form["editor1"]))
+            if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
-                var createerror = "<h3><font color=\"red\">Fail to create/modify Issue: Description can not be empty</font></h3>";
-                ViewBag.CreateError = createerror;
-                CreateAllLists(vm);
-                return View(vm);
+                vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
             }
-            vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
 
             vm.StoreIssue();
 
@@ -201,6 +198,7 @@ namespace Prometheus.Controllers
             vm.Assignee = Request.Form["assigneelist"].ToString();
             vm.Resolution = Request.Form["resolutionlist"].ToString();
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+            vm.RelativePeoples = Request.Form["RPeopleAddr"];
 
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
@@ -283,6 +281,7 @@ namespace Prometheus.Controllers
             vm.Reporter = Request.Form["reporterlist"].ToString();
             vm.Resolution = Request.Form["resolutionlist"].ToString();
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+            vm.RelativePeoples = Request.Form["RPeopleAddr"];
 
             if (string.IsNullOrEmpty(Request.Form["editor1"]))
             {
@@ -440,5 +439,69 @@ namespace Prometheus.Controllers
             return View();
         }
 
-    }
+        public ActionResult CreateRMA()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+                var vm = new IssueViewModels();
+                vm.Reporter = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                CreateAllLists(vm);
+                return View(vm);
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "Issue");
+                ck.Add("logonredirectact", "CreateRMA");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+        }
+
+
+        [HttpPost, ActionName("CreateRMA")]
+        [ValidateAntiForgeryToken]
+        public ActionResult CreateRMAPost()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+
+            var vm = new IssueViewModels();
+            vm.ProjectKey = Request.Form["projectlist"].ToString();
+            vm.IssueKey = IssueViewModels.GetUniqKey();
+            vm.IssueType = ISSUETP.RMA;
+
+            vm.FinisarRMA = Request.Form["FRMANUM"];
+            vm.FinisarModel = Request.Form["FinisarModel"];
+            vm.ECustomer = Request.Form["ECustomer"];
+            vm.CRMANUM = Request.Form["CRMANUM"];
+            vm.CReport = Request.Form["CReport"];
+            vm.RelativePeoples = Request.Form["RPeopleAddr"];
+
+            vm.Summary = "[" + vm.ProjectKey + "] RMA " + vm.FinisarRMA + " for module " + vm.FinisarModel +" from "+vm.ECustomer+". Summary: "+vm.CReport.Substring(0,vm.CReport.Length>50?50:vm.CReport.Length);
+
+            vm.Priority = Request.Form["prioritylist"].ToString();
+            vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
+            vm.ReportDate = DateTime.Now;
+            vm.Assignee = Request.Form["assigneelist"].ToString();
+            vm.Reporter = vm.Reporter = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            vm.Resolution = Resolute.Pending;
+
+            vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+
+            if (!string.IsNullOrEmpty(Request.Form["editor1"]))
+            {
+                vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
+            }
+
+            vm.StoreIssue();
+
+            ProjectEvent.CreateIssueEvent(vm.ProjectKey, vm.Reporter, vm.Assignee, vm.Summary, vm.IssueKey);
+
+            return View();
+        }
+
+
+        }
 }

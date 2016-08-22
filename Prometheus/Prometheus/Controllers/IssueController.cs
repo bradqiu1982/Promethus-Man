@@ -70,6 +70,14 @@ namespace Prometheus.Controllers
             var rpilist = UserViewModels.RetrieveAllUser();
             slist = CreateSelectList(rpilist, vm.Reporter);
             ViewBag.reporterlist = slist;
+
+            var cmelist = new List<string>();
+            string[] clist = { COMMENTTYPE.Description,COMMENTTYPE.RootCause,COMMENTTYPE.CustomReport,COMMENTTYPE.InternalReport};
+            cmelist.AddRange(clist);
+            slist = CreateSelectList(cmelist, "");
+            ViewBag.cemtypelist = slist;
+
+
         }
 
         // GET: Issue
@@ -114,6 +122,7 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
                 vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
+                vm.CommentType = COMMENTTYPE.Description;
             }
 
             vm.StoreIssue();
@@ -203,6 +212,7 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
                 vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
+                vm.CommentType = COMMENTTYPE.Description;
             }
             else
                 vm.Description = "";
@@ -291,6 +301,7 @@ namespace Prometheus.Controllers
                 return View(vm);
             }
             vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
+            vm.CommentType = COMMENTTYPE.Description;
 
             vm.StoreSubIssue();
 
@@ -493,6 +504,7 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
                 vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
+                vm.CommentType = COMMENTTYPE.Description;
             }
 
             vm.StoreIssue();

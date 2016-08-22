@@ -421,6 +421,11 @@ namespace Prometheus.Models
         {
             if (!string.IsNullOrEmpty(Description))
             {
+                if (string.IsNullOrEmpty(CommentType))
+                {
+                    CommentType = COMMENTTYPE.Description;
+                }
+
                 var sql = "insert into IssueComments(IssueKey,Comment,Reporter,CommentDate,CommentType) values('<IssueKey>','<Comment>','<Reporter>','<CommentDate>','<CommentType>')";
                 sql = sql.Replace("<IssueKey>", IssueKey).Replace("<Comment>", dbDescription)
                     .Replace("<Reporter>", Reporter).Replace("<CommentDate>", CommentDate).Replace("<CommentType>", CommentType);
@@ -950,6 +955,7 @@ namespace Prometheus.Models
             vm.Resolution = Resolute.Pending;
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
             vm.Description = desc;
+            vm.CommentType = COMMENTTYPE.Description;
             vm.StoreSubIssue();
         }
 
@@ -970,6 +976,7 @@ namespace Prometheus.Models
             vm.Resolution = Resolute.Pending;
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
             vm.Description = "Build prototypes and prove feasibility";
+            vm.CommentType = COMMENTTYPE.Description;
             vm.StoreIssue();
 
             var sum = "Complete Firmware Architecture Review";
@@ -1018,7 +1025,8 @@ namespace Prometheus.Models
             vm.Reporter = "System";
             vm.Resolution = Resolute.Pending;
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
-            vm.Description = "Build prototypes and prove feasibility";
+            vm.Description = "Finalize Product Design and Verify suitability for production";
+            vm.CommentType = COMMENTTYPE.Description;
             vm.StoreIssue();
 
             var sum = "DVT Presentation Completed and ECO Approved";
@@ -1066,7 +1074,8 @@ namespace Prometheus.Models
             vm.Reporter = "System";
             vm.Resolution = Resolute.Pending;
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
-            vm.Description = "Build prototypes and prove feasibility";
+            vm.Description = "Finalize Manufacturing Process and verify readiness of Product for Production Release and Volume Ramp";
+            vm.CommentType = COMMENTTYPE.Description;
             vm.StoreIssue();
 
             var sum = "MVT Presentation Completed and ECO Approved";

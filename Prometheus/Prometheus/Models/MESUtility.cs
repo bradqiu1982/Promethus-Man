@@ -100,6 +100,7 @@ namespace Prometheus.Models
                     vm.Resolution = Resolute.Pending;
                     vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
                     vm.Description = "Module " + item.ModuleSerialNum + " failed for " + item.ErrAbbr + " @ " + item.WhichTest +" on tester "+item.TestStation + " "+item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss");
+                    vm.CommentType = COMMENTTYPE.Description;
                     ProjectEvent.CreateIssueEvent(vm.ProjectKey, "System", vm.Assignee, vm.Summary, vm.IssueKey);
                     vm.StoreIssue();
                 }

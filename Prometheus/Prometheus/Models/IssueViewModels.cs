@@ -402,6 +402,14 @@ namespace Prometheus.Models
             var sql = "select FinisarRMA,FinisarModel,ECustomer,CRMANUM,CReport from IssueRMA where IssueKey = '<IssueKey>'";
             sql = sql.Replace("<IssueKey>", IssueKey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            if (dbret.Count > 0)
+            {
+                FinisarRMA = Convert.ToString(dbret[0][0]);
+                FinisarModel = Convert.ToString(dbret[0][1]);
+                ECustomer = Convert.ToString(dbret[0][2]);
+                CRMANUM = Convert.ToString(dbret[0][3]);
+                CReport = Convert.ToString(dbret[0][4]);
+            }
         }
 
         public void StoreSubIssue()
@@ -571,6 +579,11 @@ namespace Prometheus.Models
                 }
                 ret.CommentList = tempclist;
 
+                if (string.Compare(ret.IssueType, ISSUETP.RMA) == 0)
+                {
+                    ret.RetrieveRMA();
+                }
+
                 ret.SubIssues = RetrieveSubIssue(ret.IssueKey);
 
                 return ret;
@@ -714,6 +727,23 @@ namespace Prometheus.Models
                     , Convert.ToString(line[9]), fixresolve, "", Convert.ToString(line[11]));
 
                 tempvm.RetrieveRMA();
+
+                var tempclist = new List<IssueComments>();
+                var csql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
+                csql = csql.Replace("<IssueKey>", tempvm.IssueKey);
+                var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
+                foreach (var r in cdbret)
+                {
+                    var tempcomment = new IssueComments();
+                    tempcomment.IssueKey = Convert.ToString(r[0]);
+                    tempcomment.dbComment = Convert.ToString(r[1]);
+                    tempcomment.Reporter = Convert.ToString(r[2]);
+                    tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
+                    tempcomment.CommentType = Convert.ToString(r[4]);
+                    tempclist.Add(tempcomment);
+                }
+                tempvm.CommentList = tempclist;
+                tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey);
 
                 ret.Add(tempvm);
             }

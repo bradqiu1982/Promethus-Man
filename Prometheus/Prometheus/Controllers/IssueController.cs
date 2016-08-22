@@ -103,7 +103,7 @@ namespace Prometheus.Controllers
 
         [HttpPost, ActionName("CreateIssue")]
         [ValidateAntiForgeryToken]
-        public ActionResult CreatePostIssue()
+        public ActionResult CreateIssuePost()
         {
             var vm = new IssueViewModels();
             vm.ProjectKey = Request.Form["projectlist"].ToString();
@@ -175,6 +175,13 @@ namespace Prometheus.Controllers
             
             if (ret != null)
             {
+                if (string.Compare(ret.IssueType, ISSUETP.RMA) == 0)
+                {
+                    var dict = new RouteValueDictionary();
+                    dict.Add("issuekey", key);
+                    return RedirectToAction("UpdateRMA", "Issue", dict);
+                }
+
                 ret.Reporter = ckdict["logonuser"].Split(new char[] { '|' })[0];
                 ret.RetrieveAttachment(ret.IssueKey);
                 CreateAllLists(ret);
@@ -511,9 +518,65 @@ namespace Prometheus.Controllers
 
             ProjectEvent.CreateIssueEvent(vm.ProjectKey, vm.Reporter, vm.Assignee, vm.Summary, vm.IssueKey);
 
-            return View();
+            var dict = new RouteValueDictionary();
+            dict.Add("issuekey", vm.IssueKey);
+            return RedirectToAction("UpdateRMA", "Issue", dict);
         }
 
 
+        public ActionResult UpdateRMA(string issuekey)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "Issue");
+                ck.Add("logonredirectact", "UpdateIssue");
+                ck.Add("issuekey", issuekey);
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var key = "";
+            if (!string.IsNullOrEmpty(issuekey))
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("issuekey", issuekey);
+                CookieUtility.SetCookie(this, ck);
+                key = issuekey;
+            }
+            else if (ckdict.ContainsKey("issuekey") && !string.IsNullOrEmpty(ckdict["issuekey"]))
+            {
+                key = ckdict["issuekey"];
+            }
+
+            if (string.IsNullOrEmpty(key))
+            {
+                var tempvm = new IssueViewModels();
+                CreateAllLists(tempvm);
+                return View();
+            }
+
+            var ret = IssueViewModels.RetrieveIssueByIssueKey(key);
+            if (ret != null)
+            {
+                ret.Reporter = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                ret.RetrieveAttachment(ret.IssueKey);
+                CreateAllLists(ret);
+                return View(ret);
+            }
+            else
+            {
+                var tempvm = new IssueViewModels();
+                CreateAllLists(tempvm);
+                return View();
+            }
         }
+
+
+    }
 }

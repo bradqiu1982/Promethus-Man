@@ -56,9 +56,9 @@
         <div class="form-horizontal">
             <div class="form-group">
                 <div class="col-md-6">
-                    <label class="control-label col-md-2" for="ProjectName">Project<font color="red">*</font></label>
+                    <label class="control-label col-md-2" for="projectlist">Project<font color="red">*</font></label>
                     <div class="col-md-10">
-                        @Html.DropDownList("projectlist", null, new { @id = "ProjectKey", @class = "form-control", @readonly = "readonly" })
+                        @Html.DropDownList("projectlist", null, new { @id = "projectlist", @class = "form-control", @readonly = "readonly" })
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -121,16 +121,27 @@
 
             <div class="form-group">
                 <div class="col-md-6">
-                    <label class="control-label col-md-2" for="IssueType">Priority</label>
+                    <label class="control-label col-md-2" for="prioritylist">Priority</label>
                     <div class="col-md-10">
-                        @Html.DropDownList("prioritylist", null, new { @id = "Priority", @class = "form-control" })
+                        @Html.DropDownList("prioritylist", null, new { @id = "prioritylist", @class = "form-control" })
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <label class="control-label col-md-2" for="Assignee">Assignee</label>
+                    <label class="control-label col-md-2" for="assigneelist">Assignee</label>
                     <div class="col-md-10">
-                        @Html.DropDownList("assigneelist", null, new { @id = "Assignee", @class = "form-control" })
+                        @Html.DropDownList("assigneelist", null, new { @id = "assigneelist", @class = "form-control" })
                     </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-6">
+                    <label class="control-label col-md-2" for="resolutionlist">Resolution<font color="red">*</font></label>
+                    <div class="col-md-10">
+                        @Html.DropDownList("resolutionlist", null, new { @id = "resolutionlist", @class = "form-control" })
+                    </div>
+                </div>
+                <div class="col-md-6">
                 </div>
             </div>
 

@@ -474,6 +474,27 @@ namespace Prometheus.Models
             StoreIssueComment(DateTime.Now.ToString());
         }
 
+        public void UpdateRMA()
+        {
+            var sql = "update Issue set Priority = '<Priority>',DueDate = '<DueDate>', Assignee = '<Assignee>',Resolution = '<Resolution>',RelativePeoples='<RelativePeoples>' where IssueKey = '<IssueKey>'";
+            sql = sql.Replace("<IssueKey>", IssueKey).Replace("<Priority>", Priority)
+                .Replace("<DueDate>", DueDate.ToString()).Replace("<Assignee>", Assignee)
+                .Replace("<Resolution>", Resolution).Replace("<RelativePeoples>", RelativePeoples);
+            DBUtility.ExeLocalSqlNoRes(sql);
+
+            StoreIssueComment(DateTime.Now.ToString());
+
+            UpdateRMAInfo();
+        }
+
+        private void UpdateRMAInfo()
+        {
+            var sql = "update IssueRMA set CRMANUM = '<CRMANUM>',CReport = '<CReport>' where IssueKey = '<IssueKey>'";
+            sql = sql.Replace("<IssueKey>", IssueKey).Replace("<CRMANUM>", CRMANUM)
+                .Replace("<CReport>", CReport);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
         public void UpdateIAssign()
         {
             var sql = "update Issue set Reporter = '<Reporter>' where IssueKey = '<IssueKey>'";

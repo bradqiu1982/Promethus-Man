@@ -577,6 +577,85 @@ namespace Prometheus.Controllers
             }
         }
 
+        [HttpPost, ActionName("UpdateRMA")]
+        [ValidateAntiForgeryToken]
+        public ActionResult UpdateRMAPost()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
-    }
+            var issuekey = Request.Form["IssueKey"];
+            var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+
+            var vm = new IssueViewModels();
+            vm.ProjectKey = Request.Form["projectlist"].ToString();
+            vm.IssueKey = issuekey;
+            vm.IssueType = ISSUETP.RMA;
+
+            vm.FinisarRMA = Request.Form["FRMANUM"];
+            vm.FinisarModel = Request.Form["FinisarModel"];
+            vm.ECustomer = Request.Form["ECustomer"];
+            vm.CRMANUM = Request.Form["CRMANUM"];
+            vm.CReport = Request.Form["CReport"];
+            vm.RelativePeoples = Request.Form["RPeopleAddr"];
+
+            vm.Summary = "[" + vm.ProjectKey + "] RMA " + vm.FinisarRMA + " for module " + vm.FinisarModel + " from " + vm.ECustomer + ". Summary: " + vm.CReport.Substring(0, vm.CReport.Length > 50 ? 50 : vm.CReport.Length);
+
+            vm.Priority = Request.Form["prioritylist"].ToString();
+            vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
+            vm.ReportDate = DateTime.Now;
+            vm.Assignee = Request.Form["assigneelist"].ToString();
+            vm.Reporter = updater;
+
+            vm.Resolution = Request.Form["resolutionlist"].ToString();
+
+            if (!string.IsNullOrEmpty(Request.Form["editor1"]))
+            {
+                vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
+                vm.CommentType = Request.Form["cemtypelist"].ToString();
+            }
+            else
+                vm.Description = "";
+
+            vm.UpdateRMA();
+
+            ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Updated", originaldata.Summary, originaldata.IssueKey);
+
+            if (string.Compare(originaldata.Assignee, vm.Assignee, true) != 0)
+            {
+                vm.UpdateIAssign();
+                ProjectEvent.AssignIssueEvent(originaldata.ProjectKey, updater, vm.Assignee, originaldata.Summary, originaldata.IssueKey);
+            }
+
+            if (string.Compare(originaldata.Resolution, vm.Resolution, true) != 0)
+            {
+                if (vm.IssueClosed())
+                {
+                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
+                    vm.CloseIssue();
+                }
+
+                if (string.Compare(vm.Resolution, Resolute.Working) == 0)
+                {
+                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Started", originaldata.Summary, originaldata.IssueKey);
+                }
+
+                if (string.Compare(vm.Resolution, Resolute.Reopen) == 0)
+                {
+                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Reopened", originaldata.Summary, originaldata.IssueKey);
+                }
+            }
+
+            var newdata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+            CreateAllLists(newdata);
+            return View(newdata);
+
+
+        }
+
+
+
+
+
+        }
 }

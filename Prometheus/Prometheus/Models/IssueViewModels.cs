@@ -36,6 +36,21 @@ namespace Prometheus.Models
         public static string Unresolved = "Unresolved";
         public static string NotReproduce ="Cannot Reproduce";
         public static string Started = "Started";
+
+        public static string ColorStatus(string status)
+        {
+            if (string.Compare(status, Pending) == 0 || string.Compare(status, Reopen) == 0)
+            {
+                return "<font color = \"red\" ><strong>" +status + "</strong></font>";
+            }
+
+            if (string.Compare(status, Working) == 0 || string.Compare(status, Started) == 0)
+            {
+                return "<font color = \"yellow\" ><strong>" + status + "</strong></font>";
+            }
+
+            return "<font color = \"green\" ><strong>" + status + "</strong></font>";
+        }
     }
 
     public class COMMENTTYPE
@@ -765,6 +780,8 @@ namespace Prometheus.Models
                 }
                 tempvm.CommentList = tempclist;
                 tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey);
+
+                tempvm.RetrieveAttachment(tempvm.IssueKey);
 
                 ret.Add(tempvm);
             }

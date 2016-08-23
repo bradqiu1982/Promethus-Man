@@ -124,6 +124,8 @@ namespace Prometheus.Controllers
                 vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
                 vm.CommentType = COMMENTTYPE.Description;
             }
+            else
+                vm.Description = "";
 
             vm.StoreIssue();
 
@@ -300,15 +302,13 @@ namespace Prometheus.Controllers
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
             vm.RelativePeoples = Request.Form["RPeopleAddr"];
 
-            if (string.IsNullOrEmpty(Request.Form["editor1"]))
+            if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
-                var createerror = "<h3><font color=\"red\">Fail to create/modify Issue: Description can not be empty</font></h3>";
-                ViewBag.CreateError = createerror;
-                CreateAllLists(vm);
-                return View(vm);
+                vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
+                vm.CommentType = COMMENTTYPE.Description;
             }
-            vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
-            vm.CommentType = COMMENTTYPE.Description;
+            else
+                vm.Description = "";
 
             vm.StoreSubIssue();
 

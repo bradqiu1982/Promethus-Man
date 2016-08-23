@@ -1,4 +1,5 @@
-﻿
+﻿@model IEnumerable<Prometheus.Models.IssueViewModels>
+
 @{
     ViewBag.Title = "ProjectRMA";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -17,3 +18,96 @@
 
 <hr/>
 
+@if (Model != null)
+{
+    foreach (var item in Model)
+    {
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="min-height:40px;max-height:40px;">
+                        <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">
+                            <span class="glyphicon glyphicon-home" aria-hidden="true"></span>@item.Summary
+                        </a>
+                </div>
+                <div class="panel-body"  style="overflow-y: scroll;overflow-x: scroll;">
+                        <div class="row">
+                                <div class="col-lg-5">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        Root Cause
+                                    </div>
+                                    <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;min-height:120px;max-height:120px;">
+                                        @if (item.RootCauseCommentList.Count > 0)
+                                        {
+                                            @Html.Raw(item.RootCauseCommentList[item.RootCauseCommentList.Count - 1].Comment);
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        Action
+                                    </div>
+                                    <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;min-height:120px;max-height:120px;">
+                                        <div class="row">
+                                            <div class="col-lg-9">Summary</div>
+                                            <div class="col-lg-3">Status</div>
+                                        </div>
+                                        @foreach (var sitem in item.SubIssues)
+                                        {
+                                            <div class="row">
+                                                <div class="col-lg-9"><a href="/Issue/UpdateIssue?issuekey=@sitem.IssueKey">@sitem.Summary</a></div>
+                                                <div class="col-lg-3">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(@sitem.Resolution))</div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-1 text-center">
+                                @if (item.AttachList.Count > 0)
+                                {
+                                    <h2><a href="/Issue/IssueAttach?issuekey=@item.IssueKey">
+                                        <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>
+                                    </a></h2>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-5">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        Customer Report
+                                    </div>
+                                    <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;min-height:120px;max-height:120px;">
+                                        @if (item.Report4CustomerCommentList.Count > 0)
+                                        {
+                                            @Html.Raw(item.Report4CustomerCommentList[item.Report4CustomerCommentList.Count - 1].Comment);
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        Internal Report
+                                    </div>
+                                    <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;min-height:120px;max-height:120px;">
+                                        @if (item.InternalReportCommentList.Count > 0)
+                                        {
+                                            @Html.Raw(item.InternalReportCommentList[item.InternalReportCommentList.Count - 1].Comment);
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-1 text-center"></div>
+                       </div>
+               </div>
+            </div>
+         </div>
+
+    }
+}

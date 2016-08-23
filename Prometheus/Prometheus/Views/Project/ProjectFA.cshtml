@@ -69,7 +69,7 @@
             <div class="row">
                 <div class="col-md-1 text-center">@item.TestData.ModuleSerialNum</div>
                 <div class="col-md-2 text-center"><a href="/Project/ProjectErrAbbr?ProjectKey=@item.TestData.ProjectKey&ErrAbbr=@item.TestData.ErrAbbr">@item.TestData.ErrAbbr</a></div>
-                <div class="col-md-2 text-center">@item.IssueData.Resolution</div>
+                <div class="col-md-2 text-center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(@item.IssueData.Resolution))</div>
                 <div class="col-md-2 text-center"><a href="/User/UserCenter?username=@item.IssueData.Assignee">@item.IssueData.Assignee.Split(new char[] { '@' })[0]</a></div>
                 <div class="col-md-4 text-center"><a href="/Issue/UpdateIssue?issuekey=@item.IssueData.IssueKey">@item.IssueData.Summary</a></div>
                 <div class="col-md-1 text-center">

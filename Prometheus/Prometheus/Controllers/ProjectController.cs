@@ -35,10 +35,7 @@ namespace Prometheus.Controllers
                     item.FirstYield = -1.0;
                     item.RetestYield = -1.0;
                 }
-            }
 
-            foreach (var item in projlist)
-            {
                 var ivmlist = IssueViewModels.RetrieveNPIPROCIssue(item.ProjectKey);
                 foreach (var iv in ivmlist)
                 {
@@ -58,6 +55,7 @@ namespace Prometheus.Controllers
 
                 item.PendingTaskCount = IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Pending);
                 item.PendingFACount = ProjectFAViewModules.RetrieveFADataCount(item.ProjectKey);
+                item.PendingRMACount = IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Pending);
             }
 
             return View(projlist);
@@ -877,6 +875,15 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectRMA(string ProjectKey)
         {
+            if (ProjectKey != null)
+            {
+                var list1 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Pending);
+                var list2 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Working);
+                var list3 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Done);
+                list1.AddRange(list2);
+                list1.AddRange(list3);
+                return View(list1);
+            }
             return View();
         }
     }

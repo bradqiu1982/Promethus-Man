@@ -33,7 +33,7 @@ namespace Prometheus.Models
                 SmtpClient client = new SmtpClient();
                 client.Host = "wmail.finisar.com";
                 client.EnableSsl = true;
-                client.Timeout = 30000;
+                client.Timeout = 60000;
                 client.DeliveryMethod = SmtpDeliveryMethod.Network;
                 client.UseDefaultCredentials = false;
                 client.Credentials = new NetworkCredential("brad.qiu@finisar.com", "wangle@432");

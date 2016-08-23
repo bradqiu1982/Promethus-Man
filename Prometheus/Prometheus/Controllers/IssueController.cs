@@ -477,6 +477,27 @@ namespace Prometheus.Controllers
             }
         }
 
+        private void SendRMAEvent(IssueViewModels vm,string operate)
+        {
+            var alertime = vm.RetrieveAlertEmailDate(vm.IssueKey);
+            if (DateTime.Parse(alertime).AddHours(5) < DateTime.Now)
+            {
+                var routevalue = new RouteValueDictionary();
+                routevalue.Add("issuekey", vm.IssueKey);
+                //send validate email
+                string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+
+                var content = vm.Summary + " is " + operate + " by " + vm.Reporter + " :\r\n " + validatestr;
+
+                var toaddrs = new List<string>();
+                toaddrs.AddRange(vm.RelativePeopleList);
+                toaddrs.Add(vm.Assignee);
+                toaddrs.Add(vm.Reporter);
+                EmailUtility.SendEmail("Parallel NPI Trace Notice", toaddrs, content);
+            }
+        }
+
 
         [HttpPost, ActionName("CreateRMA")]
         [ValidateAntiForgeryToken]
@@ -517,6 +538,7 @@ namespace Prometheus.Controllers
             vm.StoreIssue();
 
             ProjectEvent.CreateIssueEvent(vm.ProjectKey, vm.Reporter, vm.Assignee, vm.Summary, vm.IssueKey);
+            SendRMAEvent(vm, "created");
 
             var dict = new RouteValueDictionary();
             dict.Add("issuekey", vm.IssueKey);
@@ -645,6 +667,8 @@ namespace Prometheus.Controllers
                     ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Reopened", originaldata.Summary, originaldata.IssueKey);
                 }
             }
+
+            SendRMAEvent(vm, "update");
 
             var newdata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
             CreateAllLists(newdata);

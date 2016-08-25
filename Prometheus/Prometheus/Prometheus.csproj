@@ -694,7 +694,7 @@
     <Content Include="Views\Project\ProjectFA.cshtml" />
     <Content Include="Views\Project\ProjectNPI.cshtml" />
     <Content Include="Views\Project\ProjectYield.cshtml" />
-    <Content Include="Views\Project\ProjectWYield.cshtml" />
+    <Content Include="Views\Project\ProjectWYieldDetail.cshtml" />
     <Content Include="Views\Issue\IssueAttach.cshtml" />
     <Content Include="Views\Project\ProjectRMA.cshtml" />
     <Content Include="Views\Issue\CreateRMA.cshtml" />

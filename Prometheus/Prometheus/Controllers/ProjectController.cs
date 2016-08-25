@@ -1038,5 +1038,198 @@ namespace Prometheus.Controllers
             }
             return View();
         }
+
+        public ActionResult ProjectMonthlyYield(string ProjectKey)
+        {
+            if (ProjectKey != null)
+            {
+                ViewBag.pjkey = ProjectKey;
+
+                var vmlist = ProjectYieldViewModule.GetYieldByMonth(ProjectKey);
+
+                var ChartxAxisValues = "";
+                var ChartSearies = "";
+
+                var ftimelist = new List<string>();
+                var fvalues = new List<double>();
+                var cvalues = new List<double>();
+
+                foreach (var item in vmlist)
+                {
+                    ftimelist.Add(item.EndDate.ToString("yyyy-MM-dd"));
+                    fvalues.Add(item.FirstYield * 100.0);
+                    cvalues.Add(item.LastYield * 100.0);
+                }
+
+                //xaxis
+                foreach (var item in ftimelist)
+                {
+                    ChartxAxisValues = ChartxAxisValues + "'" + item + "',";
+                }
+                ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
+
+
+                //yaxis
+                ChartSearies = "{name:'First Yield',data:[<fvalue>]},{name:'Retest Yield',data:[<cvalue>]}";
+
+                var tempvalue = "";
+                foreach (var item in fvalues)
+                {
+                    tempvalue = tempvalue + item.ToString("0.00") + ",";
+                }
+                tempvalue = tempvalue.Substring(0, tempvalue.Length - 1);
+                ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
+
+                tempvalue = "";
+                foreach (var item in cvalues)
+                {
+                    tempvalue = tempvalue + item.ToString("0.00") + ",";
+                }
+                tempvalue = tempvalue.Substring(0, tempvalue.Length - 1);
+                ChartSearies = ChartSearies.Replace("<cvalue>", tempvalue);
+
+                //rederect url
+                var reurl = "window.location.href = '/Project/ProjectMYieldDetail?ProjectKey='+document.getElementById(\"pjkey\").value+'&EndDate='+this.category";
+
+                var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ColumnChart.xml"));
+                ViewBag.chartscript = tempscript.Replace("#ElementID#", "monthlyyield")
+                    .Replace("#ChartType#", "column")
+                    .Replace("#Title#", "Monthly Yiled")
+                    .Replace("#ChartxAxisValues#", ChartxAxisValues)
+                    .Replace("#yAxisTitle#", "Yield Percent")
+                    .Replace("#ChartSearies#", ChartSearies)
+                    .Replace("#REDIRECTURL#", reurl);
+
+                return View();
+            }
+            return View();
+
+        }
+
+        public ActionResult ProjectMYieldDetail(string ProjectKey, string EndDate)
+        {
+            if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(EndDate))
+            {
+                var edate = DateTime.Parse(DateTime.Parse(EndDate).ToString("yyyy-MM-dd") + " 07:30:00");
+                var datestr = EndDate.Split(new char[] { '-', ' ' })[2];
+
+                var sdate = DateTime.Parse(EndDate);
+                if (Convert.ToInt32(datestr) != 1)
+                {
+                    sdate = DateTime.Parse(DateTime.Parse(EndDate).ToString("yyyy-MM") + "-01 07:30:00");
+                }
+                else
+                {
+                    sdate = sdate.AddMonths(-1);
+                }
+
+
+                var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, sdate.ToString(), edate.ToString(), pvm);
+
+                if (yieldvm.FirstYields.Count > 0)
+                {
+                    var piedatadict = new Dictionary<string, int>();
+                    var eklist = new List<string>();
+                    foreach (var error in yieldvm.FErrorMap.Keys)
+                    {
+                        eklist.Add(error);
+                    }
+
+                    foreach (var error in eklist)
+                    {
+                        if (string.Compare(error, "PASS", true) != 0)
+                        {
+                            foreach (var test in yieldvm.FirstYields)
+                            {
+                                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.FErrorMap);
+
+                                if (piedatadict.ContainsKey(error))
+                                {
+                                    var preval = piedatadict[error];
+                                    piedatadict[error] = preval + val;
+                                }
+                                else
+                                {
+                                    piedatadict.Add(error, val);
+                                }
+                            }
+                        }
+                    }
+
+                    piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.FirstYields[yieldvm.FirstYields.Count - 1].WhichTest, yieldvm.FErrorMap);
+
+                    var keys = piedatadict.Keys;
+                    var namevaluepair = "";
+                    foreach (var k in keys)
+                    {
+                        if (piedatadict[k] > 0)
+                            namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                    }
+
+                    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                    ViewBag.fchartscript = tempscript.Replace("#ElementID#", "ffailurepie")
+                        .Replace("#Title#", "First Failure")
+                        .Replace("#SERIESNAME#", "FFailure")
+                        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
+                }
+
+
+                if (yieldvm.LastYields.Count > 0)
+                {
+                    var piedatadict = new Dictionary<string, int>();
+                    var eklist = new List<string>();
+                    foreach (var error in yieldvm.LErrorMap.Keys)
+                    {
+                        eklist.Add(error);
+                    }
+
+                    foreach (var error in eklist)
+                    {
+                        if (string.Compare(error, "PASS", true) != 0)
+                        {
+                            foreach (var test in yieldvm.LastYields)
+                            {
+                                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.LErrorMap);
+
+                                if (piedatadict.ContainsKey(error))
+                                {
+                                    var preval = piedatadict[error];
+                                    piedatadict[error] = preval + val;
+                                }
+                                else
+                                {
+                                    piedatadict.Add(error, val);
+                                }
+                            }
+                        }
+                    }
+
+                    piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.LastYields[yieldvm.LastYields.Count - 1].WhichTest, yieldvm.LErrorMap);
+
+                    var keys = piedatadict.Keys;
+                    var namevaluepair = "";
+                    foreach (var k in keys)
+                    {
+                        if (piedatadict[k] > 0)
+                            namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                    }
+
+                    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                    ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
+                        .Replace("#Title#", "Retest Failure")
+                        .Replace("#SERIESNAME#", "RFailure")
+                        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
+                }
+
+                return View(yieldvm);
+            }
+            return View();
+        }
+
     }
 }

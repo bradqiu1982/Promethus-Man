@@ -152,7 +152,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        private List<DateTime> RetrieveDateSpanByMonth(string startdate,string enddate)
+        private static List<DateTime> RetrieveDateSpanByMonth(string startdate,string enddate)
         {
             var ret = new List<DateTime>();
             var sdate = DateTime.Parse(DateTime.Parse(startdate).ToString("yyyy-MM-dd") + " 07:30:00");
@@ -160,6 +160,21 @@ namespace Prometheus.Models
 
             var temptimepoint = sdate;
             var edate = DateTime.Parse(enddate);
+
+            temptimepoint = temptimepoint.AddMonths(1);
+            temptimepoint = DateTime.Parse(temptimepoint.ToString("yyyy-MM") + "-01 07:30:00");
+
+
+            if (temptimepoint > edate)
+            {
+                ret.Add(DateTime.Parse(DateTime.Parse(enddate).ToString("yyyy-MM-dd") + " 07:30:00"));
+                return ret;
+            }
+            else
+            {
+                ret.Add(temptimepoint);
+            }
+
             while (temptimepoint < edate)
             {
                 temptimepoint = temptimepoint.AddMonths(1);
@@ -334,14 +349,30 @@ namespace Prometheus.Models
             return ret;
         }
 
-        //public List<ProjectYieldViewModule> GetYieldByWeeks(string pjkey, string startdate, string enddate)
-        //{
 
-        //}
+        public static List<ProjectYieldViewModule> GetYieldByMonth(string pjkey)
+        {
+            var ret = new List<ProjectYieldViewModule>();
 
-        //public List<ProjectYieldViewModule> GetYieldByMonth(string pjkey, string startdate, string enddate)
-        //{
+            var pvm = ProjectViewModels.RetrieveOneProject(pjkey);
+            var ldate = RetrieveDateSpanByMonth(pvm.StartDate.ToString(), DateTime.Now.ToString());
 
-        //}
+            var startidx = 0;
+            if (ldate.Count > 26)
+            {
+                startidx = ldate.Count - 26;
+            }
+
+            for (int idx = startidx; idx < ldate.Count - 1; idx++)
+            {
+                var temp = GetYieldByDateRange(pjkey, ldate[idx].ToString(), ldate[idx + 1].ToString(), pvm);
+                if (temp.FirstYields.Count > 0)
+                {
+                    ret.Add(temp);
+                }
+            }
+            return ret;
+        }
+
     }
 }

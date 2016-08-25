@@ -1,10 +1,8 @@
 ﻿
 @{
-    ViewBag.Title = "ProjectYield";
+    ViewBag.Title = "ProjectMonthlyYield";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
-
 
 @if (ViewBag.pjkey != null)
 {
@@ -32,18 +30,17 @@ else
 }
 
 
-
-<hr/>
+<hr />
 
 <form>
     @if (ViewBag.pjkey != null)
     {
-        <input  value="@(ViewBag.pjkey)" id="pjkey" name="pjkey" type="hidden" />
+        <input value="@(ViewBag.pjkey)" id="pjkey" name="pjkey" type="hidden" />
     }
 </form>
 
 @if (ViewBag.chartscript != null)
-{ 
+{
     @Html.Raw(ViewBag.chartscript)
 
     <script src="~/Scripts/highcharts.js"></script>
@@ -57,7 +54,7 @@ else
                 </div>
                 <div class="panel-body">
                     <div class="col-md-12">
-                        <div id="weeklyyield" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                        <div id="monthlyyield" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
                     </div>
                 </div>
             </div>
@@ -65,18 +62,18 @@ else
     </div>
 }
 
-<hr/>
+<hr />
 
 <script>
-    function ShowMonthlyYield()
+    function ShowWeeklyYield()
     {
-        window.location.href = "/Project/ProjectMonthlyYield?ProjectKey=@ViewBag.pjkey";
+        window.location.href = "/Project/ProjectYield?ProjectKey=@ViewBag.pjkey";
     }
 </script>
 
 <div class="row">
     <div class="col-md-3">
-        <button class="form-control" onclick="ShowMonthlyYield()">Show Yield In Months</button>
+        <button class="form-control" onclick="ShowWeeklyYield()">Show Yield In Weeks</button>
     </div>
     <div class="col-md-9">
     </div>

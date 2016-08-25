@@ -1,6 +1,7 @@
 ﻿using Prometheus.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -71,11 +72,11 @@ namespace Prometheus.Controllers
             slist = CreateSelectList(rpilist, vm.Reporter);
             ViewBag.reporterlist = slist;
 
-            var cmelist = new List<string>();
-            string[] clist = { COMMENTTYPE.Description,COMMENTTYPE.RootCause,COMMENTTYPE.CustomReport,COMMENTTYPE.InternalReport};
-            cmelist.AddRange(clist);
-            slist = CreateSelectList(cmelist, "");
-            ViewBag.cemtypelist = slist;
+            //var cmelist = new List<string>();
+            //string[] clist = { COMMENTTYPE.Description,COMMENTTYPE.RootCause,COMMENTTYPE.CustomReport,COMMENTTYPE.InternalReport};
+            //cmelist.AddRange(clist);
+            //slist = CreateSelectList(cmelist, "");
+            //ViewBag.cemtypelist = slist;
 
 
         }
@@ -599,6 +600,45 @@ namespace Prometheus.Controllers
             }
         }
 
+        private List<string> ReceiveRMAFiles()
+        {
+            var ret = new List<string>();
+
+            try
+            {
+                foreach (string fl in Request.Files)
+                {
+                    if (fl != null && Request.Files[fl].ContentLength > 0)
+                    {
+                        System.Windows.MessageBox.Show(Request.Files[fl].FileName);
+
+                        string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ","_");
+
+                        string datestring = DateTime.Now.ToString("yyyyMMdd");
+                        string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+
+                        if (!Directory.Exists(imgdir))
+                        {
+                            Directory.CreateDirectory(imgdir);
+                        }
+
+                        fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
+                        Request.Files[fl].SaveAs(imgdir + fn);
+
+                        var url = "/userfiles/docs/" + datestring + "/" + fn;
+
+                        ret.Add(url);
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            { return ret; }
+
+            return ret;
+        }
+
+
         [HttpPost, ActionName("UpdateRMA")]
         [ValidateAntiForgeryToken]
         public ActionResult UpdateRMAPost()
@@ -634,10 +674,58 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
                 vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
-                vm.CommentType = Request.Form["cemtypelist"].ToString();
+                vm.CommentType = COMMENTTYPE.Description;
             }
             else
                 vm.Description = "";
+
+            if (!string.IsNullOrEmpty(Request.Form["rootcauseeditor"]))
+            {
+                var rootcause = Server.HtmlDecode(Request.Form["rootcauseeditor"]);
+                var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(rootcause));
+                var commenttype = COMMENTTYPE.RootCause;
+                IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
+            }
+
+            var urls = ReceiveRMAFiles();
+
+            if (!string.IsNullOrEmpty(Request.Form["customreportupload"]))
+            {
+
+                var customereportfile = Request.Form["customreportupload"];
+                var url = "";
+                foreach (var r in urls)
+                {
+                    if (r.Contains(Path.GetFileNameWithoutExtension(customereportfile)))
+                    {
+                        url = r;
+                        break;
+                    }
+                }
+
+                var linkstr = "<p><a href=\""+url+ "\" target=\"_blank\">[Report 4 Customer] "+ Path.GetFileNameWithoutExtension(customereportfile) +"</a></p>";
+                var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(linkstr));
+                var commenttype = COMMENTTYPE.CustomReport;
+                IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
+            }
+
+            if (!string.IsNullOrEmpty(Request.Form["internalreportupload"]))
+            {
+                var internalreportfile = Request.Form["internalreportupload"];
+                var url = "";
+                foreach (var r in urls)
+                {
+                    if (r.Contains(Path.GetFileNameWithoutExtension(internalreportfile)))
+                    {
+                        url = r;
+                        break;
+                    }
+                }
+
+                var linkstr = "<p><a href=\"" + url + "\" target=\"_blank\">[Internal Report] " + Path.GetFileNameWithoutExtension(internalreportfile) + "</a></p>";
+                var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(linkstr));
+                var commenttype = COMMENTTYPE.InternalReport;
+            }
 
             vm.UpdateRMA();
 
@@ -673,8 +761,6 @@ namespace Prometheus.Controllers
             var newdata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
             CreateAllLists(newdata);
             return View(newdata);
-
-
         }
 
 

@@ -456,6 +456,15 @@ namespace Prometheus.Models
             }
         }
 
+        public static void StoreIssueComment(string isk,string desc,string rept,string cmtype)
+        {
+            var sql = "insert into IssueComments(IssueKey,Comment,Reporter,CommentDate,CommentType) values('<IssueKey>','<Comment>','<Reporter>','<CommentDate>','<CommentType>')";
+            sql = sql.Replace("<IssueKey>", isk).Replace("<Comment>", desc).Replace("<Reporter>", rept)
+                .Replace("<CommentDate>", DateTime.Now.ToString()).Replace("<CommentType>", cmtype);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+
         public static void StoreIssueAttachment(string issuekey,string attachmenturl)
         {
             var sql = "insert into IssueAttachment(IssueKey,Attachment,UpdateTime) values('<IssueKey>','<Attachment>','<UpdateTime>')";

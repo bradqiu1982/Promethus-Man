@@ -145,8 +145,7 @@
                 </div>
             </div>
 
-            <hr />
-
+            <hr/>
             <div class="form-group">
                 <div class="col-md-6">
                     <label class="control-label col-md-2" for="ECustomer">End Custormer<font color="red">*</font></label>
@@ -222,6 +221,73 @@
                     <span class="field-validation-valid text-danger" data-valmsg-for="RPeopleAddr" data-valmsg-replace="true"></span>
                 </div>
             </div>
+
+
+            <hr />
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <div class="col-md-4">
+                        <span class="btn btn-default btn-file" id="choosefile1">
+                            Report for Customer <input type="file" name="files1" id="file1" runat="server" onchange="ShowFileNames1(this)" />
+                        </span>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="col-md-11">
+                            <label class="control-label" id="showfile1" name="showfile1"></label>
+                        </div>
+                        <div class="col-md-1">
+                            <input class="form-control text-box single-line" value="" id="customreportupload" name="customreportupload" type="hidden" />
+                        </div>
+                    </div>
+                </div>
+                <script type="text/javascript">
+                            function ShowFileNames1(oFile) {
+                                $('#showfile1').text(oFile.value);
+                                document.getElementById("customreportupload").value = oFile.value;
+                            }
+                </script>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <div class="col-md-4">
+                        <span class="btn btn-default btn-file" id="choosefile2">
+                            Internal Report <input type="file" name="files2" id="file2" runat="server" onchange="ShowFileNames2(this)" />
+                        </span>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="col-md-11">
+                            <label class="control-label" id="showfile2" name="showfile2"></label>
+                        </div>
+                        <div class="col-md-1">
+                            <input class="form-control text-box single-line" value="" id="internalreportupload" name="internalreportupload" type="hidden" />
+                        </div>
+                    </div>
+                </div>
+                <script type="text/javascript">
+                            function ShowFileNames2(oFile) {
+                                $('#showfile2').text(oFile.value);
+                                document.getElementById("internalreportupload").value = oFile.value;
+                            }
+                </script>
+            </div>
+
+            <div class="col-md-12">
+                <div class="form-group">
+                    Root Cause
+                </div>
+
+                <div class="form-group">
+                    <div>
+                        <textarea name="rootcauseeditor" id="rootcauseeditor" rows="10" cols="80"></textarea>
+                        <script>
+                            CKEDITOR.replace('rootcauseeditor', { htmlEncodeOutput: true, filebrowserImageUploadUrl: '/userfiles/Upload.ashx' });
+                        </script>
+                    </div>
+                </div>
+            </div>
+
 
             @if (Model.SubIssues.Count > 0)
             {
@@ -369,7 +435,7 @@
     <hr/>
     <div class="col-md-12">
         <div class="form-group">
-            @Html.DropDownList("cemtypelist", null, new { @id = "cemtypelist", @class = "form-control" })
+            Description
         </div>
 
         <div class="form-group">

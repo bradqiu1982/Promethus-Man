@@ -95,6 +95,68 @@ else
                             </div>
                         </div>
                     </div>
+                    <hr/>
+
+                    <div class="row col-md-12">
+                        <div class="col-md-2 text-center">
+                            @if (projectdata.FirstYield > 0)
+                            {
+                                <a href="/Project/ProjectYield?ProjectKey=@projectdata.ProjectKey">
+                                    <span class="glyphicon glyphicon-stats" aria-hidden="true"></span> First Yield @((projectdata.FirstYield * 100.0).ToString("0.00")) %
+                                </a>
+                            }
+                            else
+                            {
+                                <a href="/Project/ProjectYield?ProjectKey=@projectdata.ProjectKey">
+                                    <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>Project Yield
+                                </a>
+                            }
+                        </div>
+                        <div class="col-md-2">
+                            @if (projectdata.RetestYield > 0)
+                            {
+                                <a href="/Project/ProjectYield?ProjectKey=@projectdata.ProjectKey">
+                                    <span class="glyphicon glyphicon-stats" aria-hidden="true"></span> Retest Yield @((projectdata.RetestYield * 100.0).ToString("0.00")) %
+                                </a>
+                            }
+                        </div>
+
+                        <div class="col-md-2 text-center">
+                            <a href="/Project/ProjectFA?ProjectKey=@projectdata.ProjectKey">
+                                <span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span> Project FA <span class="badge alert-danger">@projectdata.PendingFACount</span>
+                            </a>
+                        </div>
+
+                        <div class="col-md-2 text-center">
+                            <a href="/Project/ProjectIssues?ProjectKey=@projectdata.ProjectKey">
+                                <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span> Project Tasks <span class="badge alert-danger">@projectdata.PendingTaskCount</span>
+                            </a>
+                        </div>
+
+                        <div class="col-md-2 text-center">
+                            <a href="/Project/ProjectRMA?ProjectKey=@projectdata.ProjectKey">
+                                <span class="glyphicon glyphicon-fire" aria-hidden="true"></span> Project RMA <span class="badge alert-danger">@projectdata.PendingRMACount</span>
+                            </a>
+                        </div>
+
+                        <div class="col-md-2 text-center">
+                            <a href="/Project/ProjectNPI?ProjectKey=@projectdata.ProjectKey">
+                                <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Project NPI Process
+                            </a>
+                        </div>
+
+                    </div>
+
+                    <div class="row col-md-12">
+                        <div class="col-md-1 text-center active"><a href="/Issue/UpdateIssue?issuekey=@projectdata.DVTIssueKey">DVT</a></div>
+                        <div class="col-md-2 text-center active">@projectdata.DVTDate</div>
+                        <div class="col-md-1 text-center active">@projectdata.DVTStatus</div>
+                        <div class="col-md-1 text-center"></div>
+                        <div class="col-md-1 text-center active"><a href="/Issue/UpdateIssue?issuekey=@projectdata.MVTIssueKey">MVT</a></div>
+                        <div class="col-md-2 text-center active">@projectdata.MVTDate</div>
+                        <div class="col-md-1 text-center active">@projectdata.MVTStatus</div>
+                        <div class="col-md-3 text-center"></div>
+                    </div>
 
                     <hr />
 

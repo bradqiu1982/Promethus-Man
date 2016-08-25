@@ -7,3 +7,4 @@ Prometheus/Prometheus/userfiles/images
 Prometheus/Prometheus/bin
 Prometheus/Prometheus/Scripts/images
 Prometheus/Prometheus/obj/Release
+Prometheus/Prometheus.Tests/obj/Release/

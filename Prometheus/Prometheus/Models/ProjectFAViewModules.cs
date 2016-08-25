@@ -22,32 +22,45 @@ namespace Prometheus.Models
         {
             var ret = new List<ProjectFAViewModules>();
             var pjdata = ProjectTestData.RetrieveProjectFailedTestData(100000,pjkey);
+
+            var issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Working);
             foreach (var d in pjdata)
             {
-                var im = IssueViewModels.RetrieveIssueByIssueKey(d.DataID);
-                if (im != null)
+                if (issuedict.ContainsKey(d.DataID))
                 {
-                    im.RetrieveAttachment(im.IssueKey);
-                    ret.Add(new ProjectFAViewModules(im, d));
+                    ret.Add(new ProjectFAViewModules(issuedict[d.DataID], d));
                 }
             }
+
+            issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Pending);
+            foreach (var d in pjdata)
+            {
+                if (issuedict.ContainsKey(d.DataID))
+                {
+                    ret.Add(new ProjectFAViewModules(issuedict[d.DataID], d));
+                }
+            }
+
+            //foreach (var d in pjdata)
+            //{
+            //    var im = IssueViewModels.RetrieveIssueByIssueKey(d.DataID);
+            //    if (im != null)
+            //    {
+            //        im.RetrieveAttachment(im.IssueKey);
+            //        ret.Add(new ProjectFAViewModules(im, d));
+            //    }
+            //}
+            //return ret;
+
             return ret;
+
         }
 
         public static int RetrieveFADataCount(string pjkey)
         {
-            int count = 0;
-            var ret = new List<ProjectFAViewModules>();
-            var pjdata = ProjectTestData.RetrieveProjectFailedDataID(pjkey);
-            foreach (var d in pjdata)
-            {
-                var im = IssueViewModels.RetrieveFAStatusByIssueKey(d, Resolute.Pending);
-                if (im)
-                {
-                    count = count + 1;
-                }
-            }
-            return count;
+
+            return IssueViewModels.RRetrieveFAStatusByPjkey(pjkey, Resolute.Working)
+                + IssueViewModels.RRetrieveFAStatusByPjkey(pjkey, Resolute.Pending);
         }
 
         public static List<ProjectFAViewModules> RetrieveFADataWithErrAbbr(string ProjectKey, string ErrAbbr)

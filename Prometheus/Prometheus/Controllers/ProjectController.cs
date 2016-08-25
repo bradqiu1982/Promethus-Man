@@ -22,9 +22,21 @@ namespace Prometheus.Controllers
 
             foreach (var item in projlist)
             {
-                var startdate = DateTime.Now.AddDays(-7).ToString();
+                var startdate = DateTime.Now.AddDays(-7);
                 var enddate = DateTime.Now.ToString();
-                var yvm = ProjectYieldViewModule.GetYieldByDateRange(item.ProjectKey, startdate, enddate, item);
+                if (startdate.DayOfWeek != DayOfWeek.Thursday)
+                {
+                    for (int i = 6; i > 0; i--)
+                    {
+                        startdate = startdate.AddDays(0 - i);
+                        if (startdate.DayOfWeek == DayOfWeek.Thursday)
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                var yvm = ProjectYieldViewModule.GetYieldByDateRange(item.ProjectKey, startdate.ToString(), enddate, item);
                 if (yvm.FirstYields.Count > 0)
                 {
                     item.FirstYield = yvm.FirstYield;
@@ -705,6 +717,57 @@ namespace Prometheus.Controllers
             if (ProjectKey != null)
             {
                 var vm = ProjectViewModels.RetrieveOneProject(ProjectKey);
+
+                if (vm != null)
+                {
+                    var startdate = DateTime.Now.AddDays(-7);
+                    var enddate = DateTime.Now.ToString();
+                    if (startdate.DayOfWeek != DayOfWeek.Thursday)
+                    {
+                        for (int i = 6; i > 0; i--)
+                        {
+                            startdate = startdate.AddDays(0 - i);
+                            if (startdate.DayOfWeek == DayOfWeek.Thursday)
+                            {
+                                break;
+                            }
+                        }
+                    }
+
+                    var yvm = ProjectYieldViewModule.GetYieldByDateRange(vm.ProjectKey, startdate.ToString(), enddate, vm);
+                    if (yvm.FirstYields.Count > 0)
+                    {
+                        vm.FirstYield = yvm.FirstYield;
+                        vm.RetestYield = yvm.LastYield;
+                    }
+                    else
+                    {
+                        vm.FirstYield = -1.0;
+                        vm.RetestYield = -1.0;
+                    }
+
+                    var ivmlist = IssueViewModels.RetrieveNPIPROCIssue(vm.ProjectKey);
+                    foreach (var iv in ivmlist)
+                    {
+                        if (iv.Summary.Contains(" DVT"))
+                        {
+                            vm.DVTIssueKey = iv.IssueKey;
+                            vm.DVTDate = iv.DueDate.ToString("yyyy-MM-dd");
+                            vm.DVTStatus = iv.Resolution;
+                        }
+                        if (iv.Summary.Contains(" MVT"))
+                        {
+                            vm.MVTIssueKey = iv.IssueKey;
+                            vm.MVTDate = iv.DueDate.ToString("yyyy-MM-dd");
+                            vm.MVTStatus = iv.Resolution;
+                        }
+                    }
+
+                    vm.PendingTaskCount = IssueViewModels.RetrieveTaskCountByProjectKey(vm.ProjectKey, Resolute.Pending);
+                    vm.PendingFACount = ProjectFAViewModules.RetrieveFADataCount(vm.ProjectKey);
+                    vm.PendingRMACount = IssueViewModels.RetrieveRMACountByProjectKey(vm.ProjectKey, Resolute.Pending);
+                }
+
                 return View(vm);
             }
             return View();

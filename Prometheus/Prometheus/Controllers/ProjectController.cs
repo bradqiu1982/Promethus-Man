@@ -793,18 +793,7 @@ namespace Prometheus.Controllers
                     }
                 }
 
-                //var yxias = new List<int>();
-                //var xxias = new List<string>();
                 var keys = piedatadict.Keys;
-                //foreach (var k in keys)
-                //{
-                //    yxias.Add(piedatadict[k]);
-                //    xxias.Add(k + " " + ((float)piedatadict[k] / (float)vm.Count*100.0).ToString("0.00") + "%");
-                //}
-
-                //ViewBag.yxias = yxias;
-                //ViewBag.xxias = xxias;
-
                 var namevaluepair = "";
                 foreach (var k in keys)
                 {
@@ -815,7 +804,7 @@ namespace Prometheus.Controllers
 
                 var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
                 ViewBag.chartscript = tempscript.Replace("#ElementID#", "failurepie")
-                    .Replace("#Title#", ProjectKey + " Failure")
+                    .Replace("#Title#", ProjectKey + "FA Realtime Failure")
                     .Replace("#SERIESNAME#", "Failure")
                     .Replace("#NAMEVALUEPAIRS#", namevaluepair);
 
@@ -931,6 +920,106 @@ namespace Prometheus.Controllers
 
                 var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
                 var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, sdate.ToString(), edate.ToString(),pvm);
+
+                if (yieldvm.FirstYields.Count > 0)
+                {
+                    var piedatadict = new Dictionary<string, int>();
+                    var eklist = new List<string>();
+                    foreach (var error in yieldvm.FErrorMap.Keys)
+                    {
+                        eklist.Add(error);
+                    }
+
+                    foreach (var error in eklist)
+                    {
+                        if (string.Compare(error, "PASS", true) != 0)
+                        {
+                            foreach (var test in yieldvm.FirstYields)
+                            {
+                                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.FErrorMap);
+
+                                if (piedatadict.ContainsKey(error))
+                                {
+                                    var preval = piedatadict[error];
+                                    piedatadict[error] = preval + val;
+                                }
+                                else
+                                {
+                                    piedatadict.Add(error, val);
+                                }
+                            }
+                        }
+                    }
+
+                    piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.FirstYields[yieldvm.FirstYields.Count - 1].WhichTest, yieldvm.FErrorMap);
+
+                    var keys = piedatadict.Keys;
+                    var namevaluepair = "";
+                    foreach (var k in keys)
+                    {
+                        if(piedatadict[k] > 0)
+                            namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                    }
+
+                    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                    ViewBag.fchartscript = tempscript.Replace("#ElementID#", "ffailurepie")
+                        .Replace("#Title#","First Failure")
+                        .Replace("#SERIESNAME#", "FFailure")
+                        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
+                }
+
+
+                if (yieldvm.LastYields.Count > 0)
+                {
+                    var piedatadict = new Dictionary<string, int>();
+                    var eklist = new List<string>();
+                    foreach (var error in yieldvm.LErrorMap.Keys)
+                    {
+                        eklist.Add(error);
+                    }
+
+                    foreach (var error in eklist)
+                    {
+                        if (string.Compare(error, "PASS", true) != 0)
+                        { 
+                            foreach (var test in yieldvm.LastYields)
+                            {
+                                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.LErrorMap);
+
+                                if (piedatadict.ContainsKey(error))
+                                {
+                                    var preval = piedatadict[error];
+                                    piedatadict[error] = preval + val;
+                                }
+                                else
+                                {
+                                    piedatadict.Add(error, val);
+                                }
+                            }
+                        }
+                    }
+
+                    piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.LastYields[yieldvm.LastYields.Count - 1].WhichTest, yieldvm.LErrorMap);
+
+                    var keys = piedatadict.Keys;
+                    var namevaluepair = "";
+                    foreach (var k in keys)
+                    {
+                        if (piedatadict[k] > 0)
+                            namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                    }
+
+                    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                    ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
+                        .Replace("#Title#", "Retest Failure")
+                        .Replace("#SERIESNAME#", "RFailure")
+                        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
+                }
+
                 return View(yieldvm);
             }
             return View();

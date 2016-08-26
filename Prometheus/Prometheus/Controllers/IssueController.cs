@@ -707,6 +707,7 @@ namespace Prometheus.Controllers
                 var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(linkstr));
                 var commenttype = COMMENTTYPE.CustomReport;
                 IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
+                IssueViewModels.StoreIssueAttachment(vm.IssueKey, linkstr);
             }
 
             if (!string.IsNullOrEmpty(Request.Form["internalreportupload"]))
@@ -725,6 +726,8 @@ namespace Prometheus.Controllers
                 var linkstr = "<p><a href=\"" + url + "\" target=\"_blank\">[Internal Report] " + Path.GetFileNameWithoutExtension(internalreportfile) + "</a></p>";
                 var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(linkstr));
                 var commenttype = COMMENTTYPE.InternalReport;
+                IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
+                IssueViewModels.StoreIssueAttachment(vm.IssueKey, linkstr);
             }
 
             vm.UpdateRMA();

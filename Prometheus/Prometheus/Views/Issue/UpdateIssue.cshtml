@@ -226,13 +226,22 @@
                             <div class="panel-body">
                                 @foreach (var item in Model.AttachList)
                                 {
-                                    var fns = item.Split(new char[] { '/' });
-                                    var fn = fns[fns.Length - 1];
-                                    <div class="col-md-12">
-                                        <a href="@item" target="_blank">
-                                            <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>@fn
-                                        </a>
-                                    </div>
+                                    if (item.Contains("<a href"))
+                                    {
+                                        <div class="row">
+                                            @Html.Raw(item);
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        var fns = item.Split(new char[] { '/' });
+                                        var fn = fns[fns.Length - 1];
+                                        <div class="row">
+                                            <a href="@item" target="_blank">
+                                                <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>@fn
+                                            </a>
+                                        </div>
+                                    }
                                 }
                             </div>
                         </div>

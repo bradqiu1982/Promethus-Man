@@ -610,8 +610,6 @@ namespace Prometheus.Controllers
                 {
                     if (fl != null && Request.Files[fl].ContentLength > 0)
                     {
-                        System.Windows.MessageBox.Show(Request.Files[fl].FileName);
-
                         string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ","_");
 
                         string datestring = DateTime.Now.ToString("yyyyMMdd");

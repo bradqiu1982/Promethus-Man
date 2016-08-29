@@ -26,12 +26,12 @@
             <div class="panel panel-default">
                 <div class="panel-heading" style="min-height:35px;max-height:35px;">
                         <div class="row">
-                            <div class="col-lg-8">
+                            <div class="col-lg-10">
                                 <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">
-                                    <span class="glyphicon glyphicon-home" aria-hidden="true"></span>@item.Summary
+                                    <span class="glyphicon glyphicon-home" aria-hidden="true"></span>@item.Summary.Substring(0,item.Summary.Length > 110?110:item.Summary.Length)
                                 </a>
                             </div>
-                            <div class="col-lg-4 text-right">
+                            <div class="col-lg-2 text-right">
                                 @Html.Raw(@Prometheus.Models.Resolute.ColorStatus(@item.Resolution))
                             </div>
                        </div>

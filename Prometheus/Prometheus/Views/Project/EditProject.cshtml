@@ -48,7 +48,7 @@
                                 <div class="col-md-10">
                                     @if (Model != null && !string.IsNullOrEmpty(Model.StartDate.ToString()))
                                     {
-                                        <input class="form-control text-box single-line" value="@Model.StartDate.ToString("yyyy-MM-dd")" readonly="readonly" data-val="true"  data-val-required="The StartDate field is required." id="StartDate" name="StartDate" type="date" />
+                                        <input class="form-control text-box single-line" value="@Model.StartDate.ToString("yyyy-MM-dd")" readonly="readonly" data-val="true"  data-val-required="The StartDate field is required." id="StartDate" name="StartDate" type="text" />
                                     }
 
                                 </div>

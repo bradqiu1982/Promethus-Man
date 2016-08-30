@@ -28,7 +28,7 @@
     <div class="col-md-2">
         @if (Model != null)
         {
-            <h2><a data-toggle="tooltip" title="Goto FA Page" href="/Project/ProjectRMA?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-fire" aria-hidden="true"></span> FA</a></h2>
+            <h2><a data-toggle="tooltip" title="Goto FA Page" href="/Project/ProjectRMA?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-fire" aria-hidden="true"></span> RMA</a></h2>
         }
 
     </div>
@@ -52,7 +52,7 @@
                         if (item.Contains("<a href"))
                         {
                             <div class="row">
-                                @Html.Raw(item);
+                                @Html.Raw(item)
                             </div>
                         }
                         else

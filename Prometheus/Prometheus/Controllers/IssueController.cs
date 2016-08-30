@@ -689,19 +689,20 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(Request.Form["customreportupload"]))
             {
-
                 var customereportfile = Request.Form["customreportupload"];
+                var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_");
+
                 var url = "";
                 foreach (var r in urls)
                 {
-                    if (r.Contains(Path.GetFileNameWithoutExtension(customereportfile)))
+                    if (r.Contains(originalname))
                     {
                         url = r;
                         break;
                     }
                 }
 
-                var linkstr = "<p><a href=\""+url+ "\" target=\"_blank\">[Report 4 Customer] "+ Path.GetFileNameWithoutExtension(customereportfile) +"</a></p>";
+                var linkstr = "<p><a href=\""+url+ "\" target=\"_blank\">[Report 4 Customer] "+ originalname + "</a></p>";
                 var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(linkstr));
                 var commenttype = COMMENTTYPE.CustomReport;
                 IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
@@ -711,17 +712,19 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(Request.Form["internalreportupload"]))
             {
                 var internalreportfile = Request.Form["internalreportupload"];
+                var originalname = Path.GetFileNameWithoutExtension(internalreportfile).Replace(" ", "_");
+
                 var url = "";
                 foreach (var r in urls)
                 {
-                    if (r.Contains(Path.GetFileNameWithoutExtension(internalreportfile)))
+                    if (r.Contains(originalname))
                     {
                         url = r;
                         break;
                     }
                 }
 
-                var linkstr = "<p><a href=\"" + url + "\" target=\"_blank\">[Internal Report] " + Path.GetFileNameWithoutExtension(internalreportfile) + "</a></p>";
+                var linkstr = "<p><a href=\"" + url + "\" target=\"_blank\">[Internal Report] " + originalname + "</a></p>";
                 var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(linkstr));
                 var commenttype = COMMENTTYPE.InternalReport;
                 IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);

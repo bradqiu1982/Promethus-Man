@@ -1,6 +1,6 @@
 ﻿
 @{
-    ViewBag.Title = "ProjectMonthlyYield";
+    ViewBag.Title = "ProjectPeriodYield";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -54,7 +54,7 @@ else
                 </div>
                 <div class="panel-body">
                     <div class="col-md-12">
-                        <div id="monthlyyield" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                        <div id="periodyield" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
                     </div>
                 </div>
             </div>
@@ -69,7 +69,9 @@ else
     {
         window.location.href = "/Project/ProjectYield?ProjectKey=@ViewBag.pjkey";
     }
-
+    function ShowMonthlyYield() {
+        window.location.href = "/Project/ProjectMonthlyYield?ProjectKey=@ViewBag.pjkey";
+    }
     function ShowPeriodYield() {
         if (document.getElementById("StartDate").value && document.getElementById("EndDate").value)
         {
@@ -82,6 +84,14 @@ else
     <div class="col-md-3">
         <button class="form-control" onclick="ShowWeeklyYield()">Show Yield In Weeks</button>
     </div>
+    <div class="col-md-3">
+        <button class="form-control" onclick="ShowMonthlyYield()">Show Yield In Months</button>
+    </div>
+    <div class="col-md-6">
+    </div>
+</div>
+<hr />
+<div class="row">
     <div class="col-md-1">
         <label class="control-label" for="StartDate">StartDate</label>
     </div>
@@ -94,8 +104,10 @@ else
     <div class="col-md-2">
         <input class="form-control text-box single-line" id="EndDate" name="EndDate" type="text" value="" />
     </div>
-    <div class="col-md-3">
+    <div class="col-md-2">
         <button class="form-control" onclick="ShowPeriodYield()">Show Yield In Period</button>
+    </div>
+    <div class="col-md-4">
     </div>
     <script type="text/javascript">
                             $(document).ready(function () {

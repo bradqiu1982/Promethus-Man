@@ -701,6 +701,8 @@
     <Content Include="Views\Issue\UpdateRMA.cshtml" />
     <Content Include="Views\Project\ProjectMonthlyYield.cshtml" />
     <Content Include="Views\Project\ProjectMYieldDetail.cshtml" />
+    <Content Include="Views\Project\ProjectPeriodYield.cshtml" />
+    <Content Include="Views\Project\ProjectPYieldDetail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

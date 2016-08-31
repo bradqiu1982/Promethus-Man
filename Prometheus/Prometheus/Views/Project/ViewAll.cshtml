@@ -38,7 +38,7 @@
                         @if (item.FirstYield > 0)
                         {
                             <a href="/Project/ProjectYield?ProjectKey=@item.ProjectKey">
-                                <span class="glyphicon glyphicon-stats" aria-hidden="true"></span> First Yield @((item.FirstYield * 100.0).ToString("0.00")) %
+                                <span class="glyphicon glyphicon-stats" aria-hidden="true"></span> First Yield @((item.FirstYield * 100.0).ToString("0.0")) %
                             </a>
                         }
                         else
@@ -52,7 +52,7 @@
                         @if (item.RetestYield > 0)
                         {
                             <a href="/Project/ProjectYield?ProjectKey=@item.ProjectKey">
-                                <span class="glyphicon glyphicon-stats" aria-hidden="true"></span> Retest Yield @((item.RetestYield * 100.0).ToString("0.00")) %
+                                <span class="glyphicon glyphicon-stats" aria-hidden="true"></span> Retest Yield @((item.RetestYield * 100.0).ToString("0.0")) %
                             </a>
                         }
                     </div>

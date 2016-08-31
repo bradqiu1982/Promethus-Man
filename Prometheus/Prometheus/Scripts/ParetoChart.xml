@@ -1,0 +1,64 @@
+﻿<script type="text/javascript">
+$(function () {
+    $('##ElementID#').highcharts({
+        title: {
+            text: '#Title#'
+        },
+        chart:
+        {
+          alignTicks: false
+        },
+        xAxis: {
+            categories: [#ChartxAxisValues#],
+            crosshair: true,
+            title:{
+              text: '#XAxisTitle#'
+            }
+        },
+        yAxis: [{
+            title: {
+                text: 'Amount'
+            },
+            min: 0,
+            max: #AmountMAX#
+        }, {
+            title: {
+                text: 'Percent'
+            },
+            min: 0,
+            max: 100,
+            gridLineWidth: 0,
+            tickPixelInterval: 36,
+            opposite: true
+        }],
+        series: [{
+            type: 'column',
+            name: 'Amount',
+            data: [#PCount#],
+            yAxis:0
+        }, 
+        {
+            type: 'scatter',
+            name: 'Percent',
+            color: 'rgba(223, 83, 83, .5)',
+            data: [#ABPercent#],
+            yAxis:1,
+            tooltip: {
+                    headerFormat: '<b>{point.key}</b><br/>',
+                    pointFormat: '{point.y} %'
+                }
+        },
+        {
+            type: 'spline',
+            name: 'Summary Percent',
+            data: [#PPercent#],
+            marker: {
+                lineWidth: 2,
+                lineColor: Highcharts.getOptions().colors[3],
+                fillColor: 'white'
+            },
+            yAxis:1
+        }]
+    });
+});
+</script>

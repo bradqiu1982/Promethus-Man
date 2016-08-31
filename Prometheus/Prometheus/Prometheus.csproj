@@ -185,6 +185,7 @@
     <Compile Include="Models\EmailUtility.cs" />
     <Compile Include="Models\IssueViewModels.cs" />
     <Compile Include="Models\MESUtility.cs" />
+    <Compile Include="Models\ParetoData.cs" />
     <Compile Include="Models\ProjectEvent.cs" />
     <Compile Include="Models\ProjectFAViewModules.cs" />
     <Compile Include="Models\ProjectTestData.cs" />
@@ -651,6 +652,7 @@
     <Content Include="Scripts\moment-with-locales.min.js" />
     <Content Include="Scripts\moment.js" />
     <Content Include="Scripts\moment.min.js" />
+    <Content Include="Scripts\ParetoChart.xml" />
     <Content Include="Scripts\PieChart.xml" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />

@@ -239,5 +239,31 @@ else
             </div>
         </div>
     </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Defect Pareto</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="col-md-6 text-left">
+                        @if (ViewBag.fparetoscript != null)
+                        {
+                            @Html.Raw(ViewBag.fparetoscript)
+                            <div id="fparetochart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                        }
+                    </div>
+                    <div class="col-md-6 text-left">
+                        @if (ViewBag.rparetoscript != null)
+                        {
+                            @Html.Raw(ViewBag.rparetoscript)
+                            <div id="rparetochart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
                                 }
 

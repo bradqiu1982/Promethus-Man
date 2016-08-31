@@ -33,6 +33,44 @@ namespace Prometheus.Models
         public string TestStation { set; get; }
         public string PN { set; get; }
 
+        public static Dictionary<string, bool> UpdateLockUsing = new Dictionary<string, bool>();
+        public static bool UpdatePJLockUsing(string pjkey)
+        {
+            if (UpdateLockUsing.ContainsKey(pjkey))
+            {
+                if (UpdateLockUsing[pjkey])
+                {
+                    return true;
+                }
+                else
+                {
+                    UpdateLockUsing[pjkey] = true;
+                    return false;
+                }
+            }
+            else
+            {
+                try
+                {
+                    UpdateLockUsing.Add(pjkey, true);
+                    return false;
+                }
+                catch
+                {
+                    return true;
+                }
+            }
+        }
+
+        public static void ResetUpdatePJLock(string pjkey)
+        {
+            if (UpdateLockUsing.ContainsKey(pjkey))
+            {
+                UpdateLockUsing[pjkey] = false;
+            }
+        }
+
+
         public void StoreProjectTestData()
         {
             var isql = "insert into ProjectTestData(ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN,UpdateTime) values('<ProjectKey>','<DataID>','<ModuleSerialNum>','<WhichTest>','<ModuleType>','<ErrAbbr>','<TestTimeStamp>','<TestStation>','<PN>','<UpdateTime>')";
@@ -44,25 +82,37 @@ namespace Prometheus.Models
 
         private static void PrePareLatestData(string projectkey)
         {
-            var vm = ProjectViewModels.RetrieveOneProject(projectkey);
-            if(vm.TabList.Count > 0 
-                && vm.PNList.Count > 0 
-                && vm.StationList.Count > 0)
+            if (UpdatePJLockUsing(projectkey))
+                return;
+
+            try
             {
-                string lastupdatetime = ProjectTestData.RetrieveLatestTimeOfLocalProject(projectkey);
-                if (!string.IsNullOrEmpty(lastupdatetime))
+                var vm = ProjectViewModels.RetrieveOneProject(projectkey);
+                if (vm.TabList.Count > 0
+                    && vm.PNList.Count > 0
+                    && vm.StationList.Count > 0)
                 {
-                    var vlast = DateTime.Parse(lastupdatetime);
-                    vlast = vlast.AddMinutes(30);
-                    if (vlast < DateTime.Now)
+                    string lastupdatetime = ProjectTestData.RetrieveLatestTimeOfLocalProject(projectkey);
+                    if (!string.IsNullOrEmpty(lastupdatetime))
                     {
-                        MESUtility.UpdateProjectData(vm, lastupdatetime, DateTime.Now.ToString());
+                        var vlast = DateTime.Parse(lastupdatetime);
+                        vlast = vlast.AddMinutes(30);
+                        if (vlast < DateTime.Now)
+                        {
+                            MESUtility.UpdateProjectData(vm, lastupdatetime, DateTime.Now.ToString());
+                        }
+                    }
+                    else
+                    {
+                        MESUtility.UpdateProjectData(vm, vm.StartDate.ToString(), DateTime.Now.ToString());
                     }
                 }
-                else
-                {
-                    MESUtility.UpdateProjectData(vm, vm.StartDate.ToString(), DateTime.Now.ToString());
-                }
+
+                ResetUpdatePJLock(projectkey);
+            }
+            catch (Exception ex)
+            {
+                ResetUpdatePJLock(projectkey);
             }
         }
 

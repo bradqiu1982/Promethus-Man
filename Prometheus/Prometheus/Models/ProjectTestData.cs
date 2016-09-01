@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -33,7 +34,7 @@ namespace Prometheus.Models
         public string TestStation { set; get; }
         public string PN { set; get; }
 
-        public static Dictionary<string, bool> UpdateLockUsing = new Dictionary<string, bool>();
+        public static ConcurrentDictionary<string, bool> UpdateLockUsing = new ConcurrentDictionary<string, bool>();
         public static bool UpdatePJLockUsing(string pjkey)
         {
             if (UpdateLockUsing.ContainsKey(pjkey))
@@ -52,7 +53,7 @@ namespace Prometheus.Models
             {
                 try
                 {
-                    UpdateLockUsing.Add(pjkey, true);
+                    UpdateLockUsing.TryAdd(pjkey, true);
                     return false;
                 }
                 catch

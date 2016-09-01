@@ -22,12 +22,12 @@ namespace Prometheus.Models
             }
             catch (SqlException ex)
             {
-                System.Windows.MessageBox.Show(ex.ToString());
+                //System.Windows.MessageBox.Show(ex.ToString());
                 return null;
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.ToString());
+                //System.Windows.MessageBox.Show(ex.ToString());
                 return null;
             }
         }
@@ -43,7 +43,7 @@ namespace Prometheus.Models
             }
             catch (SqlException ex)
             {
-                System.Windows.MessageBox.Show(ex.ToString());
+                //System.Windows.MessageBox.Show(ex.ToString());
             }
             catch (Exception ex)
             {
@@ -66,13 +66,13 @@ namespace Prometheus.Models
             }
             catch (SqlException ex)
             {
-                System.Windows.MessageBox.Show(ex.ToString());
+                //System.Windows.MessageBox.Show(ex.ToString());
                 return false;
             }
             catch (Exception ex)
             {
                 CloseConnector(conn);
-                System.Windows.MessageBox.Show(ex.ToString());
+                //System.Windows.MessageBox.Show(ex.ToString());
                 return false;
             }
         }
@@ -109,14 +109,14 @@ namespace Prometheus.Models
             }
             catch (SqlException ex)
             {
-                System.Windows.MessageBox.Show(ex.ToString());
+                //System.Windows.MessageBox.Show(ex.ToString());
                 CloseConnector(conn);
                 ret.Clear();
                 return ret;
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.ToString());
+                //System.Windows.MessageBox.Show(ex.ToString());
                 CloseConnector(conn);
                 ret.Clear();
                 return ret;
@@ -128,18 +128,18 @@ namespace Prometheus.Models
             var conn = new SqlConnection();
             try
             {
-                conn.ConnectionString = "Server=CN-CSSQL;uid=SHG_Read;pwd=shgread;Database=InsiteDB;";
+                conn.ConnectionString = "Server=CN-CSSQL;uid=SHG_Read;pwd=shgread;Database=InsiteDB;Connection Timeout=30;";
                 conn.Open();
                 return conn;
             }
             catch (SqlException ex)
             {
-                System.Windows.MessageBox.Show(ex.ToString());
+                //System.Windows.MessageBox.Show(ex.ToString());
                 return null;
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.ToString());
+                //System.Windows.MessageBox.Show(ex.ToString());
                 return null;
             }
         }
@@ -161,13 +161,13 @@ namespace Prometheus.Models
             catch (SqlException ex)
             {
                 CloseConnector(conn);
-                System.Windows.MessageBox.Show(ex.ToString());
+                //System.Windows.MessageBox.Show(ex.ToString());
                 return false;
             }
             catch (Exception ex)
             {
                 CloseConnector(conn);
-                System.Windows.MessageBox.Show(ex.ToString());
+                //System.Windows.MessageBox.Show(ex.ToString());
                 return false;
             }
         }
@@ -182,6 +182,7 @@ namespace Prometheus.Models
                     return ret;
 
                 var command = conn.CreateCommand();
+                command.CommandTimeout = 60;
                 command.CommandText = sql;
                 var sqlreader = command.ExecuteReader();
                 if (sqlreader.HasRows)
@@ -204,14 +205,14 @@ namespace Prometheus.Models
             }
             catch (SqlException ex)
             {
-                System.Windows.MessageBox.Show(ex.ToString());
+                //System.Windows.MessageBox.Show(ex.ToString());
                 CloseConnector(conn);
                 ret.Clear();
                 return ret;
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.ToString());
+                //System.Windows.MessageBox.Show(ex.ToString());
                 CloseConnector(conn);
                 ret.Clear();
                 return ret;

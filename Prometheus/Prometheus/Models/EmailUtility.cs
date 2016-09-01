@@ -53,7 +53,7 @@ namespace Prometheus.Models
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.ToString());
+                //System.Windows.MessageBox.Show(ex.ToString());
                 return false;
             }
             return true;

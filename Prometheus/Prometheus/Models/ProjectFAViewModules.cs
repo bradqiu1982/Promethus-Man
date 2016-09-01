@@ -41,19 +41,7 @@ namespace Prometheus.Models
                 }
             }
 
-            //foreach (var d in pjdata)
-            //{
-            //    var im = IssueViewModels.RetrieveIssueByIssueKey(d.DataID);
-            //    if (im != null)
-            //    {
-            //        im.RetrieveAttachment(im.IssueKey);
-            //        ret.Add(new ProjectFAViewModules(im, d));
-            //    }
-            //}
-            //return ret;
-
             return ret;
-
         }
 
         public static int RetrieveFADataCount(string pjkey)

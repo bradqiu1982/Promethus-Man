@@ -163,6 +163,8 @@ namespace Prometheus.Models
                                 {
                                     if (!bondingeddatadict.ContainsKey(tempdata.DataID))
                                     {
+                                        bondingeddatadict.Add(tempdata.DataID,true);
+
                                         tempdata.StoreProjectTestData();
                                         if (!sndict.ContainsKey(tempdata.ModuleSerialNum))
                                         {
@@ -241,6 +243,8 @@ namespace Prometheus.Models
                             {
                                 if (!bondingeddatadict.ContainsKey(tempdata.DataID))
                                 {
+                                    bondingeddatadict.Add(tempdata.DataID,true);
+
                                     tempdata.StoreProjectTestData();
                                     if (!sndict.ContainsKey(tempdata.ModuleSerialNum))
                                     {

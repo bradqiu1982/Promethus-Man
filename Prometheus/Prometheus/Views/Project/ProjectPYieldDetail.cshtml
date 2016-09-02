@@ -162,41 +162,44 @@ else
                 </div>
                 <div class="panel-body">
                     <div class="col-md-12">
-                        <table class="table table-bordered table-hover">
-                            <tr>
-                                <th>ErrAbbr</th>
-                                @foreach (var item in Model.FirstYields)
-                                {
-                                    <th>@item.WhichTest</th>
-                                }
-                            </tr>
-                            @{
-                                var eklist = new List<string>();
-                                foreach (var error in Model.FErrorMap.Keys)
-                                {
-                                    eklist.Add(error);
-                                }
+                        <table id="firsttable" name="firsttable" class="table table-bordered table-hover">
+                            <thead class="header">
+                                <tr>
+                                    <th>ErrAbbr</th>
+                                    @foreach (var item in Model.FirstYields)
+                                    {
+                                        <th>@item.WhichTest</th>
+                                    }
+                                </tr>
+                                </thead>
+                            <tbody>
+                                @{
+                                    var eklist = new List<string>();
+                                    foreach (var error in Model.FErrorMap.Keys)
+                                    {
+                                        eklist.Add(error);
+                                    }
 
-                                foreach (var error in eklist)
-                                {
-                                    <tr>
-                                        <th>@error</th>
-                                        @foreach (var test in Model.FirstYields)
-                                        {
-                                            var val = Prometheus.Models.ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, Model.FErrorMap);
-                                            <td>@val</td>
-                                        }
-                                    </tr>
+                                    foreach (var error in eklist)
+                                    {
+                                        <tr>
+                                            <th>@error</th>
+                                            @foreach (var test in Model.FirstYields)
+                                            {
+                                                var val = Prometheus.Models.ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, Model.FErrorMap);
+                                                <td>@val</td>
+                                            }
+                                        </tr>
+                                    }
                                 }
-                            }
-
+                            </tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
+    
     <div class="row">
         <div class="col-md-12">
             <div class="panel panel-default">
@@ -205,40 +208,52 @@ else
                 </div>
                 <div class="panel-body">
                     <div class="col-md-12">
-                        <table class="table table-bordered table-hover">
-                            <tr>
-                                <th>ErrAbbr</th>
-                                @foreach (var item in Model.LastYields)
-                                {
-                                    <th>@item.WhichTest</th>
-                                }
-                            </tr>
-                            @{
-                                eklist = new List<string>();
-                                foreach (var error in Model.LErrorMap.Keys)
-                                {
-                                    eklist.Add(error);
-                                }
+                        <table id="retesttable" name="retesttable" class="table table-bordered table-hover">
+                            <thead class="header">
+                                <tr>
+                                    <th>ErrAbbr</th>
+                                    @foreach (var item in Model.LastYields)
+                                    {
+                                        <th>@item.WhichTest</th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    eklist = new List<string>();
+                                    foreach (var error in Model.LErrorMap.Keys)
+                                    {
+                                        eklist.Add(error);
+                                    }
 
-                                foreach (var error in eklist)
-                                {
-                                    <tr>
-                                        <th>@error</th>
-                                        @foreach (var test in Model.LastYields)
-                                        {
-                                            var val = Prometheus.Models.ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, Model.LErrorMap);
-                                            <td>@val</td>
-                                        }
-                                    </tr>
+                                    foreach (var error in eklist)
+                                    {
+                                        <tr>
+                                            <th>@error</th>
+                                            @foreach (var test in Model.LastYields)
+                                            {
+                                                var val = Prometheus.Models.ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, Model.LErrorMap);
+                                                <td>@val</td>
+                                            }
+                                        </tr>
+                                    }
                                 }
-                            }
-
+                                </tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <script type="text/javascript">
+    $(document).ready(function () {
+        var offset = $('.navbar').height();
+        $("#firsttable").stickyTableHeaders({ fixedOffset: offset });
+        $("#retesttable").stickyTableHeaders({ fixedOffset: offset });
+        });
+    </script>
+
 
     <div class="row">
         <div class="col-md-12">

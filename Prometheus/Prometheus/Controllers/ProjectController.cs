@@ -1035,172 +1035,12 @@ namespace Prometheus.Controllers
 
                 if (firstdatalist.Count > 0)
                 {
-                    var peralist = new List<ParetoData>();
-
-                    if (firstdatalist.Count > 1)
-                    {
-                        firstdatalist.Sort(delegate (KeyValuePair<string, int> pair1, KeyValuePair<string, int> pair2)
-                        {
-                            return pair2.Value.CompareTo(pair1.Value);
-                        });
-                    }
-
-                    var sum = 0;
-                    for (var i = 0; i < firstdatalist.Count; i++)
-                    {
-                        sum = sum + firstdatalist[i].Value;
-                    }
-
-                    for (var i = 0; i < firstdatalist.Count; i++)
-                    {
-                        var tempperato = new ParetoData();
-                        tempperato.key = firstdatalist[i].Key;
-                        if (i == 0)
-                        {
-                            tempperato.count = firstdatalist[i].Value;
-                            tempperato.percent = tempperato.count / (double)sum;
-                            tempperato.sumpercent = tempperato.percent;
-                            peralist.Add(tempperato);
-                        }
-                        else
-                        {
-                            tempperato.count = firstdatalist[i].Value;
-                            tempperato.percent = tempperato.count / (double)sum;
-                            tempperato.sumpercent = peralist[peralist.Count - 1].sumpercent + tempperato.percent;
-                            peralist.Add(tempperato);
-                        }
-                    }
-
-                    //xaxis
-                    var ChartxAxisValues = "";
-
-                    foreach (var item in peralist)
-                    {
-                        ChartxAxisValues = ChartxAxisValues + "'" + item.key + "',";
-                    }
-                    ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
-
-
-                    //yaxis
-                    //var ChartSearies = "{name:'Defect',data:[<fvalue>]}";
-
-                    var pcountvalue = "";
-                    foreach (var item in peralist)
-                    {
-                        pcountvalue = pcountvalue + item.count.ToString() + ",";
-                    }
-                    pcountvalue = pcountvalue.Substring(0, pcountvalue.Length - 1);
-
-                    var ppecentvalue = "";
-                    foreach (var item in peralist)
-                    {
-                        ppecentvalue = ppecentvalue + (item.sumpercent * 100).ToString("0.0") + ",";
-                    }
-                    ppecentvalue = ppecentvalue.Substring(0, ppecentvalue.Length - 1);
-
-                    var abpecentvalue = "";
-                    foreach (var item in peralist)
-                    {
-                        abpecentvalue = abpecentvalue + (item.percent * 100).ToString("0.0") + ",";
-                    }
-                    abpecentvalue = abpecentvalue.Substring(0, abpecentvalue.Length - 1);
-
-                    //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
-
-                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ParetoChart.xml"));
-                    ViewBag.fparetoscript = tempscript.Replace("#ElementID#", "fparetochart")
-                        .Replace("#Title#", "Pareto of First Test Defect")
-                        .Replace("#XAxisTitle#", "Defect")
-                        .Replace("#ChartxAxisValues#", ChartxAxisValues)
-                        .Replace("#AmountMAX#", sum.ToString())
-                        .Replace("#PCount#", pcountvalue)
-                        .Replace("#ABPercent#", abpecentvalue)
-                        .Replace("#PPercent#", ppecentvalue);
+                    firsttestparetofun(firstdatalist);
                 }
 
                 if (retestdatalist.Count > 0)
                 {
-                    var peralist = new List<ParetoData>();
-
-                    if (retestdatalist.Count > 1)
-                    {
-                        retestdatalist.Sort(delegate (KeyValuePair<string, int> pair1, KeyValuePair<string, int> pair2)
-                        {
-                            return pair2.Value.CompareTo(pair1.Value);
-                        });
-                    }
-
-                    var sum = 0;
-                    for (var i = 0; i < retestdatalist.Count; i++)
-                    {
-                        sum = sum + retestdatalist[i].Value;
-                    }
-
-                    for (var i = 0; i < retestdatalist.Count; i++)
-                    {
-                        var tempperato = new ParetoData();
-                        tempperato.key = retestdatalist[i].Key;
-                        if (i == 0)
-                        {
-                            tempperato.count = retestdatalist[i].Value;
-                            tempperato.percent = tempperato.count / (double)sum;
-                            tempperato.sumpercent = tempperato.percent;
-                            peralist.Add(tempperato);
-                        }
-                        else
-                        {
-                            tempperato.count = retestdatalist[i].Value;
-                            tempperato.percent = tempperato.count / (double)sum;
-                            tempperato.sumpercent = peralist[peralist.Count - 1].sumpercent + tempperato.percent;
-                            peralist.Add(tempperato);
-                        }
-                    }
-
-                    //xaxis
-                    var ChartxAxisValues = "";
-
-                    foreach (var item in peralist)
-                    {
-                        ChartxAxisValues = ChartxAxisValues + "'" + item.key + "',";
-                    }
-                    ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
-
-
-                    //yaxis
-                    //var ChartSearies = "{name:'Defect',data:[<fvalue>]}";
-
-                    var pcountvalue = "";
-                    foreach (var item in peralist)
-                    {
-                        pcountvalue = pcountvalue + item.count.ToString() + ",";
-                    }
-                    pcountvalue = pcountvalue.Substring(0, pcountvalue.Length - 1);
-
-                    var ppecentvalue = "";
-                    foreach (var item in peralist)
-                    {
-                        ppecentvalue = ppecentvalue + (item.sumpercent * 100).ToString("0.0") + ",";
-                    }
-                    ppecentvalue = ppecentvalue.Substring(0, ppecentvalue.Length - 1);
-
-                    var abpecentvalue = "";
-                    foreach (var item in peralist)
-                    {
-                        abpecentvalue = abpecentvalue + (item.percent * 100).ToString("0.0") + ",";
-                    }
-                    abpecentvalue = abpecentvalue.Substring(0, abpecentvalue.Length - 1);
-
-                    //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
-
-                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ParetoChart.xml"));
-                    ViewBag.rparetoscript = tempscript.Replace("#ElementID#", "rparetochart")
-                        .Replace("#Title#", "Pareto of Retest Defect")
-                        .Replace("#XAxisTitle#", "Defect")
-                        .Replace("#ChartxAxisValues#", ChartxAxisValues)
-                        .Replace("#AmountMAX#", sum.ToString())
-                        .Replace("#PCount#", pcountvalue)
-                        .Replace("#ABPercent#", abpecentvalue)
-                        .Replace("#PPercent#", ppecentvalue);
+                    retestparetofun(retestdatalist);
                 }
 
                 return View(yieldvm);
@@ -1419,172 +1259,12 @@ namespace Prometheus.Controllers
 
                 if (firstdatalist.Count > 0)
                 {
-                    var peralist = new List<ParetoData>();
-
-                    if (firstdatalist.Count > 1)
-                    {
-                        firstdatalist.Sort(delegate (KeyValuePair<string, int> pair1, KeyValuePair<string, int> pair2)
-                        {
-                            return pair2.Value.CompareTo(pair1.Value);
-                        });
-                    }
-
-                    var sum = 0;
-                    for (var i = 0; i < firstdatalist.Count; i++)
-                    {
-                        sum = sum + firstdatalist[i].Value;
-                    }
-
-                    for (var i = 0; i < firstdatalist.Count; i++)
-                    {
-                        var tempperato = new ParetoData();
-                        tempperato.key = firstdatalist[i].Key;
-                        if (i == 0)
-                        {
-                            tempperato.count = firstdatalist[i].Value;
-                            tempperato.percent = tempperato.count / (double)sum;
-                            tempperato.sumpercent = tempperato.percent;
-                            peralist.Add(tempperato);
-                        }
-                        else
-                        {
-                            tempperato.count = firstdatalist[i].Value;
-                            tempperato.percent = tempperato.count / (double)sum;
-                            tempperato.sumpercent = peralist[peralist.Count - 1].sumpercent + tempperato.percent;
-                            peralist.Add(tempperato);
-                        }
-                    }
-
-                    //xaxis
-                    var ChartxAxisValues = "";
-
-                    foreach (var item in peralist)
-                    {
-                        ChartxAxisValues = ChartxAxisValues + "'" + item.key + "',";
-                    }
-                    ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
-
-
-                    //yaxis
-                    //var ChartSearies = "{name:'Defect',data:[<fvalue>]}";
-
-                    var pcountvalue = "";
-                    foreach (var item in peralist)
-                    {
-                        pcountvalue = pcountvalue + item.count.ToString() + ",";
-                    }
-                    pcountvalue = pcountvalue.Substring(0, pcountvalue.Length - 1);
-
-                    var ppecentvalue = "";
-                    foreach (var item in peralist)
-                    {
-                        ppecentvalue = ppecentvalue + (item.sumpercent * 100).ToString("0.0") + ",";
-                    }
-                    ppecentvalue = ppecentvalue.Substring(0, ppecentvalue.Length - 1);
-
-                    var abpecentvalue = "";
-                    foreach (var item in peralist)
-                    {
-                        abpecentvalue = abpecentvalue + (item.percent * 100).ToString("0.0") + ",";
-                    }
-                    abpecentvalue = abpecentvalue.Substring(0, abpecentvalue.Length - 1);
-
-                    //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
-
-                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ParetoChart.xml"));
-                    ViewBag.fparetoscript = tempscript.Replace("#ElementID#", "fparetochart")
-                        .Replace("#Title#", "Pareto of First Test Defect")
-                        .Replace("#XAxisTitle#", "Defect")
-                        .Replace("#ChartxAxisValues#", ChartxAxisValues)
-                        .Replace("#AmountMAX#", sum.ToString())
-                        .Replace("#PCount#", pcountvalue)
-                        .Replace("#ABPercent#", abpecentvalue)
-                        .Replace("#PPercent#", ppecentvalue);
+                    firsttestparetofun(firstdatalist);
                 }
 
                 if (retestdatalist.Count > 0)
                 {
-                    var peralist = new List<ParetoData>();
-
-                    if (retestdatalist.Count > 1)
-                    {
-                        retestdatalist.Sort(delegate (KeyValuePair<string, int> pair1, KeyValuePair<string, int> pair2)
-                        {
-                            return pair2.Value.CompareTo(pair1.Value);
-                        });
-                    }
-
-                    var sum = 0;
-                    for (var i = 0; i < retestdatalist.Count; i++)
-                    {
-                        sum = sum + retestdatalist[i].Value;
-                    }
-
-                    for (var i = 0; i < retestdatalist.Count; i++)
-                    {
-                        var tempperato = new ParetoData();
-                        tempperato.key = retestdatalist[i].Key;
-                        if (i == 0)
-                        {
-                            tempperato.count = retestdatalist[i].Value;
-                            tempperato.percent = tempperato.count / (double)sum;
-                            tempperato.sumpercent = tempperato.percent;
-                            peralist.Add(tempperato);
-                        }
-                        else
-                        {
-                            tempperato.count = retestdatalist[i].Value;
-                            tempperato.percent = tempperato.count / (double)sum;
-                            tempperato.sumpercent = peralist[peralist.Count - 1].sumpercent + tempperato.percent;
-                            peralist.Add(tempperato);
-                        }
-                    }
-
-                    //xaxis
-                    var ChartxAxisValues = "";
-
-                    foreach (var item in peralist)
-                    {
-                        ChartxAxisValues = ChartxAxisValues + "'" + item.key + "',";
-                    }
-                    ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
-
-
-                    //yaxis
-                    //var ChartSearies = "{name:'Defect',data:[<fvalue>]}";
-
-                    var pcountvalue = "";
-                    foreach (var item in peralist)
-                    {
-                        pcountvalue = pcountvalue + item.count.ToString() + ",";
-                    }
-                    pcountvalue = pcountvalue.Substring(0, pcountvalue.Length - 1);
-
-                    var ppecentvalue = "";
-                    foreach (var item in peralist)
-                    {
-                        ppecentvalue = ppecentvalue + (item.sumpercent * 100).ToString("0.0") + ",";
-                    }
-                    ppecentvalue = ppecentvalue.Substring(0, ppecentvalue.Length - 1);
-
-                    var abpecentvalue = "";
-                    foreach (var item in peralist)
-                    {
-                        abpecentvalue = abpecentvalue + (item.percent * 100).ToString("0.0") + ",";
-                    }
-                    abpecentvalue = abpecentvalue.Substring(0, abpecentvalue.Length - 1);
-
-                    //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
-
-                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ParetoChart.xml"));
-                    ViewBag.rparetoscript = tempscript.Replace("#ElementID#", "rparetochart")
-                        .Replace("#Title#", "Pareto of Retest Defect")
-                        .Replace("#XAxisTitle#", "Defect")
-                        .Replace("#ChartxAxisValues#", ChartxAxisValues)
-                        .Replace("#AmountMAX#", sum.ToString())
-                        .Replace("#PCount#", pcountvalue)
-                        .Replace("#ABPercent#", abpecentvalue)
-                        .Replace("#PPercent#", ppecentvalue);
+                    retestparetofun(retestdatalist);
                 }
 
                 return View(yieldvm);
@@ -1670,6 +1350,218 @@ namespace Prometheus.Controllers
             return View();
         }
 
+
+        private void firsttestparetofun(List<KeyValuePair<string, int>> firstdatalist)
+        {
+            if (firstdatalist.Count > 0)
+            {
+                var peralist = new List<ParetoData>();
+
+                if (firstdatalist.Count > 1)
+                {
+                    firstdatalist.Sort(delegate (KeyValuePair<string, int> pair1, KeyValuePair<string, int> pair2)
+                    {
+                        return pair2.Value.CompareTo(pair1.Value);
+                    });
+                }
+
+                var sum = 0;
+                for (var i = 0; i < firstdatalist.Count; i++)
+                {
+                    sum = sum + firstdatalist[i].Value;
+                }
+
+                var otherpercent = 0.0;
+
+                for (var i = 0; i < firstdatalist.Count; i++)
+                {
+                    if (firstdatalist.Count > 5 && peralist.Count > 0 && peralist[peralist.Count - 1].sumpercent > 0.95)
+                    {
+                        otherpercent = otherpercent + firstdatalist[i].Value / (double)sum;
+                        if (i == (firstdatalist.Count - 1))
+                        {
+                            var tempperato = new ParetoData();
+                            tempperato.key = "Other";
+                            tempperato.count = (int)(otherpercent * sum);
+                            tempperato.percent = otherpercent;
+                            tempperato.sumpercent = 1.0;
+                            peralist.Add(tempperato);
+                        }
+                    }
+                    else
+                    {
+                        var tempperato = new ParetoData();
+                        tempperato.key = firstdatalist[i].Key;
+                        if (i == 0)
+                        {
+                            tempperato.count = firstdatalist[i].Value;
+                            tempperato.percent = tempperato.count / (double)sum;
+                            tempperato.sumpercent = tempperato.percent;
+                            peralist.Add(tempperato);
+                        }
+                        else
+                        {
+                            tempperato.count = firstdatalist[i].Value;
+                            tempperato.percent = tempperato.count / (double)sum;
+                            tempperato.sumpercent = peralist[peralist.Count - 1].sumpercent + tempperato.percent;
+                            peralist.Add(tempperato);
+                        }
+                    }
+                }
+
+                //xaxis
+                var ChartxAxisValues = "";
+
+                foreach (var item in peralist)
+                {
+                    ChartxAxisValues = ChartxAxisValues + "'" + item.key + "',";
+                }
+                ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
+
+
+                //yaxis
+                //var ChartSearies = "{name:'Defect',data:[<fvalue>]}";
+
+                var pcountvalue = "";
+                foreach (var item in peralist)
+                {
+                    pcountvalue = pcountvalue + item.count.ToString() + ",";
+                }
+                pcountvalue = pcountvalue.Substring(0, pcountvalue.Length - 1);
+
+                var ppecentvalue = "";
+                foreach (var item in peralist)
+                {
+                    ppecentvalue = ppecentvalue + (item.sumpercent * 100).ToString("0.0") + ",";
+                }
+                ppecentvalue = ppecentvalue.Substring(0, ppecentvalue.Length - 1);
+
+                var abpecentvalue = "";
+                foreach (var item in peralist)
+                {
+                    abpecentvalue = abpecentvalue + (item.percent * 100).ToString("0.0") + ",";
+                }
+                abpecentvalue = abpecentvalue.Substring(0, abpecentvalue.Length - 1);
+
+                //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
+
+                var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ParetoChart.xml"));
+                ViewBag.fparetoscript = tempscript.Replace("#ElementID#", "fparetochart")
+                    .Replace("#Title#", "Pareto of First Test Defect")
+                    .Replace("#XAxisTitle#", "Defect")
+                    .Replace("#ChartxAxisValues#", ChartxAxisValues)
+                    .Replace("#AmountMAX#", sum.ToString())
+                    .Replace("#PCount#", pcountvalue)
+                    .Replace("#ABPercent#", abpecentvalue)
+                    .Replace("#PPercent#", ppecentvalue);
+            }
+        }
+
+        private void retestparetofun(List<KeyValuePair<string, int>> retestdatalist)
+        {
+            if (retestdatalist.Count > 0)
+            {
+                var peralist = new List<ParetoData>();
+
+                if (retestdatalist.Count > 1)
+                {
+                    retestdatalist.Sort(delegate (KeyValuePair<string, int> pair1, KeyValuePair<string, int> pair2)
+                    {
+                        return pair2.Value.CompareTo(pair1.Value);
+                    });
+                }
+
+                var sum = 0;
+                for (var i = 0; i < retestdatalist.Count; i++)
+                {
+                    sum = sum + retestdatalist[i].Value;
+                }
+
+                var otherpercent = 0.0;
+
+                for (var i = 0; i < retestdatalist.Count; i++)
+                {
+                    if (retestdatalist.Count > 5 && peralist.Count > 0 && peralist[peralist.Count - 1].sumpercent > 0.95)
+                    {
+                        otherpercent = otherpercent + retestdatalist[i].Value / (double)sum;
+                        if (i == (retestdatalist.Count - 1))
+                        {
+                            var tempperato = new ParetoData();
+                            tempperato.key = "Other";
+                            tempperato.count = (int)(otherpercent * sum);
+                            tempperato.percent = otherpercent;
+                            tempperato.sumpercent = 1.0;
+                            peralist.Add(tempperato);
+                        }
+                    }
+                    else
+                    {
+                        var tempperato = new ParetoData();
+                        tempperato.key = retestdatalist[i].Key;
+                        if (i == 0)
+                        {
+                            tempperato.count = retestdatalist[i].Value;
+                            tempperato.percent = tempperato.count / (double)sum;
+                            tempperato.sumpercent = tempperato.percent;
+                            peralist.Add(tempperato);
+                        }
+                        else
+                        {
+                            tempperato.count = retestdatalist[i].Value;
+                            tempperato.percent = tempperato.count / (double)sum;
+                            tempperato.sumpercent = peralist[peralist.Count - 1].sumpercent + tempperato.percent;
+                            peralist.Add(tempperato);
+                        }
+                    }
+                }
+
+                //xaxis
+                var ChartxAxisValues = "";
+
+                foreach (var item in peralist)
+                {
+                    ChartxAxisValues = ChartxAxisValues + "'" + item.key + "',";
+                }
+                ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
+
+
+                //yaxis
+                //var ChartSearies = "{name:'Defect',data:[<fvalue>]}";
+
+                var pcountvalue = "";
+                foreach (var item in peralist)
+                {
+                    pcountvalue = pcountvalue + item.count.ToString() + ",";
+                }
+                pcountvalue = pcountvalue.Substring(0, pcountvalue.Length - 1);
+
+                var ppecentvalue = "";
+                foreach (var item in peralist)
+                {
+                    ppecentvalue = ppecentvalue + (item.sumpercent * 100).ToString("0.0") + ",";
+                }
+                ppecentvalue = ppecentvalue.Substring(0, ppecentvalue.Length - 1);
+
+                var abpecentvalue = "";
+                foreach (var item in peralist)
+                {
+                    abpecentvalue = abpecentvalue + (item.percent * 100).ToString("0.0") + ",";
+                }
+                abpecentvalue = abpecentvalue.Substring(0, abpecentvalue.Length - 1);
+
+                //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
+
+                var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ParetoChart.xml"));
+                ViewBag.rparetoscript = tempscript.Replace("#ElementID#", "rparetochart")
+                    .Replace("#Title#", "Pareto of Retest Defect")
+                    .Replace("#XAxisTitle#", "Defect")
+                    .Replace("#ChartxAxisValues#", ChartxAxisValues)
+                    .Replace("#AmountMAX#", sum.ToString())
+                    .Replace("#PCount#", pcountvalue)
+                    .Replace("#ABPercent#", abpecentvalue)
+                    .Replace("#PPercent#", ppecentvalue);
+            }
+        }
 
         public ActionResult ProjectPYieldDetail(string ProjectKey, string StartDate, string EndDate)
         {
@@ -1789,172 +1681,12 @@ namespace Prometheus.Controllers
 
                 if (firstdatalist.Count > 0)
                 {
-                    var peralist = new List<ParetoData>();
-
-                    if (firstdatalist.Count > 1)
-                    {
-                        firstdatalist.Sort(delegate (KeyValuePair<string, int> pair1,KeyValuePair<string, int> pair2)
-                        {
-                            return pair2.Value.CompareTo(pair1.Value);
-                        });
-                    }
-
-                    var sum = 0;
-                    for (var i = 0; i < firstdatalist.Count; i++)
-                    {
-                        sum = sum + firstdatalist[i].Value;
-                    }
-
-                    for (var i = 0; i < firstdatalist.Count; i++)
-                    {
-                        var tempperato = new ParetoData();
-                        tempperato.key = firstdatalist[i].Key;
-                        if (i == 0)
-                        {
-                            tempperato.count = firstdatalist[i].Value;
-                            tempperato.percent = tempperato.count /(double)sum;
-                            tempperato.sumpercent = tempperato.percent;
-                            peralist.Add(tempperato);
-                        }
-                        else
-                        {
-                            tempperato.count = firstdatalist[i].Value;
-                            tempperato.percent = tempperato.count / (double)sum;
-                            tempperato.sumpercent = peralist[peralist.Count -1].sumpercent + tempperato.percent;
-                            peralist.Add(tempperato);
-                        }
-                    }
-
-                    //xaxis
-                    var ChartxAxisValues = "";
-
-                    foreach (var item in peralist)
-                    {
-                        ChartxAxisValues = ChartxAxisValues + "'" + item.key + "',";
-                    }
-                    ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
-
-
-                    //yaxis
-                    //var ChartSearies = "{name:'Defect',data:[<fvalue>]}";
-
-                    var pcountvalue = "";
-                    foreach (var item in peralist)
-                    {
-                        pcountvalue = pcountvalue + item.count.ToString() + ",";
-                    }
-                    pcountvalue = pcountvalue.Substring(0, pcountvalue.Length - 1);
-
-                    var ppecentvalue = "";
-                    foreach (var item in peralist)
-                    {
-                        ppecentvalue = ppecentvalue + (item.sumpercent*100).ToString("0.0") + ",";
-                    }
-                    ppecentvalue = ppecentvalue.Substring(0, ppecentvalue.Length - 1);
-
-                    var abpecentvalue = "";
-                    foreach (var item in peralist)
-                    {
-                        abpecentvalue = abpecentvalue + (item.percent * 100).ToString("0.0") + ",";
-                    }
-                    abpecentvalue = abpecentvalue.Substring(0, abpecentvalue.Length - 1);
-
-                    //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
-
-                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ParetoChart.xml"));
-                    ViewBag.fparetoscript = tempscript.Replace("#ElementID#", "fparetochart")
-                        .Replace("#Title#", "Pareto of First Test Defect")
-                        .Replace("#XAxisTitle#", "Defect")
-                        .Replace("#ChartxAxisValues#", ChartxAxisValues)
-                        .Replace("#AmountMAX#", sum.ToString())
-                        .Replace("#PCount#", pcountvalue)
-                        .Replace("#ABPercent#", abpecentvalue)
-                        .Replace("#PPercent#", ppecentvalue);
+                    firsttestparetofun(firstdatalist);
                 }
 
                 if (retestdatalist.Count > 0)
                 {
-                    var peralist = new List<ParetoData>();
-
-                    if (retestdatalist.Count > 1)
-                    {
-                        retestdatalist.Sort(delegate (KeyValuePair<string, int> pair1, KeyValuePair<string, int> pair2)
-                        {
-                            return pair2.Value.CompareTo(pair1.Value);
-                        });
-                    }
-
-                    var sum = 0;
-                    for (var i = 0; i < retestdatalist.Count; i++)
-                    {
-                        sum = sum + retestdatalist[i].Value;
-                    }
-
-                    for (var i = 0; i < retestdatalist.Count; i++)
-                    {
-                        var tempperato = new ParetoData();
-                        tempperato.key = retestdatalist[i].Key;
-                        if (i == 0)
-                        {
-                            tempperato.count = retestdatalist[i].Value;
-                            tempperato.percent = tempperato.count / (double)sum;
-                            tempperato.sumpercent = tempperato.percent;
-                            peralist.Add(tempperato);
-                        }
-                        else
-                        {
-                            tempperato.count = retestdatalist[i].Value;
-                            tempperato.percent = tempperato.count / (double)sum;
-                            tempperato.sumpercent = peralist[peralist.Count - 1].sumpercent + tempperato.percent;
-                            peralist.Add(tempperato);
-                        }
-                    }
-
-                    //xaxis
-                    var ChartxAxisValues = "";
-
-                    foreach (var item in peralist)
-                    {
-                        ChartxAxisValues = ChartxAxisValues + "'" + item.key + "',";
-                    }
-                    ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
-
-
-                    //yaxis
-                    //var ChartSearies = "{name:'Defect',data:[<fvalue>]}";
-
-                    var pcountvalue = "";
-                    foreach (var item in peralist)
-                    {
-                        pcountvalue = pcountvalue + item.count.ToString() + ",";
-                    }
-                    pcountvalue = pcountvalue.Substring(0, pcountvalue.Length - 1);
-
-                    var ppecentvalue = "";
-                    foreach (var item in peralist)
-                    {
-                        ppecentvalue = ppecentvalue + (item.sumpercent * 100).ToString("0.0") + ",";
-                    }
-                    ppecentvalue = ppecentvalue.Substring(0, ppecentvalue.Length - 1);
-
-                    var abpecentvalue = "";
-                    foreach (var item in peralist)
-                    {
-                        abpecentvalue = abpecentvalue + (item.percent * 100).ToString("0.0") + ",";
-                    }
-                    abpecentvalue = abpecentvalue.Substring(0, abpecentvalue.Length - 1);
-
-                    //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
-
-                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ParetoChart.xml"));
-                    ViewBag.rparetoscript = tempscript.Replace("#ElementID#", "rparetochart")
-                        .Replace("#Title#", "Pareto of Retest Defect")
-                        .Replace("#XAxisTitle#", "Defect")
-                        .Replace("#ChartxAxisValues#", ChartxAxisValues)
-                        .Replace("#AmountMAX#", sum.ToString())
-                        .Replace("#PCount#", pcountvalue)
-                        .Replace("#ABPercent#", abpecentvalue)
-                        .Replace("#PPercent#", ppecentvalue);
+                    retestparetofun(retestdatalist);
                 }
 
                 return View(yieldvm);

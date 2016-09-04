@@ -9,7 +9,7 @@
     <div class="col-md-3">
         <h2>Update RMA</h2>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-3">
         @if (Model != null && string.IsNullOrEmpty(Model.ParentIssueKey))
         {
             using (Html.BeginForm("PrepareSubIssue", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
@@ -17,7 +17,7 @@
                 @Html.AntiForgeryToken()
                 if (Model != null && !string.IsNullOrEmpty(Model.IssueKey))
                 {
-                    <input class="form-control text-box single-line" value="@(Model.IssueKey)" id="HIssueKey" name="HIssueKey" type="hidden" />
+                    <input class="form-control text-box single-line" value="@(Model.IssueKey+"#[Containment]")" id="HIssueKey" name="HIssueKey" type="hidden" />
                 }
                 else
                 {
@@ -31,7 +31,7 @@
                 {
                     <input class="form-control text-box single-line" id="HProjectKey" name="HProjectKey" type="hidden" value="" />
                 }
-                <button data-toggle="tooltip" title="Add Sub Issue" type="submit" class="btn btn-default glyphicon-plus" style="font-size:1.5em; margin-top: 0.83em;margin-bottom: 0.83em;width:100px;"></button>
+                <button data-toggle="tooltip" title="Add Containment Action" type="submit" class="btn btn-default" style="font-size:1.5em; margin-top: 0.83em;margin-bottom: 0.83em;width:100%;">Add Containment Action</button>
             }
         }
         else if (Model != null && !string.IsNullOrEmpty(Model.ParentIssueKey))
@@ -40,7 +40,38 @@
         }
 
     </div>
-    <div class="col-md-7">
+    <div class="col-md-3">
+        @if (Model != null && string.IsNullOrEmpty(Model.ParentIssueKey))
+        {
+            using (Html.BeginForm("PrepareSubIssue", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+                if (Model != null && !string.IsNullOrEmpty(Model.IssueKey))
+                {
+                    <input class="form-control text-box single-line" value="@(Model.IssueKey+"#[Corroborate]")" id="HIssueKey" name="HIssueKey" type="hidden" />
+                }
+                else
+                {
+                    <input class="form-control text-box single-line" id="HIssueKey" name="HIssueKey" type="hidden" value="" />
+                }
+                if (Model != null && !string.IsNullOrEmpty(Model.ProjectKey))
+                {
+                    <input class="form-control text-box single-line" value="@(Model.ProjectKey)" id="HProjectKey" name="HProjectKey" type="hidden" />
+                }
+                else
+                {
+                    <input class="form-control text-box single-line" id="HProjectKey" name="HProjectKey" type="hidden" value="" />
+                }
+                <button data-toggle="tooltip" title="Add Corroborate Action" type="submit" class="btn btn-default" style="font-size:1.5em; margin-top: 0.83em;margin-bottom: 0.83em;width:100%;">Add Corroborate Action</button>
+            }
+        }
+        else if (Model != null && !string.IsNullOrEmpty(Model.ParentIssueKey))
+        {
+            <h2><a data-toggle="tooltip" title="Goto Parent Issue" href="/Issue/UpdateIssue?issuekey=@(Model.ParentIssueKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+        }
+
+    </div>
+    <div class="col-md-3">
     </div>
 </div>
 <hr />
@@ -272,14 +303,14 @@
                             }
                 </script>
             </div>
-
+            <hr/>
             <div class="col-md-12">
                 <div class="form-group">
                     Root Cause
                 </div>
 
                 <div class="form-group">
-                    <div>
+                    <div class="col-md-12">
                         <textarea name="rootcauseeditor" id="rootcauseeditor" rows="10" cols="80"></textarea>
                         <script>
                             CKEDITOR.replace('rootcauseeditor', { htmlEncodeOutput: true, filebrowserImageUploadUrl: '/userfiles/Upload.ashx' });

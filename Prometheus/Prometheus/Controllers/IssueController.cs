@@ -288,12 +288,23 @@ namespace Prometheus.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult CreatePostSubIssue()
         {
+            var sumpre = "";
             var vm = new IssueViewModels();
             vm.ProjectKey = Request.Form["projectlist"].ToString();
             vm.IssueKey = IssueViewModels.GetUniqKey();
-            vm.ParentIssueKey = Request.Form["HParentIssueKey"];
+
+            var pisk = Request.Form["HParentIssueKey"];
+            if (pisk.Contains("#"))
+            {
+                vm.ParentIssueKey = pisk.Split(new char[] { '#' })[0];
+                sumpre = pisk.Split(new char[] { '#' })[1];
+            }
+            else
+            {
+                vm.ParentIssueKey = Request.Form["HParentIssueKey"];
+            }
             vm.IssueType = Request.Form["issuetypelist"].ToString();
-            vm.Summary = Request.Form["Summary"];
+            vm.Summary = sumpre + Request.Form["Summary"];
             vm.Priority = Request.Form["prioritylist"].ToString();
             vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
             vm.ReportDate = DateTime.Now;

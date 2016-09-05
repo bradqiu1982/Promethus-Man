@@ -1062,6 +1062,20 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        public ActionResult ProjectRMAStatus(string ProjectKey)
+        {
+            if (ProjectKey != null)
+            {
+                var list1 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Pending);
+                var list2 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Working);
+                var list3 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Done);
+                list1.AddRange(list2);
+                list1.AddRange(list3);
+                return View(list1);
+            }
+            return View();
+        }
+
         public ActionResult ProjectMonthlyYield(string ProjectKey)
         {
             if (ProjectKey != null)

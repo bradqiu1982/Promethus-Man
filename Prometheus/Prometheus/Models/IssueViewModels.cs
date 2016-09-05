@@ -299,6 +299,20 @@ namespace Prometheus.Models
             {
                 sissue.Clear();
                 sissue.AddRange(value);
+
+                containmentactionlist.Clear();
+                corrobrateactionlist.Clear();
+                foreach (var item in value)
+                {
+                    if (item.Summary.Contains("[Containment]"))
+                    {
+                        containmentactionlist.Add(item);
+                    }
+                    if (item.Summary.Contains("[Corroborate]"))
+                    {
+                        corrobrateactionlist.Add(item);
+                    }
+                }
             }
             get
             {
@@ -306,6 +320,60 @@ namespace Prometheus.Models
             }
         }
 
+        private List<IssueViewModels> containmentactionlist = new List<IssueViewModels>();
+        private List<IssueViewModels> corrobrateactionlist = new List<IssueViewModels>();
+
+        public List<IssueViewModels> ContainmentActions
+        {
+            get
+            { return containmentactionlist; }
+        }
+
+        public string ContainmentActionStatus()
+        {
+            if (containmentactionlist.Count > 0)
+            {
+                foreach (var item in containmentactionlist)
+                {
+                    if (item.Resolution == Resolute.Pending || item.Resolution == Resolute.Reopen)
+                    {
+                        return Resolute.ColorStatus(Resolute.Pending);
+                    }
+                    if (item.Resolution == Resolute.Working)
+                    {
+                        return Resolute.ColorStatus(Resolute.Working);
+                    }
+                }
+                return Resolute.ColorStatus(Resolute.Done);
+            }
+            return Resolute.ColorStatus(Resolute.Pending);
+        }
+
+        public List<IssueViewModels> CorrobrateActions
+        {
+            get
+            { return corrobrateactionlist; }
+        }
+
+        public string CorrobrateActionStatus()
+        {
+            if (corrobrateactionlist.Count > 0)
+            {
+                foreach (var item in corrobrateactionlist)
+                {
+                    if (item.Resolution == Resolute.Pending || item.Resolution == Resolute.Reopen)
+                    {
+                        return Resolute.ColorStatus(Resolute.Pending);
+                    }
+                    if (item.Resolution == Resolute.Working)
+                    {
+                        return Resolute.ColorStatus(Resolute.Working);
+                    }
+                }
+                return Resolute.ColorStatus(Resolute.Done);
+            }
+            return Resolute.ColorStatus(Resolute.Pending);
+        }
 
         #region RMA
 

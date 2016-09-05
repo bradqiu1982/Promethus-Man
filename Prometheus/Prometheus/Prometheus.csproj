@@ -706,6 +706,12 @@
     <Content Include="Views\Project\ProjectMYieldDetail.cshtml" />
     <Content Include="Views\Project\ProjectPeriodYield.cshtml" />
     <Content Include="Views\Project\ProjectPYieldDetail.cshtml" />
+    <Content Include="Views\Project\ProjectRMAStatus.cshtml" />
+    <Content Include="Views\Issue\ShowRootCause.cshtml" />
+    <Content Include="Views\Issue\ShowInternalReport.cshtml" />
+    <Content Include="Views\Issue\ShowReport4Customer.cshtml" />
+    <Content Include="Views\Issue\ShowContainmentAction.cshtml" />
+    <Content Include="Views\Issue\ShowCorrobrateAction.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

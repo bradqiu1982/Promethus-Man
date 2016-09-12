@@ -46,7 +46,7 @@
                 </tr>
                 <tr>
                     <td width="10%">@item.FinisarRMA</td>
-                    <td width="10%">N/A</td>
+                    <td width="10%">@item.ModuleSN</td>
                     @if (item.RootCauseCommentList.Count > 0)
                     {
                         <td width="16%"><a href="/Issue/ShowRootCause?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></td>

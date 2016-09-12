@@ -47,40 +47,31 @@
                     <div class="col-md-10">
                         @if (Model != null && !string.IsNullOrEmpty(Model.FinisarModel))
                         {
-                            <input class="form-control text-box single-line" value="@Model.FinisarModel" data-val="true" data-val-length="The field must be a string with a minimum length of 5 and a maximum length of 50." data-val-length-max="50" data-val-length-min="5" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="FinisarModel" name="FinisarModel" type="text" />
+                            <input class="form-control text-box single-line" value="@Model.FinisarModel" data-val="true" data-val-length="The field must be a string with a minimum length of 3 and a maximum length of 50." data-val-length-max="50" data-val-length-min="3" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="FinisarModel" name="FinisarModel" type="text" />
                         }
                         else
                         {
-                            <input class="form-control text-box single-line" data-val="true" data-val-length="The field must be a string with a minimum length of 5 and a maximum length of 50." data-val-length-max="50" data-val-length-min="5" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="FinisarModel" name="FinisarModel" type="text" value="" />
+                            <input class="form-control text-box single-line" data-val="true" data-val-length="The field must be a string with a minimum length of 3 and a maximum length of 50." data-val-length-max="50" data-val-length-min="3" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="FinisarModel" name="FinisarModel" type="text" value="" />
                         }
                         <span class="field-validation-valid text-danger" data-valmsg-for="FinisarModel" data-valmsg-replace="true"></span>
                     </div>
                 </div>
 
                 <div class="col-md-6">
-                    <label class="control-label col-md-2" for="DueDate">DueDate<font color="red">*</font></label>
+                    <label class="control-label col-md-2" for="ModuleSN">Model SN<font color="red">*</font></label>
                     <div class="col-md-10">
-                        @if (Model != null && string.Compare(Model.DueDate.ToString("yyyy-MM-dd"), "0001-01-01") != 0)
+                        @if (Model != null && !string.IsNullOrEmpty(Model.ModuleSN))
                         {
-                            <input class="form-control text-box single-line" value="@Model.DueDate.ToString("yyyy-MM-dd")" data-val="true"  data-val-required="The DueDate field is required." id="DueDate" name="DueDate" type="text" />
+                            <input class="form-control text-box single-line" value="@Model.ModuleSN" data-val="true" data-val-length="The field must be a string with a minimum length of 3 and a maximum length of 50." data-val-length-max="50" data-val-length-min="3" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="ModuleSN" name="ModuleSN" type="text" />
                         }
                         else
                         {
-                            <input class="form-control text-box single-line" data-val="true"   id="DueDate" name="DueDate" type="text" value="" />
+                            <input class="form-control text-box single-line" data-val="true" data-val-length="The field must be a string with a minimum length of 3 and a maximum length of 50." data-val-length-max="50" data-val-length-min="3" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="ModuleSN" name="ModuleSN" type="text" value="" />
                         }
-                        <span class="field-validation-valid text-danger" data-valmsg-for="DueDate" data-valmsg-replace="true"></span>
+                        <span class="field-validation-valid text-danger" data-valmsg-for="ModuleSN" data-valmsg-replace="true"></span>
                     </div>
-
                 </div>
-                <script type="text/javascript">
-                    $(document).ready(function () {
-                        $("#DueDate").datepicker({
-                            changeMonth: true,
-                            changeYear: true,
-                            dateFormat: 'yy-mm-dd'
-                        });
-                    });
-                </script>
+
             </div>
 
             <div class="form-group">
@@ -95,6 +86,34 @@
                     <div class="col-md-10">
                         @Html.DropDownList("assigneelist", null, new { @id = "Assignee", @class = "form-control" })
                     </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-6">
+                    <label class="control-label col-md-2" for="DueDate">DueDate<font color="red">*</font></label>
+                    <div class="col-md-10">
+                        @if (Model != null && string.Compare(Model.DueDate.ToString("yyyy-MM-dd"), "0001-01-01") != 0)
+                        {
+                            <input class="form-control text-box single-line" value="@Model.DueDate.ToString("yyyy-MM-dd")" data-val="true" data-val-required="The DueDate field is required." id="DueDate" name="DueDate" type="text" />
+                        }
+                        else
+                        {
+                            <input class="form-control text-box single-line" data-val="true" id="DueDate" name="DueDate" type="text" value="" />
+                        }
+                        <span class="field-validation-valid text-danger" data-valmsg-for="DueDate" data-valmsg-replace="true"></span>
+                    </div>
+                </div>
+                <script type="text/javascript">
+                    $(document).ready(function () {
+                        $("#DueDate").datepicker({
+                            changeMonth: true,
+                            changeYear: true,
+                            dateFormat: 'yy-mm-dd'
+                        });
+                    });
+                </script>
+                <div class="col-md-6">
                 </div>
             </div>
 
@@ -121,91 +140,91 @@
                     <div class="col-md-10">
                         @if (Model != null && !string.IsNullOrEmpty(Model.CRMANUM))
                         {
-                            <input class="form-control text-box single-line" value="@Model.CRMANUM" data-val="true" data-val-length="The field must be a string with a minimum length of 3 and a maximum length of 50." data-val-length-max="50" data-val-length-min="3" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$"  id="CRMANUM" name="CRMANUM" type="text" />
+                            <input class="form-control text-box single-line" value="@Model.CRMANUM" data-val="true" data-val-length="The field must be a string with a minimum length of 3 and a maximum length of 50." data-val-length-max="50" data-val-length-min="3" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="CRMANUM" name="CRMANUM" type="text" />
                         }
                         else
                         {
-                            <input class="form-control text-box single-line" data-val="true" data-val-length="The field must be a string with a minimum length of 3 and a maximum length of 50." data-val-length-max="50" data-val-length-min="3" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$"  id="CRMANUM" name="CRMANUM" type="text" value="N/A" />
+                            <input class="form-control text-box single-line" data-val="true" data-val-length="The field must be a string with a minimum length of 3 and a maximum length of 50." data-val-length-max="50" data-val-length-min="3" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="CRMANUM" name="CRMANUM" type="text" value="N/A" />
                         }
                         <span class="field-validation-valid text-danger" data-valmsg-for="CRMANUM" data-valmsg-replace="true"></span>
                     </div>
                 </div>
             </div>
 
-            <hr />
+                    <hr />
 
-            <div class="col-md-12">
-                <div class="form-group">
-                    <label>Custormer RMA Reason<font color="red">*</font></label>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label>Custormer RMA Reason<font color="red">*</font></label>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            @if (Model != null && !string.IsNullOrEmpty(Model.CReport))
+                            {
+                                <textarea class="form-control" name="CReport" id="CReport" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 180." data-val-length-max="180" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required.">@(Model.CReport)</textarea>
+                            }
+                            else
+                            {
+                                <textarea class="form-control" name="CReport" id="CReport" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 180." data-val-length-max="180" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required."></textarea>
+                            }
+                        </div>
+                        <span class="field-validation-valid text-danger" data-valmsg-for="CReport" data-valmsg-replace="true"></span>
+                    </div>
+
                 </div>
 
-                <div class="form-group">
+                    <hr />
                     <div class="col-md-12">
-                        @if (Model != null && !string.IsNullOrEmpty(Model.CReport))
-                        {
-                            <textarea class="form-control" name="CReport" id="CReport" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 180." data-val-length-max="180" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required.">@(Model.CReport)</textarea>
-                        }
-                        else
-                        {
-                            <textarea class="form-control" name="CReport" id="CReport" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 180." data-val-length-max="180" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required."></textarea>
-                        }
+                        <div class="form-group">
+                            <label>Relative People Email<font color="red">*</font></label>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-12" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
+                                @if (Model != null && !string.IsNullOrEmpty(Model.RelativePeoples))
+                                {
+                                    <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 200." data-val-length-max="200" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required.">@Model.RelativePeoples</textarea>
+                                }
+                                else
+                                {
+                                    <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 200." data-val-length-max="200" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required."></textarea>
+                                }
+                            </div>
+                            <span class="field-validation-valid text-danger" data-valmsg-for="RPeopleAddr" data-valmsg-replace="true"></span>
+                        </div>
                     </div>
-                    <span class="field-validation-valid text-danger" data-valmsg-for="CReport" data-valmsg-replace="true"></span>
+
                 </div>
-
             </div>
-
             <hr />
+
             <div class="col-md-12">
                 <div class="form-group">
-                    <label>Relative People Email<font color="red">*</font></label>
+                    <label class="control-label">Description</label>
                 </div>
 
                 <div class="form-group">
-                    <div class="col-md-12" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
-                        @if (Model != null && !string.IsNullOrEmpty(Model.RelativePeoples))
-                        {
-                            <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 200." data-val-length-max="200" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required.">@Model.RelativePeoples</textarea>
+                    <div>
+                        @if (Model != null && !string.IsNullOrEmpty(Model.Description))
+                {
+                            <textarea name="editor1" id="editor1" rows="10" cols="80">@(Model.Description)</textarea>
                         }
                         else
                         {
-                            <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 200." data-val-length-max="200" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required."></textarea>
+                            <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
                         }
+                        <script>
+                            CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserImageUploadUrl: '/userfiles/Upload.ashx' });
+                        </script>
                     </div>
-                    <span class="field-validation-valid text-danger" data-valmsg-for="RPeopleAddr" data-valmsg-replace="true"></span>
                 </div>
             </div>
 
-        </div>
-    </div>
-    <hr />
-
-    <div class="col-md-12">
-        <div class="form-group">
-            <label class="control-label">Description</label>
-        </div>
-
-        <div class="form-group">
-            <div>
-                @if (Model != null && !string.IsNullOrEmpty(Model.Description))
-                {
-                    <textarea name="editor1" id="editor1" rows="10" cols="80">@(Model.Description)</textarea>
-                }
-                else
-                {
-                    <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
-                }
-                <script>
-                        CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserImageUploadUrl: '/userfiles/Upload.ashx' });
-                </script>
+            <div class="form-group">
+                <div>
+                    <input type="submit" value="Submit" class="btn btn-default" />
+                </div>
             </div>
-        </div>
-    </div>
-
-        <div class="form-group">
-            <div>
-                <input type="submit" value="Submit" class="btn btn-default" />
-            </div>
-        </div>
-}
+            }
 

@@ -528,6 +528,7 @@ namespace Prometheus.Controllers
             vm.CRMANUM = Request.Form["CRMANUM"];
             vm.CReport = Request.Form["CReport"];
             vm.RelativePeoples = Request.Form["RPeopleAddr"];
+            vm.ModuleSN = Request.Form["ModuleSN"];
 
             vm.Summary = "[" + vm.ProjectKey + "] RMA " + vm.FinisarRMA + " for module " + vm.FinisarModel +" from "+vm.ECustomer+". Summary: "+vm.CReport.Substring(0,vm.CReport.Length>50?50:vm.CReport.Length);
 
@@ -654,9 +655,18 @@ namespace Prometheus.Controllers
         {
             var ckdict = CookieUtility.UnpackCookie(this);
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
-
             var issuekey = Request.Form["IssueKey"];
+
             var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+
+            if (Request.Form["deleterma"] != null)
+            {
+                if (string.Compare(updater, originaldata.Reporter, true) == 0)
+                {
+                    IssueViewModels.RemoveIssue(issuekey);
+                }
+                return RedirectToAction("ViewAll", "Project");
+            }
 
             var vm = new IssueViewModels();
             vm.ProjectKey = Request.Form["projectlist"].ToString();
@@ -669,6 +679,7 @@ namespace Prometheus.Controllers
             vm.CRMANUM = Request.Form["CRMANUM"];
             vm.CReport = Request.Form["CReport"];
             vm.RelativePeoples = Request.Form["RPeopleAddr"];
+            vm.ModuleSN = Request.Form["ModuleSN"];
 
             vm.Summary = "[" + vm.ProjectKey + "] RMA " + vm.FinisarRMA + " for module " + vm.FinisarModel + " from " + vm.ECustomer + ". Summary: " + vm.CReport.Substring(0, vm.CReport.Length > 50 ? 50 : vm.CReport.Length);
 

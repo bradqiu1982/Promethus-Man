@@ -380,7 +380,7 @@ namespace Prometheus.Models
         public string FinisarRMA { set; get; }
 
         public string FinisarModel { set; get; }
-
+        public string ModuleSN { set; get; }
         public string ECustomer { set; get; }
 
         public string CRMANUM { set; get; }
@@ -473,16 +473,16 @@ namespace Prometheus.Models
         private void StoreRMA()
         {
 
-            var sql = "insert into IssueRMA(IssueKey,FinisarRMA,FinisarModel,ECustomer,CRMANUM,CReport) values('<IssueKey>','<FinisarRMA>','<FinisarModel>','<ECustomer>','<CRMANUM>','<CReport>')";
+            var sql = "insert into IssueRMA(IssueKey,FinisarRMA,FinisarModel,ECustomer,CRMANUM,CReport,ModuleSN) values('<IssueKey>','<FinisarRMA>','<FinisarModel>','<ECustomer>','<CRMANUM>','<CReport>','<ModuleSN>')";
             sql = sql.Replace("<IssueKey>", IssueKey).Replace("<FinisarRMA>", FinisarRMA)
                 .Replace("<FinisarModel>", FinisarModel).Replace("<ECustomer>", ECustomer)
-                .Replace("<CRMANUM>", CRMANUM).Replace("<CReport>", CReport);
+                .Replace("<CRMANUM>", CRMANUM).Replace("<CReport>", CReport).Replace("<ModuleSN>", ModuleSN);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
         private void RetrieveRMA()
         {
-            var sql = "select FinisarRMA,FinisarModel,ECustomer,CRMANUM,CReport from IssueRMA where IssueKey = '<IssueKey>'";
+            var sql = "select FinisarRMA,FinisarModel,ECustomer,CRMANUM,CReport,ModuleSN from IssueRMA where IssueKey = '<IssueKey>'";
             sql = sql.Replace("<IssueKey>", IssueKey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             if (dbret.Count > 0)
@@ -492,7 +492,27 @@ namespace Prometheus.Models
                 ECustomer = Convert.ToString(dbret[0][2]);
                 CRMANUM = Convert.ToString(dbret[0][3]);
                 CReport = Convert.ToString(dbret[0][4]);
+                ModuleSN = Convert.ToString(dbret[0][5]);
             }
+        }
+
+        public static void RemoveIssue(string issuekey)
+        {
+            var sql = "delete from Issue where IssueKey = '<IssueKey>'";
+            sql = sql.Replace("<IssueKey>", issuekey);
+            DBUtility.ExeLocalSqlNoRes(sql);
+
+            sql = "delete from IssueRMA where IssueKey = '<IssueKey>'";
+            sql = sql.Replace("<IssueKey>", issuekey);
+            DBUtility.ExeLocalSqlNoRes(sql);
+
+            sql = "delete from IssueAttachment where IssueKey = '<IssueKey>'";
+            sql = sql.Replace("<IssueKey>", issuekey);
+            DBUtility.ExeLocalSqlNoRes(sql);
+
+            sql = "delete from IssueComments where IssueKey = '<IssueKey>'";
+            sql = sql.Replace("<IssueKey>", issuekey);
+            DBUtility.ExeLocalSqlNoRes(sql);
         }
 
         public void StoreSubIssue()
@@ -568,10 +588,11 @@ namespace Prometheus.Models
 
         public void UpdateRMA()
         {
-            var sql = "update Issue set Priority = '<Priority>',DueDate = '<DueDate>', Assignee = '<Assignee>',Resolution = '<Resolution>',RelativePeoples='<RelativePeoples>' where IssueKey = '<IssueKey>'";
+            var sql = "update Issue set Priority = '<Priority>',DueDate = '<DueDate>', Assignee = '<Assignee>',Resolution = '<Resolution>',RelativePeoples='<RelativePeoples>',ModuleSN='<ModuleSN>' where IssueKey = '<IssueKey>'";
             sql = sql.Replace("<IssueKey>", IssueKey).Replace("<Priority>", Priority)
                 .Replace("<DueDate>", DueDate.ToString()).Replace("<Assignee>", Assignee)
-                .Replace("<Resolution>", Resolution).Replace("<RelativePeoples>", RelativePeoples);
+                .Replace("<Resolution>", Resolution).Replace("<RelativePeoples>", RelativePeoples)
+                .Replace("<ModuleSN>", ModuleSN);
             DBUtility.ExeLocalSqlNoRes(sql);
 
             StoreIssueComment(DateTime.Now.ToString());

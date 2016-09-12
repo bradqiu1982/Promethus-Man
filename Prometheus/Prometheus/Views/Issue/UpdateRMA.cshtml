@@ -125,29 +125,20 @@
                 </div>
 
                 <div class="col-md-6">
-                    <label class="control-label col-md-2" for="DueDate">DueDate<font color="red">*</font></label>
+                    <label class="control-label col-md-2" for="ModuleSN">Model SN<font color="red">*</font></label>
                     <div class="col-md-10">
-                        @if (Model != null && string.Compare(Model.DueDate.ToString("yyyy-MM-dd"), "0001-01-01") != 0)
+                        @if (Model != null && !string.IsNullOrEmpty(Model.ModuleSN))
                         {
-                            <input class="form-control text-box single-line" value="@Model.DueDate.ToString("yyyy-MM-dd")" data-val="true"  data-val-required="The DueDate field is required." id="DueDate" name="DueDate" type="text" />
+                            <input class="form-control text-box single-line" value="@Model.ModuleSN" data-val="true" data-val-length="The field must be a string with a minimum length of 3 and a maximum length of 50." data-val-length-max="50" data-val-length-min="3" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="ModuleSN" name="ModuleSN" type="text" />
                         }
                         else
                         {
-                            <input class="form-control text-box single-line" data-val="true" data-val-required="The DueDate field is required." id="DueDate" name="DueDate" type="text" value="" />
+                            <input class="form-control text-box single-line" data-val="true" data-val-length="The field must be a string with a minimum length of 3 and a maximum length of 50." data-val-length-max="50" data-val-length-min="3" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="ModuleSN" name="ModuleSN" type="text" value="" />
                         }
-                        <span class="field-validation-valid text-danger" data-valmsg-for="DueDate" data-valmsg-replace="true"></span>
+                        <span class="field-validation-valid text-danger" data-valmsg-for="ModuleSN" data-valmsg-replace="true"></span>
                     </div>
-
                 </div>
-                <script type="text/javascript">
-                    $(document).ready(function () {
-                        $("#DueDate").datepicker({
-                            changeMonth: true,
-                            changeYear: true,
-                            dateFormat: 'yy-mm-dd'
-                        });
-                    });
-                </script>
+
             </div>
 
             <div class="form-group">
@@ -173,7 +164,28 @@
                     </div>
                 </div>
                 <div class="col-md-6">
+                    <label class="control-label col-md-2" for="DueDate">DueDate<font color="red">*</font></label>
+                    <div class="col-md-10">
+                        @if (Model != null && string.Compare(Model.DueDate.ToString("yyyy-MM-dd"), "0001-01-01") != 0)
+                        {
+                            <input class="form-control text-box single-line" value="@Model.DueDate.ToString("yyyy-MM-dd")" data-val="true" data-val-required="The DueDate field is required." id="DueDate" name="DueDate" type="text" />
+                        }
+                        else
+                        {
+                            <input class="form-control text-box single-line" data-val="true" data-val-required="The DueDate field is required." id="DueDate" name="DueDate" type="text" value="" />
+                        }
+                        <span class="field-validation-valid text-danger" data-valmsg-for="DueDate" data-valmsg-replace="true"></span>
+                    </div>
                 </div>
+                <script type="text/javascript">
+                    $(document).ready(function () {
+                        $("#DueDate").datepicker({
+                            changeMonth: true,
+                            changeYear: true,
+                            dateFormat: 'yy-mm-dd'
+                        });
+                    });
+                </script>
             </div>
 
             <hr/>
@@ -510,9 +522,13 @@
     </div>
 
     <div class="form-group">
-        <div>
-            <input type="submit" value="Submit" class="btn btn-default" />
+        <div class="col-md-3">
+            <input type="submit" value="Submit" id="updaterma" name="updaterma" class="btn btn-default" />
         </div>
+        <div class="col-md-3">
+            <input type="submit" value="Delete" id="deleterma" name="deleterma" class="btn btn-default" />
+        </div>
+        <div class="col-md-6"></div>
     </div>
 }
 

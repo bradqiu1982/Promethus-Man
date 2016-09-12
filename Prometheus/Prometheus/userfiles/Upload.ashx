@@ -47,7 +47,10 @@ public class Upload : IHttpHandler {
                 url = "/userfiles/docs/" +datestring+"/"+ fn;
 
                 var dict = CookieUtility.UnpackCookie(new HttpRequestWrapper(context.Request));
-                if (dict.ContainsKey("issuekey") && !string.IsNullOrEmpty(dict["issuekey"]))
+                if (dict.ContainsKey("issuekey") 
+                    && !string.IsNullOrEmpty(dict["issuekey"])
+                    && dict.ContainsKey("currentaction")
+                    && string.Compare(dict["currentaction"],"UpdateIssue") == 0)
                 {
                     IssueViewModels.StoreIssueAttachment(dict["issuekey"], url);
                 }

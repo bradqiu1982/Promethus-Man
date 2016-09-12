@@ -822,6 +822,46 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(ErrAbbr))
             {
                 var vm = ProjectFAViewModules.RetrieveFADataWithErrAbbr(ProjectKey, ErrAbbr);
+
+                var tempitems = new List<ProjectFAViewModules>();
+
+                foreach (var item in vm)
+                {
+                    if (item.IssueData.Resolution != Resolute.Pending
+                        && item.IssueData.Resolution != Resolute.Working
+                        && item.IssueData.Resolution != Resolute.Reopen)
+                    {
+                        var removesameasissue = false;
+                        foreach (var c in item.IssueData.CommentList)
+                        {
+                            if (c.Comment.Contains("<p>Issue Same As <a"))
+                            {
+                                removesameasissue = true;
+                                break;
+                            }
+                        }
+                        if (removesameasissue)
+                        {
+                            continue;
+                        }
+
+                        tempitems.Add(item);
+                    }
+                }
+
+                if (tempitems.Count > 0)
+                {
+                    var pslist = new List<SelectListItem>();
+                    foreach (var item in tempitems)
+                    {
+                        var pitem = new SelectListItem();
+                        pitem.Text = item.IssueData.Summary;
+                        pitem.Value = item.IssueData.IssueKey;
+                        pslist.Add(pitem);
+                    }
+                    ViewBag.DoneIssueList = pslist;
+                }
+
                 return View("ProjectFA",vm);
             }
             return View();

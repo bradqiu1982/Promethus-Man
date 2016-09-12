@@ -49,33 +49,97 @@
     }
 
     <div class="row">
+    @if (ViewBag.chartscript == null && fadata != null && fadata.Count > 0 && ViewBag.DoneIssueList != null)
+    {
+        <div class="col-md-3 text-center">ModuleSN</div>
+        <div class="col-md-2 text-center">ErrAbbr</div>
+        <div class="col-md-1 text-center">FA Status</div>
+        <div class="col-md-1 text-center">Assignee</div>
+        <div class="col-md-4 text-center">Issue</div>
+        <div class="col-md-1 text-center">Attachment</div>
+    }
+    else
+    {
         <div class="col-md-1 text-center">ModuleSN</div>
         <div class="col-md-2 text-center">ErrAbbr</div>
         <div class="col-md-2 text-center">FA Status</div>
         <div class="col-md-2 text-center">Assignee</div>
         <div class="col-md-4 text-center">Issue</div>
         <div class="col-md-1 text-center">Attachment</div>
+    }
     </div>
     <hr />
-    @if (Model != null)
+
+@using (Html.BeginForm("SameAsIssue", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    if (Model != null)
     {
+        var i = 0;
         foreach (var item in Model)
         {
-            <div class="row">
-                <div class="col-md-1 text-center">@item.TestData.ModuleSerialNum</div>
-                <div class="col-md-2 text-center"><a href="/Project/ProjectErrAbbr?ProjectKey=@item.TestData.ProjectKey&ErrAbbr=@item.TestData.ErrAbbr">@item.TestData.ErrAbbr</a></div>
-                <div class="col-md-2 text-center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(@item.IssueData.Resolution))</div>
-                <div class="col-md-2 text-center"><a href="/User/UserCenter?username=@item.IssueData.Assignee">@item.IssueData.Assignee.Split(new char[] { '@' })[0]</a></div>
-                <div class="col-md-4 text-center"><a href="/Issue/UpdateIssue?issuekey=@item.IssueData.IssueKey">@item.IssueData.Summary</a></div>
-                <div class="col-md-1 text-center">
-                    @if (item.IssueData.AttachList.Count > 0)
-                    {
-                        <a href="/Issue/IssueAttach?issuekey=@item.IssueData.IssueKey">
-                            <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>
-                        </a>
-                    }
+            if (ViewBag.chartscript == null && fadata != null && fadata.Count > 0 && ViewBag.DoneIssueList != null)
+            {
+                <div class="row">
+                    <div class="col-md-3 text-center">
+                        <div class="col-md-3">
+                            <span class="input-group-addon">
+                                <input type="checkbox" id="check@(i)" name="check@(i)" value="true"/>
+                            </span>
+                            <input class="form-control text-box single-line" value="@item.IssueData.IssueKey" id="HIssueKey@(i)" name="HIssueKey@(i)" type="hidden" />
+                        </div>
+                        <div class="col-md-9">@item.TestData.ModuleSerialNum</div>
+                    </div>
+                    <div class="col-md-2 text-center"><a href="/Project/ProjectErrAbbr?ProjectKey=@item.TestData.ProjectKey&ErrAbbr=@item.TestData.ErrAbbr">@item.TestData.ErrAbbr</a></div>
+                    <div class="col-md-1 text-center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(@item.IssueData.Resolution))</div>
+                    <div class="col-md-1 text-center"><a href="/User/UserCenter?username=@item.IssueData.Assignee">@item.IssueData.Assignee.Split(new char[] { '@' })[0]</a></div>
+                    <div class="col-md-4 text-center"><a href="/Issue/UpdateIssue?issuekey=@item.IssueData.IssueKey">@item.IssueData.Summary</a></div>
+                    <div class="col-md-1 text-center">
+                        @if (item.IssueData.AttachList.Count > 0)
+                        {
+                            <a href="/Issue/IssueAttach?issuekey=@item.IssueData.IssueKey">
+                                <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>
+                            </a>
+                        }
+                    </div>
                 </div>
-            </div>
+            }
+            else
+            {
+                <div class="row">
+                    <div class="col-md-1 text-center">
+                        @item.TestData.ModuleSerialNum
+                    </div>
+                    <div class="col-md-2 text-center"><a href="/Project/ProjectErrAbbr?ProjectKey=@item.TestData.ProjectKey&ErrAbbr=@item.TestData.ErrAbbr">@item.TestData.ErrAbbr</a></div>
+                    <div class="col-md-2 text-center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(@item.IssueData.Resolution))</div>
+                    <div class="col-md-2 text-center"><a href="/User/UserCenter?username=@item.IssueData.Assignee">@item.IssueData.Assignee.Split(new char[] { '@' })[0]</a></div>
+                    <div class="col-md-4 text-center"><a href="/Issue/UpdateIssue?issuekey=@item.IssueData.IssueKey">@item.IssueData.Summary</a></div>
+                    <div class="col-md-1 text-center">
+                        @if (item.IssueData.AttachList.Count > 0)
+                        {
+                            <a href="/Issue/IssueAttach?issuekey=@item.IssueData.IssueKey">
+                                <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+
             <hr />
+            i = i + 1;
         }
     }
+
+    if (ViewBag.chartscript == null && fadata != null && fadata.Count > 0 && ViewBag.DoneIssueList != null)
+    {
+        <div class="row">
+            <div class="col-md-2 text-center">
+                <input type="submit" value="Same As" class="btn btn-default" />
+            </div>
+            <div class="col-md-10 text-center">
+                @Html.DropDownList("DoneIssueList", null, new { @id = "DoneIssueList", @class = "form-control"})
+            </div>
+        </div>
+    }
+}

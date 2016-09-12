@@ -492,8 +492,10 @@ namespace Prometheus.Controllers
         private void SendRMAEvent(IssueViewModels vm,string operate)
         {
             var alertime = vm.RetrieveAlertEmailDate(vm.IssueKey);
-            if (DateTime.Parse(alertime).AddHours(5) < DateTime.Now)
+            if (DateTime.Parse(alertime).AddHours(24) < DateTime.Now)
             {
+                vm.UpdateAlertEmailDate();
+
                 var routevalue = new RouteValueDictionary();
                 routevalue.Add("issuekey", vm.IssueKey);
                 //send validate email
@@ -507,6 +509,7 @@ namespace Prometheus.Controllers
                 toaddrs.Add(vm.Assignee);
                 toaddrs.Add(vm.Reporter);
                 EmailUtility.SendEmail("Parallel NPI Trace Notice", toaddrs, content);
+                
             }
         }
 
@@ -790,7 +793,38 @@ namespace Prometheus.Controllers
         }
 
 
+        [HttpPost, ActionName("SameAsIssue")]
+        [ValidateAntiForgeryToken]
+        public ActionResult SameAsIssue()
+        {
+            var targetissuekey = Request.Form["DoneIssueList"].ToString();
+            var tobeissuekey = new List<string>();
+            for (var i = 0; i < 300; i++)
+            {
+                if (Request.Form["check" + i] != null && string.Compare(Request.Form["check" + i],"true",true) == 0)
+                {
+                    tobeissuekey.Add(Request.Form["HIssueKey" + i]);
+                }
+            }
 
+            var targetdata = IssueViewModels.RetrieveIssueByIssueKey(targetissuekey);
+            foreach (var key in tobeissuekey)
+            {
+                var tobedata = IssueViewModels.RetrieveIssueByIssueKey(key);
+                if (string.Compare(tobedata.Resolution, Resolute.Pending) != 0
+                    && string.Compare(tobedata.Resolution, Resolute.Working) != 0
+                    && string.Compare(tobedata.Resolution, Resolute.Reopen) != 0)
+                {
+                    continue;
+                }
+
+                tobedata.Resolution = Resolute.Done;
+                tobedata.Description = "<p>Issue Same As <a href=\"/Issue/UpdateIssue?issuekey=" + targetdata.IssueKey+"\">"+targetdata.Summary +"</a></p>";
+                tobedata.UpdateIssue();
+            }
+
+            return RedirectToAction("ViewAll", "Project");
+        }
 
 
         }

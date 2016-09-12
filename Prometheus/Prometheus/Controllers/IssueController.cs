@@ -159,12 +159,16 @@ namespace Prometheus.Controllers
             {
                 var ck = new Dictionary<string, string>();
                 ck.Add("issuekey", issuekey);
+                ck.Add("currentaction", "UpdateIssue");
                 CookieUtility.SetCookie(this, ck);
                 key = issuekey;
             }
             else if (ckdict.ContainsKey("issuekey") && !string.IsNullOrEmpty(ckdict["issuekey"]))
             {
                 key = ckdict["issuekey"];
+                var ck = new Dictionary<string, string>();
+                ck.Add("currentaction", "UpdateIssue");
+                CookieUtility.SetCookie(this, ck);
             }
 
             if (string.IsNullOrEmpty(key))
@@ -575,6 +579,7 @@ namespace Prometheus.Controllers
                 ck.Add("logonredirectctrl", "Issue");
                 ck.Add("logonredirectact", "UpdateIssue");
                 ck.Add("issuekey", issuekey);
+                ck.Add("currentaction", "UpdateIssue");
                 CookieUtility.SetCookie(this, ck);
                 return RedirectToAction("LoginUser", "User");
             }
@@ -590,6 +595,9 @@ namespace Prometheus.Controllers
             else if (ckdict.ContainsKey("issuekey") && !string.IsNullOrEmpty(ckdict["issuekey"]))
             {
                 key = ckdict["issuekey"];
+                var ck = new Dictionary<string, string>();
+                ck.Add("currentaction", "UpdateIssue");
+                CookieUtility.SetCookie(this, ck);
             }
 
             if (string.IsNullOrEmpty(key))

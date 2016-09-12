@@ -186,6 +186,7 @@
     <Compile Include="Models\IssueViewModels.cs" />
     <Compile Include="Models\MESUtility.cs" />
     <Compile Include="Models\ParetoData.cs" />
+    <Compile Include="Models\ProjectErrorViewModels.cs" />
     <Compile Include="Models\ProjectEvent.cs" />
     <Compile Include="Models\ProjectFAViewModules.cs" />
     <Compile Include="Models\ProjectTestData.cs" />

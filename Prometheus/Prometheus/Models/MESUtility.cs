@@ -150,6 +150,12 @@ namespace Prometheus.Models
                                 {
                                     tempdata.StoreProjectTestData();
 
+                                    var ekey = ProjectErrorViewModels.GetUniqKey();
+                                    var pjerror = new ProjectErrorViewModels(vm.ProjectKey, ekey, tempdata.ErrAbbr, "", 1);
+                                    pjerror.Reporter = "System";
+                                    pjerror.Description = "";
+                                    pjerror.AddandUpdateProjectError();
+
                                     if (!sndict.ContainsKey(tempdata.ModuleSerialNum))
                                     {
                                         sndict.Add(tempdata.ModuleSerialNum, true);
@@ -164,9 +170,15 @@ namespace Prometheus.Models
                                     if (!bondingeddatadict.ContainsKey(tempdata.DataID))
                                     {
                                         bondingeddatadict.Add(tempdata.DataID,true);
-
                                         tempdata.StoreProjectTestData();
-                                        if (!sndict.ContainsKey(tempdata.ModuleSerialNum))
+
+                                        var ekey = ProjectErrorViewModels.GetUniqKey();
+                                        var pjerror = new ProjectErrorViewModels(vm.ProjectKey, ekey, tempdata.ErrAbbr, "", 1);
+                                        pjerror.Reporter = "System";
+                                        pjerror.Description = "";
+                                        pjerror.AddandUpdateProjectError();
+
+                                    if (!sndict.ContainsKey(tempdata.ModuleSerialNum))
                                         {
                                             sndict.Add(tempdata.ModuleSerialNum, true);
                                             if (string.Compare(tempdata.ErrAbbr, "PASS", true) != 0)
@@ -230,6 +242,12 @@ namespace Prometheus.Models
                             {
                                 tempdata.StoreProjectTestData();
 
+                                var ekey = ProjectErrorViewModels.GetUniqKey();
+                                var pjerror = new ProjectErrorViewModels(vm.ProjectKey, ekey, tempdata.ErrAbbr, "", 1);
+                                pjerror.Reporter = "System";
+                                pjerror.Description = "";
+                                pjerror.AddandUpdateProjectError();
+
                                 if (!sndict.ContainsKey(tempdata.ModuleSerialNum))
                                 {
                                     sndict.Add(tempdata.ModuleSerialNum, true);
@@ -246,6 +264,13 @@ namespace Prometheus.Models
                                     bondingeddatadict.Add(tempdata.DataID,true);
 
                                     tempdata.StoreProjectTestData();
+
+                                    var ekey = ProjectErrorViewModels.GetUniqKey();
+                                    var pjerror = new ProjectErrorViewModels(vm.ProjectKey, ekey, tempdata.ErrAbbr, "", 1);
+                                    pjerror.Reporter = "System";
+                                    pjerror.Description = "";
+                                    pjerror.AddandUpdateProjectError();
+
                                     if (!sndict.ContainsKey(tempdata.ModuleSerialNum))
                                     {
                                         sndict.Add(tempdata.ModuleSerialNum, true);

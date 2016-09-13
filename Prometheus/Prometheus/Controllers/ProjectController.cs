@@ -817,6 +817,40 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        public ActionResult ProjectError(string ProjectKey)
+        {
+            if (!string.IsNullOrEmpty(ProjectKey))
+            {
+                var vm = ProjectErrorViewModels.RetrieveErrorByPJKey(ProjectKey);
+                var piedatadict = new Dictionary<string, int>();
+                foreach (var item in vm)
+                {
+                    piedatadict.Add(item.OrignalCode, item.ErrorCount);
+                }
+
+                var keys = piedatadict.Keys;
+                if (keys.Count > 0)
+                {
+                    var namevaluepair = "";
+                    foreach (var k in keys)
+                    {
+                        namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                    }
+
+                    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                    ViewBag.chartscript = tempscript.Replace("#ElementID#", "failurepie")
+                        .Replace("#Title#", ProjectKey + " Realtime Failure")
+                        .Replace("#SERIESNAME#", "Failure")
+                        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
+                }
+
+                return View(vm);
+            }
+            return View();
+        }
+        
         public ActionResult ProjectErrAbbr(string ProjectKey, string ErrAbbr)
         {
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(ErrAbbr))
@@ -1748,6 +1782,72 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        public ActionResult UpdateProjectError(string ErrorKey)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
 
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "Project");
+                ck.Add("logonredirectact", "UpdateProjectError");
+                ck.Add("errorkey", ErrorKey);
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var key = "";
+            if (!string.IsNullOrEmpty(ErrorKey))
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("errorkey", ErrorKey);
+                ck.Add("currentaction", "UpdateProjectError");
+                CookieUtility.SetCookie(this, ck);
+                key = ErrorKey;
+            }
+            else if (ckdict.ContainsKey("errorkey") && !string.IsNullOrEmpty(ckdict["errorkey"]))
+            {
+                key = ckdict["errorkey"];
+                var ck = new Dictionary<string, string>();
+                ck.Add("currentaction", "UpdateProjectError");
+                CookieUtility.SetCookie(this, ck);
+            }
+            
+            if (!string.IsNullOrEmpty(key))
+            {
+                var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key);
+                return View(vm[0]);
+            }
+            return View();
+        }
+
+        [HttpPost, ActionName("UpdateProjectError")]
+        [ValidateAntiForgeryToken]
+        public ActionResult UpdateProjectErrorPost()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            
+            var vm = new ProjectErrorViewModels();
+            vm.ErrorKey = Request.Form["ErrorKey"];
+            vm.ShortDesc = Request.Form["ShortDesc"];
+            var temphtml = Request.Form["editor1"];
+            if (string.IsNullOrEmpty(temphtml))
+            {
+                vm.Description = "";
+            }
+            else
+            {
+                vm.Description = Server.HtmlDecode(temphtml);
+            }
+            vm.Reporter = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            vm.UpdateProjectError();
+            
+            var tempvm = ProjectErrorViewModels.RetrieveErrorByErrorKey(vm.ErrorKey);
+            return View(tempvm[0]);
+        }
     }
 }

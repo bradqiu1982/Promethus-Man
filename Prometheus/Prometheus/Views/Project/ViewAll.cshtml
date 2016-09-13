@@ -34,7 +34,7 @@
             </div>
             <div class="panel-body col-md-12">
                 <div class="row col-md-12">
-                    <div class="col-md-2 text-center">
+                    <div class="col-md-2 text-left">
                         @if (item.FirstYield > 0)
                         {
                             <a href="/Project/ProjectYield?ProjectKey=@item.ProjectKey">
@@ -83,16 +83,21 @@
                 </div>
                 <hr/>
                 <div class="row col-md-12">
+                    <div class="col-md-2 text-left">
+                        <a href="/Project/ProjectError?ProjectKey=@item.ProjectKey">
+                            <span class="glyphicon glyphicon-screenshot" aria-hidden="true"></span> Project Error
+                        </a>
+                    </div>
+
                     <div class="col-md-2 text-center">
                         <a href="/Project/ProjectNPI?ProjectKey=@item.ProjectKey">
                             <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Project NPI Process
                         </a>
                     </div>
-                    <div class="col-md-1 text-center"></div>
+                    
                     <div class="col-md-1 text-center active"><a href="/Issue/UpdateIssue?issuekey=@item.DVTIssueKey">DVT</a></div>
                     <div class="col-md-2 text-center active">@item.DVTDate</div>
                     <div class="col-md-1 text-center active">@item.DVTStatus</div>
-                    <div class="col-md-1 text-center"></div>
                     <div class="col-md-1 text-center active"><a href="/Issue/UpdateIssue?issuekey=@item.MVTIssueKey">MVT</a></div>
                     <div class="col-md-2 text-center active">@item.MVTDate</div>
                     <div class="col-md-1 text-center active">@item.MVTStatus</div>

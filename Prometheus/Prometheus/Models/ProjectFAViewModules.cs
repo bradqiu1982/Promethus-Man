@@ -41,6 +41,15 @@ namespace Prometheus.Models
                 }
             }
 
+            issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Done);
+            foreach (var d in pjdata)
+            {
+                if (issuedict.ContainsKey(d.DataID))
+                {
+                    ret.Add(new ProjectFAViewModules(issuedict[d.DataID], d));
+                }
+            }
+
             return ret;
         }
 

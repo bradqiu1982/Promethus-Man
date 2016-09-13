@@ -219,6 +219,22 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static List<ProjectErrorViewModels> RetrieveErrorByPJKey(string projectkey,string errorcode)
+        {
+            var ret = new List<ProjectErrorViewModels>();
+            var sql = "select  ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount from ProjectError where ProjectKey = '<ProjectKey>' and OrignalCode = '<OrignalCode>'";
+            sql = sql.Replace("<ProjectKey>", projectkey).Replace("<OrignalCode>", errorcode);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+
+            foreach (var line in dbret)
+            {
+                var temperror = new ProjectErrorViewModels(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToString(line[2]), Convert.ToString(line[3]), Convert.ToInt32(line[4]));
+                temperror.CommentList = RetrieveErrorComments(temperror.ErrorKey);
+                ret.Add(temperror);
+            }
+            return ret;
+        }
+
         public static List<ProjectErrorViewModels> RetrieveErrorByErrorKey(string ekey)
         {
             var ret = new List<ProjectErrorViewModels>();

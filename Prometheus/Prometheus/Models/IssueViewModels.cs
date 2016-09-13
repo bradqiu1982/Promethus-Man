@@ -459,7 +459,7 @@ namespace Prometheus.Models
                 .Replace("<Summary>", Summary).Replace("<Priority>", Priority).Replace("<DueDate>", DueDate.ToString())
                 .Replace("<ResolvedDate>", ResolvedDate.ToString()).Replace("<ReportDate>", ReportDate.ToString()).Replace("<Assignee>", Assignee)
                 .Replace("<Reporter>", Reporter).Replace("<Resolution>", Resolution).Replace("<Creator>", Reporter)
-                .Replace("<AlertEmailUpdateDate>", DateTime.Now.AddHours(-6).ToString()).Replace("<RelativePeoples>", RelativePeoples);
+                .Replace("<AlertEmailUpdateDate>", DateTime.Now.AddHours(-25).ToString()).Replace("<RelativePeoples>", RelativePeoples);
             DBUtility.ExeLocalSqlNoRes(sql);
 
             StoreIssueComment(DateTime.Now.ToString());
@@ -588,11 +588,10 @@ namespace Prometheus.Models
 
         public void UpdateRMA()
         {
-            var sql = "update Issue set Priority = '<Priority>',DueDate = '<DueDate>', Assignee = '<Assignee>',Resolution = '<Resolution>',RelativePeoples='<RelativePeoples>',ModuleSN='<ModuleSN>' where IssueKey = '<IssueKey>'";
+            var sql = "update Issue set Priority = '<Priority>',DueDate = '<DueDate>', Assignee = '<Assignee>',Resolution = '<Resolution>',RelativePeoples = '<RelativePeoples>' where IssueKey = '<IssueKey>'";
             sql = sql.Replace("<IssueKey>", IssueKey).Replace("<Priority>", Priority)
                 .Replace("<DueDate>", DueDate.ToString()).Replace("<Assignee>", Assignee)
-                .Replace("<Resolution>", Resolution).Replace("<RelativePeoples>", RelativePeoples)
-                .Replace("<ModuleSN>", ModuleSN);
+                .Replace("<Resolution>", Resolution).Replace("<RelativePeoples>", RelativePeoples);
             DBUtility.ExeLocalSqlNoRes(sql);
 
             StoreIssueComment(DateTime.Now.ToString());
@@ -602,9 +601,9 @@ namespace Prometheus.Models
 
         private void UpdateRMAInfo()
         {
-            var sql = "update IssueRMA set CRMANUM = '<CRMANUM>',CReport = '<CReport>' where IssueKey = '<IssueKey>'";
+            var sql = "update IssueRMA set CRMANUM = '<CRMANUM>',CReport = '<CReport>',ModuleSN = '<ModuleSN>' where IssueKey = '<IssueKey>'";
             sql = sql.Replace("<IssueKey>", IssueKey).Replace("<CRMANUM>", CRMANUM)
-                .Replace("<CReport>", CReport);
+                .Replace("<CReport>", CReport).Replace("<ModuleSN>", ModuleSN);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 

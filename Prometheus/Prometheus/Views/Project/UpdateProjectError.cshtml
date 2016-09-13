@@ -1,0 +1,117 @@
+﻿@model Prometheus.Models.ProjectErrorViewModels
+
+@{
+    ViewBag.Title = "UpdateProjectError";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<div class="row">
+    <div class="col-md-4">
+        <h2>Update Project Error</h2>
+    </div>
+    <div class="col-md-2">
+        <h2><a data-toggle="tooltip" title="Goto ViewAll Page" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+    </div>
+    <div class="col-md-6"></div>
+</div>
+
+<hr />
+
+<script src="../../ckeditor/ckeditor.js"></script>
+
+@if (Model != null)
+{
+    using (Html.BeginForm("UpdateProjectError", "Project", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-group">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="control-label col-md-2" for="ProjectKey">Project Key</label>
+                        <div class="col-md-10">
+                            <input class="form-control text-box single-line" id="ProjectKey" name="ProjectKey" type="text" value="@Model.ProjectKey" readonly="readonly" />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="control-label col-md-2" for="ErrorCode">Error Code</label>
+                        <div class="col-md-10">
+                            <input class="form-control text-box single-line" id="ErrorCode" name="ErrorCode" type="text" value="@Model.OrignalCode" readonly="readonly" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="control-label col-md-2" for="ShortDesc">Short Desc</label>
+                        <div class="col-md-10">
+                            <input class="form-control text-box single-line" data-val="true" data-val-length="The field must be a string with a minimum length of 3 and a maximum length of 25." data-val-length-max="25" data-val-length-min="3" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="ShortDesc" name="ShortDesc" type="text" value="@Model.ShortDesc" />
+                            <span class="field-validation-valid text-danger" data-valmsg-for="ShortDesc" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="control-label col-md-2" for="ErrorCount">Error Count</label>
+                        <div class="col-md-10">
+                            <input class="form-control text-box single-line" data-val="true" id="ErrorCount" name="ErrorCount" type="text" value="@Model.ErrorCount" readonly="readonly" />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6"><input class="form-control text-box single-line" value="@(Model.ErrorKey)" id="ErrorKey" name="ErrorKey" type="hidden"/></div>
+                    <div class="col-md-6"></div>
+                </div>
+            </div>
+        </div>
+
+                foreach (var item in Model.CommentList)
+                {
+                <hr />
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Comment</h3>
+                            </div>
+                            <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
+                                @Html.Raw(item.Comment)
+                            </div>
+                            <div class="panel-footer text-right">
+                                Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.CommentDate.ToString()
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+
+                <hr />
+
+                <div class="col-md-12">
+                    <div class="form-group">
+                        Description
+                    </div>
+
+                    <div class="form-group">
+                        <div>
+                            @if (Model != null && !string.IsNullOrEmpty(Model.Description))
+                            {
+                                <textarea name="editor1" id="editor1" rows="10" cols="80">@(Model.Description)</textarea>
+                            }
+                            else
+                            {
+                                <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
+                            }
+                            <script>
+                                CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserImageUploadUrl: '/userfiles/Upload.ashx' });
+                            </script>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Submit" class="btn btn-default" />
+                </div>
+        }
+}

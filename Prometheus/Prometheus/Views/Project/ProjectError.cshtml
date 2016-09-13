@@ -1,0 +1,73 @@
+﻿@model IEnumerable<Prometheus.Models.ProjectErrorViewModels>
+
+@{
+    ViewBag.Title = "ProjectError";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-3">
+        <h2>Project Error</h2>
+    </div>
+    <div class="col-md-2">
+        <h2><a data-toggle="tooltip" title="Goto ViewAll Page" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+    </div>
+    <div class="col-md-7"></div>
+</div>
+    
+<hr/>
+
+<script src="~/Scripts/highcharts.js"></script>
+<script src="~/Scripts/exporting.js"></script>
+
+@if (ViewBag.chartscript != null)
+{
+    @Html.Raw(ViewBag.chartscript)
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Failure</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="col-md-12">
+                        <div id="failurepie" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<hr/>
+
+@if (Model != null)
+{
+    <div class="row">
+        <div class="col-md-2 text-center">Error Code</div>
+        <div class="col-md-3 text-center">Short Desc</div>
+        <div class="col-md-1 text-center">Count</div>
+        <div class="col-md-6 text-center">Comment</div>
+    </div>
+
+    <hr/>
+
+    foreach (var item in Model)
+    {
+        <div class="row">
+            <div class="col-md-2 text-center"><a href="/Project/UpdateProjectError?ErrorKey=@item.ErrorKey">@item.OrignalCode</a></div>
+            <div class="col-md-3 text-center">@item.ShortDesc</div>
+            <div class="col-md-1 text-center">@item.ErrorCount</div>
+            @if (item.CommentList.Count > 0)
+            {
+                <div class="col-md-6 text-center">@Html.Raw(item.CommentList[0].Comment)</div>
+            }
+            else
+            {
+                <div class="col-md-6 text-center"></div>
+            }
+        </div>
+        <hr/>
+     }
+}

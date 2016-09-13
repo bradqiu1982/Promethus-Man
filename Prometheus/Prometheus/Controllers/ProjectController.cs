@@ -807,7 +807,7 @@ namespace Prometheus.Controllers
 
                     var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
                     ViewBag.chartscript = tempscript.Replace("#ElementID#", "failurepie")
-                        .Replace("#Title#", ProjectKey + "FA Realtime Failure")
+                        .Replace("#Title#", ProjectKey + " FA Realtime Failure")
                         .Replace("#SERIESNAME#", "Failure")
                         .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                 }

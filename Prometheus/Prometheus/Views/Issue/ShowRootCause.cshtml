@@ -1,4 +1,4 @@
-﻿@Model Prometheus.Models.IssueViewModels
+﻿@model Prometheus.Models.IssueViewModels
 
 @{
     ViewBag.Title = "ShowRootCause";
@@ -6,12 +6,20 @@
 }
 
 <h2>Root Cause</h2>
-
-<div class="row">
-    <div class="panel panel-default">
-        <div class="panel-heading">Root Cause</div>
-        <div class="panel-body">
-
+@if (Model != null)
+{
+    foreach (Prometheus.Models.IssueComments item in Model.RootCauseCommentList)
+    {
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-heading">Root Cause</div>
+                <div class="panel-body">
+                    @Html.Raw(item.Comment)
+                </div>
+                <div class="panel-footer text-right">
+                    Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.CommentDate.ToString()
+                </div>
+            </div>
         </div>
-    </div>
-</div>
+    }
+}

@@ -59,7 +59,7 @@ namespace Prometheus.Controllers
             ViewBag.prioritylist = slist;
 
             var rsilist = new List<string>();
-            string[] rlist = { Resolute.Pending,Resolute.Working,Resolute.Reopen,Resolute.Fixed,Resolute.Done,Resolute.NotFix,Resolute.Unresolved, Resolute.NotReproduce};
+            string[] rlist = { Resolute.Pending, Resolute.Working, Resolute.Reopen, Resolute.Fixed, Resolute.Done, Resolute.NotFix, Resolute.Unresolved, Resolute.NotReproduce };
             rsilist.AddRange(rlist);
             slist = CreateSelectList(rsilist, vm.Resolution);
             ViewBag.resolutionlist = slist;
@@ -130,7 +130,7 @@ namespace Prometheus.Controllers
 
             vm.StoreIssue();
 
-            ProjectEvent.CreateIssueEvent(vm.ProjectKey,vm.Reporter,vm.Assignee,vm.Summary,vm.IssueKey);
+            ProjectEvent.CreateIssueEvent(vm.ProjectKey, vm.Reporter, vm.Assignee, vm.Summary, vm.IssueKey);
 
             var dict = new RouteValueDictionary();
             dict.Add("issuekey", vm.IssueKey);
@@ -179,7 +179,7 @@ namespace Prometheus.Controllers
             }
 
             var ret = IssueViewModels.RetrieveIssueByIssueKey(key);
-            
+
             if (ret != null)
             {
                 if (string.Compare(ret.IssueType, ISSUETP.RMA) == 0)
@@ -277,7 +277,7 @@ namespace Prometheus.Controllers
             return RedirectToAction("CreateSubIssue", dict);
         }
 
-        public ActionResult CreateSubIssue(string parentkey,string projectkey)
+        public ActionResult CreateSubIssue(string parentkey, string projectkey)
         {
             var ckdict = CookieUtility.UnpackCookie(this);
             var vm = new IssueViewModels();
@@ -370,9 +370,9 @@ namespace Prometheus.Controllers
             ViewBag.projectlist = slist;
 
             var typelist = new List<string>();
-            string[] tlist = { ISSUETP.Bug,ISSUETP.RMA, ISSUETP.NewFeature, ISSUETP.Task,ISSUETP.Improvement,ISSUETP.Document,ISSUETP.NPIPROC};
+            string[] tlist = { ISSUETP.Bug, ISSUETP.RMA, ISSUETP.NewFeature, ISSUETP.Task, ISSUETP.Improvement, ISSUETP.Document, ISSUETP.NPIPROC };
             typelist.AddRange(tlist);
-            slist = CreateSearchSelectList(typelist,"");
+            slist = CreateSearchSelectList(typelist, "");
             ViewBag.issuetypelist = slist;
 
             var rsilist = new List<string>();
@@ -493,7 +493,7 @@ namespace Prometheus.Controllers
             }
         }
 
-        private void SendRMAEvent(IssueViewModels vm,string operate)
+        private void SendRMAEvent(IssueViewModels vm, string operate)
         {
             var alertime = vm.RetrieveAlertEmailDate(vm.IssueKey);
             if (DateTime.Parse(alertime).AddHours(24) < DateTime.Now)
@@ -513,7 +513,7 @@ namespace Prometheus.Controllers
                 toaddrs.Add(vm.Assignee);
                 toaddrs.Add(vm.Reporter);
                 EmailUtility.SendEmail("Parallel NPI Trace Notice", toaddrs, content);
-                
+
             }
         }
 
@@ -537,7 +537,7 @@ namespace Prometheus.Controllers
             vm.RelativePeoples = Request.Form["RPeopleAddr"];
             vm.ModuleSN = Request.Form["ModuleSN"];
 
-            vm.Summary = "[" + vm.ProjectKey + "] RMA " + vm.FinisarRMA + " for module " + vm.FinisarModel +" from "+vm.ECustomer+". Summary: "+vm.CReport.Substring(0,vm.CReport.Length>50?50:vm.CReport.Length);
+            vm.Summary = "[" + vm.ProjectKey + "] RMA " + vm.FinisarRMA + " for module " + vm.FinisarModel + " from " + vm.ECustomer + ". Summary: " + vm.CReport.Substring(0, vm.CReport.Length > 50 ? 50 : vm.CReport.Length);
 
             vm.Priority = Request.Form["prioritylist"].ToString();
             vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
@@ -633,7 +633,7 @@ namespace Prometheus.Controllers
                 {
                     if (fl != null && Request.Files[fl].ContentLength > 0)
                     {
-                        string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ","_");
+                        string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ", "_");
 
                         string datestring = DateTime.Now.ToString("yyyyMMdd");
                         string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
@@ -735,7 +735,7 @@ namespace Prometheus.Controllers
                     }
                 }
 
-                var linkstr = "<p><a href=\""+url+ "\" target=\"_blank\">[Report 4 Customer] "+ originalname + "</a></p>";
+                var linkstr = "<p><a href=\"" + url + "\" target=\"_blank\">[Report 4 Customer] " + originalname + "</a></p>";
                 var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(linkstr));
                 var commenttype = COMMENTTYPE.CustomReport;
                 IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
@@ -800,6 +800,36 @@ namespace Prometheus.Controllers
             return View(newdata);
         }
 
+
+        public ActionResult ShowRootCause(string issuekey)
+        {
+            if (!string.IsNullOrEmpty(issuekey))
+            {
+                var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+                return View(vm);
+            }
+            return View();
+        }
+
+        public ActionResult ShowContainmentAction(string issuekey)
+        {
+            if (!string.IsNullOrEmpty(issuekey))
+            {
+                var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+                return View(vm.ContainmentActions);
+            }
+            return View();
+        }
+
+        public ActionResult ShowCorrobrateAction(string issuekey)
+        {
+            if (!string.IsNullOrEmpty(issuekey))
+            {
+                var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+                return View(vm.CorrobrateActions);
+            }
+            return View();
+        }
 
         [HttpPost, ActionName("SameAsIssue")]
         [ValidateAntiForgeryToken]

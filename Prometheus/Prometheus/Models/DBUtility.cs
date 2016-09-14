@@ -67,13 +67,13 @@ namespace Prometheus.Models
             catch (SqlException ex)
             {
                 CloseConnector(conn);
-                System.Windows.MessageBox.Show(ex.ToString());
+                //System.Windows.MessageBox.Show(ex.ToString());
                 return false;
             }
             catch (Exception ex)
             {
                 CloseConnector(conn);
-                System.Windows.MessageBox.Show(ex.ToString());
+                //System.Windows.MessageBox.Show(ex.ToString());
                 return false;
             }
         }
@@ -112,14 +112,14 @@ namespace Prometheus.Models
             {
                 
                 CloseConnector(conn);
-                System.Windows.MessageBox.Show(ex.ToString());
+                //System.Windows.MessageBox.Show(ex.ToString());
                 ret.Clear();
                 return ret;
             }
             catch (Exception ex)
             {
                 CloseConnector(conn);
-                System.Windows.MessageBox.Show(ex.ToString());
+                //System.Windows.MessageBox.Show(ex.ToString());
                 ret.Clear();
                 return ret;
             }

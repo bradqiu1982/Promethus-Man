@@ -1824,6 +1824,55 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        public ActionResult UpdateProjectError2(string ProjectKey,string ErrorCode)
+        {
+            var tempvm = ProjectErrorViewModels.RetrieveErrorByPJKey(ProjectKey, ErrorCode);
+            var ErrorKey = "";
+            if (tempvm.Count > 0)
+            {
+                ErrorKey = tempvm[0].ErrorKey;
+            }
+
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "Project");
+                ck.Add("logonredirectact", "UpdateProjectError");
+                ck.Add("errorkey", ErrorKey);
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var key = "";
+            if (!string.IsNullOrEmpty(ErrorKey))
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("errorkey", ErrorKey);
+                ck.Add("currentaction", "UpdateProjectError");
+                CookieUtility.SetCookie(this, ck);
+                key = ErrorKey;
+            }
+            else if (ckdict.ContainsKey("errorkey") && !string.IsNullOrEmpty(ckdict["errorkey"]))
+            {
+                key = ckdict["errorkey"];
+                var ck = new Dictionary<string, string>();
+                ck.Add("currentaction", "UpdateProjectError");
+                CookieUtility.SetCookie(this, ck);
+            }
+
+            if (!string.IsNullOrEmpty(key))
+            {
+                var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key);
+                return View("UpdateProjectError",vm[0]);
+            }
+            return View("UpdateProjectError");
+        }
+
         [HttpPost, ActionName("UpdateProjectError")]
         [ValidateAntiForgeryToken]
         public ActionResult UpdateProjectErrorPost()

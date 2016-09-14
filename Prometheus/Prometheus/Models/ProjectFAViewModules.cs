@@ -23,12 +23,16 @@ namespace Prometheus.Models
             var ret = new List<ProjectFAViewModules>();
             var pjdata = ProjectTestData.RetrieveProjectFailedTestData(100000,pjkey);
 
+            var i = 0;
             var issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Working);
             foreach (var d in pjdata)
             {
                 if (issuedict.ContainsKey(d.DataID))
                 {
                     ret.Add(new ProjectFAViewModules(issuedict[d.DataID], d));
+                    if (i > 50)
+                        break;
+                    i = i + 1;
                 }
             }
 
@@ -38,17 +42,20 @@ namespace Prometheus.Models
                 if (issuedict.ContainsKey(d.DataID))
                 {
                     ret.Add(new ProjectFAViewModules(issuedict[d.DataID], d));
+                    if (i > 500)
+                        break;
+                    i = i + 1;
                 }
             }
 
-            issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Done);
-            foreach (var d in pjdata)
-            {
-                if (issuedict.ContainsKey(d.DataID))
-                {
-                    ret.Add(new ProjectFAViewModules(issuedict[d.DataID], d));
-                }
-            }
+            //issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Done);
+            //foreach (var d in pjdata)
+            //{
+            //    if (issuedict.ContainsKey(d.DataID))
+            //    {
+            //        ret.Add(new ProjectFAViewModules(issuedict[d.DataID], d));
+            //    }
+            //}
 
             return ret;
         }

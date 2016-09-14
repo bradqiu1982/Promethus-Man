@@ -219,6 +219,22 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static string RetrieveRealError(string projectkey, string errorcode)
+        {
+            var vm = RetrieveErrorByPJKey(projectkey, errorcode);
+            if (vm.Count == 0)
+            {
+                return errorcode;
+            }
+
+            if (string.IsNullOrEmpty(vm[0].ShortDesc))
+            {
+                return errorcode;
+            }
+
+            return vm[0].ShortDesc;
+        }
+
         public static List<ProjectErrorViewModels> RetrieveErrorByPJKey(string projectkey,string errorcode)
         {
             var ret = new List<ProjectErrorViewModels>();

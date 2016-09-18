@@ -778,7 +778,7 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(ProjectKey))
             {
-                var vm  = ProjectFAViewModules.RetrieveFAData(ProjectKey);
+                var vm  = ProjectFAViewModules.RetrievePendingFAData(ProjectKey);
 
                 var piedatadict = new Dictionary<string, int>();
                 foreach (var item in vm)
@@ -899,6 +899,48 @@ namespace Prometheus.Controllers
                 return View("ProjectFA",vm);
             }
             return View();
+        }
+
+        [HttpPost, ActionName("ProjectDoneFA")]
+        [ValidateAntiForgeryToken]
+        public ActionResult ProjectDoneFA()
+        {
+            var projectkey = Request.Form["HProjectKey"];
+            var vm = ProjectFAViewModules.RetrieveDoneFAData(projectkey);
+
+            var piedatadict = new Dictionary<string, int>();
+            foreach (var item in vm)
+            {
+                if (piedatadict.ContainsKey(item.TestData.ErrAbbr))
+                {
+                    var preval = piedatadict[item.TestData.ErrAbbr];
+                    piedatadict[item.TestData.ErrAbbr] = preval + 1;
+                }
+                else
+                {
+                    piedatadict.Add(item.TestData.ErrAbbr, 1);
+                }
+            }
+
+            var keys = piedatadict.Keys;
+            if (keys.Count > 0)
+            {
+                var namevaluepair = "";
+                foreach (var k in keys)
+                {
+                    namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                }
+
+                namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                ViewBag.chartscript = tempscript.Replace("#ElementID#", "failurepie")
+                    .Replace("#Title#", projectkey + " Done FA Failure")
+                    .Replace("#SERIESNAME#", "Failure")
+                    .Replace("#NAMEVALUEPAIRS#", namevaluepair);
+            }
+
+            return View("ProjectFA", vm);
         }
 
         public ActionResult ProjectNPI(string ProjectKey)

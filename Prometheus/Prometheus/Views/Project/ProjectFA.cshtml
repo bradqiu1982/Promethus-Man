@@ -20,7 +20,21 @@
             <h2><a data-toggle="tooltip" title="Goto ViewAll Page" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
         }
      </div>
-    <div class="col-md-8"></div>
+        
+
+    <div class="col-md-2">
+        @if (Model != null && fadata.Count > 0 && ViewBag.chartscript != null)
+        {
+            using (Html.BeginForm("ProjectDoneFA", "Project", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+                <input class="form-control text-box single-line" value="@(fadata[0].IssueData.ProjectKey)" id="HProjectKey" name="HProjectKey" type="hidden" />
+                <button data-toggle="tooltip" title="Done FA" type="submit" class="btn btn-default" style="font-size:1.5em; margin-top: 0.83em;margin-bottom: 0.83em;width:100%;">Done FA</button>
+            }
+        }
+    </div>
+
+    <div class="col-md-6"></div>
 </div>
 
 <hr/>

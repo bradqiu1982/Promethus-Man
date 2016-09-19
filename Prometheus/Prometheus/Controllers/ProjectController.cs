@@ -1940,5 +1940,16 @@ namespace Prometheus.Controllers
             var tempvm = ProjectErrorViewModels.RetrieveErrorByErrorKey(vm.ErrorKey);
             return View(tempvm[0]);
         }
+
+
+        public ActionResult SendPage()
+        {
+            var htmlstr1 = WebPageVM.GetPage("http://localhost/");
+            var tolist = new List<string>();
+            var htmlhelper = new HtmlHelper(new ViewContext(),new ViewPage());
+            var htmlstr = htmlhelper.Raw(htmlstr1);
+            EmailUtility.SendHtmlEmail("View All Page", tolist, htmlstr.ToHtmlString());
+            return RedirectToAction("ViewAll");
+        }
     }
 }

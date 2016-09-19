@@ -717,6 +717,7 @@
     <Content Include="Views\Project\ProjectError.cshtml" />
     <Content Include="Views\Project\UpdateProjectError.cshtml" />
     <Content Include="Views\PJReport\IBook.cshtml" />
+    <Content Include="Views\PJReport\ViewReport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

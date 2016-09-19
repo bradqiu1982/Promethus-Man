@@ -58,6 +58,10 @@ namespace Prometheus.Models
         public static string MonthlyPareto = "Monthly Pareto";
     }
 
+    public class PJReportItem
+    {
+        public string YieldTrend { set; get; }
+    }
 
     public class PJReportViewModels
     {

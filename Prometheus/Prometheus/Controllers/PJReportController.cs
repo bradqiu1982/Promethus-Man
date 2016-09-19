@@ -133,9 +133,45 @@ namespace Prometheus.Controllers
             return View(vm);
         }
 
+
+
         public ActionResult ViewReport()
         {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
 
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "PJReport");
+                ck.Add("logonredirectact", "ViewReport");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            var vm = PJReportViewModels.RetrieveBookReportRecord(updater);
+            if (vm == null)
+            {
+                return RedirectToAction("IBook");
+            }
+
+            var pjreportdict = new Dictionary<string, PJReportItem>();
+
+            foreach (var item in vm.ProjectList)
+            {
+                ProjectController.ProjectWeeklyTrend(this, item);
+                var reportitem = new PJReportItem();
+                reportitem.YieldTrend = this.ViewBag.chartscript.Replace("weeklyyield",item+ "weeklyyield");
+                this.ViewBag.chartscript = null;
+                pjreportdict.Add(item, reportitem);
+            }
+
+            ViewBag.ReportDict = pjreportdict;
+
+            return View();
         }
     }
 }

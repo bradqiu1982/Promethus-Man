@@ -193,6 +193,7 @@
     <Compile Include="Models\ProjectViewModels.cs" />
     <Compile Include="Models\ProjectYieldViewModule.cs" />
     <Compile Include="Models\UserViewModels.cs" />
+    <Compile Include="Models\WebPageVM.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>

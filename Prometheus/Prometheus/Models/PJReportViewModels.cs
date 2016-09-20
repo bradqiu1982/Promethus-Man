@@ -16,7 +16,7 @@ namespace Prometheus.Models
         public static string SUN = "SUNDAY";
         public static string EVE = "EVERY DAY";
 
-        public int GetWeekDay(string day)
+        public static int GetWeekDay(string day)
         {
             if (string.Compare(day, ReportSelectTime.MON) == 0)
             {
@@ -202,6 +202,26 @@ namespace Prometheus.Models
                 return ret;
             }
             return null;
+        }
+
+        public static List<PJReportViewModels> RetrieveBookReportRecord()
+        {
+            var ret = new List<PJReportViewModels>();
+
+            var sql = "select username,projects,reporttypes,reporttime,lastupdatetime from BookReportRecord";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            foreach(var line in dbret)
+            {
+                var temp = new PJReportViewModels();
+                temp.username = Convert.ToString(line[0]);
+                temp.projects = Convert.ToString(line[1]);
+                temp.reporttypes = Convert.ToString(line[2]);
+                temp.reporttime = Convert.ToString(line[3]);
+                temp.lastupdatetime = DateTime.Parse(Convert.ToString(line[4]));
+                ret.Add(temp);
+            }
+
+            return ret;
         }
 
     }

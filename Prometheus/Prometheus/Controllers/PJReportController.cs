@@ -238,9 +238,13 @@ namespace Prometheus.Controllers
                     .Replace("#ABPercent#", abpecentvalue)
                     .Replace("#PPercent#", ppecentvalue);
             }
+            else
+            {
+                ViewBag.rparetoscript = string.Empty;
+            }
         }
 
-        public void MonthlyPareto(string ProjectKey)
+        private void MonthlyPareto(string ProjectKey)
         {
             var edate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd") + " 07:30:00");
             var sdate = edate.AddDays(-30);
@@ -289,9 +293,9 @@ namespace Prometheus.Controllers
         }
 
 
-        public void IssueCountTrend(string ProjectKey)
+        private void IssueCountTrend(string ProjectKey)
         {
-            var edate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd") + " 10:30:00");
+            var edate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd") + " 07:30:00");
             var sdate = edate.AddDays(-30);
             var pendingissues = IssueViewModels.RetrieveIssueForIncreaseSummary(ProjectKey,sdate.ToString());
             var solvedissues = IssueViewModels.RetrieveIssueForSolveSummary(ProjectKey, sdate.ToString());
@@ -365,6 +369,87 @@ namespace Prometheus.Controllers
                 .Replace("#NAMEVALUEPAIRS#", ChartSearies);
         }
 
+        private string FailurePieChart(Dictionary<string,int> piedatadict, string date)
+        {
+            if (piedatadict.Count > 0)
+            {
+                var keys = piedatadict.Keys;
+                var namevaluepair = "";
+                foreach (var k in keys)
+                {
+                    if (piedatadict[k] > 0)
+                        namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                }
+
+                namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                return tempscript.Replace("#Title#", date+" Failure")
+                    .Replace("#SERIESNAME#", "Failure")
+                    .Replace("#NAMEVALUEPAIRS#", namevaluepair);
+            }
+
+            return string.Empty;
+        }
+
+        public List<string> PJFailureTrend(string ProjectKey)
+        {
+            var ret = new List<string>();
+
+            var edate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd") + " 07:30:00");
+            var sdate = edate.AddDays(-30);
+            var pendingissues = IssueViewModels.RetrieveIssueForIncreaseSummary(ProjectKey, sdate.ToString());
+
+            var datelist = new List<string>();
+            var dictlist = new List<Dictionary<string, int>>();
+            
+
+            for (var temptime = sdate; temptime < edate;)
+            {
+                var tempstime = temptime;
+                temptime = temptime.AddDays(10);
+
+                var tempdict = new Dictionary<string, int>();
+
+                foreach (var item in pendingissues)
+                {
+                    if (item.ReportDate < temptime && item.ReportDate >= tempstime 
+                        && string.Compare(item.Reporter, "System",true) == 0)
+                    {
+                        var errorkey = item.Summary.Split(new string[] { "failed for", "@" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim();
+                        if (tempdict.ContainsKey(errorkey))
+                        {
+                            tempdict[errorkey] = tempdict[errorkey] + 1;
+                        }
+                        else
+                        {
+                            tempdict.Add(errorkey, 1);
+                        }
+                    }
+                }
+
+                dictlist.Add(tempdict);
+                datelist.Add(temptime.ToString("yyyy-MM-dd"));
+            }
+
+            var idx = 0;
+            foreach (var item in dictlist)
+            {
+                ret.Add(FailurePieChart(item,datelist[idx]));
+                idx = idx + 1;
+            }
+
+            return ret;
+        }
+
+        public ActionResult UserBookedReport(string username)
+        {
+            var ck = new Dictionary<string, string>();
+            ck.Add("logonuser", username);
+            CookieUtility.SetCookie(this, ck);
+            return RedirectToAction("ViewReport");
+        }
+
         public ActionResult ViewReport()
         {
             var ckdict = CookieUtility.UnpackCookie(this);
@@ -398,9 +483,13 @@ namespace Prometheus.Controllers
                     {
                         ProjectController.ProjectWeeklyTrend(this, pjkey);
                         var reportitem = new PJReportItem();
-                        reportitem.YieldTrend = this.ViewBag.chartscript.Replace("weeklyyield",pjkey+ "weeklyyield");
-                        this.ViewBag.chartscript = null;
-                        pjreportdict.Add(pjkey, reportitem);
+                        if (!string.IsNullOrEmpty(this.ViewBag.chartscript))
+                        {
+                            reportitem.YieldTrend = this.ViewBag.chartscript.Replace("weeklyyield",pjkey+ "weeklyyield");
+                            this.ViewBag.chartscript = null;
+                            pjreportdict.Add(pjkey, reportitem);
+                        }
+
                     }
 
                     if (string.Compare(reptype, PJReportType.MonthlyPareto) == 0)
@@ -437,6 +526,25 @@ namespace Prometheus.Controllers
                         }
                     }
 
+                    if (string.Compare(reptype, PJReportType.FailureTrend) == 0)
+                    {
+                        var chartlist  = PJFailureTrend(pjkey);
+                        for (var idx=0;idx < chartlist.Count;idx++)
+                        {
+                            chartlist[idx] = chartlist[idx].Replace("#ElementID#", pjkey +"failuretrend"+idx);
+                        }
+
+                        if (pjreportdict.ContainsKey(pjkey))
+                        {
+                            pjreportdict[pjkey].FailureTrends = chartlist;
+                        }
+                        else
+                        {
+                            var reportitem = new PJReportItem();
+                            reportitem.FailureTrends = chartlist;
+                            pjreportdict.Add(pjkey, reportitem);
+                        }
+                    }
                 }
             }
 

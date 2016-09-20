@@ -63,6 +63,16 @@ namespace Prometheus.Models
         public string YieldTrend { set; get; }
         public string MonthlyPareto { set; get; }
         public string IssueTrend { set; get; }
+
+        private List<string> failurelist = new List<string>();
+        public List<string> FailureTrends
+        {
+            get { return failurelist; }
+            set {
+                failurelist.Clear();
+                failurelist.AddRange(value);
+                    }
+        }
     }
 
     public class PJReportViewModels

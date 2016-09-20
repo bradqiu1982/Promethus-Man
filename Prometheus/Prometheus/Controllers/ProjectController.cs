@@ -1006,7 +1006,7 @@ namespace Prometheus.Controllers
                     var tempscript = System.IO.File.ReadAllText(ctrl.Server.MapPath("~/Scripts/ColumnChart.xml"));
                     ctrl.ViewBag.chartscript = tempscript.Replace("#ElementID#", "weeklyyield")
                         .Replace("#ChartType#", "column")
-                        .Replace("#Title#", "Weekly Yiled")
+                        .Replace("#Title#", "Weekly Yiled Trend")
                         .Replace("#ChartxAxisValues#", ChartxAxisValues)
                         .Replace("#yAxisTitle#", "Yield Percent")
                         .Replace("#ChartSearies#", ChartSearies)

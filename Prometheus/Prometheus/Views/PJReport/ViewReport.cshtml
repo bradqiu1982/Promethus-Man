@@ -21,12 +21,35 @@
                     <div class="panel-heading">@item.Key</div>
                     <div class="panel-body">
                         <div class="col-md-12">
-                            <div id="@(item.Key)weeklyyield" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                            @if (!string.IsNullOrEmpty(item.Value.YieldTrend))
+                            {
+                                <div class="row">
+                                    <div id="@(item.Key)weeklyyield" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                                </div>
+                                <hr />
+                            }
+
+                            @if (!string.IsNullOrEmpty(item.Value.MonthlyPareto))
+                            {
+                                <div class="row">
+                                    <div id="@(item.Key)rparetochart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                                </div>
+                                <hr />
+                            }
+
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        @Html.Raw(item.Value.YieldTrend)
+        if (!string.IsNullOrEmpty(item.Value.YieldTrend))
+        {
+            @Html.Raw(item.Value.YieldTrend)
+        }
+
+        if (!string.IsNullOrEmpty(item.Value.MonthlyPareto))
+        {
+            @Html.Raw(item.Value.MonthlyPareto)
+        }
     }
 }

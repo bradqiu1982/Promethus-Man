@@ -61,6 +61,7 @@ namespace Prometheus.Models
     public class PJReportItem
     {
         public string YieldTrend { set; get; }
+        public string MonthlyPareto { set; get; }
     }
 
     public class PJReportViewModels

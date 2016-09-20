@@ -1001,7 +1001,7 @@ namespace Prometheus.Controllers
                     ChartSearies = ChartSearies.Replace("<cvalue>", tempvalue);
 
                     //rederect url
-                    var reurl = "window.location.href = '/Project/ProjectWYieldDetail?ProjectKey='+document.getElementById(\"pjkey\").value+'&EndDate='+this.category";
+                    var reurl = "window.location.href = '/Project/ProjectWYieldDetail?ProjectKey="+ProjectKey+"'"+ "+'&EndDate='+this.category";
 
                     var tempscript = System.IO.File.ReadAllText(ctrl.Server.MapPath("~/Scripts/ColumnChart.xml"));
                     ctrl.ViewBag.chartscript = tempscript.Replace("#ElementID#", "weeklyyield")
@@ -1248,7 +1248,7 @@ namespace Prometheus.Controllers
                     ChartSearies = ChartSearies.Replace("<cvalue>", tempvalue);
 
                     //rederect url
-                    var reurl = "window.location.href = '/Project/ProjectMYieldDetail?ProjectKey='+document.getElementById(\"pjkey\").value+'&EndDate='+this.category";
+                    var reurl = "window.location.href = '/Project/ProjectWYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category";
 
                     var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ColumnChart.xml"));
                     ViewBag.chartscript = tempscript.Replace("#ElementID#", "monthlyyield")

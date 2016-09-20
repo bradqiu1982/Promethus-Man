@@ -1,0 +1,25 @@
+﻿<script type="text/javascript">
+$(function () {
+    $('##ElementID#').highcharts({
+        chart: {
+            type: 'area'
+        },
+        title: {
+            text: '#Title#'
+        },
+        xAxis: {
+            categories: [#ChartxAxisValues#],
+            crosshair: true
+        },
+        yAxis: {
+            title: {
+                text: 'Amount'
+            }
+        },
+        tooltip: {
+            pointFormat: '{series.name} <b>{point.y:,.0f}</b>'
+  },
+  series: [#NAMEVALUEPAIRS#]
+  });
+  });
+</script>

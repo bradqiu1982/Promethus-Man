@@ -859,6 +859,7 @@ namespace Prometheus.Controllers
                 tobedata.Resolution = Resolute.Done;
                 tobedata.Description = "<p>Issue Same As <a href=\"/Issue/UpdateIssue?issuekey=" + targetdata.IssueKey+"\">"+targetdata.Summary +"</a></p>";
                 tobedata.UpdateIssue();
+                tobedata.CloseIssue();
             }
 
             return RedirectToAction("ViewAll", "Project");

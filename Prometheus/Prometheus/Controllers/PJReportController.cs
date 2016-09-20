@@ -288,6 +288,83 @@ namespace Prometheus.Controllers
             }
         }
 
+
+        public void IssueCountTrend(string ProjectKey)
+        {
+            var edate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd") + " 10:30:00");
+            var sdate = edate.AddDays(-30);
+            var pendingissues = IssueViewModels.RetrieveIssueForIncreaseSummary(ProjectKey,sdate.ToString());
+            var solvedissues = IssueViewModels.RetrieveIssueForSolveSummary(ProjectKey, sdate.ToString());
+            
+            var datelist = new List<string>();
+            var pendinglist = new List<int>();
+            var solvedlist = new List<int>();
+            var pendingsum = 0;
+            var slovedsum = 0;
+
+            for (var temptime = sdate; temptime < edate; )
+            {
+                var tempstime = temptime;
+                temptime = temptime.AddDays(1);
+
+                foreach (var item in pendingissues)
+                {
+                    if (item.ReportDate < temptime && item.ReportDate >= tempstime)
+                    {
+                        pendingsum = pendingsum + 1;
+                    }
+
+                }
+
+                foreach (var item in solvedissues)
+                {
+                    if (item.ResolvedDate <= temptime && item.ResolvedDate >= tempstime)
+                    {
+                        slovedsum = slovedsum + 1;
+                    }
+                }
+
+                datelist.Add(temptime.ToString());
+                pendinglist.Add(pendingsum);
+                solvedlist.Add(slovedsum);
+            }
+
+            var ChartxAxisValues = "";
+            var ChartSearies = "";
+            //xaxis
+            foreach (var item in datelist)
+            {
+                ChartxAxisValues = ChartxAxisValues + "'" + DateTime.Parse(item).ToString("yyyy-MM-dd") + "',";
+            }
+            ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
+
+
+            //yaxis
+            ChartSearies = "{name:'Issue Increase',data:[<fvalue>]},{name:'Issue Solved',data:[<cvalue>]}";
+
+            var tempvalue = "";
+            foreach (var item in pendinglist)
+            {
+                tempvalue = tempvalue + item.ToString() + ",";
+            }
+            tempvalue = tempvalue.Substring(0, tempvalue.Length - 1);
+            ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
+
+            tempvalue = "";
+            foreach (var item in solvedlist)
+            {
+                tempvalue = tempvalue + item.ToString("0.00") + ",";
+            }
+            tempvalue = tempvalue.Substring(0, tempvalue.Length - 1);
+            ChartSearies = ChartSearies.Replace("<cvalue>", tempvalue);
+
+            var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/AreaChart.xml"));
+            ViewBag.issuetrendscript = tempscript.Replace("#ElementID#", "issuetrendchart")
+                .Replace("#Title#", "Issue Count Trend")
+                .Replace("#ChartxAxisValues#", ChartxAxisValues)
+                .Replace("#NAMEVALUEPAIRS#", ChartSearies);
+        }
+
         public ActionResult ViewReport()
         {
             var ckdict = CookieUtility.UnpackCookie(this);
@@ -343,9 +420,24 @@ namespace Prometheus.Controllers
                         }
                     }
 
+                    if (string.Compare(reptype, PJReportType.IssueTrend) == 0)
+                    {
+                        IssueCountTrend(pjkey);
+                        if (pjreportdict.ContainsKey(pjkey))
+                        {
+                            pjreportdict[pjkey].IssueTrend = ViewBag.issuetrendscript.Replace("issuetrendchart", pjkey + "issuetrendchart");
+                            ViewBag.issuetrendscript = null;
+                        }
+                        else
+                        {
+                            var reportitem = new PJReportItem();
+                            reportitem.IssueTrend = ViewBag.issuetrendscript.Replace("issuetrendchart", pjkey + "issuetrendchart");
+                            ViewBag.issuetrendscript = null;
+                            pjreportdict.Add(pjkey, reportitem);
+                        }
+                    }
+
                 }
-
-
             }
 
             ViewBag.ReportDict = pjreportdict;

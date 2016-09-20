@@ -53,7 +53,7 @@ namespace Prometheus.Models
     public class PJReportType
     {
         public static string YieldTrend = "Yield Trend";
-        public static string IssueTrend = "Issue Solved Trend";
+        public static string IssueTrend = "Issue Count Trend";
         public static string FailureTrend = "Failure Trend";
         public static string MonthlyPareto = "Monthly Pareto";
     }
@@ -62,6 +62,7 @@ namespace Prometheus.Models
     {
         public string YieldTrend { set; get; }
         public string MonthlyPareto { set; get; }
+        public string IssueTrend { set; get; }
     }
 
     public class PJReportViewModels

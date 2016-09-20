@@ -37,6 +37,13 @@
                                 <hr />
                             }
 
+                            @if (!string.IsNullOrEmpty(item.Value.IssueTrend))
+                            {
+                                <div class="row">
+                                    <div id="@(item.Key)issuetrendchart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                                </div>
+                                <hr />
+                            }
                         </div>
                     </div>
                 </div>
@@ -50,6 +57,11 @@
         if (!string.IsNullOrEmpty(item.Value.MonthlyPareto))
         {
             @Html.Raw(item.Value.MonthlyPareto)
+        }
+
+        if (!string.IsNullOrEmpty(item.Value.IssueTrend))
+        {
+            @Html.Raw(item.Value.IssueTrend)
         }
     }
 }

@@ -722,7 +722,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />
-    <Folder Include="userfiles\image\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

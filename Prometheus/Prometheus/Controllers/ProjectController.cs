@@ -71,7 +71,48 @@ namespace Prometheus.Controllers
                 item.PendingRMACount = IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Pending);
             }
 
+            new Thread(() =>
+            {
+                try
+                {
+                    SendBookedReportNotice();
+                }
+                catch (Exception ex)
+                { }
+            }).Start();
+
             return View(projlist);
+        }
+
+        private void SendBookedReportNotice()
+        {
+            var filename = "log"+DateTime.Now.ToString("yyyy-MM-dd");
+            var wholefilename = Server.MapPath("~/userfiles")+ "\\"+ filename;
+            if (!System.IO.File.Exists(wholefilename))
+            {
+                var hello = "hello";
+                System.IO.File.WriteAllText(wholefilename,hello);
+                var bookrecords = PJReportViewModels.RetrieveBookReportRecord();
+                foreach (var record in bookrecords)
+                {
+                    var wkday = ReportSelectTime.GetWeekDay(record.reporttime);
+                    if (wkday == 8 || wkday == (int)DateTime.Now.DayOfWeek)
+                    {
+                        var routevalue = new RouteValueDictionary();
+                        routevalue.Add("username", record.username);
+                        //send validate email
+                        string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                        string validatestr = this.Url.Action("UserBookedReport", "PJReport", routevalue, scheme);
+
+                        var content = "Click below link to review the Report which you booked :\r\n " + validatestr;
+
+                        var toaddrs = new List<string>();
+                        toaddrs.Add(record.username);
+                        EmailUtility.SendEmail("Parallel NPI Trace Notice", toaddrs, content);
+                    }
+                }//end foreach
+            }//end if
+
         }
 
         private List<SelectListItem> CreateSelectList(List<string> valist, string defVal)

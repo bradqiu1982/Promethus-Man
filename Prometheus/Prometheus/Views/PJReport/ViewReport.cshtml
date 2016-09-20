@@ -4,7 +4,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>ViewReport</h2>
+<h2>Report</h2>
 
 <hr/>
 
@@ -44,6 +44,15 @@
                                 </div>
                                 <hr />
                             }
+
+                            @if (item.Value.FailureTrends.Count > 0)
+                            {
+                                <div class="row">
+                                    <div class="col-lg-4"><div id="@(item.Key)failuretrend0" style="min-width: 310px; height: 400px; margin: 0 auto"></div></div>
+                                    <div class="col-lg-4"><div id="@(item.Key)failuretrend1" style="min-width: 310px; height: 400px; margin: 0 auto"></div></div>
+                                    <div class="col-lg-4"><div id="@(item.Key)failuretrend2" style="min-width: 310px; height: 400px; margin: 0 auto"></div></div>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>
@@ -63,5 +72,13 @@
         {
             @Html.Raw(item.Value.IssueTrend)
         }
+        foreach (var fp in item.Value.FailureTrends)
+        {
+            if (!string.IsNullOrEmpty(fp))
+            {
+                @Html.Raw(fp)
+            }
+        }
+
     }
 }

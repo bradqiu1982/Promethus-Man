@@ -739,6 +739,7 @@
     <Content Include="Views\PJReport\IBook.cshtml" />
     <Content Include="Views\PJReport\ViewReport.cshtml" />
     <Content Include="Views\CustomerData\CommitVecselData.cshtml" />
+    <Content Include="Views\CustomerData\ConfirmVecselData.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

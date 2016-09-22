@@ -150,7 +150,9 @@ namespace Prometheus.Controllers
                         var data = RetrieveDataFromExcel(wholefn);
                         if (data.Count > 0)
                         {
-                            return View();
+                            ViewBag.ROWCOUNT = data.Count;
+                            ViewBag.COLCOUNT = data[0].Count;
+                            return View("ConfirmVecselData",data);
                         }
                     }
 
@@ -166,6 +168,22 @@ namespace Prometheus.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult ConfirmVecselDataPost()
         {
+            if (Request.Form["confirmdata"] != null)
+            {
+                var rowcnt = Convert.ToInt32(Request.Form["rowcount"]);
+                var colcnt = Convert.ToInt32(Request.Form["colcount"]);
+                var data = new List<List<string>>();
+                for (var row = 0; row < rowcnt; row++)
+                {
+                    var line = new List<string>();
+                    for (var col = 0; col < colcnt; col++)
+                    {
+                        line.Add(Request.Form["row" + row + "col" + col]);
+                    }
+                    data.Add(line);
+                }
+            }
+
             return View();
         }
 

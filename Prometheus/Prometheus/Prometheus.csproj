@@ -740,6 +740,8 @@
     <Content Include="Views\PJReport\ViewReport.cshtml" />
     <Content Include="Views\CustomerData\CommitVecselData.cshtml" />
     <Content Include="Views\CustomerData\ConfirmVecselData.cshtml" />
+    <Content Include="Views\CustomerData\CommitRMAData.cshtml" />
+    <Content Include="Views\CustomerData\ConfirmRMAData.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

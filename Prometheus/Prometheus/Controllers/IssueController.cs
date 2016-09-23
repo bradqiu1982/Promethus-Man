@@ -543,7 +543,7 @@ namespace Prometheus.Controllers
             vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
             vm.ReportDate = DateTime.Now;
             vm.Assignee = Request.Form["assigneelist"].ToString();
-            vm.Reporter = vm.Reporter = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            vm.Reporter = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
             vm.Resolution = Resolute.Pending;
 

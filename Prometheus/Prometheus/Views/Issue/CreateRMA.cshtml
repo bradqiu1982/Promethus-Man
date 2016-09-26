@@ -177,18 +177,18 @@
                     <hr />
                     <div class="col-md-12">
                         <div class="form-group">
-                            <label>Relative People Email<font color="red">*</font></label>
+                            <label>Relative People Email</label>
                         </div>
 
                         <div class="form-group">
                             <div class="col-md-12" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
                                 @if (Model != null && !string.IsNullOrEmpty(Model.RelativePeoples))
                                 {
-                                    <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 200." data-val-length-max="200" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required.">@Model.RelativePeoples</textarea>
+                                    <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 200." data-val-length-max="200" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$">@Model.RelativePeoples</textarea>
                                 }
                                 else
                                 {
-                                    <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 200." data-val-length-max="200" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required."></textarea>
+                                    <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 200." data-val-length-max="200" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$"></textarea>
                                 }
                             </div>
                             <span class="field-validation-valid text-danger" data-valmsg-for="RPeopleAddr" data-valmsg-replace="true"></span>

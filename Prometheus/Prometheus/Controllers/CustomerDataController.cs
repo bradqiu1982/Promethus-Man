@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using Excel = Microsoft.Office.Interop.Excel;
@@ -191,13 +192,43 @@ namespace Prometheus.Controllers
 
         public ActionResult CommitRMAData()
         {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "CustomerData");
+                ck.Add("logonredirectact", "CommitRMAData");
+                ck.Add("currentaction", "CommitRMAData");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
             return View();
+        }
+
+        private static string RMSpectialCh(string str)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (char c in str)
+            {
+                if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
+                {
+                    sb.Append(c);
+                }
+            }
+            return sb.ToString();
         }
 
         [HttpPost, ActionName("CommitRMAData")]
         [ValidateAntiForgeryToken]
         public ActionResult CommitRMADataPost()
         {
+            var projlist = ProjectViewModels.RetrieveAllProjectKey();
+
             var wholefn = "";
             try
             {
@@ -234,11 +265,93 @@ namespace Prometheus.Controllers
                     if (!string.IsNullOrEmpty(wholefn))
                     {
                         var data = RetrieveDataFromExcel(wholefn);
-                        if (data.Count > 0)
+                        var realdata = new List<List<string>>();
+                        if (data.Count > 1)
                         {
-                            ViewBag.ROWCOUNT = data.Count;
-                            ViewBag.COLCOUNT = data[0].Count;
-                            return View("ConfirmRMAData", data);
+                            var templine = new List<string>();
+                            templine.Add("Project");
+                            templine.Add("Finisar RMA");
+                            templine.Add("Finisar Model");
+                            templine.Add("Model SN");
+                            templine.Add("Assignee Email");
+                            templine.Add("Due Date");
+                            templine.Add("End Customer");
+                            templine.Add("Customer RMA Reason");
+                            realdata.Add(templine);
+
+                            for (var idx = 0;idx < data.Count;idx++)
+                            {
+                                if (idx != 0)
+                                {
+                                    var snlist = data[idx][8].Split(new string[] { "\r","\n", " ", ";" }, StringSplitOptions.RemoveEmptyEntries);
+                                    var reasons = data[idx][10].Split(new string[] { "\r", "\n"}, StringSplitOptions.RemoveEmptyEntries);
+                                    foreach (var sn in snlist)
+                                    {
+                                        templine = new List<string>();
+
+                                        var trimprojectname = RMSpectialCh(data[idx][12]);
+                                        var pjname = string.Empty;
+                                        foreach (var item in projlist)
+                                        {
+                                            if (item.Contains(trimprojectname))
+                                            {
+                                                pjname = item;
+                                                break;
+                                            }
+                                        }
+
+                                        if (!string.IsNullOrEmpty(pjname))
+                                        {
+                                            templine.Add(pjname);
+                                        }
+                                        else
+                                        {
+                                            templine.Add("N/A");
+                                        }
+
+                                        templine.Add(data[idx][1]);
+                                        templine.Add(data[idx][6]+" "+ data[idx][7]);
+                                        templine.Add(sn);
+                                        if (!data[idx][13].Contains("@"))
+                                        {
+                                            templine.Add(data[idx][13].Trim().Replace(" ",".")+"@finisar.com");
+                                        }
+                                        else
+                                        {
+                                            templine.Add(data[idx][13]);
+                                        }
+                                        templine.Add(data[idx][14]);
+                                        templine.Add(data[idx][4]);
+
+                                        var rs = "N/A";
+                                        foreach (var r in reasons)
+                                        {
+                                            if (r.Contains(sn))
+                                            {
+                                                rs = r;
+                                                break;
+                                            }
+                                        }
+
+                                        if (reasons.Count() == 1)
+                                        {
+                                            rs = reasons[0];
+                                        }
+
+                                        templine.Add(rs);
+
+                                        realdata.Add(templine);
+                                    }//end foreach
+                                }//end if
+                            }//end for
+                        }
+
+
+                        if (realdata.Count > 1)
+                        {
+                            ViewBag.ROWCOUNT = realdata.Count;
+                            ViewBag.COLCOUNT = realdata[0].Count;
+                            return View("ConfirmRMAData", realdata);
                         }
                     }
 
@@ -257,6 +370,9 @@ namespace Prometheus.Controllers
         {
             if (Request.Form["confirmdata"] != null)
             {
+                var ckdict = CookieUtility.UnpackCookie(this);
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
                 var rowcnt = Convert.ToInt32(Request.Form["rowcount"]);
                 var colcnt = Convert.ToInt32(Request.Form["colcount"]);
                 var data = new List<List<string>>();
@@ -271,11 +387,11 @@ namespace Prometheus.Controllers
                 }
 
 
-                if (data.Count > 1 && data[0].Count == 11)
+                if (data.Count > 1 && data[0].Count == 8)
                 {
                     for (int i = 0; i < data.Count; i++)
                     {
-                        if (i != 0)
+                        if (i != 0 && string.Compare(data[i][0], "N/A") != 0)
                         {
                             var vm = new IssueViewModels();
                             vm.ProjectKey = data[i][0];
@@ -284,23 +400,25 @@ namespace Prometheus.Controllers
 
                             vm.FinisarRMA = data[i][1];
                             vm.FinisarModel = data[i][2];
-                            vm.ECustomer = data[i][7];
-                            vm.CRMANUM = data[i][8];
-                            vm.CReport = data[i][9];
-                            vm.RelativePeoples = data[i][10];
+                            vm.ECustomer = data[i][6];
+                            vm.CRMANUM = "N/A";
+                            vm.CReport = data[i][7];
+                            vm.RelativePeoples = "";
                             vm.ModuleSN = data[i][3];
 
-                            vm.Summary = "[" + vm.ProjectKey + "] RMA " + vm.FinisarRMA + " for module " + vm.FinisarModel + " from " + vm.ECustomer + ". Summary: " + vm.CReport.Substring(0, vm.CReport.Length > 50 ? 50 : vm.CReport.Length);
+                            vm.Summary = "RMA " + vm.FinisarRMA + " for module " + vm.FinisarModel + " from " + vm.ECustomer + ":" + vm.CReport.Substring(0, vm.CReport.Length > 50 ? 50 : vm.CReport.Length);
 
                             vm.Priority = ISSUEPR.Major;
-                            vm.DueDate = DateTime.Parse(data[i][6]);
+                            vm.DueDate = DateTime.Parse(data[i][5]);
                             vm.ReportDate = DateTime.Now;
                             vm.Assignee = data[i][4];
-                            vm.Reporter = data[i][5];
+                            vm.Reporter = updater;
 
                             vm.Resolution = Resolute.Pending;
 
                             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+
+                            vm.RMAFailureCode = "";
 
                             vm.Description = "";
                             vm.CommentType = COMMENTTYPE.Description;

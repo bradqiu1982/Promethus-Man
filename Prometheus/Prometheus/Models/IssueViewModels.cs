@@ -379,6 +379,8 @@ namespace Prometheus.Models
 
         public string FinisarRMA { set; get; }
 
+        public string RMAFailureCode { set; get; }
+
         public string FinisarModel { set; get; }
         public string ModuleSN { set; get; }
         public string ECustomer { set; get; }
@@ -473,8 +475,8 @@ namespace Prometheus.Models
         private void StoreRMA()
         {
 
-            var sql = "insert into IssueRMA(IssueKey,FinisarRMA,FinisarModel,ECustomer,CRMANUM,CReport,ModuleSN) values('<IssueKey>','<FinisarRMA>','<FinisarModel>','<ECustomer>','<CRMANUM>','<CReport>','<ModuleSN>')";
-            sql = sql.Replace("<IssueKey>", IssueKey).Replace("<FinisarRMA>", FinisarRMA)
+            var sql = "insert into IssueRMA(IssueKey,FinisarRMA,FinisarModel,ECustomer,CRMANUM,CReport,ModuleSN,RMAFailureCode) values('<IssueKey>','<FinisarRMA>','<FinisarModel>','<ECustomer>','<CRMANUM>','<CReport>','<ModuleSN>','<RMAFailureCode>')";
+            sql = sql.Replace("<IssueKey>", IssueKey).Replace("<FinisarRMA>", FinisarRMA).Replace("<RMAFailureCode>", RMAFailureCode)
                 .Replace("<FinisarModel>", FinisarModel).Replace("<ECustomer>", ECustomer)
                 .Replace("<CRMANUM>", CRMANUM).Replace("<CReport>", CReport).Replace("<ModuleSN>", ModuleSN);
             DBUtility.ExeLocalSqlNoRes(sql);
@@ -482,7 +484,7 @@ namespace Prometheus.Models
 
         private void RetrieveRMA()
         {
-            var sql = "select FinisarRMA,FinisarModel,ECustomer,CRMANUM,CReport,ModuleSN from IssueRMA where IssueKey = '<IssueKey>'";
+            var sql = "select FinisarRMA,FinisarModel,ECustomer,CRMANUM,CReport,ModuleSN,RMAFailureCode from IssueRMA where IssueKey = '<IssueKey>'";
             sql = sql.Replace("<IssueKey>", IssueKey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             if (dbret.Count > 0)
@@ -493,6 +495,7 @@ namespace Prometheus.Models
                 CRMANUM = Convert.ToString(dbret[0][3]);
                 CReport = Convert.ToString(dbret[0][4]);
                 ModuleSN = Convert.ToString(dbret[0][5]);
+                RMAFailureCode = Convert.ToString(dbret[0][6]);
             }
         }
 

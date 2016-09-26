@@ -530,6 +530,7 @@ namespace Prometheus.Controllers
             vm.IssueType = ISSUETP.RMA;
 
             vm.FinisarRMA = Request.Form["FRMANUM"];
+            vm.RMAFailureCode = "";
             vm.FinisarModel = Request.Form["FinisarModel"];
             vm.ECustomer = Request.Form["ECustomer"];
             vm.CRMANUM = Request.Form["CRMANUM"];
@@ -537,7 +538,7 @@ namespace Prometheus.Controllers
             vm.RelativePeoples = Request.Form["RPeopleAddr"];
             vm.ModuleSN = Request.Form["ModuleSN"];
 
-            vm.Summary = "[" + vm.ProjectKey + "] RMA " + vm.FinisarRMA + " for module " + vm.FinisarModel + " from " + vm.ECustomer + ". Summary: " + vm.CReport.Substring(0, vm.CReport.Length > 50 ? 50 : vm.CReport.Length);
+            vm.Summary = "RMA " + vm.FinisarRMA + " for module " + vm.FinisarModel + " from " + vm.ECustomer + ": " + vm.CReport.Substring(0, vm.CReport.Length > 50 ? 50 : vm.CReport.Length);
 
             vm.Priority = Request.Form["prioritylist"].ToString();
             vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
@@ -685,6 +686,7 @@ namespace Prometheus.Controllers
             vm.IssueType = ISSUETP.RMA;
 
             vm.FinisarRMA = Request.Form["FRMANUM"];
+            vm.RMAFailureCode = Request.Form["RMAFailureCode"];
             vm.FinisarModel = Request.Form["FinisarModel"];
             vm.ECustomer = Request.Form["ECustomer"];
             vm.CRMANUM = Request.Form["CRMANUM"];
@@ -692,7 +694,7 @@ namespace Prometheus.Controllers
             vm.RelativePeoples = Request.Form["RPeopleAddr"];
             vm.ModuleSN = Request.Form["ModuleSN"];
 
-            vm.Summary = "[" + vm.ProjectKey + "] RMA " + vm.FinisarRMA + " for module " + vm.FinisarModel + " from " + vm.ECustomer + ". Summary: " + vm.CReport.Substring(0, vm.CReport.Length > 50 ? 50 : vm.CReport.Length);
+            vm.Summary = "RMA " + vm.FinisarRMA + " for module " + vm.FinisarModel + " from " + vm.ECustomer + ": " + vm.CReport.Substring(0, vm.CReport.Length > 50 ? 50 : vm.CReport.Length);
 
             vm.Priority = Request.Form["prioritylist"].ToString();
             vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);

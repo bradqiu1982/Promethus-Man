@@ -187,7 +187,23 @@
                     });
                 </script>
             </div>
-
+            <div class="form-group">
+                <div class="col-md-6">
+                    <label class="control-label col-md-2" for="FRMANUM">RMA Failure Code</label>
+                    <div class="col-md-10">
+                        @if (Model != null && !string.IsNullOrEmpty(Model.RMAFailureCode))
+                        {
+                            <input class="form-control text-box single-line" value="@Model.RMAFailureCode" readonly="readonly" data-val="true" data-val-length="The field must be a string with a minimum length of 5 and a maximum length of 25." data-val-length-max="25" data-val-length-min="5" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$"  id="RMAFailureCode" name="RMAFailureCode" type="text" />
+                        }
+                        else
+                        {
+                            <input class="form-control text-box single-line" data-val="true" data-val-length="The field must be a string with a minimum length of 5 and a maximum length of 25." data-val-length-max="25" data-val-length-min="5" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="RMAFailureCode" name="RMAFailureCode" type="text" value="" />
+                        }
+                        <span class="field-validation-valid text-danger" data-valmsg-for="RMAFailureCode" data-valmsg-replace="true"></span>
+                    </div>
+                </div>
+                <div class="col-md-6"></div>
+            </div>
             <hr/>
             <div class="form-group">
                 <div class="col-md-6">
@@ -247,18 +263,18 @@
             <hr />
             <div class="col-md-12">
                 <div class="form-group">
-                    <label>Relative People Email<font color="red">*</font></label>
+                    <label>Relative People Email</label>
                 </div>
 
                 <div class="form-group">
                     <div class="col-md-12" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
                         @if (Model != null && !string.IsNullOrEmpty(Model.RelativePeoples))
                         {
-                            <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 200." data-val-length-max="200" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required.">@Model.RelativePeoples</textarea>
+                            <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 200." data-val-length-max="200" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$">@Model.RelativePeoples</textarea>
                         }
                         else
                         {
-                            <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 200." data-val-length-max="200" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required."></textarea>
+                            <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 200." data-val-length-max="200" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$"></textarea>
                         }
                     </div>
                     <span class="field-validation-valid text-danger" data-valmsg-for="RPeopleAddr" data-valmsg-replace="true"></span>

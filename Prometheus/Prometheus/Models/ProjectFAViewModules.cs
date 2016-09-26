@@ -21,30 +21,23 @@ namespace Prometheus.Models
         public static List<ProjectFAViewModules> RetrievePendingFAData(string pjkey)
         {
             var ret = new List<ProjectFAViewModules>();
-            var pjdata = ProjectTestData.RetrieveProjectFailedTestData(100000,pjkey);
-
-            var i = 0;
-            var issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Working);
-            foreach (var d in pjdata)
+            var issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Working,50);
+            foreach (var d in issuedict)
             {
-                if (issuedict.ContainsKey(d.DataID))
+                var pjdata = ProjectTestData.RetrieveProjectTestData(d.IssueKey);
+                if (pjdata.Count > 0)
                 {
-                    ret.Add(new ProjectFAViewModules(issuedict[d.DataID], d));
-                    if (i > 50)
-                        break;
-                    i = i + 1;
+                    ret.Add(new ProjectFAViewModules(d, pjdata[0]));
                 }
             }
 
-            issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Pending);
-            foreach (var d in pjdata)
+            issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Pending,500);
+            foreach (var d in issuedict)
             {
-                if (issuedict.ContainsKey(d.DataID))
+                var pjdata = ProjectTestData.RetrieveProjectTestData(d.IssueKey);
+                if (pjdata.Count > 0)
                 {
-                    ret.Add(new ProjectFAViewModules(issuedict[d.DataID], d));
-                    if (i > 500)
-                        break;
-                    i = i + 1;
+                    ret.Add(new ProjectFAViewModules(d, pjdata[0]));
                 }
             }
 
@@ -56,7 +49,7 @@ namespace Prometheus.Models
             var ret = new List<ProjectFAViewModules>();
             var pjdata = ProjectTestData.RetrieveProjectFailedTestData(100000, pjkey);
 
-            var issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Done);
+            var issuedict = IssueViewModels.RRetrieveFADictByPjkey(pjkey, Resolute.Done,100000);
             foreach (var d in pjdata)
             {
                 if (issuedict.ContainsKey(d.DataID))

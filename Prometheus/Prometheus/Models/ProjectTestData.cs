@@ -91,7 +91,8 @@ namespace Prometheus.Models
                 var vm = ProjectViewModels.RetrieveOneProject(projectkey);
                 if (vm.TabList.Count > 0
                     && vm.PNList.Count > 0
-                    && vm.StationList.Count > 0)
+                    && vm.StationList.Count > 0
+                    && vm.FinishRating < 90)
                 {
                     string lastupdatetime = ProjectTestData.RetrieveLatestTimeOfLocalProject(projectkey);
                     if (!string.IsNullOrEmpty(lastupdatetime))

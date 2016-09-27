@@ -207,6 +207,20 @@ namespace Prometheus.Controllers
             }
         }
 
+        public static void RegisterUserAuto(string name)
+        {
+            var dbret = UserViewModels.RetrieveUser(name);
+            if (dbret == null)
+            {
+                var user = new UserViewModels();
+                user.Email = name.ToUpper();
+                user.Password = "abc@123";
+                user.UpdateDate = DateTime.Now;
+                user.RegistUser();
+                UserViewModels.ActiveUser(user.Email);
+            }
+        }
+
         [HttpPost, ActionName("LoginUser")]
         [ValidateAntiForgeryToken]
         public ActionResult LoginUserPOST()

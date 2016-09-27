@@ -411,7 +411,7 @@ namespace Prometheus.Controllers
                             vm.Priority = ISSUEPR.Major;
                             vm.DueDate = DateTime.Parse(data[i][5]);
                             vm.ReportDate = DateTime.Now;
-                            vm.Assignee = data[i][4];
+                            vm.Assignee = data[i][4].ToUpper();
                             vm.Reporter = updater;
 
                             vm.Resolution = Resolute.Pending;
@@ -424,6 +424,8 @@ namespace Prometheus.Controllers
                             vm.CommentType = COMMENTTYPE.Description;
 
                             vm.StoreIssue();
+
+                            UserController.RegisterUserAuto(vm.Assignee);
                         }
                     }//end for
                     return RedirectToAction("ViewAll", "Project");

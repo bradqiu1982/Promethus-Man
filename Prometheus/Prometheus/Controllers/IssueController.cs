@@ -20,7 +20,7 @@ namespace Prometheus.Controllers
                 var pitem = new SelectListItem();
                 pitem.Text = p;
                 pitem.Value = p;
-                if (!string.IsNullOrEmpty(defVal) && string.Compare(defVal, p) == 0)
+                if (!string.IsNullOrEmpty(defVal) && string.Compare(defVal, p,true) == 0)
                 {
                     pitem.Selected = true;
                 }

@@ -293,7 +293,7 @@ namespace Prometheus.Controllers
                                         var pjname = string.Empty;
                                         foreach (var item in projlist)
                                         {
-                                            if (item.Contains(trimprojectname))
+                                            if (string.Compare(item, trimprojectname) == 0)
                                             {
                                                 pjname = item;
                                                 break;

@@ -742,6 +742,7 @@
     <Content Include="Views\CustomerData\ConfirmVecselData.cshtml" />
     <Content Include="Views\CustomerData\CommitRMAData.cshtml" />
     <Content Include="Views\CustomerData\ConfirmRMAData.cshtml" />
+    <Content Include="Scripts\project_list.xlsx" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

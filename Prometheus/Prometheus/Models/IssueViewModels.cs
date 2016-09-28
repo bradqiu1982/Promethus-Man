@@ -301,16 +301,16 @@ namespace Prometheus.Models
                 sissue.AddRange(value);
 
                 containmentactionlist.Clear();
-                corrobrateactionlist.Clear();
+                Correctiveactionlist.Clear();
                 foreach (var item in value)
                 {
                     if (item.Summary.Contains("[Containment]"))
                     {
                         containmentactionlist.Add(item);
                     }
-                    if (item.Summary.Contains("[Corroborate]"))
+                    if (item.Summary.Contains("[Corrective]"))
                     {
-                        corrobrateactionlist.Add(item);
+                        Correctiveactionlist.Add(item);
                     }
                 }
             }
@@ -321,7 +321,7 @@ namespace Prometheus.Models
         }
 
         private List<IssueViewModels> containmentactionlist = new List<IssueViewModels>();
-        private List<IssueViewModels> corrobrateactionlist = new List<IssueViewModels>();
+        private List<IssueViewModels> Correctiveactionlist = new List<IssueViewModels>();
 
         public List<IssueViewModels> ContainmentActions
         {
@@ -349,17 +349,17 @@ namespace Prometheus.Models
             return Resolute.ColorStatus(Resolute.Pending);
         }
 
-        public List<IssueViewModels> CorrobrateActions
+        public List<IssueViewModels> CorrectiveActions
         {
             get
-            { return corrobrateactionlist; }
+            { return Correctiveactionlist; }
         }
 
-        public string CorrobrateActionStatus()
+        public string CorrectiveActionStatus()
         {
-            if (corrobrateactionlist.Count > 0)
+            if (Correctiveactionlist.Count > 0)
             {
-                foreach (var item in corrobrateactionlist)
+                foreach (var item in Correctiveactionlist)
                 {
                     if (item.Resolution == Resolute.Pending || item.Resolution == Resolute.Reopen)
                     {

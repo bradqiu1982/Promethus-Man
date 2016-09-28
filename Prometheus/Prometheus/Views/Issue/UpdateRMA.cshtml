@@ -193,7 +193,7 @@
                     <div class="col-md-10">
                         @if (Model != null && !string.IsNullOrEmpty(Model.RMAFailureCode))
                         {
-                            <input class="form-control text-box single-line" value="@Model.RMAFailureCode" readonly="readonly" data-val="true" data-val-length="The field must be a string with a minimum length of 5 and a maximum length of 25." data-val-length-max="25" data-val-length-min="5" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$"  id="RMAFailureCode" name="RMAFailureCode" type="text" />
+                            <input class="form-control text-box single-line" value="@Model.RMAFailureCode"  data-val="true" data-val-length="The field must be a string with a minimum length of 5 and a maximum length of 25." data-val-length-max="25" data-val-length-min="5" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$"  id="RMAFailureCode" name="RMAFailureCode" type="text" />
                         }
                         else
                         {

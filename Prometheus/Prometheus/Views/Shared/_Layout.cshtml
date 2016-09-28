@@ -65,7 +65,10 @@
                                     @Html.ActionLink("Create Issue", "CreateIssue", "Issue")
                                 </li>
                                 <li>
-                                    @Html.ActionLink("Create RMA", "CreateRMA", "Issue")
+                                    @Html.ActionLink("Create Single RMA", "CreateRMA", "Issue")
+                                </li>
+                                <li>
+                                    @Html.ActionLink("Create batch RMA", "CommitRMAData", "CustomerData")
                                 </li>
                                 <li>
                                     @Html.ActionLink("Search Issue", "SearchIssue", "Issue")
@@ -94,9 +97,6 @@
                             <ul class="dropdown-menu">
                                 <li>
                                     @Html.ActionLink("Commit Vecsel Data", "CommitVecselData", "CustomerData")
-                                </li>
-                                <li>
-                                    @Html.ActionLink("Commit RMA Data", "CommitRMAData", "CustomerData")
                                 </li>
                             </ul>
                         </li>

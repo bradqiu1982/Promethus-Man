@@ -604,9 +604,9 @@ namespace Prometheus.Models
 
         private void UpdateRMAInfo()
         {
-            var sql = "update IssueRMA set CRMANUM = '<CRMANUM>',CReport = '<CReport>',ModuleSN = '<ModuleSN>' where IssueKey = '<IssueKey>'";
+            var sql = "update IssueRMA set CRMANUM = '<CRMANUM>',CReport = '<CReport>',ModuleSN = '<ModuleSN>',RMAFailureCode = '<RMAFailureCode>'  where IssueKey = '<IssueKey>'";
             sql = sql.Replace("<IssueKey>", IssueKey).Replace("<CRMANUM>", CRMANUM)
-                .Replace("<CReport>", CReport).Replace("<ModuleSN>", ModuleSN);
+                .Replace("<CReport>", CReport).Replace("<ModuleSN>", ModuleSN).Replace("<RMAFailureCode>", RMAFailureCode);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 

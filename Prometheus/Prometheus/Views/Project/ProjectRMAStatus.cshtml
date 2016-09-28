@@ -28,7 +28,7 @@
                 <th width="13%">RootCause</th>
                 <th width="13%">RMA Failure Code</th>
                 <th width="14%">Containment Action</th>
-                <th width="14%">Corrobrate Action</th>
+                <th width="14%">Corrective Action</th>
                 <th width="13%">Internal Report</th>
                 <th width="13%">Customer Report</th>
             </tr>
@@ -68,9 +68,9 @@
                         <td width="14%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
                     }
                     
-                    @if (item.CorrobrateActions.Count > 0)
+                    @if (item.CorrectiveActions.Count > 0)
                     {
-                        <td width="14%"><a href="/Issue/ShowCorrobrateAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.CorrobrateActionStatus())</a></td>
+                        <td width="14%"><a href="/Issue/ShowCorrectiveAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.CorrectiveActionStatus())</a></td>
                     }
                     else
                     {

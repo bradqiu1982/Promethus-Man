@@ -823,12 +823,12 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        public ActionResult ShowCorrobrateAction(string issuekey)
+        public ActionResult ShowCorrectiveAction(string issuekey)
         {
             if (!string.IsNullOrEmpty(issuekey))
             {
                 var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
-                return View(vm.CorrobrateActions);
+                return View(vm.CorrectiveActions);
             }
             return View();
         }

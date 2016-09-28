@@ -220,6 +220,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Data\Prometheus.mdf" />
+    <Content Include="App_Data\Prometheus_log.ldf">
+      <DependentUpon>Prometheus.mdf</DependentUpon>
+    </Content>
     <Content Include="ckeditor\adapters\jquery.js" />
     <Content Include="ckeditor\build-config.js" />
     <Content Include="ckeditor\ckeditor.js" />
@@ -730,7 +733,7 @@
     <Content Include="Views\Project\ProjectRMAStatus.cshtml" />
     <Content Include="Views\Issue\ShowRootCause.cshtml" />
     <Content Include="Views\Issue\ShowContainmentAction.cshtml" />
-    <Content Include="Views\Issue\ShowCorrobrateAction.cshtml" />
+    <Content Include="Views\Issue\ShowCorrectiveAction.cshtml" />
     <Content Include="Views\Project\ProjectError.cshtml" />
     <Content Include="Views\Project\UpdateProjectError.cshtml" />
     <Content Include="Views\PJReport\IBook.cshtml" />

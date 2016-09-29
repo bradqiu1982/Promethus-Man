@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Routing;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Prometheus.Controllers
@@ -338,7 +339,7 @@ namespace Prometheus.Controllers
                                             }
                                         }
 
-                                        if (reasons.Count() == 1)
+                                        if (rs == "N/A" && reasons.Count() > 0)
                                         {
                                             rs = reasons[0];
                                         }
@@ -366,6 +367,31 @@ namespace Prometheus.Controllers
             { }
 
             return View();
+        }
+
+
+        private void SendRMAEvent(IssueViewModels vm, string operate, bool nocheck = false)
+        {
+            var alertime = vm.RetrieveAlertEmailDate(vm.IssueKey);
+            if ((!string.IsNullOrEmpty(alertime) && DateTime.Parse(alertime).AddHours(24) < DateTime.Now) || nocheck)
+            {
+                vm.UpdateAlertEmailDate();
+
+                var routevalue = new RouteValueDictionary();
+                routevalue.Add("issuekey", vm.IssueKey);
+                //send validate email
+                string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+
+                var content = vm.Summary + " is " + operate + " by " + vm.Reporter + " :\r\n " + validatestr;
+
+                var toaddrs = new List<string>();
+                toaddrs.AddRange(vm.RelativePeopleList);
+                toaddrs.Add(vm.Assignee);
+                toaddrs.Add(vm.Reporter);
+                EmailUtility.SendEmail("Parallel NPI Trace Notice", toaddrs, content);
+
+            }
         }
 
 
@@ -442,7 +468,7 @@ namespace Prometheus.Controllers
                                 vm.ModuleSN = vm.ModuleSN.Substring(0, 48);
                             }
 
-                            vm.Summary = "RMA " + vm.FinisarRMA + " for module " + vm.FinisarModel + " from " + vm.ECustomer + ":" + vm.CReport.Substring(0, vm.CReport.Length > 50 ? 50 : vm.CReport.Length);
+                            vm.Summary = "RMA " + vm.FinisarRMA + " for module " + vm.ModuleSN + " " + vm.FinisarModel + " from " + vm.ECustomer + ":" + vm.CReport.Substring(0, vm.CReport.Length > 50 ? 50 : vm.CReport.Length);
                             if (vm.Summary.Length > 200)
                             {
                                 vm.Summary = vm.Summary.Substring(0, 198);
@@ -473,8 +499,8 @@ namespace Prometheus.Controllers
                             vm.CommentType = COMMENTTYPE.Description;
 
                             vm.StoreIssue();
-
                             UserController.RegisterUserAuto(vm.Assignee);
+                            SendRMAEvent(vm, "created",true);
                         }
                     }//end for
                     return RedirectToAction("ViewAll", "Project");

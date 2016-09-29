@@ -493,10 +493,10 @@ namespace Prometheus.Controllers
             }
         }
 
-        private void SendRMAEvent(IssueViewModels vm, string operate)
+        private void  SendRMAEvent(IssueViewModels vm, string operate,bool nocheck= false)
         {
             var alertime = vm.RetrieveAlertEmailDate(vm.IssueKey);
-            if (DateTime.Parse(alertime).AddHours(24) < DateTime.Now)
+            if ((!string.IsNullOrEmpty(alertime) && DateTime.Parse(alertime).AddHours(24) < DateTime.Now) || nocheck)
             {
                 vm.UpdateAlertEmailDate();
 
@@ -559,7 +559,7 @@ namespace Prometheus.Controllers
             vm.StoreIssue();
 
             ProjectEvent.CreateIssueEvent(vm.ProjectKey, vm.Reporter, vm.Assignee, vm.Summary, vm.IssueKey);
-            SendRMAEvent(vm, "created");
+            SendRMAEvent(vm, "created",true);
 
             var dict = new RouteValueDictionary();
             dict.Add("issuekey", vm.IssueKey);
@@ -782,6 +782,7 @@ namespace Prometheus.Controllers
                 {
                     ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
                     vm.CloseIssue();
+                    SendRMAEvent(vm, "closed",true);
                 }
 
                 if (string.Compare(vm.Resolution, Resolute.Working) == 0)
@@ -792,10 +793,9 @@ namespace Prometheus.Controllers
                 if (string.Compare(vm.Resolution, Resolute.Reopen) == 0)
                 {
                     ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Reopened", originaldata.Summary, originaldata.IssueKey);
+                    SendRMAEvent(vm, "reopened",true);
                 }
             }
-
-            SendRMAEvent(vm, "update");
 
             var newdata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
             CreateAllLists(newdata);

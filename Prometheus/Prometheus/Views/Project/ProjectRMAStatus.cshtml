@@ -25,12 +25,14 @@
             <tr>
                 <th width="10%">RMA#</th>
                 <th width="10%">SN</th>
-                <th width="13%">RootCause</th>
-                <th width="13%">RMA Failure Code</th>
-                <th width="14%">Containment Action</th>
-                <th width="14%">Corrective Action</th>
-                <th width="13%">Internal Report</th>
-                <th width="13%">Customer Report</th>
+                <th width="10%">RootCause</th>
+                <th width="10%">RMA Failure Code</th>
+                <th width="10%">Containment Action</th>
+                <th width="10%">Corrective Action</th>
+                <th width="10%">Internal Report</th>
+                <th width="10%">Customer Report</th>
+                <th width="10%">Owner</th>
+                <th width="10%">Report Date</th>
             </tr>
         </thead>
         <tbody>
@@ -38,7 +40,7 @@
             {
                 <tr>
                     <td width="10%">@(Model.Count() - i)</td>
-                    <td colspan="7" width="90%">
+                    <td colspan="9" width="90%">
                         <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">
                             <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
                             @item.Summary.Substring(0, item.Summary.Length > 125 ? 125 : item.Summary.Length)
@@ -50,31 +52,31 @@
                     <td width="10%">@item.ModuleSN</td>
                     @if (item.RootCauseCommentList.Count > 0)
                     {
-                        <td width="13%"><a href="/Issue/ShowRootCause?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></td>
+                        <td width="10%"><a href="/Issue/ShowRootCause?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></td>
                     }
                     else
                     {
-                        <td width="13%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
+                        <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
                     }
 
-                    <td width="13%">@item.RMAFailureCode</td>
+                    <td width="10%">@item.RMAFailureCode</td>
                     
                     @if (item.ContainmentActions.Count > 0)
                     {
-                        <td width="14%"><a href="/Issue/ShowContainmentAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.ContainmentActionStatus())</a></td>
+                        <td width="10%"><a href="/Issue/ShowContainmentAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.ContainmentActionStatus())</a></td>
                     }
                     else
                     {
-                        <td width="14%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
+                        <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
                     }
                     
                     @if (item.CorrectiveActions.Count > 0)
                     {
-                        <td width="14%"><a href="/Issue/ShowCorrectiveAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.CorrectiveActionStatus())</a></td>
+                        <td width="10%"><a href="/Issue/ShowCorrectiveAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.CorrectiveActionStatus())</a></td>
                     }
                     else
                     {
-                        <td width="14%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
+                        <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
                     }
 
                     @if (item.InternalReportCommentList.Count > 0)
@@ -85,11 +87,11 @@
                             , Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done));
 
 
-                        <td width="13%">@Html.Raw(newcomment)</td>
+                        <td width="10%">@Html.Raw(newcomment)</td>
                     }
                     else
                     {
-                        <td width="13%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
+                        <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
                     }
                     
                     @if (item.Report4CustomerCommentList.Count > 0)
@@ -99,12 +101,15 @@
                         var newcomment = item.Report4CustomerCommentList[item.Report4CustomerCommentList.Count - 1].Comment.Replace(originalstr
                             , Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done));
 
-                        <td width="13%">@Html.Raw(newcomment)</td>
+                        <td width="10%">@Html.Raw(newcomment)</td>
                     }
                     else
                     {
-                        <td width="13%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
+                        <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
                     }
+
+                    <td width="10%">@item.Assignee.Split(new string[] { "@"},StringSplitOptions.None)[0]</td>
+                    <td width="10%">@item.ReportDate.ToString("yy/MM/dd")</td>
                 </tr>
                 i = i + 1;
             }

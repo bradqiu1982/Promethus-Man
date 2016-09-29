@@ -46,9 +46,19 @@
                                 <tr>
                                     @foreach (var item in line)
                                     {
-                                        <td>
-                                            <input class="form-control" id="row@(rowcnt)col@(colcnt)" name="row@(rowcnt)col@(colcnt)" value="@item" />
-                                        </td>
+                                        if (colcnt == 0)
+                                        {
+                                            <td>
+                                                <input class="form-control" id="row@(rowcnt)col@(colcnt)" name="row@(rowcnt)col@(colcnt)" value="@item" readonly="readonly"/>
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td>
+                                                <input class="form-control" id="row@(rowcnt)col@(colcnt)" name="row@(rowcnt)col@(colcnt)" value="@item" />
+                                            </td>
+                                        }
+
                                         colcnt = colcnt + 1;
                                     }
                                 </tr>

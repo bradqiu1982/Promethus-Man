@@ -289,11 +289,16 @@ namespace Prometheus.Controllers
                                     {
                                         templine = new List<string>();
 
-                                        var trimprojectname = RMSpectialCh(data[idx][12]);
+                                        var trimprojectname = RMSpectialCh(data[idx][12]).ToUpper();
+                                        if (trimprojectname.Length > 40)
+                                        {
+                                            trimprojectname = trimprojectname.Substring(0, 38);
+                                        }
+
                                         var pjname = string.Empty;
                                         foreach (var item in projlist)
                                         {
-                                            if (string.Compare(item, trimprojectname) == 0)
+                                            if (string.Compare(item, trimprojectname,true) == 0)
                                             {
                                                 pjname = item;
                                                 break;
@@ -395,24 +400,68 @@ namespace Prometheus.Controllers
                         {
                             var vm = new IssueViewModels();
                             vm.ProjectKey = data[i][0];
+                            if (vm.ProjectKey.Length > 50)
+                            {
+                                vm.ProjectKey = vm.ProjectKey.Substring(0, 48);
+                            }
+
                             vm.IssueKey = IssueViewModels.GetUniqKey();
                             vm.IssueType = ISSUETP.RMA;
 
                             vm.FinisarRMA = data[i][1];
+                            if (vm.FinisarRMA.Length > 50)
+                            {
+                                vm.FinisarRMA = vm.FinisarRMA.Substring(0, 48);
+                            }
+
                             vm.FinisarModel = data[i][2];
+                            if (vm.FinisarModel.Length > 50)
+                            {
+                                vm.FinisarModel = vm.FinisarModel.Substring(0, 48);
+                            }
+
                             vm.ECustomer = data[i][6];
+                            if (vm.ECustomer.Length > 50)
+                            {
+                                vm.ECustomer = vm.ECustomer.Substring(0, 48);
+                            }
+
+
                             vm.CRMANUM = "N/A";
+
                             vm.CReport = data[i][7];
+                            if (vm.CReport.Length > 180)
+                            {
+                                vm.CReport = vm.CReport.Substring(0, 178);
+                            }
+
                             vm.RelativePeoples = "";
                             vm.ModuleSN = data[i][3];
+                            if (vm.ModuleSN.Length > 50)
+                            {
+                                vm.ModuleSN = vm.ModuleSN.Substring(0, 48);
+                            }
 
                             vm.Summary = "RMA " + vm.FinisarRMA + " for module " + vm.FinisarModel + " from " + vm.ECustomer + ":" + vm.CReport.Substring(0, vm.CReport.Length > 50 ? 50 : vm.CReport.Length);
+                            if (vm.Summary.Length > 200)
+                            {
+                                vm.Summary = vm.Summary.Substring(0, 198);
+                            }
 
                             vm.Priority = ISSUEPR.Major;
                             vm.DueDate = DateTime.Parse(data[i][5]);
                             vm.ReportDate = DateTime.Now;
                             vm.Assignee = data[i][4].ToUpper();
+                            if (vm.Assignee.Length > 200)
+                            {
+                                vm.Assignee = vm.Assignee.Substring(0, 198);
+                            }
+
                             vm.Reporter = updater;
+                            if (vm.Reporter.Length > 200)
+                            {
+                                vm.Reporter = vm.Reporter.Substring(0, 198);
+                            }
 
                             vm.Resolution = Resolute.Pending;
 

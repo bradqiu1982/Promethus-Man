@@ -455,7 +455,7 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(projectmodel.ProjectName))
             {
                 var tempstr = RMSpectialCh(projectmodel.ProjectName);
-                projectmodel.ProjectKey = tempstr.Substring(0, (tempstr.Length > 20) ? 18 : tempstr.Length).ToUpper();
+                projectmodel.ProjectKey = tempstr.Substring(0, (tempstr.Length > 40) ? 38 : tempstr.Length).ToUpper();
             }
             else
                 projectmodel.ProjectKey = "";

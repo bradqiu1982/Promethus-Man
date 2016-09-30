@@ -1,0 +1,49 @@
+﻿
+@{
+    ViewBag.Title = "CommitVcselData";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Commit Vcsel Data</h2>
+
+@using (Html.BeginForm("CommitVcselData", "CustomerData", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+
+            <div class="col-md-4">
+                <span class="btn btn-default btn-file" id="choosefile1">
+                    Vcsel Data <input type="file" name="files1" id="file1" runat="server" onchange="ShowFileNames1(this)" />
+                </span>
+            </div>
+            <div class="col-md-8">
+                <div class="col-md-11">
+                    <label class="control-label" id="showfile1" name="showfile1"></label>
+                </div>
+                <div class="col-md-1">
+                    <input class="form-control text-box single-line" value="" id="VcselFileName" name="VcselFileName" type="hidden" />
+                </div>
+            </div>
+        </div>
+        
+            <script type="text/javascript">
+                function ShowFileNames1(oFile) {
+                    $('#showfile1').text(oFile.value);
+                    document.getElementById("VcselFileName").value = oFile.value;
+                }
+            </script>
+    </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <div class="col-md-3"><input type="submit" value="Submit" class="btn btn-default" /></div>
+                <div class="col-md-9"></div>
+            </div>
+        </div>
+    </div>
+}
+

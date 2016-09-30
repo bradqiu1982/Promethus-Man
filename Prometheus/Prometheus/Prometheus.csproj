@@ -214,6 +214,7 @@
     <Compile Include="Models\ProjectViewModels.cs" />
     <Compile Include="Models\ProjectYieldViewModule.cs" />
     <Compile Include="Models\UserViewModels.cs" />
+    <Compile Include="Models\VcselViewModel.cs" />
     <Compile Include="Models\WebPageVM.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -738,8 +739,8 @@
     <Content Include="Views\Project\UpdateProjectError.cshtml" />
     <Content Include="Views\PJReport\IBook.cshtml" />
     <Content Include="Views\PJReport\ViewReport.cshtml" />
-    <Content Include="Views\CustomerData\CommitVecselData.cshtml" />
-    <Content Include="Views\CustomerData\ConfirmVecselData.cshtml" />
+    <Content Include="Views\CustomerData\CommitVcselData.cshtml" />
+    <Content Include="Views\CustomerData\ConfirmVcselData.cshtml" />
     <Content Include="Views\CustomerData\CommitRMAData.cshtml" />
     <Content Include="Views\CustomerData\ConfirmRMAData.cshtml" />
     <Content Include="Scripts\project_list.xlsx" />

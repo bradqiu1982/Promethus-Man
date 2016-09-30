@@ -1,0 +1,84 @@
+﻿@model IEnumerable<IEnumerable<string>>
+
+    @{
+        ViewBag.Title = "ConfirmVcselData";
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+
+    <h2>Confirm Vcsel Data</h2>
+
+    <hr />
+
+    @using (Html.BeginForm("ConfirmVcselData", "CustomerData", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+        if (Model != null && Model.Count() > 0)
+        {
+            <input class="form-control" id="rowcount" name="rowcount" value="@ViewBag.ROWCOUNT" type="hidden" />
+            <input class="form-control" id="colcount" name="colcount" value="@ViewBag.COLCOUNT" type="hidden" />
+
+            var rowcnt = 0;
+            var colcnt = 0;
+
+            <div class="row">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Vcsel Data</div>
+                    <div class="panel-body"  style="overflow-y: scroll;overflow-x: scroll;height:400px">
+                        <table id="firsttable" name="firsttable" class="table table-bordered table-hover">
+
+                            <thead class="header">
+                                <tr>
+                                    @foreach (var item in Model.ElementAt(0))
+                                    {
+                                        <th>
+                                            
+                                            <textarea class="form-control" id="row@(rowcnt)col@(colcnt)" name="row@(rowcnt)col@(colcnt)" style="width: 150px;height:24px;overflow-y: scroll;overflow-x:unset;font-size:8px"> @item</textarea>
+                                        </th>
+                                        colcnt = colcnt + 1;
+                                    }
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @foreach (var line in Model)
+                                {
+                                    if (string.IsNullOrEmpty(line.ElementAt(1)))
+                                    {
+                                        continue;
+                                    }
+
+                                    colcnt = 0;
+
+                                    if (rowcnt != 0)
+                                    {
+                                        <tr>
+                                            @foreach (var item in line)
+                                            {
+                                                <td>
+                                                    <textarea class="form-control" id="row@(rowcnt)col@(colcnt)" name="row@(rowcnt)col@(colcnt)" style="width: 150px;height:24px;overflow-y: scroll;overflow-x:unset;font-size:8px">@item</textarea>
+                                                </td>
+                                                colcnt = colcnt + 1;
+                                            }
+                                        </tr>
+                                    }
+                                    rowcnt = rowcnt + 1;
+                                }
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <div class="col-md-3"><input type="submit" value="Confirm" id="confirmdata" name="confirmdata" class="btn btn-default" /></div>
+                                <div class="col-md-3"><input type="submit" value="Cancel" id="canceldata" name="canceldata" class="btn btn-default" /></div>
+                                <div class="col-md-6"></div>
+                            </div>
+                        </div>
+                    </div>
+                    }
+
+                    }
+

@@ -13,7 +13,7 @@ namespace Prometheus.Controllers
 {
     public class CustomerDataController : Controller
     {
-        public ActionResult CommitVecselData()
+        public ActionResult CommitVcselData()
         {
             return View();
         }
@@ -93,6 +93,9 @@ namespace Prometheus.Controllers
                     }
                 }
 
+                wkb.Close();
+                excel.Quit();
+
                 return data;
             }
             catch (Exception ex)
@@ -106,21 +109,25 @@ namespace Prometheus.Controllers
                     ReleaseRCM(wkb);
                 if (excel != null)
                     ReleaseRCM(excel);
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
             }
         }
 
 
 
-        [HttpPost, ActionName("CommitVecselData")]
+        [HttpPost, ActionName("CommitVcselData")]
         [ValidateAntiForgeryToken]
-        public ActionResult CommitVecselDataPost()
+        public ActionResult CommitVcselDataPost()
         {
             var wholefn = "";
             try
             {
-                if (!string.IsNullOrEmpty(Request.Form["VecselFileName"]))
+                if (!string.IsNullOrEmpty(Request.Form["VcselFileName"]))
                 {
-                    var customereportfile = Request.Form["VecselFileName"];
+                    var customereportfile = Request.Form["VcselFileName"];
                     var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_");
 
                     foreach (string fl in Request.Files)
@@ -155,7 +162,7 @@ namespace Prometheus.Controllers
                         {
                             ViewBag.ROWCOUNT = data.Count;
                             ViewBag.COLCOUNT = data[0].Count;
-                            return View("ConfirmVecselData",data);
+                            return View("ConfirmVcselData",data);
                         }
                     }
 
@@ -167,9 +174,9 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        [HttpPost, ActionName("ConfirmVecselData")]
+        [HttpPost, ActionName("ConfirmVcselData")]
         [ValidateAntiForgeryToken]
-        public ActionResult ConfirmVecselDataPost()
+        public ActionResult ConfirmVcselDataPost()
         {
             if (Request.Form["confirmdata"] != null)
             {
@@ -178,12 +185,20 @@ namespace Prometheus.Controllers
                 var data = new List<List<string>>();
                 for (var row = 0; row < rowcnt; row++)
                 {
-                    var line = new List<string>();
-                    for (var col = 0; col < colcnt; col++)
+                    if (row != 0)
                     {
-                        line.Add(Request.Form["row" + row + "col" + col]);
+                        var line = new List<string>();
+                        for (var col = 0; col < colcnt; col++)
+                        {
+                            line.Add(Request.Form["row" + row + "col" + col]);
+                        }
+                        data.Add(line);
                     }
-                    data.Add(line);
+                }
+
+                foreach (var line in data)
+                {
+                    VcselViewModel.StoreVcselData(line);
                 }
             }
 

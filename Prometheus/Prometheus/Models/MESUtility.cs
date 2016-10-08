@@ -196,7 +196,10 @@ namespace Prometheus.Models
                         }
                     }
 
-                    CreateSystemIssues(failurelist);
+                    if (vm.FinishRating < 90)
+                    {
+                        CreateSystemIssues(failurelist);
+                    }
                 }
             
         }
@@ -293,7 +296,11 @@ namespace Prometheus.Models
                     }
                 }
 
-                CreateSystemIssues(failurelist);
+                if (vm.FinishRating < 90)
+                {
+                    CreateSystemIssues(failurelist);
+                }
+                
             }
 
         }

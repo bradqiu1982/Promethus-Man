@@ -5,33 +5,71 @@
 
 <h2>Review Vcsel Data</h2>
 
+<hr/>
+
 @if (Model != null)
 {
 
-    foreach (var keyvalp in Model)
-    {
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h4 class="panel-title">@keyvalp.Key</h4>
-             </div>
-                <div class="panel-body" style="overflow-x:scroll">
-                    <table class="table table-bordered table-hover">
-                        <tbody>
-
-                            @foreach (var line in keyvalp.Value)
+    <table id="vcseldatatable" class="display" width="100" cellspacing="0">
+        <thead>
+            @foreach (var line in Model)
+            {
+                <tr>
+                    @foreach (var item in line)
                             {
-                                <tr>
-                                    @foreach (var item in line)
+                        <th>@item</th>
+                    }
+                </tr>
+                break;
+            }
+        </thead>
+
+        <tbody>
+            @foreach (var line in Model)
+            {
+                <tr>
+                    @foreach (var item in line)
+                    {
+                        <th>@item</th>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#vcseldatatable').DataTable({
+                'iDisplayLength': 50,
+                'aLengthMenu': [[25, 50, 100, -1],
+                                [25, 50, 100,  "All"]],
+            });
+                    } );
+    </script>
+       
+        @*foreach (var keyvalp in Model)
+            {
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">@keyvalp.Key</h4>
+                     </div>
+                        <div class="panel-body" style="overflow-x:scroll">
+                            <table class="table table-bordered table-hover">
+                                <tbody>
+
+                                    @foreach (var line in keyvalp.Value)
                                     {
-                                        <td>
-                                            <textarea class="form-control" style="width: 150px;height:24px;overflow-y: scroll;overflow-x:unset;font-size:8px">@item</textarea>
-                                        </td>
+                                        <tr>
+                                            @foreach (var item in line)
+                                            {
+                                                <td>
+                                                    <textarea class="form-control" style="width: 150px;height:24px;overflow-y: scroll;overflow-x:unset;font-size:8px">@item</textarea>
+                                                </td>
+                                            }
+                                        </tr>
                                     }
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-           </div>
-      }
+                                </tbody>
+                            </table>
+                        </div>
+                   </div>
+              }*@
 }

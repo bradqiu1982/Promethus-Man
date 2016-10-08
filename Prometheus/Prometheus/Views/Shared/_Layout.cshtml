@@ -16,7 +16,9 @@
     @Scripts.Render("~/bundles/jqueryval")
     @Scripts.Render("~/bundles/jquery-ui")
     @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/datatables")
     <link href="@Url.Content("~/Content/themes/bootstrapfileinput.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/themes/jquery.dataTables.min.css")" rel="stylesheet" type="text/css" />
 
     <style type="text/css">
         .tableFloatingHeaderOriginal th {
@@ -98,9 +100,9 @@
                                 <li>
                                     @Html.ActionLink("Commit Vcsel Data", "CommitVcselData", "CustomerData")
                                 </li>
-                                @*<li>
+                                <li>
                                     @Html.ActionLink("Review Vcsel Data", "ReviewVcselData", "CustomerData")
-                                </li>*@
+                                </li>
                             </ul>
                         </li>
                     </ul>

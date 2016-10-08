@@ -548,6 +548,7 @@
     <Content Include="Content\themes\base\images\ui-icons_888888_256x240.png" />
     <Content Include="Content\themes\base\images\ui-icons_cd0a0a_256x240.png" />
     <Content Include="Content\themes\base\jquery-ui.css" />
+    <Content Include="Content\themes\jquery.dataTables.min.css" />
     <Content Include="Content\themes\base\menu.css" />
     <Content Include="Content\themes\base\progressbar.css" />
     <Content Include="Content\themes\base\resizable.css" />
@@ -668,6 +669,7 @@
     <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery-ui-1.11.4.js" />
     <Content Include="Scripts\jquery-ui-1.11.4.min.js" />
+    <Content Include="Scripts\jquery.dataTables.min.js" />
     <Content Include="Scripts\jquery.stickytableheaders.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />

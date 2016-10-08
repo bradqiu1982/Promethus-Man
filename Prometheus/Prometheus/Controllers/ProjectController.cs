@@ -206,6 +206,7 @@ namespace Prometheus.Controllers
                 ViewBag.Engineer6 = CreateSelectList(asilist, eglist[5].Name);
             else
                 ViewBag.Engineer6 = CreateSelectList(asilist, "");
+
         }
 
         public ActionResult CreateProject()
@@ -602,6 +603,39 @@ namespace Prometheus.Controllers
             return RedirectToAction("ViewAll");
         }
 
+        private void CreateUpdateIssueList(ProjectViewModels vm)
+        {
+            var pslist = new List<SelectListItem>();
+
+            var psitem = new SelectListItem();
+            psitem.Text = "True";
+            psitem.Value = "True";
+            pslist.Add(psitem);
+
+            psitem = new SelectListItem();
+            psitem.Text = "False";
+            psitem.Value = "False";
+            pslist.Add(psitem);
+
+            if (vm != null)
+            {
+                if (vm.FinishRating < 90)
+                {
+                    pslist[0].Selected = true;
+                }
+                else
+                {
+                    pslist[1].Selected = true;
+                }
+            }
+            else
+            {
+                pslist[0].Selected = true;
+            }
+
+            ViewBag.updateissuelist =pslist;
+        }
+
         public ActionResult EditProject(string ProjectKey)
         {
             var ckdict = CookieUtility.UnpackCookie(this);
@@ -617,6 +651,7 @@ namespace Prometheus.Controllers
                 {
                     var vm = ProjectViewModels.RetrieveOneProject(realkey);
                     CreateAllUserLists(vm);
+                    CreateUpdateIssueList(vm);
                     return View(vm);
                 }
                 else
@@ -682,8 +717,18 @@ namespace Prometheus.Controllers
         {
             var projectmodel = new ProjectViewModels();
             projectmodel.ProjectName = Request.Form["ProjectName"];
-            try {projectmodel.FinishRating = Convert.ToDouble(Request.Form["FinishRating"])%100; }
-            catch(Exception ex) { projectmodel.FinishRating = 0; }
+
+            //try {projectmodel.FinishRating = Convert.ToDouble(Request.Form["FinishRating"])%100; }
+            //catch(Exception ex) { projectmodel.FinishRating = 0; }
+            if (string.Compare(Request.Form["updateissuelist"].ToString(), "True", true) == 0)
+            {
+                projectmodel.FinishRating = 0;
+            }
+            else
+            {
+                projectmodel.FinishRating = 99;
+            }
+
             RetrievePorjectKey(projectmodel);
 
             RetrieveProjectMember(projectmodel);
@@ -696,6 +741,7 @@ namespace Prometheus.Controllers
             if (!RetrieveProjectDate(projectmodel))
             {
                 CreateAllUserLists(projectmodel);
+                CreateUpdateIssueList(projectmodel);
                 return View(projectmodel);
             }
                 
@@ -703,6 +749,7 @@ namespace Prometheus.Controllers
             if (!ProjectValidate(projectmodel,true))
             {
                 CreateAllUserLists(projectmodel);
+                CreateUpdateIssueList(projectmodel);
                 return View(projectmodel);
             }
 

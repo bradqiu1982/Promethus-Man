@@ -37,7 +37,7 @@ namespace Prometheus.Models
                 client.Timeout = 60000;
                 client.DeliveryMethod = SmtpDeliveryMethod.Network;
                 client.UseDefaultCredentials = false;
-                client.Credentials = new NetworkCredential("brad.qiu@finisar.com", "wangle@432");
+                client.Credentials = new NetworkCredential("brad.qiu@finisar.com", "wangle@4321");
 
                 ServicePointManager.ServerCertificateValidationCallback
                     = delegate (object s, X509Certificate certificate, X509Chain chain
@@ -84,7 +84,7 @@ namespace Prometheus.Models
                 client.Timeout = 60000;
                 client.DeliveryMethod = SmtpDeliveryMethod.Network;
                 client.UseDefaultCredentials = false;
-                client.Credentials = new NetworkCredential("brad.qiu@finisar.com", "wangle@432");
+                client.Credentials = new NetworkCredential("brad.qiu@finisar.com", "wangle@4321");
 
                 ServicePointManager.ServerCertificateValidationCallback
                     = delegate (object s, X509Certificate certificate, X509Chain chain

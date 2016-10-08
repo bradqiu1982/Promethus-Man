@@ -67,7 +67,7 @@
                     }
                     else
                     {
-                        <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
+                        <td width="10%">N/A</td>
                     }
                     
                     @if (item.CorrectiveActions.Count > 0)
@@ -76,7 +76,7 @@
                     }
                     else
                     {
-                        <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
+                        <td width="10%">N/A</td>
                     }
 
                     @if (item.InternalReportCommentList.Count > 0)
@@ -109,7 +109,7 @@
                     }
 
                     <td width="10%">@item.Assignee.Split(new string[] { "@"},StringSplitOptions.None)[0]</td>
-                    <td width="10%">@item.ReportDate.ToString("yy/MM/dd")</td>
+                    <td width="10%">@item.ReportDate.ToString("MM/dd-yy")</td>
                 </tr>
                 i = i + 1;
             }

@@ -1,6 +1,4 @@
-﻿@model IEnumerable<IEnumerable<string>>
-
-    @{
+﻿    @{
         ViewBag.Title = "ConfirmVcselData";
         Layout = "~/Views/Shared/_Layout.cshtml";
     }
@@ -42,7 +40,7 @@
                             <tbody>
                                 @foreach (var line in Model)
                                 {
-                                    if (string.IsNullOrEmpty(line.ElementAt(1)))
+                                    if (string.IsNullOrEmpty(line.ElementAt(1).Trim()))
                                     {
                                         continue;
                                     }

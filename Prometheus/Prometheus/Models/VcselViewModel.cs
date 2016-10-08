@@ -25,5 +25,24 @@ namespace Prometheus.Models
             sql = sql.Replace("<v>", valuestring);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
+
+        public static List<List<string>> RetrieveVcselData()
+        {
+            var ret = new List<List<string>>();
+            var sql = "select * from VCSELUsageTable";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                var templine = new List<string>();
+                foreach (var item in line)
+                {
+                    templine.Add(Convert.ToString(item));
+                }
+                ret.Add(templine);
+            }
+            return ret;
+        }
+
+
     }
 }

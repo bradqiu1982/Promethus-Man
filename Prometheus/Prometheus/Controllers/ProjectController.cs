@@ -595,6 +595,7 @@ namespace Prometheus.Controllers
             //    try
             //    {
                     MESUtility.StartProjectBonding(projectmodel);
+                    BIDataUtility.StartProjectBonding(projectmodel);
             //    }
             //    catch (Exception ex)
             //    { }
@@ -711,6 +712,28 @@ namespace Prometheus.Controllers
             return changed;
         }
 
+        private bool PNBondingChanged(ProjectViewModels oldpjdata, ProjectViewModels newpjdata)
+        {
+            var pndict = new Dictionary<string, bool>();
+            foreach (var pn in oldpjdata.PNList)
+            {
+                pndict.Add(pn.Pn, true);
+            }
+
+            bool changed = false;
+
+            foreach (var pn in newpjdata.PNList)
+            {
+                if (!pndict.ContainsKey(pn.Pn))
+                {
+                    changed = true;
+                    break;
+                }
+            }
+
+            return changed;
+        }
+
         [HttpPost, ActionName("EditProject")]
         [ValidateAntiForgeryToken]
         public ActionResult EditProjectPost()
@@ -756,6 +779,7 @@ namespace Prometheus.Controllers
             var oldpjdata = ProjectViewModels.RetrieveOneProject(projectmodel.ProjectKey);
 
             bool databondingchange = DataBondingChanged(oldpjdata, projectmodel);
+            bool pnbondingchg = PNBondingChanged(oldpjdata, projectmodel);
 
             projectmodel.StoreProject();
 
@@ -776,10 +800,16 @@ namespace Prometheus.Controllers
                 //    try
                 //    {
                         MESUtility.StartProjectBonding(projectmodel);
+                        
                 //    }
                 //    catch (Exception ex)
                 //    { }
                 //}).Start();
+            }
+
+            if (pnbondingchg)
+            {
+                BIDataUtility.StartProjectBonding(projectmodel);
             }
 
             return RedirectToAction("ViewAll");
@@ -1259,15 +1289,19 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectRMA(string ProjectKey)
         {
-            if (ProjectKey != null)
-            {
-                var list1 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Pending);
-                var list2 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Working);
-                var list3 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Done);
-                list1.AddRange(list2);
-                list1.AddRange(list3);
-                return View(list1);
-            }
+            //var sql = "select ModuleSerialNum,Step,ModuleType,ErrAbbr,TestTimeStamp,TestStation,ModulePartNum,wafer,waferpn,ChannelNum,SLOPE,THOLD,PO_LD,PO_LD_18,PO_LD_25,PO_LD_127,PO_Uniformity,Delta_SLOPE,Delta_THOLD,Delta_PO_LD,Delta_PO_LD_18,Delta_PO_LD_25,Delta_PO_LD_127,Delta_PO_Uniformity from dbo.PRLL_VcselInfoSummary_2016(nolock) where wafer <> 'NULL' and ModulePartNum in ('1241915') order by TestTimeStamp Desc,ModuleSerialNum";
+            //var dbret = DBUtility.ExePRLSqlWithRes(sql);
+            //System.Windows.MessageBox.Show("get data row:" + dbret.Count);
+            
+            //if (ProjectKey != null)
+            //{
+            //    var list1 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Pending);
+            //    var list2 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Working);
+            //    var list3 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Done);
+            //    list1.AddRange(list2);
+            //    list1.AddRange(list3);
+            //    return View(list1);
+            //}
             return View();
         }
 

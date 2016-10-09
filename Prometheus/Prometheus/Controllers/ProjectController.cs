@@ -71,49 +71,10 @@ namespace Prometheus.Controllers
                 item.PendingRMACount = IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Pending);
             }
 
-            new Thread(() =>
-            {
-                try
-                {
-                    SendBookedReportNotice();
-                }
-                catch (Exception ex)
-                { }
-            }).Start();
-
             return View(projlist);
         }
 
-        private void SendBookedReportNotice()
-        {
-            var filename = "log"+DateTime.Now.ToString("yyyy-MM-dd");
-            var wholefilename = Server.MapPath("~/userfiles")+ "\\"+ filename;
-            if (!System.IO.File.Exists(wholefilename))
-            {
-                var hello = "hello";
-                System.IO.File.WriteAllText(wholefilename,hello);
-                var bookrecords = PJReportViewModels.RetrieveBookReportRecord();
-                foreach (var record in bookrecords)
-                {
-                    var wkday = ReportSelectTime.GetWeekDay(record.reporttime);
-                    if (wkday == 8 || wkday == (int)DateTime.Now.DayOfWeek)
-                    {
-                        var routevalue = new RouteValueDictionary();
-                        routevalue.Add("username", record.username);
-                        //send validate email
-                        string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
-                        string validatestr = this.Url.Action("UserBookedReport", "PJReport", routevalue, scheme);
 
-                        var content = "Click below link to review the Report which you booked :\r\n " + validatestr;
-
-                        var toaddrs = new List<string>();
-                        toaddrs.Add(record.username);
-                        EmailUtility.SendEmail("Parallel NPI Trace Notice", toaddrs, content);
-                    }
-                }//end foreach
-            }//end if
-
-        }
 
         private List<SelectListItem> CreateSelectList(List<string> valist, string defVal)
         {
@@ -1289,19 +1250,15 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectRMA(string ProjectKey)
         {
-            //var sql = "select ModuleSerialNum,Step,ModuleType,ErrAbbr,TestTimeStamp,TestStation,ModulePartNum,wafer,waferpn,ChannelNum,SLOPE,THOLD,PO_LD,PO_LD_18,PO_LD_25,PO_LD_127,PO_Uniformity,Delta_SLOPE,Delta_THOLD,Delta_PO_LD,Delta_PO_LD_18,Delta_PO_LD_25,Delta_PO_LD_127,Delta_PO_Uniformity from dbo.PRLL_VcselInfoSummary_2016(nolock) where wafer <> 'NULL' and ModulePartNum in ('1241915') order by TestTimeStamp Desc,ModuleSerialNum";
-            //var dbret = DBUtility.ExePRLSqlWithRes(sql);
-            //System.Windows.MessageBox.Show("get data row:" + dbret.Count);
-            
-            //if (ProjectKey != null)
-            //{
-            //    var list1 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Pending);
-            //    var list2 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Working);
-            //    var list3 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Done);
-            //    list1.AddRange(list2);
-            //    list1.AddRange(list3);
-            //    return View(list1);
-            //}
+            if (ProjectKey != null)
+            {
+                var list1 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Pending);
+                var list2 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Working);
+                var list3 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Done);
+                list1.AddRange(list2);
+                list1.AddRange(list3);
+                return View(list1);
+            }
             return View();
         }
 
@@ -2068,15 +2025,69 @@ namespace Prometheus.Controllers
             return View(tempvm[0]);
         }
 
-
-        public ActionResult SendPage()
+        private void SendBookedReportNotice()
         {
-            var htmlstr1 = WebPageVM.GetPage("http://localhost/");
-            var tolist = new List<string>();
-            var htmlhelper = new HtmlHelper(new ViewContext(),new ViewPage());
-            var htmlstr = htmlhelper.Raw(htmlstr1);
-            EmailUtility.SendHtmlEmail("View All Page", tolist, htmlstr.ToHtmlString());
-            return RedirectToAction("ViewAll");
+            var filename = "log" + DateTime.Now.ToString("yyyy-MM-dd");
+            var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
+            if (!System.IO.File.Exists(wholefilename))
+            {
+                var hello = "hello";
+                System.IO.File.WriteAllText(wholefilename, hello);
+                var bookrecords = PJReportViewModels.RetrieveBookReportRecord();
+                foreach (var record in bookrecords)
+                {
+                    var wkday = ReportSelectTime.GetWeekDay(record.reporttime);
+                    if (wkday == 8 || wkday == (int)DateTime.Now.DayOfWeek)
+                    {
+                        var routevalue = new RouteValueDictionary();
+                        routevalue.Add("username", record.username);
+                        //send validate email
+                        string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                        string validatestr = this.Url.Action("UserBookedReport", "PJReport", routevalue, scheme);
+
+                        var content = "Click below link to review the Report which you booked :\r\n " + validatestr;
+
+                        var toaddrs = new List<string>();
+                        toaddrs.Add(record.username);
+                        EmailUtility.SendEmail("Parallel NPI Trace Notice", toaddrs, content);
+                    }
+                }//end foreach
+            }//end if
+
         }
+
+        public ActionResult HeartBeat()
+        {
+            try
+            {
+                SendBookedReportNotice();
+            }
+            catch (Exception ex)
+            { }
+
+            var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
+            foreach (var pjkey in pjkeylist)
+            {
+                try
+                {
+                    ProjectTestData.PrePareLatestData(pjkey);
+                }
+                catch (Exception ex)
+                { }
+            }
+
+            foreach (var pjkey in pjkeylist)
+            {
+                try
+                {
+                    BITestData.PrePareLatestData(pjkey);
+                }
+                catch (Exception ex)
+                { }
+            }
+
+            return View();
+        }
+
     }
 }

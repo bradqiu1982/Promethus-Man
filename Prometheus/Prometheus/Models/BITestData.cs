@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -82,5 +83,78 @@ namespace Prometheus.Models
             else
                 return null;
         }
+
+
+        public static ConcurrentDictionary<string, bool> UpdateLockUsing = new ConcurrentDictionary<string, bool>();
+        public static bool UpdatePJLockUsing(string pjkey)
+        {
+            if (UpdateLockUsing.ContainsKey(pjkey))
+            {
+                if (UpdateLockUsing[pjkey])
+                {
+                    return true;
+                }
+                else
+                {
+                    UpdateLockUsing[pjkey] = true;
+                    return false;
+                }
+            }
+            else
+            {
+                try
+                {
+                    UpdateLockUsing.TryAdd(pjkey, true);
+                    return false;
+                }
+                catch
+                {
+                    return true;
+                }
+            }
+        }
+
+        public static void ResetUpdatePJLock(string pjkey)
+        {
+            if (UpdateLockUsing.ContainsKey(pjkey))
+            {
+                UpdateLockUsing[pjkey] = false;
+            }
+        }
+
+        public static void PrePareLatestData(string projectkey)
+        {
+            if (UpdatePJLockUsing(projectkey))
+                return;
+
+            try
+            {
+                var vm = ProjectViewModels.RetrieveOneProject(projectkey);
+                if (vm.PNList.Count > 0)
+                {
+                    string lastupdatetime = BITestData.RetrieveLatestTimeOfLocalBI(projectkey);
+                    if (!string.IsNullOrEmpty(lastupdatetime))
+                    {
+                        var vlast = DateTime.Parse(lastupdatetime);
+                        vlast = vlast.AddMinutes(18);
+                        if (vlast < DateTime.Now)
+                        {
+                            BIDataUtility.UpdateProjectData(vm);
+                        }
+                    }
+                    else
+                    {
+                        BIDataUtility.UpdateProjectData(vm);
+                    }
+                }
+
+                ResetUpdatePJLock(projectkey);
+            }
+            catch (Exception ex)
+            {
+                ResetUpdatePJLock(projectkey);
+            }
+        }
+
     }
 }

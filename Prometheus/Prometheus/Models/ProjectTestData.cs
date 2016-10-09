@@ -81,7 +81,7 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(isql);
         }
 
-        private static void PrePareLatestData(string projectkey)
+        public static void PrePareLatestData(string projectkey)
         {
             if (UpdatePJLockUsing(projectkey))
                 return;
@@ -97,7 +97,7 @@ namespace Prometheus.Models
                     if (!string.IsNullOrEmpty(lastupdatetime))
                     {
                         var vlast = DateTime.Parse(lastupdatetime);
-                        vlast = vlast.AddMinutes(30);
+                        vlast = vlast.AddMinutes(18);
                         if (vlast < DateTime.Now)
                         {
                             MESUtility.UpdateProjectData(vm, lastupdatetime, DateTime.Now.ToString());
@@ -132,7 +132,7 @@ namespace Prometheus.Models
 
         public static List<ProjectTestData> RetrieveProjectTestData(int topnum,string projectkey)
         {
-            ProjectTestData.PrePareLatestData(projectkey);
+            //ProjectTestData.PrePareLatestData(projectkey);
 
             var ret = new List<ProjectTestData>();
             var sql = "select top <topnum> ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN from ProjectTestData where ProjectKey = '<ProjectKey>' order by TestTimeStamp DESC";
@@ -150,7 +150,7 @@ namespace Prometheus.Models
 
         public static List<ProjectTestData> RetrieveProjectTestData(string projectkey,string startdate,string enddate,bool firstyield)
         {
-            ProjectTestData.PrePareLatestData(projectkey);
+            //ProjectTestData.PrePareLatestData(projectkey);
 
             var ret = new List<ProjectTestData>();
             var sql = "";
@@ -178,7 +178,7 @@ namespace Prometheus.Models
 
         public static List<ProjectTestData> RetrieveProjectFailedTestData(int topnum, string projectkey)
         {
-            ProjectTestData.PrePareLatestData(projectkey);
+            //ProjectTestData.PrePareLatestData(projectkey);
 
             var ret = new List<ProjectTestData>();
             var sql = "select top <topnum> ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN from ProjectTestData where ProjectKey = '<ProjectKey>' and ErrAbbr <> 'PASS' order by ErrAbbr,TestTimeStamp DESC";
@@ -225,7 +225,7 @@ namespace Prometheus.Models
 
         public static List<ProjectTestData> RetrieveProjectTestDataWithErrAbbr(int topnum, string ProjectKey, string ErrAbbr)
         {
-            ProjectTestData.PrePareLatestData(ProjectKey);
+            //ProjectTestData.PrePareLatestData(ProjectKey);
 
             var ret = new List<ProjectTestData>();
             var sql = "select top <topnum> ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN from ProjectTestData where ProjectKey = '<ProjectKey>' and ErrAbbr = '<ErrAbbr>' order by TestTimeStamp DESC";

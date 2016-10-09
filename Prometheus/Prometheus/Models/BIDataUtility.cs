@@ -186,7 +186,6 @@ namespace Prometheus.Models
         }
 
 
-
         public static void UpdateProjectData(ProjectViewModels vm)
         {
             if (vm.PNList.Count > 0)

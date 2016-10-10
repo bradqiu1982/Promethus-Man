@@ -63,8 +63,12 @@ namespace Prometheus.Models
         private Dictionary<string, Dictionary<string, int>> lemap = new Dictionary<string, Dictionary<string, int>>();
         public Dictionary<string, Dictionary<string, int>> LErrorMap { get { return lemap; } }
 
-        public static void RegisterError(string errorcode, string whichtest, Dictionary<string, Dictionary<string, int>> emap)
+        public static void RegisterError(string errorcode1, string whichtest, Dictionary<string, Dictionary<string, int>> emap)
         {
+            var errorcode = errorcode1;
+            if (string.Compare(errorcode, "pass", true) == 0)
+                errorcode = "PASS";
+
             if (emap.ContainsKey(errorcode))
             {
                 var tempdict = emap[errorcode];

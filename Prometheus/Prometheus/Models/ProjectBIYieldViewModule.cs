@@ -30,8 +30,12 @@ namespace Prometheus.Models
         public Dictionary<string, Dictionary<string, int>> LErrorMap { get { return lemap; } }
 
 
-        public static void RegisterError(string errorcode, string whichtest, Dictionary<string, Dictionary<string, int>> emap)
+        public static void RegisterError(string errorcode1, string whichtest, Dictionary<string, Dictionary<string, int>> emap)
         {
+            var errorcode = errorcode1;
+            if (string.Compare(errorcode, "pass", true) == 0)
+                errorcode = "PASS";
+
             if (emap.ContainsKey(errorcode))
             {
                 var tempdict = emap[errorcode];
@@ -213,6 +217,37 @@ namespace Prometheus.Models
             }
             return ret;
         }
+
+        public static int RetrieveErrorCount(string errorcode, string whichtest, Dictionary<string, Dictionary<string, int>> emap)
+        {
+            if (emap.ContainsKey(errorcode))
+            {
+                var tempdict = emap[errorcode];
+                if (tempdict.ContainsKey(whichtest))
+                {
+                    return tempdict[whichtest];
+                }
+                return 0;
+            }
+
+            return 0;
+        }
+
+
+        public static ProjectBIYieldViewModule GetYieldByWafer(string pjkey, string wafer)
+        {
+            var ret = new ProjectBIYieldViewModule();
+            ret.ProjectKey = pjkey;
+            ret.ProjectKey = pjkey;
+            ret.StartDate = DateTime.Now;
+            ret.EndDate = DateTime.Now;
+
+            var plist = BITestData.RetrieveProjectTestDataByWafer(pjkey, wafer);
+            RetrieveCummYield(ret, plist);
+
+            return ret;
+        }
+
 
     }
 }

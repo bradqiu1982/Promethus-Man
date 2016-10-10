@@ -16,15 +16,88 @@
     <script src="~/Scripts/exporting.js"></script>
 
     <div class="row">
-        <div class="col-md-12">
-            <div class="panel panel-default">
+        <div class="col-md-6">
+            <div class="panel panel-default" style="height:300px">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Yield</h3>
+                    <h3 class="panel-title">Weekly Yields</h3>
                 </div>
                 <div class="panel-body">
                     <div class="col-md-12">
-                        <div id="weeklyyield" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                        <div id="weeklyyield" style="min-width: 310px; height: 280px; margin: 0 auto"></div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="panel panel-default" style="height:300px">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Yield Query</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="col-md-12">
+                        <script>
+                            function ShowPeriodYield() {
+                                if (document.getElementById("StartDate").value && document.getElementById("EndDate").value)
+                                {
+                                    window.location.href = '/BurnIn/ProjectBIPeriodYield?ProjectKey=@ViewBag.pjkey' + '&StartDate=' + document.getElementById("StartDate").value + '&EndDate=' + document.getElementById("EndDate").value;
+                                }
+                            }
+                            function ShowWaferYield() {
+                                if (document.getElementById("waferlist").value && document.getElementById("waferlist").value != 'NONE')
+                                {
+                                    window.location.href = '/BurnIn/ProjectBIWaferYield?ProjectKey=@ViewBag.pjkey' + '&Wafer=' + document.getElementById("waferlist").value;
+                                }
+                            }
+                        </script>
+
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label class="control-label" for="StartDate">StartDate</label>
+                            </div>
+                            <div class="col-md-3">
+                                <input class="form-control text-box single-line" id="StartDate" name="StartDate" type="text" value="" />
+                            </div>
+                            <div class="col-md-2">
+                                <label class="control-label" for="EndDate">EndDate</label>
+                            </div>
+                            <div class="col-md-3">
+                                <input class="form-control text-box single-line" id="EndDate" name="EndDate" type="text" value="" />
+                            </div>
+                            <div class="col-md-2">
+                                <button class="form-control" onclick="ShowPeriodYield()"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                            </div>
+                            <script type="text/javascript">
+                            $(document).ready(function () {
+                                $("#StartDate").datepicker({
+                                    changeMonth: true,
+                                    changeYear: true,
+                                    dateFormat: 'yy-mm-dd'
+                                });
+                                $("#EndDate").datepicker({
+                                    changeMonth: true,
+                                    changeYear: true,
+                                    dateFormat: 'yy-mm-dd'
+                                });
+                            });
+                            </script>
+                        </div>
+                        
+                        <hr/>
+                        
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label class="control-label" for="StartDate">WAFER</label>
+                            </div>
+                            <div class="col-md-8">
+                                @Html.DropDownList("waferlist", null, new { @id = "waferlist", @class = "form-control" })
+                            </div>
+                            <div class="col-md-2">
+                                <button class="form-control" onclick="ShowWaferYield()"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                            </div>
+                        </div>
+                        @*<div class="row"></div>*@
+                     </div>
                 </div>
             </div>
         </div>

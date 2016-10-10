@@ -755,6 +755,11 @@
     <Content Include="Views\CustomerData\ReviewVcselData.cshtml" />
     <Content Include="Views\Project\HeartBeat.cshtml" />
     <Content Include="Views\BurnIn\BurnInMainPage.cshtml" />
+    <Content Include="Views\BurnIn\ProjectBIWYieldDetail.cshtml" />
+    <Content Include="Views\BurnIn\ProjectBIPeriodYield.cshtml" />
+    <Content Include="Views\BurnIn\ProjectBIPYieldDetail.cshtml" />
+    <Content Include="Views\BurnIn\ProjectBIWaferYield.cshtml" />
+    <Content Include="Views\BurnIn\ProjectBIWaferYieldDetail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

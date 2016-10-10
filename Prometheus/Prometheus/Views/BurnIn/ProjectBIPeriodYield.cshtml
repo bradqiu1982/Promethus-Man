@@ -1,0 +1,52 @@
+﻿
+@{
+    ViewBag.Title = "ProjectBIPeriodYield";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (ViewBag.pjkey != null)
+{
+    <div class="row">
+        <div class="col-md-3">
+            <h2>@ViewBag.pjkey Burn-In Yield</h2>
+        </div>
+        <div class="col-md-2">
+            <h2><a data-toggle="tooltip" title="Goto Burn-In Main Page" href="/BurnIn/BurnInMainPage?ProjectKey=@(ViewBag.pjkey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+        </div>
+        <div class="col-md-7"></div>
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-3">
+            <h2>Project Burn-In Yield</h2>
+        </div>
+        <div class="col-md-2">
+        </div>
+        <div class="col-md-7"></div>
+    </div>
+}
+
+@if (ViewBag.chartscript != null)
+{
+    @Html.Raw(ViewBag.chartscript)
+
+    <script src="~/Scripts/highcharts.js"></script>
+    <script src="~/Scripts/exporting.js"></script>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Burn-In Yield</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="col-md-12">
+                        <div id="periodyield" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

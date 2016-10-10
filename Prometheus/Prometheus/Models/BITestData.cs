@@ -160,6 +160,39 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static List<BITestData> RetrieveProjectTestDataByWafer(string pjkey, string wafer)
+        {
+
+            var ret = new List<BITestData>();
+            var sql = "select ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN,Wafer,Waferpn from BITestData where ProjectKey = '<ProjectKey>' and Wafer = '<Wafer>' order by ModuleSerialNum,TestTimeStamp DESC";
+
+            sql = sql.Replace("<ProjectKey>", pjkey).Replace("<Wafer>", wafer);
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            foreach (var item in dbret)
+            {
+                var tempdata = new BITestData(Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])
+                    , Convert.ToString(item[3]), Convert.ToString(item[4]), Convert.ToString(item[5])
+                    , Convert.ToString(item[6]), Convert.ToString(item[7]), Convert.ToString(item[8]), Convert.ToString(item[9]), Convert.ToString(item[10]));
+                ret.Add(tempdata);
+            }
+            return ret;
+        }
+
+        public static List<string> RetrieveAllWafer(string projectkey)
+        {
+            var ret = new List<string>();
+            var sql = "select DISTINCT Wafer from BITestData where ProjectKey = '<ProjectKey>' ";
+            sql = sql.Replace("<ProjectKey>", projectkey);
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            foreach (var item in dbret)
+            {
+                ret.Add(Convert.ToString(item[0]));
+            }
+            return ret;
+        }
+
         public static ConcurrentDictionary<string, bool> UpdateLockUsing = new ConcurrentDictionary<string, bool>();
         public static bool UpdatePJLockUsing(string pjkey)
         {

@@ -201,10 +201,10 @@ namespace Prometheus.Models
                         }
                     }
 
-                    if (vm.FinishRating < 90)
-                    {
-                        CreateSystemIssues(failurelist);
-                    }
+                    //if (vm.FinishRating < 90)
+                    //{
+                    //    CreateSystemIssues(failurelist);
+                    //}
                 }
 
                 ProjectTestData.ResetUpdatePJLock(vm.ProjectKey);

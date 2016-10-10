@@ -109,7 +109,12 @@ namespace Prometheus.Models
 
         public static void StartProjectBonding(ProjectViewModels vm)
         {
-            
+            try
+            {
+                if (ProjectTestData.UpdatePJLockUsing(vm.ProjectKey))
+                    return;
+
+
                 if (vm.StationList.Count > 0
                     && vm.TabList.Count > 0
                     && vm.PNList.Count > 0)
@@ -201,6 +206,14 @@ namespace Prometheus.Models
                         CreateSystemIssues(failurelist);
                     }
                 }
+
+                ProjectTestData.ResetUpdatePJLock(vm.ProjectKey);
+            }
+            catch (Exception ex)
+            {
+                ProjectTestData.ResetUpdatePJLock(vm.ProjectKey);
+            }
+
             
         }
 

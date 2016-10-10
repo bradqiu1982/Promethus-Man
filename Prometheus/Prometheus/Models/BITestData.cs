@@ -38,6 +38,24 @@ namespace Prometheus.Models
 
     public class BITestData
     {
+        public BITestData() { }
+
+        public BITestData(string pk, string did, string sn, string wtest, string mt, string err, string testtime, string station, string p,string wf,string wfp)
+        {
+            ProjectKey = pk;
+            DataID = did;
+            ModuleSerialNum = sn;
+            WhichTest = wtest;
+            ModuleType = mt;
+            ErrAbbr = err;
+            TestTimeStamp = DateTime.Parse(testtime);
+            TestStation = station;
+            PN = p;
+            Wafer = wf;
+            Waferpn = wfp;
+        }
+
+
         public string ProjectKey { set; get; }
         public string DataID { set; get; }
         public string ModuleSerialNum { set; get; }
@@ -99,6 +117,48 @@ namespace Prometheus.Models
                 return null;
         }
 
+        public static Dictionary<string, bool> RetrieveSNBeforeDate(string projectkey, string edate)
+        {
+            var ret = new Dictionary<string, bool>();
+            var sql = "select ModuleSerialNum from BITestData where ProjectKey = '<ProjectKey>' and TestTimeStamp < '<ENDDATE>'";
+            sql = sql.Replace("<ProjectKey>", projectkey).Replace("<ENDDATE>", edate);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            foreach (var item in dbret)
+            {
+                var key = Convert.ToString(item[0]);
+                if (!ret.ContainsKey(key))
+                {
+                    ret.Add(key, true);
+                }
+            }
+            return ret;
+        }
+
+        public static List<BITestData> RetrieveProjectTestData(string projectkey, string startdate, string enddate, bool firstyield)
+        {
+            var ret = new List<BITestData>();
+            var sql = "";
+            if (firstyield)
+            {
+                sql = "select ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN,Wafer,Waferpn from BITestData where ProjectKey = '<ProjectKey>' and TestTimeStamp > '<StartDate>' and TestTimeStamp < '<EndDate>' order by ModuleSerialNum,TestTimeStamp ASC";
+            }
+            else
+            {
+                sql = "select ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN,Wafer,Waferpn from BITestData where ProjectKey = '<ProjectKey>' and TestTimeStamp > '<StartDate>' and TestTimeStamp < '<EndDate>' order by ModuleSerialNum,TestTimeStamp DESC";
+            }
+
+            sql = sql.Replace("<ProjectKey>", projectkey).Replace("<StartDate>", startdate).Replace("<EndDate>", enddate);
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            foreach (var item in dbret)
+            {
+                var tempdata = new BITestData(Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])
+                    , Convert.ToString(item[3]), Convert.ToString(item[4]), Convert.ToString(item[5])
+                    , Convert.ToString(item[6]), Convert.ToString(item[7]), Convert.ToString(item[8]), Convert.ToString(item[9]), Convert.ToString(item[10]));
+                ret.Add(tempdata);
+            }
+            return ret;
+        }
 
         public static ConcurrentDictionary<string, bool> UpdateLockUsing = new ConcurrentDictionary<string, bool>();
         public static bool UpdatePJLockUsing(string pjkey)

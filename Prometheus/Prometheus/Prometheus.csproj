@@ -187,6 +187,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\BurnInController.cs" />
     <Compile Include="Controllers\CustomerDataController.cs" />
     <Compile Include="Controllers\DashBoardController.cs" />
     <Compile Include="Controllers\DBManageController.cs" />
@@ -209,6 +210,7 @@
     <Compile Include="Models\MESUtility.cs" />
     <Compile Include="Models\ParetoData.cs" />
     <Compile Include="Models\PJReportViewModels.cs" />
+    <Compile Include="Models\ProjectBIYieldViewModule.cs" />
     <Compile Include="Models\ProjectErrorViewModels.cs" />
     <Compile Include="Models\ProjectEvent.cs" />
     <Compile Include="Models\ProjectFAViewModules.cs" />
@@ -752,6 +754,7 @@
     <Content Include="Scripts\project_list.xlsx" />
     <Content Include="Views\CustomerData\ReviewVcselData.cshtml" />
     <Content Include="Views\Project\HeartBeat.cshtml" />
+    <Content Include="Views\BurnIn\BurnInMainPage.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

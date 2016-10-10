@@ -312,7 +312,7 @@ namespace Prometheus.Models
                     kv.Value.StoreBIData();
                 }//end foreach
 
-                if (vm.FinishRating < 90)
+                if (vm.FinishRating < 90 && DateTime.Parse(starttime) != vm.StartDate)
                 {
                     CreateSystemIssues(failurelist);
                 }

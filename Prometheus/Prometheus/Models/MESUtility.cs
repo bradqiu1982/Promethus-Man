@@ -309,7 +309,7 @@ namespace Prometheus.Models
                     }
                 }
 
-                if (vm.FinishRating < 90)
+                if (vm.FinishRating < 90 && DateTime.Parse(starttime) != vm.StartDate)
                 {
                     CreateSystemIssues(failurelist);
                 }

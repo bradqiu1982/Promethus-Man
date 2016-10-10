@@ -24,6 +24,16 @@ namespace Prometheus.Models
         public double Delta_PO_LD_25 { set; get; }
         public double Delta_PO_LD_127 { set; get; }
         public double Delta_PO_Uniformity { set; get; }
+
+        public void StoreBIDateField()
+        {
+            var isql = "insert into BITestDataField values('<DataID>','<ChannelNum>',<SLOPE>,<THOLD>,<PO_LD>,<PO_LD_18>,<PO_LD_25>,<PO_LD_127>,<PO_Uniformity>,<Delta_SLOPE>,<Delta_THOLD>,<Delta_PO_LD>,<Delta_PO_LD_18>,<Delta_PO_LD_25>,<Delta_PO_LD_127>,<Delta_PO_Uniformity>)";
+            isql = isql.Replace("<DataID>", DataID).Replace("<ChannelNum>", ChannelNum).Replace("<SLOPE>", SLOPE.ToString()).Replace("<THOLD>", THOLD.ToString())
+                .Replace("<PO_LD>", PO_LD.ToString()).Replace("<PO_LD_18>", PO_LD_18.ToString()).Replace("<PO_LD_25>", PO_LD_25.ToString()).Replace("<PO_LD_127>", PO_LD_127.ToString())
+                .Replace("<PO_Uniformity>", PO_Uniformity.ToString()).Replace("<Delta_SLOPE>", Delta_SLOPE.ToString()).Replace("<Delta_THOLD>", Delta_THOLD.ToString()).Replace("<Delta_PO_LD>", Delta_PO_LD.ToString())
+                .Replace("<Delta_PO_LD_18>", Delta_PO_LD_18.ToString()).Replace("<Delta_PO_LD_25>", Delta_PO_LD_25.ToString()).Replace("<Delta_PO_LD_127>", Delta_PO_LD_127.ToString()).Replace("<Delta_PO_Uniformity>", Delta_PO_Uniformity.ToString());
+            DBUtility.ExeLocalSqlNoRes(isql);
+        }
     }
 
     public class BITestData
@@ -56,6 +66,11 @@ namespace Prometheus.Models
                 .Replace("<TestTimeStamp>", TestTimeStamp.ToString()).Replace("<TestStation>", TestStation).Replace("<PN>", PN)
                 .Replace("<UpdateTime>", DateTime.Now.ToString()).Replace("<Wafer>", Wafer).Replace("<Waferpn>", Waferpn);
             DBUtility.ExeLocalSqlNoRes(isql);
+
+            foreach (var item in DataFields)
+            {
+                item.StoreBIDateField();
+            }
         }
 
         public static Dictionary<string, DateTime> RetrieveAllDataID(string projectkey)

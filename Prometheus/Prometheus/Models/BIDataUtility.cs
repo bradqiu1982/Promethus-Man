@@ -95,7 +95,7 @@ namespace Prometheus.Models
                     {
                         var bondeddatadict = BITestData.RetrieveAllDataID(vm.ProjectKey);
 
-                        var failurelist = new List<BITestData>();
+                        //var failurelist = new List<BITestData>();
                         var sql = "select ModuleSerialNum,Step,ModuleType,ErrAbbr,TestTimeStamp,TestStation,ModulePartNum,wafer,waferpn,ChannelNum,SLOPE,THOLD,PO_LD,PO_LD_18,PO_LD_25,PO_LD_127,PO_Uniformity,Delta_SLOPE,Delta_THOLD,Delta_PO_LD,Delta_PO_LD_18,Delta_PO_LD_25,Delta_PO_LD_127,Delta_PO_Uniformity from dbo.PRLL_VcselInfoSummary_2016(nolock) where wafer <> 'NULL' and waferpn  <> 'NULL' and ErrAbbr  <> 'NULL' and ModulePartNum in <PNCOND> and TestTimeStamp > '<TIMECOND>' order by TestTimeStamp Desc,ModuleSerialNum";
                         var pncond = PNCondition(vm.PNList);
                         sql = sql.Replace("<PNCOND>",pncond).Replace("<TIMECOND>", vm.StartDate.ToString());
@@ -204,6 +204,9 @@ namespace Prometheus.Models
         {
             if (vm.PNList.Count > 0)
             {
+                var failurelist = new List<BITestData>();
+                var failuredict = new Dictionary<string, bool>();
+
                 var starttime = BITestData.RetrieveLatestTimeOfLocalBI(vm.ProjectKey);
                 if (string.IsNullOrEmpty(starttime))
                 {
@@ -226,6 +229,13 @@ namespace Prometheus.Models
                             if (string.Compare(ConvertString(line[3]), "Pass", true) != 0)
                             {
                                 tempdataiddict[tempid].ErrAbbr = ConvertString(line[3]);
+
+                                if (!failuredict.ContainsKey(tempdataiddict[tempid].ModuleSerialNum))
+                                {
+                                    failuredict.Add(tempdataiddict[tempid].ModuleSerialNum, true);
+                                    failurelist.Add(tempdataiddict[tempid]);
+                                }
+                                
                             }
 
                             var tempdf = new BITestDataField();
@@ -284,6 +294,16 @@ namespace Prometheus.Models
                         tempdata.DataFields.Add(tempdf);
 
                         tempdataiddict.Add(tempid, tempdata);
+
+                        if (string.Compare(tempdata.ErrAbbr, "Pass", true) != 0)
+                        {
+                            if (!failuredict.ContainsKey(tempdata.ModuleSerialNum))
+                            {
+                                failuredict.Add(tempdata.ModuleSerialNum, true);
+                                failurelist.Add(tempdata);
+                            }
+
+                        }
                     }
                 }//end foreach
 
@@ -292,6 +312,38 @@ namespace Prometheus.Models
                     kv.Value.StoreBIData();
                 }//end foreach
 
+                if (vm.FinishRating < 90)
+                {
+                    CreateSystemIssues(failurelist);
+                }
+
+            }
+        }
+
+
+        private static void CreateSystemIssues(List<BITestData> failurelist)
+        {
+            if (failurelist.Count > 0)
+            {
+                foreach (var item in failurelist)
+                {
+                    var vm = new IssueViewModels();
+                    vm.ProjectKey = item.ProjectKey;
+                    vm.IssueKey = item.DataID;
+                    vm.IssueType = ISSUETP.Bug;
+                    vm.Summary = "Module " + item.ModuleSerialNum + " failed for " + item.ErrAbbr + " @Burn-In Step " + item.WhichTest;
+                    vm.Priority = ISSUEPR.Major;
+                    vm.DueDate = DateTime.Now.AddDays(7);
+                    vm.ReportDate = item.TestTimeStamp;
+                    vm.Assignee = "DYLY.LI@FINISAR.COM";
+                    vm.Reporter = "System";
+                    vm.Resolution = Resolute.Pending;
+                    vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+                    vm.Description = "Module " + item.ModuleSerialNum + " failed for " + item.ErrAbbr + " @Burn-In Step " + item.WhichTest + " on tester " + item.TestStation + " " + item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss");
+                    vm.CommentType = COMMENTTYPE.Description;
+                    ProjectEvent.CreateIssueEvent(vm.ProjectKey, "System", vm.Assignee, vm.Summary, vm.IssueKey);
+                    vm.StoreIssue();
+                }
             }
         }
 

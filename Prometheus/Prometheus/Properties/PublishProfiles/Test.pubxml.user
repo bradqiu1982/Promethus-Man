@@ -10,19 +10,19 @@ by editing this MSBuild file. In order to learn more about this please visit htt
   </PropertyGroup>
   <ItemGroup>
     <File Include="App_Data/Prometheus.mdf">
-      <publishTime>10/09/2016 14:38:43</publishTime>
+      <publishTime>10/09/2016 15:56:09</publishTime>
     </File>
     <File Include="App_Data/Prometheus_log.ldf">
-      <publishTime>10/09/2016 14:38:43</publishTime>
+      <publishTime>10/09/2016 15:56:09</publishTime>
     </File>
     <File Include="bin/Antlr3.Runtime.dll">
       <publishTime>02/22/2013 08:43:40</publishTime>
     </File>
     <File Include="bin/App_global.asax.compiled">
-      <publishTime>10/09/2016 14:44:32</publishTime>
+      <publishTime>10/09/2016 15:56:40</publishTime>
     </File>
     <File Include="bin/App_global.asax.dll">
-      <publishTime>10/09/2016 14:44:32</publishTime>
+      <publishTime>10/09/2016 15:56:40</publishTime>
     </File>
     <File Include="bin/Content/Finisar.PNG">
       <publishTime>07/29/2016 10:33:51</publishTime>
@@ -82,7 +82,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/27/2012 13:00:52</publishTime>
     </File>
     <File Include="bin/Prometheus.dll">
-      <publishTime>10/09/2016 14:43:52</publishTime>
+      <publishTime>10/09/2016 15:56:06</publishTime>
     </File>
     <File Include="bin/roslyn/csc.exe">
       <publishTime>06/18/2015 20:19:46</publishTime>
@@ -1456,7 +1456,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>09/22/2016 14:33:57</publishTime>
     </File>
     <File Include="PrecompiledApp.config">
-      <publishTime>10/09/2016 14:43:58</publishTime>
+      <publishTime>10/09/2016 15:56:12</publishTime>
     </File>
     <File Include="Scripts/AreaChart.xml">
       <publishTime>09/20/2016 10:57:13</publishTime>
@@ -1474,10 +1474,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>08/17/2016 09:17:26</publishTime>
     </File>
     <File Include="Scripts/HeartBeat.exe">
-      <publishTime>10/09/2016 14:01:05</publishTime>
+      <publishTime>10/09/2016 15:00:15</publishTime>
     </File>
     <File Include="Scripts/heartbeat.txt">
-      <publishTime>10/09/2016 14:01:14</publishTime>
+      <publishTime>10/09/2016 15:48:41</publishTime>
     </File>
     <File Include="Scripts/highcharts.js">
       <publishTime>08/18/2016 10:19:34</publishTime>
@@ -1623,6 +1623,9 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="Views/Project/EditProject.cshtml">
       <publishTime>10/08/2016 15:27:39</publishTime>
     </File>
+    <File Include="Views/Project/HeartBeat.cshtml">
+      <publishTime>10/09/2016 15:13:30</publishTime>
+    </File>
     <File Include="Views/Project/ProjectDetail.cshtml">
       <publishTime>08/25/2016 08:23:36</publishTime>
     </File>
@@ -1669,7 +1672,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>09/13/2016 16:51:45</publishTime>
     </File>
     <File Include="Views/Project/ViewAll.cshtml">
-      <publishTime>09/19/2016 10:04:29</publishTime>
+      <publishTime>10/09/2016 15:16:04</publishTime>
     </File>
     <File Include="Views/Shared/Error.cshtml">
       <publishTime>07/04/2016 09:41:39</publishTime>

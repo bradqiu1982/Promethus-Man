@@ -79,14 +79,13 @@
                             </div>
 
                             <div class="col-md-2 text-center">
-                                <a href="/Project/ProjectRMA?ProjectKey=@item.ProjectKey">
-                                    <span class="glyphicon glyphicon-fire" aria-hidden="true"></span> Project RMA <span class="badge alert-danger">@item.PendingRMACount</span>
-                                </a>
+                                <a href="/BurnIn/BurnInMainPage?ProjectKey=@item.ProjectKey" target="_blank">
+                                    <span class="glyphicon glyphicon-fire" aria-hidden="true"></span> Project Burn-In</a>
                             </div>
 
                             <div class="col-md-2 text-center">
                                 <a href="/Project/ProjectRMAStatus?ProjectKey=@item.ProjectKey">
-                                    <span class="glyphicon glyphicon-fire" aria-hidden="true"></span> RMA Status<span class="badge alert-danger">@item.PendingRMACount</span>
+                                    <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> RMA Status<span class="badge alert-danger">@item.PendingRMACount</span>
                                 </a>
                             </div>
                         </div>

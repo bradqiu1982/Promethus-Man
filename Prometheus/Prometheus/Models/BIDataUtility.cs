@@ -335,7 +335,7 @@ namespace Prometheus.Models
                     vm.Priority = ISSUEPR.Major;
                     vm.DueDate = DateTime.Now.AddDays(7);
                     vm.ReportDate = item.TestTimeStamp;
-                    vm.Assignee = "DYLY.LI@FINISAR.COM";
+                    vm.Assignee = "DALY.LI@FINISAR.COM";
                     vm.Reporter = "System";
                     vm.Resolution = Resolute.Pending;
                     vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");

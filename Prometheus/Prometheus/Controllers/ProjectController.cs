@@ -2065,6 +2065,18 @@ namespace Prometheus.Controllers
             catch (Exception ex)
             { }
 
+            try
+            {
+                var filename = "log" + DateTime.Now.ToString("yyyy-MM-dd");
+                var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
+
+                var content = System.IO.File.ReadAllText(wholefilename);
+                content = content + "heart beat start @ " + DateTime.Now.ToString() + "\r\n";
+                System.IO.File.WriteAllText(wholefilename, content);
+            }
+            catch (Exception ex)
+            { }
+
             var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
             foreach (var pjkey in pjkeylist)
             {
@@ -2085,6 +2097,18 @@ namespace Prometheus.Controllers
                 catch (Exception ex)
                 { }
             }
+
+            try
+            {
+                var filename = "log" + DateTime.Now.ToString("yyyy-MM-dd");
+                var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
+
+                var content = System.IO.File.ReadAllText(wholefilename);
+                content = content+ "heart beat end @ "+DateTime.Now.ToString()+"\r\n";
+                System.IO.File.WriteAllText(wholefilename, content);
+            }
+            catch (Exception ex)
+            { }
 
             return View();
         }

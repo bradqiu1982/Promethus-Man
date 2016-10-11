@@ -2056,6 +2056,61 @@ namespace Prometheus.Controllers
 
         }
 
+        private void SendRMAAlertEmail()
+        {
+            var pjlist = ProjectViewModels.RetrieveAllProjectKey();
+            foreach (var pjkey in pjlist)
+            {
+                try {
+                        var fvissues = IssueViewModels.Retrieve_Alert_RMAByProjectKey(pjkey, true);
+
+                        foreach (var item in fvissues)
+                        { item.UpdateAlertEmailDate();}
+                            
+                        foreach (var item in fvissues)
+                        {
+                            var routevalue = new RouteValueDictionary();
+                            routevalue.Add("issuekey", item.IssueKey);
+                            //send validate email
+                            string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                            string validatestr = this.Url.Action("UpdateRMA", "Issue", routevalue, scheme);
+
+                            var content = "RMA FA of "+item.ModuleSN+" must finished today :\r\n " + validatestr;
+
+                            var toaddrs = new List<string>();
+                            toaddrs.Add(item.Reporter);
+                            toaddrs.Add(item.Assignee);
+                            EmailUtility.SendEmail("Parallel NPI Trace Notice", toaddrs, content);
+                        }
+                } catch (Exception ex) { }
+
+
+                try {
+                        var faissues = IssueViewModels.Retrieve_Alert_RMAByProjectKey(pjkey, false);
+
+                        foreach (var item in faissues)
+                        { item.UpdateAlertEmailDate(); }
+
+                        foreach (var item in faissues)
+                        {
+                            var routevalue = new RouteValueDictionary();
+                            routevalue.Add("issuekey", item.IssueKey);
+                            //send validate email
+                            string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                            string validatestr = this.Url.Action("UpdateRMA", "Issue", routevalue, scheme);
+
+                            var content = "RMA report of " + item.ModuleSN + " must finished today :\r\n " + validatestr;
+
+                            var toaddrs = new List<string>();
+                            toaddrs.Add(item.Reporter);
+                            toaddrs.Add(item.Assignee);
+                            EmailUtility.SendEmail("Parallel NPI Trace Notice", toaddrs, content);
+                        }
+                } catch (Exception ex) { }
+
+            }//end foreach
+        }
+
         public ActionResult HeartBeat()
         {
             try
@@ -2109,6 +2164,12 @@ namespace Prometheus.Controllers
             }
             catch (Exception ex)
             { }
+
+            try
+            {
+                SendRMAAlertEmail();
+            }
+            catch (Exception ex) { }
 
             return View();
         }

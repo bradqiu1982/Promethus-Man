@@ -583,7 +583,7 @@ namespace Prometheus.Controllers
                             }
 
                             vm.Priority = ISSUEPR.Major;
-                            vm.DueDate = DateTime.Parse(data[i][5]);
+                            vm.DueDate = DateTime.Parse(data[i][5]).AddDays(12);
                             vm.ReportDate = DateTime.Now;
                             vm.Assignee = data[i][4].ToUpper();
                             if (vm.Assignee.Length > 200)

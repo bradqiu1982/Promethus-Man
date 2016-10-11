@@ -24,20 +24,50 @@ namespace Prometheus.Models
             var issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Working,50);
             foreach (var d in issuedict)
             {
-                var pjdata = ProjectTestData.RetrieveProjectTestData(d.IssueKey);
-                if (pjdata.Count > 0)
+                if (d.Summary.Contains("@Burn-In Step"))
                 {
-                    ret.Add(new ProjectFAViewModules(d, pjdata[0]));
+                    var pd = new ProjectTestData();
+                    var splitinfo = d.Summary.Split(new string[] { " " }, StringSplitOptions.None);
+                    if (splitinfo.Length > 4)
+                    {
+                        pd.ModuleSerialNum = splitinfo[1];
+                        pd.ErrAbbr = splitinfo[4];
+                        pd.ProjectKey = d.ProjectKey;
+                        ret.Add(new ProjectFAViewModules(d, pd));
+                    }
+                }
+                else
+                {
+                    var pjdata = ProjectTestData.RetrieveProjectTestData(d.IssueKey);
+                    if (pjdata.Count > 0)
+                    {
+                        ret.Add(new ProjectFAViewModules(d, pjdata[0]));
+                    }
                 }
             }
 
             issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Pending,500);
             foreach (var d in issuedict)
             {
-                var pjdata = ProjectTestData.RetrieveProjectTestData(d.IssueKey);
-                if (pjdata.Count > 0)
+                if (d.Summary.Contains("@Burn-In Step"))
                 {
-                    ret.Add(new ProjectFAViewModules(d, pjdata[0]));
+                    var pd = new ProjectTestData();
+                    var splitinfo = d.Summary.Split(new string[] { " " }, StringSplitOptions.None);
+                    if (splitinfo.Length > 4) {
+                        pd.ModuleSerialNum = splitinfo[1];
+                        pd.ErrAbbr = splitinfo[4];
+                        pd.ProjectKey = d.ProjectKey;
+                        ret.Add(new ProjectFAViewModules(d, pd));
+                    }
+
+                }
+                else
+                {
+                    var pjdata = ProjectTestData.RetrieveProjectTestData(d.IssueKey);
+                    if (pjdata.Count > 0)
+                    {
+                        ret.Add(new ProjectFAViewModules(d, pjdata[0]));
+                    }
                 }
             }
 

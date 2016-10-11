@@ -10,6 +10,16 @@
         <h2>Update Issue</h2>
     </div>
     <div class="col-md-2">
+        @if (string.Compare(Model.IssueType, Prometheus.Models.ISSUETP.Task) == 0)
+        {
+            <h2><a data-toggle="tooltip" title="Goto Project Task" href="/Project/ProjectIssues?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+        }
+        else
+        {
+            <h2><a data-toggle="tooltip" title="Goto Project FA" href="/Project/ProjectFA?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+        }
+    </div>
+    <div class="col-md-2">
         @if (Model != null && string.IsNullOrEmpty(Model.ParentIssueKey))
         {
             using (Html.BeginForm("PrepareSubIssue", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
@@ -38,10 +48,8 @@
         {
            <h2><a data-toggle="tooltip" title="Goto Parent Issue" href="/Issue/UpdateIssue?issuekey=@(Model.ParentIssueKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
         }
-
-
     </div>
-    <div class="col-md-7">
+    <div class="col-md-5">
     </div>
 </div>
 <hr />

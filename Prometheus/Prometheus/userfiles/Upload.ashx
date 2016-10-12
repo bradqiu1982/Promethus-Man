@@ -30,6 +30,9 @@ public class Upload : IHttpHandler {
                 }
 
                 fn = Path.GetFileNameWithoutExtension(fn)+"-"+DateTime.Now.ToString("yyyyMMddHHmmss")+Path.GetExtension(fn);
+                fn = fn.Replace(" ", "_").Replace("#", "")
+                            .Replace("&", "").Replace("?", "").Replace("%", "");
+
                 uploads.SaveAs(imgdir + fn);
                 url = "/userfiles/images/" +datestring+"/"+ fn;
             }
@@ -43,11 +46,14 @@ public class Upload : IHttpHandler {
                 }
 
                 fn = Path.GetFileNameWithoutExtension(fn)+"-"+DateTime.Now.ToString("yyyyMMddHHmmss")+Path.GetExtension(fn);
+                fn = fn.Replace(" ", "_").Replace("#", "")
+                            .Replace("&", "").Replace("?", "").Replace("%", "");
+                
                 uploads.SaveAs(imgdir + fn);
                 url = "/userfiles/docs/" +datestring+"/"+ fn;
 
                 var dict = CookieUtility.UnpackCookie(new HttpRequestWrapper(context.Request));
-                if (dict.ContainsKey("issuekey") 
+                if (dict.ContainsKey("issuekey")
                     && !string.IsNullOrEmpty(dict["issuekey"])
                     && dict.ContainsKey("currentaction")
                     && string.Compare(dict["currentaction"],"UpdateIssue") == 0)

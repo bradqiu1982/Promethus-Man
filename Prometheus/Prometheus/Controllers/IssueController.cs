@@ -634,7 +634,9 @@ namespace Prometheus.Controllers
                 {
                     if (fl != null && Request.Files[fl].ContentLength > 0)
                     {
-                        string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ", "_");
+                        string fn = Path.GetFileName(Request.Files[fl].FileName)
+                            .Replace(" ", "_").Replace("#","")
+                            .Replace("&", "").Replace("?", "").Replace("%", "");
 
                         string datestring = DateTime.Now.ToString("yyyyMMdd");
                         string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
@@ -725,7 +727,9 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(Request.Form["customreportupload"]))
             {
                 var customereportfile = Request.Form["customreportupload"];
-                var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_");
+                var originalname = Path.GetFileNameWithoutExtension(customereportfile)
+                    .Replace(" ", "_").Replace("#", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "");
 
                 var url = "";
                 foreach (var r in urls)
@@ -747,7 +751,9 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(Request.Form["internalreportupload"]))
             {
                 var internalreportfile = Request.Form["internalreportupload"];
-                var originalname = Path.GetFileNameWithoutExtension(internalreportfile).Replace(" ", "_");
+                var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
+                    .Replace(" ", "_").Replace("#", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "");
 
                 var url = "";
                 foreach (var r in urls)

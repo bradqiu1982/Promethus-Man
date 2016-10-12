@@ -98,7 +98,7 @@ else
                     <hr/>
 
                     <div class="row col-md-12">
-                        <div class="col-md-2 text-center">
+                        <div class="col-md-2 text-left">
                             @if (projectdata.FirstYield > 0)
                             {
                                 <a href="/Project/ProjectYield?ProjectKey=@projectdata.ProjectKey">
@@ -121,104 +121,126 @@ else
                             }
                         </div>
 
-                        <div class="col-md-2 text-center">
+                        <div class="col-md-2 text-left">
                             <a href="/Project/ProjectFA?ProjectKey=@projectdata.ProjectKey">
                                 <span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span> Project FA <span class="badge alert-danger">@projectdata.PendingFACount</span>
                             </a>
                         </div>
 
-                        <div class="col-md-2 text-center">
+                        <div class="col-md-2 text-left">
                             <a href="/Project/ProjectIssues?ProjectKey=@projectdata.ProjectKey">
                                 <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span> Project Tasks <span class="badge alert-danger">@projectdata.PendingTaskCount</span>
                             </a>
                         </div>
 
-                        <div class="col-md-2 text-center">
+                        <div class="col-md-2 text-left">
                             <a href="/Project/ProjectRMAStatus?ProjectKey=@projectdata.ProjectKey">
                                 <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Project RMA <span class="badge alert-danger">@projectdata.PendingRMACount</span>
                             </a>
                         </div>
 
-                        <div class="col-md-2 text-center">
+                        <div class="col-md-2 text-left">
+                        </div>
+
+                    </div>
+                    
+                    <hr />
+
+                    <div class="row col-md-12">
+                        <div class="col-md-2 text-left">
+                            <a href="/BurnIn/BurnInMainPage?ProjectKey=@projectdata.ProjectKey" target="_blank">
+                                <span class="glyphicon glyphicon-fire" aria-hidden="true"></span> Project Burn-In
+                            </a>
+                        </div>
+                        <div class="col-md-2 text-left">
+                            <a href="/Project/ProjectError?ProjectKey=@projectdata.ProjectKey">
+                                <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span> Project Error
+                            </a>
+                        </div>
+                        <div class="col-md-2 text-left">
                             <a href="/Project/ProjectNPI?ProjectKey=@projectdata.ProjectKey">
                                 <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Project NPI Process
                             </a>
                         </div>
+                        <div class="col-md-6 text-left">
 
+                        </div>
                     </div>
-
-                    <div class="row col-md-12">
-                        <div class="col-md-1 text-center active"><a href="/Issue/UpdateIssue?issuekey=@projectdata.DVTIssueKey">DVT</a></div>
-                        <div class="col-md-2 text-center active">@projectdata.DVTDate</div>
-                        <div class="col-md-1 text-center active">@projectdata.DVTStatus</div>
-                        <div class="col-md-1 text-center"></div>
-                        <div class="col-md-1 text-center active"><a href="/Issue/UpdateIssue?issuekey=@projectdata.MVTIssueKey">MVT</a></div>
-                        <div class="col-md-2 text-center active">@projectdata.MVTDate</div>
-                        <div class="col-md-1 text-center active">@projectdata.MVTStatus</div>
-                        <div class="col-md-3 text-center"></div>
-                    </div>
-
+                    
                     <hr />
 
-                    @for (var i = 0; i < 1; i++)
+                        <div class="row col-md-12">
+                            <div class="col-md-1 text-left active"><a href="/Issue/UpdateIssue?issuekey=@projectdata.DVTIssueKey">DVT</a></div>
+                            <div class="col-md-2 text-left active">@projectdata.DVTDate</div>
+                            <div class="col-md-1 text-left active">@projectdata.DVTStatus</div>
+                            <div class="col-md-1 text-left"></div>
+                            <div class="col-md-1 text-left active"><a href="/Issue/UpdateIssue?issuekey=@projectdata.MVTIssueKey">MVT</a></div>
+                            <div class="col-md-2 text-left active">@projectdata.MVTDate</div>
+                            <div class="col-md-1 text-left active">@projectdata.MVTStatus</div>
+                            <div class="col-md-3 text-left"></div>
+                        </div>
+
+                        <hr />
+
+                        @for (var i = 0; i < 1; i++)
                 {
-                        <div class="row">
-                            <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-6">
 
-                                @if (Model != null && PMList.Count > (i * 2))
-                                {
-                                    <label class="control-label col-md-2" for="PM@(i*2 + 1)">PM@(i * 2 + 1)</label>
-                                    <div class="col-md-10">
-                                        @Html.ActionLink(@PMList[(i * 2)].Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = @PMList[(i * 2)].Name }, null)
-                                    </div>
-                                }
+                                    @if (Model != null && PMList.Count > (i * 2))
+                                    {
+                                        <label class="control-label col-md-2" for="PM@(i*2 + 1)">PM@(i * 2 + 1)</label>
+                                        <div class="col-md-10">
+                                            @Html.ActionLink(@PMList[(i * 2)].Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = @PMList[(i * 2)].Name }, null)
+                                        </div>
+                                    }
+                                </div>
+                                <div class="col-md-6">
+                                    @if (Model != null && PMList.Count > (i * 2 + 1))
+                                    {
+                                        <label class="control-label col-md-2" for="PM@(i*2 + 2)">PM@(i * 2 + 2)</label>
+                                        <div class="col-md-10">
+                                            @Html.ActionLink(@PMList[(i * 2 + 1)].Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = @PMList[(i * 2 + 1)].Name }, null)
+                                        </div>
+                                    }
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                @if (Model != null && PMList.Count > (i * 2 + 1))
-                                {
-                                    <label class="control-label col-md-2" for="PM@(i*2 + 2)">PM@(i * 2 + 2)</label>
-                                    <div class="col-md-10">
-                                        @Html.ActionLink(@PMList[(i * 2 + 1)].Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = @PMList[(i * 2 + 1)].Name }, null)
-                                    </div>
-                                }
-                            </div>
-                        </div>
-                    }
+                        }
 
-                    <hr />
+                        <hr />
 
-                    @for (var i = 0; i < 3; i++)
+                        @for (var i = 0; i < 3; i++)
                 {
+                            <div class="row">
+                                <div class="col-md-6">
+                                    @if (Model != null && ENGList.Count > (i * 2))
+                                    {
+                                        <label class="control-label col-md-2" for="Engineer@(i*2 + 1)">Engineer@(i * 2 + 1)</label>
+                                        <div class="col-md-10">
+                                            @Html.ActionLink(@ENGList[(i * 2)].Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = @ENGList[(i * 2)].Name }, null)
+                                        </div>
+                                    }
+                                </div>
+                                <div class="col-md-6">
+                                    @if (Model != null && ENGList.Count > (i * 2 + 1))
+                                    {
+                                        <label class="control-label col-md-2" for="Engineer@(i*2 + 2)">Engineer@(i * 2 + 2)</label>
+                                        <div class="col-md-10">
+                                            @Html.ActionLink(@ENGList[(i * 2 + 1)].Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = @ENGList[(i * 2 + 1)].Name }, null)
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        <hr />
+
                         <div class="row">
-                            <div class="col-md-6">
-                                @if (Model != null && ENGList.Count > (i * 2))
-                                {
-                                    <label class="control-label col-md-2" for="Engineer@(i*2 + 1)">Engineer@(i * 2 + 1)</label>
-                                    <div class="col-md-10">
-                                        @Html.ActionLink(@ENGList[(i * 2)].Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = @ENGList[(i * 2)].Name }, null)
-                                    </div>
-                                }
+                            <div class="col-md-12">
+                                @Html.Raw(projectdata.Description)
                             </div>
-                            <div class="col-md-6">
-                                @if (Model != null && ENGList.Count > (i * 2 + 1))
-                                {
-                                    <label class="control-label col-md-2" for="Engineer@(i*2 + 2)">Engineer@(i * 2 + 2)</label>
-                                    <div class="col-md-10">
-                                        @Html.ActionLink(@ENGList[(i * 2 + 1)].Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = @ENGList[(i * 2 + 1)].Name }, null)
-                                    </div>
-                                }
-                            </div>
-                        </div>
-                    }
-
-                    <hr />
-
-                    <div class="row">
-                        <div class="col-md-12">
-                            @Html.Raw(projectdata.Description)
                         </div>
                     </div>
-                </div>
             </div>
         }
 

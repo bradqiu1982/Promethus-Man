@@ -1047,7 +1047,7 @@ namespace Prometheus.Controllers
         }
 
 
-        public static void ProjectWeeklyTrend(Controller ctrl, string ProjectKey)
+        /*public static void ProjectWeeklyTrend(Controller ctrl, string ProjectKey)
         {
                 var vmlist = ProjectYieldViewModule.GetYieldByWeeks(ProjectKey);
                 if (vmlist.Count > 0)
@@ -1105,6 +1105,86 @@ namespace Prometheus.Controllers
                         .Replace("#ChartSearies#", ChartSearies)
                         .Replace("#REDIRECTURL#", reurl);
                 }
+        }*/
+
+        public static void ProjectWeeklyTrend(Controller ctrl, string ProjectKey)
+        {
+            var vmlist = ProjectYieldViewModule.GetYieldByWeeks(ProjectKey);
+            if (vmlist.Count > 0)
+            {
+                var ChartxAxisValues = "";
+                //var ChartSearies = "";
+
+                var ftimelist = new List<string>();
+                var famountlist = new List<int>();
+                var fyieldlist = new List<double>();
+                var ryieldlist = new List<double>();
+                var maxamout = 0;
+
+                foreach (var item in vmlist)
+                {
+                    ftimelist.Add(item.EndDate.ToString("yyyy-MM-dd"));
+                    fyieldlist.Add(item.FirstYield * 100.0);
+                    ryieldlist.Add(item.LastYield * 100.0);
+
+                    var tempfamount = 0;
+                    foreach (var d in item.FirstYields)
+                    {
+                        if (d.InputCount > tempfamount) { tempfamount = d.InputCount; }
+                        if (d.InputCount > maxamout) { maxamout = d.InputCount; }
+                    }
+                    famountlist.Add(tempfamount);
+                }
+
+                //xaxis
+                foreach (var item in ftimelist)
+                {
+                    ChartxAxisValues = ChartxAxisValues + "'" + item + "',";
+                }
+                ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
+
+
+                //yaxis
+                //ChartSearies = "{name:'First Yield',data:[<fvalue>]},{name:'Retest Yield',data:[<cvalue>]}";
+
+                var famout = "";
+                foreach (var item in famountlist)
+                {
+                    famout = famout + item.ToString() + ",";
+                }
+                famout = famout.Substring(0, famout.Length - 1);
+
+                var ftempvalue = "";
+                foreach (var item in fyieldlist)
+                {
+                    ftempvalue = ftempvalue + item.ToString("0.00") + ",";
+                }
+                ftempvalue = ftempvalue.Substring(0, ftempvalue.Length - 1);
+                //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
+
+                var rtempvalue = "";
+                foreach (var item in ryieldlist)
+                {
+                    rtempvalue = rtempvalue + item.ToString("0.00") + ",";
+                }
+                rtempvalue = rtempvalue.Substring(0, rtempvalue.Length - 1);
+                //ChartSearies = ChartSearies.Replace("<cvalue>", tempvalue);
+
+                //rederect url
+                var reurl = "window.location.href = '/Project/ProjectWYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category";
+
+                var tempscript = System.IO.File.ReadAllText(ctrl.Server.MapPath("~/Scripts/SuperYield.xml"));
+                ctrl.ViewBag.chartscript = tempscript.Replace("#ElementID#", "weeklyyield")
+                    .Replace("#Title#", "Weekly Yiled Trend")
+                    .Replace("#ChartxAxisValues#", ChartxAxisValues)
+                    .Replace("#XAxisTitle#", "Date")
+                    .Replace("#AmountMAX#", maxamout.ToString())
+                    .Replace("#FirstAmount#", famout)
+                    .Replace("#FirstYield#", ftempvalue)
+                    .Replace("#RetestYield#", rtempvalue)
+                    .Replace("#REDIRECTURL#", reurl);
+
+            }
         }
 
         public ActionResult ProjectYield(string ProjectKey)
@@ -1290,7 +1370,7 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        public ActionResult ProjectMonthlyYield(string ProjectKey)
+        /*public ActionResult ProjectMonthlyYield(string ProjectKey)
         {
             if (ProjectKey != null)
             {
@@ -1341,7 +1421,7 @@ namespace Prometheus.Controllers
                     ChartSearies = ChartSearies.Replace("<cvalue>", tempvalue);
 
                     //rederect url
-                    var reurl = "window.location.href = '/Project/ProjectWYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category";
+                    var reurl = "window.location.href = '/Project/ProjectMYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category";
 
                     var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ColumnChart.xml"));
                     ViewBag.chartscript = tempscript.Replace("#ElementID#", "monthlyyield")
@@ -1350,6 +1430,94 @@ namespace Prometheus.Controllers
                         .Replace("#ChartxAxisValues#", ChartxAxisValues)
                         .Replace("#yAxisTitle#", "Yield Percent")
                         .Replace("#ChartSearies#", ChartSearies)
+                        .Replace("#REDIRECTURL#", reurl);
+                }
+
+                return View();
+            }
+            return View();
+
+        }*/
+
+        public ActionResult ProjectMonthlyYield(string ProjectKey)
+        {
+            if (ProjectKey != null)
+            {
+                ViewBag.pjkey = ProjectKey;
+
+                var vmlist = ProjectYieldViewModule.GetYieldByMonth(ProjectKey);
+                if (vmlist.Count > 0)
+                {
+                    var ChartxAxisValues = "";
+                    //var ChartSearies = "";
+
+                    var ftimelist = new List<string>();
+                    var famountlist = new List<int>();
+                    var fyieldlist = new List<double>();
+                    var ryieldlist = new List<double>();
+                    var maxamout = 0;
+
+                    foreach (var item in vmlist)
+                    {
+                        ftimelist.Add(item.EndDate.ToString("yyyy-MM-dd"));
+                        fyieldlist.Add(item.FirstYield * 100.0);
+                        ryieldlist.Add(item.LastYield * 100.0);
+
+                        var tempfamount = 0;
+                        foreach (var d in item.FirstYields)
+                        {
+                            if (d.InputCount > tempfamount) { tempfamount = d.InputCount; }
+                            if (d.InputCount > maxamout) { maxamout = d.InputCount; }
+                        }
+                        famountlist.Add(tempfamount);
+                    }
+
+                    //xaxis
+                    foreach (var item in ftimelist)
+                    {
+                        ChartxAxisValues = ChartxAxisValues + "'" + item + "',";
+                    }
+                    ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
+
+
+                    //yaxis
+                    //ChartSearies = "{name:'First Yield',data:[<fvalue>]},{name:'Retest Yield',data:[<cvalue>]}";
+
+                    var famout = "";
+                    foreach (var item in famountlist)
+                    {
+                        famout = famout + item.ToString() + ",";
+                    }
+                    famout = famout.Substring(0, famout.Length - 1);
+
+                    var ftempvalue = "";
+                    foreach (var item in fyieldlist)
+                    {
+                        ftempvalue = ftempvalue + item.ToString("0.00") + ",";
+                    }
+                    ftempvalue = ftempvalue.Substring(0, ftempvalue.Length - 1);
+                    //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
+
+                    var rtempvalue = "";
+                    foreach (var item in ryieldlist)
+                    {
+                        rtempvalue = rtempvalue + item.ToString("0.00") + ",";
+                    }
+                    rtempvalue = rtempvalue.Substring(0, rtempvalue.Length - 1);
+                    //ChartSearies = ChartSearies.Replace("<cvalue>", tempvalue);
+
+                    //rederect url
+                    var reurl = "window.location.href = '/Project/ProjectMYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category";
+
+                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/SuperYield.xml"));
+                    ViewBag.chartscript = tempscript.Replace("#ElementID#", "monthlyyield")
+                        .Replace("#Title#", "Monthly Yield")
+                        .Replace("#ChartxAxisValues#", ChartxAxisValues)
+                        .Replace("#XAxisTitle#", "Date")
+                        .Replace("#AmountMAX#", maxamout.ToString())
+                        .Replace("#FirstAmount#", famout)
+                        .Replace("#FirstYield#", ftempvalue)
+                        .Replace("#RetestYield#", rtempvalue)
                         .Replace("#REDIRECTURL#", reurl);
                 }
 
@@ -1500,7 +1668,7 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        public ActionResult ProjectPeriodYield(string ProjectKey,string StartDate,string EndDate)
+        /*public ActionResult ProjectPeriodYield(string ProjectKey,string StartDate,string EndDate)
         {
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(StartDate) && !string.IsNullOrEmpty(EndDate))
             {
@@ -1576,8 +1744,103 @@ namespace Prometheus.Controllers
                 return View();
             }
             return View();
-        }
+        }*/
 
+        public ActionResult ProjectPeriodYield(string ProjectKey, string StartDate, string EndDate)
+        {
+            if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(StartDate) && !string.IsNullOrEmpty(EndDate))
+            {
+                ViewBag.pjkey = ProjectKey;
+
+                var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
+
+                var vmlist = new List<ProjectYieldViewModule>();
+                var tempret = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, StartDate, EndDate, pvm);
+                if (tempret.FirstYields.Count > 0)
+                {
+                    vmlist.Add(tempret);
+                }
+
+                if (vmlist.Count > 0)
+                {
+                    var ChartxAxisValues = "";
+                    //var ChartSearies = "";
+
+                    var ftimelist = new List<string>();
+                    var famountlist = new List<int>();
+                    var fyieldlist = new List<double>();
+                    var ryieldlist = new List<double>();
+                    var maxamout = 0;
+
+                    foreach (var item in vmlist)
+                    {
+                        ftimelist.Add(item.EndDate.ToString("yyyy-MM-dd"));
+                        fyieldlist.Add(item.FirstYield * 100.0);
+                        ryieldlist.Add(item.LastYield * 100.0);
+
+                        var tempfamount = 0;
+                        foreach (var d in item.FirstYields)
+                        {
+                            if (d.InputCount > tempfamount){ tempfamount = d.InputCount;}
+                            if (d.InputCount > maxamout) { maxamout = d.InputCount; }
+                        }
+                        famountlist.Add(tempfamount);
+                    }
+
+                    //xaxis
+                    foreach (var item in ftimelist)
+                    {
+                        ChartxAxisValues = ChartxAxisValues + "'" + item + "',";
+                    }
+                    ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
+
+
+                    //yaxis
+                    //ChartSearies = "{name:'First Yield',data:[<fvalue>]},{name:'Retest Yield',data:[<cvalue>]}";
+
+                    var famout = "";
+                    foreach (var item in famountlist)
+                    {
+                        famout = famout + item.ToString() + ",";
+                    }
+                    famout = famout.Substring(0, famout.Length - 1);
+
+                    var ftempvalue = "";
+                    foreach (var item in fyieldlist)
+                    {
+                        ftempvalue = ftempvalue + item.ToString("0.00") + ",";
+                    }
+                    ftempvalue = ftempvalue.Substring(0, ftempvalue.Length - 1);
+                    //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
+
+                    var rtempvalue = "";
+                    foreach (var item in ryieldlist)
+                    {
+                        rtempvalue = rtempvalue + item.ToString("0.00") + ",";
+                    }
+                    rtempvalue = rtempvalue.Substring(0, rtempvalue.Length - 1);
+                    //ChartSearies = ChartSearies.Replace("<cvalue>", tempvalue);
+
+                    //rederect url
+                    var tempurl = "/Project/ProjectPYieldDetail?ProjectKey=" + ProjectKey + "&StartDate=" + StartDate + "&EndDate=" + EndDate;
+                    var reurl = "window.location.href = '" + tempurl + "'";
+
+                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/SuperYield.xml"));
+                    ViewBag.chartscript = tempscript.Replace("#ElementID#", "periodyield")
+                        .Replace("#Title#", "Period Yield")
+                        .Replace("#ChartxAxisValues#", ChartxAxisValues)
+                        .Replace("#XAxisTitle#", "Date")
+                        .Replace("#AmountMAX#", maxamout.ToString())
+                        .Replace("#FirstAmount#", famout)
+                        .Replace("#FirstYield#", ftempvalue)
+                        .Replace("#RetestYield#", rtempvalue)
+                        .Replace("#REDIRECTURL#", reurl);
+                }
+
+                return View();
+            }
+            return View();
+        }
 
         private void firsttestparetofun(List<KeyValuePair<string, int>> firstdatalist)
         {

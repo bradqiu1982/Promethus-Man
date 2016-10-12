@@ -31,30 +31,45 @@ $(function () {
             tickPixelInterval: 36,
             opposite: true
         }],
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            },
+            series:{
+              allowPointSelect:true,
+              point: {
+                        events:{
+                          click:function(e)
+                          {
+                            #REDIRECTURL#
+                          }
+                        }
+                        }
+            }
+        },
         series: [{
             type: 'column',
-            name: 'Amount',
-            data: [#PCount#],
+            name: 'Input Count',
+            data: [#FirstAmount#],
             yAxis:0
-        }, 
-        {
-            type: 'scatter',
-            name: 'Percent',
-            color: 'rgba(223, 83, 83, .5)',
-            data: [#ABPercent#],
-            yAxis:1,
-            tooltip: {
-                    headerFormat: '<b>{point.key}</b><br/>',
-                    pointFormat: '{point.y} %'
-                }
         },
         {
-            type: 'spline',
-            name: 'Summary Percent',
-            data: [#PPercent#],
+            type: 'line',
+            name: 'First Yield',
+            data: [#FirstYield#],
             marker: {
                 lineWidth: 2,
-                lineColor: Highcharts.getOptions().colors[3],
+                fillColor: 'red'
+            },
+            yAxis:1
+        },
+        {
+            type: 'line',
+            name: 'Retest Yield',
+            data: [#RetestYield#],
+            marker: {
+                lineWidth: 2,
                 fillColor: 'green'
             },
             yAxis:1
@@ -62,3 +77,4 @@ $(function () {
     });
 });
 </script>
+

@@ -690,6 +690,7 @@
     <Content Include="Scripts\PieChart.xml" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
+    <Content Include="Scripts\SuperYield.xml" />
     <Content Include="Scripts\_references.js" />
     <Content Include="Scripts\ColumnChart.xml" />
     <Content Include="Web.config">

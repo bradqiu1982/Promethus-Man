@@ -21,8 +21,19 @@ namespace Prometheus.Controllers
         {
             var projlist = ProjectViewModels.RetrieveAllProject();
 
+            var filterlist = new List<SelectListItem>();
+            var filteritem = new SelectListItem();
+            filteritem.Text = "NONE";
+            filteritem.Value = "NONE";
+            filterlist.Add(filteritem);
+
             foreach (var item in projlist)
             {
+                filteritem = new SelectListItem();
+                filteritem.Text = item.ProjectKey;
+                filteritem.Value = item.ProjectKey;
+                filterlist.Add(filteritem);
+
                 var startdate = DateTime.Now.AddDays(-7);
                 var enddate = DateTime.Now.ToString();
                 if (startdate.DayOfWeek != DayOfWeek.Thursday)
@@ -70,6 +81,9 @@ namespace Prometheus.Controllers
                 item.PendingFACount = ProjectFAViewModules.RetrieveFADataCount(item.ProjectKey);
                 item.PendingRMACount = IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Pending);
             }
+
+            filterlist[0].Selected = true;
+            ViewBag.pjfilterlist = filterlist;
 
             return View(projlist);
         }

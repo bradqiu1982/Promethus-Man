@@ -18,7 +18,28 @@
 </div>
 
 
-    <hr />
+<hr />
+
+    <div class="row col-md-12">
+        <div class="col-md-1">
+            <label class="control-label" for="pjfilterlist">Filter:</label>
+        </div>
+        <div class="col-md-4">
+            @Html.DropDownList("pjfilterlist", null, new { @id = "pjfilterlist", @class = "form-control",@onchange = "ShowProjectDetail()" })
+        </div>
+        <div class="col-md-7">
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        function ShowProjectDetail() {
+            if (document.getElementById("pjfilterlist").value && document.getElementById("pjfilterlist").value != 'NONE')
+            {
+                window.location.href = '/Project/ProjectDetail?ProjectKey=' + document.getElementById("pjfilterlist").value;
+            }
+        }
+    </script>
+<hr/>
 
     @foreach (var item in Model)
     {

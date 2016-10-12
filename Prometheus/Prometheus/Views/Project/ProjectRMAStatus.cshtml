@@ -38,12 +38,14 @@
         <tbody>
             @foreach (var item in Model)
             {
+                var rmatitle = item.Summary.Split(new string[] { "from" },StringSplitOptions.None)[1].Trim();
+
                 <tr>
                     <td width="10%">@(Model.Count() - i)</td>
                     <td colspan="9" width="90%">
                         <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">
                             <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
-                            @item.Summary.Substring(0, item.Summary.Length > 125 ? 125 : item.Summary.Length)
+                            @rmatitle.Substring(0,rmatitle.Length>125?125:rmatitle.Length)
                             </a>
                     </td>
                 </tr>

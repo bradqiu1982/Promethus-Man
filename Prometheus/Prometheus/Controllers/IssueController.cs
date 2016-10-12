@@ -538,7 +538,11 @@ namespace Prometheus.Controllers
             vm.RelativePeoples = Request.Form["RPeopleAddr"];
             vm.ModuleSN = Request.Form["ModuleSN"];
 
-            vm.Summary = "RMA " + vm.FinisarRMA + " for module " + vm.FinisarModel + " from " + vm.ECustomer + ": " + vm.CReport.Substring(0, vm.CReport.Length > 50 ? 50 : vm.CReport.Length);
+            vm.Summary = "RMA " + vm.FinisarRMA + " for module " + vm.FinisarModel + " from " + vm.ECustomer + ": " + vm.CReport;
+            if (vm.Summary.Length > 200)
+            {
+                vm.Summary = vm.Summary.Substring(0, 198);
+            }
 
             vm.Priority = Request.Form["prioritylist"].ToString();
             vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
@@ -696,7 +700,11 @@ namespace Prometheus.Controllers
             vm.RelativePeoples = Request.Form["RPeopleAddr"];
             vm.ModuleSN = Request.Form["ModuleSN"];
 
-            vm.Summary = "RMA " + vm.FinisarRMA + " for module " + vm.FinisarModel + " from " + vm.ECustomer + ": " + vm.CReport.Substring(0, vm.CReport.Length > 50 ? 50 : vm.CReport.Length);
+            vm.Summary = "RMA " + vm.FinisarRMA + " for module " + vm.FinisarModel + " from " + vm.ECustomer + ": " + vm.CReport;
+            if (vm.Summary.Length > 200)
+            {
+                vm.Summary = vm.Summary.Substring(0, 198);
+            }
 
             vm.Priority = Request.Form["prioritylist"].ToString();
             vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);

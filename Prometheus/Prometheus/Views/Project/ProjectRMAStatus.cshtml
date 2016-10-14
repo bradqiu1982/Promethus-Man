@@ -83,13 +83,19 @@
 
                     @if (item.InternalReportCommentList.Count > 0)
                     {
-                        var originalstr = System.Text.RegularExpressions.Regex.Replace(
-                            item.InternalReportCommentList[item.InternalReportCommentList.Count - 1].Comment, "<.*?>", string.Empty);
-                        var newcomment = item.InternalReportCommentList[item.InternalReportCommentList.Count - 1].Comment.Replace(originalstr
-                            , Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done));
+                        if (item.InternalReportCommentList[item.InternalReportCommentList.Count - 1].Comment.Contains("<a href"))
+                        {
+                            var originalstr = System.Text.RegularExpressions.Regex.Replace(
+                                                        item.InternalReportCommentList[item.InternalReportCommentList.Count - 1].Comment, "<.*?>", string.Empty);
+                            var newcomment = item.InternalReportCommentList[item.InternalReportCommentList.Count - 1].Comment.Replace(originalstr
+                                , Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done));
+                                <td width="10%">@Html.Raw(newcomment)</td>
+                        }
+                        else
+                        {
+                            <td width="10%"><p><a href="@item.InternalReportCommentList[item.InternalReportCommentList.Count - 1].Comment" target="_blank">@Html.Raw(Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></p></td>
+                        }
 
-
-                        <td width="10%">@Html.Raw(newcomment)</td>
                     }
                     else
                     {
@@ -98,12 +104,19 @@
                     
                     @if (item.Report4CustomerCommentList.Count > 0)
                     {
-                        var originalstr = System.Text.RegularExpressions.Regex.Replace(
-                            item.Report4CustomerCommentList[item.Report4CustomerCommentList.Count - 1].Comment, "<.*?>", string.Empty);
-                        var newcomment = item.Report4CustomerCommentList[item.Report4CustomerCommentList.Count - 1].Comment.Replace(originalstr
-                            , Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done));
+                        if (item.Report4CustomerCommentList[item.Report4CustomerCommentList.Count - 1].Comment.Contains("<a href"))
+                        {
+                            var originalstr = System.Text.RegularExpressions.Regex.Replace(
+                                item.Report4CustomerCommentList[item.Report4CustomerCommentList.Count - 1].Comment, "<.*?>", string.Empty);
+                            var newcomment = item.Report4CustomerCommentList[item.Report4CustomerCommentList.Count - 1].Comment.Replace(originalstr
+                                , Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done));
 
-                        <td width="10%">@Html.Raw(newcomment)</td>
+                            <td width="10%">@Html.Raw(newcomment)</td>
+                        }
+                        else
+                        {
+                            <td width="10%"><p><a href="@item.Report4CustomerCommentList[item.Report4CustomerCommentList.Count - 1].Comment" target="_blank">@Html.Raw(Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></p></td>
+                        }
                     }
                     else
                     {

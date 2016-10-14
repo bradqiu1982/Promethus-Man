@@ -50,6 +50,10 @@
         }
     </div>
     <div class="col-md-5">
+        @if (Model != null)
+        {
+            <input class="form-control text-box single-line" value="@(Model.IssueKey)" id="HIssueKeyForDelete" name="HIssueKeyForDelete" type="hidden" />
+        }
     </div>
 </div>
 <hr />
@@ -100,7 +104,15 @@
                 <div class="col-md-6">
                     <label class="control-label col-md-2" for="resolutionlist">Status<font color="red">*</font></label>
                     <div class="col-md-10">
+                    @if (ViewBag.isassignee != null && ViewBag.isassignee)
+                    {
                         @Html.DropDownList("resolutionlist", null, new { @id = "resolutionlist", @class = "form-control" })
+                    }
+                    else
+                    {
+                        @Html.DropDownList("resolutionlist", null, new { @id = "resolutionlist", @class = "form-control", @readonly = "readonly" })
+                    }
+                        
                     </div>
                 </div>
             </div>
@@ -153,6 +165,8 @@
                 </script>
             </div>
 
+        @if (ViewBag.isassignee != null && ViewBag.isassignee)
+        {
             <hr />
             <div class="col-md-12">
                 <div class="form-group">
@@ -173,6 +187,8 @@
                     <span class="field-validation-valid text-danger" data-valmsg-for="RPeopleAddr" data-valmsg-replace="true"></span>
                 </div>
             </div>
+        }
+
             <hr/>
             
             <div class="form-group">
@@ -234,6 +250,19 @@
                             <div class="panel-body">
                                 @foreach (var item in Model.AttachList)
                                 {
+                                    var realfn = "";
+                                    if (item.Contains("<a href"))
+                                    {
+                                        var tempfn = item.Split(new string[] { "<a href=", "target=" }, StringSplitOptions.None)[1].Replace("\"", "").Trim();
+                                        var tempfns = tempfn.Split(new string[] { "/" }, StringSplitOptions.None);
+                                        realfn = tempfns[tempfns.Length - 1];
+                                    }
+                                    else
+                                    {
+                                        var tempfns = item.Split(new string[] { "/" }, StringSplitOptions.None);
+                                        realfn = tempfns[tempfns.Length - 1].Trim();
+                                    }
+
                                     if (item.Contains("<a href"))
                                     {
                                         <div class="row">
@@ -244,15 +273,41 @@
                                     {
                                         var fns = item.Split(new char[] { '/' });
                                         var fn = fns[fns.Length - 1];
-                                        <div class="row">
-                                            <a href="@item" target="_blank">
-                                                <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>@fn
-                                            </a>
+                                        
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <a href="@item" target="_blank">
+                                                        <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>@fn
+                                                    </a>
+                                                </div>
+                                                <div class="col-md-1">
+                                                    @if (ViewBag.isassignee != null && ViewBag.isassignee)
+                                                    {
+                                                        <button class="form-control" value="@realfn" onclick="DeleteAttachment(this)">
+                                                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                                        </button>
+                                                    }
+                                                </div>
+                                                <div class="col-md-5"></div>
+                                            </div>
+                                            }
+                                            }
                                         </div>
-                                    }
-                                }
-                            </div>
                         </div>
+
+                        <script type="text/javascript">
+                            function DeleteAttachment(oBT) {
+                                if (confirm("Do you real want to delete this attachment?"))
+                                {
+                                    window.location.href = '/Issue/DeleteAttachment?issuekey=' + document.getElementById("HIssueKeyForDelete").value + '&filename=' + oBT.value
+                                }
+                                else
+                                {
+                                    window.location.href = '/Issue/UpdateIssue?issuekey=' + document.getElementById("HIssueKeyForDelete").value
+                                }
+                            }
+                        </script>
+
                     </div>
                 </div>
             }
@@ -283,8 +338,8 @@
         <div class="col-md-12">
             @if (Model != null)
             {
-                if (!Model.IssueClosed())
-                {
+                //if (!Model.IssueClosed())
+                //{
                     <div class="form-group">
                         <label class="control-label">Description<font color="red">*</font></label>
                     </div>
@@ -297,7 +352,7 @@
                             </script>
                         </div>
                     </div>
-                }
+                //}
             }
             else
             {

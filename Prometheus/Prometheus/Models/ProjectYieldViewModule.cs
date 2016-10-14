@@ -378,5 +378,37 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static List<ProjectYieldViewModule> GetYieldByDay(string pjkey,string starttime,string endtime)
+        {
+            var ret = new List<ProjectYieldViewModule>();
+            var pvm = ProjectViewModels.RetrieveOneProject(pjkey);
+
+            var stime = DateTime.Parse(starttime);
+            var etime = DateTime.Parse(endtime);
+
+            var ldate = new List<DateTime>();
+            for (var item = stime; item < etime;)
+            {
+                ldate.Add(item);
+                item = item.AddDays(1);
+            }
+
+            var startidx = 0;
+            if (ldate.Count > 30)
+            {
+                startidx = ldate.Count - 30;
+            }
+
+            for (int idx = startidx; idx < ldate.Count - 1; idx++)
+            {
+                var temp = GetYieldByDateRange(pjkey, ldate[idx].ToString(), ldate[idx + 1].ToString(), pvm);
+                if (temp.FirstYields.Count > 0)
+                {
+                    ret.Add(temp);
+                }
+            }
+            return ret;
+        }
+
     }
 }

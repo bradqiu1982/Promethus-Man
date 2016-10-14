@@ -1,10 +1,8 @@
 ﻿
 @{
-    ViewBag.Title = "ProjectYield";
+    ViewBag.Title = "ProjectDailyYield";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
-
 
 @if (ViewBag.pjkey != null)
 {
@@ -32,18 +30,17 @@ else
 }
 
 
-
-<hr/>
+<hr />
 
 <form>
     @if (ViewBag.pjkey != null)
     {
-        <input  value="@(ViewBag.pjkey)" id="pjkey" name="pjkey" type="hidden" />
+        <input value="@(ViewBag.pjkey)" id="pjkey" name="pjkey" type="hidden" />
     }
 </form>
 
 @if (ViewBag.chartscript != null)
-{ 
+{
     @Html.Raw(ViewBag.chartscript)
 
     <script src="~/Scripts/highcharts.js"></script>
@@ -57,7 +54,7 @@ else
                 </div>
                 <div class="panel-body">
                     <div class="col-md-12">
-                        <div id="weeklyyield" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                        <div id="dailyyield" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
                     </div>
                 </div>
             </div>
@@ -65,12 +62,12 @@ else
     </div>
 }
 
-<hr/>
+<hr />
 
 <script>
-    function ShowMonthlyYield()
+    function ShowWeeklyYield()
     {
-        window.location.href = "/Project/ProjectMonthlyYield?ProjectKey=@ViewBag.pjkey";
+        window.location.href = "/Project/ProjectYield?ProjectKey=@ViewBag.pjkey";
     }
 
     function ShowPeriodYield() {
@@ -79,17 +76,11 @@ else
             window.location.href = '/Project/ProjectPeriodYield?ProjectKey=@ViewBag.pjkey' + '&StartDate=' + document.getElementById("StartDate").value + '&EndDate=' + document.getElementById("EndDate").value;
         }
     }
-
-    function ShowDailyYield() {
-        if (document.getElementById("StartDate").value && document.getElementById("EndDate").value) {
-            window.location.href = '/Project/ProjectDailyYield?ProjectKey=@ViewBag.pjkey' + '&StartDate=' + document.getElementById("StartDate").value + '&EndDate=' + document.getElementById("EndDate").value;
-        }
-    }
 </script>
 
 <div class="row">
     <div class="col-md-2">
-        <button class="form-control" onclick="ShowMonthlyYield()">Yield In Months</button>
+        <button class="form-control" onclick="ShowWeeklyYield()">Yield In Weeks</button>
     </div>
     <div class="col-md-1">
         <label class="control-label" for="StartDate">StartDate</label>
@@ -98,16 +89,13 @@ else
         <input class="form-control text-box single-line" id="StartDate" name="StartDate" type="text" value="" />
     </div>
     <div class="col-md-1">
-        <label class="control-label" for="EndDate">EndDate</label>
+        <label class="control-label" for="StartDate">EndDate</label>
     </div>
     <div class="col-md-2">
         <input class="form-control text-box single-line" id="EndDate" name="EndDate" type="text" value="" />
     </div>
     <div class="col-md-2">
         <button class="form-control" onclick="ShowPeriodYield()">Yield In Period</button>
-    </div>
-    <div class="col-md-2">
-        <button class="form-control" onclick="ShowDailyYield()">Yield In Days</button>
     </div>
     <script type="text/javascript">
                             $(document).ready(function () {
@@ -124,3 +112,5 @@ else
                             });
     </script>
 </div>
+
+

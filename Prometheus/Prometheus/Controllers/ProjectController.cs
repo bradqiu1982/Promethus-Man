@@ -1533,6 +1533,227 @@ namespace Prometheus.Controllers
 
         }
 
+        public ActionResult ProjectDailyYield(string ProjectKey, string StartDate, string EndDate)
+        {
+            if (ProjectKey != null && StartDate != null && EndDate != null)
+            {
+                ViewBag.pjkey = ProjectKey;
+                var vmlist = ProjectYieldViewModule.GetYieldByDay(ProjectKey, StartDate, EndDate);
+                if (vmlist.Count > 0)
+                {
+                    var ChartxAxisValues = "";
+                    //var ChartSearies = "";
+
+                    var ftimelist = new List<string>();
+                    var famountlist = new List<int>();
+                    var fyieldlist = new List<double>();
+                    var ryieldlist = new List<double>();
+                    var maxamout = 0;
+
+                    foreach (var item in vmlist)
+                    {
+                        ftimelist.Add(item.EndDate.ToString("yyyy-MM-dd"));
+                        fyieldlist.Add(item.FirstYield * 100.0);
+                        ryieldlist.Add(item.LastYield * 100.0);
+
+                        var tempfamount = 0;
+                        foreach (var d in item.FirstYields)
+                        {
+                            if (d.InputCount > tempfamount) { tempfamount = d.InputCount; }
+                            if (d.InputCount > maxamout) { maxamout = d.InputCount; }
+                        }
+                        famountlist.Add(tempfamount);
+                    }
+
+                    //xaxis
+                    foreach (var item in ftimelist)
+                    {
+                        ChartxAxisValues = ChartxAxisValues + "'" + item + "',";
+                    }
+                    ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
+
+
+                    //yaxis
+                    //ChartSearies = "{name:'First Yield',data:[<fvalue>]},{name:'Retest Yield',data:[<cvalue>]}";
+
+                    var famout = "";
+                    foreach (var item in famountlist)
+                    {
+                        famout = famout + item.ToString() + ",";
+                    }
+                    famout = famout.Substring(0, famout.Length - 1);
+
+                    var ftempvalue = "";
+                    foreach (var item in fyieldlist)
+                    {
+                        ftempvalue = ftempvalue + item.ToString("0.00") + ",";
+                    }
+                    ftempvalue = ftempvalue.Substring(0, ftempvalue.Length - 1);
+                    //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
+
+                    var rtempvalue = "";
+                    foreach (var item in ryieldlist)
+                    {
+                        rtempvalue = rtempvalue + item.ToString("0.00") + ",";
+                    }
+                    rtempvalue = rtempvalue.Substring(0, rtempvalue.Length - 1);
+                    //ChartSearies = ChartSearies.Replace("<cvalue>", tempvalue);
+
+                    //rederect url
+                    var reurl = "window.location.href = '/Project/ProjectDYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category+'&VStartDate='+'" + StartDate+ "'+'&VEndDate='+'"+EndDate+"'";
+
+                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/SuperYield.xml"));
+                    ViewBag.chartscript = tempscript.Replace("#ElementID#", "dailyyield")
+                        .Replace("#Title#", "Daily Yield")
+                        .Replace("#ChartxAxisValues#", ChartxAxisValues)
+                        .Replace("#XAxisTitle#", "Date")
+                        .Replace("#AmountMAX#", maxamout.ToString())
+                        .Replace("#FirstAmount#", famout)
+                        .Replace("#FirstYield#", ftempvalue)
+                        .Replace("#RetestYield#", rtempvalue)
+                        .Replace("#REDIRECTURL#", reurl);
+                }
+
+                return View();
+            }
+
+            return View();
+        }
+
+        public ActionResult ProjectDYieldDetail(string ProjectKey, string EndDate,string VStartDate,string VEndDate)
+        {
+            if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(EndDate))
+            {
+
+                ViewBag.StartDate = VStartDate;
+                ViewBag.EndDate = VEndDate;
+
+                var edate = DateTime.Parse(DateTime.Parse(EndDate).ToString("yyyy-MM-dd") + " 07:30:00");
+                var sdate = edate.AddDays(-1);
+                var firstdatalist = new List<KeyValuePair<string, int>>();
+                var retestdatalist = new List<KeyValuePair<string, int>>();
+
+                var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, sdate.ToString(), edate.ToString(), pvm);
+
+                if (yieldvm.FirstYields.Count > 0)
+                {
+                    var piedatadict = new Dictionary<string, int>();
+                    var eklist = new List<string>();
+                    foreach (var error in yieldvm.FErrorMap.Keys)
+                    {
+                        eklist.Add(error);
+                    }
+
+                    foreach (var error in eklist)
+                    {
+                        if (string.Compare(error, "PASS", true) != 0)
+                        {
+                            foreach (var test in yieldvm.FirstYields)
+                            {
+                                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.FErrorMap);
+
+                                if (piedatadict.ContainsKey(error))
+                                {
+                                    var preval = piedatadict[error];
+                                    piedatadict[error] = preval + val;
+                                }
+                                else
+                                {
+                                    piedatadict.Add(error, val);
+                                }
+                            }
+                        }
+                    }
+
+                    firstdatalist = piedatadict.ToList();
+
+                    piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.FirstYields[yieldvm.FirstYields.Count - 1].WhichTest, yieldvm.FErrorMap);
+
+                    var keys = piedatadict.Keys;
+                    var namevaluepair = "";
+                    foreach (var k in keys)
+                    {
+                        if (piedatadict[k] > 0)
+                            namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                    }
+
+                    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                    ViewBag.fchartscript = tempscript.Replace("#ElementID#", "ffailurepie")
+                        .Replace("#Title#", "First Failure")
+                        .Replace("#SERIESNAME#", "FFailure")
+                        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
+                }
+
+
+                if (yieldvm.LastYields.Count > 0)
+                {
+                    var piedatadict = new Dictionary<string, int>();
+                    var eklist = new List<string>();
+                    foreach (var error in yieldvm.LErrorMap.Keys)
+                    {
+                        eklist.Add(error);
+                    }
+
+                    foreach (var error in eklist)
+                    {
+                        if (string.Compare(error, "PASS", true) != 0)
+                        {
+                            foreach (var test in yieldvm.LastYields)
+                            {
+                                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.LErrorMap);
+
+                                if (piedatadict.ContainsKey(error))
+                                {
+                                    var preval = piedatadict[error];
+                                    piedatadict[error] = preval + val;
+                                }
+                                else
+                                {
+                                    piedatadict.Add(error, val);
+                                }
+                            }
+                        }
+                    }
+
+                    retestdatalist = piedatadict.ToList();
+
+                    piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.LastYields[yieldvm.LastYields.Count - 1].WhichTest, yieldvm.LErrorMap);
+
+                    var keys = piedatadict.Keys;
+                    var namevaluepair = "";
+                    foreach (var k in keys)
+                    {
+                        if (piedatadict[k] > 0)
+                            namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                    }
+
+                    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                    ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
+                        .Replace("#Title#", "Retest Failure")
+                        .Replace("#SERIESNAME#", "RFailure")
+                        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
+                }
+
+                if (firstdatalist.Count > 0)
+                {
+                    firsttestparetofun(firstdatalist);
+                }
+
+                if (retestdatalist.Count > 0)
+                {
+                    retestparetofun(retestdatalist);
+                }
+
+                return View(yieldvm);
+            }
+            return View();
+        }
+
         public ActionResult ProjectMYieldDetail(string ProjectKey, string EndDate)
         {
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(EndDate))

@@ -721,6 +721,7 @@ namespace Prometheus.Models
                 }
 
                 ret.SubIssues = RetrieveSubIssue(ret.IssueKey);
+                ret.RetrieveAttachment(ret.IssueKey);
 
                 return ret;
             }
@@ -1338,6 +1339,33 @@ namespace Prometheus.Models
 
             return ret;
         }
+
+        public static void DeleteAttachment(string issuekey,string cond)
+        {
+            var csql = "select Attachment from IssueAttachment where IssueKey = '<IssueKey>' and Attachment = '<cond>'";
+            csql = csql.Replace("<IssueKey>", issuekey).Replace("<cond>", cond);
+            var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
+            if (cdbret.Count == 1)
+            {
+                csql = "delete from IssueAttachment where IssueKey = '<IssueKey>' and Attachment = '<cond>'";
+                csql = csql.Replace("<IssueKey>", issuekey).Replace("<cond>", cond);
+                DBUtility.ExeLocalSqlNoRes(csql);
+            }//end if
+        }
+
+        public static void DeleteComment(string issuekey, string cond)
+        {
+            var csql = "select Comment from IssueComments where IssueKey = '<IssueKey>' and Comment = '<cond>'";
+            csql = csql.Replace("<IssueKey>", issuekey).Replace("<cond>", cond);
+            var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
+            if (cdbret.Count == 1)
+            {
+                csql = "delete from IssueComments where IssueKey = '<IssueKey>' and Comment = '<cond>'";
+                csql = csql.Replace("<IssueKey>", issuekey).Replace("<cond>", cond);
+                DBUtility.ExeLocalSqlNoRes(csql);
+            }//end if
+        }
+
 
         private static void CreateNPISubIssue(string projectname, string pjkey,string parentkey, string firstengineer, string sum, string desc,int duemonth)
         {

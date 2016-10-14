@@ -78,6 +78,10 @@
 
     </div>
     <div class="col-md-2">
+        @if (Model != null)
+        {
+            <input class="form-control text-box single-line" value="@(Model.IssueKey)" id="HIssueKeyForDelete" name="HIssueKeyForDelete" type="hidden" />
+        }
     </div>
 </div>
 <hr />
@@ -166,7 +170,14 @@
                 <div class="col-md-6">
                     <label class="control-label col-md-2" for="resolutionlist">Status<font color="red">*</font></label>
                     <div class="col-md-10">
+                    @if (ViewBag.isassignee != null && ViewBag.isassignee)
+                    {
                         @Html.DropDownList("resolutionlist", null, new { @id = "resolutionlist", @class = "form-control" })
+                    }
+                    else
+                    {
+                        @Html.DropDownList("resolutionlist", null, new { @id = "resolutionlist", @class = "form-control", @readonly = "readonly" })
+                    }
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -254,7 +265,14 @@
                     <div class="col-md-12">
                         @if (Model != null && !string.IsNullOrEmpty(Model.CReport))
                         {
-                            <textarea class="form-control" name="CReport" id="CReport" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 180." data-val-length-max="180" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required.">@(Model.CReport)</textarea>
+                            if (ViewBag.isassignee != null && ViewBag.isassignee)
+                            {
+                                <textarea class="form-control" name="CReport" id="CReport" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 180." data-val-length-max="180" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required.">@(Model.CReport)</textarea>
+                            }
+                            else
+                            {
+                                <textarea class="form-control" readonly="readonly" name="CReport" id="CReport" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 180." data-val-length-max="180" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required.">@(Model.CReport)</textarea>
+                            }
                         }
                         else
                         {
@@ -266,92 +284,96 @@
 
             </div>
 
-            <hr />
-            <div class="col-md-12">
-                <div class="form-group">
-                    <label>Related People Email</label>
-                </div>
-
-                <div class="form-group">
-                    <div class="col-md-12" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
-                        @if (Model != null && !string.IsNullOrEmpty(Model.RelativePeoples))
-                        {
-                            <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 200." data-val-length-max="200" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$">@Model.RelativePeoples</textarea>
-                        }
-                        else
-                        {
-                            <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 200." data-val-length-max="200" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$"></textarea>
-                        }
-                    </div>
-                    <span class="field-validation-valid text-danger" data-valmsg-for="RPeopleAddr" data-valmsg-replace="true"></span>
-                </div>
-            </div>
-
-
-            <hr />
-
-            <div class="form-group">
+            @if (ViewBag.isassignee != null && ViewBag.isassignee)
+            {
+                <hr />
                 <div class="col-md-12">
-                    <div class="col-md-4">
-                        <span class="btn btn-default btn-file" id="choosefile1">
-                            Report for Customer <input type="file" name="files1" id="file1" runat="server" onchange="ShowFileNames1(this)" />
-                        </span>
+                    <div class="form-group">
+                        <label>Related People Email</label>
                     </div>
-                    <div class="col-md-8">
-                        <div class="col-md-11">
-                            <label class="control-label" id="showfile1" name="showfile1"></label>
+
+                    <div class="form-group">
+                        <div class="col-md-12" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
+                            @if (Model != null && !string.IsNullOrEmpty(Model.RelativePeoples))
+                            {
+                                <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 200." data-val-length-max="200" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$">@Model.RelativePeoples</textarea>
+                            }
+                            else
+                            {
+                                <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 200." data-val-length-max="200" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$"></textarea>
+                            }
                         </div>
-                        <div class="col-md-1">
-                            <input class="form-control text-box single-line" value="" id="customreportupload" name="customreportupload" type="hidden" />
-                        </div>
+                        <span class="field-validation-valid text-danger" data-valmsg-for="RPeopleAddr" data-valmsg-replace="true"></span>
                     </div>
                 </div>
-                <script type="text/javascript">
+
+
+                <hr />
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <div class="col-md-4">
+                            <span class="btn btn-default btn-file" id="choosefile1">
+                                Report for Customer <input type="file" name="files1" id="file1" runat="server" onchange="ShowFileNames1(this)" />
+                            </span>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="col-md-11">
+                                <label class="control-label" id="showfile1" name="showfile1"></label>
+                            </div>
+                            <div class="col-md-1">
+                                <input class="form-control text-box single-line" value="" id="customreportupload" name="customreportupload" type="hidden" />
+                            </div>
+                        </div>
+                    </div>
+                    <script type="text/javascript">
                             function ShowFileNames1(oFile) {
                                 $('#showfile1').text(oFile.value);
                                 document.getElementById("customreportupload").value = oFile.value;
                             }
-                </script>
-            </div>
-
-            <div class="form-group">
-                <div class="col-md-12">
-                    <div class="col-md-4">
-                        <span class="btn btn-default btn-file" id="choosefile2">
-                            Internal Report <input type="file" name="files2" id="file2" runat="server" onchange="ShowFileNames2(this)" />
-                        </span>
-                    </div>
-                    <div class="col-md-8">
-                        <div class="col-md-11">
-                            <label class="control-label" id="showfile2" name="showfile2"></label>
-                        </div>
-                        <div class="col-md-1">
-                            <input class="form-control text-box single-line" value="" id="internalreportupload" name="internalreportupload" type="hidden" />
-                        </div>
-                    </div>
-                </div>
-                <script type="text/javascript">
-                            function ShowFileNames2(oFile) {
-                                $('#showfile2').text(oFile.value);
-                                document.getElementById("internalreportupload").value = oFile.value;
-                            }
-                </script>
-            </div>
-            <hr/>
-            <div class="col-md-12">
-                <div class="form-group">
-                    Root Cause
+                    </script>
                 </div>
 
                 <div class="form-group">
                     <div class="col-md-12">
-                        <textarea name="rootcauseeditor" id="rootcauseeditor" rows="10" cols="80"></textarea>
-                        <script>
+                        <div class="col-md-4">
+                            <span class="btn btn-default btn-file" id="choosefile2">
+                                Internal Report <input type="file" name="files2" id="file2" runat="server" onchange="ShowFileNames2(this)" />
+                            </span>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="col-md-11">
+                                <label class="control-label" id="showfile2" name="showfile2"></label>
+                            </div>
+                            <div class="col-md-1">
+                                <input class="form-control text-box single-line" value="" id="internalreportupload" name="internalreportupload" type="hidden" />
+                            </div>
+                        </div>
+                    </div>
+                    <script type="text/javascript">
+                            function ShowFileNames2(oFile) {
+                                $('#showfile2').text(oFile.value);
+                                document.getElementById("internalreportupload").value = oFile.value;
+                            }
+                    </script>
+                </div>
+                <hr />
+                <div class="col-md-12">
+                    <div class="form-group">
+                        Root Cause
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <textarea name="rootcauseeditor" id="rootcauseeditor" rows="10" cols="80"></textarea>
+                            <script>
                             CKEDITOR.replace('rootcauseeditor', { htmlEncodeOutput: true, filebrowserImageUploadUrl: '/userfiles/Upload.ashx' });
-                        </script>
+                            </script>
+                        </div>
                     </div>
                 </div>
-            </div>
+            }
+
 
 
             @if (Model.SubIssues.Count > 0)
@@ -400,10 +422,33 @@
                             <div class="panel-body">
                                 @foreach (var item in Model.AttachList)
                                 {
+                                    var realfn = "";
+                                    if (item.Contains("<a href"))
+                                    {
+                                        var tempfn = item.Split(new string[] { "<a href=", "target="}, StringSplitOptions.None)[1].Replace("\"","").Trim();
+                                        var tempfns = tempfn.Split(new string[] { "/" }, StringSplitOptions.None);
+                                        realfn = tempfns[tempfns.Length -1];
+                                    }
+                                    else
+                                    {
+                                        var tempfns = item.Split(new string[] { "/" }, StringSplitOptions.None);
+                                        realfn = tempfns[tempfns.Length - 1].Trim();
+                                    }
+
                                     if (item.Contains("<a href"))
                                     {
                                         <div class="row">
-                                            @Html.Raw(item)
+                                            <div class="col-md-6">@Html.Raw(item)</div>
+                                            <div class="col-md-1">
+                                            @if (ViewBag.isassignee != null && ViewBag.isassignee)
+                                            {
+                                                <button class="form-control" value="@realfn" onclick="DeleteAttachment(this)">
+                                                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                                </button>
+                                            }
+                                            </div>
+                                            <div class="col-md-5"></div>
+                                            
                                         </div>
                                     }
                                     else
@@ -411,14 +456,38 @@
                                         var fns = item.Split(new char[] { '/' });
                                         var fn = fns[fns.Length - 1];
                                         <div class="row">
-                                            <a href="@item" target="_blank">
-                                                <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>@fn
-                                            </a>
+                                            <div class="col-md-6">
+                                                <a href="@item" target="_blank">
+                                                        <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>@fn
+                                                </a>
+                                            </div>
+                                            <div class="col-md-1">
+                                            @if (ViewBag.isassignee != null && ViewBag.isassignee)
+                                            {
+                                                <button class="form-control" value="@realfn" onclick="DeleteAttachment(this)">
+                                                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                                </button>
+                                            }
+                                            </div>
+                                            <div class="col-md-5"></div>
+                                            
                                         </div>
                                     }
                                 }
                                 </div>
                         </div>
+                        <script type="text/javascript">
+                            function DeleteAttachment(oBT) {
+                                if (confirm("Do you real want to delete this attachment?"))
+                                {
+                                    window.location.href = '/Issue/DeleteAttachment?issuekey=' + document.getElementById("HIssueKeyForDelete").value + '&filename=' + oBT.value
+                                }
+                                else
+                                {
+                                    window.location.href = '/Issue/UpdateIssue?issuekey=' + document.getElementById("HIssueKeyForDelete").value
+                                }
+                            }
+                        </script>
                     </div>
                 </div>
             }
@@ -453,7 +522,16 @@
                                 <h3 class="panel-title">Report for customer</h3>
                             </div>
                             <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
-                                @Html.Raw(item.Comment)
+                                @if (item.Comment.Contains("<a href"))
+                                {
+                                    @Html.Raw(item.Comment)
+                                }
+                                else
+                                {
+                                    var fns = item.Comment.Split(new char[] { '/' });
+                                    var fn = fns[fns.Length - 1];
+                                    <a href="@item.Comment" target="_blank">@fn</a>
+                                }
                             </div>
                             <div class="panel-footer text-right">
                                 Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.CommentDate.ToString()
@@ -473,7 +551,16 @@
                                 <h3 class="panel-title">Internal Report</h3>
                             </div>
                             <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
-                                @Html.Raw(item.Comment)
+                               @if (item.Comment.Contains("<a href"))
+                               {
+                                    @Html.Raw(item.Comment)
+                               }
+                               else
+                               {
+                                   var fns = item.Comment.Split(new char[] { '/' });
+                                   var fn = fns[fns.Length - 1];
+                                    <a href="@item.Comment" target="_blank">@fn</a>
+                               }
                             </div>
                             <div class="panel-footer text-right">
                                 Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.CommentDate.ToString()
@@ -543,14 +630,17 @@
         <div class="col-md-6"></div>
     </div>
 
-    <div class="form-group">
-        <div class="col-md-3">
-            <input type="submit" value="Submit" id="updaterma" name="updaterma" class="btn btn-default" />
+    <div class="row col-md-12">
+        <div class="form-group">
+            <div class="col-md-3">
+                <input type="submit" value="Submit" id="updaterma" name="updaterma" class="btn btn-default" />
+            </div>
+            <div class="col-md-3">
+                <input type="submit" value="Delete" id="deleterma" name="deleterma" class="btn btn-default" />
+            </div>
+            <div class="col-md-6"></div>
         </div>
-        <div class="col-md-3">
-            <input type="submit" value="Delete" id="deleterma" name="deleterma" class="btn btn-default" />
-        </div>
-        <div class="col-md-6"></div>
     </div>
+
 }
 

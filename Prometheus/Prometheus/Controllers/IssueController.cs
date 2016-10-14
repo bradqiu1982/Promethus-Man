@@ -189,8 +189,17 @@ namespace Prometheus.Controllers
                     return RedirectToAction("UpdateRMA", "Issue", dict);
                 }
 
-                ret.Reporter = ckdict["logonuser"].Split(new char[] { '|' })[0];
-                ret.RetrieveAttachment(ret.IssueKey);
+
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                ViewBag.isassignee = false;
+                if (string.Compare(updater, ret.Assignee, true) == 0
+                        || string.Compare(updater, ret.Reporter,true) == 0)
+                {
+                    ViewBag.isassignee = true;
+                }
+
+                ret.Reporter = updater;
+
                 CreateAllLists(ret);
                 return View(ret);
             }
@@ -261,6 +270,14 @@ namespace Prometheus.Controllers
             }
 
             var newdata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+
+            ViewBag.isassignee = false;
+            if (string.Compare(updater, newdata.Assignee, true) == 0
+                    || string.Compare(updater, newdata.Reporter,true) == 0)
+            {
+                ViewBag.isassignee = true;
+            }
+
             CreateAllLists(newdata);
             return View(newdata);
         }
@@ -615,8 +632,16 @@ namespace Prometheus.Controllers
             var ret = IssueViewModels.RetrieveIssueByIssueKey(key);
             if (ret != null)
             {
-                ret.Reporter = ckdict["logonuser"].Split(new char[] { '|' })[0];
-                ret.RetrieveAttachment(ret.IssueKey);
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+                ViewBag.isassignee = false;
+                if (string.Compare(updater, ret.Assignee, true) == 0 
+                    || string.Compare(updater,ret.Reporter,true) == 0)
+                {
+                    ViewBag.isassignee = true;
+                }
+                ret.Reporter = updater;
+
                 CreateAllLists(ret);
                 return View(ret);
             }
@@ -749,7 +774,9 @@ namespace Prometheus.Controllers
                     }
                 }
 
-                var linkstr = "<p><a href=\"" + url + "\" target=\"_blank\">[Report 4 Customer] " + originalname + "</a></p>";
+                //var linkstr = "<p><a href=\"" + url + "\" target=\"_blank\">[Report 4 Customer] " + originalname + "</a></p>";
+
+                var linkstr = url;
                 var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(linkstr));
                 var commenttype = COMMENTTYPE.CustomReport;
                 IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
@@ -773,7 +800,8 @@ namespace Prometheus.Controllers
                     }
                 }
 
-                var linkstr = "<p><a href=\"" + url + "\" target=\"_blank\">[Internal Report] " + originalname + "</a></p>";
+                //var linkstr = "<p><a href=\"" + url + "\" target=\"_blank\">[Internal Report] " + originalname + "</a></p>";
+                var linkstr = url;
                 var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(linkstr));
                 var commenttype = COMMENTTYPE.InternalReport;
                 IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
@@ -813,6 +841,14 @@ namespace Prometheus.Controllers
 
             var newdata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
             CreateAllLists(newdata);
+
+            ViewBag.isassignee = false;
+            if (string.Compare(updater, newdata.Assignee, true) == 0
+                    || string.Compare(updater, newdata.Reporter,true) == 0)
+            {
+                ViewBag.isassignee = true;
+            }
+
             return View(newdata);
         }
 
@@ -880,6 +916,51 @@ namespace Prometheus.Controllers
 
             return RedirectToAction("ViewAll", "Project");
         }
+
+        private List<string> AttachCond(string filename)
+        {
+            var ret = new List<string>();
+
+            var tempstrs = filename.Split(new string[] { "-", "." }, StringSplitOptions.None);
+            var tempdatestr = tempstrs[tempstrs.Length - 2].Substring(0, tempstrs[tempstrs.Length - 2].Length - 6);
+
+            var originalname = filename.Split(new string[] { "-" + tempdatestr }, StringSplitOptions.None)[0];
+
+
+            var url = "/userfiles/docs/" + tempdatestr + "/" + filename;
+            var linkstr1 = "<p><a href=\"" + url + "\" target=\"_blank\">[Report 4 Customer] " + originalname + "</a></p>";
+            var linkstr2 = "<p><a href=\"" + url + "\" target=\"_blank\">[Internal Report] " + originalname + "</a></p>";
+
+            ret.Add(url);
+            ret.Add(linkstr1);
+            ret.Add(linkstr2);
+            return ret;
+        }
+
+        public ActionResult DeleteAttachment(string issuekey, string filename)
+        {
+            if (!string.IsNullOrEmpty(issuekey) && !string.IsNullOrEmpty(filename))
+            {
+                var attachcond = AttachCond(filename);
+                foreach (var item in attachcond)
+                {
+                    IssueViewModels.DeleteAttachment(issuekey, item);
+                }
+
+                foreach (var item in attachcond)
+                {
+                    IssueViewModels.DeleteComment(issuekey
+                        , Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(item)));
+                }
+
+                var dict = new RouteValueDictionary();
+                dict.Add("issuekey", issuekey);
+                return RedirectToAction("UpdateIssue", "Issue", dict);
+            }
+
+            return RedirectToAction("ViewAll", "Project");
+        }
+
 
 
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Prometheus.Controllers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -227,6 +228,7 @@ namespace Prometheus.Models
             {
 
                 var failurelist = new List<ProjectTestData>();
+                var passlist = new List<ProjectTestData>();
 
                 bool bondinged = false;
                 if (ProjectTestData.RetrieveLatestTimeOfLocalProject(vm.ProjectKey) != null)
@@ -275,6 +277,10 @@ namespace Prometheus.Models
 
                                         failurelist.Add(tempdata);
                                     }
+                                    else
+                                    {
+                                        passlist.Add(tempdata);
+                                    }
                                 }
                             }
                             else
@@ -284,8 +290,6 @@ namespace Prometheus.Models
                                     bondingeddatadict.Add(tempdata.DataID,true);
 
                                     tempdata.StoreProjectTestData();
-
-
 
                                     if (!sndict.ContainsKey(tempdata.ModuleSerialNum))
                                     {
@@ -300,6 +304,10 @@ namespace Prometheus.Models
 
                                             failurelist.Add(tempdata);
                                         }
+                                        else
+                                        {
+                                            passlist.Add(tempdata);
+                                        }
                                     }
                                 }
                             }
@@ -312,6 +320,11 @@ namespace Prometheus.Models
                 if (vm.FinishRating < 90 && DateTime.Parse(starttime) != vm.StartDate)
                 {
                     CreateSystemIssues(failurelist);
+                }
+
+                foreach (var item in passlist)
+                {
+                    IssueController.CloseIssueAutomaticlly(item.ModuleSerialNum, item.WhichTest,item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss"));
                 }
                 
             }

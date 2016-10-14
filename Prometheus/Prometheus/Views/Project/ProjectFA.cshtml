@@ -69,7 +69,8 @@
         <div class="col-md-2 text-center">ErrAbbr</div>
         <div class="col-md-1 text-center">FA Status</div>
         <div class="col-md-1 text-center">Assignee</div>
-        <div class="col-md-4 text-center">Issue</div>
+        <div class="col-md-3 text-center">Issue</div>
+        <div class="col-md-1 text-center">Date</div>
         <div class="col-md-1 text-center">Attachment</div>
     }
     else
@@ -78,7 +79,8 @@
         <div class="col-md-2 text-center">ErrAbbr</div>
         <div class="col-md-2 text-center">FA Status</div>
         <div class="col-md-2 text-center">Assignee</div>
-        <div class="col-md-4 text-center">Issue</div>
+        <div class="col-md-3 text-center">Issue</div>
+        <div class="col-md-1 text-center">Date</div>
         <div class="col-md-1 text-center">Attachment</div>
     }
     </div>
@@ -115,7 +117,8 @@
                     </div>
                     <div class="col-md-1 text-center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(@item.IssueData.Resolution))</div>
                     <div class="col-md-1 text-center"><a href="/User/UserCenter?username=@item.IssueData.Assignee">@item.IssueData.Assignee.Split(new char[] { '@' })[0]</a></div>
-                    <div class="col-md-4 text-center"><a href="/Issue/UpdateIssue?issuekey=@item.IssueData.IssueKey">@item.IssueData.Summary</a></div>
+                    <div class="col-md-3 text-center"><a href="/Issue/UpdateIssue?issuekey=@item.IssueData.IssueKey">@item.IssueData.Summary</a></div>
+                    <div class="col-md-1 text-center">@item.IssueData.ReportDate.ToString("MM/dd-yy")</div>
                     <div class="col-md-1 text-center">
                         @if (item.IssueData.AttachList.Count > 0)
                         {
@@ -142,7 +145,8 @@
                     </div>
                     <div class="col-md-2 text-center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(@item.IssueData.Resolution))</div>
                     <div class="col-md-2 text-center"><a href="/User/UserCenter?username=@item.IssueData.Assignee">@item.IssueData.Assignee.Split(new char[] { '@' })[0]</a></div>
-                    <div class="col-md-4 text-center"><a href="/Issue/UpdateIssue?issuekey=@item.IssueData.IssueKey">@item.IssueData.Summary</a></div>
+                    <div class="col-md-3 text-center"><a href="/Issue/UpdateIssue?issuekey=@item.IssueData.IssueKey">@item.IssueData.Summary</a></div>
+                    <div class="col-md-1 text-center">@item.IssueData.ReportDate.ToString("MM/dd-yy")</div>
                     <div class="col-md-1 text-center">
                         @if (item.IssueData.AttachList.Count > 0)
                         {

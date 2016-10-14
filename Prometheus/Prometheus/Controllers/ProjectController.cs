@@ -77,9 +77,12 @@ namespace Prometheus.Controllers
                     }
                 }
 
-                item.PendingTaskCount = IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Pending);
-                item.PendingFACount = ProjectFAViewModules.RetrieveFADataCount(item.ProjectKey);
-                item.PendingRMACount = IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Pending);
+                item.PendingTaskCount = IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Pending).ToString()
+                    + "/" + IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Done).ToString();
+                item.PendingFACount = ProjectFAViewModules.RetrieveFADataCount(item.ProjectKey).ToString()
+                    +"/"+ ProjectFAViewModules.RetrieveFADataCount(item.ProjectKey,false).ToString();
+                item.PendingRMACount = IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Pending).ToString()
+                    + "/" + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Done).ToString();
             }
 
             filterlist[0].Selected = true;
@@ -857,9 +860,12 @@ namespace Prometheus.Controllers
                         }
                     }
 
-                    vm.PendingTaskCount = IssueViewModels.RetrieveTaskCountByProjectKey(vm.ProjectKey, Resolute.Pending);
-                    vm.PendingFACount = ProjectFAViewModules.RetrieveFADataCount(vm.ProjectKey);
-                    vm.PendingRMACount = IssueViewModels.RetrieveRMACountByProjectKey(vm.ProjectKey, Resolute.Pending);
+                    vm.PendingTaskCount = IssueViewModels.RetrieveTaskCountByProjectKey(vm.ProjectKey, Resolute.Pending).ToString()
+                        + "/" + IssueViewModels.RetrieveTaskCountByProjectKey(vm.ProjectKey, Resolute.Done).ToString(); 
+                    vm.PendingFACount = ProjectFAViewModules.RetrieveFADataCount(vm.ProjectKey).ToString()
+                        + "/" + ProjectFAViewModules.RetrieveFADataCount(vm.ProjectKey, false).ToString();
+                    vm.PendingRMACount = IssueViewModels.RetrieveRMACountByProjectKey(vm.ProjectKey, Resolute.Pending).ToString()
+                         + "/" + IssueViewModels.RetrieveRMACountByProjectKey(vm.ProjectKey, Resolute.Done).ToString();
                 }
 
                 return View(vm);

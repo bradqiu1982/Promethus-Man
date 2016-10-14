@@ -91,11 +91,17 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static int RetrieveFADataCount(string pjkey)
+        public static int RetrieveFADataCount(string pjkey,bool pending=true)
         {
-
-            return IssueViewModels.RRetrieveFAStatusByPjkey(pjkey, Resolute.Working)
-                + IssueViewModels.RRetrieveFAStatusByPjkey(pjkey, Resolute.Pending);
+            if (pending)
+            {
+                return IssueViewModels.RRetrieveFAStatusByPjkey(pjkey, Resolute.Working)
+                                + IssueViewModels.RRetrieveFAStatusByPjkey(pjkey, Resolute.Pending);
+            }
+            else
+            {
+                return IssueViewModels.RRetrieveFAStatusByPjkey(pjkey, Resolute.Done);
+            }
         }
 
         public static List<ProjectFAViewModules> RetrieveFADataWithErrAbbr(string ProjectKey, string ErrAbbr)

@@ -1,7 +1,7 @@
 ﻿@model Prometheus.Models.ProjectYieldViewModule
 
 @{
-    ViewBag.Title = "ProjectMYieldDetail";
+    ViewBag.Title = "ProjectDYieldDetail";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -12,7 +12,7 @@
             <h2>@Model.ProjectKey @Model.EndDate.ToString("yyyy-MM-dd") Yield</h2>
         </div>
         <div class="col-md-2">
-            <h2><a data-toggle="tooltip" title="Goto Yield Page" href="/Project/ProjectDailyYield?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+            <h2><a data-toggle="tooltip" title="Goto Yield Page" href="/Project/ProjectDailyYield?ProjectKey=@(Model.ProjectKey+ "&StartDate="+ ViewBag.StartDate + "&EndDate=" + ViewBag.EndDate)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
         </div>
         <div class="col-md-5"></div>
     </div>
@@ -197,48 +197,48 @@ else
         </div>
     </div>
 
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">Retest Failure</h3>
-                                </div>
-                                <div class="panel-body">
-                                    <div class="col-md-12">
-                                        <table class="table table-bordered table-hover">
-                                            <tr>
-                                                <th>ErrAbbr</th>
-                                                @foreach (var item in Model.LastYields)
-                                                {
-                                                    <th>@item.WhichTest</th>
-                                                }
-                                            </tr>
-                                            @{
-                                                eklist = new List<string>();
-                                                foreach (var error in Model.LErrorMap.Keys)
-                                                {
-                                                    eklist.Add(error);
-                                                }
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Retest Failure</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="col-md-12">
+                        <table class="table table-bordered table-hover">
+                            <tr>
+                                <th>ErrAbbr</th>
+                                @foreach (var item in Model.LastYields)
+                                {
+                                    <th>@item.WhichTest</th>
+                                }
+                            </tr>
+                            @{
+                                eklist = new List<string>();
+                                foreach (var error in Model.LErrorMap.Keys)
+                                {
+                                    eklist.Add(error);
+                                }
 
-                                                foreach (var error in eklist)
-                                                {
-                                                    <tr>
-                                                        <th>@error</th>
-                                                        @foreach (var test in Model.LastYields)
-                                                        {
-                                                            var val = Prometheus.Models.ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, Model.LErrorMap);
-                                                            <td>@val</td>
-                                                        }
-                                                    </tr>
-                                                }
-                                            }
+                                foreach (var error in eklist)
+                                {
+                                    <tr>
+                                        <th>@error</th>
+                                        @foreach (var test in Model.LastYields)
+                                        {
+                                            var val = Prometheus.Models.ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, Model.LErrorMap);
+                                            <td>@val</td>
+                                        }
+                                    </tr>
+                                }
+                            }
 
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        </table>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
                     <div class="row">
                         <div class="col-md-12">
@@ -265,5 +265,8 @@ else
                             </div>
                         </div>
                     </div>
-                                                }
+                                }
+
+
+
 

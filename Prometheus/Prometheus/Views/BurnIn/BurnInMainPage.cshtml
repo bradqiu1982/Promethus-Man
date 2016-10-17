@@ -43,6 +43,11 @@
                                     window.location.href = '/BurnIn/ProjectBIPeriodYield?ProjectKey=@ViewBag.pjkey' + '&StartDate=' + document.getElementById("StartDate").value + '&EndDate=' + document.getElementById("EndDate").value;
                                 }
                             }
+                            function ShowDailyYield() {
+                                if (document.getElementById("StartDate").value && document.getElementById("EndDate").value) {
+                                    window.location.href = '/BurnIn/ProjectBIDailyYield?ProjectKey=@ViewBag.pjkey' + '&StartDate=' + document.getElementById("StartDate").value + '&EndDate=' + document.getElementById("EndDate").value;
+                                }
+                            }
                             function ShowWaferYield() {
                                 if (document.getElementById("waferlist").value && document.getElementById("waferlist").value != 'NONE')
                                 {
@@ -64,8 +69,11 @@
                             <div class="col-md-3">
                                 <input class="form-control text-box single-line" id="EndDate" name="EndDate" type="text" value="" />
                             </div>
-                            <div class="col-md-2">
-                                <button class="form-control" onclick="ShowPeriodYield()"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                            <div class="col-md-1">
+                                <button class="form-control" onclick="ShowPeriodYield()"><span class="glyphicon glyphicon-search" aria-hidden="true"></span>P</button>
+                            </div>
+                            <div class="col-md-1">
+                                <button class="form-control" onclick="ShowDailyYield()"><span class="glyphicon glyphicon-search" aria-hidden="true"></span>D</button>
                             </div>
                             <script type="text/javascript">
                             $(document).ready(function () {

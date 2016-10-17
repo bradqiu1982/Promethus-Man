@@ -283,6 +283,74 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        public ActionResult ProjectBIDailyYield(string ProjectKey, string StartDate, string EndDate)
+        {
+            //if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(StartDate) && !string.IsNullOrEmpty(EndDate))
+            //{
+            //    ViewBag.pjkey = ProjectKey;
+
+            //    var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
+
+            //    var vmlist = new List<ProjectBIYieldViewModule>();
+            //    var tempret = ProjectBIYieldViewModule.GetYieldByDateRange(ProjectKey, StartDate, EndDate, pvm);
+            //    if (tempret.LastYields.Count > 0)
+            //    {
+            //        vmlist.Add(tempret);
+            //    }
+
+            //    if (vmlist.Count > 0)
+            //    {
+            //        var ChartxAxisValues = "";
+            //        var ChartSearies = "";
+
+            //        var ftimelist = new List<string>();
+            //        var cvalues = new List<double>();
+
+            //        foreach (var item in vmlist)
+            //        {
+            //            ftimelist.Add(item.EndDate.ToString("yyyy-MM-dd"));
+            //            cvalues.Add(item.LastYield * 100.0);
+            //        }
+
+            //        //xaxis
+            //        foreach (var item in ftimelist)
+            //        {
+            //            ChartxAxisValues = ChartxAxisValues + "'" + item + "',";
+            //        }
+            //        ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
+
+
+            //        //yaxis
+            //        ChartSearies = "{name:'FY',data:[<cvalue>]}";
+
+            //        var tempvalue = "";
+            //        foreach (var item in cvalues)
+            //        {
+            //            tempvalue = tempvalue + item.ToString("0.00") + ",";
+            //        }
+            //        tempvalue = tempvalue.Substring(0, tempvalue.Length - 1);
+            //        ChartSearies = ChartSearies.Replace("<cvalue>", tempvalue);
+
+
+            //        //rederect url
+            //        var tempurl = "/BurnIn/ProjectBIPYieldDetail?ProjectKey=" + ProjectKey + "&StartDate=" + StartDate + "&EndDate=" + EndDate;
+            //        var reurl = "window.location.href = '" + tempurl + "'";
+
+            //        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ColumnChart.xml"));
+            //        ViewBag.chartscript = tempscript.Replace("#ElementID#", "periodyield")
+            //            .Replace("#ChartType#", "column")
+            //            .Replace("#Title#", "Period Yiled")
+            //            .Replace("#ChartxAxisValues#", ChartxAxisValues)
+            //            .Replace("#yAxisTitle#", "Yield Percent")
+            //            .Replace("#ChartSearies#", ChartSearies)
+            //            .Replace("#REDIRECTURL#", reurl);
+            //    }
+
+            //    return View();
+            //}
+            return View();
+        }
+
         public ActionResult ProjectBIPeriodYield(string ProjectKey, string StartDate, string EndDate)
         {
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(StartDate) && !string.IsNullOrEmpty(EndDate))

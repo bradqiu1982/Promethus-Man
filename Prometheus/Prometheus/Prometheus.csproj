@@ -763,6 +763,8 @@
     <Content Include="Views\BurnIn\ProjectBIWaferYieldDetail.cshtml" />
     <Content Include="Views\Project\ProjectDailyYield.cshtml" />
     <Content Include="Views\Project\ProjectDYieldDetail.cshtml" />
+    <Content Include="Views\BurnIn\ProjectBIDailyYield.cshtml" />
+    <Content Include="Views\BurnIn\ProjectBIDailyYieldDetail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

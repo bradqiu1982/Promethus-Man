@@ -139,6 +139,10 @@ namespace Prometheus.Controllers
                     {
                         return -1;
                     }
+                    else if (pair1.FinishRating > pair2.FinishRating)
+                    {
+                        return 1;
+                    }
                 }
 
 

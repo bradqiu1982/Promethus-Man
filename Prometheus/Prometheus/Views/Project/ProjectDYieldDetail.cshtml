@@ -9,7 +9,7 @@
 {
     <div class="row">
         <div class="col-md-5">
-            <h2>@Model.ProjectKey @Model.EndDate.ToString("yyyy-MM-dd") Yield</h2>
+            <h2>@Model.ProjectKey @Model.StartDate.ToString("yyyy-MM-dd") Yield</h2>
         </div>
         <div class="col-md-2">
             <h2><a data-toggle="tooltip" title="Goto Yield Page" href="/Project/ProjectDailyYield?ProjectKey=@(Model.ProjectKey+ "&StartDate="+ ViewBag.StartDate + "&EndDate=" + ViewBag.EndDate)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>

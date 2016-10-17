@@ -169,16 +169,22 @@ else
                     
                     <hr />
 
-                        <div class="row col-md-12">
-                            <div class="col-md-1 text-left active"><a href="/Issue/UpdateIssue?issuekey=@projectdata.DVTIssueKey">DVT</a></div>
-                            <div class="col-md-2 text-left active">@projectdata.DVTDate</div>
-                            <div class="col-md-1 text-left active">@projectdata.DVTStatus</div>
-                            <div class="col-md-1 text-left"></div>
-                            <div class="col-md-1 text-left active"><a href="/Issue/UpdateIssue?issuekey=@projectdata.MVTIssueKey">MVT</a></div>
-                            <div class="col-md-2 text-left active">@projectdata.MVTDate</div>
-                            <div class="col-md-1 text-left active">@projectdata.MVTStatus</div>
-                            <div class="col-md-3 text-left"></div>
-                        </div>
+                    <div class="row col-md-12">
+                    @if (!string.IsNullOrEmpty(projectdata.CurrentNPIProc)
+                         && !string.IsNullOrEmpty(projectdata.PIP1Date)
+                         && !string.IsNullOrEmpty(projectdata.MVTDate))
+                    {
+                        <div class="col-md-1 text-center active"><a href="/Issue/UpdateIssue?issuekey=@projectdata.CurrentNPIProcKey">@projectdata.CurrentNPIProc</a></div>
+                        <div class="col-md-2 text-center active">@projectdata.PIP1Date</div>
+                        <div class="col-md-2 text-center active">@projectdata.MVTDate</div>
+                        <div class="col-md-3 text-center"></div>
+                    }
+                    else
+                    {
+                        <div class="col-md-8 text-center"></div>
+                    }
+                    <div class="col-md-3 text-left"></div>
+                    </div>
 
                         <hr />
 

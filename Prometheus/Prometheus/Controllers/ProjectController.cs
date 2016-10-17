@@ -62,22 +62,7 @@ namespace Prometheus.Controllers
                     item.RetestYield = -1.0;
                 }
 
-                var ivmlist = IssueViewModels.RetrieveNPIPROCIssue(item.ProjectKey);
-                foreach (var iv in ivmlist)
-                {
-                    if (iv.Summary.Contains(" DVT"))
-                    {
-                        item.DVTIssueKey = iv.IssueKey;
-                        item.DVTDate = iv.DueDate.ToString("yyyy-MM-dd");
-                        item.DVTStatus = iv.Resolution;
-                    }
-                    if (iv.Summary.Contains(" MVT"))
-                    {
-                        item.MVTIssueKey = iv.IssueKey;
-                        item.MVTDate = iv.DueDate.ToString("yyyy-MM-dd");
-                        item.MVTStatus = iv.Resolution;
-                    }
-                }
+                NPIInfo(item);
 
                 item.PendingTaskCount = IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Pending).ToString()
                     + "/" + IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Done).ToString();
@@ -92,6 +77,48 @@ namespace Prometheus.Controllers
 
             SortPJ(projlist);
             return View(projlist);
+        }
+
+        private void NPIInfo(ProjectViewModels item)
+        {
+                var ivmlist = IssueViewModels.RetrieveNPIPROCIssue(item.ProjectKey);
+                foreach (var iv in ivmlist)
+                {
+                    if (iv.Summary.Contains("PIP1"))
+                    {
+                        item.PIP1Date = iv.DueDate.ToString("yyyy-MM-dd");
+                    }
+
+                    if (iv.Summary.Contains("MVT"))
+                    {
+                        item.MVTDate = iv.DueDate.ToString("yyyy-MM-dd");
+                    }
+
+                    if (iv.Resolution == Resolute.Working)
+                    {
+                        if (iv.Summary.Contains("PIP1"))
+                        {
+                            item.CurrentNPIProc = "PIP1";
+                        }
+                        if (iv.Summary.Contains("EVT"))
+                        {
+                            item.CurrentNPIProc = "EVT";
+                        }
+                        if (iv.Summary.Contains("DVT"))
+                        {
+                            item.CurrentNPIProc = "DVT";
+                        }
+                        if (iv.Summary.Contains("MVT"))
+                        {
+                            item.CurrentNPIProc = "MVT";
+                        }
+                        if (iv.Summary.Contains("MP"))
+                        {
+                            item.CurrentNPIProc = "MP";
+                        }
+                        item.CurrentNPIProcKey = iv.IssueKey;
+                    }
+                }
         }
 
         private void SortPJ(List<ProjectViewModels> projlist)
@@ -622,7 +649,7 @@ namespace Prometheus.Controllers
 
             projectmodel.StoreProject();
 
-            IssueViewModels.CreateNPIProcTasks(projectmodel.ProjectName, projectmodel.ProjectKey, projectmodel.MemberList[1].Name);
+            //IssueViewModels.CreateNPIProcTasks(projectmodel.ProjectName, projectmodel.ProjectKey, projectmodel.MemberList[1].Name);
 
             var ckdict = CookieUtility.UnpackCookie(this);
             var who = (ckdict["logonuser"]).Split(new string[]{ "||"},StringSplitOptions.None)[0];
@@ -902,22 +929,7 @@ namespace Prometheus.Controllers
                         vm.RetestYield = -1.0;
                     }
 
-                    var ivmlist = IssueViewModels.RetrieveNPIPROCIssue(vm.ProjectKey);
-                    foreach (var iv in ivmlist)
-                    {
-                        if (iv.Summary.Contains(" DVT"))
-                        {
-                            vm.DVTIssueKey = iv.IssueKey;
-                            vm.DVTDate = iv.DueDate.ToString("yyyy-MM-dd");
-                            vm.DVTStatus = iv.Resolution;
-                        }
-                        if (iv.Summary.Contains(" MVT"))
-                        {
-                            vm.MVTIssueKey = iv.IssueKey;
-                            vm.MVTDate = iv.DueDate.ToString("yyyy-MM-dd");
-                            vm.MVTStatus = iv.Resolution;
-                        }
-                    }
+                    NPIInfo(vm);
 
                     vm.PendingTaskCount = IssueViewModels.RetrieveTaskCountByProjectKey(vm.ProjectKey, Resolute.Pending).ToString()
                         + "/" + IssueViewModels.RetrieveTaskCountByProjectKey(vm.ProjectKey, Resolute.Done).ToString(); 

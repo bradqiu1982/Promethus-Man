@@ -36,7 +36,7 @@ namespace Prometheus.Controllers
 
 
                 //yaxis
-                ChartSearies = "{name:'Retest Yield',data:[<cvalue>]}";
+                ChartSearies = "{name:'FY',data:[<cvalue>]}";
 
                 var tempvalue = "";
                 foreach (var item in cvalues)
@@ -188,7 +188,7 @@ namespace Prometheus.Controllers
 
                 var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ParetoChart.xml"));
                 ViewBag.rparetoscript = tempscript.Replace("#ElementID#", "rparetochart")
-                    .Replace("#Title#", "Pareto of Retest Defect")
+                    .Replace("#Title#", "Pareto of Final Defect")
                     .Replace("#XAxisTitle#", "Defect")
                     .Replace("#ChartxAxisValues#", ChartxAxisValues)
                     .Replace("#AmountMAX#", sum.ToString())
@@ -268,7 +268,7 @@ namespace Prometheus.Controllers
 
                     var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
                     ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
-                        .Replace("#Title#", "Retest Failure")
+                        .Replace("#Title#", "Final Failure")
                         .Replace("#SERIESNAME#", "RFailure")
                         .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                 }
@@ -321,7 +321,7 @@ namespace Prometheus.Controllers
 
 
                     //yaxis
-                    ChartSearies = "{name:'Retest Yield',data:[<cvalue>]}";
+                    ChartSearies = "{name:'FY',data:[<cvalue>]}";
 
                     var tempvalue = "";
                     foreach (var item in cvalues)
@@ -409,7 +409,7 @@ namespace Prometheus.Controllers
 
                     var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
                     ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
-                        .Replace("#Title#", "Retest Failure")
+                        .Replace("#Title#", "Final Failure")
                         .Replace("#SERIESNAME#", "RFailure")
                         .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                 }
@@ -462,7 +462,7 @@ namespace Prometheus.Controllers
 
 
                     //yaxis
-                    ChartSearies = "{name:'Retest Yield',data:[<cvalue>]}";
+                    ChartSearies = "{name:'FY',data:[<cvalue>]}";
 
                     var tempvalue = "";
                     foreach (var item in cvalues)
@@ -548,7 +548,7 @@ namespace Prometheus.Controllers
 
                     var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
                     ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
-                        .Replace("#Title#", "Retest Failure")
+                        .Replace("#Title#", "Final Failure")
                         .Replace("#SERIESNAME#", "RFailure")
                         .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                 }

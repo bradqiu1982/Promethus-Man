@@ -102,7 +102,7 @@ else
                             @if (projectdata.FirstYield > 0)
                             {
                                 <a href="/Project/ProjectYield?ProjectKey=@projectdata.ProjectKey">
-                                    <span class="glyphicon glyphicon-stats" aria-hidden="true"></span> First Yield @((projectdata.FirstYield * 100.0).ToString("0.00")) %
+                                    <span class="glyphicon glyphicon-stats" aria-hidden="true"></span> FPY @((projectdata.FirstYield * 100.0).ToString("0.00")) %
                                 </a>
                             }
                             else
@@ -116,7 +116,7 @@ else
                             @if (projectdata.RetestYield > 0)
                             {
                                 <a href="/Project/ProjectYield?ProjectKey=@projectdata.ProjectKey">
-                                    <span class="glyphicon glyphicon-stats" aria-hidden="true"></span> Retest Yield @((projectdata.RetestYield * 100.0).ToString("0.00")) %
+                                    <span class="glyphicon glyphicon-stats" aria-hidden="true"></span> FY @((projectdata.RetestYield * 100.0).ToString("0.00")) %
                                 </a>
                             }
                         </div>

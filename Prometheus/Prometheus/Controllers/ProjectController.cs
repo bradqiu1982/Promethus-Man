@@ -1627,7 +1627,7 @@ namespace Prometheus.Controllers
 
                     foreach (var item in vmlist)
                     {
-                        ftimelist.Add(item.EndDate.ToString("yyyy-MM-dd"));
+                        ftimelist.Add(item.StartDate.ToString("yyyy-MM-dd"));
                         fyieldlist.Add(item.FirstYield * 100.0);
                         ryieldlist.Add(item.LastYield * 100.0);
 
@@ -1703,7 +1703,7 @@ namespace Prometheus.Controllers
                 ViewBag.StartDate = VStartDate;
                 ViewBag.EndDate = VEndDate;
 
-                var edate = DateTime.Parse(DateTime.Parse(EndDate).ToString("yyyy-MM-dd") + " 07:30:00");
+                var edate = DateTime.Parse(DateTime.Parse(EndDate).AddDays(1).ToString("yyyy-MM-dd") + " 07:30:00");
                 var sdate = edate.AddDays(-1);
                 var firstdatalist = new List<KeyValuePair<string, int>>();
                 var retestdatalist = new List<KeyValuePair<string, int>>();

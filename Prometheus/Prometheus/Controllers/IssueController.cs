@@ -102,6 +102,21 @@ namespace Prometheus.Controllers
             }
         }
 
+        private void SendTaskEvent(IssueViewModels vm, string operate)
+        {
+                var routevalue = new RouteValueDictionary();
+                routevalue.Add("issuekey", vm.IssueKey);
+                //send validate email
+                string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+
+                var content = vm.Summary + " is " + operate + " by " + vm.Reporter + " :\r\n " + validatestr;
+
+                var toaddrs = new List<string>();
+                toaddrs.AddRange(vm.RelativePeopleList);
+                EmailUtility.SendEmail("Parallel NPI Trace Notice", toaddrs, content);
+        }
+
         [HttpPost, ActionName("CreateIssue")]
         [ValidateAntiForgeryToken]
         public ActionResult CreateIssuePost()
@@ -131,6 +146,11 @@ namespace Prometheus.Controllers
             vm.StoreIssue();
 
             ProjectEvent.CreateIssueEvent(vm.ProjectKey, vm.Reporter, vm.Assignee, vm.Summary, vm.IssueKey);
+
+            if (vm.RelativePeopleList.Count > 0)
+            {
+                SendTaskEvent(vm, "asigned to you");
+            }
 
             var dict = new RouteValueDictionary();
             dict.Add("issuekey", vm.IssueKey);

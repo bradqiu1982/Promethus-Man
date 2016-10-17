@@ -438,7 +438,7 @@ namespace Prometheus.Models
 
         public static List<string> RetrieveAllProjectKey()
         {
-            var sql = "select ProjectKey from Project";
+            var sql = "select ProjectKey from Project order by ProjectKey ASC";
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             var ret = new List<string>();
             foreach (var line in dbret)

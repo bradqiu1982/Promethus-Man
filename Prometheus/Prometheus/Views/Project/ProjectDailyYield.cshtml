@@ -76,6 +76,11 @@ else
             window.location.href = '/Project/ProjectPeriodYield?ProjectKey=@ViewBag.pjkey' + '&StartDate=' + document.getElementById("StartDate").value + '&EndDate=' + document.getElementById("EndDate").value;
         }
     }
+    function ShowDailyYield() {
+        if (document.getElementById("StartDate").value && document.getElementById("EndDate").value) {
+            window.location.href = '/Project/ProjectDailyYield?ProjectKey=@ViewBag.pjkey' + '&StartDate=' + document.getElementById("StartDate").value + '&EndDate=' + document.getElementById("EndDate").value;
+        }
+    }
 </script>
 
 <div class="row">
@@ -96,6 +101,9 @@ else
     </div>
     <div class="col-md-2">
         <button class="form-control" onclick="ShowPeriodYield()">Yield In Period</button>
+    </div>
+    <div class="col-md-2">
+        <button class="form-control" onclick="ShowDailyYield()">Yield In Days</button>
     </div>
     <script type="text/javascript">
                             $(document).ready(function () {

@@ -132,12 +132,19 @@
                                 </a>
                             </div>
 
-                            <div class="col-md-1 text-center active"><a href="/Issue/UpdateIssue?issuekey=@item.DVTIssueKey">DVT</a></div>
-                            <div class="col-md-2 text-center active">@item.DVTDate</div>
-                            <div class="col-md-1 text-center active">@item.DVTStatus</div>
-                            <div class="col-md-1 text-center active"><a href="/Issue/UpdateIssue?issuekey=@item.MVTIssueKey">MVT</a></div>
-                            <div class="col-md-2 text-center active">@item.MVTDate</div>
-                            <div class="col-md-1 text-center active">@item.MVTStatus</div>
+                            @if (!string.IsNullOrEmpty(item.CurrentNPIProc)
+                                 && !string.IsNullOrEmpty(item.PIP1Date)
+                                 && !string.IsNullOrEmpty(item.MVTDate))
+                            {
+                                <div class="col-md-1 text-center active"><a href="/Issue/UpdateIssue?issuekey=@item.CurrentNPIProcKey">@item.CurrentNPIProc</a></div>
+                                <div class="col-md-2 text-center active">@item.PIP1Date</div>
+                                <div class="col-md-2 text-center active">@item.MVTDate</div>
+                                <div class="col-md-3 text-center"></div>
+                            }
+                            else
+                            {
+                                <div class="col-md-8 text-center"></div>
+                            }
 
                         </div>
 

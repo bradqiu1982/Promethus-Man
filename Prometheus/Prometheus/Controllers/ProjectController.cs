@@ -16,6 +16,8 @@ namespace Prometheus.Controllers
     public class ProjectController : Controller
     {
 
+
+
         // GET: Project
         public ActionResult ViewAll()
         {
@@ -88,10 +90,67 @@ namespace Prometheus.Controllers
             filterlist[0].Selected = true;
             ViewBag.pjfilterlist = filterlist;
 
+            SortPJ(projlist);
             return View(projlist);
         }
 
+        private void SortPJ(List<ProjectViewModels> projlist)
+        {
+            projlist.Sort(delegate (ProjectViewModels pair1, ProjectViewModels pair2)
+            {
+                if (pair1.FirstYield > 0 && pair2.FirstYield <= 0)
+                {
+                    return -1;
+                }
+                else if(pair1.FirstYield <= 0 && pair2.FirstYield > 0)
+                {
+                    return 1;
+                }
+                else
+                {
+                    if (pair1.FinishRating < pair2.FinishRating)
+                    {
+                        return -1;
+                    }
+                }
 
+
+                if (Convert.ToInt32(pair1.PendingRMACount.Split(new string[] { "/" }, StringSplitOptions.None)[1])
+                > Convert.ToInt32(pair2.PendingRMACount.Split(new string[] { "/" }, StringSplitOptions.None)[1]))
+                {
+                    return -1;
+                }
+                else if (Convert.ToInt32(pair1.PendingRMACount.Split(new string[] { "/" }, StringSplitOptions.None)[1])
+                < Convert.ToInt32(pair2.PendingRMACount.Split(new string[] { "/" }, StringSplitOptions.None)[1]))
+                {
+                    return 1;
+                }
+
+                if (Convert.ToInt32(pair1.PendingFACount.Split(new string[] { "/" }, StringSplitOptions.None)[1])
+                > Convert.ToInt32(pair2.PendingFACount.Split(new string[] { "/" }, StringSplitOptions.None)[1]))
+                {
+                    return -1;
+                }
+                else if (Convert.ToInt32(pair1.PendingFACount.Split(new string[] { "/" }, StringSplitOptions.None)[1])
+                < Convert.ToInt32(pair2.PendingFACount.Split(new string[] { "/" }, StringSplitOptions.None)[1]))
+                {
+                    return 1;
+                }
+
+                if (Convert.ToInt32(pair1.PendingTaskCount.Split(new string[] { "/" }, StringSplitOptions.None)[1])
+                > Convert.ToInt32(pair2.PendingTaskCount.Split(new string[] { "/" }, StringSplitOptions.None)[1]))
+                {
+                    return -1;
+                }
+                else if (Convert.ToInt32(pair1.PendingTaskCount.Split(new string[] { "/" }, StringSplitOptions.None)[1])
+                < Convert.ToInt32(pair2.PendingTaskCount.Split(new string[] { "/" }, StringSplitOptions.None)[1]))
+                {
+                    return 1;
+                }
+
+                return 0;
+            });
+        }
 
         private List<SelectListItem> CreateSelectList(List<string> valist, string defVal)
         {

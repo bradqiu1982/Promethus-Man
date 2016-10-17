@@ -1388,7 +1388,7 @@ namespace Prometheus.Models
             var csql = "select Attachment from IssueAttachment where IssueKey = '<IssueKey>' and Attachment = '<cond>'";
             csql = csql.Replace("<IssueKey>", issuekey).Replace("<cond>", cond);
             var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
-            if (cdbret.Count == 1)
+            if (cdbret.Count > 0 && cdbret.Count < 3)
             {
                 csql = "delete from IssueAttachment where IssueKey = '<IssueKey>' and Attachment = '<cond>'";
                 csql = csql.Replace("<IssueKey>", issuekey).Replace("<cond>", cond);
@@ -1401,7 +1401,7 @@ namespace Prometheus.Models
             var csql = "select Comment from IssueComments where IssueKey = '<IssueKey>' and Comment = '<cond>'";
             csql = csql.Replace("<IssueKey>", issuekey).Replace("<cond>", cond);
             var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
-            if (cdbret.Count == 1)
+            if (cdbret.Count > 0 && cdbret.Count < 3)
             {
                 csql = "delete from IssueComments where IssueKey = '<IssueKey>' and Comment = '<cond>'";
                 csql = csql.Replace("<IssueKey>", issuekey).Replace("<cond>", cond);

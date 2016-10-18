@@ -46,7 +46,7 @@ namespace Prometheus.Models
 
             if (string.Compare(status, Working) == 0 || string.Compare(status, Started) == 0)
             {
-                return "<font color = \"yellow\" ><strong>" + status + "</strong></font>";
+                return "<font color = \"Orange\" ><strong>" + status + "</strong></font>";
             }
 
             return "<font color = \"green\" ><strong>" + status + "</strong></font>";

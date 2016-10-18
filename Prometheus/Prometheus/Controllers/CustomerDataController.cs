@@ -49,7 +49,7 @@ namespace Prometheus.Controllers
             bool ret = true;
             foreach (var item in line)
             {
-                if (!string.IsNullOrEmpty(item))
+                if (!string.IsNullOrEmpty(item.Trim()))
                 {
                     ret = false;
                 }

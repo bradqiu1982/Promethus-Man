@@ -42,7 +42,7 @@
                             <tbody>
                                 @foreach (var line in Model)
                                 {
-                                    if (string.IsNullOrEmpty(line.ElementAt(1).Trim()))
+                                    if (string.IsNullOrEmpty(line.ElementAt(1).Trim()) || line.Count() != 40)
                                     {
                                         continue;
                                     }

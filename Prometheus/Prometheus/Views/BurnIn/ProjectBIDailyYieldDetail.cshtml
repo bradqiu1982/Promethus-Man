@@ -1,8 +1,176 @@
-﻿
+﻿@model Prometheus.Models.ProjectBIYieldViewModule
+
 @{
     ViewBag.Title = "ProjectBIDailyYieldDetail";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>ProjectBIDailyYieldDetail</h2>
+@if (Model != null)
+{
+    <div class="row">
+        <div class="col-md-5">
+            <h2>@Model.ProjectKey Burn-In @Model.StartDate.ToString("yyyy-MM-dd") Yield</h2>
+        </div>
+        <div class="col-md-2">
+            <h2><a data-toggle="tooltip" title="Goto Burn-in Main Page" href="/BurnIn/BurnInMainPage?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+        </div>
+        <div class="col-md-5"></div>
+    </div>
+}
+else
+{
+    <h2>Burn-In Yield Detail</h2>
+}
+
+<hr />
+
+
+@if (Model != null)
+{
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Burn-In Yield</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="col-md-12">
+                        <table class="table table-bordered table-hover">
+                            <tr>
+                                <th>Test</th>
+                                @foreach (var item in Model.LastYields)
+                                {
+                                    <th>@item.WhichTest</th>
+                                }
+                                <th>Sum Yield</th>
+                            </tr>
+                            <tr>
+                                <th>Input</th>
+                                @foreach (var item in Model.LastYields)
+                                {
+                                    <td>@item.InputCount</td>
+                                }
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <th>Output</th>
+                                @foreach (var item in Model.LastYields)
+                                {
+                                    <td>@item.OutputCount</td>
+                                }
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <th>Yield</th>
+                                @foreach (var item in Model.LastYields)
+                                {
+                                    <td>@((item.Yield * 100.0).ToString("0.00"))%</td>
+                                }
+                                <td>@((Model.LastYield * 100.0).ToString("0.00"))%</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/Scripts/highcharts.js"></script>
+    <script src="~/Scripts/exporting.js"></script>
+
+    if (ViewBag.rchartscript != null)
+    {
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Failure Pie</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="col-md-3 text-left">
+                        </div>
+                        <div class="col-md-6 text-left">
+                            @if (ViewBag.rchartscript != null)
+                            {
+                                @Html.Raw(ViewBag.rchartscript)
+                                <div id="rfailurepie" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                            }
+
+                        </div>
+
+                        <div class="col-md-3 text-left">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Burn-In Failure</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="col-md-12">
+                        <table class="table table-bordered table-hover">
+                            <tr>
+                                <th>ErrAbbr</th>
+                                @foreach (var item in Model.LastYields)
+                                {
+                                    <th>@item.WhichTest</th>
+                                }
+                            </tr>
+                            @{
+                                var eklist = new List<string>();
+                                foreach (var error in Model.LErrorMap.Keys)
+                                {
+                                    eklist.Add(error);
+                                }
+
+                                foreach (var error in eklist)
+                                {
+                                    <tr>
+                                        <th>@error</th>
+                                        @foreach (var test in Model.LastYields)
+                                        {
+                                            var val = Prometheus.Models.ProjectBIYieldViewModule.RetrieveErrorCount(error, test.WhichTest, Model.LErrorMap);
+                                            <td>@val</td>
+                                        }
+                                    </tr>
+                                }
+                            }
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    if (ViewBag.rparetoscript != null)
+    {
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Defect Pareto</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="col-md-3 text-left"></div>
+                        <div class="col-md-6 text-left">
+                            @if (ViewBag.rparetoscript != null)
+                            {
+                                @Html.Raw(ViewBag.rparetoscript)
+                                <div id="rparetochart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                            }
+                        </div>
+                        <div class="col-md-3 text-left"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+    }
 

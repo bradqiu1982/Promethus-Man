@@ -77,18 +77,47 @@ namespace Prometheus.Models
         public static List<ProjectFAViewModules> RetrieveDoneFAData(string pjkey)
         {
             var ret = new List<ProjectFAViewModules>();
-            var pjdata = ProjectTestData.RetrieveProjectFailedTestData(100000, pjkey);
 
-            var issuedict = IssueViewModels.RRetrieveFADictByPjkey(pjkey, Resolute.Done,100000);
-            foreach (var d in pjdata)
+            var issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Done, 1000);
+            foreach (var d in issuedict)
             {
-                if (issuedict.ContainsKey(d.DataID))
+                if (d.Summary.Contains("@Burn-In Step"))
                 {
-                    ret.Add(new ProjectFAViewModules(issuedict[d.DataID], d));
+                    var pd = new ProjectTestData();
+                    var splitinfo = d.Summary.Split(new string[] { " " }, StringSplitOptions.None);
+                    if (splitinfo.Length > 4)
+                    {
+                        pd.ModuleSerialNum = splitinfo[1];
+                        pd.ErrAbbr = splitinfo[4];
+                        pd.ProjectKey = d.ProjectKey;
+                        ret.Add(new ProjectFAViewModules(d, pd));
+                    }
+                }
+                else
+                {
+                    var pjdata = ProjectTestData.RetrieveProjectTestData(d.IssueKey);
+                    if (pjdata.Count > 0)
+                    {
+                        ret.Add(new ProjectFAViewModules(d, pjdata[0]));
+                    }
                 }
             }
 
             return ret;
+
+            //var ret = new List<ProjectFAViewModules>();
+            //var pjdata = ProjectTestData.RetrieveProjectFailedTestData(100000, pjkey);
+
+            //var issuedict = IssueViewModels.RRetrieveFADictByPjkey(pjkey, Resolute.Done,100000);
+            //foreach (var d in pjdata)
+            //{
+            //    if (issuedict.ContainsKey(d.DataID))
+            //    {
+            //        ret.Add(new ProjectFAViewModules(issuedict[d.DataID], d));
+            //    }
+            //}
+
+            //return ret;
         }
 
         public static int RetrieveFADataCount(string pjkey,bool pending=true)

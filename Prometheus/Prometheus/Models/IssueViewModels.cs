@@ -783,8 +783,8 @@ namespace Prometheus.Models
                 //}
                 //ret.CommentList = tempclist;
                 //ret.SubIssues = RetrieveSubIssue(ret.IssueKey);
-                //ret.RetrieveAttachment(ret.IssueKey);
 
+                ret.RetrieveAttachment(ret.IssueKey);
                 retdict.Add( ret);
             }
 
@@ -888,8 +888,8 @@ namespace Prometheus.Models
                 //}
                 //ret.CommentList = tempclist;
                 //ret.SubIssues = RetrieveSubIssue(ret.IssueKey);
-                //ret.RetrieveAttachment(ret.IssueKey);
 
+                ret.RetrieveAttachment(ret.IssueKey);
                 retdict.Add(ret.IssueKey, ret);
             }
 
@@ -1270,6 +1270,7 @@ namespace Prometheus.Models
                     , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
 
                 tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey);
+                tempvm.RetrieveAttachment(tempvm.IssueKey);
                 ret.Add(tempvm);
             }
             return ret;

@@ -135,27 +135,29 @@ namespace Prometheus.Controllers
                 }
                 else
                 {
-                    if (pair1.FinishRating < pair2.FinishRating)
+
+                    if (pair1.RetestYield > 0 && pair2.RetestYield <= 0)
                     {
                         return -1;
                     }
-                    else if (pair1.FinishRating > pair2.FinishRating)
+                    else if (pair1.RetestYield <= 0 && pair2.RetestYield > 0)
                     {
                         return 1;
+                    }
+                    else
+                    {
+                        if (pair1.FinishRating < pair2.FinishRating)
+                        {
+                            return -1;
+                        }
+                        else if (pair1.FinishRating > pair2.FinishRating)
+                        {
+                            return 1;
+                        }
                     }
                 }
 
 
-                if (Convert.ToInt32(pair1.PendingRMACount.Split(new string[] { "/" }, StringSplitOptions.None)[1])
-                > Convert.ToInt32(pair2.PendingRMACount.Split(new string[] { "/" }, StringSplitOptions.None)[1]))
-                {
-                    return -1;
-                }
-                else if (Convert.ToInt32(pair1.PendingRMACount.Split(new string[] { "/" }, StringSplitOptions.None)[1])
-                < Convert.ToInt32(pair2.PendingRMACount.Split(new string[] { "/" }, StringSplitOptions.None)[1]))
-                {
-                    return 1;
-                }
 
                 if (Convert.ToInt32(pair1.PendingFACount.Split(new string[] { "/" }, StringSplitOptions.None)[1])
                 > Convert.ToInt32(pair2.PendingFACount.Split(new string[] { "/" }, StringSplitOptions.None)[1]))
@@ -164,6 +166,17 @@ namespace Prometheus.Controllers
                 }
                 else if (Convert.ToInt32(pair1.PendingFACount.Split(new string[] { "/" }, StringSplitOptions.None)[1])
                 < Convert.ToInt32(pair2.PendingFACount.Split(new string[] { "/" }, StringSplitOptions.None)[1]))
+                {
+                    return 1;
+                }
+
+                if (Convert.ToInt32(pair1.PendingRMACount.Split(new string[] { "/" }, StringSplitOptions.None)[1])
+                > Convert.ToInt32(pair2.PendingRMACount.Split(new string[] { "/" }, StringSplitOptions.None)[1]))
+                {
+                    return -1;
+                }
+                else if (Convert.ToInt32(pair1.PendingRMACount.Split(new string[] { "/" }, StringSplitOptions.None)[1])
+                < Convert.ToInt32(pair2.PendingRMACount.Split(new string[] { "/" }, StringSplitOptions.None)[1]))
                 {
                     return 1;
                 }

@@ -9,16 +9,7 @@
     <div class="col-md-3">
         <h2>Update Issue</h2>
     </div>
-    <div class="col-md-2">
-        @if (string.Compare(Model.IssueType, Prometheus.Models.ISSUETP.Task) == 0)
-        {
-            <h2><a data-toggle="tooltip" title="Goto Project Task" href="/Project/ProjectIssues?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
-        }
-        else
-        {
-            <h2><a data-toggle="tooltip" title="Goto Project FA" href="/Project/ProjectFA?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
-        }
-    </div>
+
     <div class="col-md-2">
         @if (Model != null && string.IsNullOrEmpty(Model.ParentIssueKey))
         {
@@ -49,7 +40,24 @@
            <h2><a data-toggle="tooltip" title="Goto Parent Issue" href="/Issue/UpdateIssue?issuekey=@(Model.ParentIssueKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
         }
     </div>
-    <div class="col-md-5">
+
+    <div class="col-md-1">
+            <h2><a data-toggle="tooltip" title="Goto Project Task" href="/Project/ProjectIssues?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span></a></h2>
+    </div>
+
+    <div class="col-md-1">
+        <h2><a data-toggle="tooltip" title="Goto Project FA" href="/Project/ProjectFA?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span></a></h2>
+    </div>
+
+    <div class="col-md-1">
+        <h2><a data-toggle="tooltip" title="Goto Project RMA" href="/Project/ProjectRMAStatus?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span></a></h2>
+    </div>
+
+    <div class="col-md-1">
+        <h2><a data-toggle="tooltip" title="Goto Project NPI" href="/Project/ProjectNPI?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></a></h2>
+    </div>
+
+    <div class="col-md-3">
         @if (Model != null)
         {
             <input class="form-control text-box single-line" value="@(Model.IssueKey)" id="HIssueKeyForDelete" name="HIssueKeyForDelete" type="hidden" />

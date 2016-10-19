@@ -322,9 +322,12 @@ namespace Prometheus.Models
                     CreateSystemIssues(failurelist);
                 }
 
-                foreach (var item in passlist)
+                if (vm.FinishRating < 90 && DateTime.Parse(starttime) != vm.StartDate)
                 {
-                    IssueController.CloseIssueAutomaticlly(item.ModuleSerialNum, item.WhichTest,item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss"));
+                    foreach (var item in passlist)
+                    {
+                        IssueController.CloseIssueAutomaticlly(item.ProjectKey,item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss"));
+                    }
                 }
                 
             }

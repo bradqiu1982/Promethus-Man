@@ -937,9 +937,9 @@ namespace Prometheus.Controllers
             return RedirectToAction("ViewAll", "Project");
         }
 
-        public static void CloseIssueAutomaticlly(string SN,string whichtest,string tester, string datestr)
+        public static void CloseIssueAutomaticlly(string pjkey,string SN,string whichtest,string tester, string datestr)
         {
-            var issues = IssueViewModels.RRetrieveFABySN(SN, whichtest, Resolute.Pending);
+            var issues = IssueViewModels.RRetrieveFABySN(pjkey,SN, whichtest, Resolute.Pending);
             foreach (var tobedata in issues)
             {
                 tobedata.Resolution = Resolute.Done;

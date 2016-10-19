@@ -806,7 +806,7 @@ namespace Prometheus.Models
             return retdict;
         }
 
-        public static List<IssueViewModels> RRetrieveFABySN(string SN,string whichtest, string issuestatus)
+        public static List<IssueViewModels> RRetrieveFABySN(string pjkey,string SN,string whichtest, string issuestatus)
         {
             var retdict = new List<IssueViewModels>();
 
@@ -828,8 +828,8 @@ namespace Prometheus.Models
                 fixresolve = Resolute.Done;
             }
 
-            var sql = "select top  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples from Issue where Summary like '%<ModuleSerialNum>%' and Summary like '%<whichtest>%'  and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' order by ReportDate DESC";
-            sql = sql.Replace("<ModuleSerialNum>", SN).Replace("<cond>", cond).Replace("<whichtest>", whichtest)
+            var sql = "select top  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples from Issue where ProjectKey = '<ProjectKey>' and Summary like '%<ModuleSerialNum>%' and Summary like '%<whichtest>%'  and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' order by ReportDate DESC";
+            sql = sql.Replace("<ModuleSerialNum>", SN).Replace("<cond>", cond).Replace("<whichtest>", whichtest).Replace("<ProjectKey>", pjkey)
                     .Replace("<IssueType1>", ISSUETP.NPIPROC).Replace("<IssueType2>", ISSUETP.RMA);
 
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);

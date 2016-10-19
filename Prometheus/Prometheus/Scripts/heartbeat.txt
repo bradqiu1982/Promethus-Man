@@ -1,3 +1,2 @@
-http://wux-d80007560/Project/HeartBeat
-http://shg-l80003583/Project/HeartBeat
+http://localhost/Project/HeartBeat
 

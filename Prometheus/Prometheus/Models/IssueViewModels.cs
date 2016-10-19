@@ -51,6 +51,21 @@ namespace Prometheus.Models
 
             return "<font color = \"green\" ><strong>" + status + "</strong></font>";
         }
+
+        public static string ColorStatus2(string status)
+        {
+            if (string.Compare(status, Pending) == 0 || string.Compare(status, Reopen) == 0)
+            {
+                return "<font color = \"red\" ><strong>" + status + "</strong></font>";
+            }
+
+            if (string.Compare(status, Working) == 0 || string.Compare(status, Started) == 0)
+            {
+                return "<font color = \"Orange\" ><strong> Working </strong></font>";
+            }
+
+            return "<font color = \"green\" ><strong> Close </strong></font>";
+        }
     }
 
     public class COMMENTTYPE

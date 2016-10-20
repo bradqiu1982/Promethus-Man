@@ -49,7 +49,7 @@ $(function () {
                 }
         },
         {
-            type: 'spline',
+            type: 'line',
             name: 'Summary Percent',
             data: [#PPercent#],
             marker: {

@@ -1106,12 +1106,16 @@ namespace Prometheus.Models
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)
             {
+                var tempsolve = fixresolve;
+                if (string.Compare(Convert.ToString(line[10]), Resolute.Reopen) == 0)
+                    tempsolve = Resolute.Reopen;
+
                 var tempvm = new IssueViewModels(Convert.ToString(line[0])
                     , Convert.ToString(line[1]), Convert.ToString(line[2])
                     , Convert.ToString(line[3]), Convert.ToString(line[4])
                     , Convert.ToString(line[5]), Convert.ToString(line[6])
                     , Convert.ToString(line[7]), Convert.ToString(line[8])
-                    , Convert.ToString(line[9]), fixresolve, "", Convert.ToString(line[11]));
+                    , Convert.ToString(line[9]), tempsolve, "", Convert.ToString(line[11]));
 
                 tempvm.RetrieveRMA();
 

@@ -879,6 +879,49 @@ namespace Prometheus.Models
             return retdict;
         }
 
+        public static List<IssueViewModels> RRetrieveBIFABySN(string pjkey, string SN, string whichtest, string issuestatus)
+        {
+            var retdict = new List<IssueViewModels>();
+
+            var cond = "";
+            var fixresolve = "";
+            if (string.Compare(issuestatus, Resolute.Pending) == 0)
+            {
+                cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";
+                fixresolve = Resolute.Pending;
+            }
+            else if (string.Compare(issuestatus, Resolute.Working) == 0)
+            {
+                cond = "('" + Resolute.Working + "')";
+                fixresolve = Resolute.Working;
+            }
+            else
+            {
+                cond = "('" + Resolute.Fixed + "','" + Resolute.Done + "','" + Resolute.NotFix + "','" + Resolute.NotReproduce + "','" + Resolute.Unresolved + "')";
+                fixresolve = Resolute.Done;
+            }
+
+            var sql = "select top  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples from Issue where ProjectKey = '<ProjectKey>' and Summary like '%<BICond>%' and Summary like '%<ModuleSerialNum>%' and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' order by ReportDate DESC";
+            sql = sql.Replace("<ModuleSerialNum>", SN).Replace("<BICond>", " @Burn-In Step " + whichtest).Replace("<cond>", cond).Replace("<ProjectKey>", pjkey)
+                    .Replace("<IssueType1>", ISSUETP.NPIPROC).Replace("<IssueType2>", ISSUETP.RMA);
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                var ret = new IssueViewModels(Convert.ToString(line[0])
+                    , Convert.ToString(line[1]), Convert.ToString(line[2])
+                    , Convert.ToString(line[3]), Convert.ToString(line[4])
+                    , Convert.ToString(line[5]), Convert.ToString(line[6])
+                    , Convert.ToString(line[7]), Convert.ToString(line[8])
+                    , Convert.ToString(line[9]), Convert.ToString(line[10])
+                    , Convert.ToString(line[11]), Convert.ToString(line[12]));
+
+                retdict.Add(ret);
+            }
+
+            return retdict;
+        }
+
         public static Dictionary<string, IssueViewModels> RRetrieveFADictByPjkey(string pjkey, string issuestatus, int topnum)
         {
             var retdict = new Dictionary<string, IssueViewModels>();

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Prometheus.Controllers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -206,6 +207,7 @@ namespace Prometheus.Models
             {
                 var failurelist = new List<BITestData>();
                 var failuredict = new Dictionary<string, bool>();
+                var passlist = new List<BITestData>();
 
                 var starttime = BITestData.RetrieveLatestTimeOfLocalBI(vm.ProjectKey);
                 if (string.IsNullOrEmpty(starttime))
@@ -304,6 +306,10 @@ namespace Prometheus.Models
                             }
 
                         }
+                        else
+                        {
+                            passlist.Add(tempdata);
+                        }
                     }
                 }//end foreach
 
@@ -315,8 +321,12 @@ namespace Prometheus.Models
                 if (DateTime.Parse(starttime) != vm.StartDate)
                 {
                     CreateSystemIssues(failurelist);
-                }
 
+                    foreach (var item in passlist)
+                    {
+                        IssueController.CloseBIIssueAutomaticlly(item.ProjectKey, item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss"));
+                    }
+                }
             }
         }
 

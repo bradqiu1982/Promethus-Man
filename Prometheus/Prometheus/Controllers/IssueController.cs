@@ -266,6 +266,15 @@ namespace Prometheus.Controllers
             var issuekey = Request.Form["IssueKey"];
             var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
 
+           if (Request.Form["deleteisu"] != null)
+            {
+                if (string.Compare(updater, originaldata.Reporter, true) == 0)
+                {
+                    IssueViewModels.RemoveIssue(issuekey);
+                }
+                return RedirectToAction("ViewAll", "Project");
+            }
+
             var vm = new IssueViewModels();
             vm.IssueKey = issuekey;
             vm.Reporter = updater;

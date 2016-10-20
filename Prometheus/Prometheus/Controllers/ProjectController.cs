@@ -666,7 +666,7 @@ namespace Prometheus.Controllers
 
             projectmodel.StoreProject();
 
-            //IssueViewModels.CreateNPIProcTasks(projectmodel.ProjectName, projectmodel.ProjectKey, projectmodel.MemberList[1].Name);
+            IssueViewModels.CreateNPIProcTasks(projectmodel.ProjectName, projectmodel.ProjectKey, projectmodel.MemberList[1].Name);
 
             var ckdict = CookieUtility.UnpackCookie(this);
             var who = (ckdict["logonuser"]).Split(new string[]{ "||"},StringSplitOptions.None)[0];

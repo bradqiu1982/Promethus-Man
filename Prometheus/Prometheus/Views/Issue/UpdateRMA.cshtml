@@ -665,7 +665,10 @@
                 <input type="submit" value="Submit" id="updaterma" name="updaterma" class="btn btn-default" />
             </div>
             <div class="col-md-3">
-                <input type="submit" value="Delete" id="deleterma" name="deleterma" class="btn btn-default" />
+                @if (ViewBag.isassignee != null && ViewBag.isassignee)
+                {
+                    <input type="submit" value="Delete" id="deleterma" name="deleterma" class="btn btn-default" />
+                }
             </div>
             <div class="col-md-6"></div>
         </div>

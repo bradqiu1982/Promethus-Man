@@ -516,21 +516,51 @@ namespace Prometheus.Models
 
         public static void RemoveIssue(string issuekey)
         {
-            var sql = "delete from Issue where IssueKey = '<IssueKey>'";
-            sql = sql.Replace("<IssueKey>", issuekey);
-            DBUtility.ExeLocalSqlNoRes(sql);
+            try
+            {
+                var subissues = RetrieveSubIssue(issuekey);
+                var sql = "";
 
-            sql = "delete from IssueRMA where IssueKey = '<IssueKey>'";
-            sql = sql.Replace("<IssueKey>", issuekey);
-            DBUtility.ExeLocalSqlNoRes(sql);
+                foreach (var item in subissues)
+                {
+                    sql = "delete from Issue where IssueKey = '<IssueKey>'";
+                    sql = sql.Replace("<IssueKey>", item.IssueKey);
+                    DBUtility.ExeLocalSqlNoRes(sql);
 
-            sql = "delete from IssueAttachment where IssueKey = '<IssueKey>'";
-            sql = sql.Replace("<IssueKey>", issuekey);
-            DBUtility.ExeLocalSqlNoRes(sql);
+                    sql = "delete from IssueRMA where IssueKey = '<IssueKey>'";
+                    sql = sql.Replace("<IssueKey>", item.IssueKey);
+                    DBUtility.ExeLocalSqlNoRes(sql);
 
-            sql = "delete from IssueComments where IssueKey = '<IssueKey>'";
-            sql = sql.Replace("<IssueKey>", issuekey);
-            DBUtility.ExeLocalSqlNoRes(sql);
+                    sql = "delete from IssueAttachment where IssueKey = '<IssueKey>'";
+                    sql = sql.Replace("<IssueKey>", item.IssueKey);
+                    DBUtility.ExeLocalSqlNoRes(sql);
+
+                    sql = "delete from IssueComments where IssueKey = '<IssueKey>'";
+                    sql = sql.Replace("<IssueKey>", item.IssueKey);
+                    DBUtility.ExeLocalSqlNoRes(sql);
+                }
+
+                sql = "delete from Issue where IssueKey = '<IssueKey>'";
+                sql = sql.Replace("<IssueKey>", issuekey);
+                DBUtility.ExeLocalSqlNoRes(sql);
+
+                sql = "delete from IssueRMA where IssueKey = '<IssueKey>'";
+                sql = sql.Replace("<IssueKey>", issuekey);
+                DBUtility.ExeLocalSqlNoRes(sql);
+
+                sql = "delete from IssueAttachment where IssueKey = '<IssueKey>'";
+                sql = sql.Replace("<IssueKey>", issuekey);
+                DBUtility.ExeLocalSqlNoRes(sql);
+
+                sql = "delete from IssueComments where IssueKey = '<IssueKey>'";
+                sql = sql.Replace("<IssueKey>", issuekey);
+                DBUtility.ExeLocalSqlNoRes(sql);
+            }
+            catch (Exception ex)
+            {
+
+            }
+
         }
 
         public void StoreSubIssue()

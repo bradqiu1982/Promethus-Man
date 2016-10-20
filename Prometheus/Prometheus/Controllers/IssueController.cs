@@ -145,6 +145,31 @@ namespace Prometheus.Controllers
 
             vm.StoreIssue();
 
+            if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
+            {
+                var urls = ReceiveRMAFiles();
+                var internalreportfile = Request.Form["attachmentupload"];
+                var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
+                    .Replace(" ", "_").Replace("#", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                var url = "";
+                foreach (var r in urls)
+                {
+                    if (r.Contains(originalname))
+                    {
+                        url = r;
+                        break;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(url))
+                {
+                    IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
+                }
+            }
+
+
             ProjectEvent.CreateIssueEvent(vm.ProjectKey, vm.Reporter, vm.Assignee, vm.Summary, vm.IssueKey);
 
             if (vm.RelativePeopleList.Count > 0)
@@ -262,6 +287,30 @@ namespace Prometheus.Controllers
 
             vm.UpdateIssue();
 
+            if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
+            {
+                var urls = ReceiveRMAFiles();
+                var internalreportfile = Request.Form["attachmentupload"];
+                var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
+                    .Replace(" ", "_").Replace("#", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                var url = "";
+                foreach (var r in urls)
+                {
+                    if (r.Contains(originalname))
+                    {
+                        url = r;
+                        break;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(url))
+                {
+                    IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
+                }
+            }
+
             ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Updated", originaldata.Summary, originaldata.IssueKey);
 
             if (string.Compare(originaldata.Assignee, vm.Assignee, true) != 0)
@@ -364,6 +413,30 @@ namespace Prometheus.Controllers
                 vm.Description = "";
 
             vm.StoreSubIssue();
+
+            if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
+            {
+                var urls = ReceiveRMAFiles();
+                var internalreportfile = Request.Form["attachmentupload"];
+                var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
+                    .Replace(" ", "_").Replace("#", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                var url = "";
+                foreach (var r in urls)
+                {
+                    if (r.Contains(originalname))
+                    {
+                        url = r;
+                        break;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(url))
+                {
+                    IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
+                }
+            }
 
             ProjectEvent.CreateIssueEvent(vm.ProjectKey, vm.Reporter, vm.Assignee, vm.Summary, vm.IssueKey);
 
@@ -599,6 +672,30 @@ namespace Prometheus.Controllers
 
             vm.StoreIssue();
 
+            if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
+            {
+                var urls = ReceiveRMAFiles();
+                var internalreportfile = Request.Form["attachmentupload"];
+                var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
+                    .Replace(" ", "_").Replace("#", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                var url = "";
+                foreach (var r in urls)
+                {
+                    if (r.Contains(originalname))
+                    {
+                        url = r;
+                        break;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(url))
+                {
+                    IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
+                }
+            }
+
             ProjectEvent.CreateIssueEvent(vm.ProjectKey, vm.Reporter, vm.Assignee, vm.Summary, vm.IssueKey);
             SendRMAEvent(vm, "created",true);
 
@@ -685,7 +782,7 @@ namespace Prometheus.Controllers
                     {
                         string fn = Path.GetFileName(Request.Files[fl].FileName)
                             .Replace(" ", "_").Replace("#","")
-                            .Replace("&", "").Replace("?", "").Replace("%", "");
+                            .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
 
                         string datestring = DateTime.Now.ToString("yyyyMMdd");
                         string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
@@ -777,12 +874,35 @@ namespace Prometheus.Controllers
 
             var urls = ReceiveRMAFiles();
 
+            if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
+            {
+                var attachementfile = Request.Form["attachmentupload"];
+                var originalname1 = Path.GetFileNameWithoutExtension(attachementfile)
+                    .Replace(" ", "_").Replace("#", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                var url = "";
+                foreach (var r in urls)
+                {
+                    if (r.Contains(originalname1))
+                    {
+                        url = r;
+                        break;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(url))
+                {
+                    IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
+                }
+            }
+
             if (!string.IsNullOrEmpty(Request.Form["customreportupload"]))
             {
                 var customereportfile = Request.Form["customreportupload"];
                 var originalname = Path.GetFileNameWithoutExtension(customereportfile)
                     .Replace(" ", "_").Replace("#", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "");
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
 
                 var url = "";
                 foreach (var r in urls)
@@ -794,13 +914,14 @@ namespace Prometheus.Controllers
                     }
                 }
 
-                //var linkstr = "<p><a href=\"" + url + "\" target=\"_blank\">[Report 4 Customer] " + originalname + "</a></p>";
-
-                var linkstr = url;
-                var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(linkstr));
-                var commenttype = COMMENTTYPE.CustomReport;
-                IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
-                IssueViewModels.StoreIssueAttachment(vm.IssueKey, linkstr);
+                if (!string.IsNullOrEmpty(url))
+                {
+                    var linkstr = url;
+                    var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(linkstr));
+                    var commenttype = COMMENTTYPE.CustomReport;
+                    IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
+                    IssueViewModels.StoreIssueAttachment(vm.IssueKey, linkstr);
+                }
             }
 
             if (!string.IsNullOrEmpty(Request.Form["internalreportupload"]))
@@ -808,7 +929,7 @@ namespace Prometheus.Controllers
                 var internalreportfile = Request.Form["internalreportupload"];
                 var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
                     .Replace(" ", "_").Replace("#", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "");
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
 
                 var url = "";
                 foreach (var r in urls)
@@ -820,12 +941,14 @@ namespace Prometheus.Controllers
                     }
                 }
 
-                //var linkstr = "<p><a href=\"" + url + "\" target=\"_blank\">[Internal Report] " + originalname + "</a></p>";
-                var linkstr = url;
-                var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(linkstr));
-                var commenttype = COMMENTTYPE.InternalReport;
-                IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
-                IssueViewModels.StoreIssueAttachment(vm.IssueKey, linkstr);
+                if (!string.IsNullOrEmpty(url))
+                {
+                    var linkstr = url;
+                    var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(linkstr));
+                    var commenttype = COMMENTTYPE.InternalReport;
+                    IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
+                    IssueViewModels.StoreIssueAttachment(vm.IssueKey, linkstr);
+                }
             }
 
             vm.UpdateRMA();

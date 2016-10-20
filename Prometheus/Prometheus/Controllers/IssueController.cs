@@ -113,7 +113,12 @@ namespace Prometheus.Controllers
                 var content = vm.Summary + " is " + operate + " by " + vm.Reporter + " :\r\n " + validatestr;
 
                 var toaddrs = new List<string>();
-                toaddrs.AddRange(vm.RelativePeopleList);
+                toaddrs.Add(vm.Reporter);
+                toaddrs.Add(vm.Assignee);
+                if (vm.RelativePeopleList.Count > 0)
+                {
+                    toaddrs.AddRange(vm.RelativePeopleList);
+                }
                 EmailUtility.SendEmail("Parallel NPI Trace Notice", toaddrs, content);
         }
 
@@ -172,10 +177,10 @@ namespace Prometheus.Controllers
 
             ProjectEvent.CreateIssueEvent(vm.ProjectKey, vm.Reporter, vm.Assignee, vm.Summary, vm.IssueKey);
 
-            if (vm.RelativePeopleList.Count > 0)
-            {
+            //if (vm.RelativePeopleList.Count > 0)
+            //{
                 SendTaskEvent(vm, "asigned to you");
-            }
+            //}
 
             var dict = new RouteValueDictionary();
             dict.Add("issuekey", vm.IssueKey);

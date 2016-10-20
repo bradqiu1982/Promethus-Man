@@ -195,6 +195,32 @@
                         </div>
                     </div>
 
+            <hr />
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <div class="col-md-4">
+                        <span class="btn btn-default btn-file" id="choosefile3">
+                            Attachment <input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
+                        </span>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="col-md-11">
+                            <label class="control-label" id="showfile3" name="showfile3"></label>
+                        </div>
+                        <div class="col-md-1">
+                            <input class="form-control text-box single-line" value="" id="attachmentupload" name="attachmentupload" type="hidden" />
+                        </div>
+                    </div>
+                </div>
+                <script type="text/javascript">
+                function ShowFileNames3(oFile) {
+                    $('#showfile3').text(oFile.value);
+                    document.getElementById("attachmentupload").value = oFile.value;
+                }
+                </script>
+            </div>
+
                 </div>
             </div>
             <hr />

@@ -15,7 +15,26 @@ namespace Prometheus.Models
         {
             get
             {
-                return OutputCount / (double)(InputCount);
+                try
+                {
+                    return OutputCount / (double)(InputCount);
+                }
+                catch (Exception)
+                { return 0.0; }
+            }
+        }
+
+        public int CorrectOutputCount { set; get; }
+        public double CorrectYield
+        {
+            get
+            {
+                try
+                {
+                    return CorrectOutputCount / (double)(InputCount);
+                }
+                catch (Exception)
+                { return 0.0; }
             }
         }
     }

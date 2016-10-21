@@ -26,11 +26,24 @@ namespace Prometheus.Models
             }
         }
 
+        public double CorrectLastYield
+        {
+            get
+            {
+                var ret = 1.0;
+                foreach (var item in LastYields)
+                {
+                    ret = ret * item.CorrectYield;
+                }
+                return ret;
+            }
+        }
+
         private Dictionary<string, Dictionary<string, int>> lemap = new Dictionary<string, Dictionary<string, int>>();
         public Dictionary<string, Dictionary<string, int>> LErrorMap { get { return lemap; } }
 
 
-        public static void RegisterError(string errorcode1, string whichtest, Dictionary<string, Dictionary<string, int>> emap)
+        private static void RegisterError(string errorcode1, string whichtest, Dictionary<string, Dictionary<string, int>> emap)
         {
             var errorcode = errorcode1;
             if (string.Compare(errorcode, "pass", true) == 0)
@@ -60,6 +73,9 @@ namespace Prometheus.Models
         {
             var yielddict = new Dictionary<string, TestYield>();
             var sndict = new Dictionary<string, bool>();
+
+            var correctbidict = IssueViewModels.RetrieveAllBIRootCause(pyvm.ProjectKey);
+
             foreach (var p in plist)
             {
                 if (!sndict.ContainsKey(p.WhichTest + ":" + p.ModuleSerialNum))
@@ -69,7 +85,19 @@ namespace Prometheus.Models
                     {
                         yielddict[p.WhichTest].InputCount = yielddict[p.WhichTest].InputCount + 1;
                         if (string.Compare(p.ErrAbbr, "PASS", true) == 0)
+                        {
                             yielddict[p.WhichTest].OutputCount = yielddict[p.WhichTest].OutputCount + 1;
+                            yielddict[p.WhichTest].CorrectOutputCount = yielddict[p.WhichTest].CorrectOutputCount + 1;
+                        }
+                        else
+                        {
+                            if (correctbidict.ContainsKey(p.ModuleSerialNum)
+                                && string.Compare(correctbidict[p.ModuleSerialNum], BIROOTCAUSE.VCSELISSUE) != 0)
+                            {
+                                yielddict[p.WhichTest].CorrectOutputCount = yielddict[p.WhichTest].CorrectOutputCount + 1;
+                            }
+                        }
+                            
                         RegisterError(p.ErrAbbr, p.WhichTest, pyvm.LErrorMap);
                     }
                     else
@@ -77,9 +105,21 @@ namespace Prometheus.Models
                         var tempyield = new TestYield();
                         tempyield.InputCount = 1;
                         if (string.Compare(p.ErrAbbr, "PASS", true) == 0)
+                        {
                             tempyield.OutputCount = 1;
+                            tempyield.CorrectOutputCount = 1;
+                        }
                         else
+                        {
                             tempyield.OutputCount = 0;
+                            tempyield.CorrectOutputCount = 0;
+                            if (correctbidict.ContainsKey(p.ModuleSerialNum)
+                                && string.Compare(correctbidict[p.ModuleSerialNum], BIROOTCAUSE.VCSELISSUE) != 0)
+                            {
+                                tempyield.CorrectOutputCount = 1;
+                            }
+                        }
+
                         tempyield.WhichTest = p.WhichTest;
 
                         RegisterError(p.ErrAbbr, p.WhichTest, pyvm.LErrorMap);

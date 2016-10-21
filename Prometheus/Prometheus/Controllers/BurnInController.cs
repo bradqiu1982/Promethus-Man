@@ -20,12 +20,15 @@ namespace Prometheus.Controllers
                 var ftimelist = new List<string>();
                 var famountlist = new List<int>();
                 var ryieldlist = new List<double>();
+                var cyieldlist = new List<double>();
                 var maxamout = 0;
 
                 foreach (var item in vmlist)
                 {
                     ftimelist.Add(item.EndDate.ToString("yyyy-MM-dd"));
                     ryieldlist.Add(item.LastYield * 100.0);
+                    cyieldlist.Add(item.CorrectLastYield * 100.0);
+
                     var tempfamount = 0;
                     foreach (var d in item.LastYields)
                     {
@@ -57,6 +60,13 @@ namespace Prometheus.Controllers
                 }
                 rtempvalue = rtempvalue.Substring(0, rtempvalue.Length - 1);
 
+                var crtempvalue = "";
+                foreach (var item in cyieldlist)
+                {
+                    crtempvalue = crtempvalue + item.ToString("0.00") + ",";
+                }
+                crtempvalue = crtempvalue.Substring(0, crtempvalue.Length - 1);
+
                 //rederect url
                 var reurl = "window.location.href = '/BurnIn/ProjectBIWYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category";
 
@@ -69,6 +79,7 @@ namespace Prometheus.Controllers
                     .Replace("#AmountMAX#", maxamout.ToString())
                     .Replace("#FirstAmount#", famout)
                     .Replace("#RetestYield#", rtempvalue)
+                    .Replace("#CorrectiveYield#", crtempvalue)
                     .Replace("#REDIRECTURL#", reurl);
             }
         }
@@ -310,12 +321,14 @@ namespace Prometheus.Controllers
                     var ftimelist = new List<string>();
                     var famountlist = new List<int>();
                     var ryieldlist = new List<double>();
+                    var cyieldlist = new List<double>();
                     var maxamout = 0;
 
                     foreach (var item in vmlist)
                     {
                         ftimelist.Add(item.StartDate.ToString("yyyy-MM-dd"));
                         ryieldlist.Add(item.LastYield * 100.0);
+                        cyieldlist.Add(item.CorrectLastYield * 100.0);
 
                         var tempfamount = 0;
                         foreach (var d in item.LastYields)
@@ -349,6 +362,13 @@ namespace Prometheus.Controllers
                     }
                     rtempvalue = rtempvalue.Substring(0, rtempvalue.Length - 1);
 
+                    var crtempvalue = "";
+                    foreach (var item in cyieldlist)
+                    {
+                        crtempvalue = crtempvalue + item.ToString("0.00") + ",";
+                    }
+                    crtempvalue = crtempvalue.Substring(0, crtempvalue.Length - 1);
+
                     //rederect url
                     var reurl = "window.location.href = '/BurnIn/ProjectBIDailyYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category+'&VStartDate='+'" + StartDate + "'+'&VEndDate='+'" + EndDate + "'";
 
@@ -360,6 +380,7 @@ namespace Prometheus.Controllers
                         .Replace("#AmountMAX#", maxamout.ToString())
                         .Replace("#FirstAmount#", famout)
                         .Replace("#RetestYield#", rtempvalue)
+                        .Replace("#CorrectiveYield#", crtempvalue)
                         .Replace("#REDIRECTURL#", reurl);
                 }
 
@@ -469,12 +490,14 @@ namespace Prometheus.Controllers
                     var ftimelist = new List<string>();
                     var famountlist = new List<int>();
                     var ryieldlist = new List<double>();
+                    var cyieldlist = new List<double>();
                     var maxamout = 0;
 
                     foreach (var item in vmlist)
                     {
                         ftimelist.Add(item.EndDate.ToString("yyyy-MM-dd"));
                         ryieldlist.Add(item.LastYield * 100.0);
+                        cyieldlist.Add(item.CorrectLastYield * 100.0);
 
                         var tempfamount = 0;
                         foreach (var d in item.LastYields)
@@ -507,10 +530,16 @@ namespace Prometheus.Controllers
                     }
                     rtempvalue = rtempvalue.Substring(0, rtempvalue.Length - 1);
 
+                    var crtempvalue = "";
+                    foreach (var item in cyieldlist)
+                    {
+                        crtempvalue = crtempvalue + item.ToString("0.00") + ",";
+                    }
+                    crtempvalue = crtempvalue.Substring(0, crtempvalue.Length - 1);
+
                     //rederect url
                     var tempurl = "/BurnIn/ProjectBIPYieldDetail?ProjectKey=" + ProjectKey + "&StartDate=" + StartDate + "&EndDate=" + EndDate;
                     var reurl = "window.location.href = '" + tempurl + "'";
-
 
                     var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/BISuperYield.xml"));
                     ViewBag.chartscript = tempscript.Replace("#ElementID#", "periodyield")
@@ -520,6 +549,7 @@ namespace Prometheus.Controllers
                         .Replace("#AmountMAX#", maxamout.ToString())
                         .Replace("#FirstAmount#", famout)
                         .Replace("#RetestYield#", rtempvalue)
+                        .Replace("#CorrectiveYield#", crtempvalue)
                         .Replace("#REDIRECTURL#", reurl);
                 }
 
@@ -625,12 +655,15 @@ namespace Prometheus.Controllers
                     var ftimelist = new List<string>();
                     var famountlist = new List<int>();
                     var ryieldlist = new List<double>();
+                    var cyieldlist = new List<double>();
                     var maxamout = 0;
 
                     foreach (var item in vmlist)
                     {
                         ftimelist.Add(item.EndDate.ToString("yyyy-MM-dd"));
                         ryieldlist.Add(item.LastYield * 100.0);
+                        cyieldlist.Add(item.CorrectLastYield * 100.0);
+
                         var tempfamount = 0;
                         foreach (var d in item.LastYields)
                         {
@@ -662,6 +695,12 @@ namespace Prometheus.Controllers
                     }
                     rtempvalue = rtempvalue.Substring(0, rtempvalue.Length - 1);
 
+                    var crtempvalue = "";
+                    foreach (var item in cyieldlist)
+                    {
+                        crtempvalue = crtempvalue + item.ToString("0.00") + ",";
+                    }
+                    crtempvalue = crtempvalue.Substring(0, crtempvalue.Length - 1);
 
                     //rederect url
                     var tempurl = "/BurnIn/ProjectBIWaferYieldDetail?ProjectKey=" + ProjectKey + "&Wafer=" + Wafer;
@@ -675,6 +714,7 @@ namespace Prometheus.Controllers
                         .Replace("#AmountMAX#", maxamout.ToString())
                         .Replace("#FirstAmount#", famout)
                         .Replace("#RetestYield#", rtempvalue)
+                        .Replace("#CorrectiveYield#", crtempvalue)
                         .Replace("#REDIRECTURL#", reurl);
                 }
 

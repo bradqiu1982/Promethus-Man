@@ -173,61 +173,75 @@
                 </script>
             </div>
 
-            <hr/>
+            @if (ViewBag.birootcauselist != null)
+            {
+                <div class="form-group">
 
-            <div class="form-group">
-                <div class="col-md-12">
-                    <div class="col-md-4">
-                        <span class="btn btn-default btn-file" id="choosefile3">
-                            Attachment <input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
-                        </span>
-                    </div>
-                    <div class="col-md-8">
-                        <div class="col-md-11">
-                            <label class="control-label" id="showfile3" name="showfile3"></label>
-                        </div>
-                        <div class="col-md-1">
-                            <input class="form-control text-box single-line" value="" id="attachmentupload" name="attachmentupload" type="hidden" />
+                    <div class="col-md-6">
+                        <label class="control-label col-md-2" for="birootcauselist">BI RootCause</label>
+                        <div class="col-md-10">
+                            @Html.DropDownList("birootcauselist", null, new { @id = "birootcauselist", @class = "form-control" })
                         </div>
                     </div>
+                    <div class="col-md-6"></div>
                 </div>
-                <script type="text/javascript">
-                            function ShowFileNames3(oFile) {
-                                $('#showfile3').text(oFile.value);
-                                document.getElementById("attachmentupload").value = oFile.value;
-                            }
-                </script>
-            </div>
+            }
 
- 
-        @if (ViewBag.isassignee != null && ViewBag.isassignee)
-        {
-            <hr />
-            <div class="col-md-12">
-                <div class="form-group">
-                    <label>Related People Email</label>
-                </div>
+                <hr />
 
                 <div class="form-group">
-                    <div class="col-md-12" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
-                        @if (Model != null && !string.IsNullOrEmpty(Model.RelativePeoples))
-                        {
-                            <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 200." data-val-length-max="200" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$">@Model.RelativePeoples</textarea>
-                        }
-                        else
-                        {
-                            <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 200." data-val-length-max="200" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$"></textarea>
-                        }
+                    <div class="col-md-12">
+                        <div class="col-md-4">
+                            <span class="btn btn-default btn-file" id="choosefile3">
+                                Attachment <input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
+                            </span>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="col-md-11">
+                                <label class="control-label" id="showfile3" name="showfile3"></label>
+                            </div>
+                            <div class="col-md-1">
+                                <input class="form-control text-box single-line" value="" id="attachmentupload" name="attachmentupload" type="hidden" />
+                            </div>
+                        </div>
                     </div>
-                    <span class="field-validation-valid text-danger" data-valmsg-for="RPeopleAddr" data-valmsg-replace="true"></span>
+                    <script type="text/javascript">
+                        function ShowFileNames3(oFile) {
+                            $('#showfile3').text(oFile.value);
+                            document.getElementById("attachmentupload").value = oFile.value;
+                        }
+                    </script>
                 </div>
-            </div>
-        }
 
-            <hr/>
-            
-            <div class="form-group">
-                <div class="col-md-6">
+
+                @if (ViewBag.isassignee != null && ViewBag.isassignee)
+                {
+                    <hr />
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Related People Email</label>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-12" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
+                                @if (Model != null && !string.IsNullOrEmpty(Model.RelativePeoples))
+                                {
+                                    <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 200." data-val-length-max="200" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$">@Model.RelativePeoples</textarea>
+                                }
+                                else
+                                {
+                                    <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 200." data-val-length-max="200" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$"></textarea>
+                                }
+                            </div>
+                            <span class="field-validation-valid text-danger" data-valmsg-for="RPeopleAddr" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                }
+
+                <hr />
+
+                <div class="form-group">
+                    <div class="col-md-6">
                         @if (Model != null && !string.IsNullOrEmpty(Model.IssueKey))
                         {
                             <input class="form-control text-box single-line" value="@(Model.IssueKey)" id="IssueKey" name="IssueKey" type="hidden" />
@@ -236,79 +250,79 @@
                         {
                             <input class="form-control text-box single-line" id="IssueKey" name="IssueKey" type="hidden" value="" />
                         }
+                    </div>
+                    <div class="col-md-6"></div>
                 </div>
-                <div class="col-md-6"></div>
-            </div>
 
-            @if(Model != null && Model.SubIssues.Count > 0)
-            {
-                <div class="form-group">
-                    <div class="col-md-12">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Sub Issues</h3>
-                            </div>
-                            <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
-                                <div class="row">
-                                    <div class="col-md-4">Summary</div>
-                                    <div class="col-md-2">Status</div>
-                                    <div class="col-md-2">Asignee</div>
-                                    <div class="col-md-2">DueDate</div>
-                                    <div class="col-md-2"></div>
+                @if (Model != null && Model.SubIssues.Count > 0)
+                {
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Sub Issues</h3>
                                 </div>
-                                @foreach (var item in Model.SubIssues)
-                                {
+                                <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
                                     <div class="row">
-                                        <div class="col-md-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></div>
-                                        <div class="col-md-2">@item.Resolution</div>
-                                        <div class="col-md-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
-                                        <div class="col-md-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
+                                        <div class="col-md-4">Summary</div>
+                                        <div class="col-md-2">Status</div>
+                                        <div class="col-md-2">Asignee</div>
+                                        <div class="col-md-2">DueDate</div>
                                         <div class="col-md-2"></div>
                                     </div>
-                                }
-                            </div>
-                        
-                        </div>
-                    </div>
-                </div>
-            }
-
-            @if (Model != null && Model.AttachList.Count > 0)
-            {
-                <hr/>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Attachments</h3>
-                            </div>
-                            <div class="panel-body">
-                                @foreach (var item in Model.AttachList)
-                                {
-                                    var realfn = "";
-                                    if (item.Contains("<a href"))
-                                    {
-                                        var tempfn = item.Split(new string[] { "<a href=", "target=" }, StringSplitOptions.None)[1].Replace("\"", "").Trim();
-                                        var tempfns = tempfn.Split(new string[] { "/" }, StringSplitOptions.None);
-                                        realfn = tempfns[tempfns.Length - 1];
-                                    }
-                                    else
-                                    {
-                                        var tempfns = item.Split(new string[] { "/" }, StringSplitOptions.None);
-                                        realfn = tempfns[tempfns.Length - 1].Trim();
-                                    }
-
-                                    if (item.Contains("<a href"))
+                                    @foreach (var item in Model.SubIssues)
                                     {
                                         <div class="row">
-                                            @Html.Raw(item);
+                                            <div class="col-md-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></div>
+                                            <div class="col-md-2">@item.Resolution</div>
+                                            <div class="col-md-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
+                                            <div class="col-md-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
+                                            <div class="col-md-2"></div>
                                         </div>
                                     }
-                                    else
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @if (Model != null && Model.AttachList.Count > 0)
+                {
+                    <hr />
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Attachments</h3>
+                                </div>
+                                <div class="panel-body">
+                                    @foreach (var item in Model.AttachList)
                                     {
-                                        var fns = item.Split(new char[] { '/' });
-                                        var fn = fns[fns.Length - 1];
-                                        
+                                        var realfn = "";
+                                        if (item.Contains("<a href"))
+                                        {
+                                            var tempfn = item.Split(new string[] { "<a href=", "target=" }, StringSplitOptions.None)[1].Replace("\"", "").Trim();
+                                            var tempfns = tempfn.Split(new string[] { "/" }, StringSplitOptions.None);
+                                            realfn = tempfns[tempfns.Length - 1];
+                                        }
+                                        else
+                                        {
+                                            var tempfns = item.Split(new string[] { "/" }, StringSplitOptions.None);
+                                            realfn = tempfns[tempfns.Length - 1].Trim();
+                                        }
+
+                                        if (item.Contains("<a href"))
+                                        {
+                                            <div class="row">
+                                                @Html.Raw(item);
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            var fns = item.Split(new char[] { '/' });
+                                            var fn = fns[fns.Length - 1];
+
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <a href="@item" target="_blank">
@@ -325,30 +339,28 @@
                                                 </div>
                                                 <div class="col-md-5"></div>
                                             </div>
-                                            }
-                                            }
-                                        </div>
+                                        }
+                                    }
+                                </div>
+                            </div>
+
+                            <script type="text/javascript">
+                                function DeleteAttachment(oBT) {
+                                    if (confirm("Do you real want to delete this attachment?")) {
+                                        window.location.href = '/Issue/DeleteAttachment?issuekey=' + document.getElementById("HIssueKeyForDelete").value + '&filename=' + oBT.value
+                                    }
+                                    else {
+                                        window.location.href = '/Issue/UpdateIssue?issuekey=' + document.getElementById("HIssueKeyForDelete").value
+                                    }
+                                }
+                            </script>
+
                         </div>
-
-                        <script type="text/javascript">
-                            function DeleteAttachment(oBT) {
-                                if (confirm("Do you real want to delete this attachment?"))
-                                {
-                                    window.location.href = '/Issue/DeleteAttachment?issuekey=' + document.getElementById("HIssueKeyForDelete").value + '&filename=' + oBT.value
-                                }
-                                else
-                                {
-                                    window.location.href = '/Issue/UpdateIssue?issuekey=' + document.getElementById("HIssueKeyForDelete").value
-                                }
-                            }
-                        </script>
-
                     </div>
-                </div>
-            }
+                }
 
-             @foreach (var item in Model.GeneralCommentList)
-             {
+                @foreach (var item in Model.GeneralCommentList)
+                {
                     <hr />
                     <div class="form-group">
                         <div class="col-md-12">

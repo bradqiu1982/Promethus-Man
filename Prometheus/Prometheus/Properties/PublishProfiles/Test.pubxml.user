@@ -10,19 +10,19 @@ by editing this MSBuild file. In order to learn more about this please visit htt
   </PropertyGroup>
   <ItemGroup>
     <File Include="App_Data/Prometheus.mdf">
-      <publishTime>10/09/2016 15:56:09</publishTime>
+      <publishTime>10/21/2016 11:07:15</publishTime>
     </File>
     <File Include="App_Data/Prometheus_log.ldf">
-      <publishTime>10/09/2016 15:56:09</publishTime>
+      <publishTime>10/21/2016 11:07:15</publishTime>
     </File>
     <File Include="bin/Antlr3.Runtime.dll">
       <publishTime>02/22/2013 08:43:40</publishTime>
     </File>
     <File Include="bin/App_global.asax.compiled">
-      <publishTime>10/09/2016 15:56:40</publishTime>
+      <publishTime>10/21/2016 11:07:54</publishTime>
     </File>
     <File Include="bin/App_global.asax.dll">
-      <publishTime>10/09/2016 15:56:40</publishTime>
+      <publishTime>10/21/2016 11:07:52</publishTime>
     </File>
     <File Include="bin/Content/Finisar.PNG">
       <publishTime>07/29/2016 10:33:51</publishTime>
@@ -82,7 +82,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/27/2012 13:00:52</publishTime>
     </File>
     <File Include="bin/Prometheus.dll">
-      <publishTime>10/09/2016 15:56:06</publishTime>
+      <publishTime>10/21/2016 11:07:14</publishTime>
     </File>
     <File Include="bin/roslyn/csc.exe">
       <publishTime>06/18/2015 20:19:46</publishTime>
@@ -1456,10 +1456,13 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>09/22/2016 14:33:57</publishTime>
     </File>
     <File Include="PrecompiledApp.config">
-      <publishTime>10/09/2016 15:56:12</publishTime>
+      <publishTime>10/21/2016 11:07:25</publishTime>
     </File>
     <File Include="Scripts/AreaChart.xml">
       <publishTime>09/20/2016 10:57:13</publishTime>
+    </File>
+    <File Include="Scripts/BISuperYield.xml">
+      <publishTime>10/21/2016 10:35:02</publishTime>
     </File>
     <File Include="Scripts/bootstrap.js">
       <publishTime>07/04/2016 17:41:32</publishTime>
@@ -1474,10 +1477,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>08/17/2016 09:17:26</publishTime>
     </File>
     <File Include="Scripts/HeartBeat.exe">
-      <publishTime>10/09/2016 15:00:15</publishTime>
+      <publishTime>10/20/2016 10:15:12</publishTime>
     </File>
     <File Include="Scripts/heartbeat.txt">
-      <publishTime>10/09/2016 15:48:41</publishTime>
+      <publishTime>10/19/2016 09:34:47</publishTime>
     </File>
     <File Include="Scripts/highcharts.js">
       <publishTime>08/18/2016 10:19:34</publishTime>
@@ -1531,13 +1534,13 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>07/04/2016 17:41:36</publishTime>
     </File>
     <File Include="Scripts/ParetoChart.xml">
-      <publishTime>08/31/2016 16:50:26</publishTime>
+      <publishTime>10/20/2016 14:53:39</publishTime>
     </File>
     <File Include="Scripts/PieChart.xml">
       <publishTime>08/18/2016 08:39:46</publishTime>
     </File>
     <File Include="Scripts/project_list.xlsx">
-      <publishTime>09/27/2016 08:42:27</publishTime>
+      <publishTime>10/09/2016 16:25:31</publishTime>
     </File>
     <File Include="Scripts/respond.js">
       <publishTime>07/04/2016 09:41:36</publishTime>
@@ -1545,11 +1548,38 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="Scripts/respond.min.js">
       <publishTime>07/04/2016 09:41:36</publishTime>
     </File>
+    <File Include="Scripts/SuperYield.xml">
+      <publishTime>10/17/2016 12:46:12</publishTime>
+    </File>
     <File Include="Scripts/_references.js">
       <publishTime>10/08/2016 10:31:40</publishTime>
     </File>
     <File Include="userfiles/Upload.ashx">
-      <publishTime>09/20/2016 16:32:19</publishTime>
+      <publishTime>10/20/2016 08:15:59</publishTime>
+    </File>
+    <File Include="Views/BurnIn/BurnInMainPage.cshtml">
+      <publishTime>10/21/2016 10:24:23</publishTime>
+    </File>
+    <File Include="Views/BurnIn/ProjectBIDailyYield.cshtml">
+      <publishTime>10/18/2016 14:09:44</publishTime>
+    </File>
+    <File Include="Views/BurnIn/ProjectBIDailyYieldDetail.cshtml">
+      <publishTime>10/18/2016 15:24:40</publishTime>
+    </File>
+    <File Include="Views/BurnIn/ProjectBIPeriodYield.cshtml">
+      <publishTime>10/10/2016 13:59:58</publishTime>
+    </File>
+    <File Include="Views/BurnIn/ProjectBIPYieldDetail.cshtml">
+      <publishTime>10/10/2016 15:23:36</publishTime>
+    </File>
+    <File Include="Views/BurnIn/ProjectBIWaferYield.cshtml">
+      <publishTime>10/10/2016 15:21:02</publishTime>
+    </File>
+    <File Include="Views/BurnIn/ProjectBIWaferYieldDetail.cshtml">
+      <publishTime>10/10/2016 15:30:59</publishTime>
+    </File>
+    <File Include="Views/BurnIn/ProjectBIWYieldDetail.cshtml">
+      <publishTime>10/10/2016 15:24:03</publishTime>
     </File>
     <File Include="Views/CustomerData/CommitRMAData.cshtml">
       <publishTime>09/28/2016 15:19:45</publishTime>
@@ -1564,13 +1594,13 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>09/30/2016 10:34:25</publishTime>
     </File>
     <File Include="Views/CustomerData/ConfirmVcselData.cshtml">
-      <publishTime>10/08/2016 09:55:42</publishTime>
+      <publishTime>10/18/2016 15:49:59</publishTime>
     </File>
     <File Include="Views/CustomerData/ConfirmVecselData.cshtml">
       <publishTime>09/22/2016 16:27:58</publishTime>
     </File>
     <File Include="Views/CustomerData/ReviewVcselData.cshtml">
-      <publishTime>10/08/2016 10:31:55</publishTime>
+      <publishTime>10/18/2016 17:15:38</publishTime>
     </File>
     <File Include="Views/DashBoard/SystemBoard.cshtml">
       <publishTime>08/29/2016 16:45:04</publishTime>
@@ -1579,19 +1609,19 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>09/14/2016 16:24:26</publishTime>
     </File>
     <File Include="Views/Issue/CreateIssue.cshtml">
-      <publishTime>09/28/2016 17:10:18</publishTime>
+      <publishTime>10/20/2016 09:26:36</publishTime>
     </File>
     <File Include="Views/Issue/CreateRMA.cshtml">
-      <publishTime>09/28/2016 15:13:58</publishTime>
+      <publishTime>10/20/2016 09:19:26</publishTime>
     </File>
     <File Include="Views/Issue/CreateSubIssue.cshtml">
-      <publishTime>09/28/2016 17:10:18</publishTime>
+      <publishTime>10/20/2016 09:15:50</publishTime>
     </File>
     <File Include="Views/Issue/IssueAttach.cshtml">
-      <publishTime>08/30/2016 10:45:05</publishTime>
+      <publishTime>10/10/2016 09:27:15</publishTime>
     </File>
     <File Include="Views/Issue/SearchIssue.cshtml">
-      <publishTime>09/28/2016 17:10:18</publishTime>
+      <publishTime>10/19/2016 13:32:27</publishTime>
     </File>
     <File Include="Views/Issue/ShowContainmentAction.cshtml">
       <publishTime>09/13/2016 10:06:03</publishTime>
@@ -1606,10 +1636,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>09/13/2016 10:07:44</publishTime>
     </File>
     <File Include="Views/Issue/UpdateIssue.cshtml">
-      <publishTime>09/28/2016 17:10:18</publishTime>
+      <publishTime>10/21/2016 08:25:50</publishTime>
     </File>
     <File Include="Views/Issue/UpdateRMA.cshtml">
-      <publishTime>09/30/2016 14:57:12</publishTime>
+      <publishTime>10/20/2016 14:48:36</publishTime>
     </File>
     <File Include="Views/PJReport/IBook.cshtml">
       <publishTime>09/19/2016 17:51:06</publishTime>
@@ -1618,61 +1648,67 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>09/20/2016 14:09:29</publishTime>
     </File>
     <File Include="Views/Project/CreateProject.cshtml">
-      <publishTime>09/02/2016 15:24:59</publishTime>
+      <publishTime>10/19/2016 13:38:28</publishTime>
     </File>
     <File Include="Views/Project/EditProject.cshtml">
-      <publishTime>10/08/2016 15:27:39</publishTime>
+      <publishTime>10/19/2016 13:32:28</publishTime>
     </File>
     <File Include="Views/Project/HeartBeat.cshtml">
       <publishTime>10/09/2016 15:13:30</publishTime>
     </File>
+    <File Include="Views/Project/ProjectDailyYield.cshtml">
+      <publishTime>10/17/2016 08:00:52</publishTime>
+    </File>
     <File Include="Views/Project/ProjectDetail.cshtml">
-      <publishTime>08/25/2016 08:23:36</publishTime>
+      <publishTime>10/17/2016 12:47:08</publishTime>
+    </File>
+    <File Include="Views/Project/ProjectDYieldDetail.cshtml">
+      <publishTime>10/17/2016 15:58:54</publishTime>
     </File>
     <File Include="Views/Project/ProjectError.cshtml">
       <publishTime>09/14/2016 12:33:11</publishTime>
     </File>
     <File Include="Views/Project/ProjectFA.cshtml">
-      <publishTime>09/20/2016 09:47:05</publishTime>
+      <publishTime>10/19/2016 14:30:35</publishTime>
     </File>
     <File Include="Views/Project/ProjectIssues.cshtml">
       <publishTime>08/29/2016 16:21:09</publishTime>
     </File>
     <File Include="Views/Project/ProjectMonthlyYield.cshtml">
-      <publishTime>08/30/2016 18:25:42</publishTime>
+      <publishTime>10/17/2016 08:02:12</publishTime>
     </File>
     <File Include="Views/Project/ProjectMYieldDetail.cshtml">
-      <publishTime>08/31/2016 16:14:03</publishTime>
+      <publishTime>10/17/2016 12:48:44</publishTime>
     </File>
     <File Include="Views/Project/ProjectNPI.cshtml">
-      <publishTime>08/18/2016 10:14:38</publishTime>
+      <publishTime>10/19/2016 14:31:35</publishTime>
     </File>
     <File Include="Views/Project/ProjectPeriodYield.cshtml">
-      <publishTime>08/30/2016 18:58:15</publishTime>
+      <publishTime>10/17/2016 07:58:21</publishTime>
     </File>
     <File Include="Views/Project/ProjectPYieldDetail.cshtml">
-      <publishTime>09/02/2016 16:19:00</publishTime>
+      <publishTime>10/17/2016 12:48:44</publishTime>
     </File>
     <File Include="Views/Project/ProjectRMA.cshtml">
-      <publishTime>08/29/2016 16:16:21</publishTime>
+      <publishTime>10/20/2016 10:32:35</publishTime>
     </File>
     <File Include="Views/Project/ProjectRMAStatus.cshtml">
-      <publishTime>10/08/2016 11:14:32</publishTime>
+      <publishTime>10/20/2016 10:32:42</publishTime>
     </File>
     <File Include="Views/Project/ProjectWYield.cshtml">
       <publishTime>08/18/2016 10:25:57</publishTime>
     </File>
     <File Include="Views/Project/ProjectWYieldDetail.cshtml">
-      <publishTime>09/01/2016 16:53:54</publishTime>
+      <publishTime>10/17/2016 12:48:44</publishTime>
     </File>
     <File Include="Views/Project/ProjectYield.cshtml">
-      <publishTime>08/30/2016 18:33:51</publishTime>
+      <publishTime>10/14/2016 15:42:33</publishTime>
     </File>
     <File Include="Views/Project/UpdateProjectError.cshtml">
-      <publishTime>09/13/2016 16:51:45</publishTime>
+      <publishTime>10/19/2016 13:36:39</publishTime>
     </File>
     <File Include="Views/Project/ViewAll.cshtml">
-      <publishTime>10/09/2016 15:16:04</publishTime>
+      <publishTime>10/17/2016 12:48:44</publishTime>
     </File>
     <File Include="Views/Shared/Error.cshtml">
       <publishTime>07/04/2016 09:41:39</publishTime>
@@ -1681,10 +1717,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>07/04/2016 09:41:41</publishTime>
     </File>
     <File Include="Views/Shared/_Layout.cshtml">
-      <publishTime>10/08/2016 10:32:33</publishTime>
+      <publishTime>10/12/2016 10:37:01</publishTime>
     </File>
     <File Include="Views/Shared/_LoginPartial.cshtml">
-      <publishTime>08/02/2016 16:22:47</publishTime>
+      <publishTime>10/12/2016 10:42:20</publishTime>
     </File>
     <File Include="Views/User/LoginUser.cshtml">
       <publishTime>08/04/2016 15:23:32</publishTime>

@@ -25,6 +25,17 @@ namespace Prometheus.Models
         public static string Trivial = "Trivial";
     }
 
+    public class BIROOTCAUSE
+    {
+        public static string VCSELISSUE = "VCSEL Issue";
+        public static string DATAISSUE = "Data Issue";
+        public static string COMMISSUE = "Communication Issue";
+        public static string QVLDISSUE = "QVLD Issue";
+        public static string PCBAISSUE = "PCBA Issue";
+        public static string VMIISSUE = "VMI Issue";
+        public static string OTHERISSUE = "Other Issue";
+    }
+
     public class Resolute
     {
         public static string Pending = "Pending";
@@ -1502,6 +1513,50 @@ namespace Prometheus.Models
             }//end if
         }
 
+
+        public static void StoreBIRootCause(string pjkey, string sn,string rootcause)
+        {
+            var csql = "delete from BIROOTCAUSE where ProjectKey = '<ProjectKey>' and ModuleSN = '<ModuleSN>'";
+            csql = csql.Replace("<ProjectKey>", pjkey).Replace("<ModuleSN>", sn);
+            DBUtility.ExeLocalSqlNoRes(csql);
+
+            var sql = "insert into BIROOTCAUSE(ProjectKey,ModuleSN,RootCause) values('<ProjectKey>','<ModuleSN>','<RootCause>')";
+            sql = sql.Replace("<ProjectKey>", pjkey).Replace("<ModuleSN>", sn).Replace("<RootCause>", rootcause);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        public static string RetrieveBIRootCause(string pjkey, string sn)
+        {
+            var csql = "select RootCause from BIROOTCAUSE where ProjectKey = '<ProjectKey>' and ModuleSN = '<ModuleSN>'";
+            csql = csql.Replace("<ProjectKey>", pjkey).Replace("<ModuleSN>", sn);
+            var dbret = DBUtility.ExeLocalSqlWithRes(csql);
+            if (dbret.Count > 0)
+            {
+                return Convert.ToString(dbret[0][0]);
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+
+        public static Dictionary<string,string> RetrieveAllBIRootCause(string pjkey)
+        {
+            var ret =  new Dictionary<string, string>();
+            var csql = "select ModuleSN,RootCause from BIROOTCAUSE where ProjectKey = '<ProjectKey>'";
+            csql = csql.Replace("<ProjectKey>", pjkey);
+            var dbret = DBUtility.ExeLocalSqlWithRes(csql);
+            foreach (var line in dbret)
+            {
+                var sn = Convert.ToString(line[0]);
+                var root = Convert.ToString(line[1]);
+                if (!ret.ContainsKey(sn))
+                {
+                    ret.Add(sn, root);
+                }
+            }
+            return ret;
+        }
 
         private static void CreateNPISubIssue(string projectname, string pjkey,string parentkey, string firstengineer, string sum, string desc,int duemonth)
         {

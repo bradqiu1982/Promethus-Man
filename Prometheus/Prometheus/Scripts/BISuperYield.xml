@@ -67,6 +67,20 @@ $(function () {
                     pointFormat: '{point.y} %'
                 },
             yAxis:1
+        },
+        {
+            type: 'line',
+            name: 'Corrective FY',
+            data: [#CorrectiveYield#],
+            marker: {
+                lineWidth: 2,
+                fillColor: 'orange'
+            },
+            tooltip: {
+                    headerFormat: '<b>{point.key}</b><br/>',
+                    pointFormat: '{point.y} %'
+                },
+            yAxis:1
         }]
     });
 });

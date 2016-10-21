@@ -187,6 +187,39 @@ namespace Prometheus.Controllers
             return RedirectToAction("UpdateIssue", "Issue", dict);
         }
 
+        private List<SelectListItem> CreateBIRootIssue(string pjkey,string sn)
+        {
+            var defval = IssueViewModels.RetrieveBIRootCause(pjkey, sn);
+
+            var plist = new List<SelectListItem>();
+
+            var p = new SelectListItem();
+            p.Text = "NONE";
+            p.Value = "NONE";
+            plist.Add(p);
+
+            string[] blist = { BIROOTCAUSE.VCSELISSUE,BIROOTCAUSE.DATAISSUE, BIROOTCAUSE.COMMISSUE, BIROOTCAUSE.QVLDISSUE, BIROOTCAUSE.PCBAISSUE, BIROOTCAUSE.VMIISSUE, BIROOTCAUSE.OTHERISSUE };
+            foreach (var item in blist)
+            {
+                p = new SelectListItem();
+                p.Text = item;
+                p.Value = item;
+                if (string.Compare(item, defval) == 0)
+                {
+                    p.Selected = true;
+                }
+                plist.Add(p);
+            }
+
+            if (string.IsNullOrEmpty(defval))
+            {
+                plist[0].Selected = true;
+            }
+
+            return plist;
+
+        }
+
         public ActionResult UpdateIssue(string issuekey)
         {
             var ckdict = CookieUtility.UnpackCookie(this);
@@ -249,8 +282,13 @@ namespace Prometheus.Controllers
                 }
 
                 ret.Reporter = updater;
-
                 CreateAllLists(ret);
+
+                if (ret.Summary.Contains(" @Burn-In Step "))
+                {
+                    var sn = ret.Summary.Split(new string[] { " " }, StringSplitOptions.None)[1].Trim().ToUpper();
+                    ViewBag.birootcauselist = CreateBIRootIssue(ret.ProjectKey, sn);
+                }
                 return View(ret);
             }
             else
@@ -354,6 +392,16 @@ namespace Prometheus.Controllers
 
             var newdata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
 
+            if (Request.Form["birootcauselist"] != null)
+            {
+                var biret = Request.Form["birootcauselist"].ToString();
+                if (string.Compare(biret, "NONE") != 0)
+                {
+                    var sn = newdata.Summary.Split(new string[] { " " }, StringSplitOptions.None)[1].Trim().ToUpper();
+                    IssueViewModels.StoreBIRootCause(newdata.ProjectKey, sn, biret);
+                }
+            }
+
             ViewBag.isassignee = false;
             if (string.Compare(updater, newdata.Assignee, true) == 0
                     || string.Compare(updater, newdata.Reporter,true) == 0)
@@ -362,6 +410,12 @@ namespace Prometheus.Controllers
             }
 
             CreateAllLists(newdata);
+
+            if (newdata.Summary.Contains(" @Burn-In Step "))
+            {
+                var sn = newdata.Summary.Split(new string[] { " " }, StringSplitOptions.None)[1].Trim().ToUpper();
+                ViewBag.birootcauselist = CreateBIRootIssue(newdata.ProjectKey, sn);
+            }
             return View(newdata);
         }
 

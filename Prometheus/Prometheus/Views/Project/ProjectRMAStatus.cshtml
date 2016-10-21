@@ -9,10 +9,16 @@
     <div class="col-md-3">
         <h2>Project RMA Status</h2>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-2 text-center">
         <h2><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
     </div>
-    <div class="col-md-7"></div>
+    <div class="col-md-2">
+        @if (Model != null && Model.Count() > 0)
+        {
+            <h2><a data-toggle="tooltip" title="Export RMA Report" href="/Issue/ExportRMAData?ProjectKey=@Model.ElementAt(0).ProjectKey" target="_blank"><span class="glyphicon glyphicon-share" aria-hidden="true"></span></a></h2>
+        }
+    </div>
+    <div class="col-md-5"></div>
 </div>
 
 <hr />

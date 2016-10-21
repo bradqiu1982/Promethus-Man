@@ -1196,7 +1196,33 @@ namespace Prometheus.Controllers
             return RedirectToAction("ViewAll", "Project");
         }
 
+        public ActionResult ExportRMAData(string ProjectKey)
+        {
+            if (!string.IsNullOrEmpty(ProjectKey))
+            {
+                string datestring = DateTime.Now.ToString("yyyyMMdd");
+                string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+                if (!Directory.Exists(imgdir))
+                {
+                    Directory.CreateDirectory(imgdir);
+                }
 
+                var fn = "RMA_Report_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+                var filename = imgdir + fn;
+                var lines = new List<string>();
+                lines.Add("\"a\",\"b,c\",\"ef\",\r\n");
+                lines.Add("\"a\",\"b,c\",\"e,f\",\"I\",\r\n");
+                var wholefile = "";
+                foreach (var l in lines)
+                {
+                    wholefile = wholefile + l;
+                }
+                System.IO.File.WriteAllText(filename, wholefile);
+
+                return File(filename, "application/vnd.ms-excel", fn);
+            }
+            return RedirectToAction("ViewAll", "Project");
+        }
 
         }
 }

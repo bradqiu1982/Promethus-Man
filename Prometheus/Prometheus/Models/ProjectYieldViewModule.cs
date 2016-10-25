@@ -45,6 +45,23 @@ namespace Prometheus.Models
         public DateTime StartDate { set; get; }
         public DateTime EndDate { set; get; }
 
+
+        private List<TestYield> rltimeyield = new List<TestYield>();
+        public List<TestYield> RealTimeYields { get { return rltimeyield; } }
+        public double RealTimeYield
+        {
+            get
+            {
+                var ret = 1.0;
+                foreach (var item in RealTimeYields)
+                {
+                    ret = ret * item.Yield;
+                }
+                return ret;
+            }
+        }
+
+
         private List<TestYield> fyield = new List<TestYield>();
         public List<TestYield> FirstYields { get { return fyield; } }
 
@@ -214,6 +231,46 @@ namespace Prometheus.Models
             return ret;
         }
 
+        private static void RetrieveRealTimeYield(ProjectYieldViewModule pyvm, List<ProjectTestData> plist, ProjectViewModels pvm)
+        {
+
+            var yielddict = new Dictionary<string, TestYield>();
+            var sndict = new Dictionary<string, bool>();
+            foreach (var p in plist)
+            {
+                if (!sndict.ContainsKey(p.WhichTest + ":" + p.ModuleSerialNum))
+                {
+                    sndict.Add(p.WhichTest + ":" + p.ModuleSerialNum, true);
+                    if (yielddict.ContainsKey(p.WhichTest))
+                    {
+                        yielddict[p.WhichTest].InputCount = yielddict[p.WhichTest].InputCount + 1;
+                        if (string.Compare(p.ErrAbbr, "PASS", true) == 0)
+                            yielddict[p.WhichTest].OutputCount = yielddict[p.WhichTest].OutputCount + 1;
+                    }
+                    else
+                    {
+                        var tempyield = new TestYield();
+                        tempyield.InputCount = 1;
+                        if (string.Compare(p.ErrAbbr, "PASS", true) == 0)
+                            tempyield.OutputCount = 1;
+                        else
+                            tempyield.OutputCount = 0;
+                        tempyield.WhichTest = p.WhichTest;
+
+                        yielddict.Add(p.WhichTest, tempyield);
+                    }
+                }
+            }
+
+            foreach (var s in pvm.StationList)
+            {
+                if (yielddict.ContainsKey(s.Station))
+                {
+                    pyvm.RealTimeYields.Add(yielddict[s.Station]);
+                }
+            }
+        }
+
         private static void RetrieveFirstYield(ProjectYieldViewModule pyvm, List<ProjectTestData> plist, ProjectViewModels pvm)
         {
 
@@ -312,6 +369,8 @@ namespace Prometheus.Models
                 return ret;
             }
 
+            var realtimedatalist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, enddate, false);
+            RetrieveRealTimeYield(ret, realtimedatalist, pvm);
 
             var plist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, enddate, true);
             var snlist = ProjectTestData.RetrieveSNBeforeDate(pjkey, startdate);

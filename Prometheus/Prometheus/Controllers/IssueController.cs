@@ -1196,6 +1196,76 @@ namespace Prometheus.Controllers
             return RedirectToAction("ViewAll", "Project");
         }
 
+        private List<string> PrepeareRMAReport(string ProjectKey)
+        {
+            var lines = new List<string>();
+            var list1 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Pending);
+            var list2 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Working);
+            var list3 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Done);
+            list1.AddRange(list2);
+            list1.AddRange(list3);
+
+            var line = "FINISAR RMA,SN,STATUS,CUSTOMER,RMA FAILURE CODE,ROOT CAUSE,OWENER,OPEN ISSUE DATE,CUSTOMER RMA REASON,INTERNAL REPORT,CUSTOMER REPORT";
+            lines.Add(line);
+
+            foreach (var item in list1)
+            {
+                var rootcause = "";
+                if (item.RootCauseCommentList.Count > 0)
+                {
+                    rootcause = item.RootCauseCommentList[item.RootCauseCommentList.Count - 1].Comment.Replace("\"", "");
+                    rootcause = System.Text.RegularExpressions.Regex.Replace(rootcause, "<.*?>", string.Empty);
+                }
+
+                var routevalue = new RouteValueDictionary();
+                routevalue.Add("issuekey", "ABC");
+                string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+                validatestr = validatestr.Split(new string[] { "/Issue" }, StringSplitOptions.None)[0];
+
+
+                var internalreport = "";
+                if (item.InternalReportCommentList.Count > 0)
+                {
+                    if (item.InternalReportCommentList[item.InternalReportCommentList.Count - 1].Comment.Contains("<a href"))
+                    {
+                        internalreport = item.InternalReportCommentList[item.InternalReportCommentList.Count - 1].Comment.Split(new string[] { "<a href=\"", "\" target=" }, StringSplitOptions.None)[1];
+                     }
+                    else
+                    {
+                        internalreport = item.InternalReportCommentList[item.InternalReportCommentList.Count - 1].Comment;
+                    }
+                    internalreport = validatestr + internalreport;
+                }
+
+
+                var customerreport = "";
+                if (item.Report4CustomerCommentList.Count > 0)
+                {
+                    if (item.Report4CustomerCommentList[item.Report4CustomerCommentList.Count - 1].Comment.Contains("<a href"))
+                    {
+                        customerreport = item.Report4CustomerCommentList[item.Report4CustomerCommentList.Count - 1].Comment.Split(new string[] { "<a href=\"", "\" target=" }, StringSplitOptions.None)[1];
+                    }
+                    else
+                    {
+                        customerreport = item.Report4CustomerCommentList[item.Report4CustomerCommentList.Count - 1].Comment;
+                    }
+                    customerreport = validatestr + customerreport;
+                }
+
+
+                line = string.Empty;
+                line = "\""+item.FinisarRMA.Replace("\"","")+"\","+ "\""+item.ModuleSN.Replace("\"", "") + "\"," + "\"" + item.Resolution.Replace("\"", "") + "\","
+                    + "\"" + item.ECustomer.Replace("\"", "") + "\","+ "\""+item.RMAFailureCode.Replace("\"", "") + "\"," + "\""+ rootcause + "\"," 
+                    + "\""+item.Assignee.Replace("\"", "")+ "\"," + "\""+item.ReportDate.ToString("yyyy-MM-dd hh:mm:ss") + "\"," + "\"" + item.CReport.Replace("\"", "") + "\","
+                    + "\""+ internalreport + "\"," + "\""+ customerreport + "\",";
+
+                lines.Add(line);
+            }
+      
+            return lines;
+        }
+
         public ActionResult ExportRMAData(string ProjectKey)
         {
             if (!string.IsNullOrEmpty(ProjectKey))
@@ -1207,15 +1277,15 @@ namespace Prometheus.Controllers
                     Directory.CreateDirectory(imgdir);
                 }
 
-                var fn = "RMA_Report_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+                var fn = ProjectKey+"_RMA_Report_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
                 var filename = imgdir + fn;
-                var lines = new List<string>();
-                lines.Add("\"a\",\"b,c\",\"ef\",\r\n");
-                lines.Add("\"a\",\"b,c\",\"e,f\",\"I\",\r\n");
+
+                var lines = PrepeareRMAReport(ProjectKey);
+
                 var wholefile = "";
                 foreach (var l in lines)
                 {
-                    wholefile = wholefile + l;
+                    wholefile = wholefile + l+"\r\n";
                 }
                 System.IO.File.WriteAllText(filename, wholefile);
 

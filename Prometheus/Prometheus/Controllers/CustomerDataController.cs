@@ -216,7 +216,7 @@ namespace Prometheus.Controllers
             titles.Add("Module_Name");
             titles.Add("Module_AgilePN");
             titles.Add("VCSEL_AgilePN");
-            titles.Add("VCSEL_ProductFamily");
+            //titles.Add("VCSEL_ProductFamily");
             titles.Add("VCSEL_Description");
             titles.Add("PD_AgilePN");
             titles.Add("PD_Description");
@@ -236,7 +236,8 @@ namespace Prometheus.Controllers
                 for (var i = 0; i < line.Count; i++)
                 {
                     if (i == 0 || i == 1 || i == 2
-                        || i == 7 || i == 8 || i == 9
+                        //|| i == 7 || i == 8 || i == 9
+                        || i == 7 || i == 9
                         || i == 10 || i == 12 || i == 13
                         || i == 32 || i == 33 || i == 34)
                     {
@@ -247,55 +248,6 @@ namespace Prometheus.Controllers
             }
             return View(vm);
 
-            //var datadict = new Dictionary<string, List<List<string>>>();
-            //foreach(var line in data)
-            //{
-            //    if (string.IsNullOrEmpty(line[1].Trim()))
-            //    {
-            //        continue;
-            //    }
-
-            //    var showline = new List<string>();
-            //    for (var i = 0; i < line.Count; i++)
-            //    {
-            //        if (i == 0 || i ==1 || i ==2
-            //            || i ==7|| i ==8 || i ==9
-            //            || i ==10 || i ==12 || i ==13
-            //            || i ==32 || i == 33 || i == 34)
-            //        {
-            //            showline.Add(line[i]);
-            //        }
-            //    }
-
-            //    if (datadict.ContainsKey(line[1]))
-            //    {
-            //        datadict[line[1]].Add(showline);
-            //    }
-            //    else
-            //    {
-            //        var linearr = new List<List<string>>();
-
-            //        var titles = new List<string>();
-            //        titles.Add("Module_Desc");
-            //        titles.Add("Module_Name");
-            //        titles.Add("Module_AgilePN");
-            //        titles.Add("VCSEL_AgilePN");
-            //        titles.Add("VCSEL_ProductFamily");
-            //        titles.Add("VCSEL_Description");
-            //        titles.Add("PD_AgilePN");
-            //        titles.Add("PD_Description");
-            //        titles.Add("MPD_AgilePN");
-            //        titles.Add("PBI_VCSEL_Temp");
-            //        titles.Add("PBI_VCSEL_Bias");
-            //        titles.Add("PBI_VCSEL_Time");
-
-            //        linearr.Add(titles);
-            //        linearr.Add(showline);
-            //        datadict.Add(line[1], linearr);
-            //    }
-            //}
-
-            //return View(datadict);
         }
 
 

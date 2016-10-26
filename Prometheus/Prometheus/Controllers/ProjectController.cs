@@ -1213,13 +1213,16 @@ namespace Prometheus.Controllers
                 var famountlist = new List<int>();
                 var fyieldlist = new List<double>();
                 var ryieldlist = new List<double>();
+                var rtyieldlist = new List<double>();
                 var maxamout = 0;
 
                 foreach (var item in vmlist)
                 {
                     ftimelist.Add(item.EndDate.ToString("yyyy-MM-dd"));
+
                     fyieldlist.Add(item.FirstYield * 100.0);
                     ryieldlist.Add(item.LastYield * 100.0);
+                    rtyieldlist.Add(item.RealTimeYield * 100.0);
 
                     var tempfamount = 0;
                     foreach (var d in item.FirstYields)
@@ -1256,6 +1259,13 @@ namespace Prometheus.Controllers
                 ftempvalue = ftempvalue.Substring(0, ftempvalue.Length - 1);
                 //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
 
+                var rttempvalue = "";
+                foreach (var item in rtyieldlist)
+                {
+                    rttempvalue = rttempvalue + item.ToString("0.00") + ",";
+                }
+                rttempvalue = rttempvalue.Substring(0, rttempvalue.Length - 1);
+
                 var rtempvalue = "";
                 foreach (var item in ryieldlist)
                 {
@@ -1263,6 +1273,39 @@ namespace Prometheus.Controllers
                 }
                 rtempvalue = rtempvalue.Substring(0, rtempvalue.Length - 1);
                 //ChartSearies = ChartSearies.Replace("<cvalue>", tempvalue);
+
+                var FINALTOOLTIP = "";
+                var REALTIMETOOLTIP = "";
+
+                for (var idx = 0; idx < rtyieldlist.Count; idx++)
+                {
+                    FINALTOOLTIP = FINALTOOLTIP+"'<table>"
+                        + "<tr><td><b>FPY</b></td><td>" + fyieldlist[idx].ToString("0.00") + "&#37;</td></tr>"
+                        + "<tr><td><b>FY</b></td><td>" + ryieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
+
+                    foreach (var d in vmlist[idx].LastYields)
+                    {
+                        FINALTOOLTIP = FINALTOOLTIP + "<tr><td><b>" + d.WhichTest + "</b></td><td>Input:</td><td>" + d.InputCount.ToString() + "</td><td>Output:</td><td>" + d.OutputCount.ToString() + "</td></tr>";
+                    }
+
+                    FINALTOOLTIP =  FINALTOOLTIP + "</table>'";
+                    FINALTOOLTIP = FINALTOOLTIP + ",";
+                }
+                FINALTOOLTIP = FINALTOOLTIP.Substring(0, FINALTOOLTIP.Length - 1);
+
+
+                for (var idx = 0; idx < rtyieldlist.Count; idx++)
+                {
+                    REALTIMETOOLTIP = REALTIMETOOLTIP+"'<table>"
+                        + "<tr><td><b>Realtime Yield</b></td><td>" + rtyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
+                    foreach (var d in vmlist[idx].RealTimeYields)
+                    {
+                        REALTIMETOOLTIP = REALTIMETOOLTIP + "<tr><td><b>" + d.WhichTest + "</b></td><td>Input:</td><td>" + d.InputCount.ToString() + "</td><td>Output:</td><td>" + d.OutputCount.ToString() + "</td></tr>";
+                    }
+                    REALTIMETOOLTIP = REALTIMETOOLTIP + "</table>'";
+                    REALTIMETOOLTIP = REALTIMETOOLTIP + ",";
+                }
+                REALTIMETOOLTIP = REALTIMETOOLTIP.Substring(0, REALTIMETOOLTIP.Length - 1);
 
                 //rederect url
                 var reurl = "window.location.href = '/Project/ProjectWYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category";
@@ -1276,6 +1319,9 @@ namespace Prometheus.Controllers
                     .Replace("#FirstAmount#", famout)
                     .Replace("#FirstYield#", ftempvalue)
                     .Replace("#RetestYield#", rtempvalue)
+                    .Replace("#RealTimeYield#", rttempvalue)
+                    .Replace("#FINALTOOLTIP#", FINALTOOLTIP)
+                    .Replace("#REALTIMETOOLTIP#", REALTIMETOOLTIP)
                     .Replace("#REDIRECTURL#", reurl);
 
             }
@@ -1586,6 +1632,7 @@ namespace Prometheus.Controllers
                     var famountlist = new List<int>();
                     var fyieldlist = new List<double>();
                     var ryieldlist = new List<double>();
+                    var rtyieldlist = new List<double>();
                     var maxamout = 0;
 
                     foreach (var item in vmlist)
@@ -1593,6 +1640,7 @@ namespace Prometheus.Controllers
                         ftimelist.Add(item.EndDate.ToString("yyyy-MM-dd"));
                         fyieldlist.Add(item.FirstYield * 100.0);
                         ryieldlist.Add(item.LastYield * 100.0);
+                        rtyieldlist.Add(item.RealTimeYield * 100.0);
 
                         var tempfamount = 0;
                         foreach (var d in item.FirstYields)
@@ -1629,6 +1677,13 @@ namespace Prometheus.Controllers
                     ftempvalue = ftempvalue.Substring(0, ftempvalue.Length - 1);
                     //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
 
+                    var rttempvalue = "";
+                    foreach (var item in rtyieldlist)
+                    {
+                        rttempvalue = rttempvalue + item.ToString("0.00") + ",";
+                    }
+                    rttempvalue = rttempvalue.Substring(0, rttempvalue.Length - 1);
+
                     var rtempvalue = "";
                     foreach (var item in ryieldlist)
                     {
@@ -1636,6 +1691,39 @@ namespace Prometheus.Controllers
                     }
                     rtempvalue = rtempvalue.Substring(0, rtempvalue.Length - 1);
                     //ChartSearies = ChartSearies.Replace("<cvalue>", tempvalue);
+
+                    var FINALTOOLTIP = "";
+                    var REALTIMETOOLTIP = "";
+
+                    for (var idx = 0; idx < rtyieldlist.Count; idx++)
+                    {
+                        FINALTOOLTIP = FINALTOOLTIP + "'<table>"
+                            + "<tr><td><b>FPY</b></td><td>" + fyieldlist[idx].ToString("0.00") + "&#37;</td></tr>"
+                            + "<tr><td><b>FY</b></td><td>" + ryieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
+
+                        foreach (var d in vmlist[idx].LastYields)
+                        {
+                            FINALTOOLTIP = FINALTOOLTIP + "<tr><td><b>" + d.WhichTest + "</b></td><td>Input:</td><td>" + d.InputCount.ToString() + "</td><td>Output:</td><td>" + d.OutputCount.ToString() + "</td></tr>";
+                        }
+
+                        FINALTOOLTIP = FINALTOOLTIP + "</table>'";
+                        FINALTOOLTIP = FINALTOOLTIP + ",";
+                    }
+                    FINALTOOLTIP = FINALTOOLTIP.Substring(0, FINALTOOLTIP.Length - 1);
+
+
+                    for (var idx = 0; idx < rtyieldlist.Count; idx++)
+                    {
+                        REALTIMETOOLTIP = REALTIMETOOLTIP + "'<table>"
+                            + "<tr><td><b>Realtime Yield</b></td><td>" + rtyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
+                        foreach (var d in vmlist[idx].RealTimeYields)
+                        {
+                            REALTIMETOOLTIP = REALTIMETOOLTIP + "<tr><td><b>" + d.WhichTest + "</b></td><td>Input:</td><td>" + d.InputCount.ToString() + "</td><td>Output:</td><td>" + d.OutputCount.ToString() + "</td></tr>";
+                        }
+                        REALTIMETOOLTIP = REALTIMETOOLTIP + "</table>'";
+                        REALTIMETOOLTIP = REALTIMETOOLTIP + ",";
+                    }
+                    REALTIMETOOLTIP = REALTIMETOOLTIP.Substring(0, REALTIMETOOLTIP.Length - 1);
 
                     //rederect url
                     var reurl = "window.location.href = '/Project/ProjectMYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category";
@@ -1649,6 +1737,9 @@ namespace Prometheus.Controllers
                         .Replace("#FirstAmount#", famout)
                         .Replace("#FirstYield#", ftempvalue)
                         .Replace("#RetestYield#", rtempvalue)
+                        .Replace("#RealTimeYield#", rttempvalue)
+                        .Replace("#FINALTOOLTIP#", FINALTOOLTIP)
+                        .Replace("#REALTIMETOOLTIP#", REALTIMETOOLTIP)
                         .Replace("#REDIRECTURL#", reurl);
                 }
 
@@ -1673,6 +1764,7 @@ namespace Prometheus.Controllers
                     var famountlist = new List<int>();
                     var fyieldlist = new List<double>();
                     var ryieldlist = new List<double>();
+                    var rtyieldlist = new List<double>();
                     var maxamout = 0;
 
                     foreach (var item in vmlist)
@@ -1680,6 +1772,7 @@ namespace Prometheus.Controllers
                         ftimelist.Add(item.StartDate.ToString("yyyy-MM-dd"));
                         fyieldlist.Add(item.FirstYield * 100.0);
                         ryieldlist.Add(item.LastYield * 100.0);
+                        rtyieldlist.Add(item.RealTimeYield * 100.0);
 
                         var tempfamount = 0;
                         foreach (var d in item.FirstYields)
@@ -1716,6 +1809,13 @@ namespace Prometheus.Controllers
                     ftempvalue = ftempvalue.Substring(0, ftempvalue.Length - 1);
                     //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
 
+                    var rttempvalue = "";
+                    foreach (var item in rtyieldlist)
+                    {
+                        rttempvalue = rttempvalue + item.ToString("0.00") + ",";
+                    }
+                    rttempvalue = rttempvalue.Substring(0, rttempvalue.Length - 1);
+
                     var rtempvalue = "";
                     foreach (var item in ryieldlist)
                     {
@@ -1723,6 +1823,39 @@ namespace Prometheus.Controllers
                     }
                     rtempvalue = rtempvalue.Substring(0, rtempvalue.Length - 1);
                     //ChartSearies = ChartSearies.Replace("<cvalue>", tempvalue);
+
+                    var FINALTOOLTIP = "";
+                    var REALTIMETOOLTIP = "";
+
+                    for (var idx = 0; idx < rtyieldlist.Count; idx++)
+                    {
+                        FINALTOOLTIP = FINALTOOLTIP + "'<table>"
+                            + "<tr><td><b>FPY</b></td><td>" + fyieldlist[idx].ToString("0.00") + "&#37;</td></tr>"
+                            + "<tr><td><b>FY</b></td><td>" + ryieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
+
+                        foreach (var d in vmlist[idx].LastYields)
+                        {
+                            FINALTOOLTIP = FINALTOOLTIP + "<tr><td><b>" + d.WhichTest + "</b></td><td>Input:</td><td>" + d.InputCount.ToString() + "</td><td>Output:</td><td>" + d.OutputCount.ToString() + "</td></tr>";
+                        }
+
+                        FINALTOOLTIP = FINALTOOLTIP + "</table>'";
+                        FINALTOOLTIP = FINALTOOLTIP + ",";
+                    }
+                    FINALTOOLTIP = FINALTOOLTIP.Substring(0, FINALTOOLTIP.Length - 1);
+
+
+                    for (var idx = 0; idx < rtyieldlist.Count; idx++)
+                    {
+                        REALTIMETOOLTIP = REALTIMETOOLTIP + "'<table>"
+                            + "<tr><td><b>Realtime Yield</b></td><td>" + rtyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
+                        foreach (var d in vmlist[idx].RealTimeYields)
+                        {
+                            REALTIMETOOLTIP = REALTIMETOOLTIP + "<tr><td><b>" + d.WhichTest + "</b></td><td>Input:</td><td>" + d.InputCount.ToString() + "</td><td>Output:</td><td>" + d.OutputCount.ToString() + "</td></tr>";
+                        }
+                        REALTIMETOOLTIP = REALTIMETOOLTIP + "</table>'";
+                        REALTIMETOOLTIP = REALTIMETOOLTIP + ",";
+                    }
+                    REALTIMETOOLTIP = REALTIMETOOLTIP.Substring(0, REALTIMETOOLTIP.Length - 1);
 
                     //rederect url
                     var reurl = "window.location.href = '/Project/ProjectDYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category+'&VStartDate='+'" + StartDate+ "'+'&VEndDate='+'"+EndDate+"'";
@@ -1736,6 +1869,9 @@ namespace Prometheus.Controllers
                         .Replace("#FirstAmount#", famout)
                         .Replace("#FirstYield#", ftempvalue)
                         .Replace("#RetestYield#", rtempvalue)
+                        .Replace("#RealTimeYield#", rttempvalue)
+                        .Replace("#FINALTOOLTIP#", FINALTOOLTIP)
+                        .Replace("#REALTIMETOOLTIP#", REALTIMETOOLTIP)
                         .Replace("#REDIRECTURL#", reurl);
                 }
 
@@ -2108,7 +2244,7 @@ namespace Prometheus.Controllers
 
                 var vmlist = new List<ProjectYieldViewModule>();
                 var tempret = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, StartDate, EndDate, pvm);
-                if (tempret.FirstYields.Count > 0)
+                if (tempret.RealTimeYields.Count > 0)
                 {
                     vmlist.Add(tempret);
                 }
@@ -2122,6 +2258,7 @@ namespace Prometheus.Controllers
                     var famountlist = new List<int>();
                     var fyieldlist = new List<double>();
                     var ryieldlist = new List<double>();
+                    var rtyieldlist = new List<double>();
                     var maxamout = 0;
 
                     foreach (var item in vmlist)
@@ -2129,6 +2266,7 @@ namespace Prometheus.Controllers
                         ftimelist.Add(item.EndDate.ToString("yyyy-MM-dd"));
                         fyieldlist.Add(item.FirstYield * 100.0);
                         ryieldlist.Add(item.LastYield * 100.0);
+                        rtyieldlist.Add(item.RealTimeYield * 100.0);
 
                         var tempfamount = 0;
                         foreach (var d in item.FirstYields)
@@ -2165,6 +2303,13 @@ namespace Prometheus.Controllers
                     ftempvalue = ftempvalue.Substring(0, ftempvalue.Length - 1);
                     //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
 
+                    var rttempvalue = "";
+                    foreach (var item in rtyieldlist)
+                    {
+                        rttempvalue = rttempvalue + item.ToString("0.00") + ",";
+                    }
+                    rttempvalue = rttempvalue.Substring(0, rttempvalue.Length - 1);
+
                     var rtempvalue = "";
                     foreach (var item in ryieldlist)
                     {
@@ -2172,6 +2317,39 @@ namespace Prometheus.Controllers
                     }
                     rtempvalue = rtempvalue.Substring(0, rtempvalue.Length - 1);
                     //ChartSearies = ChartSearies.Replace("<cvalue>", tempvalue);
+
+                    var FINALTOOLTIP = "";
+                    var REALTIMETOOLTIP = "";
+
+                    for (var idx = 0; idx < rtyieldlist.Count; idx++)
+                    {
+                        FINALTOOLTIP = FINALTOOLTIP + "'<table>"
+                            + "<tr><td><b>FPY</b></td><td>" + fyieldlist[idx].ToString("0.00") + "&#37;</td></tr>"
+                            + "<tr><td><b>FY</b></td><td>" + ryieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
+
+                        foreach (var d in vmlist[idx].LastYields)
+                        {
+                            FINALTOOLTIP = FINALTOOLTIP + "<tr><td><b>" + d.WhichTest + "</b></td><td>Input:</td><td>" + d.InputCount.ToString() + "</td><td>Output:</td><td>" + d.OutputCount.ToString() + "</td></tr>";
+                        }
+
+                        FINALTOOLTIP = FINALTOOLTIP + "</table>'";
+                        FINALTOOLTIP = FINALTOOLTIP + ",";
+                    }
+                    FINALTOOLTIP = FINALTOOLTIP.Substring(0, FINALTOOLTIP.Length - 1);
+
+
+                    for (var idx = 0; idx < rtyieldlist.Count; idx++)
+                    {
+                        REALTIMETOOLTIP = REALTIMETOOLTIP + "'<table>"
+                            + "<tr><td><b>Realtime Yield</b></td><td>" + rtyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
+                        foreach (var d in vmlist[idx].RealTimeYields)
+                        {
+                            REALTIMETOOLTIP = REALTIMETOOLTIP + "<tr><td><b>" + d.WhichTest + "</b></td><td>Input:</td><td>" + d.InputCount.ToString() + "</td><td>Output:</td><td>" + d.OutputCount.ToString() + "</td></tr>";
+                        }
+                        REALTIMETOOLTIP = REALTIMETOOLTIP + "</table>'";
+                        REALTIMETOOLTIP = REALTIMETOOLTIP + ",";
+                    }
+                    REALTIMETOOLTIP = REALTIMETOOLTIP.Substring(0, REALTIMETOOLTIP.Length - 1);
 
                     //rederect url
                     var tempurl = "/Project/ProjectPYieldDetail?ProjectKey=" + ProjectKey + "&StartDate=" + StartDate + "&EndDate=" + EndDate;
@@ -2186,6 +2364,9 @@ namespace Prometheus.Controllers
                         .Replace("#FirstAmount#", famout)
                         .Replace("#FirstYield#", ftempvalue)
                         .Replace("#RetestYield#", rtempvalue)
+                        .Replace("#RealTimeYield#", rttempvalue)
+                        .Replace("#FINALTOOLTIP#", FINALTOOLTIP)
+                        .Replace("#REALTIMETOOLTIP#", REALTIMETOOLTIP)
                         .Replace("#REDIRECTURL#", reurl);
                 }
 

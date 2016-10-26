@@ -1,5 +1,9 @@
 ﻿<script type="text/javascript">
 $(function () {
+
+    var tooltiparray1=[#FINALTOOLTIP#];
+    var tooltiparray2=[#REALTIMETOOLTIP#];
+    
     $('##ElementID#').highcharts({
         title: {
             text: '#Title#'
@@ -48,9 +52,33 @@ $(function () {
                         }
             }
         },
+				tooltip: {
+            		useHTML: true,
+      					enabled: true,
+                formatter: function(args) {
+                  var this_point_index = this.series.data.indexOf(this.point);
+                  var this_series_index = this.series.index;
+                  
+                  if(this_series_index == 0)
+                  {
+                  		return this.point.y;
+                  }
+                  
+                  if(this_series_index == 1||this_series_index == 2)
+                  {
+                  	return tooltiparray1[this_point_index];
+                  }
+                  
+                  if(this_series_index == 3)
+                  {
+                  	return tooltiparray2[this_point_index];
+                  }
+                  
+                  }
+        			},
         series: [{
             type: 'column',
-            name: 'Input Count',
+            name: 'New Input Count',
             data: [#FirstAmount#],
             yAxis:0
         },
@@ -62,10 +90,6 @@ $(function () {
                 lineWidth: 2,
                 fillColor: 'red'
             },
-            tooltip: {
-                    headerFormat: '<b>{point.key}</b><br/>',
-                    pointFormat: '{point.y} %'
-                },
             yAxis:1
         },
         {
@@ -76,10 +100,16 @@ $(function () {
                 lineWidth: 2,
                 fillColor: 'green'
             },
-            tooltip: {
-                    headerFormat: '<b>{point.key}</b><br/>',
-                    pointFormat: '{point.y} %'
-                },
+            yAxis:1
+        },
+        {
+            type: 'line',
+            name: 'RealTime Yield',
+            data: [#RealTimeYield#],
+            marker: {
+                lineWidth: 2,
+                fillColor: 'orange'
+            },
             yAxis:1
         }]
     });

@@ -52,6 +52,9 @@ namespace Prometheus.Models
         {
             get
             {
+                if (RealTimeYields.Count == 0)
+                    return 0.0;
+
                 var ret = 1.0;
                 foreach (var item in RealTimeYields)
                 {
@@ -69,6 +72,9 @@ namespace Prometheus.Models
         {
             get
             {
+                if (FirstYields.Count == 0)
+                    return 0.0;
+
                 var ret = 1.0;
                 foreach (var item in FirstYields)
                 {
@@ -84,6 +90,9 @@ namespace Prometheus.Models
         {
             get
             {
+                if (LastYields.Count == 0)
+                    return 0.0;
+
                 var ret = 1.0;
                 foreach (var item in LastYields)
                 {
@@ -423,7 +432,7 @@ namespace Prometheus.Models
             for(int idx  = startidx; idx < ldate.Count -1;idx++)
             {
                 var temp  = GetYieldByDateRange(pjkey, ldate[idx].ToString(), ldate[idx+1].ToString(),pvm);
-                if (temp.FirstYields.Count > 0)
+                if (temp.RealTimeYields.Count > 0)
                 {
                     ret.Add(temp);
                 }
@@ -448,7 +457,7 @@ namespace Prometheus.Models
             for (int idx = startidx; idx < ldate.Count - 1; idx++)
             {
                 var temp = GetYieldByDateRange(pjkey, ldate[idx].ToString(), ldate[idx + 1].ToString(), pvm);
-                if (temp.FirstYields.Count > 0)
+                if (temp.RealTimeYields.Count > 0)
                 {
                     ret.Add(temp);
                 }
@@ -480,7 +489,7 @@ namespace Prometheus.Models
             for (int idx = startidx; idx < ldate.Count - 1; idx++)
             {
                 var temp = GetYieldByDateRange(pjkey, ldate[idx].ToString(), ldate[idx + 1].ToString(), pvm);
-                if (temp.FirstYields.Count > 0)
+                if (temp.RealTimeYields.Count > 0)
                 {
                     ret.Add(temp);
                 }

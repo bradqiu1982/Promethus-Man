@@ -56,7 +56,16 @@ $(function () {
             		useHTML: true,
       					enabled: true,
                 formatter: function(args) {
-                  var this_point_index = this.series.data.indexOf(this.point);
+                  var this_point_index = 0;
+                  var dataarray = this.series.data;
+                  for(var i = 0;i < dataarray.length;i++)
+                  {
+                    if(dataarray[i] === this.point)
+                    {
+                      this_point_index = i;
+                    }
+                  }
+                  
                   var this_series_index = this.series.index;
                   
                   if(this_series_index == 0)

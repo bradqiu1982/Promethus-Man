@@ -1279,7 +1279,7 @@ namespace Prometheus.Controllers
 
                 for (var idx = 0; idx < rtyieldlist.Count; idx++)
                 {
-                    FINALTOOLTIP = FINALTOOLTIP+"'<table>"
+                    FINALTOOLTIP = FINALTOOLTIP+ "'<!doctype html><table>"
                         + "<tr><td><b>FPY</b></td><td>" + fyieldlist[idx].ToString("0.00") + "&#37;</td></tr>"
                         + "<tr><td><b>FY</b></td><td>" + ryieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
 
@@ -1296,7 +1296,7 @@ namespace Prometheus.Controllers
 
                 for (var idx = 0; idx < rtyieldlist.Count; idx++)
                 {
-                    REALTIMETOOLTIP = REALTIMETOOLTIP+"'<table>"
+                    REALTIMETOOLTIP = REALTIMETOOLTIP+ "'<!doctype html><table>"
                         + "<tr><td><b>Realtime Yield</b></td><td>" + rtyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
                     foreach (var d in vmlist[idx].RealTimeYields)
                     {
@@ -1697,7 +1697,7 @@ namespace Prometheus.Controllers
 
                     for (var idx = 0; idx < rtyieldlist.Count; idx++)
                     {
-                        FINALTOOLTIP = FINALTOOLTIP + "'<table>"
+                        FINALTOOLTIP = FINALTOOLTIP + "'<!doctype html><table>"
                             + "<tr><td><b>FPY</b></td><td>" + fyieldlist[idx].ToString("0.00") + "&#37;</td></tr>"
                             + "<tr><td><b>FY</b></td><td>" + ryieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
 
@@ -1714,7 +1714,7 @@ namespace Prometheus.Controllers
 
                     for (var idx = 0; idx < rtyieldlist.Count; idx++)
                     {
-                        REALTIMETOOLTIP = REALTIMETOOLTIP + "'<table>"
+                        REALTIMETOOLTIP = REALTIMETOOLTIP + "'<!doctype html><table>"
                             + "<tr><td><b>Realtime Yield</b></td><td>" + rtyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
                         foreach (var d in vmlist[idx].RealTimeYields)
                         {
@@ -1829,7 +1829,7 @@ namespace Prometheus.Controllers
 
                     for (var idx = 0; idx < rtyieldlist.Count; idx++)
                     {
-                        FINALTOOLTIP = FINALTOOLTIP + "'<table>"
+                        FINALTOOLTIP = FINALTOOLTIP + "'<!doctype html><table>"
                             + "<tr><td><b>FPY</b></td><td>" + fyieldlist[idx].ToString("0.00") + "&#37;</td></tr>"
                             + "<tr><td><b>FY</b></td><td>" + ryieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
 
@@ -1846,7 +1846,7 @@ namespace Prometheus.Controllers
 
                     for (var idx = 0; idx < rtyieldlist.Count; idx++)
                     {
-                        REALTIMETOOLTIP = REALTIMETOOLTIP + "'<table>"
+                        REALTIMETOOLTIP = REALTIMETOOLTIP + "'<!doctype html><table>"
                             + "<tr><td><b>Realtime Yield</b></td><td>" + rtyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
                         foreach (var d in vmlist[idx].RealTimeYields)
                         {
@@ -2323,7 +2323,7 @@ namespace Prometheus.Controllers
 
                     for (var idx = 0; idx < rtyieldlist.Count; idx++)
                     {
-                        FINALTOOLTIP = FINALTOOLTIP + "'<table>"
+                        FINALTOOLTIP = FINALTOOLTIP + "'<!doctype html><table>"
                             + "<tr><td><b>FPY</b></td><td>" + fyieldlist[idx].ToString("0.00") + "&#37;</td></tr>"
                             + "<tr><td><b>FY</b></td><td>" + ryieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
 
@@ -2340,7 +2340,7 @@ namespace Prometheus.Controllers
 
                     for (var idx = 0; idx < rtyieldlist.Count; idx++)
                     {
-                        REALTIMETOOLTIP = REALTIMETOOLTIP + "'<table>"
+                        REALTIMETOOLTIP = REALTIMETOOLTIP + "'<!doctype html><table>"
                             + "<tr><td><b>Realtime Yield</b></td><td>" + rtyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
                         foreach (var d in vmlist[idx].RealTimeYields)
                         {

@@ -8,3 +8,4 @@ Prometheus/Prometheus/bin
 Prometheus/Prometheus/Scripts/images
 Prometheus/Prometheus/obj/Release
 Prometheus/Prometheus.Tests/obj/Release/
+Prometheus/Prometheus/userfiles/VCSEL-EMAIL-CHECK

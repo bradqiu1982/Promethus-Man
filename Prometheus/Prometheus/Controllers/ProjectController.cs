@@ -2835,6 +2835,107 @@ namespace Prometheus.Controllers
             return View(tempvm[0]);
         }
 
+        private Dictionary<string, double> VcselEmailCheck()
+        {
+            try
+            {
+                var filename = "VCSEL-EMAIL-CHECK";
+                var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
+                if (System.IO.File.Exists(wholefilename))
+                {
+                    var ret = new Dictionary<string, double>();
+                    var content = System.IO.File.ReadAllText(wholefilename);
+                    if (content.Length > 3)
+                    {
+                        var lines = content.Split(new string[] { "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                        foreach (var item in lines)
+                        {
+                            var keyvalue = item.Split(new string[] { "<>" }, StringSplitOptions.RemoveEmptyEntries);
+                            ret.Add(keyvalue[0].Trim(), Convert.ToDouble(keyvalue[1].Trim()));
+                        }
+                    }
+                    return ret;
+                }
+                else
+                {
+                    return new Dictionary<string, double>();
+                }
+            }
+            catch (Exception ex)
+            { return new Dictionary<string, double>(); }
+        }
+
+        private void VcselEmailStore(Dictionary<string, double> emailed)
+        {
+            try
+            {
+                var filename = "VCSEL-EMAIL-CHECK";
+                var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
+                var content = "";
+                foreach (var item in emailed)
+                {
+                        content = content + item.Key + "<>" + item.Value.ToString("0.00000") + "\r\n";
+                }
+                System.IO.File.WriteAllText(wholefilename, content);
+            }
+            catch (Exception ex)
+            { }
+
+        }
+
+        private void CheckVecselYieldByWafer(List<string> pjkeylist)
+        {
+            var filename = "log" + DateTime.Now.ToString("yyyy-MM-dd");
+            var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
+            
+            if (!System.IO.File.Exists(wholefilename))
+            {
+                var emailed = VcselEmailCheck();
+                var content = string.Empty;
+
+                foreach (var item in pjkeylist)
+                {
+                    var waferlist = BITestData.RetrieveAllWafer(item);
+                    foreach (var w in waferlist)
+                    {
+                        var yield = ProjectBIYieldViewModule.GetYieldByWafer(item, w);
+                        if (yield.CorrectLastYield > 0.1 && yield.CorrectLastYield < 0.98)
+                        {
+                            if (!emailed.ContainsKey(item + "-" + w))
+                            {
+                                emailed.Add(item + "-" + w, yield.CorrectLastYield);
+                                content = content+"Warning: the yield of " + item + " wafer " + w + " is " + (yield.CorrectLastYield * 100.0).ToString("0.00") + "%\r\n";
+                                
+                            }
+                            else
+                            {
+                                var lasttimeyield = Convert.ToDouble(emailed[item + "-" + w]);
+                                if ((yield.CorrectLastYield - lasttimeyield) < -0.01)
+                                {
+                                    emailed[item + "-" + w] = yield.CorrectLastYield;
+                                    content = content + "Warning: the yield of " + item + " wafer " + w + " is " + (yield.CorrectLastYield * 100.0).ToString("0.00") + "%\r\n";
+                                }
+                            }
+                        }
+                    }//end foreach
+                }//end foreach
+
+                VcselEmailStore(emailed);
+
+                if (!string.IsNullOrEmpty(content))
+                {
+                    var toaddrs = new List<string>();
+                    toaddrs.Add("windy.ju@finisar.com");
+                    toaddrs.Add("daly.li@finisar.com");
+                    toaddrs.Add("tyler.zhang@finisar.com");
+                    toaddrs.Add("tony.lv@finisar.com");
+                    EmailUtility.SendEmail("VCSEL WAFER YIELD WARNING", toaddrs, content);
+                    new System.Threading.ManualResetEvent(false).WaitOne(10000);
+                }
+
+            }
+        }
+
         private void SendBookedReportNotice()
         {
             var filename = "log" + DateTime.Now.ToString("yyyy-MM-dd");
@@ -2923,6 +3024,17 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat()
         {
+            var starttime = DateTime.Now.ToString();
+
+            var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
+            try
+            {
+                CheckVecselYieldByWafer(pjkeylist);
+            }
+            catch (Exception ex)
+            { }
+
+
             try
             {
                 SendBookedReportNotice();
@@ -2936,13 +3048,13 @@ namespace Prometheus.Controllers
                 var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
 
                 var content = System.IO.File.ReadAllText(wholefilename);
-                content = content + "heart beat start @ " + DateTime.Now.ToString() + "\r\n";
+                content = content + "heart beat start @ " + starttime + "\r\n";
                 System.IO.File.WriteAllText(wholefilename, content);
             }
             catch (Exception ex)
             { }
 
-            var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
+            
             foreach (var pjkey in pjkeylist)
             {
                 try

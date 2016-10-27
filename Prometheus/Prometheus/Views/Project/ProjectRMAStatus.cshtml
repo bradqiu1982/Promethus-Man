@@ -12,13 +12,19 @@
     <div class="col-md-2 text-center">
         <h2><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-2 text-center">
         @if (Model != null && Model.Count() > 0)
         {
             <h2><a data-toggle="tooltip" title="Export RMA Report" href="/Issue/ExportRMAData?ProjectKey=@Model.ElementAt(0).ProjectKey" target="_blank"><span class="glyphicon glyphicon-share" aria-hidden="true"></span></a></h2>
         }
     </div>
-    <div class="col-md-5"></div>
+    <div class="col-md-2 text-left">
+        @if (Model != null && Model.Count() > 0)
+        {
+            <h2><a data-toggle="tooltip" title="Export All RMA Report" href="/Issue/ExportAllRMAData" target="_blank"><span class="glyphicon glyphicon-share" aria-hidden="true"></span>ALL</a></h2>
+        }
+    </div>
+    <div class="col-md-3"></div>
 </div>
 
 <hr />

@@ -3096,5 +3096,53 @@ namespace Prometheus.Controllers
             return View();
         }
 
-    }
+        private static bool IsDigitsOnly(string str)
+        {
+            foreach (char c in str)
+            {
+                if (c < '0' || c > '9')
+                    return false;
+            }
+
+            return true;
+        }
+
+        public ActionResult TestPNDesc(string PNs)
+        {
+            var vm = new List<List<string>>();
+            
+            var title = new List<string>();
+            title.Add("Part Num");
+            vm.Add(title);
+
+            if (!string.IsNullOrEmpty(PNs))
+            {
+                var ps = PNs.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+
+                var pndeslist = new List<string>();
+                foreach (var p in ps)
+                {
+                    if (!IsDigitsOnly(p.Trim()))
+                    {
+                        pndeslist.Add(p.Trim());
+                    }
+                }
+
+                if (pndeslist.Count > 0)
+                {
+                    var partnums = MESUtility.RetrieveAllPN(pndeslist);
+                    foreach (var pt in partnums)
+                    {
+                        var templine = new List<string>();
+                        templine.Add(pt);
+                        vm.Add(templine);
+                    }
+                }
+            }
+
+            return View(vm);
+        }
+
+
+        }
 }

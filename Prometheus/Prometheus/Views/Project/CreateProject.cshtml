@@ -170,17 +170,22 @@
                     <hr />
                     <div class="form-group">
                         <div class="col-md-12">
-                            <label class="form-control text-left">PNs contains PN Descriptions and Burn-In PNs. eg:PN Description1; PN Description2; ...;BURN-IN PN1;BURN-IN PN2;... </label>
+                            <label class="control-label text-left">PNs contains Project PN Descriptions and Burn-In PNs. eg:FTLC9141;1183638;1228361;1183636</label>
                         </div>
                     </div>
                     <div class="form-group">
-                        <div class="col-md-3">
-                            <a href="~/Scripts/project_pn_desc_list.xlsx" target="_blank">Project PN Description FILE</a>
-                        </div>
-                        <div class="col-md-3">
-                            <a href="~/Scripts/burn_in_pn_list.xlsx" target="_blank">BURN-IN PN File</a>
-                        </div>
-                        <div class="col-md-6">
+                        <div class="col-md-12">
+                            <div class="col-md-2">
+                                <label class="control-label">Reference File:</label>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="~/Scripts/project_pn_desc_list.xlsx" target="_blank">Project PN Description</a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="~/Scripts/burn_in_pn_list.xlsx" target="_blank">BURN-IN PN</a>
+                            </div>
+                            <div class="col-md-4">
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -197,11 +202,32 @@
                         </div>
                         <span class="field-validation-valid text-danger" data-valmsg-for="PNs" data-valmsg-replace="true"></span>
                     </div>
+
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <div class="col-md-3">
+                                <button class="form-control" onclick="TestPNDesc()" type="button">Test PN Description</button>
+                            </div>
+                            <div class="col-md-9">
+                            </div>
+                        </div>
+                        <script type="text/javascript">
+                                function TestPNDesc()
+                                {
+                                    if (document.getElementById("PNs").value && document.getElementById("PNs").value.length > 0)
+                                    {
+                                        var myurl = '/Project/TestPNDesc?PNs=' + document.getElementById("PNs").value;
+                                        window.open(myurl, '_blank');
+                                    }
+                                }
+                        </script>
+                    </div>
+
                     <hr />
 
                     <div class="form-group">
                         <div class="col-md-12">
-                            <label class="form-control text-left">Stations</label>
+                            <label class="control-label text-left">Stations</label>
                         </div>
                     </div>
                     <div class="form-group">

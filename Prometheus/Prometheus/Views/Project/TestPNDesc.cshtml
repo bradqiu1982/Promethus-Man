@@ -1,0 +1,57 @@
+﻿
+@{
+    ViewBag.Title = "TestPNDesc";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@if (ViewBag.PNDES != null)
+{
+    <h2>PN List of @ViewBag.</h2>
+}
+else
+{
+    <h2>PN List</h2>
+}
+
+<hr/>
+
+@if (Model != null)
+{
+    <table id="pndatatable" class="display" width="100" cellspacing="0">
+        <thead>
+            @foreach (var line in Model)
+            {
+                <tr>
+                    @foreach (var item in line)
+                    {
+                        <th>@item</th>
+                    }
+                </tr>
+                break;
+            }
+        </thead>
+
+        <tbody>
+            @foreach (var line in Model)
+            {
+                <tr>
+                    @foreach (var item in line)
+                    {
+                        <td>@item</td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#pndatatable').DataTable({
+                'iDisplayLength': 50,
+                'aLengthMenu': [[25, 50, 100, -1],
+                                [25, 50, 100, "All"]]
+            });
+                    } );
+    </script>
+}

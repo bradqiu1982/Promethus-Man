@@ -170,11 +170,21 @@
                     <hr />
                     <div class="form-group">
                         <div class="col-md-12">
-                            <label class="form-control text-left">PNs</label>
+                            <label class="form-control text-left">PNs contains PN Descriptions and Burn-In PNs. eg:PN Description1; PN Description2; ...;BURN-IN PN1;BURN-IN PN2;... </label>
                         </div>
                     </div>
                     <div class="form-group">
-                        <div class="col-md-12" data-toggle="tooltip" data-placement="center" title="Exampel: PN ; PN ;PN">
+                        <div class="col-md-3">
+                            <a href="~/Scripts/project_pn_desc_list.xlsx" target="_blank">Project PN Description FILE</a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="~/Scripts/burn_in_pn_list.xlsx" target="_blank">BURN-IN PN File</a>
+                        </div>
+                        <div class="col-md-6">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12" data-toggle="tooltip" data-placement="center" title="Exampel: Exampel: PN Desc1; PN Desc2;BI PN1;BI PN2">
                             @if (Model != null && !string.IsNullOrEmpty(Model.PNs))
                             {
                                 <textarea class="form-control" name="PNs" id="PNs" style="min-width: 100%;min-height:200px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required.">@(Model.PNs)</textarea>

@@ -666,6 +666,7 @@
     <Content Include="Content\bootstrap\badges.less" />
     <Content Include="Content\bootstrap\alerts.less" />
     <None Include="Properties\PublishProfiles\Test.pubxml" />
+    <Content Include="Scripts\burn_in_pn_list.xlsx" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\exporting.js" />
     <Content Include="Scripts\HeartBeat.exe" />
@@ -766,6 +767,7 @@
     <Content Include="Views\Project\ProjectDYieldDetail.cshtml" />
     <Content Include="Views\BurnIn\ProjectBIDailyYield.cshtml" />
     <Content Include="Views\BurnIn\ProjectBIDailyYieldDetail.cshtml" />
+    <Content Include="Scripts\project_pn_desc_list.xlsx" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

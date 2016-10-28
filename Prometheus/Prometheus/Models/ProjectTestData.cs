@@ -53,8 +53,23 @@ namespace Prometheus.Models
             {
                 try
                 {
-                    UpdateLockUsing.TryAdd(pjkey, true);
-                    return false;
+                    var ret = UpdateLockUsing.TryAdd(pjkey, true);
+                    if (ret)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        if (UpdateLockUsing[pjkey])
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            UpdateLockUsing[pjkey] = true;
+                            return false;
+                        }
+                    }
                 }
                 catch
                 {

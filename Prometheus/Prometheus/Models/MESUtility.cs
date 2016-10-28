@@ -383,8 +383,40 @@ namespace Prometheus.Models
 
         }
 
+        public static List<string> RetrieveAllPN(List<string> pndeslist)
+        {
+            var cond = "";
+            foreach (var pn in pndeslist)
+            {
+                if (!IsDigitsOnly(pn.Trim()))
+                {
+                    if (string.IsNullOrEmpty(cond))
+                    {
+                        cond = " c.Description like '%" + pn.Trim() + "%' ";
+                    }
+                    else
+                    {
+                        cond = cond + " or c.Description like '%" + pn.Trim() + "%' ";
+                    }
+                }
+            }
 
-
+            if (string.IsNullOrEmpty(cond))
+            {
+                return new List<string>();
+            }
+            else
+            {
+                var ret = new List<string>();
+                var sql = "select DISTINCT p.ProductName from insite.Product c (nolock) left join insite.ProductBase p on c.ProductBaseId = p.ProductBaseId where " + cond;
+                var dbret = DBUtility.ExeMESSqlWithRes(sql);
+                foreach (var item in dbret)
+                {
+                    ret.Add(Convert.ToString(item[0]));
+                }
+                return ret;
+            }
+        }
 
 
     }

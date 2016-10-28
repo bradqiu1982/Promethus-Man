@@ -9,6 +9,17 @@ namespace Prometheus.Models
 {
     public class MESUtility
     {
+        private static bool IsDigitsOnly(string str)
+        {
+            foreach (char c in str)
+            {
+                if (c < '0' || c > '9')
+                    return false;
+            }
+
+            return true;
+        }
+
         private static string RMSpectialCh(string str)
         {
             StringBuilder sb = new StringBuilder();
@@ -24,22 +35,31 @@ namespace Prometheus.Models
 
         private static string PNCondition(List<ProjectPn> pns)
         {
-            string ret = "('";
+            var cond = "";
             foreach (var pn in pns)
             {
-                ret = ret + RMSpectialCh(pn.Pn) + "','";
+                if (!IsDigitsOnly(pn.Pn.Trim()))
+                {
+                    if (string.IsNullOrEmpty(cond))
+                    {
+                        cond = " c.Description like '%" + pn.Pn.Trim() + "%' ";
+                    }
+                    else
+                    {
+                        cond = cond + " or c.Description like '%" + pn.Pn.Trim() + "%' ";
+                    }
+                }
             }
 
-            if (pns.Count > 0)
+            if (string.IsNullOrEmpty(cond))
             {
-                ret = ret.Substring(0, ret.Length - 2) + ")";
+                return string.Empty;
             }
             else
             {
-                ret = "('')";
+                var ret = "select DISTINCT p.ProductName from insite.Product c (nolock) left join insite.ProductBase p on c.ProductBaseId = p.ProductBaseId where " + cond;
+                return ret;
             }
-
-            return ret;
         }
 
 
@@ -61,12 +81,20 @@ namespace Prometheus.Models
 
             string pncond = PNCondition(projectmodel.PNList);
 
-            var sql = "select dc_<DCTABLE>HistoryId,ModuleSerialNum, WhichTest, ModuleType, ErrAbbr, TestTimeStamp, TestStation,assemblypartnum from  insite.dc_<DCTABLE> (nolock) where assemblypartnum in  <PNCOND>   <TIMECOND>  order by  moduleserialnum,testtimestamp DESC";
+            var sql = "select dc_<DCTABLE>HistoryId,ModuleSerialNum, WhichTest, ModuleType, ErrAbbr, TestTimeStamp, TestStation,assemblypartnum from  insite.dc_<DCTABLE> (nolock) where assemblypartnum in  (<PNCOND>)  <TIMECOND>  order by  moduleserialnum,testtimestamp DESC";
 
             var ret = new Dictionary<string, string>();
             foreach (var tb in tables)
             {
-                ret.Add(tb.Key,sql.Replace("<DCTABLE>",tb.Value).Replace("<PNCOND>", pncond));
+                if (string.IsNullOrEmpty(pncond))
+                {
+                    ret.Add(tb.Key,string.Empty);
+                }
+                else
+                {
+                     ret.Add(tb.Key,sql.Replace("<DCTABLE>",tb.Value).Replace("<PNCOND>", pncond));
+                }
+                
             }
             return ret;
         }
@@ -139,6 +167,11 @@ namespace Prometheus.Models
                     var sqls = RetrieveSqlFromProjectModel(vm);
                     foreach (var s in sqls)
                     {
+                        if (string.IsNullOrEmpty(s.Value))
+                        {
+                            continue;
+                        }
+
                         var sndict = new Dictionary<string, bool>();
                         var sql = s.Value.Replace("<TIMECOND>", "and TestTimeStamp > '" + vm.StartDate.ToString() + "'");
                         var dbret = DBUtility.ExeMESSqlWithRes(sql);
@@ -221,8 +254,12 @@ namespace Prometheus.Models
 
         public static void UpdateProjectData(ProjectViewModels vm,string starttime,string endtime)
         {
+            try
+            {
+                if (ProjectTestData.UpdatePJLockUsing(vm.ProjectKey))
+                    return;
 
-            if (vm.StationList.Count > 0
+                if (vm.StationList.Count > 0
                 && vm.TabList.Count > 0
                 && vm.PNList.Count > 0)
             {
@@ -245,6 +282,11 @@ namespace Prometheus.Models
                 var sqls = RetrieveSqlFromProjectModel(vm);
                 foreach (var s in sqls)
                 {
+                    if (string.IsNullOrEmpty(s.Value))
+                    {
+                        continue;
+                    }
+
                     var sndict = new Dictionary<string, bool>();
                     var sql = s.Value.Replace("<TIMECOND>", "and TestTimeStamp > '" + starttime + "' and TestTimeStamp < '"+ endtime + "'");
                     var dbret = DBUtility.ExeMESSqlWithRes(sql);
@@ -330,6 +372,13 @@ namespace Prometheus.Models
                     }
                 }
                 
+            }
+
+                ProjectTestData.ResetUpdatePJLock(vm.ProjectKey);
+            }
+            catch (Exception ex)
+            {
+                ProjectTestData.ResetUpdatePJLock(vm.ProjectKey);
             }
 
         }

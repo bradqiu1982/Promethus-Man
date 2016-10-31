@@ -43,7 +43,7 @@ namespace Prometheus.Models
         public static string Reopen = "Reopen";
         public static string Fixed = "Fixed";
         public static string Done = "Done";
-        public static string NotFix = "Will Not Fix";
+        public static string NotFix = "No Action";
         public static string Unresolved = "Unresolved";
         public static string NotReproduce ="Cannot Reproduce";
         public static string Started = "Started";
@@ -369,6 +369,10 @@ namespace Prometheus.Models
                     {
                         return Resolute.ColorStatus(Resolute.Working);
                     }
+                    if (item.Resolution == Resolute.NotFix)
+                    {
+                        return Resolute.ColorStatus(Resolute.NotFix);
+                    }
                 }
                 return Resolute.ColorStatus(Resolute.Done);
             }
@@ -394,6 +398,10 @@ namespace Prometheus.Models
                     if (item.Resolution == Resolute.Working)
                     {
                         return Resolute.ColorStatus(Resolute.Working);
+                    }
+                    if (item.Resolution == Resolute.NotFix)
+                    {
+                        return Resolute.ColorStatus(Resolute.NotFix);
                     }
                 }
                 return Resolute.ColorStatus(Resolute.Done);

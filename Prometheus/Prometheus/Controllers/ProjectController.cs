@@ -1214,6 +1214,7 @@ namespace Prometheus.Controllers
                 var fyieldlist = new List<double>();
                 var ryieldlist = new List<double>();
                 var rtyieldlist = new List<double>();
+                var snyieldlist = new List<double>();
                 var maxamout = 0;
 
                 foreach (var item in vmlist)
@@ -1223,6 +1224,7 @@ namespace Prometheus.Controllers
                     fyieldlist.Add(item.FirstYield * 100.0);
                     ryieldlist.Add(item.LastYield * 100.0);
                     rtyieldlist.Add(item.RealTimeYield * 100.0);
+                    snyieldlist.Add(item.SNYield * 100);
 
                     var tempfamount = 0;
                     foreach (var d in item.FirstYields)
@@ -1266,6 +1268,13 @@ namespace Prometheus.Controllers
                 }
                 rttempvalue = rttempvalue.Substring(0, rttempvalue.Length - 1);
 
+                var sntempvalue = "";
+                foreach (var item in snyieldlist)
+                {
+                    sntempvalue = sntempvalue + item.ToString("0.00") + ",";
+                }
+                sntempvalue = sntempvalue.Substring(0, sntempvalue.Length - 1);
+
                 var rtempvalue = "";
                 foreach (var item in ryieldlist)
                 {
@@ -1276,6 +1285,7 @@ namespace Prometheus.Controllers
 
                 var FINALTOOLTIP = "";
                 var REALTIMETOOLTIP = "";
+
 
                 for (var idx = 0; idx < rtyieldlist.Count; idx++)
                 {
@@ -1307,6 +1317,20 @@ namespace Prometheus.Controllers
                 }
                 REALTIMETOOLTIP = REALTIMETOOLTIP.Substring(0, REALTIMETOOLTIP.Length - 1);
 
+                var SNTOOLTIP = "";
+                for (var idx = 0; idx < snyieldlist.Count; idx++)
+                {
+                    SNTOOLTIP = SNTOOLTIP + "'<!doctype html><table>"
+                        + "<tr><td><b>SN Trace Yield</b></td><td>" + snyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
+                    foreach (var d in vmlist[idx].SNYields)
+                    {
+                        SNTOOLTIP = SNTOOLTIP + "<tr><td><b>" + d.WhichTest + "</b></td><td>Input:</td><td>" + d.InputCount.ToString() + "</td><td>Output:</td><td>" + d.OutputCount.ToString() + "</td></tr>";
+                    }
+                    SNTOOLTIP = SNTOOLTIP + "</table>'";
+                    SNTOOLTIP = SNTOOLTIP + ",";
+                }
+                SNTOOLTIP = SNTOOLTIP.Substring(0, SNTOOLTIP.Length - 1);
+
                 //rederect url
                 var reurl = "window.location.href = '/Project/ProjectWYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category";
 
@@ -1320,8 +1344,10 @@ namespace Prometheus.Controllers
                     .Replace("#FirstYield#", ftempvalue)
                     .Replace("#RetestYield#", rtempvalue)
                     .Replace("#RealTimeYield#", rttempvalue)
+                    .Replace("#SNYield#", sntempvalue)
                     .Replace("#FINALTOOLTIP#", FINALTOOLTIP)
                     .Replace("#REALTIMETOOLTIP#", REALTIMETOOLTIP)
+                    .Replace("#SNTOOLTIP#", SNTOOLTIP)
                     .Replace("#REDIRECTURL#", reurl);
 
             }
@@ -1633,6 +1659,7 @@ namespace Prometheus.Controllers
                     var fyieldlist = new List<double>();
                     var ryieldlist = new List<double>();
                     var rtyieldlist = new List<double>();
+                    var snyieldlist = new List<double>();
                     var maxamout = 0;
 
                     foreach (var item in vmlist)
@@ -1641,6 +1668,7 @@ namespace Prometheus.Controllers
                         fyieldlist.Add(item.FirstYield * 100.0);
                         ryieldlist.Add(item.LastYield * 100.0);
                         rtyieldlist.Add(item.RealTimeYield * 100.0);
+                        snyieldlist.Add(item.SNYield * 100);
 
                         var tempfamount = 0;
                         foreach (var d in item.FirstYields)
@@ -1684,6 +1712,13 @@ namespace Prometheus.Controllers
                     }
                     rttempvalue = rttempvalue.Substring(0, rttempvalue.Length - 1);
 
+                    var sntempvalue = "";
+                    foreach (var item in snyieldlist)
+                    {
+                        sntempvalue = sntempvalue + item.ToString("0.00") + ",";
+                    }
+                    sntempvalue = sntempvalue.Substring(0, sntempvalue.Length - 1);
+
                     var rtempvalue = "";
                     foreach (var item in ryieldlist)
                     {
@@ -1725,6 +1760,20 @@ namespace Prometheus.Controllers
                     }
                     REALTIMETOOLTIP = REALTIMETOOLTIP.Substring(0, REALTIMETOOLTIP.Length - 1);
 
+                    var SNTOOLTIP = "";
+                    for (var idx = 0; idx < snyieldlist.Count; idx++)
+                    {
+                        SNTOOLTIP = SNTOOLTIP + "'<!doctype html><table>"
+                            + "<tr><td><b>SN Trace Yield</b></td><td>" + snyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
+                        foreach (var d in vmlist[idx].SNYields)
+                        {
+                            SNTOOLTIP = SNTOOLTIP + "<tr><td><b>" + d.WhichTest + "</b></td><td>Input:</td><td>" + d.InputCount.ToString() + "</td><td>Output:</td><td>" + d.OutputCount.ToString() + "</td></tr>";
+                        }
+                        SNTOOLTIP = SNTOOLTIP + "</table>'";
+                        SNTOOLTIP = SNTOOLTIP + ",";
+                    }
+                    SNTOOLTIP = SNTOOLTIP.Substring(0, SNTOOLTIP.Length - 1);
+
                     //rederect url
                     var reurl = "window.location.href = '/Project/ProjectMYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category";
 
@@ -1740,6 +1789,8 @@ namespace Prometheus.Controllers
                         .Replace("#RealTimeYield#", rttempvalue)
                         .Replace("#FINALTOOLTIP#", FINALTOOLTIP)
                         .Replace("#REALTIMETOOLTIP#", REALTIMETOOLTIP)
+                        .Replace("#SNYield#", sntempvalue)
+                        .Replace("#SNTOOLTIP#", SNTOOLTIP)
                         .Replace("#REDIRECTURL#", reurl);
                 }
 
@@ -1765,6 +1816,7 @@ namespace Prometheus.Controllers
                     var fyieldlist = new List<double>();
                     var ryieldlist = new List<double>();
                     var rtyieldlist = new List<double>();
+                    var snyieldlist = new List<double>();
                     var maxamout = 0;
 
                     foreach (var item in vmlist)
@@ -1773,6 +1825,7 @@ namespace Prometheus.Controllers
                         fyieldlist.Add(item.FirstYield * 100.0);
                         ryieldlist.Add(item.LastYield * 100.0);
                         rtyieldlist.Add(item.RealTimeYield * 100.0);
+                        snyieldlist.Add(item.SNYield * 100);
 
                         var tempfamount = 0;
                         foreach (var d in item.FirstYields)
@@ -1816,6 +1869,13 @@ namespace Prometheus.Controllers
                     }
                     rttempvalue = rttempvalue.Substring(0, rttempvalue.Length - 1);
 
+                    var sntempvalue = "";
+                    foreach (var item in snyieldlist)
+                    {
+                        sntempvalue = sntempvalue + item.ToString("0.00") + ",";
+                    }
+                    sntempvalue = sntempvalue.Substring(0, sntempvalue.Length - 1);
+
                     var rtempvalue = "";
                     foreach (var item in ryieldlist)
                     {
@@ -1857,6 +1917,20 @@ namespace Prometheus.Controllers
                     }
                     REALTIMETOOLTIP = REALTIMETOOLTIP.Substring(0, REALTIMETOOLTIP.Length - 1);
 
+                    var SNTOOLTIP = "";
+                    for (var idx = 0; idx < snyieldlist.Count; idx++)
+                    {
+                        SNTOOLTIP = SNTOOLTIP + "'<!doctype html><table>"
+                            + "<tr><td><b>SN Trace Yield</b></td><td>" + snyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
+                        foreach (var d in vmlist[idx].SNYields)
+                        {
+                            SNTOOLTIP = SNTOOLTIP + "<tr><td><b>" + d.WhichTest + "</b></td><td>Input:</td><td>" + d.InputCount.ToString() + "</td><td>Output:</td><td>" + d.OutputCount.ToString() + "</td></tr>";
+                        }
+                        SNTOOLTIP = SNTOOLTIP + "</table>'";
+                        SNTOOLTIP = SNTOOLTIP + ",";
+                    }
+                    SNTOOLTIP = SNTOOLTIP.Substring(0, SNTOOLTIP.Length - 1);
+
                     //rederect url
                     var reurl = "window.location.href = '/Project/ProjectDYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category+'&VStartDate='+'" + StartDate+ "'+'&VEndDate='+'"+EndDate+"'";
 
@@ -1872,6 +1946,8 @@ namespace Prometheus.Controllers
                         .Replace("#RealTimeYield#", rttempvalue)
                         .Replace("#FINALTOOLTIP#", FINALTOOLTIP)
                         .Replace("#REALTIMETOOLTIP#", REALTIMETOOLTIP)
+                        .Replace("#SNYield#", sntempvalue)
+                        .Replace("#SNTOOLTIP#", SNTOOLTIP)
                         .Replace("#REDIRECTURL#", reurl);
                 }
 
@@ -2259,6 +2335,7 @@ namespace Prometheus.Controllers
                     var fyieldlist = new List<double>();
                     var ryieldlist = new List<double>();
                     var rtyieldlist = new List<double>();
+                    var snyieldlist = new List<double>();
                     var maxamout = 0;
 
                     foreach (var item in vmlist)
@@ -2267,6 +2344,7 @@ namespace Prometheus.Controllers
                         fyieldlist.Add(item.FirstYield * 100.0);
                         ryieldlist.Add(item.LastYield * 100.0);
                         rtyieldlist.Add(item.RealTimeYield * 100.0);
+                        snyieldlist.Add(item.SNYield * 100);
 
                         var tempfamount = 0;
                         foreach (var d in item.FirstYields)
@@ -2310,6 +2388,13 @@ namespace Prometheus.Controllers
                     }
                     rttempvalue = rttempvalue.Substring(0, rttempvalue.Length - 1);
 
+                    var sntempvalue = "";
+                    foreach (var item in snyieldlist)
+                    {
+                        sntempvalue = sntempvalue + item.ToString("0.00") + ",";
+                    }
+                    sntempvalue = sntempvalue.Substring(0, sntempvalue.Length - 1);
+
                     var rtempvalue = "";
                     foreach (var item in ryieldlist)
                     {
@@ -2351,6 +2436,20 @@ namespace Prometheus.Controllers
                     }
                     REALTIMETOOLTIP = REALTIMETOOLTIP.Substring(0, REALTIMETOOLTIP.Length - 1);
 
+                    var SNTOOLTIP = "";
+                    for (var idx = 0; idx < snyieldlist.Count; idx++)
+                    {
+                        SNTOOLTIP = SNTOOLTIP + "'<!doctype html><table>"
+                            + "<tr><td><b>SN Trace Yield</b></td><td>" + snyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
+                        foreach (var d in vmlist[idx].SNYields)
+                        {
+                            SNTOOLTIP = SNTOOLTIP + "<tr><td><b>" + d.WhichTest + "</b></td><td>Input:</td><td>" + d.InputCount.ToString() + "</td><td>Output:</td><td>" + d.OutputCount.ToString() + "</td></tr>";
+                        }
+                        SNTOOLTIP = SNTOOLTIP + "</table>'";
+                        SNTOOLTIP = SNTOOLTIP + ",";
+                    }
+                    SNTOOLTIP = SNTOOLTIP.Substring(0, SNTOOLTIP.Length - 1);
+
                     //rederect url
                     var tempurl = "/Project/ProjectPYieldDetail?ProjectKey=" + ProjectKey + "&StartDate=" + StartDate + "&EndDate=" + EndDate;
                     var reurl = "window.location.href = '" + tempurl + "'";
@@ -2367,6 +2466,8 @@ namespace Prometheus.Controllers
                         .Replace("#RealTimeYield#", rttempvalue)
                         .Replace("#FINALTOOLTIP#", FINALTOOLTIP)
                         .Replace("#REALTIMETOOLTIP#", REALTIMETOOLTIP)
+                        .Replace("#SNYield#", sntempvalue)
+                        .Replace("#SNTOOLTIP#", SNTOOLTIP)
                         .Replace("#REDIRECTURL#", reurl);
                 }
 

@@ -3,6 +3,7 @@ $(function () {
 
     var tooltiparray1=[#FINALTOOLTIP#];
     var tooltiparray2=[#REALTIMETOOLTIP#];
+    var tooltiparray3=[#SNTOOLTIP#];
     
     $('##ElementID#').highcharts({
         title: {
@@ -83,11 +84,16 @@ $(function () {
                   	return tooltiparray2[this_point_index];
                   }
                   
+                  if(this_series_index == 4)
+                  {
+                  	return tooltiparray3[this_point_index];
+                  }
+                  
                   }
         			},
         series: [{
             type: 'column',
-            name: 'New Input Count',
+            name: 'Input Count',
             data: [#FirstAmount#],
             yAxis:0
         },
@@ -118,6 +124,17 @@ $(function () {
             marker: {
                 lineWidth: 2,
                 fillColor: 'orange'
+            },
+            yAxis:1
+        },
+        {
+            type: 'line',
+            name: 'SN Trace Yield',
+            visible: false,
+            data: [#SNYield#],
+            marker: {
+                lineWidth: 2,
+                fillColor: 'purple'
             },
             yAxis:1
         }]

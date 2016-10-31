@@ -211,8 +211,6 @@ namespace Prometheus.Models
                                         bondingeddatadict.Add(tempdata.DataID,true);
                                         tempdata.StoreProjectTestData();
 
-
-
                                     if (!sndict.ContainsKey(tempdata.ModuleSerialNum))
                                         {
                                             sndict.Add(tempdata.ModuleSerialNum, true);
@@ -303,8 +301,6 @@ namespace Prometheus.Models
                             if (!bondinged)
                             {
                                 tempdata.StoreProjectTestData();
-
-
 
                                 if (!sndict.ContainsKey(tempdata.ModuleSerialNum))
                                 {

@@ -269,6 +269,25 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static Dictionary<string, bool> RetrieveSNBeforeDateWithStation(string projectkey, string edate)
+        {
+            var ret = new Dictionary<string, bool>();
+            var sql = "select ModuleSerialNum,WhichTest from ProjectTestData where ProjectKey = '<ProjectKey>' and TestTimeStamp < '<ENDDATE>'";
+            sql = sql.Replace("<ProjectKey>", projectkey).Replace("<ENDDATE>", edate);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            foreach (var item in dbret)
+            {
+                var key = Convert.ToString(item[0]);
+                var key2 = Convert.ToString(item[1]);
+
+                if (!ret.ContainsKey(key+"-"+ key2))
+                {
+                    ret.Add(key + "-" + key2, true);
+                }
+            }
+            return ret;
+        }
+
         public static Dictionary<string, bool> RetrieveSNBeforeDate(string projectkey, string edate)
         {
             var ret = new Dictionary<string, bool>();
@@ -278,6 +297,7 @@ namespace Prometheus.Models
             foreach (var item in dbret)
             {
                 var key = Convert.ToString(item[0]);
+                
                 if (!ret.ContainsKey(key))
                 {
                     ret.Add(key, true);
@@ -285,7 +305,5 @@ namespace Prometheus.Models
             }
             return ret;
         }
-
-
     }
 }

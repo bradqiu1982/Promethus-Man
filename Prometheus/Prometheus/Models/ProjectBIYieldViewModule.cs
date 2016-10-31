@@ -157,7 +157,7 @@ namespace Prometheus.Models
 
             foreach (var item in plist)
             {
-                if (!snlist.ContainsKey(item.ModuleSerialNum))
+                if (!snlist.ContainsKey(item.ModuleSerialNum + "-" + item.WhichTest))
                 {
 
                     if (!validatedict.ContainsKey(item.ModuleSerialNum))

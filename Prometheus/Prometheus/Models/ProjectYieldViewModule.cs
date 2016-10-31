@@ -45,6 +45,23 @@ namespace Prometheus.Models
         public DateTime StartDate { set; get; }
         public DateTime EndDate { set; get; }
 
+        private List<TestYield> snyield = new List<TestYield>();
+        public List<TestYield> SNYields { get { return snyield; } }
+        public double SNYield
+        {
+            get
+            {
+                if (SNYields.Count == 0)
+                    return 0.0;
+
+                var ret = 1.0;
+                foreach (var item in SNYields)
+                {
+                    ret = ret * item.Yield;
+                }
+                return ret;
+            }
+        }
 
         private List<TestYield> rltimeyield = new List<TestYield>();
         public List<TestYield> RealTimeYields { get { return rltimeyield; } }
@@ -63,6 +80,8 @@ namespace Prometheus.Models
                 return ret;
             }
         }
+
+
 
 
         private List<TestYield> fyield = new List<TestYield>();
@@ -280,6 +299,46 @@ namespace Prometheus.Models
             }
         }
 
+        private static void RetrieveSNYield(ProjectYieldViewModule pyvm, List<ProjectTestData> plist, ProjectViewModels pvm)
+        {
+
+            var yielddict = new Dictionary<string, TestYield>();
+            var sndict = new Dictionary<string, bool>();
+            foreach (var p in plist)
+            {
+                if (!sndict.ContainsKey(p.WhichTest + ":" + p.ModuleSerialNum))
+                {
+                    sndict.Add(p.WhichTest + ":" + p.ModuleSerialNum, true);
+                    if (yielddict.ContainsKey(p.WhichTest))
+                    {
+                        yielddict[p.WhichTest].InputCount = yielddict[p.WhichTest].InputCount + 1;
+                        if (string.Compare(p.ErrAbbr, "PASS", true) == 0)
+                            yielddict[p.WhichTest].OutputCount = yielddict[p.WhichTest].OutputCount + 1;
+                    }
+                    else
+                    {
+                        var tempyield = new TestYield();
+                        tempyield.InputCount = 1;
+                        if (string.Compare(p.ErrAbbr, "PASS", true) == 0)
+                            tempyield.OutputCount = 1;
+                        else
+                            tempyield.OutputCount = 0;
+                        tempyield.WhichTest = p.WhichTest;
+
+                        yielddict.Add(p.WhichTest, tempyield);
+                    }
+                }
+            }
+
+            foreach (var s in pvm.StationList)
+            {
+                if (yielddict.ContainsKey(s.Station))
+                {
+                    pyvm.SNYields.Add(yielddict[s.Station]);
+                }
+            }
+        }
+
         private static void RetrieveFirstYield(ProjectYieldViewModule pyvm, List<ProjectTestData> plist, ProjectViewModels pvm)
         {
 
@@ -378,17 +437,44 @@ namespace Prometheus.Models
                 return ret;
             }
 
-            var realtimedatalist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, enddate, false);
-            RetrieveRealTimeYield(ret, realtimedatalist, pvm);
+            var fdatalist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, enddate, false);
+            RetrieveRealTimeYield(ret, fdatalist, pvm);
 
-            var plist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, enddate, true);
+            var tplist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, enddate, true);
             var snlist = ProjectTestData.RetrieveSNBeforeDate(pjkey, startdate);
-
             var validatedict = new Dictionary<string, bool>();
-            var filteredPjData = new List<ProjectTestData>();
-            foreach (var item in plist)
+
+            foreach (var item in tplist)
             {
                 if (!snlist.ContainsKey(item.ModuleSerialNum))
+                {
+                    if (!validatedict.ContainsKey(item.ModuleSerialNum))
+                    {
+                        validatedict.Add(item.ModuleSerialNum, true);
+                    }
+                }
+            }
+
+            var plist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate,DateTime.Parse(enddate).AddYears(5).ToString(), false);
+            var filteredPjData2 = new List<ProjectTestData>();
+            foreach (var item in plist)
+            {
+                if (validatedict.ContainsKey(item.ModuleSerialNum))
+                {
+                    filteredPjData2.Add(item);
+                }
+            }
+            RetrieveSNYield(ret, filteredPjData2, pvm);
+
+
+            //plist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, enddate, true);
+            snlist = ProjectTestData.RetrieveSNBeforeDateWithStation(pjkey, startdate);
+            validatedict = new Dictionary<string, bool>();
+            var filteredPjData = new List<ProjectTestData>();
+
+            foreach (var item in tplist)
+            {
+                if (!snlist.ContainsKey(item.ModuleSerialNum+"-"+item.WhichTest))
                 {
                     filteredPjData.Add(item);
                     if (!validatedict.ContainsKey(item.ModuleSerialNum))
@@ -401,9 +487,9 @@ namespace Prometheus.Models
             RetrieveFirstYield(ret, filteredPjData, pvm);
 
 
-            plist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, DateTime.Parse(enddate).AddYears(5).ToString(), false);
-            var filteredPjData2 = new List<ProjectTestData>();
-            foreach (var item in plist)
+            //plist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, enddate, false);
+            filteredPjData2 = new List<ProjectTestData>();
+            foreach (var item in fdatalist)
             {
                 if (validatedict.ContainsKey(item.ModuleSerialNum))
                 {

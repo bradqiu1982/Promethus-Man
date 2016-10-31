@@ -408,7 +408,7 @@
             @if (Model.SubIssues.Count > 0)
             {
                 <hr/>
-                <div class="form-group">
+                @*<div class="form-group">
                     <div class="col-md-12">
                         <div class="panel panel-default">
                             <div class="panel-heading">
@@ -436,8 +436,75 @@
 
                         </div>
                     </div>
+                </div>*@
+            }
+
+            @if (Model.ContainmentActions.Count > 0)
+            {
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Containment Actions</h3>
+                            </div>
+                            <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
+                                <div class="row">
+                                    <div class="col-md-4">Summary</div>
+                                    <div class="col-md-2">Status</div>
+                                    <div class="col-md-2">Asignee</div>
+                                    <div class="col-md-2">DueDate</div>
+                                    <div class="col-md-2"></div>
+                                </div>
+                                @foreach (var item in Model.ContainmentActions)
+                                {
+                                    <div class="row">
+                                        <div class="col-md-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace("[Containment]", "")</a></div>
+                                        <div class="col-md-2">@item.Resolution</div>
+                                        <div class="col-md-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
+                                        <div class="col-md-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
+                                        <div class="col-md-2"></div>
+                                    </div>
+                                }
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
             }
+
+            @if (Model.CorrectiveActions.Count > 0)
+            {
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Corrective Actions</h3>
+                            </div>
+                            <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
+                                <div class="row">
+                                    <div class="col-md-4">Summary</div>
+                                    <div class="col-md-2">Status</div>
+                                    <div class="col-md-2">Asignee</div>
+                                    <div class="col-md-2">DueDate</div>
+                                    <div class="col-md-2"></div>
+                                </div>
+                                @foreach (var item in Model.CorrectiveActions)
+                                {
+                                    <div class="row">
+                                        <div class="col-md-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace("[Corrective]", "")</a></div>
+                                        <div class="col-md-2">@item.Resolution</div>
+                                        <div class="col-md-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
+                                        <div class="col-md-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
+                                        <div class="col-md-2"></div>
+                                    </div>
+                                }
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            }
+
 
             @if (Model != null && Model.AttachList.Count > 0)
             {

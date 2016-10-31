@@ -7,7 +7,15 @@
 
 <div class="row">
     <div class="col-md-3">
+    @if (Model != null && Model.Count() > 0)
+    {
+         <h2>@Model.ElementAt(0).ProjectKey RMA Status</h2>
+    }
+    else
+    {
         <h2>Project RMA Status</h2>
+    }
+        
     </div>
     <div class="col-md-2 text-center">
         <h2><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>

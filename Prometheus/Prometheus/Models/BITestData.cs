@@ -94,13 +94,20 @@ namespace Prometheus.Models
         public static Dictionary<string, DateTime> RetrieveAllDataID(string projectkey)
         {
             var ret = new Dictionary<string, DateTime>();
-            var sql = "select ModuleSerialNum,WhichTest,TestTimeStamp from BITestData where ProjectKey = '<ProjectKey>'";
+            var sql = "select ModuleSerialNum,WhichTest,TestTimeStamp from BITestData where ProjectKey = '<ProjectKey>' order by TestTimeStamp DESC";
             sql = sql.Replace("<ProjectKey>", projectkey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             foreach (var item in dbret)
             {
-                ret.Add(Convert.ToString(item[0])+"_"+ Convert.ToString(item[1]), DateTime.Parse(Convert.ToString(item[2])));
-            }
+                try
+                {
+                    if (!ret.ContainsKey(Convert.ToString(item[0]) + "_" + Convert.ToString(item[1])))
+                    {
+                        ret.Add(Convert.ToString(item[0])+"_"+ Convert.ToString(item[1]), DateTime.Parse(Convert.ToString(item[2])));
+                    }
+                }
+                catch(Exception ex) { }
+           }
             return ret;
         }
 

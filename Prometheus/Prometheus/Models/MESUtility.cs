@@ -73,7 +73,9 @@ namespace Prometheus.Models
                 {
                     if (string.Compare(s.Station.ToUpper(), m.Station.ToUpper()) == 0)
                     {
+                        if (!tables.ContainsKey(s.Station)) { 
                         tables.Add(s.Station,m.TableName);
+                        }
                         break;
                     }
                 }

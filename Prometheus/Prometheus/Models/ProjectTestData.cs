@@ -264,7 +264,10 @@ namespace Prometheus.Models
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             foreach (var item in dbret)
             {
-                ret.Add(Convert.ToString(item[0]), true);
+                if (!ret.ContainsKey(Convert.ToString(item[0])))
+                {
+                    ret.Add(Convert.ToString(item[0]), true);
+                }
             }
             return ret;
         }

@@ -71,7 +71,6 @@ $(function () {
         {
             type: 'line',
             name: 'Corrective FY',
-            visible: false,
             data: [#CorrectiveYield#],
             marker: {
                 lineWidth: 2,

@@ -3013,22 +3013,36 @@ namespace Prometheus.Controllers
                     foreach (var w in waferlist)
                     {
                         var yield = ProjectBIYieldViewModule.GetYieldByWafer(item, w);
-                        if (yield.CorrectLastYield > 0.1 && yield.CorrectLastYield < 0.99)
+                        if (yield.CorrectLastYield > 0.1 && yield.CorrectLastYield < 0.98)
                         {
+                            var suminput = 0;
+                            var sumoutput = 0;
+                            var sumcrrectoutput = 0;
+
+                            foreach (var yitem in yield.LastYields)
+                            {
+                                suminput = suminput + yitem.InputCount;
+                                sumoutput = sumoutput + yitem.OutputCount;
+                                sumcrrectoutput = sumcrrectoutput + yitem.CorrectOutputCount;
+                            }
+                            content = content + "Warning: the yield of " + item + " wafer " + w + " is " + (yield.CorrectLastYield * 100.0).ToString("0.00") + "%\r\n"
+                                +"Input: "+suminput.ToString() + "Output: " + sumoutput.ToString() + "\r\n"
+                                + (suminput- sumcrrectoutput).ToString()+" modules need to be solved and "+(sumcrrectoutput - sumoutput).ToString() +" modules has been solved" +"\r\n";
+
                             if (!emailed.ContainsKey(item + "-" + w))
                             {
                                 emailed.Add(item + "-" + w, yield.CorrectLastYield);
-                                content = content+"Warning: the yield of " + item + " wafer " + w + " is " + (yield.CorrectLastYield * 100.0).ToString("0.00") + "%\r\n";
-                                
+                                //content = content + "Warning: the yield of " + item + " wafer " + w + " is " + (yield.CorrectLastYield * 100.0).ToString("0.00") + "%\r\n";
+
                             }
                             else
                             {
-                                var lasttimeyield = Convert.ToDouble(emailed[item + "-" + w]);
-                                if ((yield.CorrectLastYield - lasttimeyield) < -0.01)
-                                {
+                                //var lasttimeyield = Convert.ToDouble(emailed[item + "-" + w]);
+                                //if ((yield.CorrectLastYield - lasttimeyield) < -0.01)
+                                //{
                                     emailed[item + "-" + w] = yield.CorrectLastYield;
-                                    content = content + "Warning: the yield of " + item + " wafer " + w + " is " + (yield.CorrectLastYield * 100.0).ToString("0.00") + "%\r\n";
-                                }
+                                //    content = content + "Warning: the yield of " + item + " wafer " + w + " is " + (yield.CorrectLastYield * 100.0).ToString("0.00") + "%\r\n";
+                                //}
                             }
                         }
                     }//end foreach
@@ -3043,6 +3057,8 @@ namespace Prometheus.Controllers
                     toaddrs.Add("daly.li@finisar.com");
                     toaddrs.Add("tyler.zhang@finisar.com");
                     toaddrs.Add("tony.lv@finisar.com");
+                    toaddrs.Add("Zhongxi.Yu@finisar.com");
+                    toaddrs.Add("Zhijun.Chen@finisar.com");
                     EmailUtility.SendEmail("VCSEL WAFER YIELD WARNING", toaddrs, content);
                     new System.Threading.ManualResetEvent(false).WaitOne(10000);
                 }

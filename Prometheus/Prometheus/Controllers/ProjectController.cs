@@ -758,7 +758,11 @@ namespace Prometheus.Controllers
             var pndict = new Dictionary<string, bool>();
             foreach (var pn in oldpjdata.PNList)
             {
-                pndict.Add(pn.Pn, true);
+                if (!pndict.ContainsKey(pn.Pn))
+                {
+                    pndict.Add(pn.Pn, true);
+                }
+                    
             }
 
             bool changed = false;
@@ -778,7 +782,10 @@ namespace Prometheus.Controllers
             var stationdict = new Dictionary<string, bool>();
             foreach (var stat in oldpjdata.StationList)
             {
-                stationdict.Add(stat.Station, true);
+                if (!stationdict.ContainsKey(stat.Station))
+                {
+                    stationdict.Add(stat.Station, true);
+                }
             }
 
             foreach (var stat in newpjdata.StationList)
@@ -798,7 +805,10 @@ namespace Prometheus.Controllers
             var pndict = new Dictionary<string, bool>();
             foreach (var pn in oldpjdata.PNList)
             {
-                pndict.Add(pn.Pn, true);
+                if (!pndict.ContainsKey(pn.Pn))
+                {
+                    pndict.Add(pn.Pn, true);
+                }
             }
 
             bool changed = false;
@@ -1012,7 +1022,10 @@ namespace Prometheus.Controllers
                 var piedatadict = new Dictionary<string, int>();
                 foreach (var item in vm)
                 {
-                    piedatadict.Add(item.OrignalCode, item.ErrorCount);
+                    if (!piedatadict.ContainsKey(item.OrignalCode))
+                    {
+                        piedatadict.Add(item.OrignalCode, item.ErrorCount);
+                    }
                 }
 
                 var keys = piedatadict.Keys;

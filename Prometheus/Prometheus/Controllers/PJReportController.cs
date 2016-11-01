@@ -487,7 +487,15 @@ namespace Prometheus.Controllers
                         {
                             reportitem.YieldTrend = this.ViewBag.chartscript.Replace("weeklyyield",pjkey+ "weeklyyield");
                             this.ViewBag.chartscript = null;
-                            pjreportdict.Add(pjkey, reportitem);
+                            if (!pjreportdict.ContainsKey(pjkey))
+                            {
+                                pjreportdict.Add(pjkey, reportitem);
+                            }
+                            else
+                            {
+                                pjreportdict[pjkey].YieldTrend = reportitem.YieldTrend;
+                            }
+                            
                         }
 
                     }

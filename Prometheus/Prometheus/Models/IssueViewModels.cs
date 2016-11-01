@@ -50,7 +50,10 @@ namespace Prometheus.Models
 
         public static string ColorStatus(string status)
         {
-            if (string.Compare(status, Pending) == 0 || string.Compare(status, Reopen) == 0)
+            if (string.Compare(status, Pending) == 0 
+                || string.Compare(status, Reopen) == 0
+                || string.Compare(status, Unresolved) == 0
+                || string.Compare(status, NotReproduce) == 0)
             {
                 return "<font color = \"red\" ><strong>" +status + "</strong></font>";
             }
@@ -373,6 +376,14 @@ namespace Prometheus.Models
                     {
                         return Resolute.ColorStatus(Resolute.NotFix);
                     }
+                    if (item.Resolution == Resolute.Unresolved)
+                    {
+                        return Resolute.ColorStatus(Resolute.Unresolved);
+                    }
+                    if(item.Resolution == Resolute.NotReproduce)
+                    {
+                        return Resolute.ColorStatus(Resolute.NotReproduce);
+                    }
                 }
                 return Resolute.ColorStatus(Resolute.Done);
             }
@@ -402,6 +413,14 @@ namespace Prometheus.Models
                     if (item.Resolution == Resolute.NotFix)
                     {
                         return Resolute.ColorStatus(Resolute.NotFix);
+                    }
+                    if (item.Resolution == Resolute.Unresolved)
+                    {
+                        return Resolute.ColorStatus(Resolute.Unresolved);
+                    }
+                    if (item.Resolution == Resolute.NotReproduce)
+                    {
+                        return Resolute.ColorStatus(Resolute.NotReproduce);
                     }
                 }
                 return Resolute.ColorStatus(Resolute.Done);

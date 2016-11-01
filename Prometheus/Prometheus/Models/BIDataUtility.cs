@@ -228,9 +228,6 @@ namespace Prometheus.Models
         {
             try
             {
-                if (BITestData.UpdatePJLockUsing(vm.ProjectKey))
-                    return;
-
                 if (vm.PNList.Count > 0)
                     {
                         var failurelist = new List<BITestData>();
@@ -248,7 +245,6 @@ namespace Prometheus.Models
 
                     if (string.IsNullOrEmpty(pncond))
                     {
-                        BITestData.ResetUpdatePJLock(vm.ProjectKey);
                         return;
                     }
 
@@ -364,11 +360,9 @@ namespace Prometheus.Models
                         }
                     }
 
-                BITestData.ResetUpdatePJLock(vm.ProjectKey);
             }
             catch (Exception ex)
             {
-                BITestData.ResetUpdatePJLock(vm.ProjectKey);
             }
 
         }

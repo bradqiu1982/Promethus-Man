@@ -256,8 +256,6 @@ namespace Prometheus.Models
         {
             try
             {
-                if (ProjectTestData.UpdatePJLockUsing(vm.ProjectKey))
-                    return;
 
                 if (vm.StationList.Count > 0
                 && vm.TabList.Count > 0
@@ -372,11 +370,11 @@ namespace Prometheus.Models
                 
             }
 
-                ProjectTestData.ResetUpdatePJLock(vm.ProjectKey);
+
             }
             catch (Exception ex)
             {
-                ProjectTestData.ResetUpdatePJLock(vm.ProjectKey);
+                
             }
 
         }

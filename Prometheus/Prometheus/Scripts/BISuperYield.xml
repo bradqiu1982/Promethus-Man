@@ -25,7 +25,7 @@ $(function () {
             title: {
                 text: 'Percent'
             },
-            min: 0,
+            min: 80,
             max: 100,
             gridLineWidth: 0,
             tickPixelInterval: 36,

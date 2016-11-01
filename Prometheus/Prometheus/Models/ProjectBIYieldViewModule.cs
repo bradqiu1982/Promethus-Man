@@ -91,10 +91,12 @@ namespace Prometheus.Models
                         }
                         else
                         {
+                            yielddict[p.WhichTest].CorrectOutputCount = yielddict[p.WhichTest].CorrectOutputCount + 1;
+
                             if (correctbidict.ContainsKey(p.ModuleSerialNum)
-                                && string.Compare(correctbidict[p.ModuleSerialNum], BIROOTCAUSE.VCSELISSUE) != 0)
+                                && string.Compare(correctbidict[p.ModuleSerialNum], BIROOTCAUSE.VCSELISSUE) == 0)
                             {
-                                yielddict[p.WhichTest].CorrectOutputCount = yielddict[p.WhichTest].CorrectOutputCount + 1;
+                                yielddict[p.WhichTest].CorrectOutputCount = yielddict[p.WhichTest].CorrectOutputCount - 1;
                             }
                         }
                             
@@ -112,11 +114,11 @@ namespace Prometheus.Models
                         else
                         {
                             tempyield.OutputCount = 0;
-                            tempyield.CorrectOutputCount = 0;
+                            tempyield.CorrectOutputCount = 1;
                             if (correctbidict.ContainsKey(p.ModuleSerialNum)
-                                && string.Compare(correctbidict[p.ModuleSerialNum], BIROOTCAUSE.VCSELISSUE) != 0)
+                                && string.Compare(correctbidict[p.ModuleSerialNum], BIROOTCAUSE.VCSELISSUE) == 0)
                             {
-                                tempyield.CorrectOutputCount = 1;
+                                tempyield.CorrectOutputCount = 0;
                             }
                         }
 

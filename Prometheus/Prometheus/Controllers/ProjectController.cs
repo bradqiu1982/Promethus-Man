@@ -3000,7 +3000,7 @@ namespace Prometheus.Controllers
                     foreach (var w in waferlist)
                     {
                         var yield = ProjectBIYieldViewModule.GetYieldByWafer(item, w);
-                        if (yield.CorrectLastYield > 0.1 && yield.CorrectLastYield < 0.98)
+                        if (yield.CorrectLastYield > 0.1 && yield.CorrectLastYield < 0.99)
                         {
                             if (!emailed.ContainsKey(item + "-" + w))
                             {

@@ -37,6 +37,13 @@ namespace Prometheus.Models
                 { return 0.0; }
             }
         }
+
+        private Dictionary<string, bool> allsndict = new Dictionary<string, bool>();
+        public Dictionary<string, bool> AllSNDict { get { return allsndict; } }
+
+
+        private Dictionary<string, bool> errsndict = new Dictionary<string, bool>();
+        public Dictionary<string, bool> ErrSNDict { get { return errsndict; } }
     }
 
     public class ProjectYieldViewModule

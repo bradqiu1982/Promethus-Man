@@ -22,51 +22,56 @@ namespace Prometheus.Models
         {
             var ret = new List<ProjectFAViewModules>();
             var issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Working,50);
+            var issuedict2 = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Pending, 500);
+            issuedict.AddRange(issuedict2);
+
+            var bisndict = new Dictionary<string, string>();
+            var fasndict = new Dictionary<string, string>();
+
             foreach (var d in issuedict)
             {
                 if (d.Summary.Contains("@Burn-In Step"))
                 {
-                    var pd = new ProjectTestData();
-                    var splitinfo = d.Summary.Split(new string[] { " " }, StringSplitOptions.None);
-                    if (splitinfo.Length > 4)
+                    var sn = "";
+                    var pjdata = BITestData.RetrieveProjectTestDataByDataID(d.IssueKey);
+                    if (pjdata.Count > 0)
                     {
-                        pd.ModuleSerialNum = splitinfo[1];
-                        pd.ErrAbbr = splitinfo[4];
+                        sn = pjdata[0].ModuleSerialNum;
+                    }
+
+                    if (!string.IsNullOrEmpty(sn) && !bisndict.ContainsKey(sn))
+                    {
+                        bisndict.Add(sn, d.ReportDate.ToString());
+                        var pd = new ProjectTestData();
+                        pd.ModuleSerialNum = sn;
+                        pd.ErrAbbr = pjdata[0].ErrAbbr;
                         pd.ProjectKey = d.ProjectKey;
                         ret.Add(new ProjectFAViewModules(d, pd));
+                    }
+                    else if (!string.IsNullOrEmpty(sn) && bisndict.ContainsKey(sn))
+                    {
+                        //close automaticlly
+                        IssueViewModels.CloseDupBIIssueAutomaticlly(d.ProjectKey, sn, bisndict[sn]);
                     }
                 }
                 else
                 {
+                    var sn = "";
                     var pjdata = ProjectTestData.RetrieveProjectTestData(d.IssueKey);
                     if (pjdata.Count > 0)
                     {
-                        ret.Add(new ProjectFAViewModules(d, pjdata[0]));
-                    }
-                }
-            }
-
-            issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Pending,500);
-            foreach (var d in issuedict)
-            {
-                if (d.Summary.Contains("@Burn-In Step"))
-                {
-                    var pd = new ProjectTestData();
-                    var splitinfo = d.Summary.Split(new string[] { " " }, StringSplitOptions.None);
-                    if (splitinfo.Length > 4) {
-                        pd.ModuleSerialNum = splitinfo[1];
-                        pd.ErrAbbr = splitinfo[4];
-                        pd.ProjectKey = d.ProjectKey;
-                        ret.Add(new ProjectFAViewModules(d, pd));
+                        sn = pjdata[0].ModuleSerialNum;
                     }
 
-                }
-                else
-                {
-                    var pjdata = ProjectTestData.RetrieveProjectTestData(d.IssueKey);
-                    if (pjdata.Count > 0)
+                    if (!string.IsNullOrEmpty(sn) && !fasndict.ContainsKey(sn))
                     {
+                        fasndict.Add(sn, d.ReportDate.ToString());
                         ret.Add(new ProjectFAViewModules(d, pjdata[0]));
+                    }
+                    else if (!string.IsNullOrEmpty(sn) && fasndict.ContainsKey(sn))
+                    {
+                        //close automaticlly
+                        IssueViewModels.CloseDupIssueAutomaticlly(d.ProjectKey, sn, fasndict[sn]);
                     }
                 }
             }
@@ -83,12 +88,12 @@ namespace Prometheus.Models
             {
                 if (d.Summary.Contains("@Burn-In Step"))
                 {
-                    var pd = new ProjectTestData();
-                    var splitinfo = d.Summary.Split(new string[] { " " }, StringSplitOptions.None);
-                    if (splitinfo.Length > 4)
+                    var pjdata = BITestData.RetrieveProjectTestDataByDataID(d.IssueKey);
+                    if (pjdata.Count > 0)
                     {
-                        pd.ModuleSerialNum = splitinfo[1];
-                        pd.ErrAbbr = splitinfo[4];
+                        var pd = new ProjectTestData();
+                        pd.ModuleSerialNum = pjdata[0].ModuleSerialNum;
+                        pd.ErrAbbr = pjdata[0].ErrAbbr;
                         pd.ProjectKey = d.ProjectKey;
                         ret.Add(new ProjectFAViewModules(d, pd));
                     }

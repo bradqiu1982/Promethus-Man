@@ -187,6 +187,25 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static List<BITestData> RetrieveProjectTestDataByDataID(string DataID)
+        {
+
+            var ret = new List<BITestData>();
+            var sql = "select ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN,Wafer,Waferpn from BITestData where DataID = '<DataID>'";
+
+            sql = sql.Replace("<DataID>", DataID);
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            foreach (var item in dbret)
+            {
+                var tempdata = new BITestData(Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])
+                    , Convert.ToString(item[3]), Convert.ToString(item[4]), Convert.ToString(item[5])
+                    , Convert.ToString(item[6]), Convert.ToString(item[7]), Convert.ToString(item[8]), Convert.ToString(item[9]), Convert.ToString(item[10]));
+                ret.Add(tempdata);
+            }
+            return ret;
+        }
+
         public static List<string> RetrieveAllWafer(string projectkey)
         {
             var ret = new List<string>();

@@ -187,10 +187,10 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<BITestData> RetrieveProjectTestDataByDataID(string DataID)
+        public static List<ProjectTestData> RetrieveProjectTestDataByDataID(string DataID)
         {
 
-            var ret = new List<BITestData>();
+            var ret = new List<ProjectTestData>();
             var sql = "select ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN,Wafer,Waferpn from BITestData where DataID = '<DataID>'";
 
             sql = sql.Replace("<DataID>", DataID);
@@ -198,9 +198,27 @@ namespace Prometheus.Models
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             foreach (var item in dbret)
             {
-                var tempdata = new BITestData(Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])
+                var tempdata = new ProjectTestData(Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])
                     , Convert.ToString(item[3]), Convert.ToString(item[4]), Convert.ToString(item[5])
-                    , Convert.ToString(item[6]), Convert.ToString(item[7]), Convert.ToString(item[8]), Convert.ToString(item[9]), Convert.ToString(item[10]));
+                    , Convert.ToString(item[6]), Convert.ToString(item[7]), Convert.ToString(item[8]));
+                ret.Add(tempdata);
+            }
+            return ret;
+        }
+
+        public static List<ProjectTestData> RetrieveProjectTestDataWithErrAbbr(int topnum, string ProjectKey, string ErrAbbr)
+        {
+            //ProjectTestData.PrePareLatestData(ProjectKey);
+
+            var ret = new List<ProjectTestData>();
+            var sql = "select top <topnum> ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN from BITestData where ProjectKey = '<ProjectKey>' and ErrAbbr = '<ErrAbbr>' order by TestTimeStamp DESC";
+            sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<topnum>", Convert.ToString(topnum)).Replace("<ErrAbbr>", ErrAbbr);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            foreach (var item in dbret)
+            {
+                var tempdata = new ProjectTestData(Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])
+                    , Convert.ToString(item[3]), Convert.ToString(item[4]), Convert.ToString(item[5])
+                    , Convert.ToString(item[6]), Convert.ToString(item[7]), Convert.ToString(item[8]));
                 ret.Add(tempdata);
             }
             return ret;

@@ -166,12 +166,38 @@
     if (ViewBag.chartscript == null && fadata != null && fadata.Count > 0 && ViewBag.DoneIssueList != null)
     {
         <div class="row">
+            <div class="col-md-1 text-center">
+                <span class="input-group-addon">
+                    <input type="checkbox" id="checkall" name="checkall" onclick="ChooseAll(this)" />
+                </span>
+            </div>
             <div class="col-md-2 text-center">
                 <input type="submit" value="Same As" class="btn btn-default" />
             </div>
-            <div class="col-md-10 text-center">
+            <div class="col-md-9 text-center">
                 @Html.DropDownList("DoneIssueList", null, new { @id = "DoneIssueList", @class = "form-control"})
             </div>
+            <script type="text/javascript">
+                function ChooseAll(oBox) {
+                    if (oBox.checked === true)
+                    {
+                        for (var idx = 0; idx < 300; idx++)
+                        {
+                            if (document.getElementById("check" + idx)){
+                                document.getElementById("check" + idx).checked = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (var idx = 0; idx < 300; idx++) {
+                            if (document.getElementById("check" + idx)) {
+                                document.getElementById("check" + idx).checked = false;
+                            }
+                        }
+                    }
+                }
+            </script>
         </div>
     }
 }

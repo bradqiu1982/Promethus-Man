@@ -142,10 +142,16 @@ namespace Prometheus.Models
         {
             var ret = new List<ProjectFAViewModules>();
             var pjdata = ProjectTestData.RetrieveProjectTestDataWithErrAbbr(100000, ProjectKey, ErrAbbr);
+            if (pjdata.Count == 0)
+            {
+                pjdata = BITestData.RetrieveProjectTestDataWithErrAbbr(100000, ProjectKey, ErrAbbr);
+            }
+
+
             foreach (var d in pjdata)
             {
                 var im = IssueViewModels.RetrieveIssueByIssueKey(d.DataID);
-                if (im != null)
+                if (im != null && im.Resolution != Resolute.AutoClose)
                 {
                     ret.Add(new ProjectFAViewModules(im, d));
                 }

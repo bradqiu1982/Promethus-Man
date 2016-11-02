@@ -1124,8 +1124,24 @@ namespace Prometheus.Controllers
                 tobedata.UpdateIssue();
                 tobedata.CloseIssue();
             }
+            var pjdata = ProjectTestData.RetrieveProjectTestData(targetissuekey);
+            if (pjdata.Count == 0)
+            {
+                pjdata = BITestData.RetrieveProjectTestDataByDataID(targetissuekey);
+            }
 
-            return RedirectToAction("ViewAll", "Project");
+            if (pjdata.Count > 0)
+            {
+                var dict = new RouteValueDictionary();
+                dict.Add("ProjectKey", pjdata[0].ProjectKey);
+                dict.Add("ErrAbbr", pjdata[0].ErrAbbr);
+                return RedirectToAction("ProjectErrAbbr", "Project",dict);
+            }
+            else
+            {
+                return RedirectToAction("ViewAll", "Project");
+            }
+
         }
 
 

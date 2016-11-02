@@ -3006,6 +3006,7 @@ namespace Prometheus.Controllers
             {
                 var emailed = VcselEmailCheck();
                 var content = string.Empty;
+                var logcontent = string.Empty;
 
                 foreach (var item in pjkeylist)
                 {
@@ -3015,19 +3016,43 @@ namespace Prometheus.Controllers
                         var yield = ProjectBIYieldViewModule.GetYieldByWafer(item, w);
                         if (yield.CorrectLastYield > 0.1 && yield.CorrectLastYield < 0.98)
                         {
-                            var suminput = 0;
-                            var sumoutput = 0;
-                            var sumcrrectoutput = 0;
+
+                            var alldict = new Dictionary<string, bool>();
+                            var errdict = new Dictionary<string, bool>();
 
                             foreach (var yitem in yield.LastYields)
                             {
-                                suminput = suminput + yitem.InputCount;
-                                sumoutput = sumoutput + yitem.OutputCount;
-                                sumcrrectoutput = sumcrrectoutput + yitem.CorrectOutputCount;
+                                foreach (var snitem in yitem.AllSNDict)
+                                {
+                                    if (!alldict.ContainsKey(snitem.Key))
+                                    {
+                                        alldict.Add(snitem.Key, true);
+                                    }
+                                }
+
+                                foreach (var snitem in yitem.ErrSNDict)
+                                {
+                                    if (!errdict.ContainsKey(snitem.Key))
+                                    {
+                                        errdict.Add(snitem.Key, true);
+                                    }
+                                }
                             }
-                            content = content + "Warning: the yield of " + item + " wafer " + w + " is " + (yield.CorrectLastYield * 100.0).ToString("0.00") + "%\r\n"
-                                +"Input: "+suminput.ToString() + " Output: " + sumoutput.ToString() + "\r\n"
-                                + (suminput- sumcrrectoutput).ToString()+" modules need to be solved and "+(sumcrrectoutput - sumoutput).ToString() +" modules has been solved" +"\r\n";
+
+                            content = content + "Warning: the corrective yield of " + item + " wafer " + w + " is " + (yield.CorrectLastYield * 100.0).ToString("0.00") + "%\r\n"
+                                +"Input: "+ alldict.Count.ToString() + " Output: " + (alldict.Count-errdict.Count).ToString() + "\r\n";
+
+                            logcontent = logcontent + content;
+                            logcontent = logcontent + "All SN:\r\n";
+                            foreach (var sn in alldict)
+                            {
+                                logcontent = logcontent + sn.Key+"\r\n";
+                            }
+                            logcontent = logcontent + "Error SN:\r\n";
+                            foreach (var sn in errdict)
+                            {
+                                logcontent = logcontent + sn.Key + "\r\n";
+                            }
 
                             if (!emailed.ContainsKey(item + "-" + w))
                             {
@@ -3050,8 +3075,21 @@ namespace Prometheus.Controllers
 
                 VcselEmailStore(emailed);
 
+
+
                 if (!string.IsNullOrEmpty(content))
                 {
+                    var fn = "VCSEL_WAFER_SN" + DateTime.Now.ToString("yyyy-MM-dd") + ".txt";
+                    var logvcsel = Server.MapPath("~/userfiles") + "\\" + fn;
+                    System.IO.File.WriteAllText(logvcsel, logcontent);
+
+                    var url = "/userfiles/" + fn;
+                    var routevalue = new RouteValueDictionary();
+                    routevalue.Add("issuekey", "ABC");
+                    string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                    string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+                    validatestr = validatestr.Split(new string[] { "/Issue" }, StringSplitOptions.None)[0]+ url;
+
                     var toaddrs = new List<string>();
                     toaddrs.Add("windy.ju@finisar.com");
                     toaddrs.Add("daly.li@finisar.com");
@@ -3059,7 +3097,7 @@ namespace Prometheus.Controllers
                     toaddrs.Add("tony.lv@finisar.com");
                     toaddrs.Add("Zhongxi.Yu@finisar.com");
                     toaddrs.Add("Zhijun.Chen@finisar.com");
-                    EmailUtility.SendEmail("VCSEL WAFER YIELD WARNING", toaddrs, content);
+                    EmailUtility.SendEmail("VCSEL WAFER YIELD WARNING", toaddrs, content + "\r\n Wafer SN File: " + validatestr);
                     new System.Threading.ManualResetEvent(false).WaitOne(10000);
                 }
 

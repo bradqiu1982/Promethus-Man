@@ -588,27 +588,42 @@
                 </div>
             }
 
-            @foreach (var item in Model.RootCauseCommentList)
+            @if (Model.RootCauseCommentList.Count > 0)
             {
                 <hr />
-                <div class="form-group">
-                    <div class="col-md-12">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Root Cause</h3>
-                            </div>
-                            <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
-                                @Html.Raw(item.Comment)
-                            </div>
-                            <div class="panel-footer text-right">
-                                Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.CommentDate.ToString()
+
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Root Cause</h3>
+                                </div>
+                                <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
+                                        @foreach (var item in Model.RootCauseCommentList)
+                                        {
+                                            <div class="row col-md-12">
+                                                @Html.Raw(item.Comment)
+                                            </div>
+                                            <div class="row col-md-12">
+                                                <div class="col-md-8"></div>
+                                                <div class="col-md-2">
+                                                    Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    @item.CommentDate.ToString()
+                                                </div>
+                                            </div>
+                                       }
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
             }
 
-            @foreach (var item in Model.Report4CustomerCommentList)
+
+
+            
+            @if(Model.Report4CustomerCommentList.Count > 0)
             {
                 <hr />
                 <div class="form-group">
@@ -618,26 +633,41 @@
                                 <h3 class="panel-title">Report for customer</h3>
                             </div>
                             <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
-                                @if (item.Comment.Contains("<a href"))
+                                @foreach (var item in Model.Report4CustomerCommentList)
                                 {
-                                    @Html.Raw(item.Comment)
+                                    <div class="row col-md-12">
+
+                                    @if (item.Comment.Contains("<a href"))
+                                    {
+                                        @Html.Raw(item.Comment)
+                                    }
+                                    else
+                                    {
+                                        var fns = item.Comment.Split(new char[] { '/' });
+                                        var fn = fns[fns.Length - 1];
+                                        <a href="@item.Comment" target="_blank">@fn</a>
+                                    }
+
+                                    </div>
+
+                                    <div class="row col-md-12">
+                                        <div class="col-md-8"></div>
+                                        <div class="col-md-2">
+                                            Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>
+                                        </div>
+                                        <div class="col-md-2">
+                                            @item.CommentDate.ToString()
+                                        </div>
+                                    </div>
                                 }
-                                else
-                                {
-                                    var fns = item.Comment.Split(new char[] { '/' });
-                                    var fn = fns[fns.Length - 1];
-                                    <a href="@item.Comment" target="_blank">@fn</a>
-                                }
-                            </div>
-                            <div class="panel-footer text-right">
-                                Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.CommentDate.ToString()
                             </div>
                         </div>
                     </div>
                 </div>
             }
 
-            @foreach (var item in Model.InternalReportCommentList)
+            
+            @if(Model.InternalReportCommentList.Count > 0)
             {
                 <hr />
                 <div class="form-group">
@@ -647,20 +677,34 @@
                                 <h3 class="panel-title">Internal Report</h3>
                             </div>
                             <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
-                               @if (item.Comment.Contains("<a href"))
-                               {
-                                    @Html.Raw(item.Comment)
-                               }
-                               else
-                               {
-                                   var fns = item.Comment.Split(new char[] { '/' });
-                                   var fn = fns[fns.Length - 1];
-                                    <a href="@item.Comment" target="_blank">@fn</a>
-                               }
+                                @foreach (var item in Model.InternalReportCommentList)
+                                {
+                                    <div class="row col-md-12">
+
+                                        @if (item.Comment.Contains("<a href"))
+                                        {
+                                            @Html.Raw(item.Comment)
+                                        }
+                                        else
+                                        {
+                                            var fns = item.Comment.Split(new char[] { '/' });
+                                            var fn = fns[fns.Length - 1];
+                                            <a href="@item.Comment" target="_blank">@fn</a>
+                                        }
+
+                                    </div>
+                                    <div class="row col-md-12">
+                                        <div class="col-md-8"></div>
+                                        <div class="col-md-2">
+                                            Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>
+                                        </div>
+                                        <div class="col-md-2">
+                                            @item.CommentDate.ToString()
+                                        </div>
+                                    </div>
+                                }
                             </div>
-                            <div class="panel-footer text-right">
-                                Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.CommentDate.ToString()
-                            </div>
+
                         </div>
                     </div>
                 </div>

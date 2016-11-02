@@ -132,6 +132,7 @@ namespace Prometheus.Models
                     vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
                     vm.Description = "Module " + item.ModuleSerialNum + " failed for " + item.ErrAbbr + " @ " + item.WhichTest +" on tester "+item.TestStation + " "+item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss");
                     vm.CommentType = COMMENTTYPE.Description;
+                    vm.ModuleSN = item.ModuleSerialNum;
                     ProjectEvent.CreateIssueEvent(vm.ProjectKey, "System", vm.Assignee, vm.Summary, vm.IssueKey);
                     vm.StoreIssue();
                 }
@@ -364,7 +365,7 @@ namespace Prometheus.Models
                 {
                     foreach (var item in passlist)
                     {
-                        IssueController.CloseIssueAutomaticlly(item.ProjectKey,item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss"));
+                        IssueViewModels.CloseIssueAutomaticlly(item.ProjectKey,item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss"));
                     }
                 }
                 

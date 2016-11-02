@@ -47,6 +47,7 @@ namespace Prometheus.Models
         public static string Unresolved = "Unresolved";
         public static string NotReproduce ="Cannot Reproduce";
         public static string Started = "Started";
+        public static string AutoClose = "AutoClose";
 
         public static string ColorStatus(string status)
         {
@@ -874,27 +875,12 @@ namespace Prometheus.Models
             return retdict;
         }
 
-        public static List<IssueViewModels> RRetrieveFABySN(string pjkey,string SN,string whichtest, string issuestatus)
+        public static List<IssueViewModels> RRetrieveFABySN(string pjkey,string SN,string whichtest)
         {
             var retdict = new List<IssueViewModels>();
 
             var cond = "";
-            var fixresolve = "";
-            if (string.Compare(issuestatus, Resolute.Pending) == 0)
-            {
-                cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";
-                fixresolve = Resolute.Pending;
-            }
-            else if (string.Compare(issuestatus, Resolute.Working) == 0)
-            {
-                cond = "('" + Resolute.Working + "')";
-                fixresolve = Resolute.Working;
-            }
-            else
-            {
-                cond = "('" + Resolute.Fixed + "','" + Resolute.Done + "','" + Resolute.NotFix + "','" + Resolute.NotReproduce + "','" + Resolute.Unresolved + "')";
-                fixresolve = Resolute.Done;
-            }
+            cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";
 
             var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples from Issue where ParentIssueKey = '' and ProjectKey = '<ProjectKey>' and Summary like '%<ModuleSerialNum>%' and Summary like '%<whichtest>%'  and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' order by ReportDate DESC";
             sql = sql.Replace("<ModuleSerialNum>", SN).Replace("<cond>", cond).Replace("<whichtest>", whichtest).Replace("<ProjectKey>", pjkey)
@@ -917,30 +903,71 @@ namespace Prometheus.Models
             return retdict;
         }
 
-        public static List<IssueViewModels> RRetrieveBIFABySN(string pjkey, string SN, string whichtest, string issuestatus)
+        public static List<IssueViewModels> RRetrieveDupFABySN(string pjkey, string SN,string datestr)
         {
             var retdict = new List<IssueViewModels>();
 
             var cond = "";
-            var fixresolve = "";
-            if (string.Compare(issuestatus, Resolute.Pending) == 0)
+            cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";
+
+            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples from Issue where ParentIssueKey = '' and ProjectKey = '<ProjectKey>' and Summary like '%<ModuleSerialNum>%' and ReportDate < '<DATESTR>'  and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' order by ReportDate DESC";
+            sql = sql.Replace("<ModuleSerialNum>", SN).Replace("<cond>", cond).Replace("<DATESTR>", datestr).Replace("<ProjectKey>", pjkey)
+                    .Replace("<IssueType1>", ISSUETP.NPIPROC).Replace("<IssueType2>", ISSUETP.RMA);
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            foreach (var line in dbret)
             {
-                cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";
-                fixresolve = Resolute.Pending;
+                var ret = new IssueViewModels(Convert.ToString(line[0])
+                    , Convert.ToString(line[1]), Convert.ToString(line[2])
+                    , Convert.ToString(line[3]), Convert.ToString(line[4])
+                    , Convert.ToString(line[5]), Convert.ToString(line[6])
+                    , Convert.ToString(line[7]), Convert.ToString(line[8])
+                    , Convert.ToString(line[9]), Convert.ToString(line[10])
+                    , Convert.ToString(line[11]), Convert.ToString(line[12]));
+
+                retdict.Add(ret);
             }
-            else if (string.Compare(issuestatus, Resolute.Working) == 0)
-            {
-                cond = "('" + Resolute.Working + "')";
-                fixresolve = Resolute.Working;
-            }
-            else
-            {
-                cond = "('" + Resolute.Fixed + "','" + Resolute.Done + "','" + Resolute.NotFix + "','" + Resolute.NotReproduce + "','" + Resolute.Unresolved + "')";
-                fixresolve = Resolute.Done;
-            }
+
+            return retdict;
+        }
+
+        public static List<IssueViewModels> RRetrieveBIFABySN(string pjkey, string SN, string whichtest)
+        {
+            var retdict = new List<IssueViewModels>();
+
+            var cond = "";
+            cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";
 
             var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples from Issue where ProjectKey = '<ProjectKey>' and Summary like '%<BICond>%' and Summary like '%<ModuleSerialNum>%' and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' order by ReportDate DESC";
             sql = sql.Replace("<ModuleSerialNum>", SN).Replace("<BICond>", " @Burn-In Step " + whichtest).Replace("<cond>", cond).Replace("<ProjectKey>", pjkey)
+                    .Replace("<IssueType1>", ISSUETP.NPIPROC).Replace("<IssueType2>", ISSUETP.RMA);
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                var ret = new IssueViewModels(Convert.ToString(line[0])
+                    , Convert.ToString(line[1]), Convert.ToString(line[2])
+                    , Convert.ToString(line[3]), Convert.ToString(line[4])
+                    , Convert.ToString(line[5]), Convert.ToString(line[6])
+                    , Convert.ToString(line[7]), Convert.ToString(line[8])
+                    , Convert.ToString(line[9]), Convert.ToString(line[10])
+                    , Convert.ToString(line[11]), Convert.ToString(line[12]));
+
+                retdict.Add(ret);
+            }
+
+            return retdict;
+        }
+
+        public static List<IssueViewModels> RRetrieveDupBIFABySN(string pjkey, string SN, string datestr)
+        {
+            var retdict = new List<IssueViewModels>();
+
+            var cond = "";
+            cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";
+
+            var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples from Issue where ProjectKey = '<ProjectKey>' and Summary like '%<BICond>%' and ReportDate < '<DATESTR>' and Summary like '%<ModuleSerialNum>%' and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' order by ReportDate DESC";
+            sql = sql.Replace("<ModuleSerialNum>", SN).Replace("<BICond>", " @Burn-In Step").Replace("<cond>", cond).Replace("<ProjectKey>", pjkey).Replace("<DATESTR>", datestr)
                     .Replace("<IssueType1>", ISSUETP.NPIPROC).Replace("<IssueType2>", ISSUETP.RMA);
 
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
@@ -1848,5 +1875,53 @@ namespace Prometheus.Models
             CreateMPIssues(projectname, pjkey, firstengineer);
         }
 
+
+        public static void CloseIssueAutomaticlly(string pjkey, string SN, string whichtest, string tester, string datestr)
+        {
+            var issues = IssueViewModels.RRetrieveFABySN(pjkey, SN, whichtest);
+            foreach (var tobedata in issues)
+            {
+                tobedata.Resolution = Resolute.AutoClose;
+                tobedata.Description = "Module " + SN + " passed " + whichtest + " test @" + tester + " @" + datestr;
+                tobedata.UpdateIssue();
+                tobedata.CloseIssue();
+            }
+        }
+
+        public static void CloseDupIssueAutomaticlly(string pjkey, string SN, string datestr)
+        {
+            var issues = IssueViewModels.RRetrieveDupFABySN(pjkey, SN, datestr);
+            foreach (var tobedata in issues)
+            {
+                tobedata.Resolution = Resolute.AutoClose;
+                tobedata.Description = "Module " + SN + " is closed automaticlly for duplication reason " + " @" + DateTime.Now.ToString();
+                tobedata.UpdateIssue();
+                tobedata.CloseIssue();
+            }
+        }
+
+        public static void CloseBIIssueAutomaticlly(string pjkey, string SN, string whichtest, string tester, string datestr)
+        {
+            var issues = IssueViewModels.RRetrieveBIFABySN(pjkey, SN, whichtest);
+            foreach (var tobedata in issues)
+            {
+                tobedata.Resolution = Resolute.AutoClose;
+                tobedata.Description = "Module " + SN + " passed " + whichtest + " test @" + tester + " @" + datestr;
+                tobedata.UpdateIssue();
+                tobedata.CloseIssue();
+            }
+        }
+
+        public static void CloseDupBIIssueAutomaticlly(string pjkey, string SN, string datestr)
+        {
+            var issues = IssueViewModels.RRetrieveDupBIFABySN(pjkey, SN, datestr);
+            foreach (var tobedata in issues)
+            {
+                tobedata.Resolution = Resolute.AutoClose;
+                tobedata.Description = "Module " + SN + "  is closed automaticlly for duplication reason " + " @" + DateTime.Now.ToString();
+                tobedata.UpdateIssue();
+                tobedata.CloseIssue();
+            }
+        }
     }
 }

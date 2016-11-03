@@ -1189,14 +1189,10 @@ namespace Prometheus.Controllers
             return RedirectToAction("ViewAll", "Project");
         }
 
-        private List<string> PrepeareRMAReport(string ProjectKey)
+        private List<string> PrepeareRMAReport(string ProjectKey, string StartDate, string EndDate)
         {
             var lines = new List<string>();
-            var list1 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Pending);
-            var list2 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Working);
-            var list3 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Done);
-            list1.AddRange(list2);
-            list1.AddRange(list3);
+            var list1 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, StartDate, EndDate);
 
             var line = "FINISAR RMA,SN,STATUS,CUSTOMER,RMA FAILURE CODE,ROOT CAUSE,OWENER,OPEN ISSUE DATE,CUSTOMER RMA REASON,INTERNAL REPORT,CUSTOMER REPORT";
             lines.Add(line);
@@ -1259,7 +1255,7 @@ namespace Prometheus.Controllers
             return lines;
         }
 
-        public ActionResult ExportRMAData(string ProjectKey)
+        public ActionResult ExportRMAData(string ProjectKey, string StartDate, string EndDate)
         {
             if (!string.IsNullOrEmpty(ProjectKey))
             {
@@ -1273,7 +1269,7 @@ namespace Prometheus.Controllers
                 var fn = ProjectKey+"_RMA_Report_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
                 var filename = imgdir + fn;
 
-                var lines = PrepeareRMAReport(ProjectKey);
+                var lines = PrepeareRMAReport(ProjectKey, StartDate, EndDate);
 
                 var wholefile = "";
                 foreach (var l in lines)
@@ -1287,10 +1283,10 @@ namespace Prometheus.Controllers
             return RedirectToAction("ViewAll", "Project");
         }
 
-        private List<string> PrepeareAllRMAReport()
+        private List<string> PrepeareAllRMAReport(string StartDate, string EndDate)
         {
             var lines = new List<string>();
-            var list1 = IssueViewModels.RetrieveAllRMAIssue();
+            var list1 = IssueViewModels.RetrieveAllRMAIssue(StartDate, EndDate);
 
             var line = "FINISAR RMA,PROJECT,SN,STATUS,CUSTOMER,RMA FAILURE CODE,ROOT CAUSE,OWENER,OPEN ISSUE DATE,CUSTOMER RMA REASON,INTERNAL REPORT,CUSTOMER REPORT";
             lines.Add(line);
@@ -1354,7 +1350,7 @@ namespace Prometheus.Controllers
             return lines;
         }
 
-        public ActionResult ExportAllRMAData()
+        public ActionResult ExportAllRMAData(string StartDate, string EndDate)
         {
             string datestring = DateTime.Now.ToString("yyyyMMdd");
             string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
@@ -1366,7 +1362,7 @@ namespace Prometheus.Controllers
             var fn = "NPI_RMA_Report_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
             var filename = imgdir + fn;
 
-            var lines = PrepeareAllRMAReport();
+            var lines = PrepeareAllRMAReport(StartDate,EndDate);
 
             var wholefile = "";
             foreach (var l in lines)

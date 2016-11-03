@@ -1282,11 +1282,73 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<IssueViewModels> RetrieveAllRMAIssue()
+        public static List<IssueViewModels> RetrieveRMAByProjectKey(string projectkey, string StartDate, string EndDate)
         {
+            var sql = "";
+            if (string.Compare(StartDate, "NONE", true) == 0)
+            {
+                sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where ProjectKey = '<ProjectKey>' and  ParentIssueKey = '' and IssueType = '<IssueType>' order by ReportDate DESC";
+                sql = sql.Replace("<ProjectKey>", projectkey).Replace("<IssueType>", ISSUETP.RMA);
+            }
+            else
+            {
+                sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where ProjectKey = '<ProjectKey>' and  ParentIssueKey = '' and IssueType = '<IssueType>' and ReportDate >= '<StartDate>' and ReportDate <= '<EndDate>' order by ReportDate DESC";
+                sql = sql.Replace("<ProjectKey>", projectkey).Replace("<IssueType>", ISSUETP.RMA).Replace("<StartDate>", StartDate).Replace("<EndDate>", EndDate);
+            }
 
-            var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where ParentIssueKey = '' and IssueType = '<IssueType>' order by ReportDate DESC";
-            sql = sql.Replace("<IssueType>", ISSUETP.RMA);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var ret = new List<IssueViewModels>();
+            foreach (var line in dbret)
+            {
+
+                var tempvm = new IssueViewModels(Convert.ToString(line[0])
+                    , Convert.ToString(line[1]), Convert.ToString(line[2])
+                    , Convert.ToString(line[3]), Convert.ToString(line[4])
+                    , Convert.ToString(line[5]), Convert.ToString(line[6])
+                    , Convert.ToString(line[7]), Convert.ToString(line[8])
+                    , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
+
+                tempvm.RetrieveRMA();
+
+                var tempclist = new List<IssueComments>();
+                var csql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
+                csql = csql.Replace("<IssueKey>", tempvm.IssueKey);
+                var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
+                foreach (var r in cdbret)
+                {
+                    var tempcomment = new IssueComments();
+                    tempcomment.IssueKey = Convert.ToString(r[0]);
+                    tempcomment.dbComment = Convert.ToString(r[1]);
+                    tempcomment.Reporter = Convert.ToString(r[2]);
+                    tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
+                    tempcomment.CommentType = Convert.ToString(r[4]);
+                    tempclist.Add(tempcomment);
+                }
+                tempvm.CommentList = tempclist;
+                tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey);
+
+                tempvm.RetrieveAttachment(tempvm.IssueKey);
+
+                ret.Add(tempvm);
+            }
+
+            return ret;
+        }
+
+        public static List<IssueViewModels> RetrieveAllRMAIssue(string StartDate, string EndDate)
+        {
+            var sql = "";
+            if (string.Compare(StartDate, "NONE", true) == 0)
+            {
+                sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where ParentIssueKey = '' and IssueType = '<IssueType>' order by ReportDate DESC";
+                sql = sql.Replace("<IssueType>", ISSUETP.RMA);
+            }
+            else
+            {
+                sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where ParentIssueKey = '' and IssueType = '<IssueType>' and ReportDate >= '<StartDate>' and ReportDate <= '<EndDate>' order by ReportDate DESC";
+                sql = sql.Replace("<IssueType>", ISSUETP.RMA).Replace("<StartDate>", StartDate).Replace("<EndDate>", EndDate);
+            }
+
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)

@@ -17,115 +17,178 @@
     }
         
     </div>
-    <div class="col-md-2 text-center">
-        <h2><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
-    </div>
-    <div class="col-md-2 text-center">
-        @if (Model != null && Model.Count() > 0)
-        {
-            <h2><a data-toggle="tooltip" title="Export RMA Report" href="/Issue/ExportRMAData?ProjectKey=@Model.ElementAt(0).ProjectKey" target="_blank"><span class="glyphicon glyphicon-share" aria-hidden="true"></span></a></h2>
-        }
-    </div>
-    <div class="col-md-2 text-left">
-        @if (Model != null && Model.Count() > 0)
-        {
-            <h2><a data-toggle="tooltip" title="Export All RMA Report" href="/Issue/ExportAllRMAData" target="_blank"><span class="glyphicon glyphicon-share" aria-hidden="true"></span>ALL</a></h2>
-        }
-    </div>
-    <div class="col-md-3"></div>
+    <div class="col-md-9"></div>
 </div>
 
-<hr />
+<hr/>
 
-@if (Model != null)
-{
-    <script src="~/Scripts/highcharts.js"></script>
-    <script src="~/Scripts/exporting.js"></script>
+<div class="row">
+    <div class="col-md-1">
+        <label class="control-label" for="StartDate">StartDate</label>
+    </div>
+    <div class="col-md-2">
+        <input class="form-control text-box single-line" id="StartDate" name="StartDate" type="text" value="" />
+    </div>
+    <div class="col-md-1">
+        <label class="control-label" for="EndDate">EndDate</label>
+    </div>
+    <div class="col-md-2">
+        <input class="form-control text-box single-line" id="EndDate" name="EndDate" type="text" value="" />
+    </div>
 
-    if (ViewBag.chartscript != null)
+    <div class="col-md-1">
+        @if (Model != null && Model.Count() > 0)
+        {
+            <button class="form-control" data-toggle="tooltip" title="Export RMA Report" onclick="ShareRMA()" type="button"><span class="glyphicon glyphicon-share" aria-hidden="true"></span></button>
+        }
+        @*<h2><a data-toggle="tooltip" title="Export RMA Report" href="/Issue/ExportRMAData?ProjectKey=@Model.ElementAt(0).ProjectKey" target="_blank"><span class="glyphicon glyphicon-share" aria-hidden="true"></span></a></h2>*@
+    </div>
+    <div class="col-md-1">
+        @if (Model != null && Model.Count() > 0)
+        {
+            <button class="form-control" data-toggle="tooltip" title="Export All RMA Report" onclick="ShareAllRMA()" type="button"><span class="glyphicon glyphicon-share" aria-hidden="true"></span>ALL</button>
+        }
+         @*<h2><a data-toggle="tooltip" title="Export All RMA Report" href="/Issue/ExportAllRMAData" target="_blank"><span class="glyphicon glyphicon-share" aria-hidden="true"></span>ALL</a></h2>*@
+    </div>
+    
+    <div class="col-md-1">
+        <button class="form-control" data-toggle="tooltip" title="Goto ViewAll" onclick="GoToAll()" type="button"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></button>
+        @*<h2><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>*@
+    </div>
+    <div class="col-md-3"></div>
+    <script type="text/javascript">
+            $(document).ready(function () {
+                $("#StartDate").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    dateFormat: 'yy-mm-dd'
+                });
+                $("#EndDate").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    dateFormat: 'yy-mm-dd'
+                });
+            });
+
+            function GoToAll() {
+                    window.location.href = '/Project/ViewAll';
+            }
+
+            function ShareRMA() {
+                if (document.getElementById("StartDate").value && document.getElementById("EndDate").value) {
+                    var myurl = '/Issue/ExportRMAData?ProjectKey=@Model.ElementAt(0).ProjectKey&StartDate=' + document.getElementById("StartDate").value + '&EndDate=' + document.getElementById("EndDate").value;
+                    window.open(myurl, '_blank');
+                }
+                else {
+                    var myurl = '/Issue/ExportRMAData?ProjectKey=@Model.ElementAt(0).ProjectKey&StartDate=NONE&EndDate=NONE';
+                    window.open(myurl, '_blank');
+                }
+            }
+
+            function ShareAllRMA() {
+                if (document.getElementById("StartDate").value && document.getElementById("EndDate").value) {
+                    var myurl = '/Issue/ExportAllRMAData?StartDate=' + document.getElementById("StartDate").value + '&EndDate=' + document.getElementById("EndDate").value;
+                    window.open(myurl, '_blank');
+                }
+                else
+                {
+                    var myurl = '/Issue/ExportAllRMAData?StartDate=NONE&EndDate=NONE';
+                    window.open(myurl, '_blank');
+                }
+        }
+    </script>
+</div>
+    <hr />
+
+    @if (Model != null)
     {
-        @Html.Raw(ViewBag.chartscript)
+        <script src="~/Scripts/highcharts.js"></script>
+        <script src="~/Scripts/exporting.js"></script>
 
-        <div class="row">
-            <div class="col-md-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Failure</h3>
-                    </div>
-                    <div class="panel-body">
-                        <div class="col-md-12">
-                            <div id="failurepie" style="min-width: 310px; height: 300px; margin: 0 auto"></div>
+        if (ViewBag.chartscript != null)
+        {
+            @Html.Raw(ViewBag.chartscript)
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Failure</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-md-12">
+                                <div id="failurepie" style="min-width: 310px; height: 300px; margin: 0 auto"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    }
+        }
 
-    var i = 0;
-    <table id="firsttable" name="firsttable" class="table table-bordered table-hover">
-        <thead class="header">
-            <tr>
-                <th width="10%">RMA#</th>
-                <th width="10%">SN</th>
-                <th width="10%">RootCause</th>
-                <th width="10%">RMA Failure Code</th>
-                <th width="10%">Containment Action</th>
-                <th width="10%">Corrective Action</th>
-                <th width="10%">Internal Report</th>
-                <th width="10%">Customer Report</th>
-                <th width="10%">Owner</th>
-                <th width="10%">Report Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                var rmatitle = item.Summary.Split(new string[] { "from" },StringSplitOptions.None)[1].Trim();
-
+        var i = 0;
+        <table id="firsttable" name="firsttable" class="table table-bordered table-hover">
+            <thead class="header">
                 <tr>
-                    <td width="10%">@(Model.Count() - i)</td>
-                    <td colspan="8" width="80%">
-                        <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">
-                            <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
-                            @rmatitle.Substring(0,rmatitle.Length>125?125:rmatitle.Length)
-                            </a>
-                    </td>
-                    <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus2(item.Resolution))</td>
+                    <th width="10%">RMA#</th>
+                    <th width="10%">SN</th>
+                    <th width="10%">RootCause</th>
+                    <th width="10%">RMA Failure Code</th>
+                    <th width="10%">Containment Action</th>
+                    <th width="10%">Corrective Action</th>
+                    <th width="10%">Internal Report</th>
+                    <th width="10%">Customer Report</th>
+                    <th width="10%">Owner</th>
+                    <th width="10%">Report Date</th>
                 </tr>
-                <tr>
-                    <td width="10%">@item.FinisarRMA</td>
-                    <td width="10%">@item.ModuleSN</td>
-                    @if (item.RootCauseCommentList.Count > 0)
-                    {
-                        <td width="10%"><a href="/Issue/ShowRootCause?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></td>
-                    }
-                    else
-                    {
-                        <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
-                    }
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    var rmatitle = item.Summary.Split(new string[] { "from" }, StringSplitOptions.None)[1].Trim();
 
-                    <td width="10%">@item.RMAFailureCode</td>
-                    
-                    @if (item.ContainmentActions.Count > 0)
+                    <tr>
+                        <td width="10%">@(Model.Count() - i)</td>
+                        <td colspan="8" width="80%">
+                            <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">
+                                <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
+                                @rmatitle.Substring(0, rmatitle.Length > 125 ? 125 : rmatitle.Length)
+                            </a>
+                        </td>
+                        <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus2(item.Resolution))</td>
+                    </tr>
+                    <tr>
+                        <td width="10%">@item.FinisarRMA</td>
+                        <td width="10%">@item.ModuleSN</td>
+                        @if (item.RootCauseCommentList.Count > 0)
                     {
-                        <td width="10%"><a href="/Issue/ShowContainmentAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.ContainmentActionStatus())</a></td>
-                    }
-                    else
-                    {
-                        <td width="10%">N/A</td>
-                    }
-                    
-                    @if (item.CorrectiveActions.Count > 0)
-                    {
-                        <td width="10%"><a href="/Issue/ShowCorrectiveAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.CorrectiveActionStatus())</a></td>
-                    }
-                    else
-                    {
-                        <td width="10%">N/A</td>
-                    }
+                            <td width="10%"><a href="/Issue/ShowRootCause?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></td>
+                        }
+                        else
+                        {
+                            <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
+                        }
 
-                    @if (item.InternalReportCommentList.Count > 0)
+                        <td width="10%">@item.RMAFailureCode</td>
+
+                        @if (item.ContainmentActions.Count > 0)
+                    {
+                            <td width="10%"><a href="/Issue/ShowContainmentAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.ContainmentActionStatus())</a></td>
+                        }
+                        else
+                        {
+                            <td width="10%">N/A</td>
+                        }
+
+                        @if (item.CorrectiveActions.Count > 0)
+                    {
+                            <td width="10%"><a href="/Issue/ShowCorrectiveAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.CorrectiveActionStatus())</a></td>
+                        }
+                        else
+                        {
+                            <td width="10%">N/A</td>
+                        }
+
+                        @if (item.InternalReportCommentList.Count > 0)
                     {
                         if (item.InternalReportCommentList[item.InternalReportCommentList.Count - 1].Comment.Contains("<a href"))
                         {
@@ -134,19 +197,19 @@
                             var newcomment = item.InternalReportCommentList[item.InternalReportCommentList.Count - 1].Comment.Replace(originalstr
                                 , Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done));
                                 <td width="10%">@Html.Raw(newcomment)</td>
+                            }
+                            else
+                            {
+                                <td width="10%"><p><a href="@item.InternalReportCommentList[item.InternalReportCommentList.Count - 1].Comment" target="_blank">@Html.Raw(Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></p></td>
+                            }
+
                         }
                         else
                         {
-                            <td width="10%"><p><a href="@item.InternalReportCommentList[item.InternalReportCommentList.Count - 1].Comment" target="_blank">@Html.Raw(Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></p></td>
+                            <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
                         }
 
-                    }
-                    else
-                    {
-                        <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
-                    }
-                    
-                    @if (item.Report4CustomerCommentList.Count > 0)
+                        @if (item.Report4CustomerCommentList.Count > 0)
                     {
                         if (item.Report4CustomerCommentList[item.Report4CustomerCommentList.Count - 1].Comment.Contains("<a href"))
                         {
@@ -155,29 +218,29 @@
                             var newcomment = item.Report4CustomerCommentList[item.Report4CustomerCommentList.Count - 1].Comment.Replace(originalstr
                                 , Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done));
 
-                            <td width="10%">@Html.Raw(newcomment)</td>
+                                <td width="10%">@Html.Raw(newcomment)</td>
+                            }
+                            else
+                            {
+                                <td width="10%"><p><a href="@item.Report4CustomerCommentList[item.Report4CustomerCommentList.Count - 1].Comment" target="_blank">@Html.Raw(Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></p></td>
+                            }
                         }
                         else
                         {
-                            <td width="10%"><p><a href="@item.Report4CustomerCommentList[item.Report4CustomerCommentList.Count - 1].Comment" target="_blank">@Html.Raw(Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></p></td>
+                            <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
                         }
-                    }
-                    else
-                    {
-                        <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
-                    }
 
-                    <td width="10%"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
-                    <td width="10%">@item.ReportDate.ToString("MM/dd-yy")</td>
-                </tr>
-                i = i + 1;
-            }
-        </tbody>
-    </table>
-    <script type="text/javascript">
-    $(document).ready(function () {
-        var offset = $('.navbar').height();
-        $("#firsttable").stickyTableHeaders({ fixedOffset: offset });
-        });
-    </script>
-}
+                        <td width="10%"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
+                        <td width="10%">@item.ReportDate.ToString("MM/dd-yy")</td>
+                    </tr>
+                    i = i + 1;
+                }
+            </tbody>
+        </table>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                var offset = $('.navbar').height();
+                $("#firsttable").stickyTableHeaders({ fixedOffset: offset });
+            });
+        </script>
+    }

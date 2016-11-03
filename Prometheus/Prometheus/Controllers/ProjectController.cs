@@ -3083,12 +3083,21 @@ namespace Prometheus.Controllers
                     var logvcsel = Server.MapPath("~/userfiles") + "\\" + fn;
                     System.IO.File.WriteAllText(logvcsel, logcontent);
 
+                    var netcomputername = "";
+                    try
+                    {
+                        netcomputername = System.Net.Dns.GetHostName();
+                    }
+                    catch (Exception ex) { }
+
+
                     var url = "/userfiles/" + fn;
                     var routevalue = new RouteValueDictionary();
                     routevalue.Add("issuekey", "ABC");
                     string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
                     string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
                     validatestr = validatestr.Split(new string[] { "/Issue" }, StringSplitOptions.None)[0]+ url;
+                    validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
 
                     var toaddrs = new List<string>();
                     toaddrs.Add("windy.ju@finisar.com");

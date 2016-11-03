@@ -83,6 +83,34 @@ namespace Prometheus.Models
         }
     }
 
+    public class RMAFAILCODE
+    {
+        public static string VCSEL = "VCSEL";
+        public static string PD = "PD";
+        public static string MPD = "MPD";
+        public static string Process = "Process";
+        public static string Flex = "Flex";
+        public static string PCB = "PCB";
+        public static string SMT = "SMT";
+        public static string Epoxy = "Epoxy";
+        public static string Cable = "Cable";
+        public static string LaserDriver = "Laser Driver";
+        public static string TIA = "TIA";
+        public static string CDR = "CDR";
+        public static string MCU = "MCU";
+        public static string OtherIC = "Other IC";
+        public static string Passivecomponent = "Passive component";
+        public static string Contamination = "Contamination";
+        public static string Mechanical = "Mechanical";
+        public static string Firmware = "Firmware";
+        public static string WrongEEPROM = "Wrong EEPROM";
+        public static string VMI = "VMI";
+        public static string Lens = "Lens";
+        public static string NTF = "NTF";
+        public static string Others = "Others";
+        public static string Customerissue = "Customer issue";
+    }
+
     public class COMMENTTYPE
     {
         public static string Description = "Description";

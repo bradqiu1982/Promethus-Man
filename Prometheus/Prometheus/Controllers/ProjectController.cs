@@ -198,6 +198,7 @@ namespace Prometheus.Controllers
 
         private List<SelectListItem> CreateSelectList(List<string> valist, string defVal)
         {
+            bool selected = false;
             var pslist = new List<SelectListItem>();
 
             var pitem = new SelectListItem();
@@ -210,14 +211,15 @@ namespace Prometheus.Controllers
                 pitem = new SelectListItem();
                 pitem.Text = p;
                 pitem.Value = p;
-                if (!string.IsNullOrEmpty(defVal) && string.Compare(defVal, p) == 0)
+                if (!string.IsNullOrEmpty(defVal) && string.Compare(defVal, p,true) == 0)
                 {
                     pitem.Selected = true;
+                    selected = true;
                 }
                 pslist.Add(pitem);
             }
 
-            if (string.IsNullOrEmpty(defVal) && pslist.Count > 0)
+            if (!selected && pslist.Count > 0)
             {
                 pslist[0].Selected = true;
             }

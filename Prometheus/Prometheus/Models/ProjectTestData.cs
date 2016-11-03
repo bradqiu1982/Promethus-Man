@@ -256,6 +256,24 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static List<ProjectTestData> RetrieveProjectTestDataWithSN(int topnum, string ProjectKey, string SN)
+        {
+            //ProjectTestData.PrePareLatestData(ProjectKey);
+
+            var ret = new List<ProjectTestData>();
+            var sql = "select top <topnum> ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN from ProjectTestData where ProjectKey = '<ProjectKey>' and ModuleSerialNum = '<ModuleSerialNum>' order by TestTimeStamp DESC";
+            sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<topnum>", Convert.ToString(topnum)).Replace("<ModuleSerialNum>", SN);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            foreach (var item in dbret)
+            {
+                var tempdata = new ProjectTestData(Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])
+                    , Convert.ToString(item[3]), Convert.ToString(item[4]), Convert.ToString(item[5])
+                    , Convert.ToString(item[6]), Convert.ToString(item[7]), Convert.ToString(item[8]));
+                ret.Add(tempdata);
+            }
+            return ret;
+        }
+
         public static Dictionary<string,bool> RetrieveAllDataID(string projectkey)
         {
             var ret = new Dictionary<string, bool>();

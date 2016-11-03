@@ -159,5 +159,30 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static List<ProjectFAViewModules> RetrieveFADataWithSN(string ProjectKey, string SN)
+        {
+            var ret = new List<ProjectFAViewModules>();
+            var pjdata = ProjectTestData.RetrieveProjectTestDataWithSN(100000, ProjectKey, SN);
+            var pjdata1 = BITestData.RetrieveProjectTestDataWithSN(100000, ProjectKey, SN);
+            if (pjdata1.Count > 0) {
+                pjdata.AddRange(pjdata1);
+            }
+            
+            //if (pjdata.Count == 0)
+            //{
+            //    pjdata = BITestData.RetrieveProjectTestDataWithSN(100000, ProjectKey, SN);
+            //}
+
+            foreach (var d in pjdata)
+            {
+                var im = IssueViewModels.RetrieveIssueByIssueKey(d.DataID);
+                if (im != null)
+                {
+                    ret.Add(new ProjectFAViewModules(im, d));
+                }
+            }
+            return ret;
+        }
+
     }
 }

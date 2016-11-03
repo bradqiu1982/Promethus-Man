@@ -1098,7 +1098,17 @@ namespace Prometheus.Controllers
 
                 return View("ProjectFA",vm);
             }
-            return View();
+            return RedirectToAction("ViewAll","Project");
+        }
+
+        public ActionResult SNIssue(string ProjectKey, string SN)
+        {
+            if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(SN))
+            {
+                var vm = ProjectFAViewModules.RetrieveFADataWithSN(ProjectKey, SN);
+                return View("ProjectFA", vm);
+            }
+            return RedirectToAction("ViewAll", "Project");
         }
 
         [HttpPost, ActionName("ProjectDoneFA")]

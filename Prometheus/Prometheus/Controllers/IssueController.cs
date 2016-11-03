@@ -709,6 +709,7 @@ namespace Prometheus.Controllers
 
             vm.FinisarRMA = Request.Form["FRMANUM"];
             vm.RMAFailureCode = "";
+            vm.FVCode = "";
             vm.FinisarModel = Request.Form["FinisarModel"];
             vm.ECustomer = Request.Form["ECustomer"];
             vm.CRMANUM = Request.Form["CRMANUM"];
@@ -903,6 +904,7 @@ namespace Prometheus.Controllers
 
             vm.FinisarRMA = Request.Form["FRMANUM"];
             vm.RMAFailureCode = Request.Form["RMAFailureCode"];
+            vm.FVCode = Request.Form["FVCode"];
             vm.FinisarModel = Request.Form["FinisarModel"];
             vm.ECustomer = Request.Form["ECustomer"];
             vm.CRMANUM = Request.Form["CRMANUM"];
@@ -1194,7 +1196,7 @@ namespace Prometheus.Controllers
             var lines = new List<string>();
             var list1 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, StartDate, EndDate);
 
-            var line = "FINISAR RMA,SN,STATUS,CUSTOMER,RMA FAILURE CODE,ROOT CAUSE,OWENER,OPEN ISSUE DATE,CUSTOMER RMA REASON,INTERNAL REPORT,CUSTOMER REPORT";
+            var line = "FINISAR RMA,SN,STATUS,CUSTOMER,FV,RMA FAILURE CODE,ROOT CAUSE,OWENER,OPEN ISSUE DATE,CUSTOMER RMA REASON,INTERNAL REPORT,CUSTOMER REPORT";
             lines.Add(line);
 
             foreach (var item in list1)
@@ -1245,7 +1247,7 @@ namespace Prometheus.Controllers
 
                 line = string.Empty;
                 line = "\""+item.FinisarRMA.Replace("\"","")+"\","+ "\""+item.ModuleSN.Replace("\"", "") + "\"," + "\"" + item.Resolution.Replace("\"", "") + "\","
-                    + "\"" + item.ECustomer.Replace("\"", "") + "\","+ "\""+item.RMAFailureCode.Replace("\"", "") + "\"," + "\""+ rootcause + "\"," 
+                    + "\"" + item.ECustomer.Replace("\"", "") + "\"," + "\"" + item.FVCode.Replace("\"", "") + "\","+ "\""+item.RMAFailureCode.Replace("\"", "") + "\"," + "\""+ rootcause + "\"," 
                     + "\""+item.Assignee.Replace("\"", "")+ "\"," + "\""+item.ReportDate.ToString("yyyy-MM-dd hh:mm:ss") + "\"," + "\"" + item.CReport.Replace("\"", "") + "\","
                     + "\""+ internalreport + "\"," + "\""+ customerreport + "\",";
 
@@ -1288,7 +1290,7 @@ namespace Prometheus.Controllers
             var lines = new List<string>();
             var list1 = IssueViewModels.RetrieveAllRMAIssue(StartDate, EndDate);
 
-            var line = "FINISAR RMA,PROJECT,SN,STATUS,CUSTOMER,RMA FAILURE CODE,ROOT CAUSE,OWENER,OPEN ISSUE DATE,CUSTOMER RMA REASON,INTERNAL REPORT,CUSTOMER REPORT";
+            var line = "FINISAR RMA,PROJECT,SN,STATUS,CUSTOMER,FV,RMA FAILURE CODE,ROOT CAUSE,OWENER,OPEN ISSUE DATE,CUSTOMER RMA REASON,INTERNAL REPORT,CUSTOMER REPORT";
             lines.Add(line);
 
             foreach (var item in list1)
@@ -1340,7 +1342,7 @@ namespace Prometheus.Controllers
 
                 line = string.Empty;
                 line = "\"" + item.FinisarRMA.Replace("\"", "") + "\"," + "\"" + item.ProjectKey.Replace("\"", "") + "\"," + "\"" + item.ModuleSN.Replace("\"", "") + "\"," + "\"" + item.Resolution.Replace("\"", "") + "\","
-                    + "\"" + item.ECustomer.Replace("\"", "") + "\"," + "\"" + item.RMAFailureCode.Replace("\"", "") + "\"," + "\"" + rootcause + "\","
+                    + "\"" + item.ECustomer.Replace("\"", "") + "\"," + "\"" + item.FVCode.Replace("\"", "") + "\"," + "\"" + item.RMAFailureCode.Replace("\"", "") + "\"," + "\"" + rootcause + "\","
                     + "\"" + item.Assignee.Replace("\"", "") + "\"," + "\"" + item.ReportDate.ToString("yyyy-MM-dd hh:mm:ss") + "\"," + "\"" + item.CReport.Replace("\"", "") + "\","
                     + "\"" + internalreport + "\"," + "\"" + customerreport + "\",";
 

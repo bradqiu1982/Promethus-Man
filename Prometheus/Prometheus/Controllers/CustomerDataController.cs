@@ -554,7 +554,7 @@ namespace Prometheus.Controllers
                             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
 
                             vm.RMAFailureCode = "";
-
+                            vm.FVCode = "";
                             vm.Description = "";
                             vm.CommentType = COMMENTTYPE.Description;
 

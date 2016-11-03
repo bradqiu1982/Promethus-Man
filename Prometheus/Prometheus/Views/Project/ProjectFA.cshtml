@@ -105,7 +105,7 @@
                             </span>
                             <input class="form-control text-box single-line" value="@item.IssueData.IssueKey" id="HIssueKey@(i)" name="HIssueKey@(i)" type="hidden" />
                         </div>
-                        <div class="col-md-9">@item.TestData.ModuleSerialNum</div>
+                        <div class="col-md-9"><a href="/Project/SNIssue?ProjectKey=@item.TestData.ProjectKey&SN=@item.TestData.ModuleSerialNum">@item.TestData.ModuleSerialNum</a></div>
                     </div>
                     <div class="col-md-2 text-center">
                         <div class="col-md-8">
@@ -133,7 +133,7 @@
             {
                 <div class="row">
                     <div class="col-md-1 text-center">
-                        @item.TestData.ModuleSerialNum
+                        <a href="/Project/SNIssue?ProjectKey=@item.TestData.ProjectKey&SN=@item.TestData.ModuleSerialNum">@item.TestData.ModuleSerialNum</a>
                     </div>
                     <div class="col-md-2 text-center">
                         <div class="col-md-8">

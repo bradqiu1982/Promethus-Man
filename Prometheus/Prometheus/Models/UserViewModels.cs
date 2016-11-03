@@ -107,6 +107,8 @@ namespace Prometheus.Models
             {
                 ret.Add(Convert.ToString(line[0]));
             }
+
+            ret.Sort();
             return ret;
         }
 

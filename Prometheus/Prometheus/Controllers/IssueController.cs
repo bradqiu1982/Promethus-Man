@@ -14,6 +14,7 @@ namespace Prometheus.Controllers
 
         private List<SelectListItem> CreateSelectList(List<string> valist, string defVal)
         {
+            bool selected = false;
             var pslist = new List<SelectListItem>();
             foreach (var p in valist)
             {
@@ -23,11 +24,12 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(defVal) && string.Compare(defVal, p,true) == 0)
                 {
                     pitem.Selected = true;
+                    selected = true;
                 }
                 pslist.Add(pitem);
             }
 
-            if (string.IsNullOrEmpty(defVal) && pslist.Count > 0)
+            if (!selected && pslist.Count > 0)
             {
                 pslist[0].Selected = true;
             }
@@ -71,6 +73,15 @@ namespace Prometheus.Controllers
             var rpilist = UserViewModels.RetrieveAllUser();
             slist = CreateSelectList(rpilist, vm.Reporter);
             ViewBag.reporterlist = slist;
+
+            var fcilist = new List<string>();
+            string[] clist = { "None", RMAFAILCODE.Cable, RMAFAILCODE.CDR, RMAFAILCODE.Contamination, RMAFAILCODE.Epoxy, RMAFAILCODE.Firmware, RMAFAILCODE.Flex,
+            RMAFAILCODE.LaserDriver,RMAFAILCODE.Lens,RMAFAILCODE.MCU,RMAFAILCODE.Mechanical,RMAFAILCODE.MPD,RMAFAILCODE.NTF,RMAFAILCODE.OtherIC,RMAFAILCODE.Others,
+            RMAFAILCODE.Passivecomponent,RMAFAILCODE.PCB,RMAFAILCODE.PD,RMAFAILCODE.Process,RMAFAILCODE.SMT,RMAFAILCODE.TIA,RMAFAILCODE.VCSEL,RMAFAILCODE.VMI,RMAFAILCODE.WrongEEPROM,RMAFAILCODE.Customerissue};
+
+            fcilist.AddRange(clist);
+            slist = CreateSelectList(fcilist, vm.RMAFailureCode);
+            ViewBag.RMAFailureCode = slist;
 
             //var cmelist = new List<string>();
             //string[] clist = { COMMENTTYPE.Description,COMMENTTYPE.RootCause,COMMENTTYPE.CustomReport,COMMENTTYPE.InternalReport};
@@ -515,6 +526,7 @@ namespace Prometheus.Controllers
 
         private List<SelectListItem> CreateSearchSelectList(List<string> valist, string defVal)
         {
+            bool selected = false;
             var pslist = new List<SelectListItem>();
             var pitem = new SelectListItem();
             pitem.Text = "NONE";
@@ -526,14 +538,15 @@ namespace Prometheus.Controllers
                 pitem = new SelectListItem();
                 pitem.Text = p;
                 pitem.Value = p;
-                if (!string.IsNullOrEmpty(defVal) && string.Compare(defVal, p) == 0)
+                if (!string.IsNullOrEmpty(defVal) && string.Compare(defVal, p,true) == 0)
                 {
                     pitem.Selected = true;
+                    selected = true;
                 }
                 pslist.Add(pitem);
             }
 
-            if (string.IsNullOrEmpty(defVal) && pslist.Count > 0)
+            if (!selected && pslist.Count > 0)
             {
                 pslist[0].Selected = true;
             }
@@ -903,7 +916,16 @@ namespace Prometheus.Controllers
             vm.IssueType = ISSUETP.RMA;
 
             vm.FinisarRMA = Request.Form["FRMANUM"];
-            vm.RMAFailureCode = Request.Form["RMAFailureCode"];
+            var tempfailurecode = Request.Form["RMAFailureCode"].ToString();
+            if (string.Compare(tempfailurecode, "None", true) == 0)
+            {
+                vm.RMAFailureCode = "";
+            }
+            else
+            {
+                vm.RMAFailureCode = tempfailurecode;
+            }
+            
             vm.FVCode = Request.Form["FVCode"];
             vm.FinisarModel = Request.Form["FinisarModel"];
             vm.ECustomer = Request.Form["ECustomer"];

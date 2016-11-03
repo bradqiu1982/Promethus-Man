@@ -435,6 +435,8 @@ namespace Prometheus.Models
 
         public string RMAFailureCode { set; get; }
 
+        public string FVCode { set; get; }
+
         public string FinisarModel { set; get; }
         public string ModuleSN { set; get; }
         public string ECustomer { set; get; }
@@ -529,8 +531,8 @@ namespace Prometheus.Models
         private void StoreRMA()
         {
 
-            var sql = "insert into IssueRMA(IssueKey,FinisarRMA,FinisarModel,ECustomer,CRMANUM,CReport,ModuleSN,RMAFailureCode) values('<IssueKey>','<FinisarRMA>','<FinisarModel>','<ECustomer>','<CRMANUM>','<CReport>','<ModuleSN>','<RMAFailureCode>')";
-            sql = sql.Replace("<IssueKey>", IssueKey).Replace("<FinisarRMA>", FinisarRMA).Replace("<RMAFailureCode>", RMAFailureCode)
+            var sql = "insert into IssueRMA(IssueKey,FinisarRMA,FinisarModel,ECustomer,CRMANUM,CReport,ModuleSN,RMAFailureCode,FVCode) values('<IssueKey>','<FinisarRMA>','<FinisarModel>','<ECustomer>','<CRMANUM>','<CReport>','<ModuleSN>','<RMAFailureCode>','<FVCode>')";
+            sql = sql.Replace("<IssueKey>", IssueKey).Replace("<FinisarRMA>", FinisarRMA).Replace("<RMAFailureCode>", RMAFailureCode).Replace("<FVCode>", FVCode)
                 .Replace("<FinisarModel>", FinisarModel).Replace("<ECustomer>", ECustomer)
                 .Replace("<CRMANUM>", CRMANUM).Replace("<CReport>", CReport).Replace("<ModuleSN>", ModuleSN);
             DBUtility.ExeLocalSqlNoRes(sql);
@@ -538,7 +540,7 @@ namespace Prometheus.Models
 
         private void RetrieveRMA()
         {
-            var sql = "select FinisarRMA,FinisarModel,ECustomer,CRMANUM,CReport,ModuleSN,RMAFailureCode from IssueRMA where IssueKey = '<IssueKey>'";
+            var sql = "select FinisarRMA,FinisarModel,ECustomer,CRMANUM,CReport,ModuleSN,RMAFailureCode,FVCode from IssueRMA where IssueKey = '<IssueKey>'";
             sql = sql.Replace("<IssueKey>", IssueKey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             if (dbret.Count > 0)
@@ -550,6 +552,7 @@ namespace Prometheus.Models
                 CReport = Convert.ToString(dbret[0][4]);
                 ModuleSN = Convert.ToString(dbret[0][5]);
                 RMAFailureCode = Convert.ToString(dbret[0][6]);
+                FVCode = Convert.ToString(dbret[0][7]);
             }
         }
 
@@ -688,9 +691,9 @@ namespace Prometheus.Models
 
         private void UpdateRMAInfo()
         {
-            var sql = "update IssueRMA set CRMANUM = '<CRMANUM>',CReport = '<CReport>',ModuleSN = '<ModuleSN>',RMAFailureCode = '<RMAFailureCode>'  where IssueKey = '<IssueKey>'";
+            var sql = "update IssueRMA set CRMANUM = '<CRMANUM>',CReport = '<CReport>',ModuleSN = '<ModuleSN>',RMAFailureCode = '<RMAFailureCode>',FVCode = '<FVCode>'  where IssueKey = '<IssueKey>'";
             sql = sql.Replace("<IssueKey>", IssueKey).Replace("<CRMANUM>", CRMANUM)
-                .Replace("<CReport>", CReport).Replace("<ModuleSN>", ModuleSN).Replace("<RMAFailureCode>", RMAFailureCode);
+                .Replace("<CReport>", CReport).Replace("<ModuleSN>", ModuleSN).Replace("<RMAFailureCode>", RMAFailureCode).Replace("<FVCode>", FVCode);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 

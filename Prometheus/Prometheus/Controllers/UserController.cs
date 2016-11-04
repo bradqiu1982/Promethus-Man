@@ -300,14 +300,58 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(usernm))
             {
                 var list1 = IssueViewModels.RetrieveIssueByAssignee(usernm, Resolute.Pending, 60);
-                var list2 = IssueViewModels.RetrieveIssueByAssignee(usernm, Resolute.Working, 30);
-                var list3 = IssueViewModels.RetrieveIssueByAssignee(usernm, Resolute.Done, 30);
+                var list2 = IssueViewModels.RetrieveIssueByAssigneeWorking(usernm, Resolute.Working, 60);
+                var list3 = IssueViewModels.RetrieveIssueByAssignee(usernm, Resolute.Done, 200);
                 list1.AddRange(list2);
                 list1.AddRange(list3);
 
                 ViewBag.UserName = usernm.Split(new char[] { '@' })[0];
 
-                ViewBag.iassignlist = IssueViewModels.RetrieveIssueByCreator(usernm, 100);
+                var iassignissues= IssueViewModels.RetrieveIssueByCreator(usernm, 300);
+                var wholedata = new List<List<string>>();
+                var title = new List<string>();
+                title.Add("Project");
+                title.Add("Summary");
+                title.Add("Priority");
+                title.Add("IssueType");
+                title.Add("Assignee");
+                title.Add("Status");
+                title.Add("Due Date");
+                wholedata.Add(title);
+
+                foreach (var item in iassignissues)
+                {
+                    var templine = new List<string>();
+                    templine.Add(item.ProjectKey);
+                    templine.Add(item.Summary);
+                    templine.Add(item.Priority);
+                    templine.Add(item.Assignee);
+                    templine.Add(item.Resolution);
+                    templine.Add(item.DueDate.ToString("MM/dd-yy"));
+                    templine.Add(item.IssueKey);
+                    templine.Add("MAIN");
+                    templine.Add(item.IssueType);
+
+                    wholedata.Add(templine);
+                    foreach (var item1 in item.SubIssues)
+                    {
+                        templine = new List<string>();
+                        templine.Add(item1.ProjectKey);
+                        templine.Add(item1.Summary);
+                        templine.Add(item1.Priority);
+                        templine.Add(item1.Assignee);
+                        templine.Add(item1.Resolution);
+                        templine.Add(item1.DueDate.ToString("MM/dd-yy"));
+                        templine.Add(item1.IssueKey);
+                        templine.Add("SUB");
+                        templine.Add(item1.IssueType);
+
+                        wholedata.Add(templine);
+                    }
+                }
+
+                //ViewBag.iassignlist = IssueViewModels.RetrieveIssueByCreator(usernm, 100);
+                ViewBag.iassignlist = wholedata;
 
                 return View(list1);
             }

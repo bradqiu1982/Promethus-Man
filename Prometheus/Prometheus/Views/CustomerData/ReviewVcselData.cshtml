@@ -11,15 +11,15 @@
 
 @if (Model != null)
 {
-
-    <table id="vcseldatatable" class="display" width="100" cellspacing="0">
+    var idx = 0;
+    <table id="vcseldatatable" class="display" cellspacing="0">
         <thead>
             @foreach (var line in Model)
             {
                 <tr>
                     @foreach (var item in line)
                             {
-                        <th>@item</th>
+                        <th style="font-size:10px">@item</th>
                     }
                 </tr>
                 break;
@@ -29,10 +29,15 @@
         <tbody>
             @foreach (var line in Model)
             {
+                if (idx == 0)
+                {
+                    idx = idx + 1;
+                    continue;
+                }
                 <tr>
                     @foreach (var item in line)
                     {
-                        <th>@item</th>
+                        <th style="font-size:10px">@item</th>
                     }
                 </tr>
             }

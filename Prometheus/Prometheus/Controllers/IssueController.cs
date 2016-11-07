@@ -133,10 +133,33 @@ namespace Prometheus.Controllers
                 EmailUtility.SendEmail("Parallel NPI Trace Notice", toaddrs, content);
         }
 
+        private void SendTaskEvent(IssueViewModels vm, string operate, string Reporter, string Assignee)
+        {
+            var routevalue = new RouteValueDictionary();
+            routevalue.Add("issuekey", vm.IssueKey);
+            //send validate email
+            string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+            string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+
+            var content = vm.Summary + " is " + operate + " by " + vm.Reporter + " :\r\n " + validatestr;
+
+            var toaddrs = new List<string>();
+            toaddrs.Add(Reporter);
+            toaddrs.Add(Assignee);
+            if (vm.RelativePeopleList.Count > 0)
+            {
+                toaddrs.AddRange(vm.RelativePeopleList);
+            }
+            EmailUtility.SendEmail("Parallel NPI Trace Notice", toaddrs, content);
+        }
+
         [HttpPost, ActionName("CreateIssue")]
         [ValidateAntiForgeryToken]
         public ActionResult CreateIssuePost()
         {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
             var vm = new IssueViewModels();
             vm.ProjectKey = Request.Form["projectlist"].ToString();
             vm.IssueKey = IssueViewModels.GetUniqKey();
@@ -146,7 +169,7 @@ namespace Prometheus.Controllers
             vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
             vm.ReportDate = DateTime.Now;
             vm.Assignee = Request.Form["assigneelist"].ToString();
-            vm.Reporter = Request.Form["reporterlist"].ToString();
+            vm.Reporter = updater;//Request.Form["reporterlist"].ToString();
             vm.Resolution = Request.Form["resolutionlist"].ToString();
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
             vm.RelativePeoples = Request.Form["RPeopleAddr"];
@@ -335,8 +358,19 @@ namespace Prometheus.Controllers
             vm.IssueType = Request.Form["issuetypelist"].ToString();
             vm.Priority = Request.Form["prioritylist"].ToString();
             vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
-            vm.Assignee = Request.Form["assigneelist"].ToString();
-            vm.Resolution = Request.Form["resolutionlist"].ToString();
+
+            if (string.Compare(originaldata.Reporter, updater, true) == 0
+                || string.Compare(originaldata.Assignee, updater, true) == 0)
+            {
+                vm.Assignee = Request.Form["assigneelist"].ToString();
+                vm.Resolution = Request.Form["resolutionlist"].ToString();
+            }
+            else
+            {
+                vm.Assignee = originaldata.Assignee;
+                vm.Resolution = originaldata.Resolution;
+            }
+
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
             vm.RelativePeoples = Request.Form["RPeopleAddr"];
 
@@ -380,6 +414,8 @@ namespace Prometheus.Controllers
             {
                 vm.UpdateIAssign();
                 ProjectEvent.AssignIssueEvent(originaldata.ProjectKey, updater, vm.Assignee, originaldata.Summary, originaldata.IssueKey);
+                vm.Summary = originaldata.Summary;
+                SendTaskEvent(vm, "asigned to you", updater, vm.Assignee);
             }
 
             if (string.Compare(originaldata.Resolution, vm.Resolution, true) != 0)
@@ -457,6 +493,9 @@ namespace Prometheus.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult CreatePostSubIssue()
         {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
             var sumpre = "";
             var vm = new IssueViewModels();
             vm.ProjectKey = Request.Form["projectlist"].ToString();
@@ -478,7 +517,7 @@ namespace Prometheus.Controllers
             vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
             vm.ReportDate = DateTime.Now;
             vm.Assignee = Request.Form["assigneelist"].ToString();
-            vm.Reporter = Request.Form["reporterlist"].ToString();
+            vm.Reporter = updater; //Request.Form["reporterlist"].ToString();
             vm.Resolution = Request.Form["resolutionlist"].ToString();
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
             vm.RelativePeoples = Request.Form["RPeopleAddr"];
@@ -943,10 +982,18 @@ namespace Prometheus.Controllers
             vm.Priority = Request.Form["prioritylist"].ToString();
             vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
             vm.ReportDate = DateTime.Now;
-            vm.Assignee = Request.Form["assigneelist"].ToString();
             vm.Reporter = updater;
-
-            vm.Resolution = Request.Form["resolutionlist"].ToString();
+            if (string.Compare(originaldata.Reporter, updater, true) == 0
+                || string.Compare(originaldata.Assignee, updater, true) == 0)
+            {
+                vm.Assignee = Request.Form["assigneelist"].ToString();
+                vm.Resolution = Request.Form["resolutionlist"].ToString();
+            }
+            else
+            {
+                vm.Assignee = originaldata.Assignee;
+                vm.Resolution = originaldata.Resolution;
+            }
 
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
@@ -1051,6 +1098,8 @@ namespace Prometheus.Controllers
             {
                 vm.UpdateIAssign();
                 ProjectEvent.AssignIssueEvent(originaldata.ProjectKey, updater, vm.Assignee, originaldata.Summary, originaldata.IssueKey);
+                vm.Summary = originaldata.Summary;
+                SendTaskEvent(vm, "asigned to you", updater, vm.Assignee);
             }
 
             if (string.Compare(originaldata.Resolution, vm.Resolution, true) != 0)

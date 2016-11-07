@@ -110,19 +110,6 @@ namespace Prometheus.Models
 
             return ret;
 
-            //var ret = new List<ProjectFAViewModules>();
-            //var pjdata = ProjectTestData.RetrieveProjectFailedTestData(100000, pjkey);
-
-            //var issuedict = IssueViewModels.RRetrieveFADictByPjkey(pjkey, Resolute.Done,100000);
-            //foreach (var d in pjdata)
-            //{
-            //    if (issuedict.ContainsKey(d.DataID))
-            //    {
-            //        ret.Add(new ProjectFAViewModules(issuedict[d.DataID], d));
-            //    }
-            //}
-
-            //return ret;
         }
 
         public static int RetrieveFADataCount(string pjkey,bool pending=true)

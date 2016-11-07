@@ -593,38 +593,38 @@ namespace Prometheus.Models
 
                 foreach (var item in subissues)
                 {
-                    sql = "delete from Issue where IssueKey = '<IssueKey>'";
+                    sql = "update Issue  set APVal1 = 'delete' where IssueKey = '<IssueKey>'";
                     sql = sql.Replace("<IssueKey>", item.IssueKey);
                     DBUtility.ExeLocalSqlNoRes(sql);
 
-                    sql = "delete from IssueRMA where IssueKey = '<IssueKey>'";
-                    sql = sql.Replace("<IssueKey>", item.IssueKey);
-                    DBUtility.ExeLocalSqlNoRes(sql);
+                    //sql = "delete from IssueRMA where IssueKey = '<IssueKey>'";
+                    //sql = sql.Replace("<IssueKey>", item.IssueKey);
+                    //DBUtility.ExeLocalSqlNoRes(sql);
 
-                    sql = "delete from IssueAttachment where IssueKey = '<IssueKey>'";
-                    sql = sql.Replace("<IssueKey>", item.IssueKey);
-                    DBUtility.ExeLocalSqlNoRes(sql);
+                    //sql = "delete from IssueAttachment where IssueKey = '<IssueKey>'";
+                    //sql = sql.Replace("<IssueKey>", item.IssueKey);
+                    //DBUtility.ExeLocalSqlNoRes(sql);
 
-                    sql = "delete from IssueComments where IssueKey = '<IssueKey>'";
-                    sql = sql.Replace("<IssueKey>", item.IssueKey);
-                    DBUtility.ExeLocalSqlNoRes(sql);
+                    //sql = "delete from IssueComments where IssueKey = '<IssueKey>'";
+                    //sql = sql.Replace("<IssueKey>", item.IssueKey);
+                    //DBUtility.ExeLocalSqlNoRes(sql);
                 }
 
-                sql = "delete from Issue where IssueKey = '<IssueKey>'";
+                sql = "update Issue  set APVal1 = 'delete' where IssueKey = '<IssueKey>'";
                 sql = sql.Replace("<IssueKey>", issuekey);
                 DBUtility.ExeLocalSqlNoRes(sql);
 
-                sql = "delete from IssueRMA where IssueKey = '<IssueKey>'";
-                sql = sql.Replace("<IssueKey>", issuekey);
-                DBUtility.ExeLocalSqlNoRes(sql);
+                //sql = "delete from IssueRMA where IssueKey = '<IssueKey>'";
+                //sql = sql.Replace("<IssueKey>", issuekey);
+                //DBUtility.ExeLocalSqlNoRes(sql);
 
-                sql = "delete from IssueAttachment where IssueKey = '<IssueKey>'";
-                sql = sql.Replace("<IssueKey>", issuekey);
-                DBUtility.ExeLocalSqlNoRes(sql);
+                //sql = "delete from IssueAttachment where IssueKey = '<IssueKey>'";
+                //sql = sql.Replace("<IssueKey>", issuekey);
+                //DBUtility.ExeLocalSqlNoRes(sql);
 
-                sql = "delete from IssueComments where IssueKey = '<IssueKey>'";
-                sql = sql.Replace("<IssueKey>", issuekey);
-                DBUtility.ExeLocalSqlNoRes(sql);
+                //sql = "delete from IssueComments where IssueKey = '<IssueKey>'";
+                //sql = sql.Replace("<IssueKey>", issuekey);
+                //DBUtility.ExeLocalSqlNoRes(sql);
             }
             catch (Exception ex)
             {
@@ -762,7 +762,7 @@ namespace Prometheus.Models
         public static List<IssueViewModels> RetrieveSubIssue(string parentkey)
         {
             var ret = new List<IssueViewModels>();
-            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where ParentIssueKey = '<ParentIssueKey>'";
+            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and ParentIssueKey = '<ParentIssueKey>'";
             sql = sql.Replace("<ParentIssueKey>", parentkey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             foreach (var line in dbret)
@@ -800,7 +800,7 @@ namespace Prometheus.Models
 
         public static IssueViewModels RetrieveIssueByIssueKey(string issuekey)
         {
-            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples from Issue where IssueKey = '<IssueKey>'";
+            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples from Issue where APVal1 <> 'delete' and IssueKey = '<IssueKey>'";
             sql = sql.Replace("<IssueKey>", issuekey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             if (dbret.Count > 0)
@@ -866,7 +866,7 @@ namespace Prometheus.Models
                 fixresolve = Resolute.Done;
             }
 
-            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples from Issue where ParentIssueKey = '' and ProjectKey = '<ProjectKey>' and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType>' order by ReportDate DESC";
+            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples from Issue where  APVal1 <> 'delete' and  ParentIssueKey = '' and ProjectKey = '<ProjectKey>' and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType>' order by ReportDate DESC";
             sql = sql.Replace("<ProjectKey>", pjkey).Replace("<cond>", cond).Replace("<topnum>", Convert.ToString(topnum))
                     .Replace("<IssueType>", ISSUETP.NPIPROC);
 
@@ -913,7 +913,7 @@ namespace Prometheus.Models
             var cond = "";
             cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";
 
-            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples from Issue where ParentIssueKey = '' and ProjectKey = '<ProjectKey>' and Summary like '%<ModuleSerialNum>%' and Summary like '%<whichtest>%'  and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' order by ReportDate DESC";
+            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples from Issue where  APVal1 <> 'delete' and  ParentIssueKey = '' and ProjectKey = '<ProjectKey>' and Summary like '%<ModuleSerialNum>%' and Summary like '%<whichtest>%'  and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' order by ReportDate DESC";
             sql = sql.Replace("<ModuleSerialNum>", SN).Replace("<cond>", cond).Replace("<whichtest>", whichtest).Replace("<ProjectKey>", pjkey)
                     .Replace("<IssueType1>", ISSUETP.NPIPROC).Replace("<IssueType2>", ISSUETP.RMA);
 
@@ -941,7 +941,7 @@ namespace Prometheus.Models
             var cond = "";
             cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";
 
-            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples from Issue where ParentIssueKey = '' and ProjectKey = '<ProjectKey>' and Summary like '%<ModuleSerialNum>%' and ReportDate < '<DATESTR>'  and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' order by ReportDate DESC";
+            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples from Issue where  APVal1 <> 'delete' and  ParentIssueKey = '' and ProjectKey = '<ProjectKey>' and Summary like '%<ModuleSerialNum>%' and ReportDate < '<DATESTR>'  and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' order by ReportDate DESC";
             sql = sql.Replace("<ModuleSerialNum>", SN).Replace("<cond>", cond).Replace("<DATESTR>", datestr).Replace("<ProjectKey>", pjkey)
                     .Replace("<IssueType1>", ISSUETP.NPIPROC).Replace("<IssueType2>", ISSUETP.RMA);
 
@@ -969,7 +969,7 @@ namespace Prometheus.Models
             var cond = "";
             cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";
 
-            var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples from Issue where ProjectKey = '<ProjectKey>' and Summary like '%<BICond>%' and Summary like '%<ModuleSerialNum>%' and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' order by ReportDate DESC";
+            var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and Summary like '%<BICond>%' and Summary like '%<ModuleSerialNum>%' and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' order by ReportDate DESC";
             sql = sql.Replace("<ModuleSerialNum>", SN).Replace("<BICond>", " @Burn-In Step " + whichtest).Replace("<cond>", cond).Replace("<ProjectKey>", pjkey)
                     .Replace("<IssueType1>", ISSUETP.NPIPROC).Replace("<IssueType2>", ISSUETP.RMA);
 
@@ -997,7 +997,7 @@ namespace Prometheus.Models
             var cond = "";
             cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";
 
-            var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples from Issue where ProjectKey = '<ProjectKey>' and Summary like '%<BICond>%' and ReportDate < '<DATESTR>' and Summary like '%<ModuleSerialNum>%' and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' order by ReportDate DESC";
+            var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and Summary like '%<BICond>%' and ReportDate < '<DATESTR>' and Summary like '%<ModuleSerialNum>%' and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' order by ReportDate DESC";
             sql = sql.Replace("<ModuleSerialNum>", SN).Replace("<BICond>", " @Burn-In Step").Replace("<cond>", cond).Replace("<ProjectKey>", pjkey).Replace("<DATESTR>", datestr)
                     .Replace("<IssueType1>", ISSUETP.NPIPROC).Replace("<IssueType2>", ISSUETP.RMA);
 
@@ -1039,7 +1039,7 @@ namespace Prometheus.Models
                 fixresolve = Resolute.Done;
             }
 
-            var sql = "select IssueKey from Issue where ParentIssueKey = '' and  ProjectKey = '<ProjectKey>' and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType>'";
+            var sql = "select IssueKey from Issue where APVal1 <> 'delete' and  ParentIssueKey = '' and  ProjectKey = '<ProjectKey>' and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType>'";
             sql = sql.Replace("<ProjectKey>", pjkey).Replace("<cond>", cond).Replace("<IssueType>", ISSUETP.NPIPROC);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             return dbret.Count;
@@ -1072,7 +1072,7 @@ namespace Prometheus.Models
                 fixresolve = Resolute.Done;
             }
 
-            var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where ProjectKey = '<ProjectKey>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' and Creator <> 'System' order by ReportDate DESC";
+            var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' and Creator <> 'System' order by ReportDate DESC";
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<cond>", cond).Replace("<IssueType1>", ISSUETP.NPIPROC).Replace("<IssueType2>", ISSUETP.RMA);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             var ret = new List<IssueViewModels>();
@@ -1109,7 +1109,7 @@ namespace Prometheus.Models
                 fixresolve = Resolute.Done;
             }
 
-            var sql = "select IssueKey from Issue where ProjectKey = '<ProjectKey>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' and Creator <> 'System' order by ReportDate DESC";
+            var sql = "select IssueKey from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' and Creator <> 'System' order by ReportDate DESC";
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<cond>", cond).Replace("<IssueType1>", ISSUETP.NPIPROC).Replace("<IssueType2>", ISSUETP.RMA);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             return dbret.Count;
@@ -1117,7 +1117,7 @@ namespace Prometheus.Models
 
         public static List<IssueViewModels> RetrieveIssueForIncreaseSummary(string projectkey,string startdate)
         {
-            var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where ProjectKey = '<ProjectKey>' and  ParentIssueKey = '' and IssueType <> '<IssueType>' and ReportDate > '<ReportDate>' order by ReportDate ASC";
+            var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and  ParentIssueKey = '' and IssueType <> '<IssueType>' and ReportDate > '<ReportDate>' order by ReportDate ASC";
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<ReportDate>", startdate).Replace("<IssueType>", ISSUETP.NPIPROC);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             var ret = new List<IssueViewModels>();
@@ -1138,7 +1138,7 @@ namespace Prometheus.Models
 
         public static List<IssueViewModels> RetrieveIssueForSolveSummary(string projectkey, string startdate)
         {
-            var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where ProjectKey = '<ProjectKey>' and  ParentIssueKey = '' and IssueType <> '<IssueType>' and ResolvedDate > '<ResolvedDate>' order by ResolvedDate ASC";
+            var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and  ParentIssueKey = '' and IssueType <> '<IssueType>' and ResolvedDate > '<ResolvedDate>' order by ResolvedDate ASC";
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<ResolvedDate>", startdate).Replace("<IssueType>", ISSUETP.NPIPROC);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             var ret = new List<IssueViewModels>();
@@ -1178,7 +1178,7 @@ namespace Prometheus.Models
                 fixresolve = Resolute.Done;
             }
 
-            var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where ProjectKey = '<ProjectKey>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType = '<IssueType>' order by ReportDate DESC";
+            var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType = '<IssueType>' order by ReportDate DESC";
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<cond>", cond).Replace("<IssueType>", ISSUETP.RMA);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             var ret = new List<IssueViewModels>();
@@ -1227,12 +1227,12 @@ namespace Prometheus.Models
             var sql = "";
             if (string.Compare(StartDate, "NONE", true) == 0)
             {
-                sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where ProjectKey = '<ProjectKey>' and  ParentIssueKey = '' and IssueType = '<IssueType>' order by ReportDate DESC";
+                sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and  ParentIssueKey = '' and IssueType = '<IssueType>' order by ReportDate DESC";
                 sql = sql.Replace("<ProjectKey>", projectkey).Replace("<IssueType>", ISSUETP.RMA);
             }
             else
             {
-                sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where ProjectKey = '<ProjectKey>' and  ParentIssueKey = '' and IssueType = '<IssueType>' and ReportDate >= '<StartDate>' and ReportDate <= '<EndDate>' order by ReportDate DESC";
+                sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and  ParentIssueKey = '' and IssueType = '<IssueType>' and ReportDate >= '<StartDate>' and ReportDate <= '<EndDate>' order by ReportDate DESC";
                 sql = sql.Replace("<ProjectKey>", projectkey).Replace("<IssueType>", ISSUETP.RMA).Replace("<StartDate>", StartDate).Replace("<EndDate>", DateTime.Parse(EndDate).AddDays(1).ToString());
             }
 
@@ -1280,12 +1280,12 @@ namespace Prometheus.Models
             var sql = "";
             if (string.Compare(StartDate, "NONE", true) == 0)
             {
-                sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where ParentIssueKey = '' and IssueType = '<IssueType>' order by ReportDate DESC";
+                sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ParentIssueKey = '' and IssueType = '<IssueType>' order by ReportDate DESC";
                 sql = sql.Replace("<IssueType>", ISSUETP.RMA);
             }
             else
             {
-                sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where ParentIssueKey = '' and IssueType = '<IssueType>' and ReportDate >= '<StartDate>' and ReportDate <= '<EndDate>' order by ReportDate DESC";
+                sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ParentIssueKey = '' and IssueType = '<IssueType>' and ReportDate >= '<StartDate>' and ReportDate <= '<EndDate>' order by ReportDate DESC";
                 sql = sql.Replace("<IssueType>", ISSUETP.RMA).Replace("<StartDate>", StartDate).Replace("<EndDate>", DateTime.Parse(EndDate).AddDays(1).ToString());
             }
 
@@ -1344,7 +1344,7 @@ namespace Prometheus.Models
                 endtime = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd") + " 23:59:59").AddDays(5).ToString();
             }
 
-            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples,AlertEmailUpdateDate from Issue where ProjectKey = '<ProjectKey>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType = '<IssueType>' and DueDate >= '<stattime>' and DueDate <= '<endtime>' ";
+            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples,AlertEmailUpdateDate from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType = '<IssueType>' and DueDate >= '<stattime>' and DueDate <= '<endtime>' ";
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<cond>", cond).Replace("<IssueType>", ISSUETP.RMA).Replace("<stattime>", stattime).Replace("<endtime>", endtime);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             var ret = new List<IssueViewModels>();
@@ -1390,7 +1390,7 @@ namespace Prometheus.Models
                 fixresolve = Resolute.Done;
             }
 
-            var sql = "select IssueKey from Issue where ProjectKey = '<ProjectKey>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType = '<IssueType>' order by ReportDate DESC";
+            var sql = "select IssueKey from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType = '<IssueType>' order by ReportDate DESC";
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<cond>", cond).Replace("<IssueType>", ISSUETP.RMA);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             return dbret.Count;
@@ -1417,7 +1417,7 @@ namespace Prometheus.Models
                 fixresolve = Resolute.Done;
             }
 
-            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where Assignee = '<Assignee>' and Resolution in <cond> and IssueType <> '<IssueType1>' and  Reporter <> 'System' order by ReportDate DESC";
+            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  Assignee = '<Assignee>' and Resolution in <cond> and IssueType <> '<IssueType1>' and  Reporter <> 'System' order by ReportDate DESC";
             sql = sql.Replace("<Assignee>", assignee).Replace("<topnum>", Convert.ToString(topnum)).Replace("<cond>", cond).Replace("<IssueType1>", ISSUETP.NPIPROC);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             var ret = new List<IssueViewModels>();
@@ -1454,7 +1454,7 @@ namespace Prometheus.Models
                 fixresolve = Resolute.Done;
             }
 
-            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where Assignee = '<Assignee>' and Resolution in <cond> order by ReportDate DESC";
+            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  Assignee = '<Assignee>' and Resolution in <cond> order by ReportDate DESC";
             sql = sql.Replace("<Assignee>", assignee).Replace("<topnum>", Convert.ToString(topnum)).Replace("<cond>", cond).Replace("<IssueType>", ISSUETP.Bug);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             var ret = new List<IssueViewModels>();
@@ -1474,7 +1474,7 @@ namespace Prometheus.Models
 
         public static List<IssueViewModels> RetrieveIssueByCreator(string creator, int topnum)
         {
-            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where (Creator = '<Creator>' or Reporter = '<Creator>') and ParentIssueKey = '' order by ReportDate DESC";
+            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  (Creator = '<Creator>' or Reporter = '<Creator>') and ParentIssueKey = '' order by ReportDate DESC";
             sql = sql.Replace("<Creator>", creator).Replace("<topnum>", Convert.ToString(topnum));
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             var ret = new List<IssueViewModels>();
@@ -1496,7 +1496,7 @@ namespace Prometheus.Models
 
         public static List<IssueViewModels> RetrieveNPIPROCIssue(string pjkey)
         {
-            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where ProjectKey = '<ProjectKey>' and ParentIssueKey = '' and IssueType = '<IssueType>' order by DueDate ASC";
+            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and ParentIssueKey = '' and IssueType = '<IssueType>' order by DueDate ASC";
             sql = sql.Replace("<ProjectKey>", pjkey).Replace("<IssueType>", Convert.ToString(ISSUETP.NPIPROC));
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             var ret = new List<IssueViewModels>();
@@ -1518,7 +1518,7 @@ namespace Prometheus.Models
 
         public static List<IssueViewModels> SearchIssue(string pjkey,string type,string resolution,string asignee,string startdate,string enddate,string summary, int topnum)
         {
-            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where <cond> order by ReportDate DESC";
+            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  <cond> order by ReportDate DESC";
 
             bool withand = false;
             var cond = "";

@@ -174,8 +174,13 @@
             <div class="col-md-2 text-center">
                 <input type="submit" value="Same As" class="btn btn-default" />
             </div>
-            <div class="col-md-9 text-center">
+            <div class="col-md-4 text-center">
                 @Html.DropDownList("DoneIssueList", null, new { @id = "DoneIssueList", @class = "form-control"})
+            </div>
+            <div class="col-md-1 text-center">
+                <button class="form-control" data-toggle="tooltip" title="View Selected Issue" onclick="ShowSelectIssue()" type="button"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>
+            </div>
+            <div class="col-md-4 text-center">
             </div>
             <script type="text/javascript">
                 function ChooseAll(oBox) {
@@ -197,6 +202,16 @@
                         }
                     }
                 }
+
+                function ShowSelectIssue()
+                {
+                    if (document.getElementById("DoneIssueList").value)
+                    {
+                        var myurl = '/Issue/UpdateIssue?issuekey=' + document.getElementById("DoneIssueList").value;
+                        window.open(myurl, '_blank');
+                    }
+                }
+
             </script>
         </div>
     }

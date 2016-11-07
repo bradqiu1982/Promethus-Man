@@ -1059,6 +1059,7 @@ namespace Prometheus.Controllers
             {
                 var vm = ProjectFAViewModules.RetrieveFADataWithErrAbbr(ProjectKey, ErrAbbr);
 
+                var pendingitems = new List<ProjectFAViewModules>();
                 var tempitems = new List<ProjectFAViewModules>();
 
                 foreach (var item in vm)
@@ -1083,6 +1084,10 @@ namespace Prometheus.Controllers
 
                         tempitems.Add(item);
                     }
+                    else
+                    {
+                        pendingitems.Add(item);
+                    }
                 }
 
                 if (tempitems.Count > 0)
@@ -1098,7 +1103,7 @@ namespace Prometheus.Controllers
                     ViewBag.DoneIssueList = pslist;
                 }
 
-                return View("ProjectFA",vm);
+                return View("ProjectFA", pendingitems);
             }
             return RedirectToAction("ViewAll","Project");
         }

@@ -140,13 +140,7 @@
             </div>
 
             <div class="form-group">
-
-                <div class="col-md-6">
-                    <label class="control-label col-md-2" for="reporterlist">Reporter<font color="red">*</font></label>
-                    <div class="col-md-10">
-                        @Html.DropDownList("reporterlist", null, new { @id = "reporterlist", @class = "form-control" })
-                    </div>
-                </div>
+                
                 <div class="col-md-6">
                     <label class="control-label col-md-2" for="DueDate">DueDate<font color="red">*</font></label>
                     <div class="col-md-10">
@@ -161,6 +155,12 @@
                         <span class="field-validation-valid text-danger" data-valmsg-for="DueDate" data-valmsg-replace="true"></span>
                     </div>
 
+                </div>
+                <div class="col-md-6">
+                    @*<label class="control-label col-md-2" for="reporterlist">Reporter<font color="red">*</font></label>
+                        <div class="col-md-10">
+                            @Html.DropDownList("reporterlist", null, new { @id = "reporterlist", @class = "form-control" })
+                        </div>*@
                 </div>
                 <script type="text/javascript">
                     $(document).ready(function () {

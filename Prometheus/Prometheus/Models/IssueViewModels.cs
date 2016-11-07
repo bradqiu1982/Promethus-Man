@@ -727,7 +727,7 @@ namespace Prometheus.Models
 
         public void UpdateIAssign()
         {
-            var sql = "update Issue set Reporter = '<Reporter>' where IssueKey = '<IssueKey>'";
+            var sql =  "update Issue set Reporter = '<Reporter>' where IssueKey = '<IssueKey>'";
             sql = sql.Replace("<IssueKey>", IssueKey).Replace("<Reporter>", Reporter);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
@@ -1018,97 +1018,6 @@ namespace Prometheus.Models
             return retdict;
         }
 
-        public static Dictionary<string, IssueViewModels> RRetrieveFADictByPjkey(string pjkey, string issuestatus, int topnum)
-        {
-            var retdict = new Dictionary<string, IssueViewModels>();
-
-            var cond = "";
-            var fixresolve = "";
-            if (string.Compare(issuestatus, Resolute.Pending) == 0)
-            {
-                cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";
-                fixresolve = Resolute.Pending;
-            }
-            else if (string.Compare(issuestatus, Resolute.Working) == 0)
-            {
-                cond = "('" + Resolute.Working + "')";
-                fixresolve = Resolute.Working;
-            }
-            else
-            {
-                cond = "('" + Resolute.Fixed + "','" + Resolute.Done + "','" + Resolute.NotFix + "','" + Resolute.NotReproduce + "','" + Resolute.Unresolved + "')";
-                fixresolve = Resolute.Done;
-            }
-
-            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples from Issue where ProjectKey = '<ProjectKey>' and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType>' order by ReportDate DESC";
-            sql = sql.Replace("<ProjectKey>", pjkey).Replace("<cond>", cond).Replace("<topnum>", Convert.ToString(topnum))
-                    .Replace("<IssueType>", ISSUETP.NPIPROC);
-
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
-            foreach (var line in dbret)
-            {
-                var ret = new IssueViewModels(Convert.ToString(line[0])
-                    , Convert.ToString(line[1]), Convert.ToString(line[2])
-                    , Convert.ToString(line[3]), Convert.ToString(line[4])
-                    , Convert.ToString(line[5]), Convert.ToString(line[6])
-                    , Convert.ToString(line[7]), Convert.ToString(line[8])
-                    , Convert.ToString(line[9]), Convert.ToString(line[10])
-                    , Convert.ToString(line[11]), Convert.ToString(line[12]));
-
-
-                //var tempclist = new List<IssueComments>();
-                //sql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
-                //sql = sql.Replace("<IssueKey>", ret.IssueKey);
-                //var cret = DBUtility.ExeLocalSqlWithRes(sql);
-                //foreach (var r in cret)
-                //{
-                //    var tempcomment = new IssueComments();
-                //    tempcomment.IssueKey = Convert.ToString(r[0]);
-                //    tempcomment.dbComment = Convert.ToString(r[1]);
-                //    tempcomment.Reporter = Convert.ToString(r[2]);
-                //    tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
-                //    tempcomment.CommentType = Convert.ToString(r[4]);
-                //    tempclist.Add(tempcomment);
-                //}
-                //ret.CommentList = tempclist;
-                //ret.SubIssues = RetrieveSubIssue(ret.IssueKey);
-
-                ret.RetrieveAttachment(ret.IssueKey);
-                retdict.Add(ret.IssueKey, ret);
-            }
-
-            return retdict;
-        }
-
-        //public static bool RetrieveFAStatusByIssueKey(string issuekey, string issuestatus)
-        //{
-        //    var cond = "";
-        //    var fixresolve = "";
-        //    if (string.Compare(issuestatus, Resolute.Pending) == 0)
-        //    {
-        //        cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";
-        //        fixresolve = Resolute.Pending;
-        //    }
-        //    else if (string.Compare(issuestatus, Resolute.Working) == 0)
-        //    {
-        //        cond = "('" + Resolute.Working + "')";
-        //        fixresolve = Resolute.Working;
-        //    }
-        //    else
-        //    {
-        //        cond = "('" + Resolute.Fixed + "','" + Resolute.Done + "','" + Resolute.NotFix + "','" + Resolute.NotReproduce + "','" + Resolute.Unresolved + "')";
-        //        fixresolve = Resolute.Done;
-        //    }
-
-        //    var sql = "select IssueKey from Issue where IssueKey = '<IssueKey>'  and Resolution in <cond>";
-        //    sql = sql.Replace("<IssueKey>", issuekey).Replace("<cond>", cond);
-        //    var dbret = DBUtility.ExeLocalSqlWithRes(sql);
-        //    if (dbret.Count > 0)
-        //    {
-        //        return true;
-        //    }
-        //    return false;
-        //}
 
         public static int RRetrieveFAStatusByPjkey(string pjkey, string issuestatus)
         {
@@ -1508,8 +1417,8 @@ namespace Prometheus.Models
                 fixresolve = Resolute.Done;
             }
 
-            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where Assignee = '<Assignee>' and Resolution in <cond> and IssueType <> '<IssueType1>' and (IssueType <> '<IssueType>' or (IssueType = '<IssueType>' and Creator <> 'System')) order by ReportDate DESC";
-            sql = sql.Replace("<Assignee>", assignee).Replace("<topnum>", Convert.ToString(topnum)).Replace("<cond>", cond).Replace("<IssueType>", ISSUETP.Bug).Replace("<IssueType1>", ISSUETP.NPIPROC);
+            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where Assignee = '<Assignee>' and Resolution in <cond> and IssueType <> '<IssueType1>' and  Reporter <> 'System' order by ReportDate DESC";
+            sql = sql.Replace("<Assignee>", assignee).Replace("<topnum>", Convert.ToString(topnum)).Replace("<cond>", cond).Replace("<IssueType1>", ISSUETP.NPIPROC);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)

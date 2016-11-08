@@ -15,7 +15,7 @@
 </ul>
 
     <ul class="nav navbar-nav navbar-right">
-        <li>@Html.ActionLink("Register", "RegisterUser", "User")</li>
+        @*<li>@Html.ActionLink("Register", "RegisterUser", "User")</li>*@
         @{
             var ckdict = CookieUtility.UnpackCookie(Request);
             if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))

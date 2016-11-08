@@ -66,19 +66,34 @@ namespace Prometheus.Models
 
         public ProjectViewModels()
         {
-            
+            MonitorVcsel = "";
+            ProjectType = "";
         }
 
-        public ProjectViewModels(string prokey, string proname, string startdate, double finshrate, string sdescription)
+        public ProjectViewModels(string prokey, string proname, string startdate, double finshrate, string sdescription,string monitorvcsel,string vcselwarning,string pjtype)
         {
             this.ProjectKey = prokey;
             this.dbProjectName = proname;
             this.StartDate = DateTime.Parse(startdate);
             this.FinishRating = finshrate;
             this.dbDescription = sdescription;
+            this.MonitorVcsel = monitorvcsel;
+            this.ProjectType = pjtype;
+            if (string.IsNullOrEmpty(vcselwarning))
+            {
+                this.VcselWarningYield = "98.0";
+            }
+            else
+            {
+                try
+                { this.VcselWarningYield = Convert.ToDouble(vcselwarning).ToString("0.0"); }
+                catch (Exception ex) { this.VcselWarningYield = Convert.ToDouble(98).ToString("0.0"); }
+            }
         }
 
         public string ProjectKey { set; get; }
+
+        public string ProjectType { set; get; }
 
         public string sProjectName = "";
 
@@ -143,6 +158,9 @@ namespace Prometheus.Models
 
         public double FinishRating { set; get; }
 
+        public string MonitorVcsel { set; get; }
+
+        public string VcselWarningYield { set; get; }
 
         private string sDescription = "";
 
@@ -339,8 +357,11 @@ namespace Prometheus.Models
             sql = sql.Replace("<ProjectKey>", ProjectKey);
             DBUtility.ExeLocalSqlNoRes(sql);
 
-            sql = "insert into Project(ProjectKey,ProjectName,StartDate,Description,FinishRate) values('<ProjectKey>','<ProjectName>','<StartDate>','<Description>',<FinishRate>)";
-            sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ProjectName>", dbProjectName).Replace("<StartDate>", StartDate.ToString("yyyy-MM-dd")).Replace("<Description>", dbDescription).Replace("<FinishRate>", Convert.ToString(FinishRating));
+            sql = "insert into Project(ProjectKey,ProjectName,StartDate,Description,FinishRate,APVal1,APVal2,ProjectType) values('<ProjectKey>','<ProjectName>','<StartDate>','<Description>',<FinishRate>,'<MonitorVcsel>','<VcselWarningYield>','<ProjectType>')";
+            sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ProjectName>", dbProjectName)
+                .Replace("<StartDate>", StartDate.ToString("yyyy-MM-dd"))
+                .Replace("<Description>", dbDescription).Replace("<FinishRate>", Convert.ToString(FinishRating))
+                .Replace("<MonitorVcsel>", MonitorVcsel).Replace("<VcselWarningYield>", VcselWarningYield).Replace("<ProjectType>", ProjectType);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
@@ -512,14 +533,16 @@ namespace Prometheus.Models
 
         public static ProjectViewModels RetrieveOneProject(string key)
         {
-            var sql = "select ProjectKey,ProjectName,StartDate,FinishRate,Description from Project where ProjectKey = '<ProjectKey>' and validate = 1";
+            var sql = "select ProjectKey,ProjectName,StartDate,FinishRate,Description,APVal1,APVal2,ProjectType from Project where ProjectKey = '<ProjectKey>' and validate = 1";
             sql = sql.Replace("<ProjectKey>", key);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             if (dbret.Count > 0)
             {
                 var ret = new ProjectViewModels(Convert.ToString(dbret[0][0])
                     , Convert.ToString(dbret[0][1]), Convert.ToString(dbret[0][2])
-                    , Convert.ToDouble(dbret[0][3]), Convert.ToString(dbret[0][4]));
+                    , Convert.ToDouble(dbret[0][3]), Convert.ToString(dbret[0][4])
+                    , Convert.ToString(dbret[0][5]), Convert.ToString(dbret[0][6])
+                    , Convert.ToString(dbret[0][7]));
 
                 ret.MemberList = RetrieveProjectMembers(key);
                 ret.TabList = RetrieveProjectMesTable(key);

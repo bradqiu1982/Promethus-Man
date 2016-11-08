@@ -299,6 +299,7 @@ namespace Prometheus.Controllers
             {
                 var vm = new ProjectViewModels();
                 CreateAllUserLists(vm);
+                CreateProjectTypeList(vm);
                 return View();
             }
             else
@@ -644,6 +645,10 @@ namespace Prometheus.Controllers
             var projectmodel = new ProjectViewModels();
             projectmodel.ProjectName = Request.Form["ProjectName"];
             projectmodel.FinishRating = 0;
+
+            projectmodel.ProjectType = Request.Form["projecttypelist"].ToString();
+
+
             RetrievePorjectKey(projectmodel);
 
             RetrieveProjectMember(projectmodel);
@@ -656,6 +661,7 @@ namespace Prometheus.Controllers
             if (!RetrieveProjectDate(projectmodel))
             {
                 CreateAllUserLists(projectmodel);
+                CreateProjectTypeList(projectmodel);
                 return View(projectmodel);
             }
 
@@ -663,6 +669,7 @@ namespace Prometheus.Controllers
             if (!ProjectValidate(projectmodel))
             {
                 CreateAllUserLists(projectmodel);
+                CreateProjectTypeList(projectmodel);
                 return View(projectmodel);
             }
 
@@ -720,6 +727,72 @@ namespace Prometheus.Controllers
             ViewBag.updateissuelist =pslist;
         }
 
+        private void CreateMonitorVcselList(ProjectViewModels vm)
+        {
+            var pslist = new List<SelectListItem>();
+
+            var psitem = new SelectListItem();
+            psitem.Text = "True";
+            psitem.Value = "True";
+            pslist.Add(psitem);
+
+            psitem = new SelectListItem();
+            psitem.Text = "False";
+            psitem.Value = "False";
+            pslist.Add(psitem);
+
+            if (vm != null)
+            {
+                if (string.IsNullOrEmpty(vm.MonitorVcsel) 
+                    || string.Compare(vm.MonitorVcsel,"True",true) == 0)
+                {
+                    pslist[0].Selected = true;
+                }
+                else
+                {
+                    pslist[1].Selected = true;
+                }
+            }
+            else
+            {
+                pslist[0].Selected = true;
+            }
+
+            ViewBag.monitorvcsellist = pslist;
+        }
+
+        private void CreateProjectTypeList(ProjectViewModels vm)
+        {
+            var pjtypelist = new List<string>();
+            pjtypelist.Add("Parallel");
+            pjtypelist.Add("Tunable");
+            pjtypelist.Add("OSA");
+            pjtypelist.Add("LineCard");
+            pjtypelist.Add("Others");
+
+            bool selected = false;
+            var pslist = new List<SelectListItem>();
+            foreach (var item in pjtypelist)
+            {
+                var psitem = new SelectListItem();
+                psitem.Text = item;
+                psitem.Value = item;
+                if (vm != null && string.Compare(vm.ProjectType, item, true) == 0)
+                {
+                    psitem.Selected = true;
+                    selected = true;
+                }
+                pslist.Add(psitem);
+            }
+
+            if (!selected)
+            {
+                pslist[0].Selected = true;
+            }
+
+            ViewBag.projecttypelist = pslist;
+        }
+
         public ActionResult EditProject(string ProjectKey)
         {
             var ckdict = CookieUtility.UnpackCookie(this);
@@ -736,6 +809,8 @@ namespace Prometheus.Controllers
                     var vm = ProjectViewModels.RetrieveOneProject(realkey);
                     CreateAllUserLists(vm);
                     CreateUpdateIssueList(vm);
+                    CreateMonitorVcselList(vm);
+                    CreateProjectTypeList(vm);
                     return View(vm);
                 }
                 else
@@ -834,6 +909,8 @@ namespace Prometheus.Controllers
             var projectmodel = new ProjectViewModels();
             projectmodel.ProjectName = Request.Form["ProjectName"];
 
+            projectmodel.ProjectType = Request.Form["projecttypelist"].ToString();
+
             //try {projectmodel.FinishRating = Convert.ToDouble(Request.Form["FinishRating"])%100; }
             //catch(Exception ex) { projectmodel.FinishRating = 0; }
             if (string.Compare(Request.Form["updateissuelist"].ToString(), "True", true) == 0)
@@ -843,6 +920,21 @@ namespace Prometheus.Controllers
             else
             {
                 projectmodel.FinishRating = 99;
+            }
+
+            projectmodel.MonitorVcsel = Request.Form["monitorvcsellist"].ToString();
+
+            if (string.IsNullOrEmpty(Request.Form["VcselWarningYield"]))
+            {
+                projectmodel.VcselWarningYield = "98";
+            }
+            else
+            {
+                var tempval = 98.0;
+                try
+                { tempval = Convert.ToDouble(Request.Form["VcselWarningYield"]); }
+                catch (Exception ex) { tempval = 98.0; }
+                projectmodel.VcselWarningYield = (tempval % 100.0).ToString("0.0");
             }
 
             RetrievePorjectKey(projectmodel);
@@ -858,6 +950,8 @@ namespace Prometheus.Controllers
             {
                 CreateAllUserLists(projectmodel);
                 CreateUpdateIssueList(projectmodel);
+                CreateMonitorVcselList(projectmodel);
+                CreateProjectTypeList(projectmodel);
                 return View(projectmodel);
             }
                 
@@ -866,6 +960,8 @@ namespace Prometheus.Controllers
             {
                 CreateAllUserLists(projectmodel);
                 CreateUpdateIssueList(projectmodel);
+                CreateMonitorVcselList(projectmodel);
+                CreateProjectTypeList(projectmodel);
                 return View(projectmodel);
             }
 
@@ -3022,20 +3118,36 @@ namespace Prometheus.Controllers
             if (!System.IO.File.Exists(wholefilename))
             {
                 var emailed = VcselEmailCheck();
-                var content = string.Empty;
+                //var content = "<!DOCTYPE html><table>";
+                var content1 = string.Empty;
                 var logcontent = string.Empty;
+                bool hascontent = false;
+
+                //var tempcontent2 = "<tr>" + "<th>Project</th>" + "<th>Wafer</th>" + "<th>Corrective Yield</th>" + "<th>Input</th>" + "<th>Output</th>" + "</tr>";
+                //content = content + tempcontent2;
 
                 foreach (var item in pjkeylist)
                 {
+                    var pjval = ProjectViewModels.RetrieveOneProject(item);
+                    if (string.Compare(pjval.MonitorVcsel,"False",true) == 0)
+                    {
+                        continue;
+                    }
+                    var warningyield = Convert.ToDouble(pjval.VcselWarningYield) * 0.01;
+
+
                     var waferlist = BITestData.RetrieveAllWafer(item);
+
+                    
                     foreach (var w in waferlist)
                     {
                         var yield = ProjectBIYieldViewModule.GetYieldByWafer(item, w);
-                        if (yield.CorrectLastYield > 0.1 && yield.CorrectLastYield < 0.98)
+                        if (yield.CorrectLastYield > 0.1 && yield.CorrectLastYield < warningyield)
                         {
 
                             var alldict = new Dictionary<string, bool>();
                             var errdict = new Dictionary<string, bool>();
+                            var cordict = new Dictionary<string, bool>();
 
                             foreach (var yitem in yield.LastYields)
                             {
@@ -3054,12 +3166,31 @@ namespace Prometheus.Controllers
                                         errdict.Add(snitem.Key, true);
                                     }
                                 }
+
+                                foreach (var snitem in yitem.CorSNDict)
+                                {
+                                    if (!cordict.ContainsKey(snitem.Key))
+                                    {
+                                        cordict.Add(snitem.Key, true);
+                                    }
+                                }
                             }
 
-                            content = content + "Warning: the corrective yield of " + item + " wafer " + w + " is " + (yield.CorrectLastYield * 100.0).ToString("0.00") + "%\r\n"
-                                +"Input: "+ alldict.Count.ToString() + " Output: " + (alldict.Count-errdict.Count).ToString() + "\r\n";
+                            hascontent = true;
+                            var tempcontent1 = "Warning: the corrective yield of " + item + " wafer " + w + " is " + (yield.CorrectLastYield * 100.0).ToString("0.00") + "% \r\n\r\n"
+                                + " Total Input: "+ alldict.Count.ToString() + " ,Failed Modules: " + errdict.Count.ToString()+" ,Reviewed Modules" + cordict.Count.ToString() + " \r\n\r\n";
 
-                            logcontent = logcontent + content;
+                            if (errdict.Count == cordict.Count)
+                            {
+                                tempcontent1 = "[Reviewed ] " + tempcontent1;
+                            }
+
+                            //tempcontent2 = "<tr>"+ "<td>"+item+"</td>" + "<td>"+w+"</td>" + "<td>"+ (yield.CorrectLastYield * 100.0).ToString("0.00") + "%</td>" + "<td>"+ alldict.Count.ToString() + "</td>" + "<td>"+ ((int)(alldict.Count* yield.CorrectLastYield)).ToString() + "</td>" + "</tr>";
+                            //content = content + tempcontent2;
+
+                            content1 = content1 + tempcontent1;
+
+                            logcontent = logcontent + tempcontent1;
                             logcontent = logcontent + "All SN:\r\n";
                             foreach (var sn in alldict)
                             {
@@ -3074,27 +3205,34 @@ namespace Prometheus.Controllers
                             if (!emailed.ContainsKey(item + "-" + w))
                             {
                                 emailed.Add(item + "-" + w, yield.CorrectLastYield);
+                                content1 = "[new] " + content1;
                                 //content = content + "Warning: the yield of " + item + " wafer " + w + " is " + (yield.CorrectLastYield * 100.0).ToString("0.00") + "%\r\n";
 
                             }
                             else
                             {
-                                //var lasttimeyield = Convert.ToDouble(emailed[item + "-" + w]);
-                                //if ((yield.CorrectLastYield - lasttimeyield) < -0.01)
-                                //{
-                                    emailed[item + "-" + w] = yield.CorrectLastYield;
-                                //    content = content + "Warning: the yield of " + item + " wafer " + w + " is " + (yield.CorrectLastYield * 100.0).ToString("0.00") + "%\r\n";
-                                //}
+                                var lasttimeyield = Convert.ToDouble(emailed[item + "-" + w].ToString("0.0"));
+                                var currentyield = Convert.ToDouble(yield.CorrectLastYield.ToString("0.0"));
+                                if (currentyield > lasttimeyield)
+                                {
+                                    content1 = "[^] " + content1;
+                                }
+                                else if(currentyield < lasttimeyield)
+                                {
+                                    content1 = "[v] " + content1;
+                                }
+                                emailed[item + "-" + w] = yield.CorrectLastYield;
                             }
                         }
                     }//end foreach
                 }//end foreach
 
+
                 VcselEmailStore(emailed);
 
+                //content = content + "</table>";
 
-
-                if (!string.IsNullOrEmpty(content))
+                if (hascontent)
                 {
                     var fn = "VCSEL_WAFER_SN" + DateTime.Now.ToString("yyyy-MM-dd") + ".txt";
                     var logvcsel = Server.MapPath("~/userfiles") + "\\" + fn;
@@ -3123,7 +3261,8 @@ namespace Prometheus.Controllers
                     toaddrs.Add("tony.lv@finisar.com");
                     toaddrs.Add("Zhongxi.Yu@finisar.com");
                     toaddrs.Add("Zhijun.Chen@finisar.com");
-                    EmailUtility.SendEmail("VCSEL WAFER YIELD WARNING", toaddrs, content + "\r\n Wafer SN File: " + validatestr);
+                    //toaddrs.Add("brad.qiu@finisar.com");
+                    EmailUtility.SendEmail("VCSEL WAFER YIELD WARNING", toaddrs, content1 + "\r\nWafer SN File: " + validatestr);
                     new System.Threading.ManualResetEvent(false).WaitOne(10000);
                 }
 

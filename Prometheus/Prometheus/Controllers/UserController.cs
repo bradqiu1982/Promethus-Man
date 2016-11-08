@@ -283,9 +283,42 @@ namespace Prometheus.Controllers
             return RedirectToAction("ViewAll", "Project");
         }
 
-        public ActionResult UserCenter(string username)
+        private List<SelectListItem> CreateSelectList(List<string> valist, string defVal)
+        {
+            bool selected = false;
+            var pslist = new List<SelectListItem>();
+            foreach (var p in valist)
+            {
+                var pitem = new SelectListItem();
+                pitem.Text = p;
+                pitem.Value = p;
+                if (!string.IsNullOrEmpty(defVal) && string.Compare(defVal, p, true) == 0)
+                {
+                    pitem.Selected = true;
+                    selected = true;
+                }
+                pslist.Add(pitem);
+            }
+
+            if (!selected && pslist.Count > 0)
+            {
+                pslist[0].Selected = true;
+            }
+
+            return pslist;
+        }
+
+        private void CreateICareList()
+        {
+            var asilist = UserViewModels.RetrieveAllUser();
+            var slist = CreateSelectList(asilist, "");
+            ViewBag.chooseuserlist = slist;
+        }
+
+        public ActionResult UserCenter(string username,string month)
         {
             var ckdict = CookieUtility.UnpackCookie(this);
+            
 
             var usernm = "";
             if (!string.IsNullOrEmpty(username))
@@ -297,8 +330,10 @@ namespace Prometheus.Controllers
                 usernm = ckdict["logonuser"].Split(new char[] { '|' })[0];
             }
 
+            
             if (!string.IsNullOrEmpty(usernm))
             {
+                //asign to me
                 var list1 = IssueViewModels.RetrieveIssueByAssignee(usernm, Resolute.Pending, 60);
                 var list2 = IssueViewModels.RetrieveIssueByAssigneeWorking(usernm, Resolute.Working, 60);
                 var list3 = IssueViewModels.RetrieveIssueByAssignee(usernm, Resolute.Done, 200);
@@ -307,6 +342,7 @@ namespace Prometheus.Controllers
 
                 ViewBag.UserName = usernm.Split(new char[] { '@' })[0];
 
+                //I assign
                 var iassignissues= IssueViewModels.RetrieveIssueByCreator(usernm, 300);
                 var wholedata = new List<List<string>>();
                 var title = new List<string>();
@@ -350,8 +386,32 @@ namespace Prometheus.Controllers
                     }
                 }
 
-                //ViewBag.iassignlist = IssueViewModels.RetrieveIssueByCreator(usernm, 100);
                 ViewBag.iassignlist = wholedata;
+
+                //I care
+                if (ckdict.Count > 0 && ckdict.ContainsKey("logonuser"))
+                {
+               
+                    var updater = ckdict["logonuser"].Split(new char[] { '|' })[0].ToUpper();
+                    var tempmonth = 1;
+                    if (string.IsNullOrEmpty(month))
+                    {
+                        tempmonth = 2;
+                    }
+                    else
+                    {
+                        try { tempmonth = Convert.ToInt32(month); }
+                        catch (Exception ex) { tempmonth = 1; }
+
+                    }
+
+                    if (string.Compare(updater, usernm, true) == 0)
+                    {
+                        CreateICareList();
+                        ViewBag.icaredatalist = UserIssueViewModels.RetrieveICareData(this, updater, tempmonth);
+                    }
+
+                }
 
                 return View(list1);
             }

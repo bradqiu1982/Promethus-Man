@@ -56,20 +56,39 @@
                         </div>
                         <div class="form-group">
                             <div class="col-md-6">
+                                <label class="control-label col-md-2">Project Type</label>
+                                <div class="col-md-10">
+                                    @Html.DropDownList("projecttypelist", null, new { @id = "projecttypelist", @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="col-md-6">
                                 <label class="control-label col-md-2">Update MES Data</label>
                                 <div class="col-md-10">
                                     @Html.DropDownList("updateissuelist", null, new { @id = "updateissuelist", @class = "form-control" })
                                 </div>
-                                @*<label class="control-label col-md-2" for="FinishRating">FinishRate</label>
-                                <div class="col-md-10" data-toggle="tooltip" data-placement="bottom" title="Finish Percent">
-                                    @if (Model != null && !string.IsNullOrEmpty(Model.FinishRating.ToString()))
-                                    {
-                                        <input class="form-control text-box single-line" value="@Model.FinishRating.ToString()" data-val="true" data-val-length="The field Project must be a string with a minimum length of 1 and a maximum length of 2." data-val-length-max="4" data-val-length-min="1" data-val-required="The FinishRating field is required." id="FinishRating" name="FinishRating" type="text" />
-                                    }
-                                    <span class="field-validation-valid text-danger" data-valmsg-for="FinishRating" data-valmsg-replace="true"></span>
-                                </div>*@
                             </div>
-                            <div class="col-md-6"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-6">
+                                <label class="control-label col-md-2">Monitor Vcsel</label>
+                                <div class="col-md-10">
+                                    @Html.DropDownList("monitorvcsellist", null, new { @id = "monitorvcsellist", @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="control-label col-md-2" for="VcselWarningYield">Vcsel Warning Yield</label>
+                                <div class="col-md-10">
+                                @if (Model != null && !string.IsNullOrEmpty(Model.VcselWarningYield))
+                                {
+                                    <input class="form-control text-box single-line" value="@Model.VcselWarningYield" data-val="true" data-val-length="The field Project must be a string with a minimum length of 1 and a maximum length of 4." data-val-length-max="4" data-val-length-min="1" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The Project field is required." id="VcselWarningYield" name="VcselWarningYield" type="text" />
+                                }
+                                else if(Model != null)
+                                {
+                                    <input class="form-control text-box single-line" value="98" data-val="true" data-val-length="The field Project must be a string with a minimum length of 1 and a maximum length of 4." data-val-length-max="4" data-val-length-min="1" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The Project field is required." id="VcselWarningYield" name="VcselWarningYield" type="text" />
+                                }
+                                </div>
+                            </div>
                         </div>
 
                         <hr />

@@ -98,12 +98,17 @@ namespace Prometheus.Models
                                 && string.Compare(correctbidict[p.ModuleSerialNum], BIROOTCAUSE.VCSELISSUE) != 0)
                             {
                                 yielddict[p.WhichTest].CorrectOutputCount = yielddict[p.WhichTest].CorrectOutputCount + 1;
+                                
                             }
-                            else
+
+                            if (correctbidict.ContainsKey(p.ModuleSerialNum))
                             {
-                                if (!yielddict[p.WhichTest].ErrSNDict.ContainsKey(p.ModuleSerialNum))
-                                { yielddict[p.WhichTest].ErrSNDict.Add(p.ModuleSerialNum, true); }
+                                if (!yielddict[p.WhichTest].CorSNDict.ContainsKey(p.ModuleSerialNum))
+                                { yielddict[p.WhichTest].CorSNDict.Add(p.ModuleSerialNum, true); }
                             }
+
+                            if (!yielddict[p.WhichTest].ErrSNDict.ContainsKey(p.ModuleSerialNum))
+                                { yielddict[p.WhichTest].ErrSNDict.Add(p.ModuleSerialNum, true); }
                         }
                             
                         RegisterError(p.ErrAbbr, p.WhichTest, pyvm.LErrorMap);
@@ -130,11 +135,15 @@ namespace Prometheus.Models
                             {
                                 tempyield.CorrectOutputCount = 1;
                             }
-                            else
+
+                            if (correctbidict.ContainsKey(p.ModuleSerialNum))
                             {
-                                if (!tempyield.ErrSNDict.ContainsKey(p.ModuleSerialNum))
-                                { tempyield.ErrSNDict.Add(p.ModuleSerialNum, true); }
+                                if (!tempyield.CorSNDict.ContainsKey(p.ModuleSerialNum))
+                                { tempyield.CorSNDict.Add(p.ModuleSerialNum, true); }
                             }
+
+                            if (!tempyield.ErrSNDict.ContainsKey(p.ModuleSerialNum))
+                                { tempyield.ErrSNDict.Add(p.ModuleSerialNum, true); }
                         }
 
                         tempyield.WhichTest = p.WhichTest;

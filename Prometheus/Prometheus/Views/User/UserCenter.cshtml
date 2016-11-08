@@ -38,6 +38,7 @@
     <li class="active"><a href="#tab_a" data-toggle="pill">My Blog</a></li>
     <li><a href="#tab_b" data-toggle="pill">Assigned To Me</a></li>
     <li><a href="#tab_c" data-toggle="pill">I Assign</a></li>
+    <li><a href="#tab_d" data-toggle="pill">I Care</a></li>
 </ul>
 <div class="tab-content col-md-10">
     <div class="tab-pane active" id="tab_a">
@@ -188,56 +189,59 @@
             </script>
         }
 
-    @*@if (iassignlist != null && iassignlist.Count > 0)
-    {
-        <div class="col-md-12">
-            @foreach (var item in iassignlist)
-            {
-                <div class="panel panel-default">
-                    <div class="panel-heading" style="min-height:40px;max-height:40px;">
-                        <div class="col-md-3 text-left">
-                            <a href="/Project/ProjectDetail?ProjectKey=@item.ProjectKey">
-                                <span class="glyphicon glyphicon-home" aria-hidden="true"></span> @item.ProjectKey
-                            </a>
-                        </div>
-                        <div class="col-md-10"></div>
-                    </div>
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="col-md-6 text-left">Summary</div>
-                            <div class="col-md-2 text-left">Asignee</div>
-                            <div class="col-md-2 text-left">Status</div>
-                            <div class="col-md-2 text-left">DueDate</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 text-left"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></div>
-                            <div class="col-md-2 text-left"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
-                            <div class="col-md-2 text-left">@item.Resolution</div>
-                            <div class="col-md-2 text-left">@item.DueDate.ToString("yyyy-MM-dd")</div>
-                        </div>
-
-                        @if (item.SubIssues.Count > 0)
-                        {
-                            <div class="row">
-                                <div class="col-md-12 text-left">Sub Issues</div>
-                            </div>
-                            foreach (var sub in item.SubIssues)
-                            {
-                                <div class="row">
-                                    <div class="col-md-6 text-left"><a href="/Issue/UpdateIssue?issuekey=@sub.IssueKey">@sub.Summary</a></div>
-                                    <div class="col-md-2 text-left"><a href="/User/UserCenter?username=@sub.Assignee">@sub.Assignee.Split(new char[] { '@' })[0]</a></div>
-                                    <div class="col-md-2 text-left">@sub.Resolution</div>
-                                    <div class="col-md-2 text-left"></div>
-                                </div>
-                            }
-                        }
-                      </div>
-                </div>
-            }
-        </div>
-     }*@
-
      </div>
+
+    <script src="~/Scripts/highcharts.js"></script>
+    <script src="~/Scripts/exporting.js"></script>
+
+    <div class="tab-pane" id="tab_d">
+
+        @if (ViewBag.chooseuserlist != null && ViewBag.icaredatalist != null)
+        {
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">I Care</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row col-md-12">
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr />
+
+            foreach (var item in ViewBag.icaredatalist)
+            {
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title"><a href="/User/UserCenter?username=@item.CurrentUser">@item.CurrentUser.Split(new char[] { '@' })[0]</a></h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row col-md-12">
+                                    <div class="row">
+                                        <div id="@((item.CurrentUser.Split(new char[] { '@' })[0]).Replace(".",""))issuetrendchart" style="height: 400px; margin: 0 auto"></div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @Html.Raw(item.UserIssueTrend)
+            }
+
+        }
+        
+
+    </div>
 </div>
 
 

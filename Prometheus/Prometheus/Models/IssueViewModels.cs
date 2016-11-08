@@ -773,25 +773,26 @@ namespace Prometheus.Models
                     , Convert.ToString(line[5]), Convert.ToString(line[6])
                     , Convert.ToString(line[7]), Convert.ToString(line[8])
                     , Convert.ToString(line[9]), Convert.ToString(line[10]), parentkey, Convert.ToString(line[11]));
-                
 
 
-                var tempclist = new List<IssueComments>();
-                var csql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
-                csql = csql.Replace("<IssueKey>", tempvm.IssueKey);
+                tempvm.RetrieveComment();
 
-                var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
-                foreach (var r in cdbret)
-                {
-                    var tempcomment = new IssueComments();
-                    tempcomment.IssueKey = Convert.ToString(r[0]);
-                    tempcomment.dbComment = Convert.ToString(r[1]);
-                    tempcomment.Reporter = Convert.ToString(r[2]);
-                    tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
-                    tempcomment.CommentType = Convert.ToString(r[4]);
-                    tempclist.Add(tempcomment);
-                }
-                tempvm.CommentList = tempclist;
+                //var tempclist = new List<IssueComments>();
+                //var csql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
+                //csql = csql.Replace("<IssueKey>", tempvm.IssueKey);
+
+                //var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
+                //foreach (var r in cdbret)
+                //{
+                //    var tempcomment = new IssueComments();
+                //    tempcomment.IssueKey = Convert.ToString(r[0]);
+                //    tempcomment.dbComment = Convert.ToString(r[1]);
+                //    tempcomment.Reporter = Convert.ToString(r[2]);
+                //    tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
+                //    tempcomment.CommentType = Convert.ToString(r[4]);
+                //    tempclist.Add(tempcomment);
+                //}
+                //tempvm.CommentList = tempclist;
 
                 ret.Add(tempvm);
             }
@@ -814,21 +815,23 @@ namespace Prometheus.Models
                     , Convert.ToString(dbret[0][11]), Convert.ToString(dbret[0][12]));
 
 
-                var tempclist = new List<IssueComments>();
-                sql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
-                sql = sql.Replace("<IssueKey>", issuekey);
-                dbret = DBUtility.ExeLocalSqlWithRes(sql);
-                foreach (var r in dbret)
-                {
-                    var tempcomment = new IssueComments();
-                    tempcomment.IssueKey = Convert.ToString(r[0]);
-                    tempcomment.dbComment = Convert.ToString(r[1]);
-                    tempcomment.Reporter = Convert.ToString(r[2]);
-                    tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
-                    tempcomment.CommentType = Convert.ToString(r[4]);
-                    tempclist.Add(tempcomment);
-                }
-                ret.CommentList = tempclist;
+                //var tempclist = new List<IssueComments>();
+                //sql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
+                //sql = sql.Replace("<IssueKey>", issuekey);
+                //dbret = DBUtility.ExeLocalSqlWithRes(sql);
+                //foreach (var r in dbret)
+                //{
+                //    var tempcomment = new IssueComments();
+                //    tempcomment.IssueKey = Convert.ToString(r[0]);
+                //    tempcomment.dbComment = Convert.ToString(r[1]);
+                //    tempcomment.Reporter = Convert.ToString(r[2]);
+                //    tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
+                //    tempcomment.CommentType = Convert.ToString(r[4]);
+                //    tempclist.Add(tempcomment);
+                //}
+                //ret.CommentList = tempclist;
+
+                ret.RetrieveComment();
 
                 if (string.Compare(ret.IssueType, ISSUETP.RMA) == 0)
                 {
@@ -1158,6 +1161,168 @@ namespace Prometheus.Models
         }
 
 
+        public static List<IssueViewModels> RetrieveIssueAllByUser(string user, string startdate)
+        {
+            var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and Resolution <> '<Resolution>' and  Assignee = '<Assignee>' and  ParentIssueKey = '' and IssueType <> '<IssueType>' and ReportDate > '<ReportDate>' order by ReportDate ASC";
+            sql = sql.Replace("<Assignee>", user).Replace("<ReportDate>", startdate).Replace("<IssueType>", ISSUETP.NPIPROC).Replace("<Resolution>",Resolute.AutoClose);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var ret = new List<IssueViewModels>();
+            foreach (var line in dbret)
+            {
+                var tempvm = new IssueViewModels(Convert.ToString(line[0])
+                    , Convert.ToString(line[1]), Convert.ToString(line[2])
+                    , Convert.ToString(line[3]), Convert.ToString(line[4])
+                    , Convert.ToString(line[5]), Convert.ToString(line[6])
+                    , Convert.ToString(line[7]), Convert.ToString(line[8])
+                    , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
+
+
+
+                tempvm.RetrieveComment();
+                tempvm.RetrieveAttachment(tempvm.IssueKey);
+
+                bool sameas = false;
+                foreach (var com in tempvm.CommentList)
+                {
+                    if (com.Comment.Contains("<p>Issue Same As <a"))
+                    {
+                        sameas = true;
+                        break;
+                    }
+
+                    if (com.Comment.Contains("passed")
+                        && string.Compare(com.Reporter, "System", true) == 0)
+                    {
+                        sameas = true;
+                        break;
+                    }
+                }
+                if (sameas)
+                {
+                    continue;
+                }
+
+                ret.Add(tempvm);
+            }
+
+            return ret;
+        }
+
+        private void RetrieveComment()
+        {
+                var tempclist = new List<IssueComments>();
+                var csql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
+                csql = csql.Replace("<IssueKey>", IssueKey);
+                var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
+                foreach (var r in cdbret)
+                {
+                    var tempcomment = new IssueComments();
+                    tempcomment.IssueKey = Convert.ToString(r[0]);
+                    tempcomment.dbComment = Convert.ToString(r[1]);
+                    tempcomment.Reporter = Convert.ToString(r[2]);
+                    tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
+                    tempcomment.CommentType = Convert.ToString(r[4]);
+                    tempclist.Add(tempcomment);
+                }
+                CommentList = tempclist;
+        }
+
+        public static List<IssueViewModels> RetrieveIssuePendingByUser(string user, string startdate)
+        {
+            var cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";
+
+            var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  Assignee = '<Assignee>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType <> '<IssueType>' and ReportDate > '<ReportDate>' order by ReportDate ASC";
+            sql = sql.Replace("<Assignee>", user).Replace("<cond>", cond).Replace("<ReportDate>", startdate).Replace("<IssueType>", ISSUETP.NPIPROC);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var ret = new List<IssueViewModels>();
+            foreach (var line in dbret)
+            {
+                var tempvm = new IssueViewModels(Convert.ToString(line[0])
+                    , Convert.ToString(line[1]), Convert.ToString(line[2])
+                    , Convert.ToString(line[3]), Convert.ToString(line[4])
+                    , Convert.ToString(line[5]), Convert.ToString(line[6])
+                    , Convert.ToString(line[7]), Convert.ToString(line[8])
+                    , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
+
+                ret.Add(tempvm);
+            }
+
+            return ret;
+        }
+
+        public static List<IssueViewModels> RetrieveIssueWorkingByUser(string user, string startdate)
+        {
+            var cond = "('" + Resolute.Working + "')";
+
+            var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  Assignee = '<Assignee>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType <> '<IssueType>' and ReportDate > '<ReportDate>' order by ReportDate ASC";
+            sql = sql.Replace("<Assignee>", user).Replace("<cond>", cond).Replace("<ReportDate>", startdate).Replace("<IssueType>", ISSUETP.NPIPROC);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var ret = new List<IssueViewModels>();
+            foreach (var line in dbret)
+            {
+                var tempvm = new IssueViewModels(Convert.ToString(line[0])
+                    , Convert.ToString(line[1]), Convert.ToString(line[2])
+                    , Convert.ToString(line[3]), Convert.ToString(line[4])
+                    , Convert.ToString(line[5]), Convert.ToString(line[6])
+                    , Convert.ToString(line[7]), Convert.ToString(line[8])
+                    , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
+
+                ret.Add(tempvm);
+            }
+
+            return ret;
+        }
+
+        public static List<IssueViewModels> RetrieveIssueDoneByUser(string user, string startdate)
+        {
+            var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and Resolution <> '<Resolution>' and  Assignee = '<Assignee>' and  ParentIssueKey = '' and IssueType <> '<IssueType>' and ResolvedDate > '<ResolvedDate>' order by ResolvedDate ASC";
+            sql = sql.Replace("<Assignee>", user.ToUpper()).Replace("<ResolvedDate>", startdate).Replace("<IssueType>", ISSUETP.NPIPROC).Replace("<Resolution>", Resolute.AutoClose);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var ret = new List<IssueViewModels>();
+            foreach (var line in dbret)
+            {
+                var tempvm = new IssueViewModels(Convert.ToString(line[0])
+                    , Convert.ToString(line[1]), Convert.ToString(line[2])
+                    , Convert.ToString(line[3]), Convert.ToString(line[4])
+                    , Convert.ToString(line[5]), Convert.ToString(line[6])
+                    , Convert.ToString(line[7]), Convert.ToString(line[8])
+                    , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
+
+                tempvm.RetrieveComment();
+                tempvm.RetrieveAttachment(tempvm.IssueKey);
+
+                if (tempvm.CommentList.Count == 1 && tempvm.AttachList.Count == 0)
+                {
+                    continue;
+                }
+
+                bool sameas = false;
+                foreach (var com in tempvm.CommentList)
+                {
+                    if (com.Comment.Contains("<p>Issue Same As <a"))
+                    {
+                        sameas = true;
+                        break;
+                    }
+
+                    if (com.Comment.Contains("passed")
+                        && string.Compare(com.Reporter, "System", true) == 0)
+                    {
+                        sameas = true;
+                        break;
+                    }
+                }
+                if (sameas)
+                {
+                    continue;
+                }
+
+                ret.Add(tempvm);
+            }
+
+            return ret;
+        }
+
         public static List<IssueViewModels> RetrieveRMAByProjectKey(string projectkey, string issuestatus)
         {
             var cond = "";
@@ -1197,21 +1362,24 @@ namespace Prometheus.Models
 
                 tempvm.RetrieveRMA();
 
-                var tempclist = new List<IssueComments>();
-                var csql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
-                csql = csql.Replace("<IssueKey>", tempvm.IssueKey);
-                var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
-                foreach (var r in cdbret)
-                {
-                    var tempcomment = new IssueComments();
-                    tempcomment.IssueKey = Convert.ToString(r[0]);
-                    tempcomment.dbComment = Convert.ToString(r[1]);
-                    tempcomment.Reporter = Convert.ToString(r[2]);
-                    tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
-                    tempcomment.CommentType = Convert.ToString(r[4]);
-                    tempclist.Add(tempcomment);
-                }
-                tempvm.CommentList = tempclist;
+                //var tempclist = new List<IssueComments>();
+                //var csql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
+                //csql = csql.Replace("<IssueKey>", tempvm.IssueKey);
+                //var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
+                //foreach (var r in cdbret)
+                //{
+                //    var tempcomment = new IssueComments();
+                //    tempcomment.IssueKey = Convert.ToString(r[0]);
+                //    tempcomment.dbComment = Convert.ToString(r[1]);
+                //    tempcomment.Reporter = Convert.ToString(r[2]);
+                //    tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
+                //    tempcomment.CommentType = Convert.ToString(r[4]);
+                //    tempclist.Add(tempcomment);
+                //}
+                //tempvm.CommentList = tempclist;
+
+                tempvm.RetrieveComment();
+
                 tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey);
 
                 tempvm.RetrieveAttachment(tempvm.IssueKey);
@@ -1250,21 +1418,24 @@ namespace Prometheus.Models
 
                 tempvm.RetrieveRMA();
 
-                var tempclist = new List<IssueComments>();
-                var csql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
-                csql = csql.Replace("<IssueKey>", tempvm.IssueKey);
-                var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
-                foreach (var r in cdbret)
-                {
-                    var tempcomment = new IssueComments();
-                    tempcomment.IssueKey = Convert.ToString(r[0]);
-                    tempcomment.dbComment = Convert.ToString(r[1]);
-                    tempcomment.Reporter = Convert.ToString(r[2]);
-                    tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
-                    tempcomment.CommentType = Convert.ToString(r[4]);
-                    tempclist.Add(tempcomment);
-                }
-                tempvm.CommentList = tempclist;
+                //var tempclist = new List<IssueComments>();
+                //var csql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
+                //csql = csql.Replace("<IssueKey>", tempvm.IssueKey);
+                //var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
+                //foreach (var r in cdbret)
+                //{
+                //    var tempcomment = new IssueComments();
+                //    tempcomment.IssueKey = Convert.ToString(r[0]);
+                //    tempcomment.dbComment = Convert.ToString(r[1]);
+                //    tempcomment.Reporter = Convert.ToString(r[2]);
+                //    tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
+                //    tempcomment.CommentType = Convert.ToString(r[4]);
+                //    tempclist.Add(tempcomment);
+                //}
+                //tempvm.CommentList = tempclist;
+
+                tempvm.RetrieveComment();
+
                 tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey);
 
                 tempvm.RetrieveAttachment(tempvm.IssueKey);
@@ -1303,21 +1474,24 @@ namespace Prometheus.Models
 
                 tempvm.RetrieveRMA();
 
-                var tempclist = new List<IssueComments>();
-                var csql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
-                csql = csql.Replace("<IssueKey>", tempvm.IssueKey);
-                var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
-                foreach (var r in cdbret)
-                {
-                    var tempcomment = new IssueComments();
-                    tempcomment.IssueKey = Convert.ToString(r[0]);
-                    tempcomment.dbComment = Convert.ToString(r[1]);
-                    tempcomment.Reporter = Convert.ToString(r[2]);
-                    tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
-                    tempcomment.CommentType = Convert.ToString(r[4]);
-                    tempclist.Add(tempcomment);
-                }
-                tempvm.CommentList = tempclist;
+                //var tempclist = new List<IssueComments>();
+                //var csql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
+                //csql = csql.Replace("<IssueKey>", tempvm.IssueKey);
+                //var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
+                //foreach (var r in cdbret)
+                //{
+                //    var tempcomment = new IssueComments();
+                //    tempcomment.IssueKey = Convert.ToString(r[0]);
+                //    tempcomment.dbComment = Convert.ToString(r[1]);
+                //    tempcomment.Reporter = Convert.ToString(r[2]);
+                //    tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
+                //    tempcomment.CommentType = Convert.ToString(r[4]);
+                //    tempclist.Add(tempcomment);
+                //}
+                //tempvm.CommentList = tempclist;
+
+                tempvm.RetrieveComment();
+
                 tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey);
 
                 tempvm.RetrieveAttachment(tempvm.IssueKey);

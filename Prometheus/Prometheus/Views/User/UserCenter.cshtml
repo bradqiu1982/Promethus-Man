@@ -34,6 +34,10 @@
         }
     }
 }
+
+<script src="~/Scripts/highcharts.js"></script>
+<script src="~/Scripts/exporting.js"></script>
+
 <ul class="nav nav-pills nav-stacked col-md-2">
     <li class="active"><a href="#tab_a" data-toggle="pill">My Blog</a></li>
     <li><a href="#tab_b" data-toggle="pill">Assigned To Me</a></li>
@@ -42,7 +46,51 @@
 </ul>
 <div class="tab-content col-md-10">
     <div class="tab-pane active" id="tab_a">
-        My Blog
+        <h2>My Blog</h2>
+        @if (ViewBag.myissuesummary != null)
+        {
+            <hr />
+            foreach (var item in ViewBag.myissuesummary)
+            {
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title"><a href="/User/UserCenter?username=@item.CurrentUser">@item.CurrentUser.Split(new char[] { '@' })[0]</a></h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row col-md-12">
+                                    <div class="col-md-3">
+                                        <a href="/User/UserIssues?username=@item.CurrentUser&month=1" target="_blank">
+                                            Working Issue <span class="badge alert-info">@item.WorkingIssueCount.ToString()</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <a href="/User/UserIssues?username=@item.CurrentUser&month=1" target="_blank">
+                                            Done Issue <span class="badge alert-success">@item.DoneIssueCount.ToString()</span>
+                                            </a>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <a href="/User/UserIssues?username=@item.CurrentUser&month=1" target="_blank">
+                                            Pending Issue <span class="badge alert-danger">@item.PendingIssueCount.ToString()</span>
+                                            </a>
+                                    </div>
+                                    <div class="col-md-3"></div>
+                                </div>
+                                <hr />
+                                <div class="row col-md-12">
+                                    <div class="row">
+                                        <div id="@((item.CurrentUser.Split(new char[] { '@' })[0]).Replace(".",""))issuetrendchart" style="height: 400px; margin: 0 auto;width:648px"></div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @Html.Raw(item.UserIssueTrend)
+            }
+        }
     </div>
 
     <div class="tab-pane" id="tab_b">
@@ -176,6 +224,7 @@
                 'aLengthMenu': [[25, 50, 100, -1],
                                 [25, 50, 100, "All"]],
                 "bAutoWidth": false,
+                "aaSorting": [],
                 "aoColumns": [
                 { sWidth: '10%' },
                 { sWidth: '40%' },
@@ -191,13 +240,16 @@
 
      </div>
 
-    <script src="~/Scripts/highcharts.js"></script>
-    <script src="~/Scripts/exporting.js"></script>
+
 
     <div class="tab-pane" id="tab_d">
 
-        @if (ViewBag.chooseuserlist != null && ViewBag.icaredatalist != null)
+        @if (ViewBag.chooseuserlist != null)
         {
+            using (Html.BeginForm("OperateICare", "User", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+
             <div class="row">
                 <div class="col-md-12">
                     <div class="panel panel-default">
@@ -205,17 +257,60 @@
                             <h3 class="panel-title">I Care</h3>
                         </div>
                         <div class="panel-body">
-                            <div class="row col-md-12">
+                            <div class="form-group">
+                                <div class="row col-md-12">
+                                    <div class="col-md-8">
+                                        <div class="col-md-7">
+                                            @Html.DropDownList("chooseuserlist", null, new { @id = "chooseuserlist", @class = "form-control" })
+                                        </div>
+                                        <div class="col-md-1">
 
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button id="adduser" name="adduser" class="form-control"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                                            @*<input type="submit" value="Submit" id="updaterma" name="updaterma" class="btn btn-default" />*@
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button id="deleteuser" name="deleteuser" class="form-control"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                    
+                                    </div>
+                                </div>
                             </div>
+                            <div class="form-group">
+                                <div class="row col-md-12">
 
-                        </div>
+                                    <div class="col-md-8">
+                                        <div class="col-md-7">
+                                            @Html.DropDownList("monthlist", null, new { @id = "monthlist", @class = "form-control" })
+                                        </div>
+                                        <div class="col-md-1 text-left">
+                                            Months
+                                        </div>
+                                        <div class="col-md-1">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button id="viewuser" name="viewuser" class="form-control"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>
+                                        </div>
+                                        <div class="col-md-1">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
                     </div>
                 </div>
             </div>
-
+            }
             <hr />
+        }
 
+        @if (ViewBag.icaredatalist != null)
+        {
             foreach (var item in ViewBag.icaredatalist)
             {
                 <div class="row">
@@ -226,8 +321,27 @@
                             </div>
                             <div class="panel-body">
                                 <div class="row col-md-12">
+                                    <div class="col-md-3">
+                                        <a href="/User/UserIssues?username=@item.CurrentUser&month=@ViewBag.icaremonth" target="_blank">
+                                            Working Issue <span class="badge alert-info">@item.WorkingIssueCount.ToString()</span>
+                                            </a>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <a href="/User/UserIssues?username=@item.CurrentUser&month=@ViewBag.icaremonth" target="_blank">
+                                            Done Issue <span class="badge alert-success">@item.DoneIssueCount.ToString()</span>
+                                            </a>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <a href="/User/UserIssues?username=@item.CurrentUser&month=@ViewBag.icaremonth" target="_blank">
+                                            Pending Issue <span class="badge alert-danger">@item.PendingIssueCount.ToString()</span>
+                                            </a>
+                                    </div>
+                                    <div class="col-md-3"></div>
+                                </div>
+                                <hr/>
+                                <div class="row col-md-12">
                                     <div class="row">
-                                        <div id="@((item.CurrentUser.Split(new char[] { '@' })[0]).Replace(".",""))issuetrendchart" style="height: 400px; margin: 0 auto"></div>
+                                        <div id="@((item.CurrentUser.Split(new char[] { '@' })[0]).Replace(".",""))issuetrendchart" style="height: 400px; margin: 0 auto;width:648px"></div>
                                     </div>
                                 </div>
 

@@ -19,10 +19,7 @@ namespace Prometheus.Models
 
         public static List<string> RetrieveAllICareUser(string me)
         {
-            var ret = new List<string>();
-            ret.Add("Alex.chen@finisar.com");
-            ret.Add("Colin.cui@finisar.com");
-            ret.Add("Zhao.liu@finisar.com");
+            var ret = UserViewModels.RetrieveICare(me);
             ret.Sort();
             return ret;
         }
@@ -30,6 +27,22 @@ namespace Prometheus.Models
         public static List<UserIssueViewModels> RetrieveICareData(Controller ctrl, string me,int month)
         {
             var uselist = RetrieveAllICareUser(me);
+            var ret = new List<UserIssueViewModels>();
+            foreach (var item in uselist)
+            {
+                var tempuserdata = new UserIssueViewModels();
+                tempuserdata.CurrentUser = item;
+                IssueCountTrend(ctrl, tempuserdata, item, month);
+                ret.Add(tempuserdata);
+            }
+            return ret;
+        }
+
+        public static List<UserIssueViewModels> RetrieveMyIssuerSummary(Controller ctrl, string me, int month)
+        {
+            var uselist = new List<string>();
+            uselist.Add(me);
+
             var ret = new List<UserIssueViewModels>();
             foreach (var item in uselist)
             {

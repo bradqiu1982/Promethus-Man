@@ -3185,8 +3185,27 @@ namespace Prometheus.Controllers
                                 tempcontent1 = "[Reviewed ] " + tempcontent1;
                             }
 
-                            //tempcontent2 = "<tr>"+ "<td>"+item+"</td>" + "<td>"+w+"</td>" + "<td>"+ (yield.CorrectLastYield * 100.0).ToString("0.00") + "%</td>" + "<td>"+ alldict.Count.ToString() + "</td>" + "<td>"+ ((int)(alldict.Count* yield.CorrectLastYield)).ToString() + "</td>" + "</tr>";
-                            //content = content + tempcontent2;
+                            if (!emailed.ContainsKey(item + "-" + w))
+                            {
+                                tempcontent1 = "[new ] " + tempcontent1;
+                                emailed.Add(item + "-" + w, yield.CorrectLastYield);
+                            }
+                            else
+                            {
+                                var lasttimeyield = Convert.ToDouble(emailed[item + "-" + w].ToString("0.0"));
+                                var currentyield = Convert.ToDouble(yield.CorrectLastYield.ToString("0.0"));
+                                if (currentyield > lasttimeyield)
+                                {
+                                    tempcontent1 = "[^] " + tempcontent1;
+                                }
+                                else if (currentyield < lasttimeyield)
+                                {
+                                    tempcontent1 = "[v] " + tempcontent1;
+                                }
+                                emailed[item + "-" + w] = yield.CorrectLastYield;
+                            }
+                                //tempcontent2 = "<tr>"+ "<td>"+item+"</td>" + "<td>"+w+"</td>" + "<td>"+ (yield.CorrectLastYield * 100.0).ToString("0.00") + "%</td>" + "<td>"+ alldict.Count.ToString() + "</td>" + "<td>"+ ((int)(alldict.Count* yield.CorrectLastYield)).ToString() + "</td>" + "</tr>";
+                                //content = content + tempcontent2;
 
                             content1 = content1 + tempcontent1;
 
@@ -3202,27 +3221,6 @@ namespace Prometheus.Controllers
                                 logcontent = logcontent + sn.Key + "\r\n";
                             }
 
-                            if (!emailed.ContainsKey(item + "-" + w))
-                            {
-                                emailed.Add(item + "-" + w, yield.CorrectLastYield);
-                                content1 = "[new] " + content1;
-                                //content = content + "Warning: the yield of " + item + " wafer " + w + " is " + (yield.CorrectLastYield * 100.0).ToString("0.00") + "%\r\n";
-
-                            }
-                            else
-                            {
-                                var lasttimeyield = Convert.ToDouble(emailed[item + "-" + w].ToString("0.0"));
-                                var currentyield = Convert.ToDouble(yield.CorrectLastYield.ToString("0.0"));
-                                if (currentyield > lasttimeyield)
-                                {
-                                    content1 = "[^] " + content1;
-                                }
-                                else if(currentyield < lasttimeyield)
-                                {
-                                    content1 = "[v] " + content1;
-                                }
-                                emailed[item + "-" + w] = yield.CorrectLastYield;
-                            }
                         }
                     }//end foreach
                 }//end foreach

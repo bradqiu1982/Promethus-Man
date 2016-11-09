@@ -1177,7 +1177,6 @@ namespace Prometheus.Models
                     , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
 
 
-
                 tempvm.RetrieveComment();
                 tempvm.RetrieveAttachment(tempvm.IssueKey);
 
@@ -1244,6 +1243,8 @@ namespace Prometheus.Models
                     , Convert.ToString(line[7]), Convert.ToString(line[8])
                     , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
 
+                tempvm.RetrieveAttachment(tempvm.IssueKey);
+
                 ret.Add(tempvm);
             }
 
@@ -1266,6 +1267,8 @@ namespace Prometheus.Models
                     , Convert.ToString(line[5]), Convert.ToString(line[6])
                     , Convert.ToString(line[7]), Convert.ToString(line[8])
                     , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
+
+                tempvm.RetrieveAttachment(tempvm.IssueKey);
 
                 ret.Add(tempvm);
             }

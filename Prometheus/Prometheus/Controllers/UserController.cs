@@ -313,6 +313,12 @@ namespace Prometheus.Controllers
             var asilist = UserViewModels.RetrieveAllUser();
             var slist = CreateSelectList(asilist, "");
             ViewBag.chooseuserlist = slist;
+
+            var months = new string[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "18" };
+            asilist = new List<string>();
+            asilist.AddRange(months);
+            slist = CreateSelectList(asilist, "");
+            ViewBag.monthlist = slist;
         }
 
         public ActionResult UserCenter(string username,string month)
@@ -333,6 +339,16 @@ namespace Prometheus.Controllers
             
             if (!string.IsNullOrEmpty(usernm))
             {
+                //my blog
+                if (ckdict.Count > 0 && ckdict.ContainsKey("logonuser"))
+                {
+                    var updater = ckdict["logonuser"].Split(new char[] { '|' })[0].ToUpper();
+                    if (string.Compare(updater, usernm, true) == 0)
+                    {
+                        ViewBag.myissuesummary = UserIssueViewModels.RetrieveMyIssuerSummary(this, updater, 1);
+                    }
+                }
+
                 //asign to me
                 var list1 = IssueViewModels.RetrieveIssueByAssignee(usernm, Resolute.Pending, 60);
                 var list2 = IssueViewModels.RetrieveIssueByAssigneeWorking(usernm, Resolute.Working, 60);
@@ -396,7 +412,7 @@ namespace Prometheus.Controllers
                     var tempmonth = 1;
                     if (string.IsNullOrEmpty(month))
                     {
-                        tempmonth = 2;
+                        tempmonth = 1;
                     }
                     else
                     {
@@ -409,6 +425,7 @@ namespace Prometheus.Controllers
                     {
                         CreateICareList();
                         ViewBag.icaredatalist = UserIssueViewModels.RetrieveICareData(this, updater, tempmonth);
+                        ViewBag.icaremonth = tempmonth.ToString();
                     }
 
                 }
@@ -419,6 +436,104 @@ namespace Prometheus.Controllers
             {
                 return RedirectToAction("LoginUser", "User");
             }
+        }
+
+        [HttpPost, ActionName("OperateICare")]
+        [ValidateAntiForgeryToken]
+        public ActionResult OperateICare()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            var dict = new RouteValueDictionary();
+            if (Request.Form["adduser"] != null)
+            {
+                var other = Request.Form["chooseuserlist"].ToString();
+                UserViewModels.AddICare(updater, other);
+                dict.Add("month", "1");
+            }
+
+            if (Request.Form["deleteuser"] != null)
+            {
+                var other = Request.Form["chooseuserlist"].ToString();
+                UserViewModels.RemoveICare(updater, other);
+                dict.Add("month", "1");
+            }
+
+            if (Request.Form["viewuser"] != null)
+            {
+                dict.Add("month", Request.Form["monthlist"].ToString());
+            }
+
+            dict.Add("username", updater);
+            
+            return RedirectToAction("UserCenter", "User", dict);
+        }
+
+        public ActionResult UserIssues(string username,string month)
+        {
+            if (!string.IsNullOrEmpty(username))
+            {
+                ViewBag.UserName = username.Split(new char[] { '@' })[0];
+
+                var tempmonth = 1;
+                if (string.IsNullOrEmpty(month))
+                {
+                    tempmonth = 1;
+                }
+                else
+                {
+                    try { tempmonth = Convert.ToInt32(month); }
+                    catch (Exception ex) { tempmonth = 1; }
+                }
+
+                var edate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd") + " 07:30:00");
+                var sdate = edate.AddMonths(0 - tempmonth);
+                var pendingissues = IssueViewModels.RetrieveIssuePendingByUser(username, sdate.ToString());
+                var workingissues = IssueViewModels.RetrieveIssueWorkingByUser(username, sdate.ToString());
+                var solvedissues = IssueViewModels.RetrieveIssueDoneByUser(username, sdate.ToString());
+                workingissues.AddRange(solvedissues);
+                workingissues.AddRange(pendingissues);
+
+                var wholedata = new List<List<string>>();
+                var title = new List<string>();
+                title.Add("Project");
+                title.Add("Summary");
+                title.Add("Priority");
+                title.Add("IssueType");
+                title.Add("Status");
+                title.Add("Due Date");
+                title.Add("Attachment");
+                wholedata.Add(title);
+
+                foreach (var item in workingissues)
+                {
+                    var templine = new List<string>();
+                    templine.Add(item.ProjectKey);
+                    templine.Add(item.Summary);
+                    templine.Add(item.Priority);
+                    templine.Add(item.IssueType);
+                    templine.Add(item.Resolution);
+                    templine.Add(item.DueDate.ToString("MM/dd-yy"));
+                    if (item.AttachList.Count > 0)
+                    {
+                        templine.Add("has");
+                    }
+                    else
+                    {
+                        templine.Add("");
+                    }
+                    templine.Add(item.IssueKey);
+
+                    wholedata.Add(templine);
+                }
+
+                ViewBag.userissuelist = wholedata;
+
+                return View();
+            }
+
+            return View();
         }
 
     }

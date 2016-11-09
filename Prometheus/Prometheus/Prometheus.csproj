@@ -770,6 +770,7 @@
     <Content Include="Views\BurnIn\ProjectBIDailyYieldDetail.cshtml" />
     <Content Include="Scripts\project_pn_desc_list.xlsx" />
     <Content Include="Views\Project\TestPNDesc.cshtml" />
+    <Content Include="Views\User\UserIssues.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

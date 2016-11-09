@@ -112,6 +112,38 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static void AddICare(string me,string other)
+        {
+            RemoveICare(me, other);
+            var sql = "insert into UserNet(ME,OTHER) values('<ME>','<OTHER>')";
+            sql = sql.Replace("<ME>", me.ToUpper()).Replace("<OTHER>", other.ToUpper());
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        public static void RemoveICare(string me, string other)
+        {
+            var sql = "delete from UserNet where ME='<ME>' and OTHER='<OTHER>'";
+            sql = sql.Replace("<ME>", me.ToUpper()).Replace("<OTHER>", other.ToUpper());
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        public static List<string> RetrieveICare(string me)
+        {
+            var sql = "select OTHER from UserNet where  ME='<ME>'";
+            sql = sql.Replace("<ME>", me);
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var ret = new List<string>();
+
+            foreach (var line in dbret)
+            {
+                ret.Add(Convert.ToString(line[0]));
+            }
+
+            ret.Sort();
+            return ret;
+        }
+
     }
 
 }

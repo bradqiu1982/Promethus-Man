@@ -1,0 +1,92 @@
+﻿
+@{
+    ViewBag.Title = "UserIssues";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (ViewBag.UserName != null)
+{
+    <h2>@ViewBag.UserName Issues</h2>
+}
+else
+{
+    <h2>User Issues</h2>
+}
+
+<hr/>
+
+@if (ViewBag.userissuelist != null)
+{
+    var idx = 0;
+    <table id="pndatatable" class="display" cellspacing="0">
+        <thead>
+            @foreach (var line in ViewBag.userissuelist)
+            {
+                <tr>
+                    <th style="font-size:12px">@line[0]</th>
+                    <th style="font-size:12px">@line[1]</th>
+                    <th style="font-size:12px">@line[2]</th>
+                    <th style="font-size:12px">@line[3]</th>
+                    <th style="font-size:12px">@line[4]</th>
+                    <th style="font-size:12px">@line[5]</th>
+                    <th style="font-size:12px">@line[6]</th>
+                </tr>
+                break;
+            }
+        </thead>
+
+        <tbody>
+            @foreach (var line in ViewBag.userissuelist)
+            {
+                if (idx == 0)
+                {
+                    idx = idx + 1;
+                    continue;
+                }
+
+                    <tr>
+                        <th style="font-size:12px">@line[0]</th>
+                        <th style="font-size:12px"><a href="/Issue/UpdateIssue?issuekey=@line[7]">@line[1]</a></th>
+                        <th style="font-size:12px">@line[2]</th>
+                        <th style="font-size:12px">@line[3]</th>
+                        <th style="font-size:12px">@line[4]</th>
+                        <th style="font-size:12px">@line[5]</th>
+                        @if (!string.IsNullOrEmpty(line[6]))
+                        {
+                            <th style="font-size:12px">
+                                <a href="/Issue/IssueAttach?issuekey=@line[7]" target="_blank">
+                                    <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>
+                                </a>
+                            </th>
+                        }
+                        else
+                        {
+                            <th style="font-size:12px"></th>
+                        }
+                    </tr>
+
+            }
+        </tbody>
+    </table>
+
+            <script type="text/javascript">
+        $(document).ready(function() {
+            $('#pndatatable').DataTable({
+                'iDisplayLength': 50,
+                'aLengthMenu': [[25, 50, 100, -1],
+                                [25, 50, 100, "All"]],
+                "bAutoWidth": false,
+                "aaSorting": [],
+                "aoColumns": [
+                { sWidth: '10%' },
+                { sWidth: '40%' },
+                { sWidth: '10%' },
+                { sWidth: '10%' },
+                { sWidth: '10%' },
+                { sWidth: '10%' },
+                { sWidth: '10%' }]
+            });
+                    } );
+            </script>
+}
+

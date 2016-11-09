@@ -23,6 +23,8 @@
 <hr/>
 
 <div class="row">
+@if (Model != null && Model.Count() > 0)
+{
     <div class="col-md-1">
         <label class="control-label" for="StartDate">StartDate</label>
     </div>
@@ -35,6 +37,12 @@
     <div class="col-md-2">
         <input class="form-control text-box single-line" id="EndDate" name="EndDate" type="text" value="" />
     </div>
+}
+else
+{
+    <div class="col-md-6">
+    </div>
+}
 
     <div class="col-md-1">
         @if (Model != null && Model.Count() > 0)
@@ -56,23 +64,28 @@
         @*<h2><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>*@
     </div>
     <div class="col-md-3"></div>
+    
     <script type="text/javascript">
-            $(document).ready(function () {
-                $("#StartDate").datepicker({
-                    changeMonth: true,
-                    changeYear: true,
-                    dateFormat: 'yy-mm-dd'
-                });
-                $("#EndDate").datepicker({
-                    changeMonth: true,
-                    changeYear: true,
-                    dateFormat: 'yy-mm-dd'
-                });
-            });
+        function GoToAll() {
+            window.location.href = '/Project/ViewAll';
+        }
+    </script>
 
-            function GoToAll() {
-                    window.location.href = '/Project/ViewAll';
-            }
+@if (Model != null && Model.Count() > 0)
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#StartDate").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: 'yy-mm-dd'
+            });
+            $("#EndDate").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: 'yy-mm-dd'
+            });
+        });
 
             function ShareRMA() {
                 if (document.getElementById("StartDate").value && document.getElementById("EndDate").value) {
@@ -96,7 +109,9 @@
                     window.open(myurl, '_blank');
                 }
         }
-    </script>
+</script>
+}
+
 </div>
     <hr />
 

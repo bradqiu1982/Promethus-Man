@@ -1073,6 +1073,8 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(ProjectKey))
             {
+                ViewBag.projectkey = ProjectKey;
+
                 var vm  = ProjectFAViewModules.RetrievePendingFAData(ProjectKey);
 
                 var piedatadict = new Dictionary<string, int>();
@@ -1153,6 +1155,8 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(ErrAbbr))
             {
+                ViewBag.projectkey = ProjectKey;
+
                 var vm = ProjectFAViewModules.RetrieveFADataWithErrAbbr(ProjectKey, ErrAbbr);
 
                 var pendingitems = new List<ProjectFAViewModules>();
@@ -1208,6 +1212,8 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(SN))
             {
+                ViewBag.projectkey = ProjectKey;
+
                 var vm = ProjectFAViewModules.RetrieveFADataWithSN(ProjectKey, SN);
                 return View("ProjectFA", vm);
             }
@@ -1219,6 +1225,8 @@ namespace Prometheus.Controllers
         public ActionResult ProjectDoneFA()
         {
             var projectkey = Request.Form["HProjectKey"];
+            ViewBag.projectkey = projectkey;
+
             var vm = ProjectFAViewModules.RetrieveDoneFAData(projectkey);
 
             var piedatadict = new Dictionary<string, int>();

@@ -1168,10 +1168,23 @@ namespace Prometheus.Controllers
                         && item.IssueData.Resolution != Resolute.Working
                         && item.IssueData.Resolution != Resolute.Reopen)
                     {
+
+                        if (string.Compare(item.IssueData.Resolution, Resolute.AutoClose, true) == 0)
+                        {
+                            continue;
+                        }
+
                         var removesameasissue = false;
                         foreach (var c in item.IssueData.CommentList)
                         {
                             if (c.Comment.Contains("<p>Issue Same As <a"))
+                            {
+                                removesameasissue = true;
+                                break;
+                            }
+
+                            if (c.Comment.Contains("passed")
+                                && string.Compare(c.Reporter, "System", true) == 0)
                             {
                                 removesameasissue = true;
                                 break;

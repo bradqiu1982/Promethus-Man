@@ -3503,7 +3503,7 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(pjkey))
             {
-                                try
+                try
                 {
                     BITestData.RetrieveWaferDataFromMes(pjkey);
                     var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();

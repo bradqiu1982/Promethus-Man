@@ -519,7 +519,7 @@ namespace Prometheus.Controllers
             vm.Priority = Request.Form["prioritylist"].ToString();
             vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
             vm.ReportDate = DateTime.Now;
-            vm.Assignee = Request.Form["assigneelist"].ToString();
+            vm.Assignee = updater; //Request.Form["assigneelist"].ToString();
             vm.Reporter = updater; //Request.Form["reporterlist"].ToString();
             vm.Resolution = Request.Form["resolutionlist"].ToString();
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");

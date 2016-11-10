@@ -345,11 +345,14 @@ namespace Prometheus.Controllers
 
            if (Request.Form["deleteisu"] != null)
             {
-                if (string.Compare(updater, originaldata.Reporter, true) == 0)
+                if (string.Compare(updater, originaldata.Reporter, true) == 0
+                    || string.Compare(updater, originaldata.Assignee, true) == 0)
                 {
                     IssueViewModels.RemoveIssue(issuekey);
+                    var dict = new RouteValueDictionary();
+                    dict.Add("ProjectKey", originaldata.ProjectKey);
+                    return RedirectToAction("ProjectDetail", "Project",dict);
                 }
-                return RedirectToAction("ViewAll", "Project");
             }
 
             var vm = new IssueViewModels();
@@ -942,11 +945,14 @@ namespace Prometheus.Controllers
 
             if (Request.Form["deleterma"] != null)
             {
-                if (string.Compare(updater, originaldata.Reporter, true) == 0)
+                if (string.Compare(updater, originaldata.Reporter, true) == 0
+                    || string.Compare(updater, originaldata.Assignee, true) == 0)
                 {
                     IssueViewModels.RemoveIssue(issuekey);
+                    var dict = new RouteValueDictionary();
+                    dict.Add("ProjectKey", originaldata.ProjectKey);
+                    return RedirectToAction("ProjectDetail", "Project",dict);
                 }
-                return RedirectToAction("ViewAll", "Project");
             }
 
             var vm = new IssueViewModels();

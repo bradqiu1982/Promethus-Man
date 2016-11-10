@@ -367,6 +367,137 @@ namespace Prometheus.Models
 
         }
 
+        public static void RetrievePjWaferAllData(ProjectViewModels vm)
+        {
+            try
+            {
+                var wafers = BITestData.RetrieveAllWafer(vm.ProjectKey);
+                if (vm.PNList.Count > 0 && wafers.Count > 0)
+                {
+                    var failurelist = new List<BITestData>();
+                    var failuredict = new Dictionary<string, bool>();
+                    var passlist = new List<BITestData>();
+
+                    var starttime = vm.StartDate.ToString();
+
+                    var sql = "select ModuleSerialNum,Step,ModuleType,ErrAbbr,TestTimeStamp,TestStation,ModulePartNum,wafer,waferpn,ChannelNum,SLOPE,THOLD,PO_LD,PO_LD_18,PO_LD_25,PO_LD_127,PO_Uniformity,Delta_SLOPE,Delta_THOLD,Delta_PO_LD,Delta_PO_LD_18,Delta_PO_LD_25,Delta_PO_LD_127,Delta_PO_Uniformity from dbo.PRLL_VcselInfoSummary_2016(nolock) where wafer in <WAFERCOND> and waferpn  <> 'NULL' and ErrAbbr  <> 'NULL' and ModulePartNum in <PNCOND> and TestTimeStamp <= '<TIMECOND>' order by TestTimeStamp Desc,ModuleSerialNum";
+                    var pncond = PNCondition(vm.PNList);
+                    if (string.IsNullOrEmpty(pncond))
+                    {
+                        return;
+                    }
+                    var wafercond = "('";
+                    foreach (var w in wafers)
+                    {
+                        wafercond = wafercond + w + "','";
+                    }
+                    wafercond = wafercond.Substring(0, wafercond.Length - 2) + ")";
+
+                    sql = sql.Replace("<PNCOND>", pncond).Replace("<TIMECOND>", starttime).Replace("<WAFERCOND>", wafercond);
+
+                    var dbret = DBUtility.ExePRLSqlWithRes(sql);
+                    if (dbret.Count > 0)
+                    {
+                        var bondeddatadict = BITestData.RetrieveAllDataIDASC(vm.ProjectKey);
+                        var tempdataiddict = new Dictionary<string, BITestData>();
+
+                        foreach (var line in dbret)
+                        {
+                            var tempid = ConvertString(line[0]) + "_" + ConvertString(line[1]);
+
+                                if (!bondeddatadict.ContainsKey(tempid))
+                                {
+                                    if (tempdataiddict.ContainsKey(tempid))
+                                    {
+                                        if (DateTime.Parse(ConvertString(line[4])) == tempdataiddict[tempid].TestTimeStamp)
+                                        {
+                                            if (string.Compare(ConvertString(line[3]), "Pass", true) != 0)
+                                            {
+                                                tempdataiddict[tempid].ErrAbbr = ConvertString(line[3]);
+
+                                                if (!failuredict.ContainsKey(tempdataiddict[tempid].ModuleSerialNum))
+                                                {
+                                                    failuredict.Add(tempdataiddict[tempid].ModuleSerialNum, true);
+                                                    failurelist.Add(tempdataiddict[tempid]);
+                                                }
+
+                                            }
+
+                                            var tempdf = new BITestDataField();
+                                            tempdf.DataID = tempdataiddict[tempid].DataID;
+                                            tempdf.ChannelNum = ConvertString(line[9]);
+                                            tempdf.SLOPE = ConvertDouble(line[10]);
+                                            tempdf.THOLD = ConvertDouble(line[11]);
+                                            tempdf.PO_LD = ConvertDouble(line[12]);
+                                            tempdf.PO_LD_18 = ConvertDouble(line[13]);
+                                            tempdf.PO_LD_25 = ConvertDouble(line[14]);
+                                            tempdf.PO_LD_127 = ConvertDouble(line[15]);
+                                            tempdf.PO_Uniformity = ConvertDouble(line[16]);
+                                            tempdf.Delta_SLOPE = ConvertDouble(line[17]);
+                                            tempdf.Delta_THOLD = ConvertDouble(line[18]);
+                                            tempdf.Delta_PO_LD = ConvertDouble(line[19]);
+                                            tempdf.Delta_PO_LD_18 = ConvertDouble(line[20]);
+                                            tempdf.Delta_PO_LD_25 = ConvertDouble(line[21]);
+                                            tempdf.Delta_PO_LD_127 = ConvertDouble(line[22]);
+                                            tempdf.Delta_PO_Uniformity = ConvertDouble(line[23]);
+                                            tempdataiddict[tempid].DataFields.Add(tempdf);
+                                        }//same time
+                                    }
+                                    else
+                                    {
+                                        var tempdata = new BITestData();
+                                        tempdata.DataID = GetUniqKey();
+                                        tempdata.ProjectKey = vm.ProjectKey;
+                                        tempdata.ModuleSerialNum = ConvertString(line[0]);
+                                        tempdata.WhichTest = ConvertString(line[1]);
+                                        tempdata.ModuleType = ConvertString(line[2]);
+                                        tempdata.ErrAbbr = ConvertString(line[3]);
+                                        tempdata.TestTimeStamp = DateTime.Parse(ConvertString(line[4]));
+                                        tempdata.TestStation = ConvertString(line[5]);
+                                        tempdata.PN = ConvertString(line[6]);
+                                        tempdata.Wafer = ConvertString(line[7]);
+                                        tempdata.Waferpn = ConvertString(line[8]);
+
+                                        var tempdf = new BITestDataField();
+                                        tempdf.DataID = tempdata.DataID;
+                                        tempdf.ChannelNum = ConvertString(line[9]);
+                                        tempdf.SLOPE = ConvertDouble(line[10]);
+                                        tempdf.THOLD = ConvertDouble(line[11]);
+                                        tempdf.PO_LD = ConvertDouble(line[12]);
+                                        tempdf.PO_LD_18 = ConvertDouble(line[13]);
+                                        tempdf.PO_LD_25 = ConvertDouble(line[14]);
+                                        tempdf.PO_LD_127 = ConvertDouble(line[15]);
+                                        tempdf.PO_Uniformity = ConvertDouble(line[16]);
+                                        tempdf.Delta_SLOPE = ConvertDouble(line[17]);
+                                        tempdf.Delta_THOLD = ConvertDouble(line[18]);
+                                        tempdf.Delta_PO_LD = ConvertDouble(line[19]);
+                                        tempdf.Delta_PO_LD_18 = ConvertDouble(line[20]);
+                                        tempdf.Delta_PO_LD_25 = ConvertDouble(line[21]);
+                                        tempdf.Delta_PO_LD_127 = ConvertDouble(line[22]);
+                                        tempdf.Delta_PO_Uniformity = ConvertDouble(line[23]);
+
+                                        tempdata.DataFields.Add(tempdf);
+
+                                        tempdataiddict.Add(tempid, tempdata);
+
+                                    }
+                            }//end if (!bondeddatadict.ContainsKey(tempid))
+                        }//end foreach
+
+                        foreach (var kv in tempdataiddict)
+                        {
+                            kv.Value.StoreBIData();
+                        }//end foreach
+
+                    }//end if (dbret.Count > 0)
+                }//end if pn > 0
+
+            }
+            catch (Exception ex)
+            {
+            }
+
+        }
 
         private static void CreateSystemIssues(List<BITestData> failurelist)
         {

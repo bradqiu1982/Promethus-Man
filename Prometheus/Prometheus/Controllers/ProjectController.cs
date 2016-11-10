@@ -3131,13 +3131,8 @@ namespace Prometheus.Controllers
 
         }
 
-        private void CheckVecselYieldByWafer(List<string> pjkeylist)
+        private void RealCheckVcselYieldByWafer(List<string> pjkeylist)
         {
-            var filename = "log" + DateTime.Now.ToString("yyyy-MM-dd");
-            var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
-            
-            if (!System.IO.File.Exists(wholefilename))
-            {
                 var emailed = VcselEmailCheck();
                 //var content = "<!DOCTYPE html><table>";
                 var content1 = string.Empty;
@@ -3284,7 +3279,16 @@ namespace Prometheus.Controllers
                     EmailUtility.SendEmail("VCSEL WAFER YIELD WARNING", toaddrs, content1 + "\r\nWafer SN File: " + validatestr);
                     new System.Threading.ManualResetEvent(false).WaitOne(10000);
                 }
+        }
 
+        private void CheckVecselYieldByWafer(List<string> pjkeylist)
+        {
+            var filename = "log" + DateTime.Now.ToString("yyyy-MM-dd");
+            var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
+            
+            if (!System.IO.File.Exists(wholefilename))
+            {
+                RealCheckVcselYieldByWafer(pjkeylist);
             }
         }
 
@@ -3493,6 +3497,24 @@ namespace Prometheus.Controllers
             }
 
             return View(vm);
+        }
+
+        public ActionResult RetrieveWaferData(string pjkey)
+        {
+            if (!string.IsNullOrEmpty(pjkey))
+            {
+                                try
+                {
+                    BITestData.RetrieveWaferDataFromMes(pjkey);
+                    var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
+                    RealCheckVcselYieldByWafer(pjkeylist);
+                }
+                catch (Exception ex)
+                { }
+
+            }
+
+            return RedirectToAction("ViewAll", "Project");
         }
 
 

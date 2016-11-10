@@ -20,11 +20,13 @@
     @Html.AntiForgeryToken()
 
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-
+    <div class="row">
     <div class="form-group">
         <ul class="nav nav-pills nav-stacked col-md-2">
             <li class="active"><a href="#tab_a" data-toggle="pill">Base Info<font color="red">*</font></a></li>
             <li><a href="#tab_b" data-toggle="pill">MES Bonding</a></li>
+            <li><a href="#tab_c" data-toggle="pill">ATE Bonding</a></li>
+            <li><a href="#tab_d" data-toggle="pill">BURN-IN Setting</a></li>
         </ul>
 
         <div class="tab-content col-md-10">
@@ -69,30 +71,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <div class="col-md-6">
-                                <label class="control-label col-md-2">Monitor Vcsel</label>
-                                <div class="col-md-10">
-                                    @Html.DropDownList("monitorvcsellist", null, new { @id = "monitorvcsellist", @class = "form-control" })
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="control-label col-md-2" for="VcselWarningYield">Vcsel Warning Yield</label>
-                                <div class="col-md-10">
-                                @if (Model != null && !string.IsNullOrEmpty(Model.VcselWarningYield))
-                                {
-                                    <input class="form-control text-box single-line" value="@Model.VcselWarningYield" data-val="true" data-val-length="The field Project must be a string with a minimum length of 1 and a maximum length of 4." data-val-length-max="4" data-val-length-min="1" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The Project field is required." id="VcselWarningYield" name="VcselWarningYield" type="text" />
-                                }
-                                else if(Model != null)
-                                {
-                                    <input class="form-control text-box single-line" value="98" data-val="true" data-val-length="The field Project must be a string with a minimum length of 1 and a maximum length of 4." data-val-length-max="4" data-val-length-min="1" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The Project field is required." id="VcselWarningYield" name="VcselWarningYield" type="text" />
-                                }
-                                </div>
-                            </div>
-                        </div>
-
                         <hr />
-
 
                         @for (var i = 0; i < 1; i++)
                         {
@@ -264,13 +243,63 @@
 
                     </div>
                 </div>
+
+            <div class="tab-pane" id="tab_c"></div>
+            <div class="tab-pane" id="tab_d">
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="control-label col-md-2">Monitor Vcsel</label>
+                        <div class="col-md-10">
+                            @Html.DropDownList("monitorvcsellist", null, new { @id = "monitorvcsellist", @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="control-label col-md-2" for="VcselWarningYield">Vcsel Warning Yield</label>
+                        <div class="col-md-10">
+                            @if (Model != null && !string.IsNullOrEmpty(Model.VcselWarningYield))
+                            {
+                                <input class="form-control text-box single-line" value="@Model.VcselWarningYield" data-val="true" data-val-length="The field Project must be a string with a minimum length of 1 and a maximum length of 4." data-val-length-max="4" data-val-length-min="1" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The Project field is required." id="VcselWarningYield" name="VcselWarningYield" type="text" />
+                            }
+                            else if (Model != null)
+                            {
+                                <input class="form-control text-box single-line" value="98" data-val="true" data-val-length="The field Project must be a string with a minimum length of 1 and a maximum length of 4." data-val-length-max="4" data-val-length-min="1" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The Project field is required." id="VcselWarningYield" name="VcselWarningYield" type="text" />
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <button id="retrievewaferdata" name="retrievewaferdata" type="button" class="form-control" onclick="getwaferdata()">Retrieve Wafers Data</button>
+                    </div>
+                    <div class="col-md-6">
+                    </div>
+                    @if (Model != null)
+                    {
+                    <script type="text/javascript">
+                        
+                        function getwaferdata()
+                        {
+                                window.location.href = '/Project/RetrieveWaferData?pjkey=@(Model.ProjectKey)';
+                        }
+                    </script> 
+                    }
+                </div>
+
+
+
+            </div>
         </div>
     </div>
-
-    <div class="form-group">
-        <div>
-            <input type="submit" value="Update" class="btn btn-default" />
-        </div>
     </div>
 
-}
+    <hr/>
+
+    <div class="row">
+        <div class="form-group">
+            <div>
+                <input type="submit" value="Update" class="btn btn-default" />
+            </div>
+        </div>
+     </div>
+        }

@@ -111,6 +111,26 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static Dictionary<string, DateTime> RetrieveAllDataIDASC(string projectkey)
+        {
+            var ret = new Dictionary<string, DateTime>();
+            var sql = "select ModuleSerialNum,WhichTest,TestTimeStamp from BITestData where ProjectKey = '<ProjectKey>' order by TestTimeStamp ASC";
+            sql = sql.Replace("<ProjectKey>", projectkey);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            foreach (var item in dbret)
+            {
+                try
+                {
+                    if (!ret.ContainsKey(Convert.ToString(item[0]) + "_" + Convert.ToString(item[1])))
+                    {
+                        ret.Add(Convert.ToString(item[0]) + "_" + Convert.ToString(item[1]), DateTime.Parse(Convert.ToString(item[2])));
+                    }
+                }
+                catch (Exception ex) { }
+            }
+            return ret;
+        }
+
         public static string RetrieveLatestTimeOfLocalBI(string projectkey)
         {
             var sql = "select top 1 UpdateTime from BITestData where ProjectKey = '<ProjectKey>' order by TestTimeStamp DESC";
@@ -334,6 +354,23 @@ namespace Prometheus.Models
                     }
                 }
 
+                ResetUpdatePJLock(projectkey);
+            }
+            catch (Exception ex)
+            {
+                ResetUpdatePJLock(projectkey);
+            }
+        }
+
+        public static void RetrieveWaferDataFromMes (string projectkey)
+        {
+            if (UpdatePJLockUsing(projectkey))
+                return;
+
+            try
+            {
+                var vm = ProjectViewModels.RetrieveOneProject(projectkey);
+                BIDataUtility.RetrievePjWaferAllData(vm);
                 ResetUpdatePJLock(projectkey);
             }
             catch (Exception ex)

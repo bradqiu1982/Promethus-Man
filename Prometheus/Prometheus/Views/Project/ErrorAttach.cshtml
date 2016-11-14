@@ -1,0 +1,64 @@
+﻿@model Prometheus.Models.ProjectErrorViewModels
+
+@{
+    ViewBag.Title = "ErrorAttach";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (Model != null)
+{
+    <div class="row col-md-12">
+        <div class="col-md-3">
+            <h2>@Model.ProjectKey @Model.OrignalCode Error Attach</h2>
+        </div>
+        <div class="col-md-2">
+            <h2><a data-toggle="tooltip" title="Goto Error Page" href="/Project/ProjectError?ProjectKey=@(Model.ProjectKey)">
+                    <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span> Project Error
+                </a></h2>
+        </div>
+        <div class="col-md-2">
+                <h2><a data-toggle="tooltip" title="Goto FA Page" href="/Project/ProjectFA?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span> FA</a></h2>
+        </div>
+        <div class="col-md-2">
+                <h2><a data-toggle="tooltip" title="Goto RMA Page" href="/Project/ProjectRMAStatus?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> RMA</a></h2>
+        </div>
+    </div>
+    }
+    else
+    {
+    <div class="row col-md-12">
+        <div class="col-md-3">
+            <h2>Error Attach</h2>
+        </div>
+        <div class="col-md-9"></div>
+        </div>
+    }
+
+        @if (Model != null && Model.AttachList.Count > 0)
+        {
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Attachments for @Model.ProjectKey @Model.OrignalCode</h3>
+                        </div>
+                        <div class="panel-body">
+                            @foreach (var item in Model.AttachList)
+                            {
+
+                                var fns = item.Split(new char[] { '/' });
+                                var fn = fns[fns.Length - 1];
+                                <div class="row">
+                                    <a href="@item" target="_blank">
+                                        <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>@fn
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+
+

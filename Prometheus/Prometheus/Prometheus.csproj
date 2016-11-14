@@ -771,6 +771,7 @@
     <Content Include="Scripts\project_pn_desc_list.xlsx" />
     <Content Include="Views\Project\TestPNDesc.cshtml" />
     <Content Include="Views\User\UserIssues.cshtml" />
+    <Content Include="Views\Project\ErrorAttach.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

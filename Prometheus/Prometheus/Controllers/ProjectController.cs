@@ -15,9 +15,6 @@ namespace Prometheus.Controllers
 {
     public class ProjectController : Controller
     {
-
-
-
         // GET: Project
         public ActionResult ViewAll()
         {

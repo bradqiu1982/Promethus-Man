@@ -156,6 +156,20 @@ namespace Prometheus.Models
             }
         }
 
+        private List<string> attachlist = new List<string>();
+        public List<string> AttachList
+        {
+            set
+            {
+                attachlist.Clear();
+                attachlist.AddRange(value);
+            }
+            get
+            {
+                return attachlist;
+            }
+        }
+
         public static string GetUniqKey()
         {
             return Guid.NewGuid().ToString("N");
@@ -214,6 +228,7 @@ namespace Prometheus.Models
             {
                 var temperror = new ProjectErrorViewModels(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToString(line[2]), Convert.ToString(line[3]),Convert.ToInt32(line[4]));
                 temperror.CommentList = RetrieveErrorComments(temperror.ErrorKey);
+                temperror.RetrieveAttachment(temperror.ErrorKey);
                 ret.Add(temperror);
             }
             return ret;
@@ -246,6 +261,7 @@ namespace Prometheus.Models
             {
                 var temperror = new ProjectErrorViewModels(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToString(line[2]), Convert.ToString(line[3]), Convert.ToInt32(line[4]));
                 temperror.CommentList = RetrieveErrorComments(temperror.ErrorKey);
+                temperror.RetrieveAttachment(temperror.ErrorKey);
                 ret.Add(temperror);
             }
             return ret;
@@ -262,6 +278,7 @@ namespace Prometheus.Models
             {
                 var temperror = new ProjectErrorViewModels(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToString(line[2]), Convert.ToString(line[3]), Convert.ToInt32(line[4]));
                 temperror.CommentList = RetrieveErrorComments(temperror.ErrorKey);
+                temperror.RetrieveAttachment(temperror.ErrorKey);
                 ret.Add(temperror);
             }
             return ret;
@@ -285,5 +302,40 @@ namespace Prometheus.Models
             }
             return ret;
         }
+
+        public static void StoreErrorAttachment(string errorkey, string attachmenturl)
+        {
+            var sql = "insert into PJErrorAttachment(ErrorKey,Attachment,UpdateTime) values('<ErrorKey>','<Attachment>','<UpdateTime>')";
+            sql = sql.Replace("<ErrorKey>", errorkey).Replace("<Attachment>", attachmenturl).Replace("<UpdateTime>", DateTime.Now.ToString());
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        public void RetrieveAttachment(string errorkey)
+        {
+            var ret = new List<string>();
+            var csql = "select Attachment from PJErrorAttachment where ErrorKey = '<ErrorKey>' order by UpdateTime ASC";
+            csql = csql.Replace("<ErrorKey>", errorkey);
+
+            var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
+            foreach (var r in cdbret)
+            {
+                ret.Add(Convert.ToString(r[0]));
+            }
+            AttachList = ret;
+        }
+
+        public static void DeleteAttachment(string errorkey, string cond)
+        {
+            var csql = "select Attachment from PJErrorAttachment where ErrorKey = '<ErrorKey>' and Attachment like '%<cond>%'";
+            csql = csql.Replace("<ErrorKey>", errorkey).Replace("<cond>", cond);
+            var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
+            if (cdbret.Count > 0 && cdbret.Count < 3)
+            {
+                csql = "delete from PJErrorAttachment where ErrorKey = '<ErrorKey>' and Attachment like '%<cond>%'";
+                csql = csql.Replace("<ErrorKey>", errorkey).Replace("<cond>", cond);
+                DBUtility.ExeLocalSqlNoRes(csql);
+            }//end if
+        }
+
     }
 }

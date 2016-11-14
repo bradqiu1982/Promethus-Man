@@ -3003,6 +3003,7 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(key))
             {
                 var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key);
+                ViewBag.FirstEngineer = ProjectViewModels.RetrieveOneProject(vm[0].ProjectKey).FirstEngineer;
                 return View(vm[0]);
             }
             return View();
@@ -3052,9 +3053,49 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(key))
             {
                 var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key);
+                ViewBag.FirstEngineer = ProjectViewModels.RetrieveOneProject(vm[0].ProjectKey).FirstEngineer;
                 return View("UpdateProjectError",vm[0]);
             }
             return View("UpdateProjectError");
+        }
+
+
+        private List<string> ReceiveAttachFiles()
+        {
+            var ret = new List<string>();
+
+            try
+            {
+                foreach (string fl in Request.Files)
+                {
+                    if (fl != null && Request.Files[fl].ContentLength > 0)
+                    {
+                        string fn = Path.GetFileName(Request.Files[fl].FileName)
+                            .Replace(" ", "_").Replace("#", "")
+                            .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                        string datestring = DateTime.Now.ToString("yyyyMMdd");
+                        string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+
+                        if (!Directory.Exists(imgdir))
+                        {
+                            Directory.CreateDirectory(imgdir);
+                        }
+
+                        fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
+                        Request.Files[fl].SaveAs(imgdir + fn);
+
+                        var url = "/userfiles/docs/" + datestring + "/" + fn;
+
+                        ret.Add(url);
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            { return ret; }
+
+            return ret;
         }
 
         [HttpPost, ActionName("UpdateProjectError")]
@@ -3078,9 +3119,65 @@ namespace Prometheus.Controllers
             vm.Reporter = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
             vm.UpdateProjectError();
-            
+
+            if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
+            {
+                var urls = ReceiveAttachFiles();
+                var internalreportfile = Request.Form["attachmentupload"];
+                var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
+                    .Replace(" ", "_").Replace("#", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                var url = "";
+                foreach (var r in urls)
+                {
+                    if (r.Contains(originalname))
+                    {
+                        url = r;
+                        break;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(url))
+                {
+                    ProjectErrorViewModels.StoreErrorAttachment(vm.ErrorKey, url);
+                }
+            }
+
             var tempvm = ProjectErrorViewModels.RetrieveErrorByErrorKey(vm.ErrorKey);
+            ViewBag.FirstEngineer = ProjectViewModels.RetrieveOneProject(tempvm[0].ProjectKey).FirstEngineer;
             return View(tempvm[0]);
+        }
+
+        public ActionResult DeleteErrorAttachment(string errorkey,string filename)
+        {
+            if (!string.IsNullOrEmpty(errorkey) && !string.IsNullOrEmpty(filename))
+            {
+                var tempvm = ProjectErrorViewModels.RetrieveErrorByErrorKey(errorkey);
+                var FirstEngineer = ProjectViewModels.RetrieveOneProject(tempvm[0].ProjectKey).FirstEngineer;
+                var ckdict = CookieUtility.UnpackCookie(this);
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+                if (string.Compare(FirstEngineer, updater, true) == 0)
+                {
+                    ProjectErrorViewModels.DeleteAttachment(errorkey,filename);
+                }
+
+                var dict = new RouteValueDictionary();
+                dict.Add("ErrorKey", errorkey);
+                return RedirectToAction("UpdateProjectError", "Project", dict);
+
+            }
+            else if (!string.IsNullOrEmpty(errorkey))
+            {
+                var dict = new RouteValueDictionary();
+                dict.Add("ErrorKey", errorkey);
+                return RedirectToAction("UpdateProjectError", "Project", dict);
+            }
+            else
+            {
+                return RedirectToAction("ViewAll", "Project");
+            }
         }
 
         private Dictionary<string, double> VcselEmailCheck()

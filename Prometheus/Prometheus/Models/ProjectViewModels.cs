@@ -323,12 +323,24 @@ namespace Prometheus.Models
         {
             get
             { return lmeb; }
+
             set
             {
                 lmeb.Clear();
                 lmeb.AddRange(value);
+
+                foreach (var eg in lmeb)
+                {
+                    if (string.Compare(eg.Role, Prometheus.Models.ProjectViewModels.ENGROLE) == 0)
+                    {
+                        FirstEngineer = eg.Name;
+                        break;
+                    }
+                }
             }
         }
+
+        public string FirstEngineer { set; get; }
 
         //public string DVTDate { set; get; }
         //public string DVTStatus { set; get; }

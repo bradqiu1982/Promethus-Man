@@ -60,7 +60,14 @@ else
     </div>
     
     <div class="col-md-1">
-        <button class="form-control" data-toggle="tooltip" title="Goto ViewAll" onclick="GoToAll()" type="button"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></button>
+        @if (Model != null && Model.Count() > 0)
+        {
+            <h2><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ElementAt(0).ProjectKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+        }
+        else
+        {
+            <h2><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+        }
         @*<h2><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>*@
     </div>
     <div class="col-md-3"></div>

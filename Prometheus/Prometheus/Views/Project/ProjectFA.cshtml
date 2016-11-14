@@ -8,12 +8,24 @@
 
 <div class="row">
     <div class="col-md-2">
-        <h2>Project FA</h2>
+        @if (ViewBag.projectkey != null)
+        {
+            <h2>@ViewBag.projectkey FA</h2>
+        }
+        else
+        {
+            <h2>Project FA</h2>
+        }
     </div>
     <div class="col-md-2">
         @if (ViewBag.chartscript == null && ViewBag.projectkey != null)
         {
             <h2><a data-toggle="tooltip" title="Goto FA Page" href="/Project/ProjectFA?ProjectKey=@(ViewBag.projectkey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+        }
+        else if (ViewBag.projectkey != null)
+        {
+            <h2><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(ViewBag.projectkey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+
         }
         else
         {

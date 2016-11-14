@@ -7,10 +7,26 @@
 
 <div class="row">
     <div class="col-md-3">
-        <h2>Project Error</h2>
+
+@if (Model != null && Model.Count() > 0)
+{
+    <h2>@(Model.ElementAt(0).ProjectKey) Errors</h2>
+}
+else
+{
+    <h2>Project Errors</h2>
+}
+
     </div>
     <div class="col-md-2">
-        <h2><a data-toggle="tooltip" title="Goto ViewAll Page" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+        @if (Model != null && Model.Count() > 0)
+        {
+            <h2><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ElementAt(0).ProjectKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+        }
+        else
+        {
+            <h2><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+        }
     </div>
     <div class="col-md-7"></div>
 </div>

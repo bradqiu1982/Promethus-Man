@@ -30,14 +30,14 @@
     }
 }
 
-@if (donelist.Count > 0)
+@if (Model != null && Model.Count() > 0)
 {
     <div class="row">
         <div class="col-md-3">
-            <h2>@donelist[0].ProjectKey Tasks</h2>
+            <h2>@(Model.ElementAt(0).ProjectKey) Tasks</h2>
         </div>
         <div class="col-md-2">
-            <h2><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+            <h2><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ElementAt(0).ProjectKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
         </div>
         <div class="col-md-7"></div>
     </div>
@@ -58,66 +58,66 @@ else
 <hr />
 
 <div class="row">
-        <div class="col-md-12">
-            <div class="col-md-4">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Pending</h3>
-                    </div>
+    <div class="col-md-12">
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Pending</h3>
+                </div>
 
-                    <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;height:420px;">
-                        @foreach (var item in pendinglist)
-                        {
-                            <div class="panel-body">
-                                <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a> Asingned To <a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a>
-                            </div>
+                <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;height:420px;">
+                    @foreach (var item in pendinglist)
+                    {
+                        <div class="panel-body">
+                            <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a> Asingned To <a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a>
+                        </div>
                             <div class="panel-body text-right">
                                 Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString()
                             </div>
                             <hr />
-                        }
-                    </div>
+                    }
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Working</h3>
-                    </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Working</h3>
+                </div>
 
-                    <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;height:420px;">
-                        @foreach (var item in workinglist)
-                        {
-                            <div class="panel-body">
-                                <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a> Asingned To <a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a>
-                            </div>
+                <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;height:420px;">
+                    @foreach (var item in workinglist)
+                    {
+                        <div class="panel-body">
+                            <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a> Asingned To <a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a>
+                        </div>
                             <div class="panel-body text-right">
                                 Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString()
                             </div>
                             <hr />
-                        }
-                    </div>
+                    }
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Done</h3>
-                    </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Done</h3>
+                </div>
 
-                    <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;height:420px;">
-                        @foreach (var item in donelist)
-                        {
-                            <div class="panel-body">
-                                <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a> Asingned To <a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a>
-                            </div>
+                <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;height:420px;">
+                    @foreach (var item in donelist)
+                    {
+                        <div class="panel-body">
+                            <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a> Asingned To <a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a>
+                        </div>
                             <div class="panel-body text-right">
                                 Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString()
                             </div>
                             <hr />
-                        }
-                    </div>
+                    }
                 </div>
             </div>
         </div>
     </div>
+</div>

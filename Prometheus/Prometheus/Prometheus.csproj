@@ -772,6 +772,7 @@
     <Content Include="Views\Project\TestPNDesc.cshtml" />
     <Content Include="Views\User\UserIssues.cshtml" />
     <Content Include="Views\Project\ErrorAttach.cshtml" />
+    <Content Include="Views\Project\LowYieldWarn.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

@@ -19,6 +19,7 @@ namespace Prometheus
                 defaults: new { controller = "Project", action = "ViewAll" }
                 //defaults: new { controller = "DashBoard", action = "SystemBoard" }
             );
+
         }
     }
 }

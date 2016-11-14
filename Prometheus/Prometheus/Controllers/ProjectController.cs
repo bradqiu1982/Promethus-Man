@@ -3416,6 +3416,11 @@ namespace Prometheus.Controllers
                         string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
                         string validatestr = this.Url.Action("UserBookedReport", "PJReport", routevalue, scheme);
 
+                        var netcomputername = "";
+                        try{ netcomputername = System.Net.Dns.GetHostName();}
+                        catch (Exception ex) { }
+                        validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
+
                         var content = "Click below link to review the Report which you booked :\r\n " + validatestr;
 
                         var toaddrs = new List<string>();
@@ -3445,8 +3450,12 @@ namespace Prometheus.Controllers
                             //send validate email
                             string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
                             string validatestr = this.Url.Action("UpdateRMA", "Issue", routevalue, scheme);
+                            var netcomputername = "";
+                            try { netcomputername = System.Net.Dns.GetHostName(); }
+                            catch (Exception ex) { }
+                            validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
 
-                            var content = "RMA FA of "+item.ModuleSN+" must finished today :\r\n " + validatestr;
+                        var content = "RMA FA of "+item.ModuleSN+" must finished today :\r\n " + validatestr;
 
                             var toaddrs = new List<string>();
                             toaddrs.Add(item.Reporter);
@@ -3470,7 +3479,12 @@ namespace Prometheus.Controllers
                             string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
                             string validatestr = this.Url.Action("UpdateRMA", "Issue", routevalue, scheme);
 
-                            var content = "RMA report of " + item.ModuleSN + " must finished today :\r\n " + validatestr;
+                            var netcomputername = "";
+                            try { netcomputername = System.Net.Dns.GetHostName(); }
+                            catch (Exception ex) { }
+                            validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
+
+                        var content = "RMA report of " + item.ModuleSN + " must finished today :\r\n " + validatestr;
 
                             var toaddrs = new List<string>();
                             toaddrs.Add(item.Reporter);
@@ -3621,6 +3635,112 @@ namespace Prometheus.Controllers
             return RedirectToAction("ViewAll", "Project");
         }
 
+        public ActionResult LowYieldWarn(string IssueKey)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
 
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "Project");
+                ck.Add("logonredirectact", "LowYieldWarn");
+                ck.Add("issuekey", IssueKey);
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var key = "";
+            if (!string.IsNullOrEmpty(IssueKey))
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("issuekey", IssueKey);
+                ck.Add("currentaction", "LowYieldWarn");
+                CookieUtility.SetCookie(this, ck);
+                key = IssueKey;
+            }
+            else if (ckdict.ContainsKey("issuekey") && !string.IsNullOrEmpty(ckdict["issuekey"]))
+            {
+                key = ckdict["issuekey"];
+                var ck = new Dictionary<string, string>();
+                ck.Add("currentaction", "LowYieldWarn");
+                CookieUtility.SetCookie(this, ck);
+            }
+
+            if (string.IsNullOrEmpty(key))
+            {
+                return View();
+            }
+
+            var ret = IssueViewModels.RetrieveIssueByIssueKey(key);
+            if (ret != null)
+            {
+                return View(ret);
+            }
+            else
+            { return View(); }
         }
+
+
+        private void SendTaskEvent(IssueViewModels vm, string comment,List<string> addrlist)
+        {
+            var routevalue = new RouteValueDictionary();
+            routevalue.Add("issuekey", vm.IssueKey);
+            //send validate email
+            string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+            string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+
+            var netcomputername = "";
+            try { netcomputername = System.Net.Dns.GetHostName(); }
+            catch (Exception ex) { }
+            validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
+
+            var content = "Hi All,\r\n\r\nThis is a LYT(low yield trigger) information. Please pay your attention to it. Thanks!\r\n\r\nFailure mode: " + vm.Summary + "\r\n\r\nLYT Reason:\r\n\r\n" + comment + " \r\n\r\nDetail Information: " + validatestr;
+
+            var toaddrs = new List<string>();
+            toaddrs.AddRange(addrlist);
+            toaddrs.Add(vm.Assignee);
+            EmailUtility.SendEmail("Parallel Project LYT", toaddrs, content);
+            IssueViewModels.UpdateLYT(vm.IssueKey);
+            new System.Threading.ManualResetEvent(false).WaitOne(3000);
+        }
+
+        [HttpPost, ActionName("LowYieldWarn")]
+        [ValidateAntiForgeryToken]
+        public ActionResult LowYieldWarnPost()
+        {
+            var issuekey = Request.Form["IssueKey"];
+            var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+            if (vm != null)
+            {
+                var ckdict = CookieUtility.UnpackCookie(this);
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+                if (string.Compare(vm.Assignee, updater, true) == 0
+                    && Request.Form["sendisu"] != null)
+                {
+                    var comment = Request.Form["commentcontent"];
+                    var addrs = Request.Form["RPeopleAddr"].Split(new char[] { ';'});
+                    var addrlist = new List<string>();
+                    addrlist.AddRange(addrs);
+
+                    SendTaskEvent(vm, comment, addrlist);
+
+                    var dict = new RouteValueDictionary();
+                    dict.Add("ProjectKey", vm.ProjectKey);
+                    return RedirectToAction("ProjectFA", "Project", dict);
+                }
+                else
+                {
+                    var dict = new RouteValueDictionary();
+                    dict.Add("ProjectKey", vm.ProjectKey);
+                    return RedirectToAction("ProjectFA", "Project", dict);
+                }
+            }
+            return RedirectToAction("ViewAll", "Project");
+        }
+
+    }
 }

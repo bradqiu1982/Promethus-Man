@@ -1,0 +1,74 @@
+﻿@model Prometheus.Models.IssueViewModels
+
+@{
+    ViewBag.Title = "LowYieldWarn";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Low Yield Trigger</h2>
+
+<hr/>
+
+@if (Model != null)
+{
+    <h3>Summary: @Model.Summary</h3>
+    <hr/>
+    using (Html.BeginForm("LowYieldWarn", "Project", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="row col-md-12">
+            <div class="form-group">
+                <label>Related People Email<font color="red">*</font></label>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-12" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
+                   <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;"  data-val="true" data-val-required="This field is required." data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 200." data-val-length-max="200" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$"></textarea>
+                </div>
+                <span class="field-validation-valid text-danger" data-valmsg-for="RPeopleAddr" data-valmsg-replace="true"></span>
+            </div>
+        </div>
+
+        <hr/>
+
+        <div class="row col-md-12">
+            <div class="form-group">
+                <label>Comment<font color="red">*</font></label>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-12" data-toggle="tooltip" data-placement="center" title="Your comment about this Low Yield Trigger">
+                    <textarea class="form-control" name="commentcontent" id="commentcontent" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-required="This field is required." data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 200." data-val-length-max="200" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$"></textarea>
+                </div>
+                <span class="field-validation-valid text-danger" data-valmsg-for="commentcontent" data-valmsg-replace="true"></span>
+            </div>
+        </div>
+
+        <div class="row col-md-12">
+            <div class="col-md-6">
+                <input class="form-control text-box single-line" value="@(Model.IssueKey)" id="IssueKey" name="IssueKey" type="hidden" />
+            </div>
+            <div class="col-md-6">
+            </div>
+        </div>
+
+        <hr/>
+
+        <div class="row col-md-12">
+            <div class="form-group">
+                <div class="col-md-3">
+                    <input type="submit" value="Send" id="sendisu" name="sendisu" class="btn btn-default" />
+                </div>
+                <div class="col-md-3">
+                    <input type="submit" value="Cancel" id="cancelisu" name="cancelisu" class="btn btn-default" />
+                </div>
+                <div class="col-md-6"></div>
+            </div>
+        </div>
+    }
+}
+
+
+

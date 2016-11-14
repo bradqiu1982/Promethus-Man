@@ -77,23 +77,25 @@
     <div class="row">
     @if (ViewBag.chartscript == null && fadata != null && fadata.Count > 0 && ViewBag.DoneIssueList != null)
     {
-        <div class="col-md-3 text-center">ModuleSN</div>
+        <div class="col-md-2 text-center">ModuleSN</div>
         <div class="col-md-2 text-center">ErrAbbr</div>
         <div class="col-md-1 text-center">FA Status</div>
         <div class="col-md-1 text-center">Assignee</div>
         <div class="col-md-3 text-center">Issue</div>
         <div class="col-md-1 text-center">Date</div>
         <div class="col-md-1 text-center">Attachment</div>
+        <div class="col-md-1 text-center">LYT</div>
     }
     else
     {
-        <div class="col-md-1 text-center">ModuleSN</div>
+        <div class="col-md-2 text-center">ModuleSN</div>
         <div class="col-md-2 text-center">ErrAbbr</div>
-        <div class="col-md-2 text-center">FA Status</div>
-        <div class="col-md-2 text-center">Assignee</div>
+        <div class="col-md-1 text-center">FA Status</div>
+        <div class="col-md-1 text-center">Assignee</div>
         <div class="col-md-3 text-center">Issue</div>
         <div class="col-md-1 text-center">Date</div>
         <div class="col-md-1 text-center">Attachment</div>
+        <div class="col-md-1 text-center">LYT</div>
     }
     </div>
     <hr />
@@ -110,11 +112,15 @@
             if (ViewBag.chartscript == null && fadata != null && fadata.Count > 0 && ViewBag.DoneIssueList != null)
             {
                 <div class="row">
-                    <div class="col-md-3 text-center">
+                    <div class="col-md-2 text-center">
                         <div class="col-md-3">
                             <span class="input-group-addon">
                                 <input type="checkbox" id="check@(i)" name="check@(i)" value="true"/>
                             </span>
+                            @if (!string.IsNullOrEmpty(item.IssueData.LYT))
+                            {
+                                <span class="badge alert-danger">LYT</span>
+                            }
                             <input class="form-control text-box single-line" value="@item.IssueData.IssueKey" id="HIssueKey@(i)" name="HIssueKey@(i)" type="hidden" />
                         </div>
                         <div class="col-md-9"><a href="/Project/SNIssue?ProjectKey=@item.TestData.ProjectKey&SN=@item.TestData.ModuleSerialNum">@item.TestData.ModuleSerialNum</a></div>
@@ -139,12 +145,20 @@
                             </a>
                         }
                     </div>
+                    <div class="col-md-1 text-center">
+                        <button data-toggle="tooltip" title="Low Yield Trigger" class="form-control" value="@item.IssueData.IssueKey" type="button" onclick="LowYieldWarning(this)">
+                            <span class="glyphicon glyphicon-share" aria-hidden="true"></span></button>
+                    </div>
                 </div>
             }
             else
             {
                 <div class="row">
-                    <div class="col-md-1 text-center">
+                    <div class="col-md-2 text-center">
+                        @if (!string.IsNullOrEmpty(item.IssueData.LYT))
+                        {
+                            <span class="badge alert-danger">LYT</span>
+                        }
                         <a href="/Project/SNIssue?ProjectKey=@item.TestData.ProjectKey&SN=@item.TestData.ModuleSerialNum">@item.TestData.ModuleSerialNum</a>
                     </div>
                     <div class="col-md-2 text-center">
@@ -155,8 +169,8 @@
                             <a href="/Project/UpdateProjectError2?ProjectKey=@item.TestData.ProjectKey&ErrorCode=@item.TestData.ErrAbbr"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
                         </div>
                     </div>
-                    <div class="col-md-2 text-center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(@item.IssueData.Resolution))</div>
-                    <div class="col-md-2 text-center"><a href="/User/UserCenter?username=@item.IssueData.Assignee">@item.IssueData.Assignee.Split(new char[] { '@' })[0]</a></div>
+                    <div class="col-md-1 text-center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(@item.IssueData.Resolution))</div>
+                    <div class="col-md-1 text-center"><a href="/User/UserCenter?username=@item.IssueData.Assignee">@item.IssueData.Assignee.Split(new char[] { '@' })[0]</a></div>
                     <div class="col-md-3 text-center"><a href="/Issue/UpdateIssue?issuekey=@item.IssueData.IssueKey">@item.IssueData.Summary</a></div>
                     <div class="col-md-1 text-center">@item.IssueData.ReportDate.ToString("MM/dd-yy")</div>
                     <div class="col-md-1 text-center">
@@ -167,6 +181,10 @@
                             </a>
                         }
                     </div>
+                    <div class="col-md-1 text-center">
+                        <button data-toggle="tooltip" title="Low Yield Trigger" class="form-control" value="@item.IssueData.IssueKey" type="button" onclick="LowYieldWarning(this)">
+                            <span class="glyphicon glyphicon-share" aria-hidden="true"></span></button>
+                    </div>
                 </div>
             }
 
@@ -174,6 +192,17 @@
             i = i + 1;
         }
     }
+
+    <script type="text/javascript">
+        function LowYieldWarning(oBT)
+        {
+            if (confirm("Warning: only FA assignee can trigger Low Yield Trigger."))
+            {
+                var myurl = "/Project/LowYieldWarn?IssueKey=" + oBT.value;
+                window.open(myurl, '_blank');
+            }
+        }
+    </script>
 
     if (ViewBag.chartscript == null && fadata != null && fadata.Count > 0 && ViewBag.DoneIssueList != null)
     {

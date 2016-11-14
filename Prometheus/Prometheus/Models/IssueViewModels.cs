@@ -518,6 +518,8 @@ namespace Prometheus.Models
         public DateTime AlertEmailUpdateDate { set; get; }
         #endregion
 
+        public string LYT { set; get; }
+
 
         public static string GetUniqKey()
         {
@@ -801,7 +803,7 @@ namespace Prometheus.Models
 
         public static IssueViewModels RetrieveIssueByIssueKey(string issuekey)
         {
-            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples from Issue where APVal1 <> 'delete' and IssueKey = '<IssueKey>'";
+            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples,APVal2 from Issue where APVal1 <> 'delete' and IssueKey = '<IssueKey>'";
             sql = sql.Replace("<IssueKey>", issuekey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             if (dbret.Count > 0)
@@ -813,7 +815,7 @@ namespace Prometheus.Models
                     , Convert.ToString(dbret[0][7]), Convert.ToString(dbret[0][8])
                     , Convert.ToString(dbret[0][9]), Convert.ToString(dbret[0][10])
                     , Convert.ToString(dbret[0][11]), Convert.ToString(dbret[0][12]));
-
+                ret.LYT = Convert.ToString(dbret[0][13]);
 
                 //var tempclist = new List<IssueComments>();
                 //sql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
@@ -869,7 +871,7 @@ namespace Prometheus.Models
                 fixresolve = Resolute.Done;
             }
 
-            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples from Issue where  APVal1 <> 'delete' and  ParentIssueKey = '' and ProjectKey = '<ProjectKey>' and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType>' order by ReportDate DESC";
+            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples,APVal2 from Issue where  APVal1 <> 'delete' and  ParentIssueKey = '' and ProjectKey = '<ProjectKey>' and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType>' order by ReportDate DESC";
             sql = sql.Replace("<ProjectKey>", pjkey).Replace("<cond>", cond).Replace("<topnum>", Convert.ToString(topnum))
                     .Replace("<IssueType>", ISSUETP.NPIPROC);
 
@@ -883,7 +885,7 @@ namespace Prometheus.Models
                     , Convert.ToString(line[7]), Convert.ToString(line[8])
                     , Convert.ToString(line[9]), Convert.ToString(line[10])
                     , Convert.ToString(line[11]), Convert.ToString(line[12]));
-
+                ret.LYT = Convert.ToString(line[13]);
 
                 //var tempclist = new List<IssueComments>();
                 //sql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
@@ -1852,6 +1854,13 @@ namespace Prometheus.Models
             {
                 return string.Empty;
             }
+        }
+
+        public static void UpdateLYT(string IssueKey)
+        {
+            var sql = "update Issue set APVal2 = '<LYT>' where IssueKey = '<IssueKey>'";
+            sql = sql.Replace("<IssueKey>", IssueKey).Replace("<LYT>", "LYT");
+            DBUtility.ExeLocalSqlNoRes(sql);
         }
 
         public static Dictionary<string,string> RetrieveAllBIRootCause(string pjkey)

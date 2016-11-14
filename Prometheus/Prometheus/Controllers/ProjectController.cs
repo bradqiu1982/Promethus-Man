@@ -3149,6 +3149,16 @@ namespace Prometheus.Controllers
             return View(tempvm[0]);
         }
 
+        public ActionResult ErrorAttach(string ErrorKey)
+        {
+            if (!string.IsNullOrEmpty(ErrorKey))
+            {
+                var tempvm = ProjectErrorViewModels.RetrieveErrorByErrorKey(ErrorKey);
+                return View(tempvm[0]);
+            }
+            return RedirectToAction("ViewAll", "Project");
+        }
+
         public ActionResult DeleteErrorAttachment(string errorkey,string filename)
         {
             if (!string.IsNullOrEmpty(errorkey) && !string.IsNullOrEmpty(filename))

@@ -47,9 +47,10 @@
     <div class="row">
         <div class="col-md-2 text-center">Error Code</div>
         <div class="col-md-3 text-center">Short Desc</div>
-        <div class="col-md-1 text-center">Count</div>
-        <div class="col-md-5 text-center">Comment</div>
+        <div class="col-md-2 text-center">Count</div>
+        <div class="col-md-1 text-center">Attachement</div>
         <div class="col-md-1 text-center">FA</div>
+        <div class="col-md-3 text-center"></div>
     </div>
 
     <hr/>
@@ -59,16 +60,17 @@
         <div class="row">
             <div class="col-md-2 text-center"><a href="/Project/UpdateProjectError?ErrorKey=@item.ErrorKey">@item.OrignalCode</a></div>
             <div class="col-md-3 text-center">@item.ShortDesc</div>
-            <div class="col-md-1 text-center">@item.ErrorCount</div>
-            @if (item.CommentList.Count > 0)
+            <div class="col-md-2 text-center">@item.ErrorCount</div>
+            @if (item.AttachList.Count > 0)
             {
-                <div class="col-md-5 text-center">@Html.Raw(item.CommentList[0].Comment)</div>
+                <div class="col-md-1 text-center"><a href="/Project/ErrorAttach?ErrorKey=@item.ErrorKey" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></a></div>
             }
             else
             {
-                <div class="col-md-5 text-center"></div>
+                <div class="col-md-1 text-center"></div>
             }
             <div class="col-md-1 text-center"><a href="/Project/ProjectErrAbbr?ProjectKey=@item.ProjectKey&ErrAbbr=@item.OrignalCode"><span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span></a></div>
+            <div class="col-md-3 text-center"></div>
         </div>
         <hr/>
      }

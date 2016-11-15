@@ -157,7 +157,16 @@ else
 
                             <div class="col-md-2 text-left">
                                 <a href="/Project/ProjectFA?ProjectKey=@projectdata.ProjectKey">
-                                    <span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span> Project FA <span class="badge alert-danger">@projectdata.PendingFACount</span>
+                                    <span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span> Project FA 
+                                    @if (projectdata.FinishRating < 90)
+                                    {
+                                        <span class="badge alert-danger">@projectdata.PendingFACount</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge alert-success">@projectdata.PendingFACount</span>
+                                    }
+
                                 </a>
                             </div>
 

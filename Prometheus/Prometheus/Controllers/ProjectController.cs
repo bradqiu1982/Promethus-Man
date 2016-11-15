@@ -1029,11 +1029,11 @@ namespace Prometheus.Controllers
                     var enddate = DateTime.Now.ToString();
                     if (startdate.DayOfWeek != DayOfWeek.Thursday)
                     {
-                        for (int i = 6; i > 0; i--)
+                        for (int i = 7; i > 0; i--)
                         {
-                            startdate = startdate.AddDays(0 - i);
-                            if (startdate.DayOfWeek == DayOfWeek.Thursday)
+                            if (DateTime.Now.AddDays(0 - i).DayOfWeek == DayOfWeek.Thursday)
                             {
+                                startdate = DateTime.Now.AddDays(0 - i);
                                 break;
                             }
                         }

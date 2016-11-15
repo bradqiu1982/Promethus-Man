@@ -33,66 +33,74 @@
     using (Html.BeginForm("UpdateProjectError", "Project", FormMethod.Post, new { enctype = "multipart/form-data" }))
     {
         @Html.AntiForgeryToken()
-
-        <div class="form-group">
-            <div class="form-horizontal">
-                <div class="form-group">
-                    <div class="col-md-6">
-                        <label class="control-label col-md-2" for="ProjectKey">Project Key</label>
-                        <div class="col-md-10">
-                            <input class="form-control text-box single-line" id="ProjectKey" name="ProjectKey" type="text" value="@Model.ProjectKey" readonly="readonly" />
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="control-label col-md-2" for="ErrorCode">Error Code</label>
-                        <div class="col-md-10">
-                            <input class="form-control text-box single-line" id="ErrorCode" name="ErrorCode" type="text" value="@Model.OrignalCode" readonly="readonly" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="col-md-6">
-                        <label class="control-label col-md-2" for="ShortDesc">Short Desc</label>
-                        <div class="col-md-10">
-                            <input class="form-control text-box single-line" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 25." data-val-length-max="25" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="ShortDesc" name="ShortDesc" type="text" value="@Model.ShortDesc" />
-                            <span class="field-validation-valid text-danger" data-valmsg-for="ShortDesc" data-valmsg-replace="true"></span>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="control-label col-md-2" for="ErrorCount">Error Count</label>
-                        <div class="col-md-10">
-                            <input class="form-control text-box single-line" data-val="true" id="ErrorCount" name="ErrorCount" type="text" value="@Model.ErrorCount" readonly="readonly" />
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-md-6"><input class="form-control text-box single-line" value="@(Model.ErrorKey)" id="ErrorKey" name="ErrorKey" type="hidden"/></div>
-                    <div class="col-md-6"></div>
-                </div>
-                <hr/>
-                <div class="form-group">
-                    <div class="col-md-12">
-                        <div class="col-md-4">
-                            <span class="btn btn-default btn-file" id="choosefile3">
-                                Attachment <input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
-                            </span>
-                        </div>
-                        <div class="col-md-8">
-                            <div class="col-md-11">
-                                <label class="control-label" id="showfile3" name="showfile3"></label>
+        <div class="row col-md-12">
+            <div class="form-group">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <label class="control-label col-md-2" for="ProjectKey">Project Key</label>
+                            <div class="col-md-10">
+                                <input class="form-control text-box single-line" id="ProjectKey" name="ProjectKey" type="text" value="@Model.ProjectKey" readonly="readonly" />
                             </div>
-                            <div class="col-md-1">
-                                <input class="form-control text-box single-line" value="" id="attachmentupload" name="attachmentupload" type="hidden" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="control-label col-md-2" for="ErrorCode">Error Code</label>
+                            <div class="col-md-10">
+                                <input class="form-control text-box single-line" id="ErrorCode" name="ErrorCode" type="text" value="@Model.OrignalCode" readonly="readonly" />
                             </div>
                         </div>
                     </div>
-                    <script type="text/javascript">
+
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <label class="control-label col-md-2" for="ShortDesc">Short Desc</label>
+                            <div class="col-md-10">
+                                @if (ViewBag.assigee != null && ViewBag.assigee)
+                                {
+                                <input class="form-control text-box single-line" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 25." data-val-length-max="25" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="ShortDesc" name="ShortDesc" type="text" value="@Model.ShortDesc" />
+                                <span class="field-validation-valid text-danger" data-valmsg-for="ShortDesc" data-valmsg-replace="true"></span>
+                                }
+                                else
+                                {
+                                    <input class="form-control text-box single-line" readonly="readonly" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 25." data-val-length-max="25" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="ShortDesc" name="ShortDesc" type="text" value="@Model.ShortDesc" />
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="control-label col-md-2" for="ErrorCount">Error Count</label>
+                            <div class="col-md-10">
+                                <input class="form-control text-box single-line" data-val="true" id="ErrorCount" name="ErrorCount" type="text" value="@Model.ErrorCount" readonly="readonly" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-6"><input class="form-control text-box single-line" value="@(Model.ErrorKey)" id="ErrorKey" name="ErrorKey" type="hidden" /></div>
+                        <div class="col-md-6"></div>
+                    </div>
+                    <hr />
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <div class="col-md-4">
+                                <span class="btn btn-default btn-file" id="choosefile3">
+                                    Attachment <input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
+                                </span>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="col-md-11">
+                                    <label class="control-label" id="showfile3" name="showfile3"></label>
+                                </div>
+                                <div class="col-md-1">
+                                    <input class="form-control text-box single-line" value="" id="attachmentupload" name="attachmentupload" type="hidden" />
+                                </div>
+                            </div>
+                        </div>
+                        <script type="text/javascript">
                             function ShowFileNames3(oFile) {
                                 $('#showfile3').text(oFile.value);
                                 document.getElementById("attachmentupload").value = oFile.value;
                             }
-                    </script>
+                        </script>
+                    </div>
                 </div>
             </div>
         </div>
@@ -100,54 +108,123 @@
         if (Model != null && Model.AttachList.Count > 0)
         {
             <hr />
-                <div class="row">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Attachments</h3>
+                        </div>
+                        <div class="panel-body">
+                            @foreach (var item in Model.AttachList)
+                            {
+                                var realfn = "";
+                                var tempfns = item.Split(new string[] { "/" }, StringSplitOptions.None);
+                                realfn = tempfns[tempfns.Length - 1].Trim();
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <a href="@item" target="_blank">
+                                            <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>@realfn
+                                        </a>
+                                    </div>
+                                    <div class="col-md-1">
+                                        @if (ViewBag.assigee != null && ViewBag.assigee)
+                                        {
+                                            <button class="form-control" value="@realfn" onclick="DeleteAttachment(this)">
+                                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                            </button>
+                                        }
+                                    </div>
+                                    <div class="col-md-5"></div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <script type="text/javascript">
+                        function DeleteAttachment(oBT) {
+                            if (confirm("Notice: Do you really want to delete this attachment?")) {
+                                window.location.href = '/Project/DeleteErrorAttachment?errorkey=' + document.getElementById("ErrorKey").value + '&filename=' + oBT.value
+                            }
+                            else {
+                                window.location.href = '/Project/UpdateProjectError?errorkey=' + document.getElementById("ErrorKey").value
+                            }
+                        }
+                    </script>
+                </div>
+            </div>
+        }
+
+
+
+        if (Model.FailureDetailCommentList.Count > 0)
+        {
+            <hr />
+
+                <div class="form-group">
                     <div class="col-md-12">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <h3 class="panel-title">Attachments</h3>
+                                <h3 class="panel-title">Failure Detail</h3>
                             </div>
-                            <div class="panel-body">
-                                @foreach (var item in Model.AttachList)
+                            <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
+                                @foreach (var item in Model.FailureDetailCommentList)
                                 {
-                                    var realfn = "";
-                                    var tempfns = item.Split(new string[] { "/" }, StringSplitOptions.None);
-                                    realfn = tempfns[tempfns.Length - 1].Trim();
-
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <a href="@item" target="_blank">
-                                                    <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>@realfn
-                                                </a>
+                                    <div class="row col-md-12">
+                                        @Html.Raw(item.Comment)
+                                    </div>
+                                            <div class="row col-md-12">
+                                                <div class="col-md-8"></div>
+                                                <div class="col-md-2">
+                                                    Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    @item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")
+                                                </div>
                                             </div>
-                                            <div class="col-md-1">
-                                                    <button class="form-control" value="@realfn" onclick="DeleteAttachment(this)">
-                                                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                                                    </button>
-                                            </div>
-                                            <div class="col-md-5"></div>
-                                        </div>
+                                            <hr/>
                                 }
                             </div>
                         </div>
-                        <script type="text/javascript">
-                            function DeleteAttachment(oBT) {
-                                if (confirm("Notice: only @(ViewBag.FirstEngineer) can delete this attachment?"))
-                                {
-                                    window.location.href = '/Project/DeleteErrorAttachment?errorkey=' + document.getElementById("ErrorKey").value + '&filename=' + oBT.value
-                                }
-                                else
-                                {
-                                    window.location.href = '/Project/UpdateProjectError?errorkey=' + document.getElementById("ErrorKey").value
-                                }
-                            }
-                        </script>
                     </div>
                 </div>
         }
 
-        foreach (var item in Model.CommentList)
+        if (Model.RootCauseCommentList.Count > 0)
         {
-                <hr />
+            <hr />
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Root Cause</h3>
+                        </div>
+                        <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
+                            @foreach (var item in Model.RootCauseCommentList)
+                            {
+                                <div class="row col-md-12">
+                                    @Html.Raw(item.Comment)
+                                </div>
+                                    <div class="row col-md-12">
+                                        <div class="col-md-8"></div>
+                                        <div class="col-md-2">
+                                            Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>
+                                        </div>
+                                        <div class="col-md-2">
+                                            @item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")
+                                        </div>
+                                    </div>
+                                    <hr/>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        foreach (var item in Model.GeneralCommentList)
+        {
+            <hr />
                 <div class="form-group">
                     <div class="col-md-12">
                         <div class="panel panel-default">
@@ -158,39 +235,73 @@
                                 @Html.Raw(item.Comment)
                             </div>
                             <div class="panel-footer text-right">
-                                Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.CommentDate.ToString()
+                                Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")
                             </div>
                         </div>
                     </div>
                 </div>
-                }
-
-                <hr />
-
-                <div class="col-md-12">
-                    <div class="form-group">
-                        Description
-                    </div>
-
-                    <div class="form-group">
-                        <div>
-                            @if (Model != null && !string.IsNullOrEmpty(Model.Description))
-                            {
-                                <textarea name="editor1" id="editor1" rows="10" cols="80">@(Model.Description)</textarea>
-                            }
-                            else
-                            {
-                                <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
-                            }
-                            <script>
-                                CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserImageUploadUrl: '/userfiles/Upload.ashx' });
-                            </script>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <input type="submit" value="Submit" class="btn btn-default" />
-                </div>
         }
+
+        if (ViewBag.assigee != null && ViewBag.assigee)
+        {
+        <hr />
+
+        <div class="col-md-12">
+            <div class="form-group">
+                Failure Detail
+            </div>
+
+            <div class="form-group">
+                <div>
+                    <textarea name="editor3" id="editor3" rows="10" cols="80"></textarea>
+                    <script>
+                                CKEDITOR.replace('editor3', { htmlEncodeOutput: true, filebrowserImageUploadUrl: '/userfiles/Upload.ashx' });
+                    </script>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="col-md-12">
+            <div class="form-group">
+                Root Cause
+            </div>
+
+            <div class="form-group">
+                <div>
+                        <textarea name="editor2" id="editor2" rows="10" cols="80"></textarea>
+                    <script>
+                                CKEDITOR.replace('editor2', { htmlEncodeOutput: true, filebrowserImageUploadUrl: '/userfiles/Upload.ashx' });
+                    </script>
+                </div>
+            </div>
+        </div>
+
+        }
+
+        <hr />
+        <div class="col-md-12">
+            <div class="form-group">
+                Description
+            </div>
+
+            <div class="form-group">
+                <div>
+                        <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
+                    <script>
+                        CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserImageUploadUrl: '/userfiles/Upload.ashx' });
+                    </script>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="col-md-12">
+            <div class="form-group">
+                <input type="submit" value="Submit" class="btn btn-default" />
+            </div>
+        </div>
+    }
 }

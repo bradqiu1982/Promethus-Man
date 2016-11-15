@@ -3000,7 +3000,16 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(key))
             {
                 var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key);
-                ViewBag.FirstEngineer = ProjectViewModels.RetrieveOneProject(vm[0].ProjectKey).FirstEngineer;
+                var FirstEngineer = ProjectViewModels.RetrieveOneProject(vm[0].ProjectKey).FirstEngineer;
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                if (string.Compare(FirstEngineer, updater, true) == 0)
+                {
+                    ViewBag.assigee = true;
+                }
+                else
+                {
+                    ViewBag.assigee = false;
+                }
                 return View(vm[0]);
             }
             return View();
@@ -3050,7 +3059,17 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(key))
             {
                 var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key);
-                ViewBag.FirstEngineer = ProjectViewModels.RetrieveOneProject(vm[0].ProjectKey).FirstEngineer;
+                var FirstEngineer = ProjectViewModels.RetrieveOneProject(vm[0].ProjectKey).FirstEngineer;
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                if (string.Compare(FirstEngineer, updater, true) == 0)
+                {
+                    ViewBag.assigee = true;
+                }
+                else
+                {
+                    ViewBag.assigee = false;
+                }
+
                 return View("UpdateProjectError",vm[0]);
             }
             return View("UpdateProjectError");
@@ -3104,18 +3123,39 @@ namespace Prometheus.Controllers
             var vm = new ProjectErrorViewModels();
             vm.ErrorKey = Request.Form["ErrorKey"];
             vm.ShortDesc = Request.Form["ShortDesc"];
+            vm.Reporter = ckdict["logonuser"].Split(new char[] { '|' })[0];            
+
+            vm.UpdateShortDesc();
+
             var temphtml = Request.Form["editor1"];
-            if (string.IsNullOrEmpty(temphtml))
-            {
-                vm.Description = "";
-            }
-            else
+            if (!string.IsNullOrEmpty(temphtml))
             {
                 vm.Description = Server.HtmlDecode(temphtml);
+                ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey,vm.dbDescription,PJERRORCOMMENTTYPE.Description,vm.Reporter,DateTime.Now.ToString());
             }
-            vm.Reporter = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
-            vm.UpdateProjectError();
+            if (Request.Form["editor2"] != null)
+            {
+                var com = new ErrorComments();
+                com.Comment = Server.HtmlDecode(Request.Form["editor2"]);
+                if (!string.IsNullOrEmpty(com.Comment))
+                {
+                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.RootCause, vm.Reporter, DateTime.Now.ToString());
+                }
+            }
+
+            if (Request.Form["editor3"] != null)
+            {
+                var com = new ErrorComments();
+                com.Comment = Server.HtmlDecode(Request.Form["editor3"]);
+                if (!string.IsNullOrEmpty(com.Comment))
+                {
+                    if (!string.IsNullOrEmpty(com.Comment))
+                    {
+                        ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.FailureDetail, vm.Reporter, DateTime.Now.ToString());
+                    }
+                }
+            }
 
             if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
             {
@@ -3142,7 +3182,17 @@ namespace Prometheus.Controllers
             }
 
             var tempvm = ProjectErrorViewModels.RetrieveErrorByErrorKey(vm.ErrorKey);
-            ViewBag.FirstEngineer = ProjectViewModels.RetrieveOneProject(tempvm[0].ProjectKey).FirstEngineer;
+            var FirstEngineer = ProjectViewModels.RetrieveOneProject(tempvm[0].ProjectKey).FirstEngineer;
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            if (string.Compare(FirstEngineer, updater, true) == 0)
+            {
+                ViewBag.assigee = true;
+            }
+            else
+            {
+                ViewBag.assigee = false;
+            }
+
             return View(tempvm[0]);
         }
 

@@ -5,6 +5,13 @@ using System.Web;
 
 namespace Prometheus.Models
 {
+    public class PJERRORCOMMENTTYPE
+    {
+        public static string Description = "Description";
+        public static string RootCause = "RootCause";
+        public static string FailureDetail= "FailureDetail";
+    }
+
     public class ErrorComments
     {
         public string ErrorKey { set; get; }
@@ -63,6 +70,8 @@ namespace Prometheus.Models
         public string Reporter { set; get; }
 
         public DateTime CommentDate { set; get; }
+
+        public string CommentType { set; get; }
     }
 
     public class ProjectErrorViewModels
@@ -142,6 +151,28 @@ namespace Prometheus.Models
             }
         }
 
+
+        private List<ErrorComments> generalcommentlist = new List<ErrorComments>();
+        private List<ErrorComments> rootcausecommentlist = new List<ErrorComments>();
+        private List<ErrorComments> failuredetailcommentlist = new List<ErrorComments>();
+
+
+        public List<ErrorComments> GeneralCommentList
+        {
+            get { return generalcommentlist; }
+        }
+
+        public List<ErrorComments> RootCauseCommentList
+        {
+            get { return rootcausecommentlist; }
+        }
+
+        public List<ErrorComments> FailureDetailCommentList
+        {
+            get { return failuredetailcommentlist; }
+        }
+
+
         private List<ErrorComments> cemlist = new List<ErrorComments>();
         public List<ErrorComments> CommentList
         {
@@ -149,6 +180,22 @@ namespace Prometheus.Models
             {
                 cemlist.Clear();
                 cemlist.AddRange(value);
+                foreach (var item in cemlist)
+                {
+                    if (string.Compare(item.CommentType, PJERRORCOMMENTTYPE.Description) == 0
+                        ||string.IsNullOrEmpty(item.CommentType))
+                    {
+                        generalcommentlist.Add(item);
+                    }
+                    if (string.Compare(item.CommentType, PJERRORCOMMENTTYPE.RootCause) == 0)
+                    {
+                        rootcausecommentlist.Add(item);
+                    }
+                    if (string.Compare(item.CommentType, PJERRORCOMMENTTYPE.FailureDetail) == 0)
+                    {
+                        failuredetailcommentlist.Add(item);
+                    }
+                }
             }
             get
             {
@@ -197,24 +244,32 @@ namespace Prometheus.Models
             }
         }
 
-        public void UpdateProjectError()
+        public void UpdateShortDesc()
         {
             var sql = "update ProjectError set ShortDesc = '<ShortDesc>'  where ErrorKey = '<ErrorKey>'";
             sql = sql.Replace("<ErrorKey>", ErrorKey).Replace("<ShortDesc>", ShortDesc);
             DBUtility.ExeLocalSqlNoRes(sql);
 
-            StoreErrorComment(DateTime.Now.ToString());
+            //StoreErrorComment(DateTime.Now.ToString());
         }
 
-        private void StoreErrorComment(string CommentDate)
+        //private void StoreErrorComment(string CommentDate)
+        //{
+        //    if (!string.IsNullOrEmpty(Description))
+        //    {
+        //        var sql = "insert into ErrorComments(ErrorKey,Comment,Reporter,CommentDate) values('<ErrorKey>','<Comment>','<Reporter>','<CommentDate>')";
+        //        sql = sql.Replace("<ErrorKey>", ErrorKey).Replace("<Comment>", dbDescription)
+        //            .Replace("<Reporter>", Reporter).Replace("<CommentDate>", CommentDate);
+        //        DBUtility.ExeLocalSqlNoRes(sql);
+        //    }
+        //}
+
+        public static void StoreErrorComment(string ErrorKey, string dbComment,string CommentType, string Reporter, string CommentDate)
         {
-            if (!string.IsNullOrEmpty(Description))
-            {
-                var sql = "insert into ErrorComments(ErrorKey,Comment,Reporter,CommentDate) values('<ErrorKey>','<Comment>','<Reporter>','<CommentDate>')";
-                sql = sql.Replace("<ErrorKey>", ErrorKey).Replace("<Comment>", dbDescription)
-                    .Replace("<Reporter>", Reporter).Replace("<CommentDate>", CommentDate);
-                DBUtility.ExeLocalSqlNoRes(sql);
-            }
+            var sql = "insert into ErrorComments(ErrorKey,Comment,Reporter,CommentDate,CommentType) values('<ErrorKey>','<Comment>','<Reporter>','<CommentDate>','<CommentType>')";
+            sql = sql.Replace("<ErrorKey>", ErrorKey).Replace("<Comment>", dbComment)
+                .Replace("<Reporter>", Reporter).Replace("<CommentDate>", CommentDate).Replace("<CommentType>", CommentType);
+            DBUtility.ExeLocalSqlNoRes(sql);
         }
 
         public static List<ProjectErrorViewModels> RetrieveErrorByPJKey(string projectkey)
@@ -287,7 +342,7 @@ namespace Prometheus.Models
         private static List<ErrorComments> RetrieveErrorComments(string errorkey)
         {
             var ret = new List<ErrorComments>();
-            var sql = "select ErrorKey,Comment,Reporter,CommentDate from ErrorComments where ErrorKey = '<ErrorKey>'";
+            var sql = "select ErrorKey,Comment,Reporter,CommentDate,CommentType from ErrorComments where ErrorKey = '<ErrorKey>'";
             sql = sql.Replace("<ErrorKey>", errorkey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
 
@@ -298,6 +353,7 @@ namespace Prometheus.Models
                 tempcomment.dbComment = Convert.ToString(r[1]);
                 tempcomment.Reporter = Convert.ToString(r[2]);
                 tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
+                tempcomment.CommentType = Convert.ToString(r[4]);
                 ret.Add(tempcomment);
             }
             return ret;

@@ -1653,8 +1653,8 @@ namespace Prometheus.Models
 
         public static List<IssueViewModels> RetrieveIssueByCreator(string creator, int topnum)
         {
-            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  (Creator = '<Creator>' or Reporter = '<Creator>') and ParentIssueKey = '' order by ReportDate DESC";
-            sql = sql.Replace("<Creator>", creator).Replace("<topnum>", Convert.ToString(topnum));
+            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and IssueType <> '<IssueType>' and  (Creator = '<Creator>' or Reporter = '<Creator>') and ParentIssueKey = '' order by ReportDate DESC";
+            sql = sql.Replace("<Creator>", creator).Replace("<topnum>", Convert.ToString(topnum)).Replace("<IssueType>", ISSUETP.NPIPROC);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)

@@ -342,7 +342,7 @@ namespace Prometheus.Models
         private static List<ErrorComments> RetrieveErrorComments(string errorkey)
         {
             var ret = new List<ErrorComments>();
-            var sql = "select ErrorKey,Comment,Reporter,CommentDate,CommentType from ErrorComments where ErrorKey = '<ErrorKey>' and APVal1 <> 'delete'";
+            var sql = "select ErrorKey,Comment,Reporter,CommentDate,CommentType from ErrorComments where ErrorKey = '<ErrorKey>' and APVal1 <> 'delete' order by CommentDate ASC";
             sql = sql.Replace("<ErrorKey>", errorkey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
 

@@ -3772,7 +3772,7 @@ namespace Prometheus.Controllers
                     && Request.Form["sendisu"] != null)
                 {
                     var comment = Request.Form["commentcontent"];
-                    var addrs = Request.Form["RPeopleAddr"].Split(new char[] { ';'});
+                    var addrs = Request.Form["RPeopleAddr"].Split(new string[] {";"},StringSplitOptions.RemoveEmptyEntries);
                     var addrlist = new List<string>();
                     addrlist.AddRange(addrs);
 
@@ -3780,13 +3780,13 @@ namespace Prometheus.Controllers
 
                     var dict = new RouteValueDictionary();
                     dict.Add("ProjectKey", vm.ProjectKey);
-                    return RedirectToAction("ProjectFA", "Project", dict);
+                    return RedirectToAction("ProjectDetail", "Project", dict);
                 }
                 else
                 {
                     var dict = new RouteValueDictionary();
                     dict.Add("ProjectKey", vm.ProjectKey);
-                    return RedirectToAction("ProjectFA", "Project", dict);
+                    return RedirectToAction("ProjectDetail", "Project", dict);
                 }
             }
             return RedirectToAction("ViewAll", "Project");

@@ -6,7 +6,7 @@
 }
 
 <div class="row">
-    <div class="col-md-3">
+    <div class="col-md-4">
     @if (Model != null && Model.Count() > 0)
     {
          <h2>@Model.ElementAt(0).ProjectKey RMA Status</h2>
@@ -17,7 +17,18 @@
     }
         
     </div>
-    <div class="col-md-9"></div>
+
+    <div class="col-md-1">
+        @if (Model != null && Model.Count() > 0)
+        {
+            <h2><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ElementAt(0).ProjectKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+        }
+        else
+        {
+            <h2><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+        }
+    </div>
+    <div class="col-md-7"></div>
 </div>
 
 <hr/>
@@ -47,27 +58,20 @@ else
     <div class="col-md-1">
         @if (Model != null && Model.Count() > 0)
         {
-            <button class="form-control" data-toggle="tooltip" title="Export RMA Report" onclick="ShareRMA()" type="button"><span class="glyphicon glyphicon-share" aria-hidden="true"></span></button>
+            <button class="form-control" data-toggle="tooltip" title="Export RMA Report" onclick="ShareRMA()" type="button"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span></button>
         }
         @*<h2><a data-toggle="tooltip" title="Export RMA Report" href="/Issue/ExportRMAData?ProjectKey=@Model.ElementAt(0).ProjectKey" target="_blank"><span class="glyphicon glyphicon-share" aria-hidden="true"></span></a></h2>*@
     </div>
     <div class="col-md-1">
         @if (Model != null && Model.Count() > 0)
         {
-            <button class="form-control" data-toggle="tooltip" title="Export All RMA Report" onclick="ShareAllRMA()" type="button"><span class="glyphicon glyphicon-share" aria-hidden="true"></span>ALL</button>
+            <button class="form-control" data-toggle="tooltip" title="Export All RMA Report" onclick="ShareAllRMA()" type="button"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span>ALL</button>
         }
          @*<h2><a data-toggle="tooltip" title="Export All RMA Report" href="/Issue/ExportAllRMAData" target="_blank"><span class="glyphicon glyphicon-share" aria-hidden="true"></span>ALL</a></h2>*@
     </div>
     
     <div class="col-md-1">
-        @if (Model != null && Model.Count() > 0)
-        {
-            <h2><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ElementAt(0).ProjectKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
-        }
-        else
-        {
-            <h2><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
-        }
+
         @*<h2><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>*@
     </div>
     <div class="col-md-3"></div>
@@ -170,7 +174,18 @@ else
                     var rmatitle = item.Summary.Split(new string[] { "from" }, StringSplitOptions.None)[1].Trim();
 
                     <tr>
-                        <td width="10%">@(Model.Count() - i)</td>
+                        <td width="10%">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    @(Model.Count() - i)
+                                </div>
+                                <div class="col-md-8">
+                                    <button data-toggle="tooltip" title="Low Yield Trigger" class="form-control" value="@item.IssueKey" type="button" onclick="LowYieldWarning(this)">
+                                        <span class="glyphicon glyphicon-share" aria-hidden="true"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
                         <td colspan="9" width="80%">
                             <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">
                                 <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
@@ -180,7 +195,13 @@ else
                         <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus2(item.Resolution))</td>
                     </tr>
                     <tr>
-                        <td width="10%">@item.FinisarRMA</td>
+                        <td width="10%">
+                            @if (!string.IsNullOrEmpty(item.LYT))
+                            {
+                                <span class="badge alert-danger">LYT</span>
+                            }
+                            @item.FinisarRMA
+                        </td>
                         <td width="10%">@item.ModuleSN</td>
                         @if (item.RootCauseCommentList.Count > 0)
                     {
@@ -266,5 +287,12 @@ else
                 var offset = $('.navbar').height();
                 $("#firsttable").stickyTableHeaders({ fixedOffset: offset });
             });
+
+            function LowYieldWarning(oBT) {
+                if (confirm("Warning: only RMA assignee can trigger Low Yield Trigger.")) {
+                    var myurl = "/Project/LowYieldWarn?IssueKey=" + oBT.value;
+                    window.open(myurl, '_blank');
+                }
+            }
         </script>
     }

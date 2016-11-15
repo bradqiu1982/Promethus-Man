@@ -342,7 +342,7 @@ namespace Prometheus.Models
         private static List<ErrorComments> RetrieveErrorComments(string errorkey)
         {
             var ret = new List<ErrorComments>();
-            var sql = "select ErrorKey,Comment,Reporter,CommentDate,CommentType from ErrorComments where ErrorKey = '<ErrorKey>'";
+            var sql = "select ErrorKey,Comment,Reporter,CommentDate,CommentType from ErrorComments where ErrorKey = '<ErrorKey>' and APVal1 <> 'delete'";
             sql = sql.Replace("<ErrorKey>", errorkey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
 
@@ -357,6 +357,13 @@ namespace Prometheus.Models
                 ret.Add(tempcomment);
             }
             return ret;
+        }
+
+        public static void DeleteErrorComment(string ErrorKey, string CommentType, string Date)
+        {
+            var sql = "update ErrorComments set APVal1 = 'delete' where ErrorKey='<ErrorKey>' and CommentType='<CommentType>' and CommentDate='<CommentDate>'";
+            sql = sql.Replace("<ErrorKey>", ErrorKey).Replace("<CommentType>", CommentType).Replace("<CommentDate>", Date);
+            DBUtility.ExeLocalSqlNoRes(sql);
         }
 
         public static void StoreErrorAttachment(string errorkey, string attachmenturl)

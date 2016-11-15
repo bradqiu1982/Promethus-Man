@@ -3012,7 +3012,20 @@ namespace Prometheus.Controllers
                 }
                 return View(vm[0]);
             }
+            
             return View();
+        }
+
+        public ActionResult DeleteErrorComment(string ErrorKey, string CommentType, string Date)
+        {
+            if (!string.IsNullOrEmpty(ErrorKey) && !string.IsNullOrEmpty(CommentType) && !string.IsNullOrEmpty(Date) )
+            {
+                ProjectErrorViewModels.DeleteErrorComment(ErrorKey, CommentType, Date);
+                var dict = new RouteValueDictionary();
+                dict.Add("ErrorKey", ErrorKey);
+                return RedirectToAction("UpdateProjectError", "Project",dict);
+            }
+            return RedirectToAction("ViewAll", "Project");
         }
 
         public ActionResult UpdateProjectError2(string ProjectKey,string ErrorCode)

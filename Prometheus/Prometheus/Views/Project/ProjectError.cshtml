@@ -74,7 +74,9 @@ else
     foreach (var item in Model)
     {
         <div class="row">
-            <div class="col-md-2 text-center"><a href="/Project/UpdateProjectError?ErrorKey=@item.ErrorKey">@item.OrignalCode</a></div>
+            <div class="col-md-2 text-center">
+            @if (item.CommentList.Count > 0)
+            {<span class="badge alert-danger">C</span>}<a href="/Project/UpdateProjectError?ErrorKey=@item.ErrorKey">@item.OrignalCode</a></div>
             <div class="col-md-3 text-center">@item.ShortDesc</div>
             <div class="col-md-2 text-center">@item.ErrorCount</div>
             @if (item.AttachList.Count > 0)

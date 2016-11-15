@@ -618,9 +618,10 @@
                                                     Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>
                                                 </div>
                                                 <div class="col-md-2">
-                                                    @item.CommentDate.ToString()
+                                                    @item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")
                                                 </div>
                                             </div>
+                                            <hr/>
                                        }
                                 </div>
                             </div>
@@ -664,9 +665,10 @@
                                             Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>
                                         </div>
                                         <div class="col-md-2">
-                                            @item.CommentDate.ToString()
+                                            @item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")
                                         </div>
                                     </div>
+                                    <hr/>
                                 }
                             </div>
                         </div>
@@ -707,9 +709,10 @@
                                             Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>
                                         </div>
                                         <div class="col-md-2">
-                                            @item.CommentDate.ToString()
+                                            @item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")
                                         </div>
                                     </div>
+                                    <hr/>
                                 }
                             </div>
 
@@ -731,7 +734,7 @@
                                     @Html.Raw(item.Comment)
                                 </div>
                                 <div class="panel-footer text-right">
-                                    Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.CommentDate.ToString()
+                                    Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")
                                 </div>
                             </div>
                         </div>

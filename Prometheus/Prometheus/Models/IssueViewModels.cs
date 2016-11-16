@@ -1178,9 +1178,16 @@ namespace Prometheus.Models
                     , Convert.ToString(line[7]), Convert.ToString(line[8])
                     , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
 
-
                 tempvm.RetrieveComment();
                 tempvm.RetrieveAttachment(tempvm.IssueKey);
+
+                if (string.Compare(tempvm.Resolution,Resolute.Pending) != 0
+                    && string.Compare(tempvm.Resolution, Resolute.Working) != 0
+                    && string.Compare(tempvm.Resolution, Resolute.Reopen) != 0
+                    && tempvm.CommentList.Count == 1 && tempvm.AttachList.Count == 0)
+                {
+                    continue;
+                }
 
                 bool sameas = false;
                 foreach (var com in tempvm.CommentList)

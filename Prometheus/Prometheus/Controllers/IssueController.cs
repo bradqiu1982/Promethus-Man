@@ -408,6 +408,7 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(url))
                 {
                     IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
+                    UserRankViewModel.UpdateUserRank(updater, 5);
                 }
             }
 
@@ -425,6 +426,16 @@ namespace Prometheus.Controllers
             {
                 if (vm.IssueClosed())
                 {
+                    var realissue = IssueViewModels.RetrieveIssueByIssueKey(vm.IssueKey);
+                    if (realissue.AttachList.Count > 0)
+                    {
+                        UserRankViewModel.UpdateUserRank(updater, 5);
+                    }
+                    else if (realissue.CommentList.Count > 1)
+                    {
+                        UserRankViewModel.UpdateUserRank(updater, 2);
+                    }
+                    
                     ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
                     vm.CloseIssue();
                 }
@@ -1039,6 +1050,8 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(url))
                 {
                     IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
+
+                    UserRankViewModel.UpdateUserRank(updater, 5);
                 }
             }
 
@@ -1066,6 +1079,8 @@ namespace Prometheus.Controllers
                     var commenttype = COMMENTTYPE.CustomReport;
                     IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
                     IssueViewModels.StoreIssueAttachment(vm.IssueKey, linkstr);
+
+                    UserRankViewModel.UpdateUserRank(updater, 5);
                 }
             }
 
@@ -1093,6 +1108,8 @@ namespace Prometheus.Controllers
                     var commenttype = COMMENTTYPE.InternalReport;
                     IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
                     IssueViewModels.StoreIssueAttachment(vm.IssueKey, linkstr);
+
+                    UserRankViewModel.UpdateUserRank(updater, 10);
                 }
             }
 
@@ -1112,6 +1129,8 @@ namespace Prometheus.Controllers
             {
                 if (vm.IssueClosed())
                 {
+                    UserRankViewModel.UpdateUserRank(updater, 10);
+
                     ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
                     vm.CloseIssue();
                     SendRMAEvent(vm, "closed",true);

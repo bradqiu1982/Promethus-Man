@@ -194,6 +194,8 @@ namespace Prometheus.Controllers
                 ck.Add("logonredirectctrl","");
                 CookieUtility.SetCookie(this, ck);
 
+                UserRankViewModel.UpdateUserRank(username,1);
+
                 return RedirectToAction(logonredirectact, logonredirectctrl);
             }
             else
@@ -203,6 +205,9 @@ namespace Prometheus.Controllers
                 var ck = new Dictionary<string, string>();
                 ck.Add("logonuser", logonuser);
                 CookieUtility.SetCookie(this, ck);
+
+                UserRankViewModel.UpdateUserRank(username, 1);
+
                 return RedirectToAction("UserCenter", "User");
             }
         }

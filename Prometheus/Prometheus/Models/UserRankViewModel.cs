@@ -54,13 +54,14 @@ namespace Prometheus.Models
             {
                 sql = "Insert into UserRank(UserName,UpdateDate,Rank) values('<UserName>','<UpdateDate>','<Rank>')";
                 sql = sql.Replace("<UserName>", username).Replace("<UpdateDate>", updatetime).Replace("<Rank>", Convert.ToString(rank));
+                DBUtility.ExeLocalSqlNoRes(sql);
             }
         }
 
         public static void UpdateUserRank(string username, int rank)
         {
-            UpdateUserTotalRank(username, rank);
-            UpdateUserDailyRank(username, rank);
+            UpdateUserTotalRank(username.ToUpper(), rank);
+            UpdateUserDailyRank(username.ToUpper(), rank);
         }
 
         public static string RetrieveTotalRank(string username)

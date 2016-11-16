@@ -16,6 +16,7 @@ namespace Prometheus.Models
         public int DoneIssueCount { set; get; }
         public string UserIssueTrend { set; get; }
         public string UserRankTrend { set; get; }
+        public string TotalRank { set; get; }
 
 
         public static List<string> RetrieveAllICareUser(string me)
@@ -88,7 +89,9 @@ namespace Prometheus.Models
 
         private static void RankTrend(Controller ctrl, UserActionTrend uservm, string username, int month)
         {
-            var timeranklist = UserRankViewModel.RetrieveRankByMonth(username, month);
+            uservm.TotalRank = UserRankViewModel.RetrieveTotalRank(username.ToUpper());
+
+            var timeranklist = UserRankViewModel.RetrieveRankByMonth(username.ToUpper(), month);
 
             var ranklist = new List<int>();
             int sumrank = 0;

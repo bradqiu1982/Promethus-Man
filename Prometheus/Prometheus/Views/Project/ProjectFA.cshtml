@@ -75,8 +75,6 @@
     }
 
     <div class="row">
-    @if (ViewBag.chartscript == null && fadata != null && fadata.Count > 0 && ViewBag.DoneIssueList != null)
-    {
         <div class="col-md-2 text-center">ModuleSN</div>
         <div class="col-md-2 text-center">ErrAbbr</div>
         <div class="col-md-1 text-center">FA Status</div>
@@ -85,149 +83,93 @@
         <div class="col-md-1 text-center">Date</div>
         <div class="col-md-1 text-center">Attachment</div>
         <div class="col-md-1 text-center">LYT</div>
-    }
-    else
-    {
-        <div class="col-md-2 text-center">ModuleSN</div>
-        <div class="col-md-2 text-center">ErrAbbr</div>
-        <div class="col-md-1 text-center">FA Status</div>
-        <div class="col-md-1 text-center">Assignee</div>
-        <div class="col-md-3 text-center">Issue</div>
-        <div class="col-md-1 text-center">Date</div>
-        <div class="col-md-1 text-center">Attachment</div>
-        <div class="col-md-1 text-center">LYT</div>
-    }
     </div>
+
     <hr />
 
-@using (Html.BeginForm("SameAsIssue", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
-{
-    @Html.AntiForgeryToken()
 
-    if (Model != null)
+    @if (Model != null)
     {
-        var i = 0;
-        foreach (var item in Model)
+        if (ViewBag.chartscript == null && fadata != null && fadata.Count > 0 && ViewBag.DoneIssueList != null)
         {
-            if (ViewBag.chartscript == null && fadata != null && fadata.Count > 0 && ViewBag.DoneIssueList != null)
+            using (Html.BeginForm("SameAsIssue", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
             {
-                <div class="row">
-                    <div class="col-md-2 text-center">
-                        <div class="col-md-3">
+                @Html.AntiForgeryToken()
+
+                var i = 0;
+                foreach (var item in Model)
+                {
+                            <div class="row">
+                                <div class="col-md-2 text-center">
+                                    <div class="col-md-3">
+                                        <span class="input-group-addon">
+                                            <input type="checkbox" id="check@(i)" name="check@(i)" value="true"/>
+                                        </span>
+                                        <input class="form-control text-box single-line" value="@item.IssueData.IssueKey" id="HIssueKey@(i)" name="HIssueKey@(i)" type="hidden" />
+                                    </div>
+                                    <div class="col-md-9">
+                                    @if (!string.IsNullOrEmpty(item.IssueData.LYT))
+                                    {
+                                        <span class="badge alert-danger">L</span>
+                                    }
+                                    <a href="/Project/SNIssue?ProjectKey=@item.TestData.ProjectKey&SN=@item.TestData.ModuleSerialNum">@item.TestData.ModuleSerialNum</a></div>
+                                </div>
+
+                                <div class="col-md-2 text-center">
+                                    <div class="col-md-8">
+                                        <a href="/Project/ProjectErrAbbr?ProjectKey=@item.TestData.ProjectKey&ErrAbbr=@item.TestData.ErrAbbr">@item.TestData.ErrAbbr</a>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <a href="/Project/UpdateProjectError2?ProjectKey=@item.TestData.ProjectKey&ErrorCode=@item.TestData.ErrAbbr"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
+                                    </div>
+                                </div>
+                                <div class="col-md-1 text-center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(@item.IssueData.Resolution))</div>
+                                <div class="col-md-1 text-center"><a href="/User/UserCenter?username=@item.IssueData.Assignee">@item.IssueData.Assignee.Split(new char[] { '@' })[0]</a></div>
+                                <div class="col-md-3 text-center"><a href="/Issue/UpdateIssue?issuekey=@item.IssueData.IssueKey">@item.IssueData.Summary</a></div>
+                                <div class="col-md-1 text-center">@item.IssueData.ReportDate.ToString("MM/dd-yy")</div>
+                                <div class="col-md-1 text-center">
+                                    @if (item.IssueData.AttachList.Count > 0)
+                                    {
+                                        <a href="/Issue/IssueAttach?issuekey=@item.IssueData.IssueKey" target="_blank">
+                                            <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>
+                                        </a>
+                                    }
+                                </div>
+                                <div class="col-md-1 text-center">
+                                    <button data-toggle="tooltip" title="Low Yield Trigger" class="form-control" value="@item.IssueData.IssueKey" type="button" onclick="LowYieldWarning(this)">
+                                        <span class="glyphicon glyphicon-share" aria-hidden="true"></span></button>
+                                </div>
+                            </div>
+                    i = i + 1;
+                }
+
+                <hr />
+
+                if (ViewBag.logined != null && ViewBag.logined)
+                {
+                    <div class="row">
+                        <div class="col-md-1 text-center">
                             <span class="input-group-addon">
-                                <input type="checkbox" id="check@(i)" name="check@(i)" value="true"/>
+                                <input type="checkbox" id="checkall" name="checkall" onclick="ChooseAll(this)" />
                             </span>
-                            @if (!string.IsNullOrEmpty(item.IssueData.LYT))
-                            {
-                                <span class="badge alert-danger">LYT</span>
-                            }
-                            <input class="form-control text-box single-line" value="@item.IssueData.IssueKey" id="HIssueKey@(i)" name="HIssueKey@(i)" type="hidden" />
                         </div>
-                        <div class="col-md-9"><a href="/Project/SNIssue?ProjectKey=@item.TestData.ProjectKey&SN=@item.TestData.ModuleSerialNum">@item.TestData.ModuleSerialNum</a></div>
-                    </div>
-                    <div class="col-md-2 text-center">
-                        <div class="col-md-8">
-                            <a href="/Project/ProjectErrAbbr?ProjectKey=@item.TestData.ProjectKey&ErrAbbr=@item.TestData.ErrAbbr">@item.TestData.ErrAbbr</a>
+                        <div class="col-md-2 text-center">
+                            <input type="submit" value="Same As" class="btn btn-default" />
                         </div>
-                        <div class="col-md-4">
-                            <a href="/Project/UpdateProjectError2?ProjectKey=@item.TestData.ProjectKey&ErrorCode=@item.TestData.ErrAbbr"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
+                        <div class="col-md-4 text-center">
+                            @Html.DropDownList("DoneIssueList", null, new { @id = "DoneIssueList", @class = "form-control" })
                         </div>
-                    </div>
-                    <div class="col-md-1 text-center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(@item.IssueData.Resolution))</div>
-                    <div class="col-md-1 text-center"><a href="/User/UserCenter?username=@item.IssueData.Assignee">@item.IssueData.Assignee.Split(new char[] { '@' })[0]</a></div>
-                    <div class="col-md-3 text-center"><a href="/Issue/UpdateIssue?issuekey=@item.IssueData.IssueKey">@item.IssueData.Summary</a></div>
-                    <div class="col-md-1 text-center">@item.IssueData.ReportDate.ToString("MM/dd-yy")</div>
-                    <div class="col-md-1 text-center">
-                        @if (item.IssueData.AttachList.Count > 0)
-                        {
-                            <a href="/Issue/IssueAttach?issuekey=@item.IssueData.IssueKey" target="_blank">
-                                <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>
-                            </a>
-                        }
-                    </div>
-                    <div class="col-md-1 text-center">
-                        <button data-toggle="tooltip" title="Low Yield Trigger" class="form-control" value="@item.IssueData.IssueKey" type="button" onclick="LowYieldWarning(this)">
-                            <span class="glyphicon glyphicon-share" aria-hidden="true"></span></button>
-                    </div>
-                </div>
-            }
-            else
-            {
-                <div class="row">
-                    <div class="col-md-2 text-center">
-                        @if (!string.IsNullOrEmpty(item.IssueData.LYT))
-                        {
-                            <span class="badge alert-danger">LYT</span>
-                        }
-                        <a href="/Project/SNIssue?ProjectKey=@item.TestData.ProjectKey&SN=@item.TestData.ModuleSerialNum">@item.TestData.ModuleSerialNum</a>
-                    </div>
-                    <div class="col-md-2 text-center">
-                        <div class="col-md-8">
-                            <a href="/Project/ProjectErrAbbr?ProjectKey=@item.TestData.ProjectKey&ErrAbbr=@item.TestData.ErrAbbr">@item.TestData.ErrAbbr</a>
+                        <div class="col-md-1 text-center">
+                            <button class="form-control" data-toggle="tooltip" title="View Selected Issue" onclick="ShowSelectIssue()" type="button"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>
                         </div>
-                        <div class="col-md-4">
-                            <a href="/Project/UpdateProjectError2?ProjectKey=@item.TestData.ProjectKey&ErrorCode=@item.TestData.ErrAbbr"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
+                        <div class="col-md-4 text-center">
                         </div>
-                    </div>
-                    <div class="col-md-1 text-center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(@item.IssueData.Resolution))</div>
-                    <div class="col-md-1 text-center"><a href="/User/UserCenter?username=@item.IssueData.Assignee">@item.IssueData.Assignee.Split(new char[] { '@' })[0]</a></div>
-                    <div class="col-md-3 text-center"><a href="/Issue/UpdateIssue?issuekey=@item.IssueData.IssueKey">@item.IssueData.Summary</a></div>
-                    <div class="col-md-1 text-center">@item.IssueData.ReportDate.ToString("MM/dd-yy")</div>
-                    <div class="col-md-1 text-center">
-                        @if (item.IssueData.AttachList.Count > 0)
-                        {
-                            <a href="/Issue/IssueAttach?issuekey=@item.IssueData.IssueKey" target="_blank">
-                                <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>
-                            </a>
-                        }
-                    </div>
-                    <div class="col-md-1 text-center">
-                        <button data-toggle="tooltip" title="Low Yield Trigger" class="form-control" value="@item.IssueData.IssueKey" type="button" onclick="LowYieldWarning(this)">
-                            <span class="glyphicon glyphicon-share" aria-hidden="true"></span></button>
-                    </div>
-                </div>
-            }
+                        <script type="text/javascript">
 
-            <hr />
-            i = i + 1;
-        }
-    }
-
-    <script type="text/javascript">
-        function LowYieldWarning(oBT)
-        {
-            if (confirm("Warning: only FA assignee can trigger Low Yield Trigger."))
-            {
-                var myurl = "/Project/LowYieldWarn?IssueKey=" + oBT.value;
-                window.open(myurl, '_blank');
-            }
-        }
-    </script>
-
-    if (ViewBag.chartscript == null && fadata != null && fadata.Count > 0 && ViewBag.DoneIssueList != null)
-    {
-        <div class="row">
-            <div class="col-md-1 text-center">
-                <span class="input-group-addon">
-                    <input type="checkbox" id="checkall" name="checkall" onclick="ChooseAll(this)" />
-                </span>
-            </div>
-            <div class="col-md-2 text-center">
-                <input type="submit" value="Same As" class="btn btn-default" />
-            </div>
-            <div class="col-md-4 text-center">
-                @Html.DropDownList("DoneIssueList", null, new { @id = "DoneIssueList", @class = "form-control"})
-            </div>
-            <div class="col-md-1 text-center">
-                <button class="form-control" data-toggle="tooltip" title="View Selected Issue" onclick="ShowSelectIssue()" type="button"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>
-            </div>
-            <div class="col-md-4 text-center">
-            </div>
-            <script type="text/javascript">
-                function ChooseAll(oBox) {
+                    function ChooseAll(oBox) {
                     if (oBox.checked === true)
                     {
-                        for (var idx = 0; idx < 300; idx++)
+                        for (var idx = 0; idx < 600; idx++)
                         {
                             if (document.getElementById("check" + idx)){
                                 document.getElementById("check" + idx).checked = true;
@@ -236,7 +178,7 @@
                     }
                     else
                     {
-                        for (var idx = 0; idx < 300; idx++) {
+                        for (var idx = 0; idx < 600; idx++) {
                             if (document.getElementById("check" + idx)) {
                                 document.getElementById("check" + idx).checked = false;
                             }
@@ -253,7 +195,125 @@
                     }
                 }
 
-            </script>
-        </div>
+                        </script>
+                    </div>
+                }
+
+
+            }
+        }
+        else
+        {
+
+            using (Html.BeginForm("AsignIssues", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+
+                var i = 0;
+                foreach (var item in Model)
+                {
+                    <div class="row">
+                        <div class="col-md-2 text-center">
+                            <div class="col-md-3">
+                                <span class="input-group-addon">
+                                    <input type="checkbox" id="check@(i)" name="check@(i)" value="true" />
+                                </span>
+                                
+                                <input class="form-control text-box single-line" value="@item.IssueData.IssueKey" id="HIssueKey@(i)" name="HIssueKey@(i)" type="hidden" />
+                            </div>
+                            <div class="col-md-9">
+                            @if (!string.IsNullOrEmpty(item.IssueData.LYT))
+                            {
+                                <span class="badge alert-danger">L</span>
+                            }
+                            <a href="/Project/SNIssue?ProjectKey=@item.TestData.ProjectKey&SN=@item.TestData.ModuleSerialNum">@item.TestData.ModuleSerialNum</a></div>
+                        </div>
+
+                        <div class="col-md-2 text-center">
+                            <div class="col-md-8">
+                                <a href="/Project/ProjectErrAbbr?ProjectKey=@item.TestData.ProjectKey&ErrAbbr=@item.TestData.ErrAbbr">@item.TestData.ErrAbbr</a>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="/Project/UpdateProjectError2?ProjectKey=@item.TestData.ProjectKey&ErrorCode=@item.TestData.ErrAbbr"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
+                            </div>
+                        </div>
+                        <div class="col-md-1 text-center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(@item.IssueData.Resolution))</div>
+                        <div class="col-md-1 text-center"><a href="/User/UserCenter?username=@item.IssueData.Assignee">@item.IssueData.Assignee.Split(new char[] { '@' })[0]</a></div>
+                        <div class="col-md-3 text-center"><a href="/Issue/UpdateIssue?issuekey=@item.IssueData.IssueKey">@item.IssueData.Summary</a></div>
+                        <div class="col-md-1 text-center">@item.IssueData.ReportDate.ToString("MM/dd-yy")</div>
+                        <div class="col-md-1 text-center">
+                            @if (item.IssueData.AttachList.Count > 0)
+                            {
+                                <a href="/Issue/IssueAttach?issuekey=@item.IssueData.IssueKey" target="_blank">
+                                    <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>
+                                </a>
+                            }
+                        </div>
+                        <div class="col-md-1 text-center">
+                            <button data-toggle="tooltip" title="Low Yield Trigger" class="form-control" value="@item.IssueData.IssueKey" type="button" onclick="LowYieldWarning(this)">
+                                <span class="glyphicon glyphicon-share" aria-hidden="true"></span></button>
+                        </div>
+                    </div>
+
+                    i = i + 1;
+                }
+
+                <hr />
+
+                if (ViewBag.logined != null && ViewBag.logined)
+                {
+                    <div class="row">
+                        <div class="col-md-1 text-center">
+                            <span class="input-group-addon">
+                                <input type="checkbox" id="checkall" name="checkall" onclick="ChooseAll(this)" />
+                            </span>
+                        </div>
+                        <div class="col-md-2 text-center">
+                            <input type="submit" value="Assign To" class="btn btn-default" />
+                        </div>
+                        <div class="col-md-4 text-center">
+                            @Html.DropDownList("AllUserList", null, new { @id = "AllUserList", @class = "form-control" })
+                        </div>
+                        <div class="col-md-1 text-center">
+                        </div>
+                        <div class="col-md-4 text-center">
+                        </div>
+
+                        <script type="text/javascript">
+                            function ChooseAll(oBox) {
+                            if (oBox.checked === true)
+                            {
+                                for (var idx = 0; idx < 600; idx++)
+                                {
+                                    if (document.getElementById("check" + idx)){
+                                        document.getElementById("check" + idx).checked = true;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                for (var idx = 0; idx < 600; idx++) {
+                                    if (document.getElementById("check" + idx)) {
+                                        document.getElementById("check" + idx).checked = false;
+                                    }
+                                }
+                            }
+                        }
+                        </script>
+                    </div>
+                }//end if
+            }
+        }
+
     }
-}
+
+    <script type="text/javascript">
+        function LowYieldWarning(oBT)
+        {
+            if (confirm("Warning: only FA assignee can trigger Low Yield Trigger."))
+            {
+                var myurl = "/Project/LowYieldWarn?IssueKey=" + oBT.value;
+                window.open(myurl, '_blank');
+            }
+        }
+    </script>

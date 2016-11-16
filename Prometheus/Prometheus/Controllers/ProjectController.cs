@@ -224,6 +224,32 @@ namespace Prometheus.Controllers
             return pslist;
         }
 
+        private List<SelectListItem> CreateSelectList1(List<string> valist, string defVal)
+        {
+            bool selected = false;
+            var pslist = new List<SelectListItem>();
+
+            foreach (var p in valist)
+            {
+                var pitem = new SelectListItem();
+                pitem.Text = p;
+                pitem.Value = p;
+                if (!string.IsNullOrEmpty(defVal) && string.Compare(defVal, p, true) == 0)
+                {
+                    pitem.Selected = true;
+                    selected = true;
+                }
+                pslist.Add(pitem);
+            }
+
+            if (!selected && pslist.Count > 0)
+            {
+                pslist[0].Selected = true;
+            }
+
+            return pslist;
+        }
+
         private void CreateAllUserLists(ProjectViewModels vm)
         {
             var pmlist = new List<ProjectMembers>();
@@ -1106,6 +1132,15 @@ namespace Prometheus.Controllers
                         .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                 }
 
+                var asilist = UserViewModels.RetrieveAllUser();
+                ViewBag.AllUserList = CreateSelectList1(asilist, "");
+
+                var ckdict = CookieUtility.UnpackCookie(this);
+                if (ckdict.ContainsKey("logonuser"))
+                {
+                    ViewBag.logined = true;
+                }
+
                 return View(vm);
             }
             return View();
@@ -1213,6 +1248,13 @@ namespace Prometheus.Controllers
                     ViewBag.DoneIssueList = pslist;
                 }
 
+                var asilist = UserViewModels.RetrieveAllUser();
+                ViewBag.AllUserList = CreateSelectList1(asilist, "");
+                var ckdict = CookieUtility.UnpackCookie(this);
+                if (ckdict.ContainsKey("logonuser"))
+                {
+                    ViewBag.logined = true;
+                }
                 return View("ProjectFA", pendingitems);
             }
             return RedirectToAction("ViewAll","Project");
@@ -1225,6 +1267,14 @@ namespace Prometheus.Controllers
                 ViewBag.projectkey = ProjectKey;
 
                 var vm = ProjectFAViewModules.RetrieveFADataWithSN(ProjectKey, SN);
+
+                var asilist = UserViewModels.RetrieveAllUser();
+                ViewBag.AllUserList = CreateSelectList1(asilist, "");
+                var ckdict = CookieUtility.UnpackCookie(this);
+                if (ckdict.ContainsKey("logonuser"))
+                {
+                    ViewBag.logined = true;
+                }
                 return View("ProjectFA", vm);
             }
             return RedirectToAction("ViewAll", "Project");
@@ -1269,6 +1319,14 @@ namespace Prometheus.Controllers
                     .Replace("#Title#", projectkey + " Done FA Failure")
                     .Replace("#SERIESNAME#", "Failure")
                     .Replace("#NAMEVALUEPAIRS#", namevaluepair);
+            }
+
+            var asilist = UserViewModels.RetrieveAllUser();
+            ViewBag.AllUserList = CreateSelectList1(asilist, "");
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser"))
+            {
+                ViewBag.logined = true;
             }
 
             return View("ProjectFA", vm);

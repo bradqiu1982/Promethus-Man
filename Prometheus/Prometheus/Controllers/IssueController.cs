@@ -381,6 +381,7 @@ namespace Prometheus.Controllers
             {
                 vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
                 vm.CommentType = COMMENTTYPE.Description;
+                UserRankViewModel.UpdateUserRank(updater, 2);
             }
             else
                 vm.Description = "";
@@ -1016,6 +1017,7 @@ namespace Prometheus.Controllers
             {
                 vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
                 vm.CommentType = COMMENTTYPE.Description;
+                UserRankViewModel.UpdateUserRank(updater, 2);
             }
             else
                 vm.Description = "";
@@ -1026,6 +1028,7 @@ namespace Prometheus.Controllers
                 var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(rootcause));
                 var commenttype = COMMENTTYPE.RootCause;
                 IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
+                UserRankViewModel.UpdateUserRank(updater, 5);
             }
 
             var urls = ReceiveRMAFiles();
@@ -1129,7 +1132,7 @@ namespace Prometheus.Controllers
             {
                 if (vm.IssueClosed())
                 {
-                    UserRankViewModel.UpdateUserRank(updater, 10);
+                    UserRankViewModel.UpdateUserRank(updater, 5);
 
                     ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
                     vm.CloseIssue();

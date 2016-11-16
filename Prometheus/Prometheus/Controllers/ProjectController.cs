@@ -3132,7 +3132,8 @@ namespace Prometheus.Controllers
         public ActionResult UpdateProjectErrorPost()
         {
             var ckdict = CookieUtility.UnpackCookie(this);
-            
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
             var vm = new ProjectErrorViewModels();
             vm.ErrorKey = Request.Form["ErrorKey"];
             vm.ShortDesc = Request.Form["ShortDesc"];
@@ -3145,6 +3146,7 @@ namespace Prometheus.Controllers
             {
                 vm.Description = Server.HtmlDecode(temphtml);
                 ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey,vm.dbDescription,PJERRORCOMMENTTYPE.Description,vm.Reporter,DateTime.Now.ToString());
+                UserRankViewModel.UpdateUserRank(updater, 2);
             }
 
             if (Request.Form["editor2"] != null)
@@ -3154,6 +3156,7 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(com.Comment))
                 {
                     ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.RootCause, vm.Reporter, DateTime.Now.ToString());
+                    UserRankViewModel.UpdateUserRank(updater, 5);
                 }
             }
 
@@ -3166,6 +3169,7 @@ namespace Prometheus.Controllers
                     if (!string.IsNullOrEmpty(com.Comment))
                     {
                         ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.FailureDetail, vm.Reporter, DateTime.Now.ToString());
+                        UserRankViewModel.UpdateUserRank(updater, 2);
                     }
                 }
             }
@@ -3191,12 +3195,13 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(url))
                 {
                     ProjectErrorViewModels.StoreErrorAttachment(vm.ErrorKey, url);
+                    UserRankViewModel.UpdateUserRank(updater, 5);
                 }
             }
 
             var tempvm = ProjectErrorViewModels.RetrieveErrorByErrorKey(vm.ErrorKey);
             var FirstEngineer = ProjectViewModels.RetrieveOneProject(tempvm[0].ProjectKey).FirstEngineer;
-            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            
             if (string.Compare(FirstEngineer, updater, true) == 0)
             {
                 ViewBag.assigee = true;

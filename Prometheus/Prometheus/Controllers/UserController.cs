@@ -321,6 +321,7 @@ namespace Prometheus.Controllers
             ViewBag.monthlist = slist;
         }
 
+
         public ActionResult UserCenter(string username,string month)
         {
             var ckdict = CookieUtility.UnpackCookie(this);
@@ -340,14 +341,17 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(usernm))
             {
                 //my blog
-                if (ckdict.Count > 0 && ckdict.ContainsKey("logonuser"))
-                {
-                    var updater = ckdict["logonuser"].Split(new char[] { '|' })[0].ToUpper();
-                    if (string.Compare(updater, usernm, true) == 0)
-                    {
-                        ViewBag.myissuesummary = UserIssueViewModels.RetrieveMyIssuerSummary(this, updater, 1);
-                    }
-                }
+
+                //if (ckdict.Count > 0 && ckdict.ContainsKey("logonuser"))
+                //{
+                //    var updater = ckdict["logonuser"].Split(new char[] { '|' })[0].ToUpper();
+                //    if (string.Compare(updater, usernm, true) == 0)
+                //    {
+                        ViewBag.myissuesummary = UserActionTrend.RetrieveMyIssuerSummary(this, usernm, 1);
+                        ViewBag.myranksummary = UserActionTrend.RetrieveMyRankSummary(this,usernm,1);
+                //    }
+                    
+                //}
 
                 //asign to me
                 var list1 = IssueViewModels.RetrieveIssueByAssignee(usernm, Resolute.Pending, 60);
@@ -424,7 +428,8 @@ namespace Prometheus.Controllers
                     if (string.Compare(updater, usernm, true) == 0)
                     {
                         CreateICareList();
-                        ViewBag.icaredatalist = UserIssueViewModels.RetrieveICareData(this, updater, tempmonth);
+                        ViewBag.icareissuelist = UserActionTrend.RetrieveICareUserIssue(this, updater, tempmonth);
+                        ViewBag.icareranklist = UserActionTrend.RetrieveICareUserRank(this, updater, tempmonth);
                         ViewBag.icaremonth = tempmonth.ToString();
                     }
 

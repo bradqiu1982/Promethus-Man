@@ -6,15 +6,16 @@ using System.Web.Mvc;
 
 namespace Prometheus.Models
 {
-    public class UserIssueViewModels
+    public class UserActionTrend
     {
-        public UserIssueViewModels() { }
+        public UserActionTrend() { }
 
         public string CurrentUser { set; get; }
         public int PendingIssueCount { set; get; }
         public int WorkingIssueCount { set; get; }
         public int DoneIssueCount { set; get; }
         public string UserIssueTrend { set; get; }
+        public string UserRankTrend { set; get; }
 
 
         public static List<string> RetrieveAllICareUser(string me)
@@ -24,13 +25,13 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<UserIssueViewModels> RetrieveICareData(Controller ctrl, string me,int month)
+        public static List<UserActionTrend> RetrieveICareUserIssue(Controller ctrl, string me,int month)
         {
             var uselist = RetrieveAllICareUser(me);
-            var ret = new List<UserIssueViewModels>();
+            var ret = new List<UserActionTrend>();
             foreach (var item in uselist)
             {
-                var tempuserdata = new UserIssueViewModels();
+                var tempuserdata = new UserActionTrend();
                 tempuserdata.CurrentUser = item;
                 IssueCountTrend(ctrl, tempuserdata, item, month);
                 ret.Add(tempuserdata);
@@ -38,15 +39,15 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<UserIssueViewModels> RetrieveMyIssuerSummary(Controller ctrl, string me, int month)
+        public static List<UserActionTrend> RetrieveMyIssuerSummary(Controller ctrl, string me, int month)
         {
             var uselist = new List<string>();
             uselist.Add(me);
 
-            var ret = new List<UserIssueViewModels>();
+            var ret = new List<UserActionTrend>();
             foreach (var item in uselist)
             {
-                var tempuserdata = new UserIssueViewModels();
+                var tempuserdata = new UserActionTrend();
                 tempuserdata.CurrentUser = item;
                 IssueCountTrend(ctrl, tempuserdata, item, month);
                 ret.Add(tempuserdata);
@@ -54,7 +55,77 @@ namespace Prometheus.Models
             return ret;
         }
 
-        private static void IssueCountTrend(Controller ctrl, UserIssueViewModels uservm, string username,int month)
+        public static List<UserActionTrend> RetrieveICareUserRank(Controller ctrl, string me, int month)
+        {
+            var uselist = RetrieveAllICareUser(me);
+
+            var ret = new List<UserActionTrend>();
+            foreach (var item in uselist)
+            {
+                var tempuserdata = new UserActionTrend();
+                tempuserdata.CurrentUser = item;
+                RankTrend(ctrl, tempuserdata, item, month);
+                ret.Add(tempuserdata);
+            }
+            return ret;
+        }
+
+        public static List<UserActionTrend> RetrieveMyRankSummary(Controller ctrl, string me, int month)
+        {
+            var uselist = new List<string>();
+            uselist.Add(me);
+
+            var ret = new List<UserActionTrend>();
+            foreach (var item in uselist)
+            {
+                var tempuserdata = new UserActionTrend();
+                tempuserdata.CurrentUser = item;
+                RankTrend(ctrl, tempuserdata, item,month);
+                ret.Add(tempuserdata);
+            }
+            return ret;
+        }
+
+        private static void RankTrend(Controller ctrl, UserActionTrend uservm, string username, int month)
+        {
+            var timeranklist = UserRankViewModel.RetrieveRankByMonth(username, month);
+
+            var ranklist = new List<int>();
+            int sumrank = 0;
+            foreach (var item in timeranklist)
+            {
+                sumrank = sumrank + item.Rank;
+                ranklist.Add(sumrank);
+            }
+
+            var ChartxAxisValues = "";
+            var ChartSearies = "";
+            //xaxis
+            foreach (var item in timeranklist)
+            {
+                ChartxAxisValues = ChartxAxisValues + "'" + item.UpdateDate.ToString("yyyy-MM-dd") + "',";
+            }
+            ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
+
+            //yaxis
+            ChartSearies = "{name:'User Rank',data:[<fvalue>]}";
+
+            var tempvalue = "";
+            foreach (var item in ranklist)
+            {
+                tempvalue = tempvalue + item.ToString() + ",";
+            }
+            tempvalue = tempvalue.Substring(0, tempvalue.Length - 1);
+            ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
+
+            var tempscript = System.IO.File.ReadAllText(ctrl.Server.MapPath("~/Scripts/AreaChart.xml"));
+            uservm.UserRankTrend = tempscript.Replace("#ElementID#", (uservm.CurrentUser.Split(new char[] { '@' })[0]).Replace(".", "") + "userrankchart")
+                .Replace("#Title#", "User Rank Trend")
+                .Replace("#ChartxAxisValues#", ChartxAxisValues)
+                .Replace("#NAMEVALUEPAIRS#", ChartSearies);
+        }
+
+        private static void IssueCountTrend(Controller ctrl, UserActionTrend uservm, string username,int month)
         {
             var edate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd") + " 07:30:00");
             var sdate = edate.AddMonths(0-month);

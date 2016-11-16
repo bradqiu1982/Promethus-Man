@@ -1199,9 +1199,12 @@ namespace Prometheus.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult SameAsIssue()
         {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
             var targetissuekey = Request.Form["DoneIssueList"].ToString();
             var tobeissuekey = new List<string>();
-            for (var i = 0; i < 300; i++)
+            for (var i = 0; i < 600; i++)
             {
                 if (Request.Form["check" + i] != null && string.Compare(Request.Form["check" + i],"true",true) == 0)
                 {
@@ -1216,6 +1219,11 @@ namespace Prometheus.Controllers
                 if (string.Compare(tobedata.Resolution, Resolute.Pending) != 0
                     && string.Compare(tobedata.Resolution, Resolute.Working) != 0
                     && string.Compare(tobedata.Resolution, Resolute.Reopen) != 0)
+                {
+                    continue;
+                }
+
+                if (string.Compare(tobedata.Assignee, updater, true) != 0)
                 {
                     continue;
                 }
@@ -1243,6 +1251,49 @@ namespace Prometheus.Controllers
                 return RedirectToAction("ViewAll", "Project");
             }
 
+        }
+
+        [HttpPost, ActionName("AsignIssues")]
+        [ValidateAntiForgeryToken]
+        public ActionResult AsignIssues()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            var tobeassigee = Request.Form["AllUserList"].ToString();
+
+            var tobeissuekey = new List<string>();
+            for (var i = 0; i < 600; i++)
+            {
+                if (Request.Form["check" + i] != null && string.Compare(Request.Form["check" + i], "true", true) == 0)
+                {
+                    tobeissuekey.Add(Request.Form["HIssueKey" + i]);
+                }
+            }
+
+            //var targetdata = IssueViewModels.RetrieveIssueByIssueKey(targetissuekey);
+            foreach (var key in tobeissuekey)
+            {
+                var tobedata = IssueViewModels.RetrieveIssueByIssueKey(key);
+                if (string.Compare(tobedata.Assignee, updater, true) != 0)
+                {
+                    continue;
+                }
+                tobedata.Assignee = tobeassigee;
+                tobedata.UpdateIssue();
+            }
+
+            if (tobeissuekey.Count > 0)
+            {
+                var tempvm = IssueViewModels.RetrieveIssueByIssueKey(tobeissuekey[0]);
+                var dict = new RouteValueDictionary();
+                dict.Add("ProjectKey", tempvm.ProjectKey);
+                return RedirectToAction("ProjectFA", "Project", dict);
+            }
+            else
+            {
+                return RedirectToAction("ViewAll", "Project");
+            }
         }
 
 

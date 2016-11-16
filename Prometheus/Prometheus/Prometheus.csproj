@@ -218,6 +218,7 @@
     <Compile Include="Models\ProjectViewModels.cs" />
     <Compile Include="Models\ProjectYieldViewModule.cs" />
     <Compile Include="Models\UserIssueViewModels.cs" />
+    <Compile Include="Models\UserRankViewModel.cs" />
     <Compile Include="Models\UserViewModels.cs" />
     <Compile Include="Models\VcselViewModel.cs" />
     <Compile Include="Models\WebPageVM.cs" />

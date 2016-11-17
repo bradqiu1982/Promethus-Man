@@ -1220,25 +1220,28 @@ namespace Prometheus.Controllers
                             continue;
                         }
 
-                        var removesameasissue = false;
-                        foreach (var c in item.IssueData.CommentList)
+                        if (item.IssueData.CommentList.Count == 2)
                         {
-                            if (c.Comment.Contains("<p>Issue Same As <a"))
+                            var removesameasissue = false;
+                            foreach (var c in item.IssueData.CommentList)
                             {
-                                removesameasissue = true;
-                                break;
-                            }
+                                if (c.Comment.Contains("<p>Issue Same As <a"))
+                                {
+                                    removesameasissue = true;
+                                    break;
+                                }
 
-                            if (c.Comment.Contains("passed")
-                                && string.Compare(c.Reporter, "System", true) == 0)
-                            {
-                                removesameasissue = true;
-                                break;
+                                if (c.Comment.Contains("passed")
+                                    && string.Compare(c.Reporter, "System", true) == 0)
+                                {
+                                    removesameasissue = true;
+                                    break;
+                                }
                             }
-                        }
-                        if (removesameasissue)
-                        {
-                            continue;
+                            if (removesameasissue)
+                            {
+                                continue;
+                            }
                         }
 
                         tempitems.Add(item);

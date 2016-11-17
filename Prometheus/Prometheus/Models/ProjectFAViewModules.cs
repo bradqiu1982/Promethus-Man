@@ -83,9 +83,33 @@ namespace Prometheus.Models
         {
             var ret = new List<ProjectFAViewModules>();
 
-            var issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Done, 1000);
+            var issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Done, 2000);
             foreach (var d in issuedict)
             {
+                if (d.CommentList.Count == 2)
+                {
+                    bool sameas = false;
+                    foreach (var com in d.CommentList)
+                    {
+                        if (com.Comment.Contains("<p>Issue Same As <a"))
+                        {
+                            sameas = true;
+                            break;
+                        }
+
+                        if (com.Comment.Contains("passed")
+                            && string.Compare(com.Reporter, "System", true) == 0)
+                        {
+                            sameas = true;
+                            break;
+                        }
+                    }
+                    if (sameas)
+                    {
+                        continue;
+                    }
+                }
+
                 if (d.Summary.Contains("@Burn-In Step"))
                 {
                     var pjdata = BITestData.RetrieveProjectTestDataByDataID(d.IssueKey);

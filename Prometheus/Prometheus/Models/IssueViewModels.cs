@@ -1190,25 +1190,28 @@ namespace Prometheus.Models
                     continue;
                 }
 
-                bool sameas = false;
-                foreach (var com in tempvm.CommentList)
+                if (tempvm.CommentList.Count == 2)
                 {
-                    if (com.Comment.Contains("<p>Issue Same As <a"))
+                    bool sameas = false;
+                    foreach (var com in tempvm.CommentList)
                     {
-                        sameas = true;
-                        break;
-                    }
+                        if (com.Comment.Contains("<p>Issue Same As <a"))
+                        {
+                            sameas = true;
+                            break;
+                        }
 
-                    if (com.Comment.Contains("passed")
-                        && string.Compare(com.Reporter, "System", true) == 0)
-                    {
-                        sameas = true;
-                        break;
+                        if (com.Comment.Contains("passed")
+                            && string.Compare(com.Reporter, "System", true) == 0)
+                        {
+                            sameas = true;
+                            break;
+                        }
                     }
-                }
-                if (sameas)
-                {
-                    continue;
+                    if (sameas)
+                    {
+                        continue;
+                    }
                 }
 
                 ret.Add(tempvm);
@@ -1309,27 +1312,29 @@ namespace Prometheus.Models
                     continue;
                 }
 
-                bool sameas = false;
-                foreach (var com in tempvm.CommentList)
+                if (tempvm.CommentList.Count == 2)
                 {
-                    if (com.Comment.Contains("<p>Issue Same As <a"))
+                    bool sameas = false;
+                    foreach (var com in tempvm.CommentList)
                     {
-                        sameas = true;
-                        break;
-                    }
+                        if (com.Comment.Contains("<p>Issue Same As <a"))
+                        {
+                            sameas = true;
+                            break;
+                        }
 
-                    if (com.Comment.Contains("passed")
-                        && string.Compare(com.Reporter, "System", true) == 0)
+                        if (com.Comment.Contains("passed")
+                            && string.Compare(com.Reporter, "System", true) == 0)
+                        {
+                            sameas = true;
+                            break;
+                        }
+                    }
+                    if (sameas)
                     {
-                        sameas = true;
-                        break;
+                        continue;
                     }
                 }
-                if (sameas)
-                {
-                    continue;
-                }
-
                 ret.Add(tempvm);
             }
 

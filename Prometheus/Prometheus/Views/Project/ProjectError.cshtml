@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<Prometheus.Models.ProjectErrorViewModels>
 
 @{
-    ViewBag.Title = "ProjectError";
+    ViewBag.Title = "DebugTree";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -10,11 +10,11 @@
 
 @if (Model != null && Model.Count() > 0)
 {
-    <h2>@(Model.ElementAt(0).ProjectKey) Errors</h2>
+    <h2>@(Model.ElementAt(0).ProjectKey) Debug Tree</h2>
 }
 else
 {
-    <h2>Project Errors</h2>
+    <h2>Debug Tree</h2>
 }
 
     </div>

@@ -279,7 +279,7 @@ namespace Prometheus.Models
         public static List<ProjectErrorViewModels> RetrieveErrorByPJKey(string projectkey)
         {
             var ret = new List<ProjectErrorViewModels>();
-            var sql = "select  ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount from ProjectError where ProjectKey = '<ProjectKey>'";
+            var sql = "select  ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount from ProjectError where ProjectKey = '<ProjectKey>' order by ErrorCount DESC";
             sql = sql.Replace("<ProjectKey>", projectkey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
 

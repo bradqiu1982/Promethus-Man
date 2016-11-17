@@ -180,12 +180,12 @@ namespace Prometheus.Models
             {
                 cemlist.Clear();
                 cemlist.AddRange(value);
+                generalcommentlist.Clear();
+                rootcausecommentlist.Clear();
+                failuredetailcommentlist.Clear();
+
                 foreach (var item in cemlist)
                 {
-                    generalcommentlist.Clear();
-                    rootcausecommentlist.Clear();
-                    failuredetailcommentlist.Clear();
-
                     if (string.Compare(item.CommentType, PJERRORCOMMENTTYPE.Description) == 0
                         ||string.IsNullOrEmpty(item.CommentType))
                     {

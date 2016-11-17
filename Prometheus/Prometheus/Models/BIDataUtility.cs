@@ -520,6 +520,7 @@ namespace Prometheus.Models
                     vm.Description = "Module " + item.ModuleSerialNum + " failed for " + item.ErrAbbr + " @Burn-In Step " + item.WhichTest + " on tester " + item.TestStation + " " + item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss");
                     vm.CommentType = COMMENTTYPE.Description;
                     vm.ModuleSN = item.ModuleSerialNum;
+                    vm.ErrAbbr = item.ErrAbbr;
                     ProjectEvent.CreateIssueEvent(vm.ProjectKey, "System", vm.Assignee, vm.Summary, vm.IssueKey);
                     vm.StoreIssue();
                 }

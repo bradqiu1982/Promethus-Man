@@ -184,7 +184,10 @@ namespace Prometheus.Models
     public class IssueViewModels
     {
         public IssueViewModels()
-        { }
+        {
+            ModuleSN = "";
+            ErrAbbr = "";
+        }
 
         public IssueViewModels(string pk,string ik,string it,string sum,string pri,string ddate,string rsdate,string rtdate,string assign,string rt,string resolute,string pik,string rpeople)
         {
@@ -467,6 +470,9 @@ namespace Prometheus.Models
 
         public string FinisarModel { set; get; }
         public string ModuleSN { set; get; }
+
+        public string ErrAbbr { set; get; }
+
         public string ECustomer { set; get; }
 
         public string CRMANUM { set; get; }
@@ -542,12 +548,13 @@ namespace Prometheus.Models
 
         public void StoreIssue()
         {
-            var sql = "insert into Issue(ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,Creator,AlertEmailUpdateDate,RelativePeoples) values('<ProjectKey>','<IssueKey>','<IssueType>','<Summary>','<Priority>','<DueDate>','<ResolvedDate>','<ReportDate>','<Assignee>','<Reporter>','<Resolution>','<Creator>','<AlertEmailUpdateDate>','<RelativePeoples>')";
+            var sql = "insert into Issue(ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,Creator,AlertEmailUpdateDate,RelativePeoples,ModuleSN,ErrAbbr) values('<ProjectKey>','<IssueKey>','<IssueType>','<Summary>','<Priority>','<DueDate>','<ResolvedDate>','<ReportDate>','<Assignee>','<Reporter>','<Resolution>','<Creator>','<AlertEmailUpdateDate>','<RelativePeoples>','<ModuleSN>','<ErrAbbr>')";
             sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<IssueKey>", IssueKey).Replace("<IssueType>", IssueType)
                 .Replace("<Summary>", Summary).Replace("<Priority>", Priority).Replace("<DueDate>", DueDate.ToString())
                 .Replace("<ResolvedDate>", ResolvedDate.ToString()).Replace("<ReportDate>", ReportDate.ToString()).Replace("<Assignee>", Assignee)
                 .Replace("<Reporter>", Reporter).Replace("<Resolution>", Resolution).Replace("<Creator>", Reporter)
-                .Replace("<AlertEmailUpdateDate>", DateTime.Now.AddHours(-25).ToString()).Replace("<RelativePeoples>", RelativePeoples);
+                .Replace("<AlertEmailUpdateDate>", DateTime.Now.AddHours(-25).ToString()).Replace("<RelativePeoples>", RelativePeoples)
+                .Replace("<ModuleSN>", ModuleSN).Replace("<ErrAbbr>", ErrAbbr);
             DBUtility.ExeLocalSqlNoRes(sql);
 
             StoreIssueComment(DateTime.Now.ToString());

@@ -904,6 +904,7 @@ namespace Prometheus.Models
                 //ret.CommentList = tempclist;
                 //ret.SubIssues = RetrieveSubIssue(ret.IssueKey);
 
+                ret.RetrieveComment();
                 ret.RetrieveAttachment(ret.IssueKey);
                 retdict.Add( ret);
             }

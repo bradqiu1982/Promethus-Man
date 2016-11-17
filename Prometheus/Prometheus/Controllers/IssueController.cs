@@ -306,6 +306,12 @@ namespace Prometheus.Controllers
                     return RedirectToAction("UpdateRMA", "Issue", dict);
                 }
 
+                if (string.Compare(ret.IssueType, ISSUETP.Bug) == 0)
+                {
+                    var dict = new RouteValueDictionary();
+                    dict.Add("issuekey", key);
+                    return RedirectToAction("UpdateBug", "Issue", dict);
+                }
 
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
                 ViewBag.isassignee = false;
@@ -840,6 +846,243 @@ namespace Prometheus.Controllers
             return RedirectToAction("UpdateRMA", "Issue", dict);
         }
 
+        public ActionResult UpdateBug(string issuekey)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "Issue");
+                ck.Add("logonredirectact", "UpdateIssue");
+                ck.Add("issuekey", issuekey);
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var key = "";
+            if (!string.IsNullOrEmpty(issuekey))
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("issuekey", issuekey);
+                ck.Add("currentaction", "UpdateIssue");
+                CookieUtility.SetCookie(this, ck);
+                key = issuekey;
+            }
+            else if (ckdict.ContainsKey("issuekey") && !string.IsNullOrEmpty(ckdict["issuekey"]))
+            {
+                key = ckdict["issuekey"];
+                var ck = new Dictionary<string, string>();
+                ck.Add("currentaction", "UpdateIssue");
+                CookieUtility.SetCookie(this, ck);
+            }
+
+            if (string.IsNullOrEmpty(key))
+            {
+                var tempvm = new IssueViewModels();
+                CreateAllLists(tempvm);
+                return View();
+            }
+
+            var ret = IssueViewModels.RetrieveIssueByIssueKey(key);
+
+            if (ret != null)
+            {
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                ViewBag.isassignee = false;
+                if (string.Compare(updater, ret.Assignee, true) == 0
+                        || string.Compare(updater, ret.Reporter, true) == 0)
+                {
+                    ViewBag.isassignee = true;
+                }
+
+                ret.Reporter = updater;
+                CreateAllLists(ret);
+
+                if (ret.Summary.Contains(" @Burn-In Step "))
+                {
+                    var sn = ret.Summary.Split(new string[] { " " }, StringSplitOptions.None)[1].Trim().ToUpper();
+                    ViewBag.birootcauselist = CreateBIRootIssue(ret.ProjectKey, sn);
+                }
+                return View(ret);
+            }
+            else
+            {
+                var tempvm = new IssueViewModels();
+                CreateAllLists(tempvm);
+                return View();
+            }
+        }
+
+        [HttpPost, ActionName("UpdateBug")]
+        [ValidateAntiForgeryToken]
+        public ActionResult UpdateBugPost()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            var issuekey = Request.Form["IssueKey"];
+            var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+
+            if (Request.Form["deleteisu"] != null)
+            {
+                if (string.Compare(updater, originaldata.Reporter, true) == 0
+                    || string.Compare(updater, originaldata.Assignee, true) == 0)
+                {
+                    IssueViewModels.RemoveIssue(issuekey);
+                    var dict = new RouteValueDictionary();
+                    dict.Add("ProjectKey", originaldata.ProjectKey);
+                    return RedirectToAction("ProjectDetail", "Project", dict);
+                }
+            }
+
+            var vm = new IssueViewModels();
+            vm.IssueKey = issuekey;
+            vm.Reporter = updater;
+            vm.IssueType = Request.Form["issuetypelist"].ToString();
+            vm.Priority = Request.Form["prioritylist"].ToString();
+            vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
+
+            if (string.Compare(originaldata.Reporter, updater, true) == 0
+                || string.Compare(originaldata.Assignee, updater, true) == 0)
+            {
+                vm.Assignee = Request.Form["assigneelist"].ToString();
+                vm.Resolution = Request.Form["resolutionlist"].ToString();
+            }
+            else
+            {
+                vm.Assignee = originaldata.Assignee;
+                vm.Resolution = originaldata.Resolution;
+            }
+
+            vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+            vm.RelativePeoples = Request.Form["RPeopleAddr"];
+
+            if (!string.IsNullOrEmpty(Request.Form["failureeditor"]))
+            {
+                var failure = Server.HtmlDecode(Request.Form["failureeditor"]);
+                var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(failure));
+                var commenttype = COMMENTTYPE.FailureDetail;
+                IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
+                UserRankViewModel.UpdateUserRank(updater, 2);
+            }
+
+            if (!string.IsNullOrEmpty(Request.Form["rootcauseeditor"]))
+            {
+                var rootcause = Server.HtmlDecode(Request.Form["rootcauseeditor"]);
+                var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(rootcause));
+                var commenttype = COMMENTTYPE.RootCause;
+                IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
+                UserRankViewModel.UpdateUserRank(updater, 5);
+            }
+
+            if (!string.IsNullOrEmpty(Request.Form["editor1"]))
+            {
+                vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
+                vm.CommentType = COMMENTTYPE.Description;
+                UserRankViewModel.UpdateUserRank(updater, 2);
+            }
+            else
+                vm.Description = "";
+
+            vm.UpdateIssue();
+
+            if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
+            {
+                var urls = ReceiveRMAFiles();
+                var internalreportfile = Request.Form["attachmentupload"];
+                var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
+                    .Replace(" ", "_").Replace("#", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                var url = "";
+                foreach (var r in urls)
+                {
+                    if (r.Contains(originalname))
+                    {
+                        url = r;
+                        break;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(url))
+                {
+                    IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
+                    UserRankViewModel.UpdateUserRank(updater, 5);
+                }
+            }
+
+            ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Updated", originaldata.Summary, originaldata.IssueKey);
+
+            if (string.Compare(originaldata.Assignee, vm.Assignee, true) != 0)
+            {
+                vm.UpdateIAssign();
+                ProjectEvent.AssignIssueEvent(originaldata.ProjectKey, updater, vm.Assignee, originaldata.Summary, originaldata.IssueKey);
+                vm.Summary = originaldata.Summary;
+                SendTaskEvent(vm, "asigned to you", updater, vm.Assignee);
+            }
+
+            if (string.Compare(originaldata.Resolution, vm.Resolution, true) != 0)
+            {
+                if (vm.IssueClosed())
+                {
+                    var realissue = IssueViewModels.RetrieveIssueByIssueKey(vm.IssueKey);
+                    if (realissue.AttachList.Count > 0)
+                    {
+                        UserRankViewModel.UpdateUserRank(updater, 5);
+                    }
+                    else if (realissue.CommentList.Count > 1)
+                    {
+                        UserRankViewModel.UpdateUserRank(updater, 2);
+                    }
+
+                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
+                    vm.CloseIssue();
+                }
+
+                if (string.Compare(vm.Resolution, Resolute.Working) == 0)
+                {
+                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Started", originaldata.Summary, originaldata.IssueKey);
+                }
+
+                if (string.Compare(vm.Resolution, Resolute.Reopen) == 0)
+                {
+                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Reopened", originaldata.Summary, originaldata.IssueKey);
+                }
+            }
+
+            var newdata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+
+            if (Request.Form["birootcauselist"] != null)
+            {
+                var biret = Request.Form["birootcauselist"].ToString();
+                if (string.Compare(biret, "NONE") != 0)
+                {
+                    var sn = newdata.Summary.Split(new string[] { " " }, StringSplitOptions.None)[1].Trim().ToUpper();
+                    IssueViewModels.StoreBIRootCause(newdata.ProjectKey, sn, biret);
+                }
+            }
+
+            ViewBag.isassignee = false;
+            if (string.Compare(updater, newdata.Assignee, true) == 0
+                    || string.Compare(updater, newdata.Reporter, true) == 0)
+            {
+                ViewBag.isassignee = true;
+            }
+
+            CreateAllLists(newdata);
+
+            if (newdata.Summary.Contains(" @Burn-In Step "))
+            {
+                var sn = newdata.Summary.Split(new string[] { " " }, StringSplitOptions.None)[1].Trim().ToUpper();
+                ViewBag.birootcauselist = CreateBIRootIssue(newdata.ProjectKey, sn);
+            }
+            return View(newdata);
+
+        }
 
         public ActionResult UpdateRMA(string issuekey)
         {

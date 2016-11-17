@@ -774,6 +774,7 @@
     <Content Include="Views\User\UserIssues.cshtml" />
     <Content Include="Views\Project\ErrorAttach.cshtml" />
     <Content Include="Views\Project\LowYieldWarn.cshtml" />
+    <Content Include="Views\Issue\UpdateBug.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

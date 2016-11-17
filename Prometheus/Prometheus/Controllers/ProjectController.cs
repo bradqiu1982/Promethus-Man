@@ -18,6 +18,20 @@ namespace Prometheus.Controllers
         // GET: Project
         public ActionResult ViewAll()
         {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "Project");
+                ck.Add("logonredirectact", "ViewAll");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
             var projlist = ProjectViewModels.RetrieveAllProject();
 
             var filterlist = new List<SelectListItem>();

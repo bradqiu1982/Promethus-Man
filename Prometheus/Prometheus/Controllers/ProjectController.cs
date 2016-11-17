@@ -3592,7 +3592,7 @@ namespace Prometheus.Controllers
                             routevalue.Add("issuekey", item.IssueKey);
                             //send validate email
                             string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
-                            string validatestr = this.Url.Action("UpdateRMA", "Issue", routevalue, scheme);
+                            string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
                             var netcomputername = "";
                             try { netcomputername = System.Net.Dns.GetHostName(); }
                             catch (Exception ex) { }
@@ -3620,7 +3620,7 @@ namespace Prometheus.Controllers
                             routevalue.Add("issuekey", item.IssueKey);
                             //send validate email
                             string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
-                            string validatestr = this.Url.Action("UpdateRMA", "Issue", routevalue, scheme);
+                            string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
 
                             var netcomputername = "";
                             try { netcomputername = System.Net.Dns.GetHostName(); }

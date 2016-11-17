@@ -117,6 +117,7 @@ namespace Prometheus.Models
         public static string RootCause = "Root Cause";
         public static string CustomReport = "Report for Customer";
         public static string InternalReport = "Internal Report";
+        public static string FailureDetail = "FailureDetail";
     }
 
     public class IssueComments
@@ -285,9 +286,12 @@ namespace Prometheus.Models
                 rootcausecommentlist.Clear();
                 repot4customercommentlist.Clear();
                 internalrepotcommentlist.Clear();
+                failuredetailcommentlist.Clear();
+
                 foreach (var item in cemlist)
                 {
-                    if (string.Compare(item.CommentType,COMMENTTYPE.Description) == 0)
+                    if (string.Compare(item.CommentType,COMMENTTYPE.Description) == 0
+                        ||string.IsNullOrEmpty(item.CommentType))
                     {
                         generalcommentlist.Add(item);
                     }
@@ -303,6 +307,10 @@ namespace Prometheus.Models
                     {
                         internalrepotcommentlist.Add(item);
                     }
+                    if (string.Compare(item.CommentType, COMMENTTYPE.FailureDetail) == 0)
+                    {
+                        failuredetailcommentlist.Add(item);
+                    }
                 }
             }
             get
@@ -315,6 +323,7 @@ namespace Prometheus.Models
         private List<IssueComments> rootcausecommentlist = new List<IssueComments>();
         private List<IssueComments> repot4customercommentlist = new List<IssueComments>();
         private List<IssueComments> internalrepotcommentlist = new List<IssueComments>();
+        private List<IssueComments> failuredetailcommentlist = new List<IssueComments>();
 
         public List<IssueComments> GeneralCommentList
         {
@@ -336,6 +345,10 @@ namespace Prometheus.Models
             get { return internalrepotcommentlist; }
         }
 
+        public List<IssueComments> FailureDetailCommentList
+        {
+            get { return failuredetailcommentlist; }
+        }
 
         private List<string> attachlist = new List<string>();
         public List<string> AttachList

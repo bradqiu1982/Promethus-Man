@@ -3249,6 +3249,20 @@ namespace Prometheus.Controllers
                 }
             }
 
+            if (Request.Form["resulteditor"] != null)
+            {
+                var com = new ErrorComments();
+                com.Comment = Server.HtmlDecode(Request.Form["resulteditor"]);
+                if (!string.IsNullOrEmpty(com.Comment))
+                {
+                    if (!string.IsNullOrEmpty(com.Comment))
+                    {
+                        ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.Result, vm.Reporter, DateTime.Now.ToString());
+                        UserRankViewModel.UpdateUserRank(updater, 2);
+                    }
+                }
+            }
+
             if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
             {
                 var urls = ReceiveAttachFiles();

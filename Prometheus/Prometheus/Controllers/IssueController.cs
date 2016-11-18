@@ -979,6 +979,15 @@ namespace Prometheus.Controllers
                 UserRankViewModel.UpdateUserRank(updater, 5);
             }
 
+            if (!string.IsNullOrEmpty(Request.Form["resulteditor"]))
+            {
+                var rootcause = Server.HtmlDecode(Request.Form["resulteditor"]);
+                var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(rootcause));
+                var commenttype = COMMENTTYPE.Result;
+                IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
+                UserRankViewModel.UpdateUserRank(updater,2);
+            }
+
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
                 vm.Description = Server.HtmlDecode(Request.Form["editor1"]);

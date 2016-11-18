@@ -10,6 +10,7 @@ namespace Prometheus.Models
         public static string Description = "Description";
         public static string RootCause = "RootCause";
         public static string FailureDetail= "FailureDetail";
+        public static string Result = "Result";
     }
 
     public class ErrorComments
@@ -155,7 +156,7 @@ namespace Prometheus.Models
         private List<ErrorComments> generalcommentlist = new List<ErrorComments>();
         private List<ErrorComments> rootcausecommentlist = new List<ErrorComments>();
         private List<ErrorComments> failuredetailcommentlist = new List<ErrorComments>();
-
+        private List<ErrorComments> resultcommentlist = new List<ErrorComments>();
 
         public List<ErrorComments> GeneralCommentList
         {
@@ -165,6 +166,11 @@ namespace Prometheus.Models
         public List<ErrorComments> RootCauseCommentList
         {
             get { return rootcausecommentlist; }
+        }
+
+        public List<ErrorComments> ResultCommentList
+        {
+            get { return resultcommentlist; }
         }
 
         public List<ErrorComments> FailureDetailCommentList
@@ -183,6 +189,7 @@ namespace Prometheus.Models
                 generalcommentlist.Clear();
                 rootcausecommentlist.Clear();
                 failuredetailcommentlist.Clear();
+                resultcommentlist.Clear();
 
                 foreach (var item in cemlist)
                 {
@@ -198,6 +205,10 @@ namespace Prometheus.Models
                     if (string.Compare(item.CommentType, PJERRORCOMMENTTYPE.FailureDetail) == 0)
                     {
                         failuredetailcommentlist.Add(item);
+                    }
+                    if (string.Compare(item.CommentType, PJERRORCOMMENTTYPE.Result) == 0)
+                    {
+                        resultcommentlist.Add(item);
                     }
                 }
             }

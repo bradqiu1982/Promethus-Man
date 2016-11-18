@@ -118,6 +118,7 @@ namespace Prometheus.Models
         public static string CustomReport = "Report for Customer";
         public static string InternalReport = "Internal Report";
         public static string FailureDetail = "FailureDetail";
+        public static string Result = "Result";
     }
 
     public class IssueComments
@@ -287,6 +288,7 @@ namespace Prometheus.Models
                 repot4customercommentlist.Clear();
                 internalrepotcommentlist.Clear();
                 failuredetailcommentlist.Clear();
+                resultcommentlist.Clear();
 
                 foreach (var item in cemlist)
                 {
@@ -311,6 +313,10 @@ namespace Prometheus.Models
                     {
                         failuredetailcommentlist.Add(item);
                     }
+                    if (string.Compare(item.CommentType, COMMENTTYPE.Result) == 0)
+                    {
+                        resultcommentlist.Add(item);
+                    }
                 }
             }
             get
@@ -324,6 +330,7 @@ namespace Prometheus.Models
         private List<IssueComments> repot4customercommentlist = new List<IssueComments>();
         private List<IssueComments> internalrepotcommentlist = new List<IssueComments>();
         private List<IssueComments> failuredetailcommentlist = new List<IssueComments>();
+        private List<IssueComments> resultcommentlist = new List<IssueComments>();
 
         public List<IssueComments> GeneralCommentList
         {
@@ -348,6 +355,11 @@ namespace Prometheus.Models
         public List<IssueComments> FailureDetailCommentList
         {
             get { return failuredetailcommentlist; }
+        }
+
+        public List<IssueComments> ResultCommentList
+        {
+            get { return resultcommentlist; }
         }
 
         private List<string> attachlist = new List<string>();

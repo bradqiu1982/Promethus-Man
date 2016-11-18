@@ -111,11 +111,13 @@
                                     </div>
 
                                     <div class="col-md-5 text-center">
-                                        @if (item.IssueData.CommentList.Count > 2
+                                        @if (item.IssueData.RootCauseCommentList.Count > 0
+                                            || item.IssueData.ResultCommentList.Count > 0
+                                            || item.IssueData.CommentList.Count > 2
                                             || (item.IssueData.CommentList.Count > 1 && item.IssueData.CommentList[1].Comment.Length > 150))
-                                        {
-                                            <span class="badge alert-success">C</span>
-                                        }
+                                            {
+                                                <span class="badge alert-success">C</span>
+                                            }
 
                                         @if (!string.IsNullOrEmpty(item.IssueData.LYT))
                                         {
@@ -236,11 +238,13 @@
                                 <input class="form-control text-box single-line" value="@item.IssueData.IssueKey" id="HIssueKey@(i)" name="HIssueKey@(i)" type="hidden" />
                             </div>
                             <div class="col-md-5 text-center">
-                                @if (item.IssueData.CommentList.Count > 2
-                                || (item.IssueData.CommentList.Count > 1 && item.IssueData.CommentList[1].Comment.Length > 150))
-                                {
-                                    <span class="badge alert-success">C</span>
-                                }
+                                @if (item.IssueData.RootCauseCommentList.Count > 0
+                                    ||item.IssueData.ResultCommentList.Count > 0
+                                    ||item.IssueData.CommentList.Count > 2
+                                    || (item.IssueData.CommentList.Count > 1 && item.IssueData.CommentList[1].Comment.Length > 150))
+                                    {
+                                        <span class="badge alert-success">C</span>
+                                    }
                                 @if (!string.IsNullOrEmpty(item.IssueData.LYT))
                                 {
                                     <span class="badge alert-danger">LYT</span>

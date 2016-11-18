@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Data.SqlClient;
 using System.IO;
+using System.Data;
 
 namespace Prometheus.Models
 {
@@ -32,7 +33,51 @@ namespace Prometheus.Models
             }
         }
 
-        private static void CloseConnector(SqlConnection conn)
+        //"Server=CN-CSSQL;uid=SHG_Read;pwd=shgread;Database=InsiteDB;Connection Timeout=30;"
+        public static SqlConnection GetConnector(string constr)
+        {
+            var conn = new SqlConnection();
+            try
+            {
+                conn.ConnectionString = constr;
+                conn.Open();
+                return conn;
+            }
+            catch (SqlException ex)
+            {
+                System.Windows.MessageBox.Show(ex.ToString());
+                return null;
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.ToString());
+                return null;
+            }
+        }
+
+        public static bool ExeSqlNoRes(SqlConnection conn,string sql)
+        {
+            if (conn == null)
+                return false;
+
+            try
+            {
+                var command = conn.CreateCommand();
+                command.CommandText = sql;
+                command.ExecuteNonQuery();
+                return true;
+            }
+            catch (SqlException ex)
+            {
+                return false;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public static void CloseConnector(SqlConnection conn)
         {
             if (conn == null)
                 return;
@@ -75,6 +120,32 @@ namespace Prometheus.Models
                 CloseConnector(conn);
                 //System.Windows.MessageBox.Show(ex.ToString());
                 return false;
+            }
+        }
+
+
+        public static DataTable ExecuteLocalQueryReturnTable(string sql)
+        {
+            var conn = GetLocalConnector();
+            try
+            {
+                var dt = new DataTable();
+                SqlDataAdapter myAd = new SqlDataAdapter(sql, conn);
+                myAd.SelectCommand.CommandTimeout = 0;
+                myAd.Fill(dt);
+                return dt;
+            }
+            catch (SqlException ex)
+            {
+                CloseConnector(conn);
+                //System.Windows.MessageBox.Show(ex.ToString());
+                return null;
+            }
+            catch (Exception ex)
+            {
+                CloseConnector(conn);
+                //System.Windows.MessageBox.Show(ex.ToString());
+                return null;
             }
         }
 

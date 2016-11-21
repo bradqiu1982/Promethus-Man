@@ -52,10 +52,11 @@ namespace Prometheus.Controllers
         public ActionResult MoveDataBase()
         {
             var targetdb = "Server=wux-parallel;uid=NPI;pwd=NPI@IPN;Database=NPITrace;Connection Timeout=30;";
-
+            
             var tablelist = new List<string>();
             tablelist.Add("UserTable");
-            //tablelist.Add("BITestDataField");
+            tablelist.Add("BITestDataField");
+
             foreach (var tab in tablelist)
             {
                 SqlConnection targetcon = null;
@@ -65,30 +66,38 @@ namespace Prometheus.Controllers
                     var tempsql = "delete from " + tab;
                     DBUtility.ExeSqlNoRes(targetcon, tempsql);
 
-                    //load data to memory
-                    //var sql = "select * from " + tab;
-                    var sql = "select * from(select ROW_NUMBER() OVER(order by(select null)) as mycount, * from " + tab + ") s1 where s1.mycount < 500";
-                    var dt = DBUtility.ExecuteLocalQueryReturnTable(sql);
-
-                    if (dt != null)
+                    for(int idx = 0; ;)
                     {
-                        using (SqlBulkCopy bulkCopy = new SqlBulkCopy(targetcon))
+                        var endidx = idx + 100000;
+
+                            //load data to memory
+                            var sql = "select * from(select ROW_NUMBER() OVER(order by(select null)) as mycount, * from " + tab + ") s1 where s1.mycount > "+ idx.ToString() +" and s1.mycount <= "+endidx.ToString();
+                            var dt = DBUtility.ExecuteLocalQueryReturnTable(sql);
+                        if (dt.Rows.Count == 0)
                         {
-                            bulkCopy.DestinationTableName = tab;
-                            try
+                            break;
+                        }
+
+                            if (dt != null && dt.Rows.Count > 0)
                             {
-                                for (int i = 1; i < dt.Columns.Count; i++)
+                                using (SqlBulkCopy bulkCopy = new SqlBulkCopy(targetcon))
                                 {
-                                    bulkCopy.ColumnMappings.Add(dt.Columns[i].ColumnName, dt.Columns[i].ColumnName);
-                                }
-                                bulkCopy.WriteToServer(dt);
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine(ex.Message);
-                            }
-                        }//end using
-                    }
+                                    bulkCopy.DestinationTableName = tab;
+                                    try
+                                    {
+                                        for (int i = 1; i < dt.Columns.Count; i++)
+                                        {
+                                            bulkCopy.ColumnMappings.Add(dt.Columns[i].ColumnName, dt.Columns[i].ColumnName);
+                                        }
+                                        bulkCopy.WriteToServer(dt);
+                                        dt.Clear();
+                                    }
+                                    catch (Exception ex){}
+                                }//end using
+                            }//end if
+
+                        idx = idx + 100000;
+                    }//end for
                 }
                 catch (Exception ex)
                 {

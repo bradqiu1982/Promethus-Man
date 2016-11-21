@@ -85,10 +85,10 @@ namespace Prometheus.Models
                 .Replace("<UpdateTime>", DateTime.Now.ToString()).Replace("<Wafer>", Wafer).Replace("<Waferpn>", Waferpn);
             DBUtility.ExeLocalSqlNoRes(isql);
 
-            foreach (var item in DataFields)
-            {
-                item.StoreBIDateField();
-            }
+            //foreach (var item in DataFields)
+            //{
+            //    item.StoreBIDateField();
+            //}
         }
 
         public static Dictionary<string, DateTime> RetrieveAllDataID(string projectkey)

@@ -244,7 +244,76 @@
                     </div>
                 </div>
 
-            <div class="tab-pane" id="tab_c"></div>
+            <div class="tab-pane" id="tab_c">
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label class="control-label text-left">Project Model_ID. eg:FTLX6871;FTLX6872;FTLX6672</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <div class="col-md-2">
+                            <label class="control-label">Reference File:</label>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="~/Scripts/project_model_id_list.xlsx" target="_blank">Project Model ID</a>
+                        </div>
+                        <div class="col-md-3">
+                        </div>
+                        <div class="col-md-4">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12" data-toggle="tooltip" data-placement="center" title="Exampel: Model_ID1;Model_ID2....">
+                        @if (Model != null && !string.IsNullOrEmpty(Model.ModelIDs))
+                        {
+                            <textarea class="form-control" name="ModelIDs" id="ModelIDs" style="min-width: 100%;min-height:200px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required.">@(Model.ModelIDs)</textarea>
+                        }
+                        else
+                        {
+                            <textarea class="form-control" name="ModelIDs" id="ModelIDs" style="min-width: 100%;min-height:200px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required."></textarea>
+                        }
+
+                    </div>
+                    <span class="field-validation-valid text-danger" data-valmsg-for="ModelIDs" data-valmsg-replace="true"></span>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label class="control-label text-left">Indicative DataSet Name. eg:final,assembly,tune_rf,tune,temp_test_7up</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <div class="col-md-2">
+                            <label class="control-label">Reference File:</label>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="~/Scripts/project_indicative_datasetname_list.xlsx" target="_blank">Project Indicative DataSetName</a>
+                        </div>
+                        <div class="col-md-3">
+                        </div>
+                        <div class="col-md-4">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12" data-toggle="tooltip" data-placement="center" title="Exampel: DataSetName1;DataSetName2....">
+                        @if (Model != null && !string.IsNullOrEmpty(Model.SumDatasets))
+                        {
+                            <textarea class="form-control" name="SumDatasets" id="SumDatasets" style="min-width: 100%;min-height:200px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required.">@(Model.SumDatasets)</textarea>
+                        }
+                        else
+                        {
+                            <textarea class="form-control" name="SumDatasets" id="SumDatasets" style="min-width: 100%;min-height:200px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required."></textarea>
+                        }
+
+                    </div>
+                    <span class="field-validation-valid text-danger" data-valmsg-for="SumDatasets" data-valmsg-replace="true"></span>
+                </div>
+
+            </div>
             <div class="tab-pane" id="tab_d">
                 <div class="form-group">
                     <div class="col-md-6">

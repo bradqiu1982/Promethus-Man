@@ -1,6 +1,5 @@
 Prometheus/Prometheus.Tests/obj/Debug
 Prometheus/Prometheus/obj/Debug
-Prometheus/packages
 Prometheus/Prometheus.Tests/bin/
 Prometheus/Prometheus/userfiles/docs
 Prometheus/Prometheus/userfiles/images
@@ -9,3 +8,5 @@ Prometheus/Prometheus/Scripts/images
 Prometheus/Prometheus/obj/Release
 Prometheus/Prometheus.Tests/obj/Release/
 Prometheus/Prometheus/userfiles/VCSEL-EMAIL-CHECK
+Prometheus/Prometheus.Tests/obj
+Prometheus/Prometheus/obj/

@@ -27,6 +27,7 @@
         <ul class="nav nav-pills nav-stacked col-md-2">
             <li class="active"><a href="#tab_a" data-toggle="pill">Base Info<font color="red">*</font></a></li>
             <li><a href="#tab_b" data-toggle="pill">MES Bonding</a></li>
+            <li><a href="#tab_c" data-toggle="pill">ATE Bonding</a></li>
         </ul>
 
         <div class="tab-content col-md-10">
@@ -157,107 +158,179 @@
 
                     </div>
 
-                    <div class="tab-pane" id="tab_b">
-                        <div class="form-horizontal">
+            <div class="tab-pane" id="tab_b">
+                <div class="form-horizontal">
 
-                            <div class="form-group">
-                                <div class="col-md-6">
-                                    <div class="col-md-6">
-                                        <span class="btn btn-default btn-file" id="choosefile">
-                                            Upload MESConfig.ini <input type="file" name="files" id="file1" runat="server" onchange="ShowFileNames(this)" />
-                                        </span>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="control-label" id="showfilename" name="showfilename"></label>
-                                    </div>
-                                </div>
-                                <script type="text/javascript">
-                                    function ShowFileNames(oFile) {
-                                        $('#showfilename').text(oFile.value);
-                                    }
-                                </script>
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <div class="col-md-6">
+                                <span class="btn btn-default btn-file" id="choosefile">
+                                    Upload MESConfig.ini <input type="file" name="files" id="file1" runat="server" onchange="ShowFileNames(this)" />
+                                </span>
                             </div>
-
-                            <hr />
-                            <div class="form-group">
-                                <div class="col-md-12">
-                                    <label class="control-label text-left">PNs contains Project PN Descriptions and Burn-In PNs. eg:FTLC9141;1183638;1228361;1183636</label>
-                                </div>
+                            <div class="col-md-6">
+                                <label class="control-label" id="showfilename" name="showfilename"></label>
                             </div>
-                            <div class="form-group">
-                                <div class="col-md-12">
-                                    <div class="col-md-2">
-                                        <label class="control-label">Reference File:</label>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <a href="~/Scripts/project_pn_desc_list.xlsx" target="_blank">Project PN Description</a>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <a href="~/Scripts/burn_in_pn_list.xlsx" target="_blank">BURN-IN PN</a>
-                                    </div>
-                                    <div class="col-md-4">
-                                    </div>
-                                </div>
+                        </div>
+                        <script type="text/javascript">
+                            function ShowFileNames(oFile) {
+                                $('#showfilename').text(oFile.value);
+                            }
+                        </script>
+                    </div>
+
+                    <hr />
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <label class="control-label text-left">PNs contains Project PN Descriptions and Burn-In PNs. eg:FTLC9141;1183638;1228361;1183636</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <div class="col-md-2">
+                                <label class="control-label">Reference File:</label>
                             </div>
-                            <div class="form-group">
-                                <div class="col-md-12" data-toggle="tooltip" data-placement="center" title="Exampel: Exampel: PN Desc1; PN Desc2;BI PN1;BI PN2">
-                                    @if (Model != null && !string.IsNullOrEmpty(Model.PNs))
-                                    {
-                                        <textarea class="form-control" name="PNs" id="PNs" style="min-width: 100%;min-height:200px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required.">@(Model.PNs)</textarea>
-                                    }
-                                    else
-                                    {
-                                        <textarea class="form-control" name="PNs" id="PNs" style="min-width: 100%;min-height:200px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required."></textarea>
-                                    }
-
-                                </div>
-                                <span class="field-validation-valid text-danger" data-valmsg-for="PNs" data-valmsg-replace="true"></span>
+                            <div class="col-md-3">
+                                <a href="~/Scripts/project_pn_desc_list.xlsx" target="_blank">Project PN Description</a>
                             </div>
-
-                            <div class="form-group">
-                                <div class="col-md-12">
-                                    <div class="col-md-3">
-                                        <button class="form-control" onclick="TestPNDesc()" type="button">Test PN Description</button>
-                                    </div>
-                                    <div class="col-md-9">
-                                    </div>
-                                </div>
-                                <script type="text/javascript">
-                                    function TestPNDesc() {
-                                        if (document.getElementById("PNs").value && document.getElementById("PNs").value.length > 0) {
-                                            var myurl = '/Project/TestPNDesc?PNs=' + document.getElementById("PNs").value;
-                                            window.open(myurl, '_blank');
-                                        }
-                                    }
-                                </script>
+                            <div class="col-md-3">
+                                <a href="~/Scripts/burn_in_pn_list.xlsx" target="_blank">BURN-IN PN</a>
                             </div>
-
-                            <hr />
-
-                            <div class="form-group">
-                                <div class="col-md-12">
-                                    <label class="control-label text-left">Stations</label>
-                                </div>
+                            <div class="col-md-4">
                             </div>
-                            <div class="form-group">
-                                <div class="col-md-12" data-toggle="tooltip" data-placement="center" title="Exampel: Station ; Station ;Station">
-                                    @if (Model != null && !string.IsNullOrEmpty(Model.Stations))
-                                    {
-                                        <textarea class="form-control" name="Stations" id="Stations" style="min-width: 100%;min-height:200px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required.">@(Model.Stations)</textarea>
-                                    }
-                                    else
-                                    {
-                                        <textarea class="form-control" name="Stations" id="Stations" style="min-width: 100%;min-height:200px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required."></textarea>
-                                    }
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12" data-toggle="tooltip" data-placement="center" title="Exampel: Exampel: PN Desc1; PN Desc2;BI PN1;BI PN2">
+                            @if (Model != null && !string.IsNullOrEmpty(Model.PNs))
+                            {
+                                <textarea class="form-control" name="PNs" id="PNs" style="min-width: 100%;min-height:200px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required.">@(Model.PNs)</textarea>
+                            }
+                            else
+                            {
+                                <textarea class="form-control" name="PNs" id="PNs" style="min-width: 100%;min-height:200px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required."></textarea>
+                            }
 
-                                </div>
-                                <span class="field-validation-valid text-danger" data-valmsg-for="Stations" data-valmsg-replace="true"></span>
+                        </div>
+                        <span class="field-validation-valid text-danger" data-valmsg-for="PNs" data-valmsg-replace="true"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <div class="col-md-3">
+                                <button class="form-control" onclick="TestPNDesc()" type="button">Test PN Description</button>
                             </div>
-                            <hr />
+                            <div class="col-md-9">
+                            </div>
+                        </div>
+                        <script type="text/javascript">
+                            function TestPNDesc() {
+                                if (document.getElementById("PNs").value && document.getElementById("PNs").value.length > 0) {
+                                    var myurl = '/Project/TestPNDesc?PNs=' + document.getElementById("PNs").value;
+                                    window.open(myurl, '_blank');
+                                }
+                            }
+                        </script>
+                    </div>
 
+                    <hr />
+
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <label class="control-label text-left">Stations</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12" data-toggle="tooltip" data-placement="center" title="Exampel: Station ; Station ;Station">
+                            @if (Model != null && !string.IsNullOrEmpty(Model.Stations))
+                            {
+                                <textarea class="form-control" name="Stations" id="Stations" style="min-width: 100%;min-height:200px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required.">@(Model.Stations)</textarea>
+                            }
+                            else
+                            {
+                                <textarea class="form-control" name="Stations" id="Stations" style="min-width: 100%;min-height:200px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required."></textarea>
+                            }
+
+                        </div>
+                        <span class="field-validation-valid text-danger" data-valmsg-for="Stations" data-valmsg-replace="true"></span>
+                    </div>
+                    <hr />
+
+                </div>
+            </div>
+
+            <div class="tab-pane" id="tab_c">
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label class="control-label text-left">Project Model_ID. eg:FTLX6871;FTLX6872;FTLX6672</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <div class="col-md-2">
+                            <label class="control-label">Reference File:</label>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="~/Scripts/project_model_id_list.xlsx" target="_blank">Project Model ID</a>
+                        </div>
+                        <div class="col-md-3">
+                        </div>
+                        <div class="col-md-4">
                         </div>
                     </div>
                 </div>
+                <div class="form-group">
+                    <div class="col-md-12" data-toggle="tooltip" data-placement="center" title="Exampel: Model_ID1;Model_ID2....">
+                        @if (Model != null && !string.IsNullOrEmpty(Model.ModelIDs))
+                        {
+                            <textarea class="form-control" name="ModelIDs" id="ModelIDs" style="min-width: 100%;min-height:200px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required.">@(Model.ModelIDs)</textarea>
+                        }
+                        else
+                        {
+                            <textarea class="form-control" name="ModelIDs" id="ModelIDs" style="min-width: 100%;min-height:200px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required."></textarea>
+                        }
+
+                    </div>
+                    <span class="field-validation-valid text-danger" data-valmsg-for="ModelIDs" data-valmsg-replace="true"></span>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label class="control-label text-left">Indicative DataSet Name. eg:final,assembly,tune_rf,tune,temp_test_7up</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <div class="col-md-2">
+                            <label class="control-label">Reference File:</label>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="~/Scripts/project_indicative_datasetname_list.xlsx" target="_blank">Project Indicative DataSetName</a>
+                        </div>
+                        <div class="col-md-3">
+                        </div>
+                        <div class="col-md-4">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12" data-toggle="tooltip" data-placement="center" title="Exampel: DataSetName1;DataSetName2....">
+                        @if (Model != null && !string.IsNullOrEmpty(Model.SumDatasets))
+                        {
+                            <textarea class="form-control" name="SumDatasets" id="SumDatasets" style="min-width: 100%;min-height:200px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required.">@(Model.SumDatasets)</textarea>
+                        }
+                        else
+                        {
+                            <textarea class="form-control" name="SumDatasets" id="SumDatasets" style="min-width: 100%;min-height:200px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required."></textarea>
+                        }
+
+                    </div>
+                    <span class="field-validation-valid text-danger" data-valmsg-for="SumDatasets" data-valmsg-replace="true"></span>
+                </div>
+            </div>
+
+            
+        </div>
     </div>
  
         <div class="form-group">

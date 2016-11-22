@@ -306,6 +306,90 @@ namespace Prometheus.Models
             }
         }
 
+        private List<ProjectPn> lmd = new List<ProjectPn>();
+        public List<ProjectPn> MDIDList
+        {
+            get
+            { return lmd; }
+            set
+            {
+                lmd.Clear();
+                lmd.AddRange(value);
+            }
+        }
+
+        public string ModelIDs
+        {
+            set
+            {
+                lmd.Clear();
+                if (!string.IsNullOrEmpty(value))
+                {
+                    var temppn = value.Replace("'", "");
+                    var temppns = temppn.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var p in temppns)
+                    {
+                        lmd.Add(new ProjectPn(ProjectKey, p.Trim()));
+                    }
+                }
+            }
+
+            get
+            {
+                var ret = "";
+                foreach (var p in lmd)
+                {
+                    if (string.IsNullOrEmpty(ret))
+                        ret = p.Pn;
+                    else
+                        ret = ret + ";" + p.Pn;
+                }
+                return ret;
+            }
+        }
+
+        private List<ProjectStation> lsumdataset = new List<ProjectStation>();
+        public List<ProjectStation> SumDatasetList
+        {
+            get
+            { return lsumdataset; }
+            set
+            {
+                lsumdataset.Clear();
+                lsumdataset.AddRange(value);
+            }
+        }
+
+        public string SumDatasets
+        {
+            set
+            {
+                lsumdataset.Clear();
+                if (!string.IsNullOrEmpty(value))
+                {
+                    var tempstat = value.Replace("'", "");
+                    var tempstats = tempstat.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var s in tempstats)
+                    {
+                        lsumdataset.Add(new ProjectStation(ProjectKey, s.Trim()));
+                    }
+                }
+            }
+
+            get
+            {
+                var ret = "";
+                foreach (var p in lsumdataset)
+                {
+                    if (string.IsNullOrEmpty(ret))
+                        ret = p.Station;
+                    else
+                        ret = ret + ";" + p.Station;
+                }
+                return ret;
+            }
+        }
+
         private List<ProjectMesTable> ltab = new List<ProjectMesTable>();
         public List<ProjectMesTable> TabList
         {

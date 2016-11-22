@@ -18,6 +18,8 @@ namespace Prometheus.Controllers
         // GET: Project
         public ActionResult ViewAll()
         {
+            ATEUtility.retrieveATEData();
+
             var ckdict = CookieUtility.UnpackCookie(this);
             if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
             {
@@ -695,6 +697,9 @@ namespace Prometheus.Controllers
             RetrievePNs(projectmodel);
             RetrieveStation(projectmodel);
 
+            projectmodel.ModelIDs = Request.Form["ModelIDs"];
+            projectmodel.SumDatasets = Request.Form["SumDatasets"];
+
             if (!RetrieveProjectDate(projectmodel))
             {
                 CreateAllUserLists(projectmodel);
@@ -718,15 +723,10 @@ namespace Prometheus.Controllers
             var who = (ckdict["logonuser"]).Split(new string[]{ "||"},StringSplitOptions.None)[0];
             ProjectEvent.CreateProjectEvent(who, projectmodel.ProjectKey, projectmodel.ProjectName);
 
-            //new Thread(() => {
-            //    try
-            //    {
-                    MESUtility.StartProjectBonding(projectmodel);
-                    BIDataUtility.StartProjectBonding(projectmodel);
-            //    }
-            //    catch (Exception ex)
-            //    { }
-            //}).Start();
+            MESUtility.StartProjectBonding(projectmodel);
+            BIDataUtility.StartProjectBonding(projectmodel);
+
+
 
             return RedirectToAction("ViewAll");
         }
@@ -982,6 +982,8 @@ namespace Prometheus.Controllers
             StoreMesConfig(projectmodel);
             RetrievePNs(projectmodel);
             RetrieveStation(projectmodel);
+            projectmodel.ModelIDs = Request.Form["ModelIDs"];
+            projectmodel.SumDatasets = Request.Form["SumDatasets"];
 
             if (!RetrieveProjectDate(projectmodel))
             {
@@ -1021,16 +1023,7 @@ namespace Prometheus.Controllers
 
             if(databondingchange)
             {
-                //new Thread(() =>
-                //{
-                //    try
-                //    {
-                        MESUtility.StartProjectBonding(projectmodel);
-                        
-                //    }
-                //    catch (Exception ex)
-                //    { }
-                //}).Start();
+                MESUtility.StartProjectBonding(projectmodel);
             }
 
             if (pnbondingchg)

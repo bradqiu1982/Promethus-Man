@@ -96,7 +96,7 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(isql);
         }
 
-        public static void PrePareLatestData(string projectkey)
+        public static void PrePareMESLatestData(string projectkey)
         {
             if (UpdatePJLockUsing(projectkey))
                 return;
@@ -111,16 +111,51 @@ namespace Prometheus.Models
                     string lastupdatetime = ProjectTestData.RetrieveLatestTimeOfLocalProject(projectkey);
                     if (!string.IsNullOrEmpty(lastupdatetime))
                     {
-                        var vlast = DateTime.Parse(lastupdatetime);
-                        vlast = vlast.AddMinutes(18);
-                        if (vlast < DateTime.Now)
-                        {
+                        //var vlast = DateTime.Parse(lastupdatetime);
+                        //vlast = vlast.AddMinutes(18);
+                        //if (vlast < DateTime.Now)
+                        //{
                             MESUtility.UpdateProjectData(vm, lastupdatetime, DateTime.Now.ToString());
-                        }
+                        //}
                     }
                     else
                     {
                         MESUtility.UpdateProjectData(vm, vm.StartDate.ToString(), DateTime.Now.ToString());
+                    }
+                }
+
+                ResetUpdatePJLock(projectkey);
+            }
+            catch (Exception ex)
+            {
+                ResetUpdatePJLock(projectkey);
+            }
+        }
+
+        public static void PrePareATELatestData(string projectkey)
+        {
+            if (UpdatePJLockUsing(projectkey))
+                return;
+
+            try
+            {
+                var vm = ProjectViewModels.RetrieveOneProject(projectkey);
+                if (vm.SumDatasetList.Count > 0
+                    && vm.MDIDList.Count > 0)
+                {
+                    string lastupdatetime = ProjectTestData.RetrieveLatestTimeOfLocalProject(projectkey);
+                    if (!string.IsNullOrEmpty(lastupdatetime))
+                    {
+                        //var vlast = DateTime.Parse(lastupdatetime);
+                        //vlast = vlast.AddMinutes(18);
+                        //if (vlast < DateTime.Now)
+                        //{
+                            ATEUtility.UpdateProjectData(vm, lastupdatetime);
+                        //}
+                    }
+                    else
+                    {
+                        ATEUtility.UpdateProjectData(vm, vm.StartDate.ToString());
                     }
                 }
 

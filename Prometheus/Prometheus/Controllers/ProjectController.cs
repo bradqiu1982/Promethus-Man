@@ -18,8 +18,6 @@ namespace Prometheus.Controllers
         // GET: Project
         public ActionResult ViewAll()
         {
-            ATEUtility.retrieveATEData();
-
             var ckdict = CookieUtility.UnpackCookie(this);
             if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
             {
@@ -451,6 +449,12 @@ namespace Prometheus.Controllers
                 return false;
             }
 
+            if (projectmodel.StationList.Count > 0 && projectmodel.SumDatasetList.Count > 0)
+            {
+                ViewBag.CreateError = createerror.Replace("<ErrorMsg>", "A project can not bonding MES and ATE at same time");
+                return false;
+            }
+
             //foreach (var eg in projectmodel.MemberList)
             //{
             //    if (!EmailAddressValidate(eg.Name.Trim()))
@@ -725,7 +729,7 @@ namespace Prometheus.Controllers
 
             MESUtility.StartProjectBonding(projectmodel);
             BIDataUtility.StartProjectBonding(projectmodel);
-
+            ATEUtility.StartProjectBonding(projectmodel);
 
 
             return RedirectToAction("ViewAll");
@@ -1030,6 +1034,8 @@ namespace Prometheus.Controllers
             {
                 BIDataUtility.StartProjectBonding(projectmodel);
             }
+
+            ProjectTestData.PrePareATELatestData(projectmodel.ProjectKey);
 
             return RedirectToAction("ViewAll");
         }
@@ -3678,12 +3684,18 @@ namespace Prometheus.Controllers
             catch (Exception ex)
             { }
 
+            try
+            {
+                SendRMAAlertEmail();
+            }
+            catch (Exception ex) { }
             
+             
             foreach (var pjkey in pjkeylist)
             {
                 try
                 {
-                    ProjectTestData.PrePareLatestData(pjkey);
+                    ProjectTestData.PrePareMESLatestData(pjkey);
                 }
                 catch (Exception ex)
                 { }
@@ -3694,6 +3706,17 @@ namespace Prometheus.Controllers
                 try
                 {
                     BITestData.PrePareLatestData(pjkey);
+                }
+                catch (Exception ex)
+                { }
+            }
+
+
+            foreach (var pjkey in pjkeylist)
+            {
+                try
+                {
+                    ProjectTestData.PrePareATELatestData(pjkey);
                 }
                 catch (Exception ex)
                 { }
@@ -3711,14 +3734,24 @@ namespace Prometheus.Controllers
             catch (Exception ex)
             { }
 
-            try
-            {
-                SendRMAAlertEmail();
-            }
-            catch (Exception ex) { }
-
             return View();
         }
+
+        public ActionResult HeartBeat2()
+        {
+            var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
+            foreach (var pjkey in pjkeylist)
+            {
+                try
+                {
+                    ProjectTestData.PrePareATELatestData(pjkey);
+                }
+                catch (Exception ex)
+                { }
+            }
+            return View("HeartBeat");
+        }
+
 
         private static bool IsDigitsOnly(string str)
         {

@@ -512,6 +512,23 @@ namespace Prometheus.Models
             }
         }
 
+        private void StoreProjectModelID()
+        {
+            if (MDIDList.Count > 0)
+            {
+                var sql = "delete from ProjectModelID where ProjectKey = '<ProjectKey>'";
+                sql = sql.Replace("<ProjectKey>", ProjectKey);
+                DBUtility.ExeLocalSqlNoRes(sql);
+            }
+
+            foreach (var item in MDIDList)
+            {
+                var sql = "insert into ProjectModelID(ProjectKey,ModelID) values('<ProjectKey>','<ModelID>')";
+                sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ModelID>", item.Pn);
+                DBUtility.ExeLocalSqlNoRes(sql);
+            }
+        }
+
         private void StoreProjectStation()
         {
             if (StationList.Count > 0)
@@ -529,6 +546,23 @@ namespace Prometheus.Models
             }
         }
 
+        private void StoreProjectSumDataSet()
+        {
+            if (SumDatasetList.Count > 0)
+            {
+                var sql = "delete from ProjectSumDataSet where ProjectKey = '<ProjectKey>'";
+                sql = sql.Replace("<ProjectKey>", ProjectKey);
+                DBUtility.ExeLocalSqlNoRes(sql);
+            }
+
+            foreach (var item in SumDatasetList)
+            {
+                var sql = "insert into ProjectSumDataSet(ProjectKey,SumDataSet) values('<ProjectKey>','<SumDataSet>')";
+                sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<SumDataSet>", item.Station);
+                DBUtility.ExeLocalSqlNoRes(sql);
+            }
+        }
+
         public void StoreProject()
         {
             StoreProjectBaseInfo();
@@ -536,6 +570,8 @@ namespace Prometheus.Models
             StoreProjectMesTable();
             StoreProjectPN();
             StoreProjectStation();
+            StoreProjectModelID();
+            StoreProjectSumDataSet();
         }
 
         public bool CheckExistProject()
@@ -627,6 +663,39 @@ namespace Prometheus.Models
             return ret;
         }
 
+        private static List<ProjectPn> RetrieveProjectModelID(string key)
+        {
+            var ret = new List<ProjectPn>();
+
+            var sql = "select ModelID from ProjectModelID where ProjectKey = '<ProjectKey>'";
+            sql = sql.Replace("<ProjectKey>", key);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+
+            foreach (var line in dbret)
+            {
+                var m = new ProjectPn(key, Convert.ToString(line[0]));
+                ret.Add(m);
+            }
+            return ret;
+        }
+
+        private static List<ProjectStation> RetrieveProjectSumDataSet(string key)
+        {
+            var ret = new List<ProjectStation>();
+
+            var sql = "select SumDataSet from ProjectSumDataSet where ProjectKey = '<ProjectKey>'";
+            sql = sql.Replace("<ProjectKey>", key);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+
+            foreach (var line in dbret)
+            {
+                var m = new ProjectStation(key, Convert.ToString(line[0]));
+                ret.Add(m);
+            }
+            return ret;
+        }
+
+
         public static ProjectViewModels RetrieveOneProject(string key)
         {
             var sql = "select ProjectKey,ProjectName,StartDate,FinishRate,Description,APVal1,APVal2,ProjectType from Project where ProjectKey = '<ProjectKey>' and validate = 1";
@@ -644,6 +713,8 @@ namespace Prometheus.Models
                 ret.TabList = RetrieveProjectMesTable(key);
                 ret.PNList = RetrieveProjectPn(key);
                 ret.StationList = RetrieveProjectStation(key);
+                ret.MDIDList = RetrieveProjectModelID(key);
+                ret.SumDatasetList = RetrieveProjectSumDataSet(key);
                 return ret;
             }
             else

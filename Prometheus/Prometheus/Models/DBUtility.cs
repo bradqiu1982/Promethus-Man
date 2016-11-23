@@ -390,22 +390,15 @@ namespace Prometheus.Models
         }
 
 
-        public static List<List<object>> ExeATESqlWithRes(string sql,string atedllpath)
+        public static List<List<object>> ExeATESqlWithRes(string sql)
         {
-            //var envpath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Process);
-            //if (!envpath.Contains(atedllpath))
-            //{
-            //    Environment.SetEnvironmentVariable("PATH", atedllpath, EnvironmentVariableTarget.Process);
-            //}
 
             var ret = new List<List<object>>();
 
             OracleConnection Oracleconn = null;
             try
             {
-                //var ConnectionStr = "Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=shg-oracle)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=ateshg)));User Id=extviewer;Password=extviewer;";
                 var ConnectionStr = "User Id=extviewer;Password=extviewer;Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=shg-oracle)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ateshg)));";
-                //var ConnectionStr = "SERVER=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=shg-oracle)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ateshg))); uid = extviewer; pwd = extviewer;";
 
                 Oracleconn = new OracleConnection(ConnectionStr);
                 try

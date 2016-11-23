@@ -3537,7 +3537,7 @@ namespace Prometheus.Controllers
                     toaddrs.Add("Zhijun.Chen@finisar.com");
                     //toaddrs.Add("brad.qiu@finisar.com");
                     EmailUtility.SendEmail("VCSEL WAFER YIELD WARNING", toaddrs, content1 + "\r\nWafer SN File: " + validatestr);
-                    new System.Threading.ManualResetEvent(false).WaitOne(10000);
+                    new System.Threading.ManualResetEvent(false).WaitOne(5000);
                 }
         }
 
@@ -3582,6 +3582,7 @@ namespace Prometheus.Controllers
                         var toaddrs = new List<string>();
                         toaddrs.Add(record.username);
                         EmailUtility.SendEmail("Parallel NPI Trace Notice", toaddrs, content);
+                        new System.Threading.ManualResetEvent(false).WaitOne(500);
                     }
                 }//end foreach
             }//end if
@@ -3617,7 +3618,8 @@ namespace Prometheus.Controllers
                             toaddrs.Add(item.Reporter);
                             toaddrs.Add(item.Assignee);
                             EmailUtility.SendEmail("Parallel NPI Trace Notice", toaddrs, content);
-                        }
+                            new System.Threading.ManualResetEvent(false).WaitOne(300);
+                    }
                 } catch (Exception ex) { }
 
 
@@ -3646,7 +3648,8 @@ namespace Prometheus.Controllers
                             toaddrs.Add(item.Reporter);
                             toaddrs.Add(item.Assignee);
                             EmailUtility.SendEmail("Parallel NPI Trace Notice", toaddrs, content);
-                        }
+                            new System.Threading.ManualResetEvent(false).WaitOne(300);
+                    }
                 } catch (Exception ex) { }
 
             }//end foreach

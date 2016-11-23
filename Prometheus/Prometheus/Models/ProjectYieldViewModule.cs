@@ -300,13 +300,27 @@ namespace Prometheus.Models
                 }
             }
 
-            foreach (var s in pvm.StationList)
+            if (pvm.SumDatasetList.Count > 0)
             {
-                if (yielddict.ContainsKey(s.Station))
+                foreach (var s in pvm.SumDatasetList)
                 {
-                    pyvm.RealTimeYields.Add(yielddict[s.Station]);
+                    if (yielddict.ContainsKey(s.Station))
+                    {
+                        pyvm.RealTimeYields.Add(yielddict[s.Station]);
+                    }
                 }
             }
+            else if (pvm.StationList.Count > 0)
+            {
+                foreach (var s in pvm.StationList)
+                {
+                    if (yielddict.ContainsKey(s.Station))
+                    {
+                        pyvm.RealTimeYields.Add(yielddict[s.Station]);
+                    }
+                }
+            }
+
         }
 
         private static void RetrieveSNYield(ProjectYieldViewModule pyvm, List<ProjectTestData> plist, ProjectViewModels pvm)
@@ -340,13 +354,28 @@ namespace Prometheus.Models
                 }
             }
 
-            foreach (var s in pvm.StationList)
+            if (pvm.SumDatasetList.Count > 0)
             {
-                if (yielddict.ContainsKey(s.Station))
+                foreach (var s in pvm.SumDatasetList)
                 {
-                    pyvm.SNYields.Add(yielddict[s.Station]);
+                    if (yielddict.ContainsKey(s.Station))
+                    {
+                        pyvm.SNYields.Add(yielddict[s.Station]);
+                    }
                 }
             }
+            else if (pvm.StationList.Count > 0)
+            {
+                foreach (var s in pvm.StationList)
+                {
+                    if (yielddict.ContainsKey(s.Station))
+                    {
+                        pyvm.SNYields.Add(yielddict[s.Station]);
+                    }
+                }
+            }
+
+
         }
 
         private static void RetrieveFirstYield(ProjectYieldViewModule pyvm, List<ProjectTestData> plist, ProjectViewModels pvm)
@@ -382,13 +411,28 @@ namespace Prometheus.Models
                 }
             }
 
-            foreach (var s in pvm.StationList)
+            if (pvm.SumDatasetList.Count > 0)
             {
-                if (yielddict.ContainsKey(s.Station))
+                foreach (var s in pvm.SumDatasetList)
                 {
-                    pyvm.FirstYields.Add(yielddict[s.Station]);
+                    if (yielddict.ContainsKey(s.Station))
+                    {
+                        pyvm.FirstYields.Add(yielddict[s.Station]);
+                    }
                 }
             }
+            else if (pvm.StationList.Count > 0)
+            {
+                foreach (var s in pvm.StationList)
+                {
+                    if (yielddict.ContainsKey(s.Station))
+                    {
+                        pyvm.FirstYields.Add(yielddict[s.Station]);
+                    }
+                }
+            }
+
+
         }
 
         private static void RetrieveCummYield(ProjectYieldViewModule pyvm, List<ProjectTestData> plist, ProjectViewModels pvm)
@@ -423,13 +467,28 @@ namespace Prometheus.Models
                 }
             }
 
-            foreach (var s in pvm.StationList)
+            if (pvm.SumDatasetList.Count > 0)
             {
-                if (yielddict.ContainsKey(s.Station))
+                foreach (var s in pvm.SumDatasetList)
                 {
-                    pyvm.LastYields.Add(yielddict[s.Station]);
+                    if (yielddict.ContainsKey(s.Station))
+                    {
+                        pyvm.LastYields.Add(yielddict[s.Station]);
+                    }
                 }
             }
+            else if (pvm.StationList.Count > 0)
+            {
+                foreach (var s in pvm.StationList)
+                {
+                    if (yielddict.ContainsKey(s.Station))
+                    {
+                        pyvm.LastYields.Add(yielddict[s.Station]);
+                    }
+                }
+            }
+
+
         }
 
         public static ProjectYieldViewModule GetYieldByDateRange(string pjkey, string sdate, string edate, ProjectViewModels pvm)

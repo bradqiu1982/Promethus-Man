@@ -504,6 +504,8 @@ namespace Prometheus.Models
 
         public string CReport { set; get; }
 
+        public string DataID { set; get; }
+
         private List<string> relatpeople = new List<string>();
         public List<string> RelativePeopleList
         {
@@ -573,13 +575,13 @@ namespace Prometheus.Models
 
         public void StoreIssue()
         {
-            var sql = "insert into Issue(ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,Creator,AlertEmailUpdateDate,RelativePeoples,ModuleSN,ErrAbbr) values('<ProjectKey>','<IssueKey>','<IssueType>','<Summary>','<Priority>','<DueDate>','<ResolvedDate>','<ReportDate>','<Assignee>','<Reporter>','<Resolution>','<Creator>','<AlertEmailUpdateDate>','<RelativePeoples>','<ModuleSN>','<ErrAbbr>')";
+            var sql = "insert into Issue(ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,Creator,AlertEmailUpdateDate,RelativePeoples,ModuleSN,ErrAbbr,DataID) values('<ProjectKey>','<IssueKey>','<IssueType>','<Summary>','<Priority>','<DueDate>','<ResolvedDate>','<ReportDate>','<Assignee>','<Reporter>','<Resolution>','<Creator>','<AlertEmailUpdateDate>','<RelativePeoples>','<ModuleSN>','<ErrAbbr>','<DataID>')";
             sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<IssueKey>", IssueKey).Replace("<IssueType>", IssueType)
                 .Replace("<Summary>", Summary).Replace("<Priority>", Priority).Replace("<DueDate>", DueDate.ToString())
                 .Replace("<ResolvedDate>", ResolvedDate.ToString()).Replace("<ReportDate>", ReportDate.ToString()).Replace("<Assignee>", Assignee)
                 .Replace("<Reporter>", Reporter).Replace("<Resolution>", Resolution).Replace("<Creator>", Reporter)
                 .Replace("<AlertEmailUpdateDate>", DateTime.Now.AddHours(-25).ToString()).Replace("<RelativePeoples>", RelativePeoples)
-                .Replace("<ModuleSN>", ModuleSN).Replace("<ErrAbbr>", ErrAbbr);
+                .Replace("<ModuleSN>", ModuleSN).Replace("<ErrAbbr>", ErrAbbr).Replace("<DataID>", DataID);
             DBUtility.ExeLocalSqlNoRes(sql);
 
             StoreIssueComment(DateTime.Now.ToString());

@@ -521,6 +521,7 @@ namespace Prometheus.Models
                     vm.CommentType = COMMENTTYPE.Description;
                     vm.ModuleSN = item.ModuleSerialNum;
                     vm.ErrAbbr = item.ErrAbbr;
+                    vm.DataID = item.DataID;
                     ProjectEvent.CreateIssueEvent(vm.ProjectKey, "System", vm.Assignee, vm.Summary, vm.IssueKey);
                     vm.StoreIssue();
                 }

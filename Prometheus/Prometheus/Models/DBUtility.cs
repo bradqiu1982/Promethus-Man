@@ -414,7 +414,7 @@ namespace Prometheus.Models
                     }
                 }
                 catch (Exception e) {
-                    System.Windows.MessageBox.Show(e.Message);
+                    //System.Windows.MessageBox.Show(e.Message);
                 }
 
                 OracleCommand cmd = new OracleCommand(sql, Oracleconn);
@@ -435,7 +435,7 @@ namespace Prometheus.Models
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.Message);
+                //System.Windows.MessageBox.Show(ex.Message);
 
                 try
                 {

@@ -785,6 +785,8 @@
     <Content Include="Views\DbManage\MoveDataBase.cshtml" />
     <Content Include="Scripts\project_model_id_list.xlsx" />
     <Content Include="Scripts\project_indicative_datasetname_list.xlsx" />
+    <Content Include="Views\CustomerData\CommitOBAData.cshtml" />
+    <Content Include="Views\CustomerData\ConfirmOBAData.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

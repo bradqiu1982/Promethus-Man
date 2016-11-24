@@ -45,7 +45,7 @@ namespace Prometheus.Controllers
             ViewBag.projectlist = slist;
 
             var typelist = new List<string>();
-            string[] tlist = { ISSUETP.Bug, ISSUETP.NewFeature, ISSUETP.Task
+            string[] tlist = { ISSUETP.Bug,ISSUETP.Task,ISSUETP.RMA,ISSUETP.OBA, ISSUETP.NewFeature
             ,ISSUETP.Improvement,ISSUETP.Document,ISSUETP.NPIPROC};
 
             typelist.AddRange(tlist);
@@ -621,7 +621,7 @@ namespace Prometheus.Controllers
             ViewBag.projectlist = slist;
 
             var typelist = new List<string>();
-            string[] tlist = { ISSUETP.Bug, ISSUETP.RMA, ISSUETP.NewFeature, ISSUETP.Task, ISSUETP.Improvement, ISSUETP.Document, ISSUETP.NPIPROC };
+            string[] tlist = { ISSUETP.Bug, ISSUETP.Task, ISSUETP.RMA, ISSUETP.OBA, ISSUETP.NewFeature, ISSUETP.Improvement, ISSUETP.Document, ISSUETP.NPIPROC };
             typelist.AddRange(tlist);
             slist = CreateSearchSelectList(typelist, "");
             ViewBag.issuetypelist = slist;
@@ -1596,7 +1596,7 @@ namespace Prometheus.Controllers
         private List<string> PrepeareRMAReport(string ProjectKey, string StartDate, string EndDate)
         {
             var lines = new List<string>();
-            var list1 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, StartDate, EndDate);
+            var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, StartDate, EndDate,ISSUETP.RMA);
 
             var line = "FINISAR RMA,SN,STATUS,CUSTOMER,FV,RMA FAILURE CODE,ROOT CAUSE,OWENER,OPEN ISSUE DATE,CUSTOMER RMA REASON,INTERNAL REPORT,CUSTOMER REPORT";
             lines.Add(line);
@@ -1690,7 +1690,7 @@ namespace Prometheus.Controllers
         private List<string> PrepeareAllRMAReport(string StartDate, string EndDate)
         {
             var lines = new List<string>();
-            var list1 = IssueViewModels.RetrieveAllRMAIssue(StartDate, EndDate);
+            var list1 = IssueViewModels.RetrieveAllIssueTypeIssue(StartDate, EndDate,ISSUETP.RMA);
 
             var line = "FINISAR RMA,PROJECT,SN,STATUS,CUSTOMER,FV,RMA FAILURE CODE,ROOT CAUSE,OWENER,OPEN ISSUE DATE,CUSTOMER RMA REASON,INTERNAL REPORT,CUSTOMER REPORT";
             lines.Add(line);

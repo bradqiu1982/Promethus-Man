@@ -513,10 +513,10 @@ namespace Prometheus.Controllers
                             {
                                 if (idx != 0)
                                 {
-                                    //var snlist = data[idx][8].Split(new string[] { "\r", "\n", " ", ";" }, StringSplitOptions.RemoveEmptyEntries);
+                                    var snlist = data[idx][5].Split(new string[] { "\r", "\n", " ", ";","," }, StringSplitOptions.RemoveEmptyEntries);
                                     //var reasons = data[idx][10].Split(new string[] { "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
-                                    //foreach (var sn in snlist)
-                                    //{
+                                    foreach (var sn in snlist)
+                                    {
                                         templine = new List<string>();
 
                                         var trimprojectname = RMSpectialCh(data[idx][3]).ToUpper();
@@ -545,7 +545,7 @@ namespace Prometheus.Controllers
                                         }
 
                                         templine.Add(data[idx][2]);
-                                        templine.Add(data[idx][5]);
+                                        templine.Add(sn);
                                         templine.Add(data[idx][4]);
                                         templine.Add(data[idx][7]);
 
@@ -561,7 +561,7 @@ namespace Prometheus.Controllers
                                         templine.Add(data[idx][1]);
 
                                         realdata.Add(templine);
-                                    //}//end foreach
+                                    }//end foreach
                                 }//end if
                             }//end for
                         }
@@ -585,6 +585,30 @@ namespace Prometheus.Controllers
 
 
         private void SendRMAEvent(IssueViewModels vm, string operate, bool nocheck = false)
+        {
+            var alertime = vm.RetrieveAlertEmailDate(vm.IssueKey);
+            if ((!string.IsNullOrEmpty(alertime) && DateTime.Parse(alertime).AddHours(24) < DateTime.Now) || nocheck)
+            {
+                vm.UpdateAlertEmailDate();
+
+                var routevalue = new RouteValueDictionary();
+                routevalue.Add("issuekey", vm.IssueKey);
+                //send validate email
+                string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+
+                var content = vm.Summary + " is " + operate + " by " + vm.Reporter + " :\r\n " + validatestr;
+
+                var toaddrs = new List<string>();
+                toaddrs.AddRange(vm.RelativePeopleList);
+                toaddrs.Add(vm.Assignee);
+                toaddrs.Add(vm.Reporter);
+                EmailUtility.SendEmail("Parallel NPI Trace Notice", toaddrs, content);
+                new System.Threading.ManualResetEvent(false).WaitOne(500);
+            }
+        }
+
+        private void SendOBAEvent(IssueViewModels vm, string operate, bool nocheck = false)
         {
             var alertime = vm.RetrieveAlertEmailDate(vm.IssueKey);
             if ((!string.IsNullOrEmpty(alertime) && DateTime.Parse(alertime).AddHours(24) < DateTime.Now) || nocheck)
@@ -742,119 +766,110 @@ namespace Prometheus.Controllers
             //templine.Add("Assignee Email");
             //templine.Add("Open Date");
 
-            //if (Request.Form["confirmdata"] != null)
-            //{
-            //    var ckdict = CookieUtility.UnpackCookie(this);
-            //    var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            if (Request.Form["confirmdata"] != null)
+            {
+                var ckdict = CookieUtility.UnpackCookie(this);
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
-            //    var rowcnt = Convert.ToInt32(Request.Form["rowcount"]);
-            //    var colcnt = Convert.ToInt32(Request.Form["colcount"]);
-            //    var data = new List<List<string>>();
-            //    for (var row = 0; row < rowcnt; row++)
-            //    {
-            //        var line = new List<string>();
-            //        for (var col = 0; col < colcnt; col++)
-            //        {
-            //            line.Add(Request.Form["row" + row + "col" + col]);
-            //        }
-            //        data.Add(line);
-            //    }
-
-
-            //    if (data.Count > 1 && data[0].Count == 8)
-            //    {
-            //        for (int i = 0; i < data.Count; i++)
-            //        {
-            //            if (i != 0 && string.Compare(data[i][0], "N/A") != 0)
-            //            {
-            //                var vm = new IssueViewModels();
-            //                vm.ProjectKey = data[i][0];
-            //                if (vm.ProjectKey.Length > 50)
-            //                {
-            //                    vm.ProjectKey = vm.ProjectKey.Substring(0, 48);
-            //                }
-
-            //                vm.IssueKey = IssueViewModels.GetUniqKey();
-            //                vm.IssueType = ISSUETP.RMA;
-
-            //                vm.FinisarRMA = data[i][1];
-            //                if (vm.FinisarRMA.Length > 50)
-            //                {
-            //                    vm.FinisarRMA = vm.FinisarRMA.Substring(0, 48);
-            //                }
-
-            //                vm.FinisarModel = data[i][2];
-            //                if (vm.FinisarModel.Length > 50)
-            //                {
-            //                    vm.FinisarModel = vm.FinisarModel.Substring(0, 48);
-            //                }
-
-            //                vm.ECustomer = data[i][6];
-            //                if (vm.ECustomer.Length > 50)
-            //                {
-            //                    vm.ECustomer = vm.ECustomer.Substring(0, 48);
-            //                }
+                var rowcnt = Convert.ToInt32(Request.Form["rowcount"]);
+                var colcnt = Convert.ToInt32(Request.Form["colcount"]);
+                var data = new List<List<string>>();
+                for (var row = 0; row < rowcnt; row++)
+                {
+                    var line = new List<string>();
+                    for (var col = 0; col < colcnt; col++)
+                    {
+                        line.Add(Request.Form["row" + row + "col" + col]);
+                    }
+                    data.Add(line);
+                }
 
 
-            //                vm.CRMANUM = "N/A";
+                if (data.Count > 1 && data[0].Count == 7)
+                {
+                    for (int i = 0; i < data.Count; i++)
+                    {
+                        if (i != 0 && string.Compare(data[i][0], "N/A") != 0)
+                        {
+                            var vm = new IssueViewModels();
+                            vm.ProjectKey = data[i][0];
+                            if (vm.ProjectKey.Length > 50)
+                            {
+                                vm.ProjectKey = vm.ProjectKey.Substring(0, 48);
+                            }
 
-            //                vm.CReport = data[i][7];
-            //                if (vm.CReport.Length > 180)
-            //                {
-            //                    vm.CReport = vm.CReport.Substring(0, 178);
-            //                }
+                            vm.IssueKey = IssueViewModels.GetUniqKey();
+                            vm.IssueType = ISSUETP.OBA;
 
-            //                vm.RelativePeoples = "";
-            //                vm.ModuleSN = data[i][3];
-            //                if (vm.ModuleSN.Length > 50)
-            //                {
-            //                    vm.ModuleSN = vm.ModuleSN.Substring(0, 48);
-            //                }
+                            vm.FinisarDMR = data[i][1];
+                            if (vm.FinisarDMR.Length > 50)
+                            {
+                                vm.FinisarDMR = vm.FinisarDMR.Substring(0, 48);
+                            }
 
-            //                vm.Summary = "RMA " + vm.FinisarRMA + " for module " + vm.ModuleSN + " " + vm.FinisarModel + " from " + vm.ECustomer + ":" + vm.CReport;
-            //                if (vm.Summary.Length > 200)
-            //                {
-            //                    vm.Summary = vm.Summary.Substring(0, 198);
-            //                }
+                            vm.ModuleSN = data[i][2];
+                            if (vm.ModuleSN.Length > 50)
+                            {
+                                vm.ModuleSN = vm.ModuleSN.Substring(0, 48);
+                            }
 
-            //                vm.Priority = ISSUEPR.Major;
-            //                try
-            //                {
-            //                    vm.DueDate = DateTime.Parse(data[i][5]).AddDays(12);
-            //                }
-            //                catch (Exception e) { vm.DueDate = DateTime.Now.AddDays(12); }
+                            vm.OBAFailureRate = data[i][3];
+                            if (vm.OBAFailureRate.Length > 50)
+                            {
+                                vm.OBAFailureRate = vm.OBAFailureRate.Substring(0, 48);
+                            }
 
+                            vm.RelativePeoples = "";
+                            
+                            vm.Summary = "OBA " + vm.FinisarDMR + " for module " + vm.ModuleSN + ":" + data[i][4];
+                            if (vm.Summary.Length > 200)
+                            {
+                                vm.Summary = vm.Summary.Substring(0, 198);
+                            }
 
-            //                vm.ReportDate = DateTime.Now;
-            //                vm.Assignee = data[i][4].ToUpper();
-            //                if (vm.Assignee.Length > 200)
-            //                {
-            //                    vm.Assignee = vm.Assignee.Substring(0, 198);
-            //                }
+                            vm.Priority = ISSUEPR.Major;
 
-            //                vm.Reporter = updater;
-            //                if (vm.Reporter.Length > 200)
-            //                {
-            //                    vm.Reporter = vm.Reporter.Substring(0, 198);
-            //                }
+                            vm.ReportDate = DateTime.Now;
+                            vm.Assignee = data[i][5].ToUpper();
+                            if (vm.Assignee.Length > 200)
+                            {
+                                vm.Assignee = vm.Assignee.Substring(0, 198);
+                            }
 
-            //                vm.Resolution = Resolute.Pending;
+                            try
+                            {
+                                vm.DueDate = DateTime.Parse(data[i][6]).AddDays(6);
+                            }
+                            catch (Exception e) { vm.DueDate = DateTime.Now.AddDays(6); }
 
-            //                vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+                            vm.Reporter = updater;
+                            if (vm.Reporter.Length > 200)
+                            {
+                                vm.Reporter = vm.Reporter.Substring(0, 198);
+                            }
 
-            //                vm.RMAFailureCode = "";
-            //                vm.FVCode = "";
-            //                vm.Description = "";
-            //                vm.CommentType = COMMENTTYPE.Description;
+                            vm.Resolution = Resolute.Pending;
 
-            //                vm.StoreIssue();
-            //                UserController.RegisterUserAuto(vm.Assignee);
-            //                SendRMAEvent(vm, "created", true);
-            //            }
-            //        }//end for
-            //        return RedirectToAction("ViewAll", "Project");
-            //    }
-            //}
+                            vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+
+                            vm.Description = "";
+                            vm.CommentType = COMMENTTYPE.Description;
+
+                            vm.DataID = "";
+                            vm.ErrAbbr = "";
+                            vm.FVCode = "";
+                            vm.MaterialDisposition = "";
+
+                            vm.StoreIssue();
+
+                            UserController.RegisterUserAuto(vm.Assignee);
+
+                            SendOBAEvent(vm, "created", true);
+                        }
+                    }//end for
+                    return RedirectToAction("ViewAll", "Project");
+                }
+            }
 
             return View();
         }

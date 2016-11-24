@@ -1730,9 +1730,9 @@ namespace Prometheus.Controllers
         {
             if (ProjectKey != null)
             {
-                var list1 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Pending);
-                var list2 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Working);
-                var list3 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Done);
+                var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Pending,ISSUETP.RMA);
+                var list2 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Working,ISSUETP.RMA);
+                var list3 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Done,ISSUETP.RMA);
                 list1.AddRange(list2);
                 list1.AddRange(list3);
                 return View(list1);
@@ -1744,9 +1744,9 @@ namespace Prometheus.Controllers
         {
             if (ProjectKey != null)
             {
-                var list1 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Pending);
-                var list2 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Working);
-                var list3 = IssueViewModels.RetrieveRMAByProjectKey(ProjectKey, Resolute.Done);
+                var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Pending, ISSUETP.RMA);
+                var list2 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Working, ISSUETP.RMA);
+                var list3 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Done, ISSUETP.RMA);
                 list1.AddRange(list2);
                 list1.AddRange(list3);
 

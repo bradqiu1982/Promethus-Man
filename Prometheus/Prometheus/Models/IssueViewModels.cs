@@ -9,9 +9,10 @@ namespace Prometheus.Models
     {
         public static string Bug = "Bug";
         public static string RMA = "RMA";
+        public static string Task = "Task";
+        public static string OBA = "OBA";
         public static string NPIPROC = "NPI PROCESS";
         public static string NewFeature = "New Feature";
-        public static string Task = "Task";
         public static string Improvement = "Improvement";
         public static string Document = "Document";
     }
@@ -484,6 +485,14 @@ namespace Prometheus.Models
             }
             return Resolute.ColorStatus(Resolute.Pending);
         }
+        
+        
+        #region OBA
+        public string FinisarDMR { set; get; }
+        public string OBAFailureRate { set; get; }
+        public string MaterialDisposition { set; get; }
+        #endregion
+
 
         #region RMA
 
@@ -589,6 +598,37 @@ namespace Prometheus.Models
             if (string.Compare(IssueType, ISSUETP.RMA) == 0)
             {
                 StoreRMA();
+            }
+
+            if (string.Compare(IssueType, ISSUETP.OBA) == 0)
+            {
+                StoreOBA();
+            }
+        }
+
+        private void StoreOBA()
+        {
+            var sql = "insert into IssueOBA(IssueKey,FinisarDMR,OBAFailureRate,MaterialDisposition,ModuleSN,FVCode) values('<IssueKey>','<FinisarDMR>','<OBAFailureRate>','<MaterialDisposition>','<ModuleSN>','<FVCode>')";
+            sql = sql.Replace("<IssueKey>", IssueKey).Replace("<FinisarDMR>", FinisarDMR).Replace("<OBAFailureRate>", OBAFailureRate).Replace("<FVCode>", FVCode)
+                .Replace("<MaterialDisposition>", MaterialDisposition).Replace("<ModuleSN>", ModuleSN);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        private void RetrieveOBA()
+        {
+            var sql = "select FinisarDMR,OBAFailureRate,MaterialDisposition,ModuleSN,FVCode from IssueOBA where IssueKey = '<IssueKey>'";
+            sql = sql.Replace("<IssueKey>", IssueKey);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            if (dbret.Count > 0)
+            {
+                FinisarRMA = Convert.ToString(dbret[0][0]);
+                FinisarModel = Convert.ToString(dbret[0][1]);
+                ECustomer = Convert.ToString(dbret[0][2]);
+                CRMANUM = Convert.ToString(dbret[0][3]);
+                CReport = Convert.ToString(dbret[0][4]);
+                ModuleSN = Convert.ToString(dbret[0][5]);
+                RMAFailureCode = Convert.ToString(dbret[0][6]);
+                FVCode = Convert.ToString(dbret[0][7]);
             }
         }
 
@@ -761,6 +801,28 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
+        public void UpdateOBA()
+        {
+            var sql = "update Issue set Priority = '<Priority>',DueDate = '<DueDate>', Assignee = '<Assignee>',Resolution = '<Resolution>',RelativePeoples = '<RelativePeoples>' where IssueKey = '<IssueKey>'";
+            sql = sql.Replace("<IssueKey>", IssueKey).Replace("<Priority>", Priority)
+                .Replace("<DueDate>", DueDate.ToString()).Replace("<Assignee>", Assignee)
+                .Replace("<Resolution>", Resolution).Replace("<RelativePeoples>", RelativePeoples);
+            DBUtility.ExeLocalSqlNoRes(sql);
+
+            StoreIssueComment(DateTime.Now.ToString());
+
+            UpdateOBAInfo();
+        }
+
+        private void UpdateOBAInfo()
+        {//ssueKey,FinisarDMR,OBAFailureRate,MaterialDisposition,ModuleSN,FVCode
+            var sql = "update IssueOBA set FinisarDMR = '<FinisarDMR>',OBAFailureRate = '<OBAFailureRate>',MaterialDisposition = '<MaterialDisposition>',FVCode = '<FVCode>'  where IssueKey = '<IssueKey>'";
+            sql = sql.Replace("<IssueKey>", IssueKey).Replace("<FinisarDMR>", FinisarDMR)
+                .Replace("<OBAFailureRate>", OBAFailureRate).Replace("<MaterialDisposition>", MaterialDisposition).Replace("<FVCode>", FVCode);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+
         public void UpdateIAssign()
         {
             var sql =  "update Issue set Reporter = '<Reporter>' where IssueKey = '<IssueKey>'";
@@ -851,27 +913,16 @@ namespace Prometheus.Models
                     , Convert.ToString(dbret[0][11]), Convert.ToString(dbret[0][12]));
                 ret.LYT = Convert.ToString(dbret[0][13]);
 
-                //var tempclist = new List<IssueComments>();
-                //sql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
-                //sql = sql.Replace("<IssueKey>", issuekey);
-                //dbret = DBUtility.ExeLocalSqlWithRes(sql);
-                //foreach (var r in dbret)
-                //{
-                //    var tempcomment = new IssueComments();
-                //    tempcomment.IssueKey = Convert.ToString(r[0]);
-                //    tempcomment.dbComment = Convert.ToString(r[1]);
-                //    tempcomment.Reporter = Convert.ToString(r[2]);
-                //    tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
-                //    tempcomment.CommentType = Convert.ToString(r[4]);
-                //    tempclist.Add(tempcomment);
-                //}
-                //ret.CommentList = tempclist;
-
                 ret.RetrieveComment();
 
                 if (string.Compare(ret.IssueType, ISSUETP.RMA) == 0)
                 {
                     ret.RetrieveRMA();
+                }
+
+                if (string.Compare(ret.IssueType, ISSUETP.OBA) == 0)
+                {
+                    ret.RetrieveOBA();
                 }
 
                 ret.SubIssues = RetrieveSubIssue(ret.IssueKey);
@@ -1375,7 +1426,140 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<IssueViewModels> RetrieveRMAByProjectKey(string projectkey, string issuestatus)
+        //public static List<IssueViewModels> RetrieveRMAByProjectKey(string projectkey, string issuestatus)
+        //{
+        //    var cond = "";
+        //    var fixresolve = "";
+        //    if (string.Compare(issuestatus, Resolute.Pending) == 0)
+        //    {
+        //        cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";
+        //        fixresolve = Resolute.Pending;
+        //    }
+        //    else if (string.Compare(issuestatus, Resolute.Working) == 0)
+        //    {
+        //        cond = "('" + Resolute.Working + "')";
+        //        fixresolve = Resolute.Working;
+        //    }
+        //    else
+        //    {
+        //        cond = "('" + Resolute.Fixed + "','" + Resolute.Done + "','" + Resolute.NotFix + "','" + Resolute.NotReproduce + "','" + Resolute.Unresolved + "')";
+        //        fixresolve = Resolute.Done;
+        //    }
+
+        //    var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples,APVal2 from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType = '<IssueType>' order by ReportDate DESC";
+        //    sql = sql.Replace("<ProjectKey>", projectkey).Replace("<cond>", cond).Replace("<IssueType>", ISSUETP.RMA);
+        //    var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+        //    var ret = new List<IssueViewModels>();
+        //    foreach (var line in dbret)
+        //    {
+        //        var tempsolve = fixresolve;
+        //        if (string.Compare(Convert.ToString(line[10]), Resolute.Reopen) == 0)
+        //            tempsolve = Resolute.Reopen;
+
+        //        var tempvm = new IssueViewModels(Convert.ToString(line[0])
+        //            , Convert.ToString(line[1]), Convert.ToString(line[2])
+        //            , Convert.ToString(line[3]), Convert.ToString(line[4])
+        //            , Convert.ToString(line[5]), Convert.ToString(line[6])
+        //            , Convert.ToString(line[7]), Convert.ToString(line[8])
+        //            , Convert.ToString(line[9]), tempsolve, "", Convert.ToString(line[11]));
+        //        tempvm.LYT = Convert.ToString(Convert.ToString(line[12]));
+
+        //        tempvm.RetrieveRMA();
+
+        //        tempvm.RetrieveComment();
+
+        //        tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey);
+
+        //        tempvm.RetrieveAttachment(tempvm.IssueKey);
+
+        //        ret.Add(tempvm);
+        //    }
+
+        //    return ret;
+        //}
+
+        //public static List<IssueViewModels> RetrieveRMAByProjectKey(string projectkey, string StartDate, string EndDate)
+        //{
+        //    var sql = "";
+        //    if (string.Compare(StartDate, "NONE", true) == 0)
+        //    {
+        //        sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and  ParentIssueKey = '' and IssueType = '<IssueType>' order by ReportDate DESC";
+        //        sql = sql.Replace("<ProjectKey>", projectkey).Replace("<IssueType>", ISSUETP.RMA);
+        //    }
+        //    else
+        //    {
+        //        sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and  ParentIssueKey = '' and IssueType = '<IssueType>' and ReportDate >= '<StartDate>' and ReportDate <= '<EndDate>' order by ReportDate DESC";
+        //        sql = sql.Replace("<ProjectKey>", projectkey).Replace("<IssueType>", ISSUETP.RMA).Replace("<StartDate>", StartDate).Replace("<EndDate>", DateTime.Parse(EndDate).AddDays(1).ToString());
+        //    }
+
+        //    var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+        //    var ret = new List<IssueViewModels>();
+        //    foreach (var line in dbret)
+        //    {
+
+        //        var tempvm = new IssueViewModels(Convert.ToString(line[0])
+        //            , Convert.ToString(line[1]), Convert.ToString(line[2])
+        //            , Convert.ToString(line[3]), Convert.ToString(line[4])
+        //            , Convert.ToString(line[5]), Convert.ToString(line[6])
+        //            , Convert.ToString(line[7]), Convert.ToString(line[8])
+        //            , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
+
+        //        tempvm.RetrieveRMA();
+
+        //        tempvm.RetrieveComment();
+
+        //        tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey);
+
+        //        tempvm.RetrieveAttachment(tempvm.IssueKey);
+
+        //        ret.Add(tempvm);
+        //    }
+
+        //    return ret;
+        //}
+
+        //public static List<IssueViewModels> RetrieveAllRMAIssue(string StartDate, string EndDate)
+        //{
+        //    var sql = "";
+        //    if (string.Compare(StartDate, "NONE", true) == 0)
+        //    {
+        //        sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ParentIssueKey = '' and IssueType = '<IssueType>' order by ReportDate DESC";
+        //        sql = sql.Replace("<IssueType>", ISSUETP.RMA);
+        //    }
+        //    else
+        //    {
+        //        sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ParentIssueKey = '' and IssueType = '<IssueType>' and ReportDate >= '<StartDate>' and ReportDate <= '<EndDate>' order by ReportDate DESC";
+        //        sql = sql.Replace("<IssueType>", ISSUETP.RMA).Replace("<StartDate>", StartDate).Replace("<EndDate>", DateTime.Parse(EndDate).AddDays(1).ToString());
+        //    }
+
+        //    var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+        //    var ret = new List<IssueViewModels>();
+        //    foreach (var line in dbret)
+        //    {
+
+        //        var tempvm = new IssueViewModels(Convert.ToString(line[0])
+        //            , Convert.ToString(line[1]), Convert.ToString(line[2])
+        //            , Convert.ToString(line[3]), Convert.ToString(line[4])
+        //            , Convert.ToString(line[5]), Convert.ToString(line[6])
+        //            , Convert.ToString(line[7]), Convert.ToString(line[8])
+        //            , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
+
+        //        tempvm.RetrieveRMA();
+
+        //        tempvm.RetrieveComment();
+
+        //        tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey);
+
+        //        tempvm.RetrieveAttachment(tempvm.IssueKey);
+
+        //        ret.Add(tempvm);
+        //    }
+
+        //    return ret;
+        //}
+
+
+        public static List<IssueViewModels> RetrieveIssueTypeByProjectKey(string projectkey, string issuestatus,string issuetype)
         {
             var cond = "";
             var fixresolve = "";
@@ -1396,7 +1580,7 @@ namespace Prometheus.Models
             }
 
             var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples,APVal2 from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType = '<IssueType>' order by ReportDate DESC";
-            sql = sql.Replace("<ProjectKey>", projectkey).Replace("<cond>", cond).Replace("<IssueType>", ISSUETP.RMA);
+            sql = sql.Replace("<ProjectKey>", projectkey).Replace("<cond>", cond).Replace("<IssueType>", issuetype);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)
@@ -1413,23 +1597,15 @@ namespace Prometheus.Models
                     , Convert.ToString(line[9]), tempsolve, "", Convert.ToString(line[11]));
                 tempvm.LYT = Convert.ToString(Convert.ToString(line[12]));
 
-                tempvm.RetrieveRMA();
+                if (string.Compare(issuetype, ISSUETP.RMA) == 0)
+                {
+                    tempvm.RetrieveRMA();
+                }
 
-                //var tempclist = new List<IssueComments>();
-                //var csql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
-                //csql = csql.Replace("<IssueKey>", tempvm.IssueKey);
-                //var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
-                //foreach (var r in cdbret)
-                //{
-                //    var tempcomment = new IssueComments();
-                //    tempcomment.IssueKey = Convert.ToString(r[0]);
-                //    tempcomment.dbComment = Convert.ToString(r[1]);
-                //    tempcomment.Reporter = Convert.ToString(r[2]);
-                //    tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
-                //    tempcomment.CommentType = Convert.ToString(r[4]);
-                //    tempclist.Add(tempcomment);
-                //}
-                //tempvm.CommentList = tempclist;
+                if (string.Compare(issuetype, ISSUETP.OBA) == 0)
+                {
+                    tempvm.RetrieveOBA();
+                }
 
                 tempvm.RetrieveComment();
 
@@ -1443,18 +1619,18 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<IssueViewModels> RetrieveRMAByProjectKey(string projectkey, string StartDate, string EndDate)
+        public static List<IssueViewModels> RetrieveIssueTypeByProjectKey(string projectkey, string StartDate, string EndDate, string issuetype)
         {
             var sql = "";
             if (string.Compare(StartDate, "NONE", true) == 0)
             {
                 sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and  ParentIssueKey = '' and IssueType = '<IssueType>' order by ReportDate DESC";
-                sql = sql.Replace("<ProjectKey>", projectkey).Replace("<IssueType>", ISSUETP.RMA);
+                sql = sql.Replace("<ProjectKey>", projectkey).Replace("<IssueType>", issuetype);
             }
             else
             {
                 sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and  ParentIssueKey = '' and IssueType = '<IssueType>' and ReportDate >= '<StartDate>' and ReportDate <= '<EndDate>' order by ReportDate DESC";
-                sql = sql.Replace("<ProjectKey>", projectkey).Replace("<IssueType>", ISSUETP.RMA).Replace("<StartDate>", StartDate).Replace("<EndDate>", DateTime.Parse(EndDate).AddDays(1).ToString());
+                sql = sql.Replace("<ProjectKey>", projectkey).Replace("<IssueType>", issuetype).Replace("<StartDate>", StartDate).Replace("<EndDate>", DateTime.Parse(EndDate).AddDays(1).ToString());
             }
 
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
@@ -1469,23 +1645,15 @@ namespace Prometheus.Models
                     , Convert.ToString(line[7]), Convert.ToString(line[8])
                     , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
 
-                tempvm.RetrieveRMA();
+                if (string.Compare(issuetype, ISSUETP.RMA) == 0)
+                {
+                    tempvm.RetrieveRMA();
+                }
 
-                //var tempclist = new List<IssueComments>();
-                //var csql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
-                //csql = csql.Replace("<IssueKey>", tempvm.IssueKey);
-                //var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
-                //foreach (var r in cdbret)
-                //{
-                //    var tempcomment = new IssueComments();
-                //    tempcomment.IssueKey = Convert.ToString(r[0]);
-                //    tempcomment.dbComment = Convert.ToString(r[1]);
-                //    tempcomment.Reporter = Convert.ToString(r[2]);
-                //    tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
-                //    tempcomment.CommentType = Convert.ToString(r[4]);
-                //    tempclist.Add(tempcomment);
-                //}
-                //tempvm.CommentList = tempclist;
+                if (string.Compare(issuetype, ISSUETP.OBA) == 0)
+                {
+                    tempvm.RetrieveOBA();
+                }
 
                 tempvm.RetrieveComment();
 
@@ -1499,18 +1667,18 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<IssueViewModels> RetrieveAllRMAIssue(string StartDate, string EndDate)
+        public static List<IssueViewModels> RetrieveAllIssueTypeIssue(string StartDate, string EndDate, string issuetype)
         {
             var sql = "";
             if (string.Compare(StartDate, "NONE", true) == 0)
             {
                 sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ParentIssueKey = '' and IssueType = '<IssueType>' order by ReportDate DESC";
-                sql = sql.Replace("<IssueType>", ISSUETP.RMA);
+                sql = sql.Replace("<IssueType>", issuetype);
             }
             else
             {
                 sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ParentIssueKey = '' and IssueType = '<IssueType>' and ReportDate >= '<StartDate>' and ReportDate <= '<EndDate>' order by ReportDate DESC";
-                sql = sql.Replace("<IssueType>", ISSUETP.RMA).Replace("<StartDate>", StartDate).Replace("<EndDate>", DateTime.Parse(EndDate).AddDays(1).ToString());
+                sql = sql.Replace("<IssueType>", issuetype).Replace("<StartDate>", StartDate).Replace("<EndDate>", DateTime.Parse(EndDate).AddDays(1).ToString());
             }
 
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
@@ -1525,23 +1693,15 @@ namespace Prometheus.Models
                     , Convert.ToString(line[7]), Convert.ToString(line[8])
                     , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
 
-                tempvm.RetrieveRMA();
+                if (string.Compare(issuetype, ISSUETP.RMA) == 0)
+                {
+                    tempvm.RetrieveRMA();
+                }
 
-                //var tempclist = new List<IssueComments>();
-                //var csql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
-                //csql = csql.Replace("<IssueKey>", tempvm.IssueKey);
-                //var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
-                //foreach (var r in cdbret)
-                //{
-                //    var tempcomment = new IssueComments();
-                //    tempcomment.IssueKey = Convert.ToString(r[0]);
-                //    tempcomment.dbComment = Convert.ToString(r[1]);
-                //    tempcomment.Reporter = Convert.ToString(r[2]);
-                //    tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
-                //    tempcomment.CommentType = Convert.ToString(r[4]);
-                //    tempclist.Add(tempcomment);
-                //}
-                //tempvm.CommentList = tempclist;
+                if (string.Compare(issuetype, ISSUETP.OBA) == 0)
+                {
+                    tempvm.RetrieveOBA();
+                }
 
                 tempvm.RetrieveComment();
 
@@ -1554,6 +1714,7 @@ namespace Prometheus.Models
 
             return ret;
         }
+
 
         public static List<IssueViewModels> Retrieve_Alert_RMAByProjectKey(string projectkey,bool fv)
         {

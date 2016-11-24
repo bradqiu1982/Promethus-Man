@@ -3890,7 +3890,7 @@ namespace Prometheus.Controllers
             toaddrs.Add(vm.Assignee);
             EmailUtility.SendEmail("Parallel Project LYT", toaddrs, content);
             IssueViewModels.UpdateLYT(vm.IssueKey);
-            new System.Threading.ManualResetEvent(false).WaitOne(3000);
+            new System.Threading.ManualResetEvent(false).WaitOne(2000);
         }
 
         [HttpPost, ActionName("LowYieldWarn")]

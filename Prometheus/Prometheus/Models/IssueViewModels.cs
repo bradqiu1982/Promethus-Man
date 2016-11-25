@@ -621,14 +621,11 @@ namespace Prometheus.Models
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             if (dbret.Count > 0)
             {
-                FinisarRMA = Convert.ToString(dbret[0][0]);
-                FinisarModel = Convert.ToString(dbret[0][1]);
-                ECustomer = Convert.ToString(dbret[0][2]);
-                CRMANUM = Convert.ToString(dbret[0][3]);
-                CReport = Convert.ToString(dbret[0][4]);
-                ModuleSN = Convert.ToString(dbret[0][5]);
-                RMAFailureCode = Convert.ToString(dbret[0][6]);
-                FVCode = Convert.ToString(dbret[0][7]);
+                FinisarDMR = Convert.ToString(dbret[0][0]);
+                OBAFailureRate = Convert.ToString(dbret[0][1]);
+                MaterialDisposition = Convert.ToString(dbret[0][2]);
+                ModuleSN = Convert.ToString(dbret[0][3]);
+                FVCode = Convert.ToString(dbret[0][4]);
             }
         }
 

@@ -1,0 +1,257 @@
+﻿@model IEnumerable<Prometheus.Models.IssueViewModels>
+
+@{
+    ViewBag.Title = "ProjectOBA";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="row">
+    <div class="col-md-4">
+        @if (Model != null && Model.Count() > 0)
+        {
+            <h2>@Model.ElementAt(0).ProjectKey OBA Status</h2>
+        }
+        else
+        {
+            <h2>Project OBA Status</h2>
+        }
+
+    </div>
+
+    <div class="col-md-1">
+        @if (Model != null && Model.Count() > 0)
+        {
+            <h2><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ElementAt(0).ProjectKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+        }
+        else
+        {
+            <h2><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+        }
+    </div>
+    <div class="col-md-7"></div>
+</div>
+
+<hr />
+
+<div class="row">
+    @if (Model != null && Model.Count() > 0)
+    {
+        <div class="col-md-1">
+            <label class="control-label" for="StartDate">StartDate</label>
+        </div>
+        <div class="col-md-2">
+            <input class="form-control text-box single-line" id="StartDate" name="StartDate" type="text" value="" />
+        </div>
+        <div class="col-md-1">
+            <label class="control-label" for="EndDate">EndDate</label>
+        </div>
+        <div class="col-md-2">
+            <input class="form-control text-box single-line" id="EndDate" name="EndDate" type="text" value="" />
+        </div>
+    }
+    else
+    {
+        <div class="col-md-6">
+        </div>
+    }
+
+    <div class="col-md-1">
+        @if (Model != null && Model.Count() > 0)
+        {
+            <button class="form-control" data-toggle="tooltip" title="Export OBA Report" onclick="ShareRMA()" type="button"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span></button>
+        }
+    </div>
+    <div class="col-md-1">
+        @if (Model != null && Model.Count() > 0)
+        {
+            <button class="form-control" data-toggle="tooltip" title="Export All OBA Report" onclick="ShareAllRMA()" type="button"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span>ALL</button>
+        }
+    </div>
+
+    <div class="col-md-1">
+    </div>
+    <div class="col-md-3"></div>
+
+    <script type="text/javascript">
+        function GoToAll() {
+            window.location.href = '/Project/ViewAll';
+        }
+    </script>
+
+    @if (Model != null && Model.Count() > 0)
+    {
+        <script type="text/javascript">
+        $(document).ready(function () {
+            $("#StartDate").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: 'yy-mm-dd'
+            });
+            $("#EndDate").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: 'yy-mm-dd'
+            });
+        });
+
+            function ShareRMA() {
+                if (document.getElementById("StartDate").value && document.getElementById("EndDate").value) {
+                    var myurl = '/Issue/ExportOBAData?ProjectKey=@Model.ElementAt(0).ProjectKey&StartDate=' + document.getElementById("StartDate").value + '&EndDate=' + document.getElementById("EndDate").value;
+                    window.open(myurl, '_blank');
+                }
+                else {
+                    var myurl = '/Issue/ExportOBAData?ProjectKey=@Model.ElementAt(0).ProjectKey&StartDate=NONE&EndDate=NONE';
+                    window.open(myurl, '_blank');
+                }
+            }
+
+            function ShareAllRMA() {
+                if (document.getElementById("StartDate").value && document.getElementById("EndDate").value) {
+                    var myurl = '/Issue/ExportAllOBAData?StartDate=' + document.getElementById("StartDate").value + '&EndDate=' + document.getElementById("EndDate").value;
+                    window.open(myurl, '_blank');
+                }
+                else
+                {
+                    var myurl = '/Issue/ExportAllOBAData?StartDate=NONE&EndDate=NONE';
+                    window.open(myurl, '_blank');
+                }
+        }
+        </script>
+    }
+
+</div>
+<hr />
+
+@if (Model != null)
+{
+    <script src="~/Scripts/highcharts.js"></script>
+        <script src="~/Scripts/exporting.js"></script>
+
+    if (ViewBag.chartscript != null)
+    {
+        @Html.Raw(ViewBag.chartscript)
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Failure</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="col-md-12">
+                            <div id="failurepie" style="min-width: 310px; height: 300px; margin: 0 auto"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    var i = 0;
+    <table id="firsttable" name="firsttable" class="table table-bordered table-hover">
+        <thead class="header">
+            <tr>
+                <th width="14%">DMR#</th>
+                <th width="10%">SN</th>
+                <th width="10%">RootCause</th>
+                <th width="10%">FV</th>
+                <th width="13%">Containment Action</th>
+                <th width="13%">Corrective Action</th>
+                <th width="10%">Owner</th>
+                <th width="10%">Report Date</th>
+                <th width="10%">Attachment</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+                {
+                    var rmatitle = item.Summary.Trim();
+
+                <tr>
+                    <td width="14%">
+                        <div class="row">
+                            <div class="col-md-4">
+                                @(Model.Count() - i)
+                            </div>
+                            <div class="col-md-8">
+                                <button data-toggle="tooltip" title="Low Yield Trigger" class="form-control" value="@item.IssueKey" type="button" onclick="LowYieldWarning(this)">
+                                    <span class="glyphicon glyphicon-share" aria-hidden="true"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                    <td colspan="7" width="76%">
+                        <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">
+                            <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
+                            @rmatitle.Substring(0, rmatitle.Length > 125 ? 125 : rmatitle.Length)
+                        </a>
+                    </td>
+                    <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus2(item.Resolution))</td>
+                </tr>
+                    <tr>
+                        <td width="14%">
+                            @if (!string.IsNullOrEmpty(item.LYT))
+                            {
+                                <span class="badge alert-danger">LYT</span>
+                            }
+                            @item.FinisarDMR
+                        </td>
+                        <td width="10%">@item.ModuleSN</td>
+                        @if (item.RootCauseCommentList.Count > 0)
+                        {
+                            <td width="10%"><a href="/Issue/ShowRootCause?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></td>
+                        }
+                        else
+                        {
+                            <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
+                        }
+
+                        <td width="10%">@item.FVCode</td>
+
+                        @if (item.ContainmentActions.Count > 0)
+                    {
+                            <td width="13%"><a href="/Issue/ShowContainmentAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.ContainmentActionStatus())</a></td>
+                        }
+                        else
+                        {
+                            <td width="13%">N/A</td>
+                        }
+
+                        @if (item.CorrectiveActions.Count > 0)
+                    {
+                            <td width="13%"><a href="/Issue/ShowCorrectiveAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.CorrectiveActionStatus())</a></td>
+                        }
+                        else
+                        {
+                            <td width="13%">N/A</td>
+                        }
+
+                        <td width="10%"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
+                        <td width="10%">@item.ReportDate.ToString("MM/dd-yy")</td>
+                        <td width="10%">@if (item.AttachList.Count > 0)
+                        {
+                            <a href="/Issue/IssueAttach?issuekey=@item.IssueKey" target="_blank">
+                                <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>
+                            </a>
+                        }
+                        </td>
+                    </tr>
+                i = i + 1;
+            }
+        </tbody>
+    </table>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                var offset = $('.navbar').height();
+                $("#firsttable").stickyTableHeaders({ fixedOffset: offset });
+            });
+
+            function LowYieldWarning(oBT) {
+                if (confirm("Warning: only OBA issue assignee can trigger Low Yield Trigger.")) {
+                    var myurl = "/Project/LowYieldWarn?IssueKey=" + oBT.value;
+                    window.open(myurl, '_blank');
+                }
+            }
+        </script>
+}

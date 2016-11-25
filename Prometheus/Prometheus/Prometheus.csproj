@@ -787,6 +787,7 @@
     <Content Include="Scripts\project_indicative_datasetname_list.xlsx" />
     <Content Include="Views\CustomerData\CommitOBAData.cshtml" />
     <Content Include="Views\CustomerData\ConfirmOBAData.cshtml" />
+    <Content Include="Views\Project\ProjectOBA.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

@@ -83,6 +83,12 @@ namespace Prometheus.Controllers
             slist = CreateSelectList(fcilist, vm.RMAFailureCode);
             ViewBag.RMAFailureCode = slist;
 
+            var metriallist = new List<string>();
+            string[] mlist = { "None", "Scrap", "Rework", "UAI" };
+            metriallist.AddRange(mlist);
+            slist = CreateSelectList(metriallist, vm.MaterialDisposition);
+            ViewBag.dispositionlist = slist;
+
             //var cmelist = new List<string>();
             //string[] clist = { COMMENTTYPE.Description,COMMENTTYPE.RootCause,COMMENTTYPE.CustomReport,COMMENTTYPE.InternalReport};
             //cmelist.AddRange(clist);
@@ -121,7 +127,12 @@ namespace Prometheus.Controllers
                 string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
                 string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
 
-                var content = vm.Summary + " is " + operate + " by " + vm.Reporter + " :\r\n " + validatestr;
+            var netcomputername = "";
+            try { netcomputername = System.Net.Dns.GetHostName(); }
+            catch (Exception ex) { }
+            validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
+
+            var content = vm.Summary + " is " + operate + " by " + vm.Reporter + " :\r\n " + validatestr;
 
                 var toaddrs = new List<string>();
                 toaddrs.Add(vm.Reporter);
@@ -141,6 +152,11 @@ namespace Prometheus.Controllers
             string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
             string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
 
+            var netcomputername = "";
+            try { netcomputername = System.Net.Dns.GetHostName(); }
+            catch (Exception ex) { }
+            validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
+
             var content = vm.Summary + " is " + operate + " by " + vm.Reporter + " :\r\n " + validatestr;
 
             var toaddrs = new List<string>();
@@ -151,6 +167,7 @@ namespace Prometheus.Controllers
                 toaddrs.AddRange(vm.RelativePeopleList);
             }
             EmailUtility.SendEmail("Parallel NPI Trace Notice", toaddrs, content);
+            new System.Threading.ManualResetEvent(false).WaitOne(300);
         }
 
         [HttpPost, ActionName("CreateIssue")]
@@ -311,6 +328,13 @@ namespace Prometheus.Controllers
                     var dict = new RouteValueDictionary();
                     dict.Add("issuekey", key);
                     return RedirectToAction("UpdateBug", "Issue", dict);
+                }
+
+                if (string.Compare(ret.IssueType, ISSUETP.OBA) == 0)
+                {
+                    var dict = new RouteValueDictionary();
+                    dict.Add("issuekey", key);
+                    return RedirectToAction("UpdateOBA", "Issue", dict);
                 }
 
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
@@ -757,6 +781,11 @@ namespace Prometheus.Controllers
                 string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
                 string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
 
+                var netcomputername = "";
+                try { netcomputername = System.Net.Dns.GetHostName(); }
+                catch (Exception ex) { }
+                validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
+
                 var content = vm.Summary + " is " + operate + " by " + vm.Reporter + " :\r\n " + validatestr;
 
                 var toaddrs = new List<string>();
@@ -764,7 +793,7 @@ namespace Prometheus.Controllers
                 toaddrs.Add(vm.Assignee);
                 toaddrs.Add(vm.Reporter);
                 EmailUtility.SendEmail("Parallel NPI Trace Notice", toaddrs, content);
-
+                new System.Threading.ManualResetEvent(false).WaitOne(300);
             }
         }
 
@@ -1417,6 +1446,226 @@ namespace Prometheus.Controllers
         }
 
 
+        public ActionResult UpdateOBA(string issuekey)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "Issue");
+                ck.Add("logonredirectact", "UpdateIssue");
+                ck.Add("issuekey", issuekey);
+                ck.Add("currentaction", "UpdateIssue");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var key = "";
+            if (!string.IsNullOrEmpty(issuekey))
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("issuekey", issuekey);
+                CookieUtility.SetCookie(this, ck);
+                key = issuekey;
+            }
+            else if (ckdict.ContainsKey("issuekey") && !string.IsNullOrEmpty(ckdict["issuekey"]))
+            {
+                key = ckdict["issuekey"];
+                var ck = new Dictionary<string, string>();
+                ck.Add("currentaction", "UpdateIssue");
+                CookieUtility.SetCookie(this, ck);
+            }
+
+            if (string.IsNullOrEmpty(key))
+            {
+                var tempvm = new IssueViewModels();
+                CreateAllLists(tempvm);
+                return View();
+            }
+
+            var ret = IssueViewModels.RetrieveIssueByIssueKey(key);
+            if (ret != null)
+            {
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+                ViewBag.isassignee = false;
+                if (string.Compare(updater, ret.Assignee, true) == 0
+                    || string.Compare(updater, ret.Reporter, true) == 0)
+                {
+                    ViewBag.isassignee = true;
+                }
+                ret.Reporter = updater;
+
+                CreateAllLists(ret);
+                return View(ret);
+            }
+            else
+            {
+                var tempvm = new IssueViewModels();
+                CreateAllLists(tempvm);
+                return View();
+            }
+        }
+
+        [HttpPost, ActionName("UpdateOBA")]
+        [ValidateAntiForgeryToken]
+        public ActionResult UpdateOBAPost()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            var issuekey = Request.Form["IssueKey"];
+
+            var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+
+            if (Request.Form["deleterma"] != null)
+            {
+                if (string.Compare(updater, originaldata.Reporter, true) == 0
+                    || string.Compare(updater, originaldata.Assignee, true) == 0)
+                {
+                    IssueViewModels.RemoveIssue(issuekey);
+                    var dict = new RouteValueDictionary();
+                    dict.Add("ProjectKey", originaldata.ProjectKey);
+                    return RedirectToAction("ProjectDetail", "Project", dict);
+                }
+            }
+
+            var vm = new IssueViewModels();
+            vm.ProjectKey = Request.Form["projectlist"].ToString();
+            vm.IssueKey = issuekey;
+            vm.IssueType = ISSUETP.OBA;
+
+            vm.FinisarDMR = Request.Form["FinisarDMR"];
+            var tempdispose = Request.Form["dispositionlist"].ToString();
+            if (string.Compare(tempdispose, "None", true) == 0)
+            {
+                vm.MaterialDisposition = "";
+            }
+            else
+            {
+                vm.MaterialDisposition = tempdispose;
+            }
+
+            vm.OBAFailureRate = Request.Form["FailureRate"];
+
+            vm.FVCode = Request.Form["FVCode"];
+            vm.RelativePeoples = Request.Form["RPeopleAddr"];
+            vm.ModuleSN = Request.Form["ModuleSN"];
+            vm.Summary = originaldata.Summary;
+
+            vm.Priority = Request.Form["prioritylist"].ToString();
+            vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
+            vm.ReportDate = DateTime.Now;
+            vm.Reporter = updater;
+
+            if (string.Compare(originaldata.Reporter, updater, true) == 0
+                || string.Compare(originaldata.Assignee, updater, true) == 0)
+            {
+                vm.Assignee = Request.Form["assigneelist"].ToString();
+                vm.Resolution = Request.Form["resolutionlist"].ToString();
+            }
+            else
+            {
+                vm.Assignee = originaldata.Assignee;
+                vm.Resolution = originaldata.Resolution;
+            }
+
+            if (!string.IsNullOrEmpty(Request.Form["editor1"]))
+            {
+                vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
+                vm.CommentType = COMMENTTYPE.Description;
+                UserRankViewModel.UpdateUserRank(updater, 2);
+            }
+            else
+                vm.Description = "";
+
+            if (!string.IsNullOrEmpty(Request.Form["rootcauseeditor"]))
+            {
+                var rootcause = Server.HtmlDecode(Request.Form["rootcauseeditor"]);
+                var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(rootcause));
+                var commenttype = COMMENTTYPE.RootCause;
+                IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
+                UserRankViewModel.UpdateUserRank(updater, 5);
+            }
+
+            var urls = ReceiveRMAFiles();
+
+            if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
+            {
+                var attachementfile = Request.Form["attachmentupload"];
+                var originalname1 = Path.GetFileNameWithoutExtension(attachementfile)
+                    .Replace(" ", "_").Replace("#", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                var url = "";
+                foreach (var r in urls)
+                {
+                    if (r.Contains(originalname1))
+                    {
+                        url = r;
+                        break;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(url))
+                {
+                    IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
+
+                    UserRankViewModel.UpdateUserRank(updater, 5);
+                }
+            }
+
+            vm.UpdateOBA();
+
+            ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Updated", originaldata.Summary, originaldata.IssueKey);
+
+            if (string.Compare(originaldata.Assignee, vm.Assignee, true) != 0)
+            {
+                vm.UpdateIAssign();
+                ProjectEvent.AssignIssueEvent(originaldata.ProjectKey, updater, vm.Assignee, originaldata.Summary, originaldata.IssueKey);
+                vm.Summary = originaldata.Summary;
+                SendTaskEvent(vm, "asigned to you", updater, vm.Assignee);
+            }
+
+            if (string.Compare(originaldata.Resolution, vm.Resolution, true) != 0)
+            {
+                if (vm.IssueClosed())
+                {
+                    UserRankViewModel.UpdateUserRank(updater, 5);
+
+                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
+                    vm.CloseIssue();
+                    SendRMAEvent(vm, "closed", true);
+                }
+
+                if (string.Compare(vm.Resolution, Resolute.Working) == 0)
+                {
+                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Started", originaldata.Summary, originaldata.IssueKey);
+                }
+
+                if (string.Compare(vm.Resolution, Resolute.Reopen) == 0)
+                {
+                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Reopened", originaldata.Summary, originaldata.IssueKey);
+                    SendRMAEvent(vm, "reopened", true);
+                }
+            }
+
+            var newdata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+            CreateAllLists(newdata);
+
+            ViewBag.isassignee = false;
+            if (string.Compare(updater, newdata.Assignee, true) == 0
+                    || string.Compare(updater, newdata.Reporter, true) == 0)
+            {
+                ViewBag.isassignee = true;
+            }
+
+            return View(newdata);
+        }
+
         public ActionResult ShowRootCause(string issuekey)
         {
             if (!string.IsNullOrEmpty(issuekey))
@@ -1616,6 +1865,10 @@ namespace Prometheus.Controllers
                 string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
                 validatestr = validatestr.Split(new string[] { "/Issue" }, StringSplitOptions.None)[0];
 
+                var netcomputername = "";
+                try { netcomputername = System.Net.Dns.GetHostName(); }
+                catch (Exception ex) { }
+                validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
 
                 var internalreport = "";
                 if (item.InternalReportCommentList.Count > 0)
@@ -1711,6 +1964,10 @@ namespace Prometheus.Controllers
                 string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
                 validatestr = validatestr.Split(new string[] { "/Issue" }, StringSplitOptions.None)[0];
 
+                var netcomputername = "";
+                try { netcomputername = System.Net.Dns.GetHostName(); }
+                catch (Exception ex) { }
+                validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
 
                 var internalreport = "";
                 if (item.InternalReportCommentList.Count > 0)

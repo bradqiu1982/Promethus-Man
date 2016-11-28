@@ -505,6 +505,8 @@ namespace Prometheus.Controllers
                             templine.Add("Model SN");
                             templine.Add("Failure Rate");
                             templine.Add("OBA Description");
+                            templine.Add("Priority");
+                            templine.Add("Product Type");
                             templine.Add("Assignee Email");
                             templine.Add("Open Date");
                             realdata.Add(templine);
@@ -548,6 +550,27 @@ namespace Prometheus.Controllers
                                         templine.Add(sn);
                                         templine.Add(data[idx][4]);
                                         templine.Add(data[idx][7]);
+
+                                        var Priority = ISSUEPR.Major;
+                                        if (string.Compare(data[idx][8],ISSUEPR.Blocker,true) == 0)
+                                        {
+                                            Priority = ISSUEPR.Blocker;
+                                        }
+                                        if (string.Compare(data[idx][8], ISSUEPR.Critical, true) == 0)
+                                        {
+                                            Priority = ISSUEPR.Critical;
+                                        }
+
+                                        templine.Add(Priority);
+
+                                        //product type
+                                        var trimprojectname1 = RMSpectialCh(data[idx][9]).ToUpper();
+                                        if (trimprojectname.Length > 40)
+                                        {
+                                            trimprojectname1 = trimprojectname1.Substring(0, 38);
+                                        }
+                                        templine.Add(trimprojectname1);
+
 
                                         if (!data[idx][6].Contains("@"))
                                         {
@@ -763,6 +786,8 @@ namespace Prometheus.Controllers
             //templine.Add("Model SN");
             //templine.Add("Failure Rate");
             //templine.Add("OBA Description");
+            //templine.Add("Priority");
+            //templine.Add("Product Type");
             //templine.Add("Assignee Email");
             //templine.Add("Open Date");
 
@@ -785,7 +810,7 @@ namespace Prometheus.Controllers
                 }
 
 
-                if (data.Count > 1 && data[0].Count == 7)
+                if (data.Count > 1 && data[0].Count == 9)
                 {
                     for (int i = 0; i < data.Count; i++)
                     {
@@ -827,10 +852,16 @@ namespace Prometheus.Controllers
                                 vm.Summary = vm.Summary.Substring(0, 198);
                             }
 
-                            vm.Priority = ISSUEPR.Major;
+                            vm.Priority = data[i][5];
+
+                            vm.ProductType = data[i][6];
+                            if (vm.ProductType.Length > 50)
+                            {
+                                vm.ProductType = vm.ProductType.Substring(0, 48);
+                            }
 
                             vm.ReportDate = DateTime.Now;
-                            vm.Assignee = data[i][5].ToUpper();
+                            vm.Assignee = data[i][7].ToUpper();
                             if (vm.Assignee.Length > 200)
                             {
                                 vm.Assignee = vm.Assignee.Substring(0, 198);
@@ -838,7 +869,7 @@ namespace Prometheus.Controllers
 
                             try
                             {
-                                vm.DueDate = DateTime.Parse(data[i][6]).AddDays(6);
+                                vm.DueDate = DateTime.Parse(data[i][8]).AddDays(6);
                             }
                             catch (Exception e) { vm.DueDate = DateTime.Now.AddDays(6); }
 

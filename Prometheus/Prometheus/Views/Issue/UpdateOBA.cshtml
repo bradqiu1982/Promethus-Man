@@ -175,6 +175,46 @@
 
             <div class="form-group">
                 <div class="col-md-6">
+                    <label class="control-label col-md-2" for="ProductType">Product Type</label>
+                    <div class="col-md-10">
+                        @if (Model != null && !string.IsNullOrEmpty(Model.ProductType))
+                        {
+                            <input class="form-control text-box single-line" value="@Model.ProductType" readonly="readonly" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="ProductType" name="ProductType" type="text" />
+                        }
+                        else
+                        {
+                            <input class="form-control text-box single-line" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="ProductType" name="ProductType" type="text" value="" />
+                        }
+                        <span class="field-validation-valid text-danger" data-valmsg-for="ProductType" data-valmsg-replace="true"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="control-label col-md-2" for="prioritylist">Priority</label>
+                    <div class="col-md-10">
+                        @Html.DropDownList("prioritylist", null, new { @id = "prioritylist", @class = "form-control" })
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-6">
+                    <label class="control-label col-md-2" for="FVCode">FV</label>
+                    <div class="col-md-10">
+                        @if (Model != null && !string.IsNullOrEmpty(Model.FVCode))
+                        {
+                            <input class="form-control text-box single-line" data-toggle="tooltip" title="Show be short and no chinese character" value="@Model.FVCode" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 25." data-val-length-max="25" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="FVCode" name="FVCode" type="text" />
+                        }
+                        else
+                        {
+                            <input class="form-control text-box single-line" data-toggle="tooltip" title="Show be short and no chinese character" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 25." data-val-length-max="25" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="FVCode" name="FVCode" type="text" value="" />
+                        }
+                        <span class="field-validation-valid text-danger" data-valmsg-for="FVCode" data-valmsg-replace="true"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
                     <label class="control-label col-md-2" for="resolutionlist">Status<font color="red">*</font></label>
                     <div class="col-md-10">
                         @if (ViewBag.isassignee != null && ViewBag.isassignee)
@@ -187,6 +227,11 @@
                         }
                     </div>
                 </div>
+
+            </div>
+
+            <div class="form-group">
+ 
                 <div class="col-md-6">
                     <label class="control-label col-md-2" for="DueDate">DueDate<font color="red">*</font></label>
                     <div class="col-md-10">
@@ -211,30 +256,7 @@
                     });
                 </script>
             </div>
-            <div class="form-group">
-                <div class="col-md-6">
-                    <label class="control-label col-md-2" for="FVCode">FV</label>
-                    <div class="col-md-10">
-                        @if (Model != null && !string.IsNullOrEmpty(Model.FVCode))
-                        {
-                            <input class="form-control text-box single-line" data-toggle="tooltip" title="Show be short and no chinese character" value="@Model.FVCode" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 25." data-val-length-max="25" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="FVCode" name="FVCode" type="text" />
-                        }
-                        else
-                        {
-                            <input class="form-control text-box single-line" data-toggle="tooltip" title="Show be short and no chinese character" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 25." data-val-length-max="25" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="FVCode" name="FVCode" type="text" value="" />
-                        }
-                        <span class="field-validation-valid text-danger" data-valmsg-for="FVCode" data-valmsg-replace="true"></span>
-                    </div>
-                </div>
 
-                <div class="col-md-6">
-                    <label class="control-label col-md-2" for="prioritylist">Priority</label>
-                    <div class="col-md-10">
-                        @Html.DropDownList("prioritylist", null, new { @id = "prioritylist", @class = "form-control" })
-                    </div>
-                </div>
-
-            </div>
 
             @if (ViewBag.isassignee != null && ViewBag.isassignee)
             {

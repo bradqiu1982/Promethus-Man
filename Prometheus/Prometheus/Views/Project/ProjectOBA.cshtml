@@ -152,15 +152,17 @@
     <table id="firsttable" name="firsttable" class="table table-bordered table-hover">
         <thead class="header">
             <tr>
-                <th width="14%">DMR#</th>
-                <th width="10%">SN</th>
-                <th width="10%">RootCause</th>
-                <th width="10%">FV</th>
-                <th width="8%">Meterial Disposition</th>
-                <th width="10%">Containment Action</th>
-                <th width="10%">Corrective Action</th>
-                <th width="10%">Owner</th>
-                <th width="10%">Report Date</th>
+                <th width="12%">DMR#</th>
+                <th width="8%">SN</th>
+                <th width="8%">FailureRate</th>
+                <th width="8%">ProductType</th>
+                <th width="8%">Priority</th>
+                <th width="8%">FV</th>
+                <th width="8%">RootCause</th>
+                <th width="8%">Containment Action</th>
+                <th width="8%">Corrective Action</th>
+                <th width="8%">Owner</th>
+                <th width="8%">Report Date</th>
                 <th width="8%">Attachment</th>
             </tr>
         </thead>
@@ -170,7 +172,7 @@
                     var rmatitle = item.Summary.Trim();
 
                 <tr>
-                    <td width="14%">
+                    <td width="12%">
                         <div class="row">
                             <div class="col-md-4">
                                 @(Model.Count() - i)
@@ -182,7 +184,7 @@
                             </div>
                         </div>
                     </td>
-                    <td colspan="8" width="78%">
+                    <td colspan="10" width="80%">
                         <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">
                             <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
                             @rmatitle.Substring(0, rmatitle.Length > 125 ? 125 : rmatitle.Length)
@@ -191,47 +193,49 @@
                     <td width="8%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus2(item.Resolution))</td>
                 </tr>
                     <tr>
-                        <td width="14%">
+                        <td width="12%">
                             @if (!string.IsNullOrEmpty(item.LYT))
                             {
                                 <span class="badge alert-danger">LYT</span>
                             }
-                            @item.FinisarDMR
+                            <a href="http://wux-app1.china.ads.finisar.com/eDMR/DMR_Edit/DMR_View.asp?DMR_ID=@(item.FinisarDMR)" target="_blank">@item.FinisarDMR</a>
                         </td>
-                        <td width="10%">@item.ModuleSN</td>
+
+                        <td width="8%">@item.ModuleSN</td>
+                        <td width="8%">@item.OBAFailureRate</td>
+                        <td width="8%">@item.ProductType</td>
+                        <td width="8%">@item.Priority</td>
+
+                        <td width="8%">@item.FVCode</td>
                         @if (item.RootCauseCommentList.Count > 0)
                         {
-                            <td width="10%"><a href="/Issue/ShowRootCause?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></td>
+                            <td width="8%"><a href="/Issue/ShowRootCause?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></td>
                         }
                         else
                         {
-                            <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
+                            <td width="8%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
                         }
-
-                        <td width="10%">@item.FVCode</td>
-
-                        <td width="8%">@item.MaterialDisposition</td>
 
                         @if (item.ContainmentActions.Count > 0)
-                    {
-                            <td width="10%"><a href="/Issue/ShowContainmentAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.ContainmentActionStatus())</a></td>
+                        {
+                            <td width="8%"><a href="/Issue/ShowContainmentAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.ContainmentActionStatus())</a></td>
                         }
                         else
                         {
-                            <td width="10%">N/A</td>
+                            <td width="8%">N/A</td>
                         }
 
                         @if (item.CorrectiveActions.Count > 0)
-                    {
-                            <td width="10%"><a href="/Issue/ShowCorrectiveAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.CorrectiveActionStatus())</a></td>
+                        {
+                            <td width="8%"><a href="/Issue/ShowCorrectiveAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.CorrectiveActionStatus())</a></td>
                         }
                         else
                         {
-                            <td width="10%">N/A</td>
+                            <td width="8%">N/A</td>
                         }
 
-                        <td width="10%"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
-                        <td width="10%">@item.ReportDate.ToString("MM/dd-yy")</td>
+                        <td width="8%"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
+                        <td width="8%">@item.ReportDate.ToString("MM/dd")</td>
                         <td width="8%">@if (item.AttachList.Count > 0)
                         {
                             <a href="/Issue/IssueAttach?issuekey=@item.IssueKey" target="_blank">

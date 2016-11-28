@@ -198,6 +198,16 @@ namespace Prometheus.Models
                         startidx = idx + 1;
                         break;
                     }
+
+                    //find the stard position of next indivition dataset
+                    for (var tmpidx = startidx; tmpidx < currentroutedsnames.Count; tmpidx++)
+                    {
+                        if (dsdict.ContainsKey(currentroutedsnames[tmpidx].ProjectKey))
+                        {
+                            startidx = tmpidx;
+                            break;
+                        }
+                    }//end for
                 }
             }
         }

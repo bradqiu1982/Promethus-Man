@@ -1626,8 +1626,16 @@ namespace Prometheus.Models
             }
             else
             {
-                sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and  ParentIssueKey = '' and IssueType = '<IssueType>' and ReportDate >= '<StartDate>' and ReportDate <= '<EndDate>' order by ReportDate DESC";
-                sql = sql.Replace("<ProjectKey>", projectkey).Replace("<IssueType>", issuetype).Replace("<StartDate>", StartDate).Replace("<EndDate>", DateTime.Parse(EndDate).AddDays(1).ToString());
+                if (string.Compare(issuetype, ISSUETP.RMA, true) == 0)
+                {
+                    sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and  ParentIssueKey = '' and IssueType = '<IssueType>' and DueDate >= '<StartDate>' and DueDate <= '<EndDate>' order by ReportDate DESC";
+                    sql = sql.Replace("<ProjectKey>", projectkey).Replace("<IssueType>", issuetype).Replace("<StartDate>", DateTime.Parse(StartDate).AddDays(12).ToString()).Replace("<EndDate>", DateTime.Parse(EndDate).AddDays(13).ToString());
+                }
+                else
+                {
+                    sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and  ParentIssueKey = '' and IssueType = '<IssueType>' and DueDate >= '<StartDate>' and DueDate <= '<EndDate>' order by ReportDate DESC";
+                    sql = sql.Replace("<ProjectKey>", projectkey).Replace("<IssueType>", issuetype).Replace("<StartDate>", DateTime.Parse(StartDate).AddDays(6).ToString()).Replace("<EndDate>", DateTime.Parse(EndDate).AddDays(7).ToString());
+                }
             }
 
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
@@ -1674,8 +1682,16 @@ namespace Prometheus.Models
             }
             else
             {
-                sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ParentIssueKey = '' and IssueType = '<IssueType>' and ReportDate >= '<StartDate>' and ReportDate <= '<EndDate>' order by ReportDate DESC";
-                sql = sql.Replace("<IssueType>", issuetype).Replace("<StartDate>", StartDate).Replace("<EndDate>", DateTime.Parse(EndDate).AddDays(1).ToString());
+                if (string.Compare(issuetype, ISSUETP.RMA, true) == 0)
+                {
+                    sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ParentIssueKey = '' and IssueType = '<IssueType>' and DueDate >= '<StartDate>' and DueDate <= '<EndDate>' order by ReportDate DESC";
+                    sql = sql.Replace("<IssueType>", issuetype).Replace("<StartDate>", DateTime.Parse(StartDate).AddDays(12).ToString()).Replace("<EndDate>", DateTime.Parse(EndDate).AddDays(13).ToString());
+                }
+                else
+                {
+                    sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ParentIssueKey = '' and IssueType = '<IssueType>' and DueDate >= '<StartDate>' and DueDate <= '<EndDate>' order by ReportDate DESC";
+                    sql = sql.Replace("<IssueType>", issuetype).Replace("<StartDate>", DateTime.Parse(StartDate).AddDays(6).ToString()).Replace("<EndDate>", DateTime.Parse(EndDate).AddDays(7).ToString());
+                }
             }
 
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);

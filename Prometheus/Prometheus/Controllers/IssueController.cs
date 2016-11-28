@@ -2035,5 +2035,219 @@ namespace Prometheus.Controllers
             return File(filename, "application/vnd.ms-excel", fn);
         }
 
+        private List<string> PrepeareOBAReport(string ProjectKey, string StartDate, string EndDate)
+        {
+            var lines = new List<string>();
+            var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, StartDate, EndDate, ISSUETP.OBA);
+
+            var line = "NO,ISSUE DATE,DMR#,Product Type,Failure Rate,Affected SN,FA Owner,OBA Description,FV Results,ROOT CAUSE,Containment Action,Corrective Action,Material Disposition,Resolution,Attachement";
+            lines.Add(line);
+
+            var idx = 0;
+
+            foreach (var item in list1)
+            {
+                idx = idx + 1;
+
+                var index = idx.ToString();
+
+                var rootcause = "";
+                if (item.RootCauseCommentList.Count > 0)
+                {
+                    rootcause = item.RootCauseCommentList[item.RootCauseCommentList.Count - 1].Comment.Replace("\"", "");
+                    rootcause = System.Text.RegularExpressions.Regex.Replace(rootcause, "<.*?>", string.Empty);
+                }
+
+
+                var routevalue = new RouteValueDictionary();
+                routevalue.Add("issuekey", "ABC");
+                string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+                validatestr = validatestr.Split(new string[] { "/Issue" }, StringSplitOptions.None)[0];
+
+                var netcomputername = "";
+                try { netcomputername = System.Net.Dns.GetHostName(); }
+                catch (Exception ex) { }
+                validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
+
+
+                var internalreport = "";
+                if (item.AttachList.Count > 0)
+                {
+                    if (item.AttachList[item.AttachList.Count - 1].Contains("<a href"))
+                    {
+                        internalreport = item.AttachList[item.AttachList.Count - 1].Split(new string[] { "<a href=\"", "\" target=" }, StringSplitOptions.None)[1];
+                    }
+                    else
+                    {
+                        internalreport = item.AttachList[item.AttachList.Count - 1];
+                    }
+                    internalreport = validatestr + internalreport;
+                }
+
+                var issuedata = item.DueDate.AddDays(-6).ToString("MM/dd/yyyy");
+
+                var containmentaction = "";
+                if (item.ContainmentActions.Count > 0)
+                {
+                    containmentaction = item.ContainmentActions[item.ContainmentActions.Count - 1].Summary
+                        + ":" + item.ContainmentActions[item.ContainmentActions.Count - 1].Resolution;
+                }
+
+                var correctiveaction = "";
+                if (item.CorrectiveActions.Count > 0)
+                {
+                    correctiveaction = item.CorrectiveActions[item.CorrectiveActions.Count - 1].Summary
+                        + ":" + item.CorrectiveActions[item.CorrectiveActions.Count - 1].Resolution;
+                }
+
+
+                line = string.Empty;
+                line = "\"" + index + "\"," + "\"" + issuedata + "\"," + "\"" + item.FinisarDMR.Replace("\"", "") + "\","
+                    + "\"" + item.ProjectKey + "\"," + "\"'" + item.OBAFailureRate.Replace("\"", "") + "\"," + "\"" + item.ModuleSN.Replace("\"", "") + "\"," 
+                    + "\"" + item.Assignee.Replace("\"", "") + "\","+ "\"" + item.Summary.Replace("\"", "") + "\"," 
+                    + "\"" + item.FVCode.Replace("\"", "") + "\"," + "\"" + rootcause.Replace("\"", "") + "\","
+                    + "\"" + containmentaction.Replace("\"", "") + "\"," + "\"" + correctiveaction.Replace("\"", "") + "\"," 
+                    + "\"" + item.MaterialDisposition + "\"," + "\"" + item.Resolution + "\"," + "\"" + internalreport + "\",";
+
+                lines.Add(line);
+            }
+
+            return lines;
         }
+
+        public ActionResult ExportOBAData(string ProjectKey, string StartDate, string EndDate)
+        {
+            if (!string.IsNullOrEmpty(ProjectKey))
+            {
+                string datestring = DateTime.Now.ToString("yyyyMMdd");
+                string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+                if (!Directory.Exists(imgdir))
+                {
+                    Directory.CreateDirectory(imgdir);
+                }
+
+                var fn = ProjectKey + "_OBA_Report_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+                var filename = imgdir + fn;
+
+                var lines = PrepeareOBAReport(ProjectKey, StartDate, EndDate);
+
+                var wholefile = "";
+                foreach (var l in lines)
+                {
+                    wholefile = wholefile + l + "\r\n";
+                }
+                System.IO.File.WriteAllText(filename, wholefile);
+
+                return File(filename, "application/vnd.ms-excel", fn);
+            }
+            return RedirectToAction("ViewAll", "Project");
+        }
+
+        private List<string> PrepeareAllOBAReport(string StartDate, string EndDate)
+        {
+            var lines = new List<string>();
+            var list1 = IssueViewModels.RetrieveAllIssueTypeIssue(StartDate, EndDate, ISSUETP.OBA);
+
+            var line = "NO,ISSUE DATE,DMR#,Product Type,Failure Rate,Affected SN,FA Owner,OBA Description,FV Results,ROOT CAUSE,Containment Action,Corrective Action,Material Disposition,Resolution,Attachement";
+            lines.Add(line);
+
+            var idx = 0;
+
+            foreach (var item in list1)
+            {
+                idx = idx + 1;
+
+                var index = idx.ToString();
+
+                var rootcause = "";
+                if (item.RootCauseCommentList.Count > 0)
+                {
+                    rootcause = item.RootCauseCommentList[item.RootCauseCommentList.Count - 1].Comment.Replace("\"", "");
+                    rootcause = System.Text.RegularExpressions.Regex.Replace(rootcause, "<.*?>", string.Empty);
+                }
+
+
+                var routevalue = new RouteValueDictionary();
+                routevalue.Add("issuekey", "ABC");
+                string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+                validatestr = validatestr.Split(new string[] { "/Issue" }, StringSplitOptions.None)[0];
+
+                var netcomputername = "";
+                try { netcomputername = System.Net.Dns.GetHostName(); }
+                catch (Exception ex) { }
+                validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
+
+
+                var internalreport = "";
+                if (item.AttachList.Count > 0)
+                {
+                    if (item.AttachList[item.AttachList.Count - 1].Contains("<a href"))
+                    {
+                        internalreport = item.AttachList[item.AttachList.Count - 1].Split(new string[] { "<a href=\"", "\" target=" }, StringSplitOptions.None)[1];
+                    }
+                    else
+                    {
+                        internalreport = item.AttachList[item.AttachList.Count - 1];
+                    }
+                    internalreport = validatestr + internalreport;
+                }
+
+                var issuedata = item.DueDate.AddDays(-6).ToString("MM/dd/yyyy");
+
+                var containmentaction = "";
+                if (item.ContainmentActions.Count > 0)
+                {
+                    containmentaction = item.ContainmentActions[item.ContainmentActions.Count - 1].Summary
+                        + ":" + item.ContainmentActions[item.ContainmentActions.Count - 1].Resolution;
+                }
+
+                var correctiveaction = "";
+                if (item.CorrectiveActions.Count > 0)
+                {
+                    correctiveaction = item.CorrectiveActions[item.CorrectiveActions.Count - 1].Summary
+                        + ":" + item.CorrectiveActions[item.CorrectiveActions.Count - 1].Resolution;
+                }
+
+
+                line = string.Empty;
+                line = "\"" + index + "\"," + "\"" + issuedata + "\"," + "\"" + item.FinisarDMR.Replace("\"", "") + "\","
+                    + "\"" + item.ProjectKey + "\"," + "\"'" + item.OBAFailureRate.Replace("\"", "") + "\"," + "\"" + item.ModuleSN.Replace("\"", "") + "\","
+                    + "\"" + item.Assignee.Replace("\"", "") + "\"," + "\"" + item.Summary.Replace("\"", "") + "\","
+                    + "\"" + item.FVCode.Replace("\"", "") + "\"," + "\"" + rootcause.Replace("\"", "") + "\","
+                    + "\"" + containmentaction.Replace("\"", "") + "\"," + "\"" + correctiveaction.Replace("\"", "") + "\","
+                    + "\"" + item.MaterialDisposition + "\"," + "\"" + item.Resolution + "\"," + "\"" + internalreport + "\",";
+
+                lines.Add(line);
+            }
+
+            return lines;
+        }
+
+        public ActionResult ExportAllOBAData(string StartDate, string EndDate)
+        {
+            string datestring = DateTime.Now.ToString("yyyyMMdd");
+            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+            if (!Directory.Exists(imgdir))
+            {
+                Directory.CreateDirectory(imgdir);
+            }
+
+            var fn = "CQE_OBA_Report_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+            var filename = imgdir + fn;
+
+            var lines = PrepeareAllOBAReport(StartDate, EndDate);
+
+            var wholefile = "";
+            foreach (var l in lines)
+            {
+                wholefile = wholefile + l + "\r\n";
+            }
+            System.IO.File.WriteAllText(filename, wholefile);
+
+            return File(filename, "application/vnd.ms-excel", fn);
+        }
+
+    }
 }

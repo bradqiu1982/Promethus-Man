@@ -491,6 +491,7 @@ namespace Prometheus.Models
         public string FinisarDMR { set; get; }
         public string OBAFailureRate { set; get; }
         public string MaterialDisposition { set; get; }
+        public string ProductType { set; get; }
         #endregion
 
 
@@ -608,15 +609,15 @@ namespace Prometheus.Models
 
         private void StoreOBA()
         {
-            var sql = "insert into IssueOBA(IssueKey,FinisarDMR,OBAFailureRate,MaterialDisposition,ModuleSN,FVCode) values('<IssueKey>','<FinisarDMR>','<OBAFailureRate>','<MaterialDisposition>','<ModuleSN>','<FVCode>')";
+            var sql = "insert into IssueOBA(IssueKey,FinisarDMR,OBAFailureRate,MaterialDisposition,ModuleSN,FVCode,APVal1) values('<IssueKey>','<FinisarDMR>','<OBAFailureRate>','<MaterialDisposition>','<ModuleSN>','<FVCode>','<ProductType>')";
             sql = sql.Replace("<IssueKey>", IssueKey).Replace("<FinisarDMR>", FinisarDMR).Replace("<OBAFailureRate>", OBAFailureRate).Replace("<FVCode>", FVCode)
-                .Replace("<MaterialDisposition>", MaterialDisposition).Replace("<ModuleSN>", ModuleSN);
+                .Replace("<MaterialDisposition>", MaterialDisposition).Replace("<ModuleSN>", ModuleSN).Replace("<ProductType>", ProductType);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
         private void RetrieveOBA()
         {
-            var sql = "select FinisarDMR,OBAFailureRate,MaterialDisposition,ModuleSN,FVCode from IssueOBA where IssueKey = '<IssueKey>'";
+            var sql = "select FinisarDMR,OBAFailureRate,MaterialDisposition,ModuleSN,FVCode,APVal1 from IssueOBA where IssueKey = '<IssueKey>'";
             sql = sql.Replace("<IssueKey>", IssueKey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             if (dbret.Count > 0)
@@ -626,6 +627,7 @@ namespace Prometheus.Models
                 MaterialDisposition = Convert.ToString(dbret[0][2]);
                 ModuleSN = Convert.ToString(dbret[0][3]);
                 FVCode = Convert.ToString(dbret[0][4]);
+                ProductType = Convert.ToString(dbret[0][5]);
             }
         }
 
@@ -813,9 +815,9 @@ namespace Prometheus.Models
 
         private void UpdateOBAInfo()
         {//ssueKey,FinisarDMR,OBAFailureRate,MaterialDisposition,ModuleSN,FVCode
-            var sql = "update IssueOBA set FinisarDMR = '<FinisarDMR>',OBAFailureRate = '<OBAFailureRate>',MaterialDisposition = '<MaterialDisposition>',FVCode = '<FVCode>'  where IssueKey = '<IssueKey>'";
+            var sql = "update IssueOBA set FinisarDMR = '<FinisarDMR>',OBAFailureRate = '<OBAFailureRate>',MaterialDisposition = '<MaterialDisposition>',FVCode = '<FVCode>',APVal1='<ProductType>'  where IssueKey = '<IssueKey>'";
             sql = sql.Replace("<IssueKey>", IssueKey).Replace("<FinisarDMR>", FinisarDMR)
-                .Replace("<OBAFailureRate>", OBAFailureRate).Replace("<MaterialDisposition>", MaterialDisposition).Replace("<FVCode>", FVCode);
+                .Replace("<OBAFailureRate>", OBAFailureRate).Replace("<MaterialDisposition>", MaterialDisposition).Replace("<FVCode>", FVCode).Replace("<ProductType>", ProductType);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 

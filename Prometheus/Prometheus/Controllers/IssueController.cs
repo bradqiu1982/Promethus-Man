@@ -1551,6 +1551,8 @@ namespace Prometheus.Controllers
 
             vm.OBAFailureRate = Request.Form["FailureRate"];
 
+            vm.ProductType = Request.Form["ProductType"];
+
             vm.FVCode = Request.Form["FVCode"];
             vm.RelativePeoples = Request.Form["RPeopleAddr"];
             vm.ModuleSN = Request.Form["ModuleSN"];
@@ -1902,7 +1904,7 @@ namespace Prometheus.Controllers
 
                 line = string.Empty;
                 line = "\""+item.FinisarRMA.Replace("\"","")+"\","+ "\""+item.ModuleSN.Replace("\"", "") + "\"," + "\"" + item.Resolution.Replace("\"", "") + "\","
-                    + "\"" + item.ECustomer.Replace("\"", "") + "\"," + "\"" + item.FVCode.Replace("\"", "") + "\","+ "\""+item.RMAFailureCode.Replace("\"", "") + "\"," + "\""+ rootcause + "\"," 
+                    + "\"" + item.ECustomer.Replace("\"", "") + "\"," + "\"" + item.FVCode.Replace("\"", "") + "\","+ "\""+item.RMAFailureCode.Replace("\"", "") + "\"," + "\""+ rootcause.Trim() + "\"," 
                     + "\""+item.Assignee.Replace("\"", "")+ "\"," + "\""+item.ReportDate.ToString("yyyy-MM-dd hh:mm:ss") + "\"," + "\"" + item.CReport.Replace("\"", "") + "\","
                     + "\""+ internalreport + "\"," + "\""+ customerreport + "\",";
 
@@ -2001,7 +2003,7 @@ namespace Prometheus.Controllers
 
                 line = string.Empty;
                 line = "\"" + item.FinisarRMA.Replace("\"", "") + "\"," + "\"" + item.ProjectKey.Replace("\"", "") + "\"," + "\"" + item.ModuleSN.Replace("\"", "") + "\"," + "\"" + item.Resolution.Replace("\"", "") + "\","
-                    + "\"" + item.ECustomer.Replace("\"", "") + "\"," + "\"" + item.FVCode.Replace("\"", "") + "\"," + "\"" + item.RMAFailureCode.Replace("\"", "") + "\"," + "\"" + rootcause + "\","
+                    + "\"" + item.ECustomer.Replace("\"", "") + "\"," + "\"" + item.FVCode.Replace("\"", "") + "\"," + "\"" + item.RMAFailureCode.Replace("\"", "") + "\"," + "\"" + rootcause.Trim() + "\","
                     + "\"" + item.Assignee.Replace("\"", "") + "\"," + "\"" + item.ReportDate.ToString("yyyy-MM-dd hh:mm:ss") + "\"," + "\"" + item.CReport.Replace("\"", "") + "\","
                     + "\"" + internalreport + "\"," + "\"" + customerreport + "\",";
 
@@ -2040,7 +2042,7 @@ namespace Prometheus.Controllers
             var lines = new List<string>();
             var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, StartDate, EndDate, ISSUETP.OBA);
 
-            var line = "NO,ISSUE DATE,DMR#,Product Type,Failure Rate,Affected SN,FA Owner,OBA Description,FV Results,ROOT CAUSE,Containment Action,Corrective Action,Material Disposition,Resolution,Attachement";
+            var line = "NO,ISSUE DATE,DMR#,Product Type,Failure Rate,Affected SN,FA Owner,OBA Description,Priority,Product Type,FV Results,ROOT CAUSE,Containment Action,Corrective Action,Material Disposition,Resolution,Attachement";
             lines.Add(line);
 
             var idx = 0;
@@ -2072,43 +2074,46 @@ namespace Prometheus.Controllers
 
 
                 var internalreport = "";
-                if (item.AttachList.Count > 0)
+                foreach (var a in item.AttachList)
                 {
-                    if (item.AttachList[item.AttachList.Count - 1].Contains("<a href"))
+                    var internalreport1 = "";
+                    if (a.Contains("<a href"))
                     {
-                        internalreport = item.AttachList[item.AttachList.Count - 1].Split(new string[] { "<a href=\"", "\" target=" }, StringSplitOptions.None)[1];
+                        internalreport1 = a.Split(new string[] { "<a href=\"", "\" target=" }, StringSplitOptions.None)[1];
                     }
                     else
                     {
-                        internalreport = item.AttachList[item.AttachList.Count - 1];
+                        internalreport1 = a;
                     }
-                    internalreport = validatestr + internalreport;
+                    internalreport = internalreport+validatestr + internalreport1 + "||";
                 }
 
                 var issuedata = item.DueDate.AddDays(-6).ToString("MM/dd/yyyy");
 
                 var containmentaction = "";
-                if (item.ContainmentActions.Count > 0)
+                foreach (var c in item.ContainmentActions)
                 {
-                    containmentaction = item.ContainmentActions[item.ContainmentActions.Count - 1].Summary
-                        + ":" + item.ContainmentActions[item.ContainmentActions.Count - 1].Resolution;
+                    containmentaction = containmentaction + c.Summary
+                        + ":" + c.Resolution + "//";
                 }
 
                 var correctiveaction = "";
-                if (item.CorrectiveActions.Count > 0)
+                foreach (var c in item.CorrectiveActions)
                 {
-                    correctiveaction = item.CorrectiveActions[item.CorrectiveActions.Count - 1].Summary
-                        + ":" + item.CorrectiveActions[item.CorrectiveActions.Count - 1].Resolution;
+                    correctiveaction = c.Summary
+                        + ":" + c.Resolution + "//";
                 }
 
 
                 line = string.Empty;
                 line = "\"" + index + "\"," + "\"" + issuedata + "\"," + "\"" + item.FinisarDMR.Replace("\"", "") + "\","
                     + "\"" + item.ProjectKey + "\"," + "\"'" + item.OBAFailureRate.Replace("\"", "") + "\"," + "\"" + item.ModuleSN.Replace("\"", "") + "\"," 
-                    + "\"" + item.Assignee.Replace("\"", "") + "\","+ "\"" + item.Summary.Replace("\"", "") + "\"," 
-                    + "\"" + item.FVCode.Replace("\"", "") + "\"," + "\"" + rootcause.Replace("\"", "") + "\","
+                    + "\"" + item.Assignee.Replace("\"", "") + "\","+ "\"" + item.Summary.Replace("\"", "") + "\","
+                    + "\"" + item.Priority.Replace("\"", "") + "\"," + "\"" + item.ProductType.Replace("\"", "") + "\","
+                    + "\"" + item.FVCode.Replace("\"", "") + "\"," + "\"" + rootcause.Replace("\"", "").Trim() + "\","
                     + "\"" + containmentaction.Replace("\"", "") + "\"," + "\"" + correctiveaction.Replace("\"", "") + "\"," 
-                    + "\"" + item.MaterialDisposition + "\"," + "\"" + item.Resolution + "\"," + "\"" + internalreport + "\",";
+                    + "\"" + item.MaterialDisposition + "\"," + "\"" + item.Resolution + "\"," + "\"" + internalreport + "\","
+                    + "\"http://wux-app1.china.ads.finisar.com/eDMR/DMR_Edit/DMR_View.asp?DMR_ID=" + item.FinisarDMR + "\",";
 
                 lines.Add(line);
             }
@@ -2149,7 +2154,7 @@ namespace Prometheus.Controllers
             var lines = new List<string>();
             var list1 = IssueViewModels.RetrieveAllIssueTypeIssue(StartDate, EndDate, ISSUETP.OBA);
 
-            var line = "NO,ISSUE DATE,DMR#,Product Type,Failure Rate,Affected SN,FA Owner,OBA Description,FV Results,ROOT CAUSE,Containment Action,Corrective Action,Material Disposition,Resolution,Attachement";
+            var line = "NO,ISSUE DATE,DMR#,Product Type,Failure Rate,Affected SN,FA Owner,OBA Description,Priority,Product Type,FV Results,ROOT CAUSE,Containment Action,Corrective Action,Material Disposition,Resolution,Attachement";
             lines.Add(line);
 
             var idx = 0;
@@ -2181,33 +2186,34 @@ namespace Prometheus.Controllers
 
 
                 var internalreport = "";
-                if (item.AttachList.Count > 0)
+                foreach (var a in item.AttachList)
                 {
-                    if (item.AttachList[item.AttachList.Count - 1].Contains("<a href"))
+                    var internalreport1 = "";
+                    if (a.Contains("<a href"))
                     {
-                        internalreport = item.AttachList[item.AttachList.Count - 1].Split(new string[] { "<a href=\"", "\" target=" }, StringSplitOptions.None)[1];
+                        internalreport1 = a.Split(new string[] { "<a href=\"", "\" target=" }, StringSplitOptions.None)[1];
                     }
                     else
                     {
-                        internalreport = item.AttachList[item.AttachList.Count - 1];
+                        internalreport1 = a;
                     }
-                    internalreport = validatestr + internalreport;
+                    internalreport = internalreport + validatestr + internalreport1 + "||";
                 }
 
                 var issuedata = item.DueDate.AddDays(-6).ToString("MM/dd/yyyy");
 
                 var containmentaction = "";
-                if (item.ContainmentActions.Count > 0)
+                foreach (var c in item.ContainmentActions)
                 {
-                    containmentaction = item.ContainmentActions[item.ContainmentActions.Count - 1].Summary
-                        + ":" + item.ContainmentActions[item.ContainmentActions.Count - 1].Resolution;
+                    containmentaction = containmentaction + c.Summary
+                        + ":" + c.Resolution+"//";
                 }
 
                 var correctiveaction = "";
-                if (item.CorrectiveActions.Count > 0)
+                foreach (var c in item.CorrectiveActions)
                 {
-                    correctiveaction = item.CorrectiveActions[item.CorrectiveActions.Count - 1].Summary
-                        + ":" + item.CorrectiveActions[item.CorrectiveActions.Count - 1].Resolution;
+                    correctiveaction = c.Summary
+                        + ":" + c.Resolution + "//";
                 }
 
 
@@ -2215,9 +2221,11 @@ namespace Prometheus.Controllers
                 line = "\"" + index + "\"," + "\"" + issuedata + "\"," + "\"" + item.FinisarDMR.Replace("\"", "") + "\","
                     + "\"" + item.ProjectKey + "\"," + "\"'" + item.OBAFailureRate.Replace("\"", "") + "\"," + "\"" + item.ModuleSN.Replace("\"", "") + "\","
                     + "\"" + item.Assignee.Replace("\"", "") + "\"," + "\"" + item.Summary.Replace("\"", "") + "\","
-                    + "\"" + item.FVCode.Replace("\"", "") + "\"," + "\"" + rootcause.Replace("\"", "") + "\","
+                    + "\"" + item.Priority.Replace("\"", "") + "\"," + "\"" + item.ProductType.Replace("\"", "") + "\","
+                    + "\"" + item.FVCode.Replace("\"", "") + "\"," + "\"" + rootcause.Replace("\"", "").Trim() + "\","
                     + "\"" + containmentaction.Replace("\"", "") + "\"," + "\"" + correctiveaction.Replace("\"", "") + "\","
-                    + "\"" + item.MaterialDisposition + "\"," + "\"" + item.Resolution + "\"," + "\"" + internalreport + "\",";
+                    + "\"" + item.MaterialDisposition + "\"," + "\"" + item.Resolution + "\"," + "\"" + internalreport + "\"," 
+                    + "\"http://wux-app1.china.ads.finisar.com/eDMR/DMR_Edit/DMR_View.asp?DMR_ID=" + item.FinisarDMR + "\",";
 
                 lines.Add(line);
             }

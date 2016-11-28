@@ -61,7 +61,7 @@ namespace Prometheus.Controllers
             ViewBag.prioritylist = slist;
 
             var rsilist = new List<string>();
-            string[] rlist = { Resolute.Pending, Resolute.Working, Resolute.Reopen, Resolute.Fixed, Resolute.Done, Resolute.NotFix, Resolute.Unresolved, Resolute.NotReproduce };
+            string[] rlist = { Resolute.Pending, Resolute.Working, Resolute.Reopen, Resolute.Fixed, Resolute.Done, Resolute.NotFix, Resolute.Unresolved, Resolute.NotReproduce,Resolute.AutoClose };
             rsilist.AddRange(rlist);
             slist = CreateSelectList(rsilist, vm.Resolution);
             ViewBag.resolutionlist = slist;

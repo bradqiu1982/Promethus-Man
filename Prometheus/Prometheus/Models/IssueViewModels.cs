@@ -2335,6 +2335,18 @@ namespace Prometheus.Models
             }
         }
 
+        public static void CloseIssueAutomaticllyWithFailedSN(string pjkey, string SN, string whichtest, string tester, string datestr)
+        {
+            var issues = IssueViewModels.RRetrieveFABySN(pjkey, SN, whichtest);
+            foreach (var tobedata in issues)
+            {
+                tobedata.Resolution = Resolute.AutoClose;
+                tobedata.Description = "Module " + SN + " faild for " + whichtest + " test @" + tester + " @" + datestr+" again";
+                tobedata.UpdateIssue();
+                tobedata.CloseIssue();
+            }
+        }
+
         public static void CloseDupIssueAutomaticlly(string pjkey, string SN, string datestr)
         {
             var issues = IssueViewModels.RRetrieveDupFABySN(pjkey, SN, datestr);

@@ -360,12 +360,19 @@ namespace Prometheus.Models
 
                 if (vm.FinishRating < 90 && DateTime.Parse(starttime) != vm.StartDate)
                 {
-                    CreateSystemIssues(failurelist);
+                        //use latest failure cover previous failure
+                        foreach (var item in failurelist)
+                        {
+                            IssueViewModels.CloseIssueAutomaticllyWithFailedSN(item.ProjectKey, item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss"));
+                        }
+
+                        CreateSystemIssues(failurelist);
                 }
 
                 if (vm.FinishRating < 90 && DateTime.Parse(starttime) != vm.StartDate)
                 {
-                    foreach (var item in passlist)
+                        //use pass sn cover previous failure
+                        foreach (var item in passlist)
                     {
                         IssueViewModels.CloseIssueAutomaticlly(item.ProjectKey,item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss"));
                     }

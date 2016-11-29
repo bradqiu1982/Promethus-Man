@@ -3668,7 +3668,7 @@ namespace Prometheus.Controllers
                             var toaddrs = new List<string>();
                             toaddrs.Add(item.Reporter);
                             toaddrs.Add(item.Assignee);
-                            EmailUtility.SendEmail("Parallel NPI Trace Notice", toaddrs, content);
+                            EmailUtility.SendEmail("RMA Trace Notice", toaddrs, content);
                             new System.Threading.ManualResetEvent(false).WaitOne(300);
                     }
                 } catch (Exception ex) { }
@@ -3698,13 +3698,48 @@ namespace Prometheus.Controllers
                             var toaddrs = new List<string>();
                             toaddrs.Add(item.Reporter);
                             toaddrs.Add(item.Assignee);
-                            EmailUtility.SendEmail("Parallel NPI Trace Notice", toaddrs, content);
+                            EmailUtility.SendEmail("RMA Trace Notice", toaddrs, content);
                             new System.Threading.ManualResetEvent(false).WaitOne(300);
                     }
                 } catch (Exception ex) { }
 
             }//end foreach
         }
+
+        private void SendOBAAlertEmail()
+        {
+            try
+            {
+                var faissues = IssueViewModels.Retrieve_Alert_OBAByProjectKey("PQE");
+
+                foreach (var item in faissues)
+                { item.UpdateAlertEmailDate(); }
+
+                foreach (var item in faissues)
+                {
+                    var routevalue = new RouteValueDictionary();
+                    routevalue.Add("issuekey", item.IssueKey);
+                    //send validate email
+                    string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                    string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+
+                    var netcomputername = "";
+                    try { netcomputername = System.Net.Dns.GetHostName(); }
+                    catch (Exception ex) { }
+                    validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
+
+                    var content = "OBA " + item.FinisarDMR + " analyse  must finished tomorrow :\r\n " + validatestr;
+
+                    var toaddrs = new List<string>();
+                    toaddrs.Add(item.Reporter);
+                    toaddrs.Add(item.Assignee);
+                    EmailUtility.SendEmail("OBA Trace Notice", toaddrs, content);
+                    new System.Threading.ManualResetEvent(false).WaitOne(300);
+                }
+            }
+            catch (Exception ex) { }
+        }
+
 
         public ActionResult HeartBeat()
         {
@@ -3741,6 +3776,7 @@ namespace Prometheus.Controllers
             try
             {
                 SendRMAAlertEmail();
+                SendOBAAlertEmail();
             }
             catch (Exception ex) { }
             

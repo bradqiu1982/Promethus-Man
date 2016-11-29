@@ -626,7 +626,7 @@ namespace Prometheus.Controllers
                 toaddrs.AddRange(vm.RelativePeopleList);
                 toaddrs.Add(vm.Assignee);
                 toaddrs.Add(vm.Reporter);
-                EmailUtility.SendEmail("Parallel NPI Trace Notice", toaddrs, content);
+                EmailUtility.SendEmail("RMA Trace Notice", toaddrs, content);
                 new System.Threading.ManualResetEvent(false).WaitOne(500);
             }
         }
@@ -650,7 +650,7 @@ namespace Prometheus.Controllers
                 toaddrs.AddRange(vm.RelativePeopleList);
                 toaddrs.Add(vm.Assignee);
                 toaddrs.Add(vm.Reporter);
-                EmailUtility.SendEmail("Parallel NPI Trace Notice", toaddrs, content);
+                EmailUtility.SendEmail("OBA Trace Notice", toaddrs, content);
                 new System.Threading.ManualResetEvent(false).WaitOne(500);
             }
         }

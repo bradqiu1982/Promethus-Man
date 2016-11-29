@@ -792,7 +792,7 @@ namespace Prometheus.Controllers
                 toaddrs.AddRange(vm.RelativePeopleList);
                 toaddrs.Add(vm.Assignee);
                 toaddrs.Add(vm.Reporter);
-                EmailUtility.SendEmail("Parallel NPI Trace Notice", toaddrs, content);
+                EmailUtility.SendEmail("RMA Trace Notice", toaddrs, content);
                 new System.Threading.ManualResetEvent(false).WaitOne(300);
             }
         }
@@ -2022,7 +2022,7 @@ namespace Prometheus.Controllers
                 Directory.CreateDirectory(imgdir);
             }
 
-            var fn = "NPI_RMA_Report_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+            var fn = "CQE_RMA_Report_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
             var filename = imgdir + fn;
 
             var lines = PrepeareAllRMAReport(StartDate,EndDate);
@@ -2242,7 +2242,7 @@ namespace Prometheus.Controllers
                 Directory.CreateDirectory(imgdir);
             }
 
-            var fn = "CQE_OBA_Report_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+            var fn = "PQE_OBA_Report_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
             var filename = imgdir + fn;
 
             var lines = PrepeareAllOBAReport(StartDate, EndDate);

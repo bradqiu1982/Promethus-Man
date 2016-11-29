@@ -156,8 +156,51 @@
         }
 
 
+        foreach (var paircoment in Model.PairComments)
+        {
+            <hr />
 
-        if (Model.FailureDetailCommentList.Count > 0)
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Analyse</h3>
+                                    </div>
+                                    <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
+                                        @foreach (var item in paircoment)
+                                        {
+                                            <div class="row col-md-12">
+                                                <h3>@item.CommentType</h3>
+                                            </div>
+                                            <div class="row col-md-12">
+                                                @Html.Raw(item.Comment)
+                                            </div>
+                                            <div class="row col-md-12">
+                                                <div class="col-md-7"></div>
+                                                <div class="col-md-2">
+                                                    Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    @item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")
+                                                </div>
+                                                <div class="row col-md-1">
+                                                    @if (ViewBag.assigee != null && ViewBag.assigee)
+                                                {
+                                                <button class="form-control" value="ErrorKey=@(item.ErrorKey)&CommentType=Result&Date=@(item.CommentDate.ToString())" onclick="DeleteComment(this)">
+                                                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                                </button>
+                                                }
+                                                </div>
+                                            </div>
+                                            <hr />
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+        }
+
+        @*if (Model.FailureDetailCommentList.Count > 0)
         {
             <hr />
 
@@ -278,7 +321,7 @@
                     </div>
                 </div>
             </div>
-        }
+        }*@
 
         <script type="text/javascript">
 

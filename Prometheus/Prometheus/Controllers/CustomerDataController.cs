@@ -552,9 +552,9 @@ namespace Prometheus.Controllers
                                         templine.Add(data[idx][7]);
 
                                         var Priority = ISSUEPR.Major;
-                                        if (string.Compare(data[idx][8],ISSUEPR.Blocker,true) == 0)
+                                        if (string.Compare(data[idx][8],ISSUEPR.Minor,true) == 0)
                                         {
-                                            Priority = ISSUEPR.Blocker;
+                                            Priority = ISSUEPR.Minor;
                                         }
                                         if (string.Compare(data[idx][8], ISSUEPR.Critical, true) == 0)
                                         {

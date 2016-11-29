@@ -1152,6 +1152,7 @@ namespace Prometheus.Controllers
                 if (ckdict.ContainsKey("logonuser"))
                 {
                     ViewBag.logined = true;
+                    ViewBag.UpdaterName = ckdict["logonuser"].Split(new char[] { '|' })[0].ToUpper();
                 }
 
                 return View(vm);

@@ -179,6 +179,13 @@ namespace Prometheus.Models
         }
 
 
+        private List<List<ErrorComments>> pcomments = new List<List<ErrorComments>>();
+        public List<List<ErrorComments>> PairComments
+        {
+            get { return pcomments; }
+        }
+
+
         private List<ErrorComments> cemlist = new List<ErrorComments>();
         public List<ErrorComments> CommentList
         {
@@ -211,7 +218,34 @@ namespace Prometheus.Models
                         resultcommentlist.Add(item);
                     }
                 }
+
+                foreach (var item in failuredetailcommentlist)
+                {
+                    var temppitem = new List<ErrorComments>();
+                    temppitem.Add(item);
+
+                    var starttime = item.CommentDate.AddSeconds(-3);
+                    var endtime = item.CommentDate.AddSeconds(3);
+
+                    foreach (var r in rootcausecommentlist)
+                    {
+                        if (r.CommentDate > starttime && r.CommentDate < endtime)
+                        {
+                            temppitem.Add(r);
+                        }
+                    }//end foreach
+                    foreach (var r in resultcommentlist)
+                    {
+                        if (r.CommentDate > starttime && r.CommentDate < endtime)
+                        {
+                            temppitem.Add(r);
+                        }
+                    }//end foreach
+
+                    pcomments.Add(temppitem);
+                }//end foreach
             }
+
             get
             {
                 return cemlist;

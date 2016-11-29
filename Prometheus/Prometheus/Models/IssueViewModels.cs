@@ -898,7 +898,7 @@ namespace Prometheus.Models
 
         public static IssueViewModels RetrieveIssueByIssueKey(string issuekey)
         {
-            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples,APVal2 from Issue where APVal1 <> 'delete' and IssueKey = '<IssueKey>'";
+            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples,APVal2,ErrAbbr from Issue where APVal1 <> 'delete' and IssueKey = '<IssueKey>'";
             sql = sql.Replace("<IssueKey>", issuekey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             if (dbret.Count > 0)
@@ -911,6 +911,7 @@ namespace Prometheus.Models
                     , Convert.ToString(dbret[0][9]), Convert.ToString(dbret[0][10])
                     , Convert.ToString(dbret[0][11]), Convert.ToString(dbret[0][12]));
                 ret.LYT = Convert.ToString(dbret[0][13]);
+                ret.ErrAbbr = Convert.ToString(dbret[0][14]);
 
                 ret.RetrieveComment();
 

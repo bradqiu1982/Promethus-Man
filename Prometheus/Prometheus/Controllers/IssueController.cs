@@ -968,6 +968,52 @@ namespace Prometheus.Controllers
                 }
             }
 
+
+            if (Request.Form["linkisu"] != null)
+            {
+                if (string.Compare(updater, originaldata.Reporter, true) == 0
+                    || string.Compare(updater, originaldata.Assignee, true) == 0)
+                {
+                    var errabbr = "";
+                    if (!string.IsNullOrEmpty(originaldata.ErrAbbr))
+                    {
+                        errabbr = originaldata.ErrAbbr;
+                    }
+                    else
+                    {
+                        try {
+                            errabbr = originaldata.Summary.Split(new string[] { "failed for", "@" }, StringSplitOptions.None)[1].Trim();
+                        } catch (Exception ex) { errabbr = ""; }
+                        
+                    }
+
+                    if (!string.IsNullOrEmpty(errabbr))
+                    {
+                        var perrlist = ProjectErrorViewModels.RetrieveErrorByPJKey(originaldata.ProjectKey, errabbr);
+                        if (perrlist.Count > 0)
+                        {
+                            var linktime = DateTime.Now.ToString();
+                            foreach (var item in originaldata.FailureDetailCommentList)
+                            {
+                                ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, item.dbComment, PJERRORCOMMENTTYPE.FailureDetail,updater, linktime);
+                            }
+                            foreach (var item in originaldata.RootCauseCommentList)
+                            {
+                                ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, item.dbComment, PJERRORCOMMENTTYPE.RootCause, updater, linktime);
+                            }
+                            foreach (var item in originaldata.ResultCommentList)
+                            {
+                                ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, item.dbComment, PJERRORCOMMENTTYPE.Result, updater, linktime);
+                            }
+
+                            var dict = new RouteValueDictionary();
+                            dict.Add("ErrorKey", perrlist[0].ErrorKey);
+                            return RedirectToAction("UpdateProjectError", "Project", dict);
+                        }//end if
+                    }//end if
+                }
+            }
+
             var vm = new IssueViewModels();
             vm.IssueKey = issuekey;
             vm.Reporter = updater;

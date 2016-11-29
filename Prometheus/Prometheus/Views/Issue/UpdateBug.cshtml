@@ -560,7 +560,16 @@
                     <input type="submit" value="Delete" id="deleteisu" name="deleteisu" class="btn btn-default" />
                 }
             </div>
-            <div class="col-md-6"></div>
+            <div class="col-md-3">
+                @if (ViewBag.isassignee != null 
+                    && ViewBag.isassignee
+                    && Model.FailureDetailCommentList.Count > 0
+                    && Model.RootCauseCommentList.Count > 0)
+                {
+                    <input type="submit" value="Link2DebugTree" id="linkisu" name="linkisu" class="btn btn-default" />
+                }
+            </div>
+            <div class="col-md-3"></div>
         </div>
     </div>
 }

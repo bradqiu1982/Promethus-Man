@@ -337,6 +337,13 @@ namespace Prometheus.Controllers
                     return RedirectToAction("UpdateOBA", "Issue", dict);
                 }
 
+                if (string.Compare(ret.IssueType, ISSUETP.Quality) == 0)
+                {
+                    var dict = new RouteValueDictionary();
+                    dict.Add("issuekey", key);
+                    return RedirectToAction("UpdateQuality", "Issue", dict);
+                }
+
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
                 ViewBag.isassignee = false;
                 if (string.Compare(updater, ret.Assignee, true) == 0
@@ -1715,6 +1722,16 @@ namespace Prometheus.Controllers
         }
 
         public ActionResult ShowRootCause(string issuekey)
+        {
+            if (!string.IsNullOrEmpty(issuekey))
+            {
+                var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+                return View(vm);
+            }
+            return View();
+        }
+
+        public ActionResult ShowAnalysis(string issuekey)
         {
             if (!string.IsNullOrEmpty(issuekey))
             {

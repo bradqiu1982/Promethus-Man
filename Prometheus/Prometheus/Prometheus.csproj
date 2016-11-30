@@ -790,6 +790,10 @@
     <Content Include="Views\CustomerData\ConfirmOBAData.cshtml" />
     <Content Include="Views\Project\ProjectOBA.cshtml" />
     <Content Include="Views\Issue\UpdateOBA.cshtml" />
+    <Content Include="Views\Project\ProjectQuality.cshtml" />
+    <Content Include="Views\Issue\ShowAnalysis.cshtml" />
+    <Content Include="Views\CustomerData\CommitQualityData.cshtml" />
+    <Content Include="Views\CustomerData\ConfirmQualityData.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

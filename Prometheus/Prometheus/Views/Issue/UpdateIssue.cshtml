@@ -157,10 +157,17 @@
 
                 </div>
                 <div class="col-md-6">
-                    @*<label class="control-label col-md-2" for="reporterlist">Reporter<font color="red">*</font></label>
-                        <div class="col-md-10">
-                            @Html.DropDownList("reporterlist", null, new { @id = "reporterlist", @class = "form-control" })
-                        </div>*@
+                    <label class="control-label col-md-2">Creator</label>
+                    <div class="col-md-10">
+                        @if (Model != null && !string.IsNullOrEmpty(Model.Reporter))
+                        {
+                            <input class="form-control text-box single-line" value="@Model.Reporter" readonly="readonly" type="text"/>
+                        }
+                        else
+                        {
+                            <input class="form-control text-box single-line" readonly="readonly" type="text" value="" />
+                        }
+                    </div>
                 </div>
                 <script type="text/javascript">
                     $(document).ready(function () {

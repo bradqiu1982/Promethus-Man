@@ -352,7 +352,7 @@ namespace Prometheus.Controllers
                     ViewBag.isassignee = true;
                 }
 
-                ret.Reporter = updater;
+                //ret.Reporter = updater;
                 CreateAllLists(ret);
 
                 if (ret.Summary.Contains(" @Burn-In Step "))
@@ -935,7 +935,7 @@ namespace Prometheus.Controllers
                     ViewBag.isassignee = true;
                 }
 
-                ret.Reporter = updater;
+                //ret.Reporter = updater;
                 CreateAllLists(ret);
 
                 if (ret.Summary.Contains(" @Burn-In Step "))
@@ -1227,7 +1227,7 @@ namespace Prometheus.Controllers
                 {
                     ViewBag.isassignee = true;
                 }
-                ret.Reporter = updater;
+                //ret.Reporter = updater;
 
                 CreateAllLists(ret);
                 return View(ret);
@@ -1551,7 +1551,7 @@ namespace Prometheus.Controllers
                 {
                     ViewBag.isassignee = true;
                 }
-                ret.Reporter = updater;
+                //ret.Reporter = updater;
 
                 CreateAllLists(ret);
                 return View(ret);

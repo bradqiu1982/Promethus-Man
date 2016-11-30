@@ -202,7 +202,7 @@ namespace Prometheus.Controllers
                 }
             }
 
-            return View();
+            return RedirectToAction("ReviewVcselData","CustomerData");
         }
 
 
@@ -216,7 +216,6 @@ namespace Prometheus.Controllers
             titles.Add("Module_Name");
             titles.Add("Module_AgilePN");
             titles.Add("VCSEL_AgilePN");
-            //titles.Add("VCSEL_ProductFamily");
             titles.Add("VCSEL_Description");
             titles.Add("PD_AgilePN");
             titles.Add("PD_Description");
@@ -224,6 +223,8 @@ namespace Prometheus.Controllers
             titles.Add("PBI_VCSEL_Temp");
             titles.Add("PBI_VCSEL_Bias");
             titles.Add("PBI_VCSEL_Time");
+            titles.Add("Allen_PN");
+
             vm.Add(titles);
             foreach (var line in data)
             {
@@ -233,21 +234,13 @@ namespace Prometheus.Controllers
                 }
 
                 var showline = new List<string>();
-                for (var i = 0; i < line.Count; i++)
+                for (var i = 0; i < titles.Count; i++)
                 {
-                    if (i == 0 || i == 1 || i == 2
-                        //|| i == 7 || i == 8 || i == 9
-                        || i == 7 || i == 9
-                        || i == 10 || i == 12 || i == 13
-                        || i == 32 || i == 33 || i == 34)
-                    {
-                        showline.Add(line[i]);
-                    }
+                   showline.Add(line[i]);
                 }
                 vm.Add(showline);
             }
             return View(vm);
-
         }
 
 
@@ -905,7 +898,78 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        private List<string> PrepeareVcselReport()
+        {
+            var ret = new List<string>();
 
+            var data = VcselViewModel.RetrieveVcselData();
+            var vm = new List<List<string>>();
+            var titles = new List<string>();
+            titles.Add("Module_Desc");
+            titles.Add("Module_Name");
+            titles.Add("Module_AgilePN");
+            titles.Add("VCSEL_AgilePN");
+            titles.Add("VCSEL_Description");
+            titles.Add("PD_AgilePN");
+            titles.Add("PD_Description");
+            titles.Add("MPD_AgilePN");
+            titles.Add("PBI_VCSEL_Temp");
+            titles.Add("PBI_VCSEL_Bias");
+            titles.Add("PBI_VCSEL_Time");
+            titles.Add("Allen_PN");
+
+            vm.Add(titles);
+            foreach (var line in data)
+            {
+                if (string.IsNullOrEmpty(line[1].Trim()))
+                {
+                    continue;
+                }
+
+                var showline = new List<string>();
+                for (var i = 0; i < titles.Count; i++)
+                {
+                    showline.Add(line[i]);
+                }
+                vm.Add(showline);
+            }
+
+            foreach (var line in vm)
+            {
+                var ls = "";
+                foreach (var item in line)
+                {
+                    ls = ls + "\"" + item.Replace("\"", "").Trim() + "\",";
+                }
+                ret.Add(ls);
+            }
+
+            return ret;
+        }
+
+        public ActionResult ExportVcselData()
+        {
+            string datestring = DateTime.Now.ToString("yyyyMMdd");
+            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+            if (!Directory.Exists(imgdir))
+            {
+                Directory.CreateDirectory(imgdir);
+            }
+
+            var fn = "Vcsel_Usage_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+            var filename = imgdir + fn;
+
+            var lines = PrepeareVcselReport();
+
+            var wholefile = "";
+            foreach (var l in lines)
+            {
+                wholefile = wholefile + l + "\r\n";
+            }
+            System.IO.File.WriteAllText(filename, wholefile);
+
+            return File(filename, "application/vnd.ms-excel", fn);
+        }
 
     }
 }

@@ -11,13 +11,13 @@ namespace Prometheus.Models
 
         public static void StoreVcselData(List<string> line)
         {
-            var sql = "delete from VCSELUsageTable where Module_Desc='<v0>' and Module_AgilePN='<v2>' and VCSEL_AgilePN = '<v7>'";
-            sql = sql.Replace("<v0>", line[0]).Replace("<v2>", line[2]).Replace("<v7>", line[7]);
+            var sql = "delete from VCSELUsageTable where Module_Desc='<v0>' and Module_AgilePN='<v2>' and VCSEL_AgilePN = '<v3>'";
+            sql = sql.Replace("<v0>", line[0]).Replace("<v2>", line[2]).Replace("<v3>", line[3]);
             DBUtility.ExeLocalSqlNoRes(sql);
 
             sql = "insert into VCSELUsageTable values (<v>)";
             var valuestring = string.Empty;
-            for (var i = 0; i < 40; i++)
+            for (var i = 0; i < 12; i++)
             {
                 valuestring = valuestring + "'" + line[i] + "',";
             }
@@ -29,7 +29,7 @@ namespace Prometheus.Models
         public static List<List<string>> RetrieveVcselData()
         {
             var ret = new List<List<string>>();
-            var sql = "select * from VCSELUsageTable";
+            var sql = "select * from VCSELUsageTable order by Module_Desc";
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             foreach (var line in dbret)
             {

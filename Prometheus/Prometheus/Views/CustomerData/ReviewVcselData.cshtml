@@ -4,9 +4,22 @@
 }
 
 
-
-<h2>Review Vcsel Data</h2>
-
+<div class="row col-md-12">
+    <div class="col-md-4">
+        <h2>Review Vcsel Data</h2>
+    </div>
+    <div class="col-md-2">
+        <h2><button class="form-control" data-toggle="tooltip" title="Export Vcsel Usage" onclick="ExportVcselUsage()" type="button"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span></button></h2>
+    </div>
+    <div class="col-md-6">
+    </div>
+    <script type="text/javascript">
+        function ExportVcselUsage() {
+            var myurl = '/CustomerData/ExportVcselData';
+            window.open(myurl, '_blank');
+        }
+    </script>
+</div>
 <hr/>
 
 @if (Model != null)
@@ -19,7 +32,7 @@
                 <tr>
                     @foreach (var item in line)
                             {
-                        <th style="font-size:10px">@item</th>
+                        <th style="text-align:center;font-size:10px">@item</th>
                     }
                 </tr>
                 break;
@@ -37,7 +50,7 @@
                 <tr>
                     @foreach (var item in line)
                     {
-                        <th style="font-size:10px">@item</th>
+                        <th style="text-align:center;font-size:10px">@item</th>
                     }
                 </tr>
             }
@@ -48,7 +61,8 @@
             $('#vcseldatatable').DataTable({
                 'iDisplayLength': 50,
                 'aLengthMenu': [[25, 50, 100, -1],
-                                [25, 50, 100, "All"]]
+                                [25, 50, 100, "All"]],
+                "aaSorting": []
             });
                     } );
     </script>

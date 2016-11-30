@@ -84,7 +84,7 @@ namespace Prometheus.Controllers
             ViewBag.RMAFailureCode = slist;
 
             var metriallist = new List<string>();
-            string[] mlist = { "None", "Scrap", "Rework", "UAI" };
+            string[] mlist = { "None", "Scrap", "Rework", "UAI","Sorting","Purge" };
             metriallist.AddRange(mlist);
             slist = CreateSelectList(metriallist, vm.MaterialDisposition);
             ViewBag.dispositionlist = slist;
@@ -804,6 +804,34 @@ namespace Prometheus.Controllers
             }
         }
 
+        private void SendIssueEvent(IssueViewModels vm, string operate,string issuetype, bool nocheck = false)
+        {
+            var alertime = vm.RetrieveAlertEmailDate(vm.IssueKey);
+            if ((!string.IsNullOrEmpty(alertime) && DateTime.Parse(alertime).AddHours(24) < DateTime.Now) || nocheck)
+            {
+                vm.UpdateAlertEmailDate();
+
+                var routevalue = new RouteValueDictionary();
+                routevalue.Add("issuekey", vm.IssueKey);
+                //send validate email
+                string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+
+                var netcomputername = "";
+                try { netcomputername = System.Net.Dns.GetHostName(); }
+                catch (Exception ex) { }
+                validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
+
+                var content = vm.Summary + " is " + operate + " by " + vm.Reporter + " :\r\n " + validatestr;
+
+                var toaddrs = new List<string>();
+                toaddrs.AddRange(vm.RelativePeopleList);
+                toaddrs.Add(vm.Assignee);
+                toaddrs.Add(vm.Reporter);
+                EmailUtility.SendEmail(issuetype+" Trace Notice", toaddrs, content);
+                new System.Threading.ManualResetEvent(false).WaitOne(300);
+            }
+        }
 
         [HttpPost, ActionName("CreateRMA")]
         [ValidateAntiForgeryToken]
@@ -1669,7 +1697,7 @@ namespace Prometheus.Controllers
                 {
                     IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
 
-                    UserRankViewModel.UpdateUserRank(updater, 5);
+                    UserRankViewModel.UpdateUserRank(updater, 3);
                 }
             }
 
@@ -1693,7 +1721,7 @@ namespace Prometheus.Controllers
 
                     ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
                     vm.CloseIssue();
-                    SendRMAEvent(vm, "closed", true);
+                    SendIssueEvent(vm, "closed",ISSUETP.OBA, true);
                 }
 
                 if (string.Compare(vm.Resolution, Resolute.Working) == 0)
@@ -1704,7 +1732,239 @@ namespace Prometheus.Controllers
                 if (string.Compare(vm.Resolution, Resolute.Reopen) == 0)
                 {
                     ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Reopened", originaldata.Summary, originaldata.IssueKey);
-                    SendRMAEvent(vm, "reopened", true);
+                    SendIssueEvent(vm, "reopened", ISSUETP.OBA, true);
+                }
+            }
+
+            var newdata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+            CreateAllLists(newdata);
+
+            ViewBag.isassignee = false;
+            if (string.Compare(updater, newdata.Assignee, true) == 0
+                    || string.Compare(updater, newdata.Reporter, true) == 0)
+            {
+                ViewBag.isassignee = true;
+            }
+
+            return View(newdata);
+        }
+
+        public ActionResult UpdateQuality(string issuekey)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "Issue");
+                ck.Add("logonredirectact", "UpdateIssue");
+                ck.Add("issuekey", issuekey);
+                ck.Add("currentaction", "UpdateIssue");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var key = "";
+            if (!string.IsNullOrEmpty(issuekey))
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("issuekey", issuekey);
+                CookieUtility.SetCookie(this, ck);
+                key = issuekey;
+            }
+            else if (ckdict.ContainsKey("issuekey") && !string.IsNullOrEmpty(ckdict["issuekey"]))
+            {
+                key = ckdict["issuekey"];
+                var ck = new Dictionary<string, string>();
+                ck.Add("currentaction", "UpdateIssue");
+                CookieUtility.SetCookie(this, ck);
+            }
+
+            if (string.IsNullOrEmpty(key))
+            {
+                var tempvm = new IssueViewModels();
+                CreateAllLists(tempvm);
+                return View();
+            }
+
+            var ret = IssueViewModels.RetrieveIssueByIssueKey(key);
+            if (ret != null)
+            {
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+                ViewBag.isassignee = false;
+                if (string.Compare(updater, ret.Assignee, true) == 0
+                    || string.Compare(updater, ret.Reporter, true) == 0)
+                {
+                    ViewBag.isassignee = true;
+                }
+                //ret.Reporter = updater;
+
+                CreateAllLists(ret);
+                return View(ret);
+            }
+            else
+            {
+                var tempvm = new IssueViewModels();
+                CreateAllLists(tempvm);
+                return View();
+            }
+        }
+
+        [HttpPost, ActionName("UpdateQuality")]
+        [ValidateAntiForgeryToken]
+        public ActionResult UpdateQualityPost()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            var issuekey = Request.Form["IssueKey"];
+
+            var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+
+            if (Request.Form["deleterma"] != null)
+            {
+                if (string.Compare(updater, originaldata.Reporter, true) == 0
+                    || string.Compare(updater, originaldata.Assignee, true) == 0)
+                {
+                    IssueViewModels.RemoveIssue(issuekey);
+                    var dict = new RouteValueDictionary();
+                    dict.Add("ProjectKey", originaldata.ProjectKey);
+                    return RedirectToAction("ProjectDetail", "Project", dict);
+                }
+            }
+
+            var vm = new IssueViewModels();
+            vm.ProjectKey = Request.Form["projectlist"].ToString();
+            vm.IssueKey = issuekey;
+            vm.IssueType = ISSUETP.Quality;
+
+            vm.RMAFailureCode = Request.Form["FailureMode"];
+
+            var tempdispose = Request.Form["dispositionlist"].ToString();
+            if (string.Compare(tempdispose, "None", true) == 0)
+            {
+                vm.MaterialDisposition = "";
+            }
+            else
+            {
+                vm.MaterialDisposition = tempdispose;
+            }
+
+            vm.AffectRange = Request.Form["AffectRange"];
+
+            vm.ProductType = Request.Form["ProductType"];
+
+            vm.RelativePeoples = Request.Form["RPeopleAddr"];
+
+            vm.ModuleSN = originaldata.ModuleSN;
+            vm.Summary = originaldata.Summary;
+
+            vm.Priority = Request.Form["prioritylist"].ToString();
+            vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
+            vm.ReportDate = DateTime.Now;
+            vm.Reporter = updater;
+
+            if (string.Compare(originaldata.Reporter, updater, true) == 0
+                || string.Compare(originaldata.Assignee, updater, true) == 0)
+            {
+                vm.Assignee = Request.Form["assigneelist"].ToString();
+                vm.Resolution = Request.Form["resolutionlist"].ToString();
+            }
+            else
+            {
+                vm.Assignee = originaldata.Assignee;
+                vm.Resolution = originaldata.Resolution;
+            }
+
+            if (!string.IsNullOrEmpty(Request.Form["editor1"]))
+            {
+                vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
+                vm.CommentType = COMMENTTYPE.Description;
+                UserRankViewModel.UpdateUserRank(updater, 2);
+            }
+            else
+                vm.Description = "";
+
+            if (!string.IsNullOrEmpty(Request.Form["analysiseditor"]))
+            {
+                var analysis = Server.HtmlDecode(Request.Form["analysiseditor"]);
+                var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(analysis));
+                var commenttype = COMMENTTYPE.Analysis;
+                IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
+                UserRankViewModel.UpdateUserRank(updater, 3);
+            }
+
+            if (!string.IsNullOrEmpty(Request.Form["rootcauseeditor"]))
+            {
+                var rootcause = Server.HtmlDecode(Request.Form["rootcauseeditor"]);
+                var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(rootcause));
+                var commenttype = COMMENTTYPE.RootCause;
+                IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
+                UserRankViewModel.UpdateUserRank(updater, 5);
+            }
+
+            var urls = ReceiveRMAFiles();
+
+            if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
+            {
+                var attachementfile = Request.Form["attachmentupload"];
+                var originalname1 = Path.GetFileNameWithoutExtension(attachementfile)
+                    .Replace(" ", "_").Replace("#", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                var url = "";
+                foreach (var r in urls)
+                {
+                    if (r.Contains(originalname1))
+                    {
+                        url = r;
+                        break;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(url))
+                {
+                    IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
+
+                    UserRankViewModel.UpdateUserRank(updater, 3);
+                }
+            }
+
+            vm.UpdateQuality();
+
+            ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Updated", originaldata.Summary, originaldata.IssueKey);
+
+            if (string.Compare(originaldata.Assignee, vm.Assignee, true) != 0)
+            {
+                vm.UpdateIAssign();
+                ProjectEvent.AssignIssueEvent(originaldata.ProjectKey, updater, vm.Assignee, originaldata.Summary, originaldata.IssueKey);
+                vm.Summary = originaldata.Summary;
+                SendTaskEvent(vm, "asigned to you", updater, vm.Assignee);
+            }
+
+            if (string.Compare(originaldata.Resolution, vm.Resolution, true) != 0)
+            {
+                if (vm.IssueClosed())
+                {
+                    UserRankViewModel.UpdateUserRank(updater, 5);
+
+                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
+                    vm.CloseIssue();
+                    SendIssueEvent(vm, "closed",ISSUETP.Quality, true);
+                }
+
+                if (string.Compare(vm.Resolution, Resolute.Working) == 0)
+                {
+                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Started", originaldata.Summary, originaldata.IssueKey);
+                }
+
+                if (string.Compare(vm.Resolution, Resolute.Reopen) == 0)
+                {
+                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Reopened", originaldata.Summary, originaldata.IssueKey);
+                    SendIssueEvent(vm, "reopened", ISSUETP.Quality, true);
                 }
             }
 

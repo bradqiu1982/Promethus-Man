@@ -947,7 +947,7 @@ namespace Prometheus.Controllers
 
                             vm.RMAFailureCode = "";
                             vm.FVCode = "";
-                            vm.Description = "";
+                            vm.Description = vm.Summary;
                             vm.CommentType = COMMENTTYPE.Description;
 
                             vm.StoreIssue();
@@ -1068,7 +1068,7 @@ namespace Prometheus.Controllers
 
                             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
 
-                            vm.Description = "";
+                            vm.Description = vm.Summary;
                             vm.CommentType = COMMENTTYPE.Description;
 
                             vm.DataID = "";
@@ -1190,7 +1190,7 @@ namespace Prometheus.Controllers
 
                             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
 
-                            vm.Description = "";
+                            vm.Description = vm.Summary;
                             vm.CommentType = COMMENTTYPE.Description;
 
                             vm.DataID = "";

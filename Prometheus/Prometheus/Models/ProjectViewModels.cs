@@ -6,7 +6,17 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Prometheus.Models
 {
-    
+    public class ProjectTypeInf
+    {
+        public static string Parallel = "Parallel";
+        public static string Tunable = "Tunable";
+        public static string OSA = "OSA";
+        public static string LineCard = "LineCard";
+        public static string QM = "QM";
+        public static string Others = "Others";
+    }
+
+
     public class ProjectStation
     {
         public ProjectStation(string key, string stat)

@@ -1,18 +1,18 @@
 ﻿
 @{
-    ViewBag.Title = "CommitOBAData";
+    ViewBag.Title = "CommitQualityData";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="row">
     <div class="col-md-12">
-        <div class="col-md-4"><h2>Create OBA Issue</h2></div>
+        <div class="col-md-4"><h2>Create Quality Issue</h2></div>
         <div class="col-md-5"></div>
         <div class="col-md-3 text-center"><a href="~/Scripts/project_list.xlsx" target="_blank">Project List File</a></div>
     </div>
 </div>
 
-@using (Html.BeginForm("CommitOBAData", "CustomerData", FormMethod.Post, new { enctype = "multipart/form-data" }))
+@using (Html.BeginForm("CommitQualityData", "CustomerData", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
 
@@ -22,7 +22,7 @@
 
                 <div class="col-md-4">
                     <span class="btn btn-default btn-file" id="choosefile1">
-                        OBA Data File <input type="file" name="files1" id="file1" runat="server" onchange="ShowFileNames1(this)" />
+                        Quality Data File <input type="file" name="files1" id="file1" runat="server" onchange="ShowFileNames1(this)" />
                     </span>
                 </div>
                 <div class="col-md-8">
@@ -43,14 +43,16 @@
             </script>
         </div>
     </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="form-group">
-                    <div class="col-md-3"><input type="submit" value="Submit" class="btn btn-default" /></div>
-                    <div class="col-md-9"></div>
-                </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <div class="col-md-3"><input type="submit" value="Submit" class="btn btn-default" /></div>
+                <div class="col-md-9"></div>
             </div>
         </div>
+    </div>
 }
+
+
 
 

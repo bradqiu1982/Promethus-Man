@@ -11,6 +11,7 @@ namespace Prometheus.Models
         public static string RMA = "RMA";
         public static string Task = "Task";
         public static string OBA = "OBA";
+        public static string Quality = "Quality";
         public static string NPIPROC = "NPI PROCESS";
         public static string NewFeature = "New Feature";
         public static string Improvement = "Improvement";
@@ -120,6 +121,7 @@ namespace Prometheus.Models
         public static string InternalReport = "Internal Report";
         public static string FailureDetail = "FailureDetail";
         public static string Result = "Result";
+        public static string Analysis = "Analysis";
     }
 
     public class IssueComments
@@ -290,6 +292,7 @@ namespace Prometheus.Models
                 internalrepotcommentlist.Clear();
                 failuredetailcommentlist.Clear();
                 resultcommentlist.Clear();
+                analysiscommentlist.Clear();
 
                 foreach (var item in cemlist)
                 {
@@ -318,6 +321,10 @@ namespace Prometheus.Models
                     {
                         resultcommentlist.Add(item);
                     }
+                    if (string.Compare(item.CommentType, COMMENTTYPE.Analysis) == 0)
+                    {
+                        analysiscommentlist.Add(item);
+                    }
                 }
             }
             get
@@ -332,6 +339,7 @@ namespace Prometheus.Models
         private List<IssueComments> internalrepotcommentlist = new List<IssueComments>();
         private List<IssueComments> failuredetailcommentlist = new List<IssueComments>();
         private List<IssueComments> resultcommentlist = new List<IssueComments>();
+        private List<IssueComments> analysiscommentlist = new List<IssueComments>();
 
         public List<IssueComments> GeneralCommentList
         {
@@ -361,6 +369,11 @@ namespace Prometheus.Models
         public List<IssueComments> ResultCommentList
         {
             get { return resultcommentlist; }
+        }
+
+        public List<IssueComments> AnalysisCommentList
+        {
+            get { return analysiscommentlist; }
         }
 
         private List<string> attachlist = new List<string>();
@@ -494,6 +507,9 @@ namespace Prometheus.Models
         public string ProductType { set; get; }
         #endregion
 
+        #region Quallity
+        public string AffectRange { set; get; }
+        #endregion
 
         #region RMA
 
@@ -605,6 +621,11 @@ namespace Prometheus.Models
             {
                 StoreOBA();
             }
+
+            if (string.Compare(IssueType, ISSUETP.Quality) == 0)
+            {
+                StoreQuality();
+            }
         }
 
         private void StoreOBA()
@@ -612,6 +633,14 @@ namespace Prometheus.Models
             var sql = "insert into IssueOBA(IssueKey,FinisarDMR,OBAFailureRate,MaterialDisposition,ModuleSN,FVCode,APVal1) values('<IssueKey>','<FinisarDMR>','<OBAFailureRate>','<MaterialDisposition>','<ModuleSN>','<FVCode>','<ProductType>')";
             sql = sql.Replace("<IssueKey>", IssueKey).Replace("<FinisarDMR>", FinisarDMR).Replace("<OBAFailureRate>", OBAFailureRate).Replace("<FVCode>", FVCode)
                 .Replace("<MaterialDisposition>", MaterialDisposition).Replace("<ModuleSN>", ModuleSN).Replace("<ProductType>", ProductType);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        private void StoreQuality()
+        {
+            var sql = "insert into IssueAttribute(IssueKey,APVal1,APVal2,APVal3,APVal4) values('<IssueKey>','<RMAFailureCode>','<ProductType>','<AffectRange>','<MaterialDisposition>')";
+            sql = sql.Replace("<IssueKey>", IssueKey).Replace("<RMAFailureCode>", RMAFailureCode).Replace("<ProductType>", ProductType).Replace("<AffectRange>", AffectRange)
+                .Replace("<MaterialDisposition>", MaterialDisposition);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
@@ -628,6 +657,20 @@ namespace Prometheus.Models
                 ModuleSN = Convert.ToString(dbret[0][3]);
                 FVCode = Convert.ToString(dbret[0][4]);
                 ProductType = Convert.ToString(dbret[0][5]);
+            }
+        }
+
+        private void RetrieveQuality()
+        {
+            var sql = "select APVal1,APVal2,APVal3,APVal4 from IssueAttribute where IssueKey = '<IssueKey>'";
+            sql = sql.Replace("<IssueKey>", IssueKey);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            if (dbret.Count > 0)
+            {
+                RMAFailureCode = Convert.ToString(dbret[0][0]);
+                ProductType = Convert.ToString(dbret[0][1]);
+                AffectRange = Convert.ToString(dbret[0][2]);
+                MaterialDisposition = Convert.ToString(dbret[0][3]);
             }
         }
 
@@ -822,6 +865,27 @@ namespace Prometheus.Models
         }
 
 
+        public void UpdateQuality()
+        {
+            var sql = "update Issue set Priority = '<Priority>',DueDate = '<DueDate>', Assignee = '<Assignee>',Resolution = '<Resolution>',RelativePeoples = '<RelativePeoples>' where IssueKey = '<IssueKey>'";
+            sql = sql.Replace("<IssueKey>", IssueKey).Replace("<Priority>", Priority)
+                .Replace("<DueDate>", DueDate.ToString()).Replace("<Assignee>", Assignee)
+                .Replace("<Resolution>", Resolution).Replace("<RelativePeoples>", RelativePeoples);
+            DBUtility.ExeLocalSqlNoRes(sql);
+
+            StoreIssueComment(DateTime.Now.ToString());
+
+            UpdateQualitynfo();
+        }
+
+        private void UpdateQualitynfo()
+        {//IssueAttribute(IssueKey,APVal1,APVal2,APVal3,APVal4) values('<IssueKey>','<RMAFailureCode>','<ProductType>','<AffectRange>','<MaterialDisposition>'
+            var sql = "update IssueAttribute set APVal1 = '<RMAFailureCode>',APVal2 = '<ProductType>',APVal3 = '<AffectRange>',APVal4 = '<MaterialDisposition>' where IssueKey = '<IssueKey>'";
+            sql = sql.Replace("<IssueKey>", IssueKey).Replace("<RMAFailureCode>", RMAFailureCode)
+                .Replace("<ProductType>", ProductType).Replace("<MaterialDisposition>", MaterialDisposition).Replace("<AffectRange>", AffectRange);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
         public void UpdateIAssign()
         {
             var sql =  "update Issue set Reporter = '<Reporter>' where IssueKey = '<IssueKey>'";
@@ -923,6 +987,11 @@ namespace Prometheus.Models
                 if (string.Compare(ret.IssueType, ISSUETP.OBA) == 0)
                 {
                     ret.RetrieveOBA();
+                }
+
+                if (string.Compare(ret.IssueType, ISSUETP.Quality) == 0)
+                {
+                    ret.RetrieveQuality();
                 }
 
                 ret.SubIssues = RetrieveSubIssue(ret.IssueKey);
@@ -1607,6 +1676,11 @@ namespace Prometheus.Models
                     tempvm.RetrieveOBA();
                 }
 
+                if (string.Compare(issuetype, ISSUETP.Quality) == 0)
+                {
+                    tempvm.RetrieveQuality();
+                }
+
                 tempvm.RetrieveComment();
 
                 tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey);
@@ -1663,6 +1737,11 @@ namespace Prometheus.Models
                     tempvm.RetrieveOBA();
                 }
 
+                if (string.Compare(issuetype, ISSUETP.Quality) == 0)
+                {
+                    tempvm.RetrieveQuality();
+                }
+
                 tempvm.RetrieveComment();
 
                 tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey);
@@ -1685,7 +1764,8 @@ namespace Prometheus.Models
             }
             else
             {
-                if (string.Compare(issuetype, ISSUETP.RMA, true) == 0)
+                if (string.Compare(issuetype, ISSUETP.RMA, true) == 0 
+                    || string.Compare(issuetype, ISSUETP.Quality, true) == 0)
                 {
                     sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ParentIssueKey = '' and IssueType = '<IssueType>' and DueDate >= '<StartDate>' and DueDate <= '<EndDate>' order by ReportDate DESC";
                     sql = sql.Replace("<IssueType>", issuetype).Replace("<StartDate>", DateTime.Parse(StartDate).AddDays(12).ToString()).Replace("<EndDate>", DateTime.Parse(EndDate).AddDays(13).ToString());
@@ -1717,6 +1797,11 @@ namespace Prometheus.Models
                 if (string.Compare(issuetype, ISSUETP.OBA) == 0)
                 {
                     tempvm.RetrieveOBA();
+                }
+
+                if (string.Compare(issuetype, ISSUETP.Quality) == 0)
+                {
+                    tempvm.RetrieveQuality();
                 }
 
                 tempvm.RetrieveComment();

@@ -1,0 +1,87 @@
+﻿@model IEnumerable<IEnumerable<string>>
+
+@{
+    ViewBag.Title = "ConfirmQualityData";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Confirm Quality Data</h2>
+
+@using (Html.BeginForm("ConfirmQualityData", "CustomerData", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    if (Model != null && Model.Count() > 0)
+    {
+        <input class="form-control" id="rowcount" name="rowcount" value="@ViewBag.ROWCOUNT" type="hidden" />
+        <input class="form-control" id="colcount" name="colcount" value="@ViewBag.COLCOUNT" type="hidden" />
+
+        var rowcnt = 0;
+        var colcnt = 0;
+
+        <div class="row">
+            <div class="col-md-12">
+                <table id="firsttable" name="firsttable" class="table table-bordered table-hover">
+
+                    <thead class="header">
+                        <tr>
+                            @foreach (var item in Model.ElementAt(0))
+                            {
+                                <th>
+                                    <input class="form-control" id="row@(rowcnt)col@(colcnt)" name="row@(rowcnt)col@(colcnt)" value="@item" />
+                                </th>
+                                colcnt = colcnt + 1;
+                            }
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var line in Model)
+                        {
+                            colcnt = 0;
+
+                            if (rowcnt != 0)
+                            {
+                                <tr>
+                                    @foreach (var item in line)
+                                    {
+                                        if (colcnt == 0)
+                                        {
+                                            <td>
+                                                <input class="form-control" id="row@(rowcnt)col@(colcnt)" name="row@(rowcnt)col@(colcnt)" value="@item" readonly="readonly" style="font-size:8px" />
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td>
+                                                <input class="form-control" id="row@(rowcnt)col@(colcnt)" name="row@(rowcnt)col@(colcnt)" value="@item" style="font-size:8px" />
+                                            </td>
+                                        }
+
+                                        colcnt = colcnt + 1;
+                                    }
+                                </tr>
+                            }
+                            rowcnt = rowcnt + 1;
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <div class="col-md-3"><input type="submit" value="Confirm" id="confirmdata" name="confirmdata" class="btn btn-default" /></div>
+                    <div class="col-md-3"><input type="submit" value="Cancel" id="canceldata" name="canceldata" class="btn btn-default" /></div>
+                    <div class="col-md-6"></div>
+                </div>
+            </div>
+        </div>
+    }
+
+}
+
+
+

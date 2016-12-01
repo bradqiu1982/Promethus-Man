@@ -3630,7 +3630,7 @@ namespace Prometheus.Controllers
                     string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
                     string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
                     validatestr = validatestr.Split(new string[] { "/Issue" }, StringSplitOptions.None)[0]+ url;
-                    validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
+                    validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
                     var toaddrs = new List<string>();
                     toaddrs.Add("windy.ju@finisar.com");
@@ -3679,7 +3679,7 @@ namespace Prometheus.Controllers
                         var netcomputername = "";
                         try{ netcomputername = System.Net.Dns.GetHostName();}
                         catch (Exception ex) { }
-                        validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
+                        validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
                         var content = "Click below link to review the Report which you booked :\r\n " + validatestr;
 
@@ -3714,7 +3714,7 @@ namespace Prometheus.Controllers
                             var netcomputername = "";
                             try { netcomputername = System.Net.Dns.GetHostName(); }
                             catch (Exception ex) { }
-                            validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
+                            validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
                         var content = "RMA FA of "+item.ModuleSN+" must finished today :\r\n " + validatestr;
 
@@ -3744,7 +3744,7 @@ namespace Prometheus.Controllers
                             var netcomputername = "";
                             try { netcomputername = System.Net.Dns.GetHostName(); }
                             catch (Exception ex) { }
-                            validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
+                            validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
                         var content = "RMA report of " + item.ModuleSN + " must finished today :\r\n " + validatestr;
 
@@ -3779,7 +3779,7 @@ namespace Prometheus.Controllers
                     var netcomputername = "";
                     try { netcomputername = System.Net.Dns.GetHostName(); }
                     catch (Exception ex) { }
-                    validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
+                    validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
                     var content = "OBA " + item.FinisarDMR + " analyse  must finished tomorrow :\r\n " + validatestr;
 
@@ -4021,7 +4021,7 @@ namespace Prometheus.Controllers
             var netcomputername = "";
             try { netcomputername = System.Net.Dns.GetHostName(); }
             catch (Exception ex) { }
-            validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
+            validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
             var content = "Hi All,\r\n\r\nThis is a LYT(low yield trigger) information. Please pay your attention to it. Thanks!\r\n\r\nFailure mode: " + vm.Summary + "\r\n\r\nLYT Reason:\r\n\r\n" + comment + " \r\n\r\nDetail Information: " + validatestr;
 

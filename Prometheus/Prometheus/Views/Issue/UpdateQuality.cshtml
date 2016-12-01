@@ -88,7 +88,7 @@
 
 <script src="../../ckeditor/ckeditor.js"></script>
 
-@using (Html.BeginForm("UpdateOBA", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
+@using (Html.BeginForm("UpdateQuality", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
@@ -111,7 +111,7 @@
                         }
                         else
                         {
-                            <input class="form-control text-box single-line" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="FailureMode" name="FailureMode" type="text" value="" />
+                            <input class="form-control text-box single-line"  data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="FailureMode" name="FailureMode" type="text" value="" />
                         }
                         <span class="field-validation-valid text-danger" data-valmsg-for="FailureMode" data-valmsg-replace="true"></span>
                     </div>
@@ -152,7 +152,7 @@
                         }
                         else
                         {
-                            <input class="form-control text-box single-line" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="ProductType" name="ProductType" type="text" value="" />
+                            <input class="form-control text-box single-line"  data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="ProductType" name="ProductType" type="text" value="" />
                         }
                         <span class="field-validation-valid text-danger" data-valmsg-for="ProductType" data-valmsg-replace="true"></span>
                     </div>
@@ -172,11 +172,11 @@
                     <div class="col-md-10">
                         @if (Model != null && !string.IsNullOrEmpty(Model.AffectRange))
                         {
-                            <input class="form-control text-box single-line"  value="@Model.AffectRange" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 25." data-val-length-max="25" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="AffectRange" name="AffectRange" type="text" />
+                            <input class="form-control text-box single-line"  value="@Model.AffectRange" readonly="readonly" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="AffectRange" name="AffectRange" type="text" />
                         }
                         else
                         {
-                            <input class="form-control text-box single-line"  data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 25." data-val-length-max="25" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="AffectRange" name="AffectRange" type="text" value="" />
+                            <input class="form-control text-box single-line"   data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="AffectRange" name="AffectRange" type="text" value="" />
                         }
                         <span class="field-validation-valid text-danger" data-valmsg-for="AffectRange" data-valmsg-replace="true"></span>
                     </div>
@@ -306,42 +306,6 @@
                             }
                 </script>
             </div>
-
-            @if (ViewBag.isassignee != null && ViewBag.isassignee)
-            {
-                <hr />
-                <div class="col-md-12">
-                    <div class="form-group">
-                        Analysis
-                    </div>
-
-                    <div class="form-group">
-                        <div class="col-md-12">
-                            <textarea name="analysiseditor" id="analysiseditor" rows="10" cols="80"></textarea>
-                            <script>
-                                CKEDITOR.replace('analysiseditor', { htmlEncodeOutput: true, filebrowserImageUploadUrl: '/userfiles/Upload.ashx' });
-                            </script>
-                        </div>
-                    </div>
-                </div>
-
-                <hr />
-                <div class="col-md-12">
-                    <div class="form-group">
-                        Root Cause
-                    </div>
-
-                    <div class="form-group">
-                        <div class="col-md-12">
-                            <textarea name="rootcauseeditor" id="rootcauseeditor" rows="10" cols="80"></textarea>
-                            <script>
-                                CKEDITOR.replace('rootcauseeditor', { htmlEncodeOutput: true, filebrowserImageUploadUrl: '/userfiles/Upload.ashx' });
-                            </script>
-                        </div>
-                    </div>
-                </div>
-            }
-
 
 
             @if (Model.SubIssues.Count > 0)
@@ -587,6 +551,41 @@
 
         </div>
     </div>
+
+    if (ViewBag.isassignee != null && ViewBag.isassignee)
+    {
+        <hr />
+                <div class="col-md-12">
+                    <div class="form-group">
+                        Analysis
+                    </div>
+
+                    <div class="form-group">
+                        <div>
+                            <textarea name="analysiseditor" id="analysiseditor" rows="10" cols="80"></textarea>
+                            <script>
+                                CKEDITOR.replace('analysiseditor', { htmlEncodeOutput: true, filebrowserImageUploadUrl: '/userfiles/Upload.ashx' });
+                            </script>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+                <div class="col-md-12">
+                    <div class="form-group">
+                        Root Cause
+                    </div>
+
+                    <div class="form-group">
+                        <div>
+                            <textarea name="rootcauseeditor" id="rootcauseeditor" rows="10" cols="80"></textarea>
+                            <script>
+                                CKEDITOR.replace('rootcauseeditor', { htmlEncodeOutput: true, filebrowserImageUploadUrl: '/userfiles/Upload.ashx' });
+                            </script>
+                        </div>
+                    </div>
+                </div>
+    }
 
     <hr />
     <div class="col-md-12">

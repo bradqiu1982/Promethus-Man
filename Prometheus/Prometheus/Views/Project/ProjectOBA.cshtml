@@ -59,14 +59,14 @@
     <div class="col-md-1">
         @if (Model != null && Model.Count() > 0)
         {
-            <button class="form-control" data-toggle="tooltip" title="Export OBA Report" onclick="ShareRMA()" type="button"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span></button>
+            <button class="form-control" data-toggle="tooltip" title="Export All OBA Report" onclick="ShareAllRMA()" type="button"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span>ALL</button>
         }
     </div>
     <div class="col-md-1">
-        @if (Model != null && Model.Count() > 0)
+        @*@if (Model != null && Model.Count() > 0)
         {
-            <button class="form-control" data-toggle="tooltip" title="Export All OBA Report" onclick="ShareAllRMA()" type="button"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span>ALL</button>
-        }
+            <button class="form-control" data-toggle="tooltip" title="Export OBA Report" onclick="ShareRMA()" type="button"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span></button>
+        }*@
     </div>
 
     <div class="col-md-1">

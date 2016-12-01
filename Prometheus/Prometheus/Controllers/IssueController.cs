@@ -130,7 +130,7 @@ namespace Prometheus.Controllers
             var netcomputername = "";
             try { netcomputername = System.Net.Dns.GetHostName(); }
             catch (Exception ex) { }
-            validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
+            validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
             var content = vm.Summary + " is " + operate + " by " + vm.Reporter + " :\r\n " + validatestr;
 
@@ -155,7 +155,7 @@ namespace Prometheus.Controllers
             var netcomputername = "";
             try { netcomputername = System.Net.Dns.GetHostName(); }
             catch (Exception ex) { }
-            validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
+            validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
             var content = vm.Summary + " is " + operate + " by " + vm.Reporter + " :\r\n " + validatestr;
 
@@ -791,7 +791,7 @@ namespace Prometheus.Controllers
                 var netcomputername = "";
                 try { netcomputername = System.Net.Dns.GetHostName(); }
                 catch (Exception ex) { }
-                validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
+                validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
                 var content = vm.Summary + " is " + operate + " by " + vm.Reporter + " :\r\n " + validatestr;
 
@@ -820,7 +820,7 @@ namespace Prometheus.Controllers
                 var netcomputername = "";
                 try { netcomputername = System.Net.Dns.GetHostName(); }
                 catch (Exception ex) { }
-                validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
+                validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
                 var content = vm.Summary + " is " + operate + " by " + vm.Reporter + " :\r\n " + validatestr;
 
@@ -2172,17 +2172,32 @@ namespace Prometheus.Controllers
             var lines = new List<string>();
             var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, StartDate, EndDate,ISSUETP.RMA);
 
-            var line = "FINISAR RMA,SN,STATUS,CUSTOMER,FV,RMA FAILURE CODE,ROOT CAUSE,OWENER,OPEN ISSUE DATE,CUSTOMER RMA REASON,INTERNAL REPORT,CUSTOMER REPORT";
+            var line = "FINISAR RMA,SN,STATUS,CUSTOMER,FV,RMA FAILURE CODE,ROOT CAUSE,OWENER,OPEN ISSUE DATE,CUSTOMER RMA REASON,INTERNAL REPORT,CUSTOMER REPORT,Containment Action,Corrective Action,Attachment";
             lines.Add(line);
 
             foreach (var item in list1)
             {
                 var rootcause = "";
-                if (item.RootCauseCommentList.Count > 0)
+                foreach (var r in item.RootCauseCommentList)
                 {
-                    rootcause = item.RootCauseCommentList[item.RootCauseCommentList.Count - 1].Comment.Replace("\"", "");
-                    rootcause = System.Text.RegularExpressions.Regex.Replace(rootcause, "<.*?>", string.Empty);
+                    rootcause = rootcause + System.Text.RegularExpressions.Regex.Replace(r.Comment.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim() + "||";
                 }
+
+                var containmentaction = "";
+                foreach (var c in item.ContainmentActions)
+                {
+                    containmentaction = containmentaction + c.Summary
+                        + ":" + c.Resolution + "//";
+                }
+
+                var correctiveaction = "";
+                foreach (var c in item.CorrectiveActions)
+                {
+                    correctiveaction = correctiveaction + c.Summary
+                        + ":" + c.Resolution + "//";
+                }
+
+                
 
                 var routevalue = new RouteValueDictionary();
                 routevalue.Add("issuekey", "ABC");
@@ -2193,7 +2208,22 @@ namespace Prometheus.Controllers
                 var netcomputername = "";
                 try { netcomputername = System.Net.Dns.GetHostName(); }
                 catch (Exception ex) { }
-                validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
+                validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
+
+                var attach = "";
+                foreach (var a in item.AttachList)
+                {
+                    var internalreport1 = "";
+                    if (a.Contains("<a href"))
+                    {
+                        internalreport1 = a.Split(new string[] { "<a href=\"", "\" target=" }, StringSplitOptions.None)[1];
+                    }
+                    else
+                    {
+                        internalreport1 = a;
+                    }
+                    attach = attach + validatestr + internalreport1 + "||";
+                }
 
                 var internalreport = "";
                 if (item.InternalReportCommentList.Count > 0)
@@ -2227,9 +2257,10 @@ namespace Prometheus.Controllers
 
                 line = string.Empty;
                 line = "\""+item.FinisarRMA.Replace("\"","")+"\","+ "\""+item.ModuleSN.Replace("\"", "") + "\"," + "\"" + item.Resolution.Replace("\"", "") + "\","
-                    + "\"" + item.ECustomer.Replace("\"", "") + "\"," + "\"" + item.FVCode.Replace("\"", "") + "\","+ "\""+item.RMAFailureCode.Replace("\"", "") + "\"," + "\""+ rootcause.Trim() + "\"," 
-                    + "\""+item.Assignee.Replace("\"", "")+ "\"," + "\""+item.ReportDate.ToString("yyyy-MM-dd hh:mm:ss") + "\"," + "\"" + item.CReport.Replace("\"", "") + "\","
-                    + "\""+ internalreport + "\"," + "\""+ customerreport + "\",";
+                    + "\"" + item.ECustomer.Replace("\"", "") + "\"," + "\"" + item.FVCode.Replace("\"", "") + "\","+ "\""+item.RMAFailureCode.Replace("\"", "") + "\"," 
+                    + "\""+ rootcause.Trim() + "\"," + "\""+item.Assignee.Replace("\"", "")+ "\"," + "\""+item.ReportDate.ToString("yyyy-MM-dd hh:mm:ss") + "\"," 
+                    + "\"" + item.CReport.Replace("\"", "") + "\","+ "\""+ internalreport + "\"," + "\""+ customerreport + "\","
+                    + "\"" + containmentaction.Replace("\"", "") + "\"," + "\"" + correctiveaction.Replace("\"", "") + "\"," + "\"" + attach.Replace("\"", "") + "\",";
 
                 lines.Add(line);
             }
@@ -2270,17 +2301,29 @@ namespace Prometheus.Controllers
             var lines = new List<string>();
             var list1 = IssueViewModels.RetrieveAllIssueTypeIssue(StartDate, EndDate,ISSUETP.RMA);
 
-            var line = "FINISAR RMA,PROJECT,SN,STATUS,CUSTOMER,FV,RMA FAILURE CODE,ROOT CAUSE,OWENER,OPEN ISSUE DATE,CUSTOMER RMA REASON,INTERNAL REPORT,CUSTOMER REPORT";
+            var line = "FINISAR RMA,PROJECT,SN,STATUS,CUSTOMER,FV,RMA FAILURE CODE,ROOT CAUSE,OWENER,OPEN ISSUE DATE,CUSTOMER RMA REASON,INTERNAL REPORT,CUSTOMER REPORT,Containment Action,Corrective Action,Attachment";
             lines.Add(line);
 
             foreach (var item in list1)
             {
                 var rootcause = "";
-                if (item.RootCauseCommentList.Count > 0)
+                foreach (var r in item.RootCauseCommentList)
                 {
-                    rootcause = item.RootCauseCommentList[item.RootCauseCommentList.Count - 1].Comment.Replace("\"", "");
-                    rootcause = System.Text.RegularExpressions.Regex.Replace(rootcause, "<.*?>", string.Empty);
-                    rootcause = rootcause.Replace("&nbsp;", "");
+                    rootcause = rootcause + System.Text.RegularExpressions.Regex.Replace(r.Comment.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim() + "||";
+                }
+
+                var containmentaction = "";
+                foreach (var c in item.ContainmentActions)
+                {
+                    containmentaction = containmentaction + c.Summary
+                        + ":" + c.Resolution + "//";
+                }
+
+                var correctiveaction = "";
+                foreach (var c in item.CorrectiveActions)
+                {
+                    correctiveaction = correctiveaction + c.Summary
+                        + ":" + c.Resolution + "//";
                 }
 
                 var routevalue = new RouteValueDictionary();
@@ -2292,7 +2335,22 @@ namespace Prometheus.Controllers
                 var netcomputername = "";
                 try { netcomputername = System.Net.Dns.GetHostName(); }
                 catch (Exception ex) { }
-                validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
+                validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
+
+                var attach = "";
+                foreach (var a in item.AttachList)
+                {
+                    var internalreport1 = "";
+                    if (a.Contains("<a href"))
+                    {
+                        internalreport1 = a.Split(new string[] { "<a href=\"", "\" target=" }, StringSplitOptions.None)[1];
+                    }
+                    else
+                    {
+                        internalreport1 = a;
+                    }
+                    attach = attach + validatestr + internalreport1 + "||";
+                }
 
                 var internalreport = "";
                 if (item.InternalReportCommentList.Count > 0)
@@ -2328,7 +2386,8 @@ namespace Prometheus.Controllers
                 line = "\"" + item.FinisarRMA.Replace("\"", "") + "\"," + "\"" + item.ProjectKey.Replace("\"", "") + "\"," + "\"" + item.ModuleSN.Replace("\"", "") + "\"," + "\"" + item.Resolution.Replace("\"", "") + "\","
                     + "\"" + item.ECustomer.Replace("\"", "") + "\"," + "\"" + item.FVCode.Replace("\"", "") + "\"," + "\"" + item.RMAFailureCode.Replace("\"", "") + "\"," + "\"" + rootcause.Trim() + "\","
                     + "\"" + item.Assignee.Replace("\"", "") + "\"," + "\"" + item.ReportDate.ToString("yyyy-MM-dd hh:mm:ss") + "\"," + "\"" + item.CReport.Replace("\"", "") + "\","
-                    + "\"" + internalreport + "\"," + "\"" + customerreport + "\",";
+                    + "\"" + internalreport + "\"," + "\"" + customerreport + "\","
+                    + "\"" + containmentaction.Replace("\"", "") + "\"," + "\"" + correctiveaction.Replace("\"", "") + "\"," + "\"" + attach.Replace("\"", "") + "\",";
 
                 lines.Add(line);
             }
@@ -2360,124 +2419,123 @@ namespace Prometheus.Controllers
             return File(filename, "application/vnd.ms-excel", fn);
         }
 
-        private List<string> PrepeareOBAReport(string ProjectKey, string StartDate, string EndDate)
-        {
-            var lines = new List<string>();
-            var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, StartDate, EndDate, ISSUETP.OBA);
+        //private List<string> PrepeareOBAReport(string ProjectKey, string StartDate, string EndDate)
+        //{
+        //    var lines = new List<string>();
+        //    var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, StartDate, EndDate, ISSUETP.OBA);
 
-            var line = "NO,ISSUE DATE,DMR#,Product Type,Failure Rate,Affected SN,FA Owner,OBA Description,Priority,Product Type,FV Results,ROOT CAUSE,Containment Action,Corrective Action,Material Disposition,Resolution,Attachement";
-            lines.Add(line);
+        //    var line = "NO,ISSUE DATE,DMR#,Project Name,Failure Rate,Affected SN,FA Owner,OBA Description,Priority,Product Type,FV Results,ROOT CAUSE,Containment Action,Corrective Action,Material Disposition,Resolution,Attachement";
+        //    lines.Add(line);
 
-            var idx = 0;
+        //    var idx = 0;
 
-            foreach (var item in list1)
-            {
-                idx = idx + 1;
+        //    foreach (var item in list1)
+        //    {
+        //        idx = idx + 1;
 
-                var index = idx.ToString();
+        //        var index = idx.ToString();
 
-                var rootcause = "";
-                if (item.RootCauseCommentList.Count > 0)
-                {
-                    rootcause = item.RootCauseCommentList[item.RootCauseCommentList.Count - 1].Comment.Replace("\"", "");
-                    rootcause = System.Text.RegularExpressions.Regex.Replace(rootcause, "<.*?>", string.Empty);
-                }
-
-
-                var routevalue = new RouteValueDictionary();
-                routevalue.Add("issuekey", "ABC");
-                string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
-                string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
-                validatestr = validatestr.Split(new string[] { "/Issue" }, StringSplitOptions.None)[0];
-
-                var netcomputername = "";
-                try { netcomputername = System.Net.Dns.GetHostName(); }
-                catch (Exception ex) { }
-                validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
+        //        var rootcause = "";
+        //        foreach (var r in item.RootCauseCommentList)
+        //        {
+        //            rootcause = rootcause + System.Text.RegularExpressions.Regex.Replace(r.Comment.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty) + "||";
+        //        }
 
 
-                var internalreport = "";
-                foreach (var a in item.AttachList)
-                {
-                    var internalreport1 = "";
-                    if (a.Contains("<a href"))
-                    {
-                        internalreport1 = a.Split(new string[] { "<a href=\"", "\" target=" }, StringSplitOptions.None)[1];
-                    }
-                    else
-                    {
-                        internalreport1 = a;
-                    }
-                    internalreport = internalreport+validatestr + internalreport1 + "||";
-                }
+        //        var routevalue = new RouteValueDictionary();
+        //        routevalue.Add("issuekey", "ABC");
+        //        string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+        //        string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+        //        validatestr = validatestr.Split(new string[] { "/Issue" }, StringSplitOptions.None)[0];
 
-                var issuedata = item.DueDate.AddDays(-6).ToString("MM/dd/yyyy");
-
-                var containmentaction = "";
-                foreach (var c in item.ContainmentActions)
-                {
-                    containmentaction = containmentaction + c.Summary
-                        + ":" + c.Resolution + "//";
-                }
-
-                var correctiveaction = "";
-                foreach (var c in item.CorrectiveActions)
-                {
-                    correctiveaction = c.Summary
-                        + ":" + c.Resolution + "//";
-                }
+        //        var netcomputername = "";
+        //        try { netcomputername = System.Net.Dns.GetHostName(); }
+        //        catch (Exception ex) { }
+        //        validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
 
 
-                line = string.Empty;
-                line = "\"" + index + "\"," + "\"" + issuedata + "\"," + "\"" + item.FinisarDMR.Replace("\"", "") + "\","
-                    + "\"" + item.ProjectKey + "\"," + "\"'" + item.OBAFailureRate.Replace("\"", "") + "\"," + "\"" + item.ModuleSN.Replace("\"", "") + "\"," 
-                    + "\"" + item.Assignee.Replace("\"", "") + "\","+ "\"" + item.Summary.Replace("\"", "") + "\","
-                    + "\"" + item.Priority.Replace("\"", "") + "\"," + "\"" + item.ProductType.Replace("\"", "") + "\","
-                    + "\"" + item.FVCode.Replace("\"", "") + "\"," + "\"" + rootcause.Replace("\"", "").Trim() + "\","
-                    + "\"" + containmentaction.Replace("\"", "") + "\"," + "\"" + correctiveaction.Replace("\"", "") + "\"," 
-                    + "\"" + item.MaterialDisposition + "\"," + "\"" + item.Resolution + "\"," + "\"" + internalreport + "\","
-                    + "\"http://wux-app1.china.ads.finisar.com/eDMR/DMR_Edit/DMR_View.asp?DMR_ID=" + item.FinisarDMR + "\",";
+        //        var internalreport = "";
+        //        foreach (var a in item.AttachList)
+        //        {
+        //            var internalreport1 = "";
+        //            if (a.Contains("<a href"))
+        //            {
+        //                internalreport1 = a.Split(new string[] { "<a href=\"", "\" target=" }, StringSplitOptions.None)[1];
+        //            }
+        //            else
+        //            {
+        //                internalreport1 = a;
+        //            }
+        //            internalreport = internalreport+validatestr + internalreport1 + "||";
+        //        }
 
-                lines.Add(line);
-            }
+        //        var issuedata = item.DueDate.AddDays(-6).ToString("MM/dd/yyyy");
 
-            return lines;
-        }
+        //        var containmentaction = "";
+        //        foreach (var c in item.ContainmentActions)
+        //        {
+        //            containmentaction = containmentaction + c.Summary
+        //                + ":" + c.Resolution + "//";
+        //        }
 
-        public ActionResult ExportOBAData(string ProjectKey, string StartDate, string EndDate)
-        {
-            if (!string.IsNullOrEmpty(ProjectKey))
-            {
-                string datestring = DateTime.Now.ToString("yyyyMMdd");
-                string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
-                if (!Directory.Exists(imgdir))
-                {
-                    Directory.CreateDirectory(imgdir);
-                }
+        //        var correctiveaction = "";
+        //        foreach (var c in item.CorrectiveActions)
+        //        {
+        //            correctiveaction = c.Summary
+        //                + ":" + c.Resolution + "//";
+        //        }
 
-                var fn = ProjectKey + "_OBA_Report_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
-                var filename = imgdir + fn;
 
-                var lines = PrepeareOBAReport(ProjectKey, StartDate, EndDate);
+        //        line = string.Empty;
+        //        line = "\"" + index + "\"," + "\"" + issuedata + "\"," + "\"" + item.FinisarDMR.Replace("\"", "") + "\","
+        //            + "\"" + item.ProjectKey + "\"," + "\"'" + item.OBAFailureRate.Replace("\"", "") + "\"," + "\"" + item.ModuleSN.Replace("\"", "") + "\"," 
+        //            + "\"" + item.Assignee.Replace("\"", "") + "\","+ "\"" + item.Summary.Replace("\"", "") + "\","
+        //            + "\"" + item.Priority.Replace("\"", "") + "\"," + "\"" + item.ProductType.Replace("\"", "") + "\","
+        //            + "\"" + item.FVCode.Replace("\"", "") + "\"," + "\"" + rootcause.Replace("\"", "").Trim() + "\","
+        //            + "\"" + containmentaction.Replace("\"", "") + "\"," + "\"" + correctiveaction.Replace("\"", "") + "\"," 
+        //            + "\"" + item.MaterialDisposition + "\"," + "\"" + item.Resolution + "\"," + "\"" + internalreport + "\","
+        //            + "\"http://wux-app1.china.ads.finisar.com/eDMR/DMR_Edit/DMR_View.asp?DMR_ID=" + item.FinisarDMR + "\",";
 
-                var wholefile = "";
-                foreach (var l in lines)
-                {
-                    wholefile = wholefile + l + "\r\n";
-                }
-                System.IO.File.WriteAllText(filename, wholefile);
+        //        lines.Add(line);
+        //    }
 
-                return File(filename, "application/vnd.ms-excel", fn);
-            }
-            return RedirectToAction("ViewAll", "Project");
-        }
+        //    return lines;
+        //}
+
+        //public ActionResult ExportOBAData(string ProjectKey, string StartDate, string EndDate)
+        //{
+        //    if (!string.IsNullOrEmpty(ProjectKey))
+        //    {
+        //        string datestring = DateTime.Now.ToString("yyyyMMdd");
+        //        string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+        //        if (!Directory.Exists(imgdir))
+        //        {
+        //            Directory.CreateDirectory(imgdir);
+        //        }
+
+        //        var fn = ProjectKey + "_OBA_Report_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+        //        var filename = imgdir + fn;
+
+        //        var lines = PrepeareOBAReport(ProjectKey, StartDate, EndDate);
+
+        //        var wholefile = "";
+        //        foreach (var l in lines)
+        //        {
+        //            wholefile = wholefile + l + "\r\n";
+        //        }
+        //        System.IO.File.WriteAllText(filename, wholefile);
+
+        //        return File(filename, "application/vnd.ms-excel", fn);
+        //    }
+        //    return RedirectToAction("ViewAll", "Project");
+        //}
 
         private List<string> PrepeareAllOBAReport(string StartDate, string EndDate)
         {
             var lines = new List<string>();
             var list1 = IssueViewModels.RetrieveAllIssueTypeIssue(StartDate, EndDate, ISSUETP.OBA);
 
-            var line = "NO,ISSUE DATE,DMR#,Product Type,Failure Rate,Affected SN,FA Owner,OBA Description,Priority,Product Type,FV Results,ROOT CAUSE,Containment Action,Corrective Action,Material Disposition,Resolution,Attachement";
+            var line = "NO,ISSUE DATE,DMR#,Project Name,Failure Rate,Affected SN,FA Owner,OBA Description,Priority,Product Type,FV Results,ROOT CAUSE,Containment Action,Corrective Action,Material Disposition,Resolution,Attachement";
             lines.Add(line);
 
             var idx = 0;
@@ -2489,12 +2547,10 @@ namespace Prometheus.Controllers
                 var index = idx.ToString();
 
                 var rootcause = "";
-                if (item.RootCauseCommentList.Count > 0)
+                foreach (var r in item.RootCauseCommentList)
                 {
-                    rootcause = item.RootCauseCommentList[item.RootCauseCommentList.Count - 1].Comment.Replace("\"", "");
-                    rootcause = System.Text.RegularExpressions.Regex.Replace(rootcause, "<.*?>", string.Empty);
+                    rootcause = rootcause + System.Text.RegularExpressions.Regex.Replace(r.Comment.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim() + "||";
                 }
-
 
                 var routevalue = new RouteValueDictionary();
                 routevalue.Add("issuekey", "ABC");
@@ -2505,7 +2561,7 @@ namespace Prometheus.Controllers
                 var netcomputername = "";
                 try { netcomputername = System.Net.Dns.GetHostName(); }
                 catch (Exception ex) { }
-                validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
+                validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
 
                 var internalreport = "";
@@ -2535,7 +2591,7 @@ namespace Prometheus.Controllers
                 var correctiveaction = "";
                 foreach (var c in item.CorrectiveActions)
                 {
-                    correctiveaction = c.Summary
+                    correctiveaction = correctiveaction + c.Summary
                         + ":" + c.Resolution + "//";
                 }
 
@@ -2579,6 +2635,114 @@ namespace Prometheus.Controllers
 
             return File(filename, "application/vnd.ms-excel", fn);
         }
+
+
+        private List<string> PrepeareAllQualityReport( string StartDate, string EndDate)
+        {
+            var lines = new List<string>();
+            var list1 = IssueViewModels.RetrieveAllIssueTypeIssue(StartDate, EndDate, ISSUETP.Quality);
+
+            var line = "DATE,Project Name,Failure Mode,Product Type,Affected Range,Description,Priority,Owner,Analysis,ROOT CAUSE,Containment Action,Corrective Action,Product Disposal,Resolution,Attachement";
+            lines.Add(line);
+
+            foreach (var item in list1)
+            {
+
+                var rootcause = "";
+                foreach (var r in item.RootCauseCommentList)
+                {
+                    rootcause = rootcause + System.Text.RegularExpressions.Regex.Replace(r.Comment.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim() + "||";
+                }
+
+                var analysis = "";
+                foreach (var r in item.AnalysisCommentList)
+                {
+                    analysis = analysis + System.Text.RegularExpressions.Regex.Replace(r.Comment.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim() + "||";
+                }
+
+                var routevalue = new RouteValueDictionary();
+                routevalue.Add("issuekey", "ABC");
+                string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+                validatestr = validatestr.Split(new string[] { "/Issue" }, StringSplitOptions.None)[0];
+
+                var netcomputername = "";
+                try { netcomputername = System.Net.Dns.GetHostName(); }
+                catch (Exception ex) { }
+                validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
+
+
+                var internalreport = "";
+                foreach (var a in item.AttachList)
+                {
+                    var internalreport1 = "";
+                    if (a.Contains("<a href"))
+                    {
+                        internalreport1 = a.Split(new string[] { "<a href=\"", "\" target=" }, StringSplitOptions.None)[1];
+                    }
+                    else
+                    {
+                        internalreport1 = a;
+                    }
+                    internalreport = internalreport + validatestr + internalreport1 + "||";
+                }
+
+                var issuedata = item.DueDate.AddDays(-12).ToString("MM/dd/yyyy");
+
+                var containmentaction = "";
+                foreach (var c in item.ContainmentActions)
+                {
+                    containmentaction = containmentaction + c.Summary
+                        + ":" + c.Resolution + "//";
+                }
+
+                var correctiveaction = "";
+                foreach (var c in item.CorrectiveActions)
+                {
+                    correctiveaction = correctiveaction + c.Summary
+                        + ":" + c.Resolution + "//";
+                }
+
+
+                line = string.Empty;
+                line = "\"" + issuedata + "\"," + "\"" + item.ProjectKey + "\"," + "\"" + item.RMAFailureCode.Replace("\"", "") + "\","
+                    + "\"" + item.ProductType + "\"," + "\"" + item.AffectRange.Replace("\"", "") + "\"," + "\"" + item.Summary.Replace("\"", "") + "\","
+                    + "\"" + item.Priority.Replace("\"", "") + "\"," + "\"" + item.Assignee.Replace("\"", "") + "\","
+                    + "\"" + analysis.Replace("\"", "") + "\"," + "\"" + rootcause.Replace("\"", "") + "\","
+                    + "\"" + containmentaction.Replace("\"", "") + "\"," + "\"" + correctiveaction.Replace("\"", "") + "\","
+                    + "\"" + item.MaterialDisposition + "\"," + "\"" + item.Resolution + "\"," + "\"" + internalreport + "\",";
+
+                lines.Add(line);
+            }
+
+            return lines;
+        }
+
+        public ActionResult ExportAllQualityData(string StartDate, string EndDate)
+        {
+                string datestring = DateTime.Now.ToString("yyyyMMdd");
+                string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+                if (!Directory.Exists(imgdir))
+                {
+                    Directory.CreateDirectory(imgdir);
+                }
+
+                var fn = "PQE_Quality_Report_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+                var filename = imgdir + fn;
+
+                var lines = PrepeareAllQualityReport(StartDate, EndDate);
+
+                var wholefile = "";
+                foreach (var l in lines)
+                {
+                    wholefile = wholefile + l + "\r\n";
+                }
+                System.IO.File.WriteAllText(filename, wholefile);
+
+                return File(filename, "application/vnd.ms-excel", fn);
+
+        }
+
 
     }
 }

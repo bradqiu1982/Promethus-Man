@@ -288,10 +288,7 @@ namespace Prometheus.Controllers
             }
 
 
-            if (retestdatalist.Count > 0)
-            {
-                retestparetofun(retestdatalist);
-            }
+            retestparetofun(retestdatalist);
         }
 
 
@@ -505,34 +502,40 @@ namespace Prometheus.Controllers
                     if (string.Compare(reptype, PJReportType.MonthlyPareto) == 0)
                     {
                         MonthlyPareto(pjkey);
-                        if (pjreportdict.ContainsKey(pjkey))
+                        if (!string.IsNullOrEmpty(this.ViewBag.rparetoscript))
                         {
-                            pjreportdict[pjkey].MonthlyPareto = ViewBag.rparetoscript.Replace("rparetochart", pjkey + "rparetochart");
-                            ViewBag.rparetoscript = null;
-                        }
-                        else
-                        {
-                            var reportitem = new PJReportItem();
-                            reportitem.MonthlyPareto = ViewBag.rparetoscript.Replace("rparetochart", pjkey + "rparetochart");
-                            ViewBag.rparetoscript = null;
-                            pjreportdict.Add(pjkey, reportitem);
+                            if (pjreportdict.ContainsKey(pjkey))
+                            {
+                                pjreportdict[pjkey].MonthlyPareto = ViewBag.rparetoscript.Replace("rparetochart", pjkey + "rparetochart");
+                                ViewBag.rparetoscript = null;
+                            }
+                            else
+                            {
+                                var reportitem = new PJReportItem();
+                                reportitem.MonthlyPareto = ViewBag.rparetoscript.Replace("rparetochart", pjkey + "rparetochart");
+                                ViewBag.rparetoscript = null;
+                                pjreportdict.Add(pjkey, reportitem);
+                            }
                         }
                     }
 
                     if (string.Compare(reptype, PJReportType.IssueTrend) == 0)
                     {
                         IssueCountTrend(pjkey);
-                        if (pjreportdict.ContainsKey(pjkey))
+                        if (!string.IsNullOrEmpty(this.ViewBag.issuetrendscript))
                         {
-                            pjreportdict[pjkey].IssueTrend = ViewBag.issuetrendscript.Replace("issuetrendchart", pjkey + "issuetrendchart");
-                            ViewBag.issuetrendscript = null;
-                        }
-                        else
-                        {
-                            var reportitem = new PJReportItem();
-                            reportitem.IssueTrend = ViewBag.issuetrendscript.Replace("issuetrendchart", pjkey + "issuetrendchart");
-                            ViewBag.issuetrendscript = null;
-                            pjreportdict.Add(pjkey, reportitem);
+                            if (pjreportdict.ContainsKey(pjkey))
+                            {
+                                pjreportdict[pjkey].IssueTrend = ViewBag.issuetrendscript.Replace("issuetrendchart", pjkey + "issuetrendchart");
+                                ViewBag.issuetrendscript = null;
+                            }
+                            else
+                            {
+                                var reportitem = new PJReportItem();
+                                reportitem.IssueTrend = ViewBag.issuetrendscript.Replace("issuetrendchart", pjkey + "issuetrendchart");
+                                ViewBag.issuetrendscript = null;
+                                pjreportdict.Add(pjkey, reportitem);
+                            }
                         }
                     }
 

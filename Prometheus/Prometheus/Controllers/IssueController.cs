@@ -352,6 +352,21 @@ namespace Prometheus.Controllers
                     ViewBag.isassignee = true;
                 }
 
+                ViewBag.authrized = true;
+                if (string.Compare(ret.IssueType, ISSUETP.NPIPROC) == 0)
+                {
+                    ViewBag.authrized = false;
+                }
+                var pj = ProjectViewModels.RetrieveOneProject(ret.ProjectKey);
+                foreach (var item in pj.MemberList)
+                {
+                    if (string.Compare(item.Name, updater, true) == 0)
+                    {
+                        ViewBag.authrized = true;
+                        break;
+                    }
+                }
+
                 //ret.Reporter = updater;
                 CreateAllLists(ret);
 
@@ -506,6 +521,21 @@ namespace Prometheus.Controllers
                     || string.Compare(updater, newdata.Reporter,true) == 0)
             {
                 ViewBag.isassignee = true;
+            }
+
+            ViewBag.authrized = true;
+            if (string.Compare(newdata.IssueType, ISSUETP.NPIPROC) == 0)
+            {
+                ViewBag.authrized = false;
+            }
+            var pj = ProjectViewModels.RetrieveOneProject(newdata.ProjectKey);
+            foreach (var item in pj.MemberList)
+            {
+                if (string.Compare(item.Name, updater, true) == 0)
+                {
+                    ViewBag.authrized = true;
+                    break;
+                }
             }
 
             CreateAllLists(newdata);

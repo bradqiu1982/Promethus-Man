@@ -37,6 +37,11 @@ namespace Prometheus.Controllers
             string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
             string validatestr = this.Url.Action("ActiveUser", "User", routevalue, scheme);
 
+            var netcomputername = "";
+            try { netcomputername = System.Net.Dns.GetHostName(); }
+            catch (Exception ex) { }
+            validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
+
             var toaddrs = new List<string>();
             toaddrs.Add(username);
             EmailUtility.SendEmail("NPI Website Active Link",toaddrs, validatestr);
@@ -156,6 +161,10 @@ namespace Prometheus.Controllers
             //send validate email
             string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
             string validatestr = this.Url.Action("ResetUser", "User", routevalue, scheme);
+            var netcomputername = "";
+            try { netcomputername = System.Net.Dns.GetHostName(); }
+            catch (Exception ex) { }
+            validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
             var toaddrs = new List<string>();
             toaddrs.Add(username);

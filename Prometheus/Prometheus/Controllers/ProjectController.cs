@@ -1355,6 +1355,25 @@ namespace Prometheus.Controllers
             if (ProjectKey != null)
             {
                 var vmlist = IssueViewModels.RetrieveNPIPROCIssue(ProjectKey);
+                var pj = ProjectViewModels.RetrieveOneProject(ProjectKey);
+
+                var ckdict = CookieUtility.UnpackCookie(this);
+                var updater = "";
+                if (ckdict.ContainsKey("logonuser"))
+                {
+                    updater = ckdict["logonuser"].Split(new char[] { '|' })[0].ToUpper();
+                }
+
+                ViewBag.authrized = false;
+                foreach (var item in pj.MemberList)
+                {
+                    if (string.Compare(item.Name, updater, true) == 0)
+                    {
+                        ViewBag.authrized = true;
+                        break;
+                    }
+                }
+
                 return View(vmlist);
             }
             return View();

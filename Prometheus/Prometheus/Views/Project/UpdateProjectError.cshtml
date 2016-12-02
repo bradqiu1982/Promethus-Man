@@ -3,6 +3,7 @@
 @{
     ViewBag.Title = "UpdateDebugTree";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var idx = 0;
 }
 
 
@@ -158,13 +159,14 @@
 
         foreach (var paircoment in Model.PairComments)
         {
-            <hr />
+            idx = idx + 1;
 
+            <hr />
                         <div class="form-group">
                             <div class="col-md-12">
                                 <div class="panel panel-default">
                                     <div class="panel-heading">
-                                        <h3 class="panel-title">Analyse</h3>
+                                        <h3 class="panel-title">Analyse @idx</h3>
                                     </div>
                                     <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
                                         @foreach (var item in paircoment)

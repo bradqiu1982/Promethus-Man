@@ -3575,6 +3575,11 @@ namespace Prometheus.Controllers
                                 }
                             }
 
+                        if (alldict.Count < 80)
+                        {
+                            continue;
+                        }
+
                             hascontent = true;
                             var tempcontent1 = "Warning: the corrective yield of " + item + " wafer " + w + " is " + (yield.CorrectLastYield * 100.0).ToString("0.00") + "% \r\n\r\n"
                                 + " Total Input: "+ alldict.Count.ToString() + " ,Failed Modules: " + errdict.Count.ToString()+" ,Reviewed Modules: " + cordict.Count.ToString() + " \r\n\r\n";

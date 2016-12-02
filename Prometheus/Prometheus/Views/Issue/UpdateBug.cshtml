@@ -570,12 +570,17 @@
                 }
             </div>
             <div class="col-md-3">
-                @if (ViewBag.isassignee != null 
+                @if (ViewBag.isassignee != null
                     && ViewBag.isassignee
                     && Model.FailureDetailCommentList.Count > 0
                     && Model.RootCauseCommentList.Count > 0)
                 {
                     <input type="submit" value="Link2DebugTree" id="linkisu" name="linkisu" class="btn btn-default" />
+                }
+                else if (ViewBag.isassignee != null
+                    && ViewBag.isassignee)
+                {
+                    <button type="button" disabled>Link2DebugTree</button>
                 }
             </div>
             <div class="col-md-3"></div>

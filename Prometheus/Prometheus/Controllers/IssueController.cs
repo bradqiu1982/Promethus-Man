@@ -1071,6 +1071,13 @@ namespace Prometheus.Controllers
                                 ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, item.dbComment, PJERRORCOMMENTTYPE.Result, updater, linktime);
                             }
 
+                            foreach (var item in originaldata.AttachList)
+                            {
+                                ProjectErrorViewModels.StoreErrorAttachment(perrlist[0].ErrorKey, item);
+                            }
+
+                            UserRankViewModel.UpdateUserRank(updater, 10);
+
                             var dict = new RouteValueDictionary();
                             dict.Add("ErrorKey", perrlist[0].ErrorKey);
                             return RedirectToAction("UpdateProjectError", "Project", dict);

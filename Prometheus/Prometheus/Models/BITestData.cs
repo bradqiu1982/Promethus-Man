@@ -265,7 +265,7 @@ namespace Prometheus.Models
         public static List<string> RetrieveAllWafer(string projectkey)
         {
             var ret = new List<string>();
-            var sql = "select DISTINCT Wafer from BITestData where ProjectKey = '<ProjectKey>' ";
+            var sql = "select DISTINCT Wafer from BITestData where ProjectKey = '<ProjectKey>' order by Wafer";
             sql = sql.Replace("<ProjectKey>", projectkey);
 
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);

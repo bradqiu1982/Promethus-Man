@@ -1,0 +1,159 @@
+﻿
+@{
+    ViewBag.Title = "ILearn";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>I Learn</h2>
+
+<hr />
+
+<script src="~/Scripts/highcharts.js"></script>
+<script src="~/Scripts/exporting.js"></script>
+
+
+<ul class="nav nav-pills nav-stacked col-md-2">
+    <li class="active"><a href="#tab_a" data-toggle="pill">I Learn</a></li>
+    <li><a href="#tab_b" data-toggle="pill">I Share</a></li>
+</ul>
+<div class="tab-content col-md-10">
+    <div class="tab-pane active" id="tab_a">
+        @if(ViewBag.ILearn != null)
+        {
+        <table id="ilearndatatable" class="display" cellspacing="0">
+            <thead>
+                    <tr>
+                        <th style="text-align:center;font-size:12px">Share Summary</th>
+                        <th style="text-align:center;font-size:12px">Share Tag</th>
+                        <th style="text-align:center;font-size:12px">Product</th>
+                        <th style="text-align:center;font-size:12px">Creator</th>
+                        <th style="text-align:center;font-size:12px">Favor</th>
+                        <th style="text-align:center;font-size:12px"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></th>
+                        <th style="text-align:center;font-size:12px">Date</th>
+                        <th style="text-align:center;font-size:12px">I Like</th>
+                        <th style="text-align:center;font-size:12px">I Push</th>
+                    </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var line in ViewBag.ILearn)
+                {
+                    <tr>
+                        @if (!string.IsNullOrEmpty(line.DocURL))
+                        {
+                            <td style="text-align:center;font-size:12px"><a href="@(line.DocURL)" target="_blank">@(line.Summary)</a></td>
+                        }
+                        else
+                        {
+                            <td style="text-align:center;font-size:12px"><a href="/Issue/UpdateIssue?issuekey=@(line.DOCKey)" target="_blank">@(line.Summary)</a></td>
+                        }
+                        
+                        <td style="text-align:center;font-size:12px">@(line.DOCTag)</td>
+                        <td style="text-align:center;font-size:12px">@(line.DOCPJK)</td>
+                        <td style="text-align:center;font-size:12px">@(line.DOCCreator.Split(new char[] { '@' })[0])</td>
+                        <td style="text-align:center;font-size:12px">@(line.DOCFavorTimes)</td>
+
+                        @if (!string.IsNullOrEmpty(line.DOCFavor))
+                        {
+                            <td style="text-align:center;font-size:12px"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></td>
+                        }
+                        else
+                        {
+                            <td style="text-align:center;font-size:12px"></td>
+                        }
+                        
+                        <td style="text-align:center;font-size:12px">@(line.DOCDate.ToString("dd/MM"))</td>
+                        <td style="text-align:center;font-size:12px"><button class="form-control" type="button" value="DOCPJK=@(line.DOCPJK)&DOCKey=@(line.DOCKey)" onclick="LikeThisDoc(this)"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></button></td>
+                        <td style="text-align:center;font-size:12px"><button class="form-control" type="button">Push</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <script type="text/javascript">
+        $(document).ready(function() {
+            $('#ilearndatatable').DataTable({
+                'iDisplayLength': 50,
+                'aLengthMenu': [[25, 50, 100, -1],
+                                [25, 50, 100, "All"]],
+                "bAutoWidth": false,
+                "aaSorting": [],
+                "aoColumns": [
+                { sWidth: '20%' },
+                { sWidth: '15%' },
+                { sWidth: '10%' },
+                { sWidth: '10%' },
+                { sWidth: '10%' },
+                { sWidth: '5%' },
+                { sWidth: '10%' },
+                { sWidth: '10%' },
+                { sWidth: '10%' }]
+            });
+        });
+
+        function LikeThisDoc(oBT)
+        {
+            window.location.href = '/User/ILike?' + oBT.value;
+        }
+        </script>
+        }
+    </div>
+    <div class="tab-pane" id="tab_b">
+        @if (ViewBag.IShare != null)
+        {
+            <table id="isharedatatable" class="display" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th style="text-align:center;font-size:12px">Summary</th>
+                        <th style="text-align:center;font-size:12px">Share Tag</th>
+                        <th style="text-align:center;font-size:12px">Product</th>
+                        <th style="text-align:center;font-size:12px">Favor</th>
+                        <th style="text-align:center;font-size:12px">Date</th>
+                        <th style="text-align:center;font-size:12px">I Push</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var line in ViewBag.IShare)
+                    {
+                        <tr>
+                            @if (!string.IsNullOrEmpty(line.DocURL))
+                            {
+                                <td style="text-align:center;font-size:12px"><a href="@(line.DocURL)" target="_blank">@(line.Summary)</a></td>
+                            }
+                            else
+                            {
+                                <td style="text-align:center;font-size:12px"><a href="/Issue/UpdateIssue?issuekey=@(line.DOCKey)" target="_blank">@(line.Summary)</a></td>
+                            }
+
+                            <td style="text-align:center;font-size:12px">@(line.DOCTag)</td>
+                            <td style="text-align:center;font-size:12px">@(line.DOCPJK)</td>
+                            <td style="text-align:center;font-size:12px">@(line.DOCFavorTimes)</td>
+                            <td style="text-align:center;font-size:12px">@(line.DOCDate.ToString("dd/MM"))</td>
+                            <td style="text-align:center;font-size:12px"><button class="form-control" type="button">Push</button></td>
+                        </tr>
+                     }
+                </tbody>
+            </table>
+
+            <script type="text/javascript">
+        $(document).ready(function() {
+            $('#isharedatatable').DataTable({
+                'iDisplayLength': 50,
+                'aLengthMenu': [[25, 50, 100, -1],
+                                [25, 50, 100, "All"]],
+                "bAutoWidth": false,
+                "aaSorting": [],
+                "aoColumns": [
+                { sWidth: '20%' },
+                { sWidth: '15%' },
+                { sWidth: '10%' },
+                { sWidth: '10%' },
+                { sWidth: '10%' },
+                { sWidth: '10%' }]
+            });
+                    } );
+            </script>
+        }
+    </div>
+</div>

@@ -216,6 +216,7 @@
                         function ShowFileNames3(oFile) {
                             $('#showfile3').text(oFile.value);
                             document.getElementById("attachmentupload").value = oFile.value;
+                            $('#attachtag').modal({ backdrop: 'static' });
                         }
                     </script>
                 </div>
@@ -439,6 +440,39 @@
                 }
             </div>
             <div class="col-md-6"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="attachtag" tabindex="-1" role="dialog" aria-labelledby="attachtagLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="attachtagLabel">Share Document Tag</h4>
+                </div>
+                <div class="row"></div>
+                <hr />
+                <div class="row"></div>
+                @if (ViewBag.tobechoosetags != null)
+                {
+                    for (var idx = 0; idx < ViewBag.tobechoosetags.Count; idx++)
+                    {
+                        <div class="col-md-4">
+                            <div class="col-md-3">
+                                <input type="checkbox" id="attachtagcheck@(idx)" name="attachtagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
+                            </div>
+                            <div class="col-md-9">
+                                <label class="control-label">@(ViewBag.tobechoosetags[idx])</label>
+                            </div>
+                        </div>
+                    }
+                }
+                <div class="row"></div>
+                <hr />
+                <div class="row"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Done</button>
+                </div>
+            </div>
         </div>
     </div>
 }

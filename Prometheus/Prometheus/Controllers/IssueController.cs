@@ -375,6 +375,8 @@ namespace Prometheus.Controllers
                     var sn = ret.Summary.Split(new string[] { " " }, StringSplitOptions.None)[1].Trim().ToUpper();
                     ViewBag.birootcauselist = CreateBIRootIssue(ret.ProjectKey, sn);
                 }
+
+                ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
                 return View(ret);
             }
             else
@@ -440,6 +442,16 @@ namespace Prometheus.Controllers
 
             vm.UpdateIssue();
 
+
+            var attachtag = string.Empty;
+            for (var i = 0; i < 200; i++)
+            {
+                if (Request.Form["attachtagcheck" + i] != null)
+                {
+                    attachtag = attachtag + Request.Form["attachtagcheck" + i] + ";";
+                }
+            }
+
             if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
             {
                 var urls = ReceiveRMAFiles();
@@ -462,6 +474,12 @@ namespace Prometheus.Controllers
                 {
                     IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
                     UserRankViewModel.UpdateUserRank(updater, 5);
+                    if (!string.IsNullOrEmpty(attachtag))
+                    {
+                        var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+                        var dockey = tempkeys[tempkeys.Length - 1];
+                        ShareDocVM.ShareDoc(originaldata.ProjectKey, ShareDocType.DOCUMENT, dockey, attachtag, updater, DateTime.Now.ToString());
+                    }
                 }
             }
 
@@ -545,6 +563,7 @@ namespace Prometheus.Controllers
                 var sn = newdata.Summary.Split(new string[] { " " }, StringSplitOptions.None)[1].Trim().ToUpper();
                 ViewBag.birootcauselist = CreateBIRootIssue(newdata.ProjectKey, sn);
             }
+            ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
             return View(newdata);
         }
 

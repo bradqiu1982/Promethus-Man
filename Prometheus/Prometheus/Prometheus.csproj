@@ -225,6 +225,7 @@
     <Compile Include="Models\ProjectTestData.cs" />
     <Compile Include="Models\ProjectViewModels.cs" />
     <Compile Include="Models\ProjectYieldViewModule.cs" />
+    <Compile Include="Models\ShareDocVM.cs" />
     <Compile Include="Models\UserIssueViewModels.cs" />
     <Compile Include="Models\UserRankViewModel.cs" />
     <Compile Include="Models\UserViewModels.cs" />
@@ -795,6 +796,8 @@
     <Content Include="Views\CustomerData\CommitQualityData.cshtml" />
     <Content Include="Views\CustomerData\ConfirmQualityData.cshtml" />
     <Content Include="Views\Issue\UpdateQuality.cshtml" />
+    <Content Include="Views\User\AddShareTag.cshtml" />
+    <Content Include="Views\User\IBook.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

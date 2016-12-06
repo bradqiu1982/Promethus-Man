@@ -1,0 +1,73 @@
+﻿
+@{
+    ViewBag.Title = "IBook";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (ViewBag.projectlist != null && ViewBag.taglist != null)
+{
+    using (Html.BeginForm("AddUserShareTag", "User", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="row">
+            <div class="col-md-4"><h2>Add New Tags</h2></div>
+            <div class="col-md-8"></div>
+        </div>
+        <hr/>
+        <div class="row">
+            <div class="col-md-2"><label class="control-label">Project Tag</label></div>
+            <div class="col-md-3">@Html.DropDownList("projectlist", null, new { @id = "projectlist", @class = "form-control" })</div>
+            <div class="col-md-2"><input type="submit" value="Add Tag" id="updatetag" name="updatetag" class="btn btn-default" /></div>
+            <div class="col-md-4"></div>
+        </div>
+        <hr/>
+        <div class="row">
+            <div class="col-md-2"><label class="control-label">Document Tag</label></div>
+            <div class="col-md-3">@Html.DropDownList("taglist", null, new { @id = "taglist", @class = "form-control" })</div>
+            <div class="col-md-2"><input type="submit" value="Add Tag" id="updatetag" name="updatetag" class="btn btn-default" /></div>
+            <div class="col-md-4"></div>
+        </div>
+    }
+}
+
+<hr />
+
+@if (ViewBag.usertaglist != null)
+{
+    using (Html.BeginForm("UpdateUserShareTag", "User", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+
+
+            <div class="row">
+                <div class="col-md-3"><h2>User Booked Tags</h2></div>
+                <div class="col-md-9"></div>
+            </div>
+            <hr/>
+
+            <div class="row"></div>
+
+        for (var idx = 0; idx < ViewBag.usertaglist.Count; idx++)
+        {
+                <div class="col-md-4">
+                    <div class="col-md-3">
+                        <input type="checkbox" checked="checked" id="check@(idx)" name="check@(idx)" value="@(ViewBag.usertaglist[idx])" />
+                    </div>
+                    <div class="col-md-9">
+                        <label class="control-label">@(ViewBag.usertaglist[idx])</label>
+                    </div>
+                </div>
+        }
+
+        
+        <div class="row"></div>
+        <hr/>
+
+            <div class="row">
+                <div class="col-md-3"><input type="submit" value="Update Tag" id="updatetag" name="updatetag" class="btn btn-default" /></div>
+                <div class="col-md-9"></div>
+            </div>
+
+    }
+}

@@ -25,6 +25,25 @@
             background-color: #D3D3D3;
             border-bottom: 1px solid #DDD;
         }
+
+        .modal {
+          text-align: center;
+          padding: 0!important;
+        }
+
+        .modal:before {
+          content: '';
+          display: inline-block;
+          height: 100%;
+          vertical-align: middle;
+          margin-right: -4px;
+        }
+
+        .modal-dialog {
+          display: inline-block;
+          text-align: left;
+          vertical-align: middle;
+        }
     </style>
     <script src="~/Scripts/jquery.stickytableheaders.js"></script>
 </head>
@@ -85,7 +104,7 @@
                         </li>
                     </ul>
 
-                    <ul class="nav navbar-nav">
+                    @*<ul class="nav navbar-nav">
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Reports<span class="caret"></span></a>
                             <ul class="dropdown-menu">
@@ -97,7 +116,7 @@
                                 </li>
                             </ul>
                         </li>
-                    </ul>
+                    </ul>*@
 
                     <ul class="nav navbar-nav">
                         <li class="dropdown">
@@ -119,6 +138,12 @@
                             <ul class="dropdown-menu">
                                 <li>
                                     @Html.ActionLink("User Center", "UserCenter", "User")
+                                </li>
+                                <li>
+                                    @Html.ActionLink("IBook", "IBook", "User")
+                                </li>
+                                <li>
+                                    @Html.ActionLink("ILearn", "ILearn", "User")
                                 </li>
                             </ul>
                         </li>

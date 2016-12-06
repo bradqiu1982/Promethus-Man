@@ -1830,12 +1830,12 @@ namespace Prometheus.Models
             var fixresolve = Resolute.Pending;
             
             //2 days for fv,5 days for fa
-            var stattime = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd") + " 00:00:00").AddDays(10).ToString();
+            var stattime = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd") + " 00:00:01").AddDays(10).ToString();
             var endtime = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd") + " 23:59:59").AddDays(10).ToString();
 
             if (!fv)
             {
-                stattime = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd") + " 00:00:00").AddDays(5).ToString();
+                stattime = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd") + " 00:00:01").AddDays(5).ToString();
                 endtime = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd") + " 23:59:59").AddDays(5).ToString();
             }
 
@@ -1872,7 +1872,7 @@ namespace Prometheus.Models
             var fixresolve = Resolute.Pending;
 
             //2 days for fv,5 days for fa
-            var stattime = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd") + " 00:00:00").AddDays(4).ToString();
+            var stattime = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd") + " 00:00:01").AddDays(4).ToString();
             var endtime = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd") + " 23:59:59").AddDays(4).ToString();
 
 

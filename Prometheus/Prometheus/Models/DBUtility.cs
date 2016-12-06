@@ -11,6 +11,20 @@ namespace Prometheus.Models
 {
     public class DBUtility
     {
+        private static void logthdinfo(string info)
+        {
+            var filename = "e:\\sqlexception-" + DateTime.Now.ToString("yyyy-MM-dd");
+            if (File.Exists(filename))
+            {
+                var content = System.IO.File.ReadAllText(filename);
+                content = content +"\r\n"+DateTime.Now.ToString()+" : "+ info;
+                System.IO.File.WriteAllText(filename, content);
+            }
+            else
+            {
+                System.IO.File.WriteAllText(filename, DateTime.Now.ToString() + " : " + info);
+            }
+        }
 
         private static SqlConnection GetLocalConnector()
         {
@@ -25,12 +39,14 @@ namespace Prometheus.Models
             catch (SqlException ex)
             {
                 //System.Windows.MessageBox.Show(ex.ToString());
+                logthdinfo("open connect exception: "+ex.Message+"\r\n");
                 CloseConnector(conn);
                 return null;
             }
             catch (Exception ex)
             {
                 //System.Windows.MessageBox.Show(ex.ToString());
+                logthdinfo("open connect exception: " + ex.Message + "\r\n");
                 CloseConnector(conn);
                 return null;
             }
@@ -91,10 +107,12 @@ namespace Prometheus.Models
             }
             catch (SqlException ex)
             {
+                logthdinfo("close conn exception: " + ex.Message + "\r\n");
                 //System.Windows.MessageBox.Show(ex.ToString());
             }
             catch (Exception ex)
             {
+                logthdinfo("close conn exception: " + ex.Message + "\r\n");
             }
         }
 
@@ -114,12 +132,14 @@ namespace Prometheus.Models
             }
             catch (SqlException ex)
             {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
                 CloseConnector(conn);
                 //System.Windows.MessageBox.Show(ex.ToString());
                 return false;
             }
             catch (Exception ex)
             {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
                 CloseConnector(conn);
                 //System.Windows.MessageBox.Show(ex.ToString());
                 return false;
@@ -185,6 +205,7 @@ namespace Prometheus.Models
             }
             catch (SqlException ex)
             {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
                 if (sqlreader != null)
                 {
                     sqlreader.Close();
@@ -196,6 +217,7 @@ namespace Prometheus.Models
             }
             catch (Exception ex)
             {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
                 if (sqlreader != null)
                 {
                     sqlreader.Close();
@@ -244,12 +266,14 @@ namespace Prometheus.Models
             }
             catch (SqlException ex)
             {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
                 CloseConnector(conn);
                 //System.Windows.MessageBox.Show(ex.ToString());
                 return false;
             }
             catch (Exception ex)
             {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
                 CloseConnector(conn);
                 //System.Windows.MessageBox.Show(ex.ToString());
                 return false;
@@ -289,6 +313,7 @@ namespace Prometheus.Models
             }
             catch (SqlException ex)
             {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
                 //System.Windows.MessageBox.Show(ex.ToString());
                 CloseConnector(conn);
                 ret.Clear();
@@ -296,6 +321,7 @@ namespace Prometheus.Models
             }
             catch (Exception ex)
             {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
                 //System.Windows.MessageBox.Show(ex.ToString());
                 CloseConnector(conn);
                 ret.Clear();
@@ -340,12 +366,14 @@ namespace Prometheus.Models
             }
             catch (SqlException ex)
             {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
                 CloseConnector(conn);
                 //System.Windows.MessageBox.Show(ex.ToString());
                 return false;
             }
             catch (Exception ex)
             {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
                 CloseConnector(conn);
                 //System.Windows.MessageBox.Show(ex.ToString());
                 return false;
@@ -385,6 +413,7 @@ namespace Prometheus.Models
             }
             catch (SqlException ex)
             {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
                 //System.Windows.MessageBox.Show(ex.ToString());
                 CloseConnector(conn);
                 ret.Clear();
@@ -392,6 +421,7 @@ namespace Prometheus.Models
             }
             catch (Exception ex)
             {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
                 //System.Windows.MessageBox.Show(ex.ToString());
                 CloseConnector(conn);
                 ret.Clear();

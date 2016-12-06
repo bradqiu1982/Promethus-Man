@@ -25,11 +25,13 @@ namespace Prometheus.Models
             catch (SqlException ex)
             {
                 //System.Windows.MessageBox.Show(ex.ToString());
+                CloseConnector(conn);
                 return null;
             }
             catch (Exception ex)
             {
                 //System.Windows.MessageBox.Show(ex.ToString());
+                CloseConnector(conn);
                 return null;
             }
         }
@@ -154,6 +156,7 @@ namespace Prometheus.Models
         {
             var ret = new List<List<object>>();
             var conn = GetLocalConnector();
+            SqlDataReader sqlreader = null;
             try
             {
                 if (conn == null)
@@ -161,7 +164,7 @@ namespace Prometheus.Models
 
                 var command = conn.CreateCommand();
                 command.CommandText = sql;
-                var sqlreader = command.ExecuteReader();
+                sqlreader = command.ExecuteReader();
                 if (sqlreader.HasRows)
                 {
 
@@ -182,7 +185,10 @@ namespace Prometheus.Models
             }
             catch (SqlException ex)
             {
-                
+                if (sqlreader != null)
+                {
+                    sqlreader.Close();
+                }
                 CloseConnector(conn);
                 //System.Windows.MessageBox.Show(ex.ToString());
                 ret.Clear();
@@ -190,6 +196,10 @@ namespace Prometheus.Models
             }
             catch (Exception ex)
             {
+                if (sqlreader != null)
+                {
+                    sqlreader.Close();
+                }
                 CloseConnector(conn);
                 //System.Windows.MessageBox.Show(ex.ToString());
                 ret.Clear();

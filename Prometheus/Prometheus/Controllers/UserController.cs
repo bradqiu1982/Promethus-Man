@@ -677,7 +677,7 @@ namespace Prometheus.Controllers
             {
                 var ck = new Dictionary<string, string>();
                 ck.Add("logonredirectctrl", "User");
-                ck.Add("logonredirectact", "IBook");
+                ck.Add("logonredirectact", "AddUserShareTag");
                 CookieUtility.SetCookie(this, ck);
                 return RedirectToAction("LoginUser", "User");
             }

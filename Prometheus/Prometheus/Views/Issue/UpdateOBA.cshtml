@@ -219,13 +219,37 @@
                     <div class="col-md-10">
                         @if (ViewBag.isassignee != null && ViewBag.isassignee)
                         {
-                            @Html.DropDownList("resolutionlist", null, new { @id = "resolutionlist", @class = "form-control" })
+                            @Html.DropDownList("resolutionlist", null, new { @id = "resolutionlist", @class = "form-control", @onchange = "chooseissuetag()" })
                         }
                         else
                         {
                             @Html.DropDownList("resolutionlist", null, new { @id = "resolutionlist", @class = "form-control", @readonly = "readonly" })
                         }
                     </div>
+
+                    @if (ViewBag.isassignee != null
+                    && ViewBag.isassignee
+                    && Model.RootCauseCommentList.Count > 0)
+                    {
+                        <script type="text/javascript">
+                            function chooseissuetag()
+                            {
+                                if (document.getElementById("resolutionlist")
+                                    && (document.getElementById("resolutionlist").value === "Fixed"
+                                    || document.getElementById("resolutionlist").value === "Done")) {
+                                    $('#issuetag').modal({ backdrop: 'static' });
+                                }
+                            }
+                        </script>
+                    }
+                    else
+                    {
+                        <script type="text/javascript">
+                            function chooseissuetag()
+                            {
+                            }
+                        </script>
+                    }
                 </div>
 
             </div>
@@ -336,6 +360,7 @@
                         function ShowFileNames3(oFile) {
                             $('#showfile3').text(oFile.value);
                             document.getElementById("attachmentupload").value = oFile.value;
+                            $('#attachtag').modal({ backdrop: 'static' });
                         }
                     </script>
                 </div>
@@ -621,6 +646,86 @@
         </div>
     </div>
 
+
+    <div class="modal" id="attachtag" tabindex="-1" role="dialog" aria-labelledby="attachtagLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="attachtagLabel">Share Document Tag</h4>
+                </div>
+                <div class="row"></div>
+                <hr />
+                <div class="row"></div>
+                @if (ViewBag.tobechoosetags != null)
+                {
+                    for (var idx = 0; idx < ViewBag.tobechoosetags.Count; idx++)
+                    {
+                        <div class="col-md-4">
+                            <div class="col-md-3">
+                                @if (string.Compare(ViewBag.tobechoosetags[idx], "OBA", true) == 0)
+                                {
+                                    <input type="checkbox" id="attachtagcheck@(idx)" checked="checked" name="attachtagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
+                                }
+                                else
+                                {
+                                    <input type="checkbox" id="attachtagcheck@(idx)" name="attachtagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
+                                }
+                            </div>
+                            <div class="col-md-9">
+                                <label class="control-label">@(ViewBag.tobechoosetags[idx])</label>
+                            </div>
+                        </div>
+                    }
+                }
+                <div class="row"></div>
+                <hr />
+                <div class="row"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="issuetag" tabindex="-1" role="dialog" aria-labelledby="issuetagLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="issuetagLabel">Share Issue Tag</h4>
+                </div>
+                <div class="row"></div>
+                <hr />
+                <div class="row"></div>
+                @if (ViewBag.tobechoosetags != null)
+                {
+                    for (var idx = 0; idx < ViewBag.tobechoosetags.Count; idx++)
+                    {
+                        <div class="col-md-4">
+                            <div class="col-md-3">
+                                @if (string.Compare(ViewBag.tobechoosetags[idx], "OBA", true) == 0)
+                                {
+                                    <input type="checkbox" id="issuetagcheck@(idx)" checked="checked" name="issuetagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
+                                }
+                                else
+                                {
+                                    <input type="checkbox" id="issuetagcheck@(idx)" name="issuetagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
+                                }
+                            </div>
+                            <div class="col-md-9">
+                                <label class="control-label">@(ViewBag.tobechoosetags[idx])</label>
+                            </div>
+                        </div>
+                    }
+                }
+                <div class="row"></div>
+                <hr />
+                <div class="row"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
 }
 
 

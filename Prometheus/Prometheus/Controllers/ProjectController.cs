@@ -725,7 +725,7 @@ namespace Prometheus.Controllers
 
             var ckdict = CookieUtility.UnpackCookie(this);
             var who = (ckdict["logonuser"]).Split(new string[]{ "||"},StringSplitOptions.None)[0];
-            ProjectEvent.CreateProjectEvent(who, projectmodel.ProjectKey, projectmodel.ProjectName);
+            //ProjectEvent.CreateProjectEvent(who, projectmodel.ProjectKey, projectmodel.ProjectName);
 
             MESUtility.StartProjectBonding(projectmodel);
             BIDataUtility.StartProjectBonding(projectmodel);
@@ -1024,7 +1024,7 @@ namespace Prometheus.Controllers
                         
             var ckdict = CookieUtility.UnpackCookie(this);
             var who = (ckdict["logonuser"]).Split(new string[] { "||" }, StringSplitOptions.None)[0];
-            ProjectEvent.UpdateProjectEvent(who, projectmodel.ProjectKey, projectmodel.ProjectName);
+            //ProjectEvent.UpdateProjectEvent(who, projectmodel.ProjectKey, projectmodel.ProjectName);
 
             if(databondingchange)
             {

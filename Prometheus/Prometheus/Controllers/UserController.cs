@@ -653,7 +653,7 @@ namespace Prometheus.Controllers
             createtaglist();
 
             var usertaglist = new List<string>();
-            var usertagdict = ShareDocVM.RetrieveUserBookTag(updater).DOCTagDict;
+            var usertagdict = ShareDocVM.RetrieveUserBookedTag(updater).DOCTagDict;
             usertaglist.AddRange(usertagdict.Keys);
             if (usertaglist.Count > 0)
             {
@@ -684,7 +684,7 @@ namespace Prometheus.Controllers
 
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
             var usertaglist = new List<string>();
-            var usertagdict = ShareDocVM.RetrieveUserBookTag(updater).DOCTagDict;
+            var usertagdict = ShareDocVM.RetrieveUserBookedTag(updater).DOCTagDict;
             usertaglist.AddRange(usertagdict.Keys);
 
             var pjtag = Request.Form["projectlist"].ToString();
@@ -707,7 +707,7 @@ namespace Prometheus.Controllers
             }
             ShareDocVM.SetUserBookTag(updater, usertag);
 
-            return RedirectToAction("IBook");
+            return RedirectToAction("IBook", "User");
         }
 
         [HttpPost, ActionName("UpdateUserShareTag")]
@@ -729,6 +729,13 @@ namespace Prometheus.Controllers
             }
 
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            if (Request.Form["matchpostfile"] != null)
+            {
+                ShareDocVM.MatchAllPostDocForUser(updater);
+                return RedirectToAction("ILearn");
+            }
+            
             var tags = string.Empty;
             for (var i = 0; i < 600; i++)
             {
@@ -739,7 +746,77 @@ namespace Prometheus.Controllers
             }
             ShareDocVM.SetUserBookTag(updater,tags);
 
-            return RedirectToAction("IBook");
+            return RedirectToAction("IBook","User");
+        }
+
+        public ActionResult ILearn()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "IBook");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            ViewBag.ILearn = ShareDocVM.RetrieveMyLearn(updater);
+            ViewBag.IShare = ShareDocVM.RetrieveMyShare(updater);
+            return View();
+        }
+
+        public ActionResult ILike(string DOCPJK, string DOCKey)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "IBook");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            if (!string.IsNullOrEmpty(DOCPJK)
+                && !string.IsNullOrEmpty(DOCKey))
+            {
+                ShareDocVM.LikeDoc(DOCPJK, DOCKey, updater);
+            }
+            return RedirectToAction("ILearn", "User");
+        }
+
+        public ActionResult IPush()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "IBook");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            return RedirectToAction("ILearn", "User");
         }
 
     }

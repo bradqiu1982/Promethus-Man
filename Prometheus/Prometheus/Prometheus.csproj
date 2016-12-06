@@ -798,6 +798,7 @@
     <Content Include="Views\Issue\UpdateQuality.cshtml" />
     <Content Include="Views\User\AddShareTag.cshtml" />
     <Content Include="Views\User\IBook.cshtml" />
+    <Content Include="Views\User\ILearn.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

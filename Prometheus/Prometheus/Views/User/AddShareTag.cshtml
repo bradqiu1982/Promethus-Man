@@ -1,0 +1,49 @@
+﻿
+@{
+    ViewBag.Title = "AddShareTag";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Add Share Tag</h2>
+
+
+<hr />
+
+@using (Html.BeginForm("AddShareTag", "User", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <div class="row col-md-12">
+        <div class="col-md-3">
+            <label>Share Tags<font color="red">*</font></label>
+        </div>
+        <div class="col-md-9">
+        </div>
+    </div>
+
+    <div class="row col-md-12">
+        <div class="col-md-12" data-toggle="tooltip" data-placement="center" title="Exampel: tag string ; tag string ;tag string">
+            @if (ViewBag.tagstr != null)
+            {
+                <textarea class="form-control col-md-12" name="querystring" id="querystring" style="height:200px;min-width:600px;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="6" data-val-required="The field is required.">@(ViewBag.tagstr)</textarea>
+            }
+            else
+            {
+                <textarea class="form-control col-md-12" name="querystring" id="querystring" style="height:200px;min-width:600px;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="6" data-val-required="The field is required."></textarea>
+            }
+        </div>
+        <span class="field-validation-valid text-danger" data-valmsg-for="querystring" data-valmsg-replace="true"></span>
+    </div>
+
+    <hr/>
+
+    <div class="row col-md-12">
+        <div class="col-md-3">
+            <input type="submit" value="Add" class="btn btn-default" />
+        </div>
+        <div class="col-md-9">
+        </div>
+    </div>
+}
+

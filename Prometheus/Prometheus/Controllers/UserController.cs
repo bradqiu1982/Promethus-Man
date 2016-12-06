@@ -555,5 +555,192 @@ namespace Prometheus.Controllers
             return View();
         }
 
+
+        public ActionResult AddShareTag()
+        {
+            var tagstr = string.Empty;
+            var tags = ShareDocVM.RetrieveShareTags();
+
+            foreach (var tag in tags)
+            {
+                tagstr = tagstr + tag + ";";
+            }
+
+            ViewBag.tagstr = tagstr;
+
+            return View();
+        }
+
+        [HttpPost, ActionName("AddShareTag")]
+        [ValidateAntiForgeryToken]
+        public ActionResult AddShareTagPost()
+        {
+            var tagstr = Request.Form["querystring"];
+            var tags = tagstr.Split(new string[] { ";","," }, StringSplitOptions.RemoveEmptyEntries);
+            var taglist = new List<string>();
+            taglist.AddRange(tags);
+            ShareDocVM.StoreShareTags(taglist);
+
+            var tags1 = ShareDocVM.RetrieveShareTags();
+            var tagstr1 = string.Empty;
+            foreach (var tag in tags1)
+            {
+                tagstr1 = tagstr1 + tag + ";";
+            }
+
+            ViewBag.tagstr = tagstr1;
+
+            return View();
+        }
+
+        private List<SelectListItem> CreateSelectList(List<string> valist)
+        {
+            bool selected = false;
+            var pslist = new List<SelectListItem>();
+
+            var pitem = new SelectListItem();
+            pitem.Text = "NONE";
+            pitem.Value = "NONE";
+            pslist.Add(pitem);
+
+            foreach (var p in valist)
+            {
+                pitem = new SelectListItem();
+                pitem.Text = p;
+                pitem.Value = p;
+                pslist.Add(pitem);
+            }
+
+            if (!selected && pslist.Count > 0)
+            {
+                pslist[0].Selected = true;
+            }
+
+            return pslist;
+        }
+
+        private void createpjlist()
+        {
+            var projlist = ProjectViewModels.RetrieveAllProjectKey();
+            ViewBag.projectlist= CreateSelectList(projlist);
+        }
+
+        private void createtaglist()
+        {
+            var tags = ShareDocVM.RetrieveShareTags();
+            tags.Sort();
+            ViewBag.taglist = CreateSelectList(tags);
+        }
+
+        public ActionResult IBook()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "IBook");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            createpjlist();
+            createtaglist();
+
+            var usertaglist = new List<string>();
+            var usertagdict = ShareDocVM.RetrieveUserBookTag(updater).DOCTagDict;
+            usertaglist.AddRange(usertagdict.Keys);
+            if (usertaglist.Count > 0)
+            {
+                usertaglist.Sort();
+                ViewBag.usertaglist = usertaglist;
+            }
+            return View();
+        }
+
+
+        [HttpPost, ActionName("AddUserShareTag")]
+        [ValidateAntiForgeryToken]
+        public ActionResult AddUserShareTag()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "IBook");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            var usertaglist = new List<string>();
+            var usertagdict = ShareDocVM.RetrieveUserBookTag(updater).DOCTagDict;
+            usertaglist.AddRange(usertagdict.Keys);
+
+            var pjtag = Request.Form["projectlist"].ToString();
+            var normaltag = Request.Form["taglist"].ToString();
+
+            if (string.Compare(pjtag, "NONE", true) != 0)
+            {
+                usertaglist.Add(pjtag);
+            }
+
+            if (string.Compare(normaltag, "NONE", true) != 0)
+            {
+                usertaglist.Add(normaltag);
+            }
+
+            var usertag = string.Empty;
+            foreach (var tag in usertaglist)
+            {
+                usertag = usertag + tag + ";";
+            }
+            ShareDocVM.SetUserBookTag(updater, usertag);
+
+            return RedirectToAction("IBook");
+        }
+
+        [HttpPost, ActionName("UpdateUserShareTag")]
+        [ValidateAntiForgeryToken]
+        public ActionResult UpdateUserShareTag()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "IBook");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            var tags = string.Empty;
+            for (var i = 0; i < 600; i++)
+            {
+                if (Request.Form["check" + i] != null)
+                {
+                    tags = tags + Request.Form["check" + i] + ";";
+                }
+            }
+            ShareDocVM.SetUserBookTag(updater,tags);
+
+            return RedirectToAction("IBook");
+        }
+
     }
 }

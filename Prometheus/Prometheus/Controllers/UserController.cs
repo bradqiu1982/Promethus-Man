@@ -723,7 +723,7 @@ namespace Prometheus.Controllers
             {
                 var ck = new Dictionary<string, string>();
                 ck.Add("logonredirectctrl", "User");
-                ck.Add("logonredirectact", "IBook");
+                ck.Add("logonredirectact", "UpdateUserShareTag");
                 CookieUtility.SetCookie(this, ck);
                 return RedirectToAction("LoginUser", "User");
             }
@@ -760,7 +760,7 @@ namespace Prometheus.Controllers
             {
                 var ck = new Dictionary<string, string>();
                 ck.Add("logonredirectctrl", "User");
-                ck.Add("logonredirectact", "IBook");
+                ck.Add("logonredirectact", "ILearn");
                 CookieUtility.SetCookie(this, ck);
                 return RedirectToAction("LoginUser", "User");
             }
@@ -783,7 +783,7 @@ namespace Prometheus.Controllers
             {
                 var ck = new Dictionary<string, string>();
                 ck.Add("logonredirectctrl", "User");
-                ck.Add("logonredirectact", "IBook");
+                ck.Add("logonredirectact", "ILike");
                 CookieUtility.SetCookie(this, ck);
                 return RedirectToAction("LoginUser", "User");
             }
@@ -809,7 +809,7 @@ namespace Prometheus.Controllers
             {
                 var ck = new Dictionary<string, string>();
                 ck.Add("logonredirectctrl", "User");
-                ck.Add("logonredirectact", "IBook");
+                ck.Add("logonredirectact", "IPush");
                 CookieUtility.SetCookie(this, ck);
                 return RedirectToAction("LoginUser", "User");
             }

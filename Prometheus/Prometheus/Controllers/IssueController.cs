@@ -226,7 +226,7 @@ namespace Prometheus.Controllers
             }
 
 
-            ProjectEvent.CreateIssueEvent(vm.ProjectKey, vm.Reporter, vm.Assignee, vm.Summary, vm.IssueKey);
+            //ProjectEvent.CreateIssueEvent(vm.ProjectKey, vm.Reporter, vm.Assignee, vm.Summary, vm.IssueKey);
 
             //if (vm.RelativePeopleList.Count > 0)
             //{
@@ -465,12 +465,12 @@ namespace Prometheus.Controllers
                 }
             }
 
-            ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Updated", originaldata.Summary, originaldata.IssueKey);
+            //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Updated", originaldata.Summary, originaldata.IssueKey);
 
             if (string.Compare(originaldata.Assignee, vm.Assignee, true) != 0)
             {
                 vm.UpdateIAssign();
-                ProjectEvent.AssignIssueEvent(originaldata.ProjectKey, updater, vm.Assignee, originaldata.Summary, originaldata.IssueKey);
+                //ProjectEvent.AssignIssueEvent(originaldata.ProjectKey, updater, vm.Assignee, originaldata.Summary, originaldata.IssueKey);
                 vm.Summary = originaldata.Summary;
                 SendTaskEvent(vm, "asigned to you", updater, vm.Assignee);
             }
@@ -489,18 +489,18 @@ namespace Prometheus.Controllers
                         UserRankViewModel.UpdateUserRank(updater, 2);
                     }
                     
-                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
+                    //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
                     vm.CloseIssue();
                 }
 
                 if (string.Compare(vm.Resolution, Resolute.Working) == 0)
                 {
-                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Started", originaldata.Summary, originaldata.IssueKey);
+                    //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Started", originaldata.Summary, originaldata.IssueKey);
                 }
 
                 if (string.Compare(vm.Resolution, Resolute.Reopen) == 0)
                 {
-                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Reopened", originaldata.Summary, originaldata.IssueKey);
+                    //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Reopened", originaldata.Summary, originaldata.IssueKey);
                 }
             }
 
@@ -638,7 +638,7 @@ namespace Prometheus.Controllers
                 }
             }
 
-            ProjectEvent.CreateIssueEvent(vm.ProjectKey, vm.Reporter, vm.Assignee, vm.Summary, vm.IssueKey);
+            //ProjectEvent.CreateIssueEvent(vm.ProjectKey, vm.Reporter, vm.Assignee, vm.Summary, vm.IssueKey);
 
             var dict = new RouteValueDictionary();
             dict.Add("issuekey", vm.ParentIssueKey);
@@ -932,7 +932,7 @@ namespace Prometheus.Controllers
                 }
             }
 
-            ProjectEvent.CreateIssueEvent(vm.ProjectKey, vm.Reporter, vm.Assignee, vm.Summary, vm.IssueKey);
+            //ProjectEvent.CreateIssueEvent(vm.ProjectKey, vm.Reporter, vm.Assignee, vm.Summary, vm.IssueKey);
             SendRMAEvent(vm, "created",true);
 
             var dict = new RouteValueDictionary();
@@ -1148,12 +1148,12 @@ namespace Prometheus.Controllers
 
             vm.UpdateIssue();
 
-            var issuetage = string.Empty;
+            var issuetag = string.Empty;
             for (var i = 0; i < 200; i++)
             {
                 if (Request.Form["issuetagcheck" + i] != null)
                 {
-                    issuetage = issuetage + Request.Form["issuetagcheck" + i] + ";";
+                    issuetag = issuetag + Request.Form["issuetagcheck" + i] + ";";
                 }
             }
 
@@ -1197,12 +1197,12 @@ namespace Prometheus.Controllers
                 }
             }
 
-            ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Updated", originaldata.Summary, originaldata.IssueKey);
+            //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Updated", originaldata.Summary, originaldata.IssueKey);
 
             if (string.Compare(originaldata.Assignee, vm.Assignee, true) != 0)
             {
                 vm.UpdateIAssign();
-                ProjectEvent.AssignIssueEvent(originaldata.ProjectKey, updater, vm.Assignee, originaldata.Summary, originaldata.IssueKey);
+                //ProjectEvent.AssignIssueEvent(originaldata.ProjectKey, updater, vm.Assignee, originaldata.Summary, originaldata.IssueKey);
                 vm.Summary = originaldata.Summary;
                 SendTaskEvent(vm, "asigned to you", updater, vm.Assignee);
             }
@@ -1221,23 +1221,23 @@ namespace Prometheus.Controllers
                         UserRankViewModel.UpdateUserRank(updater, 2);
                     }
 
-                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
+                    //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
                     vm.CloseIssue();
 
-                    if (!string.IsNullOrEmpty(issuetage))
+                    if (!string.IsNullOrEmpty(issuetag))
                     {
-                        ShareDocVM.ShareDoc(originaldata.ProjectKey, ShareDocType.ISSUE, originaldata.IssueKey, issuetage, updater, DateTime.Now.ToString());
+                        ShareDocVM.ShareDoc(originaldata.ProjectKey, ShareDocType.ISSUE, originaldata.IssueKey, issuetag, updater, DateTime.Now.ToString());
                     }
                 }
 
                 if (string.Compare(vm.Resolution, Resolute.Working) == 0)
                 {
-                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Started", originaldata.Summary, originaldata.IssueKey);
+                    //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Started", originaldata.Summary, originaldata.IssueKey);
                 }
 
                 if (string.Compare(vm.Resolution, Resolute.Reopen) == 0)
                 {
-                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Reopened", originaldata.Summary, originaldata.IssueKey);
+                    //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Reopened", originaldata.Summary, originaldata.IssueKey);
                 }
             }
 
@@ -1327,6 +1327,7 @@ namespace Prometheus.Controllers
                 }
                 //ret.Reporter = updater;
 
+                ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
                 CreateAllLists(ret);
                 return View(ret);
             }
@@ -1463,6 +1464,42 @@ namespace Prometheus.Controllers
                 UserRankViewModel.UpdateUserRank(updater, 5);
             }
 
+            var issuetag = string.Empty;
+            for (var i = 0; i < 200; i++)
+            {
+                if (Request.Form["issuetagcheck" + i] != null)
+                {
+                    issuetag = issuetag + Request.Form["issuetagcheck" + i] + ";";
+                }
+            }
+
+            var customertag = string.Empty;
+            for (var i = 0; i < 200; i++)
+            {
+                if (Request.Form["customertagcheck" + i] != null)
+                {
+                    customertag = customertag + Request.Form["customertagcheck" + i] + ";";
+                }
+            }
+
+            var internaltag = string.Empty;
+            for (var i = 0; i < 200; i++)
+            {
+                if (Request.Form["internaltagcheck" + i] != null)
+                {
+                    internaltag = internaltag + Request.Form["internaltagcheck" + i] + ";";
+                }
+            }
+
+            var attachtag = string.Empty;
+            for (var i = 0; i < 200; i++)
+            {
+                if (Request.Form["attachtagcheck" + i] != null)
+                {
+                    attachtag = attachtag + Request.Form["attachtagcheck" + i] + ";";
+                }
+            }
+
             var urls = ReceiveRMAFiles();
 
             if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
@@ -1485,7 +1522,12 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(url))
                 {
                     IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
-
+                    if (!string.IsNullOrEmpty(attachtag))
+                    {
+                        var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+                        var dockey = tempkeys[tempkeys.Length - 1];
+                        ShareDocVM.ShareDoc(originaldata.ProjectKey, ShareDocType.DOCUMENT, dockey, attachtag, updater, DateTime.Now.ToString());
+                    }
                     UserRankViewModel.UpdateUserRank(updater, 5);
                 }
             }
@@ -1514,7 +1556,12 @@ namespace Prometheus.Controllers
                     var commenttype = COMMENTTYPE.CustomReport;
                     IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
                     IssueViewModels.StoreIssueAttachment(vm.IssueKey, linkstr);
-
+                    if (!string.IsNullOrEmpty(customertag))
+                    {
+                        var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+                        var dockey = tempkeys[tempkeys.Length - 1];
+                        ShareDocVM.ShareDoc(originaldata.ProjectKey, ShareDocType.DOCUMENT, dockey, customertag, updater, DateTime.Now.ToString());
+                    }
                     UserRankViewModel.UpdateUserRank(updater, 5);
                 }
             }
@@ -1543,19 +1590,24 @@ namespace Prometheus.Controllers
                     var commenttype = COMMENTTYPE.InternalReport;
                     IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
                     IssueViewModels.StoreIssueAttachment(vm.IssueKey, linkstr);
-
+                    if (!string.IsNullOrEmpty(internaltag))
+                    {
+                        var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+                        var dockey = tempkeys[tempkeys.Length - 1];
+                        ShareDocVM.ShareDoc(originaldata.ProjectKey, ShareDocType.DOCUMENT, dockey, internaltag, updater, DateTime.Now.ToString());
+                    }
                     UserRankViewModel.UpdateUserRank(updater, 10);
                 }
             }
 
             vm.UpdateRMA();
 
-            ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Updated", originaldata.Summary, originaldata.IssueKey);
+            //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Updated", originaldata.Summary, originaldata.IssueKey);
 
             if (string.Compare(originaldata.Assignee, vm.Assignee, true) != 0)
             {
                 vm.UpdateIAssign();
-                ProjectEvent.AssignIssueEvent(originaldata.ProjectKey, updater, vm.Assignee, originaldata.Summary, originaldata.IssueKey);
+                //ProjectEvent.AssignIssueEvent(originaldata.ProjectKey, updater, vm.Assignee, originaldata.Summary, originaldata.IssueKey);
                 vm.Summary = originaldata.Summary;
                 SendTaskEvent(vm, "asigned to you", updater, vm.Assignee);
             }
@@ -1565,20 +1617,23 @@ namespace Prometheus.Controllers
                 if (vm.IssueClosed())
                 {
                     UserRankViewModel.UpdateUserRank(updater, 5);
-
-                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
+                    if (!string.IsNullOrEmpty(issuetag))
+                    {
+                        ShareDocVM.ShareDoc(originaldata.ProjectKey, ShareDocType.ISSUE, originaldata.IssueKey, issuetag, updater, DateTime.Now.ToString());
+                    }
+                    //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
                     vm.CloseIssue();
                     SendRMAEvent(vm, "closed",true);
                 }
 
                 if (string.Compare(vm.Resolution, Resolute.Working) == 0)
                 {
-                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Started", originaldata.Summary, originaldata.IssueKey);
+                    //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Started", originaldata.Summary, originaldata.IssueKey);
                 }
 
                 if (string.Compare(vm.Resolution, Resolute.Reopen) == 0)
                 {
-                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Reopened", originaldata.Summary, originaldata.IssueKey);
+                    //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Reopened", originaldata.Summary, originaldata.IssueKey);
                     SendRMAEvent(vm, "reopened",true);
                 }
             }
@@ -1593,6 +1648,7 @@ namespace Prometheus.Controllers
                 ViewBag.isassignee = true;
             }
 
+            ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
             return View(newdata);
         }
 
@@ -1651,6 +1707,7 @@ namespace Prometheus.Controllers
                 }
                 //ret.Reporter = updater;
 
+                ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
                 CreateAllLists(ret);
                 return View(ret);
             }
@@ -1744,6 +1801,25 @@ namespace Prometheus.Controllers
                 UserRankViewModel.UpdateUserRank(updater, 5);
             }
 
+
+            var issuetag = string.Empty;
+            for (var i = 0; i < 200; i++)
+            {
+                if (Request.Form["issuetagcheck" + i] != null)
+                {
+                    issuetag = issuetag + Request.Form["issuetagcheck" + i] + ";";
+                }
+            }
+
+            var attachtag = string.Empty;
+            for (var i = 0; i < 200; i++)
+            {
+                if (Request.Form["attachtagcheck" + i] != null)
+                {
+                    attachtag = attachtag + Request.Form["attachtagcheck" + i] + ";";
+                }
+            }
+
             var urls = ReceiveRMAFiles();
 
             if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
@@ -1766,19 +1842,24 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(url))
                 {
                     IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
-
                     UserRankViewModel.UpdateUserRank(updater, 3);
+                    if (!string.IsNullOrEmpty(attachtag))
+                    {
+                        var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+                        var dockey = tempkeys[tempkeys.Length - 1];
+                        ShareDocVM.ShareDoc(originaldata.ProjectKey, ShareDocType.DOCUMENT, dockey, attachtag, updater, DateTime.Now.ToString());
+                    }
                 }
             }
 
             vm.UpdateOBA();
 
-            ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Updated", originaldata.Summary, originaldata.IssueKey);
+            //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Updated", originaldata.Summary, originaldata.IssueKey);
 
             if (string.Compare(originaldata.Assignee, vm.Assignee, true) != 0)
             {
                 vm.UpdateIAssign();
-                ProjectEvent.AssignIssueEvent(originaldata.ProjectKey, updater, vm.Assignee, originaldata.Summary, originaldata.IssueKey);
+                //ProjectEvent.AssignIssueEvent(originaldata.ProjectKey, updater, vm.Assignee, originaldata.Summary, originaldata.IssueKey);
                 vm.Summary = originaldata.Summary;
                 SendTaskEvent(vm, "asigned to you", updater, vm.Assignee);
             }
@@ -1789,19 +1870,23 @@ namespace Prometheus.Controllers
                 {
                     UserRankViewModel.UpdateUserRank(updater, 5);
 
-                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
+                    if (!string.IsNullOrEmpty(issuetag))
+                    {
+                        ShareDocVM.ShareDoc(originaldata.ProjectKey, ShareDocType.ISSUE, originaldata.IssueKey, issuetag, updater, DateTime.Now.ToString());
+                    }
+                    //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
                     vm.CloseIssue();
                     SendIssueEvent(vm, "closed",ISSUETP.OBA, true);
                 }
 
                 if (string.Compare(vm.Resolution, Resolute.Working) == 0)
                 {
-                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Started", originaldata.Summary, originaldata.IssueKey);
+                    //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Started", originaldata.Summary, originaldata.IssueKey);
                 }
 
                 if (string.Compare(vm.Resolution, Resolute.Reopen) == 0)
                 {
-                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Reopened", originaldata.Summary, originaldata.IssueKey);
+                    //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Reopened", originaldata.Summary, originaldata.IssueKey);
                     SendIssueEvent(vm, "reopened", ISSUETP.OBA, true);
                 }
             }
@@ -1815,7 +1900,7 @@ namespace Prometheus.Controllers
             {
                 ViewBag.isassignee = true;
             }
-
+            ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
             return View(newdata);
         }
 
@@ -2005,12 +2090,12 @@ namespace Prometheus.Controllers
 
             vm.UpdateQuality();
 
-            ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Updated", originaldata.Summary, originaldata.IssueKey);
+            //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Updated", originaldata.Summary, originaldata.IssueKey);
 
             if (string.Compare(originaldata.Assignee, vm.Assignee, true) != 0)
             {
                 vm.UpdateIAssign();
-                ProjectEvent.AssignIssueEvent(originaldata.ProjectKey, updater, vm.Assignee, originaldata.Summary, originaldata.IssueKey);
+                //ProjectEvent.AssignIssueEvent(originaldata.ProjectKey, updater, vm.Assignee, originaldata.Summary, originaldata.IssueKey);
                 vm.Summary = originaldata.Summary;
                 SendTaskEvent(vm, "asigned to you", updater, vm.Assignee);
             }
@@ -2021,19 +2106,19 @@ namespace Prometheus.Controllers
                 {
                     UserRankViewModel.UpdateUserRank(updater, 5);
 
-                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
+                    //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
                     vm.CloseIssue();
                     SendIssueEvent(vm, "closed",ISSUETP.Quality, true);
                 }
 
                 if (string.Compare(vm.Resolution, Resolute.Working) == 0)
                 {
-                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Started", originaldata.Summary, originaldata.IssueKey);
+                    //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Started", originaldata.Summary, originaldata.IssueKey);
                 }
 
                 if (string.Compare(vm.Resolution, Resolute.Reopen) == 0)
                 {
-                    ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Reopened", originaldata.Summary, originaldata.IssueKey);
+                    //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Reopened", originaldata.Summary, originaldata.IssueKey);
                     SendIssueEvent(vm, "reopened", ISSUETP.Quality, true);
                 }
             }

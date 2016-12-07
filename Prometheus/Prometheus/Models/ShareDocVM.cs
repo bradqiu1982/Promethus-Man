@@ -61,9 +61,13 @@ namespace Prometheus.Models
 
         public static void ShareDoc(string DOCPJK, string DOCType, string DOCKey, string DOCTag, string DOCCreator, string DOCDate)
         {
-            var sql = "delete from ShareDoc where DOCPJK='<DOCPJK>' and DOCKey='<DOCKey>'";
+            var sql = "select DOCPJK,DOCKey from ShareDoc where DOCPJK='<DOCPJK>' and DOCKey='<DOCKey>'";
             sql = sql.Replace("<DOCPJK>", DOCPJK).Replace("<DOCKey>", DOCKey);
-            DBUtility.ExeLocalSqlNoRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            if (dbret.Count > 0)
+            {
+                return;
+            }
 
             sql = "insert into ShareDoc(DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate) values('<DOCPJK>','<DOCType>','<DOCKey>','<DOCTag>','<DOCCreator>','<DOCDate>')";
             sql = sql.Replace("<DOCPJK>", DOCPJK).Replace("<DOCType>", DOCType)
@@ -74,9 +78,13 @@ namespace Prometheus.Models
 
         private static void PushDoc(string BookerName, string DOCPJK, string DOCType, string DOCKey, string DOCTag, string DOCCreator, string DOCDate,string DOCPusher)
         {
-            var sql = "delete from UserLearn where UserName = '<BookerName>' and DOCPJK='<DOCPJK>' and DOCKey='<DOCKey>'";
+            var sql = "select DOCPJK,DOCKey from UserLearn where UserName = '<BookerName>' and DOCPJK='<DOCPJK>' and DOCKey='<DOCKey>'";
             sql = sql.Replace("<BookerName>", BookerName).Replace("<DOCPJK>", DOCPJK).Replace("<DOCKey>", DOCKey);
-            DBUtility.ExeLocalSqlNoRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            if (dbret.Count > 0)
+            {
+                return;
+            }
 
             sql = "insert into UserLearn(UserName,DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,DOCPusher) values('<BookerName>','<DOCPJK>','<DOCType>','<DOCKey>','<DOCTag>','<DOCCreator>','<DOCDate>','<DOCPusher>')";
             sql = sql.Replace("<BookerName>", BookerName).Replace("<DOCPJK>", DOCPJK).Replace("<DOCType>", DOCType)
@@ -233,7 +241,7 @@ namespace Prometheus.Models
         public static List<ShareDocVM> RetrieveMyShare(string UserName)
         {
             var ret = new List<ShareDocVM>();
-            var sql = "select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,a.DOCDate,b.DOCPusher,b.DOCFavor,a.DOCFavorTimes from ShareDoc a left join UserLearn b ON a.DOCKey = b.DOCKey where a.DOCCreator= '<UserName>' or b.DOCPusher= '<UserName>'  order by a.DOCDate DESC";
+            var sql = "select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,a.DOCDate,a.DOCFavorTimes from ShareDoc a  where a.DOCCreator= '<UserName>' order by a.DOCDate DESC";
             sql = sql.Replace("<UserName>", UserName);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             foreach (var line in dbret)
@@ -246,9 +254,7 @@ namespace Prometheus.Models
                 tempvm.DOCTag = Convert.ToString(line[3]);
                 tempvm.DOCCreator = Convert.ToString(line[4]);
                 tempvm.DOCDate = DateTime.Parse(Convert.ToString(line[5]));
-                tempvm.DOCPusher = Convert.ToString(line[6]);
-                tempvm.DOCFavor = Convert.ToString(line[7]);
-                tempvm.DOCFavorTimes = Convert.ToInt32(line[8]);
+                tempvm.DOCFavorTimes = Convert.ToInt32(line[6]);
 
                 if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
                 {

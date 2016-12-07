@@ -3680,6 +3680,17 @@ namespace Prometheus.Controllers
             }
         }
 
+        private void PushShareDoc(Controller ctrl)
+        {
+            var filename = "log" + DateTime.Now.ToString("yyyy-MM-dd");
+            var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
+
+            if (!System.IO.File.Exists(wholefilename))
+            {
+                ShareDocVM.MatchAllYesterdayDoc(ctrl);
+            }
+        }
+
         private void SendBookedReportNotice()
         {
             var filename = "log" + DateTime.Now.ToString("yyyy-MM-dd");
@@ -3840,6 +3851,13 @@ namespace Prometheus.Controllers
 
             try
             {
+                PushShareDoc(this);
+            }
+            catch (Exception ex)
+            { }
+
+            try
+            {
                 var filename = "log" + DateTime.Now.ToString("yyyy-MM-dd");
                 var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
 
@@ -3856,6 +3874,7 @@ namespace Prometheus.Controllers
                 SendOBAAlertEmail();
             }
             catch (Exception ex) { }
+
             
              
             foreach (var pjkey in pjkeylist)
@@ -3906,16 +3925,17 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
-            var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
-            foreach (var pjkey in pjkeylist)
-            {
-                try
-                {
-                    ProjectTestData.PrePareATELatestData(pjkey);
-                }
-                catch (Exception ex)
-                { }
-            }
+            //var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
+            //foreach (var pjkey in pjkeylist)
+            //{
+            //    try
+            //    {
+            //        ProjectTestData.PrePareATELatestData(pjkey);
+            //    }
+            //    catch (Exception ex)
+            //    { }
+            //}
+            ShareDocVM.MatchAllYesterdayDoc(this);
             return View("HeartBeat");
         }
 

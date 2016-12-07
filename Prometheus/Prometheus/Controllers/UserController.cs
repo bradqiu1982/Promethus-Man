@@ -766,6 +766,8 @@ namespace Prometheus.Controllers
             }
 
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            var asilist = UserViewModels.RetrieveAllUser();
+            ViewBag.towholist = CreateSelectList(asilist,"");
 
             ViewBag.ILearn = ShareDocVM.RetrieveMyLearn(updater);
             ViewBag.IShare = ShareDocVM.RetrieveMyShare(updater);
@@ -783,7 +785,7 @@ namespace Prometheus.Controllers
             {
                 var ck = new Dictionary<string, string>();
                 ck.Add("logonredirectctrl", "User");
-                ck.Add("logonredirectact", "ILike");
+                ck.Add("logonredirectact", "ILearn");
                 CookieUtility.SetCookie(this, ck);
                 return RedirectToAction("LoginUser", "User");
             }
@@ -798,7 +800,7 @@ namespace Prometheus.Controllers
             return RedirectToAction("ILearn", "User");
         }
 
-        public ActionResult IPush()
+        public ActionResult IPush(string DOCPJK, string DOCKey,string ToWho)
         {
             var ckdict = CookieUtility.UnpackCookie(this);
             if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
@@ -809,13 +811,18 @@ namespace Prometheus.Controllers
             {
                 var ck = new Dictionary<string, string>();
                 ck.Add("logonredirectctrl", "User");
-                ck.Add("logonredirectact", "IPush");
+                ck.Add("logonredirectact", "ILearn");
                 CookieUtility.SetCookie(this, ck);
                 return RedirectToAction("LoginUser", "User");
             }
-
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
+            var whoes = ToWho.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var w in whoes)
+            {
+                ShareDocVM.IPushDoc(DOCPJK, DOCKey, w.Trim().ToUpper(),updater,this);
+            }
+            
             return RedirectToAction("ILearn", "User");
         }
 

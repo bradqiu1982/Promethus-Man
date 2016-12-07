@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
+using System.Web.Routing;
 
 namespace Prometheus.Models
 {
@@ -70,7 +72,7 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
-        public static void PushDoc(string BookerName, string DOCPJK, string DOCType, string DOCKey, string DOCTag, string DOCCreator, string DOCDate,string DOCPusher)
+        private static void PushDoc(string BookerName, string DOCPJK, string DOCType, string DOCKey, string DOCTag, string DOCCreator, string DOCDate,string DOCPusher)
         {
             var sql = "delete from UserLearn where UserName = '<BookerName>' and DOCPJK='<DOCPJK>' and DOCKey='<DOCKey>'";
             sql = sql.Replace("<BookerName>", BookerName).Replace("<DOCPJK>", DOCPJK).Replace("<DOCKey>", DOCKey);
@@ -81,6 +83,69 @@ namespace Prometheus.Models
                 .Replace("<DOCKey>", DOCKey).Replace("<DOCTag>", DOCTag)
                 .Replace("<DOCCreator>", DOCCreator).Replace("<DOCDate>", DOCDate).Replace("<DOCPusher>", DOCPusher);
             DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        private static void SendPushDocEvent(string what, string urlstr, string towho, string pusher, Controller ctrl)
+        {
+            try
+            {
+                var routevalue = new RouteValueDictionary();
+                routevalue.Add("issuekey", "ABC");
+                string scheme = ctrl.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                string validatestr = ctrl.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+                var netcomputername = "";
+                try { netcomputername = System.Net.Dns.GetHostName(); }
+                catch (Exception ex) { }
+                validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
+
+
+                validatestr = validatestr.Split(new string[] { "/Issue" }, StringSplitOptions.RemoveEmptyEntries)[0] + urlstr;
+                var content = what + " is share to you by " + pusher + ":\r\n\r\n" + validatestr;
+
+                var toaddrs = new List<string>();
+                toaddrs.Add(towho);
+                EmailUtility.SendEmail("NPI Knowlege Share System", toaddrs, content);
+                new System.Threading.ManualResetEvent(false).WaitOne(20);
+            }
+            catch (Exception ex)
+            { }
+        }
+
+        public static void IPushDoc(string DOCPJK, string DOCKey, string ToWho,string Pusher, Controller ctrl)
+        {
+            var sql = "select DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,DOCFavorTimes from ShareDoc where DOCPJK = '<DOCPJK>' and DOCKey = '<DOCKey>'";
+            sql = sql.Replace("<DOCPJK>", DOCPJK).Replace("<DOCKey>", DOCKey);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                var tempvm = new ShareDocVM();
+                tempvm.DOCPJK = Convert.ToString(line[0]);
+                tempvm.DOCType = Convert.ToString(line[1]);
+                tempvm.DOCKey = Convert.ToString(line[2]);
+                tempvm.DOCTag = Convert.ToString(line[3]);
+                tempvm.DOCCreator = Convert.ToString(line[4]);
+                tempvm.DOCDate = DateTime.Parse(Convert.ToString(line[5]));
+                tempvm.DOCFavorTimes = Convert.ToInt32(line[6]);
+
+                if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
+                {
+                    var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey);
+                    tempvm.Summary = issue.Summary;
+                    tempvm.DocURL = "/Issue/UpdateIssue?issuekey=" + tempvm.DOCKey;
+                }
+                else
+                {
+                    tempvm.Summary = tempvm.DOCKey;
+                    var tempstrs = tempvm.Summary.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+                    var datestr = tempstrs[tempstrs.Length - 1].Substring(0, 8);
+                    tempvm.DocURL = "/userfiles/docs/" + datestr + "/" + tempvm.DOCKey;
+                }
+
+                PushDoc(ToWho, tempvm.DOCPJK, tempvm.DOCType, tempvm.DOCKey, tempvm.DOCTag, tempvm.DOCCreator, tempvm.DOCDate.ToString(), Pusher);
+
+                SendPushDocEvent("a new document about "+ tempvm.DOCTag , tempvm.DocURL, ToWho, Pusher, ctrl);
+            }
+
         }
 
         public static void SetUserBookTag(string UserName, string DocTag)
@@ -150,6 +215,7 @@ namespace Prometheus.Models
                 {
                     var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey);
                     tempvm.Summary = issue.Summary;
+                    tempvm.DocURL = "/Issue/UpdateIssue?issuekey="+ tempvm.DOCKey;
                 }
                 else
                 {
@@ -188,6 +254,7 @@ namespace Prometheus.Models
                 {
                     var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey);
                     tempvm.Summary = issue.Summary;
+                    tempvm.DocURL = "/Issue/UpdateIssue?issuekey=" + tempvm.DOCKey;
                 }
                 else
                 {
@@ -224,6 +291,21 @@ namespace Prometheus.Models
                 tempvm.DOCCreator = Convert.ToString(line[4]);
                 tempvm.DOCDate = DateTime.Parse(Convert.ToString(line[5]));
                 tempvm.DOCFavorTimes = Convert.ToInt32(line[6]);
+
+                if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
+                {
+                    var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey);
+                    tempvm.Summary = issue.Summary;
+                    tempvm.DocURL = "/Issue/UpdateIssue?issuekey=" + tempvm.DOCKey;
+                }
+                else
+                {
+                    tempvm.Summary = tempvm.DOCKey;
+                    var tempstrs = tempvm.Summary.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+                    var datestr = tempstrs[tempstrs.Length - 1].Substring(0, 8);
+                    tempvm.DocURL = "/userfiles/docs/" + datestr + "/" + tempvm.DOCKey;
+                }
+
                 ret.Add(tempvm);
             }
             return ret;
@@ -244,6 +326,21 @@ namespace Prometheus.Models
                 tempvm.DOCCreator = Convert.ToString(line[4]);
                 tempvm.DOCDate = DateTime.Parse(Convert.ToString(line[5]));
                 tempvm.DOCFavorTimes = Convert.ToInt32(line[6]);
+
+                if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
+                {
+                    var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey);
+                    tempvm.Summary = issue.Summary;
+                    tempvm.DocURL = "/Issue/UpdateIssue?issuekey=" + tempvm.DOCKey;
+                }
+                else
+                {
+                    tempvm.Summary = tempvm.DOCKey;
+                    var tempstrs = tempvm.Summary.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+                    var datestr = tempstrs[tempstrs.Length - 1].Substring(0, 8);
+                    tempvm.DocURL = "/userfiles/docs/" + datestr + "/" + tempvm.DOCKey;
+                }
+
                 ret.Add(tempvm);
             }
             return ret;
@@ -305,6 +402,21 @@ namespace Prometheus.Models
                 tempvm.DOCCreator = Convert.ToString(line[4]);
                 tempvm.DOCDate = DateTime.Parse(Convert.ToString(line[5]));
                 tempvm.DOCFavorTimes = Convert.ToInt32(line[6]);
+
+                if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
+                {
+                    var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey);
+                    tempvm.Summary = issue.Summary;
+                    tempvm.DocURL = "/Issue/UpdateIssue?issuekey=" + tempvm.DOCKey;
+                }
+                else
+                {
+                    tempvm.Summary = tempvm.DOCKey;
+                    var tempstrs = tempvm.Summary.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+                    var datestr = tempstrs[tempstrs.Length - 1].Substring(0, 8);
+                    tempvm.DocURL = "/userfiles/docs/" + datestr + "/" + tempvm.DOCKey;
+                }
+
                 ret.Add(tempvm);
             }
             return ret;
@@ -333,7 +445,6 @@ namespace Prometheus.Models
             return ret;
         }
 
-
         public static void MatchAllPostDocForUser(string username)
         {
             var allpostdoc = RetrieveAllSharedDocs();
@@ -347,7 +458,7 @@ namespace Prometheus.Models
                 bool push = false;
                 foreach (var utag in usertaglist)
                 {
-                    if (doc.DOCTagDict.ContainsKey(utag))
+                    if (doc.DOCTagDict.ContainsKey(utag)||string.Compare(doc.DOCPJK,utag,true) == 0)
                     {
                         push = true;
                         break;
@@ -361,7 +472,7 @@ namespace Prometheus.Models
             }//end foreach
         }
 
-        public static void MatchAllYesterdayDoc()
+        public static void MatchAllYesterdayDoc(Controller ctrl)
         {
             var userlist = RetrieveAllUserBookedTag();
             var ydoc = RetrieveYesterdayDocs();
@@ -375,7 +486,7 @@ namespace Prometheus.Models
                     bool push = false;
                     foreach (var utag in usertaglist)
                     {
-                        if (doc.DOCTagDict.ContainsKey(utag))
+                        if (doc.DOCTagDict.ContainsKey(utag) || string.Compare(doc.DOCPJK, utag, true) == 0)
                         {
                             push = true;
                             break;
@@ -385,6 +496,7 @@ namespace Prometheus.Models
                     if (push)
                     {
                         PushDoc(u.BookerName, doc.DOCPJK, doc.DOCType, doc.DOCKey, doc.DOCTag, doc.DOCCreator, doc.DOCDate.ToString(), "");
+                        SendPushDocEvent("a new document about " + doc.DOCTag, doc.DocURL, u.BookerName, "System", ctrl);
                     }
                 }//end foreach
             }//foreach

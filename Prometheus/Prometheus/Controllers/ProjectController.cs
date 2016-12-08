@@ -3841,6 +3841,12 @@ namespace Prometheus.Controllers
             catch (Exception ex)
             { }
 
+            try
+            {
+                PushShareDoc(this);
+            }
+            catch (Exception ex)
+            { }
 
             try
             {
@@ -3849,12 +3855,6 @@ namespace Prometheus.Controllers
             catch (Exception ex)
             { }
 
-            try
-            {
-                PushShareDoc(this);
-            }
-            catch (Exception ex)
-            { }
 
             try
             {

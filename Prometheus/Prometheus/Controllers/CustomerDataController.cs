@@ -72,11 +72,13 @@ namespace Prometheus.Controllers
                 var excelRange = sheet.UsedRange;
                 object[,] valueArray = (object[,])excelRange.get_Value(
                 Excel.XlRangeValueDataType.xlRangeValueDefault);
+                var totalrows = sheet.UsedRange.Rows.Count;
+                var totalcol = sheet.UsedRange.Columns.Count;
 
-                for (int row = 1; row <= sheet.UsedRange.Rows.Count; ++row)
+                for (int row = 1; row <= totalrows; ++row)
                 {
                     var line = new List<string>();
-                    for (int col = 1; col <= sheet.UsedRange.Columns.Count; ++col)
+                    for (int col = 1; col <= totalcol; ++col)
                     {
                         if (valueArray[row, col] == null)
                         {
@@ -84,7 +86,7 @@ namespace Prometheus.Controllers
                         }
                         else
                         {
-                            line.Add(valueArray[row, col].ToString().Trim());
+                            line.Add(valueArray[row, col].ToString().Trim().Replace("'",""));
                         }
                     }
                     if (!WholeLineEmpty(line))

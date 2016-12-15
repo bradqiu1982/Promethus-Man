@@ -103,7 +103,7 @@ namespace Prometheus.Models
 
             try
             {
-                conn.Close();
+                conn.Dispose();
             }
             catch (SqlException ex)
             {
@@ -121,10 +121,11 @@ namespace Prometheus.Models
             var conn = GetLocalConnector();
             if (conn == null)
                 return false;
-
+            SqlCommand command = null;
+            
             try
             {
-                var command = conn.CreateCommand();
+                command = conn.CreateCommand();
                 command.CommandText = sql;
                 command.ExecuteNonQuery();
                 CloseConnector(conn);
@@ -133,6 +134,14 @@ namespace Prometheus.Models
             catch (SqlException ex)
             {
                 logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                try
+                {
+                    if (command != null)
+                    {
+                        command.Dispose();
+                    }
+                }
+                catch (Exception e){ }
                 CloseConnector(conn);
                 //System.Windows.MessageBox.Show(ex.ToString());
                 return false;
@@ -140,6 +149,14 @@ namespace Prometheus.Models
             catch (Exception ex)
             {
                 logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                try
+                {
+                    if (command != null)
+                    {
+                        command.Dispose();
+                    }
+                }
+                catch (Exception e){ }
                 CloseConnector(conn);
                 //System.Windows.MessageBox.Show(ex.ToString());
                 return false;
@@ -176,13 +193,14 @@ namespace Prometheus.Models
         {
             var ret = new List<List<object>>();
             var conn = GetLocalConnector();
+            if (conn == null)
+                    return ret;
             SqlDataReader sqlreader = null;
+            SqlCommand command = null;
+
             try
             {
-                if (conn == null)
-                    return ret;
-
-                var command = conn.CreateCommand();
+                command = conn.CreateCommand();
                 command.CommandText = sql;
                 sqlreader = command.ExecuteReader();
                 if (sqlreader.HasRows)
@@ -206,24 +224,46 @@ namespace Prometheus.Models
             catch (SqlException ex)
             {
                 logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
-                if (sqlreader != null)
+
+                try
                 {
-                    sqlreader.Close();
+                    if (sqlreader != null)
+                    {
+                        sqlreader.Close();
+                    }
+                    if (command != null)
+                    {
+                        command.Dispose();
+                    }
                 }
+                catch (Exception e)
+                { }
+
                 CloseConnector(conn);
-                //System.Windows.MessageBox.Show(ex.ToString());
+
                 ret.Clear();
                 return ret;
             }
             catch (Exception ex)
             {
                 logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
-                if (sqlreader != null)
+
+                try
                 {
-                    sqlreader.Close();
+                    if (sqlreader != null)
+                    {
+                        sqlreader.Close();
+                    }
+                    if (command != null)
+                    {
+                        command.Dispose();
+                    }
                 }
+                catch (Exception e)
+                { }
+
                 CloseConnector(conn);
-                //System.Windows.MessageBox.Show(ex.ToString());
+
                 ret.Clear();
                 return ret;
             }

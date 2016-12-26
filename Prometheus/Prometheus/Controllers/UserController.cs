@@ -800,6 +800,31 @@ namespace Prometheus.Controllers
             return RedirectToAction("ILearn", "User");
         }
 
+        public ActionResult RemoveSharedDoc(string DOCPJK, string DOCKey)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "ILearn");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            if (!string.IsNullOrEmpty(DOCPJK)
+                && !string.IsNullOrEmpty(DOCKey))
+            {
+                ShareDocVM.RemoveDoc(DOCPJK, DOCKey);
+            }
+
+            return RedirectToAction("ILearn", "User");
+        }
+
         public ActionResult IPush(string DOCPJK, string DOCKey,string ToWho)
         {
             var ckdict = CookieUtility.UnpackCookie(this);

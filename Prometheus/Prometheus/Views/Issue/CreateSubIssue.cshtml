@@ -27,23 +27,23 @@
         <div class="form-horizontal">
 
             <div class="form-group">
-                <div class="col-md-6">
-                    <label class="control-label col-md-2" for="ProjectName">Project<font color="red">*</font></label>
-                    <div class="col-md-10">
+                <div class="col-lg-6">
+                    <label class="control-label col-lg-2" for="ProjectName">Project<font color="red">*</font></label>
+                    <div class="col-lg-10">
                         @Html.DropDownList("projectlist", null, new { @id = "ProjectKey", @class = "form-control", @readonly = "readonly" })
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="control-label col-md-2" for="IssueType">IssueType<font color="red">*</font></label>
-                    <div class="col-md-10">
+                <div class="col-lg-6">
+                    <label class="control-label col-lg-2" for="IssueType">IssueType<font color="red">*</font></label>
+                    <div class="col-lg-10">
                         @Html.DropDownList("issuetypelist", null, new { @id = "IssueType", @class = "form-control" })
                     </div>
                 </div>
             </div>
             <div class="form-group">
-                <div class="col-md-6">
-                    <label class="control-label col-md-2" for="Summary">Summary<font color="red">*</font></label>
-                    <div class="col-md-10">
+                <div class="col-lg-6">
+                    <label class="control-label col-lg-2" for="Summary">Summary<font color="red">*</font></label>
+                    <div class="col-lg-10">
                         @if (Model != null && !string.IsNullOrEmpty(Model.Summary))
                         {
                             <input class="form-control text-box single-line" value="@Model.Summary" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 180." data-val-length-max="180" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="Summary" name="Summary" type="text" />
@@ -58,23 +58,23 @@
 
                 </div>
 
-                <div class="col-md-6">
-                    <label class="control-label col-md-2" for="IssueType">Status<font color="red">*</font></label>
-                    <div class="col-md-10">
+                <div class="col-lg-6">
+                    <label class="control-label col-lg-2" for="IssueType">Status<font color="red">*</font></label>
+                    <div class="col-lg-10">
                         @Html.DropDownList("resolutionlist", null, new { @id = "Resolution", @class = "form-control" })
                     </div>
                 </div>
             </div>
             <div class="form-group">
-                <div class="col-md-6">
-                    <label class="control-label col-md-2" for="IssueType">Priority</label>
-                    <div class="col-md-10">
+                <div class="col-lg-6">
+                    <label class="control-label col-lg-2" for="IssueType">Priority</label>
+                    <div class="col-lg-10">
                         @Html.DropDownList("prioritylist", null, new { @id = "Priority", @class = "form-control" })
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="control-label col-md-2" for="Assignee">Assignee</label>
-                    <div class="col-md-10">
+                <div class="col-lg-6">
+                    <label class="control-label col-lg-2" for="Assignee">Assignee</label>
+                    <div class="col-lg-10">
                         @Html.DropDownList("assigneelist", null, new { @id = "Assignee", @class = "form-control" })
                     </div>
                 </div>
@@ -83,9 +83,9 @@
             <div class="form-group">
 
                 
-                <div class="col-md-6">
-                    <label class="control-label col-md-2" for="DueDate">DueDate<font color="red">*</font></label>
-                    <div class="col-md-10">
+                <div class="col-lg-6">
+                    <label class="control-label col-lg-2" for="DueDate">DueDate<font color="red">*</font></label>
+                    <div class="col-lg-10">
                         @if (Model != null && string.Compare(Model.DueDate.ToString("yyyy-MM-dd"), "0001-01-01") != 0)
                         {
                             <input class="form-control text-box single-line" value="@Model.DueDate.ToString("yyyy-MM-dd")" data-val="true"  data-val-required="The DueDate field is required." id="DueDate" name="DueDate" type="text" />
@@ -98,9 +98,9 @@
                     </div>
 
                 </div>
-                <div class="col-md-6">
-                    @*<label class="control-label col-md-2" for="Reporter">Reporter<font color="red">*</font></label>
-                        <div class="col-md-10">
+                <div class="col-lg-6">
+                    @*<label class="control-label col-lg-2" for="Reporter">Reporter<font color="red">*</font></label>
+                        <div class="col-lg-10">
                             @Html.DropDownList("reporterlist", null, new { @id = "Assignee", @class = "form-control" })
                         </div>*@
                 </div>
@@ -116,13 +116,13 @@
             </div>
 
             <hr />
-            <div class="col-md-12">
+            <div class="col-lg-12">
                 <div class="form-group">
                     <label>Related People Email</label>
                 </div>
 
                 <div class="form-group">
-                    <div class="col-md-12" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
+                    <div class="col-lg-12" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
                         @if (Model != null && !string.IsNullOrEmpty(Model.RelativePeoples))
                         {
                             <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 200." data-val-length-max="200" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$">@Model.RelativePeoples</textarea>
@@ -139,17 +139,17 @@
             <hr />
 
             <div class="form-group">
-                <div class="col-md-12">
-                    <div class="col-md-4">
+                <div class="col-lg-12">
+                    <div class="col-lg-4">
                         <span class="btn btn-default btn-file" id="choosefile3">
                             Attachment <input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
                         </span>
                     </div>
-                    <div class="col-md-8">
-                        <div class="col-md-11">
+                    <div class="col-lg-8">
+                        <div class="col-lg-11">
                             <label class="control-label" id="showfile3" name="showfile3"></label>
                         </div>
-                        <div class="col-md-1">
+                        <div class="col-lg-1">
                             <input class="form-control text-box single-line" value="" id="attachmentupload" name="attachmentupload" type="hidden" />
                         </div>
                     </div>
@@ -166,7 +166,7 @@
 
         <hr />
 
-        <div class="col-md-12">
+        <div class="col-lg-12">
             <div class="form-group">
                 <label class="control-label">Description</label>
             </div>

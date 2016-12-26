@@ -6,7 +6,7 @@
 }
 
 <div class="row">
-    <div class="col-md-3">
+    <div class="col-lg-3">
 
 @if (Model != null && Model.Count() > 0)
 {
@@ -18,7 +18,7 @@ else
 }
 
     </div>
-    <div class="col-md-2">
+    <div class="col-lg-2">
         @if (Model != null && Model.Count() > 0)
         {
             <h2><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ElementAt(0).ProjectKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
@@ -28,7 +28,7 @@ else
             <h2><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
         }
     </div>
-    <div class="col-md-7"></div>
+    <div class="col-lg-7"></div>
 </div>
     
 <hr/>
@@ -41,13 +41,13 @@ else
     @Html.Raw(ViewBag.chartscript)
 
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Failure</h3>
                 </div>
                 <div class="panel-body">
-                    <div class="col-md-12">
+                    <div class="col-lg-12">
                         <div id="failurepie" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
                     </div>
                 </div>
@@ -61,12 +61,12 @@ else
 @if (Model != null)
 {
     <div class="row">
-        <div class="col-md-2 text-center">Error Code</div>
-        <div class="col-md-3 text-center">Short Desc</div>
-        <div class="col-md-2 text-center">Count</div>
-        <div class="col-md-1 text-center">Attachement</div>
-        <div class="col-md-1 text-center">FA</div>
-        <div class="col-md-3 text-center"></div>
+        <div class="col-lg-2 text-center">Error Code</div>
+        <div class="col-lg-3 text-center">Short Desc</div>
+        <div class="col-lg-2 text-center">Count</div>
+        <div class="col-lg-1 text-center">Attachement</div>
+        <div class="col-lg-1 text-center">FA</div>
+        <div class="col-lg-3 text-center"></div>
     </div>
 
     <hr/>
@@ -74,21 +74,21 @@ else
     foreach (var item in Model)
     {
         <div class="row">
-            <div class="col-md-2 text-center">
+            <div class="col-lg-2 text-center">
             @if (item.CommentList.Count > 0)
             {<span class="badge alert-success">C</span>}<a href="/Project/UpdateProjectError?ErrorKey=@item.ErrorKey">@item.OrignalCode</a></div>
-            <div class="col-md-3 text-center">@item.ShortDesc</div>
-            <div class="col-md-2 text-center">@item.ErrorCount</div>
+            <div class="col-lg-3 text-center">@item.ShortDesc</div>
+            <div class="col-lg-2 text-center">@item.ErrorCount</div>
             @if (item.AttachList.Count > 0)
             {
-                <div class="col-md-1 text-center"><a href="/Project/ErrorAttach?ErrorKey=@item.ErrorKey" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></a></div>
+                <div class="col-lg-1 text-center"><a href="/Project/ErrorAttach?ErrorKey=@item.ErrorKey" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></a></div>
             }
             else
             {
-                <div class="col-md-1 text-center"></div>
+                <div class="col-lg-1 text-center"></div>
             }
-            <div class="col-md-1 text-center"><a href="/Project/ProjectErrAbbr?ProjectKey=@item.ProjectKey&ErrAbbr=@item.OrignalCode"><span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span></a></div>
-            <div class="col-md-3 text-center"></div>
+            <div class="col-lg-1 text-center"><a href="/Project/ProjectErrAbbr?ProjectKey=@item.ProjectKey&ErrAbbr=@item.OrignalCode"><span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span></a></div>
+            <div class="col-lg-3 text-center"></div>
         </div>
         <hr/>
      }

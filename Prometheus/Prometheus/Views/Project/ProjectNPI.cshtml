@@ -8,7 +8,7 @@
 
 
 <div class="row">
-    <div class="col-md-2">
+    <div class="col-lg-2">
 @if (Model != null && Model.Count() > 0)
 {
     <h2>@(Model.ElementAt(0).ProjectKey) NPI</h2>
@@ -19,7 +19,7 @@ else
 }
         
     </div>
-    <div class="col-md-2">
+    <div class="col-lg-2">
         @if (Model != null && Model.Count() > 0)
         {
             <h2><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ElementAt(0).ProjectKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
@@ -29,7 +29,7 @@ else
             <h2><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
         }
     </div>
-    <div class="col-md-8"></div>
+    <div class="col-lg-8"></div>
 </div>
 
 <hr/>
@@ -41,29 +41,29 @@ else
         <div class="row">
         <div class="panel panel-default">
             <div class="panel-heading" style="min-height:40px;max-height:40px;">
-                <div class="col-md-3 text-left">
+                <div class="col-lg-3 text-left">
                     <a href="/Project/ProjectDetail?ProjectKey=@item.ProjectKey">
                         <span class="glyphicon glyphicon-home" aria-hidden="true"></span> @item.ProjectKey
                     </a>
                 </div>
-                <div class="col-md-10"></div>
+                <div class="col-lg-10"></div>
             </div>
             <div class="panel-body">
                 <div class="row">
-                    <div class="col-md-3 text-left">Summary</div>
-                    <div class="col-md-2 text-left">Asignee</div>
-                    <div class="col-md-2 text-left">Status</div>
-                    <div class="col-md-2 text-left">DueDate</div>
-                    <div class="col-md-2 text-left"></div>
-                    <div class="col-md-1 text-left">Attachment</div>
+                    <div class="col-lg-3 text-left">Summary</div>
+                    <div class="col-lg-2 text-left">Asignee</div>
+                    <div class="col-lg-2 text-left">Status</div>
+                    <div class="col-lg-2 text-left">DueDate</div>
+                    <div class="col-lg-2 text-left"></div>
+                    <div class="col-lg-1 text-left">Attachment</div>
                 </div>
                 <div class="row">
-                    <div class="col-md-3 text-left"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></div>
-                    <div class="col-md-2 text-left"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
-                    <div class="col-md-2 text-left">@item.Resolution</div>
-                    <div class="col-md-2 text-left">@item.DueDate.ToString("yyyy-MM-dd")</div>
-                    <div class="col-md-2 text-left"></div>
-                    <div class="col-md-1 text-left">
+                    <div class="col-lg-3 text-left"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></div>
+                    <div class="col-lg-2 text-left"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
+                    <div class="col-lg-2 text-left">@item.Resolution</div>
+                    <div class="col-lg-2 text-left">@item.DueDate.ToString("yyyy-MM-dd")</div>
+                    <div class="col-lg-2 text-left"></div>
+                    <div class="col-lg-1 text-left">
                         @if (item.AttachList.Count > 0 && ViewBag.authrized)
                         {
                             <a href="/Issue/IssueAttach?issuekey=@item.IssueKey" target="_blank">

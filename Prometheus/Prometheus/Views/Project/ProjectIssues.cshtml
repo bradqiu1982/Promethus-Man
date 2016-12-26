@@ -33,33 +33,33 @@
 @if (Model != null && Model.Count() > 0)
 {
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-lg-3">
             <h2>@(Model.ElementAt(0).ProjectKey) Tasks</h2>
         </div>
-        <div class="col-md-2">
+        <div class="col-lg-2">
             <h2><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ElementAt(0).ProjectKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
         </div>
-        <div class="col-md-7"></div>
+        <div class="col-lg-7"></div>
     </div>
 }
 else
 {
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-lg-3">
             <h2>Project Issues</h2>
         </div>
-        <div class="col-md-2">
+        <div class="col-lg-2">
             <h2><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
         </div>
-        <div class="col-md-7"></div>
+        <div class="col-lg-7"></div>
     </div>
 }
 
 <hr />
 
 <div class="row">
-    <div class="col-md-12">
-        <div class="col-md-4">
+    <div class="col-lg-12">
+        <div class="col-lg-4">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Pending</h3>
@@ -79,7 +79,7 @@ else
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-lg-4">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Working</h3>
@@ -99,7 +99,7 @@ else
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-lg-4">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Done</h3>

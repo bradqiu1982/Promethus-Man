@@ -7,7 +7,7 @@
 }
 
 <div class="row">
-    <div class="col-md-2">
+    <div class="col-lg-2">
         @if (ViewBag.projectkey != null)
         {
             <h2>@ViewBag.projectkey FA</h2>
@@ -17,7 +17,7 @@
             <h2>Project FA</h2>
         }
     </div>
-    <div class="col-md-2">
+    <div class="col-lg-2">
         @if (ViewBag.chartscript == null && ViewBag.projectkey != null)
         {
             <h2><a data-toggle="tooltip" title="Goto FA Page" href="/Project/ProjectFA?ProjectKey=@(ViewBag.projectkey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
@@ -34,7 +34,7 @@
      </div>
         
 
-    <div class="col-md-2">
+    <div class="col-lg-2">
         @if (ViewBag.projectkey != null)
         {
             using (Html.BeginForm("ProjectDoneFA", "Project", FormMethod.Post, new { enctype = "multipart/form-data" }))
@@ -46,7 +46,7 @@
         }
     </div>
 
-    <div class="col-md-6"></div>
+    <div class="col-lg-6"></div>
 </div>
 
 <hr/>
@@ -59,13 +59,13 @@
         @Html.Raw(ViewBag.chartscript)
 
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-lg-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h3 class="panel-title">Failure</h3>
                     </div>
                     <div class="panel-body">
-                        <div class="col-md-12">
+                        <div class="col-lg-12">
                             <div id="failurepie" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
                         </div>
                     </div>
@@ -75,15 +75,15 @@
     }
 
     <div class="row">
-        <div class="col-md-3 text-center">ModuleSN</div>
-        <div class="col-md-2 text-center">ErrAbbr</div>
-        <div class="col-md-1 text-center">FA Status</div>
-        <div class="col-md-1 text-center">Assignee</div>
-        <div class="col-md-3 text-center">Issue</div>
-        <div class="col-md-2">
-            <div class="col-md-4 text-center">Date</div>
-            <div class="col-md-3 text-center"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></div>
-            <div class="col-md-5 text-center">LYT</div>
+        <div class="col-lg-3 text-center">ModuleSN</div>
+        <div class="col-lg-2 text-center">ErrAbbr</div>
+        <div class="col-lg-1 text-center">FA Status</div>
+        <div class="col-lg-1 text-center">Assignee</div>
+        <div class="col-lg-3 text-center">Issue</div>
+        <div class="col-lg-2">
+            <div class="col-lg-4 text-center">Date</div>
+            <div class="col-lg-3 text-center"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></div>
+            <div class="col-lg-5 text-center">LYT</div>
         </div>
     </div>
 
@@ -102,15 +102,15 @@
                 foreach (var item in Model)
                 {
                             <div class="row">
-                                <div class="col-md-3">
-                                    <div class="col-md-3 text-center">
+                                <div class="col-lg-3">
+                                    <div class="col-lg-3 text-center">
                                         <span class="input-group-addon">
                                             <input type="checkbox" id="check@(i)" name="check@(i)" value="true"/>
                                         </span>
                                         <input class="form-control text-box single-line" value="@item.IssueData.IssueKey" id="HIssueKey@(i)" name="HIssueKey@(i)" type="hidden" />
                                     </div>
 
-                                    <div class="col-md-5 text-center">
+                                    <div class="col-lg-5 text-center">
                                         @if (item.IssueData.RootCauseCommentList.Count > 0
                                             || item.IssueData.ResultCommentList.Count > 0
                                             || item.IssueData.CommentList.Count > 2
@@ -125,26 +125,26 @@
                                         }
                                     </div>
 
-                                    <div class="col-md-4 text-center">
+                                    <div class="col-lg-4 text-center">
                                     <a href="/Project/SNIssue?ProjectKey=@item.TestData.ProjectKey&SN=@item.TestData.ModuleSerialNum">@item.TestData.ModuleSerialNum</a></div>
                                 </div>
 
-                                <div class="col-md-2 text-center">
-                                    <div class="col-md-8">
+                                <div class="col-lg-2 text-center">
+                                    <div class="col-lg-8">
                                         <a href="/Project/ProjectErrAbbr?ProjectKey=@item.TestData.ProjectKey&ErrAbbr=@item.TestData.ErrAbbr">@item.TestData.ErrAbbr</a>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-lg-4">
                                         <a href="/Project/UpdateProjectError2?ProjectKey=@item.TestData.ProjectKey&ErrorCode=@item.TestData.ErrAbbr"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
                                     </div>
                                 </div>
-                                <div class="col-md-1 text-center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(@item.IssueData.Resolution))</div>
+                                <div class="col-lg-1 text-center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(@item.IssueData.Resolution))</div>
                                 
-                                <div class="col-md-1 text-center"><a href="/User/UserCenter?username=@item.IssueData.Assignee">@item.IssueData.Assignee.Split(new char[] { '@' })[0]</a></div>
+                                <div class="col-lg-1 text-center"><a href="/User/UserCenter?username=@item.IssueData.Assignee">@item.IssueData.Assignee.Split(new char[] { '@' })[0]</a></div>
 
-                                <div class="col-md-3 text-center"><a href="/Issue/UpdateIssue?issuekey=@item.IssueData.IssueKey">@item.IssueData.Summary</a></div>
-                                <div class="col-md-2">
-                                    <div class="col-md-4 text-center">@item.IssueData.ReportDate.ToString("MM/dd")</div>
-                                    <div class="col-md-3 text-center">
+                                <div class="col-lg-3 text-center"><a href="/Issue/UpdateIssue?issuekey=@item.IssueData.IssueKey">@item.IssueData.Summary</a></div>
+                                <div class="col-lg-2">
+                                    <div class="col-lg-4 text-center">@item.IssueData.ReportDate.ToString("MM/dd")</div>
+                                    <div class="col-lg-3 text-center">
                                         @if (item.IssueData.AttachList.Count > 0)
                                         {
                                             <a href="/Issue/IssueAttach?issuekey=@item.IssueData.IssueKey" target="_blank">
@@ -152,7 +152,7 @@
                                             </a>
                                         }
                                     </div>
-                                    <div class="col-md-5 text-center">
+                                    <div class="col-lg-5 text-center">
                                         <button data-toggle="tooltip" title="Low Yield Trigger" class="form-control" value="@item.IssueData.IssueKey" type="button" onclick="LowYieldWarning(this)">
                                             <span class="glyphicon glyphicon-share" aria-hidden="true"></span>
                                         </button>
@@ -167,21 +167,21 @@
                 if (ViewBag.logined != null && ViewBag.logined)
                 {
                     <div class="row">
-                        <div class="col-md-1 text-center">
+                        <div class="col-lg-1 text-center">
                             <span class="input-group-addon">
                                 <input type="checkbox" id="checkall" name="checkall" onclick="ChooseAll(this)" />
                             </span>
                         </div>
-                        <div class="col-md-2 text-center">
+                        <div class="col-lg-2 text-center">
                             <input type="submit" value="Same As" class="btn btn-default" />
                         </div>
-                        <div class="col-md-4 text-center">
+                        <div class="col-lg-4 text-center">
                             @Html.DropDownList("DoneIssueList", null, new { @id = "DoneIssueList", @class = "form-control" })
                         </div>
-                        <div class="col-md-1 text-center">
+                        <div class="col-lg-1 text-center">
                             <button class="form-control" data-toggle="tooltip" title="View Selected Issue" onclick="ShowSelectIssue()" type="button"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>
                         </div>
-                        <div class="col-md-4 text-center">
+                        <div class="col-lg-4 text-center">
                         </div>
                         <script type="text/javascript">
 
@@ -232,14 +232,14 @@
                 foreach (var item in Model)
                 {
                     <div class="row">
-                        <div class="col-md-3">
-                            <div class="col-md-3 text-center">
+                        <div class="col-lg-3">
+                            <div class="col-lg-3 text-center">
                                 <span class="input-group-addon">
                                     <input type="checkbox" id="check@(i)" name="check@(i)" value="true" />
                                 </span>
                                 <input class="form-control text-box single-line" value="@item.IssueData.IssueKey" id="HIssueKey@(i)" name="HIssueKey@(i)" type="hidden" />
                             </div>
-                            <div class="col-md-5 text-center">
+                            <div class="col-lg-5 text-center">
                                 @if (item.IssueData.RootCauseCommentList.Count > 0
                                     ||item.IssueData.ResultCommentList.Count > 0
                                     ||item.IssueData.CommentList.Count > 2
@@ -252,20 +252,20 @@
                                     <span class="badge alert-danger">LYT</span>
                                 }
                             </div>
-                            <div class="col-md-4 text-center">
+                            <div class="col-lg-4 text-center">
                             <a href="/Project/SNIssue?ProjectKey=@item.TestData.ProjectKey&SN=@item.TestData.ModuleSerialNum">@item.TestData.ModuleSerialNum</a></div>
                         </div>
 
-                        <div class="col-md-2 text-center">
-                            <div class="col-md-8">
+                        <div class="col-lg-2 text-center">
+                            <div class="col-lg-8">
                                 <a href="/Project/ProjectErrAbbr?ProjectKey=@item.TestData.ProjectKey&ErrAbbr=@item.TestData.ErrAbbr">@item.TestData.ErrAbbr</a>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-lg-4">
                                 <a href="/Project/UpdateProjectError2?ProjectKey=@item.TestData.ProjectKey&ErrorCode=@item.TestData.ErrAbbr"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
                             </div>
                         </div>
-                        <div class="col-md-1 text-center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(@item.IssueData.Resolution))</div>
-                        <div class="col-md-1 text-center">
+                        <div class="col-lg-1 text-center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(@item.IssueData.Resolution))</div>
+                        <div class="col-lg-1 text-center">
                             <a href="/User/UserCenter?username=@item.IssueData.Assignee">@item.IssueData.Assignee.Split(new char[] { '@' })[0]</a>
                             
                             <input class="form-control text-box single-line" value="@item.IssueData.Assignee.ToUpper()" id="HAssignee@(i)" name="HAssignee@(i)" type="hidden" />
@@ -278,10 +278,10 @@
                                 <input class="form-control text-box single-line" value="" id="HUpdater@(i)" name="HUpdater@(i)" type="hidden" />
                             }
                         </div>
-                        <div class="col-md-3 text-center"><a href="/Issue/UpdateIssue?issuekey=@item.IssueData.IssueKey">@item.IssueData.Summary</a></div>
-                        <div class="col-md-2">
-                            <div class="col-md-4 text-center">@item.IssueData.ReportDate.ToString("MM/dd")</div>
-                            <div class="col-md-3 text-center">
+                        <div class="col-lg-3 text-center"><a href="/Issue/UpdateIssue?issuekey=@item.IssueData.IssueKey">@item.IssueData.Summary</a></div>
+                        <div class="col-lg-2">
+                            <div class="col-lg-4 text-center">@item.IssueData.ReportDate.ToString("MM/dd")</div>
+                            <div class="col-lg-3 text-center">
                                 @if (item.IssueData.AttachList.Count > 0)
                                 {
                                     <a href="/Issue/IssueAttach?issuekey=@item.IssueData.IssueKey" target="_blank">
@@ -289,7 +289,7 @@
                                     </a>
                                 }
                             </div>
-                            <div class="col-md-5 text-center">
+                            <div class="col-lg-5 text-center">
                                 <button data-toggle="tooltip" title="Low Yield Trigger" class="form-control" value="@item.IssueData.IssueKey" type="button" onclick="LowYieldWarning(this)">
                                     <span class="glyphicon glyphicon-share" aria-hidden="true"></span></button>
                             </div>
@@ -304,20 +304,20 @@
                 if (ViewBag.logined != null && ViewBag.logined)
                 {
                     <div class="row">
-                        <div class="col-md-1 text-center">
+                        <div class="col-lg-1 text-center">
                             <span class="input-group-addon">
                                 <input type="checkbox" id="checkall" name="checkall" onclick="ChooseAll(this)" />
                             </span>
                         </div>
-                        <div class="col-md-2 text-center">
+                        <div class="col-lg-2 text-center">
                             <input type="submit" value="Assign To" class="btn btn-default" />
                         </div>
-                        <div class="col-md-4 text-center">
+                        <div class="col-lg-4 text-center">
                             @Html.DropDownList("AllUserList", null, new { @id = "AllUserList", @class = "form-control" })
                         </div>
-                        <div class="col-md-1 text-center">
+                        <div class="col-lg-1 text-center">
                         </div>
-                        <div class="col-md-4 text-center">
+                        <div class="col-lg-4 text-center">
                         </div>
 
                         <script type="text/javascript">

@@ -13,21 +13,21 @@
                 <div class="panel-heading">Containment Actions</div>
                 <div class="panel-body">
                     <div class="row">
-                        <div class="col-md-4">Summary</div>
-                        <div class="col-md-2">Status</div>
-                        <div class="col-md-2">Asignee</div>
-                        <div class="col-md-2">DueDate</div>
-                        <div class="col-md-2"></div>
+                        <div class="col-lg-4">Summary</div>
+                        <div class="col-lg-2">Status</div>
+                        <div class="col-lg-2">Asignee</div>
+                        <div class="col-lg-2">DueDate</div>
+                        <div class="col-lg-2"></div>
                     </div>
 
                     @foreach (var item in Model)
                     {
                         <div class="row">
-                            <div class="col-md-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></div>
-                            <div class="col-md-2">@item.Resolution</div>
-                            <div class="col-md-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
-                            <div class="col-md-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
-                            <div class="col-md-2"></div>
+                            <div class="col-lg-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></div>
+                            <div class="col-lg-2">@item.Resolution</div>
+                            <div class="col-lg-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
+                            <div class="col-lg-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
+                            <div class="col-lg-2"></div>
                         </div>
                     }
                 </div>

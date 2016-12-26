@@ -6,16 +6,16 @@
 }
 
 <div class="row">
-    <div class="col-md-3">
+    <div class="col-lg-3">
         <h2>Update OBA</h2>
     </div>
-    <div class="col-md-1">
+    <div class="col-lg-1">
         @if (Model != null)
         {
             <h2><a data-toggle="tooltip" title="Goto OBA" href="/Project/ProjectOBA?ProjectKey=@Model.ProjectKey"><span class="glyphicon glyphicon-record" aria-hidden="true"></span></a></h2>
         }
     </div>
-    <div class="col-md-3">
+    <div class="col-lg-3">
         @if (Model != null && string.IsNullOrEmpty(Model.ParentIssueKey))
         {
             using (Html.BeginForm("PrepareSubIssue", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
@@ -46,7 +46,7 @@
         }
 
     </div>
-    <div class="col-md-3">
+    <div class="col-lg-3">
         @if (Model != null && string.IsNullOrEmpty(Model.ParentIssueKey))
         {
             using (Html.BeginForm("PrepareSubIssue", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
@@ -77,7 +77,7 @@
         }
 
     </div>
-    <div class="col-md-2">
+    <div class="col-lg-2">
         @if (Model != null)
         {
             <input class="form-control text-box single-line" value="@(Model.IssueKey)" id="HIssueKeyForDelete" name="HIssueKeyForDelete" type="hidden" />
@@ -96,15 +96,15 @@
     <div class="form-group">
         <div class="form-horizontal">
             <div class="form-group">
-                <div class="col-md-6">
-                    <label class="control-label col-md-2" for="projectlist">Project<font color="red">*</font></label>
-                    <div class="col-md-10">
+                <div class="col-lg-6">
+                    <label class="control-label col-lg-2" for="projectlist">Project<font color="red">*</font></label>
+                    <div class="col-lg-10">
                         @Html.DropDownList("projectlist", null, new { @id = "projectlist", @class = "form-control", @readonly = "readonly" })
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="control-label col-md-2" for="FinisarDMR">Finisar DMR<font color="red">*</font></label>
-                    <div class="col-md-10">
+                <div class="col-lg-6">
+                    <label class="control-label col-lg-2" for="FinisarDMR">Finisar DMR<font color="red">*</font></label>
+                    <div class="col-lg-10">
                         @if (Model != null && !string.IsNullOrEmpty(Model.FinisarDMR))
                         {
                             <input class="form-control text-box single-line" value="@Model.FinisarDMR" readonly="readonly" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="FinisarDMR" name="FinisarDMR" type="text" />
@@ -119,9 +119,9 @@
             </div>
 
             <div class="form-group">
-                <div class="col-md-6">
-                    <label class="control-label col-md-2" for="ModuleSN">Model SN<font color="red">*</font></label>
-                    <div class="col-md-10">
+                <div class="col-lg-6">
+                    <label class="control-label col-lg-2" for="ModuleSN">Model SN<font color="red">*</font></label>
+                    <div class="col-lg-10">
                         @if (Model != null && !string.IsNullOrEmpty(Model.ModuleSN))
                         {
                             <input class="form-control text-box single-line" value="@Model.ModuleSN" readonly="readonly" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$"  id="ModuleSN" name="ModuleSN" type="text" />
@@ -134,9 +134,9 @@
                     </div>
                 </div>
 
-                <div class="col-md-6">
-                    <label class="control-label col-md-2" for="FailureRate">Failure Rate</label>
-                    <div class="col-md-10">
+                <div class="col-lg-6">
+                    <label class="control-label col-lg-2" for="FailureRate">Failure Rate</label>
+                    <div class="col-lg-10">
                         @if (Model != null && !string.IsNullOrEmpty(Model.OBAFailureRate))
                         {
                             <input class="form-control text-box single-line" value="@Model.OBAFailureRate" readonly="readonly" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$"  id="FailureRate" name="FailureRate" type="text" />
@@ -152,9 +152,9 @@
             </div>
 
             <div class="form-group">
-                <div class="col-md-6">
-                    <label class="control-label col-md-2" for="assigneelist">Assignee</label>
-                    <div class="col-md-10">
+                <div class="col-lg-6">
+                    <label class="control-label col-lg-2" for="assigneelist">Assignee</label>
+                    <div class="col-lg-10">
                         @if (ViewBag.isassignee != null && ViewBag.isassignee)
                         {
                              @Html.DropDownList("assigneelist", null, new { @id = "assigneelist", @class = "form-control" })
@@ -165,18 +165,18 @@
                         }
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="control-label col-md-2" for="dispositionlist">Material Disposition</label>
-                    <div class="col-md-10">
+                <div class="col-lg-6">
+                    <label class="control-label col-lg-2" for="dispositionlist">Material Disposition</label>
+                    <div class="col-lg-10">
                         @Html.DropDownList("dispositionlist", null, new { @id = "dispositionlist", @class = "form-control" })
                     </div>
                 </div>
             </div>
 
             <div class="form-group">
-                <div class="col-md-6">
-                    <label class="control-label col-md-2" for="ProductType">Product Type</label>
-                    <div class="col-md-10">
+                <div class="col-lg-6">
+                    <label class="control-label col-lg-2" for="ProductType">Product Type</label>
+                    <div class="col-lg-10">
                         @if (Model != null && !string.IsNullOrEmpty(Model.ProductType))
                         {
                             <input class="form-control text-box single-line" value="@Model.ProductType" readonly="readonly" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="ProductType" name="ProductType" type="text" />
@@ -189,9 +189,9 @@
                     </div>
                 </div>
 
-                <div class="col-md-6">
-                    <label class="control-label col-md-2" for="prioritylist">Priority</label>
-                    <div class="col-md-10">
+                <div class="col-lg-6">
+                    <label class="control-label col-lg-2" for="prioritylist">Priority</label>
+                    <div class="col-lg-10">
                         @Html.DropDownList("prioritylist", null, new { @id = "prioritylist", @class = "form-control" })
                     </div>
                 </div>
@@ -199,9 +199,9 @@
             </div>
 
             <div class="form-group">
-                <div class="col-md-6">
-                    <label class="control-label col-md-2" for="FVCode">FV</label>
-                    <div class="col-md-10">
+                <div class="col-lg-6">
+                    <label class="control-label col-lg-2" for="FVCode">FV</label>
+                    <div class="col-lg-10">
                         @if (Model != null && !string.IsNullOrEmpty(Model.FVCode))
                         {
                             <input class="form-control text-box single-line" data-toggle="tooltip" title="Show be short and no chinese character" value="@Model.FVCode" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 25." data-val-length-max="25" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="FVCode" name="FVCode" type="text" />
@@ -214,9 +214,9 @@
                     </div>
                 </div>
 
-                <div class="col-md-6">
-                    <label class="control-label col-md-2" for="resolutionlist">Status<font color="red">*</font></label>
-                    <div class="col-md-10">
+                <div class="col-lg-6">
+                    <label class="control-label col-lg-2" for="resolutionlist">Status<font color="red">*</font></label>
+                    <div class="col-lg-10">
                         @if (ViewBag.isassignee != null && ViewBag.isassignee)
                         {
                             @Html.DropDownList("resolutionlist", null, new { @id = "resolutionlist", @class = "form-control", @onchange = "chooseissuetag()" })
@@ -256,9 +256,9 @@
 
             <div class="form-group">
  
-                <div class="col-md-6">
-                    <label class="control-label col-md-2" for="DueDate">DueDate<font color="red">*</font></label>
-                    <div class="col-md-10">
+                <div class="col-lg-6">
+                    <label class="control-label col-lg-2" for="DueDate">DueDate<font color="red">*</font></label>
+                    <div class="col-lg-10">
                         @if (Model != null && string.Compare(Model.DueDate.ToString("yyyy-MM-dd"), "0001-01-01") != 0)
                         {
                             <input class="form-control text-box single-line" value="@Model.DueDate.ToString("yyyy-MM-dd")" data-val="true" data-val-required="The DueDate field is required." id="DueDate" name="DueDate" type="text" />
@@ -271,9 +271,9 @@
                     </div>
                 </div>
 
-                <div class="col-md-6">
-                    <label class="control-label col-md-2">Creator</label>
-                    <div class="col-md-10">
+                <div class="col-lg-6">
+                    <label class="control-label col-lg-2">Creator</label>
+                    <div class="col-lg-10">
                         @if (Model != null && !string.IsNullOrEmpty(Model.Reporter))
                         {
                             <input class="form-control text-box single-line" value="@Model.Reporter" readonly="readonly" type="text" />
@@ -297,9 +297,9 @@
             </div>
 
             <div class="form-group">
-                <div class="col-md-6">
-                    <label class="control-label col-md-2" for="Summary">Summary</label>
-                    <div class="col-md-10">
+                <div class="col-lg-6">
+                    <label class="control-label col-lg-2" for="Summary">Summary</label>
+                    <div class="col-lg-10">
                         @if (Model != null && !string.IsNullOrEmpty(Model.Summary))
                         {
                             <input class="form-control text-box single-line" value="@Model.Summary" readonly="readonly" type="text" />
@@ -310,20 +310,20 @@
                         }
                     </div>
                 </div>
-                <div class="col-md-6"></div>
+                <div class="col-lg-6"></div>
             </div>
 
 
                 @if (ViewBag.isassignee != null && ViewBag.isassignee)
                 {
                     <hr />
-                    <div class="col-md-12">
+                    <div class="col-lg-12">
                         <div class="form-group">
                             <label>Related People Email</label>
                         </div>
 
                         <div class="form-group">
-                            <div class="col-md-12" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
+                            <div class="col-lg-12" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
                                 @if (Model != null && !string.IsNullOrEmpty(Model.RelativePeoples))
                                 {
                                     <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 200." data-val-length-max="200" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$">@Model.RelativePeoples</textarea>
@@ -341,17 +341,17 @@
                 <hr />
 
                 <div class="form-group">
-                    <div class="col-md-12">
-                        <div class="col-md-4">
+                    <div class="col-lg-12">
+                        <div class="col-lg-4">
                             <span class="btn btn-default btn-file" id="choosefile3">
                                 Attachment <input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
                             </span>
                         </div>
-                        <div class="col-md-8">
-                            <div class="col-md-11">
+                        <div class="col-lg-8">
+                            <div class="col-lg-11">
                                 <label class="control-label" id="showfile3" name="showfile3"></label>
                             </div>
-                            <div class="col-md-1">
+                            <div class="col-lg-1">
                                 <input class="form-control text-box single-line" value="" id="attachmentupload" name="attachmentupload" type="hidden" />
                             </div>
                         </div>
@@ -374,27 +374,27 @@
                 @if (Model.ContainmentActions.Count > 0)
                 {
                     <div class="form-group">
-                        <div class="col-md-12">
+                        <div class="col-lg-12">
                             <div class="panel panel-default">
                                 <div class="panel-heading">
                                     <h3 class="panel-title">Containment Actions</h3>
                                 </div>
                                 <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
                                     <div class="row">
-                                        <div class="col-md-4">Summary</div>
-                                        <div class="col-md-2">Status</div>
-                                        <div class="col-md-2">Asignee</div>
-                                        <div class="col-md-2">DueDate</div>
-                                        <div class="col-md-2"></div>
+                                        <div class="col-lg-4">Summary</div>
+                                        <div class="col-lg-2">Status</div>
+                                        <div class="col-lg-2">Asignee</div>
+                                        <div class="col-lg-2">DueDate</div>
+                                        <div class="col-lg-2"></div>
                                     </div>
                                     @foreach (var item in Model.ContainmentActions)
                                     {
                                         <div class="row">
-                                            <div class="col-md-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace("[Containment]", "")</a></div>
-                                            <div class="col-md-2">@item.Resolution</div>
-                                            <div class="col-md-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
-                                            <div class="col-md-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
-                                            <div class="col-md-2"></div>
+                                            <div class="col-lg-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace("[Containment]", "")</a></div>
+                                            <div class="col-lg-2">@item.Resolution</div>
+                                            <div class="col-lg-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
+                                            <div class="col-lg-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
+                                            <div class="col-lg-2"></div>
                                         </div>
                                     }
                                 </div>
@@ -407,27 +407,27 @@
                 @if (Model.CorrectiveActions.Count > 0)
                 {
                     <div class="form-group">
-                        <div class="col-md-12">
+                        <div class="col-lg-12">
                             <div class="panel panel-default">
                                 <div class="panel-heading">
                                     <h3 class="panel-title">Corrective Actions</h3>
                                 </div>
                                 <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
                                     <div class="row">
-                                        <div class="col-md-4">Summary</div>
-                                        <div class="col-md-2">Status</div>
-                                        <div class="col-md-2">Asignee</div>
-                                        <div class="col-md-2">DueDate</div>
-                                        <div class="col-md-2"></div>
+                                        <div class="col-lg-4">Summary</div>
+                                        <div class="col-lg-2">Status</div>
+                                        <div class="col-lg-2">Asignee</div>
+                                        <div class="col-lg-2">DueDate</div>
+                                        <div class="col-lg-2"></div>
                                     </div>
                                     @foreach (var item in Model.CorrectiveActions)
                                     {
                                         <div class="row">
-                                            <div class="col-md-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace("[Corrective]", "")</a></div>
-                                            <div class="col-md-2">@item.Resolution</div>
-                                            <div class="col-md-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
-                                            <div class="col-md-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
-                                            <div class="col-md-2"></div>
+                                            <div class="col-lg-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace("[Corrective]", "")</a></div>
+                                            <div class="col-lg-2">@item.Resolution</div>
+                                            <div class="col-lg-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
+                                            <div class="col-lg-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
+                                            <div class="col-lg-2"></div>
                                         </div>
                                     }
                                 </div>
@@ -442,7 +442,7 @@
                 {
                     <hr />
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-lg-12">
                             <div class="panel panel-default">
                                 <div class="panel-heading">
                                     <h3 class="panel-title">Attachments</h3>
@@ -466,8 +466,8 @@
                                         if (item.Contains("<a href"))
                                         {
                                             <div class="row">
-                                                <div class="col-md-6">@Html.Raw(item)</div>
-                                                <div class="col-md-1">
+                                                <div class="col-lg-6">@Html.Raw(item)</div>
+                                                <div class="col-lg-1">
                                                     @if (ViewBag.isassignee != null && ViewBag.isassignee)
                                                     {
                                                         <button class="form-control" value="@realfn" onclick="DeleteAttachment(this)">
@@ -475,7 +475,7 @@
                                                         </button>
                                                     }
                                                 </div>
-                                                <div class="col-md-5"></div>
+                                                <div class="col-lg-5"></div>
 
                                             </div>
                                         }
@@ -484,12 +484,12 @@
                                             var fns = item.Split(new char[] { '/' });
                                             var fn = fns[fns.Length - 1];
                                             <div class="row">
-                                                <div class="col-md-6">
+                                                <div class="col-lg-6">
                                                     <a href="@item" target="_blank">
                                                         <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>@fn
                                                     </a>
                                                 </div>
-                                                <div class="col-md-1">
+                                                <div class="col-lg-1">
                                                     @if (ViewBag.isassignee != null && ViewBag.isassignee)
                                                     {
                                                         <button class="form-control" value="@realfn" onclick="DeleteAttachment(this)">
@@ -497,7 +497,7 @@
                                                         </button>
                                                     }
                                                 </div>
-                                                <div class="col-md-5"></div>
+                                                <div class="col-lg-5"></div>
 
                                             </div>
                                         }
@@ -523,7 +523,7 @@
                     <hr />
 
                     <div class="form-group">
-                        <div class="col-md-12">
+                        <div class="col-lg-12">
                             <div class="panel panel-default">
                                 <div class="panel-heading">
                                     <h3 class="panel-title">Root Cause</h3>
@@ -531,15 +531,15 @@
                                 <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
                                     @foreach (var item in Model.RootCauseCommentList)
                                     {
-                                        <div class="row col-md-12">
+                                        <div class="row col-lg-12">
                                             @Html.Raw(item.Comment)
                                         </div>
-                                        <div class="row col-md-12">
-                                            <div class="col-md-8"></div>
-                                            <div class="col-md-2">
+                                        <div class="row col-lg-12">
+                                            <div class="col-lg-8"></div>
+                                            <div class="col-lg-2">
                                                 Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>
                                             </div>
-                                            <div class="col-md-2">
+                                            <div class="col-lg-2">
                                                 @item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")
                                             </div>
                                         </div>
@@ -556,7 +556,7 @@
                 {
                     <hr />
                     <div class="form-group">
-                        <div class="col-md-12">
+                        <div class="col-lg-12">
                             <div class="panel panel-default">
                                 <div class="panel-heading">
                                     <h3 class="panel-title">Comment</h3>
@@ -578,7 +578,7 @@
     if (ViewBag.isassignee != null && ViewBag.isassignee)
                 {
         <hr />
-                    <div class="col-md-12">
+                    <div class="col-lg-12">
                         <div class="form-group">
                             Root Cause
                         </div>
@@ -595,7 +595,7 @@
     }
 
     <hr />
-    <div class="col-md-12">
+    <div class="col-lg-12">
         <div class="form-group">
             Comment
         </div>
@@ -618,7 +618,7 @@
     </div>
 
     <div class="form-group">
-        <div class="col-md-6">
+        <div class="col-lg-6">
             @if (Model != null && !string.IsNullOrEmpty(Model.IssueKey))
             {
                 <input class="form-control text-box single-line" value="@(Model.IssueKey)" id="IssueKey" name="IssueKey" type="hidden" />
@@ -628,21 +628,21 @@
                 <input class="form-control text-box single-line" id="IssueKey" name="IssueKey" type="hidden" value="" />
             }
         </div>
-        <div class="col-md-6"></div>
+        <div class="col-lg-6"></div>
     </div>
 
-    <div class="row col-md-12">
+    <div class="row col-lg-12">
         <div class="form-group">
-            <div class="col-md-3">
+            <div class="col-lg-3">
                 <input type="submit" value="Submit" id="updaterma" name="updaterma" class="btn btn-default" />
             </div>
-            <div class="col-md-3">
+            <div class="col-lg-3">
                 @if (ViewBag.isassignee != null && ViewBag.isassignee)
                 {
                     <input type="submit" value="Delete" id="deleterma" name="deleterma" class="btn btn-default" />
                 }
             </div>
-            <div class="col-md-6"></div>
+            <div class="col-lg-6"></div>
         </div>
     </div>
 
@@ -660,8 +660,8 @@
                 {
                     for (var idx = 0; idx < ViewBag.tobechoosetags.Count; idx++)
                     {
-                        <div class="col-md-4">
-                            <div class="col-md-3">
+                        <div class="col-lg-4">
+                            <div class="col-lg-3">
                                 @if (string.Compare(ViewBag.tobechoosetags[idx], "OBA", true) == 0)
                                 {
                                     <input type="checkbox" id="attachtagcheck@(idx)" checked="checked" name="attachtagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
@@ -671,7 +671,7 @@
                                     <input type="checkbox" id="attachtagcheck@(idx)" name="attachtagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
                                 }
                             </div>
-                            <div class="col-md-9">
+                            <div class="col-lg-9">
                                 <label class="control-label">@(ViewBag.tobechoosetags[idx])</label>
                             </div>
                         </div>
@@ -700,8 +700,8 @@
                 {
                     for (var idx = 0; idx < ViewBag.tobechoosetags.Count; idx++)
                     {
-                        <div class="col-md-4">
-                            <div class="col-md-3">
+                        <div class="col-lg-4">
+                            <div class="col-lg-3">
                                 @if (string.Compare(ViewBag.tobechoosetags[idx], "OBA", true) == 0)
                                 {
                                     <input type="checkbox" id="issuetagcheck@(idx)" checked="checked" name="issuetagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
@@ -711,7 +711,7 @@
                                     <input type="checkbox" id="issuetagcheck@(idx)" name="issuetagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
                                 }
                             </div>
-                            <div class="col-md-9">
+                            <div class="col-lg-9">
                                 <label class="control-label">@(ViewBag.tobechoosetags[idx])</label>
                             </div>
                         </div>

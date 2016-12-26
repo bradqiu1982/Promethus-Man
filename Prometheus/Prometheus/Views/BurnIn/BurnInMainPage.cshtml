@@ -78,10 +78,10 @@ else
                                 <input class="form-control text-box single-line" id="EndDate" name="EndDate" type="text" value="" />
                             </div>
                             <div class="col-lg-2">
-                                <button class="form-control" onclick="ShowPeriodYield()"><span class="glyphicon glyphicon-search" aria-hidden="true"></span>P</button>
+                                <button class="form-control"  type="button"  onclick="ShowPeriodYield()"><span class="glyphicon glyphicon-search" aria-hidden="true"></span>P</button>
                             </div>
                             <div class="col-lg-2">
-                                <button class="form-control" onclick="ShowDailyYield()"><span class="glyphicon glyphicon-search" aria-hidden="true"></span>D</button>
+                                <button class="form-control" type="button"  onclick="ShowDailyYield()"><span class="glyphicon glyphicon-search" aria-hidden="true"></span>D</button>
                             </div>
                             <script type="text/javascript">
                             $(document).ready(function () {
@@ -109,7 +109,7 @@ else
                                 @Html.DropDownList("waferlist", null, new { @id = "waferlist", @class = "form-control" })
                             </div>
                             <div class="col-lg-2">
-                                <button class="form-control" onclick="ShowWaferYield()"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                                <button class="form-control"  type="button" onclick="ShowWaferYield()"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
                             </div>
                         </div>
                         @*<div class="row"></div>*@

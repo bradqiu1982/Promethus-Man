@@ -131,7 +131,7 @@
                                     <div class="col-lg-1">
                                         @if (ViewBag.assigee != null && ViewBag.assigee)
                                         {
-                                            <button class="form-control" value="@realfn" onclick="DeleteAttachment(this)">
+                                            <button class="form-control" value="@realfn" type="button"  onclick="DeleteAttachment(this)">
                                                 <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                                             </button>
                                         }
@@ -188,7 +188,7 @@
                                                 <div class="row col-lg-1">
                                                     @if (ViewBag.assigee != null && ViewBag.assigee)
                                                 {
-                                                <button class="form-control" value="ErrorKey=@(item.ErrorKey)&CommentType=Result&Date=@(item.CommentDate.ToString())" onclick="DeleteComment(this)">
+                                                <button class="form-control"  type="button"  value="ErrorKey=@(item.ErrorKey)&CommentType=Result&Date=@(item.CommentDate.ToString())" onclick="DeleteComment(this)">
                                                     <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                                                 </button>
                                                 }
@@ -349,7 +349,7 @@
                                         <div class="col-lg-10"></div>
                                         <div class="col-lg-1">
                                             @if (ViewBag.assigee != null && ViewBag.assigee) { 
-                                            <button class="form-control" value="ErrorKey=@(item.ErrorKey)&CommentType=Description&Date=@(item.CommentDate.ToString())" onclick="DeleteComment(this)">
+                                            <button class="form-control" type="button"  value="ErrorKey=@(item.ErrorKey)&CommentType=Description&Date=@(item.CommentDate.ToString())"  onclick="DeleteComment(this)">
                                                 <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                                             </button>
                                             }

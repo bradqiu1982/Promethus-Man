@@ -15,6 +15,23 @@ $(function () {
               text: '#XAxisTitle#'
             }
         },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            },
+            series:{
+              allowPointSelect:true,
+              point: {
+                        events:{
+                          click:function(e)
+                          {
+                            #REDIRECTURL#
+                          }
+                        }
+                        }
+            }
+        },
         yAxis: [{
             title: {
                 text: 'Amount'

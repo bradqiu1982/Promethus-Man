@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
@@ -18,10 +19,10 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        private static Excel.Workbook OpenBook(Excel.Application excelInstance, string fileName, bool readOnly, bool editable,
+        private static Excel.Workbook OpenBook(Excel.Workbooks books, string fileName, bool readOnly, bool editable,
         bool updateLinks)
         {
-            Excel.Workbook book = excelInstance.Workbooks.Open(
+            Excel.Workbook book = books.Open(
                 fileName, updateLinks, readOnly,
                 Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
                 Type.Missing, editable, Type.Missing, Type.Missing, Type.Missing,
@@ -62,11 +63,15 @@ namespace Prometheus.Controllers
             var data = new List<List<string>>();
             Excel.Application excel = null;
             Excel.Workbook wkb = null;
+            Excel.Workbooks books = null;
 
             try
             {
                 excel = new Excel.Application();
-                wkb = OpenBook(excel, wholefn,true,false,false);
+                excel.DisplayAlerts = false;
+                books = excel.Workbooks;
+
+                wkb = OpenBook(books, wholefn,true,false,false);
                 Excel.Worksheet sheet = wkb.Sheets[1] as Excel.Worksheet;
 
                 var excelRange = sheet.UsedRange;
@@ -97,6 +102,11 @@ namespace Prometheus.Controllers
 
                 wkb.Close();
                 excel.Quit();
+
+                Marshal.ReleaseComObject(sheet);
+                Marshal.ReleaseComObject(wkb);
+                Marshal.ReleaseComObject(books);
+                Marshal.ReleaseComObject(excel);
 
                 return data;
             }

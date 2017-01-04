@@ -1,0 +1,148 @@
+﻿
+@{
+    ViewBag.Title = "AddBlogDoc";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Add Blog Document</h2>
+
+<hr/>
+
+<script src="../../ckeditor/ckeditor.js"></script>
+
+@using (Html.BeginForm("AddBlogDoc", "User", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="col-lg-12">
+                <div class="col-lg-6">
+                    <label class="control-label col-lg-2" for="Tag">Category</label>
+                    <div class="col-lg-10">
+                        <input class="form-control text-box single-line" data-toggle="tooltip" title="Tag1;Tag2;Tag3" id="Tag" name="Tag" type="text" onclick="PopTag()" />
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                </div>
+                <script type="text/javascript">
+                    function PopTag() {
+                        $('#attachtag').modal({ backdrop: 'static' });
+                    }
+                </script>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="form-group">
+            <div class="col-lg-12">
+                <div class="col-lg-4">
+                    <span class="btn btn-default btn-file" id="choosefile3">
+                        Share DOC by Attachement <input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
+                    </span>
+                </div>
+                <div class="col-lg-8">
+                    <div class="col-lg-11">
+                        <label class="control-label" id="showfile3" name="showfile3"></label>
+                    </div>
+                    <div class="col-lg-1">
+                        <input class="form-control text-box single-line" value="" id="attachmentupload" name="attachmentupload" type="hidden" />
+                    </div>
+                </div>
+            </div>
+            <script type="text/javascript">
+                function ShowFileNames3(oFile) {
+                    $('#showfile3').text(oFile.value);
+                    document.getElementById("attachmentupload").value = oFile.value;
+                }
+            </script>
+        </div>
+
+        <hr />
+
+        <div class="form-group">
+            <div class="col-lg-12">
+                <label class="control-label">Share DOC by editor</label>
+                </div>
+        </div>
+        <div class="form-group">
+            <div class="col-lg-12">
+                <div class="col-lg-2">
+                    <label class="control-label">Title</label>
+                </div>
+                <div class="col-lg-10">
+                    <input class="form-control text-box single-line" id="DocTitle" name="DocTitle" type="text" />
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-lg-12">
+                <textarea name="docinputeditor" id="docinputeditor" rows="30" cols="80"></textarea>
+                <script>
+                    CKEDITOR.replace('docinputeditor', { htmlEncodeOutput: true, filebrowserImageUploadUrl: '/userfiles/Upload.ashx' });
+                </script>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="form-group">
+            <div class="col-lg-12">
+                <div class="col-lg-10"></div>
+                <div class="col-lg-2">
+                    <input type="submit" value="Submit" id="updateisu" name="updateisu" class="btn btn-default" />
+                </div>
+            </div>
+        </div>
+     </div>
+        <div class="modal" id="attachtag" tabindex="-1" role="dialog" aria-labelledby="attachtagLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="attachtagLabel">Category</h4>
+                    </div>
+                    <div class="row"></div>
+                    <hr />
+                    <div class="row"></div>
+                    @if (ViewBag.tobechoosetags != null)
+                {
+                    for (var idx = 0; idx < ViewBag.tobechoosetags.Count; idx++)
+                    {
+                            <div class="col-lg-4">
+                                <div class="col-lg-3">
+                                    <input type="checkbox" id="attachtagcheck@(idx)" name="attachtagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
+                                </div>
+                                <div class="col-lg-9">
+                                    <label class="control-label">@(ViewBag.tobechoosetags[idx])</label>
+                                </div>
+                            </div>
+                        }
+                    }
+                    <div class="row"></div>
+                    <hr />
+                    <div class="row"></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" onclick="settag(this)">Done</button>
+                    </div>
+                </div>
+            </div>
+
+            <script type="text/javascript">
+                function settag(oBT) {
+                    var tagstr = "";
+                    for (var i = 0; i < 100; i++) {
+                        if (document.getElementById("attachtagcheck" + i)) {
+                            if (document.getElementById("attachtagcheck" + i).checked) {
+                                tagstr = tagstr + document.getElementById("attachtagcheck" + i).value + ";";
+                            }
+                        }
+                    }
+                    document.getElementById("Tag").value = tagstr;
+                    $('#attachtag').modal('hide');
+                    document.getElementById("Tag").focus();
+                }
+            </script>
+        </div>
+        }

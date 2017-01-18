@@ -11,6 +11,7 @@ namespace Prometheus.Models
     {
         public static string ISSUE = "ISSUE";
         public static string DOCUMENT = "DOCUMENT";
+        public static string BLOG = "BLOG";
     }
     public class ShareDocVM
     {
@@ -76,7 +77,7 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
-        private static void PushDoc(string BookerName, string DOCPJK, string DOCType, string DOCKey, string DOCTag, string DOCCreator, string DOCDate,string DOCPusher)
+        public static void PushDoc(string BookerName, string DOCPJK, string DOCType, string DOCKey, string DOCTag, string DOCCreator, string DOCDate,string DOCPusher)
         {
             var sql = "select DOCPJK,DOCKey from UserLearn where UserName = '<BookerName>' and DOCPJK='<DOCPJK>' and DOCKey='<DOCKey>'";
             sql = sql.Replace("<BookerName>", BookerName).Replace("<DOCPJK>", DOCPJK).Replace("<DOCKey>", DOCKey);
@@ -93,7 +94,7 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
-        private static void SendPushDocEvent(string what, string urlstr, string towho, string pusher, Controller ctrl)
+        public static void SendPushDocEvent(string what, string urlstr, string towho, string pusher, Controller ctrl)
         {
             try
             {
@@ -202,8 +203,8 @@ namespace Prometheus.Models
         public static List<ShareDocVM> RetrieveMyLearn(string UserName)
         {
             var ret = new List<ShareDocVM>();
-            var sql = "select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,a.DOCDate,a.DOCPusher,a.DOCFavor,b.DOCFavorTimes from UserLearn a left join ShareDoc b ON a.DOCKey = b.DOCKey where a.UserName= '<UserName>' order by a.DOCDate DESC";
-            sql = sql.Replace("<UserName>", UserName);
+            var sql = "select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,a.DOCDate,a.DOCPusher,a.DOCFavor,b.DOCFavorTimes from UserLearn a left join ShareDoc b ON a.DOCKey = b.DOCKey where a.UserName= '<UserName>' and a.DOCType <> '<DOCType>' order by a.DOCDate DESC";
+            sql = sql.Replace("<UserName>", UserName).Replace("<DOCType>", ShareDocType.BLOG);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             foreach (var line in dbret)
             {
@@ -225,7 +226,7 @@ namespace Prometheus.Models
                     tempvm.Summary = issue.Summary;
                     tempvm.DocURL = "/Issue/UpdateIssue?issuekey="+ tempvm.DOCKey;
                 }
-                else
+                else if (string.Compare(tempvm.DOCType, ShareDocType.DOCUMENT, true) == 0)
                 {
                     tempvm.Summary = tempvm.DOCKey;
                     var tempstrs = tempvm.Summary.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
@@ -235,6 +236,43 @@ namespace Prometheus.Models
 
                 ret.Add(tempvm);
             }
+
+            var bloglist = RetrieveMyLearnBlog(UserName);
+            if (bloglist.Count > 0)
+            {
+                ret.AddRange(bloglist);
+            }
+
+            return ret;
+        }
+
+        private static List<ShareDocVM> RetrieveMyLearnBlog(string UserName)
+        {
+            var ret = new List<ShareDocVM>();
+            var sql = "select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,a.DOCDate,a.DOCPusher,a.DOCFavor from UserLearn a where a.UserName= '<UserName>' and a.DOCType = '<DOCType>' order by a.DOCDate DESC";
+            sql = sql.Replace("<UserName>", UserName).Replace("<DOCType>", ShareDocType.BLOG);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                var tempvm = new ShareDocVM();
+                tempvm.BookerName = UserName;
+                tempvm.DOCPJK = Convert.ToString(line[0]);
+                tempvm.DOCType = Convert.ToString(line[1]);
+                tempvm.DOCKey = Convert.ToString(line[2]);
+                tempvm.DOCTag = Convert.ToString(line[3]);
+                tempvm.DOCCreator = Convert.ToString(line[4]);
+                tempvm.DOCDate = DateTime.Parse(Convert.ToString(line[5]));
+                tempvm.DOCPusher = Convert.ToString(line[6]);
+                tempvm.DOCFavor = Convert.ToString(line[7]);
+                tempvm.DOCFavorTimes = 0;
+
+                var blog = UserBlogVM.RetrieveBlogDoc(tempvm.DOCKey);
+                tempvm.Summary = blog.Title;
+                tempvm.DocURL = blog.DocURL;
+
+                ret.Add(tempvm);
+            }
+
             return ret;
         }
 

@@ -388,7 +388,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        private static List<ErrorComments> RetrieveErrorComments(string errorkey)
+        public static List<ErrorComments> RetrieveErrorComments(string errorkey)
         {
             var ret = new List<ErrorComments>();
             var sql = "select ErrorKey,Comment,Reporter,CommentDate,CommentType from ErrorComments where ErrorKey = '<ErrorKey>' and APVal1 <> 'delete' order by CommentDate ASC";

@@ -169,7 +169,7 @@ namespace Prometheus.Models
 
         public static string RetrieveLatestTimeOfLocalProject(string projectkey)
         {
-            var sql = "select top 1 UpdateTime from ProjectTestData where ProjectKey = '<ProjectKey>' order by TestTimeStamp DESC";
+            var sql = "select top 1 TestTimeStamp from ProjectTestData where ProjectKey = '<ProjectKey>' order by TestTimeStamp DESC";
             sql = sql.Replace("<ProjectKey>", projectkey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             if (dbret.Count > 0)

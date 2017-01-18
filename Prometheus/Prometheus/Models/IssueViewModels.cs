@@ -1101,7 +1101,7 @@ namespace Prometheus.Models
             var cond = "";
             cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";
 
-            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples from Issue where  APVal1 <> 'delete' and  ParentIssueKey = '' and ProjectKey = '<ProjectKey>' and Summary like '%<ModuleSerialNum>%' and ReportDate < '<DATESTR>'  and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' order by ReportDate DESC";
+            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples from Issue where  APVal1 <> 'delete' and  ParentIssueKey = '' and ProjectKey = '<ProjectKey>' and ModuleSN = '<ModuleSerialNum>' and ReportDate < '<DATESTR>'  and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' order by ReportDate DESC";
             sql = sql.Replace("<ModuleSerialNum>", SN).Replace("<cond>", cond).Replace("<DATESTR>", datestr).Replace("<ProjectKey>", pjkey)
                     .Replace("<IssueType1>", ISSUETP.NPIPROC).Replace("<IssueType2>", ISSUETP.RMA);
 
@@ -1122,7 +1122,37 @@ namespace Prometheus.Models
             return retdict;
         }
 
-        public static List<IssueViewModels> RRetrieveBIFABySN(string pjkey, string SN, string whichtest)
+        public static Dictionary<string, bool> RRetrieveBIPendingFA(string pjkey)
+        {
+            var retdict = new Dictionary<string, bool>();
+
+            var cond = "";
+            cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";
+
+            var sql = "select  Summary,ModuleSN from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' order by ReportDate DESC";
+            sql = sql.Replace("<cond>", cond).Replace("<ProjectKey>", pjkey)
+                    .Replace("<IssueType1>", ISSUETP.NPIPROC).Replace("<IssueType2>", ISSUETP.RMA);
+
+            //.Replace("<BICond>", " @Burn-In Step ")
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                if (Convert.ToString(line[0]).Contains("@Burn-In Step"))
+                {
+                    var sn = Convert.ToString(line[1]);
+                    if (!string.IsNullOrEmpty(sn) && !retdict.ContainsKey(sn))
+                    {
+                        retdict.Add(sn, true);
+                    }
+                }
+            }
+
+            return retdict;
+        }
+
+
+        public static List<IssueViewModels> RRetrieveBIFABySN(string pjkey, string SN)
         {
             var retdict = new List<IssueViewModels>();
 
@@ -1130,7 +1160,7 @@ namespace Prometheus.Models
             cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";
 
             var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and Summary like '%<BICond>%' and Summary like '%<ModuleSerialNum>%' and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' order by ReportDate DESC";
-            sql = sql.Replace("<ModuleSerialNum>", SN).Replace("<BICond>", " @Burn-In Step " + whichtest).Replace("<cond>", cond).Replace("<ProjectKey>", pjkey)
+            sql = sql.Replace("<ModuleSerialNum>", SN).Replace("<BICond>", " @Burn-In Step ").Replace("<cond>", cond).Replace("<ProjectKey>", pjkey)
                     .Replace("<IssueType1>", ISSUETP.NPIPROC).Replace("<IssueType2>", ISSUETP.RMA);
 
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
@@ -2490,15 +2520,34 @@ namespace Prometheus.Models
             }
         }
 
-        public static void CloseBIIssueAutomaticlly(string pjkey, string SN, string whichtest, string tester, string datestr)
+        public static void CloseBIIssueAutomaticlly(List<BITestData> passlist)
         {
-            var issues = IssueViewModels.RRetrieveBIFABySN(pjkey, SN, whichtest);
-            foreach (var tobedata in issues)
+            var closesn = new List<BITestData>();
+            if (passlist.Count > 0)
             {
-                tobedata.Resolution = Resolute.AutoClose;
-                tobedata.Description = "Module " + SN + " passed " + whichtest + " test @" + tester + " @" + datestr;
-                tobedata.UpdateIssue();
-                tobedata.CloseIssue();
+                var pendingissue = IssueViewModels.RRetrieveBIPendingFA(passlist[0].ProjectKey);
+                foreach (var item in passlist)
+                {
+                    if (pendingissue.ContainsKey(item.ModuleSerialNum))
+                    {
+                        closesn.Add(item);
+                    }
+                }
+            }
+
+            foreach (var item in closesn)
+            {
+                var issues = RRetrieveBIFABySN(item.ProjectKey, item.ModuleSerialNum);
+                foreach (var tobedata in issues)
+                {
+                    if (item.TestTimeStamp > tobedata.ReportDate)
+                    {
+                        tobedata.Resolution = Resolute.AutoClose;
+                        tobedata.Description = "Module " + item.ModuleSerialNum + " passed " + item.WhichTest + " test @" + item.TestStation + " @" + item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss");
+                        tobedata.UpdateIssue();
+                        tobedata.CloseIssue();
+                    }
+                }
             }
         }
 

@@ -103,122 +103,93 @@ namespace Prometheus.Models
 
         public static void StartProjectBonding(ProjectViewModels vm)
         {
-            try
+            var vtab = new List<string>();
+            vtab.Add("dbo.PRLL_VcselInfoSummary_2016");
+            vtab.Add("dbo.PRLL_VcselInfoSummary_2017");
+            foreach (var vt in vtab)
             {
-                if (BITestData.UpdatePJLockUsing(vm.ProjectKey))
-                    return;
-
-                    if (vm.PNList.Count > 0)
-                    {
-                        var bondeddatadict = BITestData.RetrieveAllDataID(vm.ProjectKey);
-
-                        //var failurelist = new List<BITestData>();
-                        var sql = "select ModuleSerialNum,Step,ModuleType,ErrAbbr,TestTimeStamp,TestStation,ModulePartNum,wafer,waferpn,ChannelNum,SLOPE,THOLD,PO_LD,PO_LD_18,PO_LD_25,PO_LD_127,PO_Uniformity,Delta_SLOPE,Delta_THOLD,Delta_PO_LD,Delta_PO_LD_18,Delta_PO_LD_25,Delta_PO_LD_127,Delta_PO_Uniformity from dbo.PRLL_VcselInfoSummary_2016(nolock) where wafer <> 'NULL' and waferpn  <> 'NULL' and ErrAbbr  <> 'NULL' and ModulePartNum in <PNCOND> and TestTimeStamp > '<TIMECOND>' order by TestTimeStamp Desc,ModuleSerialNum";
-                        var pncond = PNCondition(vm.PNList);
-
-                    if (string.IsNullOrEmpty(pncond))
-                    {
-                        BITestData.ResetUpdatePJLock(vm.ProjectKey);
+                try
+                {
+                    if (BITestData.UpdatePJLockUsing(vm.ProjectKey))
                         return;
-                    }
 
-                        sql = sql.Replace("<PNCOND>",pncond).Replace("<TIMECOND>", vm.StartDate.ToString());
-
-                        var tempdataiddict = new Dictionary<string, BITestData>();
-                        var dbret = DBUtility.ExePRLSqlWithRes(sql);
-                        foreach (var line in dbret)
+                        if (vm.PNList.Count > 0)
                         {
-                            var tempid = ConvertString(line[0])+ "_" + ConvertString(line[1]);
+                            var bondeddatadict = BITestData.RetrieveAllDataID(vm.ProjectKey);
 
-                            if (bondeddatadict.ContainsKey(tempid))
-                            {
-                                if (DateTime.Parse(ConvertString(line[4])) <= bondeddatadict[tempid])
-                                {
-                                    continue;
-                                }
-                            }
+                            //var failurelist = new List<BITestData>();
+                            var sql = "select ModuleSerialNum,Step,ModuleType,ErrAbbr,TestTimeStamp,TestStation,ModulePartNum,wafer,waferpn from  "+vt+"(nolock) where wafer <> 'NULL' and waferpn  <> 'NULL' and ErrAbbr  <> 'NULL' and ModulePartNum in <PNCOND> and TestTimeStamp > '<TIMECOND>' order by TestTimeStamp Desc,ModuleSerialNum";
+                            var pncond = PNCondition(vm.PNList);
 
-                            if (tempdataiddict.ContainsKey(tempid))
+                        if (string.IsNullOrEmpty(pncond))
+                        {
+                            BITestData.ResetUpdatePJLock(vm.ProjectKey);
+                            return;
+                        }
+
+                            sql = sql.Replace("<PNCOND>",pncond).Replace("<TIMECOND>", vm.StartDate.ToString());
+
+                            var tempdataiddict = new Dictionary<string, BITestData>();
+                            var dbret = DBUtility.ExePRLSqlWithRes(sql);
+                            foreach (var line in dbret)
                             {
-                                if (DateTime.Parse(ConvertString(line[4])) == tempdataiddict[tempid].TestTimeStamp)
+                                var tempid = ConvertString(line[0])+ "_" + ConvertString(line[1]);
+
+                                if (bondeddatadict.ContainsKey(tempid))
                                 {
-                                    if (string.Compare(ConvertString(line[3]), "Pass", true) != 0)
+                                    if (DateTime.Parse(ConvertString(line[4])) <= bondeddatadict[tempid])
                                     {
-                                        tempdataiddict[tempid].ErrAbbr = ConvertString(line[3]);
+                                        continue;
                                     }
+                                }
 
-                                    var tempdf = new BITestDataField();
-                                    tempdf.DataID = tempdataiddict[tempid].DataID;
-                                    tempdf.ChannelNum = ConvertString(line[9]);
-                                    tempdf.SLOPE = ConvertDouble(line[10]);
-                                    tempdf.THOLD = ConvertDouble(line[11]);
-                                    tempdf.PO_LD = ConvertDouble(line[12]);
-                                    tempdf.PO_LD_18 = ConvertDouble(line[13]);
-                                    tempdf.PO_LD_25 = ConvertDouble(line[14]);
-                                    tempdf.PO_LD_127 = ConvertDouble(line[15]);
-                                    tempdf.PO_Uniformity = ConvertDouble(line[16]);
-                                    tempdf.Delta_SLOPE = ConvertDouble(line[17]);
-                                    tempdf.Delta_THOLD = ConvertDouble(line[18]);
-                                    tempdf.Delta_PO_LD = ConvertDouble(line[19]);
-                                    tempdf.Delta_PO_LD_18 = ConvertDouble(line[20]);
-                                    tempdf.Delta_PO_LD_25 = ConvertDouble(line[21]);
-                                    tempdf.Delta_PO_LD_127 = ConvertDouble(line[22]);
-                                    tempdf.Delta_PO_Uniformity = ConvertDouble(line[23]);
-                                    tempdataiddict[tempid].DataFields.Add(tempdf);
-                                }//same time
-                            }
-                            else
+                                if (tempdataiddict.ContainsKey(tempid))
+                                {
+                                    if (DateTime.Parse(ConvertString(line[4])) == tempdataiddict[tempid].TestTimeStamp)
+                                    {
+                                        if (string.Compare(ConvertString(line[3]), "Pass", true) != 0)
+                                        {
+                                            tempdataiddict[tempid].ErrAbbr = ConvertString(line[3]);
+                                        }
+
+                                        
+                                    }//same time
+                                }
+                                else
+                                {
+                                    var tempdata = new BITestData();
+                                    tempdata.DataID = GetUniqKey();
+                                    tempdata.ProjectKey = vm.ProjectKey;
+                                    tempdata.ModuleSerialNum = ConvertString(line[0]);
+                                    tempdata.WhichTest = ConvertString(line[1]);
+                                    tempdata.ModuleType = ConvertString(line[2]);
+                                    tempdata.ErrAbbr = ConvertString(line[3]);
+                                    tempdata.TestTimeStamp = DateTime.Parse(ConvertString(line[4]));
+                                    tempdata.TestStation = ConvertString(line[5]);
+                                    tempdata.PN = ConvertString(line[6]);
+                                    tempdata.Wafer = ConvertString(line[7]);
+                                    tempdata.Waferpn = ConvertString(line[8]);
+
+                                    tempdataiddict.Add(tempid, tempdata);
+                                }
+                            }//end foreach
+
+                            foreach (var kv in tempdataiddict)
                             {
-                                var tempdata = new BITestData();
-                                tempdata.DataID = GetUniqKey();
-                                tempdata.ProjectKey = vm.ProjectKey;
-                                tempdata.ModuleSerialNum = ConvertString(line[0]);
-                                tempdata.WhichTest = ConvertString(line[1]);
-                                tempdata.ModuleType = ConvertString(line[2]);
-                                tempdata.ErrAbbr = ConvertString(line[3]);
-                                tempdata.TestTimeStamp = DateTime.Parse(ConvertString(line[4]));
-                                tempdata.TestStation = ConvertString(line[5]);
-                                tempdata.PN = ConvertString(line[6]);
-                                tempdata.Wafer = ConvertString(line[7]);
-                                tempdata.Waferpn = ConvertString(line[8]);
+                                kv.Value.StoreBIData();
+                            }//end foreach
 
-                                var tempdf = new BITestDataField();
-                                tempdf.DataID = tempdata.DataID;
-                                tempdf.ChannelNum = ConvertString(line[9]);
-                                tempdf.SLOPE = ConvertDouble(line[10]);
-                                tempdf.THOLD = ConvertDouble(line[11]);
-                                tempdf.PO_LD = ConvertDouble(line[12]);
-                                tempdf.PO_LD_18 = ConvertDouble(line[13]);
-                                tempdf.PO_LD_25 = ConvertDouble(line[14]);
-                                tempdf.PO_LD_127 = ConvertDouble(line[15]);
-                                tempdf.PO_Uniformity = ConvertDouble(line[16]);
-                                tempdf.Delta_SLOPE = ConvertDouble(line[17]);
-                                tempdf.Delta_THOLD = ConvertDouble(line[18]);
-                                tempdf.Delta_PO_LD = ConvertDouble(line[19]);
-                                tempdf.Delta_PO_LD_18 = ConvertDouble(line[20]);
-                                tempdf.Delta_PO_LD_25 = ConvertDouble(line[21]);
-                                tempdf.Delta_PO_LD_127 = ConvertDouble(line[22]);
-                                tempdf.Delta_PO_Uniformity = ConvertDouble(line[23]);
+                        }
 
-                                tempdata.DataFields.Add(tempdf);
-
-                                tempdataiddict.Add(tempid, tempdata);
-                            }
-                        }//end foreach
-
-                        foreach (var kv in tempdataiddict)
-                        {
-                            kv.Value.StoreBIData();
-                        }//end foreach
-
-                    }
-
-                BITestData.ResetUpdatePJLock(vm.ProjectKey);
+                    BITestData.ResetUpdatePJLock(vm.ProjectKey);
+                }
+                catch (Exception ex)
+                {
+                    BITestData.ResetUpdatePJLock(vm.ProjectKey);
+                }
             }
-            catch (Exception ex)
-            {
-                BITestData.ResetUpdatePJLock(vm.ProjectKey);
-            }
+
+
 
 
         }
@@ -226,276 +197,211 @@ namespace Prometheus.Models
 
         public static void UpdateProjectData(ProjectViewModels vm)
         {
-            try
+            var vtab = new List<string>();
+            vtab.Add("dbo.PRLL_VcselInfoSummary_2016");
+            vtab.Add("dbo.PRLL_VcselInfoSummary_2017");
+            foreach (var vt in vtab)
             {
-                if (vm.PNList.Count > 0)
-                    {
-                        var failurelist = new List<BITestData>();
-                        var failuredict = new Dictionary<string, bool>();
-                        var passlist = new List<BITestData>();
-
-                        var starttime = BITestData.RetrieveLatestTimeOfLocalBI(vm.ProjectKey);
-                        if (string.IsNullOrEmpty(starttime))
+                try
+                {
+                    if (vm.PNList.Count > 0)
                         {
-                            starttime = vm.StartDate.ToString();
+                            var failurelist = new List<BITestData>();
+                            var failuredict = new Dictionary<string, bool>();
+                            var passlist = new List<BITestData>();
+
+                            var starttime = BITestData.RetrieveLatestTimeOfLocalBI(vm.ProjectKey);
+                            if (string.IsNullOrEmpty(starttime))
+                            {
+                                starttime = vm.StartDate.ToString();
+                            }
+
+                            var sql = "select ModuleSerialNum,Step,ModuleType,ErrAbbr,TestTimeStamp,TestStation,ModulePartNum,wafer,waferpn from  "+vt+"(nolock) where wafer <> 'NULL' and waferpn  <> 'NULL' and ErrAbbr  <> 'NULL' and ModulePartNum in <PNCOND> and TestTimeStamp > '<TIMECOND>' order by TestTimeStamp Desc,ModuleSerialNum";
+                            var pncond = PNCondition(vm.PNList);
+
+                        if (string.IsNullOrEmpty(pncond))
+                        {
+                            return;
                         }
 
-                        var sql = "select ModuleSerialNum,Step,ModuleType,ErrAbbr,TestTimeStamp,TestStation,ModulePartNum,wafer,waferpn,ChannelNum,SLOPE,THOLD,PO_LD,PO_LD_18,PO_LD_25,PO_LD_127,PO_Uniformity,Delta_SLOPE,Delta_THOLD,Delta_PO_LD,Delta_PO_LD_18,Delta_PO_LD_25,Delta_PO_LD_127,Delta_PO_Uniformity from dbo.PRLL_VcselInfoSummary_2016(nolock) where wafer <> 'NULL' and waferpn  <> 'NULL' and ErrAbbr  <> 'NULL' and ModulePartNum in <PNCOND> and TestTimeStamp > '<TIMECOND>' order by TestTimeStamp Desc,ModuleSerialNum";
-                        var pncond = PNCondition(vm.PNList);
+                        sql = sql.Replace("<PNCOND>", pncond).Replace("<TIMECOND>", starttime);
 
-                    if (string.IsNullOrEmpty(pncond))
-                    {
-                        return;
-                    }
-
-                    sql = sql.Replace("<PNCOND>", pncond).Replace("<TIMECOND>", starttime);
-
-                        var tempdataiddict = new Dictionary<string, BITestData>();
-                        var dbret = DBUtility.ExePRLSqlWithRes(sql);
-                        foreach (var line in dbret)
-                        {
-                            var tempid = ConvertString(line[0]) + "_" + ConvertString(line[1]);
-                            if (tempdataiddict.ContainsKey(tempid))
+                            var tempdataiddict = new Dictionary<string, BITestData>();
+                            var dbret = DBUtility.ExePRLSqlWithRes(sql);
+                            foreach (var line in dbret)
                             {
-                                if (DateTime.Parse(ConvertString(line[4])) == tempdataiddict[tempid].TestTimeStamp)
+                                var tempid = ConvertString(line[0]) + "_" + ConvertString(line[1]);
+                                if (tempdataiddict.ContainsKey(tempid))
                                 {
-                                    if (string.Compare(ConvertString(line[3]), "Pass", true) != 0)
+                                    if (DateTime.Parse(ConvertString(line[4])) == tempdataiddict[tempid].TestTimeStamp)
                                     {
-                                        tempdataiddict[tempid].ErrAbbr = ConvertString(line[3]);
-
-                                        if (!failuredict.ContainsKey(tempdataiddict[tempid].ModuleSerialNum))
+                                        if (string.Compare(ConvertString(line[3]), "Pass", true) != 0)
                                         {
-                                            failuredict.Add(tempdataiddict[tempid].ModuleSerialNum, true);
-                                            failurelist.Add(tempdataiddict[tempid]);
-                                        }
+                                            tempdataiddict[tempid].ErrAbbr = ConvertString(line[3]);
+
+                                            if (!failuredict.ContainsKey(tempdataiddict[tempid].ModuleSerialNum))
+                                            {
+                                                failuredict.Add(tempdataiddict[tempid].ModuleSerialNum, true);
+                                                failurelist.Add(tempdataiddict[tempid]);
+                                            }
                                 
-                                    }
+                                        }
 
-                                    var tempdf = new BITestDataField();
-                                    tempdf.DataID = tempdataiddict[tempid].DataID;
-                                    tempdf.ChannelNum = ConvertString(line[9]);
-                                    tempdf.SLOPE = ConvertDouble(line[10]);
-                                    tempdf.THOLD = ConvertDouble(line[11]);
-                                    tempdf.PO_LD = ConvertDouble(line[12]);
-                                    tempdf.PO_LD_18 = ConvertDouble(line[13]);
-                                    tempdf.PO_LD_25 = ConvertDouble(line[14]);
-                                    tempdf.PO_LD_127 = ConvertDouble(line[15]);
-                                    tempdf.PO_Uniformity = ConvertDouble(line[16]);
-                                    tempdf.Delta_SLOPE = ConvertDouble(line[17]);
-                                    tempdf.Delta_THOLD = ConvertDouble(line[18]);
-                                    tempdf.Delta_PO_LD = ConvertDouble(line[19]);
-                                    tempdf.Delta_PO_LD_18 = ConvertDouble(line[20]);
-                                    tempdf.Delta_PO_LD_25 = ConvertDouble(line[21]);
-                                    tempdf.Delta_PO_LD_127 = ConvertDouble(line[22]);
-                                    tempdf.Delta_PO_Uniformity = ConvertDouble(line[23]);
-                                    tempdataiddict[tempid].DataFields.Add(tempdf);
-                                }//same time
-                            }
-                            else
-                            {
-                                var tempdata = new BITestData();
-                                tempdata.DataID = GetUniqKey();
-                                tempdata.ProjectKey = vm.ProjectKey;
-                                tempdata.ModuleSerialNum = ConvertString(line[0]);
-                                tempdata.WhichTest = ConvertString(line[1]);
-                                tempdata.ModuleType = ConvertString(line[2]);
-                                tempdata.ErrAbbr = ConvertString(line[3]);
-                                tempdata.TestTimeStamp = DateTime.Parse(ConvertString(line[4]));
-                                tempdata.TestStation = ConvertString(line[5]);
-                                tempdata.PN = ConvertString(line[6]);
-                                tempdata.Wafer = ConvertString(line[7]);
-                                tempdata.Waferpn = ConvertString(line[8]);
-
-                                var tempdf = new BITestDataField();
-                                tempdf.DataID = tempdata.DataID;
-                                tempdf.ChannelNum = ConvertString(line[9]);
-                                tempdf.SLOPE = ConvertDouble(line[10]);
-                                tempdf.THOLD = ConvertDouble(line[11]);
-                                tempdf.PO_LD = ConvertDouble(line[12]);
-                                tempdf.PO_LD_18 = ConvertDouble(line[13]);
-                                tempdf.PO_LD_25 = ConvertDouble(line[14]);
-                                tempdf.PO_LD_127 = ConvertDouble(line[15]);
-                                tempdf.PO_Uniformity = ConvertDouble(line[16]);
-                                tempdf.Delta_SLOPE = ConvertDouble(line[17]);
-                                tempdf.Delta_THOLD = ConvertDouble(line[18]);
-                                tempdf.Delta_PO_LD = ConvertDouble(line[19]);
-                                tempdf.Delta_PO_LD_18 = ConvertDouble(line[20]);
-                                tempdf.Delta_PO_LD_25 = ConvertDouble(line[21]);
-                                tempdf.Delta_PO_LD_127 = ConvertDouble(line[22]);
-                                tempdf.Delta_PO_Uniformity = ConvertDouble(line[23]);
-
-                                tempdata.DataFields.Add(tempdf);
-
-                                tempdataiddict.Add(tempid, tempdata);
-
-                                if (string.Compare(tempdata.ErrAbbr, "Pass", true) != 0)
-                                {
-                                    if (!failuredict.ContainsKey(tempdata.ModuleSerialNum))
-                                    {
-                                        failuredict.Add(tempdata.ModuleSerialNum, true);
-                                        failurelist.Add(tempdata);
-                                    }
-
+                                    }//same time
                                 }
                                 else
                                 {
-                                    passlist.Add(tempdata);
+                                    var tempdata = new BITestData();
+                                    tempdata.DataID = GetUniqKey();
+                                    tempdata.ProjectKey = vm.ProjectKey;
+                                    tempdata.ModuleSerialNum = ConvertString(line[0]);
+                                    tempdata.WhichTest = ConvertString(line[1]);
+                                    tempdata.ModuleType = ConvertString(line[2]);
+                                    tempdata.ErrAbbr = ConvertString(line[3]);
+                                    tempdata.TestTimeStamp = DateTime.Parse(ConvertString(line[4]));
+                                    tempdata.TestStation = ConvertString(line[5]);
+                                    tempdata.PN = ConvertString(line[6]);
+                                    tempdata.Wafer = ConvertString(line[7]);
+                                    tempdata.Waferpn = ConvertString(line[8]);
+
+                                    tempdataiddict.Add(tempid, tempdata);
+
+                                    if (string.Compare(tempdata.ErrAbbr, "Pass", true) != 0)
+                                    {
+                                        if (!failuredict.ContainsKey(tempdata.ModuleSerialNum))
+                                        {
+                                            failuredict.Add(tempdata.ModuleSerialNum, true);
+                                            failurelist.Add(tempdata);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        passlist.Add(tempdata);
+                                    }
                                 }
-                            }
-                        }//end foreach
+                            }//end foreach
 
-                        foreach (var kv in tempdataiddict)
-                        {
-                            kv.Value.StoreBIData();
-                        }//end foreach
-
-                        if (DateTime.Parse(starttime) != vm.StartDate)
-                        {
-                            CreateSystemIssues(failurelist);
-
-                            foreach (var item in passlist)
+                            foreach (var kv in tempdataiddict)
                             {
-                                IssueViewModels.CloseBIIssueAutomaticlly(item.ProjectKey, item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss"));
+                                kv.Value.StoreBIData();
+                            }//end foreach
+
+                            if (DateTime.Parse(starttime) != vm.StartDate)
+                            {
+                                CreateSystemIssues(failurelist);
+                                IssueViewModels.CloseBIIssueAutomaticlly(passlist);
                             }
                         }
-                    }
 
+                }
+                catch (Exception ex)
+                {
+                }
             }
-            catch (Exception ex)
-            {
-            }
+
+
 
         }
 
         public static void RetrievePjWaferAllData(ProjectViewModels vm)
         {
-            try
+            var vtab = new List<string>();
+            vtab.Add("dbo.PRLL_VcselInfoSummary_2016");
+            vtab.Add("dbo.PRLL_VcselInfoSummary_2017");
+            foreach (var vt in vtab)
             {
-                var wafers = BITestData.RetrieveAllWafer(vm.ProjectKey);
-                if (vm.PNList.Count > 0 && wafers.Count > 0)
+                try
                 {
-                    var failurelist = new List<BITestData>();
-                    var failuredict = new Dictionary<string, bool>();
-                    var passlist = new List<BITestData>();
-
-                    var starttime = vm.StartDate.ToString();
-
-                    var sql = "select ModuleSerialNum,Step,ModuleType,ErrAbbr,TestTimeStamp,TestStation,ModulePartNum,wafer,waferpn,ChannelNum,SLOPE,THOLD,PO_LD,PO_LD_18,PO_LD_25,PO_LD_127,PO_Uniformity,Delta_SLOPE,Delta_THOLD,Delta_PO_LD,Delta_PO_LD_18,Delta_PO_LD_25,Delta_PO_LD_127,Delta_PO_Uniformity from dbo.PRLL_VcselInfoSummary_2016(nolock) where wafer in <WAFERCOND> and waferpn  <> 'NULL' and ErrAbbr  <> 'NULL' and ModulePartNum in <PNCOND> and TestTimeStamp <= '<TIMECOND>' order by TestTimeStamp Desc,ModuleSerialNum";
-                    var pncond = PNCondition(vm.PNList);
-                    if (string.IsNullOrEmpty(pncond))
+                    var wafers = BITestData.RetrieveAllWafer(vm.ProjectKey);
+                    if (vm.PNList.Count > 0 && wafers.Count > 0)
                     {
-                        return;
-                    }
-                    var wafercond = "('";
-                    foreach (var w in wafers)
-                    {
-                        wafercond = wafercond + w + "','";
-                    }
-                    wafercond = wafercond.Substring(0, wafercond.Length - 2) + ")";
+                        var failurelist = new List<BITestData>();
+                        var failuredict = new Dictionary<string, bool>();
+                        var passlist = new List<BITestData>();
 
-                    sql = sql.Replace("<PNCOND>", pncond).Replace("<TIMECOND>", starttime).Replace("<WAFERCOND>", wafercond);
+                        var starttime = vm.StartDate.ToString();
 
-                    var dbret = DBUtility.ExePRLSqlWithRes(sql);
-                    if (dbret.Count > 0)
-                    {
-                        var bondeddatadict = BITestData.RetrieveAllDataIDASC(vm.ProjectKey);
-                        var tempdataiddict = new Dictionary<string, BITestData>();
-
-                        foreach (var line in dbret)
+                        var sql = "select ModuleSerialNum,Step,ModuleType,ErrAbbr,TestTimeStamp,TestStation,ModulePartNum,wafer,waferpn from  "+vt+"(nolock) where wafer in <WAFERCOND> and waferpn  <> 'NULL' and ErrAbbr  <> 'NULL' and ModulePartNum in <PNCOND> and TestTimeStamp <= '<TIMECOND>' order by TestTimeStamp Desc,ModuleSerialNum";
+                        var pncond = PNCondition(vm.PNList);
+                        if (string.IsNullOrEmpty(pncond))
                         {
-                            var tempid = ConvertString(line[0]) + "_" + ConvertString(line[1]);
+                            return;
+                        }
+                        var wafercond = "('";
+                        foreach (var w in wafers)
+                        {
+                            wafercond = wafercond + w + "','";
+                        }
+                        wafercond = wafercond.Substring(0, wafercond.Length - 2) + ")";
 
-                                if (!bondeddatadict.ContainsKey(tempid))
-                                {
-                                    if (tempdataiddict.ContainsKey(tempid))
+                        sql = sql.Replace("<PNCOND>", pncond).Replace("<TIMECOND>", starttime).Replace("<WAFERCOND>", wafercond);
+
+                        var dbret = DBUtility.ExePRLSqlWithRes(sql);
+                        if (dbret.Count > 0)
+                        {
+                            var bondeddatadict = BITestData.RetrieveAllDataIDASC(vm.ProjectKey);
+                            var tempdataiddict = new Dictionary<string, BITestData>();
+
+                            foreach (var line in dbret)
+                            {
+                                var tempid = ConvertString(line[0]) + "_" + ConvertString(line[1]);
+
+                                    if (!bondeddatadict.ContainsKey(tempid))
                                     {
-                                        if (DateTime.Parse(ConvertString(line[4])) == tempdataiddict[tempid].TestTimeStamp)
+                                        if (tempdataiddict.ContainsKey(tempid))
                                         {
-                                            if (string.Compare(ConvertString(line[3]), "Pass", true) != 0)
+                                            if (DateTime.Parse(ConvertString(line[4])) == tempdataiddict[tempid].TestTimeStamp)
                                             {
-                                                tempdataiddict[tempid].ErrAbbr = ConvertString(line[3]);
-
-                                                if (!failuredict.ContainsKey(tempdataiddict[tempid].ModuleSerialNum))
+                                                if (string.Compare(ConvertString(line[3]), "Pass", true) != 0)
                                                 {
-                                                    failuredict.Add(tempdataiddict[tempid].ModuleSerialNum, true);
-                                                    failurelist.Add(tempdataiddict[tempid]);
+                                                    tempdataiddict[tempid].ErrAbbr = ConvertString(line[3]);
+
+                                                    if (!failuredict.ContainsKey(tempdataiddict[tempid].ModuleSerialNum))
+                                                    {
+                                                        failuredict.Add(tempdataiddict[tempid].ModuleSerialNum, true);
+                                                        failurelist.Add(tempdataiddict[tempid]);
+                                                    }
+
                                                 }
 
-                                            }
+                                            }//same time
+                                        }
+                                        else
+                                        {
+                                            var tempdata = new BITestData();
+                                            tempdata.DataID = GetUniqKey();
+                                            tempdata.ProjectKey = vm.ProjectKey;
+                                            tempdata.ModuleSerialNum = ConvertString(line[0]);
+                                            tempdata.WhichTest = ConvertString(line[1]);
+                                            tempdata.ModuleType = ConvertString(line[2]);
+                                            tempdata.ErrAbbr = ConvertString(line[3]);
+                                            tempdata.TestTimeStamp = DateTime.Parse(ConvertString(line[4]));
+                                            tempdata.TestStation = ConvertString(line[5]);
+                                            tempdata.PN = ConvertString(line[6]);
+                                            tempdata.Wafer = ConvertString(line[7]);
+                                            tempdata.Waferpn = ConvertString(line[8]);
 
-                                            var tempdf = new BITestDataField();
-                                            tempdf.DataID = tempdataiddict[tempid].DataID;
-                                            tempdf.ChannelNum = ConvertString(line[9]);
-                                            tempdf.SLOPE = ConvertDouble(line[10]);
-                                            tempdf.THOLD = ConvertDouble(line[11]);
-                                            tempdf.PO_LD = ConvertDouble(line[12]);
-                                            tempdf.PO_LD_18 = ConvertDouble(line[13]);
-                                            tempdf.PO_LD_25 = ConvertDouble(line[14]);
-                                            tempdf.PO_LD_127 = ConvertDouble(line[15]);
-                                            tempdf.PO_Uniformity = ConvertDouble(line[16]);
-                                            tempdf.Delta_SLOPE = ConvertDouble(line[17]);
-                                            tempdf.Delta_THOLD = ConvertDouble(line[18]);
-                                            tempdf.Delta_PO_LD = ConvertDouble(line[19]);
-                                            tempdf.Delta_PO_LD_18 = ConvertDouble(line[20]);
-                                            tempdf.Delta_PO_LD_25 = ConvertDouble(line[21]);
-                                            tempdf.Delta_PO_LD_127 = ConvertDouble(line[22]);
-                                            tempdf.Delta_PO_Uniformity = ConvertDouble(line[23]);
-                                            tempdataiddict[tempid].DataFields.Add(tempdf);
-                                        }//same time
-                                    }
-                                    else
-                                    {
-                                        var tempdata = new BITestData();
-                                        tempdata.DataID = GetUniqKey();
-                                        tempdata.ProjectKey = vm.ProjectKey;
-                                        tempdata.ModuleSerialNum = ConvertString(line[0]);
-                                        tempdata.WhichTest = ConvertString(line[1]);
-                                        tempdata.ModuleType = ConvertString(line[2]);
-                                        tempdata.ErrAbbr = ConvertString(line[3]);
-                                        tempdata.TestTimeStamp = DateTime.Parse(ConvertString(line[4]));
-                                        tempdata.TestStation = ConvertString(line[5]);
-                                        tempdata.PN = ConvertString(line[6]);
-                                        tempdata.Wafer = ConvertString(line[7]);
-                                        tempdata.Waferpn = ConvertString(line[8]);
+                                            tempdataiddict.Add(tempid, tempdata);
 
-                                        var tempdf = new BITestDataField();
-                                        tempdf.DataID = tempdata.DataID;
-                                        tempdf.ChannelNum = ConvertString(line[9]);
-                                        tempdf.SLOPE = ConvertDouble(line[10]);
-                                        tempdf.THOLD = ConvertDouble(line[11]);
-                                        tempdf.PO_LD = ConvertDouble(line[12]);
-                                        tempdf.PO_LD_18 = ConvertDouble(line[13]);
-                                        tempdf.PO_LD_25 = ConvertDouble(line[14]);
-                                        tempdf.PO_LD_127 = ConvertDouble(line[15]);
-                                        tempdf.PO_Uniformity = ConvertDouble(line[16]);
-                                        tempdf.Delta_SLOPE = ConvertDouble(line[17]);
-                                        tempdf.Delta_THOLD = ConvertDouble(line[18]);
-                                        tempdf.Delta_PO_LD = ConvertDouble(line[19]);
-                                        tempdf.Delta_PO_LD_18 = ConvertDouble(line[20]);
-                                        tempdf.Delta_PO_LD_25 = ConvertDouble(line[21]);
-                                        tempdf.Delta_PO_LD_127 = ConvertDouble(line[22]);
-                                        tempdf.Delta_PO_Uniformity = ConvertDouble(line[23]);
+                                        }
+                                }//end if (!bondeddatadict.ContainsKey(tempid))
+                            }//end foreach
 
-                                        tempdata.DataFields.Add(tempdf);
+                            foreach (var kv in tempdataiddict)
+                            {
+                                kv.Value.StoreBIData();
+                            }//end foreach
 
-                                        tempdataiddict.Add(tempid, tempdata);
+                        }//end if (dbret.Count > 0)
+                    }//end if pn > 0
 
-                                    }
-                            }//end if (!bondeddatadict.ContainsKey(tempid))
-                        }//end foreach
-
-                        foreach (var kv in tempdataiddict)
-                        {
-                            kv.Value.StoreBIData();
-                        }//end foreach
-
-                    }//end if (dbret.Count > 0)
-                }//end if pn > 0
-
+                }
+                catch (Exception ex)
+                {
+                }
             }
-            catch (Exception ex)
-            {
-            }
+
+
 
         }
 

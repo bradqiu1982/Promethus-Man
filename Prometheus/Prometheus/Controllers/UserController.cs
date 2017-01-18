@@ -12,6 +12,7 @@ using Prometheus.Models;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
 using System.Threading;
+using System.IO;
 
 namespace Prometheus.Controllers
 {
@@ -849,6 +850,249 @@ namespace Prometheus.Controllers
             }
             
             return RedirectToAction("ILearn", "User");
+        }
+
+        public ActionResult IBLOG()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "IBLOG");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            var users = UserViewModels.RetrieveAllUser();
+            ViewBag.towholist = CreateSelectList(users);
+
+            var vm = UserBlogVM.RetrieveAllBlogDoc(updater);
+            return View(vm);
+        }
+
+        public ActionResult IBLogPush(string DOCKey, string ToWho)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            var vm = UserBlogVM.RetrieveBlogDoc(DOCKey);
+
+            var whoes = ToWho.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var w in whoes)
+            {
+                ShareDocVM.PushDoc(w.Trim().ToUpper(), "ALL",ShareDocType.BLOG, DOCKey,vm.Tag,vm.UserName,vm.CreateDate.ToString(), "");
+                ShareDocVM.SendPushDocEvent("a new document about " + vm.Tag, vm.DocURL, ToWho, w.Trim().ToUpper(), this);
+            }
+            return RedirectToAction("IBLOG", "User");
+        }
+
+        public ActionResult AddBlogDoc()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "AddBlogDoc");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            var tobechoosetags = new List<string>();
+            var usertag = UserBlogVM.RetrieveUserTag(updater);
+            if (!usertag.ToUpper().Contains("WeeklyReport".ToUpper()))
+            {
+                tobechoosetags.Add("WeeklyReport".ToUpper());
+            }
+            if (!usertag.ToUpper().Contains("Default".ToUpper()))
+            {
+                tobechoosetags.Add("Default".ToUpper());
+            }
+            var usertags = usertag.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+            if (usertags.Length > 0)
+            {
+                tobechoosetags.AddRange(usertags);
+            }
+            ViewBag.tobechoosetags = tobechoosetags;
+
+            return View();
+        }
+
+        private List<string> ReceiveRMAFiles()
+        {
+            var ret = new List<string>();
+
+            try
+            {
+                foreach (string fl in Request.Files)
+                {
+                    if (fl != null && Request.Files[fl].ContentLength > 0)
+                    {
+                        string fn = Path.GetFileName(Request.Files[fl].FileName)
+                            .Replace(" ", "_").Replace("#", "")
+                            .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                        string datestring = DateTime.Now.ToString("yyyyMMdd");
+                        string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+
+                        if (!Directory.Exists(imgdir))
+                        {
+                            Directory.CreateDirectory(imgdir);
+                        }
+
+                        fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
+                        Request.Files[fl].SaveAs(imgdir + fn);
+
+                        var url = "/userfiles/docs/" + datestring + "/" + fn;
+
+                        ret.Add(url);
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            { return ret; }
+
+            return ret;
+        }
+
+
+        [HttpPost, ActionName("AddBlogDoc")]
+        [ValidateAntiForgeryToken]
+        public ActionResult AddBlogDocPost()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            var tag = Request.Form["Tag"];
+            if (string.IsNullOrEmpty(tag))
+            {
+                tag = "Default;".ToUpper();
+            }
+
+            UserBlogVM.StoreUserTag(updater, tag);
+
+            if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
+            {
+                var urls = ReceiveRMAFiles();
+                var internalreportfile = Request.Form["attachmentupload"];
+                var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
+                    .Replace(" ", "_").Replace("#", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                var url = "";
+                foreach (var r in urls)
+                {
+                    if (r.Contains(originalname))
+                    {
+                        url = r;
+                        break;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(url))
+                {
+                    var blog = new UserBlogVM();
+                    blog.UserName = updater;
+                    blog.ContentType = UserBlogContentType.ATTACH;
+                    blog.Title = originalname + Path.GetExtension(internalreportfile);
+                    blog.Content = url;
+                    blog.Tag = tag;
+                    blog.StoreBlogDoc();
+                }
+            }//end if
+
+            if (!string.IsNullOrEmpty(Request.Form["docinputeditor"]))
+            {
+                var blog = new UserBlogVM();
+                blog.UserName = updater;
+                blog.ContentType = UserBlogContentType.COMMENT;
+                blog.Content = Server.HtmlDecode(Request.Form["docinputeditor"]);
+                blog.Tag = tag;
+                if (string.IsNullOrEmpty(Request.Form["DocTitle"]))
+                {
+                    var drycontent = System.Text.RegularExpressions.Regex.Replace(blog.Content.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
+                    blog.Title = drycontent.Substring(0, 45);
+                }
+                else
+                {
+                    blog.Title = Request.Form["DocTitle"];
+                }
+                blog.StoreBlogDoc();
+            }
+
+            return RedirectToAction("IBLOG", "User");
+        }
+
+
+        public ActionResult WebDoc(string DocKey)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "WebDoc");
+                ck.Add("dockey", DocKey);
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            if (!string.IsNullOrEmpty(DocKey))
+            {
+                var vm = UserBlogVM.RetrieveBlogDoc(DocKey);
+                return View(vm);
+            }
+            else
+            {
+                if (ckdict.ContainsKey("dockey") && !string.IsNullOrEmpty(ckdict["dockey"]))
+                {
+                    var vm = UserBlogVM.RetrieveBlogDoc(ckdict["dockey"]);
+                    return View(vm);
+                }
+            }
+
+            return RedirectToAction("IBLOG", "User");
+        }
+
+        [HttpPost, ActionName("WebDoc")]
+        [ValidateAntiForgeryToken]
+        public ActionResult WebDocPost()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            var dockey = Request.Form["DocKey"];
+
+            if (!string.IsNullOrEmpty(Request.Form["docinputeditor"]))
+            {
+                var com = new ErrorComments();
+                com.Comment = Server.HtmlDecode(Request.Form["docinputeditor"]);
+                if (!string.IsNullOrEmpty(com.Comment))
+                {
+                    ProjectErrorViewModels.StoreErrorComment(dockey, com.dbComment, PJERRORCOMMENTTYPE.Description, updater, DateTime.Now.ToString());
+                }
+            }
+
+            var vm = UserBlogVM.RetrieveBlogDoc(dockey);
+            return View(vm);
         }
 
     }

@@ -3931,17 +3931,16 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
-            //var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
-            //foreach (var pjkey in pjkeylist)
-            //{
-            //    try
-            //    {
-            //        ProjectTestData.PrePareATELatestData(pjkey);
-            //    }
-            //    catch (Exception ex)
-            //    { }
-            //}
-            ShareDocVM.MatchAllYesterdayDoc(this);
+            var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
+            foreach (var pjkey in pjkeylist)
+            {
+                try
+                {
+                    BITestData.PrePareLatestData(pjkey);
+                }
+                catch (Exception ex)
+                { }
+            }
             return View("HeartBeat");
         }
 

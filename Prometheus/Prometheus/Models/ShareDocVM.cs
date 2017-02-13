@@ -113,7 +113,7 @@ namespace Prometheus.Models
 
                 var toaddrs = new List<string>();
                 toaddrs.Add(towho);
-                EmailUtility.SendEmail("NPI Knowlege Share System", toaddrs, content);
+                EmailUtility.SendEmail("WUXI NPI System", toaddrs, content);
                 new System.Threading.ManualResetEvent(false).WaitOne(20);
             }
             catch (Exception ex)

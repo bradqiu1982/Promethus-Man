@@ -3670,7 +3670,7 @@ namespace Prometheus.Controllers
                     toaddrs.Add("Zhongxi.Yu@finisar.com");
                     toaddrs.Add("Zhijun.Chen@finisar.com");
                     //toaddrs.Add("brad.qiu@finisar.com");
-                    EmailUtility.SendEmail("VCSEL WAFER YIELD WARNING", toaddrs, content1 + "\r\nWafer SN File: " + validatestr);
+                    EmailUtility.SendEmail("WUXI NPI System - VCSEL WAFER YIELD WARNING", toaddrs, content1 + "\r\nWafer SN File: " + validatestr);
                     new System.Threading.ManualResetEvent(false).WaitOne(5000);
                 }
         }
@@ -3726,7 +3726,7 @@ namespace Prometheus.Controllers
 
                         var toaddrs = new List<string>();
                         toaddrs.Add(record.username);
-                        EmailUtility.SendEmail("Parallel NPI Trace Notice", toaddrs, content);
+                        EmailUtility.SendEmail("WUXI NPI System", toaddrs, content);
                         new System.Threading.ManualResetEvent(false).WaitOne(500);
                     }
                 }//end foreach
@@ -3762,7 +3762,7 @@ namespace Prometheus.Controllers
                             var toaddrs = new List<string>();
                             toaddrs.Add(item.Reporter);
                             toaddrs.Add(item.Assignee);
-                            EmailUtility.SendEmail("RMA Trace Notice", toaddrs, content);
+                            EmailUtility.SendEmail("WUXI NPI System", toaddrs, content);
                             new System.Threading.ManualResetEvent(false).WaitOne(300);
                     }
                 } catch (Exception ex) { }
@@ -3792,7 +3792,7 @@ namespace Prometheus.Controllers
                             var toaddrs = new List<string>();
                             toaddrs.Add(item.Reporter);
                             toaddrs.Add(item.Assignee);
-                            EmailUtility.SendEmail("RMA Trace Notice", toaddrs, content);
+                            EmailUtility.SendEmail("WUXI NPI System", toaddrs, content);
                             new System.Threading.ManualResetEvent(false).WaitOne(300);
                     }
                 } catch (Exception ex) { }
@@ -3827,7 +3827,7 @@ namespace Prometheus.Controllers
                     var toaddrs = new List<string>();
                     toaddrs.Add(item.Reporter);
                     toaddrs.Add(item.Assignee);
-                    EmailUtility.SendEmail("OBA Trace Notice", toaddrs, content);
+                    EmailUtility.SendEmail("WUXI NPI System", toaddrs, content);
                     new System.Threading.ManualResetEvent(false).WaitOne(300);
                 }
             }
@@ -4077,7 +4077,7 @@ namespace Prometheus.Controllers
             var toaddrs = new List<string>();
             toaddrs.AddRange(addrlist);
             toaddrs.Add(vm.Assignee);
-            EmailUtility.SendEmail("Parallel Project LYT", toaddrs, content);
+            EmailUtility.SendEmail("WUXI NPI System - Project LYT", toaddrs, content);
             IssueViewModels.UpdateLYT(vm.IssueKey);
             new System.Threading.ManualResetEvent(false).WaitOne(2000);
         }

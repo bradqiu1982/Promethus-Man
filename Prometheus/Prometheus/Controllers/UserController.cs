@@ -45,7 +45,7 @@ namespace Prometheus.Controllers
 
             var toaddrs = new List<string>();
             toaddrs.Add(username);
-            EmailUtility.SendEmail("NPI Website Active Link",toaddrs, validatestr);
+            EmailUtility.SendEmail("WUXI NPI System", toaddrs, validatestr);
         }
 
         [HttpPost, ActionName("RegisterUser")]
@@ -169,7 +169,7 @@ namespace Prometheus.Controllers
 
             var toaddrs = new List<string>();
             toaddrs.Add(username);
-            EmailUtility.SendEmail("NPI Website Active Link", toaddrs, validatestr);
+            EmailUtility.SendEmail("WUXI NPI System", toaddrs, validatestr);
             return RedirectToAction("ResetNoticeA");
         }
 
@@ -888,7 +888,7 @@ namespace Prometheus.Controllers
             foreach (var w in whoes)
             {
                 ShareDocVM.PushDoc(w.Trim().ToUpper(), "ALL",ShareDocType.BLOG, DOCKey,vm.Tag,vm.UserName,vm.CreateDate.ToString(), "");
-                ShareDocVM.SendPushDocEvent("a new document about " + vm.Tag, vm.DocURL, ToWho, w.Trim().ToUpper(), this);
+                ShareDocVM.SendPushDocEvent("a new document about " + vm.Tag, vm.DocURL, ToWho, updater.ToUpper(), this);
             }
             return RedirectToAction("IBLOG", "User");
         }

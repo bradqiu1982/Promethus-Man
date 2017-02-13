@@ -23,7 +23,7 @@ namespace Prometheus.Models
             try
             {
                 var message = new MailMessage();
-                message.From = new MailAddress("brad.qiu@finisar.com");
+                message.From = new MailAddress("WXNPI.Trace@finisar.com");
                 foreach (var item in tolist)
                 {
                     message.To.Add(item);
@@ -37,7 +37,7 @@ namespace Prometheus.Models
                 client.Timeout = 60000;
                 client.DeliveryMethod = SmtpDeliveryMethod.Network;
                 client.UseDefaultCredentials = false;
-                client.Credentials = new NetworkCredential("brad.qiu@finisar.com", "wangle@5321");
+                client.Credentials = new NetworkCredential("WXNPI.Trace@finisar.com", "abc@123");
 
                 ServicePointManager.ServerCertificateValidationCallback
                     = delegate (object s, X509Certificate certificate, X509Chain chain
@@ -65,11 +65,11 @@ namespace Prometheus.Models
             try
             {
                 MailDefinition md = new MailDefinition();
-                md.From = "brad.qiu@finisar.com";
+                md.From = "WXNPI.Trace@finisar.com";
                 md.Subject = title;
                 md.IsBodyHtml = true;
 
-                var message = md.CreateMailMessage("brad.qiu@finisar.com", new Dictionary<string, string>(), content, new System.Web.UI.Control());
+                var message = md.CreateMailMessage("WXNPI.Trace@finisar.com", new Dictionary<string, string>(), content, new System.Web.UI.Control());
                 //message.From = new MailAddress("brad.qiu@finisar.com");
                 //foreach (var item in tolist)
                 //{
@@ -84,7 +84,7 @@ namespace Prometheus.Models
                 client.Timeout = 60000;
                 client.DeliveryMethod = SmtpDeliveryMethod.Network;
                 client.UseDefaultCredentials = false;
-                client.Credentials = new NetworkCredential("brad.qiu@finisar.com", "wangle@4321");
+                client.Credentials = new NetworkCredential("WXNPI.Trace@finisar.com", "abc@123");
 
                 ServicePointManager.ServerCertificateValidationCallback
                     = delegate (object s, X509Certificate certificate, X509Chain chain

@@ -340,7 +340,18 @@ namespace Prometheus.Controllers
         public ActionResult UserCenter(string username,string month)
         {
             var ckdict = CookieUtility.UnpackCookie(this);
-            
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "UserCenter");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
 
             var usernm = "";
             if (!string.IsNullOrEmpty(username))

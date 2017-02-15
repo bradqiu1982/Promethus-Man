@@ -506,10 +506,29 @@ namespace Prometheus.Models
                 return ret;
             }
 
-            var fdatalist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, enddate, false);
+            var plist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, DateTime.Parse(enddate).AddYears(5).ToString(), false);
+
+            var fdatalist = new List<ProjectTestData>();
+            var enddatet = DateTime.Parse(enddate);
+            foreach (var item in plist)
+            {
+                if (enddatet >= item.TestTimeStamp)
+                {
+                    fdatalist.Add(item);
+                }
+            }
+
+            //var fdatalist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, enddate, false);
             RetrieveRealTimeYield(ret, fdatalist, pvm);
 
-            var tplist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, enddate, true);
+            var tplist = new List<ProjectTestData>();
+            var datacount = fdatalist.Count - 1;
+            for (int idx = datacount; idx >= 0; idx--)
+            {
+                tplist.Add(fdatalist[idx]);
+            }
+
+            //var tplist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, enddate, true);
 
             var snstationdict = ProjectTestData.RetrieveSNBeforeDateWithStation(pjkey, startdate);
             var sndict = new Dictionary<string, bool>();
@@ -524,7 +543,7 @@ namespace Prometheus.Models
             }
 
 
-            //var snlist1 = ProjectTestData.RetrieveSNBeforeDate(pjkey, startdate);
+            //var sndict = ProjectTestData.RetrieveSNBeforeDate(pjkey, startdate);
             var validatedict = new Dictionary<string, bool>();
 
             foreach (var item in tplist)
@@ -538,7 +557,7 @@ namespace Prometheus.Models
                 }
             }
 
-            var plist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate,DateTime.Parse(enddate).AddYears(5).ToString(), false);
+            //var plist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate,DateTime.Parse(enddate).AddYears(5).ToString(), false);
             var filteredPjData2 = new List<ProjectTestData>();
             foreach (var item in plist)
             {
@@ -593,9 +612,9 @@ namespace Prometheus.Models
             var  ldate = RetrieveDateSpanByWeek(pvm.StartDate.ToString(), DateTime.Now.ToString());
 
             var startidx = 0;
-            if (ldate.Count > 28)
+            if (ldate.Count > 14)
             {
-                startidx = ldate.Count - 28;
+                startidx = ldate.Count - 14;
             }
 
             for(int idx  = startidx; idx < ldate.Count -1;idx++)

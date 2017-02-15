@@ -24,6 +24,15 @@ namespace Prometheus.Models
             PN = p;
         }
 
+        public ProjectTestData(string pk, string sn, string wtest, string err, string testtime)
+        {
+            ProjectKey = pk;
+            ModuleSerialNum = sn;
+            WhichTest = wtest;
+            ErrAbbr = err;
+            TestTimeStamp = DateTime.Parse(testtime);
+        }
+
         public string ProjectKey { set; get; }
         public string DataID { set; get; }
         public string ModuleSerialNum { set; get; }
@@ -206,11 +215,11 @@ namespace Prometheus.Models
             var sql = "";
             if (firstyield)
             {
-                sql = "select ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN from ProjectTestData where ProjectKey = '<ProjectKey>' and TestTimeStamp > '<StartDate>' and TestTimeStamp < '<EndDate>' order by ModuleSerialNum,TestTimeStamp ASC";
+                sql = "select ModuleSerialNum,WhichTest,ErrAbbr,TestTimeStamp from ProjectTestData where ProjectKey = '<ProjectKey>' and TestTimeStamp > '<StartDate>' and TestTimeStamp < '<EndDate>' order by ModuleSerialNum,TestTimeStamp ASC";
             }
             else
             {
-                sql = "select ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN from ProjectTestData where ProjectKey = '<ProjectKey>' and TestTimeStamp > '<StartDate>' and TestTimeStamp < '<EndDate>' order by ModuleSerialNum,TestTimeStamp DESC";
+                sql = "select ModuleSerialNum,WhichTest,ErrAbbr,TestTimeStamp from ProjectTestData where ProjectKey = '<ProjectKey>' and TestTimeStamp > '<StartDate>' and TestTimeStamp < '<EndDate>' order by ModuleSerialNum,TestTimeStamp DESC";
             }
 
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<StartDate>", startdate).Replace("<EndDate>", enddate);
@@ -218,9 +227,9 @@ namespace Prometheus.Models
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             foreach (var item in dbret)
             {
-                var tempdata = new ProjectTestData(Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])
-                    , Convert.ToString(item[3]), Convert.ToString(item[4]), Convert.ToString(item[5])
-                    , Convert.ToString(item[6]), Convert.ToString(item[7]), Convert.ToString(item[8]));
+                //public ProjectTestData(string pk, string sn, string wtest, string err, string testtime)
+                var tempdata = new ProjectTestData(projectkey,Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])
+                    , Convert.ToString(item[3]));
                 ret.Add(tempdata);
             }
             return ret;
@@ -247,7 +256,7 @@ namespace Prometheus.Models
         public static List<ProjectTestData> RetrieveProjectTestData(string DataID)
         {
             var ret = new List<ProjectTestData>();
-            var sql = "select  ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN from ProjectTestData where DataID = '<DataID>' order by ErrAbbr,TestTimeStamp DESC";
+            var sql = "select  ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN from ProjectTestData where DataID = '<DataID>'";
             sql = sql.Replace("<DataID>", DataID);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             foreach (var item in dbret)

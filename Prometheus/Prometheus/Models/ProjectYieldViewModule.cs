@@ -510,12 +510,26 @@ namespace Prometheus.Models
             RetrieveRealTimeYield(ret, fdatalist, pvm);
 
             var tplist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, enddate, true);
-            var snlist = ProjectTestData.RetrieveSNBeforeDate(pjkey, startdate);
+
+            var snstationdict = ProjectTestData.RetrieveSNBeforeDateWithStation(pjkey, startdate);
+            var sndict = new Dictionary<string, bool>();
+            foreach (var kvpair in snstationdict)
+            {
+                var endindex = kvpair.Key.LastIndexOf('-');
+                var sn = kvpair.Key.Substring(0, endindex);
+                if (!sndict.ContainsKey(sn))
+                {
+                    sndict.Add(sn, true);
+                }
+            }
+
+
+            //var snlist1 = ProjectTestData.RetrieveSNBeforeDate(pjkey, startdate);
             var validatedict = new Dictionary<string, bool>();
 
             foreach (var item in tplist)
             {
-                if (!snlist.ContainsKey(item.ModuleSerialNum))
+                if (!sndict.ContainsKey(item.ModuleSerialNum))
                 {
                     if (!validatedict.ContainsKey(item.ModuleSerialNum))
                     {
@@ -537,13 +551,13 @@ namespace Prometheus.Models
 
 
             //plist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, enddate, true);
-            snlist = ProjectTestData.RetrieveSNBeforeDateWithStation(pjkey, startdate);
+            //snlist = ProjectTestData.RetrieveSNBeforeDateWithStation(pjkey, startdate);
             validatedict = new Dictionary<string, bool>();
             var filteredPjData = new List<ProjectTestData>();
 
             foreach (var item in tplist)
             {
-                if (!snlist.ContainsKey(item.ModuleSerialNum+"-"+item.WhichTest))
+                if (!snstationdict.ContainsKey(item.ModuleSerialNum+"-"+item.WhichTest))
                 {
                     filteredPjData.Add(item);
                     if (!validatedict.ContainsKey(item.ModuleSerialNum))

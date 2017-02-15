@@ -118,6 +118,9 @@ namespace Prometheus.Models
 
         public static bool ExeLocalSqlNoRes(string sql)
         {
+            // var now = DateTime.Now;
+            //var msec1 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
+
             var conn = GetLocalConnector();
             if (conn == null)
                 return false;
@@ -129,6 +132,15 @@ namespace Prometheus.Models
                 command.CommandText = sql;
                 command.ExecuteNonQuery();
                 CloseConnector(conn);
+
+                //now = DateTime.Now;
+                //var msec2 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
+                //if ((msec2 - msec1) > 40)
+                //{
+                //    logthdinfo("no res sql: " + sql);
+                //    logthdinfo("no res query end: " + " spend " + (msec2 - msec1).ToString());
+                //}
+
                 return true;
             }
             catch (SqlException ex)
@@ -191,6 +203,11 @@ namespace Prometheus.Models
 
         public static List<List<object>> ExeLocalSqlWithRes( string sql)
         {
+           
+            //var now = DateTime.Now;
+            //var msec1 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
+            
+
             var ret = new List<List<object>>();
             var conn = GetLocalConnector();
             if (conn == null)
@@ -219,6 +236,16 @@ namespace Prometheus.Models
 
                 sqlreader.Close();
                 CloseConnector(conn);
+
+                //now = DateTime.Now;
+                //var msec2 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
+                //if ((msec2 - msec1) > 40)
+                //{
+                //    logthdinfo("res sql: " + sql);
+                //    logthdinfo("res query end: count " + ret.Count.ToString() + " spend " + (msec2 - msec1).ToString());
+                //}
+                    
+
                 return ret;
             }
             catch (SqlException ex)

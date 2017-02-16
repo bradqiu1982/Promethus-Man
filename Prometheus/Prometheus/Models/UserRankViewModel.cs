@@ -18,7 +18,7 @@ namespace Prometheus.Models
         {
             var sql = "select TotalRank from UserTable where UserName = '<UserName>'";
             sql = sql.Replace("<UserName>", username);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
             {
                 var temprank = 0;
@@ -38,7 +38,7 @@ namespace Prometheus.Models
 
             var sql = "select Rank from UserRank where UserName = '<UserName>' and UpdateDate = '<UpdateDate>'";
             sql = sql.Replace("<UserName>", username).Replace("<UpdateDate>", updatetime);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
             {
                 var temprank = 0;
@@ -68,7 +68,7 @@ namespace Prometheus.Models
         {
             var sql = "select TotalRank from UserTable where UserName = '<UserName>'";
             sql = sql.Replace("<UserName>", username);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
             {
                 var temprank = 0;
@@ -97,7 +97,7 @@ namespace Prometheus.Models
                     .Replace("<UpdateDate1>", temptime.ToString("yyyy-MM-dd") + " 06:30:00")
                     .Replace("<UpdateDate2>", temptime.ToString("yyyy-MM-dd") + " 08:30:00");
 
-                var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+                var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
                 if (dbret.Count > 0)
                 {
                     var temprank = new TimeRank();

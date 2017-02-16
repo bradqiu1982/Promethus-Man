@@ -648,7 +648,7 @@ namespace Prometheus.Models
         {
             var sql = "select FinisarDMR,OBAFailureRate,MaterialDisposition,ModuleSN,FVCode,APVal1 from IssueOBA where IssueKey = '<IssueKey>'";
             sql = sql.Replace("<IssueKey>", IssueKey);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
             {
                 FinisarDMR = Convert.ToString(dbret[0][0]);
@@ -664,7 +664,7 @@ namespace Prometheus.Models
         {
             var sql = "select APVal1,APVal2,APVal3,APVal4 from IssueAttribute where IssueKey = '<IssueKey>'";
             sql = sql.Replace("<IssueKey>", IssueKey);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
             {
                 RMAFailureCode = Convert.ToString(dbret[0][0]);
@@ -688,7 +688,7 @@ namespace Prometheus.Models
         {
             var sql = "select FinisarRMA,FinisarModel,ECustomer,CRMANUM,CReport,ModuleSN,RMAFailureCode,FVCode from IssueRMA where IssueKey = '<IssueKey>'";
             sql = sql.Replace("<IssueKey>", IssueKey);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
             {
                 FinisarRMA = Convert.ToString(dbret[0][0]);
@@ -802,7 +802,7 @@ namespace Prometheus.Models
             var csql = "select Attachment from IssueAttachment where IssueKey = '<IssueKey>' order by UpdateTime ASC";
             csql = csql.Replace("<IssueKey>", issuekey);
 
-            var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
+            var cdbret = DBUtility.ExeLocalSqlWithRes(csql,null);
             foreach (var r in cdbret)
             {
                 ret.Add(Convert.ToString(r[0]));
@@ -904,7 +904,7 @@ namespace Prometheus.Models
         {
             var sql = "select AlertEmailUpdateDate from Issue where IssueKey = '<IssueKey>'";
             sql = sql.Replace("<IssueKey>", issuekey);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
             {
                 return Convert.ToString(dbret[0][0]);
@@ -925,7 +925,7 @@ namespace Prometheus.Models
             var ret = new List<IssueViewModels>();
             var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and ParentIssueKey = '<ParentIssueKey>'";
             sql = sql.Replace("<ParentIssueKey>", parentkey);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
             {
                 var tempvm = new IssueViewModels(Convert.ToString(line[0])
@@ -942,7 +942,7 @@ namespace Prometheus.Models
                 //var csql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
                 //csql = csql.Replace("<IssueKey>", tempvm.IssueKey);
 
-                //var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
+                //var cdbret = DBUtility.ExeLocalSqlWithRes(csql,null);
                 //foreach (var r in cdbret)
                 //{
                 //    var tempcomment = new IssueComments();
@@ -964,7 +964,7 @@ namespace Prometheus.Models
         {
             var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples,APVal2,ErrAbbr from Issue where APVal1 <> 'delete' and IssueKey = '<IssueKey>'";
             sql = sql.Replace("<IssueKey>", issuekey);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
             {
                 var ret = new IssueViewModels(Convert.ToString(dbret[0][0])
@@ -1029,7 +1029,7 @@ namespace Prometheus.Models
             sql = sql.Replace("<ProjectKey>", pjkey).Replace("<cond>", cond).Replace("<topnum>", Convert.ToString(topnum))
                     .Replace("<IssueType>", ISSUETP.NPIPROC);
 
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach(var line in dbret)
             {
                 var ret = new IssueViewModels(Convert.ToString(line[0])
@@ -1044,7 +1044,7 @@ namespace Prometheus.Models
                 //var tempclist = new List<IssueComments>();
                 //sql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
                 //sql = sql.Replace("<IssueKey>", ret.IssueKey);
-                //var cret = DBUtility.ExeLocalSqlWithRes(sql);
+                //var cret = DBUtility.ExeLocalSqlWithRes(sql,null);
                 //foreach (var r in cret)
                 //{
                 //    var tempcomment = new IssueComments();
@@ -1077,7 +1077,7 @@ namespace Prometheus.Models
             sql = sql.Replace("<ModuleSerialNum>", SN).Replace("<cond>", cond).Replace("<whichtest>", whichtest).Replace("<ProjectKey>", pjkey)
                     .Replace("<IssueType1>", ISSUETP.NPIPROC).Replace("<IssueType2>", ISSUETP.RMA);
 
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
             {
                 var ret = new IssueViewModels(Convert.ToString(line[0])
@@ -1105,7 +1105,7 @@ namespace Prometheus.Models
             sql = sql.Replace("<ModuleSerialNum>", SN).Replace("<cond>", cond).Replace("<DATESTR>", datestr).Replace("<ProjectKey>", pjkey)
                     .Replace("<IssueType1>", ISSUETP.NPIPROC).Replace("<IssueType2>", ISSUETP.RMA);
 
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
             {
                 var ret = new IssueViewModels(Convert.ToString(line[0])
@@ -1135,7 +1135,7 @@ namespace Prometheus.Models
 
             //.Replace("<BICond>", " @Burn-In Step ")
 
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
             {
                 if (Convert.ToString(line[0]).Contains("@Burn-In Step"))
@@ -1163,7 +1163,7 @@ namespace Prometheus.Models
             sql = sql.Replace("<ModuleSerialNum>", SN).Replace("<BICond>", " @Burn-In Step ").Replace("<cond>", cond).Replace("<ProjectKey>", pjkey)
                     .Replace("<IssueType1>", ISSUETP.NPIPROC).Replace("<IssueType2>", ISSUETP.RMA);
 
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
             {
                 var ret = new IssueViewModels(Convert.ToString(line[0])
@@ -1191,7 +1191,7 @@ namespace Prometheus.Models
             sql = sql.Replace("<ModuleSerialNum>", SN).Replace("<BICond>", " @Burn-In Step").Replace("<cond>", cond).Replace("<ProjectKey>", pjkey).Replace("<DATESTR>", datestr)
                     .Replace("<IssueType1>", ISSUETP.NPIPROC).Replace("<IssueType2>", ISSUETP.RMA);
 
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
             {
                 var ret = new IssueViewModels(Convert.ToString(line[0])
@@ -1231,7 +1231,7 @@ namespace Prometheus.Models
 
             var sql = "select IssueKey from Issue where APVal1 <> 'delete' and  ParentIssueKey = '' and  ProjectKey = '<ProjectKey>' and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType>'";
             sql = sql.Replace("<ProjectKey>", pjkey).Replace("<cond>", cond).Replace("<IssueType>", ISSUETP.NPIPROC);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             return dbret.Count;
         }
 
@@ -1267,7 +1267,7 @@ namespace Prometheus.Models
                 .Replace("<IssueType1>", ISSUETP.NPIPROC).Replace("<IssueType2>", ISSUETP.RMA)
                 .Replace("<IssueType3>", ISSUETP.OBA).Replace("<IssueType4>", ISSUETP.Quality);
 
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)
             {
@@ -1306,7 +1306,7 @@ namespace Prometheus.Models
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<cond>", cond)
                 .Replace("<IssueType1>", ISSUETP.NPIPROC).Replace("<IssueType2>", ISSUETP.RMA)
                 .Replace("<IssueType3>", ISSUETP.OBA).Replace("<IssueType4>", ISSUETP.Quality);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             return dbret.Count;
         }
 
@@ -1314,7 +1314,7 @@ namespace Prometheus.Models
         {
             var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and  ParentIssueKey = '' and IssueType <> '<IssueType>' and ReportDate > '<ReportDate>' order by ReportDate ASC";
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<ReportDate>", startdate).Replace("<IssueType>", ISSUETP.NPIPROC);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)
             {
@@ -1335,7 +1335,7 @@ namespace Prometheus.Models
         {
             var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and  ParentIssueKey = '' and IssueType <> '<IssueType>' and ResolvedDate > '<ResolvedDate>' order by ResolvedDate ASC";
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<ResolvedDate>", startdate).Replace("<IssueType>", ISSUETP.NPIPROC);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)
             {
@@ -1357,7 +1357,7 @@ namespace Prometheus.Models
         {
             var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and Resolution <> '<Resolution>' and  Assignee = '<Assignee>' and  ParentIssueKey = '' and IssueType <> '<IssueType>' and ReportDate > '<ReportDate>' order by ReportDate ASC";
             sql = sql.Replace("<Assignee>", user).Replace("<ReportDate>", startdate).Replace("<IssueType>", ISSUETP.NPIPROC).Replace("<Resolution>",Resolute.AutoClose);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)
             {
@@ -1414,7 +1414,7 @@ namespace Prometheus.Models
                 var tempclist = new List<IssueComments>();
                 var csql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
                 csql = csql.Replace("<IssueKey>", IssueKey);
-                var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
+                var cdbret = DBUtility.ExeLocalSqlWithRes(csql,null);
                 foreach (var r in cdbret)
                 {
                     var tempcomment = new IssueComments();
@@ -1434,7 +1434,7 @@ namespace Prometheus.Models
 
             var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  Assignee = '<Assignee>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType <> '<IssueType>' and ReportDate > '<ReportDate>' order by ReportDate ASC";
             sql = sql.Replace("<Assignee>", user).Replace("<cond>", cond).Replace("<ReportDate>", startdate).Replace("<IssueType>", ISSUETP.NPIPROC);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)
             {
@@ -1459,7 +1459,7 @@ namespace Prometheus.Models
 
             var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  Assignee = '<Assignee>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType <> '<IssueType>' and ReportDate > '<ReportDate>' order by ReportDate ASC";
             sql = sql.Replace("<Assignee>", user).Replace("<cond>", cond).Replace("<ReportDate>", startdate).Replace("<IssueType>", ISSUETP.NPIPROC);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)
             {
@@ -1482,7 +1482,7 @@ namespace Prometheus.Models
         {
             var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and Resolution <> '<Resolution>' and  Assignee = '<Assignee>' and  ParentIssueKey = '' and IssueType <> '<IssueType>' and ResolvedDate > '<ResolvedDate>' order by ResolvedDate ASC";
             sql = sql.Replace("<Assignee>", user.ToUpper()).Replace("<ResolvedDate>", startdate).Replace("<IssueType>", ISSUETP.NPIPROC).Replace("<Resolution>", Resolute.AutoClose);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)
             {
@@ -1552,7 +1552,7 @@ namespace Prometheus.Models
 
         //    var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples,APVal2 from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType = '<IssueType>' order by ReportDate DESC";
         //    sql = sql.Replace("<ProjectKey>", projectkey).Replace("<cond>", cond).Replace("<IssueType>", ISSUETP.RMA);
-        //    var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+        //    var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
         //    var ret = new List<IssueViewModels>();
         //    foreach (var line in dbret)
         //    {
@@ -1596,7 +1596,7 @@ namespace Prometheus.Models
         //        sql = sql.Replace("<ProjectKey>", projectkey).Replace("<IssueType>", ISSUETP.RMA).Replace("<StartDate>", StartDate).Replace("<EndDate>", DateTime.Parse(EndDate).AddDays(1).ToString());
         //    }
 
-        //    var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+        //    var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
         //    var ret = new List<IssueViewModels>();
         //    foreach (var line in dbret)
         //    {
@@ -1636,7 +1636,7 @@ namespace Prometheus.Models
         //        sql = sql.Replace("<IssueType>", ISSUETP.RMA).Replace("<StartDate>", StartDate).Replace("<EndDate>", DateTime.Parse(EndDate).AddDays(1).ToString());
         //    }
 
-        //    var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+        //    var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
         //    var ret = new List<IssueViewModels>();
         //    foreach (var line in dbret)
         //    {
@@ -1685,7 +1685,7 @@ namespace Prometheus.Models
 
             var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples,APVal2 from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType = '<IssueType>' order by DueDate DESC";
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<cond>", cond).Replace("<IssueType>", issuetype);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)
             {
@@ -1751,7 +1751,7 @@ namespace Prometheus.Models
                 }
             }
 
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)
             {
@@ -1813,7 +1813,7 @@ namespace Prometheus.Models
                 }
             }
 
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)
             {
@@ -1871,7 +1871,7 @@ namespace Prometheus.Models
 
             var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples,AlertEmailUpdateDate from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType = '<IssueType>' and DueDate >= '<stattime>' and DueDate <= '<endtime>' ";
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<cond>", cond).Replace("<IssueType>", ISSUETP.RMA).Replace("<stattime>", stattime).Replace("<endtime>", endtime);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)
             {
@@ -1908,7 +1908,7 @@ namespace Prometheus.Models
 
             var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples,AlertEmailUpdateDate from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType = '<IssueType>' and DueDate >= '<stattime>' and DueDate <= '<endtime>' ";
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<cond>", cond).Replace("<IssueType>", ISSUETP.OBA).Replace("<stattime>", stattime).Replace("<endtime>", endtime);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)
             {
@@ -1954,7 +1954,7 @@ namespace Prometheus.Models
 
             var sql = "select IssueKey from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType = '<IssueType>' order by ReportDate DESC";
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<cond>", cond).Replace("<IssueType>", ISSUETP.RMA);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             return dbret.Count;
         }
 
@@ -1981,7 +1981,7 @@ namespace Prometheus.Models
 
             var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  Assignee = '<Assignee>' and Resolution in <cond> and IssueType <> '<IssueType1>' and  Reporter <> 'System' order by ReportDate DESC";
             sql = sql.Replace("<Assignee>", assignee).Replace("<topnum>", Convert.ToString(topnum)).Replace("<cond>", cond).Replace("<IssueType1>", ISSUETP.NPIPROC);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)
             {
@@ -2018,7 +2018,7 @@ namespace Prometheus.Models
 
             var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  Assignee = '<Assignee>' and Resolution in <cond> order by ReportDate DESC";
             sql = sql.Replace("<Assignee>", assignee).Replace("<topnum>", Convert.ToString(topnum)).Replace("<cond>", cond).Replace("<IssueType>", ISSUETP.Bug);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)
             {
@@ -2038,7 +2038,7 @@ namespace Prometheus.Models
         {
             var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and IssueType <> '<IssueType>' and  (Creator = '<Creator>' or Reporter = '<Creator>') and ParentIssueKey = '' order by ReportDate DESC";
             sql = sql.Replace("<Creator>", creator).Replace("<topnum>", Convert.ToString(topnum)).Replace("<IssueType>", ISSUETP.NPIPROC);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)
             {
@@ -2060,7 +2060,7 @@ namespace Prometheus.Models
         {
             var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and ParentIssueKey = '' and IssueType = '<IssueType>' order by DueDate ASC";
             sql = sql.Replace("<ProjectKey>", pjkey).Replace("<IssueType>", Convert.ToString(ISSUETP.NPIPROC));
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)
             {
@@ -2170,7 +2170,7 @@ namespace Prometheus.Models
 
             sql = sql.Replace("<topnum>", Convert.ToString(topnum)).Replace("<cond>", cond);
 
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)
             {
@@ -2190,7 +2190,7 @@ namespace Prometheus.Models
         {
             var csql = "select Attachment from IssueAttachment where IssueKey = '<IssueKey>' and Attachment = '<cond>'";
             csql = csql.Replace("<IssueKey>", issuekey).Replace("<cond>", cond);
-            var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
+            var cdbret = DBUtility.ExeLocalSqlWithRes(csql,null);
             if (cdbret.Count > 0 && cdbret.Count < 3)
             {
                 csql = "delete from IssueAttachment where IssueKey = '<IssueKey>' and Attachment = '<cond>'";
@@ -2203,7 +2203,7 @@ namespace Prometheus.Models
         {
             var csql = "select Comment from IssueComments where IssueKey = '<IssueKey>' and Comment = '<cond>'";
             csql = csql.Replace("<IssueKey>", issuekey).Replace("<cond>", cond);
-            var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
+            var cdbret = DBUtility.ExeLocalSqlWithRes(csql,null);
             if (cdbret.Count > 0 && cdbret.Count < 3)
             {
                 csql = "delete from IssueComments where IssueKey = '<IssueKey>' and Comment = '<cond>'";
@@ -2228,7 +2228,7 @@ namespace Prometheus.Models
         {
             var csql = "select RootCause from BIROOTCAUSE where ProjectKey = '<ProjectKey>' and ModuleSN = '<ModuleSN>'";
             csql = csql.Replace("<ProjectKey>", pjkey).Replace("<ModuleSN>", sn);
-            var dbret = DBUtility.ExeLocalSqlWithRes(csql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(csql,null);
             if (dbret.Count > 0)
             {
                 return Convert.ToString(dbret[0][0]);
@@ -2251,7 +2251,7 @@ namespace Prometheus.Models
             var ret =  new Dictionary<string, string>();
             var csql = "select ModuleSN,RootCause from BIROOTCAUSE where ProjectKey = '<ProjectKey>'";
             csql = csql.Replace("<ProjectKey>", pjkey);
-            var dbret = DBUtility.ExeLocalSqlWithRes(csql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(csql,null);
             foreach (var line in dbret)
             {
                 var sn = Convert.ToString(line[0]);

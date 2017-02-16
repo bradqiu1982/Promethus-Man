@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Caching;
 
 namespace Prometheus.Models
 {
@@ -180,7 +181,7 @@ namespace Prometheus.Models
         {
             var sql = "select top 1 TestTimeStamp from ProjectTestData where ProjectKey = '<ProjectKey>' order by TestTimeStamp DESC";
             sql = sql.Replace("<ProjectKey>", projectkey);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
             {
                 return Convert.ToString(dbret[0][0]);
@@ -196,7 +197,7 @@ namespace Prometheus.Models
             var ret = new List<ProjectTestData>();
             var sql = "select top <topnum> ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN from ProjectTestData where ProjectKey = '<ProjectKey>' order by TestTimeStamp DESC";
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<topnum>", Convert.ToString(topnum));
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var item in dbret)
             {
                 var tempdata = new ProjectTestData(Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])
@@ -207,7 +208,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<ProjectTestData> RetrieveProjectTestData(string projectkey,string startdate,string enddate,bool firstyield)
+        public static List<ProjectTestData> RetrieveProjectTestData(string projectkey,string startdate,string enddate,bool firstyield,Cache mycache)
         {
             //ProjectTestData.PrePareLatestData(projectkey);
 
@@ -224,7 +225,7 @@ namespace Prometheus.Models
 
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<StartDate>", startdate).Replace("<EndDate>", enddate);
 
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, mycache);
             foreach (var item in dbret)
             {
                 //public ProjectTestData(string pk, string sn, string wtest, string err, string testtime)
@@ -242,7 +243,7 @@ namespace Prometheus.Models
             var ret = new List<ProjectTestData>();
             var sql = "select top <topnum> ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN from ProjectTestData where ProjectKey = '<ProjectKey>' and ErrAbbr <> 'PASS' order by ErrAbbr,TestTimeStamp DESC";
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<topnum>", Convert.ToString(topnum));
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var item in dbret)
             {
                 var tempdata = new ProjectTestData(Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])
@@ -258,7 +259,7 @@ namespace Prometheus.Models
             var ret = new List<ProjectTestData>();
             var sql = "select  ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN from ProjectTestData where DataID = '<DataID>'";
             sql = sql.Replace("<DataID>", DataID);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var item in dbret)
             {
                 var tempdata = new ProjectTestData(Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])
@@ -274,7 +275,7 @@ namespace Prometheus.Models
             var ret = new List<string>();
             var sql = "select DataID from ProjectTestData where ProjectKey = '<ProjectKey>' and ErrAbbr <> 'PASS' order by ErrAbbr,TestTimeStamp DESC";
             sql = sql.Replace("<ProjectKey>", projectkey);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var item in dbret)
             {
                 ret.Add(Convert.ToString(item[0]));
@@ -289,7 +290,7 @@ namespace Prometheus.Models
             var ret = new List<ProjectTestData>();
             var sql = "select top <topnum> ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN from ProjectTestData where ProjectKey = '<ProjectKey>' and ErrAbbr = '<ErrAbbr>' order by TestTimeStamp DESC";
             sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<topnum>", Convert.ToString(topnum)).Replace("<ErrAbbr>", ErrAbbr);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var item in dbret)
             {
                 var tempdata = new ProjectTestData(Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])
@@ -307,7 +308,7 @@ namespace Prometheus.Models
             var ret = new List<ProjectTestData>();
             var sql = "select top <topnum> ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN from ProjectTestData where ProjectKey = '<ProjectKey>' and ModuleSerialNum = '<ModuleSerialNum>' order by TestTimeStamp DESC";
             sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<topnum>", Convert.ToString(topnum)).Replace("<ModuleSerialNum>", SN);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var item in dbret)
             {
                 var tempdata = new ProjectTestData(Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])
@@ -323,7 +324,7 @@ namespace Prometheus.Models
             var ret = new Dictionary<string, bool>();
             var sql = "select DataID from ProjectTestData where ProjectKey = '<ProjectKey>'";
             sql = sql.Replace("<ProjectKey>", projectkey);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var item in dbret)
             {
                 if (!ret.ContainsKey(Convert.ToString(item[0])))
@@ -334,12 +335,12 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static Dictionary<string, bool> RetrieveSNBeforeDateWithStation(string projectkey, string edate)
+        public static Dictionary<string, bool> RetrieveSNBeforeDateWithStation(string projectkey, string edate,Cache mycache)
         {
             var ret = new Dictionary<string, bool>();
             var sql = "select ModuleSerialNum,WhichTest from ProjectTestData where ProjectKey = '<ProjectKey>' and TestTimeStamp < '<ENDDATE>'";
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<ENDDATE>", edate);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, mycache);
             foreach (var item in dbret)
             {
                 var key = Convert.ToString(item[0]);
@@ -358,7 +359,7 @@ namespace Prometheus.Models
             var ret = new Dictionary<string, bool>();
             var sql = "select ModuleSerialNum from ProjectTestData where ProjectKey = '<ProjectKey>' and TestTimeStamp < '<ENDDATE>'";
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<ENDDATE>", edate);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var item in dbret)
             {
                 var key = Convert.ToString(item[0]);

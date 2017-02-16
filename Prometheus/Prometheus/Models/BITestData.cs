@@ -96,7 +96,7 @@ namespace Prometheus.Models
             var ret = new Dictionary<string, DateTime>();
             var sql = "select ModuleSerialNum,WhichTest,TestTimeStamp from BITestData where ProjectKey = '<ProjectKey>' order by TestTimeStamp DESC";
             sql = sql.Replace("<ProjectKey>", projectkey);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var item in dbret)
             {
                 try
@@ -116,7 +116,7 @@ namespace Prometheus.Models
             var ret = new Dictionary<string, DateTime>();
             var sql = "select ModuleSerialNum,WhichTest,TestTimeStamp from BITestData where ProjectKey = '<ProjectKey>' order by TestTimeStamp ASC";
             sql = sql.Replace("<ProjectKey>", projectkey);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var item in dbret)
             {
                 try
@@ -135,7 +135,7 @@ namespace Prometheus.Models
         {
             var sql = "select top 1 TestTimeStamp from BITestData where ProjectKey = '<ProjectKey>' order by TestTimeStamp DESC";
             sql = sql.Replace("<ProjectKey>", projectkey);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
             {
                 return Convert.ToString(dbret[0][0]);
@@ -149,7 +149,7 @@ namespace Prometheus.Models
             var ret = new Dictionary<string, bool>();
             var sql = "select ModuleSerialNum,WhichTest from BITestData where ProjectKey = '<ProjectKey>' and TestTimeStamp < '<ENDDATE>'";
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<ENDDATE>", edate);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var item in dbret)
             {
                 var key = Convert.ToString(item[0]);
@@ -177,7 +177,7 @@ namespace Prometheus.Models
 
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<StartDate>", startdate).Replace("<EndDate>", enddate);
 
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var item in dbret)
             {
                 var tempdata = new BITestData(Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])
@@ -196,7 +196,7 @@ namespace Prometheus.Models
 
             sql = sql.Replace("<ProjectKey>", pjkey).Replace("<Wafer>", wafer);
 
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var item in dbret)
             {
                 var tempdata = new BITestData(Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])
@@ -215,7 +215,7 @@ namespace Prometheus.Models
 
             sql = sql.Replace("<DataID>", DataID);
 
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var item in dbret)
             {
                 var tempdata = new ProjectTestData(Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])
@@ -233,7 +233,7 @@ namespace Prometheus.Models
             var ret = new List<ProjectTestData>();
             var sql = "select top <topnum> ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN from BITestData where ProjectKey = '<ProjectKey>' and ErrAbbr = '<ErrAbbr>' order by TestTimeStamp DESC";
             sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<topnum>", Convert.ToString(topnum)).Replace("<ErrAbbr>", ErrAbbr);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var item in dbret)
             {
                 var tempdata = new ProjectTestData(Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])
@@ -251,7 +251,7 @@ namespace Prometheus.Models
             var ret = new List<ProjectTestData>();
             var sql = "select top <topnum> ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN from BITestData where ProjectKey = '<ProjectKey>' and ModuleSerialNum = '<ModuleSerialNum>' order by TestTimeStamp DESC";
             sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<topnum>", Convert.ToString(topnum)).Replace("<ModuleSerialNum>", SN);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var item in dbret)
             {
                 var tempdata = new ProjectTestData(Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])
@@ -268,7 +268,7 @@ namespace Prometheus.Models
             var sql = "select DISTINCT Wafer from BITestData where ProjectKey = '<ProjectKey>' order by Wafer";
             sql = sql.Replace("<ProjectKey>", projectkey);
 
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var item in dbret)
             {
                 ret.Add(Convert.ToString(item[0]));

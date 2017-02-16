@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Caching;
 
 namespace Prometheus.Models
 {
@@ -491,7 +492,7 @@ namespace Prometheus.Models
 
         }
 
-        public static ProjectYieldViewModule GetYieldByDateRange(string pjkey, string sdate, string edate, ProjectViewModels pvm)
+        public static ProjectYieldViewModule GetYieldByDateRange(string pjkey, string sdate, string edate, ProjectViewModels pvm,Cache mycache)
         {
             var ret = new ProjectYieldViewModule();
             ret.ProjectKey = pjkey;
@@ -506,7 +507,7 @@ namespace Prometheus.Models
                 return ret;
             }
 
-            var plist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, DateTime.Parse(enddate).AddYears(5).ToString(), false);
+            var plist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, DateTime.Parse(enddate).AddYears(5).ToString(), false,mycache);
 
             var fdatalist = new List<ProjectTestData>();
             var enddatet = DateTime.Parse(enddate);
@@ -530,7 +531,7 @@ namespace Prometheus.Models
 
             //var tplist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, enddate, true);
 
-            var snstationdict = ProjectTestData.RetrieveSNBeforeDateWithStation(pjkey, startdate);
+            var snstationdict = ProjectTestData.RetrieveSNBeforeDateWithStation(pjkey, startdate,mycache);
             var sndict = new Dictionary<string, bool>();
             foreach (var kvpair in snstationdict)
             {
@@ -604,7 +605,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<ProjectYieldViewModule> GetYieldByWeeks(string pjkey)
+        public static List<ProjectYieldViewModule> GetYieldByWeeks(string pjkey,Cache mycache)
         {
             var ret = new List<ProjectYieldViewModule>();
 
@@ -619,7 +620,7 @@ namespace Prometheus.Models
 
             for(int idx  = startidx; idx < ldate.Count -1;idx++)
             {
-                var temp  = GetYieldByDateRange(pjkey, ldate[idx].ToString(), ldate[idx+1].ToString(),pvm);
+                var temp  = GetYieldByDateRange(pjkey, ldate[idx].ToString(), ldate[idx+1].ToString(),pvm,mycache);
                 if (temp.RealTimeYields.Count > 0)
                 {
                     ret.Add(temp);
@@ -629,7 +630,7 @@ namespace Prometheus.Models
         }
 
 
-        public static List<ProjectYieldViewModule> GetYieldByMonth(string pjkey)
+        public static List<ProjectYieldViewModule> GetYieldByMonth(string pjkey, Cache mycache)
         {
             var ret = new List<ProjectYieldViewModule>();
 
@@ -644,7 +645,7 @@ namespace Prometheus.Models
 
             for (int idx = startidx; idx < ldate.Count - 1; idx++)
             {
-                var temp = GetYieldByDateRange(pjkey, ldate[idx].ToString(), ldate[idx + 1].ToString(), pvm);
+                var temp = GetYieldByDateRange(pjkey, ldate[idx].ToString(), ldate[idx + 1].ToString(), pvm,mycache);
                 if (temp.RealTimeYields.Count > 0)
                 {
                     ret.Add(temp);
@@ -653,7 +654,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<ProjectYieldViewModule> GetYieldByDay(string pjkey,string starttime,string endtime)
+        public static List<ProjectYieldViewModule> GetYieldByDay(string pjkey,string starttime,string endtime, Cache mycache)
         {
             var ret = new List<ProjectYieldViewModule>();
             var pvm = ProjectViewModels.RetrieveOneProject(pjkey);
@@ -676,7 +677,7 @@ namespace Prometheus.Models
 
             for (int idx = startidx; idx < ldate.Count - 1; idx++)
             {
-                var temp = GetYieldByDateRange(pjkey, ldate[idx].ToString(), ldate[idx + 1].ToString(), pvm);
+                var temp = GetYieldByDateRange(pjkey, ldate[idx].ToString(), ldate[idx + 1].ToString(), pvm,mycache);
                 if (temp.RealTimeYields.Count > 0)
                 {
                     ret.Add(temp);

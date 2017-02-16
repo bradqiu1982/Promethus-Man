@@ -169,7 +169,7 @@ namespace Prometheus.Models
             var ret = new List<UserBlogVM>();
             var sql = "select UserName,APVal1,APVal2,APVal3,APVal4,APVal5,APVal9 from UserBlog where UserName='<UserName>' and (APVal1 = '<TYPE1>' or APVal1 = '<TYPE2>') order by APVal9 DESC";
             sql = sql.Replace("<UserName>", username).Replace("<TYPE1>", UserBlogContentType.ATTACH).Replace("<TYPE2>", UserBlogContentType.COMMENT);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
 
             foreach (var line in dbret)
             {
@@ -206,7 +206,7 @@ namespace Prometheus.Models
 
             var sql = "select UserName,APVal1,APVal2,APVal3,APVal4,APVal5,APVal9 from UserBlog where APVal2='<APVal2>'";
             sql = sql.Replace("<APVal2>", dockey);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
 
             foreach (var line in dbret)
             {
@@ -263,7 +263,7 @@ namespace Prometheus.Models
             var ret = string.Empty;
             var sql = "select UserName,APVal1,APVal2 from UserBlog where UserName='<UserName>' and APVal1 = '<APVal1>'";
             sql = sql.Replace("<UserName>", username).Replace("<APVal1>", UserBlogContentType.TAG);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
             {
                 ret = Convert.ToString(dbret[0][2]);

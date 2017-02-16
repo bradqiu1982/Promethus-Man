@@ -55,7 +55,7 @@ namespace Prometheus.Models
         {
             var sql = "select PassWD,Validated,Priority,UpdateDate from UserTable where UserName = '<UserName>'";
             sql = sql.Replace("<UserName>", username.ToUpper());
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
             {
                 var ret = new UserViewModels();
@@ -100,7 +100,7 @@ namespace Prometheus.Models
         public static List<string> RetrieveAllUser()
         {
             var sql = "select UserName from UserTable";
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             var ret = new List<string>();
 
             foreach (var line in dbret)
@@ -132,7 +132,7 @@ namespace Prometheus.Models
             var sql = "select OTHER from UserNet where  ME='<ME>'";
             sql = sql.Replace("<ME>", me);
 
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             var ret = new List<string>();
 
             foreach (var line in dbret)

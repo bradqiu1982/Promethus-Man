@@ -100,7 +100,7 @@ namespace Prometheus.Models
 
             var sql = "select top <num> ProjectKey,EventKey,Event,UpdateDate from ProjectEvent order by UpdateDate DESC";
             sql = sql.Replace("<num>", Convert.ToString(topnum));
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var item in dbret)
             {
                 var e = new ProjectEvent(Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])

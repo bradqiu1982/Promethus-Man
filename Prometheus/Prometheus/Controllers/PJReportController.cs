@@ -252,7 +252,7 @@ namespace Prometheus.Controllers
             var sdate = edate.AddDays(-30);
             var retestdatalist = new List<KeyValuePair<string, int>>();
             var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
-            var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, sdate.ToString(), edate.ToString(), pvm);
+            var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, sdate.ToString(), edate.ToString(), pvm, HttpContext.Cache);
 
             if (yieldvm.LastYields.Count > 0)
             {

@@ -275,7 +275,7 @@ namespace Prometheus.Models
         {
             var sql = "select  ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount from ProjectError where ProjectKey = '<ProjectKey>' and OrignalCode = '<OrignalCode>'";
             sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<OrignalCode>", OrignalCode);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
 
             if (dbret.Count > 0)
             {
@@ -326,7 +326,7 @@ namespace Prometheus.Models
             var ret = new List<ProjectErrorViewModels>();
             var sql = "select  ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount from ProjectError where ProjectKey = '<ProjectKey>' order by ErrorCount DESC";
             sql = sql.Replace("<ProjectKey>", projectkey);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
 
             foreach (var line in dbret)
             {
@@ -359,7 +359,7 @@ namespace Prometheus.Models
             var ret = new List<ProjectErrorViewModels>();
             var sql = "select  ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount from ProjectError where ProjectKey = '<ProjectKey>' and OrignalCode = '<OrignalCode>'";
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<OrignalCode>", errorcode);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
 
             foreach (var line in dbret)
             {
@@ -376,7 +376,7 @@ namespace Prometheus.Models
             var ret = new List<ProjectErrorViewModels>();
             var sql = "select  ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount from ProjectError where ErrorKey = '<ErrorKey>'";
             sql = sql.Replace("<ErrorKey>", ekey);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
 
             foreach (var line in dbret)
             {
@@ -393,7 +393,7 @@ namespace Prometheus.Models
             var ret = new List<ErrorComments>();
             var sql = "select ErrorKey,Comment,Reporter,CommentDate,CommentType from ErrorComments where ErrorKey = '<ErrorKey>' and APVal1 <> 'delete' order by CommentDate ASC";
             sql = sql.Replace("<ErrorKey>", errorkey);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
 
             foreach (var r in dbret)
             {
@@ -428,7 +428,7 @@ namespace Prometheus.Models
             var csql = "select Attachment from PJErrorAttachment where ErrorKey = '<ErrorKey>' order by UpdateTime ASC";
             csql = csql.Replace("<ErrorKey>", errorkey);
 
-            var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
+            var cdbret = DBUtility.ExeLocalSqlWithRes(csql,null);
             foreach (var r in cdbret)
             {
                 ret.Add(Convert.ToString(r[0]));
@@ -440,7 +440,7 @@ namespace Prometheus.Models
         {
             var csql = "select Attachment from PJErrorAttachment where ErrorKey = '<ErrorKey>' and Attachment like '%<cond>%'";
             csql = csql.Replace("<ErrorKey>", errorkey).Replace("<cond>", cond);
-            var cdbret = DBUtility.ExeLocalSqlWithRes(csql);
+            var cdbret = DBUtility.ExeLocalSqlWithRes(csql,null);
             if (cdbret.Count > 0 && cdbret.Count < 3)
             {
                 csql = "delete from PJErrorAttachment where ErrorKey = '<ErrorKey>' and Attachment like '%<cond>%'";

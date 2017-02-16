@@ -61,7 +61,7 @@ namespace Prometheus.Controllers
                     }
                 }
 
-                var yvm = ProjectYieldViewModule.GetYieldByDateRange(item.ProjectKey, startdate.ToString(), enddate, item);
+                var yvm = ProjectYieldViewModule.GetYieldByDateRange(item.ProjectKey, startdate.ToString(), enddate, item,HttpContext.Cache);
                 if (yvm.FirstYields.Count > 0)
                 {
                     item.FirstYield = yvm.FirstYield;
@@ -1079,7 +1079,7 @@ namespace Prometheus.Controllers
                         }
                     }
 
-                    var yvm = ProjectYieldViewModule.GetYieldByDateRange(vm.ProjectKey, startdate.ToString(), enddate, vm);
+                    var yvm = ProjectYieldViewModule.GetYieldByDateRange(vm.ProjectKey, startdate.ToString(), enddate, vm, HttpContext.Cache);
                     if (yvm.FirstYields.Count > 0)
                     {
                         vm.FirstYield = yvm.FirstYield;
@@ -1442,7 +1442,7 @@ namespace Prometheus.Controllers
 
         public static void ProjectWeeklyTrend(Controller ctrl, string ProjectKey)
         {
-            var vmlist = ProjectYieldViewModule.GetYieldByWeeks(ProjectKey);
+            var vmlist = ProjectYieldViewModule.GetYieldByWeeks(ProjectKey, ctrl.HttpContext.Cache);
             if (vmlist.Count > 0)
             {
                 var ChartxAxisValues = "";
@@ -1627,7 +1627,7 @@ namespace Prometheus.Controllers
                 var retestdatalist = new List<KeyValuePair<string, int>>();
 
                 var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
-                var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, sdate.ToString(), edate.ToString(),pvm);
+                var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, sdate.ToString(), edate.ToString(),pvm, HttpContext.Cache);
 
                 if (yieldvm.FirstYields.Count > 0)
                 {
@@ -1989,7 +1989,7 @@ namespace Prometheus.Controllers
             {
                 ViewBag.pjkey = ProjectKey;
 
-                var vmlist = ProjectYieldViewModule.GetYieldByMonth(ProjectKey);
+                var vmlist = ProjectYieldViewModule.GetYieldByMonth(ProjectKey, HttpContext.Cache);
                 if (vmlist.Count > 0)
                 {
                     var ChartxAxisValues = "";
@@ -2146,7 +2146,7 @@ namespace Prometheus.Controllers
             if (ProjectKey != null && StartDate != null && EndDate != null)
             {
                 ViewBag.pjkey = ProjectKey;
-                var vmlist = ProjectYieldViewModule.GetYieldByDay(ProjectKey, StartDate, EndDate);
+                var vmlist = ProjectYieldViewModule.GetYieldByDay(ProjectKey, StartDate, EndDate, HttpContext.Cache);
                 if (vmlist.Count > 0)
                 {
                     var ChartxAxisValues = "";
@@ -2312,7 +2312,7 @@ namespace Prometheus.Controllers
                 var retestdatalist = new List<KeyValuePair<string, int>>();
 
                 var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
-                var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, sdate.ToString(), edate.ToString(), pvm);
+                var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, sdate.ToString(), edate.ToString(), pvm, HttpContext.Cache);
 
                 if (yieldvm.FirstYields.Count > 0)
                 {
@@ -2453,7 +2453,7 @@ namespace Prometheus.Controllers
                 var retestdatalist = new List<KeyValuePair<string, int>>();
 
                 var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
-                var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, sdate.ToString(), edate.ToString(), pvm);
+                var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, sdate.ToString(), edate.ToString(), pvm, HttpContext.Cache);
 
                 if (yieldvm.FirstYields.Count > 0)
                 {
@@ -2660,7 +2660,7 @@ namespace Prometheus.Controllers
                 var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
 
                 var vmlist = new List<ProjectYieldViewModule>();
-                var tempret = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, StartDate, EndDate, pvm);
+                var tempret = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, StartDate, EndDate, pvm, HttpContext.Cache);
                 if (tempret.RealTimeYields.Count > 0)
                 {
                     vmlist.Add(tempret);
@@ -3046,7 +3046,7 @@ namespace Prometheus.Controllers
                 var retestdatalist = new List<KeyValuePair<string, int>>();
 
                 var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
-                var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, StartDate, EndDate, pvm);
+                var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, StartDate, EndDate, pvm, HttpContext.Cache);
 
                 if (yieldvm.FirstYields.Count > 0)
                 {

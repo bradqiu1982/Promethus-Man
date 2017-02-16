@@ -64,7 +64,7 @@ namespace Prometheus.Models
         {
             var sql = "select DOCPJK,DOCKey from ShareDoc where DOCPJK='<DOCPJK>' and DOCKey='<DOCKey>'";
             sql = sql.Replace("<DOCPJK>", DOCPJK).Replace("<DOCKey>", DOCKey);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
             {
                 return;
@@ -81,7 +81,7 @@ namespace Prometheus.Models
         {
             var sql = "select DOCPJK,DOCKey from UserLearn where UserName = '<BookerName>' and DOCPJK='<DOCPJK>' and DOCKey='<DOCKey>'";
             sql = sql.Replace("<BookerName>", BookerName).Replace("<DOCPJK>", DOCPJK).Replace("<DOCKey>", DOCKey);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
             {
                 return;
@@ -124,7 +124,7 @@ namespace Prometheus.Models
         {
             var sql = "select DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,DOCFavorTimes from ShareDoc where DOCPJK = '<DOCPJK>' and DOCKey = '<DOCKey>'";
             sql = sql.Replace("<DOCPJK>", DOCPJK).Replace("<DOCKey>", DOCKey);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
             {
                 var tempvm = new ShareDocVM();
@@ -170,7 +170,7 @@ namespace Prometheus.Models
 
             var sql = "select DocTag from UserTable where UserName = '<UserName>'";
             sql = sql.Replace("<UserName>", UserName);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if(dbret.Count > 0)
             {
                 ret.BookerName = UserName;
@@ -185,7 +185,7 @@ namespace Prometheus.Models
             var ret = new List<ShareDocVM>();
 
             var sql = "select UserName,DocTag from UserTable";
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
             {
                 if (!string.IsNullOrEmpty(Convert.ToString(line[1])))
@@ -205,7 +205,7 @@ namespace Prometheus.Models
             var ret = new List<ShareDocVM>();
             var sql = "select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,a.DOCDate,a.DOCPusher,a.DOCFavor,b.DOCFavorTimes from UserLearn a left join ShareDoc b ON a.DOCKey = b.DOCKey where a.UserName= '<UserName>' and a.DOCType <> '<DOCType>' order by a.DOCDate DESC";
             sql = sql.Replace("<UserName>", UserName).Replace("<DOCType>", ShareDocType.BLOG);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
             {
                 var tempvm = new ShareDocVM();
@@ -251,7 +251,7 @@ namespace Prometheus.Models
             var ret = new List<ShareDocVM>();
             var sql = "select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,a.DOCDate,a.DOCPusher,a.DOCFavor from UserLearn a where a.UserName= '<UserName>' and a.DOCType = '<DOCType>' order by a.DOCDate DESC";
             sql = sql.Replace("<UserName>", UserName).Replace("<DOCType>", ShareDocType.BLOG);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
             {
                 var tempvm = new ShareDocVM();
@@ -281,7 +281,7 @@ namespace Prometheus.Models
             var ret = new List<ShareDocVM>();
             var sql = "select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,a.DOCDate,a.DOCFavorTimes from ShareDoc a  where a.DOCCreator= '<UserName>' order by a.DOCDate DESC";
             sql = sql.Replace("<UserName>", UserName);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
             {
                 var tempvm = new ShareDocVM();
@@ -324,7 +324,7 @@ namespace Prometheus.Models
 
             var sql = "select DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,DOCFavorTimes from ShareDoc where DOCDate >= '<starttime>' and DOCDate <= '<endtime>'";
             sql = sql.Replace("<starttime>", starttime).Replace("<endtime>",endtime);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
             {
                 var tempvm = new ShareDocVM();
@@ -359,7 +359,7 @@ namespace Prometheus.Models
         {
             var ret = new List<ShareDocVM>();
             var sql = "select DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,DOCFavorTimes from ShareDoc order by DOCDate";
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
             {
                 var tempvm = new ShareDocVM();
@@ -395,7 +395,7 @@ namespace Prometheus.Models
             var ret = new List<ShareDocVM>();
             var sql = "select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,a.DOCDate,b.DOCPusher,b.DOCFavor,a.DOCFavorTimes from ShareDoc a left join UserLearn b ON a.DOCKey = b.DOCKey where a.DOCPJK = '<DOCPJK>' and a.DOCKey = '<DOCKey>' and b.UserName='<UserName>'";
             sql = sql.Replace("<DOCPJK>", DOCPJK).Replace("<DOCKey>", DOCKey).Replace("<UserName>",updater);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
             {
                 var tempvm = new ShareDocVM();
@@ -446,7 +446,7 @@ namespace Prometheus.Models
             var starttime = DateTime.Now.AddDays(-10).ToString();
             var sql = "select top 10 DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,DOCFavorTimes from ShareDoc where DOCDate >= '<starttime>' order by DOCFavorTimes";
             sql = sql.Replace("<starttime>", starttime);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
             {
                 var tempvm = new ShareDocVM();
@@ -494,7 +494,7 @@ namespace Prometheus.Models
         {
             var ret = new List<string>();
             var sql = "select DOCTag from ShareTags order by DOCTag ASC";
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
             { ret.Add(Convert.ToString(line[0])); }
             return ret;

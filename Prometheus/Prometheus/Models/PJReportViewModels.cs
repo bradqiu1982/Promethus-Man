@@ -190,7 +190,7 @@ namespace Prometheus.Models
         {
             var sql = "select username,projects,reporttypes,reporttime,lastupdatetime from BookReportRecord where username = '<username>'";
             sql = sql.Replace("<username>", name);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
             {
                 var ret = new PJReportViewModels();
@@ -209,7 +209,7 @@ namespace Prometheus.Models
             var ret = new List<PJReportViewModels>();
 
             var sql = "select username,projects,reporttypes,reporttime,lastupdatetime from BookReportRecord";
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach(var line in dbret)
             {
                 var temp = new PJReportViewModels();

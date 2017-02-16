@@ -588,7 +588,7 @@ namespace Prometheus.Models
         {
             var sql = "select * from Project where ProjectKey = '<ProjectKey>'";
             sql = sql.Replace("<ProjectKey>", ProjectKey);
-            var ret = DBUtility.ExeLocalSqlWithRes(sql);
+            var ret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (ret.Count > 0)
             {
                 return true;
@@ -602,7 +602,7 @@ namespace Prometheus.Models
         public static List<string> RetrieveAllProjectKey()
         {
             var sql = "select ProjectKey from Project order by ProjectKey ASC";
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             var ret = new List<string>();
             foreach (var line in dbret)
             {
@@ -617,7 +617,7 @@ namespace Prometheus.Models
 
             var sql = "select Name,Role from ProjectMembers where ProjectKey = '<ProjectKey>'";
             sql = sql.Replace("<ProjectKey>", key);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
             {
                 var m = new ProjectMembers(key, Convert.ToString(line[0]), Convert.ToString(line[1]));
@@ -632,7 +632,7 @@ namespace Prometheus.Models
 
             var sql = "select Station,TableName from ProjectMesTable where ProjectKey = '<ProjectKey>'";
             sql = sql.Replace("<ProjectKey>", key);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
             {
                 var m = new ProjectMesTable(key, Convert.ToString(line[0]), Convert.ToString(line[1]));
@@ -647,7 +647,7 @@ namespace Prometheus.Models
 
             var sql = "select PN from ProjectPn where ProjectKey = '<ProjectKey>'";
             sql = sql.Replace("<ProjectKey>", key);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
 
             foreach (var line in dbret)
             {
@@ -663,7 +663,7 @@ namespace Prometheus.Models
 
             var sql = "select Station from ProjectStation where ProjectKey = '<ProjectKey>'";
             sql = sql.Replace("<ProjectKey>", key);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
 
             foreach (var line in dbret)
             {
@@ -679,7 +679,7 @@ namespace Prometheus.Models
 
             var sql = "select ModelID from ProjectModelID where ProjectKey = '<ProjectKey>'";
             sql = sql.Replace("<ProjectKey>", key);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
 
             foreach (var line in dbret)
             {
@@ -695,7 +695,7 @@ namespace Prometheus.Models
 
             var sql = "select SumDataSet from ProjectSumDataSet where ProjectKey = '<ProjectKey>'";
             sql = sql.Replace("<ProjectKey>", key);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
 
             foreach (var line in dbret)
             {
@@ -710,7 +710,7 @@ namespace Prometheus.Models
         {
             var sql = "select ProjectKey,ProjectName,StartDate,FinishRate,Description,APVal1,APVal2,ProjectType from Project where ProjectKey = '<ProjectKey>' and validate = 1";
             sql = sql.Replace("<ProjectKey>", key);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
             {
                 var ret = new ProjectViewModels(Convert.ToString(dbret[0][0])

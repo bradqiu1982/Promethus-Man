@@ -30,7 +30,7 @@ namespace Prometheus.Models
         {
             var ret = new List<List<string>>();
             var sql = "select * from VCSELUsageTable order by Module_Desc";
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
             {
                 var templine = new List<string>();

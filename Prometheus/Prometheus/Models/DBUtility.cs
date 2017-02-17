@@ -241,10 +241,6 @@ namespace Prometheus.Models
                         ret.Add(newline);
                     }
 
-                    if (mycache != null)
-                    {
-                        mycache.Insert(sql, ret, null, DateTime.Now.AddHours(1),Cache.NoSlidingExpiration);
-                    }
                 }
 
                 sqlreader.Close();
@@ -258,6 +254,10 @@ namespace Prometheus.Models
                 //    logthdinfo("res query end: count " + ret.Count.ToString() + " spend " + (msec2 - msec1).ToString());
                 //}
 
+                    if (mycache != null)
+                    {
+                        mycache.Insert(sql, ret, null, DateTime.Now.AddHours(1),Cache.NoSlidingExpiration);
+                    }
 
                 return ret;
             }

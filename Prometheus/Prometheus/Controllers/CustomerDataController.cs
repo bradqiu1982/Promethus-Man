@@ -316,6 +316,26 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        public ActionResult CommitRelData()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "CustomerData");
+                ck.Add("logonredirectact", "CommitRMAData");
+                ck.Add("currentaction", "CommitRMAData");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            return View();
+        }
+
         private static string RMSpectialCh(string str)
         {
             StringBuilder sb = new StringBuilder();
@@ -778,7 +798,149 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        [HttpPost, ActionName("CommitRelData")]
+        [ValidateAntiForgeryToken]
+        public ActionResult CommitRelDataPost()
+        {
+            var projlist = ProjectViewModels.RetrieveAllProjectKey();
 
+            var wholefn = "";
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Form["RMAFileName"]))
+                {
+                    var customereportfile = Request.Form["RMAFileName"];
+                    var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_").Replace("#", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                    foreach (string fl in Request.Files)
+                    {
+                        if (fl != null && Request.Files[fl].ContentLength > 0)
+                        {
+                            string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ", "_").Replace("#", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                            string datestring = DateTime.Now.ToString("yyyyMMdd");
+                            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+
+                            if (!Directory.Exists(imgdir))
+                            {
+                                Directory.CreateDirectory(imgdir);
+                            }
+
+                            fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
+                            Request.Files[fl].SaveAs(imgdir + fn);
+
+                            if (fn.Contains(originalname))
+                            {
+                                wholefn = imgdir + fn;
+                                break;
+                            }
+                        }//end if
+                    }//end foreach
+
+                    if (!string.IsNullOrEmpty(wholefn))
+                    {
+                        var data = RetrieveDataFromExcel(wholefn);
+                        var realdata = new List<List<string>>();
+                        if (data.Count > 1)
+                        {
+                            var templine = new List<string>();
+                            templine.Add("Project");
+                            templine.Add("Occurrence Date");
+                            templine.Add("Qual Type");
+                            templine.Add("Request ID");
+                            templine.Add("Line Category");
+                            templine.Add("Product");
+
+                            templine.Add("Test Type");
+                            templine.Add("Failure Interval");
+                            templine.Add("SN");
+                            templine.Add("Fail QTY");
+                            templine.Add("Total QTY");
+                            templine.Add("Analyst");
+                            templine.Add("Rel Engineer");
+                            templine.Add("Test Failure");
+                            templine.Add("Location");
+                            realdata.Add(templine);
+
+                            for (var idx = 1; idx < data.Count; idx++)
+                            {
+                                if (idx != 0)
+                                {
+                                    templine = new List<string>();
+
+                                    var trimprojectname = RMSpectialCh(data[idx][0]).ToUpper();
+                                    if (trimprojectname.Length > 40)
+                                    {
+                                        trimprojectname = trimprojectname.Substring(0, 38);
+                                    }
+
+                                    var pjname = string.Empty;
+                                    foreach (var item in projlist)
+                                    {
+                                        if (string.Compare(item, trimprojectname, true) == 0)
+                                        {
+                                            pjname = item;
+                                            break;
+                                        }
+                                    }
+
+                                    if (!string.IsNullOrEmpty(pjname))
+                                    {
+                                        templine.Add(pjname);
+                                    }
+                                    else
+                                    {
+                                        templine.Add("N/A");
+                                    }
+
+                                    templine.Add(data[idx][3]);
+                                    templine.Add(data[idx][5]);
+                                    templine.Add(data[idx][6]);
+                                    templine.Add(data[idx][7]);
+
+                                    //product type
+                                    var trimprojectname1 = RMSpectialCh(data[idx][8]).ToUpper();
+                                    if (trimprojectname.Length > 40)
+                                    {
+                                        trimprojectname1 = trimprojectname1.Substring(0, 38);
+                                    }
+                                    templine.Add(trimprojectname1);
+
+                                    templine.Add(data[idx][9]);
+                                    templine.Add(data[idx][10]);
+                                    templine.Add(data[idx][11].Replace("\r\n",":").Replace("\r", ":").Replace("\n", ":"));
+                                    templine.Add(data[idx][12]);
+                                    templine.Add(data[idx][13]);
+
+                                    templine.Add(data[idx][14]);
+                                    templine.Add(data[idx][15]);
+                                    templine.Add(data[idx][16]);
+                                    templine.Add(data[idx][21]);
+
+                                    realdata.Add(templine);
+
+                                }//end if
+                            }//end for
+                        }
+
+
+                        if (realdata.Count > 1)
+                        {
+                            ViewBag.ROWCOUNT = realdata.Count;
+                            ViewBag.COLCOUNT = realdata[0].Count;
+                            return View("ConfirmRelData", realdata);
+                        }
+                    }
+
+                }//end if
+            }
+            catch (Exception ex)
+            { }
+
+            return View();
+        }
 
         private void SendRMAEvent(IssueViewModels vm, string operate, bool nocheck = false)
         {
@@ -841,7 +1003,7 @@ namespace Prometheus.Controllers
         private void SendQualityEvent(IssueViewModels vm, string operate, bool nocheck = false)
         {
             var alertime = vm.RetrieveAlertEmailDate(vm.IssueKey);
-            if ((!string.IsNullOrEmpty(alertime) && DateTime.Parse(alertime).AddHours(24) < DateTime.Now) || nocheck)
+            if (nocheck||(!string.IsNullOrEmpty(alertime) && DateTime.Parse(alertime).AddHours(24) < DateTime.Now))
             {
                 vm.UpdateAlertEmailDate();
 
@@ -1228,6 +1390,109 @@ namespace Prometheus.Controllers
                             vm.StoreIssue();
 
                             UserController.RegisterUserAuto(vm.Assignee);
+
+                            SendQualityEvent(vm, "created", true);
+                        }
+                    }//end for
+                    return RedirectToAction("ViewAll", "Project");
+                }
+            }
+
+            return View();
+        }
+
+        public DateTime ConvertDate(string d)
+        {
+            try
+            {
+                return DateTime.Parse(d);
+            }
+            catch (Exception ex)
+            {
+                return DateTime.Now;
+            }
+        }
+        
+        [HttpPost, ActionName("ConfirmRelData")]
+        [ValidateAntiForgeryToken]
+        public ActionResult ConfirmRelDataPost()
+        {
+
+            if (Request.Form["confirmdata"] != null)
+            {
+                var ckdict = CookieUtility.UnpackCookie(this);
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+                var rowcnt = Convert.ToInt32(Request.Form["rowcount"]);
+                var colcnt = Convert.ToInt32(Request.Form["colcount"]);
+                var data = new List<List<string>>();
+                for (var row = 0; row < rowcnt; row++)
+                {
+                    var line = new List<string>();
+                    for (var col = 0; col < colcnt; col++)
+                    {
+                        line.Add(Request.Form["row" + row + "col" + col]);
+                    }
+                    data.Add(line);
+                }
+
+
+                if (data.Count > 1)
+                {
+                    for (int i = 0; i < data.Count; i++)
+                    {
+                        if (i != 0 && string.Compare(data[i][0], "N/A") != 0)
+                        {
+                            var vm = new IssueViewModels();
+                            vm.ProjectKey = data[i][0];
+                            if (vm.ProjectKey.Length > 50)
+                            {
+                                vm.ProjectKey = vm.ProjectKey.Substring(0, 48);
+                            }
+
+                            vm.ReportDate = ConvertDate(data[i][1]);
+                            vm.QualType = data[i][2];
+                            vm.RequestID = data[i][3];
+                            vm.LineCategory = data[i][4];
+                            vm.ProductType = data[i][5];
+                            vm.TestType = data[i][6];
+                            vm.FailureInterval = data[i][7];
+                            vm.ModuleSN = data[i][8];
+                            if (vm.ModuleSN.Length > 50)
+                            {
+                                vm.ModuleSN = vm.ModuleSN.Substring(0, 48);
+                            }
+                            vm.FailQTY = data[i][9];
+                            vm.TotalQTY = data[i][10];
+                            vm.Assignee = data[i][11].Split('/')[0].Split('\r')[0].Split('\n')[0].ToUpper();
+                            vm.Reporter = data[i][12].Split('/')[0].Split('\r')[0].Split('\n')[0].ToUpper();
+
+                            vm.Summary = vm.ProductType + ":" + data[i][13].Split('\r')[0].Split('\n')[0];
+                            if (vm.Summary.Length > 200)
+                            {
+                                vm.Summary = vm.Summary.Substring(0, 198);
+                            }
+
+                            vm.Location = data[i][14];
+
+                            UserController.RegisterUserAuto(vm.Assignee);
+                            UserController.RegisterUserAuto(vm.Reporter);
+
+                            vm.IssueKey = IssueViewModels.GetUniqKey();
+                            vm.IssueType = ISSUETP.Rel;
+                            vm.Priority = ISSUEPR.Major;
+
+                            vm.RelativePeoples = "";
+                            vm.FVCode = "";
+
+                            vm.DueDate = vm.ReportDate.AddDays(21);
+                            vm.Resolution = Resolute.Pending;
+                            vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+
+                            vm.Description = vm.Summary;
+                            vm.CommentType = COMMENTTYPE.Description;
+
+                            vm.StoreIssue();
 
                             SendQualityEvent(vm, "created", true);
                         }

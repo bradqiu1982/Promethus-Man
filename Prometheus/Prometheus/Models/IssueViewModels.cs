@@ -16,6 +16,7 @@ namespace Prometheus.Models
         public static string NewFeature = "New Feature";
         public static string Improvement = "Improvement";
         public static string Document = "Document";
+        public static string Rel = "Rel";
     }
 
     public class ISSUEPR
@@ -577,6 +578,17 @@ namespace Prometheus.Models
         public DateTime AlertEmailUpdateDate { set; get; }
         #endregion
 
+        #region Rel
+        public string QualType { set; get; }
+        public string RequestID { set; get; }
+        public string LineCategory { set; get; }
+        public string TestType { set; get; }
+        public string FailureInterval { set; get; }
+        public string FailQTY { set; get; }
+        public string TotalQTY { set; get; }
+        public string Location { set; get; }
+        #endregion
+
         public string LYT { set; get; }
 
 
@@ -626,6 +638,11 @@ namespace Prometheus.Models
             {
                 StoreQuality();
             }
+
+            if (string.Compare(IssueType, ISSUETP.Rel) == 0)
+            {
+                StoreReliability();
+            }
         }
 
         private void StoreOBA()
@@ -641,6 +658,25 @@ namespace Prometheus.Models
             var sql = "insert into IssueAttribute(IssueKey,APVal1,APVal2,APVal3,APVal4) values('<IssueKey>','<RMAFailureCode>','<ProductType>','<AffectRange>','<MaterialDisposition>')";
             sql = sql.Replace("<IssueKey>", IssueKey).Replace("<RMAFailureCode>", RMAFailureCode).Replace("<ProductType>", ProductType).Replace("<AffectRange>", AffectRange)
                 .Replace("<MaterialDisposition>", MaterialDisposition);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+    //    QualType { set; get; }
+    //public string RequestID { set; get; }
+    //public string LineCategory { set; get; }
+    //public string TestType { set; get; }
+    //public string FailureInterval { set; get; }
+    //public string FailQTY { set; get; }
+    //public string TotalQTY { set; get; }
+    //public string Location { set; get; }
+
+        private void StoreReliability()
+        {
+            var sql = "insert into IssueAttribute(IssueKey,APVal1,APVal2,APVal3,APVal4,APVal5,APVal6,APVal7,APVal8,APVal9,APVal10) "
+                + " values('<IssueKey>','<QualType>','<RequestID>','<LineCategory>','<ProductType>','<TestType>','<FailureInterval>','<FailQTY>','<TotalQTY>','<Location>','<FVCode>')";
+            sql = sql.Replace("<IssueKey>", IssueKey).Replace("<QualType>", QualType).Replace("<RequestID>", RequestID).Replace("<LineCategory>", LineCategory)
+                .Replace("<ProductType>", ProductType).Replace("<TestType>", TestType).Replace("<FailureInterval>", FailureInterval).Replace("<FailQTY>", FailQTY)
+                .Replace("<TotalQTY>", TotalQTY).Replace("<Location>", Location).Replace("<FVCode>", FVCode);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
@@ -671,6 +707,26 @@ namespace Prometheus.Models
                 ProductType = Convert.ToString(dbret[0][1]);
                 AffectRange = Convert.ToString(dbret[0][2]);
                 MaterialDisposition = Convert.ToString(dbret[0][3]);
+            }
+        }
+
+        private void RetrieveReliability()
+        {
+            var sql = "select APVal1,APVal2,APVal3,APVal4,APVal5,APVal6,APVal7,APVal8,APVal9,APVal10 from IssueAttribute where IssueKey = '<IssueKey>'";
+            sql = sql.Replace("<IssueKey>", IssueKey);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
+            if (dbret.Count > 0)
+            {
+                QualType = Convert.ToString(dbret[0][0]);
+                RequestID = Convert.ToString(dbret[0][1]);
+                LineCategory = Convert.ToString(dbret[0][2]);
+                ProductType = Convert.ToString(dbret[0][3]);
+                TestType = Convert.ToString(dbret[0][4]);
+                FailureInterval = Convert.ToString(dbret[0][5]);
+                FailQTY = Convert.ToString(dbret[0][6]);
+                TotalQTY = Convert.ToString(dbret[0][7]);
+                Location = Convert.ToString(dbret[0][8]);
+                FVCode = Convert.ToString(dbret[0][9]);
             }
         }
 
@@ -1714,6 +1770,11 @@ namespace Prometheus.Models
                 if (string.Compare(issuetype, ISSUETP.Quality) == 0)
                 {
                     tempvm.RetrieveQuality();
+                }
+
+                if (string.Compare(issuetype, ISSUETP.Rel) == 0)
+                {
+                    tempvm.RetrieveReliability();
                 }
 
                 tempvm.RetrieveComment();

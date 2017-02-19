@@ -47,18 +47,18 @@
     <table id="firsttable" name="firsttable"  class="display" cellspacing="0">
         <thead class="header">
             <tr>
-                <th>Product</th>
-                <th>TestType</th>
-                <th>FailRate</th>
-                <th>Summary</th>
-                <th>Status</th>
-                <th>RootCause</th>
-                <th>FV</th>
-                <th>Containment Action</th>
-                <th>Corrective Action</th>
-                <th>Owner</th>
-                <th>Rel.Engineer</th>
-                <th>ReportDate</th>
+                <th style="text-align:center">Product</th>
+                <th style="text-align:center">TestType</th>
+                <th style="text-align:center">FailRate</th>
+                <th style="text-align:center">Summary</th>
+                <th style="text-align:center">Status</th>
+                <th style="text-align:center">RootCause</th>
+                <th style="text-align:center">FV</th>
+                <th style="text-align:center">Containment Action</th>
+                <th style="text-align:center">Corrective Action</th>
+                <th style="text-align:center">Owner</th>
+                <th style="text-align:center">Rel.Engineer</th>
+                <th style="text-align:center">ReportDate</th>
             </tr>
         </thead>
         <tbody>
@@ -86,42 +86,42 @@
                         <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus2(item.Resolution))</td>
                     </tr>*@
                 <tr>
-                    <td>@item.ProductType</td>
-                    <td>@item.TestType</td>
-                    <td>@item.FailQTY/@item.TotalQTY</td>
-                    <td><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></td>
-                    <td>@Html.Raw(@Prometheus.Models.Resolute.ColorStatus2(item.Resolution))</td>
+                    <td style="text-align:center">@item.ProductType</td>
+                    <td style="text-align:center">@item.TestType</td>
+                    <td style="text-align:center">@item.FailQTY/@item.TotalQTY</td>
+                    <td style="text-align:center"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></td>
+                    <td style="text-align:center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus2(item.Resolution))</td>
 
                     @if (item.RootCauseCommentList.Count > 0)
                     {
-                        <td><a href="/Issue/ShowRootCause?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></td>
+                        <td style="text-align:center"><a href="/Issue/ShowRootCause?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></td>
                     }
                     else
                     {
-                        <td>@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
+                        <td style="text-align:center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
                     }
-                    <td>@item.FVCode</td>
+                    <td style="text-align:center">@item.FVCode</td>
 
                     @if (item.ContainmentActions.Count > 0)
                     {
-                        <td><a href="/Issue/ShowContainmentAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.ContainmentActionStatus())</a></td>
+                        <td style="text-align:center"><a href="/Issue/ShowContainmentAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.ContainmentActionStatus())</a></td>
                     }
                     else
                     {
-                        <td>N/A</td>
+                        <td style="text-align:center">N/A</td>
                     }
 
                     @if (item.CorrectiveActions.Count > 0)
                     {
-                        <td><a href="/Issue/ShowCorrectiveAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.CorrectiveActionStatus())</a></td>
+                        <td style="text-align:center"><a href="/Issue/ShowCorrectiveAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.CorrectiveActionStatus())</a></td>
                     }
                     else
                     {
-                        <td>N/A</td>
+                        <td style="text-align:center">N/A</td>
                     }
-                    <td><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
-                    <td><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
-                    <td width="10%">@item.ReportDate.ToString("MM/dd-yy")</td>
+                    <td style="text-align:center"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
+                    <td style="text-align:center"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
+                    <td style="text-align:center">@item.ReportDate.ToString("MM/dd-yy")</td>
                 </tr>
                 i = i + 1;
             }

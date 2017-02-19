@@ -914,8 +914,8 @@ namespace Prometheus.Controllers
                                     templine.Add(data[idx][12]);
                                     templine.Add(data[idx][13]);
 
-                                    templine.Add(data[idx][14]);
-                                    templine.Add(data[idx][15]);
+                                    templine.Add(data[idx][14].Split('/')[0].Split('\r')[0].Split('\n')[0].Split((char)10)[0]);
+                                    templine.Add(data[idx][15].Split('/')[0].Split('\r')[0].Split('\n')[0].Split((char)10)[0]);
                                     templine.Add(data[idx][16]);
                                     templine.Add(data[idx][21]);
 
@@ -1464,10 +1464,19 @@ namespace Prometheus.Controllers
                             }
                             vm.FailQTY = data[i][9];
                             vm.TotalQTY = data[i][10];
-                            vm.Assignee = data[i][11].Split('/')[0].Split('\r')[0].Split('\n')[0].ToUpper();
-                            vm.Reporter = data[i][12].Split('/')[0].Split('\r')[0].Split('\n')[0].ToUpper();
+                            vm.Assignee = data[i][11].Split('/')[0].Split('\r')[0].Split('\n')[0].Split((char)10)[0].ToUpper();
+                            if (!vm.Assignee.Contains("@"))
+                            {
+                                vm.Assignee = (vm.Assignee.Replace(" ", ".") + "@finisar.com").ToUpper();
+                            }
 
-                            vm.Summary = vm.ProductType + ":" + data[i][13].Split('\r')[0].Split('\n')[0];
+                            vm.Reporter = data[i][12].Split('/')[0].Split('\r')[0].Split('\n')[0].Split((char)10)[0].ToUpper();
+                            if (!vm.Reporter.Contains("@"))
+                            {
+                                vm.Reporter = (vm.Reporter.Replace(" ", ".") + "@finisar.com").ToUpper();
+                            }
+
+                            vm.Summary = data[i][13].Split('\r')[0].Split('\n')[0];
                             if (vm.Summary.Length > 200)
                             {
                                 vm.Summary = vm.Summary.Substring(0, 198);

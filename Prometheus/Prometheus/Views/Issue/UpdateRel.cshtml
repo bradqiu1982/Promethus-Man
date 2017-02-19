@@ -93,17 +93,6 @@
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-    //*QualType = Convert.ToString(dbret[0][0]);
-    //*RequestID = Convert.ToString(dbret[0][1]);
-    //*LineCategory = Convert.ToString(dbret[0][2]);
-    //*ProductType = Convert.ToString(dbret[0][3]);
-    //*TestType = Convert.ToString(dbret[0][4]);
-    //*FailureInterval = Convert.ToString(dbret[0][5]);
-    //*FailQTY = Convert.ToString(dbret[0][6]);
-    //*TotalQTY = Convert.ToString(dbret[0][7]);
-    //Location = Convert.ToString(dbret[0][8]);
-    //FVCode = Convert.ToString(dbret[0][9]);
-
     <div class="form-group">
         <div class="form-horizontal">
             
@@ -135,7 +124,7 @@
                     {
                         <label class="control-label col-lg-2">Line Category</label>
                         <div class="col-lg-10">
-                            <input class="form-control text-box single-line" id="LineCategory" name="LineCategory" value="@Model.LineCategory" readonly="readonly" type="text" />
+                            <input class="form-control text-box single-line" value="@Model.LineCategory" readonly="readonly" type="text" />
                         </div>
                     }
                     else
@@ -153,7 +142,7 @@
                     {
                         <label class="control-label col-lg-2">Product</label>
                         <div class="col-lg-10">
-                            <input class="form-control text-box single-line" id="ProductType" name="ProductType" value="@Model.ProductType" readonly="readonly" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." type="text" />
+                            <input class="form-control text-box single-line" value="@Model.ProductType" readonly="readonly"  type="text" />
                         </div>
                     }
                     else
@@ -173,7 +162,7 @@
                     {
                         <label class="control-label col-lg-2">Test Type</label>
                         <div class="col-lg-10">
-                            <input class="form-control text-box single-line" id="TestType" name="TestType" value="@Model.TestType" readonly="readonly" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." type="text" />
+                            <input class="form-control text-box single-line"  value="@Model.TestType" readonly="readonly"  type="text" />
                         </div>
                     }
                     else
@@ -191,7 +180,7 @@
                     {
                         <label class="control-label col-lg-2">Qual.Type</label>
                         <div class="col-lg-10">
-                            <input class="form-control text-box single-line" id="QualType" name="QualType" value="@Model.QualType" readonly="readonly" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." type="text" />
+                            <input class="form-control text-box single-line" value="@Model.QualType" readonly="readonly" type="text" />
                         </div>
                     }
                     else
@@ -232,7 +221,7 @@
                     {
                         <label class="control-label col-lg-2">Request ID</label>
                         <div class="col-lg-10">
-                            <input class="form-control text-box single-line" id="RequestID" name="RequestID" value="@Model.RequestID" readonly="readonly" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." type="text" />
+                            <input class="form-control text-box single-line"  value="@Model.RequestID" readonly="readonly"  type="text" />
                         </div>
                     }
                     else
@@ -249,7 +238,7 @@
                     {
                         <label class="control-label col-lg-2">Location</label>
                         <div class="col-lg-10">
-                            <input class="form-control text-box single-line" value="@Model.Location" readonly="readonly" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." type="text" />
+                            <input class="form-control text-box single-line" value="@Model.Location" readonly="readonly" type="text" />
                         </div>
                     }
                 </div>
@@ -261,7 +250,7 @@
                     {
                         <label class="control-label col-lg-2">Module SN</label>
                         <div class="col-lg-10">
-                            <input class="form-control text-box single-line" value="@Model.ModuleSN" readonly="readonly" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." type="text" />
+                            <input class="form-control text-box single-line" value="@Model.ModuleSN" readonly="readonly"  type="text" />
                         </div>
                     }
                 </div>

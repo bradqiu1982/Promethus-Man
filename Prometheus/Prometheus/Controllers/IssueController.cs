@@ -354,7 +354,8 @@ namespace Prometheus.Controllers
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
                 ViewBag.isassignee = false;
                 if (string.Compare(updater, ret.Assignee, true) == 0
-                        || string.Compare(updater, ret.Reporter,true) == 0)
+                        || string.Compare(updater, ret.Reporter,true) == 0
+                        || string.Compare(updater, ret.Creator, true) == 0)
                 {
                     ViewBag.isassignee = true;
                 }
@@ -407,7 +408,8 @@ namespace Prometheus.Controllers
            if (Request.Form["deleteisu"] != null)
             {
                 if (string.Compare(updater, originaldata.Reporter, true) == 0
-                    || string.Compare(updater, originaldata.Assignee, true) == 0)
+                    || string.Compare(updater, originaldata.Assignee, true) == 0
+                    || string.Compare(updater, originaldata.Creator, true) == 0)
                 {
                     IssueViewModels.RemoveIssue(issuekey);
                     var dict = new RouteValueDictionary();
@@ -424,7 +426,8 @@ namespace Prometheus.Controllers
             vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
 
             if (string.Compare(originaldata.Reporter, updater, true) == 0
-                || string.Compare(originaldata.Assignee, updater, true) == 0)
+                || string.Compare(originaldata.Assignee, updater, true) == 0
+                || string.Compare(originaldata.Creator, updater, true) == 0)
             {
                 vm.Assignee = Request.Form["assigneelist"].ToString();
                 vm.Resolution = Request.Form["resolutionlist"].ToString();
@@ -543,7 +546,8 @@ namespace Prometheus.Controllers
 
             ViewBag.isassignee = false;
             if (string.Compare(updater, newdata.Assignee, true) == 0
-                    || string.Compare(updater, newdata.Reporter,true) == 0)
+                    || string.Compare(updater, newdata.Reporter,true) == 0
+                    || string.Compare(updater, newdata.Creator, true) == 0)
             {
                 ViewBag.isassignee = true;
             }
@@ -1014,7 +1018,8 @@ namespace Prometheus.Controllers
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
                 ViewBag.isassignee = false;
                 if (string.Compare(updater, ret.Assignee, true) == 0
-                        || string.Compare(updater, ret.Reporter, true) == 0)
+                        || string.Compare(updater, ret.Reporter, true) == 0
+                        || string.Compare(updater, ret.Creator, true) == 0)
                 {
                     ViewBag.isassignee = true;
                 }
@@ -1052,7 +1057,8 @@ namespace Prometheus.Controllers
             if (Request.Form["deleteisu"] != null)
             {
                 if (string.Compare(updater, originaldata.Reporter, true) == 0
-                    || string.Compare(updater, originaldata.Assignee, true) == 0)
+                    || string.Compare(updater, originaldata.Assignee, true) == 0
+                    || string.Compare(updater, originaldata.Creator, true) == 0)
                 {
                     IssueViewModels.RemoveIssue(issuekey);
                     var dict = new RouteValueDictionary();
@@ -1122,7 +1128,8 @@ namespace Prometheus.Controllers
             vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
 
             if (string.Compare(originaldata.Reporter, updater, true) == 0
-                || string.Compare(originaldata.Assignee, updater, true) == 0)
+                || string.Compare(originaldata.Assignee, updater, true) == 0
+                || string.Compare(originaldata.Creator, updater, true) == 0)
             {
                 vm.Assignee = Request.Form["assigneelist"].ToString();
                 vm.Resolution = Request.Form["resolutionlist"].ToString();
@@ -1281,7 +1288,8 @@ namespace Prometheus.Controllers
 
             ViewBag.isassignee = false;
             if (string.Compare(updater, newdata.Assignee, true) == 0
-                    || string.Compare(updater, newdata.Reporter, true) == 0)
+                    || string.Compare(updater, newdata.Reporter, true) == 0
+                    || string.Compare(updater, newdata.Creator, true) == 0)
             {
                 ViewBag.isassignee = true;
             }
@@ -1347,7 +1355,8 @@ namespace Prometheus.Controllers
 
                 ViewBag.isassignee = false;
                 if (string.Compare(updater, ret.Assignee, true) == 0 
-                    || string.Compare(updater,ret.Reporter,true) == 0)
+                    || string.Compare(updater,ret.Reporter,true) == 0
+                    || string.Compare(updater, ret.Creator, true) == 0)
                 {
                     ViewBag.isassignee = true;
                 }
@@ -1417,7 +1426,8 @@ namespace Prometheus.Controllers
             if (Request.Form["deleterma"] != null)
             {
                 if (string.Compare(updater, originaldata.Reporter, true) == 0
-                    || string.Compare(updater, originaldata.Assignee, true) == 0)
+                    || string.Compare(updater, originaldata.Assignee, true) == 0
+                    || string.Compare(updater, originaldata.Creator, true) == 0)
                 {
                     IssueViewModels.RemoveIssue(issuekey);
                     var dict = new RouteValueDictionary();
@@ -1447,7 +1457,7 @@ namespace Prometheus.Controllers
             vm.ECustomer = Request.Form["ECustomer"];
             vm.CRMANUM = Request.Form["CRMANUM"];
             vm.CReport = Request.Form["CReport"];
-            vm.RelativePeoples = Request.Form["RPeopleAddr"];
+            
             vm.ModuleSN = Request.Form["ModuleSN"];
 
             vm.Summary = "RMA " + vm.FinisarRMA + " for module " + vm.FinisarModel + " from " + vm.ECustomer + ": " + vm.CReport;
@@ -1461,15 +1471,18 @@ namespace Prometheus.Controllers
             vm.ReportDate = DateTime.Now;
             vm.Reporter = updater;
             if (string.Compare(originaldata.Reporter, updater, true) == 0
-                || string.Compare(originaldata.Assignee, updater, true) == 0)
+                || string.Compare(originaldata.Assignee, updater, true) == 0
+                || string.Compare(originaldata.Creator, updater, true) == 0)
             {
                 vm.Assignee = Request.Form["assigneelist"].ToString();
                 vm.Resolution = Request.Form["resolutionlist"].ToString();
+                vm.RelativePeoples = Request.Form["RPeopleAddr"];
             }
             else
             {
                 vm.Assignee = originaldata.Assignee;
                 vm.Resolution = originaldata.Resolution;
+                vm.RelativePeoples = originaldata.RelativePeoples;
             }
 
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
@@ -1669,7 +1682,8 @@ namespace Prometheus.Controllers
 
             ViewBag.isassignee = false;
             if (string.Compare(updater, newdata.Assignee, true) == 0
-                    || string.Compare(updater, newdata.Reporter,true) == 0)
+                    || string.Compare(updater, newdata.Reporter,true) == 0
+                    || string.Compare(updater, newdata.Creator, true) == 0)
             {
                 ViewBag.isassignee = true;
             }
@@ -1726,7 +1740,8 @@ namespace Prometheus.Controllers
 
                 ViewBag.isassignee = false;
                 if (string.Compare(updater, ret.Assignee, true) == 0
-                    || string.Compare(updater, ret.Reporter, true) == 0)
+                    || string.Compare(updater, ret.Reporter, true) == 0
+                    || string.Compare(updater, ret.Creator, true) == 0)
                 {
                     ViewBag.isassignee = true;
                 }
@@ -1757,76 +1772,62 @@ namespace Prometheus.Controllers
             if (Request.Form["deleterma"] != null)
             {
                 if (string.Compare(updater, originaldata.Reporter, true) == 0
-                    || string.Compare(updater, originaldata.Assignee, true) == 0)
+                    || string.Compare(updater, originaldata.Assignee, true) == 0
+                    || string.Compare(updater, originaldata.Creator, true) == 0)
                 {
                     IssueViewModels.RemoveIssue(issuekey);
-                    var dict = new RouteValueDictionary();
-                    dict.Add("ProjectKey", originaldata.ProjectKey);
-                    return RedirectToAction("ProjectDetail", "Project", dict);
+                    var dict1 = new RouteValueDictionary();
+                    dict1.Add("ProjectKey", originaldata.ProjectKey);
+                    return RedirectToAction("ProjectDetail", "Project", dict1);
                 }
             }
 
-            var vm = new IssueViewModels();
-            vm.ProjectKey = Request.Form["projectlist"].ToString();
-            vm.IssueKey = issuekey;
-            vm.IssueType = ISSUETP.RMA;
+            if(!string.IsNullOrEmpty(Request.Form["LineCategory"]))
+                originaldata.LineCategory = Request.Form["LineCategory"];
 
-            vm.FinisarRMA = Request.Form["FRMANUM"];
-            var tempfailurecode = Request.Form["RMAFailureCode"].ToString();
-            if (string.Compare(tempfailurecode, "None", true) == 0)
-            {
-                vm.RMAFailureCode = "";
-            }
-            else
-            {
-                vm.RMAFailureCode = tempfailurecode;
-            }
+            if (!string.IsNullOrEmpty(Request.Form["ProductType"]))
+                originaldata.ProductType = Request.Form["ProductType"];
 
-            vm.FVCode = Request.Form["FVCode"];
-            vm.FinisarModel = Request.Form["FinisarModel"];
-            vm.ECustomer = Request.Form["ECustomer"];
-            vm.CRMANUM = Request.Form["CRMANUM"];
-            vm.CReport = Request.Form["CReport"];
-            vm.RelativePeoples = Request.Form["RPeopleAddr"];
-            vm.ModuleSN = Request.Form["ModuleSN"];
+            if (!string.IsNullOrEmpty(Request.Form["TestType"]))
+                originaldata.TestType = Request.Form["TestType"];
 
-            vm.Summary = "RMA " + vm.FinisarRMA + " for module " + vm.FinisarModel + " from " + vm.ECustomer + ": " + vm.CReport;
-            if (vm.Summary.Length > 200)
-            {
-                vm.Summary = vm.Summary.Substring(0, 198);
-            }
+            if (!string.IsNullOrEmpty(Request.Form["QualType"]))
+                originaldata.QualType = Request.Form["QualType"];
 
-            vm.Priority = Request.Form["prioritylist"].ToString();
-            vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
-            vm.ReportDate = DateTime.Now;
-            vm.Reporter = updater;
+            if (!string.IsNullOrEmpty(Request.Form["RequestID"]))
+                originaldata.RequestID = Request.Form["RequestID"];
+
+            originaldata.FVCode = Request.Form["FVCode"];
+            
+            originaldata.Priority = Request.Form["prioritylist"].ToString();
+            originaldata.DueDate = DateTime.Parse(Request.Form["DueDate"]);
+
+            var originalassignee = originaldata.Assignee;
+            var originaldataresolution = originaldata.Resolution;
             if (string.Compare(originaldata.Reporter, updater, true) == 0
-                || string.Compare(originaldata.Assignee, updater, true) == 0)
+                || string.Compare(originaldata.Assignee, updater, true) == 0
+                || string.Compare(originaldata.Creator, updater, true) == 0)
             {
-                vm.Assignee = Request.Form["assigneelist"].ToString();
-                vm.Resolution = Request.Form["resolutionlist"].ToString();
-            }
-            else
-            {
-                vm.Assignee = originaldata.Assignee;
-                vm.Resolution = originaldata.Resolution;
+                originaldata.Assignee = Request.Form["assigneelist"].ToString();
+                originaldata.Resolution = Request.Form["resolutionlist"].ToString();
+                originaldata.RelativePeoples = Request.Form["RPeopleAddr"];
             }
 
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
-                vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
-                vm.CommentType = COMMENTTYPE.Description;
+                originaldata.Description = Server.HtmlDecode(Request.Form["editor1"]);
+                originaldata.CommentType = COMMENTTYPE.Description;
                 UserRankViewModel.UpdateUserRank(updater, 2);
             }
             else
-                vm.Description = "";
+                originaldata.Description = "";
 
             if (!string.IsNullOrEmpty(Request.Form["rootcauseeditor"]))
             {
                 var rootcause = Server.HtmlDecode(Request.Form["rootcauseeditor"]);
                 var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(rootcause));
                 var commenttype = COMMENTTYPE.RootCause;
-                IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
+                IssueViewModels.StoreIssueComment(originaldata.IssueKey, dbstr, updater, commenttype);
                 UserRankViewModel.UpdateUserRank(updater, 5);
             }
 
@@ -1836,24 +1837,6 @@ namespace Prometheus.Controllers
                 if (Request.Form["issuetagcheck" + i] != null)
                 {
                     issuetag = issuetag + Request.Form["issuetagcheck" + i] + ";";
-                }
-            }
-
-            var customertag = string.Empty;
-            for (var i = 0; i < 200; i++)
-            {
-                if (Request.Form["customertagcheck" + i] != null)
-                {
-                    customertag = customertag + Request.Form["customertagcheck" + i] + ";";
-                }
-            }
-
-            var internaltag = string.Empty;
-            for (var i = 0; i < 200; i++)
-            {
-                if (Request.Form["internaltagcheck" + i] != null)
-                {
-                    internaltag = internaltag + Request.Form["internaltagcheck" + i] + ";";
                 }
             }
 
@@ -1887,7 +1870,7 @@ namespace Prometheus.Controllers
 
                 if (!string.IsNullOrEmpty(url))
                 {
-                    IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
+                    IssueViewModels.StoreIssueAttachment(originaldata.IssueKey, url);
                     if (!string.IsNullOrEmpty(attachtag))
                     {
                         var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
@@ -1898,89 +1881,18 @@ namespace Prometheus.Controllers
                 }
             }
 
-            if (!string.IsNullOrEmpty(Request.Form["customreportupload"]))
+
+            originaldata.UpdateRel();
+
+            if (string.Compare(originaldata.Assignee, originalassignee, true) != 0)
             {
-                var customereportfile = Request.Form["customreportupload"];
-                var originalname = Path.GetFileNameWithoutExtension(customereportfile)
-                    .Replace(" ", "_").Replace("#", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                var url = "";
-                foreach (var r in urls)
-                {
-                    if (r.Contains(originalname))
-                    {
-                        url = r;
-                        break;
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(url))
-                {
-                    var linkstr = url;
-                    var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(linkstr));
-                    var commenttype = COMMENTTYPE.CustomReport;
-                    IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
-                    IssueViewModels.StoreIssueAttachment(vm.IssueKey, linkstr);
-                    if (!string.IsNullOrEmpty(customertag))
-                    {
-                        var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
-                        var dockey = tempkeys[tempkeys.Length - 1];
-                        ShareDocVM.ShareDoc(originaldata.ProjectKey, ShareDocType.DOCUMENT, dockey, customertag, updater, DateTime.Now.ToString());
-                    }
-                    UserRankViewModel.UpdateUserRank(updater, 5);
-                }
+                originaldata.UpdateIAssign();
+                SendTaskEvent(originaldata, "asigned to you", updater, originaldata.Assignee);
             }
 
-            if (!string.IsNullOrEmpty(Request.Form["internalreportupload"]))
+            if (string.Compare(originaldataresolution, originaldata.Resolution, true) != 0)
             {
-                var internalreportfile = Request.Form["internalreportupload"];
-                var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
-                    .Replace(" ", "_").Replace("#", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                var url = "";
-                foreach (var r in urls)
-                {
-                    if (r.Contains(originalname))
-                    {
-                        url = r;
-                        break;
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(url))
-                {
-                    var linkstr = url;
-                    var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(linkstr));
-                    var commenttype = COMMENTTYPE.InternalReport;
-                    IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
-                    IssueViewModels.StoreIssueAttachment(vm.IssueKey, linkstr);
-                    if (!string.IsNullOrEmpty(internaltag))
-                    {
-                        var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
-                        var dockey = tempkeys[tempkeys.Length - 1];
-                        ShareDocVM.ShareDoc(originaldata.ProjectKey, ShareDocType.DOCUMENT, dockey, internaltag, updater, DateTime.Now.ToString());
-                    }
-                    UserRankViewModel.UpdateUserRank(updater, 10);
-                }
-            }
-
-            vm.UpdateRMA();
-
-            //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Updated", originaldata.Summary, originaldata.IssueKey);
-
-            if (string.Compare(originaldata.Assignee, vm.Assignee, true) != 0)
-            {
-                vm.UpdateIAssign();
-                //ProjectEvent.AssignIssueEvent(originaldata.ProjectKey, updater, vm.Assignee, originaldata.Summary, originaldata.IssueKey);
-                vm.Summary = originaldata.Summary;
-                SendTaskEvent(vm, "asigned to you", updater, vm.Assignee);
-            }
-
-            if (string.Compare(originaldata.Resolution, vm.Resolution, true) != 0)
-            {
-                if (vm.IssueClosed())
+                if (originaldata.IssueClosed())
                 {
                     UserRankViewModel.UpdateUserRank(updater, 5);
                     if (!string.IsNullOrEmpty(issuetag))
@@ -1988,34 +1900,20 @@ namespace Prometheus.Controllers
                         ShareDocVM.ShareDoc(originaldata.ProjectKey, ShareDocType.ISSUE, originaldata.IssueKey, issuetag, updater, DateTime.Now.ToString());
                     }
                     //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
-                    vm.CloseIssue();
-                    SendRMAEvent(vm, "closed", true);
+                    originaldata.CloseIssue();
+                    SendRMAEvent(originaldata, "closed", true);
                 }
 
-                if (string.Compare(vm.Resolution, Resolute.Working) == 0)
-                {
-                    //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Started", originaldata.Summary, originaldata.IssueKey);
-                }
-
-                if (string.Compare(vm.Resolution, Resolute.Reopen) == 0)
+                if (string.Compare(originaldata.Resolution, Resolute.Reopen) == 0)
                 {
                     //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Reopened", originaldata.Summary, originaldata.IssueKey);
-                    SendRMAEvent(vm, "reopened", true);
+                    SendRMAEvent(originaldata, "reopened", true);
                 }
             }
 
-            var newdata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
-            CreateAllLists(newdata);
-
-            ViewBag.isassignee = false;
-            if (string.Compare(updater, newdata.Assignee, true) == 0
-                    || string.Compare(updater, newdata.Reporter, true) == 0)
-            {
-                ViewBag.isassignee = true;
-            }
-
-            ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
-            return View(newdata);
+            var dict = new RouteValueDictionary();
+            dict.Add("issuekey", originaldata.IssueKey);
+            return RedirectToAction("UpdateRel", "Issue", dict);
         }
 
 
@@ -2067,7 +1965,8 @@ namespace Prometheus.Controllers
 
                 ViewBag.isassignee = false;
                 if (string.Compare(updater, ret.Assignee, true) == 0
-                    || string.Compare(updater, ret.Reporter, true) == 0)
+                    || string.Compare(updater, ret.Reporter, true) == 0
+                    || string.Compare(updater, ret.Creator, true) == 0)
                 {
                     ViewBag.isassignee = true;
                 }
@@ -2098,7 +1997,8 @@ namespace Prometheus.Controllers
             if (Request.Form["deleterma"] != null)
             {
                 if (string.Compare(updater, originaldata.Reporter, true) == 0
-                    || string.Compare(updater, originaldata.Assignee, true) == 0)
+                    || string.Compare(updater, originaldata.Assignee, true) == 0
+                    || string.Compare(updater, originaldata.Creator, true) == 0)
                 {
                     IssueViewModels.RemoveIssue(issuekey);
                     var dict = new RouteValueDictionary();
@@ -2138,7 +2038,8 @@ namespace Prometheus.Controllers
             vm.Reporter = updater;
 
             if (string.Compare(originaldata.Reporter, updater, true) == 0
-                || string.Compare(originaldata.Assignee, updater, true) == 0)
+                || string.Compare(originaldata.Assignee, updater, true) == 0
+                || string.Compare(originaldata.Creator, updater, true) == 0)
             {
                 vm.Assignee = Request.Form["assigneelist"].ToString();
                 vm.Resolution = Request.Form["resolutionlist"].ToString();
@@ -2262,7 +2163,8 @@ namespace Prometheus.Controllers
 
             ViewBag.isassignee = false;
             if (string.Compare(updater, newdata.Assignee, true) == 0
-                    || string.Compare(updater, newdata.Reporter, true) == 0)
+                    || string.Compare(updater, newdata.Reporter, true) == 0
+                    || string.Compare(updater, newdata.Creator, true) == 0)
             {
                 ViewBag.isassignee = true;
             }
@@ -2318,7 +2220,8 @@ namespace Prometheus.Controllers
 
                 ViewBag.isassignee = false;
                 if (string.Compare(updater, ret.Assignee, true) == 0
-                    || string.Compare(updater, ret.Reporter, true) == 0)
+                    || string.Compare(updater, ret.Reporter, true) == 0
+                    || string.Compare(updater, ret.Creator, true) == 0)
                 {
                     ViewBag.isassignee = true;
                 }
@@ -2348,7 +2251,8 @@ namespace Prometheus.Controllers
             if (Request.Form["deleterma"] != null)
             {
                 if (string.Compare(updater, originaldata.Reporter, true) == 0
-                    || string.Compare(updater, originaldata.Assignee, true) == 0)
+                    || string.Compare(updater, originaldata.Assignee, true) == 0
+                    || string.Compare(updater, originaldata.Creator, true) == 0)
                 {
                     IssueViewModels.RemoveIssue(issuekey);
                     var dict = new RouteValueDictionary();
@@ -2389,7 +2293,8 @@ namespace Prometheus.Controllers
             vm.Reporter = updater;
 
             if (string.Compare(originaldata.Reporter, updater, true) == 0
-                || string.Compare(originaldata.Assignee, updater, true) == 0)
+                || string.Compare(originaldata.Assignee, updater, true) == 0
+                || string.Compare(originaldata.Creator, updater, true) == 0)
             {
                 vm.Assignee = Request.Form["assigneelist"].ToString();
                 vm.Resolution = Request.Form["resolutionlist"].ToString();
@@ -2494,7 +2399,8 @@ namespace Prometheus.Controllers
 
             ViewBag.isassignee = false;
             if (string.Compare(updater, newdata.Assignee, true) == 0
-                    || string.Compare(updater, newdata.Reporter, true) == 0)
+                    || string.Compare(updater, newdata.Reporter, true) == 0
+                    || string.Compare(updater, newdata.Creator, true) == 0)
             {
                 ViewBag.isassignee = true;
             }

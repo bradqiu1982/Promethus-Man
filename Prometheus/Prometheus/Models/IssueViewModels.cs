@@ -224,6 +224,7 @@ namespace Prometheus.Models
         public DateTime ReportDate { set; get; }
         public string Assignee { set; get; }
         public string Reporter { set; get; }
+        public string Creator { set; get; }
         public string Resolution { set; get; }
 
         private string sDescription = "";
@@ -899,6 +900,32 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
+
+        public void UpdateRel()
+        {
+            var sql = "update Issue set Priority = '<Priority>',DueDate = '<DueDate>', Assignee = '<Assignee>',Resolution = '<Resolution>',RelativePeoples = '<RelativePeoples>' where IssueKey = '<IssueKey>'";
+            sql = sql.Replace("<IssueKey>", IssueKey).Replace("<Priority>", Priority)
+                .Replace("<DueDate>", DueDate.ToString()).Replace("<Assignee>", Assignee)
+                .Replace("<Resolution>", Resolution).Replace("<RelativePeoples>", RelativePeoples);
+            DBUtility.ExeLocalSqlNoRes(sql);
+
+            StoreIssueComment(DateTime.Now.ToString());
+
+            UpdateRelInfo();
+        }
+
+        private void UpdateRelInfo()
+        {
+            //IssueAttribute(IssueKey,APVal1,APVal2,APVal3,APVal4,APVal5,APVal6,APVal7,APVal8,APVal9,APVal10) "
+            //" values('<IssueKey>','<QualType>','<RequestID>','<LineCategory>','<ProductType>','<TestType>','<FailureInterval>','<FailQTY>','<TotalQTY>','<Location>','<FVCode>')
+
+            var sql = "update IssueAttribute set APVal1 = '<QualType>',APVal2 = '<RequestID>',APVal3 = '<LineCategory>',APVal4 = '<ProductType>',APVal5 = '<TestType>',APVal10 = '<FVCode>' where IssueKey = '<IssueKey>'";
+            sql = sql.Replace("<IssueKey>", IssueKey).Replace("<QualType>", QualType)
+                .Replace("<RequestID>", RequestID).Replace("<LineCategory>", LineCategory)
+                .Replace("<ProductType>", ProductType).Replace("<TestType>", TestType).Replace("<FVCode>", FVCode);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
         public void UpdateOBA()
         {
             var sql = "update Issue set Priority = '<Priority>',DueDate = '<DueDate>', Assignee = '<Assignee>',Resolution = '<Resolution>',RelativePeoples = '<RelativePeoples>' where IssueKey = '<IssueKey>'";
@@ -1018,7 +1045,7 @@ namespace Prometheus.Models
 
         public static IssueViewModels RetrieveIssueByIssueKey(string issuekey)
         {
-            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples,APVal2,ErrAbbr from Issue where APVal1 <> 'delete' and IssueKey = '<IssueKey>'";
+            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples,APVal2,ErrAbbr,Creator from Issue where APVal1 <> 'delete' and IssueKey = '<IssueKey>'";
             sql = sql.Replace("<IssueKey>", issuekey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
@@ -1032,6 +1059,7 @@ namespace Prometheus.Models
                     , Convert.ToString(dbret[0][11]), Convert.ToString(dbret[0][12]));
                 ret.LYT = Convert.ToString(dbret[0][13]);
                 ret.ErrAbbr = Convert.ToString(dbret[0][14]);
+                ret.Creator = Convert.ToString(dbret[0][15]);
 
                 ret.RetrieveComment();
 

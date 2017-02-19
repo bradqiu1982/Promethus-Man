@@ -89,7 +89,7 @@
                     <td>@item.ProductType</td>
                     <td>@item.TestType</td>
                     <td>@item.FailQTY/@item.TotalQTY</td>
-                    <td>@item.Summary</td>
+                    <td><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></td>
                     <td>@Html.Raw(@Prometheus.Models.Resolute.ColorStatus2(item.Resolution))</td>
 
                     @if (item.RootCauseCommentList.Count > 0)

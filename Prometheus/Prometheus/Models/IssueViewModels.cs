@@ -1050,6 +1050,11 @@ namespace Prometheus.Models
                     ret.RetrieveQuality();
                 }
 
+                if (string.Compare(ret.IssueType, ISSUETP.Rel) == 0)
+                {
+                    ret.RetrieveReliability();
+                }
+
                 ret.SubIssues = RetrieveSubIssue(ret.IssueKey);
                 ret.RetrieveAttachment(ret.IssueKey);
 

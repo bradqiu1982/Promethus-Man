@@ -808,6 +808,7 @@
     <Content Include="Views\CustomerData\CommitRelData.cshtml" />
     <Content Include="Views\CustomerData\ConfirmRelData.cshtml" />
     <Content Include="Views\Project\ProjectReliability.cshtml" />
+    <Content Include="Views\Issue\UpdateRel.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

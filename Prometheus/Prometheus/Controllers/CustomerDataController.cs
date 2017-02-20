@@ -158,11 +158,16 @@ namespace Prometheus.Controllers
             return ret;
         }
 
-        public static List<List<string>> RetrieveDataFromExcelWithAuth(string filename)
+        public static List<List<string>> RetrieveDataFromExcelWithAuth(Controller ctrl,string filename)
         {
             try
             {
-                using (NativeMethods cv = new NativeMethods("brad.qiu", "china", "wangle@5321"))
+                var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+                var folderuser = syscfgdict["SHAREFOLDERUSER"];
+                var folderdomin = syscfgdict["SHAREFOLDERDOMIN"];
+                var folderpwd = syscfgdict["SHAREFOLDERPWD"];
+
+                using (NativeMethods cv = new NativeMethods(folderuser, folderdomin, folderpwd))
                 {
                     return RetrieveDataFromExcel(filename);
                 }
@@ -288,7 +293,7 @@ namespace Prometheus.Controllers
 
                     if (!string.IsNullOrEmpty(wholefn))
                     {
-                        var data = RetrieveDataFromExcelWithAuth(wholefn);
+                        var data = RetrieveDataFromExcelWithAuth(this,wholefn);
                         if (data.Count > 0)
                         {
                             ViewBag.ROWCOUNT = data.Count;
@@ -511,7 +516,7 @@ namespace Prometheus.Controllers
 
                     if (!string.IsNullOrEmpty(wholefn))
                     {
-                        var data = RetrieveDataFromExcelWithAuth(wholefn);
+                        var data = RetrieveDataFromExcelWithAuth(this,wholefn);
                         var realdata = new List<List<string>>();
                         if (data.Count > 1)
                         {
@@ -658,7 +663,7 @@ namespace Prometheus.Controllers
 
                     if (!string.IsNullOrEmpty(wholefn))
                     {
-                        var data = RetrieveDataFromExcelWithAuth(wholefn);
+                        var data = RetrieveDataFromExcelWithAuth(this,wholefn);
                         var realdata = new List<List<string>>();
                         if (data.Count > 1)
                         {
@@ -812,7 +817,7 @@ namespace Prometheus.Controllers
 
                     if (!string.IsNullOrEmpty(wholefn))
                     {
-                        var data = RetrieveDataFromExcelWithAuth(wholefn);
+                        var data = RetrieveDataFromExcelWithAuth(this,wholefn);
                         var realdata = new List<List<string>>();
                         if (data.Count > 1)
                         {
@@ -960,7 +965,7 @@ namespace Prometheus.Controllers
 
                     if (!string.IsNullOrEmpty(wholefn))
                     {
-                        var data = RetrieveDataFromExcelWithAuth(wholefn);
+                        var data = RetrieveDataFromExcelWithAuth(this,wholefn);
                         var realdata = new List<List<string>>();
                         if (data.Count > 1)
                         {
@@ -1085,7 +1090,7 @@ namespace Prometheus.Controllers
                 toaddrs.AddRange(vm.RelativePeopleList);
                 toaddrs.Add(vm.Assignee);
                 toaddrs.Add(vm.Reporter);
-                EmailUtility.SendEmail("WUXI NPI System", toaddrs, content);
+                EmailUtility.SendEmail(this,"WUXI NPI System", toaddrs, content);
                 new System.Threading.ManualResetEvent(false).WaitOne(500);
             }
         }
@@ -1114,7 +1119,7 @@ namespace Prometheus.Controllers
                 toaddrs.AddRange(vm.RelativePeopleList);
                 toaddrs.Add(vm.Assignee);
                 toaddrs.Add(vm.Reporter);
-                EmailUtility.SendEmail("WUXI NPI System", toaddrs, content);
+                EmailUtility.SendEmail(this,"WUXI NPI System", toaddrs, content);
                 new System.Threading.ManualResetEvent(false).WaitOne(500);
             }
         }
@@ -1143,7 +1148,7 @@ namespace Prometheus.Controllers
                 toaddrs.AddRange(vm.RelativePeopleList);
                 toaddrs.Add(vm.Assignee);
                 toaddrs.Add(vm.Reporter);
-                EmailUtility.SendEmail("WUXI NPI System", toaddrs, content);
+                EmailUtility.SendEmail(this,"WUXI NPI System", toaddrs, content);
                 new System.Threading.ManualResetEvent(false).WaitOne(500);
             }
         }

@@ -18,12 +18,14 @@ namespace Prometheus.Models
 {
     public class EmailUtility
     {
-        public static bool SendEmail(string title, List<string> tolist, string content)
+        public static bool SendEmail(Controller ctrl,string title, List<string> tolist, string content)
         {
             try
             {
+                var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+
                 var message = new MailMessage();
-                message.From = new MailAddress("WXNPI.Trace@finisar.com");
+                message.From = new MailAddress(syscfgdict["APPEMAILADRESS"]);
                 foreach (var item in tolist)
                 {
                     message.To.Add(item);
@@ -32,12 +34,12 @@ namespace Prometheus.Models
                 message.Body = content;
 
                 SmtpClient client = new SmtpClient();
-                client.Host = "wmail.finisar.com";
+                client.Host = syscfgdict["EMAILSERVER"];
                 client.EnableSsl = true;
                 client.Timeout = 60000;
                 client.DeliveryMethod = SmtpDeliveryMethod.Network;
                 client.UseDefaultCredentials = false;
-                client.Credentials = new NetworkCredential("WXNPI.Trace@finisar.com", "abc@123");
+                client.Credentials = new NetworkCredential(syscfgdict["APPEMAILADRESS"], syscfgdict["APPEMAILPWD"]);
 
                 ServicePointManager.ServerCertificateValidationCallback
                     = delegate (object s, X509Certificate certificate, X509Chain chain

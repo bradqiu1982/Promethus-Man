@@ -210,6 +210,7 @@
     <Compile Include="Models\ATEUtility.cs" />
     <Compile Include="Models\BIDataUtility.cs" />
     <Compile Include="Models\BITestData.cs" />
+    <Compile Include="Models\CfgUtility.cs" />
     <Compile Include="Models\CookieUtility.cs" />
     <Compile Include="Models\DashBoardViewModels.cs" />
     <Compile Include="Models\DBUtility.cs" />
@@ -702,6 +703,7 @@
     <Content Include="Scripts\moment.min.js" />
     <Content Include="Scripts\ParetoChart.xml" />
     <Content Include="Scripts\PieChart.xml" />
+    <Content Include="Scripts\PromethusCfg.txt" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\SuperYield.xml" />

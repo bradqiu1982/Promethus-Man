@@ -141,7 +141,7 @@ namespace Prometheus.Controllers
                 {
                     toaddrs.AddRange(vm.RelativePeopleList);
                 }
-                EmailUtility.SendEmail("WUXI NPI System", toaddrs, content);
+                EmailUtility.SendEmail(this,"WUXI NPI System", toaddrs, content);
         }
 
         private void SendTaskEvent(IssueViewModels vm, string operate, string Reporter, string Assignee)
@@ -166,7 +166,7 @@ namespace Prometheus.Controllers
             {
                 toaddrs.AddRange(vm.RelativePeopleList);
             }
-            EmailUtility.SendEmail("WUXI NPI System", toaddrs, content);
+            EmailUtility.SendEmail(this,"WUXI NPI System", toaddrs, content);
             new System.Threading.ManualResetEvent(false).WaitOne(300);
         }
 
@@ -859,7 +859,7 @@ namespace Prometheus.Controllers
                 toaddrs.AddRange(vm.RelativePeopleList);
                 toaddrs.Add(vm.Assignee);
                 toaddrs.Add(vm.Reporter);
-                EmailUtility.SendEmail("WUXI NPI System", toaddrs, content);
+                EmailUtility.SendEmail(this,"WUXI NPI System", toaddrs, content);
                 new System.Threading.ManualResetEvent(false).WaitOne(300);
             }
         }
@@ -888,7 +888,7 @@ namespace Prometheus.Controllers
                 toaddrs.AddRange(vm.RelativePeopleList);
                 toaddrs.Add(vm.Assignee);
                 toaddrs.Add(vm.Reporter);
-                EmailUtility.SendEmail("WUXI NPI System", toaddrs, content);
+                EmailUtility.SendEmail(this,"WUXI NPI System", toaddrs, content);
                 new System.Threading.ManualResetEvent(false).WaitOne(300);
             }
         }

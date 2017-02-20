@@ -9,14 +9,114 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Excel = Microsoft.Office.Interop.Excel;
+using System.Diagnostics;
 
 namespace Prometheus.Controllers
 {
+    public class NativeMethods : IDisposable
+    {
+
+        // obtains user token  
+
+        [DllImport("advapi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+
+        static extern bool LogonUser(string pszUsername, string pszDomain, string pszPassword,
+
+            int dwLogonType, int dwLogonProvider, ref IntPtr phToken);
+
+
+
+        // closes open handes returned by LogonUser  
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+
+        extern static bool CloseHandle(IntPtr handle);
+        [DllImport("Advapi32.DLL")]
+        static extern bool ImpersonateLoggedOnUser(IntPtr hToken);
+        [DllImport("Advapi32.DLL")]
+        static extern bool RevertToSelf();
+        const int LOGON32_PROVIDER_DEFAULT = 0;
+        const int LOGON32_LOGON_NEWCREDENTIALS = 2;
+
+        private bool disposed;
+
+        public NativeMethods(string sUsername, string sDomain, string sPassword)
+        {
+
+            // initialize tokens  
+
+            IntPtr pExistingTokenHandle = new IntPtr(0);
+            IntPtr pDuplicateTokenHandle = new IntPtr(0);
+            try
+            {
+                // get handle to token  
+                bool bImpersonated = LogonUser(sUsername, sDomain, sPassword,
+
+                    LOGON32_LOGON_NEWCREDENTIALS, LOGON32_PROVIDER_DEFAULT, ref pExistingTokenHandle);
+                if (true == bImpersonated)
+                {
+
+                    if (!ImpersonateLoggedOnUser(pExistingTokenHandle))
+                    {
+                        int nErrorCode = Marshal.GetLastWin32Error();
+                        throw new Exception("ImpersonateLoggedOnUser error;Code=" + nErrorCode);
+                    }
+                }
+                else
+                {
+                    int nErrorCode = Marshal.GetLastWin32Error();
+                    throw new Exception("LogonUser error;Code=" + nErrorCode);
+                }
+
+            }
+
+            finally
+            {
+                // close handle(s)  
+                if (pExistingTokenHandle != IntPtr.Zero)
+                    CloseHandle(pExistingTokenHandle);
+                if (pDuplicateTokenHandle != IntPtr.Zero)
+                    CloseHandle(pDuplicateTokenHandle);
+            }
+
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+
+            if (!disposed)
+            {
+                RevertToSelf();
+                disposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+    }
+
     public class CustomerDataController : Controller
     {
         public ActionResult CommitVcselData()
         {
             return View();
+        }
+
+        private static void logthdinfo(string info)
+        {
+            var filename = "d:\\log\\excelexception-" + DateTime.Now.ToString("yyyy-MM-dd");
+            if (System.IO.File.Exists(filename))
+            {
+                var content = System.IO.File.ReadAllText(filename);
+                content = content + "\r\n" + DateTime.Now.ToString() + " : " + info;
+                System.IO.File.WriteAllText(filename, content);
+            }
+            else
+            {
+                System.IO.File.WriteAllText(filename, DateTime.Now.ToString() + " : " + info);
+            }
         }
 
         private static Excel.Workbook OpenBook(Excel.Workbooks books, string fileName, bool readOnly, bool editable,
@@ -45,7 +145,7 @@ namespace Prometheus.Controllers
             }
         }
 
-        private bool WholeLineEmpty(List<string> line)
+        private static bool WholeLineEmpty(List<string> line)
         {
             bool ret = true;
             foreach (var item in line)
@@ -58,7 +158,22 @@ namespace Prometheus.Controllers
             return ret;
         }
 
-        private List<List<string>> RetrieveDataFromExcel(string wholefn)
+        public static List<List<string>> RetrieveDataFromExcelWithAuth(string filename)
+        {
+            try
+            {
+                using (NativeMethods cv = new NativeMethods("brad.qiu", "china", "wangle@5321"))
+                {
+                    return RetrieveDataFromExcel(filename);
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        private static List<List<string>> RetrieveDataFromExcel(string wholefn)
         {
             var data = new List<List<string>>();
             Excel.Application excel = null;
@@ -67,6 +182,8 @@ namespace Prometheus.Controllers
 
             try
             {
+                logthdinfo(DateTime.Now.ToString() + " try to open excel file " + wholefn + "\r\n\r\n");
+
                 excel = new Excel.Application();
                 excel.DisplayAlerts = false;
                 books = excel.Workbooks;
@@ -112,6 +229,8 @@ namespace Prometheus.Controllers
             }
             catch (Exception ex)
             {
+                logthdinfo(DateTime.Now.ToString() + " Exception on " + wholefn + " :" + ex.Message + "\r\n\r\n");
+
                 data.Clear();
                 return data;
             }
@@ -169,7 +288,7 @@ namespace Prometheus.Controllers
 
                     if (!string.IsNullOrEmpty(wholefn))
                     {
-                        var data = RetrieveDataFromExcel(wholefn);
+                        var data = RetrieveDataFromExcelWithAuth(wholefn);
                         if (data.Count > 0)
                         {
                             ViewBag.ROWCOUNT = data.Count;
@@ -392,7 +511,7 @@ namespace Prometheus.Controllers
 
                     if (!string.IsNullOrEmpty(wholefn))
                     {
-                        var data = RetrieveDataFromExcel(wholefn);
+                        var data = RetrieveDataFromExcelWithAuth(wholefn);
                         var realdata = new List<List<string>>();
                         if (data.Count > 1)
                         {
@@ -539,7 +658,7 @@ namespace Prometheus.Controllers
 
                     if (!string.IsNullOrEmpty(wholefn))
                     {
-                        var data = RetrieveDataFromExcel(wholefn);
+                        var data = RetrieveDataFromExcelWithAuth(wholefn);
                         var realdata = new List<List<string>>();
                         if (data.Count > 1)
                         {
@@ -693,7 +812,7 @@ namespace Prometheus.Controllers
 
                     if (!string.IsNullOrEmpty(wholefn))
                     {
-                        var data = RetrieveDataFromExcel(wholefn);
+                        var data = RetrieveDataFromExcelWithAuth(wholefn);
                         var realdata = new List<List<string>>();
                         if (data.Count > 1)
                         {
@@ -841,7 +960,7 @@ namespace Prometheus.Controllers
 
                     if (!string.IsNullOrEmpty(wholefn))
                     {
-                        var data = RetrieveDataFromExcel(wholefn);
+                        var data = RetrieveDataFromExcelWithAuth(wholefn);
                         var realdata = new List<List<string>>();
                         if (data.Count > 1)
                         {

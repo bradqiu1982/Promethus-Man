@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 
 namespace Prometheus.Models
 {
@@ -328,7 +329,7 @@ namespace Prometheus.Models
             }
         }
 
-        public static void PrePareLatestData(string projectkey)
+        public static void PrePareLatestData(Controller ctrl, string projectkey)
         {
             if (UpdatePJLockUsing(projectkey))
                 return;
@@ -345,12 +346,12 @@ namespace Prometheus.Models
                         vlast = vlast.AddMinutes(18);
                         if (vlast < DateTime.Now)
                         {
-                            BIDataUtility.UpdateProjectData(vm);
+                            BIDataUtility.UpdateProjectData(ctrl,vm);
                         }
                     }
                     else
                     {
-                        BIDataUtility.UpdateProjectData(vm);
+                        BIDataUtility.UpdateProjectData(ctrl,vm);
                     }
                 }
 
@@ -362,7 +363,7 @@ namespace Prometheus.Models
             }
         }
 
-        public static void RetrieveWaferDataFromMes (string projectkey)
+        public static void RetrieveWaferDataFromMes (Controller ctrl, string projectkey)
         {
             if (UpdatePJLockUsing(projectkey))
                 return;
@@ -370,7 +371,7 @@ namespace Prometheus.Models
             try
             {
                 var vm = ProjectViewModels.RetrieveOneProject(projectkey);
-                BIDataUtility.RetrievePjWaferAllData(vm);
+                BIDataUtility.RetrievePjWaferAllData(ctrl,vm);
                 ResetUpdatePJLock(projectkey);
             }
             catch (Exception ex)

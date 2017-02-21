@@ -7,6 +7,7 @@ using System.IO;
 using System.Data;
 using Oracle.DataAccess.Client;
 using System.Web.Caching;
+using System.Web.Mvc;
 
 namespace Prometheus.Models
 {
@@ -420,92 +421,110 @@ namespace Prometheus.Models
             }
             catch (SqlException ex)
             {
+                logthdinfo("fail to connect to the parallel summary database:"+ex.Message);
                 //System.Windows.MessageBox.Show(ex.ToString());
                 return null;
             }
             catch (Exception ex)
             {
+                logthdinfo("fail to connect to the parallel summary database"+ex.Message);
                 //System.Windows.MessageBox.Show(ex.ToString());
                 return null;
             }
         }
 
-        public static bool ExePRLSqlNoRes(string sql)
+        public static bool ExePRLSqlNoRes(Controller ctrl, string sql)
         {
-            var conn = GetPRLConnector();
-            if (conn == null)
-                return false;
+            var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+            var folderuser = syscfgdict["SHAREFOLDERUSER"];
+            var folderdomin = syscfgdict["SHAREFOLDERDOMIN"];
+            var folderpwd = syscfgdict["SHAREFOLDERPWD"];
 
-            try
+            using (NativeMethods cv = new NativeMethods(folderuser, folderdomin, folderpwd))
             {
-                var command = conn.CreateCommand();
-                command.CommandText = sql;
-                command.ExecuteNonQuery();
-                CloseConnector(conn);
-                return true;
-            }
-            catch (SqlException ex)
-            {
-                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
-                CloseConnector(conn);
-                //System.Windows.MessageBox.Show(ex.ToString());
-                return false;
-            }
-            catch (Exception ex)
-            {
-                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
-                CloseConnector(conn);
-                //System.Windows.MessageBox.Show(ex.ToString());
-                return false;
-            }
-        }
-
-        public static List<List<object>> ExePRLSqlWithRes(string sql)
-        {
-            var ret = new List<List<object>>();
-            var conn = GetPRLConnector();
-            try
-            {
+                var conn = GetPRLConnector();
                 if (conn == null)
-                    return ret;
+                    return false;
 
-                var command = conn.CreateCommand();
-                command.CommandTimeout = 60;
-                command.CommandText = sql;
-                var sqlreader = command.ExecuteReader();
-                if (sqlreader.HasRows)
+                try
                 {
-
-                    while (sqlreader.Read())
-                    {
-                        var newline = new List<object>();
-                        for (var i = 0; i < sqlreader.FieldCount; i++)
-                        {
-                            newline.Add(sqlreader.GetValue(i));
-                        }
-                        ret.Add(newline);
-                    }
+                    var command = conn.CreateCommand();
+                    command.CommandText = sql;
+                    command.ExecuteNonQuery();
+                    CloseConnector(conn);
+                    return true;
                 }
+                catch (SqlException ex)
+                {
+                    logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                    CloseConnector(conn);
+                    //System.Windows.MessageBox.Show(ex.ToString());
+                    return false;
+                }
+                catch (Exception ex)
+                {
+                    logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                    CloseConnector(conn);
+                    //System.Windows.MessageBox.Show(ex.ToString());
+                    return false;
+                }
+            }
+        }
 
-                sqlreader.Close();
-                CloseConnector(conn);
-                return ret;
-            }
-            catch (SqlException ex)
+        public static List<List<object>> ExePRLSqlWithRes(Controller ctrl, string sql)
+        {
+            var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+            var folderuser = syscfgdict["SHAREFOLDERUSER"];
+            var folderdomin = syscfgdict["SHAREFOLDERDOMIN"];
+            var folderpwd = syscfgdict["SHAREFOLDERPWD"];
+
+            using (NativeMethods cv = new NativeMethods(folderuser, folderdomin, folderpwd))
             {
-                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
-                //System.Windows.MessageBox.Show(ex.ToString());
-                CloseConnector(conn);
-                ret.Clear();
-                return ret;
-            }
-            catch (Exception ex)
-            {
-                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
-                //System.Windows.MessageBox.Show(ex.ToString());
-                CloseConnector(conn);
-                ret.Clear();
-                return ret;
+                var ret = new List<List<object>>();
+                var conn = GetPRLConnector();
+                try
+                {
+                    if (conn == null)
+                        return ret;
+
+                    var command = conn.CreateCommand();
+                    command.CommandTimeout = 60;
+                    command.CommandText = sql;
+                    var sqlreader = command.ExecuteReader();
+                    if (sqlreader.HasRows)
+                    {
+
+                        while (sqlreader.Read())
+                        {
+                            var newline = new List<object>();
+                            for (var i = 0; i < sqlreader.FieldCount; i++)
+                            {
+                                newline.Add(sqlreader.GetValue(i));
+                            }
+                            ret.Add(newline);
+                        }
+                    }
+
+                    sqlreader.Close();
+                    CloseConnector(conn);
+                    return ret;
+                }
+                catch (SqlException ex)
+                {
+                    logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                    //System.Windows.MessageBox.Show(ex.ToString());
+                    CloseConnector(conn);
+                    ret.Clear();
+                    return ret;
+                }
+                catch (Exception ex)
+                {
+                    logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                    //System.Windows.MessageBox.Show(ex.ToString());
+                    CloseConnector(conn);
+                    ret.Clear();
+                    return ret;
+                }
             }
         }
 

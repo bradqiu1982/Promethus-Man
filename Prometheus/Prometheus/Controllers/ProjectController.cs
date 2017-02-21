@@ -75,12 +75,17 @@ namespace Prometheus.Controllers
 
                 NPIInfo(item);
 
-                item.PendingTaskCount = IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Pending).ToString()
-                    + "/" + IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Done).ToString();
-                item.PendingFACount = ProjectFAViewModules.RetrieveFADataCount(item.ProjectKey).ToString()
-                    +"/"+ ProjectFAViewModules.RetrieveFADataCount(item.ProjectKey,false).ToString();
-                item.PendingRMACount = IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Pending).ToString()
-                    + "/" + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Done).ToString();
+                var taskdone = IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Pending);
+                var tasktotal = taskdone + IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Done);
+                item.PendingTaskCount = taskdone.ToString() + "/" + tasktotal.ToString();
+
+                var fadone = ProjectFAViewModules.RetrieveFADataCount(item.ProjectKey, false);
+                var fatotal = fadone + ProjectFAViewModules.RetrieveFADataCount(item.ProjectKey);
+                item.PendingFACount = fadone.ToString()+"/"+ fatotal.ToString();
+
+                var rmadone = IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Done);
+                var rmatotal = rmadone + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Pending);
+                item.PendingRMACount = rmadone.ToString()+ "/" + rmatotal.ToString();
             }
 
             filterlist[0].Selected = true;
@@ -728,7 +733,7 @@ namespace Prometheus.Controllers
             //ProjectEvent.CreateProjectEvent(who, projectmodel.ProjectKey, projectmodel.ProjectName);
 
             MESUtility.StartProjectBonding(projectmodel);
-            BIDataUtility.StartProjectBonding(projectmodel);
+            BIDataUtility.StartProjectBonding(this,projectmodel);
             ATEUtility.StartProjectBonding(projectmodel);
 
 
@@ -1033,7 +1038,7 @@ namespace Prometheus.Controllers
 
             if (pnbondingchg)
             {
-                BIDataUtility.StartProjectBonding(projectmodel);
+                BIDataUtility.StartProjectBonding(this,projectmodel);
             }
 
             ProjectTestData.PrePareATELatestData(projectmodel.ProjectKey);
@@ -1093,12 +1098,17 @@ namespace Prometheus.Controllers
 
                     NPIInfo(vm);
 
-                    vm.PendingTaskCount = IssueViewModels.RetrieveTaskCountByProjectKey(vm.ProjectKey, Resolute.Pending).ToString()
-                        + "/" + IssueViewModels.RetrieveTaskCountByProjectKey(vm.ProjectKey, Resolute.Done).ToString(); 
-                    vm.PendingFACount = ProjectFAViewModules.RetrieveFADataCount(vm.ProjectKey).ToString()
-                        + "/" + ProjectFAViewModules.RetrieveFADataCount(vm.ProjectKey, false).ToString();
-                    vm.PendingRMACount = IssueViewModels.RetrieveRMACountByProjectKey(vm.ProjectKey, Resolute.Pending).ToString()
-                         + "/" + IssueViewModels.RetrieveRMACountByProjectKey(vm.ProjectKey, Resolute.Done).ToString();
+                    var taskdone = IssueViewModels.RetrieveTaskCountByProjectKey(vm.ProjectKey, Resolute.Pending);
+                    var tasktotal = taskdone + IssueViewModels.RetrieveTaskCountByProjectKey(vm.ProjectKey, Resolute.Done);
+                    vm.PendingTaskCount = taskdone.ToString() + "/" + tasktotal.ToString();
+
+                    var fadone = ProjectFAViewModules.RetrieveFADataCount(vm.ProjectKey, false);
+                    var fatotal = fadone + ProjectFAViewModules.RetrieveFADataCount(vm.ProjectKey);
+                    vm.PendingFACount = fadone.ToString() + "/" + fatotal.ToString();
+
+                    var rmadone = IssueViewModels.RetrieveRMACountByProjectKey(vm.ProjectKey, Resolute.Done);
+                    var rmatotal = rmadone + IssueViewModels.RetrieveRMACountByProjectKey(vm.ProjectKey, Resolute.Pending);
+                    vm.PendingRMACount = rmadone.ToString() + "/" + rmatotal.ToString();
                 }
 
                 return View(vm);
@@ -3949,7 +3959,7 @@ namespace Prometheus.Controllers
             {
                 try
                 {
-                    BITestData.PrePareLatestData(pjkey);
+                    BITestData.PrePareLatestData(this,pjkey);
                 }
                 catch (Exception ex)
                 { }
@@ -3988,7 +3998,7 @@ namespace Prometheus.Controllers
             {
                 try
                 {
-                    BITestData.PrePareLatestData(pjkey);
+                    BITestData.PrePareLatestData(this,pjkey);
                 }
                 catch (Exception ex)
                 { }
@@ -4050,7 +4060,7 @@ namespace Prometheus.Controllers
             {
                 try
                 {
-                    BITestData.RetrieveWaferDataFromMes(pjkey);
+                    BITestData.RetrieveWaferDataFromMes(this,pjkey);
                     var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
                     RealCheckVcselYieldByWafer(pjkeylist);
                 }

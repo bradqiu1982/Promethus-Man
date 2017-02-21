@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
+using System.Web.Mvc;
 
 namespace Prometheus.Models
 {
@@ -101,7 +102,7 @@ namespace Prometheus.Models
             }
         }
 
-        public static void StartProjectBonding(ProjectViewModels vm)
+        public static void StartProjectBonding(Controller ctrl, ProjectViewModels vm)
         {
             var vtab = new List<string>();
             vtab.Add("dbo.PRLL_VcselInfoSummary_2016");
@@ -130,7 +131,7 @@ namespace Prometheus.Models
                             sql = sql.Replace("<PNCOND>",pncond).Replace("<TIMECOND>", vm.StartDate.ToString());
 
                             var tempdataiddict = new Dictionary<string, BITestData>();
-                            var dbret = DBUtility.ExePRLSqlWithRes(sql);
+                            var dbret = DBUtility.ExePRLSqlWithRes(ctrl,sql);
                             foreach (var line in dbret)
                             {
                                 var tempid = ConvertString(line[0])+ "_" + ConvertString(line[1]);
@@ -195,7 +196,7 @@ namespace Prometheus.Models
         }
 
 
-        public static void UpdateProjectData(ProjectViewModels vm)
+        public static void UpdateProjectData(Controller ctrl, ProjectViewModels vm)
         {
             var vtab = new List<string>();
             vtab.Add("dbo.PRLL_VcselInfoSummary_2016");
@@ -227,7 +228,7 @@ namespace Prometheus.Models
                         sql = sql.Replace("<PNCOND>", pncond).Replace("<TIMECOND>", starttime);
 
                             var tempdataiddict = new Dictionary<string, BITestData>();
-                            var dbret = DBUtility.ExePRLSqlWithRes(sql);
+                            var dbret = DBUtility.ExePRLSqlWithRes(ctrl,sql);
                             foreach (var line in dbret)
                             {
                                 var tempid = ConvertString(line[0]) + "_" + ConvertString(line[1]);
@@ -303,7 +304,7 @@ namespace Prometheus.Models
 
         }
 
-        public static void RetrievePjWaferAllData(ProjectViewModels vm)
+        public static void RetrievePjWaferAllData(Controller ctrl, ProjectViewModels vm)
         {
             var vtab = new List<string>();
             vtab.Add("dbo.PRLL_VcselInfoSummary_2016");
@@ -336,7 +337,7 @@ namespace Prometheus.Models
 
                         sql = sql.Replace("<PNCOND>", pncond).Replace("<TIMECOND>", starttime).Replace("<WAFERCOND>", wafercond);
 
-                        var dbret = DBUtility.ExePRLSqlWithRes(sql);
+                        var dbret = DBUtility.ExePRLSqlWithRes(ctrl,sql);
                         if (dbret.Count > 0)
                         {
                             var bondeddatadict = BITestData.RetrieveAllDataIDASC(vm.ProjectKey);

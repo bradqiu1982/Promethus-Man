@@ -532,50 +532,56 @@ namespace Prometheus.Controllers
                 }
             }
 
-            var newdata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+            //var newdata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
 
             if (Request.Form["birootcauselist"] != null)
             {
                 var biret = Request.Form["birootcauselist"].ToString();
                 if (string.Compare(biret, "NONE") != 0)
                 {
-                    var sn = newdata.Summary.Split(new string[] { " " }, StringSplitOptions.None)[1].Trim().ToUpper();
-                    IssueViewModels.StoreBIRootCause(newdata.ProjectKey, sn, biret);
+                    var sn = originaldata.Summary.Split(new string[] { " " }, StringSplitOptions.None)[1].Trim().ToUpper();
+                    IssueViewModels.StoreBIRootCause(originaldata.ProjectKey, sn, biret);
                 }
             }
 
-            ViewBag.isassignee = false;
-            if (string.Compare(updater, newdata.Assignee, true) == 0
-                    || string.Compare(updater, newdata.Reporter,true) == 0
-                    || string.Compare(updater, newdata.Creator, true) == 0)
-            {
-                ViewBag.isassignee = true;
-            }
+            //ViewBag.isassignee = false;
+            //if (string.Compare(updater, newdata.Assignee, true) == 0
+            //        || string.Compare(updater, newdata.Reporter,true) == 0
+            //        || string.Compare(updater, newdata.Creator, true) == 0)
+            //{
+            //    ViewBag.isassignee = true;
+            //}
 
-            ViewBag.authrized = true;
-            if (string.Compare(newdata.IssueType, ISSUETP.NPIPROC) == 0)
-            {
-                ViewBag.authrized = false;
-            }
-            var pj = ProjectViewModels.RetrieveOneProject(newdata.ProjectKey);
-            foreach (var item in pj.MemberList)
-            {
-                if (string.Compare(item.Name, updater, true) == 0)
-                {
-                    ViewBag.authrized = true;
-                    break;
-                }
-            }
+            //ViewBag.authrized = true;
+            //if (string.Compare(newdata.IssueType, ISSUETP.NPIPROC) == 0)
+            //{
+            //    ViewBag.authrized = false;
+            //}
+            //var pj = ProjectViewModels.RetrieveOneProject(newdata.ProjectKey);
+            //foreach (var item in pj.MemberList)
+            //{
+            //    if (string.Compare(item.Name, updater, true) == 0)
+            //    {
+            //        ViewBag.authrized = true;
+            //        break;
+            //    }
+            //}
 
-            CreateAllLists(newdata);
+            //CreateAllLists(newdata);
 
-            if (newdata.Summary.Contains(" @Burn-In Step "))
-            {
-                var sn = newdata.Summary.Split(new string[] { " " }, StringSplitOptions.None)[1].Trim().ToUpper();
-                ViewBag.birootcauselist = CreateBIRootIssue(newdata.ProjectKey, sn);
-            }
-            ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
-            return View(newdata);
+            //if (newdata.Summary.Contains(" @Burn-In Step "))
+            //{
+            //    var sn = newdata.Summary.Split(new string[] { " " }, StringSplitOptions.None)[1].Trim().ToUpper();
+            //    ViewBag.birootcauselist = CreateBIRootIssue(newdata.ProjectKey, sn);
+            //}
+
+
+            //ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
+            //return View(newdata);
+
+            var dict1 = new RouteValueDictionary();
+            dict1.Add("issuekey", originaldata.IssueKey);
+            return RedirectToAction("UpdateIssue", "Issue", dict1);
         }
 
         [HttpPost]
@@ -1274,37 +1280,40 @@ namespace Prometheus.Controllers
                 }
             }
 
-            var newdata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+            //var newdata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
 
             if (Request.Form["birootcauselist"] != null)
             {
                 var biret = Request.Form["birootcauselist"].ToString();
                 if (string.Compare(biret, "NONE") != 0)
                 {
-                    var sn = newdata.Summary.Split(new string[] { " " }, StringSplitOptions.None)[1].Trim().ToUpper();
-                    IssueViewModels.StoreBIRootCause(newdata.ProjectKey, sn, biret);
+                    var sn = originaldata.Summary.Split(new string[] { " " }, StringSplitOptions.None)[1].Trim().ToUpper();
+                    IssueViewModels.StoreBIRootCause(originaldata.ProjectKey, sn, biret);
                 }
             }
 
-            ViewBag.isassignee = false;
-            if (string.Compare(updater, newdata.Assignee, true) == 0
-                    || string.Compare(updater, newdata.Reporter, true) == 0
-                    || string.Compare(updater, newdata.Creator, true) == 0)
-            {
-                ViewBag.isassignee = true;
-            }
+            //ViewBag.isassignee = false;
+            //if (string.Compare(updater, newdata.Assignee, true) == 0
+            //        || string.Compare(updater, newdata.Reporter, true) == 0
+            //        || string.Compare(updater, newdata.Creator, true) == 0)
+            //{
+            //    ViewBag.isassignee = true;
+            //}
 
-            CreateAllLists(newdata);
+            //CreateAllLists(newdata);
 
-            if (newdata.Summary.Contains(" @Burn-In Step "))
-            {
-                var sn = newdata.Summary.Split(new string[] { " " }, StringSplitOptions.None)[1].Trim().ToUpper();
-                ViewBag.birootcauselist = CreateBIRootIssue(newdata.ProjectKey, sn);
-            }
+            //if (newdata.Summary.Contains(" @Burn-In Step "))
+            //{
+            //    var sn = newdata.Summary.Split(new string[] { " " }, StringSplitOptions.None)[1].Trim().ToUpper();
+            //    ViewBag.birootcauselist = CreateBIRootIssue(newdata.ProjectKey, sn);
+            //}
 
-            ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
-            return View(newdata);
+            //ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
+            //return View(newdata);
 
+            var dict1 = new RouteValueDictionary();
+            dict1.Add("issuekey", originaldata.IssueKey);
+            return RedirectToAction("UpdateBug", "Issue", dict1);
         }
 
         public ActionResult UpdateRMA(string issuekey)
@@ -1677,19 +1686,23 @@ namespace Prometheus.Controllers
                 }
             }
 
-            var newdata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
-            CreateAllLists(newdata);
+            //var newdata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+            //CreateAllLists(newdata);
 
-            ViewBag.isassignee = false;
-            if (string.Compare(updater, newdata.Assignee, true) == 0
-                    || string.Compare(updater, newdata.Reporter,true) == 0
-                    || string.Compare(updater, newdata.Creator, true) == 0)
-            {
-                ViewBag.isassignee = true;
-            }
+            //ViewBag.isassignee = false;
+            //if (string.Compare(updater, newdata.Assignee, true) == 0
+            //        || string.Compare(updater, newdata.Reporter,true) == 0
+            //        || string.Compare(updater, newdata.Creator, true) == 0)
+            //{
+            //    ViewBag.isassignee = true;
+            //}
 
-            ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
-            return View(newdata);
+            //ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
+            //return View(newdata);
+
+            var dict1 = new RouteValueDictionary();
+            dict1.Add("issuekey", originaldata.IssueKey);
+            return RedirectToAction("UpdateRMA", "Issue", dict1);
         }
 
         public ActionResult UpdateRel(string issuekey)
@@ -2158,18 +2171,22 @@ namespace Prometheus.Controllers
                 }
             }
 
-            var newdata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
-            CreateAllLists(newdata);
+            //var newdata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+            //CreateAllLists(newdata);
 
-            ViewBag.isassignee = false;
-            if (string.Compare(updater, newdata.Assignee, true) == 0
-                    || string.Compare(updater, newdata.Reporter, true) == 0
-                    || string.Compare(updater, newdata.Creator, true) == 0)
-            {
-                ViewBag.isassignee = true;
-            }
-            ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
-            return View(newdata);
+            //ViewBag.isassignee = false;
+            //if (string.Compare(updater, newdata.Assignee, true) == 0
+            //        || string.Compare(updater, newdata.Reporter, true) == 0
+            //        || string.Compare(updater, newdata.Creator, true) == 0)
+            //{
+            //    ViewBag.isassignee = true;
+            //}
+            //ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
+            //return View(newdata);
+
+            var dict1 = new RouteValueDictionary();
+            dict1.Add("issuekey", originaldata.IssueKey);
+            return RedirectToAction("UpdateOBA", "Issue", dict1);
         }
 
         public ActionResult UpdateQuality(string issuekey)
@@ -2394,18 +2411,22 @@ namespace Prometheus.Controllers
                 }
             }
 
-            var newdata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
-            CreateAllLists(newdata);
+            //var newdata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+            //CreateAllLists(newdata);
 
-            ViewBag.isassignee = false;
-            if (string.Compare(updater, newdata.Assignee, true) == 0
-                    || string.Compare(updater, newdata.Reporter, true) == 0
-                    || string.Compare(updater, newdata.Creator, true) == 0)
-            {
-                ViewBag.isassignee = true;
-            }
+            //ViewBag.isassignee = false;
+            //if (string.Compare(updater, newdata.Assignee, true) == 0
+            //        || string.Compare(updater, newdata.Reporter, true) == 0
+            //        || string.Compare(updater, newdata.Creator, true) == 0)
+            //{
+            //    ViewBag.isassignee = true;
+            //}
 
-            return View(newdata);
+            //return View(newdata);
+
+            var dict1 = new RouteValueDictionary();
+            dict1.Add("issuekey", originaldata.IssueKey);
+            return RedirectToAction("UpdateQuality", "Issue", dict1);
         }
 
         public ActionResult ShowRootCause(string issuekey)

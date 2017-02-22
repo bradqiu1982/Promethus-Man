@@ -34,8 +34,8 @@ namespace Prometheus.Models
             try
             {
                 //conn.ConnectionString = "Data Source = (LocalDb)\\MSSQLLocalDB; AttachDbFilename = ~\\App_Data\\Prometheus.mdf; Integrated Security = True";
-                conn.ConnectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=" + Path.Combine(HttpRuntime.AppDomainAppPath, "App_Data\\Prometheus.mdf") + ";Integrated Security=True;";
-                //conn.ConnectionString = "Server=wux-parallel;uid=NPI;pwd=NPI@IPN;Database=NPITrace;Connection Timeout=30;";
+                //conn.ConnectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=" + Path.Combine(HttpRuntime.AppDomainAppPath, "App_Data\\Prometheus.mdf") + ";Integrated Security=True;";
+                conn.ConnectionString = "Server=wux-parallel;uid=NPI;pwd=NPI@IPN;Database=NPITrace;Connection Timeout=30;";
                 conn.Open();
                 return conn;
             }
@@ -416,6 +416,7 @@ namespace Prometheus.Models
             var conn = new SqlConnection();
             try
             {
+                //conn.ConnectionString = "Server=cn-csrpt;uid=WUXINPI;pwd=NPI@IPN;Database=SummaryDB;Connection Timeout=30;";
                 conn.ConnectionString = "Data Source=cn-csrpt;Initial Catalog=SummaryDB;Integrated Security=True;Connection Timeout=30;";
                 conn.Open();
                 return conn;
@@ -436,13 +437,8 @@ namespace Prometheus.Models
 
         public static bool ExePRLSqlNoRes(Controller ctrl, string sql)
         {
-            var syscfgdict = CfgUtility.GetSysConfig(ctrl);
-            var folderuser = syscfgdict["SHAREFOLDERUSER"];
-            var folderdomin = syscfgdict["SHAREFOLDERDOMIN"];
-            var folderpwd = syscfgdict["SHAREFOLDERPWD"];
+            //var syscfgdict = CfgUtility.GetSysConfig(ctrl);
 
-            using (NativeMethods cv = new NativeMethods(folderuser, folderdomin, folderpwd))
-            {
                 var conn = GetPRLConnector();
                 if (conn == null)
                     return false;
@@ -469,18 +465,13 @@ namespace Prometheus.Models
                     //System.Windows.MessageBox.Show(ex.ToString());
                     return false;
                 }
-            }
+
         }
 
         public static List<List<object>> ExePRLSqlWithRes(Controller ctrl, string sql)
         {
-            var syscfgdict = CfgUtility.GetSysConfig(ctrl);
-            var folderuser = syscfgdict["SHAREFOLDERUSER"];
-            var folderdomin = syscfgdict["SHAREFOLDERDOMIN"];
-            var folderpwd = syscfgdict["SHAREFOLDERPWD"];
+            //var syscfgdict = CfgUtility.GetSysConfig(ctrl);
 
-            using (NativeMethods cv = new NativeMethods(folderuser, folderdomin, folderpwd))
-            {
                 var ret = new List<List<object>>();
                 var conn = GetPRLConnector();
                 try
@@ -526,7 +517,6 @@ namespace Prometheus.Models
                     ret.Clear();
                     return ret;
                 }
-            }
         }
 
 

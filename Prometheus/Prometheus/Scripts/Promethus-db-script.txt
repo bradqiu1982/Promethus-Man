@@ -1,0 +1,417 @@
+CREATE TABLE [dbo].[VCSELUsageTable] (
+    [Module_Desc]       NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [Module_Name]       NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [Module_AgilePN]    NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [VCSEL_AgilePN]     NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [VCSEL_Description] NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [PD_AgilePN]        NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [PD_Description]    NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [MPD_AgilePN]       NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [PBI_VCSEL_Temp]    NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [PBI_VCSEL_Bias]    NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [PBI_VCSEL_Time]    NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [Allen_PN]          NVARCHAR (MAX) DEFAULT ('') NOT NULL
+);
+
+CREATE TABLE [dbo].[UserTable] (
+    [UserName]   NVARCHAR (200) NOT NULL,
+    [PassWD]     NVARCHAR (200) NOT NULL,
+    [Validated]  INT            DEFAULT ((0)) NOT NULL,
+    [Priority]   INT            DEFAULT ((1)) NOT NULL,
+    [UpdateDate] DATETIME       NOT NULL,
+    [TotalRank]  NVARCHAR (50)  DEFAULT ('0') NOT NULL,
+    [DocTag]     NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [APVal1]     NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [APVal2]     NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [APVal3]     DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+);
+
+CREATE TABLE [dbo].[UserRank] (
+    [UserName]   NVARCHAR (200) NOT NULL,
+    [UpdateDate] DATETIME       NOT NULL,
+    [Rank]       NVARCHAR (50)  DEFAULT ('0') NOT NULL,
+    [APVal1]     NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [APVal2]     NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [APVal3]     DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+);
+
+CREATE TABLE [dbo].[UserNet] (
+    [ME]     NVARCHAR (100) NOT NULL,
+    [OTHER]  NVARCHAR (100) NOT NULL,
+    [APVal1] NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [APVal2] NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [APVal3] NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [APVal4] DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+);
+
+CREATE TABLE [dbo].[UserLearn] (
+    [UserName]   NVARCHAR (200) NOT NULL,
+    [DOCPJK]     NVARCHAR (50)  NOT NULL,
+    [DOCType]    NVARCHAR (50)  NOT NULL,
+    [DOCKey]     NVARCHAR (MAX) NOT NULL,
+    [DOCTag]     NVARCHAR (MAX) NOT NULL,
+    [DOCCreator] NVARCHAR (200) NOT NULL,
+    [DOCPusher]  NVARCHAR (200) DEFAULT ('') NOT NULL,
+    [DOCFavor]   NVARCHAR (20)  DEFAULT ('') NOT NULL,
+    [DOCDate]    DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+    [APVal1]     NVARCHAR (200) DEFAULT ('') NOT NULL,
+    [APVal2]     NVARCHAR (200) DEFAULT ('') NOT NULL,
+    [APVal3]     DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+);
+
+CREATE TABLE [dbo].[UserBlog] (
+    [UserName] NVARCHAR (200) NOT NULL,
+    [APVal1]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [APVal2]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [APVal3]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [APVal4]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [APVal5]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [APVal6]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [APVal7]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [APVal8]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [APVal9]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+    [APVal10]  DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+    [APVal11]  NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [APVal12]  NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [APVal13]  NVARCHAR (MAX) DEFAULT ('') NOT NULL
+);
+
+CREATE TABLE [dbo].[ShareTags] (
+    [DOCTag] NVARCHAR (MAX) NOT NULL,
+    [APVal1] NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [APVal2] NVARCHAR (MAX) DEFAULT ('') NOT NULL
+);
+
+
+CREATE TABLE [dbo].[ShareDoc] (
+    [DOCPJK]        NVARCHAR (50)  NOT NULL,
+    [DOCType]       NVARCHAR (50)  NOT NULL,
+    [DOCKey]        NVARCHAR (MAX) NOT NULL,
+    [DOCTag]        NVARCHAR (MAX) NOT NULL,
+    [DOCCreator]    NVARCHAR (200) NOT NULL,
+    [DOCFavorTimes] INT            DEFAULT ((0)) NOT NULL,
+    [DOCDate]       DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+    [APVal1]        NVARCHAR (200) DEFAULT ('') NOT NULL,
+    [APVal2]        NVARCHAR (200) DEFAULT ('') NOT NULL,
+    [APVal3]        DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+);
+
+CREATE TABLE [dbo].[ProjectTestData] (
+    [ProjectKey]      NVARCHAR (50)  NOT NULL,
+    [DataID]          NVARCHAR (64)  NOT NULL,
+    [ModuleSerialNum] NVARCHAR (50)  NOT NULL,
+    [WhichTest]       NVARCHAR (50)  NOT NULL,
+    [ModuleType]      NVARCHAR (100) NOT NULL,
+    [ErrAbbr]         NVARCHAR (100) NOT NULL,
+    [TestTimeStamp]   DATETIME       NOT NULL,
+    [TestStation]     NVARCHAR (100) NOT NULL,
+    [PN]              NVARCHAR (32)  NOT NULL,
+    [UpdateTime]      DATETIME       NOT NULL
+);
+
+CREATE TABLE [dbo].[ProjectSumDataSet] (
+    [ProjectKey] NVARCHAR (50)  NOT NULL,
+    [SumDataSet] NVARCHAR (100) NOT NULL
+);
+
+CREATE TABLE [dbo].[ProjectStation] (
+    [ProjectKey] NVARCHAR (50)  NOT NULL,
+    [Station]    NVARCHAR (100) NOT NULL
+);
+
+
+CREATE TABLE [dbo].[ProjectPn] (
+    [ProjectKey] NVARCHAR (50) NOT NULL,
+    [PN]         NVARCHAR (50) NOT NULL
+);
+
+CREATE TABLE [dbo].[ProjectModelID] (
+    [ProjectKey] NVARCHAR (50)  NOT NULL,
+    [ModelID]    NVARCHAR (100) NOT NULL
+);
+
+CREATE TABLE [dbo].[ProjectMesTable] (
+    [ProjectKey] NVARCHAR (50)  NOT NULL,
+    [Station]    NVARCHAR (100) NOT NULL,
+    [TableName]  NVARCHAR (100) NOT NULL
+);
+
+CREATE TABLE [dbo].[ProjectMembers] (
+    [ProjectKey] NVARCHAR (50)  NOT NULL,
+    [Name]       NVARCHAR (100) NOT NULL,
+    [Role]       NVARCHAR (20)  NOT NULL
+);
+
+CREATE TABLE [dbo].[ProjectEvent] (
+    [ProjectKey] NVARCHAR (50)  NOT NULL,
+    [EventKey]   NVARCHAR (50)  NOT NULL,
+    [Event]      NVARCHAR (MAX) NOT NULL,
+    [UpdateDate] DATETIME       NOT NULL
+);
+
+CREATE TABLE [dbo].[ProjectError] (
+    [ProjectKey]  NVARCHAR (50) NOT NULL,
+    [OrignalCode] NVARCHAR (50) NOT NULL,
+    [ShortDesc]   NVARCHAR (50) DEFAULT ('') NOT NULL,
+    [ErrorKey]    NVARCHAR (50) NOT NULL,
+    [ErrorCount]  INT           NOT NULL
+);
+
+CREATE TABLE [dbo].[Project] (
+    [ProjectKey]  NVARCHAR (50)  NOT NULL,
+    [ProjectName] NVARCHAR (200) NOT NULL,
+    [StartDate]   DATETIME       NOT NULL,
+    [FinishRate]  DECIMAL (5, 2) DEFAULT ((0)) NOT NULL,
+    [Description] NVARCHAR (MAX) NOT NULL,
+    [validate]    INT            DEFAULT ((1)) NOT NULL,
+    [APVal1]      NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [APVal2]      NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [APVal3]      DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+    [ProjectType] NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [APVal4]      NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [APVal5]      NVARCHAR (50)  DEFAULT ('') NOT NULL
+);
+
+CREATE TABLE [dbo].[PJErrorAttachment] (
+    [ErrorKey]   NVARCHAR (200) NOT NULL,
+    [Attachment] NVARCHAR (MAX) NOT NULL,
+    [UpdateTime] DATETIME       NOT NULL,
+    [APVal1]     NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [APVal2]     NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [APVal3]     DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+);
+
+CREATE TABLE [dbo].[IssueRMA] (
+    [IssueKey]       NVARCHAR (50)  NOT NULL,
+    [FinisarRMA]     NVARCHAR (50)  NOT NULL,
+    [FinisarModel]   NVARCHAR (50)  NOT NULL,
+    [ECustomer]      NVARCHAR (180) NOT NULL,
+    [CRMANUM]        NVARCHAR (50)  NOT NULL,
+    [CReport]        NVARCHAR (180) NOT NULL,
+    [ModuleSN]       NVARCHAR (50)  NOT NULL,
+    [RMAFailureCode] NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [FVCode]         NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [APVal1]         NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [APVal2]         NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [APVal3]         DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+);
+
+CREATE TABLE [dbo].[IssueOBA] (
+    [IssueKey]            NVARCHAR (50)  NOT NULL,
+    [FinisarDMR]          NVARCHAR (50)  NOT NULL,
+    [OBAFailureRate]      NVARCHAR (50)  NOT NULL,
+    [MaterialDisposition] NVARCHAR (50)  NOT NULL,
+    [ModuleSN]            NVARCHAR (50)  NOT NULL,
+    [FVCode]              NVARCHAR (50)  NOT NULL,
+    [APVal1]              NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [APVal2]              NVARCHAR (100) DEFAULT ('') NOT NULL,
+    [APVal3]              DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+);
+
+
+CREATE TABLE [dbo].[IssueComments] (
+    [IssueKey]    NVARCHAR (50)  NOT NULL,
+    [Comment]     NVARCHAR (MAX) NOT NULL,
+    [Reporter]    NVARCHAR (200) NOT NULL,
+    [CommentDate] DATETIME       NOT NULL,
+    [CommentType] NVARCHAR (30)  DEFAULT ('Description') NOT NULL
+);
+
+
+CREATE TABLE [dbo].[IssueAttribute] (
+    [IssueKey] NVARCHAR (50) NOT NULL,
+    [APVal1]   NVARCHAR (50) DEFAULT ('') NOT NULL,
+    [APVal2]   NVARCHAR (50) DEFAULT ('') NOT NULL,
+    [APVal3]   NVARCHAR (50) DEFAULT ('') NOT NULL,
+    [APVal4]   NVARCHAR (50) DEFAULT ('') NOT NULL,
+    [APVal5]   NVARCHAR (50) DEFAULT ('') NOT NULL,
+    [APVal6]   NVARCHAR (50) DEFAULT ('') NOT NULL,
+    [APVal7]   NVARCHAR (50) DEFAULT ('') NOT NULL,
+    [APVal8]   NVARCHAR (50) DEFAULT ('') NOT NULL,
+    [APVal9]   NVARCHAR (50) DEFAULT ('') NOT NULL,
+    [APVal10]  NVARCHAR (50) DEFAULT ('') NOT NULL,
+    [APVal11]  NVARCHAR (50) DEFAULT ('') NOT NULL,
+    [APVal12]  NVARCHAR (50) DEFAULT ('') NOT NULL
+);
+
+CREATE TABLE [dbo].[IssueAttachment] (
+    [IssueKey]   NVARCHAR (50)  NOT NULL,
+    [Attachment] NVARCHAR (MAX) NOT NULL,
+    [UpdateTime] DATETIME       NOT NULL
+);
+
+CREATE TABLE [dbo].[Issue] (
+    [ProjectKey]           NVARCHAR (50)  NOT NULL,
+    [ParentIssueKey]       NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [IssueKey]             NVARCHAR (50)  NOT NULL,
+    [IssueType]            NVARCHAR (30)  NOT NULL,
+    [Summary]              NVARCHAR (200) NOT NULL,
+    [Priority]             NVARCHAR (30)  NOT NULL,
+    [DueDate]              DATETIME       NOT NULL,
+    [ResolvedDate]         DATETIME       NOT NULL,
+    [ReportDate]           DATETIME       NOT NULL,
+    [Assignee]             NVARCHAR (200) NOT NULL,
+    [Reporter]             NVARCHAR (200) NOT NULL,
+    [Creator]              NVARCHAR (200) DEFAULT ('') NOT NULL,
+    [Resolution]           NVARCHAR (30)  NOT NULL,
+    [AlertEmailUpdateDate] DATETIME       DEFAULT ('2016-08-22 10:00:00') NOT NULL,
+    [RelativePeoples]      NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [APVal1]               NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [APVal2]               NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [APVal3]               DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+    [ModuleSN]             NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [ErrAbbr]              NVARCHAR (100) DEFAULT ('') NOT NULL,
+    [APVal4]               NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [APVal5]               NVARCHAR (100) DEFAULT ('') NOT NULL,
+    [DataID]               NVARCHAR (100) DEFAULT ('') NOT NULL
+);
+
+CREATE TABLE [dbo].[ErrorComments] (
+    [ErrorKey]    NVARCHAR (200) NOT NULL,
+    [Comment]     NVARCHAR (MAX) NOT NULL,
+    [Reporter]    NVARCHAR (200) NOT NULL,
+    [CommentDate] DATETIME       NOT NULL,
+    [CommentType] NVARCHAR (200) DEFAULT ('') NOT NULL,
+    [APVal1]      NVARCHAR (200) DEFAULT ('') NOT NULL,
+    [APVal2]      NVARCHAR (200) DEFAULT ('') NOT NULL,
+    [APVal3]      DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+);
+
+CREATE TABLE [dbo].[BookReportRecord] (
+    [username]       NVARCHAR (100) NOT NULL,
+    [projects]       NVARCHAR (MAX) NOT NULL,
+    [reporttypes]    NVARCHAR (MAX) NOT NULL,
+    [reporttime]     NVARCHAR (50)  NOT NULL,
+    [lastupdatetime] DATETIME       NOT NULL
+);
+
+CREATE TABLE [dbo].[BITestDataField] (
+    [DataID]              NVARCHAR (64)  NOT NULL,
+    [ChannelNum]          NVARCHAR (100) NOT NULL,
+    [SLOPE]               FLOAT (53)     NOT NULL,
+    [THOLD]               FLOAT (53)     NOT NULL,
+    [PO_LD]               FLOAT (53)     NOT NULL,
+    [PO_LD_18]            FLOAT (53)     NOT NULL,
+    [PO_LD_25]            FLOAT (53)     NOT NULL,
+    [PO_LD_127]           FLOAT (53)     NOT NULL,
+    [PO_Uniformity]       FLOAT (53)     NOT NULL,
+    [Delta_SLOPE]         FLOAT (53)     NOT NULL,
+    [Delta_THOLD]         FLOAT (53)     NOT NULL,
+    [Delta_PO_LD]         FLOAT (53)     NOT NULL,
+    [Delta_PO_LD_18]      FLOAT (53)     NOT NULL,
+    [Delta_PO_LD_25]      FLOAT (53)     NOT NULL,
+    [Delta_PO_LD_127]     FLOAT (53)     NOT NULL,
+    [Delta_PO_Uniformity] FLOAT (53)     NOT NULL
+);
+
+CREATE TABLE [dbo].[BITestData] (
+    [ProjectKey]      NVARCHAR (50)  NOT NULL,
+    [DataID]          NVARCHAR (64)  NOT NULL,
+    [ModuleSerialNum] NVARCHAR (50)  NOT NULL,
+    [WhichTest]       NVARCHAR (50)  NOT NULL,
+    [ModuleType]      NVARCHAR (100) NOT NULL,
+    [ErrAbbr]         NVARCHAR (100) NOT NULL,
+    [TestTimeStamp]   DATETIME       NOT NULL,
+    [TestStation]     NVARCHAR (100) NOT NULL,
+    [PN]              NVARCHAR (32)  NOT NULL,
+    [UpdateTime]      DATETIME       NOT NULL,
+    [Wafer]           NVARCHAR (100) NOT NULL,
+    [Waferpn]         NVARCHAR (100) NOT NULL
+);
+
+CREATE TABLE [dbo].[BIROOTCAUSE] (
+    [ProjectKey] NVARCHAR (50) NOT NULL,
+    [ModuleSN]   NVARCHAR (50) NOT NULL,
+    [RootCause]  NVARCHAR (50) NOT NULL
+);
+
+CREATE TABLE [dbo].[BIError] (
+    [ProjectKey]  NVARCHAR (50) NOT NULL,
+    [OrignalCode] NVARCHAR (50) NOT NULL,
+    [ShortDesc]   NVARCHAR (50) DEFAULT ('') NOT NULL,
+    [ErrorKey]    NVARCHAR (50) NOT NULL,
+    [ErrorCount]  INT           NOT NULL
+);
+
+
+Create index idx on ErrorComments(ErrorKey);
+Create index idx on UserTable(UserName);
+Create index idx on IssueAttachment(IssueKey);
+Create index idx on IssueComments(IssueKey);
+Create index idx on Issue(IssueKey);
+Create index idx on ProjectTestData(DataID);
+Create index idx on BITestData(DataID);
+Create index tidx on ProjectTestData(TestTimeStamp);
+Create index pidx on ProjectTestData(ProjectKey);
+
+
+delete from BIError;
+delete from BIROOTCAUSE;
+delete from BITestData;
+delete from BITestDataField;
+delete from BookReportRecord;
+delete from ErrorComments;
+delete from Issue;
+delete from IssueAttachment;
+delete from IssueAttribute;
+delete from IssueComments;
+delete from IssueOBA;
+delete from IssueRMA;
+delete from PJErrorAttachment;
+delete from Project;
+delete from ProjectError;
+delete from ProjectEvent;
+delete from ProjectMembers;
+delete from ProjectMesTable;
+delete from ProjectModelID;
+delete from ProjectPn;
+delete from ProjectStation;
+delete from ProjectSumDataSet;
+delete from ProjectTestData;
+delete from ShareDoc;
+delete from ShareTags;
+delete from UserBlog;
+delete from UserLearn;
+delete from UserNet;
+delete from UserRank;
+delete from UserTable;
+delete from VCSELUsageTable;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -703,6 +703,7 @@
     <Content Include="Scripts\moment.min.js" />
     <Content Include="Scripts\ParetoChart.xml" />
     <Content Include="Scripts\PieChart.xml" />
+    <Content Include="Scripts\Promethus-db-script.txt" />
     <Content Include="Scripts\PromethusCfg.txt" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />

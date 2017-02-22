@@ -54,8 +54,37 @@ namespace Prometheus.Controllers
             var targetdb = "Server=wux-parallel;uid=NPI;pwd=NPI@IPN;Database=NPITrace;Connection Timeout=30;";
             
             var tablelist = new List<string>();
-            tablelist.Add("UserTable");
+            tablelist.Add("BIError");
+            tablelist.Add("BIROOTCAUSE");
+            tablelist.Add("BITestData");
             tablelist.Add("BITestDataField");
+            tablelist.Add("BookReportRecord");
+            tablelist.Add("ErrorComments");
+            tablelist.Add("Issue");
+            tablelist.Add("IssueAttachment");
+            tablelist.Add("IssueAttribute");
+            tablelist.Add("IssueComments");
+            tablelist.Add("IssueOBA");
+            tablelist.Add("IssueRMA");
+            tablelist.Add("PJErrorAttachment");
+            tablelist.Add("Project");
+            tablelist.Add("ProjectError");
+            tablelist.Add("ProjectEvent");
+            tablelist.Add("ProjectMembers");
+            tablelist.Add("ProjectMesTable");
+            tablelist.Add("ProjectModelID");
+            tablelist.Add("ProjectPn");
+            tablelist.Add("ProjectStation");
+            tablelist.Add("ProjectSumDataSet");
+            tablelist.Add("ProjectTestData");
+            tablelist.Add("ShareDoc");
+            tablelist.Add("ShareTags");
+            tablelist.Add("UserBlog");
+            tablelist.Add("UserLearn");
+            tablelist.Add("UserNet");
+            tablelist.Add("UserRank");
+            tablelist.Add("UserTable");
+            tablelist.Add("VCSELUsageTable");
 
             foreach (var tab in tablelist)
             {

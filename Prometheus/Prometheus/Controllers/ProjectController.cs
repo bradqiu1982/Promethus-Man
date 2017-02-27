@@ -3855,10 +3855,7 @@ namespace Prometheus.Controllers
                 System.IO.File.WriteAllText(wholefilename, hello);
                 var currenttime = DateTime.Now;
 
-                //var alluser = UserViewModels.RetrieveAllUser();
-                var alluser = new List<string>();
-                alluser.Add("BRAD.QIU@FINISAR.COM");
-
+                var alluser = UserViewModels.RetrieveAllUser();
                 foreach (var u in alluser)
                 {
                     if (currenttime.DayOfWeek == DayOfWeek.Monday)

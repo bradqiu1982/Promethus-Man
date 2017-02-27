@@ -3759,6 +3759,175 @@ namespace Prometheus.Controllers
             }
         }
 
+        private string IssueURL(string IssueKey)
+        {
+            var routevalue = new RouteValueDictionary();
+            routevalue.Add("issuekey", IssueKey);
+            string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+            string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+            var netcomputername = "";
+            try { netcomputername = System.Net.Dns.GetHostName(); }
+            catch (Exception ex) { }
+            return  validatestr.Replace("//localhost", "//" + netcomputername);
+        }
+
+        private string SendIAssignPendingIssue(string username)
+        {
+            var wissues = IssueViewModels.RetrieveIssueByCreator(username, Resolute.Working);
+            var pissues = IssueViewModels.RetrieveIssueByCreator(username,Resolute.Pending);
+
+            var ret = string.Empty;
+            foreach (var i in wissues)
+            {
+                ret = ret + "WORKING    " + i.Summary + "   " + i.Assignee + ":\r\n";
+                ret = ret + IssueURL(i.IssueKey) + "\r\n\r\n";
+            }
+
+            foreach (var i in pissues)
+            {
+                ret = ret + "PENDING    " + i.Summary + "   " + i.Assignee + ":\r\n";
+                ret = ret + IssueURL(i.IssueKey) + "\r\n\r\n";
+            }
+            return ret;
+        }
+
+        private string SendIAssignDoneIssue(string username)
+        {
+            var dissues = IssueViewModels.RetrieveIssueByCreator(username, Resolute.Done);
+            var ret = string.Empty;
+            foreach (var i in dissues)
+            {
+                if (i.ResolvedDate > DateTime.Now.AddDays(-7))
+                {
+                    ret = ret + "Done    " + i.Summary + "   " + i.Assignee + ":\r\n";
+                    ret = ret + IssueURL(i.IssueKey) + "\r\n\r\n";
+                }
+            }
+            return ret;
+        }
+
+        private string SendAssign2MePendingIssue(string username)
+        {
+
+            var wissues = IssueViewModels.RetrieveIssueByAssigneeWorking(username, Resolute.Working, 60);
+            var pissues = IssueViewModels.RetrieveIssueByAssignee(username, Resolute.Pending, 60);
+
+
+            var ret = string.Empty;
+
+            foreach (var i in wissues)
+            {
+                ret = ret + "WORKING    " + i.Summary + "   " + i.Reporter + ":\r\n";
+                ret = ret + IssueURL(i.IssueKey) + "\r\n\r\n";
+            }
+
+            foreach (var i in pissues)
+            {
+                ret = ret + "PENDING    " + i.Summary + "   " + i.Reporter + ":\r\n";
+                ret = ret + IssueURL(i.IssueKey) + "\r\n\r\n";
+            }
+
+            return ret;
+        }
+
+        private string SendAssign2MeDoneIssue(string username)
+        {
+            var dissues = IssueViewModels.RetrieveIssueByAssignee(username, Resolute.Done, 200);
+            var ret = string.Empty;
+            foreach (var i in dissues)
+            {
+                if (i.ResolvedDate > DateTime.Now.AddDays(-7))
+                {
+                    ret = ret + "Done    " + i.Summary + "   " + i.Reporter + ":\r\n";
+                    ret = ret + IssueURL(i.IssueKey) + "\r\n\r\n";
+                }
+            }
+            return ret;
+        }
+
+        private void SendTaskNotice()
+        {
+            var filename = "log" + DateTime.Now.ToString("yyyy-MM-dd");
+            var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
+            if (!System.IO.File.Exists(wholefilename))
+            {
+                var hello = "hello";
+                System.IO.File.WriteAllText(wholefilename, hello);
+                var currenttime = DateTime.Now;
+
+                //var alluser = UserViewModels.RetrieveAllUser();
+                var alluser = new List<string>();
+                alluser.Add("BRAD.QIU@FINISAR.COM");
+
+                foreach (var u in alluser)
+                {
+                    if (currenttime.DayOfWeek == DayOfWeek.Monday)
+                    {
+                        var Summary = string.Empty;
+                        var assign2mepending = SendAssign2MePendingIssue(u);
+                        if (!string.IsNullOrEmpty(assign2mepending))
+                        {
+                            Summary = Summary + "Assign To Me Pending:" + "\r\n\r\n";
+                            Summary = Summary + assign2mepending;
+                        }
+
+                        var iassignpending = SendIAssignPendingIssue(u);
+                        if (!string.IsNullOrEmpty(iassignpending))
+                        {
+                            Summary = Summary + "I Assign Pending:" + "\r\n\r\n";
+                            Summary = Summary + iassignpending;
+                        }
+
+                        if (!string.IsNullOrEmpty(Summary))
+                        {
+                            var tolist = new List<string>();
+                            tolist.Add(u);
+                            EmailUtility.SendEmail(this, "WUXI NPI System-Task Notice", tolist, Summary);
+                        }
+                    }//end if
+
+                    if (currenttime.DayOfWeek == DayOfWeek.Thursday)
+                    {
+                        var Summary = string.Empty;
+                        var assign2medone = SendAssign2MeDoneIssue(u);
+                        if (!string.IsNullOrEmpty(assign2medone))
+                        {
+                            Summary = Summary + "Assign To Me Done:(in recent one week)" + "\r\n\r\n";
+                            Summary = Summary + assign2medone;
+                        }
+
+                        var iassigndone = SendIAssignDoneIssue(u);
+                        if (!string.IsNullOrEmpty(iassigndone))
+                        {
+                            Summary = Summary + "I Assign Done(in recent one week):" + "\r\n\r\n";
+                            Summary = Summary + iassigndone;
+                        }
+
+                        var assign2mepending = SendAssign2MePendingIssue(u);
+                        if (!string.IsNullOrEmpty(assign2mepending))
+                        {
+                            Summary = Summary + "Assign To Me Pending:" + "\r\n\r\n";
+                            Summary = Summary + assign2mepending;
+                        }
+
+                        var iassignpending = SendIAssignPendingIssue(u);
+                        if (!string.IsNullOrEmpty(iassignpending))
+                        {
+                            Summary = Summary + "I Assign Pending:" + "\r\n\r\n";
+                            Summary = Summary + iassignpending;
+                        }
+
+                        if (!string.IsNullOrEmpty(Summary))
+                        {
+                            var tolist = new List<string>();
+                            tolist.Add(u);
+                            EmailUtility.SendEmail(this, "WUXI NPI System-Task Notice", tolist, Summary);
+                        }
+                    }//end if
+                }//end foreach
+            }//end if
+        }
+
         private void SendBookedReportNotice()
         {
             var filename = "log" + DateTime.Now.ToString("yyyy-MM-dd");
@@ -3918,7 +4087,8 @@ namespace Prometheus.Controllers
 
             try
             {
-                SendBookedReportNotice();
+                SendTaskNotice();
+                //SendBookedReportNotice();
             }
             catch (Exception ex)
             { }
@@ -3998,7 +4168,8 @@ namespace Prometheus.Controllers
             {
                 try
                 {
-                    BITestData.PrePareLatestData(this,pjkey);
+                    SendTaskNotice();
+                    //BITestData.PrePareLatestData(this,pjkey);
                 }
                 catch (Exception ex)
                 { }

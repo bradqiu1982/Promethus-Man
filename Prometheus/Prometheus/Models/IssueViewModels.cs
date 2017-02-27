@@ -2150,6 +2150,47 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static List<IssueViewModels> RetrieveIssueByCreator(string creator,string issuestatus)
+        {
+
+            var cond = "";
+            var fixresolve = "";
+            if (string.Compare(issuestatus, Resolute.Pending) == 0)
+            {
+                cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";
+                fixresolve = Resolute.Pending;
+            }
+            else if (string.Compare(issuestatus, Resolute.Working) == 0)
+            {
+                cond = "('" + Resolute.Working + "')";
+                fixresolve = Resolute.Working;
+            }
+            else
+            {
+                cond = "('" + Resolute.Fixed + "','" + Resolute.Done + "','" + Resolute.NotFix + "','" + Resolute.NotReproduce + "','" + Resolute.Unresolved + "')";
+                fixresolve = Resolute.Done;
+            }
+
+            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and IssueType <> '<IssueType>' and  (Creator = '<Creator>' or Reporter = '<Creator>') and ParentIssueKey = '' and Resolution in <cond>  order by ReportDate DESC";
+            sql = sql.Replace("<Creator>", creator).Replace("<IssueType>", ISSUETP.NPIPROC).Replace("<cond>", cond);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            var ret = new List<IssueViewModels>();
+            foreach (var line in dbret)
+            {
+                var tempvm = new IssueViewModels(Convert.ToString(line[0])
+                    , Convert.ToString(line[1]), Convert.ToString(line[2])
+                    , Convert.ToString(line[3]), Convert.ToString(line[4])
+                    , Convert.ToString(line[5]), Convert.ToString(line[6])
+                    , Convert.ToString(line[7]), Convert.ToString(line[8])
+                    , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
+
+                tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey);
+                ret.Add(tempvm);
+            }
+
+            return ret;
+        }
+
         public static List<IssueViewModels> RetrieveNPIPROCIssue(string pjkey)
         {
             var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and ParentIssueKey = '' and IssueType = '<IssueType>' order by DueDate ASC";

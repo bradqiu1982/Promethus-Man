@@ -2603,12 +2603,26 @@ namespace Prometheus.Controllers
 
                 foreach (var item in attachcond)
                 {
-                    IssueViewModels.DeleteComment(issuekey
+                    IssueViewModels.DeleteAttachComment(issuekey
                         , Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(item)));
                 }
 
                 var dict = new RouteValueDictionary();
                 dict.Add("issuekey", issuekey);
+                return RedirectToAction("UpdateIssue", "Issue", dict);
+            }
+
+            return RedirectToAction("ViewAll", "Project");
+        }
+
+        public ActionResult DeleteSPIssueComment(string IssueKey,string CommentType, string Date)
+        {
+            if (!string.IsNullOrEmpty(IssueKey) && !string.IsNullOrEmpty(CommentType) && !string.IsNullOrEmpty(Date))
+            {
+                IssueViewModels.DeleteSPComment(IssueKey, CommentType, Date);
+
+                var dict = new RouteValueDictionary();
+                dict.Add("issuekey", IssueKey);
                 return RedirectToAction("UpdateIssue", "Issue", dict);
             }
 

@@ -848,7 +848,7 @@ namespace Prometheus.Models
 
         public static void StoreIssueAttachment(string issuekey,string attachmenturl)
         {
-            var sql = "insert into IssueAttachment(IssueKey,Attachment,UpdateTime) values('<IssueKey>','<Attachment>','<UpdateTime>')";
+            var sql = "insert into IssueAttachment(IssueKey,Attachment,UpdateTime) values('<IssueKey>',N'<Attachment>','<UpdateTime>')";
             sql = sql.Replace("<IssueKey>", issuekey).Replace("<Attachment>", attachmenturl).Replace("<UpdateTime>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
@@ -1515,6 +1515,13 @@ namespace Prometheus.Models
                     tempclist.Add(tempcomment);
                 }
                 CommentList = tempclist;
+        }
+
+        public static void DeleteSPComment(string issuekey,string commenttype,string date)
+        {
+            var csql = "delete from IssueComments where IssueKey = '<IssueKey>' and CommentDate = '<CommentDate>' and CommentType = '<CommentType>'";
+            csql = csql.Replace("<IssueKey>", issuekey).Replace("<CommentDate>", date).Replace("<CommentType>", commenttype);
+            DBUtility.ExeLocalSqlNoRes(csql);
         }
 
         public static List<IssueViewModels> RetrieveIssuePendingByUser(string user, string startdate)
@@ -2323,18 +2330,18 @@ namespace Prometheus.Models
 
         public static void DeleteAttachment(string issuekey,string cond)
         {
-            var csql = "select Attachment from IssueAttachment where IssueKey = '<IssueKey>' and Attachment = '<cond>'";
+            var csql = "select Attachment from IssueAttachment where IssueKey = '<IssueKey>' and Attachment = N'<cond>'";
             csql = csql.Replace("<IssueKey>", issuekey).Replace("<cond>", cond);
             var cdbret = DBUtility.ExeLocalSqlWithRes(csql,null);
             if (cdbret.Count > 0 && cdbret.Count < 3)
             {
-                csql = "delete from IssueAttachment where IssueKey = '<IssueKey>' and Attachment = '<cond>'";
+                csql = "delete from IssueAttachment where IssueKey = '<IssueKey>' and Attachment = N'<cond>'";
                 csql = csql.Replace("<IssueKey>", issuekey).Replace("<cond>", cond);
                 DBUtility.ExeLocalSqlNoRes(csql);
             }//end if
         }
 
-        public static void DeleteComment(string issuekey, string cond)
+        public static void DeleteAttachComment(string issuekey, string cond)
         {
             var csql = "select Comment from IssueComments where IssueKey = '<IssueKey>' and Comment = '<cond>'";
             csql = csql.Replace("<IssueKey>", issuekey).Replace("<cond>", cond);

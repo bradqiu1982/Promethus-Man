@@ -417,7 +417,7 @@ namespace Prometheus.Models
 
         public static void StoreErrorAttachment(string errorkey, string attachmenturl)
         {
-            var sql = "insert into PJErrorAttachment(ErrorKey,Attachment,UpdateTime) values('<ErrorKey>','<Attachment>','<UpdateTime>')";
+            var sql = "insert into PJErrorAttachment(ErrorKey,Attachment,UpdateTime) values('<ErrorKey>',N'<Attachment>','<UpdateTime>')";
             sql = sql.Replace("<ErrorKey>", errorkey).Replace("<Attachment>", attachmenturl).Replace("<UpdateTime>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
@@ -438,12 +438,12 @@ namespace Prometheus.Models
 
         public static void DeleteAttachment(string errorkey, string cond)
         {
-            var csql = "select Attachment from PJErrorAttachment where ErrorKey = '<ErrorKey>' and Attachment like '%<cond>%'";
+            var csql = "select Attachment from PJErrorAttachment where ErrorKey = '<ErrorKey>' and Attachment like N'%<cond>%'";
             csql = csql.Replace("<ErrorKey>", errorkey).Replace("<cond>", cond);
             var cdbret = DBUtility.ExeLocalSqlWithRes(csql,null);
             if (cdbret.Count > 0 && cdbret.Count < 3)
             {
-                csql = "delete from PJErrorAttachment where ErrorKey = '<ErrorKey>' and Attachment like '%<cond>%'";
+                csql = "delete from PJErrorAttachment where ErrorKey = '<ErrorKey>' and Attachment like N'%<cond>%'";
                 csql = csql.Replace("<ErrorKey>", errorkey).Replace("<cond>", cond);
                 DBUtility.ExeLocalSqlNoRes(csql);
             }//end if

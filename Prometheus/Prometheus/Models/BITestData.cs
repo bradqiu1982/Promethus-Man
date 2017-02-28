@@ -193,9 +193,18 @@ namespace Prometheus.Models
         {
 
             var ret = new List<BITestData>();
-            var sql = "select ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN,Wafer,Waferpn from BITestData where ProjectKey = '<ProjectKey>' and Wafer = '<Wafer>' order by ModuleSerialNum,TestTimeStamp DESC";
+            var sql = string.Empty;
 
-            sql = sql.Replace("<ProjectKey>", pjkey).Replace("<Wafer>", wafer);
+            if (!string.IsNullOrEmpty(pjkey))
+            {
+                sql = "select ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN,Wafer,Waferpn from BITestData where ProjectKey = '<ProjectKey>' and Wafer = '<Wafer>' order by ModuleSerialNum,TestTimeStamp DESC";
+                sql = sql.Replace("<ProjectKey>", pjkey).Replace("<Wafer>", wafer);
+            }
+            else
+            {
+                sql = "select ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN,Wafer,Waferpn from BITestData where Wafer = '<Wafer>' order by ModuleSerialNum,TestTimeStamp DESC";
+                sql = sql.Replace("<Wafer>", wafer);
+            }
 
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var item in dbret)

@@ -238,7 +238,8 @@ namespace Prometheus.Controllers
                     .Replace("#AmountMAX#", sum.ToString())
                     .Replace("#PCount#", pcountvalue)
                     .Replace("#ABPercent#", abpecentvalue)
-                    .Replace("#PPercent#", ppecentvalue);
+                    .Replace("#PPercent#", ppecentvalue)
+                    .Replace("#REDIRECTURL#", "");
             }
             else
             {

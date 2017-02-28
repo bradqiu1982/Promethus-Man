@@ -218,7 +218,8 @@ namespace Prometheus.Controllers
                     .Replace("#AmountMAX#", sum.ToString())
                     .Replace("#PCount#", pcountvalue)
                     .Replace("#ABPercent#", abpecentvalue)
-                    .Replace("#PPercent#", ppecentvalue);
+                    .Replace("#PPercent#", ppecentvalue)
+                    .Replace("#REDIRECTURL#", "");
             }
         }
 
@@ -631,14 +632,8 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        public ActionResult ProjectBIWaferYield(string ProjectKey, string Wafer)
+        private void projectwaferyield(string ProjectKey, string Wafer)
         {
-            if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(Wafer))
-            {
-                ViewBag.pjkey = ProjectKey;
-
-                //var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
-
                 var vmlist = new List<ProjectBIYieldViewModule>();
                 var tempret = ProjectBIYieldViewModule.GetYieldByWafer(ProjectKey, Wafer);
                 if (tempret.LastYields.Count > 0)
@@ -703,12 +698,12 @@ namespace Prometheus.Controllers
                     crtempvalue = crtempvalue.Substring(0, crtempvalue.Length - 1);
 
                     //rederect url
-                    var tempurl = "/BurnIn/ProjectBIWaferYieldDetail?ProjectKey=" + ProjectKey + "&Wafer=" + Wafer;
+                    var tempurl = "/BurnIn/ProjectBIWaferYieldDetail?ProjectKey=" + ProjectKey + "&Wafer=" + Wafer+ "&Pjkey4return="+ ProjectKey;
                     var reurl = "window.location.href = '" + tempurl + "'";
 
                     var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/BISuperYield.xml"));
                     ViewBag.chartscript = tempscript.Replace("#ElementID#", "waferyield")
-                        .Replace("#Title#", "Wafer Yiled")
+                        .Replace("#Title#", "Project Wafer "+ Wafer + " Yiled")
                         .Replace("#ChartxAxisValues#", ChartxAxisValues)
                         .Replace("#XAxisTitle#", "Date")
                         .Replace("#AmountMAX#", maxamout.ToString())
@@ -717,6 +712,98 @@ namespace Prometheus.Controllers
                         .Replace("#CorrectiveYield#", crtempvalue)
                         .Replace("#REDIRECTURL#", reurl);
                 }
+        }
+
+
+        private void wholewaferyield(string ProjectKey,string Wafer)
+        {
+            var vmlist = new List<ProjectBIYieldViewModule>();
+            var tempret = ProjectBIYieldViewModule.GetYieldByWafer("", Wafer);
+            if (tempret.LastYields.Count > 0)
+            {
+                vmlist.Add(tempret);
+            }
+
+            if (vmlist.Count > 0)
+            {
+                var ChartxAxisValues = "";
+                //var ChartSearies = "";
+
+
+                var ftimelist = new List<string>();
+                var famountlist = new List<int>();
+                var ryieldlist = new List<double>();
+                var cyieldlist = new List<double>();
+                var maxamout = 0;
+
+                foreach (var item in vmlist)
+                {
+                    ftimelist.Add(item.EndDate.ToString("yyyy-MM-dd"));
+                    ryieldlist.Add(item.LastYield * 100.0);
+                    cyieldlist.Add(item.CorrectLastYield * 100.0);
+
+                    var tempfamount = 0;
+                    foreach (var d in item.LastYields)
+                    {
+                        if (d.InputCount > tempfamount) { tempfamount = d.InputCount; }
+                        if (d.InputCount > maxamout) { maxamout = d.InputCount; }
+                    }
+                    famountlist.Add(tempfamount);
+                }
+
+                //xaxis
+                foreach (var item in ftimelist)
+                {
+                    ChartxAxisValues = ChartxAxisValues + "'" + item + "',";
+                }
+                ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
+
+
+                var famout = "";
+                foreach (var item in famountlist)
+                {
+                    famout = famout + item.ToString() + ",";
+                }
+                famout = famout.Substring(0, famout.Length - 1);
+
+                var rtempvalue = "";
+                foreach (var item in ryieldlist)
+                {
+                    rtempvalue = rtempvalue + item.ToString("0.00") + ",";
+                }
+                rtempvalue = rtempvalue.Substring(0, rtempvalue.Length - 1);
+
+                var crtempvalue = "";
+                foreach (var item in cyieldlist)
+                {
+                    crtempvalue = crtempvalue + item.ToString("0.00") + ",";
+                }
+                crtempvalue = crtempvalue.Substring(0, crtempvalue.Length - 1);
+
+                //rederect url
+                var tempurl = "/BurnIn/ProjectBIWaferYieldDetail?ProjectKey=&Wafer=" + Wafer + "&Pjkey4return=" + ProjectKey;
+                var reurl = "window.location.href = '" + tempurl + "'";
+
+                var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/BISuperYield.xml"));
+                ViewBag.wholechartscript = tempscript.Replace("#ElementID#", "wholewaferyield")
+                    .Replace("#Title#", "Whole Wafer "+ Wafer + " Yiled")
+                    .Replace("#ChartxAxisValues#", ChartxAxisValues)
+                    .Replace("#XAxisTitle#", "Date")
+                    .Replace("#AmountMAX#", maxamout.ToString())
+                    .Replace("#FirstAmount#", famout)
+                    .Replace("#RetestYield#", rtempvalue)
+                    .Replace("#CorrectiveYield#", crtempvalue)
+                    .Replace("#REDIRECTURL#", reurl);
+            }
+        }
+
+        public ActionResult ProjectBIWaferYield(string ProjectKey, string Wafer)
+        {
+            if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(Wafer))
+            {
+                ViewBag.pjkey = ProjectKey;
+                projectwaferyield(ProjectKey, Wafer);
+                wholewaferyield(ProjectKey, Wafer);
 
                 return View();
             }
@@ -724,9 +811,9 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        public ActionResult ProjectBIWaferYieldDetail(string ProjectKey, string Wafer)
+        public ActionResult ProjectBIWaferYieldDetail(string ProjectKey, string Wafer,string Pjkey4return)
         {
-            if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(Wafer))
+            if (!string.IsNullOrEmpty(Wafer))
             {
                 var retestdatalist = new List<KeyValuePair<string, int>>();
 
@@ -789,6 +876,8 @@ namespace Prometheus.Controllers
                     retestparetofun(retestdatalist);
                 }
 
+                yieldvm.ProjectKey = Pjkey4return;
+                yieldvm.Wafer = Wafer;
                 return View(yieldvm);
             }
             return View();

@@ -11,6 +11,8 @@ namespace Prometheus.Models
         public DateTime StartDate { set; get; }
         public DateTime EndDate { set; get; }
 
+        public string Wafer { set; get; }
+
         private List<TestYield> lyield = new List<TestYield>();
         public List<TestYield> LastYields { get { return lyield; } }
         public double LastYield
@@ -74,7 +76,37 @@ namespace Prometheus.Models
             var yielddict = new Dictionary<string, TestYield>();
             var sndict = new Dictionary<string, bool>();
 
-            var correctbidict = IssueViewModels.RetrieveAllBIRootCause(pyvm.ProjectKey);
+            var correctbidict = new Dictionary<string, string>();
+            if (!string.IsNullOrEmpty(pyvm.ProjectKey))
+            {
+                correctbidict = IssueViewModels.RetrieveAllBIRootCause(pyvm.ProjectKey);
+            }
+            else
+            {
+                var pjkeydict = new Dictionary<string, bool>();
+                foreach (var item in plist)
+                {
+                    if (!pjkeydict.ContainsKey(item.ProjectKey))
+                    {
+                        pjkeydict.Add(item.ProjectKey, true);
+                    }
+                }
+
+                var pjkeylist = pjkeydict.Keys;
+                foreach (var pjkey in pjkeylist)
+                {
+                    var tempcorrectdict = IssueViewModels.RetrieveAllBIRootCause(pjkey);
+                    foreach (var kvpair in tempcorrectdict)
+                    {
+                        if (!correctbidict.ContainsKey(kvpair.Key))
+                        {
+                            correctbidict.Add(kvpair.Key, kvpair.Value);
+                        }
+                    }
+                }
+            }//end else
+
+
 
             foreach (var p in plist)
             {
@@ -303,7 +335,6 @@ namespace Prometheus.Models
         public static ProjectBIYieldViewModule GetYieldByWafer(string pjkey, string wafer)
         {
             var ret = new ProjectBIYieldViewModule();
-            ret.ProjectKey = pjkey;
             ret.ProjectKey = pjkey;
             ret.StartDate = DateTime.Now;
             ret.EndDate = DateTime.Now;

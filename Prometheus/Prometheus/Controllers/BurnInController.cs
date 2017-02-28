@@ -1,9 +1,11 @@
 ﻿using Prometheus.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Routing;
 
 namespace Prometheus.Controllers
 {
@@ -882,5 +884,276 @@ namespace Prometheus.Controllers
             }
             return View();
         }
+
+        public ActionResult BIError(string ProjectKey)
+        {
+            ViewBag.pjkey = ProjectKey;
+
+                var vm = ProjectErrorViewModels.RetrieveErrorByPJKey("BURNIN");
+                var piedatadict = new Dictionary<string, int>();
+                foreach (var item in vm)
+                {
+                    if (!piedatadict.ContainsKey(item.OrignalCode))
+                    {
+                        piedatadict.Add(item.OrignalCode, item.ErrorCount);
+                    }
+                }
+
+                var keys = piedatadict.Keys;
+                if (keys.Count > 0)
+                {
+                    var namevaluepair = "";
+                    foreach (var k in keys)
+                    {
+                        namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                    }
+
+                    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                    ViewBag.chartscript = tempscript.Replace("#ElementID#", "failurepie")
+                        .Replace("#Title#", "BURNIN Realtime Failure")
+                        .Replace("#SERIESNAME#", "Failure")
+                        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
+                }
+
+                return View(vm);
+        }
+
+        public ActionResult ErrorAttach(string ErrorKey)
+        {
+            if (!string.IsNullOrEmpty(ErrorKey))
+            {
+                var tempvm = ProjectErrorViewModels.RetrieveErrorByErrorKey(ErrorKey);
+                return View(tempvm[0]);
+            }
+            return RedirectToAction("ViewAll", "Project");
+        }
+
+        public ActionResult UpdateBIError(string ErrorKey)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "BurnIn");
+                ck.Add("logonredirectact", "UpdateBIError");
+                ck.Add("errorkey", ErrorKey);
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var key = "";
+            if (!string.IsNullOrEmpty(ErrorKey))
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("errorkey", ErrorKey);
+                ck.Add("currentaction", "UpdateBIError");
+                CookieUtility.SetCookie(this, ck);
+                key = ErrorKey;
+            }
+            else if (ckdict.ContainsKey("errorkey") && !string.IsNullOrEmpty(ckdict["errorkey"]))
+            {
+                key = ckdict["errorkey"];
+                var ck = new Dictionary<string, string>();
+                ck.Add("currentaction", "UpdateBIError");
+                CookieUtility.SetCookie(this, ck);
+            }
+
+            if (!string.IsNullOrEmpty(key))
+            {
+                var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key);
+                //var FirstEngineer = ProjectViewModels.RetrieveOneProject(vm[0].ProjectKey).FirstEngineer;
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                if (string.Compare("daly.li@finisar.com", updater, true) == 0
+                    || string.Compare("tony.lv@finisar.com", updater, true) == 0
+                    || string.Compare("tyler.zhang@finisar.com", updater, true) == 0)
+                {
+                    ViewBag.assigee = true;
+                }
+                else
+                {
+                    ViewBag.assigee = false;
+                }
+                return View(vm[0]);
+            }
+
+            return View();
+        }
+
+        [HttpPost, ActionName("UpdateBIError")]
+        [ValidateAntiForgeryToken]
+        public ActionResult UpdateBIErrorPost()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            var vm = new ProjectErrorViewModels();
+            vm.ErrorKey = Request.Form["ErrorKey"];
+            vm.ShortDesc = Request.Form["ShortDesc"];
+            vm.Reporter = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            vm.UpdateShortDesc();
+
+            var temphtml = Request.Form["editor1"];
+            if (!string.IsNullOrEmpty(temphtml))
+            {
+                vm.Description = Server.HtmlDecode(temphtml);
+                ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, vm.dbDescription, PJERRORCOMMENTTYPE.Description, vm.Reporter, DateTime.Now.ToString());
+                UserRankViewModel.UpdateUserRank(updater, 2);
+            }
+
+            if (Request.Form["editor2"] != null)
+            {
+                var com = new ErrorComments();
+                com.Comment = Server.HtmlDecode(Request.Form["editor2"]);
+                if (!string.IsNullOrEmpty(com.Comment))
+                {
+                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.RootCause, vm.Reporter, DateTime.Now.ToString());
+                    UserRankViewModel.UpdateUserRank(updater, 5);
+                }
+            }
+
+            if (Request.Form["editor3"] != null)
+            {
+                var com = new ErrorComments();
+                com.Comment = Server.HtmlDecode(Request.Form["editor3"]);
+                if (!string.IsNullOrEmpty(com.Comment))
+                {
+                    if (!string.IsNullOrEmpty(com.Comment))
+                    {
+                        ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.FailureDetail, vm.Reporter, DateTime.Now.ToString());
+                        UserRankViewModel.UpdateUserRank(updater, 2);
+                    }
+                }
+            }
+
+            if (Request.Form["resulteditor"] != null)
+            {
+                var com = new ErrorComments();
+                com.Comment = Server.HtmlDecode(Request.Form["resulteditor"]);
+                if (!string.IsNullOrEmpty(com.Comment))
+                {
+                    if (!string.IsNullOrEmpty(com.Comment))
+                    {
+                        ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.Result, vm.Reporter, DateTime.Now.ToString());
+                        UserRankViewModel.UpdateUserRank(updater, 2);
+                    }
+                }
+            }
+
+            if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
+            {
+                var urls = ReceiveAttachFiles();
+                var internalreportfile = Request.Form["attachmentupload"];
+                var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
+                    .Replace(" ", "_").Replace("#", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                var url = "";
+                foreach (var r in urls)
+                {
+                    if (r.Contains(originalname))
+                    {
+                        url = r;
+                        break;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(url))
+                {
+                    ProjectErrorViewModels.StoreErrorAttachment(vm.ErrorKey, url);
+                    UserRankViewModel.UpdateUserRank(updater, 5);
+                }
+            }
+
+            var dict = new RouteValueDictionary();
+            dict.Add("ErrorKey", vm.ErrorKey);
+            return RedirectToAction("UpdateBIError", "BurnIn", dict);
+        }
+
+        public ActionResult DeleteErrorComment(string ErrorKey, string CommentType, string Date)
+        {
+            if (!string.IsNullOrEmpty(ErrorKey) && !string.IsNullOrEmpty(CommentType) && !string.IsNullOrEmpty(Date))
+            {
+                ProjectErrorViewModels.DeleteErrorComment(ErrorKey, CommentType, Date);
+                var dict = new RouteValueDictionary();
+                dict.Add("ErrorKey", ErrorKey);
+                return RedirectToAction("UpdateBIError", "BurnIn", dict);
+            }
+            return RedirectToAction("ViewAll", "Project");
+        }
+
+        public ActionResult DeleteErrorAttachment(string errorkey, string filename)
+        {
+            if (!string.IsNullOrEmpty(errorkey) && !string.IsNullOrEmpty(filename))
+            {
+                var tempvm = ProjectErrorViewModels.RetrieveErrorByErrorKey(errorkey);
+                //var FirstEngineer = ProjectViewModels.RetrieveOneProject(tempvm[0].ProjectKey).FirstEngineer;
+                var ckdict = CookieUtility.UnpackCookie(this);
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+                ProjectErrorViewModels.DeleteAttachment(errorkey, filename);
+
+                var dict = new RouteValueDictionary();
+                dict.Add("ErrorKey", errorkey);
+                return RedirectToAction("UpdateBIError", "BurnIn", dict);
+
+            }
+            else if (!string.IsNullOrEmpty(errorkey))
+            {
+                var dict = new RouteValueDictionary();
+                dict.Add("ErrorKey", errorkey);
+                return RedirectToAction("UpdateBIError", "BurnIn", dict);
+            }
+            else
+            {
+                return RedirectToAction("ViewAll", "Project");
+            }
+        }
+
+        private List<string> ReceiveAttachFiles()
+        {
+            var ret = new List<string>();
+
+            try
+            {
+                foreach (string fl in Request.Files)
+                {
+                    if (fl != null && Request.Files[fl].ContentLength > 0)
+                    {
+                        string fn = Path.GetFileName(Request.Files[fl].FileName)
+                            .Replace(" ", "_").Replace("#", "")
+                            .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                        string datestring = DateTime.Now.ToString("yyyyMMdd");
+                        string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+
+                        if (!Directory.Exists(imgdir))
+                        {
+                            Directory.CreateDirectory(imgdir);
+                        }
+
+                        fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
+                        Request.Files[fl].SaveAs(imgdir + fn);
+
+                        var url = "/userfiles/docs/" + datestring + "/" + fn;
+
+                        ret.Add(url);
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            { return ret; }
+
+            return ret;
+        }
+
+
     }
 }

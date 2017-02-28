@@ -1,0 +1,35 @@
+﻿@model Prometheus.Models.ProjectErrorViewModels
+
+@{
+    ViewBag.Title = "ErrorAttach";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Error Attach</h2>
+<hr/>
+
+@if (Model != null && Model.AttachList.Count > 0)
+{
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Attachments for @Model.ProjectKey @Model.OrignalCode</h3>
+                </div>
+                <div class="panel-body">
+                    @foreach (var item in Model.AttachList)
+                    {
+
+                        var fns = item.Split(new char[] { '/' });
+                        var fn = fns[fns.Length - 1];
+                        <div class="row">
+                            <a href="@item" target="_blank">
+                                <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>@fn
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}

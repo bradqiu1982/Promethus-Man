@@ -151,6 +151,12 @@ namespace Prometheus.Models
                                         if (string.Compare(ConvertString(line[3]), "Pass", true) != 0)
                                         {
                                             tempdataiddict[tempid].ErrAbbr = ConvertString(line[3]);
+
+                                            var ekey = ProjectErrorViewModels.GetUniqKey();
+                                            var pjerror = new ProjectErrorViewModels("BURNIN", ekey, ConvertString(line[3]), "", 1);
+                                            pjerror.Reporter = "System";
+                                            pjerror.Description = "";
+                                            pjerror.AddandUpdateProjectError();
                                         }
 
                                         
@@ -244,7 +250,13 @@ namespace Prometheus.Models
                                             {
                                                 failuredict.Add(tempdataiddict[tempid].ModuleSerialNum, true);
                                                 failurelist.Add(tempdataiddict[tempid]);
-                                            }
+
+                                                var ekey = ProjectErrorViewModels.GetUniqKey();
+                                                var pjerror = new ProjectErrorViewModels("BURNIN", ekey, ConvertString(line[3]), "", 1);
+                                                pjerror.Reporter = "System";
+                                                pjerror.Description = "";
+                                                pjerror.AddandUpdateProjectError();
+                                        }
                                 
                                         }
 
@@ -273,7 +285,13 @@ namespace Prometheus.Models
                                         {
                                             failuredict.Add(tempdata.ModuleSerialNum, true);
                                             failurelist.Add(tempdata);
-                                        }
+
+                                            var ekey = ProjectErrorViewModels.GetUniqKey();
+                                            var pjerror = new ProjectErrorViewModels("BURNIN", ekey, tempdata.ErrAbbr, "", 1);
+                                            pjerror.Reporter = "System";
+                                            pjerror.Description = "";
+                                            pjerror.AddandUpdateProjectError();
+                                    }
                                     }
                                     else
                                     {
@@ -361,7 +379,13 @@ namespace Prometheus.Models
                                                     {
                                                         failuredict.Add(tempdataiddict[tempid].ModuleSerialNum, true);
                                                         failurelist.Add(tempdataiddict[tempid]);
-                                                    }
+
+                                                        var ekey = ProjectErrorViewModels.GetUniqKey();
+                                                        var pjerror = new ProjectErrorViewModels("BURNIN", ekey, ConvertString(line[3]), "", 1);
+                                                        pjerror.Reporter = "System";
+                                                        pjerror.Description = "";
+                                                        pjerror.AddandUpdateProjectError();
+                                                }
 
                                                 }
 

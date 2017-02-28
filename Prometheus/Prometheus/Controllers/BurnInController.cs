@@ -889,7 +889,7 @@ namespace Prometheus.Controllers
         {
             ViewBag.pjkey = ProjectKey;
 
-                var vm = ProjectErrorViewModels.RetrieveErrorByPJKey("BURNIN");
+                var vm = ProjectErrorViewModels.RetrieveErrorByPJKey(ProjectErrorViewModels.BURNIN);
                 var piedatadict = new Dictionary<string, int>();
                 foreach (var item in vm)
                 {

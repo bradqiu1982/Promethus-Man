@@ -80,6 +80,8 @@ namespace Prometheus.Models
         public ProjectErrorViewModels()
         { }
 
+        public static string BURNIN = "BURNIN";
+
         public ProjectErrorViewModels(string pjkey,string ekey,string ocode,string sdesc,int count)
         {
             ProjectKey = pjkey;

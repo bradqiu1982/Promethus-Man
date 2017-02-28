@@ -1094,34 +1094,114 @@ namespace Prometheus.Controllers
 
                     if (!string.IsNullOrEmpty(errabbr))
                     {
-                        var perrlist = ProjectErrorViewModels.RetrieveErrorByPJKey(originaldata.ProjectKey, errabbr);
-                        if (perrlist.Count > 0)
+                        if (!originaldata.Summary.Contains("@Burn-In Step"))
                         {
-                            var linktime = DateTime.Now.ToString();
-                            foreach (var item in originaldata.FailureDetailCommentList)
-                            {
-                                ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, item.dbComment, PJERRORCOMMENTTYPE.FailureDetail,updater, linktime);
-                            }
-                            foreach (var item in originaldata.RootCauseCommentList)
-                            {
-                                ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, item.dbComment, PJERRORCOMMENTTYPE.RootCause, updater, linktime);
-                            }
-                            foreach (var item in originaldata.ResultCommentList)
-                            {
-                                ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, item.dbComment, PJERRORCOMMENTTYPE.Result, updater, linktime);
-                            }
+                            var perrlist = ProjectErrorViewModels.RetrieveErrorByPJKey(originaldata.ProjectKey, errabbr);
+                            var testdata = ProjectTestData.RetrieveProjectTestData(originaldata.IssueKey);
 
-                            foreach (var item in originaldata.AttachList)
+                            if (perrlist.Count > 0)
                             {
-                                ProjectErrorViewModels.StoreErrorAttachment(perrlist[0].ErrorKey, item);
-                            }
+                                var linktime = DateTime.Now.ToString();
+                                foreach (var item in originaldata.FailureDetailCommentList)
+                                {
+                                    var newcomment = new IssueComments();
+                                    if (testdata.Count > 0)
+                                    {
+                                        newcomment.Comment = "<p>" + testdata[0].ModuleSerialNum + "    " + testdata[0].TestStation + "    " + testdata[0].WhichTest + "    " + testdata[0].TestTimeStamp.ToString() + "</p>"+item.Comment;
+                                    }
+                                    else
+                                    {
+                                        newcomment.Comment = item.Comment;
+                                    }
+                                
+                                    ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, newcomment.dbComment, PJERRORCOMMENTTYPE.FailureDetail,updater, linktime);
+                                }
 
-                            UserRankViewModel.UpdateUserRank(updater, 10);
+                                foreach (var item in originaldata.RootCauseCommentList)
+                                {
+                                    ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, item.dbComment, PJERRORCOMMENTTYPE.RootCause, updater, linktime);
+                                }
+                                if (originaldata.ResultCommentList.Count > 0)
+                                {
+                                    foreach (var item in originaldata.ResultCommentList)
+                                    {
+                                        ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, item.dbComment, PJERRORCOMMENTTYPE.Result, updater, linktime);
+                                    }
+                                }
+                                else
+                                {
+                                    var newcomment = new IssueComments();
+                                    newcomment.Comment = "<p>To Be Edit</p>";
+                                    ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, newcomment.dbComment, PJERRORCOMMENTTYPE.Result, updater, linktime);
+                                }
 
-                            var dict = new RouteValueDictionary();
-                            dict.Add("ErrorKey", perrlist[0].ErrorKey);
-                            return RedirectToAction("UpdateProjectError", "Project", dict);
-                        }//end if
+                                foreach (var item in originaldata.AttachList)
+                                {
+                                    ProjectErrorViewModels.StoreErrorAttachment(perrlist[0].ErrorKey, item);
+                                }
+
+                                UserRankViewModel.UpdateUserRank(updater, 10);
+
+                                var dict = new RouteValueDictionary();
+                                dict.Add("ErrorKey", perrlist[0].ErrorKey);
+                                return RedirectToAction("UpdateProjectError", "Project", dict);
+                            }//end if
+                        }
+                        else
+                        {
+                            var perrlist = ProjectErrorViewModels.RetrieveErrorByPJKey(ProjectErrorViewModels.BURNIN, errabbr);
+                            var testdata = BITestData.RetrieveProjectTestDataByDataID(originaldata.IssueKey);
+                            if (perrlist.Count > 0)
+                            {
+                                var linktime = DateTime.Now.ToString();
+                                foreach (var item in originaldata.FailureDetailCommentList)
+                                {
+                                    var newcomment = new IssueComments();
+                                    if (testdata.Count > 0)
+                                    {
+                                        newcomment.Comment = "<p>" + testdata[0].ModuleSerialNum + "    " + testdata[0].TestStation + "    " + testdata[0].WhichTest + "    " + testdata[0].TestTimeStamp.ToString() + "</p>" + item.Comment;
+                                    }
+                                    else
+                                    {
+                                        newcomment.Comment = item.Comment;
+                                    }
+
+                                    ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, newcomment.dbComment, PJERRORCOMMENTTYPE.FailureDetail, updater, linktime);
+                                }
+
+                                foreach (var item in originaldata.RootCauseCommentList)
+                                {
+                                    ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, item.dbComment, PJERRORCOMMENTTYPE.RootCause, updater, linktime);
+                                }
+
+                                if (originaldata.ResultCommentList.Count > 0)
+                                {
+                                    foreach (var item in originaldata.ResultCommentList)
+                                    {
+                                        ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, item.dbComment, PJERRORCOMMENTTYPE.Result, updater, linktime);
+                                    }
+                                }
+                                else
+                                {
+                                    var newcomment = new IssueComments();
+                                    newcomment.Comment = "<p>To Be Edit</p>";
+                                    ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, newcomment.dbComment, PJERRORCOMMENTTYPE.Result, updater, linktime);
+                                }
+
+                                foreach (var item in originaldata.AttachList)
+                                {
+                                    ProjectErrorViewModels.StoreErrorAttachment(perrlist[0].ErrorKey, item);
+                                }
+
+                                UserRankViewModel.UpdateUserRank(updater, 10);
+
+                                var dict = new RouteValueDictionary();
+                                dict.Add("ErrorKey", perrlist[0].ErrorKey);
+                                return RedirectToAction("UpdateBIError", "BurnIn", dict);
+                            }//end if
+                        }
+
+
                     }//end if
                 }
             }

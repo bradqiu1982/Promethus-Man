@@ -300,9 +300,9 @@ namespace Prometheus.Models
             var ldate = RetrieveDateSpanByWeek(pvm.StartDate.ToString(), DateTime.Now.ToString());
 
             var startidx = 0;
-            if (ldate.Count > 28)
+            if (ldate.Count > 15)
             {
-                startidx = ldate.Count - 28;
+                startidx = ldate.Count - 15;
             }
 
             for (int idx = startidx; idx < ldate.Count - 1; idx++)

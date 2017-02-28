@@ -153,7 +153,7 @@ namespace Prometheus.Models
                                             tempdataiddict[tempid].ErrAbbr = ConvertString(line[3]);
 
                                             var ekey = ProjectErrorViewModels.GetUniqKey();
-                                            var pjerror = new ProjectErrorViewModels("BURNIN", ekey, ConvertString(line[3]), "", 1);
+                                            var pjerror = new ProjectErrorViewModels(ProjectErrorViewModels.BURNIN, ekey, ConvertString(line[3]), "", 1);
                                             pjerror.Reporter = "System";
                                             pjerror.Description = "";
                                             pjerror.AddandUpdateProjectError();
@@ -252,7 +252,7 @@ namespace Prometheus.Models
                                                 failurelist.Add(tempdataiddict[tempid]);
 
                                                 var ekey = ProjectErrorViewModels.GetUniqKey();
-                                                var pjerror = new ProjectErrorViewModels("BURNIN", ekey, ConvertString(line[3]), "", 1);
+                                                var pjerror = new ProjectErrorViewModels(ProjectErrorViewModels.BURNIN, ekey, ConvertString(line[3]), "", 1);
                                                 pjerror.Reporter = "System";
                                                 pjerror.Description = "";
                                                 pjerror.AddandUpdateProjectError();
@@ -287,7 +287,7 @@ namespace Prometheus.Models
                                             failurelist.Add(tempdata);
 
                                             var ekey = ProjectErrorViewModels.GetUniqKey();
-                                            var pjerror = new ProjectErrorViewModels("BURNIN", ekey, tempdata.ErrAbbr, "", 1);
+                                            var pjerror = new ProjectErrorViewModels(ProjectErrorViewModels.BURNIN, ekey, tempdata.ErrAbbr, "", 1);
                                             pjerror.Reporter = "System";
                                             pjerror.Description = "";
                                             pjerror.AddandUpdateProjectError();
@@ -381,7 +381,7 @@ namespace Prometheus.Models
                                                         failurelist.Add(tempdataiddict[tempid]);
 
                                                         var ekey = ProjectErrorViewModels.GetUniqKey();
-                                                        var pjerror = new ProjectErrorViewModels("BURNIN", ekey, ConvertString(line[3]), "", 1);
+                                                        var pjerror = new ProjectErrorViewModels(ProjectErrorViewModels.BURNIN, ekey, ConvertString(line[3]), "", 1);
                                                         pjerror.Reporter = "System";
                                                         pjerror.Description = "";
                                                         pjerror.AddandUpdateProjectError();

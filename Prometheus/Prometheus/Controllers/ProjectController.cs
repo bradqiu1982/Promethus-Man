@@ -4169,8 +4169,8 @@ namespace Prometheus.Controllers
             {
                 try
                 {
-                    SendTaskNotice();
-                    //BITestData.PrePareLatestData(this,pjkey);
+                    //SendTaskNotice();
+                    BITestData.PrePareLatestData(this,pjkey);
                 }
                 catch (Exception ex)
                 { }

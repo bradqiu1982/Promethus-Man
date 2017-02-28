@@ -75,8 +75,8 @@ namespace Prometheus.Controllers
 
                 NPIInfo(item);
 
-                var taskdone = IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Pending);
-                var tasktotal = taskdone + IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Done);
+                var taskdone = IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Done);
+                var tasktotal = taskdone + IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Pending);
                 item.PendingTaskCount = taskdone.ToString() + "/" + tasktotal.ToString();
 
                 var fadone = ProjectFAViewModules.RetrieveFADataCount(item.ProjectKey, false);
@@ -1098,8 +1098,8 @@ namespace Prometheus.Controllers
 
                     NPIInfo(vm);
 
-                    var taskdone = IssueViewModels.RetrieveTaskCountByProjectKey(vm.ProjectKey, Resolute.Pending);
-                    var tasktotal = taskdone + IssueViewModels.RetrieveTaskCountByProjectKey(vm.ProjectKey, Resolute.Done);
+                    var taskdone = IssueViewModels.RetrieveTaskCountByProjectKey(vm.ProjectKey, Resolute.Done);
+                    var tasktotal = taskdone + IssueViewModels.RetrieveTaskCountByProjectKey(vm.ProjectKey, Resolute.Pending);
                     vm.PendingTaskCount = taskdone.ToString() + "/" + tasktotal.ToString();
 
                     var fadone = ProjectFAViewModules.RetrieveFADataCount(vm.ProjectKey, false);
@@ -3478,19 +3478,23 @@ namespace Prometheus.Controllers
                 }
             }
 
-            var tempvm = ProjectErrorViewModels.RetrieveErrorByErrorKey(vm.ErrorKey);
-            var FirstEngineer = ProjectViewModels.RetrieveOneProject(tempvm[0].ProjectKey).FirstEngineer;
-            
-            if (string.Compare(FirstEngineer, updater, true) == 0)
-            {
-                ViewBag.assigee = true;
-            }
-            else
-            {
-                ViewBag.assigee = false;
-            }
+            var dict = new RouteValueDictionary();
+            dict.Add("ErrorKey", vm.ErrorKey);
+            return RedirectToAction("UpdateProjectError", "Project", dict);
 
-            return View(tempvm[0]);
+            //var tempvm = ProjectErrorViewModels.RetrieveErrorByErrorKey(vm.ErrorKey);
+            //var FirstEngineer = ProjectViewModels.RetrieveOneProject(tempvm[0].ProjectKey).FirstEngineer;
+
+            //if (string.Compare(FirstEngineer, updater, true) == 0)
+            //{
+            //    ViewBag.assigee = true;
+            //}
+            //else
+            //{
+            //    ViewBag.assigee = false;
+            //}
+
+            //return View(tempvm[0]);
         }
 
         public ActionResult ErrorAttach(string ErrorKey)

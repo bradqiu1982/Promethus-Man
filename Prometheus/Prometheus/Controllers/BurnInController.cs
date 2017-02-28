@@ -1007,16 +1007,9 @@ namespace Prometheus.Controllers
                 UserRankViewModel.UpdateUserRank(updater, 2);
             }
 
-            if (Request.Form["editor2"] != null)
-            {
-                var com = new ErrorComments();
-                com.Comment = Server.HtmlDecode(Request.Form["editor2"]);
-                if (!string.IsNullOrEmpty(com.Comment))
-                {
-                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.RootCause, vm.Reporter, DateTime.Now.ToString());
-                    UserRankViewModel.UpdateUserRank(updater, 5);
-                }
-            }
+
+            var failuredetail = string.Empty;
+            var result = string.Empty;
 
             if (Request.Form["editor3"] != null)
             {
@@ -1024,11 +1017,10 @@ namespace Prometheus.Controllers
                 com.Comment = Server.HtmlDecode(Request.Form["editor3"]);
                 if (!string.IsNullOrEmpty(com.Comment))
                 {
-                    if (!string.IsNullOrEmpty(com.Comment))
-                    {
+
                         ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.FailureDetail, vm.Reporter, DateTime.Now.ToString());
                         UserRankViewModel.UpdateUserRank(updater, 2);
-                    }
+                    failuredetail = com.Comment;
                 }
             }
 
@@ -1038,10 +1030,34 @@ namespace Prometheus.Controllers
                 com.Comment = Server.HtmlDecode(Request.Form["resulteditor"]);
                 if (!string.IsNullOrEmpty(com.Comment))
                 {
-                    if (!string.IsNullOrEmpty(com.Comment))
-                    {
+
                         ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.Result, vm.Reporter, DateTime.Now.ToString());
                         UserRankViewModel.UpdateUserRank(updater, 2);
+                    result = com.Comment;
+                }
+            }
+
+            if (Request.Form["editor2"] != null)
+            {
+                var com = new ErrorComments();
+                com.Comment = Server.HtmlDecode(Request.Form["editor2"]);
+                if (!string.IsNullOrEmpty(com.Comment))
+                {
+                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.RootCause, vm.Reporter, DateTime.Now.ToString());
+                    UserRankViewModel.UpdateUserRank(updater, 5);
+
+                    if (string.IsNullOrEmpty(failuredetail))
+                    {
+                        var com1 = new ErrorComments();
+                        com1.Comment = "<p>To Be Edit</p>";
+                        ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.FailureDetail, vm.Reporter, DateTime.Now.ToString());
+                    }
+
+                    if (string.IsNullOrEmpty(result))
+                    {
+                        var com1 = new ErrorComments();
+                        com1.Comment = "<p>To Be Edit</p>";
+                        ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.Result, vm.Reporter, DateTime.Now.ToString());
                     }
                 }
             }

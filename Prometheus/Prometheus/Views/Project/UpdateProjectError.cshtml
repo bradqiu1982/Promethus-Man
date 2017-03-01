@@ -172,7 +172,7 @@
                                         @foreach (var item in paircoment)
                                         {
                                             <div class="row col-lg-12">
-                                                @if (string.Compare(item.CommentType, Prometheus.Models.COMMENTTYPE.RootCause) == 0)
+                                                @if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.RootCause) == 0)
                                                 {
                                                     <h3>@item.CommentType Investigation</h3>
                                                 }

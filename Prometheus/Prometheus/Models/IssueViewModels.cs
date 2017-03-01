@@ -1550,7 +1550,6 @@ namespace Prometheus.Models
 
         public static void UpdateSPComment(string issuekey, string commenttype, string date,string dbcomment)
         {
-            var tempcomment = new IssueComments();
             var csql = "update IssueComments set Comment = '<Comment>'  where IssueKey = '<IssueKey>' and CommentDate = '<CommentDate>' and CommentType = '<CommentType>'";
             csql = csql.Replace("<IssueKey>", issuekey).Replace("<CommentDate>", date).Replace("<CommentType>", commenttype).Replace("<Comment>", dbcomment);
             DBUtility.ExeLocalSqlNoRes(csql);

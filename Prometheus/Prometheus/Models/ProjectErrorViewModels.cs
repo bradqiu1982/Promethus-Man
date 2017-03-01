@@ -417,6 +417,30 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
+        public static ErrorComments RetrieveSPComment(string ErrorKey, string CommentType, string Date)
+        {
+            var tempcomment = new ErrorComments();
+            var csql = "select ErrorKey,Comment,Reporter,CommentDate,CommentType from ErrorComments  where ErrorKey='<ErrorKey>' and CommentType='<CommentType>' and CommentDate='<CommentDate>'";
+            csql = csql.Replace("<ErrorKey>", ErrorKey).Replace("<CommentType>", CommentType).Replace("<CommentDate>", Date);
+            var cdbret = DBUtility.ExeLocalSqlWithRes(csql, null);
+            foreach (var r in cdbret)
+            {
+                tempcomment.ErrorKey = Convert.ToString(r[0]);
+                tempcomment.dbComment = Convert.ToString(r[1]);
+                tempcomment.Reporter = Convert.ToString(r[2]);
+                tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
+                tempcomment.CommentType = Convert.ToString(r[4]);
+            }
+            return tempcomment;
+        }
+
+        public static void UpdateSPComment(string ErrorKey, string CommentType, string Date, string dbcomment)
+        {
+            var csql = "update ErrorComments set Comment = '<Comment>'  where ErrorKey='<ErrorKey>' and CommentType='<CommentType>' and CommentDate='<CommentDate>'";
+            csql = csql.Replace("<ErrorKey>", ErrorKey).Replace("<CommentType>", CommentType).Replace("<CommentDate>", Date).Replace("<Comment>", dbcomment);
+            DBUtility.ExeLocalSqlNoRes(csql);
+        }
+
         public static void StoreErrorAttachment(string errorkey, string attachmenturl)
         {
             var sql = "insert into PJErrorAttachment(ErrorKey,Attachment,UpdateTime) values('<ErrorKey>',N'<Attachment>','<UpdateTime>')";

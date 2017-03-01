@@ -4371,5 +4371,43 @@ namespace Prometheus.Controllers
             return RedirectToAction("ViewAll", "Project");
         }
 
+
+        public ActionResult UpdateErrorComment(string ErrorKey, string CommentType, string Date)
+        {
+            if (!string.IsNullOrEmpty(ErrorKey) && !string.IsNullOrEmpty(CommentType) && !string.IsNullOrEmpty(Date))
+            {
+                var errorcomment = ProjectErrorViewModels.RetrieveSPComment(ErrorKey, CommentType, Date);
+                return View(errorcomment);
+            }
+
+            return RedirectToAction("ViewAll", "Project");
+        }
+
+        [HttpPost, ActionName("UpdateErrorComment")]
+        [ValidateAntiForgeryToken]
+        public ActionResult UpdateErrorCommentPost()
+        {
+            var errorkey = Request.Form["HErrorKey"];
+            var commenttype = Request.Form["HType"];
+            var commentdate = Request.Form["HDate"];
+
+            if (!string.IsNullOrEmpty(Request.Form["editor1"]))
+            {
+                var tempcommment = new ErrorComments();
+                tempcommment.Comment = Server.HtmlDecode(Request.Form["editor1"]);
+                ProjectErrorViewModels.UpdateSPComment(errorkey, commenttype, commentdate, tempcommment.dbComment);
+            }
+            else
+            {
+                var tempcommment = new ErrorComments();
+                tempcommment.Comment = "<p>To Be Edit</p>";
+                ProjectErrorViewModels.UpdateSPComment(errorkey, commenttype, commentdate, tempcommment.dbComment);
+            }
+
+            var dict = new RouteValueDictionary();
+            dict.Add("ErrorKey", errorkey);
+            return RedirectToAction("UpdateProjectError", "Project", dict);
+        }
+
     }
 }

@@ -1283,6 +1283,10 @@ namespace Prometheus.Controllers
                 {
                     ViewBag.logined = true;
                 }
+
+
+                pendingitems.AddRange(tempitems);
+
                 return View("ProjectFA", pendingitems);
             }
             return RedirectToAction("ViewAll","Project");

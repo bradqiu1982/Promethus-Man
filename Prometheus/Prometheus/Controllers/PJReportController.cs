@@ -416,7 +416,7 @@ namespace Prometheus.Controllers
                     if (item.ReportDate < temptime && item.ReportDate >= tempstime 
                         && string.Compare(item.Reporter, "System",true) == 0)
                     {
-                        var errorkey = item.Summary.Split(new string[] { "failed for", "@" }, StringSplitOptions.None)[1].Trim();
+                        var errorkey = item.ErrAbbr;//item.Summary.Split(new string[] { "failed for", "@" }, StringSplitOptions.None)[1].Trim();
                         if (tempdict.ContainsKey(errorkey))
                         {
                             tempdict[errorkey] = tempdict[errorkey] + 1;

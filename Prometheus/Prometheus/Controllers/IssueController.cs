@@ -1107,7 +1107,9 @@ namespace Prometheus.Controllers
                                     var newcomment = new IssueComments();
                                     if (testdata.Count > 0)
                                     {
-                                        newcomment.Comment = "<p>" + testdata[0].ModuleSerialNum + "  -  " + testdata[0].TestStation + "  -  " + testdata[0].WhichTest + "  -  " + testdata[0].TestTimeStamp.ToString() + "</p>"+item.Comment;
+                                        newcomment.Comment = "<p>" + testdata[0].ModuleSerialNum + "  -  " + testdata[0].TestStation + "  -  " + testdata[0].WhichTest + "  -  " + testdata[0].TestTimeStamp.ToString() + "</p>"
+                                            + "<p><a href='/Issue/UpdateIssue?issuekey="+originaldata.IssueKey+"' target='_blank'>"+originaldata.ModuleSN+" link"+"</a></p>"
+                                                     + item.Comment;
                                     }
                                     else
                                     {
@@ -1159,7 +1161,9 @@ namespace Prometheus.Controllers
                                     var newcomment = new IssueComments();
                                     if (testdata.Count > 0)
                                     {
-                                        newcomment.Comment = "<p>" + testdata[0].ModuleSerialNum + "  -  " + testdata[0].TestStation + "  -  " + testdata[0].WhichTest + "  -  " + testdata[0].TestTimeStamp.ToString() + "</p>" + item.Comment;
+                                        newcomment.Comment = "<p>" + testdata[0].ModuleSerialNum + "  -  " + testdata[0].TestStation + "  -  " + testdata[0].WhichTest + "  -  " + testdata[0].TestTimeStamp.ToString() + "</p>"
+                                            + "<p><a href='/Issue/UpdateIssue?issuekey=" + originaldata.IssueKey + "' target='_blank'>" + originaldata.ModuleSN + " link" + "</a></p>"
+                                            + item.Comment;
                                     }
                                     else
                                     {

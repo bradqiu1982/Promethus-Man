@@ -118,7 +118,7 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        private void retestparetofun(List<KeyValuePair<string, int>> retestdatalist)
+        private void retestparetofun(List<KeyValuePair<string, int>> retestdatalist,string pjkey=null)
         {
             if (retestdatalist.Count > 0)
             {
@@ -212,6 +212,12 @@ namespace Prometheus.Controllers
 
                 //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
 
+                var reurl = "";
+                if (!string.IsNullOrEmpty(pjkey))
+                {
+                    reurl = "window.location.href = '/Project/ProjectErrAbbr?ProjectKey=" + pjkey + "'" + "+'&ErrAbbr='+this.category";
+                }
+
                 var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ParetoChart.xml"));
                 ViewBag.rparetoscript = tempscript.Replace("#ElementID#", "rparetochart")
                     .Replace("#Title#", "Pareto of Final Defect")
@@ -221,7 +227,7 @@ namespace Prometheus.Controllers
                     .Replace("#PCount#", pcountvalue)
                     .Replace("#ABPercent#", abpecentvalue)
                     .Replace("#PPercent#", ppecentvalue)
-                    .Replace("#REDIRECTURL#", "");
+                    .Replace("#REDIRECTURL#", reurl);
             }
         }
 
@@ -302,7 +308,7 @@ namespace Prometheus.Controllers
 
                 if (retestdatalist.Count > 0)
                 {
-                    retestparetofun(retestdatalist);
+                    retestparetofun(retestdatalist, ProjectKey);
                 }
 
                 return View(yieldvm);
@@ -462,7 +468,7 @@ namespace Prometheus.Controllers
 
                 if (retestdatalist.Count > 0)
                 {
-                    retestparetofun(retestdatalist);
+                    retestparetofun(retestdatalist, ProjectKey);
                 }
 
                 return View(yieldvm);
@@ -626,7 +632,7 @@ namespace Prometheus.Controllers
 
                 if (retestdatalist.Count > 0)
                 {
-                    retestparetofun(retestdatalist);
+                    retestparetofun(retestdatalist, ProjectKey);
                 }
 
                 return View(yieldvm);
@@ -875,7 +881,7 @@ namespace Prometheus.Controllers
 
                 if (retestdatalist.Count > 0)
                 {
-                    retestparetofun(retestdatalist);
+                    retestparetofun(retestdatalist, Pjkey4return);
                 }
 
                 yieldvm.ProjectKey = Pjkey4return;

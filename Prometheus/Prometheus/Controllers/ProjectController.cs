@@ -3803,13 +3803,13 @@ namespace Prometheus.Controllers
             var ret = string.Empty;
             foreach (var i in wissues)
             {
-                ret = ret + "WORKING    " + i.Summary + "   " + i.Assignee + ":\r\n";
+                ret = ret + "WORKING    Pending Days: " + (DateTime.Now - i.ReportDate).Days.ToString()+"    "+ i.Summary + "   " + i.Assignee + ":\r\n";
                 ret = ret + IssueURL(i.IssueKey) + "\r\n\r\n";
             }
 
             foreach (var i in pissues)
             {
-                ret = ret + "PENDING    " + i.Summary + "   " + i.Assignee + ":\r\n";
+                ret = ret + "PENDING    Pending Days: " + (DateTime.Now - i.ReportDate).Days.ToString() + "    " + i.Summary + "   " + i.Assignee + ":\r\n";
                 ret = ret + IssueURL(i.IssueKey) + "\r\n\r\n";
             }
             return ret;
@@ -3841,13 +3841,13 @@ namespace Prometheus.Controllers
 
             foreach (var i in wissues)
             {
-                ret = ret + "WORKING    " + i.Summary + "   " + i.Reporter + ":\r\n";
+                ret = ret + "WORKING    Pending Days: " + (DateTime.Now - i.ReportDate).Days.ToString() + "    " + i.Summary + "   " + i.Reporter + ":\r\n";
                 ret = ret + IssueURL(i.IssueKey) + "\r\n\r\n";
             }
 
             foreach (var i in pissues)
             {
-                ret = ret + "PENDING    " + i.Summary + "   " + i.Reporter + ":\r\n";
+                ret = ret + "PENDING    Pending Days: " + (DateTime.Now - i.ReportDate).Days.ToString() + "    " + i.Summary + "   " + i.Reporter + ":\r\n";
                 ret = ret + IssueURL(i.IssueKey) + "\r\n\r\n";
             }
 

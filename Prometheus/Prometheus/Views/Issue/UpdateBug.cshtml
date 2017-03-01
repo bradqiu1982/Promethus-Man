@@ -42,7 +42,14 @@
     </div>
 
     <div class="col-lg-1">
-        <h2><a data-toggle="tooltip" title="Goto Debug Tree" href="/Project/UpdateProjectError2?ProjectKey=@(Model.ProjectKey)&ErrorCode=@(Model.ErrAbbr)"><span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span></a></h2>
+        @if (Model.Summary.Contains("@Burn-In Step"))
+        {
+            <h2><a data-toggle="tooltip" title="Goto Debug Tree" href="/BurnIn/UpdateBIError2?ErrorCode=@(Model.ErrAbbr)"><span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span></a></h2>
+        }
+        else
+        {
+            <h2><a data-toggle="tooltip" title="Goto Debug Tree" href="/Project/UpdateProjectError2?ProjectKey=@(Model.ProjectKey)&ErrorCode=@(Model.ErrAbbr)"><span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span></a></h2>
+        }
     </div>
 
     <div class="col-lg-1">

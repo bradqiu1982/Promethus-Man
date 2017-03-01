@@ -991,6 +991,68 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        public ActionResult UpdateBIError2(string ErrorCode)
+        {
+            var tempvm = ProjectErrorViewModels.RetrieveErrorByPJKey(ProjectErrorViewModels.BURNIN, ErrorCode);
+            var ErrorKey = "";
+            if (tempvm.Count > 0)
+            {
+                ErrorKey = tempvm[0].ErrorKey;
+            }
+
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "BurnIn");
+                ck.Add("logonredirectact", "UpdateBIError2");
+                ck.Add("errorkey", ErrorKey);
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var key = "";
+            if (!string.IsNullOrEmpty(ErrorKey))
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("errorkey", ErrorKey);
+                ck.Add("currentaction", "UpdateBIError2");
+                CookieUtility.SetCookie(this, ck);
+                key = ErrorKey;
+            }
+            else if (ckdict.ContainsKey("errorkey") && !string.IsNullOrEmpty(ckdict["errorkey"]))
+            {
+                key = ckdict["errorkey"];
+                var ck = new Dictionary<string, string>();
+                ck.Add("currentaction", "UpdateBIError2");
+                CookieUtility.SetCookie(this, ck);
+            }
+
+            if (!string.IsNullOrEmpty(key))
+            {
+                var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key);
+                //var FirstEngineer = ProjectViewModels.RetrieveOneProject(vm[0].ProjectKey).FirstEngineer;
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                if (string.Compare("daly.li@finisar.com", updater, true) == 0
+                    || string.Compare("tony.lv@finisar.com", updater, true) == 0
+                    || string.Compare("tyler.zhang@finisar.com", updater, true) == 0)
+                {
+                    ViewBag.assigee = true;
+                }
+                else
+                {
+                    ViewBag.assigee = false;
+                }
+                return View("UpdateBIError",vm[0]);
+            }
+
+            return View();
+        }
+
         [HttpPost, ActionName("UpdateBIError")]
         [ValidateAntiForgeryToken]
         public ActionResult UpdateBIErrorPost()

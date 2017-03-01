@@ -5,14 +5,14 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Root Cause</h2>
+<h2>Root Cause Investigation</h2>
 @if (Model != null)
 {
     foreach (Prometheus.Models.IssueComments item in Model.RootCauseCommentList)
     {
         <div class="row">
             <div class="panel panel-default">
-                <div class="panel-heading">Root Cause</div>
+                <div class="panel-heading">Root Cause Investigation</div>
                 <div class="panel-body">
                     @Html.Raw(item.Comment)
                 </div>

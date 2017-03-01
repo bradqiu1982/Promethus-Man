@@ -172,7 +172,15 @@
                                         @foreach (var item in paircoment)
                                         {
                                             <div class="row col-lg-12">
-                                                <h3>@item.CommentType</h3>
+                                                @if (string.Compare(item.CommentType, Prometheus.Models.COMMENTTYPE.RootCause) == 0)
+                                                {
+                                                    <h3>@item.CommentType Investigation</h3>
+                                                }
+                                                else
+                                                {
+                                                    <h3>@item.CommentType</h3>
+                                                }
+                                                
                                             </div>
                                             <div class="row col-lg-12">
                                                 @Html.Raw(item.Comment)
@@ -292,7 +300,7 @@
 
         <div class="col-lg-12">
             <div class="form-group">
-                Root Cause
+                Root Cause Investigation
             </div>
 
             <div class="form-group">

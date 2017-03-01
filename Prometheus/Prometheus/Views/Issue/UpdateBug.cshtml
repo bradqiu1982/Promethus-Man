@@ -42,6 +42,10 @@
     </div>
 
     <div class="col-lg-1">
+        <h2><a data-toggle="tooltip" title="Goto Debug Tree" href="/Project/UpdateProjectError2?ProjectKey=@(Model.ProjectKey)&ErrorCode=@(Model.ErrAbbr)"><span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span></a></h2>
+    </div>
+
+    <div class="col-lg-1">
         <h2><a data-toggle="tooltip" title="Goto Project Task" href="/Project/ProjectIssues?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span></a></h2>
     </div>
 
@@ -57,7 +61,7 @@
         <h2><a data-toggle="tooltip" title="Goto Project NPI" href="/Project/ProjectNPI?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></a></h2>
     </div>
 
-    <div class="col-lg-3">
+    <div class="col-lg-2">
         @if (Model != null)
         {
             <input class="form-control text-box single-line" value="@(Model.IssueKey)" id="HIssueKeyForDelete" name="HIssueKeyForDelete" type="hidden" />

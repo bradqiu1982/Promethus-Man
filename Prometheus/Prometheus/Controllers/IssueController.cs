@@ -2713,6 +2713,43 @@ namespace Prometheus.Controllers
             return RedirectToAction("ViewAll", "Project");
         }
 
+        public ActionResult ModifyIssueComment(string IssueKey, string CommentType, string Date)
+        {
+            if (!string.IsNullOrEmpty(IssueKey) && !string.IsNullOrEmpty(CommentType) && !string.IsNullOrEmpty(Date))
+            {
+                var issuecomment  = IssueViewModels.RetrieveSPComment(IssueKey, CommentType, Date);
+                return View(issuecomment);
+            }
+
+            return RedirectToAction("ViewAll", "Project");
+        }
+
+        [HttpPost, ActionName("ModifyIssueComment")]
+        [ValidateAntiForgeryToken]
+        public ActionResult ModifyIssueCommentPost()
+        {
+            var issuekey = Request.Form["HIssueKey"];
+            var commenttype = Request.Form["HType"];
+            var commentdate = Request.Form["HDate"];
+
+            if (!string.IsNullOrEmpty(Request.Form["editor1"]))
+            {
+                var tempcommment = new IssueComments();
+                tempcommment.Comment = Server.HtmlDecode(Request.Form["editor1"]);
+                IssueViewModels.UpdateSPComment(issuekey, commenttype, commentdate, tempcommment.dbComment);
+            }
+            else
+            {
+                var tempcommment = new IssueComments();
+                tempcommment.Comment = "<p>To Be Edit</p>";
+                IssueViewModels.UpdateSPComment(issuekey, commenttype, commentdate, tempcommment.dbComment);
+            }
+
+            var dict = new RouteValueDictionary();
+            dict.Add("issuekey", issuekey);
+            return RedirectToAction("UpdateIssue", "Issue", dict);
+        }
+
         private List<string> PrepeareRMAReport(string ProjectKey, string StartDate, string EndDate)
         {
             var lines = new List<string>();

@@ -1531,6 +1531,31 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(csql);
         }
 
+        public static IssueComments RetrieveSPComment(string issuekey, string commenttype, string date)
+        {
+            var tempcomment = new IssueComments();
+            var csql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' and CommentDate = '<CommentDate>' and CommentType = '<CommentType>'";
+            csql = csql.Replace("<IssueKey>", issuekey).Replace("<CommentDate>", date).Replace("<CommentType>", commenttype);
+            var cdbret = DBUtility.ExeLocalSqlWithRes(csql, null);
+            foreach (var r in cdbret)
+            {
+                tempcomment.IssueKey = Convert.ToString(r[0]);
+                tempcomment.dbComment = Convert.ToString(r[1]);
+                tempcomment.Reporter = Convert.ToString(r[2]);
+                tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
+                tempcomment.CommentType = Convert.ToString(r[4]);
+            }
+            return tempcomment;
+        }
+
+        public static void UpdateSPComment(string issuekey, string commenttype, string date,string dbcomment)
+        {
+            var tempcomment = new IssueComments();
+            var csql = "update IssueComments set Comment = '<Comment>'  where IssueKey = '<IssueKey>' and CommentDate = '<CommentDate>' and CommentType = '<CommentType>'";
+            csql = csql.Replace("<IssueKey>", issuekey).Replace("<CommentDate>", date).Replace("<CommentType>", commenttype).Replace("<Comment>", dbcomment);
+            DBUtility.ExeLocalSqlNoRes(csql);
+        }
+
         public static List<IssueViewModels> RetrieveIssuePendingByUser(string user, string startdate)
         {
             var cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";

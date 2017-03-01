@@ -819,6 +819,7 @@
     <Content Include="Views\BurnIn\BIError.cshtml" />
     <Content Include="Views\BurnIn\ErrorAttach.cshtml" />
     <Content Include="Views\BurnIn\UpdateBIError.cshtml" />
+    <Content Include="Views\Issue\ModifyIssueComment.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

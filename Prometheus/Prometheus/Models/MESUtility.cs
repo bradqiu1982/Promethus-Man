@@ -83,7 +83,9 @@ namespace Prometheus.Models
 
             string pncond = PNCondition(projectmodel.PNList);
 
-            var sql = "select dc_<DCTABLE>HistoryId,ModuleSerialNum, WhichTest, ModuleType, ErrAbbr, TestTimeStamp, TestStation,assemblypartnum from  insite.dc_<DCTABLE> (nolock) where assemblypartnum in  (<PNCOND>)  <TIMECOND>  order by  moduleserialnum,testtimestamp DESC";
+            var joinstr = " LEFT JOIN Insite.Container b WITH (NOLOCK) ON b.containername = a.ModuleSerialNum LEFT JOIN Insite.MfgOrder d WITH(NOLOCK) ON d.MfgOrderId = b.MfgOrderId ";
+            var sql = "select a.dc_<DCTABLE>HistoryId,a.ModuleSerialNum, a.WhichTest, a.ModuleType, a.ErrAbbr, a.TestTimeStamp, a.TestStation,a.assemblypartnum ,d.MfgOrderName from "
+                + " insite.dc_<DCTABLE> a (nolock) "+ joinstr + " where assemblypartnum in  (<PNCOND>)  <TIMECOND>  order by  moduleserialnum,testtimestamp DESC";
 
             var ret = new Dictionary<string, string>();
             foreach (var tb in tables)
@@ -188,7 +190,7 @@ namespace Prometheus.Models
                                 var tempdata = new ProjectTestData(vm.ProjectKey, Convert.ToString(item[0]), Convert.ToString(item[1])
                                         ,s.Key, Convert.ToString(item[3]), Convert.ToString(item[4])
                                         , Convert.ToString(item[5]), Convert.ToString(item[6]), Convert.ToString(item[7]));
-
+                                tempdata.JO = Convert.ToString(item[8]);
 
                                 if (!bondinged)
                                 {
@@ -299,7 +301,7 @@ namespace Prometheus.Models
                             var tempdata = new ProjectTestData(vm.ProjectKey, Convert.ToString(item[0]), Convert.ToString(item[1])
                                     ,s.Key, Convert.ToString(item[3]), Convert.ToString(item[4])
                                     , Convert.ToString(item[5]), Convert.ToString(item[6]), Convert.ToString(item[7]));
-
+                                tempdata.JO = Convert.ToString(item[8]);
 
                             if (!bondinged)
                             {

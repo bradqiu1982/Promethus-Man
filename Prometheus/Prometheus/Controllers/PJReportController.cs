@@ -481,7 +481,7 @@ namespace Prometheus.Controllers
                 {
                     if (string.Compare(reptype, PJReportType.YieldTrend) == 0)
                     {
-                        ProjectController.ProjectWeeklyTrend(this, pjkey);
+                        ProjectController.ProjectWeeklyTrend(this, pjkey,14);
                         var reportitem = new PJReportItem();
                         if (!string.IsNullOrEmpty(this.ViewBag.chartscript))
                         {

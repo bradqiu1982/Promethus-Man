@@ -23,6 +23,7 @@ namespace Prometheus.Models
             TestTimeStamp = DateTime.Parse(testtime);
             TestStation = station;
             PN = p;
+            JO = string.Empty;
         }
 
         public ProjectTestData(string pk, string sn, string wtest, string err, string testtime)
@@ -43,6 +44,8 @@ namespace Prometheus.Models
         public DateTime TestTimeStamp { set; get; }
         public string TestStation { set; get; }
         public string PN { set; get; }
+
+        public string JO { set; get; }
 
         public static ConcurrentDictionary<string, bool> UpdateLockUsing = new ConcurrentDictionary<string, bool>();
         public static bool UpdatePJLockUsing(string pjkey)
@@ -99,10 +102,10 @@ namespace Prometheus.Models
 
         public void StoreProjectTestData()
         {
-            var isql = "insert into ProjectTestData(ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN,UpdateTime) values('<ProjectKey>','<DataID>','<ModuleSerialNum>','<WhichTest>','<ModuleType>','<ErrAbbr>','<TestTimeStamp>','<TestStation>','<PN>','<UpdateTime>')";
+            var isql = "insert into ProjectTestData(ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN,UpdateTime,APPV1) values('<ProjectKey>','<DataID>','<ModuleSerialNum>','<WhichTest>','<ModuleType>','<ErrAbbr>','<TestTimeStamp>','<TestStation>','<PN>','<UpdateTime>','<JO>')";
             isql = isql.Replace("<ProjectKey>", ProjectKey).Replace("<DataID>", DataID).Replace("<ModuleSerialNum>", ModuleSerialNum)
                 .Replace("<WhichTest>", WhichTest).Replace("<ModuleType>", ModuleType).Replace("<ErrAbbr>", ErrAbbr)
-                .Replace("<TestTimeStamp>", TestTimeStamp.ToString()).Replace("<TestStation>", TestStation).Replace("<PN>", PN).Replace("<UpdateTime>", DateTime.Now.ToString());
+                .Replace("<TestTimeStamp>", TestTimeStamp.ToString()).Replace("<TestStation>", TestStation).Replace("<PN>", PN).Replace("<UpdateTime>", DateTime.Now.ToString()).Replace("<JO>", JO);
             DBUtility.ExeLocalSqlNoRes(isql);
         }
 
@@ -371,5 +374,39 @@ namespace Prometheus.Models
             }
             return ret;
         }
+
+        public static List<string> RetrieveAllSNWithNoJO()
+        {
+            var ret = new List<string>();
+            var sql = "select distinct ModuleSerialNum from ProjectTestData where APPV1 = ''";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var item in dbret)
+            {
+               ret.Add(Convert.ToString(item[0])) ;
+            }
+            return ret;
+        }
+
+        public static void UpdateJO(string sn, string jo)
+        {
+            var sql = "update ProjectTestData set APPV1 = '<JO>' where ModuleSerialNum = '<ModuleSerialNum>'";
+            sql = sql.Replace("<ModuleSerialNum>", sn).Replace("<JO>", jo);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        public static string RetrieveJOFromMESSN(string SN)
+        {
+            var sql = "SELECT MO.MfgOrderName FROM Insite.MfgOrder MO WITH (NOLOCK) LEFT JOIN Insite.Container C WITH (NOLOCK) ON MO.MfgOrderId = C.MfgOrderId WHERE  c.containername = '<SN>'";
+            sql = sql.Replace("<SN>", SN);
+            var dbret = DBUtility.ExeMESSqlWithRes(sql);
+            var ret = string.Empty;
+            if (dbret.Count > 0)
+            {
+                ret = Convert.ToString(dbret[0][0]);
+            }
+            return ret;
+        }
+
+
     }
 }

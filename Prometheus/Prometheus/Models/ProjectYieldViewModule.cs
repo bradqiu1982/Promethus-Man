@@ -6,6 +6,11 @@ using System.Web.Caching;
 
 namespace Prometheus.Models
 {
+    public class YIELDTYPE
+    {
+        public static string BR = "BR";
+        public static string JO = "JO";
+    }
 
     public class TestYield
     { 
@@ -605,7 +610,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<ProjectYieldViewModule> GetYieldByWeeks(string pjkey,Cache mycache)
+        public static List<ProjectYieldViewModule> GetYieldByWeeks(string pjkey,Cache mycache,int weeks)
         {
             var ret = new List<ProjectYieldViewModule>();
 
@@ -613,9 +618,9 @@ namespace Prometheus.Models
             var  ldate = RetrieveDateSpanByWeek(pvm.StartDate.ToString(), DateTime.Now.ToString());
 
             var startidx = 0;
-            if (ldate.Count > 14)
+            if (ldate.Count > weeks)
             {
-                startidx = ldate.Count - 14;
+                startidx = ldate.Count - weeks - 1;
             }
 
             for(int idx  = startidx; idx < ldate.Count -1;idx++)
@@ -630,7 +635,7 @@ namespace Prometheus.Models
         }
 
 
-        public static List<ProjectYieldViewModule> GetYieldByMonth(string pjkey, Cache mycache)
+        public static List<ProjectYieldViewModule> GetYieldByMonth(string pjkey, Cache mycache,int Months)
         {
             var ret = new List<ProjectYieldViewModule>();
 
@@ -638,9 +643,9 @@ namespace Prometheus.Models
             var ldate = RetrieveDateSpanByMonth(pvm.StartDate.ToString(), DateTime.Now.ToString());
 
             var startidx = 0;
-            if (ldate.Count > 26)
+            if (ldate.Count > Months)
             {
-                startidx = ldate.Count - 26;
+                startidx = ldate.Count - Months-1;
             }
 
             for (int idx = startidx; idx < ldate.Count - 1; idx++)

@@ -1,0 +1,221 @@
+﻿
+@{
+    ViewBag.Title = "ProjectYieldMain";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@if (ViewBag.pjkey != null)
+{
+    <div class="row">
+        <div class="col-lg-4">
+            <h2>@ViewBag.pjkey Weekly Yield</h2>
+        </div>
+        <div class="col-lg-2">
+            <h2><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(ViewBag.pjkey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+        </div>
+        <div class="col-lg-6"></div>
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col-lg-4">
+            <h2>Project  Weekly Yield</h2>
+        </div>
+        <div class="col-lg-2">
+            <h2><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+        </div>
+        <div class="col-lg-6"></div>
+    </div>
+}
+
+<form>
+    @if (ViewBag.pjkey != null)
+    {
+        <input value="@(ViewBag.pjkey)" id="pjkey" name="pjkey" type="hidden" />
+    }
+</form>
+
+@if (ViewBag.chartscript != null)
+{
+    @Html.Raw(ViewBag.chartscript)
+
+    <script src="~/Scripts/highcharts.js"></script>
+    <script src="~/Scripts/exporting.js"></script>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Yield</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="col-lg-12">
+                        <div id="weeklyyield" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<hr />
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Yield By Time</h3>
+            </div>
+
+            <div class="panel-body">
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="col-lg-2">
+                                <label class="control-label">Weeks</label>
+                            </div>
+                            <div class="col-lg-10">
+                                @Html.DropDownList("weeklylist", null, new { @id = "weeklylist", @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="col-lg-2">
+                            <button class="form-control" type="button" onclick="ShowWeeklYYield()">Weekly Trend Yield</button>
+                        </div>
+                        <div class="col-lg-4"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="col-lg-2">
+                                <label class="control-label">Months</label>
+                            </div>
+                            <div class="col-lg-10">
+                                @Html.DropDownList("monthlylist", null, new { @id = "monthlylist", @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="col-lg-2">
+                            <button class="form-control" type="button" onclick="ShowMonthlyYield()">Monthly Trend Yield</button>
+                        </div>
+                        <div class="col-lg-4"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-12">
+                        <div class="col-lg-1">
+                            <label class="control-label" for="StartDate">StartDate</label>
+                        </div>
+                        <div class="col-lg-2">
+                            <input class="form-control text-box single-line" id="StartDate" name="StartDate" type="text" value="" />
+                        </div>
+                        <div class="col-lg-1">
+                            <label class="control-label" for="EndDate">EndDate</label>
+                        </div>
+                        <div class="col-lg-2">
+                            <input class="form-control text-box single-line" id="EndDate" name="EndDate" type="text" value="" />
+                        </div>
+                        <div class="col-lg-2">
+                            <button class="form-control" type="button" onclick="ShowPeriodYield()">Yield In Period</button>
+                        </div>
+                        <div class="col-lg-2">
+                            <button class="form-control" type="button" onclick="ShowDailyYield()">Yield In Days</button>
+                        </div>
+                        <div class="col-lg-2">
+                        </div>
+                        </div>
+                        <script type="text/javascript">
+                            $(document).ready(function () {
+                                $("#StartDate").datepicker({
+                                    changeMonth: true,
+                                    changeYear: true,
+                                    dateFormat: 'yy-mm-dd'
+                                });
+                                $("#EndDate").datepicker({
+                                    changeMonth: true,
+                                    changeYear: true,
+                                    dateFormat: 'yy-mm-dd'
+                                });
+                            });
+                        </script>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Yield By BR/JO/LOT</h3>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="col-lg-4">
+                            @Html.DropDownList("yieldtypelist", null, new { @id = "yieldtypelist", @class = "form-control" })
+                        </div>
+                        <div class="col-lg-8">
+                            <input class="form-control text-box single-line" id="BRNUM" name="BRNUM" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 25." data-val-length-max="25" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" type="text" value="" />
+                            <span class="field-validation-valid text-danger" data-valmsg-for="BRNUM" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-2">
+                        <button class="form-control" type="button" onclick="showbryield()"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Yield</button>
+                    </div>
+                    <div class="col-lg-4">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function ShowWeeklYYield()
+    {
+        if (document.getElementById("weeklylist").value) {
+            window.location.href = '/Project/ProjectYield?ProjectKey=@ViewBag.pjkey' + '&Weeks=' + document.getElementById("weeklylist").value;
+        }
+    }
+
+    function ShowMonthlyYield()
+    {
+        if (document.getElementById("monthlylist").value) {
+            window.location.href = "/Project/ProjectMonthlyYield?ProjectKey=@ViewBag.pjkey" + '&Months=' + document.getElementById("monthlylist").value;
+        }
+    }
+
+    function ShowPeriodYield() {
+        if (document.getElementById("StartDate").value && document.getElementById("EndDate").value)
+        {
+            window.location.href = '/Project/ProjectPeriodYield?ProjectKey=@ViewBag.pjkey' + '&StartDate=' + document.getElementById("StartDate").value + '&EndDate=' + document.getElementById("EndDate").value;
+        }
+    }
+
+    function ShowDailyYield() {
+        if (document.getElementById("StartDate").value && document.getElementById("EndDate").value) {
+            window.location.href = '/Project/ProjectDailyYield?ProjectKey=@ViewBag.pjkey' + '&StartDate=' + document.getElementById("StartDate").value + '&EndDate=' + document.getElementById("EndDate").value;
+        }
+    }
+
+    function showbryield()
+    {
+        if (document.getElementById("yieldtypelist").value == "BR")
+        {
+            window.location.href = "/Project/ProjectBRYield?ProjectKey=@ViewBag.pjkey";
+        }
+        if (document.getElementById("yieldtypelist").value == "JO")
+        {
+            window.location.href = "/Project/ProjectJOYield?ProjectKey=@ViewBag.pjkey";
+        }
+    }
+</script>

@@ -822,6 +822,7 @@
     <Content Include="Views\Issue\ModifyIssueComment.cshtml" />
     <Content Include="Views\Project\UpdateErrorComment.cshtml" />
     <Content Include="Views\BurnIn\UpdateErrorComment.cshtml" />
+    <Content Include="Views\Project\ProjectYieldMain.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

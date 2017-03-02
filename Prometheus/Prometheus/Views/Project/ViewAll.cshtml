@@ -114,13 +114,13 @@
                                                     <div class="col-lg-2 text-left">
                                                         @if (item.FirstYield > 0)
                                                         {
-                                                            <a href="/Project/ProjectYield?ProjectKey=@item.ProjectKey">
+                                                            <a href="/Project/ProjectYieldMain?ProjectKey=@item.ProjectKey">
                                                                 <span class="glyphicon glyphicon-stats" aria-hidden="true"></span> FPY @((item.FirstYield * 100.0).ToString("0.0")) %
                                                             </a>
                                                         }
                                                         else
                                                         {
-                                                            <a href="/Project/ProjectYield?ProjectKey=@item.ProjectKey">
+                                                            <a href="/Project/ProjectYieldMain?ProjectKey=@item.ProjectKey">
                                                                 <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>Project Yield
                                                             </a>
                                                         }
@@ -128,7 +128,7 @@
                                                     <div class="col-lg-2">
                                                         @if (item.RetestYield > 0)
                                                         {
-                                                            <a href="/Project/ProjectYield?ProjectKey=@item.ProjectKey">
+                                                            <a href="/Project/ProjectYieldMain?ProjectKey=@item.ProjectKey">
                                                                 <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>FY @((item.RetestYield * 100.0).ToString("0.0")) %
                                                             </a>
                                                         }

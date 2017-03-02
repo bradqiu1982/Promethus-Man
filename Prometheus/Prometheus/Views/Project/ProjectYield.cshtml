@@ -9,25 +9,25 @@
 @if (ViewBag.pjkey != null)
 {
     <div class="row">
-        <div class="col-lg-3">
-            <h2>@ViewBag.pjkey Yield</h2>
+        <div class="col-lg-4">
+            <h2>@ViewBag.pjkey Weekly Trend Yield</h2>
         </div>
         <div class="col-lg-2">
-            <h2><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(ViewBag.pjkey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+            <h2><a data-toggle="tooltip" title="Goto Yield Main Page" href="/Project/ProjectYieldMain?ProjectKey=@(ViewBag.pjkey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
         </div>
-        <div class="col-lg-7"></div>
+        <div class="col-lg-6"></div>
     </div>
 }
 else
 {
     <div class="row">
-        <div class="col-lg-3">
-            <h2>Project Yield</h2>
+        <div class="col-lg-4">
+            <h2>Project  Weekly Trend  Yield</h2>
         </div>
         <div class="col-lg-2">
             <h2><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
         </div>
-        <div class="col-lg-7"></div>
+        <div class="col-lg-6"></div>
     </div>
 }
 
@@ -64,63 +64,3 @@ else
         </div>
     </div>
 }
-
-<hr/>
-
-<script>
-    function ShowMonthlyYield()
-    {
-        window.location.href = "/Project/ProjectMonthlyYield?ProjectKey=@ViewBag.pjkey";
-    }
-
-    function ShowPeriodYield() {
-        if (document.getElementById("StartDate").value && document.getElementById("EndDate").value)
-        {
-            window.location.href = '/Project/ProjectPeriodYield?ProjectKey=@ViewBag.pjkey' + '&StartDate=' + document.getElementById("StartDate").value + '&EndDate=' + document.getElementById("EndDate").value;
-        }
-    }
-
-    function ShowDailyYield() {
-        if (document.getElementById("StartDate").value && document.getElementById("EndDate").value) {
-            window.location.href = '/Project/ProjectDailyYield?ProjectKey=@ViewBag.pjkey' + '&StartDate=' + document.getElementById("StartDate").value + '&EndDate=' + document.getElementById("EndDate").value;
-        }
-    }
-</script>
-
-<div class="row">
-    <div class="col-lg-2">
-        <button class="form-control"  type="button" onclick="ShowMonthlyYield()">Yield In Months</button>
-    </div>
-    <div class="col-lg-1">
-        <label class="control-label" for="StartDate">StartDate</label>
-    </div>
-    <div class="col-lg-2">
-        <input class="form-control text-box single-line" id="StartDate" name="StartDate" type="text" value="" />
-    </div>
-    <div class="col-lg-1">
-        <label class="control-label" for="EndDate">EndDate</label>
-    </div>
-    <div class="col-lg-2">
-        <input class="form-control text-box single-line" id="EndDate" name="EndDate" type="text" value="" />
-    </div>
-    <div class="col-lg-2">
-        <button class="form-control"  type="button" onclick="ShowPeriodYield()">Yield In Period</button>
-    </div>
-    <div class="col-lg-2">
-        <button class="form-control"  type="button" onclick="ShowDailyYield()">Yield In Days</button>
-    </div>
-    <script type="text/javascript">
-                            $(document).ready(function () {
-                                $("#StartDate").datepicker({
-                                    changeMonth: true,
-                                    changeYear: true,
-                                    dateFormat: 'yy-mm-dd'
-                                });
-                                $("#EndDate").datepicker({
-                                    changeMonth: true,
-                                    changeYear: true,
-                                    dateFormat: 'yy-mm-dd'
-                                });
-                            });
-    </script>
-</div>

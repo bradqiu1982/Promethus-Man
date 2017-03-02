@@ -1454,9 +1454,11 @@ namespace Prometheus.Controllers
                 }
         }*/
 
-        public static void ProjectWeeklyTrend(Controller ctrl, string ProjectKey)
+        public static void ProjectWeeklyTrend(Controller ctrl, string ProjectKey,int weeks)
         {
-            var vmlist = ProjectYieldViewModule.GetYieldByWeeks(ProjectKey, ctrl.HttpContext.Cache);
+            ctrl.ViewBag.Weeks = weeks.ToString();
+
+            var vmlist = ProjectYieldViewModule.GetYieldByWeeks(ProjectKey, ctrl.HttpContext.Cache,weeks);
             if (vmlist.Count > 0)
             {
                 var ChartxAxisValues = "";
@@ -1585,7 +1587,7 @@ namespace Prometheus.Controllers
                 SNTOOLTIP = SNTOOLTIP.Substring(0, SNTOOLTIP.Length - 1);
 
                 //rederect url
-                var reurl = "window.location.href = '/Project/ProjectWYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category";
+                var reurl = "window.location.href = '/Project/ProjectWYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category"+ "+'&Weeks='+'"+weeks.ToString()+"'";
 
                 var tempscript = System.IO.File.ReadAllText(ctrl.Server.MapPath("~/Scripts/SuperYield.xml"));
                 ctrl.ViewBag.chartscript = tempscript.Replace("#ElementID#", "weeklyyield")
@@ -1606,21 +1608,50 @@ namespace Prometheus.Controllers
             }
         }
 
-        public ActionResult ProjectYield(string ProjectKey)
+        public ActionResult ProjectYield(string ProjectKey,int Weeks)
         {
             if (ProjectKey != null)
             {
                 ViewBag.pjkey = ProjectKey;
 
-                ProjectWeeklyTrend(this, ProjectKey);
+                ProjectWeeklyTrend(this, ProjectKey, Weeks);
 
                 return View();
             }
             return View();
         }
 
-        public ActionResult ProjectWYieldDetail(string ProjectKey, string EndDate)
+        public ActionResult ProjectYieldMain(string ProjectKey)
         {
+            var sarray = new string []{ "8", "16", "24", "32", "40", "48", "56" };
+            var slist = new List<string>();
+            slist.AddRange(sarray);
+            ViewBag.weeklylist = CreateSelectList1(slist, "");
+
+            sarray = new string[] { "1", "2", "3", "4", "5", "6", "12","18","24" };
+            slist = new List<string>();
+            slist.AddRange(sarray);
+            ViewBag.monthlylist = CreateSelectList1(slist, "");
+
+            sarray = new string[] { YIELDTYPE.BR, YIELDTYPE.JO};
+            slist = new List<string>();
+            slist.AddRange(sarray);
+            ViewBag.yieldtypelist = CreateSelectList1(slist, "");
+
+            if (ProjectKey != null)
+            {
+                ViewBag.pjkey = ProjectKey;
+                ProjectWeeklyTrend(this, ProjectKey,4);
+                return View();
+            }
+
+            return View();
+        }
+
+        public ActionResult ProjectWYieldDetail(string ProjectKey, string EndDate,string Weeks)
+        {
+            ViewBag.Weeks = Weeks;
+
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(EndDate))
             {
                 var edate = DateTime.Parse(DateTime.Parse(EndDate).ToString("yyyy-MM-dd") + " 07:30:00");
@@ -2049,13 +2080,13 @@ namespace Prometheus.Controllers
 
         }*/
 
-        public ActionResult ProjectMonthlyYield(string ProjectKey)
+        public ActionResult ProjectMonthlyYield(string ProjectKey,int Months)
         {
             if (ProjectKey != null)
             {
                 ViewBag.pjkey = ProjectKey;
 
-                var vmlist = ProjectYieldViewModule.GetYieldByMonth(ProjectKey, HttpContext.Cache);
+                var vmlist = ProjectYieldViewModule.GetYieldByMonth(ProjectKey, HttpContext.Cache, Months);
                 if (vmlist.Count > 0)
                 {
                     var ChartxAxisValues = "";
@@ -2182,7 +2213,7 @@ namespace Prometheus.Controllers
                     SNTOOLTIP = SNTOOLTIP.Substring(0, SNTOOLTIP.Length - 1);
 
                     //rederect url
-                    var reurl = "window.location.href = '/Project/ProjectMYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category";
+                    var reurl = "window.location.href = '/Project/ProjectMYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category" + "+'&Months='+'" + Months.ToString() + "'";
 
                     var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/SuperYield.xml"));
                     ViewBag.chartscript = tempscript.Replace("#ElementID#", "monthlyyield")
@@ -2498,8 +2529,10 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        public ActionResult ProjectMYieldDetail(string ProjectKey, string EndDate)
+        public ActionResult ProjectMYieldDetail(string ProjectKey, string EndDate,int Months)
         {
+            ViewBag.Months = Months.ToString();
+
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(EndDate))
             {
                 var edate = DateTime.Parse(DateTime.Parse(EndDate).ToString("yyyy-MM-dd") + " 07:30:00");
@@ -4182,6 +4215,42 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        private static void logjoinfo(string info)
+        {
+            var filename = "d:\\log\\updatejo-" + DateTime.Now.ToString("yyyy-MM-dd");
+            if (System.IO.File.Exists(filename))
+            {
+                var content = System.IO.File.ReadAllText(filename);
+                content = content + "\r\n" + DateTime.Now.ToString() + " : " + info;
+                System.IO.File.WriteAllText(filename, content);
+            }
+            else
+            {
+                System.IO.File.WriteAllText(filename, DateTime.Now.ToString() + " : " + info);
+            }
+        }
+
+        private void UpdateJO()
+        {
+            var sns = ProjectTestData.RetrieveAllSNWithNoJO();
+            logjoinfo("get sn count from local: "+sns.Count.ToString());
+
+            int i = 0;
+            foreach (var sn in sns)
+            {
+                var jo = ProjectTestData.RetrieveJOFromMESSN(sn);
+                if (!string.IsNullOrEmpty(jo))
+                {
+                    ProjectTestData.UpdateJO(sn, jo);
+                    i = i + 1;
+                }
+                if (i % 10000 == 0)
+                {
+                    logjoinfo("write jo count: " + i.ToString());
+                }
+            }
+        }
+
         public ActionResult HeartBeat2()
         {
             var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
@@ -4189,8 +4258,9 @@ namespace Prometheus.Controllers
             {
                 try
                 {
+                    UpdateJO();
                     //SendTaskNotice();
-                    BITestData.PrePareLatestData(this,pjkey);
+                    //BITestData.PrePareLatestData(this,pjkey);
                 }
                 catch (Exception ex)
                 { }

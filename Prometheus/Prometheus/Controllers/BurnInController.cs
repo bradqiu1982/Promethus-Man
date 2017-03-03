@@ -361,10 +361,12 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        public ActionResult ProjectBIDailyYield(string ProjectKey, string StartDate, string EndDate)
+        public ActionResult ProjectBIDailyYield(string ProjectKey, string StartDate, string EndDate1)
         {
-            if (ProjectKey != null && StartDate != null && EndDate != null)
+            if (ProjectKey != null && StartDate != null && EndDate1 != null)
             {
+                var EndDate = DateTime.Parse(EndDate1).AddDays(1).ToString();
+
                 ViewBag.pjkey = ProjectKey;
                 var vmlist = ProjectBIYieldViewModule.GetYieldByDay(ProjectKey, StartDate, EndDate);
                 if (vmlist.Count > 0)

@@ -829,6 +829,7 @@
     <Content Include="Views\Project\ProjectBRYield.cshtml" />
     <Content Include="Views\Project\ProjectJOYield.cshtml" />
     <Content Include="Views\Project\ProjectBRYieldDetail.cshtml" />
+    <Content Include="Views\BurnIn\ProjectBIWeeklyYield.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

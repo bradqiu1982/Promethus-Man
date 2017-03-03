@@ -75,8 +75,28 @@ else
                                         window.location.href = '/BurnIn/ProjectBIWaferYield?ProjectKey=@ViewBag.pjkey' + '&Wafer=' + document.getElementById("waferlist").value;
                                     }
                                 }
+
+                                function ShowWeeklYYield() {
+                                    if (document.getElementById("weeklylist").value) {
+                                        window.location.href = '/BurnIn/ProjectBIWeeklyYield?ProjectKey=@ViewBag.pjkey' + '&Weeks=' + document.getElementById("weeklylist").value;
+                                    }
+                                }
                             </script>
 
+                            <div class="row">
+                                <div class="col-lg-2">
+                                    <label class="control-label">Weeks</label>
+                                </div>
+                                <div class="col-lg-8">
+                                    @Html.DropDownList("weeklylist", null, new { @id = "weeklylist", @class = "form-control" })
+                                </div>
+                                <div class="col-lg-2">
+                                    <button class="form-control" type="button" onclick="ShowWeeklYYield()"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                                </div>
+                            </div>
+
+                            <hr/>
+                            
                             <div class="row">
                                 <div class="col-lg-1">
                                     <label class="control-label" for="StartDate">Start</label>

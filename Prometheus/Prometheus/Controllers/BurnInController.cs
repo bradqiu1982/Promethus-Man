@@ -12,9 +12,9 @@ namespace Prometheus.Controllers
     public class BurnInController : Controller
     {
 
-        public static void ProjectWeeklyTrend(Controller ctrl, string ProjectKey)
+        public static void ProjectWeeklyTrend(Controller ctrl, string ProjectKey,int Weeks)
         {
-            var vmlist = ProjectBIYieldViewModule.GetYieldByWeeks(ProjectKey);
+            var vmlist = ProjectBIYieldViewModule.GetYieldByWeeks(ProjectKey, Weeks);
             if (vmlist.Count > 0)
             {
                 var ChartxAxisValues = "";
@@ -70,7 +70,7 @@ namespace Prometheus.Controllers
                 crtempvalue = crtempvalue.Substring(0, crtempvalue.Length - 1);
 
                 //rederect url
-                var reurl = "window.location.href = '/BurnIn/ProjectBIWYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category";
+                var reurl = "window.location.href = '/BurnIn/ProjectBIWYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category+'"+ "&Weeks="+Weeks.ToString()+"'";
 
 
                 var tempscript = System.IO.File.ReadAllText(ctrl.Server.MapPath("~/Scripts/BISuperYield.xml"));
@@ -106,14 +106,56 @@ namespace Prometheus.Controllers
             return plist;
         }
 
+        private List<SelectListItem> CreateSelectList1(List<string> valist, string defVal)
+        {
+            bool selected = false;
+            var pslist = new List<SelectListItem>();
+
+            foreach (var p in valist)
+            {
+                var pitem = new SelectListItem();
+                pitem.Text = p;
+                pitem.Value = p;
+                if (!string.IsNullOrEmpty(defVal) && string.Compare(defVal, p, true) == 0)
+                {
+                    pitem.Selected = true;
+                    selected = true;
+                }
+                pslist.Add(pitem);
+            }
+
+            if (!selected && pslist.Count > 0)
+            {
+                pslist[0].Selected = true;
+            }
+
+            return pslist;
+        }
+
+
         // GET: BurnIn
         public ActionResult BurnInMainPage(string ProjectKey)
         {
             if (!string.IsNullOrEmpty(ProjectKey))
             {
                 ViewBag.pjkey = ProjectKey;
-                ProjectWeeklyTrend(this, ProjectKey);
+                ProjectWeeklyTrend(this, ProjectKey,4);
                 ViewBag.waferlist = CreateWaferList(ProjectKey);
+
+                var sarray = new string[] { "8", "16", "24", "32", "40", "48", "56" };
+                var slist = new List<string>();
+                slist.AddRange(sarray);
+                ViewBag.weeklylist = CreateSelectList1(slist, "");
+            }
+            return View();
+        }
+
+        public ActionResult ProjectBIWeeklyYield(string ProjectKey, string Weeks)
+        {
+            if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(Weeks))
+            {
+                ViewBag.pjkey = ProjectKey;
+                ProjectWeeklyTrend(this, ProjectKey,Convert.ToInt32(Weeks));
             }
             return View();
         }
@@ -231,10 +273,13 @@ namespace Prometheus.Controllers
             }
         }
 
-        public ActionResult ProjectBIWYieldDetail(string ProjectKey, string EndDate)
+        public ActionResult ProjectBIWYieldDetail(string ProjectKey, string EndDate,string Weeks)
         {
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(EndDate))
             {
+                ViewBag.ProjectKey = ProjectKey;
+                ViewBag.Weeks = Weeks;
+
                 var edate = DateTime.Parse(DateTime.Parse(EndDate).ToString("yyyy-MM-dd") + " 07:30:00");
                 var sdate = edate.AddDays(-7);
                 if (sdate.DayOfWeek != DayOfWeek.Thursday)

@@ -292,7 +292,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<ProjectBIYieldViewModule> GetYieldByWeeks(string pjkey)
+        public static List<ProjectBIYieldViewModule> GetYieldByWeeks(string pjkey, int Weeks)
         {
             var ret = new List<ProjectBIYieldViewModule>();
 
@@ -300,9 +300,9 @@ namespace Prometheus.Models
             var ldate = RetrieveDateSpanByWeek(pvm.StartDate.ToString(), DateTime.Now.ToString());
 
             var startidx = 0;
-            if (ldate.Count > 15)
+            if (ldate.Count > Weeks)
             {
-                startidx = ldate.Count - 15;
+                startidx = ldate.Count - Weeks-1;
             }
 
             for (int idx = startidx; idx < ldate.Count - 1; idx++)

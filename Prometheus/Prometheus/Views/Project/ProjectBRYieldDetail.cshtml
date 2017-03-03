@@ -1,0 +1,290 @@
+﻿@model Prometheus.Models.ProjectYieldViewModule
+
+@{
+    ViewBag.Title = "ProjectBRYieldDetail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (Model != null)
+{
+    <div class="row">
+        <div class="col-lg-5">
+            <h2>@Model.ProjectKey  @ViewBag.BRType Yield</h2>
+        </div>
+        <div class="col-lg-2">
+            @if (string.Compare(@ViewBag.BRType, Prometheus.Models.YIELDTYPE.BR) == 0)
+            {
+                <h2><a data-toggle="tooltip" title="Goto Yield Page" href="/Project/ProjectBRYield?ProjectKey=@(Model.ProjectKey+ "&BRNUM="+ ViewBag.BRNUM)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+            }
+            else
+            {
+                <h2><a data-toggle="tooltip" title="Goto Yield Page" href="/Project/ProjectJOYield?ProjectKey=@(Model.ProjectKey+ "&BRNUM="+ ViewBag.BRNUM)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+            }
+        </div>
+        <div class="col-lg-5"></div>
+    </div>
+}
+else
+{
+    <h2>Yield Detail</h2>
+}
+
+
+<hr />
+
+@if (Model != null)
+{
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">FPY</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="col-lg-12">
+                        <table class="table table-bordered table-hover">
+                            <tr>
+                                <th>Test</th>
+                                @foreach (var item in Model.FirstYields)
+                                {
+                                    <th>@item.WhichTest</th>
+                                }
+                                <th>Sum Yield</th>
+                            </tr>
+                            <tr>
+                                <th>Input</th>
+                                @foreach (var item in Model.FirstYields)
+                                {
+                                    <td>@item.InputCount</td>
+                                }
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <th>Output</th>
+                                @foreach (var item in Model.FirstYields)
+                                {
+                                    <td>@item.OutputCount</td>
+                                }
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <th>Yield</th>
+                                @foreach (var item in Model.FirstYields)
+                                {
+                                    <td>@((item.Yield * 100.0).ToString("0.00"))%</td>
+                                }
+                                <td>@((Model.FirstYield * 100.0).ToString("0.00"))%</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">FY</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="col-lg-12">
+                        <table class="table table-bordered table-hover">
+                            <tr>
+                                <th>Test</th>
+                                @foreach (var item in Model.LastYields)
+                                {
+                                    <th>@item.WhichTest</th>
+                                }
+                                <th>Sum Yield</th>
+                            </tr>
+                            <tr>
+                                <th>Input</th>
+                                @foreach (var item in Model.LastYields)
+                                {
+                                    <td>@item.InputCount</td>
+                                }
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <th>Output</th>
+                                @foreach (var item in Model.LastYields)
+                                {
+                                    <td>@item.OutputCount</td>
+                                }
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <th>Yield</th>
+                                @foreach (var item in Model.LastYields)
+                                {
+                                    <td>@((item.Yield * 100.0).ToString("0.00"))%</td>
+                                }
+                                <td>@((Model.LastYield * 100.0).ToString("0.00"))%</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/Scripts/highcharts.js"></script>
+    <script src="~/Scripts/exporting.js"></script>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Failure Pie</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="col-lg-6 text-left">
+                        @if (ViewBag.fchartscript != null)
+                        {
+                            @Html.Raw(ViewBag.fchartscript)
+                            <div id="ffailurepie" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                        }
+
+                    </div>
+                    <div class="col-lg-6 text-left">
+                        @if (ViewBag.rchartscript != null)
+                        {
+                            @Html.Raw(ViewBag.rchartscript)
+                            <div id="rfailurepie" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">First Failure</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="col-lg-12">
+                        <table id="firsttable" name="firsttable" class="table table-bordered table-hover">
+                            <thead class="header">
+                                <tr>
+                                    <th>ErrAbbr</th>
+                                    @foreach (var item in Model.FirstYields)
+                                    {
+                                        <th>@item.WhichTest</th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    var eklist = new List<string>();
+                                    foreach (var error in Model.FErrorMap.Keys)
+                                    {
+                                        eklist.Add(error);
+                                    }
+
+                                    foreach (var error in eklist)
+                                    {
+                                        <tr>
+                                            <th>@error</th>
+                                            @foreach (var test in Model.FirstYields)
+                                            {
+                                                var val = Prometheus.Models.ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, Model.FErrorMap);
+                                                <td>@val</td>
+                                            }
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Final Failure</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="col-lg-12">
+                        <table id="retesttable" name="retesttable" class="table table-bordered table-hover">
+                            <thead class="header">
+                                <tr>
+                                    <th>ErrAbbr</th>
+                                    @foreach (var item in Model.LastYields)
+                                    {
+                                        <th>@item.WhichTest</th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    eklist = new List<string>();
+                                    foreach (var error in Model.LErrorMap.Keys)
+                                    {
+                                        eklist.Add(error);
+                                    }
+
+                                    foreach (var error in eklist)
+                                    {
+                                        <tr>
+                                            <th>@error</th>
+                                            @foreach (var test in Model.LastYields)
+                                            {
+                                                var val = Prometheus.Models.ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, Model.LErrorMap);
+                                                <td>@val</td>
+                                            }
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+    $(document).ready(function () {
+        var offset = $('.navbar').height();
+        $("#firsttable").stickyTableHeaders({ fixedOffset: offset });
+        $("#retesttable").stickyTableHeaders({ fixedOffset: offset });
+        });
+    </script>
+
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Defect Pareto</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="col-lg-6 text-left">
+                        @if (ViewBag.fparetoscript != null)
+                        {
+                            @Html.Raw(ViewBag.fparetoscript)
+                            <div id="fparetochart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                        }
+                    </div>
+                    <div class="col-lg-6 text-left">
+                        @if (ViewBag.rparetoscript != null)
+                        {
+                            @Html.Raw(ViewBag.rparetoscript)
+                            <div id="rparetochart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+                                    }

@@ -1,0 +1,66 @@
+﻿
+@{
+    ViewBag.Title = "ProjectBRYield";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (ViewBag.pjkey != null)
+{
+    <div class="row">
+        <div class="col-lg-3">
+            <h2>@ViewBag.pjkey Yield</h2>
+        </div>
+        <div class="col-lg-2">
+            <h2><a data-toggle="tooltip" title="Goto Yield Main Page" href="/Project/ProjectYieldMain?ProjectKey=@(ViewBag.pjkey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+        </div>
+        <div class="col-lg-7"></div>
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col-lg-3">
+            <h2>Project Yield</h2>
+        </div>
+        <div class="col-lg-2">
+            <h2><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+        </div>
+        <div class="col-lg-7"></div>
+    </div>
+}
+
+
+<hr />
+
+<form>
+    @if (ViewBag.pjkey != null)
+    {
+        <input value="@(ViewBag.pjkey)" id="pjkey" name="pjkey" type="hidden" />
+    }
+</form>
+
+@if (ViewBag.chartscript != null)
+{
+    @Html.Raw(ViewBag.chartscript)
+
+    <script src="~/Scripts/highcharts.js"></script>
+    <script src="~/Scripts/exporting.js"></script>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Yield</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="col-lg-12">
+                        <div id="bryield" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+

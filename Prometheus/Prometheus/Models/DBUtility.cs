@@ -28,7 +28,7 @@ namespace Prometheus.Models
             }
         }
 
-        private static SqlConnection GetLocalConnector()
+        public static SqlConnection GetLocalConnector()
         {
             var conn = new SqlConnection();
             try

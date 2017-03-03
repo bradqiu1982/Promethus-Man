@@ -239,6 +239,53 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static List<ProjectTestData> RetrieveProjectTestDataByBR(string projectkey, string br, string yieldtype, bool firstyield, Cache mycache)
+        {
+          var ret = new List<ProjectTestData>();
+
+                try
+                {
+                    var sql = "";
+                    if (firstyield)
+                    {
+                        sql = "select ModuleSerialNum,WhichTest,ErrAbbr,TestTimeStamp from ProjectTestData where ProjectKey = '<ProjectKey>' and <COND> order by ModuleSerialNum,TestTimeStamp ASC";
+                    }
+                    else
+                    {
+                        sql = "select ModuleSerialNum,WhichTest,ErrAbbr,TestTimeStamp from ProjectTestData where ProjectKey = '<ProjectKey>' and <COND> order by ModuleSerialNum,TestTimeStamp DESC";
+                    }
+
+                    var cond = "";
+                    if (string.Compare(yieldtype, YIELDTYPE.JO) == 0)
+                    {
+                        cond = "APPV1 ='"+br+"'";
+                    }
+                    else
+                    {
+                        cond = "APPV1 like '%" + br + "%'";
+                    }
+
+                    sql = sql.Replace("<ProjectKey>", projectkey).Replace("<COND>", cond);
+
+                    var dbret = DBUtility.ExeLocalSqlWithRes(sql, mycache);
+                    foreach (var item in dbret)
+                    {
+                        //public ProjectTestData(string pk, string sn, string wtest, string err, string testtime)
+                        var tempdata = new ProjectTestData(projectkey, Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])
+                            , Convert.ToString(item[3]));
+                        ret.Add(tempdata);
+                    }
+
+                }
+                catch (Exception ex)
+                {
+
+                }
+
+            return ret;
+        }
+
+
         public static List<ProjectTestData> RetrieveProjectFailedTestData(int topnum, string projectkey)
         {
             //ProjectTestData.PrePareLatestData(projectkey);

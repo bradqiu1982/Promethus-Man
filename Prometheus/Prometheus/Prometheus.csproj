@@ -583,6 +583,9 @@
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="Scripts\AreaChart.xml" />
+    <Content Include="Scripts\BaseYield.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Scripts\BISuperYield.xml" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -823,6 +826,9 @@
     <Content Include="Views\Project\UpdateErrorComment.cshtml" />
     <Content Include="Views\BurnIn\UpdateErrorComment.cshtml" />
     <Content Include="Views\Project\ProjectYieldMain.cshtml" />
+    <Content Include="Views\Project\ProjectBRYield.cshtml" />
+    <Content Include="Views\Project\ProjectJOYield.cshtml" />
+    <Content Include="Views\Project\ProjectBRYieldDetail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

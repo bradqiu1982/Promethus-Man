@@ -61,6 +61,8 @@ namespace Prometheus.Models
         public DateTime StartDate { set; get; }
         public DateTime EndDate { set; get; }
 
+        public string XKey { set; get; }
+
         private List<TestYield> snyield = new List<TestYield>();
         public List<TestYield> SNYields { get { return snyield; } }
         public double SNYield
@@ -608,6 +610,40 @@ namespace Prometheus.Models
             RetrieveCummYield(ret, filteredPjData2, pvm);
 
             return ret;
+        }
+
+        public static List<ProjectYieldViewModule> GetYieldByBRNum(string pjkey, string BRNUM, ProjectViewModels pvm, Cache mycache, string yieldtype)
+        {
+            var retlist = new List<ProjectYieldViewModule>();
+
+            var brs = BRNUM.Split(new string[] { ";", ",", " " }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var br in brs)
+            {
+
+                var ret = new ProjectYieldViewModule();
+                ret.ProjectKey = pjkey;
+
+                var plist = ProjectTestData.RetrieveProjectTestDataByBR(pjkey, br, yieldtype, false, mycache);
+
+                var tplist = new List<ProjectTestData>();
+                var datacount = plist.Count - 1;
+                for (int idx = datacount; idx >= 0; idx--)
+                {
+                    tplist.Add(plist[idx]);
+                }
+
+                RetrieveFirstYield(ret, tplist, pvm);
+
+                RetrieveCummYield(ret, plist, pvm);
+
+                if (ret.FirstYields.Count > 0)
+                {
+                    ret.XKey = br;
+                    retlist.Add(ret);
+                }
+            }
+
+            return retlist;
         }
 
         public static List<ProjectYieldViewModule> GetYieldByWeeks(string pjkey,Cache mycache,int weeks)

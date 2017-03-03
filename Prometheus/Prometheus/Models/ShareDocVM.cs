@@ -139,6 +139,11 @@ namespace Prometheus.Models
                 if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
                 {
                     var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey);
+                    if (issue == null)
+                    {
+                        continue;
+                    }
+
                     tempvm.Summary = issue.Summary;
                     tempvm.DocURL = "/Issue/UpdateIssue?issuekey=" + tempvm.DOCKey;
                 }
@@ -223,6 +228,11 @@ namespace Prometheus.Models
                 if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
                 {
                     var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey);
+                    if (issue == null)
+                    {
+                        continue;
+                    }
+
                     tempvm.Summary = issue.Summary;
                     tempvm.DocURL = "/Issue/UpdateIssue?issuekey="+ tempvm.DOCKey;
                 }
@@ -297,6 +307,11 @@ namespace Prometheus.Models
                 if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
                 {
                     var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey);
+                    if (issue == null)
+                    {
+                        continue;
+                    }
+
                     tempvm.Summary = issue.Summary;
                     tempvm.DocURL = "/Issue/UpdateIssue?issuekey=" + tempvm.DOCKey;
                 }
@@ -339,6 +354,11 @@ namespace Prometheus.Models
                 if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
                 {
                     var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey);
+                    if (issue == null)
+                    {
+                        continue;
+                    }
+
                     tempvm.Summary = issue.Summary;
                     tempvm.DocURL = "/Issue/UpdateIssue?issuekey=" + tempvm.DOCKey;
                 }
@@ -374,6 +394,11 @@ namespace Prometheus.Models
                 if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
                 {
                     var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey);
+                    if (issue == null)
+                    {
+                        continue;
+                    }
+
                     tempvm.Summary = issue.Summary;
                     tempvm.DocURL = "/Issue/UpdateIssue?issuekey=" + tempvm.DOCKey;
                 }
@@ -461,6 +486,11 @@ namespace Prometheus.Models
                 if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
                 {
                     var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey);
+                    if (issue == null)
+                    {
+                        continue;
+                    }
+
                     tempvm.Summary = issue.Summary;
                     tempvm.DocURL = "/Issue/UpdateIssue?issuekey=" + tempvm.DOCKey;
                 }

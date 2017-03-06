@@ -1054,8 +1054,7 @@ namespace Prometheus.Controllers
             return RedirectToAction("IBLOG", "User");
         }
 
-
-        public ActionResult WebDoc(string DocKey)
+        public ActionResult WebDoc(string DocKey,string Creator = "")
         {
             var ckdict = CookieUtility.UnpackCookie(this);
             if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
@@ -1067,7 +1066,8 @@ namespace Prometheus.Controllers
                 var ck = new Dictionary<string, string>();
                 ck.Add("logonredirectctrl", "User");
                 ck.Add("logonredirectact", "WebDoc");
-                ck.Add("dockey", DocKey);
+                ck.Add("DocKey", DocKey);
+                ck.Add("Creator", Creator);
                 CookieUtility.SetCookie(this, ck);
                 return RedirectToAction("LoginUser", "User");
             }
@@ -1075,13 +1075,40 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(DocKey))
             {
                 var vm = UserBlogVM.RetrieveBlogDoc(DocKey);
+
+                if (string.IsNullOrEmpty(vm.DocKey))
+                {
+                    var tempstrs = DocKey.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+                    var datestr = tempstrs[tempstrs.Length - 1].Substring(0,8);
+                    vm.ContentType = UserBlogContentType.ATTACH;
+                    vm.Title = DocKey;
+                    vm.Content = "/userfiles/docs/" + datestr + "/" + DocKey;
+                    vm.DocKey = DocKey;
+                    vm.UserName = Creator;
+                    vm.DocURL = "/User/WebDoc?DocKey=" + DocKey + "&Creator=" + Creator;
+                }
+
                 return View(vm);
             }
             else
             {
-                if (ckdict.ContainsKey("dockey") && !string.IsNullOrEmpty(ckdict["dockey"]))
+                if (ckdict.ContainsKey("DocKey") && !string.IsNullOrEmpty(ckdict["DocKey"]))
                 {
-                    var vm = UserBlogVM.RetrieveBlogDoc(ckdict["dockey"]);
+                    var vm = UserBlogVM.RetrieveBlogDoc(ckdict["DocKey"]);
+
+                    var tempDocKey = ckdict["DocKey"];
+                    if (string.IsNullOrEmpty(vm.DocKey))
+                    {
+                        var tempstrs = tempDocKey.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+                        var datestr = tempstrs[tempstrs.Length - 1].Substring(0, 8);
+                        vm.ContentType = UserBlogContentType.ATTACH;
+                        vm.Title = tempDocKey;
+                        vm.Content = "/userfiles/docs/" + datestr + "/" + tempDocKey;
+                        vm.DocKey = tempDocKey;
+                        vm.UserName = Creator;
+                        vm.DocURL = "/User/WebDoc?DocKey=" + DocKey + "&Creator=" + Creator;
+                    }
+
                     return View(vm);
                 }
             }
@@ -1098,6 +1125,9 @@ namespace Prometheus.Controllers
 
             var dockey = Request.Form["DocKey"];
 
+            var docurl = Request.Form["DOCURL"];
+            var doccreator = Request.Form["DOCCREATOR"];
+
             if (!string.IsNullOrEmpty(Request.Form["docinputeditor"]))
             {
                 var com = new ErrorComments();
@@ -1105,11 +1135,18 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(com.Comment))
                 {
                     ProjectErrorViewModels.StoreErrorComment(dockey, com.dbComment, PJERRORCOMMENTTYPE.Description, updater, DateTime.Now.ToString());
+                    //send comment mesage
+                    ShareDocVM.SendPushCommentEvent("a new comment", docurl, doccreator, updater, this);
                 }
             }
 
-            var vm = UserBlogVM.RetrieveBlogDoc(dockey);
-            return View(vm);
+            var dict = new RouteValueDictionary();
+            dict.Add("DocKey", dockey);
+            dict.Add("Creator", doccreator);
+            return RedirectToAction("WebDoc", "User", dict);
+
+            //var vm = UserBlogVM.RetrieveBlogDoc(dockey);
+            //return View(vm);
         }
 
     }

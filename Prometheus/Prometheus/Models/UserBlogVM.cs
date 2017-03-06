@@ -203,6 +203,7 @@ namespace Prometheus.Models
         public static UserBlogVM RetrieveBlogDoc(string dockey)
         {
             var ret = new UserBlogVM();
+            ret.CommentList = ProjectErrorViewModels.RetrieveErrorComments(dockey);
 
             var sql = "select UserName,APVal1,APVal2,APVal3,APVal4,APVal5,APVal9 from UserBlog where APVal2='<APVal2>'";
             sql = sql.Replace("<APVal2>", dockey);
@@ -217,7 +218,6 @@ namespace Prometheus.Models
                 ret.dbContent = Convert.ToString(line[4]);
                 ret.Tag = Convert.ToString(line[5]);
                 ret.CreateDate = DateTime.Parse(Convert.ToString(line[6]));
-                ret.CommentList = ProjectErrorViewModels.RetrieveErrorComments(dockey);
 
                 if (string.Compare(ret.ContentType, UserBlogContentType.COMMENT) == 0)
                 {
@@ -226,7 +226,8 @@ namespace Prometheus.Models
 
                 if (string.Compare(ret.ContentType, UserBlogContentType.ATTACH) == 0)
                 {
-                    ret.DocURL = ret.Content;
+                    ret.DocURL = "/User/WebDoc?DocKey=" + ret.DocKey;
+                    //ret.DocURL = ret.Content;
                 }
             }
 

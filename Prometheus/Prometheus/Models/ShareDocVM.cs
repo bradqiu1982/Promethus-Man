@@ -120,6 +120,32 @@ namespace Prometheus.Models
             { }
         }
 
+        public static void SendPushCommentEvent(string what, string urlstr, string towho, string pusher, Controller ctrl)
+        {
+            try
+            {
+                var routevalue = new RouteValueDictionary();
+                routevalue.Add("issuekey", "ABC");
+                string scheme = ctrl.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                string validatestr = ctrl.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+                var netcomputername = "";
+                try { netcomputername = System.Net.Dns.GetHostName(); }
+                catch (Exception ex) { }
+                validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
+
+
+                validatestr = validatestr.Split(new string[] { "/Issue" }, StringSplitOptions.RemoveEmptyEntries)[0] + urlstr;
+                var content = what + " is added to your share file by " + pusher + ":\r\n\r\n" + validatestr;
+
+                var toaddrs = new List<string>();
+                toaddrs.Add(towho);
+                EmailUtility.SendEmail(ctrl, "WUXI NPI System", toaddrs, content);
+                new System.Threading.ManualResetEvent(false).WaitOne(20);
+            }
+            catch (Exception ex)
+            { }
+        }
+
         public static void IPushDoc(string DOCPJK, string DOCKey, string ToWho,string Pusher, Controller ctrl)
         {
             var sql = "select DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,DOCFavorTimes from ShareDoc where DOCPJK = '<DOCPJK>' and DOCKey = N'<DOCKey>'";
@@ -239,9 +265,10 @@ namespace Prometheus.Models
                 else if (string.Compare(tempvm.DOCType, ShareDocType.DOCUMENT, true) == 0)
                 {
                     tempvm.Summary = tempvm.DOCKey;
-                    var tempstrs = tempvm.Summary.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
-                    var datestr = tempstrs[tempstrs.Length - 1].Substring(0,8);
-                    tempvm.DocURL = "/userfiles/docs/" + datestr + "/" + tempvm.DOCKey;
+                    //var tempstrs = tempvm.Summary.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+                    //var datestr = tempstrs[tempstrs.Length - 1].Substring(0,8);
+                    //tempvm.DocURL = "/userfiles/docs/" + datestr + "/" + tempvm.DOCKey;
+                    tempvm.DocURL = "/User/WebDoc?DocKey=" + tempvm.DOCKey+ "&Creator="+tempvm.DOCCreator;
                 }
 
                 ret.Add(tempvm);
@@ -318,9 +345,10 @@ namespace Prometheus.Models
                 else
                 {
                     tempvm.Summary = tempvm.DOCKey;
-                    var tempstrs = tempvm.Summary.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
-                    var datestr = tempstrs[tempstrs.Length - 1].Substring(0, 8);
-                    tempvm.DocURL = "/userfiles/docs/" + datestr + "/" + tempvm.DOCKey;
+                    //var tempstrs = tempvm.Summary.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+                    //var datestr = tempstrs[tempstrs.Length - 1].Substring(0, 8);
+                    //tempvm.DocURL = "/userfiles/docs/" + datestr + "/" + tempvm.DOCKey;
+                    tempvm.DocURL = "/User/WebDoc?DocKey=" + tempvm.DOCKey + "&Creator="+tempvm.DOCCreator;
                 }
 
                 ret.Add(tempvm);

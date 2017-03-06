@@ -76,7 +76,8 @@ namespace Prometheus.Controllers
                 NPIInfo(item);
 
                 var taskdone = IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Done);
-                var tasktotal = taskdone + IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Pending);
+                var tasktotal = taskdone + IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Pending)
+                    + IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Working);
                 item.PendingTaskCount = taskdone.ToString() + "/" + tasktotal.ToString();
 
                 var fadone = ProjectFAViewModules.RetrieveFADataCount(item.ProjectKey, false);
@@ -84,7 +85,8 @@ namespace Prometheus.Controllers
                 item.PendingFACount = fadone.ToString()+"/"+ fatotal.ToString();
 
                 var rmadone = IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Done);
-                var rmatotal = rmadone + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Pending);
+                var rmatotal = rmadone + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Pending) 
+                    + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Working);
                 item.PendingRMACount = rmadone.ToString()+ "/" + rmatotal.ToString();
             }
 
@@ -1099,7 +1101,9 @@ namespace Prometheus.Controllers
                     NPIInfo(vm);
 
                     var taskdone = IssueViewModels.RetrieveTaskCountByProjectKey(vm.ProjectKey, Resolute.Done);
-                    var tasktotal = taskdone + IssueViewModels.RetrieveTaskCountByProjectKey(vm.ProjectKey, Resolute.Pending);
+                    var tasktotal = taskdone + IssueViewModels.RetrieveTaskCountByProjectKey(vm.ProjectKey, Resolute.Pending)
+                        + IssueViewModels.RetrieveTaskCountByProjectKey(vm.ProjectKey, Resolute.Working);
+
                     vm.PendingTaskCount = taskdone.ToString() + "/" + tasktotal.ToString();
 
                     var fadone = ProjectFAViewModules.RetrieveFADataCount(vm.ProjectKey, false);
@@ -1107,7 +1111,9 @@ namespace Prometheus.Controllers
                     vm.PendingFACount = fadone.ToString() + "/" + fatotal.ToString();
 
                     var rmadone = IssueViewModels.RetrieveRMACountByProjectKey(vm.ProjectKey, Resolute.Done);
-                    var rmatotal = rmadone + IssueViewModels.RetrieveRMACountByProjectKey(vm.ProjectKey, Resolute.Pending);
+                    var rmatotal = rmadone + IssueViewModels.RetrieveRMACountByProjectKey(vm.ProjectKey, Resolute.Pending)
+                        + IssueViewModels.RetrieveRMACountByProjectKey(vm.ProjectKey, Resolute.Working);
+
                     vm.PendingRMACount = rmadone.ToString() + "/" + rmatotal.ToString();
                 }
 
@@ -4472,7 +4478,7 @@ namespace Prometheus.Controllers
             {
                 try
                 {
-                    UpdateJO();
+                    //UpdateJO();
                     //SendTaskNotice();
                     //BITestData.PrePareLatestData(this,pjkey);
                 }

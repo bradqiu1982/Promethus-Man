@@ -142,6 +142,7 @@ namespace Prometheus.Controllers
                     toaddrs.AddRange(vm.RelativePeopleList);
                 }
                 EmailUtility.SendEmail(this,"WUXI NPI System", toaddrs, content);
+            new System.Threading.ManualResetEvent(false).WaitOne(300);
         }
 
         private void SendTaskEvent(IssueViewModels vm, string operate, string Reporter, string Assignee)

@@ -28,6 +28,9 @@ namespace Prometheus.Models
                 message.From = new MailAddress(syscfgdict["APPEMAILADRESS"]);
                 foreach (var item in tolist)
                 {
+                    if (!item.Contains("@"))
+                        continue;
+
                     message.To.Add(item);
                 }
                 message.Subject = title;

@@ -1060,7 +1060,11 @@ namespace Prometheus.Controllers
                 blog.ContentType = UserBlogContentType.COMMENT;
                 blog.Content = Server.HtmlDecode(Request.Form["docinputeditor"]);
 
-                blog.Content = blog.Content + "<hr/><p><a href='" + contenturl + "' target='_blank'>Reference File: " + contentreffile + " " + "</a></p>";
+                if (!string.IsNullOrEmpty(contenturl))
+                {
+                    blog.Content = blog.Content + "<hr/><p><a href='" + contenturl + "' target='_blank'>Reference File: " + contentreffile + " " + "</a></p>";
+                }
+
                 blog.Tag = tag;
                 if (string.IsNullOrEmpty(Request.Form["DocTitle"]))
                 {
@@ -1176,7 +1180,18 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(ErrorKey) && !string.IsNullOrEmpty(CommentType) && !string.IsNullOrEmpty(Date))
             {
+                var ckdict = CookieUtility.UnpackCookie(this);
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0].ToUpper();
+
                 var errorcomment = ProjectErrorViewModels.RetrieveSPComment(ErrorKey, CommentType, Date);
+                if (string.Compare(updater, errorcomment.Reporter, true) != 0)
+                {
+                    var dict = new RouteValueDictionary();
+                    dict.Add("DocKey", ErrorKey);
+                    dict.Add("Creator", Creator);
+                    return RedirectToAction("WebDoc", "User", dict);
+                }
+
                 ViewBag.Creator = Creator;
                 return View(errorcomment);
             }
@@ -1193,16 +1208,47 @@ namespace Prometheus.Controllers
             var commentdate = Request.Form["HDate"];
             var creator = Request.Form["HCreator"];
 
+            var urls = ReceiveRMAFiles();
+            var contenturl = string.Empty;
+            var contentreffile = string.Empty;
+            if (!string.IsNullOrEmpty(Request.Form["contentattach"]))
+            {
+                var internalreportfile = Request.Form["contentattach"];
+                var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
+                    .Replace(" ", "_").Replace("#", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                foreach (var r in urls)
+                {
+                    if (r.Contains(originalname))
+                    {
+                        contentreffile = originalname;
+                        contenturl = r;
+                        break;
+                    }
+                }
+            }
+
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
                 var tempcommment = new ErrorComments();
                 tempcommment.Comment = Server.HtmlDecode(Request.Form["editor1"]);
+
+                if (!string.IsNullOrEmpty(contenturl))
+                {
+                    tempcommment.Comment = tempcommment.Comment + "<hr/><p><a href='" + contenturl + "' target='_blank'>Reference File: " + contentreffile + " " + "</a></p>";
+                }
                 ProjectErrorViewModels.UpdateSPComment(errorkey, commenttype, commentdate, tempcommment.dbComment);
             }
             else
             {
                 var tempcommment = new ErrorComments();
                 tempcommment.Comment = "<p>To Be Edit</p>";
+
+                if (!string.IsNullOrEmpty(contenturl))
+                {
+                    tempcommment.Comment = tempcommment.Comment + "<hr/><p><a href='" + contenturl + "' target='_blank'>Reference File: " + contentreffile + " " + "</a></p>";
+                }
                 ProjectErrorViewModels.UpdateSPComment(errorkey, commenttype, commentdate, tempcommment.dbComment);
             }
 

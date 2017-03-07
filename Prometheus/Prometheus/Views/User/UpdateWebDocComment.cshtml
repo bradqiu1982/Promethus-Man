@@ -20,46 +20,77 @@
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-    <div class="row">
-        <div class="col-lg-12">
+    <div class="form-group">
+        <div class="row">
+            <div class="col-lg-12">
 
-            <div class="form-group">
-                <label class="control-label">Comment</label>
-            </div>
+                <div class="form-group">
+                    <label class="control-label">Comment</label>
+                </div>
 
-            <div class="form-group">
-                <div>
-                    <textarea name="editor1" id="editor1" rows="10" cols="80">@Model.Comment</textarea>
-                    <script>
-                        CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx' });
-                    </script>
+                <div class="form-group">
+                    <div>
+                        <textarea name="editor1" id="editor1" rows="10" cols="80">@Model.Comment</textarea>
+                        <script>
+                            CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx' });
+                        </script>
+                    </div>
                 </div>
-            </div>
 
-        </div>
-    </div>
-    <div class="row">
-        <input class="form-control text-box single-line" value="@(Model.ErrorKey)" id="HErrorKey" name="HErrorKey" type="hidden" />
-    </div>
-    <div class="row">
-        <input class="form-control text-box single-line" value="@(Model.CommentType)" id="HType" name="HType" type="hidden" />
-    </div>
-    <div class="row">
-        <input class="form-control text-box single-line" value="@(Model.CommentDate.ToString())" id="HDate" name="HDate" type="hidden" />
-    </div>
-    <div class="row">
-        <input class="form-control text-box single-line" value="@(ViewBag.Creator)" id="HCreator" name="HCreator" type="hidden" />
-    </div>
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="form-group">
-                <div class="col-lg-3">
-                    <input type="submit" value="Submit" class="btn btn-default" />
-                </div>
-                <div class="col-lg-9">
-                </div>
             </div>
         </div>
     </div>
-}
+    <div class="form-group">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="col-lg-4">
+                    <span class="btn btn-default btn-file" id="choosefile4">
+                        Editor Attachement <input type="file" name="files4" id="file4" runat="server" onchange="ShowFileNames4(this)" />
+                    </span>
+                </div>
+                <div class="col-lg-8">
+                    <div class="col-lg-11">
+                        <label class="control-label" id="showfile4" name="showfile4"></label>
+                    </div>
+                    <div class="col-lg-1">
+                        <input class="form-control text-box single-line" value="" id="contentattach" name="contentattach" type="hidden" />
+                    </div>
+                </div>
+            </div>
+            <script type="text/javascript">
+                                            function ShowFileNames4(oFile) {
+                                                $('#showfile4').text(oFile.value);
+                                                document.getElementById("contentattach").value = oFile.value;
+                                            }
+            </script>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="row">
+            <input class="form-control text-box single-line" value="@(Model.ErrorKey)" id="HErrorKey" name="HErrorKey" type="hidden" />
+        </div>
+        <div class="row">
+            <input class="form-control text-box single-line" value="@(Model.CommentType)" id="HType" name="HType" type="hidden" />
+        </div>
+        <div class="row">
+            <input class="form-control text-box single-line" value="@(Model.CommentDate.ToString())" id="HDate" name="HDate" type="hidden" />
+        </div>
+        <div class="row">
+            <input class="form-control text-box single-line" value="@(ViewBag.Creator)" id="HCreator" name="HCreator" type="hidden" />
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="form-group">
+                    <div class="col-lg-3">
+                        <input type="submit" value="Submit" class="btn btn-default" />
+                    </div>
+                    <div class="col-lg-9">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+        }
 

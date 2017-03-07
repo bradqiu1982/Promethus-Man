@@ -124,6 +124,11 @@ namespace Prometheus.Models
         {
             try
             {
+                if (string.Compare(towho, pusher, true) == 0)
+                {
+                    return;
+                }
+
                 var routevalue = new RouteValueDictionary();
                 routevalue.Add("issuekey", "ABC");
                 string scheme = ctrl.Url.RequestContext.HttpContext.Request.Url.Scheme;
@@ -135,7 +140,7 @@ namespace Prometheus.Models
 
 
                 validatestr = validatestr.Split(new string[] { "/Issue" }, StringSplitOptions.RemoveEmptyEntries)[0] + urlstr;
-                var content = what + " is added to your share file by " + pusher + ":\r\n\r\n" + validatestr;
+                var content = what + " is added to your shared file by " + pusher + ":\r\n\r\n" + validatestr;
 
                 var toaddrs = new List<string>();
                 toaddrs.Add(towho);
@@ -183,7 +188,14 @@ namespace Prometheus.Models
 
                 PushDoc(ToWho, tempvm.DOCPJK, tempvm.DOCType, tempvm.DOCKey, tempvm.DOCTag, tempvm.DOCCreator, tempvm.DOCDate.ToString(), Pusher);
 
-                SendPushDocEvent("a new document about "+ tempvm.DOCTag , tempvm.DocURL, ToWho, Pusher, ctrl);
+                if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
+                {
+                    SendPushDocEvent("a new document about "+ tempvm.DOCTag , tempvm.DocURL, ToWho, Pusher, ctrl);
+                }
+                else
+                {
+                    SendPushDocEvent("a new document about " + tempvm.DOCTag, "/User/WebDoc?DocKey="+tempvm.DOCKey + "&Creator="+tempvm.DOCCreator, ToWho, Pusher, ctrl);
+                }
             }
 
         }
@@ -609,7 +621,17 @@ namespace Prometheus.Models
                     if (push)
                     {
                         PushDoc(u.BookerName, doc.DOCPJK, doc.DOCType, doc.DOCKey, doc.DOCTag, doc.DOCCreator, doc.DOCDate.ToString(), "");
-                        SendPushDocEvent("a new document about " + doc.DOCTag, doc.DocURL, u.BookerName, "System", ctrl);
+
+                        if (string.Compare(doc.DOCType, ShareDocType.ISSUE, true) == 0)
+                        {
+                            SendPushDocEvent("a new finished issue about " + doc.DOCTag, doc.DocURL, u.BookerName, "System", ctrl);
+                        }
+                        else
+                        {
+                            SendPushDocEvent("a new document about " + doc.DOCTag, "/User/WebDoc?DocKey=" + doc.DOCKey + "&Creator=" + doc.DOCCreator, u.BookerName, "System", ctrl);
+                        }
+
+                           
                     }
                 }//end foreach
             }//foreach

@@ -1002,9 +1002,10 @@ namespace Prometheus.Controllers
 
             UserBlogVM.StoreUserTag(updater, tag);
 
+            var urls = ReceiveRMAFiles();
+
             if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
             {
-                var urls = ReceiveRMAFiles();
                 var internalreportfile = Request.Form["attachmentupload"];
                 var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
                     .Replace(" ", "_").Replace("#", "")
@@ -1032,12 +1033,34 @@ namespace Prometheus.Controllers
                 }
             }//end if
 
+            var contenturl = string.Empty;
+            var contentreffile = string.Empty;
+            if (!string.IsNullOrEmpty(Request.Form["contentattach"]))
+            {
+                var internalreportfile = Request.Form["contentattach"];
+                var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
+                    .Replace(" ", "_").Replace("#", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                foreach (var r in urls)
+                {
+                    if (r.Contains(originalname))
+                    {
+                        contentreffile = originalname;
+                        contenturl = r;
+                        break;
+                    }
+                }
+            }
+
             if (!string.IsNullOrEmpty(Request.Form["docinputeditor"]))
             {
                 var blog = new UserBlogVM();
                 blog.UserName = updater;
                 blog.ContentType = UserBlogContentType.COMMENT;
                 blog.Content = Server.HtmlDecode(Request.Form["docinputeditor"]);
+
+                blog.Content = blog.Content + "<hr/><p><a href='" + contenturl + "' target='_blank'>Reference File: " + contentreffile + " " + "</a></p>";
                 blog.Tag = tag;
                 if (string.IsNullOrEmpty(Request.Form["DocTitle"]))
                 {

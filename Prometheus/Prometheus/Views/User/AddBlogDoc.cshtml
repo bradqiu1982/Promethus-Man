@@ -16,87 +16,169 @@
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
     <div class="form-horizontal">
+
         <div class="form-group">
-            <div class="col-lg-12">
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="Tag">Category</label>
-                    <div class="col-lg-10">
-                        <input class="form-control text-box single-line" data-toggle="tooltip" title="Tag1;Tag2;Tag3" id="Tag" name="Tag" type="text" onclick="PopTag()" />
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Blog Category<font color="red">*</font></h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-lg-12">
+                                <div class="col-lg-6">
+                                    <label class="control-label col-lg-2" for="Tag">Category</label>
+                                    <div class="col-lg-10">
+                                        <input class="form-control text-box single-line" data-toggle="tooltip" title="Tag1;Tag2;Tag3" id="Tag" name="Tag" type="text" onclick="PopTag()" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                </div>
+                                <script type="text/javascript">
+                                    function PopTag() {
+                                        $('#attachtag').modal({ backdrop: 'static' });
+                                    }
+                                </script>                               
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-lg-6">
-                </div>
-                <script type="text/javascript">
-                    function PopTag() {
-                        $('#attachtag').modal({ backdrop: 'static' });
-                    }
-                </script>
             </div>
         </div>
 
         <hr />
 
         <div class="form-group">
-            <div class="col-lg-12">
-                <div class="col-lg-4">
-                    <span class="btn btn-default btn-file" id="choosefile3">
-                        Share DOC by Attachement <input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
-                    </span>
-                </div>
-                <div class="col-lg-8">
-                    <div class="col-lg-11">
-                        <label class="control-label" id="showfile3" name="showfile3"></label>
-                    </div>
-                    <div class="col-lg-1">
-                        <input class="form-control text-box single-line" value="" id="attachmentupload" name="attachmentupload" type="hidden" />
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Share DOC by Attachement</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="col-lg-4">
+                                            <span class="btn btn-default btn-file" id="choosefile3">
+                                                Share Document <input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
+                                            </span>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <div class="col-lg-11">
+                                                <label class="control-label" id="showfile3" name="showfile3"></label>
+                                            </div>
+                                            <div class="col-lg-1">
+                                                <input class="form-control text-box single-line" value="" id="attachmentupload" name="attachmentupload" type="hidden" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <script type="text/javascript">
+                                    function ShowFileNames3(oFile) {
+                                        $('#showfile3').text(oFile.value);
+                                        document.getElementById("attachmentupload").value = oFile.value;
+                                    }
+                                    </script>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="col-lg-3">
+                                            <input type="submit" value="Submit" class="btn btn-default" />
+                                        </div>
+                                        <div class="col-lg-9"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
                     </div>
                 </div>
             </div>
-            <script type="text/javascript">
-                function ShowFileNames3(oFile) {
-                    $('#showfile3').text(oFile.value);
-                    document.getElementById("attachmentupload").value = oFile.value;
-                }
-            </script>
         </div>
 
         <hr />
 
         <div class="form-group">
-            <div class="col-lg-12">
-                <label class="control-label">Share DOC by editor</label>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Share DOC by Editor</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <div class="col-lg-6">
+                                        <label class="control-label col-lg-2">Title</label>
+                                        <div class="col-lg-10">
+                                            <input class="form-control text-box single-line" id="DocTitle" name="DocTitle" type="text" />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-lg-12">
+                                        <textarea name="docinputeditor" id="docinputeditor" rows="30" cols="80"></textarea>
+                                        <script>
+                                            CKEDITOR.replace('docinputeditor', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx' });
+                                        </script>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="col-lg-4">
+                                                <span class="btn btn-default btn-file" id="choosefile4">
+                                                    Editor Attachement <input type="file" name="files4" id="file4" runat="server" onchange="ShowFileNames4(this)" />
+                                                </span>
+                                            </div>
+                                            <div class="col-lg-8">
+                                                <div class="col-lg-11">
+                                                    <label class="control-label" id="showfile4" name="showfile4"></label>
+                                                </div>
+                                                <div class="col-lg-1">
+                                                    <input class="form-control text-box single-line" value="" id="contentattach" name="contentattach" type="hidden" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <script type="text/javascript">
+                                            function ShowFileNames4(oFile) {
+                                                $('#showfile4').text(oFile.value);
+                                                document.getElementById("contentattach").value = oFile.value;
+                                            }
+                                        </script>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="col-lg-3">
+                                                <input type="submit" value="Submit" class="btn btn-default" />
+                                            </div>
+                                            <div class="col-lg-9"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
-        </div>
-        <div class="form-group">
-            <div class="col-lg-12">
-                <div class="col-lg-2">
-                    <label class="control-label">Title</label>
-                </div>
-                <div class="col-lg-10">
-                    <input class="form-control text-box single-line" id="DocTitle" name="DocTitle" type="text" />
-                </div>
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="col-lg-12">
-                <textarea name="docinputeditor" id="docinputeditor" rows="30" cols="80"></textarea>
-                <script>
-                    CKEDITOR.replace('docinputeditor', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx' });
-                </script>
             </div>
         </div>
 
-        <hr />
+    </div>
 
-        <div class="form-group">
-            <div class="col-lg-12">
-                <div class="col-lg-10"></div>
-                <div class="col-lg-2">
-                    <input type="submit" value="Submit" id="updateisu" name="updateisu" class="btn btn-default" />
-                </div>
-            </div>
-        </div>
-     </div>
+
         <div class="modal" id="attachtag" tabindex="-1" role="dialog" aria-labelledby="attachtagLabel">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">

@@ -1109,7 +1109,8 @@ namespace Prometheus.Controllers
                                     if (testdata.Count > 0)
                                     {
                                         newcomment.Comment = "<p>" + testdata[0].ModuleSerialNum + "  -  " + testdata[0].TestStation + "  -  " + testdata[0].WhichTest + "  -  " + testdata[0].TestTimeStamp.ToString() + "</p>"
-                                            + "<p><a href='/Issue/UpdateIssue?issuekey="+originaldata.IssueKey+"' target='_blank'>"+originaldata.ModuleSN+" link"+"</a></p>"
+                                            + "<p><a href='/Issue/UpdateIssue?issuekey="+originaldata.IssueKey+"' target='_blank'>"+originaldata.ModuleSN+" Issue Link"+"</a></p>"
+                                            + "<p><a href='http://cn-traceview/?search=" + originaldata.ModuleSN+"_"+ testdata[0].WhichTest + "' target='_blank'>" + originaldata.ModuleSN + " TraceView Link" + "</a></p>"
                                                      + item.Comment;
                                     }
                                     else

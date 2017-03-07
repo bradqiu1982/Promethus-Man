@@ -1151,9 +1151,29 @@ namespace Prometheus.Controllers
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
             var dockey = Request.Form["DocKey"];
-
             var docurl = Request.Form["DOCURL"];
             var doccreator = Request.Form["DOCCREATOR"];
+
+            var urls = ReceiveRMAFiles();
+            var contenturl = string.Empty;
+            var contentreffile = string.Empty;
+            if (!string.IsNullOrEmpty(Request.Form["contentattach"]))
+            {
+                var internalreportfile = Request.Form["contentattach"];
+                var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
+                    .Replace(" ", "_").Replace("#", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                foreach (var r in urls)
+                {
+                    if (r.Contains(originalname))
+                    {
+                        contentreffile = originalname;
+                        contenturl = r;
+                        break;
+                    }
+                }
+            }
 
             if (!string.IsNullOrEmpty(Request.Form["docinputeditor"]))
             {
@@ -1161,6 +1181,11 @@ namespace Prometheus.Controllers
                 com.Comment = Server.HtmlDecode(Request.Form["docinputeditor"]);
                 if (!string.IsNullOrEmpty(com.Comment))
                 {
+                    if (!string.IsNullOrEmpty(contenturl))
+                    {
+                        com.Comment = com.Comment + "<hr/><p><a href='" + contenturl + "' target='_blank'>Reference File: " + contentreffile + " " + "</a></p>";
+                    }
+
                     ProjectErrorViewModels.StoreErrorComment(dockey, com.dbComment, PJERRORCOMMENTTYPE.Description, updater, DateTime.Now.ToString());
                     //send comment mesage
                     ShareDocVM.SendPushCommentEvent("a new comment", docurl, doccreator, updater, this);

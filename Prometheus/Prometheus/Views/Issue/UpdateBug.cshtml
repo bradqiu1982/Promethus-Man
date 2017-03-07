@@ -79,7 +79,7 @@
 
 <script src="../../ckeditor/ckeditor.js"></script>
 
-@using (Html.BeginForm("UpdateBug", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
+@using (Html.BeginForm("UpdateBug", "Issue", FormMethod.Post, new { enctype = "multipart/form-data", id = "issueform", name = "issueform" }))
 {
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
@@ -255,6 +255,12 @@
                             document.getElementById("attachmentupload").value = oFile.value;
                             $('#attachtag').modal({ backdrop: 'static' });
                         }
+
+                        function attachsubmit() {
+                            $('#attachtag').modal('hide');
+                            $('#issueform').submit();
+                        }
+
                 </script>
             </div>
 
@@ -734,7 +740,7 @@
                 <hr/>
                 <div class="row"></div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Done</button>
+                    <button type="button" class="btn btn-success" onclick="attachsubmit()">OK</button>
                 </div>
             </div>
         </div>

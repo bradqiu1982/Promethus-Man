@@ -18,7 +18,7 @@
     <div class="col-lg-3">
         @if (Model != null && string.IsNullOrEmpty(Model.ParentIssueKey))
         {
-            using (Html.BeginForm("PrepareSubIssue", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            using (Html.BeginForm("PrepareSubIssue", "Issue", FormMethod.Post, new { enctype = "multipart/form-data"}))
             {
                 @Html.AntiForgeryToken()
                 if (Model != null && !string.IsNullOrEmpty(Model.IssueKey))
@@ -88,7 +88,7 @@
 
 <script src="../../ckeditor/ckeditor.js"></script>
 
-@using (Html.BeginForm("UpdateQuality", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
+@using (Html.BeginForm("UpdateQuality", "Issue", FormMethod.Post, new { enctype = "multipart/form-data", id = "issueform", name = "issueform" }))
 {
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
@@ -303,6 +303,12 @@
                             function ShowFileNames3(oFile) {
                                 $('#showfile3').text(oFile.value);
                                 document.getElementById("attachmentupload").value = oFile.value;
+                                $('#attachtag').modal({ backdrop: 'static' });
+                            }
+
+                            function attachsubmit() {
+                                $('#attachtag').modal('hide');
+                                $('#issueform').submit();
                             }
                 </script>
             </div>
@@ -705,6 +711,39 @@
                 }
             </div>
             <div class="col-lg-6"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="attachtag" tabindex="-1" role="dialog" aria-labelledby="attachtagLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="attachtagLabel">Share Document Tag</h4>
+                </div>
+                <div class="row"></div>
+                <hr />
+                <div class="row"></div>
+                @if (ViewBag.tobechoosetags != null)
+                {
+                    for (var idx = 0; idx < ViewBag.tobechoosetags.Count; idx++)
+                    {
+                        <div class="col-lg-4">
+                            <div class="col-lg-3">
+                                <input type="checkbox" id="attachtagcheck@(idx)" name="attachtagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
+                            </div>
+                            <div class="col-lg-9">
+                                <label class="control-label">@(ViewBag.tobechoosetags[idx])</label>
+                            </div>
+                        </div>
+                    }
+                }
+                <div class="row"></div>
+                <hr />
+                <div class="row"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" onclick="attachsubmit()">OK</button>
+                </div>
+            </div>
         </div>
     </div>
 

@@ -18,7 +18,7 @@
     <div class="col-lg-3">
         @if (Model != null && string.IsNullOrEmpty(Model.ParentIssueKey))
         {
-            using (Html.BeginForm("PrepareSubIssue", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            using (Html.BeginForm("PrepareSubIssue", "Issue", FormMethod.Post, new { enctype = "multipart/form-data"}))
             {
                 @Html.AntiForgeryToken()
                 if (Model != null && !string.IsNullOrEmpty(Model.IssueKey))
@@ -88,7 +88,7 @@
 
 <script src="../../ckeditor/ckeditor.js"></script>
 
-@using (Html.BeginForm("UpdateOBA", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
+@using (Html.BeginForm("UpdateOBA", "Issue", FormMethod.Post, new { enctype = "multipart/form-data", id = "issueform", name = "issueform" }))
 {
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
@@ -361,6 +361,11 @@
                             $('#showfile3').text(oFile.value);
                             document.getElementById("attachmentupload").value = oFile.value;
                             $('#attachtag').modal({ backdrop: 'static' });
+                        }
+
+                        function attachsubmit() {
+                            $('#attachtag').modal('hide');
+                            $('#issueform').submit();
                         }
                     </script>
                 </div>
@@ -732,7 +737,7 @@
                 <hr />
                 <div class="row"></div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Done</button>
+                    <button type="button" class="btn btn-success" onclick="attachsubmit()">OK</button>
                 </div>
             </div>
         </div>

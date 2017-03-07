@@ -1172,5 +1172,45 @@ namespace Prometheus.Controllers
             //return View(vm);
         }
 
+        public ActionResult UpdateWebDocComment(string ErrorKey, string CommentType, string Date,string Creator)
+        {
+            if (!string.IsNullOrEmpty(ErrorKey) && !string.IsNullOrEmpty(CommentType) && !string.IsNullOrEmpty(Date))
+            {
+                var errorcomment = ProjectErrorViewModels.RetrieveSPComment(ErrorKey, CommentType, Date);
+                ViewBag.Creator = Creator;
+                return View(errorcomment);
+            }
+
+            return RedirectToAction("ViewAll", "Project");
+        }
+
+        [HttpPost, ActionName("UpdateWebDocComment")]
+        [ValidateAntiForgeryToken]
+        public ActionResult UpdateWebDocCommentPost()
+        {
+            var errorkey = Request.Form["HErrorKey"];
+            var commenttype = Request.Form["HType"];
+            var commentdate = Request.Form["HDate"];
+            var creator = Request.Form["HCreator"];
+
+            if (!string.IsNullOrEmpty(Request.Form["editor1"]))
+            {
+                var tempcommment = new ErrorComments();
+                tempcommment.Comment = Server.HtmlDecode(Request.Form["editor1"]);
+                ProjectErrorViewModels.UpdateSPComment(errorkey, commenttype, commentdate, tempcommment.dbComment);
+            }
+            else
+            {
+                var tempcommment = new ErrorComments();
+                tempcommment.Comment = "<p>To Be Edit</p>";
+                ProjectErrorViewModels.UpdateSPComment(errorkey, commenttype, commentdate, tempcommment.dbComment);
+            }
+
+            var dict = new RouteValueDictionary();
+            dict.Add("DocKey", errorkey);
+            dict.Add("Creator", creator);
+            return RedirectToAction("WebDoc", "User", dict);
+        }
+
     }
 }

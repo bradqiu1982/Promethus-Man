@@ -830,6 +830,7 @@
     <Content Include="Views\Project\ProjectJOYield.cshtml" />
     <Content Include="Views\Project\ProjectBRYieldDetail.cshtml" />
     <Content Include="Views\BurnIn\ProjectBIWeeklyYield.cshtml" />
+    <Content Include="Views\User\UpdateWebDocComment.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

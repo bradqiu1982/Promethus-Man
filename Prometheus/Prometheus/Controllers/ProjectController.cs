@@ -3638,6 +3638,8 @@ namespace Prometheus.Controllers
             var ckdict = CookieUtility.UnpackCookie(this);
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
+            var currenttime = DateTime.Now.ToString();
+
             var vm = new ProjectErrorViewModels();
             vm.ErrorKey = Request.Form["ErrorKey"];
             vm.ShortDesc = Request.Form["ShortDesc"];
@@ -3649,12 +3651,75 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(temphtml))
             {
                 vm.Description = Server.HtmlDecode(temphtml);
-                ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey,vm.dbDescription,PJERRORCOMMENTTYPE.Description,vm.Reporter,DateTime.Now.ToString());
+                ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey,vm.dbDescription,PJERRORCOMMENTTYPE.Description,vm.Reporter, currenttime);
                 UserRankViewModel.UpdateUserRank(updater, 2);
+            }
+
+            var urls = ReceiveAttachFiles();
+
+            var detailcontenturl = string.Empty;
+            var detailcontentreffile = string.Empty;
+            if (!string.IsNullOrEmpty(Request.Form["detailattach"]))
+            {
+                var internalreportfile = Request.Form["detailattach"];
+                var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
+                    .Replace(" ", "_").Replace("#", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                foreach (var r in urls)
+                {
+                    if (r.Contains(originalname))
+                    {
+                        detailcontentreffile = originalname;
+                        detailcontenturl = r;
+                        break;
+                    }
+                }
+            }
+
+            var rootcontenturl = string.Empty;
+            var rootcontentreffile = string.Empty;
+            if (!string.IsNullOrEmpty(Request.Form["rootattach"]))
+            {
+                var internalreportfile = Request.Form["rootattach"];
+                var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
+                    .Replace(" ", "_").Replace("#", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                foreach (var r in urls)
+                {
+                    if (r.Contains(originalname))
+                    {
+                        rootcontentreffile = originalname;
+                        rootcontenturl = r;
+                        break;
+                    }
+                }
+            }
+
+            var resultcontenturl = string.Empty;
+            var resultcontentreffile = string.Empty;
+            if (!string.IsNullOrEmpty(Request.Form["resultattach"]))
+            {
+                var internalreportfile = Request.Form["resultattach"];
+                var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
+                    .Replace(" ", "_").Replace("#", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                foreach (var r in urls)
+                {
+                    if (r.Contains(originalname))
+                    {
+                        resultcontentreffile = originalname;
+                        resultcontenturl = r;
+                        break;
+                    }
+                }
             }
 
             var failuredetail = string.Empty;
             var result = string.Empty;
+            
 
             if (Request.Form["editor3"] != null)
             {
@@ -3662,8 +3727,12 @@ namespace Prometheus.Controllers
                 com.Comment = Server.HtmlDecode(Request.Form["editor3"]);
                 if (!string.IsNullOrEmpty(com.Comment))
                 {
+                    if (!string.IsNullOrEmpty(detailcontenturl))
+                    {
+                        com.Comment = com.Comment + "<p><a href='" + detailcontenturl + "' target='_blank'>Reference File: " + detailcontentreffile + " " + "</a></p>";
+                    }
 
-                        ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.FailureDetail, vm.Reporter, DateTime.Now.ToString());
+                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.FailureDetail, vm.Reporter, currenttime);
                         UserRankViewModel.UpdateUserRank(updater, 2);
                     failuredetail = com.Comment;
                 }
@@ -3675,8 +3744,12 @@ namespace Prometheus.Controllers
                 com.Comment = Server.HtmlDecode(Request.Form["resulteditor"]);
                 if (!string.IsNullOrEmpty(com.Comment))
                 {
+                    if (!string.IsNullOrEmpty(resultcontenturl))
+                    {
+                        com.Comment = com.Comment + "<p><a href='" + resultcontenturl + "' target='_blank'>Reference File: " + resultcontentreffile + " " + "</a></p>";
+                    }
 
-                        ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.Result, vm.Reporter, DateTime.Now.ToString());
+                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.Result, vm.Reporter, currenttime);
                         UserRankViewModel.UpdateUserRank(updater, 2);
                     result = com.Comment;
                 }
@@ -3688,21 +3761,34 @@ namespace Prometheus.Controllers
                 com.Comment = Server.HtmlDecode(Request.Form["editor2"]);
                 if (!string.IsNullOrEmpty(com.Comment))
                 {
-                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.RootCause, vm.Reporter, DateTime.Now.ToString());
+                    if (!string.IsNullOrEmpty(rootcontenturl))
+                    {
+                        com.Comment = com.Comment + "<p><a href='" + rootcontenturl + "' target='_blank'>Reference File: " + rootcontentreffile + " " + "</a></p>";
+                    }
+
+                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.RootCause, vm.Reporter, currenttime);
                     UserRankViewModel.UpdateUserRank(updater, 5);
 
                     if (string.IsNullOrEmpty(failuredetail))
                     {
                         var com1 = new ErrorComments();
                         com1.Comment = "<p>To Be Edit</p>";
-                        ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.FailureDetail, vm.Reporter, DateTime.Now.ToString());
+                        if (!string.IsNullOrEmpty(detailcontenturl))
+                        {
+                            com1.Comment = com1.Comment + "<p><a href='" + detailcontenturl + "' target='_blank'>Reference File: " + detailcontentreffile + " " + "</a></p>";
+                        }
+                        ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.FailureDetail, vm.Reporter, currenttime);
                     }
 
                     if (string.IsNullOrEmpty(result))
                     {
                         var com1 = new ErrorComments();
                         com1.Comment = "<p>To Be Edit</p>";
-                        ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.Result, vm.Reporter, DateTime.Now.ToString());
+                        if (!string.IsNullOrEmpty(resultcontenturl))
+                        {
+                            com1.Comment = com1.Comment + "<p><a href='" + resultcontenturl + "' target='_blank'>Reference File: " + resultcontentreffile + " " + "</a></p>";
+                        }
+                        ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.Result, vm.Reporter, currenttime);
                     }
                 }
             }
@@ -3710,7 +3796,7 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
             {
-                var urls = ReceiveAttachFiles();
+                
                 var internalreportfile = Request.Form["attachmentupload"];
                 var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
                     .Replace(" ", "_").Replace("#", "")

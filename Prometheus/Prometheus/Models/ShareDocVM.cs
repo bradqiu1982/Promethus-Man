@@ -292,6 +292,20 @@ namespace Prometheus.Models
                 ret.AddRange(bloglist);
             }
 
+            ret.Sort(delegate (ShareDocVM item1, ShareDocVM item2)
+            {
+                if (item1.DOCDate > item2.DOCDate)
+                {
+                    return -1;
+                }
+                else if (item1.DOCDate < item2.DOCDate)
+                {
+                    return 1;
+                }
+                else
+                    return 0;
+            });
+
             return ret;
         }
 

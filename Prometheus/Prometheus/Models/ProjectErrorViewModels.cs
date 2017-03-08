@@ -11,6 +11,7 @@ namespace Prometheus.Models
         public static string RootCause = "RootCause";
         public static string FailureDetail= "FailureDetail";
         public static string Result = "Result";
+        public static string AnalyzeTitle = "AnalyzeTitle";
     }
 
     public class ErrorComments
@@ -159,6 +160,7 @@ namespace Prometheus.Models
         private List<ErrorComments> rootcausecommentlist = new List<ErrorComments>();
         private List<ErrorComments> failuredetailcommentlist = new List<ErrorComments>();
         private List<ErrorComments> resultcommentlist = new List<ErrorComments>();
+        private List<ErrorComments> titlecommentlist = new List<ErrorComments>();
 
         public List<ErrorComments> GeneralCommentList
         {
@@ -180,6 +182,11 @@ namespace Prometheus.Models
             get { return failuredetailcommentlist; }
         }
 
+        public List<ErrorComments> AnalyzeTitleCommentList
+        {
+            get { return titlecommentlist; }
+        }
+
 
         private List<List<ErrorComments>> pcomments = new List<List<ErrorComments>>();
         public List<List<ErrorComments>> PairComments
@@ -199,6 +206,7 @@ namespace Prometheus.Models
                 rootcausecommentlist.Clear();
                 failuredetailcommentlist.Clear();
                 resultcommentlist.Clear();
+                titlecommentlist.Clear();
 
                 foreach (var item in cemlist)
                 {
@@ -218,6 +226,10 @@ namespace Prometheus.Models
                     if (string.Compare(item.CommentType, PJERRORCOMMENTTYPE.Result) == 0)
                     {
                         resultcommentlist.Add(item);
+                    }
+                    if (string.Compare(item.CommentType, PJERRORCOMMENTTYPE.AnalyzeTitle) == 0)
+                    {
+                        titlecommentlist.Add(item);
                     }
                 }
 
@@ -243,7 +255,13 @@ namespace Prometheus.Models
                             temppitem.Add(r);
                         }
                     }//end foreach
-
+                    foreach (var r in titlecommentlist)
+                    {
+                        if (r.CommentDate > starttime && r.CommentDate < endtime)
+                        {
+                            temppitem.Add(r);
+                        }
+                    }//end foreach
                     pcomments.Add(temppitem);
                 }//end foreach
             }

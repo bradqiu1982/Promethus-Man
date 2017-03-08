@@ -34,6 +34,8 @@
     using (Html.BeginForm("UpdateProjectError", "Project", FormMethod.Post, new { enctype = "multipart/form-data" }))
     {
         @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
         <div class="row col-lg-12">
             <div class="form-group">
                 <div class="form-horizontal">
@@ -161,16 +163,30 @@
         {
             idx = idx + 1;
 
+            var analyzetitle = "";
+            foreach (var item in paircoment)
+            {
+                if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.AnalyzeTitle) == 0)
+                {
+                    analyzetitle = item.Comment;
+                }
+            }
+
             <hr />
                         <div class="form-group">
                             <div class="col-lg-12">
                                 <div class="panel panel-default">
                                     <div class="panel-heading">
-                                        <h3 class="panel-title">Analyse @idx</h3>
+                                        <h3 class="panel-title">Analyse @idx @analyzetitle</h3>
                                     </div>
                                     <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
                                         @foreach (var item in paircoment)
                                         {
+                                            if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.AnalyzeTitle) == 0)
+                                            {
+                                                continue;
+                                            }
+
                                             <div class="row col-lg-12">
                                                 @if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.RootCause) == 0)
                                                 {
@@ -281,151 +297,168 @@
         {
         <hr />
 
-        <div class="col-lg-12">
-            <div class="form-group">
-                Failure Detail
+            <div class="row">
+                <div class="form-group">
+                            <div class="col-lg-6">
+                                <div class="col-lg-2">
+                                    <label class="control-label" for="analysetitle">Analyse Title</label>
+                                </div>
+                                
+                                <div class="col-lg-10">
+                                        <input class="form-control text-box single-line"  id="analysetitle" name="analysetitle" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 200." data-val-length-max="200" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" type="text" value="" />
+                                        <span class="field-validation-valid text-danger" data-valmsg-for="analysetitle" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                            </div>
+                </div>
             </div>
+            <hr/>
+            <div class="row">
+                <div class="form-group">
+                    Failure Detail
+                </div>
 
-            <div class="form-group">
-                <div>
-                    <textarea name="editor3" id="editor3" rows="10" cols="80"></textarea>
-                    <script>
-                                CKEDITOR.replace('editor3', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx' });
+                <div class="form-group">
+                    <div>
+                        <textarea name="editor3" id="editor3" rows="10" cols="80"></textarea>
+                        <script>
+                            CKEDITOR.replace('editor3', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx' });
+                        </script>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-lg-12">
+                        <div class="col-lg-4">
+                            <span class="btn btn-default btn-file" id="choosefile1">
+                                Failure Detail Attachement <input type="file" name="files1" id="file1" runat="server" onchange="ShowFileNames1(this)" />
+                            </span>
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="col-lg-11">
+                                <label class="control-label" id="showfile1" name="showfile1"></label>
+                            </div>
+                            <div class="col-lg-1">
+                                <input class="form-control text-box single-line" value="" id="detailattach" name="detailattach" type="hidden" />
+                            </div>
+                        </div>
+                    </div>
+                    <script type="text/javascript">
+                        function ShowFileNames1(oFile) {
+                            $('#showfile1').text(oFile.value);
+                            document.getElementById("detailattach").value = oFile.value;
+                        }
                     </script>
                 </div>
             </div>
 
-            <div class="form-group">
-                <div class="col-lg-12">
-                    <div class="col-lg-4">
-                        <span class="btn btn-default btn-file" id="choosefile1">
-                            Failure Detail Attachement <input type="file" name="files1" id="file1" runat="server" onchange="ShowFileNames1(this)" />
-                        </span>
-                    </div>
-                    <div class="col-lg-8">
-                        <div class="col-lg-11">
-                            <label class="control-label" id="showfile1" name="showfile1"></label>
-                        </div>
-                        <div class="col-lg-1">
-                            <input class="form-control text-box single-line" value="" id="detailattach" name="detailattach" type="hidden" />
-                        </div>
-                    </div>
+            <hr />
+
+            <div class="row">
+                <div class="form-group">
+                    Root Cause Investigation
                 </div>
-                <script type="text/javascript">
-                                            function ShowFileNames1(oFile) {
-                                                $('#showfile1').text(oFile.value);
-                                                document.getElementById("detailattach").value = oFile.value;
-                                            }
-                </script>
-            </div>
-        </div>
 
-        <hr />
-
-        <div class="col-lg-12">
-            <div class="form-group">
-                Root Cause Investigation
-            </div>
-
-            <div class="form-group">
-                <div>
+                <div class="form-group">
+                    <div>
                         <textarea name="editor2" id="editor2" rows="10" cols="80"></textarea>
-                    <script>
-                                CKEDITOR.replace('editor2', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx' });
+                        <script>
+                            CKEDITOR.replace('editor2', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx' });
+                        </script>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-lg-12">
+                        <div class="col-lg-4">
+                            <span class="btn btn-default btn-file" id="choosefile2">
+                                Root Cause Attachement <input type="file" name="files2" id="file2" runat="server" onchange="ShowFileNames2(this)" />
+                            </span>
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="col-lg-11">
+                                <label class="control-label" id="showfile2" name="showfile2"></label>
+                            </div>
+                            <div class="col-lg-1">
+                                <input class="form-control text-box single-line" value="" id="rootattach" name="rootattach" type="hidden" />
+                            </div>
+                        </div>
+                    </div>
+                    <script type="text/javascript">
+                        function ShowFileNames2(oFile) {
+                            $('#showfile2').text(oFile.value);
+                            document.getElementById("rootattach").value = oFile.value;
+                        }
                     </script>
                 </div>
             </div>
 
-            <div class="form-group">
-                <div class="col-lg-12">
-                    <div class="col-lg-4">
-                        <span class="btn btn-default btn-file" id="choosefile2">
-                            Root Cause Attachement <input type="file" name="files2" id="file2" runat="server" onchange="ShowFileNames2(this)" />
-                        </span>
-                    </div>
-                    <div class="col-lg-8">
-                        <div class="col-lg-11">
-                            <label class="control-label" id="showfile2" name="showfile2"></label>
-                        </div>
-                        <div class="col-lg-1">
-                            <input class="form-control text-box single-line" value="" id="rootattach" name="rootattach" type="hidden" />
-                        </div>
+            <hr />
+
+            <div class="row">
+                <div class="form-group">
+                    Result
+                </div>
+
+                <div class="form-group">
+                    <div>
+                        <textarea name="resulteditor" id="resulteditor" rows="10" cols="80"></textarea>
+                        <script>
+                            CKEDITOR.replace('resulteditor', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx' });
+                        </script>
                     </div>
                 </div>
-                <script type="text/javascript">
-                                            function ShowFileNames2(oFile) {
-                                                $('#showfile2').text(oFile.value);
-                                                document.getElementById("rootattach").value = oFile.value;
-                                            }
-                </script>
-            </div>
-        </div>
 
-        <hr/>
-
-        <div class="col-lg-12">
-            <div class="form-group">
-                Result
-            </div>
-
-            <div class="form-group">
-                <div>
-                    <textarea name="resulteditor" id="resulteditor" rows="10" cols="80"></textarea>
-                    <script>
-                        CKEDITOR.replace('resulteditor', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx' });
+                <div class="form-group">
+                    <div class="col-lg-12">
+                        <div class="col-lg-4">
+                            <span class="btn btn-default btn-file" id="choosefile4">
+                                Result Attachement <input type="file" name="files4" id="file4" runat="server" onchange="ShowFileNames4(this)" />
+                            </span>
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="col-lg-11">
+                                <label class="control-label" id="showfile4" name="showfile4"></label>
+                            </div>
+                            <div class="col-lg-1">
+                                <input class="form-control text-box single-line" value="" id="resultattach" name="resultattach" type="hidden" />
+                            </div>
+                        </div>
+                    </div>
+                    <script type="text/javascript">
+                        function ShowFileNames4(oFile) {
+                            $('#showfile4').text(oFile.value);
+                            document.getElementById("resultattach").value = oFile.value;
+                        }
                     </script>
                 </div>
             </div>
 
-            <div class="form-group">
-                <div class="col-lg-12">
-                    <div class="col-lg-4">
-                        <span class="btn btn-default btn-file" id="choosefile4">
-                            Result Attachement <input type="file" name="files4" id="file4" runat="server" onchange="ShowFileNames4(this)" />
-                        </span>
-                    </div>
-                    <div class="col-lg-8">
-                        <div class="col-lg-11">
-                            <label class="control-label" id="showfile4" name="showfile4"></label>
-                        </div>
-                        <div class="col-lg-1">
-                            <input class="form-control text-box single-line" value="" id="resultattach" name="resultattach" type="hidden" />
-                        </div>
-                    </div>
+            }
+
+            <hr />
+            <div class="row">
+                <div class="form-group">
+                    Comment
                 </div>
-                <script type="text/javascript">
-                                            function ShowFileNames4(oFile) {
-                                                $('#showfile4').text(oFile.value);
-                                                document.getElementById("resultattach").value = oFile.value;
-                                            }
-                </script>
-            </div>
-        </div>
 
-        }
-
-        <hr />
-        <div class="col-lg-12">
-            <div class="form-group">
-                Comment
-            </div>
-
-            <div class="form-group">
-                <div>
+                <div class="form-group">
+                    <div>
                         <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
-                    <script>
-                        CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx' });
-                    </script>
+                        <script>
+                            CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx' });
+                        </script>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <hr />
+            <hr />
 
-        <div class="col-lg-12">
-            <div class="form-group">
-                <input type="submit" value="Submit" class="btn btn-default" />
+            <div class="row">
+                <div class="form-group">
+                    <input type="submit" value="Submit" class="btn btn-default" />
+                </div>
             </div>
-        </div>
-    }
-}
+            }
+            }

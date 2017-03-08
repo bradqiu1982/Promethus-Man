@@ -3719,7 +3719,13 @@ namespace Prometheus.Controllers
 
             var failuredetail = string.Empty;
             var result = string.Empty;
-            
+
+            if (!string.IsNullOrEmpty(Request.Form["analysetitle"]))
+            {
+                var com = new ErrorComments();
+                com.Comment = Request.Form["analysetitle"];
+                ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.AnalyzeTitle, vm.Reporter, currenttime);
+            }
 
             if (Request.Form["editor3"] != null)
             {

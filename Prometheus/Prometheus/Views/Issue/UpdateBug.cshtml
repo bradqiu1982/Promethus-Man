@@ -667,7 +667,7 @@
             <hr/>
         }
 
-        <div class="col-lg-12">
+        <div class="row">
 
                 <div class="form-group">
                     <label class="control-label">Comment</label>
@@ -683,46 +683,74 @@
                     </div>
         </div>
 
-    </div>
-    <div class="row col-lg-12">
-        <div class="form-group">
-            <div class="col-lg-3">
-                <input type="submit" value="Submit" id="updateisu" name="updateisu" class="btn btn-default" />
-            </div>
-            <div class="col-lg-3">
-                @if (ViewBag.isassignee != null && ViewBag.isassignee)
-                {
-                    <input type="submit" value="Delete" id="deleteisu" name="deleteisu" class="btn btn-default" />
-                }
-            </div>
-            <div class="col-lg-3">
+        <hr/>
+        <div class="row">
+            <div class="form-group">
                 @if (ViewBag.isassignee != null
                     && ViewBag.isassignee
                     && Model.FailureDetailCommentList.Count > 0
                     && Model.RootCauseCommentList.Count > 0)
                 {
-                    <input type="submit" value="Link2DebugTree" id="linkisu" name="linkisu" class="btn btn-default" />
-                }
-                else if (ViewBag.isassignee != null
-                    && ViewBag.isassignee)
-                {
-                    <button type="button" disabled>Link2DebugTree</button>
+                    <div class="col-lg-6">
+                        <div class="col-lg-2">
+                            <label class="control-label" for="analysetitle">DebugTree Analyse Title</label>
+                        </div>
+                        <div class="col-lg-10">
+                            <input class="form-control text-box single-line" id="analysetitle" name="analysetitle" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 200." data-val-length-max="200" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" type="text" value="" />
+                            <span class="field-validation-valid text-danger" data-valmsg-for="analysetitle" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                    </div>
                 }
             </div>
-            <div class="col-lg-3"></div>
         </div>
+        
     </div>
 
-    <div class="modal" id="attachtag" tabindex="-1" role="dialog" aria-labelledby="attachtagLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title" id="attachtagLabel">Share Document Tag</h4>
+    <div class="row">
+        <div class="form-group">
+            <div class="row col-lg-12">
+                <div class="form-group">
+                    <div class="col-lg-3">
+                        <input type="submit" value="Submit" id="updateisu" name="updateisu" class="btn btn-default" />
+                    </div>
+                    <div class="col-lg-3">
+                        @if (ViewBag.isassignee != null && ViewBag.isassignee)
+                {
+                            <input type="submit" value="Delete" id="deleteisu" name="deleteisu" class="btn btn-default" />
+                        }
+                    </div>
+                    <div class="col-lg-3">
+                        @if (ViewBag.isassignee != null
+        && ViewBag.isassignee
+        && Model.FailureDetailCommentList.Count > 0
+        && Model.RootCauseCommentList.Count > 0)
+                        {
+                            <input type="submit" value="Link2DebugTree" id="linkisu" name="linkisu" class="btn btn-default" />
+                        }
+                        else if (ViewBag.isassignee != null
+                            && ViewBag.isassignee)
+                        {
+                            <button type="button" disabled>Link2DebugTree</button>
+                        }
+                    </div>
+                    <div class="col-lg-3"></div>
                 </div>
-                <div class="row"></div>
-                    <hr/>
+            </div>
+        </div>
+        </div>
+
+        <div class="modal" id="attachtag" tabindex="-1" role="dialog" aria-labelledby="attachtagLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="attachtagLabel">Share Document Tag</h4>
+                    </div>
                     <div class="row"></div>
-                    @if(ViewBag.tobechoosetags != null)
+                    <hr />
+                    <div class="row"></div>
+                    @if (ViewBag.tobechoosetags != null)
                     {
                         for (var idx = 0; idx < ViewBag.tobechoosetags.Count; idx++)
                         {
@@ -736,49 +764,49 @@
                             </div>
                         }
                     }
-                <div class="row"></div>
-                <hr/>
-                <div class="row"></div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
-                    <button type="button" class="btn btn-success" onclick="attachsubmit()">Upload Now</button>
+                    <div class="row"></div>
+                    <hr />
+                    <div class="row"></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
+                        <button type="button" class="btn btn-success" onclick="attachsubmit()">Upload Now</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="modal" id="issuetag" tabindex="-1" role="dialog" aria-labelledby="issuetagLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title" id="issuetagLabel">Share Issue Tag</h4>
-                </div>
-                <div class="row"></div>
-                <hr />
-                <div class="row"></div>
-                @if (ViewBag.tobechoosetags != null)
+        <div class="modal" id="issuetag" tabindex="-1" role="dialog" aria-labelledby="issuetagLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="issuetagLabel">Share Issue Tag</h4>
+                    </div>
+                    <div class="row"></div>
+                    <hr />
+                    <div class="row"></div>
+                    @if (ViewBag.tobechoosetags != null)
                 {
                     for (var idx = 0; idx < ViewBag.tobechoosetags.Count; idx++)
                     {
-                        <div class="col-lg-4">
-                            <div class="col-lg-3">
-                                <input type="checkbox" id="issuetagcheck@(idx)" name="issuetagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
+                            <div class="col-lg-4">
+                                <div class="col-lg-3">
+                                    <input type="checkbox" id="issuetagcheck@(idx)" name="issuetagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
+                                </div>
+                                <div class="col-lg-9">
+                                    <label class="control-label">@(ViewBag.tobechoosetags[idx])</label>
+                                </div>
                             </div>
-                            <div class="col-lg-9">
-                                <label class="control-label">@(ViewBag.tobechoosetags[idx])</label>
-                            </div>
-                        </div>
+                        }
                     }
-                }
-                <div class="row"></div>
-                <hr />
-                <div class="row"></div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Done</button>
+                    <div class="row"></div>
+                    <hr />
+                    <div class="row"></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Done</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-}
+        }
 
 

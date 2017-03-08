@@ -1161,6 +1161,14 @@ namespace Prometheus.Controllers
                             if (perrlist.Count > 0)
                             {
                                 var linktime = DateTime.Now.ToString();
+
+                                if (!string.IsNullOrEmpty(Request.Form["analysetitle"]))
+                                {
+                                    var com = new ErrorComments();
+                                    com.Comment = Request.Form["analysetitle"];
+                                    ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.AnalyzeTitle, updater, linktime);
+                                }
+
                                 foreach (var item in originaldata.FailureDetailCommentList)
                                 {
                                     var newcomment = new IssueComments();

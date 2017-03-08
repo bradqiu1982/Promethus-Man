@@ -161,6 +161,11 @@
                         <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
                             @foreach (var item in paircoment)
                             {
+                                if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.AnalyzeTitle) == 0)
+                                {
+                                    continue;
+                                }
+
                                 <div class="row col-lg-12">
                                     @if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.RootCause) == 0)
                                     {

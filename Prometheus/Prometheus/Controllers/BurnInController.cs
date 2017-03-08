@@ -1305,16 +1305,47 @@ namespace Prometheus.Controllers
             var commenttype = Request.Form["HType"];
             var commentdate = Request.Form["HDate"];
 
+            var urls = ReceiveAttachFiles();
+            var contenturl = string.Empty;
+            var contentreffile = string.Empty;
+            if (!string.IsNullOrEmpty(Request.Form["contentattach"]))
+            {
+                var internalreportfile = Request.Form["contentattach"];
+                var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
+                    .Replace(" ", "_").Replace("#", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                foreach (var r in urls)
+                {
+                    if (r.Contains(originalname))
+                    {
+                        contentreffile = originalname;
+                        contenturl = r;
+                        break;
+                    }
+                }
+            }
+
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
                 var tempcommment = new ErrorComments();
                 tempcommment.Comment = Server.HtmlDecode(Request.Form["editor1"]);
+                if (!string.IsNullOrEmpty(contenturl))
+                {
+                    tempcommment.Comment = tempcommment.Comment + "<hr/><p><a href='" + contenturl + "' target='_blank'>Reference File: " + contentreffile + " " + "</a></p>";
+                }
+
                 ProjectErrorViewModels.UpdateSPComment(errorkey, commenttype, commentdate, tempcommment.dbComment);
             }
             else
             {
                 var tempcommment = new ErrorComments();
                 tempcommment.Comment = "<p>To Be Edit</p>";
+                if (!string.IsNullOrEmpty(contenturl))
+                {
+                    tempcommment.Comment = tempcommment.Comment + "<hr/><p><a href='" + contenturl + "' target='_blank'>Reference File: " + contentreffile + " " + "</a></p>";
+                }
+
                 ProjectErrorViewModels.UpdateSPComment(errorkey, commenttype, commentdate, tempcommment.dbComment);
             }
 

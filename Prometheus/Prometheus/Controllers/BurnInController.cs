@@ -1332,7 +1332,7 @@ namespace Prometheus.Controllers
                 tempcommment.Comment = Server.HtmlDecode(Request.Form["editor1"]);
                 if (!string.IsNullOrEmpty(contenturl))
                 {
-                    tempcommment.Comment = tempcommment.Comment + "<hr/><p><a href='" + contenturl + "' target='_blank'>Reference File: " + contentreffile + " " + "</a></p>";
+                    tempcommment.Comment = tempcommment.Comment + "<p><a href='" + contenturl + "' target='_blank'>Reference File: " + contentreffile + " " + "</a></p>";
                 }
 
                 ProjectErrorViewModels.UpdateSPComment(errorkey, commenttype, commentdate, tempcommment.dbComment);
@@ -1343,7 +1343,7 @@ namespace Prometheus.Controllers
                 tempcommment.Comment = "<p>To Be Edit</p>";
                 if (!string.IsNullOrEmpty(contenturl))
                 {
-                    tempcommment.Comment = tempcommment.Comment + "<hr/><p><a href='" + contenturl + "' target='_blank'>Reference File: " + contentreffile + " " + "</a></p>";
+                    tempcommment.Comment = tempcommment.Comment + "<p><a href='" + contenturl + "' target='_blank'>Reference File: " + contentreffile + " " + "</a></p>";
                 }
 
                 ProjectErrorViewModels.UpdateSPComment(errorkey, commenttype, commentdate, tempcommment.dbComment);

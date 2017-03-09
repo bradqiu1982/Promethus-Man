@@ -508,14 +508,25 @@ namespace Prometheus.Models
             }
         }
 
-        public static void RemoveDoc(string DOCPJK, string DOCKey)
+        //public static void RemoveDoc(string DOCPJK, string DOCKey)
+        //{
+        //    var sql = "delete from ShareDoc where DOCPJK='<DOCPJK>' and DOCKey = N'<DOCKey>'";
+        //    sql = sql.Replace("<DOCPJK>", DOCPJK).Replace("<DOCKey>", DOCKey);
+        //    DBUtility.ExeLocalSqlNoRes(sql);
+
+        //    sql = "delete from UserLearn where DOCPJK='<DOCPJK>' and DOCKey = N'<DOCKey>'";
+        //    sql = sql.Replace("<DOCPJK>", DOCPJK).Replace("<DOCKey>", DOCKey);
+        //    DBUtility.ExeLocalSqlNoRes(sql);
+        //}
+
+        public static void RemoveDoc(string DOCKey)
         {
-            var sql = "delete from ShareDoc where DOCPJK='<DOCPJK>' and DOCKey = N'<DOCKey>'";
-            sql = sql.Replace("<DOCPJK>", DOCPJK).Replace("<DOCKey>", DOCKey);
+            var sql = "delete from ShareDoc where DOCKey = N'<DOCKey>'";
+            sql = sql.Replace("<DOCKey>", DOCKey);
             DBUtility.ExeLocalSqlNoRes(sql);
 
-            sql = "delete from UserLearn where DOCPJK='<DOCPJK>' and DOCKey = N'<DOCKey>'";
-            sql = sql.Replace("<DOCPJK>", DOCPJK).Replace("<DOCKey>", DOCKey);
+            sql = "delete from UserLearn where DOCKey = N'<DOCKey>'";
+            sql = sql.Replace("<DOCKey>", DOCKey);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 

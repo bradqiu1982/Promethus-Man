@@ -831,6 +831,7 @@
     <Content Include="Views\Project\ProjectBRYieldDetail.cshtml" />
     <Content Include="Views\BurnIn\ProjectBIWeeklyYield.cshtml" />
     <Content Include="Views\User\UpdateWebDocComment.cshtml" />
+    <Content Include="Views\User\ModifyBlogDoc.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

@@ -164,6 +164,20 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
+        public static void RemoveBlogDoc(string DOCKey)
+        {
+            var sql = "delete from UserBlog where APVal2='<APVal2>'";
+            sql = sql.Replace("<APVal2>", DOCKey);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        public void UpdateBlogDoc()
+        {
+            var sql = "update UserBlog set APVal4 = '<APVal4>' where APVal2 = '<APVal2>'";
+            sql = sql.Replace("<APVal2>", DocKey).Replace("<APVal4>", dbContent);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
         public static List<UserBlogVM> RetrieveAllBlogDoc(string username)
         {
             var ret = new List<UserBlogVM>();

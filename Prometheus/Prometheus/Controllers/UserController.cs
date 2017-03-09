@@ -818,6 +818,13 @@ namespace Prometheus.Controllers
             return RedirectToAction("ILearn", "User");
         }
 
+        public ActionResult RemoveBlogDoc(string DOCKey)
+        {
+            UserBlogVM.RemoveBlogDoc(DOCKey);
+            ShareDocVM.RemoveDoc(DOCKey);
+            return RedirectToAction("IBLOG", "User");
+        }
+
         public ActionResult RemoveSharedDoc(string DOCPJK, string DOCKey)
         {
             var ckdict = CookieUtility.UnpackCookie(this);
@@ -837,7 +844,7 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(DOCPJK)
                 && !string.IsNullOrEmpty(DOCKey))
             {
-                ShareDocVM.RemoveDoc(DOCPJK, DOCKey);
+                ShareDocVM.RemoveDoc(DOCKey);
             }
 
             return RedirectToAction("ILearn", "User");
@@ -1079,6 +1086,68 @@ namespace Prometheus.Controllers
             }
 
             return RedirectToAction("IBLOG", "User");
+        }
+
+        public ActionResult ModifyBlogDoc(string DocKey)
+        {
+            var vm = UserBlogVM.RetrieveBlogDoc(DocKey);
+            return View(vm);
+        }
+
+        [HttpPost, ActionName("ModifyBlogDoc")]
+        [ValidateAntiForgeryToken]
+        public ActionResult ModifyBlogDocPost()
+        {
+            var dockey = Request.Form["HDocKey"];
+            var vm = UserBlogVM.RetrieveBlogDoc(dockey);
+
+
+            var urls = ReceiveRMAFiles();
+            var contenturl = string.Empty;
+            var contentreffile = string.Empty;
+            if (!string.IsNullOrEmpty(Request.Form["contentattach"]))
+            {
+                var internalreportfile = Request.Form["contentattach"];
+                var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
+                    .Replace(" ", "_").Replace("#", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                foreach (var r in urls)
+                {
+                    if (r.Contains(originalname))
+                    {
+                        contentreffile = originalname;
+                        contenturl = r;
+                        break;
+                    }
+                }
+            }
+
+            if (!string.IsNullOrEmpty(Request.Form["editor1"]))
+            {
+                vm.Content = Server.HtmlDecode(Request.Form["editor1"]);
+
+                if (!string.IsNullOrEmpty(contenturl))
+                {
+                    vm.Content = vm.Content + "<p><a href='" + contenturl + "' target='_blank'>Reference File: " + contentreffile + " " + "</a></p>";
+                }
+                vm.UpdateBlogDoc();
+            }
+            else
+            {
+                vm.Content = "<p>To Be Edit</p>";
+
+                if (!string.IsNullOrEmpty(contenturl))
+                {
+                    vm.Content = vm.Content + "<p><a href='" + contenturl + "' target='_blank'>Reference File: " + contentreffile + " " + "</a></p>";
+                }
+                vm.UpdateBlogDoc();
+            }
+
+            var dict = new RouteValueDictionary();
+            dict.Add("DocKey", vm.DocKey);
+            dict.Add("Creator", vm.UserName);
+            return RedirectToAction("WebDoc", "User", dict);
         }
 
         public ActionResult WebDoc(string DocKey,string Creator = "")

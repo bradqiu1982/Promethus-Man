@@ -802,7 +802,22 @@ namespace Prometheus.Models
             return ret;
         }
 
-
+        public static List<ProjectExcept> RetrieveProjectAllExcept(string ExceptType)
+        {
+            var ret = new List<ProjectExcept>();
+            var sql = "select ProjectKey,Exception,ExceptionType from ProjectException where ExceptionType='<ExceptType>'";
+            sql = sql.Replace("<ExceptType>", ExceptType);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var tempret = new ProjectExcept();
+                tempret.ProjectKey = Convert.ToString(line[0]);
+                tempret.Except = Convert.ToString(line[1]);
+                tempret.ExceptType = Convert.ToString(line[2]);
+                ret.Add(tempret);
+            }
+            return ret;
+        }
     }
 
     }

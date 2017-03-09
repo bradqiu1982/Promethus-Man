@@ -15,6 +15,21 @@ namespace Prometheus.Controllers
 {
     public class ProjectController : Controller
     {
+        private static void logthdinfo(string info)
+        {
+            //var filename = "d:\\log\\sqlexception-" + DateTime.Now.ToString("yyyy-MM-dd");
+            //if (System.IO.File.Exists(filename))
+            //{
+            //    var content = System.IO.File.ReadAllText(filename);
+            //    content = content + "\r\n" + DateTime.Now.ToString() + " : " + info;
+            //    System.IO.File.WriteAllText(filename, content);
+            //}
+            //else
+            //{
+            //    System.IO.File.WriteAllText(filename, DateTime.Now.ToString() + " : " + info);
+            //}
+        }
+
         // GET: Project
         public ActionResult ViewAll()
         {
@@ -32,13 +47,34 @@ namespace Prometheus.Controllers
                 return RedirectToAction("LoginUser", "User");
             }
 
+            var now = DateTime.Now;
+            var msec1 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
+
             var projlist = ProjectViewModels.RetrieveAllProject();
+
+            now = DateTime.Now;
+            var msec2 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
+            logthdinfo("RetrieveAllProject  " + (msec2 - msec1).ToString());
 
             var filterlist = new List<SelectListItem>();
             var filteritem = new SelectListItem();
             filteritem.Text = "NONE";
             filteritem.Value = "NONE";
             filterlist.Add(filteritem);
+
+            var startdate = DateTime.Now.AddDays(-7);
+            var enddate = DateTime.Now.ToString();
+            if (startdate.DayOfWeek != DayOfWeek.Thursday)
+            {
+                for (int i = 7; i > 0; i--)
+                {
+                    if (DateTime.Now.AddDays(0-i).DayOfWeek == DayOfWeek.Thursday)
+                    {
+                        startdate = DateTime.Now.AddDays(0 - i);
+                        break;
+                    }
+                }
+            }
 
             foreach (var item in projlist)
             {
@@ -47,21 +83,11 @@ namespace Prometheus.Controllers
                 filteritem.Value = item.ProjectKey;
                 filterlist.Add(filteritem);
 
-                var startdate = DateTime.Now.AddDays(-7);
-                var enddate = DateTime.Now.ToString();
-                if (startdate.DayOfWeek != DayOfWeek.Thursday)
-                {
-                    for (int i = 7; i > 0; i--)
-                    {
-                        if (DateTime.Now.AddDays(0-i).DayOfWeek == DayOfWeek.Thursday)
-                        {
-                            startdate = DateTime.Now.AddDays(0 - i);
-                            break;
-                        }
-                    }
-                }
+                now = DateTime.Now;
+                msec1 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
 
                 var yvm = ProjectYieldViewModule.GetYieldByDateRange(item.ProjectKey, startdate.ToString(), enddate, item,HttpContext.Cache);
+
                 if (yvm.FirstYields.Count > 0)
                 {
                     item.FirstYield = yvm.FirstYield;
@@ -72,6 +98,10 @@ namespace Prometheus.Controllers
                     item.FirstYield = -1.0;
                     item.RetestYield = -1.0;
                 }
+
+                now = DateTime.Now;
+                msec2 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
+                logthdinfo(item.ProjectKey+ " GetYieldByDateRange " + (msec2 - msec1).ToString());
 
                 NPIInfo(item);
 
@@ -92,8 +122,8 @@ namespace Prometheus.Controllers
 
             filterlist[0].Selected = true;
             ViewBag.pjfilterlist = filterlist;
-
             SortPJ(projlist);
+
             return View(projlist);
         }
 
@@ -3955,20 +3985,12 @@ namespace Prometheus.Controllers
                 //var tempcontent2 = "<tr>" + "<th>Project</th>" + "<th>Wafer</th>" + "<th>Corrective Yield</th>" + "<th>Input</th>" + "<th>Output</th>" + "</tr>";
                 //content = content + tempcontent2;
 
-                foreach (var item in pjkeylist)
-                {
-                    var pjval = ProjectViewModels.RetrieveOneProject(item);
-                    if (string.Compare(pjval.MonitorVcsel,"False",true) == 0)
-                    {
-                        continue;
-                    }
-                    var warningyield = Convert.ToDouble(pjval.VcselWarningYield) * 0.01;
-
-                var waferexcept = ProjectViewModels.RetrieveProjectExcept(item, ProjectExceptType.WAFERYIELDEXCEPT);
+                var waferexceptlist = ProjectViewModels.RetrieveProjectAllExcept(ProjectExceptType.WAFERYIELDEXCEPT);
                 var exceptdict = new Dictionary<string, bool>();
-                if (!string.IsNullOrEmpty(waferexcept.Except))
+
+                foreach(var e in waferexceptlist)
                 {
-                    var waferexcepts = waferexcept.Except.Split(new string[] { ";", ",", " " }, StringSplitOptions.RemoveEmptyEntries);
+                    var waferexcepts = e.Except.Split(new string[] { ";", ",", " " }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (var w in waferexcepts)
                     {
                         if (!exceptdict.ContainsKey(w))
@@ -3977,7 +3999,15 @@ namespace Prometheus.Controllers
                         }
                     }
                 }
-                
+
+                foreach (var item in pjkeylist)
+                {
+                    var pjval = ProjectViewModels.RetrieveOneProject(item);
+                    if (string.Compare(pjval.MonitorVcsel,"False",true) == 0)
+                    {
+                        continue;
+                    }
+                    var warningyield = Convert.ToDouble(pjval.VcselWarningYield) * 0.01;
 
                 var waferlist = BITestData.RetrieveAllWafer(item);
                     

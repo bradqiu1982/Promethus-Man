@@ -190,7 +190,7 @@ namespace Prometheus.Models
 
                 if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
                 {
-                    SendPushDocEvent("a new document about "+ tempvm.DOCTag , tempvm.DocURL, ToWho, Pusher, ctrl);
+                    SendPushDocEvent("a new Issue about "+tempvm.DOCTag, tempvm.DocURL, ToWho, Pusher, ctrl);
                 }
                 else
                 {

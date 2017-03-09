@@ -327,6 +327,9 @@ namespace Prometheus.Controllers
 
             if (string.IsNullOrEmpty(key))
             {
+                var asilist = UserViewModels.RetrieveAllUser();
+                ViewBag.towholist = CreateSelectList(asilist, "");
+
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);
                 return View();
@@ -404,11 +407,18 @@ namespace Prometheus.Controllers
                     ViewBag.birootcauselist = CreateBIRootIssue(ret.ProjectKey, sn);
                 }
 
+
+                var asilist = UserViewModels.RetrieveAllUser();
+                ViewBag.towholist = CreateSelectList(asilist, "");
+
                 ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
                 return View(ret);
             }
             else
             {
+                var asilist = UserViewModels.RetrieveAllUser();
+                ViewBag.towholist = CreateSelectList(asilist, "");
+
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);
                 return View();
@@ -601,6 +611,25 @@ namespace Prometheus.Controllers
 
             var dict1 = new RouteValueDictionary();
             dict1.Add("issuekey", originaldata.IssueKey);
+            return RedirectToAction("UpdateIssue", "Issue", dict1);
+        }
+
+        public ActionResult IPush(string IssueKey, string ToWho)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            var issue = IssueViewModels.RetrieveIssueByIssueKey(IssueKey);
+            ShareDocVM.ShareDoc(issue.ProjectKey, ShareDocType.ISSUE, issue.IssueKey, issue.Summary, updater, DateTime.Now.ToString());
+
+            var whoes = ToWho.Split(new string[] { ";", ",", " " }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var w in whoes)
+            {
+                ShareDocVM.IPushDoc(issue.ProjectKey, issue.IssueKey,w,updater,this);
+            }
+
+            var dict1 = new RouteValueDictionary();
+            dict1.Add("issuekey", IssueKey);
             return RedirectToAction("UpdateIssue", "Issue", dict1);
         }
 
@@ -1068,6 +1097,9 @@ namespace Prometheus.Controllers
 
             if (string.IsNullOrEmpty(key))
             {
+                var asilist = UserViewModels.RetrieveAllUser();
+                ViewBag.towholist = CreateSelectList(asilist, "");
+
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);
 
@@ -1097,13 +1129,20 @@ namespace Prometheus.Controllers
                     ViewBag.birootcauselist = CreateBIRootIssue(ret.ProjectKey, sn);
                 }
 
+                var asilist = UserViewModels.RetrieveAllUser();
+                ViewBag.towholist = CreateSelectList(asilist, "");
+
                 ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
                 return View(ret);
             }
             else
             {
+                var asilist = UserViewModels.RetrieveAllUser();
+                ViewBag.towholist = CreateSelectList(asilist, "");
+
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);
+
                 ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
                 return View();
             }
@@ -2000,13 +2039,13 @@ namespace Prometheus.Controllers
             }
 
             var issuetag = string.Empty;
-            for (var i = 0; i < 200; i++)
-            {
-                if (Request.Form["issuetagcheck" + i] != null)
-                {
-                    issuetag = issuetag + Request.Form["issuetagcheck" + i] + ";";
-                }
-            }
+            //for (var i = 0; i < 200; i++)
+            //{
+            //    if (Request.Form["issuetagcheck" + i] != null)
+            //    {
+            //        issuetag = issuetag + Request.Form["issuetagcheck" + i] + ";";
+            //    }
+            //}
 
             var attachtag = string.Empty;
             for (var i = 0; i < 200; i++)
@@ -2238,13 +2277,13 @@ namespace Prometheus.Controllers
 
 
             var issuetag = string.Empty;
-            for (var i = 0; i < 200; i++)
-            {
-                if (Request.Form["issuetagcheck" + i] != null)
-                {
-                    issuetag = issuetag + Request.Form["issuetagcheck" + i] + ";";
-                }
-            }
+            //for (var i = 0; i < 200; i++)
+            //{
+            //    if (Request.Form["issuetagcheck" + i] != null)
+            //    {
+            //        issuetag = issuetag + Request.Form["issuetagcheck" + i] + ";";
+            //    }
+            //}
 
             var attachtag = string.Empty;
             for (var i = 0; i < 200; i++)

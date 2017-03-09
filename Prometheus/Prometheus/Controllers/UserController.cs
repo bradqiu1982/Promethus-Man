@@ -860,7 +860,7 @@ namespace Prometheus.Controllers
             }
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
-            var whoes = ToWho.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
+            var whoes = ToWho.Split(new string[] { ";", ","," " }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var w in whoes)
             {
                 ShareDocVM.IPushDoc(DOCPJK, DOCKey, w.Trim().ToUpper(),updater,this);

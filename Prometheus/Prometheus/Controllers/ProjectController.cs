@@ -860,6 +860,10 @@ namespace Prometheus.Controllers
                     CreateUpdateIssueList(vm);
                     CreateMonitorVcselList(vm);
                     CreateProjectTypeList(vm);
+
+                    var pjexcept = ProjectViewModels.RetrieveProjectExcept(realkey, ProjectExceptType.WAFERYIELDEXCEPT);
+                    vm.WaferYieldExceptList = pjexcept.Except;
+
                     return View(vm);
                 }
                 else
@@ -1016,6 +1020,9 @@ namespace Prometheus.Controllers
                 return View(projectmodel);
             }
 
+            var waferyieldexceptlist = Request.Form["WaferYieldExceptList"];
+            ProjectViewModels.UpdateProjectExcept(projectmodel.ProjectKey, waferyieldexceptlist, ProjectExceptType.WAFERYIELDEXCEPT);
+
             var oldpjdata = ProjectViewModels.RetrieveOneProject(projectmodel.ProjectKey);
 
             bool databondingchange = DataBondingChanged(oldpjdata, projectmodel);
@@ -1045,7 +1052,11 @@ namespace Prometheus.Controllers
 
             ProjectTestData.PrePareATELatestData(projectmodel.ProjectKey);
 
-            return RedirectToAction("ViewAll");
+            var dict = new RouteValueDictionary();
+            dict.Add("ProjectKey", projectmodel.ProjectKey);
+            return RedirectToAction("ProjectDetail", "Project", dict);
+
+            //return RedirectToAction("ViewAll");
         }
 
         public ActionResult ProjectIssues(string ProjectKey)
@@ -3953,12 +3964,31 @@ namespace Prometheus.Controllers
                     }
                     var warningyield = Convert.ToDouble(pjval.VcselWarningYield) * 0.01;
 
-
-                    var waferlist = BITestData.RetrieveAllWafer(item);
-
-                    
-                    foreach (var w in waferlist)
+                var waferexcept = ProjectViewModels.RetrieveProjectExcept(item, ProjectExceptType.WAFERYIELDEXCEPT);
+                var exceptdict = new Dictionary<string, bool>();
+                if (!string.IsNullOrEmpty(waferexcept.Except))
+                {
+                    var waferexcepts = waferexcept.Except.Split(new string[] { ";", ",", " " }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var w in waferexcepts)
                     {
+                        if (!exceptdict.ContainsKey(w))
+                        {
+                            exceptdict.Add(w, true);
+                        }
+                    }
+                }
+                
+
+                var waferlist = BITestData.RetrieveAllWafer(item);
+                    
+                foreach (var w in waferlist)
+                {
+                        if (exceptdict.ContainsKey(w))
+                        {
+                            continue;
+                        }
+                        
+
                         var yield = ProjectBIYieldViewModule.GetYieldByWafer(item, w);
                         if (yield.CorrectLastYield > 0.1 && yield.CorrectLastYield < warningyield)
                         {

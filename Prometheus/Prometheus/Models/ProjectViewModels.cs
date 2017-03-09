@@ -68,6 +68,23 @@ namespace Prometheus.Models
         public string TableName { set; get; }
     }
 
+    public class ProjectExcept
+    {
+        public ProjectExcept()
+            {
+            ProjectKey = string.Empty;
+            Except = string.Empty;
+            ExceptType = string.Empty;
+            }
+        public string ProjectKey { set; get; }
+        public string Except { set; get; }
+        public string ExceptType { set; get; }
+    }
+
+    public class ProjectExceptType
+    {
+        public static string WAFERYIELDEXCEPT = "WAFERYIELDEXCEPT";
+    }
 
     public class ProjectViewModels
     {
@@ -99,7 +116,11 @@ namespace Prometheus.Models
                 { this.VcselWarningYield = Convert.ToDouble(vcselwarning).ToString("0.0"); }
                 catch (Exception ex) { this.VcselWarningYield = Convert.ToDouble(98).ToString("0.0"); }
             }
+
+            WaferYieldExceptList = "";
         }
+
+        public string WaferYieldExceptList { set; get; }
 
         public string ProjectKey { set; get; }
 
@@ -746,6 +767,42 @@ namespace Prometheus.Models
             }
             return ret;
         }
+
+        public static void UpdateProjectExcept(string ProjectKey, string Except, string ExceptType)
+        {
+            var sql = "select ProjectKey from ProjectException where ProjectKey='<ProjectKey>' and ExceptionType='<ExceptType>'";
+            sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ExceptType>", ExceptType);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            if (dbret.Count > 0)
+            {
+                sql = "update ProjectException set Exception='<Except>' where ProjectKey='<ProjectKey>' and ExceptionType='<ExceptType>'";
+                sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ExceptType>", ExceptType).Replace("<Except>", Except);
+                DBUtility.ExeLocalSqlNoRes(sql);
+            }
+            else
+            {
+                sql = "insert into ProjectException(ProjectKey,Exception,ExceptionType) values('<ProjectKey>','<Except>','<ExceptType>')";
+                sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ExceptType>", ExceptType).Replace("<Except>", Except);
+                DBUtility.ExeLocalSqlNoRes(sql);
+            }
+        }
+
+        public static ProjectExcept RetrieveProjectExcept(string ProjectKey, string ExceptType)
+        {
+            var ret = new ProjectExcept();
+            var sql = "select ProjectKey,Exception,ExceptionType from ProjectException where ProjectKey='<ProjectKey>' and ExceptionType='<ExceptType>'";
+            sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ExceptType>", ExceptType);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                ret.ProjectKey = Convert.ToString(line[0]);
+                ret.Except = Convert.ToString(line[1]);
+                ret.ExceptType = Convert.ToString(line[2]);
+            }
+            return ret;
+        }
+
+
     }
 
     }

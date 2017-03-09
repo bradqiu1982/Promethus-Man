@@ -149,6 +149,15 @@ CREATE TABLE [dbo].[ProjectEvent] (
     [UpdateDate] DATETIME       NOT NULL
 );
 
+CREATE TABLE [dbo].[ProjectException] (
+    [ProjectKey]    NVARCHAR (50)  NOT NULL,
+    [Exception]     NVARCHAR (MAX) NOT NULL,
+    [ExceptionType] NVARCHAR (50)  NOT NULL,
+    [APPV1]         NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [APPV2]         NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [APPV3]         DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+);
+
 CREATE TABLE [dbo].[ProjectError] (
     [ProjectKey]  NVARCHAR (50) NOT NULL,
     [OrignalCode] NVARCHAR (50) NOT NULL,

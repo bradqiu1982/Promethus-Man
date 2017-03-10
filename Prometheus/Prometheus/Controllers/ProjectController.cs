@@ -47,14 +47,14 @@ namespace Prometheus.Controllers
                 return RedirectToAction("LoginUser", "User");
             }
 
-            var now = DateTime.Now;
-            var msec1 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
+            //var now = DateTime.Now;
+            //var msec1 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
 
             var projlist = ProjectViewModels.RetrieveAllProject();
 
-            now = DateTime.Now;
-            var msec2 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
-            logthdinfo("RetrieveAllProject  " + (msec2 - msec1).ToString());
+            //now = DateTime.Now;
+            //var msec2 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
+            //logthdinfo("RetrieveAllProject  " + (msec2 - msec1).ToString());
 
             var filterlist = new List<SelectListItem>();
             var filteritem = new SelectListItem();
@@ -83,8 +83,8 @@ namespace Prometheus.Controllers
                 filteritem.Value = item.ProjectKey;
                 filterlist.Add(filteritem);
 
-                now = DateTime.Now;
-                msec1 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
+                //now = DateTime.Now;
+                //msec1 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
 
                 var yvm = ProjectYieldViewModule.GetYieldByDateRange(item.ProjectKey, startdate.ToString(), enddate, item,HttpContext.Cache);
 
@@ -99,9 +99,9 @@ namespace Prometheus.Controllers
                     item.RetestYield = -1.0;
                 }
 
-                now = DateTime.Now;
-                msec2 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
-                logthdinfo(item.ProjectKey+ " GetYieldByDateRange " + (msec2 - msec1).ToString());
+                //now = DateTime.Now;
+                //msec2 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
+                //logthdinfo(item.ProjectKey+ " GetYieldByDateRange " + (msec2 - msec1).ToString());
 
                 NPIInfo(item);
 

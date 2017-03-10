@@ -582,6 +582,7 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Scripts\ajaxfileupload.js" />
     <Content Include="Scripts\AreaChart.xml" />
     <Content Include="Scripts\BaseYield.xml">
       <SubType>Designer</SubType>
@@ -832,6 +833,7 @@
     <Content Include="Views\BurnIn\ProjectBIWeeklyYield.cshtml" />
     <Content Include="Views\User\UpdateWebDocComment.cshtml" />
     <Content Include="Views\User\ModifyBlogDoc.cshtml" />
+    <Content Include="userfiles\ImageUpload.ashx" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

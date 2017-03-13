@@ -515,6 +515,11 @@ namespace Prometheus.Models
             }
 
             var plist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, DateTime.Parse(enddate).AddYears(5).ToString(), false,mycache);
+            if (plist.Count == 0)
+            {
+                return ret;
+            }
+
 
             var fdatalist = new List<ProjectTestData>();
             var enddatet = DateTime.Parse(enddate);

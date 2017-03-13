@@ -12,6 +12,7 @@ namespace Prometheus.Models
         public static string ISSUE = "ISSUE";
         public static string DOCUMENT = "DOCUMENT";
         public static string BLOG = "BLOG";
+        public static string DEBUG = "DEBUG";
     }
     public class ShareDocVM
     {
@@ -178,6 +179,12 @@ namespace Prometheus.Models
                     tempvm.Summary = issue.Summary;
                     tempvm.DocURL = "/Issue/UpdateIssue?issuekey=" + tempvm.DOCKey;
                 }
+                else if (string.Compare(tempvm.DOCType, ShareDocType.DEBUG, true) == 0)
+                {
+                    var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(tempvm.DOCKey);
+                    tempvm.Summary = debugtree[0].ProjectKey+"-"+debugtree[0].OrignalCode;
+                    tempvm.DocURL = "/Project/UpdateProjectError?ErrorKey=" + tempvm.DOCKey;
+                }
                 else
                 {
                     tempvm.Summary = tempvm.DOCKey;
@@ -191,6 +198,10 @@ namespace Prometheus.Models
                 if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
                 {
                     SendPushDocEvent("a new Issue about "+tempvm.DOCTag, tempvm.DocURL, ToWho, Pusher, ctrl);
+                }
+                else if (string.Compare(tempvm.DOCType, ShareDocType.DEBUG, true) == 0)
+                {
+                    SendPushDocEvent("a debug about " +tempvm.DOCPJK+"-"+ tempvm.Summary, tempvm.DocURL, ToWho, Pusher, ctrl);
                 }
                 else
                 {
@@ -273,6 +284,12 @@ namespace Prometheus.Models
 
                     tempvm.Summary = issue.Summary;
                     tempvm.DocURL = "/Issue/UpdateIssue?issuekey="+ tempvm.DOCKey;
+                }
+                else if (string.Compare(tempvm.DOCType, ShareDocType.DEBUG, true) == 0)
+                {
+                    var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(tempvm.DOCKey);
+                    tempvm.Summary = debugtree[0].ProjectKey + "-" + debugtree[0].OrignalCode;
+                    tempvm.DocURL = "/Project/UpdateProjectError?ErrorKey=" + tempvm.DOCKey;
                 }
                 else if (string.Compare(tempvm.DOCType, ShareDocType.DOCUMENT, true) == 0)
                 {
@@ -368,6 +385,12 @@ namespace Prometheus.Models
                     tempvm.Summary = issue.Summary;
                     tempvm.DocURL = "/Issue/UpdateIssue?issuekey=" + tempvm.DOCKey;
                 }
+                else if (string.Compare(tempvm.DOCType, ShareDocType.DEBUG, true) == 0)
+                {
+                    var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(tempvm.DOCKey);
+                    tempvm.Summary = debugtree[0].ProjectKey + "-" + debugtree[0].OrignalCode;
+                    tempvm.DocURL = "/Project/UpdateProjectError?ErrorKey=" + tempvm.DOCKey;
+                }
                 else
                 {
                     tempvm.Summary = tempvm.DOCKey;
@@ -416,6 +439,12 @@ namespace Prometheus.Models
                     tempvm.Summary = issue.Summary;
                     tempvm.DocURL = "/Issue/UpdateIssue?issuekey=" + tempvm.DOCKey;
                 }
+                else if (string.Compare(tempvm.DOCType, ShareDocType.DEBUG, true) == 0)
+                {
+                    var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(tempvm.DOCKey);
+                    tempvm.Summary = debugtree[0].ProjectKey + "-" + debugtree[0].OrignalCode;
+                    tempvm.DocURL = "/Project/UpdateProjectError?ErrorKey=" + tempvm.DOCKey;
+                }
                 else
                 {
                     tempvm.Summary = tempvm.DOCKey;
@@ -455,6 +484,12 @@ namespace Prometheus.Models
 
                     tempvm.Summary = issue.Summary;
                     tempvm.DocURL = "/Issue/UpdateIssue?issuekey=" + tempvm.DOCKey;
+                }
+                else if (string.Compare(tempvm.DOCType, ShareDocType.DEBUG, true) == 0)
+                {
+                    var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(tempvm.DOCKey);
+                    tempvm.Summary = debugtree[0].ProjectKey + "-" + debugtree[0].OrignalCode;
+                    tempvm.DocURL = "/Project/UpdateProjectError?ErrorKey=" + tempvm.DOCKey;
                 }
                 else
                 {
@@ -559,6 +594,12 @@ namespace Prometheus.Models
                     tempvm.Summary = issue.Summary;
                     tempvm.DocURL = "/Issue/UpdateIssue?issuekey=" + tempvm.DOCKey;
                 }
+                else if (string.Compare(tempvm.DOCType, ShareDocType.DEBUG, true) == 0)
+                {
+                    var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(tempvm.DOCKey);
+                    tempvm.Summary = debugtree[0].ProjectKey + "-" + debugtree[0].OrignalCode;
+                    tempvm.DocURL = "/Project/UpdateProjectError?ErrorKey=" + tempvm.DOCKey;
+                }
                 else
                 {
                     tempvm.Summary = tempvm.DOCKey;
@@ -650,6 +691,10 @@ namespace Prometheus.Models
                         if (string.Compare(doc.DOCType, ShareDocType.ISSUE, true) == 0)
                         {
                             SendPushDocEvent("a new finished issue about " + doc.DOCTag, doc.DocURL, u.BookerName, "System", ctrl);
+                        }
+                        else if (string.Compare(doc.DOCType, ShareDocType.DEBUG, true) == 0)
+                        {
+                            SendPushDocEvent("a debug about " +doc.DOCPJK+"-"+ doc.DOCTag, doc.DocURL, u.BookerName, "System", ctrl);
                         }
                         else
                         {

@@ -3555,6 +3555,10 @@ namespace Prometheus.Controllers
                 {
                     ViewBag.assigee = false;
                 }
+
+                var asilist = UserViewModels.RetrieveAllUser();
+                ViewBag.towholist = CreateSelectList(asilist, "");
+
                 return View(vm[0]);
             }
             
@@ -4880,6 +4884,25 @@ namespace Prometheus.Controllers
             var dict = new RouteValueDictionary();
             dict.Add("ErrorKey", errorkey);
             return RedirectToAction("UpdateProjectError", "Project", dict);
+        }
+
+        public ActionResult IPushDebug(string ErrorKey, string ToWho)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(ErrorKey);
+            ShareDocVM.ShareDoc(debugtree[0].ProjectKey, ShareDocType.DEBUG, debugtree[0].ErrorKey, debugtree[0].OrignalCode, updater, DateTime.Now.ToString());
+
+            var whoes = ToWho.Split(new string[] { ";", ",", " " }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var w in whoes)
+            {
+                ShareDocVM.IPushDoc(debugtree[0].ProjectKey, debugtree[0].ErrorKey, w, updater, this);
+            }
+
+            var dict1 = new RouteValueDictionary();
+            dict1.Add("ErrorKey", ErrorKey);
+            return RedirectToAction("UpdateProjectError", "Project", dict1);
         }
 
     }

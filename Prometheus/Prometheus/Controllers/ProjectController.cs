@@ -660,7 +660,7 @@ namespace Prometheus.Controllers
             }
             else
             {
-                projectmodel.Description = Server.HtmlDecode(temphtml);
+                projectmodel.Description = SeverHtmlDecode.Decode(this,temphtml);
             }
         }
 
@@ -3695,7 +3695,7 @@ namespace Prometheus.Controllers
             var temphtml = Request.Form["editor1"];
             if (!string.IsNullOrEmpty(temphtml))
             {
-                vm.Description = Server.HtmlDecode(temphtml);
+                vm.Description = SeverHtmlDecode.Decode(this,temphtml);
                 ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey,vm.dbDescription,PJERRORCOMMENTTYPE.Description,vm.Reporter, currenttime);
                 UserRankViewModel.UpdateUserRank(updater, 2);
             }
@@ -3775,7 +3775,7 @@ namespace Prometheus.Controllers
             if (Request.Form["editor3"] != null)
             {
                 var com = new ErrorComments();
-                com.Comment = Server.HtmlDecode(Request.Form["editor3"]);
+                com.Comment = SeverHtmlDecode.Decode(this,Request.Form["editor3"]);
                 if (!string.IsNullOrEmpty(com.Comment))
                 {
                     if (!string.IsNullOrEmpty(detailcontenturl))
@@ -3792,7 +3792,7 @@ namespace Prometheus.Controllers
             if (Request.Form["resulteditor"] != null)
             {
                 var com = new ErrorComments();
-                com.Comment = Server.HtmlDecode(Request.Form["resulteditor"]);
+                com.Comment = SeverHtmlDecode.Decode(this,Request.Form["resulteditor"]);
                 if (!string.IsNullOrEmpty(com.Comment))
                 {
                     if (!string.IsNullOrEmpty(resultcontenturl))
@@ -3809,7 +3809,7 @@ namespace Prometheus.Controllers
             if (Request.Form["editor2"] != null)
             {
                 var com = new ErrorComments();
-                com.Comment = Server.HtmlDecode(Request.Form["editor2"]);
+                com.Comment = SeverHtmlDecode.Decode(this,Request.Form["editor2"]);
                 if (!string.IsNullOrEmpty(com.Comment))
                 {
                     if (!string.IsNullOrEmpty(rootcontenturl))
@@ -4861,7 +4861,7 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
                 var tempcommment = new ErrorComments();
-                tempcommment.Comment = Server.HtmlDecode(Request.Form["editor1"]);
+                tempcommment.Comment = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
                 if (!string.IsNullOrEmpty(contenturl))
                 {
                     tempcommment.Comment = tempcommment.Comment + "<p><a href='" + contenturl + "' target='_blank'>Reference File: " + contentreffile + " " + "</a></p>";

@@ -1065,7 +1065,7 @@ namespace Prometheus.Controllers
                 var blog = new UserBlogVM();
                 blog.UserName = updater;
                 blog.ContentType = UserBlogContentType.COMMENT;
-                blog.Content = Server.HtmlDecode(Request.Form["docinputeditor"]);
+                blog.Content = SeverHtmlDecode.Decode(this,Request.Form["docinputeditor"]);
 
                 if (!string.IsNullOrEmpty(contenturl))
                 {
@@ -1125,7 +1125,7 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
-                vm.Content = Server.HtmlDecode(Request.Form["editor1"]);
+                vm.Content = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
 
                 if (!string.IsNullOrEmpty(contenturl))
                 {
@@ -1247,7 +1247,7 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(Request.Form["docinputeditor"]))
             {
                 var com = new ErrorComments();
-                com.Comment = Server.HtmlDecode(Request.Form["docinputeditor"]);
+                com.Comment = SeverHtmlDecode.Decode(this,Request.Form["docinputeditor"]);
                 if (!string.IsNullOrEmpty(com.Comment))
                 {
                     if (!string.IsNullOrEmpty(contenturl))
@@ -1326,7 +1326,7 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
                 var tempcommment = new ErrorComments();
-                tempcommment.Comment = Server.HtmlDecode(Request.Form["editor1"]);
+                tempcommment.Comment = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
 
                 if (!string.IsNullOrEmpty(contenturl))
                 {

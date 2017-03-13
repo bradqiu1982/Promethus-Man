@@ -113,4 +113,12 @@ namespace Prometheus.Models
             return ret;
         }
     }
+
+    public class SeverHtmlDecode
+    {
+        public static string Decode(Controller ctrl, string src)
+        {
+            return ctrl.Server.HtmlDecode(src).Replace("border=\"0\"", "border=\"2\"");
+        }
+    }
 }

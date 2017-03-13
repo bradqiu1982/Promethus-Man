@@ -196,7 +196,7 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
-                vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
+                vm.Description = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
                 vm.CommentType = COMMENTTYPE.Description;
             }
             else
@@ -473,7 +473,7 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
-                vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
+                vm.Description = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
                 vm.CommentType = COMMENTTYPE.Description;
                 UserRankViewModel.UpdateUserRank(updater, 2);
             }
@@ -693,7 +693,7 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
-                vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
+                vm.Description = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
                 vm.CommentType = COMMENTTYPE.Description;
             }
             else
@@ -1008,7 +1008,7 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
-                vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
+                vm.Description = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
                 vm.CommentType = COMMENTTYPE.Description;
             }
 
@@ -1342,7 +1342,7 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(Request.Form["failureeditor"]))
             {
-                var failure = Server.HtmlDecode(Request.Form["failureeditor"]);
+                var failure = SeverHtmlDecode.Decode(this,Request.Form["failureeditor"]);
                 var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(failure));
                 var commenttype = COMMENTTYPE.FailureDetail;
                 IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
@@ -1351,7 +1351,7 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(Request.Form["rootcauseeditor"]))
             {
-                var rootcause = Server.HtmlDecode(Request.Form["rootcauseeditor"]);
+                var rootcause = SeverHtmlDecode.Decode(this,Request.Form["rootcauseeditor"]);
                 var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(rootcause));
                 var commenttype = COMMENTTYPE.RootCause;
                 IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
@@ -1360,7 +1360,7 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(Request.Form["resulteditor"]))
             {
-                var rootcause = Server.HtmlDecode(Request.Form["resulteditor"]);
+                var rootcause = SeverHtmlDecode.Decode(this,Request.Form["resulteditor"]);
                 var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(rootcause));
                 var commenttype = COMMENTTYPE.Result;
                 IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
@@ -1369,7 +1369,7 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
-                vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
+                vm.Description = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
                 vm.CommentType = COMMENTTYPE.Description;
                 UserRankViewModel.UpdateUserRank(updater, 2);
             }
@@ -1688,7 +1688,7 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
-                vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
+                vm.Description = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
                 vm.CommentType = COMMENTTYPE.Description;
                 UserRankViewModel.UpdateUserRank(updater, 2);
             }
@@ -1697,7 +1697,7 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(Request.Form["rootcauseeditor"]))
             {
-                var rootcause = Server.HtmlDecode(Request.Form["rootcauseeditor"]);
+                var rootcause = SeverHtmlDecode.Decode(this,Request.Form["rootcauseeditor"]);
                 var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(rootcause));
                 var commenttype = COMMENTTYPE.RootCause;
                 IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
@@ -2022,7 +2022,7 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
-                originaldata.Description = Server.HtmlDecode(Request.Form["editor1"]);
+                originaldata.Description = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
                 originaldata.CommentType = COMMENTTYPE.Description;
                 UserRankViewModel.UpdateUserRank(updater, 2);
             }
@@ -2031,7 +2031,7 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(Request.Form["rootcauseeditor"]))
             {
-                var rootcause = Server.HtmlDecode(Request.Form["rootcauseeditor"]);
+                var rootcause = SeverHtmlDecode.Decode(this,Request.Form["rootcauseeditor"]);
                 var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(rootcause));
                 var commenttype = COMMENTTYPE.RootCause;
                 IssueViewModels.StoreIssueComment(originaldata.IssueKey, dbstr, updater, commenttype);
@@ -2259,7 +2259,7 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
-                vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
+                vm.Description = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
                 vm.CommentType = COMMENTTYPE.Description;
                 UserRankViewModel.UpdateUserRank(updater, 2);
             }
@@ -2268,7 +2268,7 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(Request.Form["rootcauseeditor"]))
             {
-                var rootcause = Server.HtmlDecode(Request.Form["rootcauseeditor"]);
+                var rootcause = SeverHtmlDecode.Decode(this,Request.Form["rootcauseeditor"]);
                 var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(rootcause));
                 var commenttype = COMMENTTYPE.RootCause;
                 IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
@@ -2520,7 +2520,7 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
-                vm.Description = Server.HtmlDecode(Request.Form["editor1"]);
+                vm.Description = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
                 vm.CommentType = COMMENTTYPE.Description;
                 UserRankViewModel.UpdateUserRank(updater, 2);
             }
@@ -2529,7 +2529,7 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(Request.Form["analysiseditor"]))
             {
-                var analysis = Server.HtmlDecode(Request.Form["analysiseditor"]);
+                var analysis = SeverHtmlDecode.Decode(this,Request.Form["analysiseditor"]);
                 var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(analysis));
                 var commenttype = COMMENTTYPE.Analysis;
                 IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
@@ -2538,7 +2538,7 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(Request.Form["rootcauseeditor"]))
             {
-                var rootcause = Server.HtmlDecode(Request.Form["rootcauseeditor"]);
+                var rootcause = SeverHtmlDecode.Decode(this,Request.Form["rootcauseeditor"]);
                 var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(rootcause));
                 var commenttype = COMMENTTYPE.RootCause;
                 IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
@@ -2883,7 +2883,7 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
                 var tempcommment = new IssueComments();
-                tempcommment.Comment = Server.HtmlDecode(Request.Form["editor1"]);
+                tempcommment.Comment = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
                 if (!string.IsNullOrEmpty(contenturl))
                 {
                     tempcommment.Comment = tempcommment.Comment + "<p><a href='" + contenturl + "' target='_blank'>Reference File: " + contentreffile + " " + "</a></p>";

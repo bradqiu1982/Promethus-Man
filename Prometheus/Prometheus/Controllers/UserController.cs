@@ -1352,5 +1352,42 @@ namespace Prometheus.Controllers
             return RedirectToAction("WebDoc", "User", dict);
         }
 
+
+        [HttpPost, ActionName("SaveCacheInfo")]
+        public string SaveCacheInfo()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            foreach (var key in Request.Form.Keys)
+            {
+                UserCacheVM.InsertCacheInfo(updater, Request.Form.Get(key.ToString()));
+            }
+
+            return "OK";
+        }
+
+        public ActionResult UserCachedInfo()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "UserCachedInfo");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            var vm = UserCacheVM.RetrieveCacheInfo(updater);
+
+            return View(vm);
+        }
+
     }
 }

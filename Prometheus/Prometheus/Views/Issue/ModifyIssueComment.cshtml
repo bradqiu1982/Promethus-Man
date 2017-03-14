@@ -61,9 +61,7 @@
                                                         dataType: 'HTML',
                                                         success: function (data, status)
                                                         {
-                                                            var myeditor = $('#editor1');
-                                                            var wholeval = myeditor.val() + data;
-                                                            myeditor.val(wholeval);
+                                                            var wholeval = CKEDITOR.instances.editor1.getData() + data;
                                                             CKEDITOR.instances.editor1.setData(wholeval);
                                                         },
                                                         error: function (e)

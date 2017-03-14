@@ -157,9 +157,7 @@
                                                         dataType: 'HTML',
                                                         success: function (data, status)
                                                         {
-                                                            var myeditor = $('#docinputeditor');
-                                                            var wholeval = myeditor.val() + data;
-                                                            myeditor.val(wholeval);
+                                                            var wholeval = CKEDITOR.instances.docinputeditor.getData() + data;
                                                             CKEDITOR.instances.docinputeditor.setData(wholeval);
                                                         },
                                                         error: function (e)

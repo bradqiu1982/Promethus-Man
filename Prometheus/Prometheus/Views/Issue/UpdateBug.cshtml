@@ -655,9 +655,7 @@
                                                         dataType: 'HTML',
                                                         success: function (data, status)
                                                         {
-                                                            var myeditor = $('#failureeditor');
-                                                            var wholeval = myeditor.val() + data;
-                                                            myeditor.val(wholeval);
+                                                            var wholeval = CKEDITOR.instances.failureeditor.getData() + data;
                                                             CKEDITOR.instances.failureeditor.setData(wholeval);
                                                         },
                                                         error: function (e)
@@ -715,9 +713,7 @@
                                                         dataType: 'HTML',
                                                         success: function (data, status)
                                                         {
-                                                            var myeditor = $('#rootcauseeditor');
-                                                            var wholeval = myeditor.val() + data;
-                                                            myeditor.val(wholeval);
+                                                            var wholeval = CKEDITOR.instances.rootcauseeditor.getData() + data;
                                                             CKEDITOR.instances.rootcauseeditor.setData(wholeval);
                                                         },
                                                         error: function (e)
@@ -775,9 +771,7 @@
                                                         dataType: 'HTML',
                                                         success: function (data, status)
                                                         {
-                                                            var myeditor = $('#resulteditor');
-                                                            var wholeval = myeditor.val() + data;
-                                                            myeditor.val(wholeval);
+                                                            var wholeval = CKEDITOR.instances.resulteditor.getData() + data;
                                                             CKEDITOR.instances.resulteditor.setData(wholeval);
                                                         },
                                                         error: function (e)
@@ -836,9 +830,7 @@
                                                         dataType: 'HTML',
                                                         success: function (data, status)
                                                         {
-                                                            var myeditor = $('#editor1');
-                                                            var wholeval = myeditor.val() + data;
-                                                            myeditor.val(wholeval);
+                                                            var wholeval = CKEDITOR.instances.editor1.getData() + data;
                                                             CKEDITOR.instances.editor1.setData(wholeval);
                                                         },
                                                         error: function (e)

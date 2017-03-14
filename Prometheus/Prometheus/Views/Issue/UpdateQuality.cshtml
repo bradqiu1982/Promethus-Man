@@ -652,8 +652,10 @@
                                         Editor Attachement <input type="file" name="file6" id="file6" runat="server" onchange="ShowFileNames6(this)" />
                                     </span>
                                 </div>
-                                <div class="col-lg-8">
-                                </div>
+                                <div class="col-lg-1"></div>
+                                <div class="col-lg-1"><button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button></div>
+                                <div class="col-lg-1"><button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button></div>
+                                <div class="col-lg-5"></div>
                             </div>
                             <script type="text/javascript">
                                             function ShowFileNames6(oFile) {
@@ -709,8 +711,10 @@
                                         Editor Attachement <input type="file" name="file7" id="file7" runat="server" onchange="ShowFileNames7(this)" />
                                     </span>
                                 </div>
-                                <div class="col-lg-8">
-                                </div>
+                                <div class="col-lg-1"></div>
+                                <div class="col-lg-1"><button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button></div>
+                                <div class="col-lg-1"><button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button></div>
+                                <div class="col-lg-5"></div>
                             </div>
                             <script type="text/javascript">
                                             function ShowFileNames7(oFile) {
@@ -774,8 +778,10 @@
                             Editor Attachement <input type="file" name="file9" id="file9" runat="server" onchange="ShowFileNames9(this)" />
                         </span>
                     </div>
-                    <div class="col-lg-8">
-                    </div>
+                    <div class="col-lg-1"></div>
+                    <div class="col-lg-1"><button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button></div>
+                    <div class="col-lg-1"><button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button></div>
+                    <div class="col-lg-5"></div>
                 </div>
                 <script type="text/javascript">
                                             function ShowFileNames9(oFile) {
@@ -803,6 +809,27 @@
                                                 return false;
                                             }
                 </script>
+                @if (ViewBag.isassignee != null && ViewBag.isassignee)
+                {
+                    <script type="text/javascript">
+                            function SaveUserContent() {
+                                RealSaveUserContent($("#RPeopleAddr").val());
+                                RealSaveUserContent(CKEDITOR.instances.editor1.getData());
+                                RealSaveUserContent(CKEDITOR.instances.rootcauseeditor.getData());
+                                RealSaveUserContent(CKEDITOR.instances.analysiseditor.getData());
+                                return false;
+                            }
+                    </script>
+                }
+                else
+                {
+                    <script type="text/javascript">
+                            function SaveUserContent() {
+                                RealSaveUserContent(CKEDITOR.instances.editor1.getData());
+                                return false;
+                            }
+                    </script>
+                }
             </div>
         </div>
 

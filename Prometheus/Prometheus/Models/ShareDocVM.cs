@@ -326,6 +326,13 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static void RemoveMyLearn(string dockey, string username)
+        {
+            var sql = "delete from UserLearn where DOCKey='<DOCKey>' and UserName='<UserName>'";
+            sql = sql.Replace("<DOCKey>", dockey).Replace("<UserName>", username);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
         private static List<ShareDocVM> RetrieveMyLearnBlog(string UserName)
         {
             var ret = new List<ShareDocVM>();

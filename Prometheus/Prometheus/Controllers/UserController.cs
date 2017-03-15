@@ -792,6 +792,30 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        [HttpPost, ActionName("ILearnOperate")]
+        [ValidateAntiForgeryToken]
+        public ActionResult ILearnOperate()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            var tobedockey = new List<string>();
+            for (var i = 0; i < 600; i++)
+            {
+                if (Request.Form["check" + i] != null && string.Compare(Request.Form["check" + i], "true", true) == 0)
+                {
+                    tobedockey.Add(Request.Form["HDocKey" + i]);
+                }
+            }
+
+            foreach (var key in tobedockey)
+            {
+                ShareDocVM.RemoveMyLearn(key, updater);
+            }
+
+            return RedirectToAction("ILearn", "User");
+        }
+
         public ActionResult ILike(string DOCPJK, string DOCKey)
         {
             var ckdict = CookieUtility.UnpackCookie(this);

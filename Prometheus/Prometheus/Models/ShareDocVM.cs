@@ -205,7 +205,7 @@ namespace Prometheus.Models
                 }
                 else
                 {
-                    SendPushDocEvent("a new document about " + tempvm.DOCTag, "/User/WebDoc?DocKey="+tempvm.DOCKey + "&Creator="+tempvm.DOCCreator, ToWho, Pusher, ctrl);
+                    SendPushDocEvent("a new document about " + tempvm.DOCTag, "/User/WebDoc?DocKey="+ HttpUtility.UrlEncode(tempvm.DOCKey) + "&Creator="+tempvm.DOCCreator, ToWho, Pusher, ctrl);
                 }
             }
 

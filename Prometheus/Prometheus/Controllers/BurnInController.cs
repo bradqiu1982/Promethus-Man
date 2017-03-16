@@ -942,9 +942,48 @@ namespace Prometheus.Controllers
         {
             ViewBag.pjkey = ProjectKey;
 
-                var vm = ProjectErrorViewModels.RetrieveErrorByPJKey(ProjectErrorViewModels.BURNIN);
-                var piedatadict = new Dictionary<string, int>();
-                foreach (var item in vm)
+            var vm = ProjectErrorViewModels.RetrieveErrorByPJKey(ProjectErrorViewModels.BURNIN);
+
+            var countdict = new Dictionary<string, int>();
+            foreach (var item in vm)
+            {
+                var errorcode = item.OrignalCode.Split(new string[] { "_" }, StringSplitOptions.RemoveEmptyEntries)[0];
+                if (countdict.ContainsKey(errorcode))
+                {
+                    countdict[errorcode] = countdict[errorcode] + item.ErrorCount;
+                }
+                else
+                {
+                    countdict.Add(errorcode, item.ErrorCount);
+                }
+            }
+
+
+            var sumvm = new List<ProjectErrorViewModels>();
+            foreach (var kv in countdict)
+            {
+                var temp = new ProjectErrorViewModels();
+                temp.OrignalCode = kv.Key;
+                temp.ErrorCount = kv.Value;
+                sumvm.Add(temp);
+            }
+
+            sumvm.Sort(delegate (ProjectErrorViewModels item1, ProjectErrorViewModels item2)
+            {
+                if (item1.ErrorCount > item2.ErrorCount)
+                {
+                    return -1;
+                }
+                else if (item1.ErrorCount < item2.ErrorCount)
+                {
+                    return 1;
+                }
+                else
+                    return 0;
+            });
+
+            var piedatadict = new Dictionary<string, int>();
+                foreach (var item in sumvm)
                 {
                     if (!piedatadict.ContainsKey(item.OrignalCode))
                     {
@@ -969,6 +1008,8 @@ namespace Prometheus.Controllers
                         .Replace("#SERIESNAME#", "Failure")
                         .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                 }
+
+            ViewBag.sumvm = sumvm;
 
                 return View(vm);
         }

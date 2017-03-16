@@ -4442,7 +4442,7 @@ namespace Prometheus.Controllers
                             toaddrs.Add(item.Reporter);
                             toaddrs.Add(item.Assignee);
                             EmailUtility.SendEmail(this,"WUXI NPI System", toaddrs, content);
-                            new System.Threading.ManualResetEvent(false).WaitOne(300);
+                            new System.Threading.ManualResetEvent(false).WaitOne(200);
                     }
                 } catch (Exception ex) { }
 
@@ -4477,7 +4477,41 @@ namespace Prometheus.Controllers
                     toaddrs.Add(item.Reporter);
                     toaddrs.Add(item.Assignee);
                     EmailUtility.SendEmail(this,"WUXI NPI System", toaddrs, content);
-                    new System.Threading.ManualResetEvent(false).WaitOne(300);
+                    new System.Threading.ManualResetEvent(false).WaitOne(200);
+                }
+            }
+            catch (Exception ex) { }
+        }
+
+        private void SendTaskAlertEmail()
+        {
+            try
+            {
+                var faissues = IssueViewModels.Retrieve_Alert_TaskByProjectKey();
+
+                foreach (var item in faissues)
+                { item.UpdateAlertEmailDate(); }
+
+                foreach (var item in faissues)
+                {
+                    var routevalue = new RouteValueDictionary();
+                    routevalue.Add("issuekey", item.IssueKey);
+                    //send validate email
+                    string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                    string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+
+                    var netcomputername = "";
+                    try { netcomputername = System.Net.Dns.GetHostName(); }
+                    catch (Exception ex) { }
+                    validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
+
+                    var content = "Warning: Assigned to you task - " + item.Summary + " is close to its Due Date :\r\n " + validatestr;
+
+                    var toaddrs = new List<string>();
+                    //toaddrs.Add(item.Reporter);
+                    toaddrs.Add(item.Assignee);
+                    EmailUtility.SendEmail(this, "WUXI NPI System", toaddrs, content);
+                    new System.Threading.ManualResetEvent(false).WaitOne(200);
                 }
             }
             catch (Exception ex) { }
@@ -4526,6 +4560,7 @@ namespace Prometheus.Controllers
 
             try
             {
+                SendTaskAlertEmail();
                 SendRMAAlertEmail();
                 SendOBAAlertEmail();
             }
@@ -4765,7 +4800,7 @@ namespace Prometheus.Controllers
         }
 
 
-        private void SendTaskEvent(IssueViewModels vm, string comment,List<string> addrlist)
+        private void SendLYTEvent(IssueViewModels vm, string comment,List<string> addrlist)
         {
             var routevalue = new RouteValueDictionary();
             routevalue.Add("issuekey", vm.IssueKey);
@@ -4807,7 +4842,7 @@ namespace Prometheus.Controllers
                     var addrlist = new List<string>();
                     addrlist.AddRange(addrs);
 
-                    SendTaskEvent(vm, comment, addrlist);
+                    SendLYTEvent(vm, comment, addrlist);
 
                     var dict = new RouteValueDictionary();
                     dict.Add("ProjectKey", vm.ProjectKey);

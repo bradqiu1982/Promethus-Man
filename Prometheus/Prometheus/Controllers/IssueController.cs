@@ -425,6 +425,23 @@ namespace Prometheus.Controllers
             }
         }
 
+        private void SendTaskCommentEmail(string issuekey,string summary,string commenter,List<string> towho,string commentcontent)
+        {
+            var routevalue = new RouteValueDictionary();
+            routevalue.Add("issuekey", issuekey);
+            //send validate email
+            string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+            string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+
+            var netcomputername = "";
+            try { netcomputername = System.Net.Dns.GetHostName(); }
+            catch (Exception ex) { }
+            validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
+            var content = commenter + " add a new comment on issue: " + summary + "\r\n\r\n" + commentcontent + "\r\n\r\nISSUE LINK:\r\n\r\n"+ validatestr;
+            EmailUtility.SendEmail(this, "WUXI NPI System_"+commenter, towho, content);
+            new System.Threading.ManualResetEvent(false).WaitOne(50);
+        }
+
         [HttpPost, ActionName("UpdateIssue")]
         [ValidateAntiForgeryToken]
         public ActionResult UpdateIssuePost()
@@ -475,6 +492,19 @@ namespace Prometheus.Controllers
             {
                 vm.Description = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
                 vm.CommentType = COMMENTTYPE.Description;
+
+                if (string.Compare(updater.ToUpper(), originaldata.Assignee) != 0)
+                {
+                    var commenter = updater.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace("."," ");
+                    var towho = new List<string>();
+                    towho.Add(vm.Assignee);
+                    if (originaldata.Reporter.Contains("@"))
+                        towho.Add(originaldata.Reporter);
+
+                    var commentcontent = System.Text.RegularExpressions.Regex.Replace(vm.Description.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
+                    SendTaskCommentEmail(originaldata.IssueKey,originaldata.Summary,commenter,towho, commentcontent);
+                }
+
                 UserRankViewModel.UpdateUserRank(updater, 2);
             }
             else
@@ -1371,6 +1401,19 @@ namespace Prometheus.Controllers
             {
                 vm.Description = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
                 vm.CommentType = COMMENTTYPE.Description;
+
+                if (string.Compare(updater.ToUpper(), originaldata.Assignee) != 0)
+                {
+                    var commenter = updater.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
+                    var towho = new List<string>();
+                    towho.Add(vm.Assignee);
+                    if (originaldata.Reporter.Contains("@"))
+                        towho.Add(originaldata.Reporter);
+
+                    var commentcontent = System.Text.RegularExpressions.Regex.Replace(vm.Description.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
+                    SendTaskCommentEmail(originaldata.IssueKey, originaldata.Summary, commenter, towho, commentcontent);
+                }
+
                 UserRankViewModel.UpdateUserRank(updater, 2);
             }
             else

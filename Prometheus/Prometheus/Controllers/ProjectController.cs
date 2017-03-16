@@ -4194,13 +4194,19 @@ namespace Prometheus.Controllers
             var ret = string.Empty;
             foreach (var i in wissues)
             {
-                ret = ret + "WORKING    Pending-Days: " + (DateTime.Now - i.ReportDate).Days.ToString()+"    "+ i.Summary + "   " + i.Assignee +" Due Date: " + i.DueDate.ToString() + ":\r\n";
+                if (i.DueDate > DateTime.Now)
+                    continue;
+
+                ret = ret + "WORKING    Expire-Days: " + (DateTime.Now - i.DueDate).Days.ToString()+"    "+ i.Summary + "   " + i.Assignee +" Due Date: " + i.DueDate.ToString() + ":\r\n";
                 ret = ret + IssueURL(i.IssueKey) + "\r\n\r\n";
             }
 
             foreach (var i in pissues)
             {
-                ret = ret + "PENDING    Pending-Days: " + (DateTime.Now - i.ReportDate).Days.ToString() + "    " + i.Summary + "   " + i.Assignee + " Due Date: " + i.DueDate.ToString() + ":\r\n";
+                if (i.DueDate > DateTime.Now)
+                    continue;
+
+                ret = ret + "PENDING    Expire-Days: " + (DateTime.Now - i.DueDate).Days.ToString() + "    " + i.Summary + "   " + i.Assignee + " Due Date: " + i.DueDate.ToString() + ":\r\n";
                 ret = ret + IssueURL(i.IssueKey) + "\r\n\r\n";
             }
             return ret;

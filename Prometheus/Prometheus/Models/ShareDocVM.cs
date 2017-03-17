@@ -207,7 +207,7 @@ namespace Prometheus.Models
                 }
                 else if (string.Compare(tempvm.DOCType, ShareDocType.DEBUG, true) == 0)
                 {
-                    SendPushDocEvent("a debug about " +tempvm.DOCPJK+"-"+ tempvm.Summary, tempvm.DocURL, ToWho, Pusher, ctrl);
+                    SendPushDocEvent("a debug about " +tempvm.DOCPJK+"-"+ tempvm.Summary, tempvm.DocURL, ToWho, Pusher, ctrl,reason);
                 }
                 else
                 {

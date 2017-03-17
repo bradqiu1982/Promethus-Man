@@ -3632,8 +3632,13 @@ namespace Prometheus.Controllers
                     ViewBag.assigee = false;
                 }
 
+                var asilist1 = UserViewModels.RetrieveAllUser();
+                ViewBag.towholist = CreateSelectList(asilist1, "");
                 return View("UpdateProjectError",vm[0]);
             }
+
+            var asilist = UserViewModels.RetrieveAllUser();
+            ViewBag.towholist = CreateSelectList(asilist, "");
             return View("UpdateProjectError");
         }
 
@@ -4927,10 +4932,17 @@ namespace Prometheus.Controllers
             return RedirectToAction("UpdateProjectError", "Project", dict);
         }
 
-        public ActionResult IPushDebug(string ErrorKey, string ToWho)
+        public ActionResult IPushDebug(string ErrorKey, string ToWho,string Reason)
         {
             var ckdict = CookieUtility.UnpackCookie(this);
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            var tempreason = "";
+            if (!string.IsNullOrEmpty(Reason))
+            {
+                var bytes = Convert.FromBase64String(Reason);
+                tempreason = System.Text.Encoding.UTF8.GetString(bytes);
+            }
 
             var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(ErrorKey);
             ShareDocVM.ShareDoc(debugtree[0].ProjectKey, ShareDocType.DEBUG, debugtree[0].ErrorKey, debugtree[0].OrignalCode, updater, DateTime.Now.ToString());
@@ -4938,7 +4950,7 @@ namespace Prometheus.Controllers
             var whoes = ToWho.Split(new string[] { ";", ",", " " }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var w in whoes)
             {
-                ShareDocVM.IPushDoc(debugtree[0].ProjectKey, debugtree[0].ErrorKey, w, updater, this);
+                ShareDocVM.IPushDoc(debugtree[0].ProjectKey, debugtree[0].ErrorKey, w, updater, this, tempreason);
             }
 
             var dict1 = new RouteValueDictionary();

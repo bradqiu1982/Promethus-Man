@@ -667,12 +667,17 @@
 
                 function realpush() {
                     var myurl = ""
+                    $.base64.utf8encode = true;
+                    var tempreason = '';
+                    if (document.getElementById("issuereason").value) {
+                        tempreason = $.base64.btoa(document.getElementById("issuereason").value);
+                    }
 
                     if (document.getElementById("towhoinput").value) {
-                        myurl = "/Project/IPushDebug?" + document.getElementById("pushtowho").value + document.getElementById("towhoinput").value;
+                        myurl = "/Project/IPushDebug?" + document.getElementById("pushtowho").value + document.getElementById("towhoinput").value + "&Reason=" + tempreason;
                     }
                     else {
-                        myurl = "/Project/IPushDebug?" + document.getElementById("pushtowho").value + document.getElementById("towholist").value;
+                        myurl = "/Project/IPushDebug?" + document.getElementById("pushtowho").value + document.getElementById("towholist").value + "&Reason=" + tempreason;
                     }
 
                     $('#towhotag').modal('hide');
@@ -681,7 +686,7 @@
                 }
                 </script>
             </div>
-
+            
             <div class="modal" id="towhotag" tabindex="-1" role="dialog" aria-labelledby="towhoLabel">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
@@ -694,16 +699,28 @@
                                 <label class="control-label">To Who</label>
                             </div>
                             <div class="col-lg-9">
-                                @Html.DropDownList("towholist", null, new { @id = "towholist", @class = "form-control" })
+                                @if (ViewBag.towholist != null)
+                                {
+                                    @Html.DropDownList("towholist", null, new { @id = "towholist", @class = "form-control" })
+                                }
                             </div>
                         </div>
                         <hr />
                         <div class="row col-lg-12">
                             <div class="col-lg-3">
-                                <label class="control-label"></label>
+                                <label class="control-label">To who Input</label>
                             </div>
                             <div class="col-lg-9" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
                                 <textarea class="form-control col-lg-12" name="towhoinput" id="towhoinput" style="height:100px;min-width:300px;"></textarea>
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="row col-lg-12">
+                            <div class="col-lg-3">
+                                <label class="control-label">Push Comment<font color="red">*</font></label>
+                            </div>
+                            <div class="col-lg-9" data-toggle="tooltip" data-placement="center" title="Your Comment">
+                                <textarea class="form-control col-lg-12" name="issuereason" id="issuereason" style="height:100px;min-width:300px;"></textarea>
                             </div>
                         </div>
                         <div class="row"></div>

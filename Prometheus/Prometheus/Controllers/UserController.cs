@@ -925,10 +925,17 @@ namespace Prometheus.Controllers
             return View(vm);
         }
 
-        public ActionResult IBLogPush(string DOCKey, string ToWho)
+        public ActionResult IBLogPush(string DOCKey, string ToWho,string Reason)
         {
             var ckdict = CookieUtility.UnpackCookie(this);
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            var tempreason = "";
+            if (!string.IsNullOrEmpty(Reason))
+            {
+                var bytes = Convert.FromBase64String(Reason);
+                tempreason = System.Text.Encoding.UTF8.GetString(bytes);
+            }
 
             var vm = UserBlogVM.RetrieveBlogDoc(DOCKey);
 
@@ -937,7 +944,7 @@ namespace Prometheus.Controllers
             {
                 //ShareDocVM.PushDoc(w.Trim().ToUpper(), "ALL",ShareDocType.BLOG, DOCKey,vm.Tag,vm.UserName,vm.CreateDate.ToString(), "");
                 ShareDocVM.PushDoc(w.Trim().ToUpper(), "ALL", ShareDocType.BLOG, DOCKey, vm.Tag, vm.UserName, DateTime.Now.ToString(), "");
-                ShareDocVM.SendPushDocEvent("a new document about " + vm.Tag, vm.DocURL, ToWho, updater.ToUpper(), this);
+                ShareDocVM.SendPushDocEvent("a new document about " + vm.Tag, vm.DocURL, ToWho, updater.ToUpper(), this, tempreason);
             }
             return RedirectToAction("IBLOG", "User");
         }

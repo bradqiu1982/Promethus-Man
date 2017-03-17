@@ -95,7 +95,7 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
-        public static void SendPushDocEvent(string what, string urlstr, string towho, string pusher, Controller ctrl)
+        public static void SendPushDocEvent(string what, string urlstr, string towho, string pusher, Controller ctrl,string reason="")
         {
             try
             {
@@ -110,7 +110,13 @@ namespace Prometheus.Models
 
 
                 validatestr = validatestr.Split(new string[] { "/Issue" }, StringSplitOptions.RemoveEmptyEntries)[0] + urlstr;
-                var content = what + " is share to you by " + pusher + ":\r\n\r\n" + validatestr;
+
+                var content = "";
+                if (!string.IsNullOrEmpty(reason))
+                {
+                    content = "For " + reason + ":\r\n\r\n";
+                }
+                content = content+what + " is share to you by " + pusher + ":\r\n\r\n" + validatestr;
 
                 var toaddrs = new List<string>();
                 toaddrs.Add(towho);
@@ -152,7 +158,7 @@ namespace Prometheus.Models
             { }
         }
 
-        public static void IPushDoc(string DOCPJK, string DOCKey, string ToWho,string Pusher, Controller ctrl)
+        public static void IPushDoc(string DOCPJK, string DOCKey, string ToWho,string Pusher, Controller ctrl,string reason="")
         {
             var sql = "select DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,DOCFavorTimes from ShareDoc where DOCPJK = '<DOCPJK>' and DOCKey = N'<DOCKey>'";
             sql = sql.Replace("<DOCPJK>", DOCPJK).Replace("<DOCKey>", DOCKey);
@@ -197,7 +203,7 @@ namespace Prometheus.Models
 
                 if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
                 {
-                    SendPushDocEvent("a new Issue about "+tempvm.DOCTag, tempvm.DocURL, ToWho, Pusher, ctrl);
+                    SendPushDocEvent("a new Issue about "+tempvm.DOCTag, tempvm.DocURL, ToWho, Pusher, ctrl,reason);
                 }
                 else if (string.Compare(tempvm.DOCType, ShareDocType.DEBUG, true) == 0)
                 {

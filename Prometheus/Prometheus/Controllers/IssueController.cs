@@ -644,10 +644,17 @@ namespace Prometheus.Controllers
             return RedirectToAction("UpdateIssue", "Issue", dict1);
         }
 
-        public ActionResult IPush(string IssueKey, string ToWho)
+        public ActionResult IPush(string IssueKey, string ToWho,string Reason)
         {
             var ckdict = CookieUtility.UnpackCookie(this);
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            var tempreason = "";
+            if (!string.IsNullOrEmpty(Reason))
+            {
+                var bytes = Convert.FromBase64String(Reason);
+                tempreason = System.Text.Encoding.UTF8.GetString(bytes);
+            }
 
             var issue = IssueViewModels.RetrieveIssueByIssueKey(IssueKey);
             ShareDocVM.ShareDoc(issue.ProjectKey, ShareDocType.ISSUE, issue.IssueKey, issue.Summary, updater, DateTime.Now.ToString());
@@ -655,7 +662,7 @@ namespace Prometheus.Controllers
             var whoes = ToWho.Split(new string[] { ";", ",", " " }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var w in whoes)
             {
-                ShareDocVM.IPushDoc(issue.ProjectKey, issue.IssueKey,w,updater,this);
+                ShareDocVM.IPushDoc(issue.ProjectKey, issue.IssueKey,w,updater,this, tempreason);
             }
 
             var dict1 = new RouteValueDictionary();

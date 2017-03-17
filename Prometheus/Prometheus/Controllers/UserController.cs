@@ -1396,7 +1396,7 @@ namespace Prometheus.Controllers
                 UserCacheVM.InsertCacheInfo(updater, Request.Form.Get(key.ToString()));
             }
 
-            return "OK";
+            return "SAVED";
         }
 
         public ActionResult UserCachedInfo()

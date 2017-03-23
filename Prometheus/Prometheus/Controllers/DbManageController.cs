@@ -51,8 +51,11 @@ namespace Prometheus.Controllers
 
         public ActionResult MoveDataBase()
         {
-            var targetdb = "Server=wux-parallel;uid=NPI;pwd=NPI@IPN;Database=NPITrace;Connection Timeout=30;";
-            
+            return View();
+
+            //var targetdb = "Server=wux-parallel;uid=NPI;pwd=NPI@IPN;Database=NPITrace;Connection Timeout=30;";
+            var targetdb = "Server=wuxinpi;User ID=NPI;Password=NPI@NPI;Database=NPITrace;Connection Timeout=30;";
+
             var tablelist = new List<string>();
             tablelist.Add("BIError");
             tablelist.Add("BIROOTCAUSE");
@@ -70,6 +73,7 @@ namespace Prometheus.Controllers
             tablelist.Add("Project");
             tablelist.Add("ProjectError");
             tablelist.Add("ProjectEvent");
+            tablelist.Add("ProjectException");
             tablelist.Add("ProjectMembers");
             tablelist.Add("ProjectMesTable");
             tablelist.Add("ProjectModelID");
@@ -80,6 +84,7 @@ namespace Prometheus.Controllers
             tablelist.Add("ShareDoc");
             tablelist.Add("ShareTags");
             tablelist.Add("UserBlog");
+            tablelist.Add("UserCacheInfo");
             tablelist.Add("UserLearn");
             tablelist.Add("UserNet");
             tablelist.Add("UserRank");

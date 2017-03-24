@@ -54,7 +54,7 @@ namespace Prometheus.Controllers
             return View();
 
             //var targetdb = "Server=wux-parallel;uid=NPI;pwd=NPI@IPN;Database=NPITrace;Connection Timeout=30;";
-            var targetdb = "Server=wuxinpi;User ID=NPI;Password=NPI@NPI;Database=NPITrace;Connection Timeout=30;";
+            var targetdb = "Server=wuxinpi;User ID=dbg;Password=dbgpwd;Database=DebugDB;Connection Timeout=30;";
 
             var tablelist = new List<string>();
             tablelist.Add("BIError");

@@ -15,17 +15,34 @@ namespace Prometheus.Models
     {
         private static void logthdinfo(string info)
         {
-            var filename = "d:\\log\\sqlexception-" + DateTime.Now.ToString("yyyy-MM-dd");
-            if (File.Exists(filename))
+            try
             {
-                var content = System.IO.File.ReadAllText(filename);
-                content = content +"\r\n"+DateTime.Now.ToString()+" : "+ info;
-                System.IO.File.WriteAllText(filename, content);
+                var filename = "d:\\log\\sqlexception-" + DateTime.Now.ToString("yyyy-MM-dd");
+                if (File.Exists(filename))
+                {
+                    var content = System.IO.File.ReadAllText(filename);
+                    content = content +"\r\n"+DateTime.Now.ToString()+" : "+ info;
+                    System.IO.File.WriteAllText(filename, content);
+                }
+                else
+                {
+                    System.IO.File.WriteAllText(filename, DateTime.Now.ToString() + " : " + info);
+                }
             }
-            else
-            {
-                System.IO.File.WriteAllText(filename, DateTime.Now.ToString() + " : " + info);
-            }
+            catch (Exception ex)
+            { }
+
+        }
+
+        public static bool IsDebug()
+        {
+            bool debugging = false;
+#if DEBUG
+            debugging = true;
+#else
+            debugging = false;
+#endif
+            return debugging;
         }
 
         public static SqlConnection GetLocalConnector()
@@ -34,8 +51,16 @@ namespace Prometheus.Models
             try
             {
                 //conn.ConnectionString = "Data Source = (LocalDb)\\MSSQLLocalDB; AttachDbFilename = ~\\App_Data\\Prometheus.mdf; Integrated Security = True";
-                //conn.ConnectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=" + Path.Combine(HttpRuntime.AppDomainAppPath, "App_Data\\Prometheus.mdf") + ";Integrated Security=True;";
-                conn.ConnectionString = "Server=wuxinpi;User ID=NPI;Password=NPI@NPI;Database=NPITrace;Connection Timeout=30;";
+                if (IsDebug())
+                {
+                    //conn.ConnectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=" + Path.Combine(HttpRuntime.AppDomainAppPath, "App_Data\\Prometheus.mdf") + ";Integrated Security=True;";
+                    conn.ConnectionString = "Server=wuxinpi;User ID=dbg;Password=dbgpwd;Database=DebugDB;Connection Timeout=30;";
+                }
+                else
+                {
+                    conn.ConnectionString = "Server=wuxinpi;User ID=NPI;Password=NPI@NPI;Database=NPITrace;Connection Timeout=30;";
+                }
+
                 conn.Open();
                 return conn;
             }
@@ -256,7 +281,7 @@ namespace Prometheus.Models
                 //    logthdinfo("res query end: count " + ret.Count.ToString() + " spend " + (msec2 - msec1).ToString());
                 //}
 
-                    if (mycache != null)
+                if (mycache != null)
                     {
                         mycache.Insert(sql, ret, null, DateTime.Now.AddHours(1),Cache.NoSlidingExpiration);
                     }

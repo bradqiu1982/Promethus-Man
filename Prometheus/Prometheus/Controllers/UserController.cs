@@ -787,8 +787,25 @@ namespace Prometheus.Controllers
             var asilist = UserViewModels.RetrieveAllUser();
             ViewBag.towholist = CreateSelectList(asilist,"");
 
-            ViewBag.ILearn = ShareDocVM.RetrieveMyLearn(updater,this);
+            var ilearntable = new List<ShareDocVM>();
+            var iweeklytable = new List<ShareDocVM>();
+            var allileanrn =  ShareDocVM.RetrieveMyLearn(updater,this);
+            foreach (var item in allileanrn)
+            {
+                if (item.DOCTag.ToUpper().Contains("WEEKLYREPORT")
+                    || item.DOCTag.ToUpper().Contains("WEEKLY REPORT"))
+                {
+                    iweeklytable.Add(item);
+                }
+                else
+                {
+                    ilearntable.Add(item);
+                }
+            }
+
+            ViewBag.ILearn = ilearntable;
             ViewBag.IShare = ShareDocVM.RetrieveMyShare(updater,this);
+            ViewBag.IWeeklyReport = iweeklytable;
             return View();
         }
 

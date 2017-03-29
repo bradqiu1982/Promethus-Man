@@ -15,6 +15,7 @@
 <ul class="nav nav-pills nav-stacked col-lg-2">
     <li class="active"><a href="#tab_a" data-toggle="pill">I Learn</a></li>
     <li><a href="#tab_b" data-toggle="pill">I Share</a></li>
+    <li><a href="#tab_c" data-toggle="pill">Weekly Report</a></li>
 </ul>
 <div class="tab-content col-lg-10">
     <div class="tab-pane active" id="tab_a">
@@ -118,11 +119,6 @@
             });
         });
 
-        function LikeThisDoc(oBT)
-        {
-            window.location.href = '/User/ILike?' + oBT.value;
-        }
-
         function ChooseAll(oBox) {
             if (oBox.checked === true) {
                 for (var idx = 0; idx < 600; idx++) {
@@ -203,11 +199,91 @@
             </script>
         }
     </div>
+    <div class="tab-pane" id="tab_c">
+        @using (Html.BeginForm("ILearnOperate", "User", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            if (ViewBag.IWeeklyReport != null)
+            {
+                <table id="iweeklyreporttable" class="display" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th style="text-align:center;font-size:12px">Share Summary</th>
+                            <th style="text-align:center;font-size:12px">Share Tag</th>
+                            <th style="text-align:center;font-size:12px">Product</th>
+                            <th style="text-align:center;font-size:12px">Creator</th>
+                            <th style="text-align:center;font-size:12px">Favor</th>
+                            <th style="text-align:center;font-size:12px"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></th>
+                            <th style="text-align:center;font-size:12px">Date</th>
+                            <th style="text-align:center;font-size:12px">I Like</th>
+                            <th style="text-align:center;font-size:12px">I Push</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var line in ViewBag.IWeeklyReport)
+                        {
+                            <tr>
+                                <td style="text-align:center;font-size:12px"><a href="@(line.DocURL)" target="_blank">@(line.Summary)</a></td>
+                                <td style="text-align:center;font-size:12px">@(line.DOCTag)</td>
+                                <td style="text-align:center;font-size:12px">@(line.DOCPJK)</td>
+                                <td style="text-align:center;font-size:12px">@(line.DOCCreator.Split(new char[] { '@' })[0])</td>
+                                <td style="text-align:center;font-size:12px">@(line.DOCFavorTimes)</td>
+
+                                @if (!string.IsNullOrEmpty(line.DOCFavor))
+                        {
+                                    <td style="text-align:center;font-size:12px"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></td>
+                                }
+                                else
+                                {
+                                    <td style="text-align:center;font-size:12px"></td>
+                                }
+
+                                <td style="text-align:center;font-size:12px">@(line.DOCDate.ToString("dd/MM"))</td>
+                                <td style="text-align:center;font-size:12px"><button class="form-control" type="button" value="DOCPJK=@(line.DOCPJK)&DOCKey=@(line.DOCKey)" onclick="LikeThisDoc(this)"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></button></td>
+                                <td style="text-align:center;font-size:12px"><button class="form-control" type="button" value="DOCPJK=@(line.DOCPJK)&DOCKey=@(line.DOCKey)&ToWho=" onclick="PushThisDoc(this)">Push</button></td>
+                            </tr>
+
+                        }
+                    </tbody>
+                </table>
+
+
+                <script type="text/javascript">
+        $(document).ready(function() {
+            $('#iweeklyreporttable').DataTable({
+                'iDisplayLength': 50,
+                'aLengthMenu': [[25, 50, 100, -1],
+                                [25, 50, 100, "All"]],
+                "bAutoWidth": false,
+                "aaSorting": [],
+                "order": [],
+                "aoColumns": [
+                { sWidth: '18%' },
+                { sWidth: '15%' },
+                { sWidth: '8%' },
+                { sWidth: '8%' },
+                { sWidth: '5%' },
+                { sWidth: '5%' },
+                { sWidth: '10%' },
+                { sWidth: '10%' },
+                { sWidth: '10%' }]
+            });
+        });
+
+                </script>
+            }
+        }
+    </div>
 </div>
 
 <div class="row">
 <input class="form-control text-box single-line" value="" id="pushtowho" name="pushtowho" type="hidden" />
     <script type="text/javascript">
+        function LikeThisDoc(oBT) {
+            window.location.href = '/User/ILike?' + oBT.value;
+        }
+
         function PushThisDoc(oBT)
         {
             document.getElementById("pushtowho").value = oBT.value;

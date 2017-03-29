@@ -4953,6 +4953,9 @@ namespace Prometheus.Controllers
                 ShareDocVM.IPushDoc(debugtree[0].ProjectKey, debugtree[0].ErrorKey, w, updater, this, tempreason);
             }
 
+            ShareDocVM.SendPushDocEvent("a debug about " + debugtree[0].ProjectKey + "-" + debugtree[0].ErrorKey
+                , "/Project/UpdateProjectError?ErrorKey="+ debugtree[0].ErrorKey, updater, updater, this, tempreason);
+
             var dict1 = new RouteValueDictionary();
             dict1.Add("ErrorKey", ErrorKey);
             return RedirectToAction("UpdateProjectError", "Project", dict1);

@@ -665,6 +665,9 @@ namespace Prometheus.Controllers
                 ShareDocVM.IPushDoc(issue.ProjectKey, issue.IssueKey,w,updater,this, tempreason);
             }
 
+            ShareDocVM.SendPushDocEvent("a new Issue about " + issue.Summary
+                , "/Issue/UpdateIssue?issuekey="+ issue.IssueKey, updater, updater, this, tempreason);
+
             var dict1 = new RouteValueDictionary();
             dict1.Add("issuekey", IssueKey);
             return RedirectToAction("UpdateIssue", "Issue", dict1);

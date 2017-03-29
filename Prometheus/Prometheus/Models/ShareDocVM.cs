@@ -176,7 +176,7 @@ namespace Prometheus.Models
 
                 if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
                 {
-                    var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey);
+                    var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey, ctrl);
                     if (issue == null)
                     {
                         continue;
@@ -187,7 +187,7 @@ namespace Prometheus.Models
                 }
                 else if (string.Compare(tempvm.DOCType, ShareDocType.DEBUG, true) == 0)
                 {
-                    var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(tempvm.DOCKey);
+                    var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(tempvm.DOCKey,ctrl);
                     tempvm.Summary = debugtree[0].ProjectKey+"-"+debugtree[0].OrignalCode;
                     tempvm.DocURL = "/Project/UpdateProjectError?ErrorKey=" + tempvm.DOCKey;
                 }
@@ -260,7 +260,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<ShareDocVM> RetrieveMyLearn(string UserName)
+        public static List<ShareDocVM> RetrieveMyLearn(string UserName, Controller ctrl)
         {
             var ret = new List<ShareDocVM>();
             var sql = "select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,a.DOCDate,a.DOCPusher,a.DOCFavor,b.DOCFavorTimes from UserLearn a left join ShareDoc b ON a.DOCKey = b.DOCKey where a.UserName= '<UserName>' and a.DOCType <> '<DOCType>' order by a.DOCDate DESC";
@@ -282,7 +282,7 @@ namespace Prometheus.Models
 
                 if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
                 {
-                    var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey);
+                    var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey, ctrl);
                     if (issue == null)
                     {
                         continue;
@@ -293,7 +293,7 @@ namespace Prometheus.Models
                 }
                 else if (string.Compare(tempvm.DOCType, ShareDocType.DEBUG, true) == 0)
                 {
-                    var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(tempvm.DOCKey);
+                    var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(tempvm.DOCKey,ctrl);
                     tempvm.Summary = debugtree[0].ProjectKey + "-" + debugtree[0].OrignalCode;
                     tempvm.DocURL = "/Project/UpdateProjectError?ErrorKey=" + tempvm.DOCKey;
                 }
@@ -309,7 +309,7 @@ namespace Prometheus.Models
                 ret.Add(tempvm);
             }
 
-            var bloglist = RetrieveMyLearnBlog(UserName);
+            var bloglist = RetrieveMyLearnBlog(UserName,ctrl);
             if (bloglist.Count > 0)
             {
                 ret.AddRange(bloglist);
@@ -339,7 +339,7 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
-        private static List<ShareDocVM> RetrieveMyLearnBlog(string UserName)
+        private static List<ShareDocVM> RetrieveMyLearnBlog(string UserName, Controller ctrl)
         {
             var ret = new List<ShareDocVM>();
             var sql = "select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,a.DOCDate,a.DOCPusher,a.DOCFavor from UserLearn a where a.UserName= '<UserName>' and a.DOCType = '<DOCType>' order by a.DOCDate DESC";
@@ -359,7 +359,7 @@ namespace Prometheus.Models
                 tempvm.DOCFavor = Convert.ToString(line[7]);
                 tempvm.DOCFavorTimes = 0;
 
-                var blog = UserBlogVM.RetrieveBlogDoc(tempvm.DOCKey);
+                var blog = UserBlogVM.RetrieveBlogDoc(tempvm.DOCKey,ctrl);
                 tempvm.Summary = blog.Title;
                 tempvm.DocURL = blog.DocURL;
 
@@ -369,7 +369,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<ShareDocVM> RetrieveMyShare(string UserName)
+        public static List<ShareDocVM> RetrieveMyShare(string UserName,Controller ctrl)
         {
             var ret = new List<ShareDocVM>();
             var sql = "select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,a.DOCDate,a.DOCFavorTimes from ShareDoc a  where a.DOCCreator= '<UserName>' order by a.DOCDate DESC";
@@ -389,7 +389,7 @@ namespace Prometheus.Models
 
                 if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
                 {
-                    var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey);
+                    var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey,ctrl);
                     if (issue == null)
                     {
                         continue;
@@ -400,7 +400,7 @@ namespace Prometheus.Models
                 }
                 else if (string.Compare(tempvm.DOCType, ShareDocType.DEBUG, true) == 0)
                 {
-                    var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(tempvm.DOCKey);
+                    var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(tempvm.DOCKey, ctrl);
                     tempvm.Summary = debugtree[0].ProjectKey + "-" + debugtree[0].OrignalCode;
                     tempvm.DocURL = "/Project/UpdateProjectError?ErrorKey=" + tempvm.DOCKey;
                 }
@@ -420,7 +420,7 @@ namespace Prometheus.Models
 
 
 
-        public static List<ShareDocVM> RetrieveYesterdayDocs()
+        public static List<ShareDocVM> RetrieveYesterdayDocs(Controller ctrl)
         {
             var ret = new List<ShareDocVM>();
             string tempdate = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
@@ -443,7 +443,7 @@ namespace Prometheus.Models
 
                 if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
                 {
-                    var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey);
+                    var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey,ctrl);
                     if (issue == null)
                     {
                         continue;
@@ -454,7 +454,7 @@ namespace Prometheus.Models
                 }
                 else if (string.Compare(tempvm.DOCType, ShareDocType.DEBUG, true) == 0)
                 {
-                    var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(tempvm.DOCKey);
+                    var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(tempvm.DOCKey,ctrl);
                     tempvm.Summary = debugtree[0].ProjectKey + "-" + debugtree[0].OrignalCode;
                     tempvm.DocURL = "/Project/UpdateProjectError?ErrorKey=" + tempvm.DOCKey;
                 }
@@ -471,7 +471,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<ShareDocVM> RetrieveAllSharedDocs()
+        public static List<ShareDocVM> RetrieveAllSharedDocs(Controller ctrl)
         {
             var ret = new List<ShareDocVM>();
             var sql = "select DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,DOCFavorTimes from ShareDoc order by DOCDate";
@@ -489,7 +489,7 @@ namespace Prometheus.Models
 
                 if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
                 {
-                    var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey);
+                    var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey,ctrl);
                     if (issue == null)
                     {
                         continue;
@@ -500,7 +500,7 @@ namespace Prometheus.Models
                 }
                 else if (string.Compare(tempvm.DOCType, ShareDocType.DEBUG, true) == 0)
                 {
-                    var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(tempvm.DOCKey);
+                    var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(tempvm.DOCKey, ctrl);
                     tempvm.Summary = debugtree[0].ProjectKey + "-" + debugtree[0].OrignalCode;
                     tempvm.DocURL = "/Project/UpdateProjectError?ErrorKey=" + tempvm.DOCKey;
                 }
@@ -578,7 +578,7 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
-        public static List<ShareDocVM> Top10InTenDay()
+        public static List<ShareDocVM> Top10InTenDay(Controller ctrl)
         {
             var ret = new List<ShareDocVM>();
             var starttime = DateTime.Now.AddDays(-10).ToString();
@@ -598,7 +598,7 @@ namespace Prometheus.Models
 
                 if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
                 {
-                    var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey);
+                    var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey,ctrl);
                     if (issue == null)
                     {
                         continue;
@@ -609,7 +609,7 @@ namespace Prometheus.Models
                 }
                 else if (string.Compare(tempvm.DOCType, ShareDocType.DEBUG, true) == 0)
                 {
-                    var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(tempvm.DOCKey);
+                    var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(tempvm.DOCKey, ctrl);
                     tempvm.Summary = debugtree[0].ProjectKey + "-" + debugtree[0].OrignalCode;
                     tempvm.DocURL = "/Project/UpdateProjectError?ErrorKey=" + tempvm.DOCKey;
                 }
@@ -649,9 +649,9 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static void MatchAllPostDocForUser(string username)
+        public static void MatchAllPostDocForUser(string username,Controller ctrl)
         {
-            var allpostdoc = RetrieveAllSharedDocs();
+            var allpostdoc = RetrieveAllSharedDocs(ctrl);
 
             var usertag = RetrieveUserBookedTag(username);
             var usertaglist = new List<string>();
@@ -679,7 +679,7 @@ namespace Prometheus.Models
         public static void MatchAllYesterdayDoc(Controller ctrl)
         {
             var userlist = RetrieveAllUserBookedTag();
-            var ydoc = RetrieveYesterdayDocs();
+            var ydoc = RetrieveYesterdayDocs(ctrl);
 
             foreach (var u in userlist)
             {

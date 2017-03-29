@@ -395,7 +395,7 @@ namespace Prometheus.Controllers
                 ViewBag.UserName = usernm.Split(new char[] { '@' })[0];
 
                 //I assign
-                var iassignissues= IssueViewModels.RetrieveIssueByCreator(usernm, 300);
+                var iassignissues= IssueViewModels.RetrieveIssueByCreator(usernm, 300, this);
                 var wholedata = new List<List<string>>();
                 var title = new List<string>();
                 title.Add("Project");
@@ -528,7 +528,7 @@ namespace Prometheus.Controllers
                 var sdate = edate.AddMonths(0 - tempmonth);
                 var pendingissues = IssueViewModels.RetrieveIssuePendingByUser(username, sdate.ToString());
                 var workingissues = IssueViewModels.RetrieveIssueWorkingByUser(username, sdate.ToString());
-                var solvedissues = IssueViewModels.RetrieveIssueDoneByUser(username, sdate.ToString());
+                var solvedissues = IssueViewModels.RetrieveIssueDoneByUser(username, sdate.ToString(), this);
                 workingissues.AddRange(solvedissues);
                 workingissues.AddRange(pendingissues);
 
@@ -750,7 +750,7 @@ namespace Prometheus.Controllers
 
             if (Request.Form["matchpostfile"] != null)
             {
-                ShareDocVM.MatchAllPostDocForUser(updater);
+                ShareDocVM.MatchAllPostDocForUser(updater,this);
                 return RedirectToAction("ILearn");
             }
             
@@ -787,8 +787,8 @@ namespace Prometheus.Controllers
             var asilist = UserViewModels.RetrieveAllUser();
             ViewBag.towholist = CreateSelectList(asilist,"");
 
-            ViewBag.ILearn = ShareDocVM.RetrieveMyLearn(updater);
-            ViewBag.IShare = ShareDocVM.RetrieveMyShare(updater);
+            ViewBag.ILearn = ShareDocVM.RetrieveMyLearn(updater,this);
+            ViewBag.IShare = ShareDocVM.RetrieveMyShare(updater,this);
             return View();
         }
 
@@ -937,7 +937,7 @@ namespace Prometheus.Controllers
                 tempreason = System.Text.Encoding.UTF8.GetString(bytes);
             }
 
-            var vm = UserBlogVM.RetrieveBlogDoc(DOCKey);
+            var vm = UserBlogVM.RetrieveBlogDoc(DOCKey,this);
 
             var whoes = ToWho.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var w in whoes)
@@ -1122,7 +1122,7 @@ namespace Prometheus.Controllers
 
         public ActionResult ModifyBlogDoc(string DocKey)
         {
-            var vm = UserBlogVM.RetrieveBlogDoc(DocKey);
+            var vm = UserBlogVM.RetrieveBlogDoc(DocKey,this);
             return View(vm);
         }
 
@@ -1131,7 +1131,7 @@ namespace Prometheus.Controllers
         public ActionResult ModifyBlogDocPost()
         {
             var dockey = Request.Form["HDocKey"];
-            var vm = UserBlogVM.RetrieveBlogDoc(dockey);
+            var vm = UserBlogVM.RetrieveBlogDoc(dockey,this);
 
 
             var urls = ReceiveRMAFiles();
@@ -1202,7 +1202,7 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(DocKey))
             {
-                var vm = UserBlogVM.RetrieveBlogDoc(DocKey);
+                var vm = UserBlogVM.RetrieveBlogDoc(DocKey,this);
 
                 if (string.IsNullOrEmpty(vm.DocKey))
                 {
@@ -1222,7 +1222,7 @@ namespace Prometheus.Controllers
             {
                 if (ckdict.ContainsKey("DocKey") && !string.IsNullOrEmpty(ckdict["DocKey"]))
                 {
-                    var vm = UserBlogVM.RetrieveBlogDoc(ckdict["DocKey"]);
+                    var vm = UserBlogVM.RetrieveBlogDoc(ckdict["DocKey"],this);
 
                     var tempDocKey = ckdict["DocKey"];
                     if (string.IsNullOrEmpty(vm.DocKey))

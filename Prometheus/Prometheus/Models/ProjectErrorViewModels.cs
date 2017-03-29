@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 
 namespace Prometheus.Models
 {
@@ -341,7 +343,7 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
-        public static List<ProjectErrorViewModels> RetrieveErrorByPJKey(string projectkey)
+        public static List<ProjectErrorViewModels> RetrieveErrorByPJKey(string projectkey, Controller ctrl)
         {
             var ret = new List<ProjectErrorViewModels>();
             var sql = "select  ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount from ProjectError where ProjectKey = '<ProjectKey>' order by ErrorCount DESC";
@@ -351,16 +353,16 @@ namespace Prometheus.Models
             foreach (var line in dbret)
             {
                 var temperror = new ProjectErrorViewModels(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToString(line[2]), Convert.ToString(line[3]),Convert.ToInt32(line[4]));
-                temperror.CommentList = RetrieveErrorComments(temperror.ErrorKey);
+                temperror.CommentList = RetrieveErrorComments(temperror.ErrorKey,ctrl);
                 temperror.RetrieveAttachment(temperror.ErrorKey);
                 ret.Add(temperror);
             }
             return ret;
         }
 
-        public static string RetrieveRealError(string projectkey, string errorcode)
+        public static string RetrieveRealError(string projectkey, string errorcode, Controller ctrl)
         {
-            var vm = RetrieveErrorByPJKey(projectkey, errorcode);
+            var vm = RetrieveErrorByPJKey(projectkey, errorcode,ctrl);
             if (vm.Count == 0)
             {
                 return errorcode;
@@ -374,7 +376,7 @@ namespace Prometheus.Models
             return vm[0].ShortDesc;
         }
 
-        public static List<ProjectErrorViewModels> RetrieveErrorByPJKey(string projectkey,string errorcode)
+        public static List<ProjectErrorViewModels> RetrieveErrorByPJKey(string projectkey,string errorcode, Controller ctrl)
         {
             var ret = new List<ProjectErrorViewModels>();
             var sql = "select  ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount from ProjectError where ProjectKey = '<ProjectKey>' and OrignalCode = '<OrignalCode>'";
@@ -384,14 +386,14 @@ namespace Prometheus.Models
             foreach (var line in dbret)
             {
                 var temperror = new ProjectErrorViewModels(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToString(line[2]), Convert.ToString(line[3]), Convert.ToInt32(line[4]));
-                temperror.CommentList = RetrieveErrorComments(temperror.ErrorKey);
+                temperror.CommentList = RetrieveErrorComments(temperror.ErrorKey,ctrl);
                 temperror.RetrieveAttachment(temperror.ErrorKey);
                 ret.Add(temperror);
             }
             return ret;
         }
 
-        public static List<ProjectErrorViewModels> RetrieveErrorByErrorKey(string ekey)
+        public static List<ProjectErrorViewModels> RetrieveErrorByErrorKey(string ekey, Controller ctrl)
         {
             var ret = new List<ProjectErrorViewModels>();
             var sql = "select  ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount from ProjectError where ErrorKey = '<ErrorKey>'";
@@ -401,14 +403,14 @@ namespace Prometheus.Models
             foreach (var line in dbret)
             {
                 var temperror = new ProjectErrorViewModels(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToString(line[2]), Convert.ToString(line[3]), Convert.ToInt32(line[4]));
-                temperror.CommentList = RetrieveErrorComments(temperror.ErrorKey);
+                temperror.CommentList = RetrieveErrorComments(temperror.ErrorKey,ctrl);
                 temperror.RetrieveAttachment(temperror.ErrorKey);
                 ret.Add(temperror);
             }
             return ret;
         }
 
-        public static List<ErrorComments> RetrieveErrorComments(string errorkey)
+        public static List<ErrorComments> RetrieveErrorComments(string errorkey,Controller ctrl)
         {
             var ret = new List<ErrorComments>();
             var sql = "select ErrorKey,Comment,Reporter,CommentDate,CommentType from ErrorComments where ErrorKey = '<ErrorKey>' and APVal1 <> 'delete' order by CommentDate ASC";
@@ -425,7 +427,83 @@ namespace Prometheus.Models
                 tempcomment.CommentType = Convert.ToString(r[4]);
                 ret.Add(tempcomment);
             }
+
+            return RepairBase64Image4IE(ret,ctrl);
+        }
+
+
+
+        private static string WriteBase64ImgFile(string commentcontent, Controller ctrl)
+        {
+            try
+            {
+                var idx = commentcontent.IndexOf("<img alt=\"\" src=\"data:image/png;base64");
+                var base64idx = commentcontent.IndexOf("data:image/png;base64,", idx)+22;
+                var base64end = commentcontent.IndexOf("\"", base64idx);
+                var imgstrend = commentcontent.IndexOf("/>", base64end)+2;
+                var base64img = commentcontent.Substring(base64idx, base64end - base64idx);
+                var imgbytes = Convert.FromBase64String(base64img);
+
+                var imgkey = Guid.NewGuid().ToString("N");
+                string datestring = DateTime.Now.ToString("yyyyMMdd");
+                string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\images\\" + datestring + "\\";
+
+                if (!Directory.Exists(imgdir))
+                {
+                    Directory.CreateDirectory(imgdir);
+                }
+                var realpath = imgdir + imgkey + ".jpg";
+            
+                var fs = File.Create(realpath);
+                fs.Write(imgbytes, 0, imgbytes.Length);
+                fs.Close();
+
+
+                var url = "/userfiles/images/" + datestring + "/" + imgkey+".jpg";
+                var ret = commentcontent;
+                ret = ret.Remove(idx, imgstrend - idx);
+                ret = ret.Insert(idx, "<img src='" + url + "'/>");
+
+                return ret;
+            }
+            catch (Exception ex)
+            {
+                return string.Empty;
+            }
+
+        }
+
+        private static string ReplaceBase64data2File(string commentcontent, Controller ctrl)
+        {
+            var ret = commentcontent;
+            if (commentcontent.Contains("<img alt=\"\" src=\"data:image/png;base64"))
+            {
+                while (ret.Contains("<img alt=\"\" src=\"data:image/png;base64"))
+                {
+                    ret = WriteBase64ImgFile(ret,ctrl);
+                    if (string.IsNullOrEmpty(ret))
+                    {
+                        ret = commentcontent;
+                        break;
+                    }
+                }
+            }
+
             return ret;
+        }
+
+        public static List<ErrorComments> RepairBase64Image4IE(List<ErrorComments> coments, Controller ctrl)
+        {
+            foreach (var com in coments)
+            {
+                var newcomment = ReplaceBase64data2File(com.Comment, ctrl);
+                if (newcomment.Length != com.Comment.Length)
+                {
+                    com.Comment = newcomment;
+                    UpdateSPComment(com.ErrorKey, com.CommentType, com.CommentDate.ToString(), com.dbComment);
+                }
+            }
+            return coments;
         }
 
         public static void DeleteErrorComment(string ErrorKey, string CommentType, string Date)
@@ -449,6 +527,7 @@ namespace Prometheus.Models
                 tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
                 tempcomment.CommentType = Convert.ToString(r[4]);
             }
+
             return tempcomment;
         }
 

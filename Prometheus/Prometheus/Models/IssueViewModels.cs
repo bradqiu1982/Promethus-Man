@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 
 namespace Prometheus.Models
 {
@@ -759,11 +761,11 @@ namespace Prometheus.Models
             }
         }
 
-        public static void RemoveIssue(string issuekey)
+        public static void RemoveIssue(string issuekey, Controller ctrl)
         {
             try
             {
-                var subissues = RetrieveSubIssue(issuekey);
+                var subissues = RetrieveSubIssue(issuekey,ctrl);
                 var sql = "";
 
                 foreach (var item in subissues)
@@ -1003,7 +1005,7 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
-        public static List<IssueViewModels> RetrieveSubIssue(string parentkey)
+        public static List<IssueViewModels> RetrieveSubIssue(string parentkey, Controller ctrl)
         {
             var ret = new List<IssueViewModels>();
             var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and ParentIssueKey = '<ParentIssueKey>'";
@@ -1019,7 +1021,7 @@ namespace Prometheus.Models
                     , Convert.ToString(line[9]), Convert.ToString(line[10]), parentkey, Convert.ToString(line[11]));
 
 
-                tempvm.RetrieveComment();
+                tempvm.RetrieveComment(ctrl);
 
                 //var tempclist = new List<IssueComments>();
                 //var csql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
@@ -1043,7 +1045,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static IssueViewModels RetrieveIssueByIssueKey(string issuekey)
+        public static IssueViewModels RetrieveIssueByIssueKey(string issuekey, Controller ctrl)
         {
             var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples,APVal2,ErrAbbr,Creator,ModuleSN from Issue where APVal1 <> 'delete' and IssueKey = '<IssueKey>'";
             sql = sql.Replace("<IssueKey>", issuekey);
@@ -1062,7 +1064,7 @@ namespace Prometheus.Models
                 ret.Creator = Convert.ToString(dbret[0][15]);
                 ret.ModuleSN = Convert.ToString(dbret[0][16]);
 
-                ret.RetrieveComment();
+                ret.RetrieveComment(ctrl);
 
                 if (string.Compare(ret.IssueType, ISSUETP.RMA) == 0)
                 {
@@ -1084,7 +1086,7 @@ namespace Prometheus.Models
                     ret.RetrieveReliability();
                 }
 
-                ret.SubIssues = RetrieveSubIssue(ret.IssueKey);
+                ret.SubIssues = RetrieveSubIssue(ret.IssueKey,ctrl);
                 ret.RetrieveAttachment(ret.IssueKey);
 
                 return ret;
@@ -1093,7 +1095,7 @@ namespace Prometheus.Models
                 return null;
         }
 
-        public static List<IssueViewModels> RRetrieveFAByPjkey(string pjkey, string issuestatus,int topnum)
+        public static List<IssueViewModels> RRetrieveFAByPjkey(string pjkey, string issuestatus,int topnum, Controller ctrl)
         {
             var retdict = new List<IssueViewModels>();
 
@@ -1149,7 +1151,7 @@ namespace Prometheus.Models
                 //ret.CommentList = tempclist;
                 //ret.SubIssues = RetrieveSubIssue(ret.IssueKey);
 
-                ret.RetrieveComment();
+                ret.RetrieveComment(ctrl);
                 ret.RetrieveAttachment(ret.IssueKey);
                 retdict.Add( ret);
             }
@@ -1449,7 +1451,7 @@ namespace Prometheus.Models
         }
 
 
-        public static List<IssueViewModels> RetrieveIssueAllByUser(string user, string startdate)
+        public static List<IssueViewModels> RetrieveIssueAllByUser(string user, string startdate, Controller ctrl)
         {
             var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and Resolution <> '<Resolution>' and  Assignee = '<Assignee>' and  ParentIssueKey = '' and IssueType <> '<IssueType>' and ReportDate > '<ReportDate>' order by ReportDate ASC";
             sql = sql.Replace("<Assignee>", user).Replace("<ReportDate>", startdate).Replace("<IssueType>", ISSUETP.NPIPROC).Replace("<Resolution>",Resolute.AutoClose);
@@ -1464,7 +1466,7 @@ namespace Prometheus.Models
                     , Convert.ToString(line[7]), Convert.ToString(line[8])
                     , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
 
-                tempvm.RetrieveComment();
+                tempvm.RetrieveComment(ctrl);
                 tempvm.RetrieveAttachment(tempvm.IssueKey);
 
                 if (string.Compare(tempvm.Resolution,Resolute.Pending) != 0
@@ -1505,7 +1507,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        private void RetrieveComment()
+        private void RetrieveComment(Controller ctrl)
         {
                 var tempclist = new List<IssueComments>();
                 var csql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
@@ -1521,7 +1523,81 @@ namespace Prometheus.Models
                     tempcomment.CommentType = Convert.ToString(r[4]);
                     tempclist.Add(tempcomment);
                 }
-                CommentList = tempclist;
+
+                CommentList = RepairBase64Image4IE(tempclist,ctrl);
+        }
+
+        private static string WriteBase64ImgFile(string commentcontent, Controller ctrl)
+        {
+            try
+            {
+                var idx = commentcontent.IndexOf("<img alt=\"\" src=\"data:image/png;base64");
+                var base64idx = commentcontent.IndexOf("data:image/png;base64,", idx) + 22;
+                var base64end = commentcontent.IndexOf("\"", base64idx);
+                var imgstrend = commentcontent.IndexOf("/>", base64end) + 2;
+                var base64img = commentcontent.Substring(base64idx, base64end - base64idx);
+                var imgbytes = Convert.FromBase64String(base64img);
+
+                var imgkey = Guid.NewGuid().ToString("N");
+                string datestring = DateTime.Now.ToString("yyyyMMdd");
+                string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\images\\" + datestring + "\\";
+
+                if (!Directory.Exists(imgdir))
+                {
+                    Directory.CreateDirectory(imgdir);
+                }
+                var realpath = imgdir + imgkey + ".jpg";
+
+                var fs = File.Create(realpath);
+                fs.Write(imgbytes, 0, imgbytes.Length);
+                fs.Close();
+
+
+                var url = "/userfiles/images/" + datestring + "/" + imgkey + ".jpg";
+                var ret = commentcontent;
+                ret = ret.Remove(idx, imgstrend - idx);
+                ret = ret.Insert(idx, "<img src='" + url + "'/>");
+
+                return ret;
+            }
+            catch (Exception ex)
+            {
+                return string.Empty;
+            }
+
+        }
+
+        private static string ReplaceBase64data2File(string commentcontent, Controller ctrl)
+        {
+            var ret = commentcontent;
+            if (commentcontent.Contains("<img alt=\"\" src=\"data:image/png;base64"))
+            {
+                while (ret.Contains("<img alt=\"\" src=\"data:image/png;base64"))
+                {
+                    ret = WriteBase64ImgFile(ret, ctrl);
+                    if (string.IsNullOrEmpty(ret))
+                    {
+                        ret = commentcontent;
+                        break;
+                    }
+                }
+            }
+
+            return ret;
+        }
+
+        public static List<IssueComments> RepairBase64Image4IE(List<IssueComments> coments, Controller ctrl)
+        {
+            foreach (var com in coments)
+            {
+                var newcomment = ReplaceBase64data2File(com.Comment, ctrl);
+                if (newcomment.Length != com.Comment.Length)
+                {
+                    com.Comment = newcomment;
+                    UpdateSPComment(com.IssueKey, com.CommentType, com.CommentDate.ToString(), com.dbComment);
+                }
+            }
+            return coments;
         }
 
         public static void DeleteSPComment(string issuekey,string commenttype,string date)
@@ -1605,7 +1681,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<IssueViewModels> RetrieveIssueDoneByUser(string user, string startdate)
+        public static List<IssueViewModels> RetrieveIssueDoneByUser(string user, string startdate, Controller ctrl)
         {
             var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and Resolution <> '<Resolution>' and  Assignee = '<Assignee>' and  ParentIssueKey = '' and IssueType <> '<IssueType>' and ResolvedDate > '<ResolvedDate>' order by ResolvedDate ASC";
             sql = sql.Replace("<Assignee>", user.ToUpper()).Replace("<ResolvedDate>", startdate).Replace("<IssueType>", ISSUETP.NPIPROC).Replace("<Resolution>", Resolute.AutoClose);
@@ -1620,7 +1696,7 @@ namespace Prometheus.Models
                     , Convert.ToString(line[7]), Convert.ToString(line[8])
                     , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
 
-                tempvm.RetrieveComment();
+                tempvm.RetrieveComment(ctrl);
                 tempvm.RetrieveAttachment(tempvm.IssueKey);
 
                 if (tempvm.CommentList.Count == 1 && tempvm.AttachList.Count == 0)
@@ -1790,7 +1866,7 @@ namespace Prometheus.Models
         //}
 
 
-        public static List<IssueViewModels> RetrieveIssueTypeByProjectKey(string projectkey, string issuestatus,string issuetype)
+        public static List<IssueViewModels> RetrieveIssueTypeByProjectKey(string projectkey, string issuestatus,string issuetype, Controller ctrl)
         {
             var cond = "";
             var fixresolve = "";
@@ -1848,9 +1924,9 @@ namespace Prometheus.Models
                     tempvm.RetrieveReliability();
                 }
 
-                tempvm.RetrieveComment();
+                tempvm.RetrieveComment(ctrl);
 
-                tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey);
+                tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey,ctrl);
 
                 tempvm.RetrieveAttachment(tempvm.IssueKey);
 
@@ -1860,7 +1936,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<IssueViewModels> RetrieveIssueTypeByProjectKey(string projectkey, string StartDate, string EndDate, string issuetype)
+        public static List<IssueViewModels> RetrieveIssueTypeByProjectKey(string projectkey, string StartDate, string EndDate, string issuetype, Controller ctrl)
         {
             var sql = "";
             if (string.Compare(StartDate, "NONE", true) == 0)
@@ -1910,9 +1986,9 @@ namespace Prometheus.Models
                     tempvm.RetrieveQuality();
                 }
 
-                tempvm.RetrieveComment();
+                tempvm.RetrieveComment(ctrl);
 
-                tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey);
+                tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey,ctrl);
 
                 tempvm.RetrieveAttachment(tempvm.IssueKey);
 
@@ -1922,7 +1998,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<IssueViewModels> RetrieveAllIssueTypeIssue(string StartDate, string EndDate, string issuetype)
+        public static List<IssueViewModels> RetrieveAllIssueTypeIssue(string StartDate, string EndDate, string issuetype, Controller ctrl)
         {
             var sql = "";
             if (string.Compare(StartDate, "NONE", true) == 0)
@@ -1972,9 +2048,9 @@ namespace Prometheus.Models
                     tempvm.RetrieveQuality();
                 }
 
-                tempvm.RetrieveComment();
+                tempvm.RetrieveComment(ctrl);
 
-                tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey);
+                tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey,ctrl);
 
                 tempvm.RetrieveAttachment(tempvm.IssueKey);
 
@@ -2201,7 +2277,7 @@ namespace Prometheus.Models
         }
 
 
-        public static List<IssueViewModels> RetrieveIssueByCreator(string creator, int topnum)
+        public static List<IssueViewModels> RetrieveIssueByCreator(string creator, int topnum, Controller ctrl)
         {
             var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and IssueType <> '<IssueType>' and  (Creator = '<Creator>' or Reporter = '<Creator>') and ParentIssueKey = '' order by ReportDate DESC";
             sql = sql.Replace("<Creator>", creator).Replace("<topnum>", Convert.ToString(topnum)).Replace("<IssueType>", ISSUETP.NPIPROC);
@@ -2216,14 +2292,14 @@ namespace Prometheus.Models
                     , Convert.ToString(line[7]), Convert.ToString(line[8])
                     , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
                 
-                tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey);
+                tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey,ctrl);
                 ret.Add(tempvm);
             }
 
             return ret;
         }
 
-        public static List<IssueViewModels> RetrieveIssueByCreator(string creator,string issuestatus)
+        public static List<IssueViewModels> RetrieveIssueByCreator(string creator,string issuestatus, Controller ctrl)
         {
 
             var cond = "";
@@ -2257,14 +2333,14 @@ namespace Prometheus.Models
                     , Convert.ToString(line[7]), Convert.ToString(line[8])
                     , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
 
-                tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey);
+                tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey,ctrl);
                 ret.Add(tempvm);
             }
 
             return ret;
         }
 
-        public static List<IssueViewModels> RetrieveNPIPROCIssue(string pjkey)
+        public static List<IssueViewModels> RetrieveNPIPROCIssue(string pjkey, Controller ctrl)
         {
             var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and ParentIssueKey = '' and IssueType = '<IssueType>' order by DueDate ASC";
             sql = sql.Replace("<ProjectKey>", pjkey).Replace("<IssueType>", Convert.ToString(ISSUETP.NPIPROC));
@@ -2279,7 +2355,7 @@ namespace Prometheus.Models
                     , Convert.ToString(line[7]), Convert.ToString(line[8])
                     , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
 
-                tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey);
+                tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey,ctrl);
                 tempvm.RetrieveAttachment(tempvm.IssueKey);
                 ret.Add(tempvm);
             }

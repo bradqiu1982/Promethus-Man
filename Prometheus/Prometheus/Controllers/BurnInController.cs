@@ -942,7 +942,7 @@ namespace Prometheus.Controllers
         {
             ViewBag.pjkey = ProjectKey;
 
-            var vm = ProjectErrorViewModels.RetrieveErrorByPJKey(ProjectErrorViewModels.BURNIN);
+            var vm = ProjectErrorViewModels.RetrieveErrorByPJKey(ProjectErrorViewModels.BURNIN,this);
 
             var countdict = new Dictionary<string, int>();
             foreach (var item in vm)
@@ -1018,7 +1018,7 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(ErrorKey))
             {
-                var tempvm = ProjectErrorViewModels.RetrieveErrorByErrorKey(ErrorKey);
+                var tempvm = ProjectErrorViewModels.RetrieveErrorByErrorKey(ErrorKey,this);
                 return View(tempvm[0]);
             }
             return RedirectToAction("ViewAll", "Project");
@@ -1060,7 +1060,7 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(key))
             {
-                var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key);
+                var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key,this);
                 //var FirstEngineer = ProjectViewModels.RetrieveOneProject(vm[0].ProjectKey).FirstEngineer;
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
                 if (string.Compare("daly.li@finisar.com", updater, true) == 0
@@ -1081,7 +1081,7 @@ namespace Prometheus.Controllers
 
         public ActionResult UpdateBIError2(string ErrorCode)
         {
-            var tempvm = ProjectErrorViewModels.RetrieveErrorByPJKey(ProjectErrorViewModels.BURNIN, ErrorCode);
+            var tempvm = ProjectErrorViewModels.RetrieveErrorByPJKey(ProjectErrorViewModels.BURNIN, ErrorCode,this);
             var ErrorKey = "";
             if (tempvm.Count > 0)
             {
@@ -1122,7 +1122,7 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(key))
             {
-                var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key);
+                var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key,this);
                 //var FirstEngineer = ProjectViewModels.RetrieveOneProject(vm[0].ProjectKey).FirstEngineer;
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
                 if (string.Compare("daly.li@finisar.com", updater, true) == 0
@@ -1349,7 +1349,7 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(errorkey) && !string.IsNullOrEmpty(filename))
             {
-                var tempvm = ProjectErrorViewModels.RetrieveErrorByErrorKey(errorkey);
+                var tempvm = ProjectErrorViewModels.RetrieveErrorByErrorKey(errorkey,this);
                 //var FirstEngineer = ProjectViewModels.RetrieveOneProject(tempvm[0].ProjectKey).FirstEngineer;
                 var ckdict = CookieUtility.UnpackCookie(this);
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];

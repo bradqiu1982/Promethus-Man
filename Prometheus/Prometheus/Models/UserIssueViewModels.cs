@@ -133,10 +133,10 @@ namespace Prometheus.Models
             var edate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd") + " 07:30:00");
             var sdate = edate.AddMonths(0-month);
 
-            var allissue = IssueViewModels.RetrieveIssueAllByUser(username, sdate.ToString());
+            var allissue = IssueViewModels.RetrieveIssueAllByUser(username, sdate.ToString(),ctrl);
             var pendingissues = IssueViewModels.RetrieveIssuePendingByUser(username, sdate.ToString());
             var workingissues = IssueViewModels.RetrieveIssueWorkingByUser(username, sdate.ToString());
-            var solvedissues = IssueViewModels.RetrieveIssueDoneByUser(username, sdate.ToString());
+            var solvedissues = IssueViewModels.RetrieveIssueDoneByUser(username, sdate.ToString(),ctrl);
 
             uservm.PendingIssueCount = pendingissues.Count();
             uservm.WorkingIssueCount = workingissues.Count();

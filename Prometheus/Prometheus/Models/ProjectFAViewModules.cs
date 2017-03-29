@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 
 namespace Prometheus.Models
 {
@@ -18,11 +19,11 @@ namespace Prometheus.Models
         public IssueViewModels IssueData { set; get; }
         public ProjectTestData TestData { set; get; }
 
-        public static List<ProjectFAViewModules> RetrievePendingFAData(string pjkey)
+        public static List<ProjectFAViewModules> RetrievePendingFAData(string pjkey, Controller ctrl)
         {
             var ret = new List<ProjectFAViewModules>();
-            var issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Working,50);
-            var issuedict2 = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Pending, 500);
+            var issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Working,50,ctrl);
+            var issuedict2 = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Pending, 500,ctrl);
             issuedict.AddRange(issuedict2);
 
             var bisndict = new Dictionary<string, string>();
@@ -79,11 +80,11 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<ProjectFAViewModules> RetrieveDoneFAData(string pjkey)
+        public static List<ProjectFAViewModules> RetrieveDoneFAData(string pjkey, Controller ctrl)
         {
             var ret = new List<ProjectFAViewModules>();
 
-            var issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Done, 2000);
+            var issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Done, 2000,ctrl);
             foreach (var d in issuedict)
             {
                 if (d.CommentList.Count == 2)
@@ -149,7 +150,7 @@ namespace Prometheus.Models
             }
         }
 
-        public static List<ProjectFAViewModules> RetrieveFADataWithErrAbbr(string ProjectKey, string ErrAbbr)
+        public static List<ProjectFAViewModules> RetrieveFADataWithErrAbbr(string ProjectKey, string ErrAbbr, Controller ctrl)
         {
             var ret = new List<ProjectFAViewModules>();
             var pjdata = ProjectTestData.RetrieveProjectTestDataWithErrAbbr(100000, ProjectKey, ErrAbbr);
@@ -161,7 +162,7 @@ namespace Prometheus.Models
 
             foreach (var d in pjdata)
             {
-                var im = IssueViewModels.RetrieveIssueByIssueKey(d.DataID);
+                var im = IssueViewModels.RetrieveIssueByIssueKey(d.DataID,ctrl);
                 if (im != null && im.Resolution != Resolute.AutoClose)
                 {
                     ret.Add(new ProjectFAViewModules(im, d));
@@ -170,7 +171,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<ProjectFAViewModules> RetrieveFADataWithSN(string ProjectKey, string SN)
+        public static List<ProjectFAViewModules> RetrieveFADataWithSN(string ProjectKey, string SN, Controller ctrl)
         {
             var ret = new List<ProjectFAViewModules>();
             var pjdata = ProjectTestData.RetrieveProjectTestDataWithSN(100000, ProjectKey, SN);
@@ -186,7 +187,7 @@ namespace Prometheus.Models
 
             foreach (var d in pjdata)
             {
-                var im = IssueViewModels.RetrieveIssueByIssueKey(d.DataID);
+                var im = IssueViewModels.RetrieveIssueByIssueKey(d.DataID,ctrl);
                 if (im != null)
                 {
                     ret.Add(new ProjectFAViewModules(im, d));

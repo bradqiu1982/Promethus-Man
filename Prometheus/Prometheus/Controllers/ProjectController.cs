@@ -129,7 +129,7 @@ namespace Prometheus.Controllers
 
         private void NPIInfo(ProjectViewModels item)
         {
-                var ivmlist = IssueViewModels.RetrieveNPIPROCIssue(item.ProjectKey);
+                var ivmlist = IssueViewModels.RetrieveNPIPROCIssue(item.ProjectKey,this);
                 foreach (var iv in ivmlist)
                 {
                     if (iv.Summary.Contains("PIP1"))
@@ -1169,7 +1169,7 @@ namespace Prometheus.Controllers
             {
                 ViewBag.projectkey = ProjectKey;
 
-                var vm  = ProjectFAViewModules.RetrievePendingFAData(ProjectKey);
+                var vm  = ProjectFAViewModules.RetrievePendingFAData(ProjectKey,this);
 
                 var piedatadict = new Dictionary<string, int>();
                 foreach (var item in vm)
@@ -1222,7 +1222,7 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(ProjectKey))
             {
-                var vm = ProjectErrorViewModels.RetrieveErrorByPJKey(ProjectKey);
+                var vm = ProjectErrorViewModels.RetrieveErrorByPJKey(ProjectKey,this);
                 var piedatadict = new Dictionary<string, int>();
                 foreach (var item in vm)
                 {
@@ -1261,7 +1261,7 @@ namespace Prometheus.Controllers
             {
                 ViewBag.projectkey = ProjectKey;
 
-                var vm = ProjectFAViewModules.RetrieveFADataWithErrAbbr(ProjectKey, ErrAbbr);
+                var vm = ProjectFAViewModules.RetrieveFADataWithErrAbbr(ProjectKey, ErrAbbr,this);
 
                 var pendingitems = new List<ProjectFAViewModules>();
                 var tempitems = new List<ProjectFAViewModules>();
@@ -1345,7 +1345,7 @@ namespace Prometheus.Controllers
             {
                 ViewBag.projectkey = ProjectKey;
 
-                var vm = ProjectFAViewModules.RetrieveFADataWithSN(ProjectKey, SN);
+                var vm = ProjectFAViewModules.RetrieveFADataWithSN(ProjectKey, SN,this);
 
                 var asilist = UserViewModels.RetrieveAllUser();
                 ViewBag.AllUserList = CreateSelectList1(asilist, "");
@@ -1366,7 +1366,7 @@ namespace Prometheus.Controllers
             var projectkey = Request.Form["HProjectKey"];
             ViewBag.projectkey = projectkey;
 
-            var vm = ProjectFAViewModules.RetrieveDoneFAData(projectkey);
+            var vm = ProjectFAViewModules.RetrieveDoneFAData(projectkey,this);
 
             var piedatadict = new Dictionary<string, int>();
             foreach (var item in vm)
@@ -1415,7 +1415,7 @@ namespace Prometheus.Controllers
         {
             if (ProjectKey != null)
             {
-                var vmlist = IssueViewModels.RetrieveNPIPROCIssue(ProjectKey);
+                var vmlist = IssueViewModels.RetrieveNPIPROCIssue(ProjectKey,this);
                 var pj = ProjectViewModels.RetrieveOneProject(ProjectKey);
 
                 var ckdict = CookieUtility.UnpackCookie(this);
@@ -1845,9 +1845,9 @@ namespace Prometheus.Controllers
         {
             if (ProjectKey != null)
             {
-                var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Pending,ISSUETP.RMA);
-                var list2 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Working,ISSUETP.RMA);
-                var list3 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Done,ISSUETP.RMA);
+                var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Pending,ISSUETP.RMA,this);
+                var list2 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Working,ISSUETP.RMA, this);
+                var list3 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Done,ISSUETP.RMA, this);
                 list1.AddRange(list2);
                 list1.AddRange(list3);
                 return View(list1);
@@ -1859,9 +1859,9 @@ namespace Prometheus.Controllers
         {
             if (ProjectKey != null)
             {
-                var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Pending, ISSUETP.RMA);
-                var list2 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Working, ISSUETP.RMA);
-                var list3 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Done, ISSUETP.RMA);
+                var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Pending, ISSUETP.RMA, this);
+                var list2 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Working, ISSUETP.RMA, this);
+                var list3 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Done, ISSUETP.RMA, this);
                 list1.AddRange(list2);
                 list1.AddRange(list3);
 
@@ -1910,9 +1910,9 @@ namespace Prometheus.Controllers
         {
             if (ProjectKey != null)
             {
-                var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Working, ISSUETP.Rel);
-                var list2 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Pending, ISSUETP.Rel);
-                var list3 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Done, ISSUETP.Rel);
+                var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Working, ISSUETP.Rel, this);
+                var list2 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Pending, ISSUETP.Rel, this);
+                var list3 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Done, ISSUETP.Rel, this);
                 list1.AddRange(list2);
                 list1.AddRange(list3);
 
@@ -1962,9 +1962,9 @@ namespace Prometheus.Controllers
         {
             if (ProjectKey != null)
             {
-                var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Pending, ISSUETP.OBA);
-                var list2 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Working, ISSUETP.OBA);
-                var list3 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Done, ISSUETP.OBA);
+                var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Pending, ISSUETP.OBA, this);
+                var list2 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Working, ISSUETP.OBA, this);
+                var list3 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Done, ISSUETP.OBA, this);
                 list1.AddRange(list2);
                 list1.AddRange(list3);
 
@@ -2013,9 +2013,9 @@ namespace Prometheus.Controllers
         {
             if (ProjectKey != null)
             {
-                var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Pending, ISSUETP.Quality);
-                var list2 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Working, ISSUETP.Quality);
-                var list3 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Done, ISSUETP.Quality);
+                var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Pending, ISSUETP.Quality, this);
+                var list2 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Working, ISSUETP.Quality, this);
+                var list3 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Done, ISSUETP.Quality, this);
                 list1.AddRange(list2);
                 list1.AddRange(list3);
 
@@ -3544,7 +3544,7 @@ namespace Prometheus.Controllers
             
             if (!string.IsNullOrEmpty(key))
             {
-                var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key);
+                var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key,this);
                 var FirstEngineer = ProjectViewModels.RetrieveOneProject(vm[0].ProjectKey).FirstEngineer;
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
                 if (string.Compare(FirstEngineer, updater, true) == 0)
@@ -3579,7 +3579,7 @@ namespace Prometheus.Controllers
 
         public ActionResult UpdateProjectError2(string ProjectKey,string ErrorCode)
         {
-            var tempvm = ProjectErrorViewModels.RetrieveErrorByPJKey(ProjectKey, ErrorCode);
+            var tempvm = ProjectErrorViewModels.RetrieveErrorByPJKey(ProjectKey, ErrorCode,this);
             var ErrorKey = "";
             if (tempvm.Count > 0)
             {
@@ -3620,7 +3620,7 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(key))
             {
-                var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key);
+                var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key,this);
                 var FirstEngineer = ProjectViewModels.RetrieveOneProject(vm[0].ProjectKey).FirstEngineer;
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
                 if (string.Compare(FirstEngineer, updater, true) == 0)
@@ -3898,7 +3898,7 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(ErrorKey))
             {
-                var tempvm = ProjectErrorViewModels.RetrieveErrorByErrorKey(ErrorKey);
+                var tempvm = ProjectErrorViewModels.RetrieveErrorByErrorKey(ErrorKey,this);
                 return View(tempvm[0]);
             }
             return RedirectToAction("ViewAll", "Project");
@@ -3908,7 +3908,7 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(errorkey) && !string.IsNullOrEmpty(filename))
             {
-                var tempvm = ProjectErrorViewModels.RetrieveErrorByErrorKey(errorkey);
+                var tempvm = ProjectErrorViewModels.RetrieveErrorByErrorKey(errorkey,this);
                 var FirstEngineer = ProjectViewModels.RetrieveOneProject(tempvm[0].ProjectKey).FirstEngineer;
                 var ckdict = CookieUtility.UnpackCookie(this);
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
@@ -4193,8 +4193,8 @@ namespace Prometheus.Controllers
 
         private string SendIAssignPendingIssue(string username)
         {
-            var wissues = IssueViewModels.RetrieveIssueByCreator(username, Resolute.Working);
-            var pissues = IssueViewModels.RetrieveIssueByCreator(username,Resolute.Pending);
+            var wissues = IssueViewModels.RetrieveIssueByCreator(username, Resolute.Working, this);
+            var pissues = IssueViewModels.RetrieveIssueByCreator(username,Resolute.Pending, this);
 
             var ret = string.Empty;
             foreach (var i in wissues)
@@ -4219,7 +4219,7 @@ namespace Prometheus.Controllers
 
         private string SendIAssignDoneIssue(string username)
         {
-            var dissues = IssueViewModels.RetrieveIssueByCreator(username, Resolute.Done);
+            var dissues = IssueViewModels.RetrieveIssueByCreator(username, Resolute.Done, this);
             var ret = string.Empty;
             foreach (var i in dissues)
             {
@@ -4795,7 +4795,7 @@ namespace Prometheus.Controllers
                 return View();
             }
 
-            var ret = IssueViewModels.RetrieveIssueByIssueKey(key);
+            var ret = IssueViewModels.RetrieveIssueByIssueKey(key, this);
             if (ret != null)
             {
                 return View(ret);
@@ -4833,7 +4833,7 @@ namespace Prometheus.Controllers
         public ActionResult LowYieldWarnPost()
         {
             var issuekey = Request.Form["IssueKey"];
-            var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+            var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey, this);
             if (vm != null)
             {
                 var ckdict = CookieUtility.UnpackCookie(this);
@@ -4944,7 +4944,7 @@ namespace Prometheus.Controllers
                 tempreason = System.Text.Encoding.UTF8.GetString(bytes);
             }
 
-            var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(ErrorKey);
+            var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(ErrorKey,this);
             ShareDocVM.ShareDoc(debugtree[0].ProjectKey, ShareDocType.DEBUG, debugtree[0].ErrorKey, debugtree[0].OrignalCode, updater, DateTime.Now.ToString());
 
             var whoes = ToWho.Split(new string[] { ";", ",", " " }, StringSplitOptions.RemoveEmptyEntries);

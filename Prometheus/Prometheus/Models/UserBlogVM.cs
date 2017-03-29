@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 
 namespace Prometheus.Models
 {
@@ -214,10 +215,10 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static UserBlogVM RetrieveBlogDoc(string dockey)
+        public static UserBlogVM RetrieveBlogDoc(string dockey, Controller ctrl)
         {
             var ret = new UserBlogVM();
-            ret.CommentList = ProjectErrorViewModels.RetrieveErrorComments(dockey);
+            ret.CommentList = ProjectErrorViewModels.RetrieveErrorComments(dockey,ctrl);
 
             var sql = "select UserName,APVal1,APVal2,APVal3,APVal4,APVal5,APVal9 from UserBlog where APVal2='<APVal2>'";
             sql = sql.Replace("<APVal2>", dockey);

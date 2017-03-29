@@ -335,7 +335,7 @@ namespace Prometheus.Controllers
                 return View();
             }
 
-            var ret = IssueViewModels.RetrieveIssueByIssueKey(key);
+            var ret = IssueViewModels.RetrieveIssueByIssueKey(key,this);
 
             if (ret != null)
             {
@@ -450,7 +450,7 @@ namespace Prometheus.Controllers
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
             var issuekey = Request.Form["IssueKey"];
-            var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+            var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey,this);
 
            if (Request.Form["deleteisu"] != null)
             {
@@ -458,7 +458,7 @@ namespace Prometheus.Controllers
                     || string.Compare(updater, originaldata.Assignee, true) == 0
                     || string.Compare(updater, originaldata.Creator, true) == 0)
                 {
-                    IssueViewModels.RemoveIssue(issuekey);
+                    IssueViewModels.RemoveIssue(issuekey,this);
                     var dict = new RouteValueDictionary();
                     dict.Add("ProjectKey", originaldata.ProjectKey);
                     return RedirectToAction("ProjectDetail", "Project",dict);
@@ -567,7 +567,7 @@ namespace Prometheus.Controllers
             {
                 if (vm.IssueClosed())
                 {
-                    var realissue = IssueViewModels.RetrieveIssueByIssueKey(vm.IssueKey);
+                    var realissue = IssueViewModels.RetrieveIssueByIssueKey(vm.IssueKey,this);
                     if (realissue.AttachList.Count > 0)
                     {
                         UserRankViewModel.UpdateUserRank(updater, 5);
@@ -656,7 +656,7 @@ namespace Prometheus.Controllers
                 tempreason = System.Text.Encoding.UTF8.GetString(bytes);
             }
 
-            var issue = IssueViewModels.RetrieveIssueByIssueKey(IssueKey);
+            var issue = IssueViewModels.RetrieveIssueByIssueKey(IssueKey,this);
             ShareDocVM.ShareDoc(issue.ProjectKey, ShareDocType.ISSUE, issue.IssueKey, issue.Summary, updater, DateTime.Now.ToString());
 
             var whoes = ToWho.Split(new string[] { ";", ",", " " }, StringSplitOptions.RemoveEmptyEntries);
@@ -915,7 +915,7 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(issuekey))
             {
-                var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+                var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey,this);
                 if (vm != null)
                 {
                     vm.RetrieveAttachment(vm.IssueKey);
@@ -1144,7 +1144,7 @@ namespace Prometheus.Controllers
                 return View();
             }
 
-            var ret = IssueViewModels.RetrieveIssueByIssueKey(key);
+            var ret = IssueViewModels.RetrieveIssueByIssueKey(key,this);
 
             if (ret != null)
             {
@@ -1193,7 +1193,7 @@ namespace Prometheus.Controllers
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
             var issuekey = Request.Form["IssueKey"];
-            var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+            var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey,this);
 
             if (Request.Form["deleteisu"] != null)
             {
@@ -1201,7 +1201,7 @@ namespace Prometheus.Controllers
                     || string.Compare(updater, originaldata.Assignee, true) == 0
                     || string.Compare(updater, originaldata.Creator, true) == 0)
                 {
-                    IssueViewModels.RemoveIssue(issuekey);
+                    IssueViewModels.RemoveIssue(issuekey,this);
                     var dict = new RouteValueDictionary();
                     dict.Add("ProjectKey", originaldata.ProjectKey);
                     return RedirectToAction("ProjectDetail", "Project", dict);
@@ -1231,7 +1231,7 @@ namespace Prometheus.Controllers
                     {
                         if (!originaldata.Summary.Contains("@Burn-In Step"))
                         {
-                            var perrlist = ProjectErrorViewModels.RetrieveErrorByPJKey(originaldata.ProjectKey, errabbr);
+                            var perrlist = ProjectErrorViewModels.RetrieveErrorByPJKey(originaldata.ProjectKey, errabbr,this);
                             var testdata = ProjectTestData.RetrieveProjectTestData(originaldata.IssueKey);
 
                             if (perrlist.Count > 0)
@@ -1295,7 +1295,7 @@ namespace Prometheus.Controllers
                         }
                         else
                         {
-                            var perrlist = ProjectErrorViewModels.RetrieveErrorByPJKey(ProjectErrorViewModels.BURNIN, errabbr);
+                            var perrlist = ProjectErrorViewModels.RetrieveErrorByPJKey(ProjectErrorViewModels.BURNIN, errabbr,this);
                             var testdata = BITestData.RetrieveProjectTestDataByDataID(originaldata.IssueKey);
                             if (perrlist.Count > 0)
                             {
@@ -1492,7 +1492,7 @@ namespace Prometheus.Controllers
             {
                 if (vm.IssueClosed())
                 {
-                    var realissue = IssueViewModels.RetrieveIssueByIssueKey(vm.IssueKey);
+                    var realissue = IssueViewModels.RetrieveIssueByIssueKey(vm.IssueKey,this);
                     if (realissue.AttachList.Count > 0)
                     {
                         UserRankViewModel.UpdateUserRank(updater, 5);
@@ -1599,7 +1599,7 @@ namespace Prometheus.Controllers
                 return View();
             }
 
-            var ret = IssueViewModels.RetrieveIssueByIssueKey(key);
+            var ret = IssueViewModels.RetrieveIssueByIssueKey(key,this);
             if (ret != null)
             {
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
@@ -1672,7 +1672,7 @@ namespace Prometheus.Controllers
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
             var issuekey = Request.Form["IssueKey"];
 
-            var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+            var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey,this);
 
             if (Request.Form["deleterma"] != null)
             {
@@ -1680,7 +1680,7 @@ namespace Prometheus.Controllers
                     || string.Compare(updater, originaldata.Assignee, true) == 0
                     || string.Compare(updater, originaldata.Creator, true) == 0)
                 {
-                    IssueViewModels.RemoveIssue(issuekey);
+                    IssueViewModels.RemoveIssue(issuekey,this);
                     var dict = new RouteValueDictionary();
                     dict.Add("ProjectKey", originaldata.ProjectKey);
                     return RedirectToAction("ProjectDetail", "Project",dict);
@@ -1990,7 +1990,7 @@ namespace Prometheus.Controllers
                 return View();
             }
 
-            var ret = IssueViewModels.RetrieveIssueByIssueKey(key);
+            var ret = IssueViewModels.RetrieveIssueByIssueKey(key,this);
             if (ret != null)
             {
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
@@ -2024,7 +2024,7 @@ namespace Prometheus.Controllers
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
             var issuekey = Request.Form["IssueKey"];
 
-            var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+            var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey,this);
 
             if (Request.Form["deleterma"] != null)
             {
@@ -2032,7 +2032,7 @@ namespace Prometheus.Controllers
                     || string.Compare(updater, originaldata.Assignee, true) == 0
                     || string.Compare(updater, originaldata.Creator, true) == 0)
                 {
-                    IssueViewModels.RemoveIssue(issuekey);
+                    IssueViewModels.RemoveIssue(issuekey,this);
                     var dict1 = new RouteValueDictionary();
                     dict1.Add("ProjectKey", originaldata.ProjectKey);
                     return RedirectToAction("ProjectDetail", "Project", dict1);
@@ -2215,7 +2215,7 @@ namespace Prometheus.Controllers
                 return View();
             }
 
-            var ret = IssueViewModels.RetrieveIssueByIssueKey(key);
+            var ret = IssueViewModels.RetrieveIssueByIssueKey(key,this);
             if (ret != null)
             {
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
@@ -2249,7 +2249,7 @@ namespace Prometheus.Controllers
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
             var issuekey = Request.Form["IssueKey"];
 
-            var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+            var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey,this);
 
             if (Request.Form["deleterma"] != null)
             {
@@ -2257,7 +2257,7 @@ namespace Prometheus.Controllers
                     || string.Compare(updater, originaldata.Assignee, true) == 0
                     || string.Compare(updater, originaldata.Creator, true) == 0)
                 {
-                    IssueViewModels.RemoveIssue(issuekey);
+                    IssueViewModels.RemoveIssue(issuekey,this);
                     var dict = new RouteValueDictionary();
                     dict.Add("ProjectKey", originaldata.ProjectKey);
                     return RedirectToAction("ProjectDetail", "Project", dict);
@@ -2474,7 +2474,7 @@ namespace Prometheus.Controllers
                 return View();
             }
 
-            var ret = IssueViewModels.RetrieveIssueByIssueKey(key);
+            var ret = IssueViewModels.RetrieveIssueByIssueKey(key,this);
             if (ret != null)
             {
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
@@ -2509,7 +2509,7 @@ namespace Prometheus.Controllers
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
             var issuekey = Request.Form["IssueKey"];
 
-            var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+            var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey,this);
 
             if (Request.Form["deleterma"] != null)
             {
@@ -2517,7 +2517,7 @@ namespace Prometheus.Controllers
                     || string.Compare(updater, originaldata.Assignee, true) == 0
                     || string.Compare(updater, originaldata.Creator, true) == 0)
                 {
-                    IssueViewModels.RemoveIssue(issuekey);
+                    IssueViewModels.RemoveIssue(issuekey,this);
                     var dict = new RouteValueDictionary();
                     dict.Add("ProjectKey", originaldata.ProjectKey);
                     return RedirectToAction("ProjectDetail", "Project", dict);
@@ -2694,7 +2694,7 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(issuekey))
             {
-                var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+                var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey,this);
                 return View(vm);
             }
             return View();
@@ -2704,7 +2704,7 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(issuekey))
             {
-                var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+                var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey,this);
                 return View(vm);
             }
             return View();
@@ -2714,7 +2714,7 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(issuekey))
             {
-                var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+                var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey,this);
                 return View(vm.ContainmentActions);
             }
             return View();
@@ -2724,7 +2724,7 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(issuekey))
             {
-                var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
+                var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey,this);
                 return View(vm.CorrectiveActions);
             }
             return View();
@@ -2747,10 +2747,10 @@ namespace Prometheus.Controllers
                 }
             }
 
-            var targetdata = IssueViewModels.RetrieveIssueByIssueKey(targetissuekey);
+            var targetdata = IssueViewModels.RetrieveIssueByIssueKey(targetissuekey,this);
             foreach (var key in tobeissuekey)
             {
-                var tobedata = IssueViewModels.RetrieveIssueByIssueKey(key);
+                var tobedata = IssueViewModels.RetrieveIssueByIssueKey(key,this);
                 if (string.Compare(tobedata.Resolution, Resolute.Pending) != 0
                     && string.Compare(tobedata.Resolution, Resolute.Working) != 0
                     && string.Compare(tobedata.Resolution, Resolute.Reopen) != 0)
@@ -2809,7 +2809,7 @@ namespace Prometheus.Controllers
             //var targetdata = IssueViewModels.RetrieveIssueByIssueKey(targetissuekey);
             foreach (var key in tobeissuekey)
             {
-                var tobedata = IssueViewModels.RetrieveIssueByIssueKey(key);
+                var tobedata = IssueViewModels.RetrieveIssueByIssueKey(key,this);
                 if (string.Compare(tobedata.Assignee, updater, true) != 0)
                 {
                     continue;
@@ -2820,7 +2820,7 @@ namespace Prometheus.Controllers
 
             if (tobeissuekey.Count > 0)
             {
-                var tempvm = IssueViewModels.RetrieveIssueByIssueKey(tobeissuekey[0]);
+                var tempvm = IssueViewModels.RetrieveIssueByIssueKey(tobeissuekey[0],this);
                 var dict = new RouteValueDictionary();
                 dict.Add("ProjectKey", tempvm.ProjectKey);
                 return RedirectToAction("ProjectFA", "Project", dict);
@@ -2961,7 +2961,7 @@ namespace Prometheus.Controllers
         private List<string> PrepeareRMAReport(string ProjectKey, string StartDate, string EndDate)
         {
             var lines = new List<string>();
-            var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, StartDate, EndDate,ISSUETP.RMA);
+            var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, StartDate, EndDate,ISSUETP.RMA,this);
 
             var line = "FINISAR RMA,SN,STATUS,CUSTOMER,FV,RMA FAILURE CODE,ROOT CAUSE,OWENER,CREATOR,OPEN ISSUE DATE,CUSTOMER RMA REASON,INTERNAL REPORT,CUSTOMER REPORT,Containment Action,Corrective Action,Attachment";
             lines.Add(line);
@@ -3091,7 +3091,7 @@ namespace Prometheus.Controllers
         private List<string> PrepeareAllRMAReport(string StartDate, string EndDate)
         {
             var lines = new List<string>();
-            var list1 = IssueViewModels.RetrieveAllIssueTypeIssue(StartDate, EndDate,ISSUETP.RMA);
+            var list1 = IssueViewModels.RetrieveAllIssueTypeIssue(StartDate, EndDate,ISSUETP.RMA,this);
 
             var line = "FINISAR RMA,PROJECT,SN,STATUS,CUSTOMER,FV,RMA FAILURE CODE,ROOT CAUSE,OWENER,CREATOR,OPEN ISSUE DATE,CUSTOMER RMA REASON,INTERNAL REPORT,CUSTOMER REPORT,Containment Action,Corrective Action,Attachment";
             lines.Add(line);
@@ -3325,7 +3325,7 @@ namespace Prometheus.Controllers
         private List<string> PrepeareAllOBAReport(string StartDate, string EndDate)
         {
             var lines = new List<string>();
-            var list1 = IssueViewModels.RetrieveAllIssueTypeIssue(StartDate, EndDate, ISSUETP.OBA);
+            var list1 = IssueViewModels.RetrieveAllIssueTypeIssue(StartDate, EndDate, ISSUETP.OBA,this);
 
             var line = "NO,ISSUE DATE,DMR#,Project Name,Failure Rate,Affected SN,FA Owner,OBA Description,Priority,Product Type,FV Results,ROOT CAUSE,Containment Action,Corrective Action,Material Disposition,Resolution,Attachement";
             lines.Add(line);
@@ -3432,7 +3432,7 @@ namespace Prometheus.Controllers
         private List<string> PrepeareAllQualityReport( string StartDate, string EndDate)
         {
             var lines = new List<string>();
-            var list1 = IssueViewModels.RetrieveAllIssueTypeIssue(StartDate, EndDate, ISSUETP.Quality);
+            var list1 = IssueViewModels.RetrieveAllIssueTypeIssue(StartDate, EndDate, ISSUETP.Quality,this);
 
             var line = "DATE,Project Name,Failure Mode,Product Type,Affected Range,Description,Priority,Owner,Analysis,ROOT CAUSE,Containment Action,Corrective Action,Product Disposal,Resolution,Attachement";
             lines.Add(line);

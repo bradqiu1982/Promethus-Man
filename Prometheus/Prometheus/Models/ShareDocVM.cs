@@ -120,7 +120,8 @@ namespace Prometheus.Models
 
                 var toaddrs = new List<string>();
                 toaddrs.Add(towho);
-                EmailUtility.SendEmail(ctrl, "WUXI NPI System", toaddrs, content);
+                EmailUtility.SendEmail(ctrl, "WUXI NPI System - "+pusher.Split(new string[] { "@"},StringSplitOptions.RemoveEmptyEntries)[0].ToUpper()
+                    , toaddrs, content);
                 new System.Threading.ManualResetEvent(false).WaitOne(20);
             }
             catch (Exception ex)

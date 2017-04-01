@@ -5,6 +5,18 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@if (ViewBag.isassignee != null && ViewBag.isassignee)
+{
+}
+else
+{
+    <script type="text/javascript">
+            $(document).ready(function () {
+                npireadmode();
+        });
+    </script>
+}
+
 <div class="row">
     <div class="col-lg-3">
         <h2>Update Issue</h2>

@@ -158,9 +158,15 @@
                         </li>
                     </ul>
 
-                    @Html.Partial("_LoginPartial")
-                </div>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a id="editablebt" name="editablebt" onclick="changepagemode()">Edit Mode</a>
+                        </li>
+                    </ul>
 
+                    @Html.Partial("_LoginPartial")
+
+                </div>
            </div>
         </nav>
     </div>
@@ -203,10 +209,36 @@
                             var myurl = '/User/UserCachedInfo';
                             window.open(myurl, '_blank');
                         }
+
+                        function npireadmode()
+                        {
+                            $('.form-control').attr('disabled', 'disabled');
+                            $('textarea').attr('disabled', 'disabled');
+                            $('input').attr('disabled', 'disabled');
+                        }
+
+                        function npieditmode()
+                        {
+                            $('.form-control').removeAttr('disabled');
+                            $('textarea').removeAttr('disabled');
+                            $('input').removeAttr('disabled');
+                        }
+
+                        function changepagemode()
+                        {
+                            if (document.getElementById("editablebt").innerText == 'Edit Mode') {
+                                document.getElementById("editablebt").innerText = 'Review Mode';
+                                npieditmode();
+                            }
+                            else
+                            {
+                                document.getElementById("editablebt").innerText = 'Edit Mode';
+                                 npireadmode();
+                            }
+                        }
         </script>
     </div>
 
-    @*@Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")*@
+
 </body>
 </html>

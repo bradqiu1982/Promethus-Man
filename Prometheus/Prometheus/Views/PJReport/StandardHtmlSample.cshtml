@@ -1,0 +1,221 @@
+﻿
+@{
+    ViewBag.Title = "StandardHtmlSample";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="form-group">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="col-lg-3"><h2>Standard Html Sample</h2></div>
+            <div class="col-lg-3"></div>
+            <div class="col-lg-3"></div>
+            <div class="col-lg-3"></div>
+        </div>
+    </div>
+</div>
+
+<div class="form-group">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="col-lg-6"></div>
+            <div class="col-lg-6"></div>
+        </div>
+    </div>
+</div>
+
+<hr />
+
+@using (Html.BeginForm("Action", "Controller", FormMethod.Post, new { enctype = "multipart/form-data", id = "formid", name = "formid" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    //input field
+    <div class="form-group">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="col-lg-6">
+                    <div class="col-lg-2"><label class="control-label">Label 1</label></div>
+                    <div class="col-lg-10">
+                        <input class="form-control text-box single-line" value="@Model.AppV1" id="AppV1" name="AppV1" type="text" data-val="true" data-val-length="minimum length 2 and maximum length of 180." 
+                               data-val-length-max="180" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." />
+                        <span class="field-validation-valid text-danger" data-valmsg-for="AppV1" data-valmsg-replace="true"></span>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="col-lg-2"><label class="control-label">Label 2</label></div>
+                    <div class="col-lg-10">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    //drop list
+    <div class="form-group">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="col-lg-6">
+                    <div class="col-lg-2"><label class="control-label">Label 3</label></div>
+                    <div class="col-lg-10">
+                        @Html.DropDownList("appv2list", null, new { @id = "appv2list", @class = "form-control" })
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="col-lg-2"><label class="control-label">Label 4</label></div>
+                    <div class="col-lg-10">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    //date choose
+    <div class="form-group">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="col-lg-6">
+                    <div class="col-lg-2"><label class="control-label">Label 5</label></div>
+                    <div class="col-lg-10">
+                        <input class="form-control text-box single-line" id="AppV3" name="AppV3" type="text"  data-val="true" data-val-required="The DueDate field is required." value="" />
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="col-lg-2"><label class="control-label">Label 6</label></div>
+                    <div class="col-lg-10"></div>
+                </div>
+            </div>
+            <script type="text/javascript">
+                    $(document).ready(function () {
+                        $("#AppV3").datepicker({
+                            changeMonth: true,
+                            changeYear: true,
+                            dateFormat: 'yy-mm-dd'
+                        });
+                    });
+            </script>
+        </div>
+    </div>
+
+    //text area
+    <div class="form-group">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="col-lg-2"><label class="control-label">Label 5</label></div>
+                <div class="col-lg-10">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <textarea class="form-control" name="APPV4" id="APPV4" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" 
+                          data-val="true" data-val-length="minimum length 6 and maximum length 800" data-val-length-max="800" 
+                          data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$">@Model.APPV4</textarea>
+                <span class="field-validation-valid text-danger" data-valmsg-for="APPV4" data-valmsg-replace="true"></span>
+            </div>
+        </div>
+    </div>
+
+    //panel
+    <div class="form-group">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Panel Title</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="col-lg-1"></div>
+                        <div class="col-lg-10">
+                        </div>
+                        <div class="col-lg-1"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    //html editor
+    <script src="../../ckeditor/ckeditor.js"></script>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="col-lg-2"><label class="control-label">Label 6</label></div>
+                <div class="col-lg-10">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
+                <script>
+                        CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx' });
+                </script>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="col-lg-3">
+                    <span class="btn btn-default btn-file" id="choosefile6">
+                        Editor Attachment <input type="file" name="editorfile" id="editorfile" runat="server" onchange="editorattach(this)" />
+                    </span>
+                </div>
+                <div class="col-lg-9"></div>
+            </div>
+            <script type="text/javascript">
+                function editorattach(oFile) {
+                    ajaxFileUpload();
+                }
+                function ajaxFileUpload() {
+                    $.ajaxFileUpload
+                    (
+                        {
+                            url: '/userfiles/ImageUpload.ashx',
+                            secureuri: false,
+                            fileElementId: 'editorfile',
+                            dataType: 'HTML',
+                            success: function (data, status) {
+                                var wholeval = CKEDITOR.instances.editor1.getData() + data;
+                                CKEDITOR.instances.editor1.setData(wholeval);
+                            },
+                            error: function (e) {
+                                alert(e);
+                            }
+                        }
+                    )
+                    return false;
+                }
+            </script>
+        </div>
+    </div>
+
+}
+
+
+@if (ViewBag.DominoNoticeInfo != null)
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#noticmodal').modal();
+    });
+    </script>
+
+    <div class="modal" id="noticmodal" tabindex="-1" role="dialog" aria-labelledby="noticmodalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="noticmodalLabel">Notic</h4>
+                </div>
+                <div class="row text-center">
+                    <strong> @ViewBag.DominoNoticeInfo</strong>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

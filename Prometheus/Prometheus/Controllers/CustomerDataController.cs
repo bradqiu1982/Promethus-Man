@@ -37,46 +37,7 @@ namespace Prometheus.Controllers
             }
         }
 
-        private static Excel.Workbook OpenBook(Excel.Workbooks books, string fileName, bool readOnly, bool editable,
-        bool updateLinks)
-        {
-            Excel.Workbook book = books.Open(
-                fileName, updateLinks, readOnly,
-                Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
-                Type.Missing, editable, Type.Missing, Type.Missing, Type.Missing,
-                Type.Missing, Type.Missing);
-            return book;
-        }
-
-        private static void ReleaseRCM(object o)
-        {
-            try
-            {
-                System.Runtime.InteropServices.Marshal.ReleaseComObject(o);
-            }
-            catch
-            {
-            }
-            finally
-            {
-                o = null;
-            }
-        }
-
-        private static bool WholeLineEmpty(List<string> line)
-        {
-            bool ret = true;
-            foreach (var item in line)
-            {
-                if (!string.IsNullOrEmpty(item.Trim()))
-                {
-                    ret = false;
-                }
-            }
-            return ret;
-        }
-
-        public static List<List<string>> RetrieveDataFromExcelWithAuth(Controller ctrl,string filename)
+        private static List<List<string>> RetrieveDataFromExcelWithAuth(Controller ctrl,string filename)
         {
             try
             {
@@ -87,7 +48,7 @@ namespace Prometheus.Controllers
 
                 using (NativeMethods cv = new NativeMethods(folderuser, folderdomin, folderpwd))
                 {
-                    return RetrieveDataFromExcel(filename);
+                    return ExcelReader.RetrieveDataFromExcel(filename,null);
                 }
             }
             catch (Exception ex)
@@ -95,81 +56,6 @@ namespace Prometheus.Controllers
                 return null;
             }
         }
-
-        private static List<List<string>> RetrieveDataFromExcel(string wholefn)
-        {
-            var data = new List<List<string>>();
-            Excel.Application excel = null;
-            Excel.Workbook wkb = null;
-            Excel.Workbooks books = null;
-
-            try
-            {
-                logthdinfo(DateTime.Now.ToString() + " try to open excel file " + wholefn + "\r\n\r\n");
-
-                excel = new Excel.Application();
-                excel.DisplayAlerts = false;
-                books = excel.Workbooks;
-
-                wkb = OpenBook(books, wholefn,true,false,false);
-                Excel.Worksheet sheet = wkb.Sheets[1] as Excel.Worksheet;
-
-                var excelRange = sheet.UsedRange;
-                object[,] valueArray = (object[,])excelRange.get_Value(
-                Excel.XlRangeValueDataType.xlRangeValueDefault);
-                var totalrows = sheet.UsedRange.Rows.Count;
-                var totalcol = sheet.UsedRange.Columns.Count;
-
-                for (int row = 1; row <= totalrows; ++row)
-                {
-                    var line = new List<string>();
-                    for (int col = 1; col <= totalcol; ++col)
-                    {
-                        if (valueArray[row, col] == null)
-                        {
-                            line.Add(string.Empty);
-                        }
-                        else
-                        {
-                            line.Add(valueArray[row, col].ToString().Trim().Replace("'",""));
-                        }
-                    }
-                    if (!WholeLineEmpty(line))
-                    {
-                        data.Add(line);
-                    }
-                }
-
-                wkb.Close();
-                excel.Quit();
-
-                Marshal.ReleaseComObject(sheet);
-                Marshal.ReleaseComObject(wkb);
-                Marshal.ReleaseComObject(books);
-                Marshal.ReleaseComObject(excel);
-
-                return data;
-            }
-            catch (Exception ex)
-            {
-                logthdinfo(DateTime.Now.ToString() + " Exception on " + wholefn + " :" + ex.Message + "\r\n\r\n");
-
-                data.Clear();
-                return data;
-            }
-            finally
-            {
-                if (wkb != null)
-                    ReleaseRCM(wkb);
-                if (excel != null)
-                    ReleaseRCM(excel);
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-            }
-        }
-
 
 
         [HttpPost, ActionName("CommitVcselData")]
@@ -1628,6 +1514,77 @@ namespace Prometheus.Controllers
 
             return File(filename, "application/vnd.ms-excel", fn);
         }
+
+
+        public ActionResult CommitUserMatrix()
+        {
+            return View();
+        }
+
+        [HttpPost, ActionName("CommitUserMatrix")]
+        [ValidateAntiForgeryToken]
+        public ActionResult CommitUserMatrixPost()
+        {
+            var wholefn = "";
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Form["RMAFileName"]))
+                {
+                    var customereportfile = Request.Form["RMAFileName"];
+                    var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_").Replace("#", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                    foreach (string fl in Request.Files)
+                    {
+                        if (fl != null && Request.Files[fl].ContentLength > 0)
+                        {
+                            string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ", "_").Replace("#", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                            string datestring = DateTime.Now.ToString("yyyyMMdd");
+                            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+
+                            if (!Directory.Exists(imgdir))
+                            {
+                                Directory.CreateDirectory(imgdir);
+                            }
+
+                            fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
+                            Request.Files[fl].SaveAs(imgdir + fn);
+
+                            if (fn.Contains(originalname))
+                            {
+                                wholefn = imgdir + fn;
+                                break;
+                            }
+                        }//end if
+                    }//end foreach
+
+                    int idx = 0;
+                    if (!string.IsNullOrEmpty(wholefn))
+                    {
+                        var data = RetrieveDataFromExcelWithAuth(this, wholefn);
+                        if (data.Count > 1)
+                        {
+                            foreach (var line in data)
+                            {
+                                if (idx != 0)
+                                {
+                                    UserMatrixVM.UpdateUserMatrix(line[0], line[1], line[2]);
+                                }
+                                idx = idx + 1;
+                            }
+                        }//end if
+                    }//end if
+
+                }//end if
+            }
+            catch (Exception ex)
+            { }
+
+            return View();
+        }
+
 
     }
 }

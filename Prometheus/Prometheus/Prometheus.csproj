@@ -215,6 +215,8 @@
     <Compile Include="Models\DashBoardViewModels.cs" />
     <Compile Include="Models\DBUtility.cs" />
     <Compile Include="Models\EmailUtility.cs" />
+    <Compile Include="Models\ExcelReader.cs" />
+    <Compile Include="Models\ExternalDataCollector.cs" />
     <Compile Include="Models\IssueViewModels.cs" />
     <Compile Include="Models\MESUtility.cs" />
     <Compile Include="Models\ParetoData.cs" />
@@ -230,6 +232,7 @@
     <Compile Include="Models\UserBlogVM.cs" />
     <Compile Include="Models\UserCacheVM.cs" />
     <Compile Include="Models\UserIssueViewModels.cs" />
+    <Compile Include="Models\UserMatrixVM.cs" />
     <Compile Include="Models\UserRankViewModel.cs" />
     <Compile Include="Models\UserViewModels.cs" />
     <Compile Include="Models\VcselViewModel.cs" />
@@ -837,6 +840,8 @@
     <Content Include="Views\User\ModifyBlogDoc.cshtml" />
     <Content Include="userfiles\ImageUpload.ashx" />
     <Content Include="Views\User\UserCachedInfo.cshtml" />
+    <Content Include="Views\PJReport\StandardHtmlSample.cshtml" />
+    <Content Include="Views\CustomerData\CommitUserMatrix.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

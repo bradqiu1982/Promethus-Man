@@ -154,6 +154,12 @@
                                 <li>
                                     @Html.ActionLink("ILearn", "ILearn", "User")
                                 </li>
+                                <li>
+                                    @if (ViewBag.IsSuper != null && ViewBag.IsSuper)
+                                    {
+                                        @Html.ActionLink("UserMatrix", "CommitUserMatrix", "CustomerData")
+                                    }
+                                </li>
                             </ul>
                         </li>
                     </ul>

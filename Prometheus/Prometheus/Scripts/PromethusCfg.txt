@@ -4,3 +4,4 @@ SHAREFOLDERPWD:::wangle@5322
 APPEMAILADRESS:::WXNPI.Trace@finisar.com
 APPEMAILPWD:::abc@123
 EMAILSERVER:::wmail.finisar.com
+RMASHAREFILE:::\\Wux-file01\Public\Wuxi Parallel NPI\CFP4\CQE_RMA_Report.xlsx

@@ -19,6 +19,20 @@ namespace Prometheus.Controllers
     public class UserController : Controller
     {
 
+        private void IsSuper(string username)
+        {
+            var userdict = UserMatrixVM.RetrieveUserMatrixAuth();
+            if (userdict.ContainsKey(username.ToUpper()))
+            {
+                if (string.Compare(userdict[username.ToUpper()].ToUpper(), USERAUTH.SUPER.ToUpper()) == 0)
+                {
+                    ViewBag.IsSuper = true;
+                    return;
+                }//end if
+            }//end if
+            ViewBag.IsSuper = false;
+        }
+
         private bool checkexistuser(string user)
         {
             return false;
@@ -459,12 +473,13 @@ namespace Prometheus.Controllers
 
                     if (string.Compare(updater, usernm, true) == 0)
                     {
+                        IsSuper(usernm);
+
                         CreateICareList();
                         ViewBag.icareissuelist = UserActionTrend.RetrieveICareUserIssue(this, updater, tempmonth);
                         ViewBag.icareranklist = UserActionTrend.RetrieveICareUserRank(this, updater, tempmonth);
                         ViewBag.icaremonth = tempmonth.ToString();
                     }
-
                 }
 
                 return View(list1);

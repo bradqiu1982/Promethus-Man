@@ -100,6 +100,28 @@ namespace Prometheus.Models
 
         }
 
+        private static List<string> DirectoryEnumerateFiles(Controller ctrl, string dirname)
+        {
+            try
+            {
+                var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+                var folderuser = syscfgdict["SHAREFOLDERUSER"];
+                var folderdomin = syscfgdict["SHAREFOLDERDOMIN"];
+                var folderpwd = syscfgdict["SHAREFOLDERPWD"];
+
+                using (NativeMethods cv = new NativeMethods(folderuser, folderdomin, folderpwd))
+                {
+                    var ret = new List<string>();
+                    ret.AddRange(Directory.EnumerateFiles(dirname));
+                    return ret;
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
         private static string ConvertToDate(string datestr)
         {
             if (string.IsNullOrEmpty(datestr))

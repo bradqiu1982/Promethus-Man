@@ -239,8 +239,7 @@ else
                 </div>
 
 
-                @if (ViewBag.isassignee != null && ViewBag.isassignee)
-                {
+
                     <hr />
                     <div class="col-lg-12">
                         <div class="form-group">
@@ -261,7 +260,6 @@ else
                             <span class="field-validation-valid text-danger" data-valmsg-for="RPeopleAddr" data-valmsg-replace="true"></span>
                         </div>
                     </div>
-                }
 
                 <hr />
 
@@ -522,10 +520,7 @@ else
             </div>
 
             <div class="col-lg-3">
-                @if (ViewBag.isassignee != null && ViewBag.isassignee)
-                {
                     <button class="btn btn-default" type="button" value="IssueKey=@(Model.IssueKey)&ToWho=" onclick="PushTask(this)">Push</button>
-                }
             </div>
 
             <div class="col-lg-3">
@@ -535,6 +530,16 @@ else
                 function PushTask(oBT)
                 {
                     document.getElementById("pushtowho").value = oBT.value;
+                    if (document.getElementById("RPeopleAddr").value)
+                    {
+                        document.getElementById("towhoinput").value = document.getElementById("RPeopleAddr").value;
+                    }
+                    
+                    if (CKEDITOR.instances.editor1.getData())
+                    {
+                        document.getElementById("issuereason").value = 'WITHCOMMENT:' + CKEDITOR.instances.editor1.getData();
+                    }
+
                     $('#towhotag').modal({ backdrop: 'static' });
                 }
 
@@ -608,8 +613,14 @@ else
                         <label class="control-label">To Who</label>
                     </div>
                     <div class="col-lg-9">
-                        @Html.DropDownList("towholist", null, new { @id = "towholist", @class = "form-control" })
+                        @Html.DropDownList("towholist", null, new { @id = "towholist", @class = "form-control", @onchange = "chooseapusher()" })
                     </div>
+                    <script type="text/javascript">
+                            function chooseapusher()
+                            {
+                                document.getElementById("towhoinput").value = document.getElementById("towholist").value + ';' + document.getElementById("towhoinput").value;
+                            }
+                    </script>
                 </div>
                 <hr />
                 <div class="row col-lg-12">

@@ -656,6 +656,15 @@ namespace Prometheus.Controllers
                 tempreason = System.Text.Encoding.UTF8.GetString(bytes);
             }
 
+            if (tempreason.Contains("WITHCOMMENT:"))
+            {
+                tempreason = tempreason.Replace("WITHCOMMENT:", "");
+
+                var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(tempreason));
+                var commenttype = COMMENTTYPE.Description;
+                IssueViewModels.StoreIssueComment(IssueKey, dbstr, updater, commenttype);
+            }
+
             var issue = IssueViewModels.RetrieveIssueByIssueKey(IssueKey,this);
             ShareDocVM.ShareDoc(issue.ProjectKey, ShareDocType.ISSUE, issue.IssueKey, issue.Summary, updater, DateTime.Now.ToString());
 
@@ -667,6 +676,12 @@ namespace Prometheus.Controllers
 
             ShareDocVM.SendPushDocEvent("a new Issue about " + issue.Summary
                 , "/Issue/UpdateIssue?issuekey="+ issue.IssueKey, updater, updater, this, tempreason);
+
+            if (issue.Reporter.Contains("@"))
+            {
+                ShareDocVM.SendPushDocEvent("a new Issue about " + issue.Summary
+                    , "/Issue/UpdateIssue?issuekey=" + issue.IssueKey, issue.Reporter, updater, this, tempreason);
+            }
 
             var dict1 = new RouteValueDictionary();
             dict1.Add("issuekey", IssueKey);

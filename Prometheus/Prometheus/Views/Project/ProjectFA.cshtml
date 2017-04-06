@@ -110,7 +110,7 @@
                                         <input class="form-control text-box single-line" value="@item.IssueData.IssueKey" id="HIssueKey@(i)" name="HIssueKey@(i)" type="hidden" />
                                     </div>
 
-                                    <div class="col-lg-5 text-center">
+                                    <div class="col-lg-4 text-center">
                                         @if (item.IssueData.RootCauseCommentList.Count > 0
                                             || item.IssueData.ResultCommentList.Count > 0
                                             || item.IssueData.CommentList.Count > 2
@@ -125,9 +125,14 @@
                                         }
                                     </div>
 
-                                    <div class="col-lg-4 text-center">
+                                    <div class="col-lg-3 text-center">
                                     <a href="/Project/SNIssue?ProjectKey=@item.TestData.ProjectKey&SN=@item.TestData.ModuleSerialNum">@item.TestData.ModuleSerialNum</a></div>
+
+                                    <div class="col-lg-2 text-center">
+                                        <a href="http://cn-traceview/?search=@item.TestData.ModuleSerialNum"  target='_blank'><span class="badge alert-success">T</span></a>
+                                    </div>
                                 </div>
+                            
 
                                 <div class="col-lg-2 text-center">
                                     <div class="col-lg-8">
@@ -239,7 +244,7 @@
                                 </span>
                                 <input class="form-control text-box single-line" value="@item.IssueData.IssueKey" id="HIssueKey@(i)" name="HIssueKey@(i)" type="hidden" />
                             </div>
-                            <div class="col-lg-5 text-center">
+                            <div class="col-lg-4 text-center">
                                 @if (item.IssueData.RootCauseCommentList.Count > 0
                                     ||item.IssueData.ResultCommentList.Count > 0
                                     ||item.IssueData.CommentList.Count > 2
@@ -252,8 +257,12 @@
                                     <span class="badge alert-danger">LYT</span>
                                 }
                             </div>
-                            <div class="col-lg-4 text-center">
+                            <div class="col-lg-3 text-center">
                             <a href="/Project/SNIssue?ProjectKey=@item.TestData.ProjectKey&SN=@item.TestData.ModuleSerialNum">@item.TestData.ModuleSerialNum</a></div>
+
+                            <div class="col-lg-2 text-center">
+                                <a href="http://cn-traceview/?search=@item.TestData.ModuleSerialNum"  target='_blank'><span class="badge alert-success">T</span></a>
+                            </div>
                         </div>
 
                         <div class="col-lg-2 text-center">

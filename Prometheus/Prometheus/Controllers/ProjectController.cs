@@ -4952,6 +4952,15 @@ namespace Prometheus.Controllers
                 catch (Exception ex) { }
             }
 
+            if (tempreason.Contains("WITHCOMMENT:"))
+            {
+                tempreason = tempreason.Replace("WITHCOMMENT:", "");
+                var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(tempreason));
+                var commenttype = PJERRORCOMMENTTYPE.Description;
+                ProjectErrorViewModels.StoreErrorComment(ErrorKey, dbstr, commenttype, updater,DateTime.Now.ToString());
+                tempreason = tempreason.Replace("<p>", "").Replace("</p>", "\r\n");
+            }
+
             var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(ErrorKey,this);
             ShareDocVM.ShareDoc(debugtree[0].ProjectKey, ShareDocType.DEBUG, debugtree[0].ErrorKey, debugtree[0].OrignalCode, updater, DateTime.Now.ToString());
 

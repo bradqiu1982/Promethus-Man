@@ -650,10 +650,7 @@
                             <input type="submit" value="Submit" class="btn btn-default" />
                         </div>
                         <div class="col-lg-2">
-                            @if (ViewBag.assigee != null && ViewBag.assigee)
-                            {
-                                <button class="btn btn-default" type="button" value="ErrorKey=@(Model.ErrorKey)&ToWho=" onclick="PushTask(this)">Push</button>
-                            }
+                            <button class="btn btn-default" type="button" value="ErrorKey=@(Model.ErrorKey)&ToWho=" onclick="PushTask(this)">Push</button>
                         </div>
                         <div class="col-lg-8"><input class="form-control text-box single-line" value="" id="pushtowho" name="pushtowho" type="hidden" /></div>
                     </div>
@@ -662,6 +659,9 @@
                 function PushTask(oBT)
                 {
                     document.getElementById("pushtowho").value = oBT.value;
+                    if (CKEDITOR.instances.editor1.getData()) {
+                        document.getElementById("issuereason").value = 'WITHCOMMENT:' + CKEDITOR.instances.editor1.getData();
+                    }
                     $('#towhotag').modal({ backdrop: 'static' });
                 }
 
@@ -691,7 +691,7 @@
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h4 class="modal-title" id="towhoLabel">Push Task</h4>
+                            <h4 class="modal-title" id="towhoLabel">Push Debug Tree</h4>
                         </div>
                         <div class="row"></div>
                         <div class="row col-lg-12">
@@ -701,9 +701,15 @@
                             <div class="col-lg-9">
                                 @if (ViewBag.towholist != null)
                                 {
-                                    @Html.DropDownList("towholist", null, new { @id = "towholist", @class = "form-control" })
+                                    @Html.DropDownList("towholist", null, new { @id = "towholist", @class = "form-control", @onchange = "chooseapusher()" })
                                 }
                             </div>
+                            <script type="text/javascript">
+                                function chooseapusher()
+                                {
+                                    document.getElementById("towhoinput").value = document.getElementById("towholist").value + ';' + document.getElementById("towhoinput").value;
+                                }
+                            </script>
                         </div>
                         <hr />
                         <div class="row col-lg-12">

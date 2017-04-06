@@ -122,8 +122,14 @@
                                 <label class="control-label">To Who</label>
                             </div>
                             <div class="col-lg-9">
-                                @Html.DropDownList("towholist", null, new { @id = "towholist", @class = "form-control" })
+                                @Html.DropDownList("towholist", null, new { @id = "towholist", @class = "form-control", @onchange = "chooseapusher()" })
                             </div>
+                            <script type="text/javascript">
+                            function chooseapusher()
+                            {
+                                document.getElementById("towhoinput").value = document.getElementById("towholist").value + ';' + document.getElementById("towhoinput").value;
+                            }
+                            </script>
                         </div>
                         <hr />
                         <div class="row col-lg-12">

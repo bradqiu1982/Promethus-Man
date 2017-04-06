@@ -967,8 +967,16 @@ namespace Prometheus.Controllers
             var tempreason = "";
             if (!string.IsNullOrEmpty(Reason))
             {
-                var bytes = Convert.FromBase64String(Reason);
-                tempreason = System.Text.Encoding.UTF8.GetString(bytes);
+                try
+                {
+                    string dummyData = Reason.Trim().Replace(" ", "+");
+                    if (dummyData.Length % 4 > 0)
+                        dummyData = dummyData.PadRight(dummyData.Length + 4 - dummyData.Length % 4, '=');
+
+                    var bytes = Convert.FromBase64String(dummyData);
+                    tempreason = System.Text.Encoding.UTF8.GetString(bytes);
+                }
+                catch (Exception ex) { }
             }
 
             var vm = UserBlogVM.RetrieveBlogDoc(DOCKey,this);

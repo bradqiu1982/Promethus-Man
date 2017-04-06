@@ -41,7 +41,12 @@ namespace Prometheus.Models
             {
                 var tempinfo = new UserCacheVM();
                 tempinfo.UserName = Convert.ToString(line[0]);
-                var infobytes = Convert.FromBase64String(Convert.ToString(line[1]));
+
+                string dummyData = Convert.ToString(line[1]).Trim().Replace(" ", "+");
+                if (dummyData.Length % 4 > 0)
+                    dummyData = dummyData.PadRight(dummyData.Length + 4 - dummyData.Length % 4, '=');
+
+                var infobytes = Convert.FromBase64String(dummyData);
                 tempinfo.CacheInfo = System.Text.Encoding.UTF8.GetString(infobytes);
                 tempinfo.UpdateTime = DateTime.Parse(Convert.ToString(line[2]));
                 ret.Add(tempinfo);

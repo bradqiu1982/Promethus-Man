@@ -114,7 +114,7 @@ namespace Prometheus.Models
                 var content = "";
                 if (!string.IsNullOrEmpty(reason))
                 {
-                    content = "For " + reason + ":\r\n\r\n";
+                    content = "With Comment: " + reason + "\r\n\r\n";
                 }
                 content = content+what + " is share to you by " + pusher + ":\r\n\r\n" + validatestr;
 

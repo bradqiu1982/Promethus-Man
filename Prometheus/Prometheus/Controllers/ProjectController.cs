@@ -4675,18 +4675,19 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
-            var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
-            foreach (var pjkey in pjkeylist)
-            {
-                try
-                {
-                    //UpdateJO();
-                    //SendTaskNotice();
-                    //BITestData.PrePareLatestData(this,pjkey);
-                }
-                catch (Exception ex)
-                { }
-            }
+            ExternalDataCollector.RefreshRMAData(this);
+            //var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
+            //foreach (var pjkey in pjkeylist)
+            //{
+            //    try
+            //    {
+            //        //UpdateJO();
+            //        //SendTaskNotice();
+            //        //BITestData.PrePareLatestData(this,pjkey);
+            //    }
+            //    catch (Exception ex)
+            //    { }
+            //}
             return View("HeartBeat");
         }
 

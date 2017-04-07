@@ -109,6 +109,10 @@ namespace Prometheus.Controllers
                 CreateAllLists(vm);
 
                 ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
+
+                var asilist = UserViewModels.RetrieveAllUser();
+                ViewBag.towholist = CreateSelectList(asilist, "");
+
                 return View(vm);
             }
             else
@@ -329,6 +333,7 @@ namespace Prometheus.Controllers
             {
                 var asilist = UserViewModels.RetrieveAllUser();
                 ViewBag.towholist = CreateSelectList(asilist, "");
+                ViewBag.towholist1 = CreateSelectList(asilist, "");
 
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);
@@ -410,6 +415,7 @@ namespace Prometheus.Controllers
 
                 var asilist = UserViewModels.RetrieveAllUser();
                 ViewBag.towholist = CreateSelectList(asilist, "");
+                ViewBag.towholist1 = CreateSelectList(asilist, "");
 
                 ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
                 return View(ret);
@@ -418,6 +424,7 @@ namespace Prometheus.Controllers
             {
                 var asilist = UserViewModels.RetrieveAllUser();
                 ViewBag.towholist = CreateSelectList(asilist, "");
+                ViewBag.towholist1 = CreateSelectList(asilist, "");
 
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);
@@ -719,6 +726,9 @@ namespace Prometheus.Controllers
             CreateAllLists(vm);
             ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
 
+            var asilist = UserViewModels.RetrieveAllUser();
+            ViewBag.towholist = CreateSelectList(asilist, "");
+
             return View(vm);
         }
 
@@ -749,7 +759,7 @@ namespace Prometheus.Controllers
             vm.Priority = Request.Form["prioritylist"].ToString();
             vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
             vm.ReportDate = DateTime.Now;
-            vm.Assignee = updater; //Request.Form["assigneelist"].ToString();
+            vm.Assignee = Request.Form["assigneelist"].ToString();
             vm.Reporter = updater; //Request.Form["reporterlist"].ToString();
             vm.Resolution = Request.Form["resolutionlist"].ToString();
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
@@ -764,6 +774,8 @@ namespace Prometheus.Controllers
                 vm.Description = "";
 
             vm.StoreSubIssue();
+
+            SendTaskEvent(vm, "asigned to you", vm.Reporter, vm.Assignee);
 
             if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
             {
@@ -1163,6 +1175,7 @@ namespace Prometheus.Controllers
             {
                 var asilist = UserViewModels.RetrieveAllUser();
                 ViewBag.towholist = CreateSelectList(asilist, "");
+                ViewBag.towholist1 = CreateSelectList(asilist, "");
 
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);
@@ -1195,6 +1208,7 @@ namespace Prometheus.Controllers
 
                 var asilist = UserViewModels.RetrieveAllUser();
                 ViewBag.towholist = CreateSelectList(asilist, "");
+                ViewBag.towholist1 = CreateSelectList(asilist, "");
 
                 ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
                 return View(ret);
@@ -1203,6 +1217,7 @@ namespace Prometheus.Controllers
             {
                 var asilist = UserViewModels.RetrieveAllUser();
                 ViewBag.towholist = CreateSelectList(asilist, "");
+                ViewBag.towholist1 = CreateSelectList(asilist, "");
 
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);

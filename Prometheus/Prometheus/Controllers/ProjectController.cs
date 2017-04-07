@@ -4795,6 +4795,9 @@ namespace Prometheus.Controllers
                 return View();
             }
 
+            var asilist = UserViewModels.RetrieveAllUser();
+            ViewBag.towholist1 = CreateSelectList(asilist, "");
+
             var ret = IssueViewModels.RetrieveIssueByIssueKey(key, this);
             if (ret != null)
             {

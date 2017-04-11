@@ -30,9 +30,13 @@ namespace Prometheus.Models
                 {
                     if (!item.Contains("@"))
                         continue;
-
-                    message.To.Add(item);
+                    try
+                    {
+                        message.To.Add(item);
+                    }
+                    catch (Exception e) { }
                 }
+
                 message.Subject = title;
                 message.Body = content;
 

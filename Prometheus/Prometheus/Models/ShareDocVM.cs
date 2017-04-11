@@ -152,7 +152,9 @@ namespace Prometheus.Models
 
                 var toaddrs = new List<string>();
                 toaddrs.Add(towho);
-                EmailUtility.SendEmail(ctrl, "WUXI NPI System", toaddrs, content);
+
+                var reporter = pusher.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
+                EmailUtility.SendEmail(ctrl, "WUXI NPI System_"+reporter, toaddrs, content);
                 new System.Threading.ManualResetEvent(false).WaitOne(20);
             }
             catch (Exception ex)

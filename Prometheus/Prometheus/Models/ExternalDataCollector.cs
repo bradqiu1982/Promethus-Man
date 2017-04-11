@@ -633,7 +633,9 @@ namespace Prometheus.Models
                 toaddrs.AddRange(vm.RelativePeopleList);
                 toaddrs.Add(vm.Assignee);
                 toaddrs.Add(vm.Reporter);
-                EmailUtility.SendEmail(ctrl, "WUXI NPI System", toaddrs, content);
+
+                var reporter = vm.Reporter.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
+                EmailUtility.SendEmail(ctrl, "WUXI NPI System_"+reporter, toaddrs, content);
                 new System.Threading.ManualResetEvent(false).WaitOne(50);
             }
         }

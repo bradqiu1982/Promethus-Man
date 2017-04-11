@@ -147,7 +147,9 @@ namespace Prometheus.Controllers
                 {
                     toaddrs.AddRange(vm.RelativePeopleList);
                 }
-                EmailUtility.SendEmail(this,"WUXI NPI System", toaddrs, content);
+
+            var reporter = vm.Reporter.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
+            EmailUtility.SendEmail(this,"WUXI NPI System_"+ reporter, toaddrs, content);
             new System.Threading.ManualResetEvent(false).WaitOne(300);
         }
 
@@ -173,7 +175,9 @@ namespace Prometheus.Controllers
             {
                 toaddrs.AddRange(vm.RelativePeopleList);
             }
-            EmailUtility.SendEmail(this,"WUXI NPI System", toaddrs, content);
+
+            var report = Reporter.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
+            EmailUtility.SendEmail(this,"WUXI NPI System_"+report, toaddrs, content);
             new System.Threading.ManualResetEvent(false).WaitOne(300);
         }
 
@@ -1010,7 +1014,9 @@ namespace Prometheus.Controllers
                 toaddrs.AddRange(vm.RelativePeopleList);
                 toaddrs.Add(vm.Assignee);
                 toaddrs.Add(vm.Reporter);
-                EmailUtility.SendEmail(this,"WUXI NPI System", toaddrs, content);
+
+                var reporter = vm.Reporter.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
+                EmailUtility.SendEmail(this,"WUXI NPI System_"+reporter, toaddrs, content);
                 new System.Threading.ManualResetEvent(false).WaitOne(300);
             }
         }
@@ -1039,7 +1045,9 @@ namespace Prometheus.Controllers
                 toaddrs.AddRange(vm.RelativePeopleList);
                 toaddrs.Add(vm.Assignee);
                 toaddrs.Add(vm.Reporter);
-                EmailUtility.SendEmail(this,"WUXI NPI System", toaddrs, content);
+
+                var reporter = vm.Reporter.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
+                EmailUtility.SendEmail(this,"WUXI NPI System_"+reporter, toaddrs, content);
                 new System.Threading.ManualResetEvent(false).WaitOne(300);
             }
         }

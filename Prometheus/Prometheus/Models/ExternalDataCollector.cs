@@ -298,7 +298,7 @@ namespace Prometheus.Models
             var ret = new List<RMARAWData>();
             if (!string.IsNullOrEmpty(line[1]) && !string.IsNullOrEmpty(line[8]))
             {
-                var sns = line[8].Split(new char[] { '\r','\n' }, StringSplitOptions.RemoveEmptyEntries);
+                var sns = line[8].Split(new char[] { '\r','\n',',',';' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var sn in sns)
                 {
                     var tempdata = OfferRMARAWDataValue(line);

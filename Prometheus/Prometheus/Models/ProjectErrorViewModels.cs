@@ -76,6 +76,8 @@ namespace Prometheus.Models
         public DateTime CommentDate { set; get; }
 
         public string CommentType { set; get; }
+
+        public string ResultClosed { set; get; }
     }
 
     public class ProjectErrorViewModels
@@ -413,7 +415,7 @@ namespace Prometheus.Models
         public static List<ErrorComments> RetrieveErrorComments(string errorkey,Controller ctrl)
         {
             var ret = new List<ErrorComments>();
-            var sql = "select ErrorKey,Comment,Reporter,CommentDate,CommentType from ErrorComments where ErrorKey = '<ErrorKey>' and APVal1 <> 'delete' order by CommentDate ASC";
+            var sql = "select ErrorKey,Comment,Reporter,CommentDate,CommentType,APVal2 from ErrorComments where ErrorKey = '<ErrorKey>' and APVal1 <> 'delete' order by CommentDate ASC";
             sql = sql.Replace("<ErrorKey>", errorkey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
 
@@ -425,6 +427,7 @@ namespace Prometheus.Models
                 tempcomment.Reporter = Convert.ToString(r[2]);
                 tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
                 tempcomment.CommentType = Convert.ToString(r[4]);
+                tempcomment.ResultClosed = Convert.ToString(r[5]);
                 ret.Add(tempcomment);
             }
 
@@ -516,7 +519,7 @@ namespace Prometheus.Models
         public static ErrorComments RetrieveSPComment(string ErrorKey, string CommentType, string Date)
         {
             var tempcomment = new ErrorComments();
-            var csql = "select ErrorKey,Comment,Reporter,CommentDate,CommentType from ErrorComments  where ErrorKey='<ErrorKey>' and CommentType='<CommentType>' and CommentDate='<CommentDate>'";
+            var csql = "select ErrorKey,Comment,Reporter,CommentDate,CommentType,APVal2 from ErrorComments  where ErrorKey='<ErrorKey>' and CommentType='<CommentType>' and CommentDate='<CommentDate>'";
             csql = csql.Replace("<ErrorKey>", ErrorKey).Replace("<CommentType>", CommentType).Replace("<CommentDate>", Date);
             var cdbret = DBUtility.ExeLocalSqlWithRes(csql, null);
             foreach (var r in cdbret)
@@ -526,6 +529,7 @@ namespace Prometheus.Models
                 tempcomment.Reporter = Convert.ToString(r[2]);
                 tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
                 tempcomment.CommentType = Convert.ToString(r[4]);
+                tempcomment.ResultClosed = Convert.ToString(r[5]);
             }
 
             return tempcomment;
@@ -535,6 +539,13 @@ namespace Prometheus.Models
         {
             var csql = "update ErrorComments set Comment = '<Comment>'  where ErrorKey='<ErrorKey>' and CommentType='<CommentType>' and CommentDate='<CommentDate>'";
             csql = csql.Replace("<ErrorKey>", ErrorKey).Replace("<CommentType>", CommentType).Replace("<CommentDate>", Date).Replace("<Comment>", dbcomment);
+            DBUtility.ExeLocalSqlNoRes(csql);
+        }
+
+        public static void CloseSPResultComment(string ErrorKey, string CommentType, string Date)
+        {
+            var csql = "update ErrorComments set APVal2 = 'CLOSED'  where ErrorKey='<ErrorKey>' and CommentType='<CommentType>' and CommentDate='<CommentDate>'";
+            csql = csql.Replace("<ErrorKey>", ErrorKey).Replace("<CommentType>", CommentType).Replace("<CommentDate>", Date);
             DBUtility.ExeLocalSqlNoRes(csql);
         }
 

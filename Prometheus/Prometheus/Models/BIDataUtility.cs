@@ -119,7 +119,7 @@ namespace Prometheus.Models
                             var bondeddatadict = BITestData.RetrieveAllDataID(vm.ProjectKey);
 
                             //var failurelist = new List<BITestData>();
-                            var sql = "select ModuleSerialNum,Step,ModuleType,ErrAbbr,TestTimeStamp,TestStation,ModulePartNum,wafer,waferpn from  "+vt+"(nolock) where wafer <> 'NULL' and waferpn  <> 'NULL' and ErrAbbr  <> 'NULL' and ModulePartNum in <PNCOND> and TestTimeStamp > '<TIMECOND>' order by TestTimeStamp Desc,ModuleSerialNum";
+                            var sql = "select ModuleSerialNum,Step,ModuleType,ErrAbbr,TestTimeStamp,TestStation,ModulePartNum,wafer,waferpn from  "+vt+ "(nolock) where wafer <> 'NULL' and waferpn  <> 'NULL' and ErrAbbr  <> 'NULL' and ModulePartNum in <PNCOND> and TestTimeStamp > '<TIMECOND>'  and TestTimeStamp < '" + DateTime.Now.ToString() + "' order by TestTimeStamp Desc,ModuleSerialNum";
                             var pncond = PNCondition(vm.PNList);
 
                         if (string.IsNullOrEmpty(pncond))

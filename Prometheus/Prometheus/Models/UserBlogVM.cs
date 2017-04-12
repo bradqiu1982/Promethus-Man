@@ -262,7 +262,15 @@ namespace Prometheus.Models
                 }
             }
 
-            filtertag = existtag+ ";" + filtertag;
+            if (!string.IsNullOrEmpty(filtertag))
+            {
+                filtertag = existtag + ";" + filtertag;
+            }
+            else
+            {
+                filtertag = existtag;
+            }
+            
 
             var sql = "delete from UserBlog where UserName='<UserName>' and APVal1 = '<APVal1>'";
             sql = sql.Replace("<UserName>", username).Replace("<APVal1>", UserBlogContentType.TAG);

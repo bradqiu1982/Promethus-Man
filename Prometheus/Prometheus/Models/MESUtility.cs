@@ -180,7 +180,7 @@ namespace Prometheus.Models
                         }
 
                         var sndict = new Dictionary<string, bool>();
-                        var sql = s.Value.Replace("<TIMECOND>", "and TestTimeStamp > '" + vm.StartDate.ToString() + "'");
+                        var sql = s.Value.Replace("<TIMECOND>", "and TestTimeStamp > '" + vm.StartDate.ToString() + "' and TestTimeStamp < '" + DateTime.Now.ToString() + "'");
                         var dbret = DBUtility.ExeMESSqlWithRes(sql);
                         foreach (var item in dbret)
                         {

@@ -770,12 +770,12 @@ namespace Prometheus.Models
 
         public static void UpdateProjectExcept(string ProjectKey, string Except, string ExceptType)
         {
-            var sql = "select ProjectKey from ProjectException where ProjectKey='<ProjectKey>' and ExceptionType='<ExceptType>'";
-            sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ExceptType>", ExceptType);
+            var sql = "select ProjectKey from ProjectException where ExceptionType='<ExceptType>'";
+            sql = sql.Replace("<ExceptType>", ExceptType);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             if (dbret.Count > 0)
             {
-                sql = "update ProjectException set Exception='<Except>' where ProjectKey='<ProjectKey>' and ExceptionType='<ExceptType>'";
+                sql = "update ProjectException set Exception='<Except>' where ExceptionType='<ExceptType>'";
                 sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ExceptType>", ExceptType).Replace("<Except>", Except);
                 DBUtility.ExeLocalSqlNoRes(sql);
             }
@@ -790,8 +790,8 @@ namespace Prometheus.Models
         public static ProjectExcept RetrieveProjectExcept(string ProjectKey, string ExceptType)
         {
             var ret = new ProjectExcept();
-            var sql = "select ProjectKey,Exception,ExceptionType from ProjectException where ProjectKey='<ProjectKey>' and ExceptionType='<ExceptType>'";
-            sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ExceptType>", ExceptType);
+            var sql = "select ProjectKey,Exception,ExceptionType from ProjectException where ExceptionType='<ExceptType>'";
+            sql = sql.Replace("<ExceptType>", ExceptType);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
             {

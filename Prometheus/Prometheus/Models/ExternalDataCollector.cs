@@ -218,6 +218,27 @@ namespace Prometheus.Models
             catch (Exception ex) { return "1982-05-06 10:00:00"; }
         }
 
+        private static void logthdinfo(string info)
+        {
+            try
+            {
+                var filename = "d:\\log\\rmabackuptrace-" + DateTime.Now.ToString("yyyy-MM-dd");
+                if (File.Exists(filename))
+                {
+                    var content = System.IO.File.ReadAllText(filename);
+                    content = content + "\r\n" + DateTime.Now.ToString() + " : " + info;
+                    System.IO.File.WriteAllText(filename, content);
+                }
+                else
+                {
+                    System.IO.File.WriteAllText(filename, DateTime.Now.ToString() + " : " + info);
+                }
+            }
+            catch (Exception ex)
+            { }
+
+        }
+
         public static void RefreshRMAData(Controller ctrl)
         {
             var syscfgdict = CfgUtility.GetSysConfig(ctrl);
@@ -241,15 +262,21 @@ namespace Prometheus.Models
                 {
                     try
                     {
+                        logthdinfo("\r\nStart to copy file: " + srcf);
                         var desfile = imgdir + filename;
                         FileCopy(ctrl, srcf, desfile, true);
                         if (FileExist(ctrl, desfile))
                         {
+                            logthdinfo("try to get data from file: " + desfile);
                             var data = RetrieveDataFromExcelWithAuth(ctrl, desfile);
+                            logthdinfo("get data count: " + data.Count.ToString());
+
                             SolveRMAData(data, rmaclosefilefoldr, ctrl);
                         }//copied file exist
                     }
-                    catch (Exception ex) { }
+                    catch (Exception ex) {
+                        logthdinfo("SolveRMAData Exception: " + ex.Message);
+                    }
                 }//end if
             }//end foreach
         }

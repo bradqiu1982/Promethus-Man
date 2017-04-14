@@ -258,7 +258,9 @@ namespace Prometheus.Models
             foreach (var srcf in rmasrcfiles)
             {
                 var filename = Path.GetFileName(srcf);
-                if (filename.ToUpper().Contains("RMA") && filename.ToUpper().Contains("COMPLAINT"))
+                if (filename.ToUpper().Contains("RMA") 
+                    && filename.ToUpper().Contains("COMPLAINT")
+                    && filename.ToUpper().Contains("NEWDATA"))
                 {
                     try
                     {
@@ -406,13 +408,21 @@ namespace Prometheus.Models
             var rmanumfolder = rmacloseattachfolder + "\\" + RMANum;
             if (DirectoryExists(ctrl, rmanumfolder))
             {
-                string datestring = DateTime.Now.ToString("yyyyMMdd");
-                string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+                var cleanrmanum = RMANum.Replace(" ", "_").Replace("#", "").Replace("'", "")
+                            .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                var imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\RMAATTCH\\" + cleanrmanum + "\\";
+
+                if (!DirectoryExists(ctrl, imgdir))
+                    Directory.CreateDirectory(imgdir);
+
 
                 var rmaattachfiles = DirectoryEnumerateFiles(ctrl, rmanumfolder);
                 foreach (var attach in rmaattachfiles)
                 {
-                    var filename = Path.GetFileName(attach).Replace("'","");
+                    var filename = Path.GetFileName(attach).Replace(" ", "_").Replace("#", "").Replace("'", "")
+                            .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
                     if (!rmaattaches.ContainsKey(RMANum))
                     {
                         //download file and store
@@ -421,7 +431,7 @@ namespace Prometheus.Models
                         FileCopy(ctrl, attach, desfile, true);
                         if (FileExist(ctrl, desfile))
                         {
-                            var url = "/userfiles/docs/" + datestring + "/" + filename;
+                            var url = "/userfiles/docs/RMAATTCH/"+ cleanrmanum +"/"+ filename;
                             StormRMAAttach(RMANum, url);
                         }
                     }//not contain rmanum
@@ -434,7 +444,7 @@ namespace Prometheus.Models
                             FileCopy(ctrl, attach, desfile, true);
                             if (FileExist(ctrl, desfile))
                             {
-                                var url = "/userfiles/docs/" + datestring + "/" + filename;
+                                var url = "/userfiles/docs/RMAATTCH/" + cleanrmanum + "/" + filename;
                                 StormRMAAttach(RMANum, url);
                             }
                         }//not contain attach
@@ -463,7 +473,10 @@ namespace Prometheus.Models
         private static void Try2CreateRMA(RMARAWData rawdata,Dictionary<string,string> usermatrix
             , Dictionary<string, string> rmaissuedict, Dictionary<string, bool> allpjdict,Controller ctrl)
         {
-            var analyser = (rawdata.AppV_O.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
+            var analyser = rawdata.AppV_O.ToUpper();
+            if(!rawdata.AppV_O.Contains("@"))
+                analyser = (rawdata.AppV_O.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
+
             if (usermatrix.ContainsKey(analyser))
             {
                 if (string.Compare(usermatrix[analyser], USERDEPART.NPI, true) == 0)

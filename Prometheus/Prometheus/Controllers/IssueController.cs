@@ -218,7 +218,7 @@ namespace Prometheus.Controllers
                 var urls = ReceiveRMAFiles();
                 var internalreportfile = Request.Form["attachmentupload"];
                 var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
-                    .Replace(" ", "_").Replace("#", "")
+                    .Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
 
                 var url = "";
@@ -529,7 +529,7 @@ namespace Prometheus.Controllers
                 var urls = ReceiveRMAFiles();
                 var internalreportfile = Request.Form["attachmentupload"];
                 var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
-                    .Replace(" ", "_").Replace("#", "")
+                    .Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
 
                 var url = "";
@@ -786,7 +786,7 @@ namespace Prometheus.Controllers
                 var urls = ReceiveRMAFiles();
                 var internalreportfile = Request.Form["attachmentupload"];
                 var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
-                    .Replace(" ", "_").Replace("#", "")
+                    .Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
 
                 var url = "";
@@ -1103,7 +1103,7 @@ namespace Prometheus.Controllers
                 var urls = ReceiveRMAFiles();
                 var internalreportfile = Request.Form["attachmentupload"];
                 var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
-                    .Replace(" ", "_").Replace("#", "")
+                    .Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
 
                 var url = "";
@@ -1493,7 +1493,7 @@ namespace Prometheus.Controllers
                 var urls = ReceiveRMAFiles();
                 var internalreportfile = Request.Form["attachmentupload"];
                 var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
-                    .Replace(" ", "_").Replace("#", "")
+                    .Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
 
                 var url = "";
@@ -1846,7 +1846,7 @@ namespace Prometheus.Controllers
             {
                 var attachementfile = Request.Form["attachmentupload"];
                 var originalname1 = Path.GetFileNameWithoutExtension(attachementfile)
-                    .Replace(" ", "_").Replace("#", "")
+                    .Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
 
                 var url = "";
@@ -1878,7 +1878,7 @@ namespace Prometheus.Controllers
             {
                 var customereportfile = Request.Form["customreportupload"];
                 var originalname = Path.GetFileNameWithoutExtension(customereportfile)
-                    .Replace(" ", "_").Replace("#", "")
+                    .Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
 
                 var url = "";
@@ -1912,7 +1912,7 @@ namespace Prometheus.Controllers
             {
                 var internalreportfile = Request.Form["internalreportupload"];
                 var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
-                    .Replace(" ", "_").Replace("#", "")
+                    .Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
 
                 var url = "";
@@ -2162,7 +2162,7 @@ namespace Prometheus.Controllers
             {
                 var attachementfile = Request.Form["attachmentupload"];
                 var originalname1 = Path.GetFileNameWithoutExtension(attachementfile)
-                    .Replace(" ", "_").Replace("#", "")
+                    .Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
 
                 var url = "";
@@ -2400,7 +2400,7 @@ namespace Prometheus.Controllers
             {
                 var attachementfile = Request.Form["attachmentupload"];
                 var originalname1 = Path.GetFileNameWithoutExtension(attachementfile)
-                    .Replace(" ", "_").Replace("#", "")
+                    .Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
 
                 var url = "";
@@ -2651,7 +2651,7 @@ namespace Prometheus.Controllers
             {
                 var attachementfile = Request.Form["attachmentupload"];
                 var originalname1 = Path.GetFileNameWithoutExtension(attachementfile)
-                    .Replace(" ", "_").Replace("#", "")
+                    .Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
 
                 var url = "";
@@ -2966,7 +2966,7 @@ namespace Prometheus.Controllers
             {
                 var internalreportfile = Request.Form["contentattach"];
                 var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
-                    .Replace(" ", "_").Replace("#", "")
+                    .Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
 
                 foreach (var r in urls)

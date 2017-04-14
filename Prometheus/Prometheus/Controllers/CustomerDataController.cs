@@ -289,14 +289,14 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(Request.Form["RMAFileName"]))
                 {
                     var customereportfile = Request.Form["RMAFileName"];
-                    var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_").Replace("#", "")
+                    var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
 
                     foreach (string fl in Request.Files)
                     {
                         if (fl != null && Request.Files[fl].ContentLength > 0)
                         {
-                            string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ", "_").Replace("#", "")
+                            string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
 
                             string datestring = DateTime.Now.ToString("yyyyMMdd");
@@ -436,14 +436,14 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(Request.Form["RMAFileName"]))
                 {
                     var customereportfile = Request.Form["RMAFileName"];
-                    var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_").Replace("#", "")
+                    var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
 
                     foreach (string fl in Request.Files)
                     {
                         if (fl != null && Request.Files[fl].ContentLength > 0)
                         {
-                            string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ", "_").Replace("#", "")
+                            string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
 
                             string datestring = DateTime.Now.ToString("yyyyMMdd");
@@ -590,14 +590,14 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(Request.Form["RMAFileName"]))
                 {
                     var customereportfile = Request.Form["RMAFileName"];
-                    var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_").Replace("#", "")
+                    var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
 
                     foreach (string fl in Request.Files)
                     {
                         if (fl != null && Request.Files[fl].ContentLength > 0)
                         {
-                            string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ", "_").Replace("#", "")
+                            string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
 
                             string datestring = DateTime.Now.ToString("yyyyMMdd");
@@ -738,14 +738,14 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(Request.Form["RMAFileName"]))
                 {
                     var customereportfile = Request.Form["RMAFileName"];
-                    var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_").Replace("#", "")
+                    var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
 
                     foreach (string fl in Request.Files)
                     {
                         if (fl != null && Request.Files[fl].ContentLength > 0)
                         {
-                            string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ", "_").Replace("#", "")
+                            string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
 
                             string datestring = DateTime.Now.ToString("yyyyMMdd");
@@ -1535,14 +1535,14 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(Request.Form["RMAFileName"]))
                 {
                     var customereportfile = Request.Form["RMAFileName"];
-                    var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_").Replace("#", "")
+                    var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
 
                     foreach (string fl in Request.Files)
                     {
                         if (fl != null && Request.Files[fl].ContentLength > 0)
                         {
-                            string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ", "_").Replace("#", "")
+                            string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
 
                             string datestring = DateTime.Now.ToString("yyyyMMdd");

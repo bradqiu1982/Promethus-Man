@@ -388,7 +388,8 @@ namespace Prometheus.Models
         public static Dictionary<string, bool> RetrieveSNBeforeDateWithStation(string projectkey, string edate,Cache mycache)
         {
             var ret = new Dictionary<string, bool>();
-            var sql = "select ModuleSerialNum,WhichTest from ProjectTestData where ProjectKey = '<ProjectKey>' and TestTimeStamp < '<ENDDATE>'";
+            //var sql = "select ModuleSerialNum,WhichTest from ProjectTestData where ProjectKey = '<ProjectKey>' and TestTimeStamp < '<ENDDATE>'";
+            var sql = "select ModuleSerialNum,WhichTest from ProjectTestData where ProjectKey = '<ProjectKey>' and TestTimeStamp < '<ENDDATE>' and TestTimeStamp > '" + DateTime.Parse(edate).AddMonths(-6).ToString() + "' order by TestTimeStamp DESC";
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<ENDDATE>", edate);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, mycache);
             foreach (var item in dbret)

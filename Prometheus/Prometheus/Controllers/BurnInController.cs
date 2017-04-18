@@ -361,14 +361,14 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        public ActionResult ProjectBIDailyYield(string ProjectKey, string StartDate, string EndDate1)
+        public ActionResult ProjectBIDailyYield(string ProjectKey, string StartDate, string EndDate)
         {
-            if (ProjectKey != null && StartDate != null && EndDate1 != null)
+            if (ProjectKey != null && StartDate != null && EndDate != null)
             {
-                var EndDate = DateTime.Parse(EndDate1).AddDays(1).ToString();
+                var EndDate2 = DateTime.Parse(EndDate).AddDays(1).ToString();
 
                 ViewBag.pjkey = ProjectKey;
-                var vmlist = ProjectBIYieldViewModule.GetYieldByDay(ProjectKey, StartDate, EndDate);
+                var vmlist = ProjectBIYieldViewModule.GetYieldByDay(ProjectKey, StartDate, EndDate2);
                 if (vmlist.Count > 0)
                 {
                     var ChartxAxisValues = "";
@@ -426,7 +426,7 @@ namespace Prometheus.Controllers
                     crtempvalue = crtempvalue.Substring(0, crtempvalue.Length - 1);
 
                     //rederect url
-                    var reurl = "window.location.href = '/BurnIn/ProjectBIDailyYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category+'&VStartDate='+'" + StartDate + "'+'&VEndDate='+'" + EndDate + "'";
+                    var reurl = "window.location.href = '/BurnIn/ProjectBIDailyYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category+'&VStartDate='+'" + StartDate + "'+'&VEndDate='+'" + EndDate2 + "'";
 
                     var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/BISuperYield.xml"));
                     ViewBag.chartscript = tempscript.Replace("#ElementID#", "dailyyield")

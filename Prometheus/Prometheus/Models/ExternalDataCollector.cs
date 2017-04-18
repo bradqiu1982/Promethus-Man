@@ -685,7 +685,7 @@ namespace Prometheus.Models
 
         private static bool RMADataExist(RMARAWData rmadata)
         {
-            var sql = "select AppV_B from RMABackupData where AppV_B='<RMANUM>' and AppV_I='<SN>'";
+            var sql = "select AppV_B from RMABackupData where AppV_B=N'<RMANUM>' and AppV_I=N'<SN>'";
             sql = sql.Replace("<RMANUM>", rmadata.AppV_B).Replace("<SN>", rmadata.AppV_I);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)

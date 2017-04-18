@@ -19,7 +19,7 @@ namespace Prometheus.Controllers
     public class UserController : Controller
     {
 
-        private void IsSuper(string username)
+        private void UserAuth(string username)
         {
             var userdict = UserMatrixVM.RetrieveUserMatrixAuth();
             if (userdict.ContainsKey(username.ToUpper()))
@@ -27,10 +27,22 @@ namespace Prometheus.Controllers
                 if (string.Compare(userdict[username.ToUpper()].ToUpper(), USERAUTH.SUPER.ToUpper()) == 0)
                 {
                     ViewBag.IsSuper = true;
-                    return;
-                }//end if
+                }
+                else
+                {
+                    ViewBag.IsSuper = false;
+                }
+
+                if (string.Compare(userdict[username.ToUpper()].ToUpper(), USERAUTH.ADMIN.ToUpper()) == 0)
+                {
+                    ViewBag.IsAdmin = true;
+                }
+                else
+                {
+                    ViewBag.IsAdmin = false;
+                }
             }//end if
-            ViewBag.IsSuper = false;
+
         }
 
         private bool checkexistuser(string user)
@@ -473,7 +485,7 @@ namespace Prometheus.Controllers
 
                     if (string.Compare(updater, usernm, true) == 0)
                     {
-                        IsSuper(usernm);
+                        UserAuth(usernm);
 
                         CreateICareList();
                         ViewBag.icareissuelist = UserActionTrend.RetrieveICareUserIssue(this, updater, tempmonth);
@@ -481,6 +493,8 @@ namespace Prometheus.Controllers
                         ViewBag.icaremonth = tempmonth.ToString();
                     }
                 }
+
+                
 
                 return View(list1);
             }

@@ -1,0 +1,105 @@
+﻿@model IEnumerable<Prometheus.Models.RMARAWData>
+
+@{
+    ViewBag.Title = "ReviewRMABackupData";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Review RMA Data</h2>
+
+<hr/>
+
+<table id="pndatatable" class="display" width="100%" cellspacing="0">
+    <thead>
+            <tr>
+                <th style="font-size:12px">Field return</th>
+                <th style="font-size:12px">RMA/CAR</th>
+                <th style="font-size:12px">status</th>
+                <th style="font-size:12px">Customer Name</th>
+                <th style="font-size:12px">End Customer</th>
+                <th style="font-size:12px">Line Category</th>
+                <th style="font-size:12px">PN</th>
+                <th style="font-size:12px">PN Desc</th>
+                <th style="font-size:12px">SN</th>
+                <th style="font-size:12px">QTY</th>
+                <th style="font-size:12px">Site</th>
+                <th style="font-size:12px">Nonconformity Desc</th>
+                <th style="font-size:12px">Defect Category</th>
+                <th style="font-size:12px">Product Type</th>
+                <th style="font-size:12px">Analyst Owener</th>
+                <th style="font-size:12px">Issue Open Date</th>
+                <th style="font-size:12px">FAR to SNY Date</th>
+                <th style="font-size:12px">Initial FAR Submission</th>
+                <th style="font-size:12px">External FA Date 2nd</th>
+                <th style="font-size:12px">Internal FA Date 2nd</th>
+                <th style="font-size:12px">2nd FA Owner</th>
+                <th style="font-size:12px">Final FAR Date</th>
+                <th style="font-size:12px">FV Date</th>
+                <th style="font-size:12px">FV Result</th>
+                <th style="font-size:12px">Root Cause</th>
+                <th style="font-size:12px">Case Type</th>
+                <th style="font-size:12px">Repair Charge or Not</th>
+                <th style="font-size:12px">SO Num</th>
+                <th style="font-size:12px">Ship Out Date</th>
+                <th style="font-size:12px">Close Date</th>
+                <th style="font-size:12px">Remark</th>
+                <th style="font-size:12px">Latest Comments</th>
+                <th style="font-size:12px">CQE</th>
+            </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var line in Model)
+        {
+                <tr>
+                    <th style="font-size:12px">@line.AppV_A</th>
+                    <th style="font-size:12px">@line.AppV_B</th>
+                    <th style="font-size:12px">@line.AppV_C</th>
+                    <th style="font-size:12px">@line.AppV_D</th>
+                    <th style="font-size:12px">@line.AppV_E</th>
+                    <th style="font-size:12px">@line.AppV_F</th>
+                    <th style="font-size:12px">@line.AppV_G</th>
+                    <th style="font-size:12px">@line.AppV_H</th>
+                    <th style="font-size:12px">@line.AppV_I</th>
+                    <th style="font-size:12px">@line.AppV_J</th>
+                    <th style="font-size:12px">@line.AppV_K</th>
+                    <th style="font-size:12px">@line.AppV_L</th>
+                    <th style="font-size:12px">@line.AppV_M</th>
+                    <th style="font-size:12px">@line.AppV_N</th>
+                    <th style="font-size:12px">@line.AppV_O</th>
+                    <th style="font-size:12px">@line.AppV_P</th>
+                    <th style="font-size:12px">@line.AppV_Q</th>
+                    <th style="font-size:12px">@line.AppV_R</th>
+                    <th style="font-size:12px">@line.AppV_S</th>
+                    <th style="font-size:12px">@line.AppV_T</th>
+                    <th style="font-size:12px">@line.AppV_U</th>
+                    <th style="font-size:12px">@line.AppV_V</th>
+                    <th style="font-size:12px">@line.AppV_W</th>
+                    <th style="font-size:12px">@line.AppV_X</th>
+                    <th style="font-size:12px">@line.AppV_Y</th>
+                    <th style="font-size:12px">@line.AppV_Z</th>
+                    <th style="font-size:12px">@line.AppV_AA</th>
+                    <th style="font-size:12px">@line.AppV_AB</th>
+                    <th style="font-size:12px">@line.AppV_AC</th>
+                    <th style="font-size:12px">@line.AppV_AD</th>
+                    <th style="font-size:12px">@line.AppV_AE</th>
+                    <th style="font-size:12px">@line.AppV_AF</th>
+                    <th style="font-size:12px">@line.AppV_AG</th>
+                </tr>
+        }
+    </tbody>
+</table>
+
+<script type="text/javascript">
+        $(document).ready(function() {
+            $('#pndatatable').DataTable({
+                'scrollX': true,
+                'iDisplayLength': 50,
+                'aLengthMenu': [[25, 50, 100, -1],
+                                [25, 50, 100, "All"]],
+                "bAutoWidth": false,
+                "aaSorting": [],
+                "order": []
+            });
+                    } );
+</script>

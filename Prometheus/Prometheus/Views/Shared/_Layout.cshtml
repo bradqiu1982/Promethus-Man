@@ -51,6 +51,8 @@
         .panel-default > .panel-heading-open {
             background: #E41B17;
         }
+
+        th, td { white-space: nowrap; }
     </style>
     <script src="~/Scripts/jquery.stickytableheaders.js"></script>
 </head>
@@ -137,6 +139,12 @@
                                 </li>
                                 <li>
                                     @Html.ActionLink("Review Vcsel Data", "ReviewVcselData", "CustomerData")
+                                </li>
+                                <li>
+                                    @if ((ViewBag.IsSuper != null && ViewBag.IsSuper) || (ViewBag.IsAdmin != null && ViewBag.IsAdmin))
+                                    {
+                                        @Html.ActionLink("Review RMA Data", "ReviewRMABackupData", "CustomerData")
+                                    }
                                 </li>
                             </ul>
                         </li>

@@ -1590,5 +1590,12 @@ namespace Prometheus.Controllers
         }
 
 
+        public ActionResult ReviewRMABackupData()
+        {
+            var vm = ExternalDataCollector.RetrieveAllRMAData();
+            return View(vm);
+        }
+
+
     }
 }

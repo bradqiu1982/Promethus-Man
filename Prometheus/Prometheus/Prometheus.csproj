@@ -219,6 +219,7 @@
     <Compile Include="Models\ExternalDataCollector.cs" />
     <Compile Include="Models\IssueViewModels.cs" />
     <Compile Include="Models\MESUtility.cs" />
+    <Compile Include="Models\NeoMAPVM.cs" />
     <Compile Include="Models\ParetoData.cs" />
     <Compile Include="Models\PJReportViewModels.cs" />
     <Compile Include="Models\ProjectBIYieldViewModule.cs" />
@@ -842,6 +843,7 @@
     <Content Include="Views\User\UserCachedInfo.cshtml" />
     <Content Include="Views\PJReport\StandardHtmlSample.cshtml" />
     <Content Include="Views\CustomerData\CommitUserMatrix.cshtml" />
+    <Content Include="Views\CustomerData\ReviewRMABackupData.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

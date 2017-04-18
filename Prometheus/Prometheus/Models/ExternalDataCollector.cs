@@ -90,7 +90,71 @@ namespace Prometheus.Models
         public string AppV_AG { set; get; }
     }
 
+    public class NEOMAPData
+    {
+        public NEOMAPData()
+        {
+            AppV_A = string.Empty;
+            AppV_B = string.Empty;
+            AppV_C = string.Empty;
+            AppV_D = string.Empty;
+            AppV_E = string.Empty;
+            AppV_F = -99999;
+            AppV_G = string.Empty;
+            AppV_H = -99999;
+            AppV_I = -99999;
+            AppV_J = -99999;
+            AppV_K = -99999;
+            AppV_L = -99999;
+            AppV_M = -99999;
+            AppV_N = -99999;
+            AppV_O = -99999;
+            AppV_P = -99999;
+            AppV_Q = -99999;
+            AppV_R = -99999;
+            AppV_S = -99999;
+            AppV_T = -99999;
+            AppV_U = -99999;
+            AppV_V = -99999;
+            AppV_W = -99999;
+            AppV_X = -99999;
+            AppV_Y = -99999;
+            AppV_Z = -99999;
+            AppV_AA = -99999;
+            AppV_AB = -99999;
+            AppV_AC = -99999;
+        }
 
+        public string AppV_A { set; get; }
+        public string AppV_B { set; get; }
+        public string AppV_C { set; get; }
+        public string AppV_D { set; get; }
+        public string AppV_E { set; get; }
+        public double AppV_F { set; get; }
+        public string AppV_G { set; get; }
+        public double AppV_H { set; get; }
+        public double AppV_I { set; get; }
+        public double AppV_J { set; get; }
+        public double AppV_K { set; get; }
+        public double AppV_L { set; get; }
+        public double AppV_M { set; get; }
+        public double AppV_N { set; get; }
+        public double AppV_O { set; get; }
+        public double AppV_P { set; get; }
+        public double AppV_Q { set; get; }
+        public double AppV_R { set; get; }
+        public double AppV_S { set; get; }
+        public double AppV_T { set; get; }
+        public double AppV_U { set; get; }
+        public double AppV_V { set; get; }
+        public double AppV_W { set; get; }
+        public double AppV_X { set; get; }
+        public double AppV_Y { set; get; }
+        public double AppV_Z { set; get; }
+        public double AppV_AA { set; get; }
+        public double AppV_AB { set; get; }
+        public double AppV_AC { set; get; }
+    }
 
     public class ExternalDataCollector
     {
@@ -216,6 +280,20 @@ namespace Prometheus.Models
                 return DateTime.Parse(datestr).ToString();
             }
             catch (Exception ex) { return "1982-05-06 10:00:00"; }
+        }
+
+        private static double ConvertToDoubleVal(string val)
+        {
+            if (string.IsNullOrEmpty(val))
+                return -99999;
+            try
+            {
+                return Convert.ToDouble(val);
+            }
+            catch (Exception ex)
+            {
+                return -99999;
+            }
         }
 
         private static void logthdinfo(string info)
@@ -649,6 +727,82 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
+        private static string ConvertToDateStr2(object val)
+        {
+            var datestr = Convert.ToString(val);
+            if (string.IsNullOrEmpty(datestr))
+                return string.Empty;
+            try
+            {
+                var date = DateTime.Parse(datestr);
+                if (string.Compare(date.ToString("yyyy-MM-dd"), "1982-05-06") == 0)
+                {
+                    return string.Empty;
+                }
+                return date.ToString("yyyy-MM-dd");
+            }
+            catch (Exception ex)
+            {
+                return string.Empty;
+            }
+        }
+
+        public static List<RMARAWData> RetrieveAllRMAData()
+        {
+            var ret = new List<RMARAWData>();
+
+            var sql = "select AppV_A,AppV_B,AppV_C,AppV_D,AppV_E,AppV_F"
+                    + ",AppV_G,AppV_H,AppV_I,AppV_J,AppV_K,AppV_L,AppV_M,AppV_N,AppV_O"
+                    + ",AppV_P,AppV_Q,AppV_R,AppV_S,AppV_T,AppV_U,AppV_V,AppV_W,AppV_X"
+                    + ",AppV_Y,AppV_Z,AppV_AA,AppV_AB,AppV_AC,AppV_AD,AppV_AE,AppV_AF,AppV_AG from RMABackupData";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                try
+                {
+                    var tempdata = new RMARAWData();
+                    tempdata.AppV_A = Convert.ToString(line[0]);
+                    tempdata.AppV_B = Convert.ToString(line[1]);
+                    tempdata.AppV_C = Convert.ToString(line[2]);
+                    tempdata.AppV_D = Convert.ToString(line[3]);
+                    tempdata.AppV_E = Convert.ToString(line[4]);
+                    tempdata.AppV_F = Convert.ToString(line[5]);
+                    tempdata.AppV_G = Convert.ToString(line[6]);
+                    tempdata.AppV_H = Convert.ToString(line[7]);
+                    tempdata.AppV_I = Convert.ToString(line[8]);
+                    tempdata.AppV_J = Convert.ToString(line[9]);
+                    tempdata.AppV_K = Convert.ToString(line[10]);
+                    tempdata.AppV_L = Convert.ToString(line[11]);
+                    tempdata.AppV_M = Convert.ToString(line[12]);
+                    tempdata.AppV_N = Convert.ToString(line[13]);
+                    tempdata.AppV_O = Convert.ToString(line[14]);
+                    tempdata.AppV_P = ConvertToDateStr2(line[15]);
+                    tempdata.AppV_Q = ConvertToDateStr2(line[16]);
+                    tempdata.AppV_R = ConvertToDateStr2(line[17]);
+                    tempdata.AppV_S = ConvertToDateStr2(line[18]);
+                    tempdata.AppV_T = ConvertToDateStr2(line[19]);
+                    tempdata.AppV_U = Convert.ToString(line[20]);
+                    tempdata.AppV_V = ConvertToDateStr2(line[21]);
+                    tempdata.AppV_W = ConvertToDateStr2(line[22]);
+                    tempdata.AppV_X = Convert.ToString(line[23]);
+                    tempdata.AppV_Y = Convert.ToString(line[24]);
+                    tempdata.AppV_Z = Convert.ToString(line[25]);
+                    tempdata.AppV_AA = Convert.ToString(line[26]);
+                    tempdata.AppV_AB = Convert.ToString(line[27]);
+                    tempdata.AppV_AC = ConvertToDateStr2(line[28]);
+                    tempdata.AppV_AD = Convert.ToString(line[29]);
+                    tempdata.AppV_AE = Convert.ToString(line[30]);
+                    tempdata.AppV_AF = Convert.ToString(line[31]);
+                    tempdata.AppV_AG = Convert.ToString(line[32]);
+                    ret.Add(tempdata);
+                }
+                catch (Exception ex) { }
+
+            }
+
+            return ret;
+        }
+
         private static void SendRMAEvent(IssueViewModels vm, string operate,Controller ctrl, bool nocheck = false)
         {
             var alertime = vm.RetrieveAlertEmailDate(vm.IssueKey);
@@ -716,6 +870,143 @@ namespace Prometheus.Models
             sql = sql.Replace("<AppV_A>", RMANum).Replace("<AppV_B>", attach).Replace("<AppV_C>", RMAMAPDATATYPE.ATTACH);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
+
+
+        public static void RefreshNeoMAPData(Controller ctrl)
+        {
+            var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+            var neodatafolder = syscfgdict["NeoMAPDataFolder"];
+            var neodatafiles = DirectoryEnumerateFiles(ctrl, neodatafolder);
+
+            string datestring = DateTime.Now.ToString("yyyyMMdd");
+            string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+            if (!DirectoryExists(ctrl, imgdir))
+            {
+                Directory.CreateDirectory(imgdir);
+            }
+
+            var loadedfiles = NeoMAPVM.LoadedNeoMAPFile();
+
+            foreach (var srcf in neodatafiles)
+            {
+                try
+                {
+                    var filename = Path.GetFileName(srcf).Replace(" ", "_").Replace("#", "").Replace("'", "")
+                                .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+                    if (!loadedfiles.ContainsKey(filename))
+                    {
+                        var des = imgdir + filename;
+                        File.Copy(srcf, des, true);
+
+                        NeoMAPVM.UpdateNeoMAPFile(filename);
+                        var data = RetrieveDataFromExcelWithAuth(ctrl, des);
+
+                    }//end if
+                }
+                catch (Exception ex) { }
+            }//end foreach
+
+        }
+
+        private static void SolveNeoMAPData(List<List<string>> data, Controller ctrl)
+        {
+            if (data.Count == 0)
+                return;
+            if (!data[0][0].ToUpper().Contains("WAFER"))
+                return;
+            var idx = 0;
+            foreach (var line in data)
+            {
+                if (idx != 0)
+                {
+                    UpdateNeoMapData(line);
+                }//end if
+            }//end foreach
+        }
+
+        private static NEOMAPData OfferNEOData(List<string> line)
+        {
+            var tempdata = new NEOMAPData();
+            tempdata.AppV_A = line[0];
+            tempdata.AppV_B = line[1];
+            tempdata.AppV_C = line[2];
+            tempdata.AppV_D = line[3];
+            tempdata.AppV_E = line[4];
+            tempdata.AppV_F = ConvertToDoubleVal(line[5]);
+            tempdata.AppV_G = line[6];
+            tempdata.AppV_H = ConvertToDoubleVal(line[7]);
+            tempdata.AppV_I = ConvertToDoubleVal(line[8]);
+            tempdata.AppV_J = ConvertToDoubleVal(line[9]);
+            tempdata.AppV_K = ConvertToDoubleVal(line[10]);
+            tempdata.AppV_L = ConvertToDoubleVal(line[11]);
+            tempdata.AppV_M = ConvertToDoubleVal(line[12]);
+            tempdata.AppV_N = ConvertToDoubleVal(line[13]);
+            tempdata.AppV_O = ConvertToDoubleVal(line[14]);
+            tempdata.AppV_P = ConvertToDoubleVal(line[15]);
+            tempdata.AppV_Q = ConvertToDoubleVal(line[16]);
+            tempdata.AppV_R = ConvertToDoubleVal(line[17]);
+            tempdata.AppV_S = ConvertToDoubleVal(line[18]);
+            tempdata.AppV_T = ConvertToDoubleVal(line[19]);
+            tempdata.AppV_U = ConvertToDoubleVal(line[20]);
+            tempdata.AppV_V = ConvertToDoubleVal(line[21]);
+            tempdata.AppV_W = ConvertToDoubleVal(line[22]);
+            tempdata.AppV_X = ConvertToDoubleVal(line[23]);
+            tempdata.AppV_Y = ConvertToDoubleVal(line[24]);
+            tempdata.AppV_Z = ConvertToDoubleVal(line[25]);
+            tempdata.AppV_AA = ConvertToDoubleVal(line[26]);
+            tempdata.AppV_AB = ConvertToDoubleVal(line[27]);
+            tempdata.AppV_AC = ConvertToDoubleVal(line[28]);
+            return tempdata;
+        }
+
+        private static bool NEOMAPDataExist(NEOMAPData neomapdata)
+        {
+            var sql = "select AppV_A from NeoMapData where AppV_A='<AppV_A>' and AppV_C='<AppV_C>' and AppV_D='<AppV_D>' and AppV_E='<AppV_E>'";
+            sql = sql.Replace("<AppV_A>", neomapdata.AppV_A).Replace("<AppV_C>", neomapdata.AppV_C)
+                .Replace("<AppV_D>", neomapdata.AppV_D).Replace("<AppV_E>", neomapdata.AppV_E);
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            if (dbret.Count > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private static void UpdateNeoMapData(List<string> rawdata)
+        {
+            var neodata = OfferNEOData(rawdata);
+            if (!NEOMAPDataExist(neodata))
+            {
+                var sql = "insert into RMABackupData(AppV_A,AppV_B,AppV_C,AppV_D,AppV_E,AppV_F"
+                    + ",AppV_G,AppV_H,AppV_I,AppV_J,AppV_K,AppV_L,AppV_M,AppV_N,AppV_O"
+                    + ",AppV_P,AppV_Q,AppV_R,AppV_S,AppV_T,AppV_U,AppV_V,AppV_W,AppV_X"
+                    + ",AppV_Y,AppV_Z,AppV_AA,AppV_AB,AppV_AC,AppV_AD,AppV_AE,AppV_AF,AppV_AG)"
+                    + " values(N'<AppV_A>',N'<AppV_B>',N'<AppV_C>',N'<AppV_D>',N'<AppV_E>',N'<AppV_F>'"
+                    + ",N'<AppV_G>',N'<AppV_H>',N'<AppV_I>',N'<AppV_J>',N'<AppV_K>',N'<AppV_L>',N'<AppV_M>',N'<AppV_N>',N'<AppV_O>'"
+                    + ",'<AppV_P>','<AppV_Q>','<AppV_R>','<AppV_S>','<AppV_T>',N'<AppV_U>','<AppV_V>','<AppV_W>',N'<AppV_X>'"
+                    + ",N'<AppV_Y>',N'<AppV_Z>',N'<AppV_AA>',N'<AppV_AB>','<AppV_AC>',N'<AppV_AD>',N'<AppV_AE>',N'<AppV_AF>',N'<AppV_AG>')";
+
+
+                sql = sql.Replace("<AppV_A>", neodata.AppV_A).Replace("<AppV_B>", neodata.AppV_B).Replace("<AppV_C>", neodata.AppV_C)
+                    .Replace("<AppV_D>", neodata.AppV_D).Replace("<AppV_E>", neodata.AppV_E).Replace("<AppV_F>", neodata.AppV_F.ToString())
+                    .Replace("<AppV_G>", neodata.AppV_G).Replace("<AppV_H>", neodata.AppV_H.ToString()).Replace("<AppV_I>", neodata.AppV_I.ToString())
+                    .Replace("<AppV_J>", neodata.AppV_J.ToString()).Replace("<AppV_K>", neodata.AppV_K.ToString()).Replace("<AppV_L>", neodata.AppV_L.ToString())
+                    .Replace("<AppV_M>", neodata.AppV_M.ToString()).Replace("<AppV_N>", neodata.AppV_N.ToString()).Replace("<AppV_O>", neodata.AppV_O.ToString())
+                    .Replace("<AppV_P>", neodata.AppV_P.ToString()).Replace("<AppV_Q>", neodata.AppV_Q.ToString()).Replace("<AppV_R>", neodata.AppV_R.ToString())
+                    .Replace("<AppV_S>", neodata.AppV_S.ToString()).Replace("<AppV_T>", neodata.AppV_T.ToString()).Replace("<AppV_U>", neodata.AppV_U.ToString())
+                    .Replace("<AppV_V>", neodata.AppV_V.ToString()).Replace("<AppV_W>", neodata.AppV_W.ToString()).Replace("<AppV_X>", neodata.AppV_X.ToString())
+                    .Replace("<AppV_Y>", neodata.AppV_Y.ToString()).Replace("<AppV_Z>", neodata.AppV_Z.ToString()).Replace("<AppV_AA>", neodata.AppV_AA.ToString())
+                    .Replace("<AppV_AB>", neodata.AppV_AB.ToString()).Replace("<AppV_AC>", neodata.AppV_AC.ToString());
+
+                DBUtility.ExeLocalSqlNoRes(sql);
+            }
+        }
+
+
 
     }
 }

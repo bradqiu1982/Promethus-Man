@@ -6,3 +6,4 @@ APPEMAILPWD:::abc@123
 EMAILSERVER:::wmail.finisar.com
 RMASHAREFOLDER:::\\wux-fs\PUBLIC\Quality\10.Quality case summary\Customer Quality Case Summary\RMA & Complaint New
 RMACLOSEATTACHES:::\\wux-fs\PUBLIC\Quality\10.Quality case summary\Customer Quality Case Summary\RMA Close Data\RMA
+NeoMAPDataFolder:::\\wux-file01\Public\Wuxi Parallel NPI\NeoMAP Data

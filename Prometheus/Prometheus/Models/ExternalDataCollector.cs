@@ -449,6 +449,7 @@ namespace Prometheus.Models
             var rmaattaches = RetrieveRMACloseAttach(); //all rma attach
             var solvedrmanum = new Dictionary<string, bool>();
 
+            var sixmonthago = DateTime.Now.AddMonths(-6);
 
             var idx = 0;
             foreach (var line in data)
@@ -458,6 +459,16 @@ namespace Prometheus.Models
                     try
                     {
                         var rmarawdatas = SplitRMAData(line); //split rma record with sn
+
+                        if (rmarawdatas.Count > 0)
+                        {
+                            
+                            if (sixmonthago > DateTime.Parse(rmarawdatas[0].AppV_P))
+                            {
+                                continue;
+                            }
+                        }
+
                         foreach (var rawdata in rmarawdatas)
                         {
                             UpdateRMAData(rawdata);

@@ -4606,6 +4606,12 @@ namespace Prometheus.Controllers
 
             try
             {
+                ExternalDataCollector.RefreshRMAData(this);
+            }
+            catch (Exception ex) { }
+
+            try
+            {
                 var filename = "log" + DateTime.Now.ToString("yyyy-MM-dd");
                 var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
 

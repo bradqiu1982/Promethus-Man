@@ -396,12 +396,17 @@ namespace Prometheus.Models
             {
                 var key = Convert.ToString(item[0]);
                 var key2 = Convert.ToString(item[1]);
-
                 if (!ret.ContainsKey(key+"-"+ key2))
                 {
                     ret.Add(key + "-" + key2, true);
                 }
             }
+
+            dbret.Clear();
+            dbret = null;
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
             return ret;
         }
 

@@ -614,6 +614,13 @@ namespace Prometheus.Models
 
             RetrieveCummYield(ret, filteredPjData2, pvm);
 
+            plist.Clear();
+            snstationdict.Clear();
+            sndict.Clear();
+            validatedict.Clear();
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
             return ret;
         }
 

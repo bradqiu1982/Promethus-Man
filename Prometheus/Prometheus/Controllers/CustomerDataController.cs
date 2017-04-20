@@ -274,7 +274,7 @@ namespace Prometheus.Controllers
                     sb.Append(c);
                 }
             }
-            return sb.ToString();
+            return sb.ToString().ToUpper();
         }
 
         [HttpPost, ActionName("CommitRMAData")]

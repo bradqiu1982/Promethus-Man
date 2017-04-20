@@ -396,7 +396,7 @@ namespace Prometheus.Controllers
                     sb.Append(c);
                 }
             }
-            return sb.ToString();
+            return sb.ToString().ToUpper();
         }
 
         private bool EmailAddressValidate(string emailaddress)
@@ -4681,7 +4681,8 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
-            ExternalDataCollector.RefreshRMAData(this);
+            //ExternalDataCollector.RefreshRMAData(this);
+            ExternalDataCollector.RefreshRELData(this);
             //var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
             //foreach (var pjkey in pjkeylist)
             //{

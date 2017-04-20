@@ -31,7 +31,7 @@ namespace Prometheus.Models
                     sb.Append(c);
                 }
             }
-            return sb.ToString();
+            return sb.ToString().ToUpper();
         }
 
         private static string PNCondition(List<ProjectPn> pns)

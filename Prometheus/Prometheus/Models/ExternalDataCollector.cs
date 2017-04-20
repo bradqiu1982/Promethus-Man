@@ -640,7 +640,7 @@ namespace Prometheus.Models
                     if(idx > 47) return sb.ToString();
                 }
             }
-            return sb.ToString();
+            return sb.ToString().ToUpper();
         }
 
         private static void Try2CreateRMA(RMARAWData rawdata,Dictionary<string,string> usermatrix

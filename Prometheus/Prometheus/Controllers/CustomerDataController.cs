@@ -1072,7 +1072,7 @@ namespace Prometheus.Controllers
                             vm.CommentType = COMMENTTYPE.Description;
 
                             vm.StoreIssue();
-                            UserController.RegisterUserAuto(vm.Assignee);
+                            UserViewModels.RegisterUserAuto(vm.Assignee);
                             SendRMAEvent(vm, "created",true);
                         }
                     }//end for
@@ -1199,7 +1199,7 @@ namespace Prometheus.Controllers
 
                             vm.StoreIssue();
 
-                            UserController.RegisterUserAuto(vm.Assignee);
+                            UserViewModels.RegisterUserAuto(vm.Assignee);
 
                             SendOBAEvent(vm, "created", true);
                         }
@@ -1321,7 +1321,7 @@ namespace Prometheus.Controllers
 
                             vm.StoreIssue();
 
-                            UserController.RegisterUserAuto(vm.Assignee);
+                            UserViewModels.RegisterUserAuto(vm.Assignee);
 
                             SendQualityEvent(vm, "created", true);
                         }
@@ -1416,8 +1416,8 @@ namespace Prometheus.Controllers
 
                             vm.Location = data[i][14];
 
-                            UserController.RegisterUserAuto(vm.Assignee);
-                            UserController.RegisterUserAuto(vm.Reporter);
+                            UserViewModels.RegisterUserAuto(vm.Assignee);
+                            UserViewModels.RegisterUserAuto(vm.Reporter);
 
                             vm.IssueKey = IssueViewModels.GetUniqKey();
                             vm.IssueType = ISSUETP.Rel;

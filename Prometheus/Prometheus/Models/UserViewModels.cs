@@ -144,6 +144,26 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static void RegisterUserAuto(string name)
+        {
+            var dbret = UserViewModels.RetrieveUser(name);
+            if (dbret == null)
+            {
+                var tempname = name.ToUpper();
+                if (!name.Contains("@"))
+                {
+                    tempname = (name.Replace(" ", ".") + "@finisar.com").ToUpper();
+                }
+
+                var user = new UserViewModels();
+                user.Email = tempname;
+                user.Password = "abc@123";
+                user.UpdateDate = DateTime.Now;
+                user.RegistUser();
+                UserViewModels.ActiveUser(user.Email);
+            }
+        }
+
     }
 
 }

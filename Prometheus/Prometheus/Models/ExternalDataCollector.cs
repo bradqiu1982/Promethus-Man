@@ -156,6 +156,88 @@ namespace Prometheus.Models
         public double AppV_AC { set; get; }
     }
 
+    public class RELRAWData
+    {
+        public RELRAWData()
+        {
+            AppV_A = 0;
+            AppV_B = string.Empty;
+            AppV_C = string.Empty;
+            AppV_D = string.Empty;
+            AppV_E = string.Empty;
+            AppV_F = string.Empty;
+            AppV_G = string.Empty;
+            AppV_H = string.Empty;
+            AppV_I = string.Empty;
+            AppV_J = string.Empty;
+            AppV_K = string.Empty;
+            AppV_L = string.Empty;
+            AppV_M = string.Empty;
+            AppV_N = string.Empty;
+            AppV_O = string.Empty;
+            AppV_P = string.Empty;
+            AppV_Q = string.Empty;
+            AppV_R = string.Empty;
+            AppV_S = string.Empty;
+            AppV_T = string.Empty;
+            AppV_U = string.Empty;
+            AppV_V = string.Empty;
+            AppV_W = string.Empty;
+            AppV_X = string.Empty;
+            AppV_Y = string.Empty;
+            AppV_Z = string.Empty;
+            AppV_AA = string.Empty;
+            AppV_AB = string.Empty;
+            AppV_AC = string.Empty;
+            AppV_AD = string.Empty;
+            AppV_AE = string.Empty;
+            AppV_AF = string.Empty;
+            AppV_AG = string.Empty;
+        }
+
+        public int AppV_A { set; get; }
+        public string AppV_B { set; get; }
+        public string AppV_C { set; get; }
+        public string AppV_D { set; get; }
+        public string AppV_E { set; get; }
+        public string AppV_F { set; get; }
+        public string AppV_G { set; get; }
+        public string AppV_H { set; get; }
+        public string AppV_I { set; get; }
+        public string AppV_J { set; get; }
+        public string AppV_K { set; get; }
+        public string AppV_L { set; get; }
+        public string AppV_M { set; get; }
+        public string AppV_N { set; get; }
+        public string AppV_O { set; get; }
+        public string AppV_P { set; get; }
+        public string AppV_Q { set; get; }
+        public string AppV_R { set; get; }
+        public string AppV_S { set; get; }
+        public string AppV_T { set; get; }
+        public string AppV_U { set; get; }
+        public string AppV_V { set; get; }
+        public string AppV_W { set; get; }
+        public string AppV_X { set; get; }
+        public string AppV_Y { set; get; }
+        public string AppV_Z { set; get; }
+        public string AppV_AA { set; get; }
+        public string AppV_AB { set; get; }
+        public string AppV_AC { set; get; }
+        public string AppV_AD { set; get; }
+        public string AppV_AE { set; get; }
+        public string AppV_AF { set; get; }
+        public string AppV_AG { set; get; }
+    }
+
+    public class RELSubIssueType
+    {
+        public static string CONTAINMENTACTION = "[CONTAINMENTACTION]";
+        public static string CORRECTIVEACTION = "[CORRECTIVEACTION]";
+        public static string FAILVERIFYACTION = "[FAILVERIFYACTION]";
+        public static string VERIFYCORRECTIVEACTION = "[VERIFYCORRECTIVEACTION]";
+    }
+
     public class ExternalDataCollector
     {
         private static List<List<string>> RetrieveDataFromExcelWithAuth(Controller ctrl, string filename)
@@ -316,6 +398,8 @@ namespace Prometheus.Models
             { }
 
         }
+
+        #region RMA
 
         public static void RefreshRMAData(Controller ctrl)
         {
@@ -481,7 +565,7 @@ namespace Prometheus.Models
                             {
                                 continue;
                             }
-                            StormRMAAttachs(rmacloseattachfolder, rmarawdatas[0].AppV_B, rmaattaches,ctrl); //retrieve rma attach and store them
+                            StoreRMAAttachs(rmacloseattachfolder, rmarawdatas[0].AppV_B, rmaattaches,ctrl); //retrieve rma attach and store them
                             solvedrmanum.Add(rmarawdatas[0].AppV_B,true);
                         }
                     }
@@ -491,7 +575,7 @@ namespace Prometheus.Models
             }//foreach
         }
 
-        private static void StormRMAAttachs(string rmacloseattachfolder,string RMANum, Dictionary<string, Dictionary<string, bool>> rmaattaches,Controller ctrl)
+        private static void StoreRMAAttachs(string rmacloseattachfolder,string RMANum, Dictionary<string, Dictionary<string, bool>> rmaattaches,Controller ctrl)
         {
             
             var rmanumfolder = rmacloseattachfolder + "\\" + RMANum;
@@ -521,7 +605,7 @@ namespace Prometheus.Models
                         if (FileExist(ctrl, desfile))
                         {
                             var url = "/userfiles/docs/RMAATTCH/"+ cleanrmanum +"/"+ filename;
-                            StormRMAAttach(RMANum, url);
+                            StoreRMAAttach(RMANum, url);
                         }
                     }//not contain rmanum
                     else
@@ -534,7 +618,7 @@ namespace Prometheus.Models
                             if (FileExist(ctrl, desfile))
                             {
                                 var url = "/userfiles/docs/RMAATTCH/" + cleanrmanum + "/" + filename;
-                                StormRMAAttach(RMANum, url);
+                                StoreRMAAttach(RMANum, url);
                             }
                         }//not contain attach
                     }
@@ -678,7 +762,7 @@ namespace Prometheus.Models
 
             vm.StoreIssue();
 
-            UserController.RegisterUserAuto(vm.Assignee);
+            UserViewModels.RegisterUserAuto(vm.Assignee);
 
             SendRMAEvent(vm, "created",ctrl, true);
         }
@@ -875,14 +959,16 @@ namespace Prometheus.Models
             return ret;
         }
 
-        private static void StormRMAAttach(string RMANum, string attach)
+        private static void StoreRMAAttach(string RMANum, string attach)
         {
             var sql = "insert into RMAMapData(AppV_A,AppV_B,AppV_C) values(N'<AppV_A>',N'<AppV_B>',N'<AppV_C>')";
             sql = sql.Replace("<AppV_A>", RMANum).Replace("<AppV_B>", attach).Replace("<AppV_C>", RMAMAPDATATYPE.ATTACH);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
+        #endregion
 
+        #region NEOMAP
         public static void RefreshNeoMAPData(Controller ctrl)
         {
             var syscfgdict = CfgUtility.GetSysConfig(ctrl);
@@ -992,7 +1078,7 @@ namespace Prometheus.Models
             var neodata = OfferNEOData(rawdata);
             if (!NEOMAPDataExist(neodata))
             {
-                var sql = "insert into RMABackupData(AppV_A,AppV_B,AppV_C,AppV_D,AppV_E,AppV_F"
+                var sql = "insert into NeoMapData(AppV_A,AppV_B,AppV_C,AppV_D,AppV_E,AppV_F"
                     + ",AppV_G,AppV_H,AppV_I,AppV_J,AppV_K,AppV_L,AppV_M,AppV_N,AppV_O"
                     + ",AppV_P,AppV_Q,AppV_R,AppV_S,AppV_T,AppV_U,AppV_V,AppV_W,AppV_X"
                     + ",AppV_Y,AppV_Z,AppV_AA,AppV_AB,AppV_AC,AppV_AD,AppV_AE,AppV_AF,AppV_AG)"
@@ -1016,8 +1102,441 @@ namespace Prometheus.Models
                 DBUtility.ExeLocalSqlNoRes(sql);
             }
         }
+        #endregion
+
+        #region REL
+
+        private static RELRAWData OfferRELRAWDataValue(List<string> line,int startidx)
+        {
+            if (string.IsNullOrEmpty(line[2])
+                || string.IsNullOrEmpty(line[8])
+                || string.IsNullOrEmpty(line[10])
+                || string.IsNullOrEmpty(line[1])
+                || string.IsNullOrEmpty(line[13]))
+                return null;
+            
+            var tempdata = new RELRAWData();
+            if (string.IsNullOrEmpty(line[0]))
+            {
+                tempdata.AppV_A = startidx;
+            }
+            else
+            {
+                try
+                {
+                    tempdata.AppV_A = Convert.ToInt32(line[0]);
+                }
+                catch(Exception ex) { tempdata.AppV_A = startidx; }
+                
+            }
+            
+
+            tempdata.AppV_B = line[1];
+            tempdata.AppV_C = ConvertToDateStr(line[2]);
+            tempdata.AppV_D = ConvertToDateStr(line[3]);
+            tempdata.AppV_E = line[4];
+            tempdata.AppV_F = line[5];
+            tempdata.AppV_G = line[6];
+            tempdata.AppV_H = line[7];
+            tempdata.AppV_I = line[8];
+            tempdata.AppV_J = line[9];
+            tempdata.AppV_K = line[10];
+            tempdata.AppV_L = line[11];
+            tempdata.AppV_M = line[12];
+            tempdata.AppV_N = line[13];
+            tempdata.AppV_O = line[14];
+            tempdata.AppV_P = line[15];
+            tempdata.AppV_Q = line[16];
+            tempdata.AppV_R = line[17];
+            tempdata.AppV_S = line[18];
+            tempdata.AppV_T = line[19];
+            tempdata.AppV_U = line[20];
+            tempdata.AppV_V = ConvertToDateStr(line[21]);
+            tempdata.AppV_W = line[22];
+            tempdata.AppV_X = line[23];
+            tempdata.AppV_Y = line[24];
+            tempdata.AppV_Z = line[25];
+            tempdata.AppV_AA = line[26];
+            tempdata.AppV_AB = line[27];
+            tempdata.AppV_AC = line[28];
+            tempdata.AppV_AD = line[29];
+            tempdata.AppV_AE = line[30];
+            tempdata.AppV_AF = line[31];
+            tempdata.AppV_AG = line[32];
+            return tempdata;
+        }
+
+        public static void RefreshRELData(Controller ctrl)
+        {
+            var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+
+            var rmasrcfolder = syscfgdict["RELSHAREFOLDER"];
+            var rmasrcfiles = DirectoryEnumerateFiles(ctrl, rmasrcfolder);
+
+            string datestring = DateTime.Now.ToString("yyyyMMdd");
+            string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+            if (!DirectoryExists(ctrl, imgdir))
+            {
+                Directory.CreateDirectory(imgdir);
+            }
+
+            foreach (var srcf in rmasrcfiles)
+            {
+                var filename = Path.GetFileName(srcf);
+                if (filename.ToUpper().Contains("REL")
+                    && filename.ToUpper().Contains("SUMMARY")
+                    && filename.ToUpper().Contains("NEWDATA"))
+                {
+                    try
+                    {
+                        logthdinfo("\r\nStart to copy file: " + srcf);
+
+                        var desfile = imgdir + filename;
+                        FileCopy(ctrl, srcf, desfile, true);
+                        if (FileExist(ctrl, desfile))
+                        {
+                            logthdinfo("try to get data from file: " + desfile);
+                            var data = RetrieveDataFromExcelWithAuth(ctrl, desfile);
+                            logthdinfo("get data count: " + data.Count.ToString());
+
+                            SolveRELData(data,ctrl);
+                        }//copied file exist
+                    }
+                    catch (Exception ex)
+                    {
+                        logthdinfo("SolveRELData Exception: " + ex.Message);
+                    }
+                }//end if
+            }//end foreach
+        }
+
+        private static void SolveRELData(List<List<string>> data, Controller ctrl)
+        {
+            if (data.Count == 0)
+                return;
+            if (!data[0][0].ToUpper().Contains("REL FAILURE CASE ID"))
+                return;
+
+            var allrmaissue = IssueViewModels.RetrieveAllIssueTypeIssue("NONE", "NONE", ISSUETP.Rel, ctrl); //REL issues
+            var rmaissuedict = new Dictionary<string, bool>();
+            foreach (var issue in allrmaissue)
+            {
+                var uniquekey = issue.ReportDate.ToString("yyyy-MM-dd") + "-" + issue.TestType + "-" + issue.ModuleSN;
+                if (!rmaissuedict.ContainsKey(uniquekey))
+                {
+                    rmaissuedict.Add(uniquekey, true);
+                }
+            }//end foreach
+
+            var pjkeys = ProjectViewModels.RetrieveAllProjectKey(); //all pjkey
+            var allpjdict = new Dictionary<string, bool>();
+            foreach (var pjk in pjkeys)
+            {
+                allpjdict.Add(pjk, true);
+            }
+            var RELPJKEY = RMSpectialCh("Reliability");
+
+            var rmaattaches = RetrieveRelAttach(); //all rel attach
+            var solvedrmanum = new Dictionary<string, bool>();
+
+            var caseid = RetrieveLatestCaseID();
+            
+            var idx = 0;
+            foreach (var line in data)
+            {
+                if (idx != 0)
+                {
+                    try
+                    {
+                        var rawdata = OfferRELRAWDataValue(line, caseid); //split rma record with sn
+                        if (rawdata == null)
+                            continue;
+
+                        if (rawdata.AppV_A == caseid)
+                        {
+                            caseid = caseid + 1;
+                        }
+
+                        UpdateRELData(rawdata);
+
+                        if (allpjdict.ContainsKey(RELPJKEY))
+                        {
+                            Try2CreateREL(RELPJKEY,rawdata, rmaissuedict, ctrl);
+                        }
+
+                        var uniquekey = DateTime.Parse(rawdata.AppV_C).ToString("yyyy-MM-dd") + "-" + rawdata.AppV_I + "-" + rawdata.AppV_K;
+                        if (solvedrmanum.ContainsKey(uniquekey))
+                        {
+                            continue;
+                        }
+                        StoreRELAttachs(rawdata.AppV_Y,uniquekey, rawdata.AppV_A.ToString(), rmaattaches, ctrl); //retrieve rma attach and store them
+                        solvedrmanum.Add(uniquekey, true);
+
+                    }
+                    catch (Exception ex) { }
+                }//end if
+                idx = idx + 1;
+            }//foreach
+        }
+
+        public static int RetrieveLatestCaseID()
+        {
+            var sql = "select top 1 AppV_A from RELBackupData order by AppV_A DESC";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
+            if (dbret.Count > 0)
+            {
+                try
+                {
+                    var val = Convert.ToInt32(dbret[0][0]);
+                    if (val < 2000)
+                    {
+                        return 2000;
+                    }
+                    else
+                    {
+                        return val+1;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return 8000;
+                }
+            }
+            else
+            {
+                return 2000;
+            }
+        }
+
+        private static bool RELDataExist(RELRAWData rmadata)
+        {
+            var sql = "select AppV_A from RELBackupData where AppV_C=N'<AppV_C>' and AppV_I=N'<AppV_I>' and AppV_K=N'<AppV_K>'";
+            sql = sql.Replace("<AppV_C>", rmadata.AppV_C).Replace("<AppV_I>", rmadata.AppV_I).Replace("<AppV_K>", rmadata.AppV_K);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            if (dbret.Count > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private static void UpdateRELData(RELRAWData rmadata)
+        {
+            var sql = "";
+            if (RELDataExist(rmadata))
+            {
+                sql = "update RELBackupData set AppV_B = N'<AppV_B>',AppV_D = N'<AppV_D>'"
+                    + ",AppV_E = N'<AppV_E>',AppV_F = N'<AppV_F>',AppV_G = N'<AppV_G>',AppV_H = N'<AppV_H>'"
+                    + ",AppV_J = N'<AppV_J>',AppV_L = N'<AppV_L>',AppV_M = N'<AppV_M>',AppV_N = N'<AppV_N>'"
+                    + ",AppV_O = N'<AppV_O>',AppV_P = '<AppV_P>',AppV_Q = '<AppV_Q>',AppV_R = '<AppV_R>',AppV_S = '<AppV_S>'"
+                    + ",AppV_T = '<AppV_T>',AppV_U = N'<AppV_U>',AppV_V = '<AppV_V>',AppV_W = '<AppV_W>',AppV_X = N'<AppV_X>'"
+                    + ",AppV_Y = N'<AppV_Y>',AppV_Z = N'<AppV_Z>',AppV_AA = N'<AppV_AA>',AppV_AB = N'<AppV_AB>',AppV_AC = '<AppV_AC>'"
+                    + ",AppV_AD = N'<AppV_AD>',AppV_AE = N'<AppV_AE>',AppV_AF = N'<AppV_AF>',AppV_AG = N'<AppV_AG>'  where AppV_C=N'<AppV_C>' and AppV_I=N'<AppV_I>' and AppV_K=N'<AppV_K>'";
+            }
+            else
+            {
+                sql = "insert into RELBackupData(AppV_A,AppV_B,AppV_C,AppV_D,AppV_E,AppV_F"
+                    + ",AppV_G,AppV_H,AppV_I,AppV_J,AppV_K,AppV_L,AppV_M,AppV_N,AppV_O"
+                    + ",AppV_P,AppV_Q,AppV_R,AppV_S,AppV_T,AppV_U,AppV_V,AppV_W,AppV_X"
+                    + ",AppV_Y,AppV_Z,AppV_AA,AppV_AB,AppV_AC,AppV_AD,AppV_AE,AppV_AF,AppV_AG)"
+                    + " values(<AppV_A>,N'<AppV_B>',N'<AppV_C>',N'<AppV_D>',N'<AppV_E>',N'<AppV_F>'"
+                    + ",N'<AppV_G>',N'<AppV_H>',N'<AppV_I>',N'<AppV_J>',N'<AppV_K>',N'<AppV_L>',N'<AppV_M>',N'<AppV_N>',N'<AppV_O>'"
+                    + ",'<AppV_P>','<AppV_Q>','<AppV_R>','<AppV_S>','<AppV_T>',N'<AppV_U>','<AppV_V>','<AppV_W>',N'<AppV_X>'"
+                    + ",N'<AppV_Y>',N'<AppV_Z>',N'<AppV_AA>',N'<AppV_AB>','<AppV_AC>',N'<AppV_AD>',N'<AppV_AE>',N'<AppV_AF>',N'<AppV_AG>')";
+            }
+
+            sql = sql.Replace("<AppV_A>", rmadata.AppV_A.ToString()).Replace("<AppV_B>", rmadata.AppV_B).Replace("<AppV_C>", rmadata.AppV_C)
+                .Replace("<AppV_D>", rmadata.AppV_D).Replace("<AppV_E>", rmadata.AppV_E).Replace("<AppV_F>", rmadata.AppV_F)
+                .Replace("<AppV_G>", rmadata.AppV_G).Replace("<AppV_H>", rmadata.AppV_H).Replace("<AppV_I>", rmadata.AppV_I)
+                .Replace("<AppV_J>", rmadata.AppV_J).Replace("<AppV_K>", rmadata.AppV_K).Replace("<AppV_L>", rmadata.AppV_L)
+                .Replace("<AppV_M>", rmadata.AppV_M).Replace("<AppV_N>", rmadata.AppV_N).Replace("<AppV_O>", rmadata.AppV_O)
+                .Replace("<AppV_P>", rmadata.AppV_P).Replace("<AppV_Q>", rmadata.AppV_Q).Replace("<AppV_R>", rmadata.AppV_R)
+                .Replace("<AppV_S>", rmadata.AppV_S).Replace("<AppV_T>", rmadata.AppV_T).Replace("<AppV_U>", rmadata.AppV_U)
+                .Replace("<AppV_V>", rmadata.AppV_V).Replace("<AppV_W>", rmadata.AppV_W).Replace("<AppV_X>", rmadata.AppV_X)
+                .Replace("<AppV_Y>", rmadata.AppV_Y).Replace("<AppV_Z>", rmadata.AppV_Z).Replace("<AppV_AA>", rmadata.AppV_AA)
+                .Replace("<AppV_AB>", rmadata.AppV_AB).Replace("<AppV_AC>", rmadata.AppV_AC).Replace("<AppV_AD>", rmadata.AppV_AD)
+                .Replace("<AppV_AE>", rmadata.AppV_AE).Replace("<AppV_AF>", rmadata.AppV_AF).Replace("<AppV_AG>", rmadata.AppV_AG);
+
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        private static void Try2CreateREL(string RELPJKEY,RELRAWData rawdata
+            , Dictionary<string, bool> rmaissuedict, Controller ctrl)
+        {
+            if (string.IsNullOrEmpty(rawdata.AppV_N) || string.IsNullOrEmpty(rawdata.AppV_O))
+                return;
+
+            if (string.Compare(rawdata.AppV_B.ToUpper(), Resolute.Working.ToUpper()) == 0)
+            {
+                var analyser = rawdata.AppV_N.ToUpper();
+                if (!rawdata.AppV_N.Contains("@"))
+                    analyser = (rawdata.AppV_N.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
+
+                var reporter = rawdata.AppV_O.ToUpper();
+                if (!rawdata.AppV_N.Contains("@"))
+                    reporter = (rawdata.AppV_O.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
+                UserViewModels.RegisterUserAuto(analyser);
+                UserViewModels.RegisterUserAuto(reporter);
+
+                var uniquekey = DateTime.Parse(rawdata.AppV_C).ToString("yyyy-MM-dd") + "-" + rawdata.AppV_I + "-" + rawdata.AppV_K;
+                if (!rmaissuedict.ContainsKey(uniquekey))
+                {
+                    CreateRELssue(RELPJKEY, analyser, reporter, rawdata, ctrl);
+                }//check if rel issue exist
+            }//check raw data status
+        }
+
+        private static void CreateRELssue(string RELPJKEY,string analyser,string reporter, RELRAWData rawdata,Controller ctrl)
+        {
+            var vm = new IssueViewModels();
+            vm.ProjectKey = RELPJKEY;
+            vm.IssueKey = IssueViewModels.GetUniqKey();
+            vm.IssueType = ISSUETP.Rel;
+
+            vm.RelativePeoples = "";
+            vm.Priority = ISSUEPR.Major;
+            vm.Resolution = Resolute.Pending;
+            vm.FVCode = "";
+            vm.ReportDate = DateTime.Parse(rawdata.AppV_C);
+
+            vm.CaseID = rawdata.AppV_A.ToString();
+            vm.ProductType = rawdata.AppV_H;
+            vm.LineCategory = rawdata.AppV_G;
+            vm.QualType = rawdata.AppV_E;
+            vm.TestType = rawdata.AppV_I;
+            vm.FailureInterval = rawdata.AppV_J;
+            vm.TestFailure = rawdata.AppV_P;
+            vm.Location = rawdata.AppV_U;
+            vm.RequestID = rawdata.AppV_F;
+            vm.ModuleSN = rawdata.AppV_K;
+
+            vm.Assignee = analyser;
+            vm.Reporter = reporter;
+
+            vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+            vm.DueDate = DateTime.Parse(rawdata.AppV_C).AddDays(23);
+
+            vm.Summary = "REL CaseID "+vm.CaseID+": "+vm.ModuleSN+" failed for "+ vm.TestType+" test with failure "+ vm.TestFailure;
+            vm.Description = vm.Summary;
+            vm.CommentType = COMMENTTYPE.Description;
+
+            vm.StoreIssue();
+
+            CreateRelSubIssue(RELSubIssueType.FAILVERIFYACTION, "Failure Verify for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(2));
+            CreateRelSubIssue(RELSubIssueType.CONTAINMENTACTION, "Cotainment Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(30));
+            CreateRelSubIssue(RELSubIssueType.CORRECTIVEACTION, "Corrective/PreVentive Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(60));
+            CreateRelSubIssue(RELSubIssueType.CONTAINMENTACTION, "Verify Corrective/PreVentive Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, reporter, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(75));
+            IssueViewModels.StoreIssueComment(vm.IssueKey, "ROOTCAUSE: to be edited", analyser, COMMENTTYPE.RootCause);
+
+            SendRMAEvent(vm, "created", ctrl, true);
+        }
+
+        private static void CreateRelSubIssue(string presum, string sum, string pjkey, string parentkey, string analyser, string reporter, DateTime duedate)
+        {
+            var vm = new IssueViewModels();
+            vm.ProjectKey = pjkey;
+            vm.IssueKey = IssueViewModels.GetUniqKey();
+            vm.ParentIssueKey = parentkey;
+            vm.IssueType = ISSUETP.Task;
+            vm.Summary = presum + sum;
+            vm.Priority = ISSUEPR.Major;
+            vm.DueDate = duedate;
+            vm.ReportDate = DateTime.Now;
+            vm.Assignee = analyser;
+            vm.Reporter = reporter;
+            vm.Resolution = Resolute.Pending;
+            vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+            vm.StoreSubIssue();
+        }
+
+        private static Dictionary<string, Dictionary<string, bool>> RetrieveRelAttach()
+        {
+            var ret = new Dictionary<string, Dictionary<string, bool>>();
+            var sql = "select AppV_A,AppV_B,AppV_C from RELMapData where AppV_D = '<AppV_D>'";
+            sql = sql.Replace("<AppV_D>", RMAMAPDATATYPE.ATTACH);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var combinekey = Convert.ToString(line[0]);
+                var attachs = Convert.ToString(line[2]).Split(new string[] { "\\", "/" }, StringSplitOptions.RemoveEmptyEntries);
+                var attach = attachs[attachs.Length - 1];
+
+                if (ret.ContainsKey(combinekey))
+                {
+                    if (!ret[combinekey].ContainsKey(attach))
+                    {
+                        ret[combinekey].Add(attach, true);
+                    }
+                }
+                else
+                {
+                    var val = new Dictionary<string, bool>();
+                    val.Add(attach, true);
+                    ret.Add(combinekey, val);
+                }
+            }
+
+            return ret;
+        }
+
+        private static void StoreRELAttachs(string relfolder, string combinekey,string CaseID, Dictionary<string, Dictionary<string, bool>> rmaattaches, Controller ctrl)
+        {
+
+            if (DirectoryExists(ctrl, relfolder))
+            {
+                var imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\RELATTCH\\" + CaseID + "\\";
+
+                if (!DirectoryExists(ctrl, imgdir))
+                    Directory.CreateDirectory(imgdir);
 
 
+                var rmaattachfiles = DirectoryEnumerateFiles(ctrl, relfolder);
+                foreach (var attach in rmaattachfiles)
+                {
+                    var filename = Path.GetFileName(attach).Replace(" ", "_").Replace("#", "").Replace("'", "")
+                            .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                    if (!rmaattaches.ContainsKey(combinekey))
+                    {
+                        //download file and store
+
+                        var desfile = imgdir + filename;
+                        FileCopy(ctrl, attach, desfile, true);
+                        if (FileExist(ctrl, desfile))
+                        {
+                            var url = "/userfiles/docs/RELATTCH/" + CaseID + "/" + filename;
+                            StoreRELAttach( combinekey, CaseID, url);
+                        }
+                    }//not contain rmanum
+                    else
+                    {
+                        var attachdict = rmaattaches[combinekey];
+                        if (!attachdict.ContainsKey(filename))
+                        {
+                            var desfile = imgdir + filename;
+                            FileCopy(ctrl, attach, desfile, true);
+                            if (FileExist(ctrl, desfile))
+                            {
+                                var url = "/userfiles/docs/RELATTCH/" + CaseID + "/" + filename;
+                                StoreRELAttach( combinekey, CaseID, url);
+                            }
+                        }//not contain attach
+                    }
+                }//foreach
+            }//if folder exist
+        }
+
+        private static void StoreRELAttach(string combinekey, string CaseID, string attach)
+        {
+            var sql = "insert into RELMapData(AppV_A,AppV_B,AppV_C,AppV_D) values(N'<AppV_A>',N'<AppV_B>',N'<AppV_C>',N'<AppV_D>')";
+            sql = sql.Replace("<AppV_A>", combinekey).Replace("<AppV_B>", CaseID).Replace("<AppV_C>", attach).Replace("<AppV_D>", RMAMAPDATATYPE.ATTACH);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        #endregion
 
     }
 }

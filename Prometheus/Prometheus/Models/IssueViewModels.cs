@@ -582,6 +582,7 @@ namespace Prometheus.Models
         #endregion
 
         #region Rel
+
         public string QualType { set; get; }
         public string RequestID { set; get; }
         public string LineCategory { set; get; }
@@ -590,6 +591,9 @@ namespace Prometheus.Models
         public string FailQTY { set; get; }
         public string TotalQTY { set; get; }
         public string Location { set; get; }
+        public string CaseID { set; get; }
+        public string TestFailure { set; get; }
+
         #endregion
 
         public string LYT { set; get; }
@@ -616,7 +620,7 @@ namespace Prometheus.Models
 
         public void StoreIssue()
         {
-            var sql = "insert into Issue(ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,Creator,AlertEmailUpdateDate,RelativePeoples,ModuleSN,ErrAbbr,DataID) values('<ProjectKey>','<IssueKey>','<IssueType>',N'<Summary>','<Priority>','<DueDate>','<ResolvedDate>','<ReportDate>','<Assignee>','<Reporter>','<Resolution>','<Creator>','<AlertEmailUpdateDate>','<RelativePeoples>','<ModuleSN>','<ErrAbbr>','<DataID>')";
+            var sql = "insert into Issue(ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,Creator,AlertEmailUpdateDate,RelativePeoples,ModuleSN,ErrAbbr,DataID) values('<ProjectKey>','<IssueKey>','<IssueType>',N'<Summary>','<Priority>','<DueDate>','<ResolvedDate>','<ReportDate>','<Assignee>','<Reporter>','<Resolution>','<Creator>','<AlertEmailUpdateDate>','<RelativePeoples>',N'<ModuleSN>','<ErrAbbr>','<DataID>')";
             sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<IssueKey>", IssueKey).Replace("<IssueType>", IssueType)
                 .Replace("<Summary>", Summary).Replace("<Priority>", Priority).Replace("<DueDate>", DueDate.ToString())
                 .Replace("<ResolvedDate>", ResolvedDate.ToString()).Replace("<ReportDate>", ReportDate.ToString()).Replace("<Assignee>", Assignee)
@@ -650,7 +654,7 @@ namespace Prometheus.Models
 
         private void StoreOBA()
         {
-            var sql = "insert into IssueOBA(IssueKey,FinisarDMR,OBAFailureRate,MaterialDisposition,ModuleSN,FVCode,APVal1) values('<IssueKey>','<FinisarDMR>','<OBAFailureRate>','<MaterialDisposition>','<ModuleSN>','<FVCode>','<ProductType>')";
+            var sql = "insert into IssueOBA(IssueKey,FinisarDMR,OBAFailureRate,MaterialDisposition,ModuleSN,FVCode,APVal1) values('<IssueKey>','<FinisarDMR>','<OBAFailureRate>','<MaterialDisposition>',N'<ModuleSN>','<FVCode>','<ProductType>')";
             sql = sql.Replace("<IssueKey>", IssueKey).Replace("<FinisarDMR>", FinisarDMR).Replace("<OBAFailureRate>", OBAFailureRate).Replace("<FVCode>", FVCode)
                 .Replace("<MaterialDisposition>", MaterialDisposition).Replace("<ModuleSN>", ModuleSN).Replace("<ProductType>", ProductType);
             DBUtility.ExeLocalSqlNoRes(sql);
@@ -664,22 +668,28 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
-    //    QualType { set; get; }
-    //public string RequestID { set; get; }
-    //public string LineCategory { set; get; }
-    //public string TestType { set; get; }
-    //public string FailureInterval { set; get; }
-    //public string FailQTY { set; get; }
-    //public string TotalQTY { set; get; }
-    //public string Location { set; get; }
+
+        //    vm.FVCode = "";
+        //    vm.ReportDate = DateTime.Parse(rawdata.AppV_C);
+        //    vm.CaseID = rawdata.AppV_A.ToString();
+        //    vm.ProductType = rawdata.AppV_H;
+        //    vm.LineCategory = rawdata.AppV_G;
+        //    vm.QualType = rawdata.AppV_E;
+        //    vm.TestType = rawdata.AppV_I;
+        //    vm.FailureInterval = rawdata.AppV_J;
+        //    vm.TestFailure = rawdata.AppV_P;
+        //    vm.Location = rawdata.AppV_U;
+        //    vm.RequestID = rawdata.AppV_F;
 
         private void StoreReliability()
         {
-            var sql = "insert into IssueAttribute(IssueKey,APVal1,APVal2,APVal3,APVal4,APVal5,APVal6,APVal7,APVal8,APVal9,APVal10) "
-                + " values('<IssueKey>','<QualType>','<RequestID>','<LineCategory>','<ProductType>','<TestType>','<FailureInterval>','<FailQTY>','<TotalQTY>','<Location>','<FVCode>')";
-            sql = sql.Replace("<IssueKey>", IssueKey).Replace("<QualType>", QualType).Replace("<RequestID>", RequestID).Replace("<LineCategory>", LineCategory)
-                .Replace("<ProductType>", ProductType).Replace("<TestType>", TestType).Replace("<FailureInterval>", FailureInterval).Replace("<FailQTY>", FailQTY)
-                .Replace("<TotalQTY>", TotalQTY).Replace("<Location>", Location).Replace("<FVCode>", FVCode);
+            var sql = "insert into IssueAttribute(IssueKey,APVal1,APVal2,APVal3,APVal4,APVal5,APVal6,APVal7,APVal8,APVal9,APVal10,APVal11,APVal12) "
+                + " values('<IssueKey>','<CaseID>',N'<ProductType>',N'<LineCategory>',N'<QualType>',N'<TestType>',N'<FailureInterval>',N'<TestFailure>',N'<Location>',N'<RequestID>',N'<FailQTY>',N'<TotalQTY>',N'<FVCode>')";
+
+            sql = sql.Replace("<IssueKey>", IssueKey).Replace("<CaseID>", CaseID).Replace("<ProductType>", ProductType).Replace("<LineCategory>", LineCategory)
+                .Replace("<QualType>", QualType).Replace("<TestType>", TestType).Replace("<FailureInterval>", FailureInterval).Replace("<TestFailure>", TestFailure)
+                .Replace("<Location>", Location).Replace("<RequestID>", RequestID).Replace("<FailQTY>", FailQTY).Replace("<TotalQTY>", TotalQTY).Replace("<FVCode>", FVCode);
+
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
@@ -713,30 +723,34 @@ namespace Prometheus.Models
             }
         }
 
+        //var sql = "insert into IssueAttribute(IssueKey,APVal1,APVal2,APVal3,APVal4,APVal5,APVal6,APVal7,APVal8,APVal9,APVal10,APVal11,APVal12) "
+        //        + " values('<IssueKey>','<CaseID>',N'<ProductType>',N'<LineCategory>',N'<QualType>',N'<TestType>',N'<FailureInterval>',N'<TestFailure>',N'<Location>',N'<RequestID>',N'<FailQTY>',N'<TotalQTY>',N'<FVCode>')";
         private void RetrieveReliability()
         {
-            var sql = "select APVal1,APVal2,APVal3,APVal4,APVal5,APVal6,APVal7,APVal8,APVal9,APVal10 from IssueAttribute where IssueKey = '<IssueKey>'";
+            var sql = "select APVal1,APVal2,APVal3,APVal4,APVal5,APVal6,APVal7,APVal8,APVal9,APVal10,APVal11,APVal12 from IssueAttribute where IssueKey = '<IssueKey>'";
             sql = sql.Replace("<IssueKey>", IssueKey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
             {
-                QualType = Convert.ToString(dbret[0][0]);
-                RequestID = Convert.ToString(dbret[0][1]);
+                CaseID = Convert.ToString(dbret[0][0]);
+                ProductType = Convert.ToString(dbret[0][1]);
                 LineCategory = Convert.ToString(dbret[0][2]);
-                ProductType = Convert.ToString(dbret[0][3]);
+                QualType = Convert.ToString(dbret[0][3]);
                 TestType = Convert.ToString(dbret[0][4]);
                 FailureInterval = Convert.ToString(dbret[0][5]);
-                FailQTY = Convert.ToString(dbret[0][6]);
-                TotalQTY = Convert.ToString(dbret[0][7]);
-                Location = Convert.ToString(dbret[0][8]);
-                FVCode = Convert.ToString(dbret[0][9]);
+                TestFailure = Convert.ToString(dbret[0][6]);
+                Location = Convert.ToString(dbret[0][7]);
+                RequestID = Convert.ToString(dbret[0][8]);
+                FailQTY = Convert.ToString(dbret[0][9]);
+                TotalQTY = Convert.ToString(dbret[0][10]);
+                FVCode = Convert.ToString(dbret[0][11]);
             }
         }
 
         private void StoreRMA()
         {
 
-            var sql = "insert into IssueRMA(IssueKey,FinisarRMA,FinisarModel,ECustomer,CRMANUM,CReport,ModuleSN,RMAFailureCode,FVCode) values('<IssueKey>','<FinisarRMA>','<FinisarModel>','<ECustomer>','<CRMANUM>','<CReport>','<ModuleSN>','<RMAFailureCode>','<FVCode>')";
+            var sql = "insert into IssueRMA(IssueKey,FinisarRMA,FinisarModel,ECustomer,CRMANUM,CReport,ModuleSN,RMAFailureCode,FVCode) values('<IssueKey>','<FinisarRMA>','<FinisarModel>','<ECustomer>','<CRMANUM>','<CReport>',N'<ModuleSN>','<RMAFailureCode>','<FVCode>')";
             sql = sql.Replace("<IssueKey>", IssueKey).Replace("<FinisarRMA>", FinisarRMA).Replace("<RMAFailureCode>", RMAFailureCode).Replace("<FVCode>", FVCode)
                 .Replace("<FinisarModel>", FinisarModel).Replace("<ECustomer>", ECustomer)
                 .Replace("<CRMANUM>", CRMANUM).Replace("<CReport>", CReport).Replace("<ModuleSN>", ModuleSN);
@@ -1228,7 +1242,6 @@ namespace Prometheus.Models
             sql = sql.Replace("<cond>", cond).Replace("<ProjectKey>", pjkey)
                     .Replace("<IssueType1>", ISSUETP.NPIPROC).Replace("<IssueType2>", ISSUETP.RMA);
 
-            //.Replace("<BICond>", " @Burn-In Step ")
 
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
@@ -1332,13 +1345,7 @@ namespace Prometheus.Models
             return dbret.Count;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="projectkey"></param>
-        /// <param name="issuestatus"> comes from the resolution has pending,working,done three status</param>
-        /// <returns></returns>
-        /// 
+
         public static List<IssueViewModels> RetrieveTaskByProjectKey(string projectkey,string issuestatus)
         {
             var cond = "";
@@ -1733,138 +1740,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        //public static List<IssueViewModels> RetrieveRMAByProjectKey(string projectkey, string issuestatus)
-        //{
-        //    var cond = "";
-        //    var fixresolve = "";
-        //    if (string.Compare(issuestatus, Resolute.Pending) == 0)
-        //    {
-        //        cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";
-        //        fixresolve = Resolute.Pending;
-        //    }
-        //    else if (string.Compare(issuestatus, Resolute.Working) == 0)
-        //    {
-        //        cond = "('" + Resolute.Working + "')";
-        //        fixresolve = Resolute.Working;
-        //    }
-        //    else
-        //    {
-        //        cond = "('" + Resolute.Fixed + "','" + Resolute.Done + "','" + Resolute.NotFix + "','" + Resolute.NotReproduce + "','" + Resolute.Unresolved + "')";
-        //        fixresolve = Resolute.Done;
-        //    }
-
-        //    var sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples,APVal2 from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and Resolution in <cond> and  ParentIssueKey = '' and IssueType = '<IssueType>' order by ReportDate DESC";
-        //    sql = sql.Replace("<ProjectKey>", projectkey).Replace("<cond>", cond).Replace("<IssueType>", ISSUETP.RMA);
-        //    var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
-        //    var ret = new List<IssueViewModels>();
-        //    foreach (var line in dbret)
-        //    {
-        //        var tempsolve = fixresolve;
-        //        if (string.Compare(Convert.ToString(line[10]), Resolute.Reopen) == 0)
-        //            tempsolve = Resolute.Reopen;
-
-        //        var tempvm = new IssueViewModels(Convert.ToString(line[0])
-        //            , Convert.ToString(line[1]), Convert.ToString(line[2])
-        //            , Convert.ToString(line[3]), Convert.ToString(line[4])
-        //            , Convert.ToString(line[5]), Convert.ToString(line[6])
-        //            , Convert.ToString(line[7]), Convert.ToString(line[8])
-        //            , Convert.ToString(line[9]), tempsolve, "", Convert.ToString(line[11]));
-        //        tempvm.LYT = Convert.ToString(Convert.ToString(line[12]));
-
-        //        tempvm.RetrieveRMA();
-
-        //        tempvm.RetrieveComment();
-
-        //        tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey);
-
-        //        tempvm.RetrieveAttachment(tempvm.IssueKey);
-
-        //        ret.Add(tempvm);
-        //    }
-
-        //    return ret;
-        //}
-
-        //public static List<IssueViewModels> RetrieveRMAByProjectKey(string projectkey, string StartDate, string EndDate)
-        //{
-        //    var sql = "";
-        //    if (string.Compare(StartDate, "NONE", true) == 0)
-        //    {
-        //        sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and  ParentIssueKey = '' and IssueType = '<IssueType>' order by ReportDate DESC";
-        //        sql = sql.Replace("<ProjectKey>", projectkey).Replace("<IssueType>", ISSUETP.RMA);
-        //    }
-        //    else
-        //    {
-        //        sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ProjectKey = '<ProjectKey>' and  ParentIssueKey = '' and IssueType = '<IssueType>' and ReportDate >= '<StartDate>' and ReportDate <= '<EndDate>' order by ReportDate DESC";
-        //        sql = sql.Replace("<ProjectKey>", projectkey).Replace("<IssueType>", ISSUETP.RMA).Replace("<StartDate>", StartDate).Replace("<EndDate>", DateTime.Parse(EndDate).AddDays(1).ToString());
-        //    }
-
-        //    var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
-        //    var ret = new List<IssueViewModels>();
-        //    foreach (var line in dbret)
-        //    {
-
-        //        var tempvm = new IssueViewModels(Convert.ToString(line[0])
-        //            , Convert.ToString(line[1]), Convert.ToString(line[2])
-        //            , Convert.ToString(line[3]), Convert.ToString(line[4])
-        //            , Convert.ToString(line[5]), Convert.ToString(line[6])
-        //            , Convert.ToString(line[7]), Convert.ToString(line[8])
-        //            , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
-
-        //        tempvm.RetrieveRMA();
-
-        //        tempvm.RetrieveComment();
-
-        //        tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey);
-
-        //        tempvm.RetrieveAttachment(tempvm.IssueKey);
-
-        //        ret.Add(tempvm);
-        //    }
-
-        //    return ret;
-        //}
-
-        //public static List<IssueViewModels> RetrieveAllRMAIssue(string StartDate, string EndDate)
-        //{
-        //    var sql = "";
-        //    if (string.Compare(StartDate, "NONE", true) == 0)
-        //    {
-        //        sql = "select  ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ParentIssueKey = '' and IssueType = '<IssueType>' order by ReportDate DESC";
-        //        sql = sql.Replace("<IssueType>", ISSUETP.RMA);
-        //    }
-        //    else
-        //    {
-        //        sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples from Issue where APVal1 <> 'delete' and  ParentIssueKey = '' and IssueType = '<IssueType>' and ReportDate >= '<StartDate>' and ReportDate <= '<EndDate>' order by ReportDate DESC";
-        //        sql = sql.Replace("<IssueType>", ISSUETP.RMA).Replace("<StartDate>", StartDate).Replace("<EndDate>", DateTime.Parse(EndDate).AddDays(1).ToString());
-        //    }
-
-        //    var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
-        //    var ret = new List<IssueViewModels>();
-        //    foreach (var line in dbret)
-        //    {
-
-        //        var tempvm = new IssueViewModels(Convert.ToString(line[0])
-        //            , Convert.ToString(line[1]), Convert.ToString(line[2])
-        //            , Convert.ToString(line[3]), Convert.ToString(line[4])
-        //            , Convert.ToString(line[5]), Convert.ToString(line[6])
-        //            , Convert.ToString(line[7]), Convert.ToString(line[8])
-        //            , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
-
-        //        tempvm.RetrieveRMA();
-
-        //        tempvm.RetrieveComment();
-
-        //        tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey);
-
-        //        tempvm.RetrieveAttachment(tempvm.IssueKey);
-
-        //        ret.Add(tempvm);
-        //    }
-
-        //    return ret;
-        //}
-
+        
 
         public static List<IssueViewModels> RetrieveIssueTypeByProjectKey(string projectkey, string issuestatus,string issuetype, Controller ctrl)
         {
@@ -2046,6 +1922,11 @@ namespace Prometheus.Models
                 if (string.Compare(issuetype, ISSUETP.Quality) == 0)
                 {
                     tempvm.RetrieveQuality();
+                }
+
+                if (string.Compare(issuetype, ISSUETP.Rel) == 0)
+                {
+                    tempvm.RetrieveReliability();
                 }
 
                 tempvm.RetrieveComment(ctrl);
@@ -2499,18 +2380,18 @@ namespace Prometheus.Models
 
         public static void StoreBIRootCause(string pjkey, string sn,string rootcause)
         {
-            var csql = "delete from BIROOTCAUSE where ProjectKey = '<ProjectKey>' and ModuleSN = '<ModuleSN>'";
+            var csql = "delete from BIROOTCAUSE where ProjectKey = '<ProjectKey>' and ModuleSN = N'<ModuleSN>'";
             csql = csql.Replace("<ProjectKey>", pjkey).Replace("<ModuleSN>", sn);
             DBUtility.ExeLocalSqlNoRes(csql);
 
-            var sql = "insert into BIROOTCAUSE(ProjectKey,ModuleSN,RootCause) values('<ProjectKey>','<ModuleSN>','<RootCause>')";
+            var sql = "insert into BIROOTCAUSE(ProjectKey,ModuleSN,RootCause) values('<ProjectKey>',N'<ModuleSN>','<RootCause>')";
             sql = sql.Replace("<ProjectKey>", pjkey).Replace("<ModuleSN>", sn).Replace("<RootCause>", rootcause);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
         public static string RetrieveBIRootCause(string pjkey, string sn)
         {
-            var csql = "select RootCause from BIROOTCAUSE where ProjectKey = '<ProjectKey>' and ModuleSN = '<ModuleSN>'";
+            var csql = "select RootCause from BIROOTCAUSE where ProjectKey = '<ProjectKey>' and ModuleSN = N'<ModuleSN>'";
             csql = csql.Replace("<ProjectKey>", pjkey).Replace("<ModuleSN>", sn);
             var dbret = DBUtility.ExeLocalSqlWithRes(csql,null);
             if (dbret.Count > 0)

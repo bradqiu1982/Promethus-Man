@@ -522,13 +522,73 @@ namespace Prometheus.Models
             get
             { return failureverifyactionlist; }
         }
-
+        public string FVerifyActionStatus()
+        {
+            if (failureverifyactionlist.Count > 0)
+            {
+                foreach (var item in failureverifyactionlist)
+                {
+                    if (item.Resolution == Resolute.Pending || item.Resolution == Resolute.Reopen)
+                    {
+                        return Resolute.ColorStatus(Resolute.Pending);
+                    }
+                    if (item.Resolution == Resolute.Working)
+                    {
+                        return Resolute.ColorStatus(Resolute.Working);
+                    }
+                    if (item.Resolution == Resolute.NotFix)
+                    {
+                        return Resolute.ColorStatus(Resolute.NotFix);
+                    }
+                    if (item.Resolution == Resolute.Unresolved)
+                    {
+                        return Resolute.ColorStatus(Resolute.Unresolved);
+                    }
+                    if (item.Resolution == Resolute.NotReproduce)
+                    {
+                        return Resolute.ColorStatus(Resolute.NotReproduce);
+                    }
+                }
+                return Resolute.ColorStatus(Resolute.Done);
+            }
+            return Resolute.ColorStatus(Resolute.Pending);
+        }
         public List<IssueViewModels> CorrectiveVerifyActions
         {
             get
             { return correctivverifyactionlist; }
         }
-
+        public string CVerifyActionStatus()
+        {
+            if (correctivverifyactionlist.Count > 0)
+            {
+                foreach (var item in correctivverifyactionlist)
+                {
+                    if (item.Resolution == Resolute.Pending || item.Resolution == Resolute.Reopen)
+                    {
+                        return Resolute.ColorStatus(Resolute.Pending);
+                    }
+                    if (item.Resolution == Resolute.Working)
+                    {
+                        return Resolute.ColorStatus(Resolute.Working);
+                    }
+                    if (item.Resolution == Resolute.NotFix)
+                    {
+                        return Resolute.ColorStatus(Resolute.NotFix);
+                    }
+                    if (item.Resolution == Resolute.Unresolved)
+                    {
+                        return Resolute.ColorStatus(Resolute.Unresolved);
+                    }
+                    if (item.Resolution == Resolute.NotReproduce)
+                    {
+                        return Resolute.ColorStatus(Resolute.NotReproduce);
+                    }
+                }
+                return Resolute.ColorStatus(Resolute.Done);
+            }
+            return Resolute.ColorStatus(Resolute.Pending);
+        }
 
         #region OBA
         public string FinisarDMR { set; get; }
@@ -958,13 +1018,11 @@ namespace Prometheus.Models
 
         private void UpdateRelInfo()
         {
-            //IssueAttribute(IssueKey,APVal1,APVal2,APVal3,APVal4,APVal5,APVal6,APVal7,APVal8,APVal9,APVal10) "
-            //" values('<IssueKey>','<QualType>','<RequestID>','<LineCategory>','<ProductType>','<TestType>','<FailureInterval>','<FailQTY>','<TotalQTY>','<Location>','<FVCode>')
+            //var sql = "insert into IssueAttribute(IssueKey,APVal1,APVal2,APVal3,APVal4,APVal5,APVal6,APVal7,APVal8,APVal9,APVal10,APVal11,APVal12) "
+            //    + " values('<IssueKey>','<CaseID>',N'<ProductType>',N'<LineCategory>',N'<QualType>',N'<TestType>',N'<FailureInterval>',N'<TestFailure>',N'<Location>',N'<RequestID>',N'<FailQTY>',N'<TotalQTY>',N'<FVCode>')";
 
-            var sql = "update IssueAttribute set APVal1 = '<QualType>',APVal2 = '<RequestID>',APVal3 = '<LineCategory>',APVal4 = '<ProductType>',APVal5 = '<TestType>',APVal10 = '<FVCode>' where IssueKey = '<IssueKey>'";
-            sql = sql.Replace("<IssueKey>", IssueKey).Replace("<QualType>", QualType)
-                .Replace("<RequestID>", RequestID).Replace("<LineCategory>", LineCategory)
-                .Replace("<ProductType>", ProductType).Replace("<TestType>", TestType).Replace("<FVCode>", FVCode);
+            var sql = "update IssueAttribute set APVal12 = N'<FVCode>' where IssueKey = '<IssueKey>'";
+            sql = sql.Replace("<FVCode>", FVCode).Replace("<IssueKey>", IssueKey);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
@@ -1868,6 +1926,11 @@ namespace Prometheus.Models
                 if (string.Compare(issuetype, ISSUETP.Quality) == 0)
                 {
                     tempvm.RetrieveQuality();
+                }
+
+                if (string.Compare(issuetype, ISSUETP.Rel) == 0)
+                {
+                    tempvm.RetrieveReliability();
                 }
 
                 tempvm.RetrieveComment(ctrl);

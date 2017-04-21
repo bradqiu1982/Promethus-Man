@@ -2103,25 +2103,8 @@ namespace Prometheus.Controllers
                 }
             }
 
-            if(!string.IsNullOrEmpty(Request.Form["LineCategory"]))
-                originaldata.LineCategory = Request.Form["LineCategory"];
 
-            if (!string.IsNullOrEmpty(Request.Form["ProductType"]))
-                originaldata.ProductType = Request.Form["ProductType"];
 
-            if (!string.IsNullOrEmpty(Request.Form["TestType"]))
-                originaldata.TestType = Request.Form["TestType"];
-
-            if (!string.IsNullOrEmpty(Request.Form["QualType"]))
-                originaldata.QualType = Request.Form["QualType"];
-
-            if (!string.IsNullOrEmpty(Request.Form["RequestID"]))
-                originaldata.RequestID = Request.Form["RequestID"];
-
-            originaldata.FVCode = Request.Form["FVCode"];
-            
-            originaldata.Priority = Request.Form["prioritylist"].ToString();
-            originaldata.DueDate = DateTime.Parse(Request.Form["DueDate"]);
 
             var originalassignee = originaldata.Assignee;
             var originaldataresolution = originaldata.Resolution;
@@ -2132,6 +2115,9 @@ namespace Prometheus.Controllers
                 originaldata.Assignee = Request.Form["assigneelist"].ToString();
                 originaldata.Resolution = Request.Form["resolutionlist"].ToString();
                 originaldata.RelativePeoples = Request.Form["RPeopleAddr"];
+                originaldata.FVCode = Request.Form["FVCode"];
+                originaldata.Priority = Request.Form["prioritylist"].ToString();
+                originaldata.DueDate = DateTime.Parse(Request.Form["DueDate"]);
             }
 
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
@@ -2143,23 +2129,15 @@ namespace Prometheus.Controllers
             else
                 originaldata.Description = "";
 
-            if (!string.IsNullOrEmpty(Request.Form["rootcauseeditor"]))
-            {
-                var rootcause = SeverHtmlDecode.Decode(this,Request.Form["rootcauseeditor"]);
-                var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(rootcause));
-                var commenttype = COMMENTTYPE.RootCause;
-                IssueViewModels.StoreIssueComment(originaldata.IssueKey, dbstr, updater, commenttype);
-                UserRankViewModel.UpdateUserRank(updater, 5);
-            }
 
             var issuetag = string.Empty;
-            //for (var i = 0; i < 200; i++)
-            //{
-            //    if (Request.Form["issuetagcheck" + i] != null)
-            //    {
-            //        issuetag = issuetag + Request.Form["issuetagcheck" + i] + ";";
-            //    }
-            //}
+            for (var i = 0; i < 200; i++)
+            {
+                if (Request.Form["issuetagcheck" + i] != null)
+                {
+                    issuetag = issuetag + Request.Form["issuetagcheck" + i] + ";";
+                }
+            }
 
             var attachtag = string.Empty;
             for (var i = 0; i < 200; i++)
@@ -2201,7 +2179,6 @@ namespace Prometheus.Controllers
                     UserRankViewModel.UpdateUserRank(updater, 5);
                 }
             }
-
 
             originaldata.UpdateRel();
 

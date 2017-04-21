@@ -5,6 +5,12 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@*<style type="text/css">
+    th, td {
+        white-space: nowrap;
+    }
+</style>*@
+
 <div class="row">
     <div class="col-lg-4">
             <h2>Reliability</h2>
@@ -41,21 +47,24 @@
                 </div>
             </div>
         </div>
+        <hr/>
     }
 
     var i = 0;
-    <table id="firsttable" name="firsttable"  class="display" cellspacing="0">
-        <thead class="header">
+    <table id="firsttable" class="display" width="100%" cellspacing="0">
+        <thead>
             <tr>
                 <th style="text-align:center">Product</th>
-                <th style="text-align:center">TestType</th>
-                <th style="text-align:center">FailRate</th>
                 <th style="text-align:center">Summary</th>
                 <th style="text-align:center">Status</th>
-                <th style="text-align:center">RootCause</th>
                 <th style="text-align:center">FV</th>
+
+                <th style="text-align:center">Failure Verification</th>
                 <th style="text-align:center">Containment Action</th>
+                <th style="text-align:center">RootCause</th>
                 <th style="text-align:center">Corrective Action</th>
+                <th style="text-align:center">Verification 4 Corrective</th>
+
                 <th style="text-align:center">Owner</th>
                 <th style="text-align:center">Rel.Engineer</th>
                 <th style="text-align:center">ReportDate</th>
@@ -64,43 +73,21 @@
         <tbody>
             @foreach (var item in Model)
                 {
-                @*<tr>
-                        <td width="10%">
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    @(Model.Count() - i)
-                                </div>
-                                <div class="col-lg-8">
-                                    <button data-toggle="tooltip" title="Low Yield Trigger" class="form-control" value="@item.IssueKey" type="button" onclick="LowYieldWarning(this)">
-                                        <span class="glyphicon glyphicon-share" aria-hidden="true"></span>
-                                    </button>
-                                </div>
-                            </div>
-                        </td>
-                        <td colspan="9" width="80%">
-                            <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">
-                                <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
-                                @rmatitle.Substring(0, rmatitle.Length > 125 ? 125 : rmatitle.Length)
-                            </a>
-                        </td>
-                        <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus2(item.Resolution))</td>
-                    </tr>*@
+
                 <tr>
                     <td style="text-align:center">@item.ProductType</td>
-                    <td style="text-align:center">@item.TestType</td>
-                    <td style="text-align:center">@item.FailQTY/@item.TotalQTY</td>
-                    <td style="text-align:center"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></td>
+                     <td style="text-align:center;font-size:9px"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></td>
                     <td style="text-align:center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus2(item.Resolution))</td>
+                    <td style="text-align:center">@item.FVCode</td>
 
-                    @if (item.RootCauseCommentList.Count > 0)
+                    @if (item.FailureVerifyActions.Count > 0)
                     {
-                        <td style="text-align:center"><a href="/Issue/ShowRootCause?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></td>
+                        <td style="text-align:center"><a href="/Issue/ShowContainmentAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.FVerifyActionStatus())</a></td>
                     }
                     else
                     {
-                        <td style="text-align:center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
+                        <td style="text-align:center">N/A</td>
                     }
-                    <td style="text-align:center">@item.FVCode</td>
 
                     @if (item.ContainmentActions.Count > 0)
                     {
@@ -111,6 +98,22 @@
                         <td style="text-align:center">N/A</td>
                     }
 
+                    @if (item.RootCauseCommentList.Count > 0)
+                    {
+                        if (item.RootCauseCommentList[0].Comment.Contains("ROOTCAUSE: to be edited"))
+                        {
+                            <td style="text-align:center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
+                        }
+                        else
+                        {
+                            <td style="text-align:center"><a href="/Issue/ShowRootCause?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></td>
+                        }
+                    }
+                    else
+                    {
+                        <td style="text-align:center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
+                    }
+
                     @if (item.CorrectiveActions.Count > 0)
                     {
                         <td style="text-align:center"><a href="/Issue/ShowCorrectiveAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.CorrectiveActionStatus())</a></td>
@@ -119,6 +122,16 @@
                     {
                         <td style="text-align:center">N/A</td>
                     }
+
+                    @if (item.CorrectiveVerifyActions.Count > 0)
+                    {
+                        <td style="text-align:center"><a href="/Issue/ShowCorrectiveAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.CVerifyActionStatus())</a></td>
+                    }
+                    else
+                    {
+                        <td style="text-align:center">N/A</td>
+                    }
+
                     <td style="text-align:center"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
                     <td style="text-align:center"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
                     <td style="text-align:center">@item.ReportDate.ToString("MM/dd-yy")</td>
@@ -126,26 +139,19 @@
                 i = i + 1;
             }
         </tbody>
-
     </table>
+
         <script type="text/javascript">
             $(document).ready(function () {
                 $("#firsttable").DataTable({
                     'iDisplayLength': 50,
                     'aLengthMenu': [[25, 50, 100, -1],
                                     [25, 50, 100, "All"]],
-                    "bAutoWidth": true,
                     "aaSorting": [],
                     "order": []
                 });
             });
 
-            function LowYieldWarning(oBT) {
-                if (confirm("Warning: only RMA assignee can trigger Low Yield Trigger.")) {
-                    var myurl = "/Project/LowYieldWarn?IssueKey=" + oBT.value;
-                    window.open(myurl, '_blank');
-                }
-            }
         </script>
 }
 

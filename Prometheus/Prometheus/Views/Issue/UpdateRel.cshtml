@@ -5,6 +5,18 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@if (ViewBag.isassignee != null && ViewBag.isassignee)
+{
+}
+else
+{
+    <script type="text/javascript">
+            $(document).ready(function () {
+                npireadmode();
+        });
+    </script>
+}
+
 <div class="row">
     <div class="col-lg-3">
         <h2>Update Reliability</h2>
@@ -18,27 +30,6 @@
     <div class="col-lg-3">
         @if (Model != null && string.IsNullOrEmpty(Model.ParentIssueKey))
         {
-            using (Html.BeginForm("PrepareSubIssue", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
-            {
-                @Html.AntiForgeryToken()
-                if (Model != null && !string.IsNullOrEmpty(Model.IssueKey))
-                {
-                    <input class="form-control text-box single-line" value="@(Model.IssueKey+"#[Containment]")" id="HIssueKey" name="HIssueKey" type="hidden" />
-                }
-                else
-                {
-                    <input class="form-control text-box single-line" id="HIssueKey" name="HIssueKey" type="hidden" value="" />
-                }
-                if (Model != null && !string.IsNullOrEmpty(Model.ProjectKey))
-                {
-                    <input class="form-control text-box single-line" value="@(Model.ProjectKey)" id="HProjectKey" name="HProjectKey" type="hidden" />
-                }
-                else
-                {
-                    <input class="form-control text-box single-line" id="HProjectKey" name="HProjectKey" type="hidden" value="" />
-                }
-                <button data-toggle="tooltip" title="Add Containment Action" type="submit" class="btn btn-success" style="font-size:1.5em; margin-top: 0.83em;margin-bottom: 0.83em;width:100%;">Add Containment Action</button>
-            }
         }
         else if (Model != null && !string.IsNullOrEmpty(Model.ParentIssueKey))
         {
@@ -46,37 +37,7 @@
         }
 
     </div>
-    <div class="col-lg-3">
-        @if (Model != null && string.IsNullOrEmpty(Model.ParentIssueKey))
-        {
-            using (Html.BeginForm("PrepareSubIssue", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
-            {
-                @Html.AntiForgeryToken()
-                if (Model != null && !string.IsNullOrEmpty(Model.IssueKey))
-                {
-                    <input class="form-control text-box single-line" value="@(Model.IssueKey+"#[Corrective]")" id="HIssueKey" name="HIssueKey" type="hidden" />
-                }
-                else
-                {
-                    <input class="form-control text-box single-line" id="HIssueKey" name="HIssueKey" type="hidden" value="" />
-                }
-                if (Model != null && !string.IsNullOrEmpty(Model.ProjectKey))
-                {
-                    <input class="form-control text-box single-line" value="@(Model.ProjectKey)" id="HProjectKey" name="HProjectKey" type="hidden" />
-                }
-                else
-                {
-                    <input class="form-control text-box single-line" id="HProjectKey" name="HProjectKey" type="hidden" value="" />
-                }
-                <button data-toggle="tooltip" title="Add Corrective Action" type="submit" class="btn btn-success" style="font-size:1.5em; margin-top: 0.83em;margin-bottom: 0.83em;width:100%;">Add Corrective Action</button>
-            }
-        }
-        else if (Model != null && !string.IsNullOrEmpty(Model.ParentIssueKey))
-        {
-            <h2><a data-toggle="tooltip" title="Goto Parent Issue" href="/Issue/UpdateIssue?issuekey=@(Model.ParentIssueKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
-        }
 
-    </div>
     <div class="col-lg-2">
         @if (Model != null)
         {
@@ -95,301 +56,139 @@
 
     <div class="form-group">
         <div class="form-horizontal">
-            
-            <div class="form-group">
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="projectlist">Project</label>
-                    <div class="col-lg-10">
-                        @Html.DropDownList("projectlist", null, new { @id = "projectlist", @class = "form-control", @readonly = "readonly" })
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2">Summary</label>
-                    <div class="col-lg-10">
-                        @if (Model != null && !string.IsNullOrEmpty(Model.Summary))
-                        {
-                            <input class="form-control data-toggle="tooltip" title="@Model.Summary" text-box single-line" value="@Model.Summary" readonly="readonly" type="text" />
-                        }
-                        else
-                        {
-                            <input class="form-control text-box single-line" readonly="readonly" type="text" value="" />
-                        }
-                    </div>
-                </div>
-            </div>
 
-            <div class="form-group">
-                <div class="col-lg-6">
-                    @if (Model != null && !string.IsNullOrEmpty(Model.LineCategory))
-                    {
-                        <label class="control-label col-lg-2">Line Category</label>
-                        <div class="col-lg-10">
-                            <input class="form-control text-box single-line" value="@Model.LineCategory" readonly="readonly" type="text" />
-                        </div>
-                    }
-                    else
-                    {
-                        <label class="control-label col-lg-2">Line Category<font color="red">*</font></label>
-                        <div class="col-lg-10">
-                            <input class="form-control text-box single-line" id="LineCategory" name="LineCategory" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." type="text" value="" />
-                            <span class="field-validation-valid text-danger" data-valmsg-for="LineCategory" data-valmsg-replace="true"></span>
-                        </div>
-                    }
-                </div>
-
-                <div class="col-lg-6">
-                    @if (Model != null && !string.IsNullOrEmpty(Model.ProductType))
-                    {
-                        <label class="control-label col-lg-2">Product</label>
-                        <div class="col-lg-10">
-                            <input class="form-control text-box single-line" value="@Model.ProductType" readonly="readonly"  type="text" />
-                        </div>
-                    }
-                    else
-                    {
-                        <label class="control-label col-lg-2">Product<font color="red">*</font></label>
-                        <div class="col-lg-10">
-                            <input class="form-control text-box single-line" id="ProductType" name="ProductType" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." type="text" value="" />
-                            <span class="field-validation-valid text-danger" data-valmsg-for="ProductType" data-valmsg-replace="true"></span>
-                        </div>
-                    }    
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="col-lg-6">
-                    @if (Model != null && !string.IsNullOrEmpty(Model.TestType))
-                    {
-                        <label class="control-label col-lg-2">Test Type</label>
-                        <div class="col-lg-10">
-                            <input class="form-control text-box single-line"  value="@Model.TestType" readonly="readonly"  type="text" />
-                        </div>
-                    }
-                    else
-                    {
-                        <label class="control-label col-lg-2">Test Type<font color="red">*</font></label>
-                        <div class="col-lg-10">
-                            <input class="form-control text-box single-line" id="TestType" name="TestType" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." type="text" value="" />
-                            <span class="field-validation-valid text-danger" data-valmsg-for="TestType" data-valmsg-replace="true"></span>
-                        </div>
-                    }
-                </div>
-
-                <div class="col-lg-6">
-                    @if (Model != null && !string.IsNullOrEmpty(Model.QualType))
-                    {
-                        <label class="control-label col-lg-2">Qual.Type</label>
-                        <div class="col-lg-10">
-                            <input class="form-control text-box single-line" value="@Model.QualType" readonly="readonly" type="text" />
-                        </div>
-                    }
-                    else
-                    {
-                        <label class="control-label col-lg-2">Qual.Type<font color="red">*</font></label>
-                        <div class="col-lg-10">
-                            <input class="form-control text-box single-line" id="QualType" name="QualType" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." type="text" value="" />
-                            <span class="field-validation-valid text-danger" data-valmsg-for="QualType" data-valmsg-replace="true"></span>
-                        </div>
-                    }
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="col-lg-6">
-                    @if (Model != null && !string.IsNullOrEmpty(Model.TotalQTY))
-                    {
-                        <label class="control-label col-lg-2">Fail Rate</label>
-                        <div class="col-lg-10">
-                            <input class="form-control text-box single-line" value="@Model.FailQTY/@Model.TotalQTY" readonly="readonly" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." type="text" />
-                        </div>
-                    }
-                </div>
-                <div class="col-lg-6">
-                    @if (Model != null && !string.IsNullOrEmpty(Model.FailureInterval))
-                    {
-                        <label class="control-label col-lg-2">Failure Interval</label>
-                        <div class="col-lg-10">
-                            <input class="form-control text-box single-line" value="@Model.FailureInterval" readonly="readonly" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." type="text" />
-                        </div>
-                    }
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="col-lg-6">
-                    @if (Model != null && !string.IsNullOrEmpty(Model.RequestID))
-                    {
-                        <label class="control-label col-lg-2">Request ID</label>
-                        <div class="col-lg-10">
-                            <input class="form-control text-box single-line"  value="@Model.RequestID" readonly="readonly"  type="text" />
-                        </div>
-                    }
-                    else
-                    {
-                        <label class="control-label col-lg-2">Request ID<font color="red">*</font></label>
-                        <div class="col-lg-10">
-                            <input class="form-control text-box single-line" id="RequestID" name="RequestID" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." type="text" value="" />
-                            <span class="field-validation-valid text-danger" data-valmsg-for="RequestID" data-valmsg-replace="true"></span>
-                        </div>
-                    }
-                </div>
-                <div class="col-lg-6">
-                    @if (Model != null && !string.IsNullOrEmpty(Model.Location))
-                    {
-                        <label class="control-label col-lg-2">Location</label>
-                        <div class="col-lg-10">
-                            <input class="form-control text-box single-line" value="@Model.Location" readonly="readonly" type="text" />
-                        </div>
-                    }
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="col-lg-6">
-                    @if (Model != null && !string.IsNullOrEmpty(Model.ModuleSN))
-                    {
-                        <label class="control-label col-lg-2">Module SN</label>
-                        <div class="col-lg-10">
-                            <input class="form-control text-box single-line" value="@Model.ModuleSN" readonly="readonly"  type="text" />
-                        </div>
-                    }
-                </div>
-                <div class="col-lg-6">
-                </div>
-            </div>
-
-            <hr/>
-            
-            <div class="form-group">
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="prioritylist">Priority</label>
-                    <div class="col-lg-10">
-                        @Html.DropDownList("prioritylist", null, new { @id = "prioritylist", @class = "form-control" })
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="assigneelist">Assignee</label>
-                    <div class="col-lg-10">
-                        @Html.DropDownList("assigneelist", null, new { @id = "assigneelist", @class = "form-control" })
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="resolutionlist">Status<font color="red">*</font></label>
-                    <div class="col-lg-10">
-                        @if (ViewBag.isassignee != null && ViewBag.isassignee)
-                        {
-                            @Html.DropDownList("resolutionlist", null, new { @id = "resolutionlist", @class = "form-control", @onchange = "chooseissuetag()" })
-                        }
-                        else
-                        {
-                            @Html.DropDownList("resolutionlist", null, new { @id = "resolutionlist", @class = "form-control", @readonly = "readonly" })
-                        }
-                    </div>
-                    @if (ViewBag.isassignee != null
-                    && ViewBag.isassignee
-                    && Model.RootCauseCommentList.Count > 0)
-                    {
-                        <script type="text/javascript">
-                            function chooseissuetag()
-                            {
-                                if (document.getElementById("resolutionlist")
-                                    && (document.getElementById("resolutionlist").value === "Fixed"
-                                    || document.getElementById("resolutionlist").value === "Done")) {
-                                    $('#issuetag').modal({ backdrop: 'static' });
-                                }
-                            }
-                        </script>
-                    }
-                    else
-                    {
-                        <script type="text/javascript">
-                            function chooseissuetag()
-                            {
-                            }
-                        </script>
-                    }
-                </div>
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="DueDate">DueDate<font color="red">*</font></label>
-                    <div class="col-lg-10">
-                        @if (Model != null && string.Compare(Model.DueDate.ToString("yyyy-MM-dd"), "0001-01-01") != 0)
-                        {
-                            <input class="form-control text-box single-line" value="@Model.DueDate.ToString("yyyy-MM-dd")" data-val="true" data-val-required="The DueDate field is required." id="DueDate" name="DueDate" type="text" />
-                        }
-                        else
-                        {
-                            <input class="form-control text-box single-line" data-val="true" data-val-required="The DueDate field is required." id="DueDate" name="DueDate" type="text" value="" />
-                        }
-                        <span class="field-validation-valid text-danger" data-valmsg-for="DueDate" data-valmsg-replace="true"></span>
-                    </div>
-                </div>
-                <script type="text/javascript">
-                    $(document).ready(function () {
-                        $("#DueDate").datepicker({
-                            changeMonth: true,
-                            changeYear: true,
-                            dateFormat: 'yy-mm-dd'
-                        });
-                    });
-                </script>
-            </div>
-
-            <div class="form-group">
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="FVCode">FV</label>
-                    <div class="col-lg-10">
-                        @if (Model != null && !string.IsNullOrEmpty(Model.FVCode))
-                        {
-                            <input class="form-control text-box single-line" value="@Model.FVCode" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 25." data-val-length-max="25" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="FVCode" name="FVCode" type="text" />
-                        }
-                        else
-                        {
-                            <input class="form-control text-box single-line" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 25." data-val-length-max="25" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="FVCode" name="FVCode" type="text" value="" />
-                        }
-                        <span class="field-validation-valid text-danger" data-valmsg-for="FVCode" data-valmsg-replace="true"></span>
-                    </div>
-                </div>
-
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2">Rel Engineer</label>
-                    <div class="col-lg-10">
-                        @if (Model != null && !string.IsNullOrEmpty(Model.Reporter))
-                        {
-                            <input class="form-control text-box single-line" value="@Model.Reporter" readonly="readonly" type="text" />
-                        }
-                        else
-                        {
-                            <input class="form-control text-box single-line" readonly="readonly" type="text" value="" />
-                        }
-                    </div>
-                </div>
-            </div>
-
-            <hr/>
-
-            @if (ViewBag.isassignee != null && ViewBag.isassignee)
+            @if (Model != null)
             {
-                <hr />
-                <div class="col-lg-12">
-                    <div class="form-group">
-                        <label>Related People Email</label>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="col-lg-12" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
-                            @if (Model != null && !string.IsNullOrEmpty(Model.RelativePeoples))
-                            {
-                                <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 800." data-val-length-max="800" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$">@Model.RelativePeoples</textarea>
-                            }
-                            else
-                            {
-                                <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 800." data-val-length-max="800" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$"></textarea>
-                            }
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="col-lg-6">
+                                <label class="control-label col-lg-2" for="projectlist">Project</label>
+                                <div class="col-lg-10">
+                                    @Html.DropDownList("projectlist", null, new { @id = "projectlist", @class = "form-control", @readonly = "readonly" })
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <label class="control-label col-lg-2">Summary</label>
+                                <div class="col-lg-10">
+                                    <input class="form-control data-toggle=" tooltip" title="@Model.Summary" text-box single-line" value="@Model.Summary" readonly="readonly" type="text" />
+                                </div>
+                            </div>
                         </div>
-                        <span class="field-validation-valid text-danger" data-valmsg-for="RPeopleAddr" data-valmsg-replace="true"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="col-lg-6">
+                                <div class="col-lg-2"><label class="control-label">Case ID</label></div>
+                                <div class="col-lg-10">
+                                    <input class="form-control text-box single-line" value="@Model.CaseID" readonly="readonly" type="text" />
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="col-lg-2"><label class="control-label">Product</label></div>
+                                <div class="col-lg-10">
+                                    <input class="form-control text-box single-line" value="@Model.ProductType" readonly="readonly" type="text" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="col-lg-6">
+                                <div class="col-lg-2"><label class="control-label">Line Category</label></div>
+                                <div class="col-lg-10">
+                                    <input class="form-control text-box single-line" value="@Model.LineCategory" readonly="readonly" type="text" />
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="col-lg-2"><label class="control-label">Qual Type</label></div>
+                                <div class="col-lg-10">
+                                    <input class="form-control text-box single-line" value="@Model.QualType" readonly="readonly" type="text" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="col-lg-6">
+                                <div class="col-lg-2"><label class="control-label">Test Type</label></div>
+                                <div class="col-lg-10">
+                                    <input class="form-control text-box single-line" value="@Model.TestType" readonly="readonly" type="text" />
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="col-lg-2"><label class="control-label">Failure Interval</label></div>
+                                <div class="col-lg-10">
+                                    <input class="form-control text-box single-line" value="@Model.FailureInterval" readonly="readonly" type="text" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="col-lg-6">
+                                <div class="col-lg-2"><label class="control-label">Failure</label></div>
+                                <div class="col-lg-10">
+                                    <input class="form-control text-box single-line" data-toggle="tooltip" title="@Model.TestFailure" value="@Model.TestFailure" readonly="readonly" type="text" />
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="col-lg-2"><label class="control-label">Location</label></div>
+                                <div class="col-lg-10">
+                                    <input class="form-control text-box single-line" value="@Model.Location" readonly="readonly" type="text" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="col-lg-6">
+                                <div class="col-lg-2"><label class="control-label">Request ID</label></div>
+                                <div class="col-lg-10">
+                                    <input class="form-control text-box single-line" value="@Model.RequestID" readonly="readonly" type="text" />
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="col-lg-2"><label class="control-label">Module SN</label></div>
+                                <div class="col-lg-10">
+                                    <input class="form-control text-box single-line" data-toggle="tooltip" title="@Model.ModuleSN" value="@Model.ModuleSN" readonly="readonly" type="text" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="col-lg-6">
+                                <div class="col-lg-2"><label class="control-label">Fail Rate</label></div>
+                                <div class="col-lg-10">
+                                    <input class="form-control text-box single-line" value="@Model.FailQTY/@Model.TotalQTY" readonly="readonly" type="text" />
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="col-lg-2"><label class="control-label">Rel Engineer</label></div>
+                                <div class="col-lg-10">
+                                    <input class="form-control text-box single-line" value="@Model.Reporter" readonly="readonly" type="text" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             }
@@ -397,88 +196,301 @@
             <hr />
 
             <div class="form-group">
-                <div class="col-lg-12">
-                    <div class="col-lg-4">
-                        <span class="btn btn-default btn-file" id="choosefile3">
-                            Attachment <input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
-                        </span>
-                    </div>
-                    <div class="col-lg-8">
-                        <div class="col-lg-11">
-                            <label class="control-label" id="showfile3" name="showfile3"></label>
-                        </div>
-                        <div class="col-lg-1">
-                            <input class="form-control text-box single-line" value="" id="attachmentupload" name="attachmentupload" type="hidden" />
-                        </div>
-                    </div>
-                </div>
-                <script type="text/javascript">
-                            function ShowFileNames3(oFile) {
-                                $('#showfile3').text(oFile.value);
-                                document.getElementById("attachmentupload").value = oFile.value;
-                                $('#attachtag').modal({ backdrop: 'static' });
-                            }
-
-                            function attachsubmit() {
-                                $('#attachtag').modal('hide');
-                                $('#issueform').submit();
-                            }
-                </script>
-            </div>
-
-            @if (ViewBag.isassignee != null && ViewBag.isassignee)
-            {
-                <hr />
-                <div class="col-lg-12">
-                    <div class="form-group">
-                        Root Cause
-                    </div>
-
-                    <div class="form-group">
-                        <div class="col-lg-12">
-                            <textarea name="rootcauseeditor" id="rootcauseeditor" rows="10" cols="80"></textarea>
-                            <script>
-                            CKEDITOR.replace('rootcauseeditor', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx' });
-                            </script>
-                        </div>
-                    </div>
-                </div>
-            }
-
-
-
-            @if (Model.SubIssues.Count > 0)
-            {
-                <hr />
-                @*<div class="form-group">
-                        <div class="col-lg-12">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">Sub Issues</h3>
-                                </div>
-                                <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
-                                    <div class="row">
-                                        <div class="col-lg-4">Summary</div>
-                                        <div class="col-lg-2">Status</div>
-                                        <div class="col-lg-2">Asignee</div>
-                                        <div class="col-lg-2">DueDate</div>
-                                        <div class="col-lg-2"></div>
-                                    </div>
-                                    @foreach (var item in Model.SubIssues)
-                                    {
-                                        <div class="row">
-                                            <div class="col-lg-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></div>
-                                            <div class="col-lg-2">@item.Resolution</div>
-                                            <div class="col-lg-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
-                                            <div class="col-lg-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
-                                            <div class="col-lg-2"></div>
-                                        </div>
-                                    }
-                                </div>
-
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="col-lg-6">
+                            <label class="control-label col-lg-2" for="prioritylist">Priority</label>
+                            <div class="col-lg-10">
+                                @Html.DropDownList("prioritylist", null, new { @id = "prioritylist", @class = "form-control" })
                             </div>
                         </div>
-                    </div>*@
+                        <div class="col-lg-6">
+                            <label class="control-label col-lg-2" for="assigneelist">Assignee</label>
+                            <div class="col-lg-10">
+                                @Html.DropDownList("assigneelist", null, new { @id = "assigneelist", @class = "form-control" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="col-lg-6">
+                            <label class="control-label col-lg-2" for="resolutionlist">Status<font color="red">*</font></label>
+                            <div class="col-lg-10">
+                                @if (ViewBag.isassignee != null && ViewBag.isassignee)
+                                {
+                                    @Html.DropDownList("resolutionlist", null, new { @id = "resolutionlist", @class = "form-control", @onchange = "chooseissuetag()" })
+                                }
+                                else
+                                {
+                                    @Html.DropDownList("resolutionlist", null, new { @id = "resolutionlist", @class = "form-control", @readonly = "readonly" })
+                                }
+                            </div>
+                            @if (ViewBag.isassignee != null
+                                && ViewBag.isassignee
+                                && Model.RootCauseCommentList.Count > 0)
+                            {
+                                <script type="text/javascript">
+                                    function chooseissuetag() {
+                                        if (document.getElementById("resolutionlist")
+                                            && (document.getElementById("resolutionlist").value === "Fixed"
+                                            || document.getElementById("resolutionlist").value === "Done")) {
+                                            $('#issuetag').modal({ backdrop: 'static' });
+                                        }
+                                    }
+                                </script>
+                            }
+                            else
+                            {
+                                <script type="text/javascript">
+                                    function chooseissuetag() {
+                                    }
+                                </script>
+                            }
+                        </div>
+                        <div class="col-lg-6">
+                            <label class="control-label col-lg-2" for="DueDate">DueDate<font color="red">*</font></label>
+                            <div class="col-lg-10">
+                                @if (Model != null && string.Compare(Model.DueDate.ToString("yyyy-MM-dd"), "0001-01-01") != 0)
+                                {
+                                    <input class="form-control text-box single-line" value="@Model.DueDate.ToString("yyyy-MM-dd")" data-val="true" data-val-required="The DueDate field is required." id="DueDate" name="DueDate" type="text" />
+                                }
+                                else
+                                {
+                                    <input class="form-control text-box single-line" data-val="true" data-val-required="The DueDate field is required." id="DueDate" name="DueDate" type="text" value="" />
+                                }
+                                <span class="field-validation-valid text-danger" data-valmsg-for="DueDate" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                        <script type="text/javascript">
+                            $(document).ready(function () {
+                                $("#DueDate").datepicker({
+                                    changeMonth: true,
+                                    changeYear: true,
+                                    dateFormat: 'yy-mm-dd'
+                                });
+                            });
+                        </script>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="col-lg-6">
+                            <label class="control-label col-lg-2" for="FVCode">FV</label>
+                            <div class="col-lg-10">
+                                @if (Model != null && !string.IsNullOrEmpty(Model.FVCode))
+                                {
+                                    <input class="form-control text-box single-line" value="@Model.FVCode" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 25." data-val-length-max="25" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="FVCode" name="FVCode" type="text" />
+                                }
+                                else
+                                {
+                                    <input class="form-control text-box single-line" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 25." data-val-length-max="25" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="FVCode" name="FVCode" type="text" value="" />
+                                }
+                                <span class="field-validation-valid text-danger" data-valmsg-for="FVCode" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr />
+
+
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <label class="control-label">Related People Email</label>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-12" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
+                                @if (Model != null && !string.IsNullOrEmpty(Model.RelativePeoples))
+                                {
+                                    <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" onclick="chooserelatedpeople()" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 800." data-val-length-max="800" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$">@Model.RelativePeoples</textarea>
+                                }
+                                else
+                                {
+                                    <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" onclick="chooserelatedpeople()" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 800." data-val-length-max="800" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$"></textarea>
+                                }
+                            </div>
+                            <span class="field-validation-valid text-danger" data-valmsg-for="RPeopleAddr" data-valmsg-replace="true"></span>
+                        </div>
+                        <script type="text/javascript">
+                            function chooserelatedpeople() {
+                                $('#relatedmodal').modal({ backdrop: 'static' });
+                            }
+
+                            function fillreleatepeople() {
+                                $('#relatedmodal').modal('hide');
+                                document.getElementById("RPeopleAddr").value = document.getElementById("towhoinput1").value;
+                                document.getElementById("RPeopleAddr").focus();
+                            }
+                        </script>
+                    </div>
+                </div>
+
+
+            <hr />
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="col-lg-4">
+                            <span class="btn btn-default btn-file" id="choosefile3">
+                                Attachment <input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
+                            </span>
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="col-lg-11">
+                                <label class="control-label" id="showfile3" name="showfile3"></label>
+                            </div>
+                            <div class="col-lg-1">
+                                <input class="form-control text-box single-line" value="" id="attachmentupload" name="attachmentupload" type="hidden" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <script type="text/javascript">
+                        function ShowFileNames3(oFile) {
+                            $('#showfile3').text(oFile.value);
+                            document.getElementById("attachmentupload").value = oFile.value;
+                            $('#attachtag').modal({ backdrop: 'static' });
+                        }
+
+                        function attachsubmit() {
+                            $('#attachtag').modal('hide');
+                            $('#issueform').submit();
+                        }
+                    </script>
+                </div>
+            </div>
+
+            <hr/>
+
+            @if (Model != null && Model.AttachList.Count > 0)
+            {
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Attachments</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        @foreach (var item in Model.AttachList)
+                                        {
+                                            var realfn = "";
+                                            if (item.Contains("<a href"))
+                                            {
+                                                var tempfn = item.Split(new string[] { "<a href=", "target=" }, StringSplitOptions.None)[1].Replace("\"", "").Trim();
+                                                var tempfns = tempfn.Split(new string[] { "/" }, StringSplitOptions.None);
+                                                realfn = tempfns[tempfns.Length - 1];
+                                            }
+                                            else
+                                            {
+                                                var tempfns = item.Split(new string[] { "/" }, StringSplitOptions.None);
+                                                realfn = tempfns[tempfns.Length - 1].Trim();
+                                            }
+
+                                            if (item.Contains("<a href"))
+                                            {
+                                                <div class="row">
+                                                    <div class="col-lg-6">@Html.Raw(item)</div>
+                                                    <div class="col-lg-1">
+                                                        @if (ViewBag.isassignee != null && ViewBag.isassignee)
+                                                        {
+                                                            <button class="form-control" value="@realfn" type="button" onclick="DeleteAttachment(this)">
+                                                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                                            </button>
+                                                        }
+                                                    </div>
+                                                    <div class="col-lg-5"></div>
+
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                var fns = item.Split(new char[] { '/' });
+                                                var fn = fns[fns.Length - 1];
+                                                <div class="row">
+                                                    <div class="col-lg-6">
+                                                        <a href="@item" target="_blank">
+                                                            <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>@fn
+                                                        </a>
+                                                    </div>
+                                                    <div class="col-lg-1">
+                                                        @if (ViewBag.isassignee != null && ViewBag.isassignee)
+                                                        {
+                                                            <button class="form-control" value="@realfn" type="button" onclick="DeleteAttachment(this)">
+                                                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                                            </button>
+                                                        }
+                                                    </div>
+                                                    <div class="col-lg-5"></div>
+
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                                <script type="text/javascript">
+                                    function DeleteAttachment(oBT) {
+                                        if (confirm("Do you real want to delete this attachment?")) {
+                                            window.location.href = '/Issue/DeleteAttachment?issuekey=' + document.getElementById("HIssueKeyForDelete").value + '&filename=' + oBT.value
+                                        }
+                                        else {
+                                            window.location.href = '/Issue/UpdateIssue?issuekey=' + document.getElementById("HIssueKeyForDelete").value
+                                        }
+                                    }
+                                </script>
+                            </div>
+                        </div>
+
+                        <hr />
+            }
+
+            
+
+            @if (Model.FailureVerifyActions.Count > 0)
+            {
+                <div class="form-group">
+                    <div class="col-lg-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Failure Verification</h3>
+                            </div>
+                            <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
+                                <div class="row">
+                                    <div class="col-lg-4">Summary</div>
+                                    <div class="col-lg-2">Status</div>
+                                    <div class="col-lg-2">Asignee</div>
+                                    <div class="col-lg-2">DueDate</div>
+                                    <div class="col-lg-2"></div>
+                                </div>
+                                @foreach (var item in Model.FailureVerifyActions)
+                                {
+                                    <div class="row">
+                                        <div class="col-lg-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace(Prometheus.Models.RELSubIssueType.FAILVERIFYACTION, "")</a></div>
+                                        <div class="col-lg-2">@item.Resolution</div>
+                                        <div class="col-lg-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
+                                        <div class="col-lg-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
+                                        <div class="col-lg-2"></div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
             }
 
             @if (Model.ContainmentActions.Count > 0)
@@ -487,7 +499,7 @@
                     <div class="col-lg-12">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <h3 class="panel-title">Containment Actions</h3>
+                                <h3 class="panel-title">Containment Action</h3>
                             </div>
                             <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
                                 <div class="row">
@@ -500,7 +512,7 @@
                                 @foreach (var item in Model.ContainmentActions)
                                 {
                                     <div class="row">
-                                        <div class="col-lg-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace("[Containment]", "")</a></div>
+                                        <div class="col-lg-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace(Prometheus.Models.RELSubIssueType.CONTAINMENTACTION, "")</a></div>
                                         <div class="col-lg-2">@item.Resolution</div>
                                         <div class="col-lg-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
                                         <div class="col-lg-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
@@ -510,130 +522,12 @@
                             </div>
 
                         </div>
-                    </div>
-                </div>
-            }
-
-            @if (Model.CorrectiveActions.Count > 0)
-            {
-                <div class="form-group">
-                    <div class="col-lg-12">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Corrective Actions</h3>
-                            </div>
-                            <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
-                                <div class="row">
-                                    <div class="col-lg-4">Summary</div>
-                                    <div class="col-lg-2">Status</div>
-                                    <div class="col-lg-2">Asignee</div>
-                                    <div class="col-lg-2">DueDate</div>
-                                    <div class="col-lg-2"></div>
-                                </div>
-                                @foreach (var item in Model.CorrectiveActions)
-                                {
-                                    <div class="row">
-                                        <div class="col-lg-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace("[Corrective]", "")</a></div>
-                                        <div class="col-lg-2">@item.Resolution</div>
-                                        <div class="col-lg-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
-                                        <div class="col-lg-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
-                                        <div class="col-lg-2"></div>
-                                    </div>
-                                }
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            }
-
-
-            @if (Model != null && Model.AttachList.Count > 0)
-            {
-                <hr />
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Attachments</h3>
-                            </div>
-                            <div class="panel-body">
-                                @foreach (var item in Model.AttachList)
-                                {
-                                    var realfn = "";
-                                    if (item.Contains("<a href"))
-                                    {
-                                        var tempfn = item.Split(new string[] { "<a href=", "target=" }, StringSplitOptions.None)[1].Replace("\"", "").Trim();
-                                        var tempfns = tempfn.Split(new string[] { "/" }, StringSplitOptions.None);
-                                        realfn = tempfns[tempfns.Length - 1];
-                                    }
-                                    else
-                                    {
-                                        var tempfns = item.Split(new string[] { "/" }, StringSplitOptions.None);
-                                        realfn = tempfns[tempfns.Length - 1].Trim();
-                                    }
-
-                                    if (item.Contains("<a href"))
-                                    {
-                                        <div class="row">
-                                            <div class="col-lg-6">@Html.Raw(item)</div>
-                                            <div class="col-lg-1">
-                                                @if (ViewBag.isassignee != null && ViewBag.isassignee)
-                                                {
-                                                    <button class="form-control" value="@realfn" type="button" onclick="DeleteAttachment(this)">
-                                                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                                                    </button>
-                                                }
-                                            </div>
-                                            <div class="col-lg-5"></div>
-
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        var fns = item.Split(new char[] { '/' });
-                                        var fn = fns[fns.Length - 1];
-                                        <div class="row">
-                                            <div class="col-lg-6">
-                                                <a href="@item" target="_blank">
-                                                    <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>@fn
-                                                </a>
-                                            </div>
-                                            <div class="col-lg-1">
-                                                @if (ViewBag.isassignee != null && ViewBag.isassignee)
-                                                {
-                                                    <button class="form-control" value="@realfn" type="button" onclick="DeleteAttachment(this)">
-                                                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                                                    </button>
-                                                }
-                                            </div>
-                                            <div class="col-lg-5"></div>
-
-                                        </div>
-                                    }
-                                }
-                            </div>
-                        </div>
-                        <script type="text/javascript">
-                            function DeleteAttachment(oBT) {
-                                if (confirm("Do you real want to delete this attachment?"))
-                                {
-                                    window.location.href = '/Issue/DeleteAttachment?issuekey=' + document.getElementById("HIssueKeyForDelete").value + '&filename=' + oBT.value
-                                }
-                                else
-                                {
-                                    window.location.href = '/Issue/UpdateIssue?issuekey=' + document.getElementById("HIssueKeyForDelete").value
-                                }
-                            }
-                        </script>
                     </div>
                 </div>
             }
 
             @if (Model.RootCauseCommentList.Count > 0)
             {
-                <hr />
-
                 <div class="form-group">
                     <div class="col-lg-12">
                         <div class="panel panel-default">
@@ -663,12 +557,12 @@
                                                     @item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")
                                                 </div>
                                                 <div class="col-lg-1">
-                                                    @if (ViewBag.isassignee != null && ViewBag.isassignee)
-                                                    {
-                                                        <button class="form-control" type="button" value="IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="DeleteSPIssueComment(this)">
-                                                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                                                        </button>
-                                                    }
+                                                    @*@if (ViewBag.isassignee != null && ViewBag.isassignee)
+                                                {
+                                                    <button class="form-control" type="button" value="IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="DeleteSPIssueComment(this)">
+                                                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                                    </button>
+                                                }*@
                                                 </div>
                                             </div>
                                             <hr />
@@ -679,198 +573,433 @@
                 </div>
             }
 
-            @foreach (var item in Model.GeneralCommentList)
+            @if (Model.CorrectiveActions.Count > 0)
             {
-                <hr />
                 <div class="form-group">
                     <div class="col-lg-12">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <div class="row">
-                                    <div class="col-lg-2"><h3 class="panel-title">Comment</h3></div>
-                                    <div class="col-lg-7"></div>
-                                    <div class="col-lg-1">
-                                        @if (ViewBag.isassignee != null && ViewBag.isassignee)
-                                        {
-                                            <button class="form-control" type="button" value="IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="ModifyIssueComment(this)">
-                                                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                                            </button>
-                                        }
-                                    </div>
-                                    <div class="col-lg-1"></div>
-                                    <div class="col-lg-1">
-                                        @if (ViewBag.isassignee != null && ViewBag.isassignee)
-                                        {
-                                            <button class="form-control" type="button" value="IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="DeleteSPIssueComment(this)">
-                                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                                            </button>
-                                        }
-                                    </div>
-                                </div>
+                                <h3 class="panel-title">Corrective/Preventive Action</h3>
                             </div>
                             <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
-                                @Html.Raw(item.Comment)
+                                <div class="row">
+                                    <div class="col-lg-4">Summary</div>
+                                    <div class="col-lg-2">Status</div>
+                                    <div class="col-lg-2">Asignee</div>
+                                    <div class="col-lg-2">DueDate</div>
+                                    <div class="col-lg-2"></div>
+                                </div>
+                                @foreach (var item in Model.CorrectiveActions)
+                                {
+                                    <div class="row">
+                                        <div class="col-lg-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace(Prometheus.Models.RELSubIssueType.CORRECTIVEACTION, "")</a></div>
+                                        <div class="col-lg-2">@item.Resolution</div>
+                                        <div class="col-lg-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
+                                        <div class="col-lg-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
+                                        <div class="col-lg-2"></div>
+                                    </div>
+                                }
                             </div>
-                            <div class="panel-footer text-right">
-                                Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")
+
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (Model.CorrectiveVerifyActions.Count > 0)
+            {
+                <div class="form-group">
+                    <div class="col-lg-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Verification for Corrective/Preventive Action</h3>
+                            </div>
+                            <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
+                                <div class="row">
+                                    <div class="col-lg-4">Summary</div>
+                                    <div class="col-lg-2">Status</div>
+                                    <div class="col-lg-2">Asignee</div>
+                                    <div class="col-lg-2">DueDate</div>
+                                    <div class="col-lg-2"></div>
+                                </div>
+                                @foreach (var item in Model.CorrectiveVerifyActions)
+                                {
+                                    <div class="row">
+                                        <div class="col-lg-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace(Prometheus.Models.RELSubIssueType.VERIFYCORRECTIVEACTION, "")</a></div>
+                                        <div class="col-lg-2">@item.Resolution</div>
+                                        <div class="col-lg-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
+                                        <div class="col-lg-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
+                                        <div class="col-lg-2"></div>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>
                 </div>
             }
-        </div>
-        <script type="text/javascript">
-                function DeleteSPIssueComment(oBT) {
+
+                    @foreach (var item in Model.GeneralCommentList)
+                    {
+                        <hr />
+                        <div class="form-group">
+                            <div class="col-lg-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div class="row">
+                                            <div class="col-lg-2"><h3 class="panel-title">Comment</h3></div>
+                                            <div class="col-lg-7"></div>
+                                            <div class="col-lg-1">
+                                                @if (ViewBag.isassignee != null && ViewBag.isassignee)
+                                                {
+                                                    <button class="form-control" type="button" value="IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="ModifyIssueComment(this)">
+                                                        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                                                    </button>
+                                                }
+                                            </div>
+                                            <div class="col-lg-1"></div>
+                                            <div class="col-lg-1">
+                                                @if (ViewBag.isassignee != null && ViewBag.isassignee)
+                                                {
+                                                    <button class="form-control" type="button" value="IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="DeleteSPIssueComment(this)">
+                                                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                                    </button>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
+                                        @Html.Raw(item.Comment)
+                                    </div>
+                                    <div class="panel-footer text-right">
+                                        Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+             </div>
+                <script type="text/javascript">
+                    function DeleteSPIssueComment(oBT) {
                         if (oBT.value) {
                             if (confirm("Do you really want to delete this comment?")) {
                                 window.location.href = "/Issue/DeleteSPIssueComment?" + oBT.value;
                             }
                         }
-                }
-
-                function ModifyIssueComment(oBT) {
-                    if (oBT.value) {
-                        window.location.href = "/Issue/ModifyIssueComment?" + oBT.value;
                     }
-                }
-        </script>
-    </div>
 
-    <hr />
-
-    <div class="col-lg-12">
-        <div class="form-group">
-            Comment
-        </div>
-
-        <div class="form-group">
-            <div>
-                @if (Model != null && !string.IsNullOrEmpty(Model.Description))
-                {
-                    <textarea name="editor1" id="editor1" rows="10" cols="80">@(Model.Description)</textarea>
-                }
-                else
-                {
-                    <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
-                }
-                <script>
-                        CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx' });
+                    function ModifyIssueComment(oBT) {
+                        if (oBT.value) {
+                            window.location.href = "/Issue/ModifyIssueComment?" + oBT.value;
+                        }
+                    }
                 </script>
             </div>
-        </div>
-    </div>
+            
+            <hr />
 
-    <div class="form-group">
-        <div class="col-lg-6">
-            @if (Model != null && !string.IsNullOrEmpty(Model.IssueKey))
-            {
-                <input class="form-control text-box single-line" value="@(Model.IssueKey)" id="IssueKey" name="IssueKey" type="hidden" />
-            }
-            else
-            {
-                <input class="form-control text-box single-line" id="IssueKey" name="IssueKey" type="hidden" value="" />
-            }
-        </div>
-        <div class="col-lg-6"></div>
-    </div>
+            <div class="form-group">
+                <div class="col-lg-12">
+                    <div class="form-group">
+                        Comment
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            @if (Model != null && !string.IsNullOrEmpty(Model.Description))
+                            {
+                                <textarea name="editor1" id="editor1" rows="10" cols="80">@(Model.Description)</textarea>
+                            }
+                            else
+                            {
+                                <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
+                            }
+                            <script>
+                                CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx' });
+                            </script>
+                        </div>
+                    </div>
 
-    <div class="row col-lg-12">
-        <div class="form-group">
-            <div class="col-lg-3">
-                <input type="submit" value="Submit" id="updaterma" name="updaterma" class="btn btn-default" />
-            </div>
-            <div class="col-lg-3">
-                @if (ViewBag.isassignee != null && ViewBag.isassignee)
-                {
-                    <input type="submit" value="Delete" id="deleterma" name="deleterma" class="btn btn-default" />
-                }
-            </div>
-            <div class="col-lg-6"></div>
-        </div>
-    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="col-lg-4">
+                                    <span class="btn btn-default btn-file" id="choosefile9">
+                                        Editor Attachment <input type="file" name="file9" id="file9" runat="server" onchange="ShowFileNames9(this)" />
+                                    </span>
+                                </div>
+                                <div class="col-lg-8"></div>
+                            </div>
+                            <script type="text/javascript">
+                                            function ShowFileNames9(oFile) {
+                                                ajaxFileUpload9();
+                                            }
+                                            function ajaxFileUpload9() {
+                                                $.ajaxFileUpload
+                                                (
+                                                    {
+                                                        url: '/userfiles/ImageUpload.ashx',
+                                                        secureuri: false,
+                                                        fileElementId: 'file9',
+                                                        dataType: 'HTML',
+                                                        success: function (data, status)
+                                                        {
+                                                            var wholeval = CKEDITOR.instances.editor1.getData() + data;
+                                                            CKEDITOR.instances.editor1.setData(wholeval);
+                                                        },
+                                                        error: function (e)
+                                                        {
+                                                            alert(e);
+                                                        }
+                                                    }
+                                                )
+                                                return false;
+                                            }
+                            </script>
+                        </div>
+                    </div>
 
-
-    <div class="modal" id="attachtag" tabindex="-1" role="dialog" aria-labelledby="attachtagLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title" id="attachtagLabel">Share Document Tag</h4>
                 </div>
-                <div class="row"></div>
-                <hr />
-                <div class="row"></div>
-                @if (ViewBag.tobechoosetags != null)
+            </div>
+
+                <div class="form-group">
+                    <div class="col-lg-6">
+                        @if (Model != null && !string.IsNullOrEmpty(Model.IssueKey))
+                        {
+                            <input class="form-control text-box single-line" value="@(Model.IssueKey)" id="IssueKey" name="IssueKey" type="hidden" />
+                        }
+                        else
+                        {
+                            <input class="form-control text-box single-line" id="IssueKey" name="IssueKey" type="hidden" value="" />
+                        }
+                    </div>
+                    <div class="col-lg-6"></div>
+                </div>
+
+                <div class="row col-lg-12">
+                    <div class="form-group">
+                        <div class="col-lg-3">
+                            <input type="submit" value="Submit" id="updaterma" name="updaterma" class="btn btn-default" />
+                        </div>
+                        <div class="col-lg-3">
+                            @if (ViewBag.isassignee != null && ViewBag.isassignee)
+                            {
+                                <input type="submit" value="Delete" id="deleterma" name="deleterma" class="btn btn-default" />
+                            }
+                        </div>
+
+                        <div class="col-lg-3">
+                            <button class="btn btn-default" type="button" value="IssueKey=@(Model.IssueKey)&ToWho=" onclick="PushTask(this)">Push</button>
+                        </div>
+
+                        <div class="col-lg-3">
+                            <input class="form-control text-box single-line" value="" id="pushtowho" name="pushtowho" type="hidden" />
+                        </div>
+
+                        <script type="text/javascript">
+                            function PushTask(oBT)
+                            {
+                                document.getElementById("pushtowho").value = oBT.value;
+                                if (document.getElementById("RPeopleAddr").value)
+                                {
+                                    document.getElementById("towhoinput").value = document.getElementById("RPeopleAddr").value;
+                                }
+
+                                if (CKEDITOR.instances.editor1.getData())
+                                {
+                                    document.getElementById("issuereason").value = 'WITHCOMMENT:' + CKEDITOR.instances.editor1.getData();
+                                }
+
+                                $('#towhotag').modal({ backdrop: 'static' });
+                            }
+
+                            function realpush() {
+                                var myurl = ""
+                                $.base64.utf8encode = true;
+                                var tempreason = '';
+                                if (document.getElementById("issuereason").value)
+                                {
+                                    tempreason = $.base64.btoa(document.getElementById("issuereason").value);
+                                }
+
+                                if (document.getElementById("towhoinput").value) {
+                                    myurl = "/Issue/IPush?" + document.getElementById("pushtowho").value + document.getElementById("towhoinput").value + "&Reason=" + tempreason;
+                                }
+                                else {
+                                    myurl = "/Issue/IPush?" + document.getElementById("pushtowho").value + document.getElementById("towholist").value + "&Reason=" + tempreason;
+                                }
+
+                                $('#towhotag').modal('hide');
+
+                                window.location.href = myurl;
+                            }
+                        </script>
+                    </div>
+                </div>
+
+                <div class="modal" id="attachtag" tabindex="-1" role="dialog" aria-labelledby="attachtagLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="attachtagLabel">Share Document Tag</h4>
+                            </div>
+                            <div class="row"></div>
+                            <hr />
+                            <div class="row"></div>
+                            @if (ViewBag.tobechoosetags != null)
                 {
                     for (var idx = 0; idx < ViewBag.tobechoosetags.Count; idx++)
                     {
                         <div class="col-lg-4">
                             <div class="col-lg-3">
                                 @if (string.Compare(ViewBag.tobechoosetags[idx], "Rel", true) == 0)
-                                {
-                                    <input type="checkbox" id="attachtagcheck@(idx)" checked="checked" name="attachtagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
-                                }
-                                else
-                                {
-                                    <input type="checkbox" id="attachtagcheck@(idx)" name="attachtagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
-                                }
+                                        {
+                                        <input type="checkbox" id="attachtagcheck@(idx)" checked="checked" name="attachtagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
+                                        }
+                                        else
+                                        {
+                                        <input type="checkbox" id="attachtagcheck@(idx)" name="attachtagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
+                                        }
                             </div>
                             <div class="col-lg-9">
                                 <label class="control-label">@(ViewBag.tobechoosetags[idx])</label>
                             </div>
                         </div>
-                    }
-                }
-                <div class="row"></div>
-                <hr />
-                <div class="row"></div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
-                    <button type="button" class="btn btn-success" onclick="attachsubmit()">Upload Now</button>
+                            }
+                        }
+                            <div class="row"></div>
+                            <hr />
+                            <div class="row"></div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
+                                <button type="button" class="btn btn-success" onclick="attachsubmit()">Upload Now</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
 
-    <div class="modal" id="issuetag" tabindex="-1" role="dialog" aria-labelledby="issuetagLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title" id="issuetagLabel">Share Issue Tag</h4>
-                </div>
-                <div class="row"></div>
-                <hr />
-                <div class="row"></div>
-                @if (ViewBag.tobechoosetags != null)
+                <div class="modal" id="issuetag" tabindex="-1" role="dialog" aria-labelledby="issuetagLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="issuetagLabel">Share Issue Tag</h4>
+                            </div>
+                            <div class="row"></div>
+                            <hr />
+                            <div class="row"></div>
+                            @if (ViewBag.tobechoosetags != null)
                 {
                     for (var idx = 0; idx < ViewBag.tobechoosetags.Count; idx++)
                     {
                         <div class="col-lg-4">
                             <div class="col-lg-3">
                                 @if (string.Compare(ViewBag.tobechoosetags[idx], "Rel", true) == 0)
-                                {
-                                    <input type="checkbox" id="issuetagcheck@(idx)" checked="checked" name="issuetagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
-                                }
-                                else
-                                {
-                                    <input type="checkbox" id="issuetagcheck@(idx)" name="issuetagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
-                                }
+                                        {
+                                        <input type="checkbox" id="issuetagcheck@(idx)" checked="checked" name="issuetagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
+                                        }
+                                        else
+                                        {
+                                        <input type="checkbox" id="issuetagcheck@(idx)" name="issuetagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
+                                        }
                             </div>
                             <div class="col-lg-9">
                                 <label class="control-label">@(ViewBag.tobechoosetags[idx])</label>
                             </div>
                         </div>
-                    }
-                }
-                <div class="row"></div>
-                <hr />
-                <div class="row"></div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Done</button>
+                            }
+                        }
+                            <div class="row"></div>
+                            <hr />
+                            <div class="row"></div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">Done</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
 
+                <div class="modal" id="towhotag" tabindex="-1" role="dialog" aria-labelledby="towhoLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="towhoLabel">Push Task</h4>
+                            </div>
+                            <div class="row"></div>
+                            <div class="row col-lg-12">
+                                <div class="col-lg-3">
+                                    <label class="control-label">To Who</label>
+                                </div>
+                                <div class="col-lg-9">
+                                    @Html.DropDownList("towholist", null, new { @id = "towholist", @class = "form-control", @onchange = "chooseapusher()" })
+                                </div>
+                                <script type="text/javascript">
+                                    function chooseapusher()
+                                    {
+                                        document.getElementById("towhoinput").value = document.getElementById("towholist").value + ';' + document.getElementById("towhoinput").value;
+                                    }
+                                </script>
+                            </div>
+                            <hr />
+                            <div class="row col-lg-12">
+                                <div class="col-lg-3">
+                                    <label class="control-label">To who Input</label>
+                                </div>
+                                <div class="col-lg-9" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
+                                    <textarea class="form-control col-lg-12" name="towhoinput" id="towhoinput" style="height:100px;min-width:300px;"></textarea>
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="row col-lg-12">
+                                <div class="col-lg-3">
+                                    <label class="control-label">Push Comment<font color="red">*</font></label>
+                                </div>
+                                <div class="col-lg-9" data-toggle="tooltip" data-placement="center" title="Your Comment">
+                                    <textarea class="form-control col-lg-12" name="issuereason" id="issuereason" style="height:100px;min-width:300px;"></textarea>
+                                </div>
+                            </div>
+                            <div class="row"></div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-success" onclick="realpush()">Push</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal" id="relatedmodal" tabindex="-1" role="dialog" aria-labelledby="relatedmodalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="relatedmodalLabel">Choose People</h4>
+                            </div>
+                            <div class="row"></div>
+                            <div class="row col-lg-12">
+                                <div class="col-lg-3">
+                                    <label class="control-label">To Who</label>
+                                </div>
+                                <div class="col-lg-9">
+                                    @Html.DropDownList("towholist1", null, new { @id = "towholist1", @class = "form-control", @onchange = "chooseapusher1()" })
+                                </div>
+                                <script type="text/javascript">
+                            function chooseapusher1()
+                            {
+                                document.getElementById("towhoinput1").value = document.getElementById("towholist1").value + ';' + document.getElementById("towhoinput1").value;
+                            }
+                                </script>
+                            </div>
+                            <hr />
+                            <div class="row col-lg-12">
+                                <div class="col-lg-3">
+                                    <label class="control-label">To who Input</label>
+                                </div>
+                                <div class="col-lg-9" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
+                                    <textarea class="form-control col-lg-12" name="towhoinput1" id="towhoinput1" style="height:100px;min-width:300px;"></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-success" onclick="fillreleatepeople()">OK</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 }
 
 

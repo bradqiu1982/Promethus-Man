@@ -1412,6 +1412,8 @@ namespace Prometheus.Models
             vm.Location = rawdata.AppV_U;
             vm.RequestID = rawdata.AppV_F;
             vm.ModuleSN = rawdata.AppV_K;
+            vm.FailQTY = rawdata.AppV_L;
+            vm.TotalQTY = rawdata.AppV_M;
 
             vm.Assignee = analyser;
             vm.Reporter = reporter;
@@ -1428,8 +1430,11 @@ namespace Prometheus.Models
             CreateRelSubIssue(RELSubIssueType.FAILVERIFYACTION, "Failure Verify for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(2));
             CreateRelSubIssue(RELSubIssueType.CONTAINMENTACTION, "Cotainment Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(30));
             CreateRelSubIssue(RELSubIssueType.CORRECTIVEACTION, "Corrective/PreVentive Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(60));
-            CreateRelSubIssue(RELSubIssueType.CONTAINMENTACTION, "Verify Corrective/PreVentive Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, reporter, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(75));
-            IssueViewModels.StoreIssueComment(vm.IssueKey, "ROOTCAUSE: to be edited", analyser, COMMENTTYPE.RootCause);
+            CreateRelSubIssue(RELSubIssueType.VERIFYCORRECTIVEACTION, "Verify Corrective/PreVentive Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, reporter, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(75));
+
+            var comment = new IssueComments();
+            comment.Comment = "ROOTCAUSE: to be edited";
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, analyser, COMMENTTYPE.RootCause);
 
             SendRMAEvent(vm, "created", ctrl, true);
         }

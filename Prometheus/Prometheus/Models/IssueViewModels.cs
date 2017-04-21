@@ -408,24 +408,38 @@ namespace Prometheus.Models
                 Correctiveactionlist.Clear();
                 foreach (var item in value)
                 {
-                    if (item.Summary.Contains("[Containment]"))
+                    if (item.Summary.Contains("[Containment]")
+                        || item.Summary.Contains(RELSubIssueType.CONTAINMENTACTION))
                     {
                         containmentactionlist.Add(item);
                     }
-                    if (item.Summary.Contains("[Corrective]"))
+                    if (item.Summary.Contains("[Corrective]")
+                        || item.Summary.Contains(RELSubIssueType.CORRECTIVEACTION))
                     {
                         Correctiveactionlist.Add(item);
                     }
-                }
+                    if (item.Summary.Contains(RELSubIssueType.FAILVERIFYACTION))
+                    {
+                        failureverifyactionlist.Add(item);
+                    }
+                    if (item.Summary.Contains(RELSubIssueType.VERIFYCORRECTIVEACTION))
+                    {
+                        correctivverifyactionlist.Add(item);
+                    }
+                }//end foreach
             }
+
             get
             {
                 return sissue;
             }
         }
 
+
         private List<IssueViewModels> containmentactionlist = new List<IssueViewModels>();
         private List<IssueViewModels> Correctiveactionlist = new List<IssueViewModels>();
+        private List<IssueViewModels> failureverifyactionlist = new List<IssueViewModels>();
+        private List<IssueViewModels> correctivverifyactionlist = new List<IssueViewModels>();
 
         public List<IssueViewModels> ContainmentActions
         {
@@ -502,8 +516,20 @@ namespace Prometheus.Models
             }
             return Resolute.ColorStatus(Resolute.Pending);
         }
-        
-        
+
+        public List<IssueViewModels> FailureVerifyActions
+        {
+            get
+            { return failureverifyactionlist; }
+        }
+
+        public List<IssueViewModels> CorrectiveVerifyActions
+        {
+            get
+            { return correctivverifyactionlist; }
+        }
+
+
         #region OBA
         public string FinisarDMR { set; get; }
         public string OBAFailureRate { set; get; }
@@ -1036,24 +1062,6 @@ namespace Prometheus.Models
 
 
                 tempvm.RetrieveComment(ctrl);
-
-                //var tempclist = new List<IssueComments>();
-                //var csql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
-                //csql = csql.Replace("<IssueKey>", tempvm.IssueKey);
-
-                //var cdbret = DBUtility.ExeLocalSqlWithRes(csql,null);
-                //foreach (var r in cdbret)
-                //{
-                //    var tempcomment = new IssueComments();
-                //    tempcomment.IssueKey = Convert.ToString(r[0]);
-                //    tempcomment.dbComment = Convert.ToString(r[1]);
-                //    tempcomment.Reporter = Convert.ToString(r[2]);
-                //    tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
-                //    tempcomment.CommentType = Convert.ToString(r[4]);
-                //    tempclist.Add(tempcomment);
-                //}
-                //tempvm.CommentList = tempclist;
-
                 ret.Add(tempvm);
             }
             return ret;

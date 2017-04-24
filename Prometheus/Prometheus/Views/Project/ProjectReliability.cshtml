@@ -51,7 +51,7 @@
     }
 
     var i = 0;
-    <table id="firsttable" class="display" width="100%" cellspacing="0">
+    <table id="firsttable" class="display" cellspacing="0">
         <thead>
             <tr>
                 <th style="text-align:center">Product</th>
@@ -76,13 +76,13 @@
 
                 <tr>
                     <td style="text-align:center">@item.ProductType</td>
-                     <td style="text-align:center;font-size:9px"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></td>
+                     <td style="text-align:center;font-size:9px;"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></td>
                     <td style="text-align:center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus2(item.Resolution))</td>
                     <td style="text-align:center">@item.FVCode</td>
 
                     @if (item.FailureVerifyActions.Count > 0)
                     {
-                        <td style="text-align:center"><a href="/Issue/ShowContainmentAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.FVerifyActionStatus())</a></td>
+                        <td style="text-align:center"><a href="/Issue/ShowVerifyAction?verifytype=@(Prometheus.Models.RELSubIssueType.FAILVERIFYACTION)&issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.FVerifyActionStatus())</a></td>
                     }
                     else
                     {
@@ -125,7 +125,7 @@
 
                     @if (item.CorrectiveVerifyActions.Count > 0)
                     {
-                        <td style="text-align:center"><a href="/Issue/ShowCorrectiveAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.CVerifyActionStatus())</a></td>
+                        <td style="text-align:center"><a href="/Issue/ShowVerifyAction?verifytype=@(Prometheus.Models.RELSubIssueType.VERIFYCORRECTIVEACTION)&issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.CVerifyActionStatus())</a></td>
                     }
                     else
                     {

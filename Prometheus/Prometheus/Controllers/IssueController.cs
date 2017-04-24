@@ -2771,6 +2771,26 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        public ActionResult ShowVerifyAction(string verifytype, string issuekey)
+        {
+            if (!string.IsNullOrEmpty(issuekey))
+            {
+                if (string.Compare(verifytype, RELSubIssueType.FAILVERIFYACTION) == 0)
+                {
+                    var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey, this);
+                    ViewBag.pagetitle = "Failure Verification";
+                    return View(vm.FailureVerifyActions);
+                }
+                else
+                {
+                    var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey, this);
+                    ViewBag.pagetitle = "Verification 4 Corrective";
+                    return View(vm.CorrectiveVerifyActions);
+                }
+            }
+            return View();
+        }
+
         [HttpPost, ActionName("SameAsIssue")]
         [ValidateAntiForgeryToken]
         public ActionResult SameAsIssue()

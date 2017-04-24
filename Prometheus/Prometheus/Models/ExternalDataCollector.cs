@@ -1541,6 +1541,62 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
+        public static List<RELRAWData> RetrieveAllRELData()
+        {
+            var ret = new List<RELRAWData>();
+
+            var sql = "select AppV_A,AppV_B,AppV_C,AppV_D,AppV_E,AppV_F"
+                    + ",AppV_G,AppV_H,AppV_I,AppV_J,AppV_K,AppV_L,AppV_M,AppV_N,AppV_O"
+                    + ",AppV_P,AppV_Q,AppV_R,AppV_S,AppV_T,AppV_U,AppV_V,AppV_W,AppV_X"
+                    + ",AppV_Y,AppV_Z,AppV_AA,AppV_AB,AppV_AC,AppV_AD,AppV_AE,AppV_AF,AppV_AG from RELBackupData";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                try
+                {
+                    var tempdata = new RELRAWData();
+                    tempdata.AppV_A = Convert.ToInt32(line[0]);
+                    tempdata.AppV_B = Convert.ToString(line[1]);
+                    tempdata.AppV_C = ConvertToDateStr2(line[2]);
+                    tempdata.AppV_D = ConvertToDateStr2(line[3]);
+                    tempdata.AppV_E = Convert.ToString(line[4]);
+                    tempdata.AppV_F = Convert.ToString(line[5]);
+                    tempdata.AppV_G = Convert.ToString(line[6]);
+                    tempdata.AppV_H = Convert.ToString(line[7]);
+                    tempdata.AppV_I = Convert.ToString(line[8]);
+                    tempdata.AppV_J = Convert.ToString(line[9]);
+                    tempdata.AppV_K = Convert.ToString(line[10]);
+                    tempdata.AppV_L = Convert.ToString(line[11]);
+                    tempdata.AppV_M = Convert.ToString(line[12]);
+                    tempdata.AppV_N = Convert.ToString(line[13]);
+                    tempdata.AppV_O = Convert.ToString(line[14]);
+                    tempdata.AppV_P = Convert.ToString(line[15]);
+                    tempdata.AppV_Q = Convert.ToString(line[16]);
+                    tempdata.AppV_R = Convert.ToString(line[17]);
+                    tempdata.AppV_S = Convert.ToString(line[18]);
+                    tempdata.AppV_T = Convert.ToString(line[19]);
+                    tempdata.AppV_U = Convert.ToString(line[20]);
+                    tempdata.AppV_V = ConvertToDateStr2(line[21]);
+                    tempdata.AppV_W = Convert.ToString(line[22]);
+                    tempdata.AppV_X = Convert.ToString(line[23]);
+                    tempdata.AppV_Y = Convert.ToString(line[24]);
+                    tempdata.AppV_Z = Convert.ToString(line[25]);
+                    tempdata.AppV_AA = Convert.ToString(line[26]);
+                    tempdata.AppV_AB = Convert.ToString(line[27]);
+                    tempdata.AppV_AC = Convert.ToString(line[28]);
+                    tempdata.AppV_AD = Convert.ToString(line[29]);
+                    tempdata.AppV_AE = Convert.ToString(line[30]);
+                    tempdata.AppV_AF = Convert.ToString(line[31]);
+                    tempdata.AppV_AG = Convert.ToString(line[32]);
+                    ret.Add(tempdata);
+                }
+                catch (Exception ex) { }
+
+            }
+
+            return ret;
+        }
+
         #endregion
 
     }

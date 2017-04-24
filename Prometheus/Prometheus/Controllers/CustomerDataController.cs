@@ -1596,6 +1596,61 @@ namespace Prometheus.Controllers
             return View(vm);
         }
 
+        public ActionResult ReviewRelBackupData()
+        {
+            var vm = ExternalDataCollector.RetrieveAllRELData();
+            return View(vm);
+        }
+
+        private List<string> PrepeareAllRELReport()
+        {
+            var ret = new List<string>();
+            var allreldata = ExternalDataCollector.RetrieveAllRELData();
+            var line = "Rel Failure Case ID,Status,Occurrence Date,Close Date,Qual.Type,Request ID,Line category,Product,Test Type,Failure Interval,SN,QTY(Failure),Total QTY,Analyst,Rel.Engineer,Test Failure,FA Findings,Containment action,Root Cause,Corrective Action,Location,Due Date,Aging Days,Remark,FA report Link";
+            ret.Add(line);
+
+            foreach (var item in allreldata)
+            {
+                var line1 = string.Empty;
+                line1 = "\"" + item.AppV_A.ToString().Replace("\"", "") + "\"," + "\"" + item.AppV_B.Replace("\"", "") + "\"," + "\"" + item.AppV_C.Replace("\"", "") + "\"," 
+                    + "\"" + item.AppV_D.Replace("\"", "") + "\","+ "\"" + item.AppV_E.Replace("\"", "") + "\"," + "\"" + item.AppV_F.Replace("\"", "") + "\"," 
+                    + "\"" + item.AppV_G.Replace("\"", "") + "\"," + "\"" + item.AppV_H.Replace("\"", "") + "\","+ "\"" + item.AppV_I.Replace("\"", "") + "\","
+                    + "\"" + item.AppV_J.Replace("\"", "") + "\"," + "\"" + item.AppV_K.Replace("\"", "") + "\"," + "\"" + item.AppV_L.Replace("\"", "") + "\","
+                    + "\"" + item.AppV_M.Replace("\"", "") + "\"," + "\"" + item.AppV_N.Replace("\"", "") + "\"," + "\"" + item.AppV_O.Replace("\"", "") + "\","
+                    + "\"" + item.AppV_P.Replace("\"", "") + "\"," + "\"" + item.AppV_Q.Replace("\"", "") + "\"," + "\"" + item.AppV_R.Replace("\"", "") + "\","
+                    + "\"" + item.AppV_S.Replace("\"", "") + "\"," + "\"" + item.AppV_T.Replace("\"", "") + "\"," + "\"" + item.AppV_U.Replace("\"", "") + "\","
+                    + "\"" + item.AppV_V.Replace("\"", "") + "\"," + "\"" + item.AppV_W.Replace("\"", "") + "\"," + "\"" + item.AppV_X.Replace("\"", "") + "\","
+                    + "\"" + item.AppV_Y.Replace("\"", "") + "\",";
+
+                ret.Add(line1);
+            }
+
+            return ret;
+        }
+
+        public ActionResult ExportAllRELData()
+        {
+            string datestring = DateTime.Now.ToString("yyyyMMdd");
+            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+            if (!Directory.Exists(imgdir))
+            {
+                Directory.CreateDirectory(imgdir);
+            }
+
+            var fn = "QM_REL_Report_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+            var filename = imgdir + fn;
+
+            var lines = PrepeareAllRELReport();
+
+            var wholefile = "";
+            foreach (var l in lines)
+            {
+                wholefile = wholefile + l + "\r\n";
+            }
+            System.IO.File.WriteAllText(filename, wholefile);
+
+            return File(filename, "application/vnd.ms-excel", fn);
+        }
 
     }
 }

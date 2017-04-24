@@ -139,6 +139,12 @@
                                         @Html.ActionLink("Review RMA Data", "ReviewRMABackupData", "CustomerData")
                                     }
                                 </li>
+                                <li>
+                                    @*@if ((ViewBag.IsSuper != null && ViewBag.IsSuper) || (ViewBag.IsAdmin != null && ViewBag.IsAdmin))*@
+
+                                        @Html.ActionLink("Review REL Data", "ReviewRelBackupData", "CustomerData")
+
+                                </li>
                             </ul>
                         </li>
                     </ul>

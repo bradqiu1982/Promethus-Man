@@ -95,7 +95,7 @@ bool updateLinks)
                     {
                         if (saRet[1, colidx] != null)
                         {
-                            newline.Add(saRet[1, colidx].ToString().Replace("'", "").Trim());
+                            newline.Add(saRet[1, colidx].ToString().Replace("'", "").Replace("\"", "").Trim());
                         }
                         else
                         {
@@ -265,7 +265,7 @@ bool updateLinks)
                         }
                         else
                         {
-                            line.Add(valueArray[row, col].ToString().Trim().Replace("'", ""));
+                            line.Add(valueArray[row, col].ToString().Trim().Replace("'", "").Replace("\"", ""));
                         }
                     }
                     //if (!WholeLineEmpty(line))

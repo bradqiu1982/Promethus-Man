@@ -16,7 +16,7 @@ namespace Prometheus.Models
 
         private static void UpdateUserTotalRank(string username, int rank)
         {
-            var sql = "select TotalRank from UserTable where UserName = '<UserName>'";
+            var sql = "select TotalRank from UserTable where UserName = N'<UserName>'";
             sql = sql.Replace("<UserName>", username);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
@@ -26,7 +26,7 @@ namespace Prometheus.Models
                 catch (Exception ex) { temprank = 0; }
                 temprank = temprank + rank;
 
-                sql = "Update UserTable set TotalRank = '<TotalRank>' where  UserName = '<UserName>'";
+                sql = "Update UserTable set TotalRank = '<TotalRank>' where  UserName = N'<UserName>'";
                 sql = sql.Replace("<UserName>", username).Replace("<TotalRank>", Convert.ToString(temprank));
                 DBUtility.ExeLocalSqlNoRes(sql);
             }
@@ -36,7 +36,7 @@ namespace Prometheus.Models
         {
             var updatetime = DateTime.Now.ToString("yyyy-MM-dd") + " 07:30:00";
 
-            var sql = "select Rank from UserRank where UserName = '<UserName>' and UpdateDate = '<UpdateDate>'";
+            var sql = "select Rank from UserRank where UserName = N'<UserName>' and UpdateDate = '<UpdateDate>'";
             sql = sql.Replace("<UserName>", username).Replace("<UpdateDate>", updatetime);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
@@ -46,13 +46,13 @@ namespace Prometheus.Models
                 catch (Exception ex) { temprank = 0; }
                 temprank = temprank + rank;
 
-                sql = "Update UserRank set Rank = '<Rank>' where  UserName = '<UserName>' and UpdateDate = '<UpdateDate>'";
+                sql = "Update UserRank set Rank = '<Rank>' where  UserName = N'<UserName>' and UpdateDate = '<UpdateDate>'";
                 sql = sql.Replace("<UserName>", username).Replace("<UpdateDate>", updatetime).Replace("<Rank>", Convert.ToString(temprank));
                 DBUtility.ExeLocalSqlNoRes(sql);
             }
             else
             {
-                sql = "Insert into UserRank(UserName,UpdateDate,Rank) values('<UserName>','<UpdateDate>','<Rank>')";
+                sql = "Insert into UserRank(UserName,UpdateDate,Rank) values(N'<UserName>','<UpdateDate>','<Rank>')";
                 sql = sql.Replace("<UserName>", username).Replace("<UpdateDate>", updatetime).Replace("<Rank>", Convert.ToString(rank));
                 DBUtility.ExeLocalSqlNoRes(sql);
             }
@@ -66,7 +66,7 @@ namespace Prometheus.Models
 
         public static string RetrieveTotalRank(string username)
         {
-            var sql = "select TotalRank from UserTable where UserName = '<UserName>'";
+            var sql = "select TotalRank from UserTable where UserName = N'<UserName>'";
             sql = sql.Replace("<UserName>", username);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
@@ -92,7 +92,7 @@ namespace Prometheus.Models
 
             for (var temptime = stattime; temptime < endtime;)
             {
-                var sql = "select Rank,UpdateDate from UserRank where UserName = '<UserName>' and UpdateDate > '<UpdateDate1>' and UpdateDate < '<UpdateDate2>'";
+                var sql = "select Rank,UpdateDate from UserRank where UserName = N'<UserName>' and UpdateDate > '<UpdateDate1>' and UpdateDate < '<UpdateDate2>'";
                 sql = sql.Replace("<UserName>", username)
                     .Replace("<UpdateDate1>", temptime.ToString("yyyy-MM-dd") + " 06:30:00")
                     .Replace("<UpdateDate2>", temptime.ToString("yyyy-MM-dd") + " 08:30:00");

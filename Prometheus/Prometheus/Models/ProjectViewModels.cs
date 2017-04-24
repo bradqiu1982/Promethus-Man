@@ -506,6 +506,8 @@ namespace Prometheus.Models
                 var sql = "insert into ProjectMembers(ProjectKey,Name,Role) values('<ProjectKey>','<Name>','<Role>')";
                 sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<Name>", item.Name).Replace("<Role>", item.Role);
                 DBUtility.ExeLocalSqlNoRes(sql);
+
+                UserViewModels.UpdateUserProject(item.Name.ToUpper(), ProjectKey);
             }
         }
 
@@ -632,7 +634,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        private static List<ProjectMembers> RetrieveProjectMembers(string key)
+        public static List<ProjectMembers> RetrieveProjectMembers(string key)
         {
             var ret = new List<ProjectMembers>();
 

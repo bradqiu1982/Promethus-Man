@@ -4612,6 +4612,12 @@ namespace Prometheus.Controllers
 
             try
             {
+                ExternalDataCollector.RefreshRELData(this);
+            }
+            catch (Exception ex) { }
+            
+            try
+            {
                 var filename = "log" + DateTime.Now.ToString("yyyy-MM-dd");
                 var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
 
@@ -4679,8 +4685,24 @@ namespace Prometheus.Controllers
             logjoinfo("finish last jo ");
         }
 
+        private void AssignPJ2User()
+        {
+            var allpjkey = ProjectViewModels.RetrieveAllProject();
+            foreach(var pjkey in allpjkey)
+            {
+                var pjmembers = ProjectViewModels.RetrieveProjectMembers(pjkey.ProjectKey);
+                foreach (var member in pjmembers)
+                {
+                    UserViewModels.UpdateUserProject(member.Name.ToUpper(), pjkey.ProjectKey);
+                }
+            }
+
+        }
+
         public ActionResult HeartBeat2()
         {
+            //AssignPJ2User();
+
             //ExternalDataCollector.RefreshRMAData(this);
             ExternalDataCollector.RefreshRELData(this);
             //var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();

@@ -5,33 +5,6 @@
     ViewBag.Title = "Project View All";
     Layout = "~/Views/Shared/_Layout.cshtml";
     var idx = 0;
-    var pjtpdict = new Dictionary<string, bool>();
-    var pjtypelist = new List<string>();
-    pjtypelist.Add(Prometheus.Models.ProjectTypeInf.Parallel);
-    pjtypelist.Add(Prometheus.Models.ProjectTypeInf.Tunable);
-    pjtypelist.Add(Prometheus.Models.ProjectTypeInf.OSA);
-    pjtypelist.Add(Prometheus.Models.ProjectTypeInf.LineCard);
-    pjtypelist.Add(Prometheus.Models.ProjectTypeInf.QM);
-    pjtypelist.Add(Prometheus.Models.ProjectTypeInf.Others);
-
-    foreach (var item in Model)
-    {
-        var tpstr = "";
-        if (string.IsNullOrEmpty(item.ProjectType))
-        {
-            tpstr = "Parallel";
-            item.ProjectType = "Parallel";
-        }
-        else
-        {
-            tpstr = item.ProjectType;
-        }
-
-        if (!pjtpdict.ContainsKey(tpstr))
-        {
-            pjtpdict.Add(tpstr, true);
-        }
-    }
 }
 
 
@@ -55,8 +28,19 @@
         <div class="col-lg-4">
             @Html.DropDownList("pjfilterlist", null, new { @id = "pjfilterlist", @class = "form-control",@onchange = "ShowProjectDetail()" })
         </div>
-        <div class="col-lg-7">
+        <div class="col-lg-1">
         </div>
+        <div class="col-lg-1">
+            <button class="btn btn-default" type="button" onclick="LoadProject()">Load Projects</button>
+        </div>
+        <div class="col-lg-5">
+        </div>
+        <script type="text/javascript">
+            function LoadProject()
+            {
+                window.location.href = '/Project/LoadProjects';
+            }
+        </script>
     </div>
 
     <script type="text/javascript">
@@ -70,9 +54,9 @@
 <hr/>
 
 <div class="panel-group" id="accordion">
-    @foreach (var pjtype in pjtypelist)
+    @foreach (var pjtype in ViewBag.pjtypelist)
     {
-        if (pjtpdict.ContainsKey(pjtype))
+        if (ViewBag.pjtpdict.ContainsKey(pjtype))
         {
             <div class="panel panel-default" id="panel@(idx)">
                 <div class="panel-heading">

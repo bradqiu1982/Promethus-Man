@@ -42,6 +42,11 @@ namespace Prometheus.Controllers
                     ViewBag.IsAdmin = false;
                 }
             }//end if
+            else
+            {
+                ViewBag.IsSuper = false;
+                ViewBag.IsAdmin = false;
+            }
 
         }
 

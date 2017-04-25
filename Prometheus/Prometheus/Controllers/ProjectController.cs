@@ -30,6 +30,37 @@ namespace Prometheus.Controllers
             //}
         }
 
+        private void UserAuth(string username)
+        {
+            var userdict = UserMatrixVM.RetrieveUserMatrixAuth();
+            if (userdict.ContainsKey(username.ToUpper()))
+            {
+                if (string.Compare(userdict[username.ToUpper()].ToUpper(), USERAUTH.SUPER.ToUpper()) == 0)
+                {
+                    ViewBag.IsSuper = true;
+                }
+                else
+                {
+                    ViewBag.IsSuper = false;
+                }
+
+                if (string.Compare(userdict[username.ToUpper()].ToUpper(), USERAUTH.ADMIN.ToUpper()) == 0)
+                {
+                    ViewBag.IsAdmin = true;
+                }
+                else
+                {
+                    ViewBag.IsAdmin = false;
+                }
+            }//end if
+            else
+            {
+                ViewBag.IsSuper = false;
+                ViewBag.IsAdmin = false;
+            }
+
+        }
+
         // GET: Project
         public ActionResult ViewAll()
         {
@@ -47,10 +78,29 @@ namespace Prometheus.Controllers
                 return RedirectToAction("LoginUser", "User");
             }
 
+
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            UserAuth(updater);
+            
             //var now = DateTime.Now;
             //var msec1 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
+            
+            var allprojlist = ProjectViewModels.RetrieveAllProject();
+            
+            var userpj = UserViewModels.RetrieveUserProjectKeyDict(updater);
+            var projlist = new List<ProjectViewModels>();
+            foreach (var pjk in allprojlist)
+            {
+                if (userpj.ContainsKey(pjk.ProjectKey) || (ViewBag.IsSuper != null && ViewBag.IsSuper))
+                {
+                    projlist.Add(pjk);
+                }
+            }
 
-            var projlist = ProjectViewModels.RetrieveAllProject();
+            if (projlist.Count == 0)
+            {
+                return RedirectToAction("LoadProjects", "Project");
+            }
 
             //now = DateTime.Now;
             //var msec2 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
@@ -123,6 +173,35 @@ namespace Prometheus.Controllers
             filterlist[0].Selected = true;
             ViewBag.pjfilterlist = filterlist;
             SortPJ(projlist);
+
+
+            ViewBag.pjtpdict = new Dictionary<string, bool>();
+            ViewBag.pjtypelist = new List<string>();
+            ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.Parallel);
+            ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.Tunable);
+            ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.OSA);
+            ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.LineCard);
+            ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.QM);
+            ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.Others);
+
+            foreach (var item in projlist)
+            {
+                var tpstr = "";
+                if (string.IsNullOrEmpty(item.ProjectType))
+                {
+                    tpstr = "Parallel";
+                    item.ProjectType = "Parallel";
+                }
+                else
+                {
+                    tpstr = item.ProjectType;
+                }
+
+                if (!ViewBag.pjtpdict.ContainsKey(tpstr))
+                {
+                    ViewBag.pjtpdict.Add(tpstr, true);
+                }
+            }
 
             return View(projlist);
         }
@@ -5024,5 +5103,82 @@ namespace Prometheus.Controllers
             return RedirectToAction("UpdateProjectError", "Project", dict1);
         }
 
+        public ActionResult LoadProjects()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            var allprojlist = ProjectViewModels.RetrieveAllProject();
+
+            ViewBag.pjtpdict = new Dictionary<string, bool>();
+            ViewBag.pjtypelist = new List<string>();
+            ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.Parallel);
+            ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.Tunable);
+            ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.OSA);
+            ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.LineCard);
+            ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.QM);
+            ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.Others);
+
+            foreach (var item in allprojlist)
+            {
+                var tpstr = "";
+                if (string.IsNullOrEmpty(item.ProjectType))
+                {
+                    tpstr = "Parallel";
+                    item.ProjectType = "Parallel";
+                }
+                else
+                {
+                    tpstr = item.ProjectType;
+                }
+
+                if (!ViewBag.pjtpdict.ContainsKey(tpstr))
+                {
+                    ViewBag.pjtpdict.Add(tpstr, true);
+                }
+            }
+
+            ViewBag.userpjkey = UserViewModels.RetrieveUserProjectKeyDict(updater);
+
+            return View(allprojlist);
+        }
+
+        [HttpPost, ActionName("LoadProjects")]
+        [ValidateAntiForgeryToken]
+        public ActionResult LoadProjectsPost()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            var olduserpjkeydict = UserViewModels.RetrieveUserProjectKeyDict(updater);
+            var olduserpjkeylist = olduserpjkeydict.Keys;
+
+            var allprojlist = ProjectViewModels.RetrieveAllProject();
+            var pjcount = allprojlist.Count;
+
+            var choosedpj = new List<string>();
+            var choosedpjdict = new Dictionary<string,bool>();
+            for (var idx=0; idx < pjcount;idx++)
+            {
+                if (Request.Form["projectkey" + idx] != null)
+                {
+                    choosedpj.Add(Request.Form["projectkey" + idx]);
+                    choosedpjdict.Add(Request.Form["projectkey" + idx], true);
+                }
+            }
+
+            foreach (var okey in olduserpjkeylist)
+            {
+                if (!choosedpjdict.ContainsKey(okey))
+                {
+                    UserViewModels.RemovePJfromUser(updater, okey);
+                }
+            }
+
+            foreach (var newkey in choosedpj)
+            {
+                UserViewModels.UpdateUserProject(updater, newkey);
+            }
+
+            return RedirectToAction("ViewAll", "Project");
+        }
     }
 }

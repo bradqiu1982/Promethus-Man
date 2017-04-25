@@ -164,15 +164,24 @@ namespace Prometheus.Models
             }
         }
 
-        public static List<string> RetrieveUserProjectKeys(string username)
+        public static Dictionary<string, bool> RetrieveUserProjectKeyDict(string username)
         {
-            var ret = new List<string>();
+            var dict = new Dictionary<string, bool>();
             var us = RetrieveUserProjectKeyStr(username);
+
             if (!string.IsNullOrEmpty(us))
             {
-                ret.AddRange(us.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries));
-            }
-            return ret;
+                var pjs = us.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var pj in pjs)
+                {
+                    if (!dict.ContainsKey(pj))
+                    {
+                        dict.Add(pj, true);
+                    }
+                }//end foreach
+            }//end if
+
+            return dict;
         }
 
         private static string RetrieveUserProjectKeyStr(string username)

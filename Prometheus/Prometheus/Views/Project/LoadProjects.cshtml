@@ -1,0 +1,117 @@
+﻿@model IEnumerable<Prometheus.Models.ProjectViewModels>
+
+@{
+    ViewBag.Title = "LoadProjects";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var idx = 0;
+    var tabhidx = 0;
+    var tabbidx = 0;
+}
+
+<h2>Load Projects</h2>
+
+<hr/>
+
+@using (Html.BeginForm("LoadProjects", "Project", FormMethod.Post, new { enctype = "multipart/form-data", id = "issueform", name = "issueform" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="row">
+        <ul class="nav nav-pills nav-stacked col-lg-2">
+            @foreach (var pjtype in ViewBag.pjtypelist)
+            {
+                if (ViewBag.pjtpdict.ContainsKey(pjtype))
+                {
+                    if (tabhidx == 0)
+                    {
+                        <li class="active"><a href="#tab_@(tabhidx)" data-toggle="pill">@pjtype</a></li>
+                    }
+                    else
+                    {
+                        <li><a href="#tab_@(tabhidx)" data-toggle="pill">@pjtype</a></li>
+                    }
+
+                    tabhidx = tabhidx + 1;
+                }
+            }
+        </ul>
+
+        <div class="tab-content col-lg-10">
+            @foreach (var pjtype in ViewBag.pjtypelist)
+            {
+                if (ViewBag.pjtpdict.ContainsKey(pjtype))
+                {
+                    if (tabbidx == 0)
+                    {
+                        <div class="tab-pane active" id="tab_@(tabbidx)">
+                            @foreach (var item in Model)
+                            {
+                                if (string.Compare(item.ProjectType, pjtype, true) != 0)
+                                {
+                                    continue;
+                                }
+
+                                <div class="col-lg-3">
+                                    <div class="col-lg-3">
+                                        @if (ViewBag.userpjkey.ContainsKey(item.ProjectKey))
+                                        {
+                                            <input type="checkbox" checked="checked" id="projectkey@(idx)" name="projectkey@(idx)" value="@(item.ProjectKey)" />
+                                        }
+                                        else
+                                        {
+                                            <input type="checkbox" id="projectkey@(idx)" name="projectkey@(idx)" value="@(item.ProjectKey)" />
+                                        }
+                                    </div>
+                                    <div class="col-lg-9">
+                                        <label class="control-label">@(item.ProjectKey)</label>
+                                    </div>
+                                </div>
+                                idx = idx + 1;
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="tab-pane" id="tab_@(tabbidx)">
+                            @foreach (var item in Model)
+                            {
+                                if (string.Compare(item.ProjectType, pjtype, true) != 0)
+                                {
+                                    continue;
+                                }
+
+                                <div class="col-lg-3">
+                                    <div class="col-lg-3">
+                                        @if (ViewBag.userpjkey.ContainsKey(item.ProjectKey))
+                                        {
+                                            <input type="checkbox" checked="checked" id="projectkey@(idx)" name="projectkey@(idx)" value="@(item.ProjectKey)" />
+                                        }
+                                        else
+                                        {
+                                            <input type="checkbox" id="projectkey@(idx)" name="projectkey@(idx)" value="@(item.ProjectKey)" />
+                                        }
+                                    </div>
+                                    <div class="col-lg-9">
+                                        <label class="control-label">@(item.ProjectKey)</label>
+                                    </div>
+                                </div>
+                                idx = idx + 1;
+                            }
+                        </div>
+                    }
+                    tabbidx = tabbidx + 1;
+                }
+            }
+        </div>
+    </div>
+
+    <hr/>
+    
+    <div class="row">
+        <div class="col-lg-3">
+            <input type="submit" value="Load" class="btn btn-default" />
+        </div>
+        <div class="col-lg-9"></div>
+    </div>
+}

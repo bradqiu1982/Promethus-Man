@@ -853,6 +853,7 @@
     <Content Include="Views\CustomerData\ReviewRMABackupData.cshtml" />
     <Content Include="Views\Issue\ShowVerifyAction.cshtml" />
     <Content Include="Views\CustomerData\ReviewRelBackupData.cshtml" />
+    <Content Include="Views\Project\LoadProjects.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

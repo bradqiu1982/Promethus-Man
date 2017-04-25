@@ -101,6 +101,32 @@ else
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="col-lg-6">
+                                <div class="col-lg-2"><label class="control-label">Issue Open Date</label></div>
+                                <div class="col-lg-10">
+                                    <input class="form-control text-box single-line" value="@Model.ReportDate.ToString("yyyy-MM-dd")" readonly="readonly" type="text" />
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="col-lg-2"><label class="control-label">Close Date</label></div>
+                                <div class="col-lg-10">
+                                    @if (string.Compare(Model.ResolvedDate.ToString("yyyy-MM-dd"), "1982-05-06") == 0)
+                                    {
+                                        <input class="form-control text-box single-line" value="" readonly="readonly" type="text" />
+                                    }
+                                    else
+                                    {
+                                        <input class="form-control text-box single-line" value="@Model.ResolvedDate.ToString("yyyy-MM-dd")" readonly="readonly" type="text" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="col-lg-6">
                                 <div class="col-lg-2"><label class="control-label">Line Category</label></div>
                                 <div class="col-lg-10">
                                     <input class="form-control text-box single-line" value="@Model.LineCategory" readonly="readonly" type="text" />

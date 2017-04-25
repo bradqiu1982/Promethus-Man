@@ -1606,7 +1606,7 @@ namespace Prometheus.Controllers
         {
             var ret = new List<string>();
             var allreldata = ExternalDataCollector.RetrieveAllRELData();
-            var line = "Rel Failure Case ID,Status,Occurrence Date,Close Date,Qual.Type,Request ID,Line category,Product,Test Type,Failure Interval,SN,QTY(Failure),Total QTY,Analyst,Rel.Engineer,Test Failure,FA Findings,Containment action,Root Cause,Corrective Action,Location,Due Date,Aging Days,Remark,FA report Link";
+            var line = "Rel Failure Case ID,Status,Occurrence Date,Close Date,Qual.Type,Request ID,Line category,Product,Test Type,Failure Interval,SN,QTY(Failure),Total QTY,Analyst,Rel.Engineer,Test Failure,FV,Containment action,Root Cause,Corrective Action,Location,Due Date,Aging Days,Remark,FA report Link";
             ret.Add(line);
 
             foreach (var item in allreldata)

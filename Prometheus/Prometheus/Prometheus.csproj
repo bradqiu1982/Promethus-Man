@@ -547,9 +547,17 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Content\images\Assign2Me.png" />
     <Content Include="Content\images\favicon.ico" />
     <Content Include="Content\images\FinisarBuilding.jpg" />
     <Content Include="Content\images\FinisarLogo.jpg" />
+    <Content Include="Content\images\IAssigned.png" />
+    <Content Include="Content\images\IBlog.png" />
+    <Content Include="Content\images\ICare.png" />
+    <Content Include="Content\images\ILearn.png" />
+    <Content Include="Content\images\IStatus.png" />
+    <Content Include="Content\images\ITag.png" />
+    <Content Include="Content\images\MyStatus.png" />
     <Content Include="Content\images\sort_asc.png" />
     <Content Include="Content\images\sort_asc_disabled.png" />
     <Content Include="Content\images\sort_both.png" />
@@ -753,7 +761,7 @@
     <Content Include="Views\Project\EditProject.cshtml" />
     <Content Include="Views\User\RegisterUser.cshtml" />
     <Content Include="Views\User\LoginUser.cshtml" />
-    <Content Include="Views\User\UserCenter.cshtml" />
+    <Content Include="Views\User\UserCenter1.cshtml" />
     <Content Include="Views\Issue\CreateIssue.cshtml" />
     <Content Include="Views\User\ValidateNoticeA.cshtml" />
     <Content Include="Views\User\ValidateNoticeB.cshtml" />
@@ -856,6 +864,7 @@
     <Content Include="Views\Issue\ShowVerifyAction.cshtml" />
     <Content Include="Views\CustomerData\ReviewRelBackupData.cshtml" />
     <Content Include="Views\Project\LoadProjects.cshtml" />
+    <Content Include="Views\User\UserCenter.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

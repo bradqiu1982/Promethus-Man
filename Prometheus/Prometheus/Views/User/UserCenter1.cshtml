@@ -1,0 +1,427 @@
+﻿@model IEnumerable<Prometheus.Models.IssueViewModels>
+
+@{
+    ViewBag.Title = "UserCenter";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;&nbsp;</div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;&nbsp;</div>
+</div>
+
+<div class="row col-lg-12">
+    <h2>@ViewBag.UserName Center</h2>
+</div>
+
+<hr />
+
+@{
+    var pendinglist = new List<Prometheus.Models.IssueViewModels>();
+    var workinglist = new List<Prometheus.Models.IssueViewModels>();
+    var donelist = new List<Prometheus.Models.IssueViewModels>();
+    //var iassignlist = (List<Prometheus.Models.IssueViewModels>)ViewBag.iassignlist;
+}
+
+@if (Model != null)
+{
+    foreach (var item in Model)
+    {
+        if (string.Compare(item.Resolution, Prometheus.Models.Resolute.Pending) == 0)
+        {
+            pendinglist.Add(item);
+        }
+        if (string.Compare(item.Resolution, Prometheus.Models.Resolute.Working) == 0)
+        {
+            workinglist.Add(item);
+        }
+        if (string.Compare(item.Resolution, Prometheus.Models.Resolute.Done) == 0)
+        {
+            donelist.Add(item);
+        }
+    }
+}
+
+<script src="~/Scripts/highcharts.js"></script>
+<script src="~/Scripts/exporting.js"></script>
+
+<ul class="nav nav-pills nav-stacked col-lg-2">
+    <li class="active"><a href="#tab_a" data-toggle="pill">My Status</a></li>
+    <li><a href="#tab_b" data-toggle="pill">Assigned To Me</a></li>
+    <li><a href="#tab_c" data-toggle="pill">I Assign</a></li>
+    <li><a href="#tab_d" data-toggle="pill">I Care</a></li>
+</ul>
+<div class="tab-content col-lg-10">
+    <div class="tab-pane active" id="tab_a">
+
+        @if (ViewBag.myranksummary != null)
+        {
+            <div class="row col-lg-12">
+                <h2>Total Rank @ViewBag.myranksummary[0].TotalRank</h2>
+            </div>
+            <hr />
+            foreach (var item in ViewBag.myranksummary)
+            {
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title"><a href="/User/UserCenter?username=@item.CurrentUser">@item.CurrentUser.Split(new char[] { '@' })[0] Rank</a></h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row col-lg-12">
+                                    <div class="row">
+                                        <div id="@((item.CurrentUser.Split(new char[] { '@' })[0]).Replace(".",""))userrankchart" style="height: 400px; margin: 0 auto;width:648px"></div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @Html.Raw(item.UserRankTrend)
+            }
+        }
+
+        @if (ViewBag.myissuesummary != null)
+        {
+            <hr />
+            foreach (var item in ViewBag.myissuesummary)
+            {
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title"><a href="/User/UserCenter?username=@item.CurrentUser">@item.CurrentUser.Split(new char[] { '@' })[0] Issues</a></h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row col-lg-12">
+                                    <div class="col-lg-3">
+                                        <a href="/User/UserIssues?username=@item.CurrentUser&month=1" target="_blank">
+                                            Working Issue <span class="badge alert-info">@item.WorkingIssueCount.ToString()</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <a href="/User/UserIssues?username=@item.CurrentUser&month=1" target="_blank">
+                                            Done Issue <span class="badge alert-success">@item.DoneIssueCount.ToString()</span>
+                                            </a>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <a href="/User/UserIssues?username=@item.CurrentUser&month=1" target="_blank">
+                                            Pending Issue <span class="badge alert-danger">@item.PendingIssueCount.ToString()</span>
+                                            </a>
+                                    </div>
+                                    <div class="col-lg-3"></div>
+                                </div>
+                                <hr />
+                                <div class="row col-lg-12">
+                                    <div class="row">
+                                        <div id="@((item.CurrentUser.Split(new char[] { '@' })[0]).Replace(".",""))issuetrendchart" style="height: 400px; margin: 0 auto;width:648px"></div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @Html.Raw(item.UserIssueTrend)
+            }
+        }
+
+
+    </div>
+
+    <div class="tab-pane" id="tab_b">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Pending</h3>
+                    </div>
+
+                    <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;height:420px;">
+                        @foreach (var item in pendinglist)
+                        {
+                            <div class="panel-body">
+                                <a href="/Project/ProjectDetail?ProjectKey=@item.ProjectKey">[@item.ProjectKey]</a> <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a>
+                            </div>
+                            <div class="panel-body text-right" style="max-height:10px;min-height:10px;">
+                                Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString("MM/dd-yy")
+                            </div>
+                            <hr />
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Working</h3>
+                    </div>
+
+                    <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;height:420px;">
+                        @foreach (var item in workinglist)
+                        {
+                            <div class="panel-body">
+                                <a href="/Project/ProjectDetail?ProjectKey=@item.ProjectKey">[@item.ProjectKey]</a> <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a>
+                            </div>
+                            <div class="panel-body text-right" style="max-height:10px;min-height:10px;">
+                                Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString("MM/dd-yy")
+                            </div>
+                            <hr />
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Done</h3>
+                    </div>
+
+                    <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;height:420px;">
+                        @foreach (var item in donelist)
+                        {
+                            <div class="panel-body">
+                                <a href="/Project/ProjectDetail?ProjectKey=@item.ProjectKey">[@item.ProjectKey]</a> <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a>
+                            </div>
+                            <div class="panel-body text-right" style="max-height:10px;min-height:10px;">
+                                Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString("MM/dd-yy")
+                            </div>
+                            <hr />
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane" id="tab_c">
+        @if (ViewBag.iassignlist != null && ViewBag.iassignlist.Count > 0)
+        {
+            var idx = 0;
+            <table id="pndatatable" class="display" cellspacing="0">
+                <thead>
+                    @foreach (var line in ViewBag.iassignlist)
+                    {
+                        <tr>
+                            <th style="font-size:12px">@line[0]</th>
+                            <th style="font-size:12px">@line[1]</th>
+                            <th style="font-size:12px">@line[2]</th>
+                            <th style="font-size:12px">@line[3]</th>
+                            <th style="font-size:12px">@line[4]</th>
+                            <th style="font-size:12px">@line[5]</th>
+                            <th style="font-size:12px">@line[6]</th>
+                        </tr>
+                        break;
+                    }
+                </thead>
+
+                <tbody>
+                    @foreach (var line in ViewBag.iassignlist)
+                    {
+                        if (idx == 0)
+                        {
+                            idx = idx + 1;
+                            continue;
+                        }
+
+                        if (string.Compare(line[7], "MAIN") == 0)
+                        {
+                            <tr>
+                                <th style="font-size:12px">@line[0]</th>
+                                <th style="font-size:12px"><a href="/Issue/UpdateIssue?issuekey=@line[6]">@line[1]</a></th>
+                                <th style="font-size:12px">@line[2]</th>
+                                <th style="font-size:12px">@line[8]</th>
+                                <th style="font-size:12px"><a href="/User/UserCenter?username=@line[3]">@line[3].Split(new char[] { '@' })[0]</a></th>
+                                <th style="font-size:12px">@line[4]</th>
+                                <th style="font-size:12px">@line[5]</th>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td style="font-size:10px">@line[0]</td>
+                                <td style="font-size:10px"><a href="/Issue/UpdateIssue?issuekey=@line[6]">@line[1]</a></td>
+                                <td style="font-size:10px">@line[2]</td>
+                                <th style="font-size:12px">@line[8]</th>
+                                <td style="font-size:10px"><a href="/User/UserCenter?username=@line[3]">@line[3].Split(new char[] { '@' })[0]</a></td>
+                                <td style="font-size:10px">@line[4]</td>
+                                <td style="font-size:10px">@line[5]</td>
+                            </tr>
+                        }
+
+                    }
+                </tbody>
+            </table>
+
+            <script type="text/javascript">
+        $(document).ready(function() {
+            $('#pndatatable').DataTable({
+                'iDisplayLength': 50,
+                'aLengthMenu': [[25, 50, 100, -1],
+                                [25, 50, 100, "All"]],
+                "bAutoWidth": false,
+                "aaSorting": [],
+                "order": [],
+                "aoColumns": [
+                { sWidth: '10%' },
+                { sWidth: '40%' },
+                { sWidth: '10%' },
+                { sWidth: '10%' },
+                { sWidth: '10%' },
+                { sWidth: '10%' },
+                { sWidth: '10%' }]
+            });
+                    } );
+            </script>
+        }
+
+     </div>
+
+
+
+    <div class="tab-pane" id="tab_d">
+
+        @if (ViewBag.chooseuserlist != null)
+        {
+            using (Html.BeginForm("OperateICare", "User", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">I Care</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <div class="row col-lg-12">
+                                    <div class="col-lg-8">
+                                        <div class="col-lg-7">
+                                            @Html.DropDownList("chooseuserlist", null, new { @id = "chooseuserlist", @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-1">
+
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <button id="adduser" name="adduser" class="form-control"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                                            @*<input type="submit" value="Submit" id="updaterma" name="updaterma" class="btn btn-default" />*@
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <button id="deleteuser" name="deleteuser" class="form-control"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                    
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row col-lg-12">
+
+                                    <div class="col-lg-8">
+                                        <div class="col-lg-7">
+                                            @Html.DropDownList("monthlist", null, new { @id = "monthlist", @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-1 text-left">
+                                            Months
+                                        </div>
+                                        <div class="col-lg-1">
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <button id="viewuser" name="viewuser" class="form-control"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>
+                                        </div>
+                                        <div class="col-lg-1">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-5">
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+            }
+            <hr />
+        }
+
+        @if (ViewBag.icareissuelist != null && ViewBag.icareranklist != null)
+        {
+            var idx = 0;
+            foreach (var item in ViewBag.icareissuelist)
+            {
+                
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                  <a href="/User/UserCenter?username=@ViewBag.icareranklist[idx].CurrentUser">@ViewBag.icareranklist[idx].CurrentUser.Split(new char[] { '@' })[0] Total Rank @ViewBag.icareranklist[idx].TotalRank</a>
+                                </h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row col-lg-12">
+                                    <div class="row">
+                                        <div id="@((ViewBag.icareranklist[idx].CurrentUser.Split(new char[] { '@' })[0]).Replace(".",""))userrankchart" style="height: 400px; margin: 0 auto;width:648px"></div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @Html.Raw(ViewBag.icareranklist[idx].UserRankTrend)
+
+                idx = idx + 1;
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title"><a href="/User/UserCenter?username=@item.CurrentUser">@item.CurrentUser.Split(new char[] { '@' })[0] Issues</a></h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row col-lg-12">
+                                    <div class="col-lg-3">
+                                        <a href="/User/UserIssues?username=@item.CurrentUser&month=@ViewBag.icaremonth" target="_blank">
+                                            Working Issue <span class="badge alert-info">@item.WorkingIssueCount.ToString()</span>
+                                            </a>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <a href="/User/UserIssues?username=@item.CurrentUser&month=@ViewBag.icaremonth" target="_blank">
+                                            Done Issue <span class="badge alert-success">@item.DoneIssueCount.ToString()</span>
+                                            </a>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <a href="/User/UserIssues?username=@item.CurrentUser&month=@ViewBag.icaremonth" target="_blank">
+                                            Pending Issue <span class="badge alert-danger">@item.PendingIssueCount.ToString()</span>
+                                            </a>
+                                    </div>
+                                    <div class="col-lg-3"></div>
+                                </div>
+                                <hr/>
+                                <div class="row col-lg-12">
+                                    <div class="row">
+                                        <div id="@((item.CurrentUser.Split(new char[] { '@' })[0]).Replace(".",""))issuetrendchart" style="height: 400px; margin: 0 auto;width:648px"></div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @Html.Raw(item.UserIssueTrend)
+            }
+
+        }
+        
+
+    </div>
+</div>
+
+

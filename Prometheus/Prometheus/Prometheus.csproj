@@ -548,6 +548,8 @@
     </Content>
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\images\favicon.ico" />
+    <Content Include="Content\images\FinisarBuilding.jpg" />
+    <Content Include="Content\images\FinisarLogo.jpg" />
     <Content Include="Content\images\sort_asc.png" />
     <Content Include="Content\images\sort_asc_disabled.png" />
     <Content Include="Content\images\sort_both.png" />

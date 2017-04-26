@@ -56,134 +56,149 @@
     <script src="~/Scripts/jquery.stickytableheaders.js"></script>
 </head>
 
-<body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <nav class="navbar navbar-inverse navbar-fixed-top">
+<body >
+    <div class="navbar navbar-default navbar-fixed-top" style="background-color:white;border-color:#5B9BD5">
+        <nav class="navbar navbar-default navbar-fixed-top" style="background-color:white;border-color:#5B9BD5">
             <div class="container">
 
-                @*<div class="navbar-header">
-                    <button type = "button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                        @Html.ActionLink("Projects", "ViewAll", "Project", null, new { @class = "navbar-brand" })
-                </div>*@
+                <div class="row">
+                    <div class="col-4">
+                        <div class="navbar-header" style="margin-left:20px">
+                            <a class="navbar-brand" href="#">
+                                <img alt="Brand" src="~/Content/images/FinisarLogo.jpg" style="height:54px; width:334px">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="row" style="margin-bottom:-8px">
+                            <ul class="nav navbar-nav"><li>&nbsp;</li></ul>
+                            <ul class="nav navbar-nav navbar-right"><li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li></ul>
+                            
+                        </div>
+                        <div class="row" style="margin-top:-8px">
+                            <div id="navbar" class="navbar-collapse collapse">
+                                <ul class="nav navbar-nav"><li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li></ul>
+                                <ul class="nav navbar-nav">
+                                    <li class="dropdown">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Projects<span class="caret"></span></a>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                @Html.ActionLink("View Projects", "ViewAll", "Project")
+                                            </li>
+                                            <li>
+                                                @Html.ActionLink("Create Project", "CreateProject", "Project")
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
 
-                <div id = "navbar" class="navbar-collapse collapse">
-                    <ul class="nav navbar-nav">
-                        <li class="dropdown">
-                            <a href = "#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Projects<span class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    @Html.ActionLink("View Projects", "ViewAll", "Project")
-                                </li>
-                                <li>
-                                    @Html.ActionLink("Create Project", "CreateProject", "Project")
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
+                                <ul class="nav navbar-nav">
+                                    <li class="dropdown">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Issues<span class="caret"></span></a>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                @Html.ActionLink("Create Issue", "CreateIssue", "Issue")
+                                            </li>
+                                            <li>
+                                                @Html.ActionLink("Create Single RMA", "CreateRMA", "Issue")
+                                            </li>
+                                            <li>
+                                                @Html.ActionLink("Create OBA Issue", "CommitOBAData", "CustomerData")
+                                            </li>
+                                            <li>
+                                                @Html.ActionLink("Create Quality Issue", "CommitQualityData", "CustomerData")
+                                            </li>
+                                            <li>
+                                                @Html.ActionLink("Search Issue", "SearchIssue", "Issue")
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
 
-                    <ul class="nav navbar-nav">
-                        <li class="dropdown">
-                            <a href = "#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Issues<span class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    @Html.ActionLink("Create Issue", "CreateIssue", "Issue")
-                                </li>
-                                <li>
-                                    @Html.ActionLink("Create Single RMA", "CreateRMA", "Issue")
-                                </li>
-                                <li>
-                                    @Html.ActionLink("Create OBA Issue", "CommitOBAData", "CustomerData")
-                                </li>
-                                <li>
-                                    @Html.ActionLink("Create Quality Issue", "CommitQualityData", "CustomerData")
-                                </li>
-                                <li>
-                                    @Html.ActionLink("Search Issue", "SearchIssue", "Issue")
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
+                                <ul class="nav navbar-nav">
+                                    <li class="dropdown">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Custom Data<span class="caret"></span></a>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                @Html.ActionLink("Commit Vcsel Data", "CommitVcselData", "CustomerData")
+                                            </li>
+                                            <li>
+                                                @Html.ActionLink("Review Vcsel Data", "ReviewVcselData", "CustomerData")
+                                            </li>
+                                            <li>
+                                                @if ((ViewBag.IsSuper != null && ViewBag.IsSuper) || (ViewBag.IsAdmin != null && ViewBag.IsAdmin))
+                                                {
+                                                    @Html.ActionLink("Review RMA Data", "ReviewRMABackupData", "CustomerData")
+                                                }
+                                            </li>
+                                            <li>
+                                                @*@if ((ViewBag.IsSuper != null && ViewBag.IsSuper) || (ViewBag.IsAdmin != null && ViewBag.IsAdmin))*@
 
-                    @*<ul class="nav navbar-nav">
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Reports<span class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    @Html.ActionLink("IBook", "IBook", "PJReport")
-                                </li>
-                                <li>
-                                    @Html.ActionLink("View Report", "ViewReport", "PJReport")
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>*@
+                                                @Html.ActionLink("Review REL Data", "ReviewRelBackupData", "CustomerData")
 
-                    <ul class="nav navbar-nav">
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Custom Data<span class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    @Html.ActionLink("Commit Vcsel Data", "CommitVcselData", "CustomerData")
-                                </li>
-                                <li>
-                                    @Html.ActionLink("Review Vcsel Data", "ReviewVcselData", "CustomerData")
-                                </li>
-                                <li>
-                                    @if ((ViewBag.IsSuper != null && ViewBag.IsSuper) || (ViewBag.IsAdmin != null && ViewBag.IsAdmin))
-                                    {
-                                        @Html.ActionLink("Review RMA Data", "ReviewRMABackupData", "CustomerData")
-                                    }
-                                </li>
-                                <li>
-                                    @*@if ((ViewBag.IsSuper != null && ViewBag.IsSuper) || (ViewBag.IsAdmin != null && ViewBag.IsAdmin))*@
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
 
-                                        @Html.ActionLink("Review REL Data", "ReviewRelBackupData", "CustomerData")
+                                <ul class="nav navbar-nav">
+                                    <li class="dropdown">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">User Center<span class="caret"></span></a>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                @Html.ActionLink("User Center", "UserCenter", "User")
+                                            </li>
+                                            <li>
+                                                @Html.ActionLink("IBLOG", "IBLOG", "User")
+                                            </li>
+                                            <li>
+                                                @Html.ActionLink("IBook", "IBook", "User")
+                                            </li>
+                                            <li>
+                                                @Html.ActionLink("ILearn", "ILearn", "User")
+                                            </li>
+                                            <li>
+                                                @if (ViewBag.IsSuper != null && ViewBag.IsSuper)
+                                                {
+                                                    @Html.ActionLink("UserMatrix", "CommitUserMatrix", "CustomerData")
+                                                }
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
 
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                    
-                    <ul class="nav navbar-nav">
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">User<span class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    @Html.ActionLink("User Center", "UserCenter", "User")
-                                </li>
-                                <li>
-                                    @Html.ActionLink("IBLOG", "IBLOG", "User")
-                                </li>
-                                <li>
-                                    @Html.ActionLink("IBook", "IBook", "User")
-                                </li>
-                                <li>
-                                    @Html.ActionLink("ILearn", "ILearn", "User")
-                                </li>
-                                <li>
-                                    @if (ViewBag.IsSuper != null && ViewBag.IsSuper)
-                                    {
-                                        @Html.ActionLink("UserMatrix", "CommitUserMatrix", "CustomerData")
-                                    }
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
+                                <ul class="nav navbar-nav navbar-right">
+                                    <li>
+                                        <a id="editablebt" name="editablebt" onclick="changepagemode()">Edit Mode</a>
+                                    </li>
+                                </ul>
 
-                    <ul class="nav navbar-nav navbar-right">
-                        <li>
-                            <a id="editablebt" name="editablebt" onclick="changepagemode()">Edit Mode</a>
-                        </li>
-                    </ul>
+                                <ul class="nav navbar-nav navbar-right">
+                                    <li class="dropdown">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Friend Site<span class="caret"></span></a>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a href="http://cn-traceview/" target="_blank">Trace View</a>
+                                            </li>
+                                            <li>
+                                                <a href="http://wux-parallel/activeme/" target="_blank">Active ME</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
 
-                    @Html.Partial("_LoginPartial")
+                                @Html.Partial("_LoginPartial")
+                            </div>
+                        </div>
 
+                    </div>
                 </div>
+
+
+ 
+
+
+
            </div>
         </nav>
     </div>

@@ -3596,6 +3596,30 @@ namespace Prometheus.Controllers
 
         }
 
+        public ActionResult MoveTask2Working(string issuekey)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
 
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "AddBlogDoc");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            var originalissue = IssueViewModels.RetrieveIssueByIssueKey(issuekey, this);
+            originalissue.Resolution = Resolute.Working;
+            originalissue.UpdateIssue();
+
+            var dict = new RouteValueDictionary();
+            dict.Add("username", updater);
+            return RedirectToAction("Assign2Me", "User", dict);
+        }
     }
 }

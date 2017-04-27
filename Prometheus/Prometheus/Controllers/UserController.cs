@@ -383,30 +383,107 @@ namespace Prometheus.Controllers
             
             if (!string.IsNullOrEmpty(usernm))
             {
-                //my blog
-
-                //if (ckdict.Count > 0 && ckdict.ContainsKey("logonuser"))
-                //{
-                //    var updater = ckdict["logonuser"].Split(new char[] { '|' })[0].ToUpper();
-                //    if (string.Compare(updater, usernm, true) == 0)
-                //    {
-                        ViewBag.myissuesummary = UserActionTrend.RetrieveMyIssuerSummary(this, usernm, 1);
-                        ViewBag.myranksummary = UserActionTrend.RetrieveMyRankSummary(this,usernm,1);
-                //    }
-                    
-                //}
-
                 //asign to me
-                var list1 = IssueViewModels.RetrieveIssueByAssignee(usernm, Resolute.Pending, 60);
-                var list2 = IssueViewModels.RetrieveIssueByAssigneeWorking(usernm, Resolute.Working, 60);
-                var list3 = IssueViewModels.RetrieveIssueByAssignee(usernm, Resolute.Done, 200);
-                list1.AddRange(list2);
-                list1.AddRange(list3);
+                ViewBag.pendinglist = IssueViewModels.RetrieveIssueByAssignee(usernm, Resolute.Pending, 60);
+                ViewBag.workinglist = IssueViewModels.RetrieveIssueByAssigneeWorking(usernm, Resolute.Working, 60);
 
                 ViewBag.UserName = usernm.Split(new char[] { '@' })[0];
+                ViewBag.RealUserID = usernm;
 
-                //I assign
-                var iassignissues= IssueViewModels.RetrieveIssueByCreator(usernm, 300, this);
+                if (string.IsNullOrEmpty(month))
+                {
+                    ViewBag.month = "";
+                }
+                else
+                {
+                    ViewBag.month = month;
+                }
+
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("LoginUser", "User");
+            }
+        }
+
+        public ActionResult Assign2Me(string username)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "UserCenter");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var usernm = "";
+            if (!string.IsNullOrEmpty(username))
+            {
+                usernm = username;
+            }
+            else if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+                usernm = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            }
+
+
+            if (!string.IsNullOrEmpty(usernm))
+            {
+                ViewBag.UserName = usernm.Split(new char[] { '@' })[0];
+                ViewBag.RealUserID = usernm;
+
+                ViewBag.pendinglist = IssueViewModels.RetrieveIssueByAssignee(usernm, Resolute.Pending, 60);
+                ViewBag.workinglist = IssueViewModels.RetrieveIssueByAssigneeWorking(usernm, Resolute.Working, 60);
+                ViewBag.donelist = IssueViewModels.RetrieveIssueByAssignee(usernm, Resolute.Done, 200);
+
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("LoginUser", "User");
+            }
+        }
+
+        public ActionResult IAssigned(string username)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "UserCenter");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var usernm = "";
+            if (!string.IsNullOrEmpty(username))
+            {
+                usernm = username;
+            }
+            else if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+                usernm = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            }
+
+
+            if (!string.IsNullOrEmpty(usernm))
+            {
+                ViewBag.UserName = usernm.Split(new char[] { '@' })[0];
+                ViewBag.RealUserID = usernm;
+
+                var iassignissues = IssueViewModels.RetrieveIssueByCreator(usernm, 300, this);
                 var wholedata = new List<List<string>>();
                 var title = new List<string>();
                 title.Add("Project");
@@ -451,21 +528,61 @@ namespace Prometheus.Controllers
 
                 ViewBag.iassignlist = wholedata;
 
-                //I care
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("LoginUser", "User");
+            }
+        }
+
+        public ActionResult ICare(string username, string month)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "UserCenter");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var usernm = "";
+            if (!string.IsNullOrEmpty(username))
+            {
+                usernm = username;
+            }
+            else if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+                usernm = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            }
+
+
+            if (!string.IsNullOrEmpty(usernm))
+            {
+                ViewBag.UserName = usernm.Split(new char[] { '@' })[0];
+                ViewBag.RealUserID = usernm;
+
                 if (ckdict.Count > 0 && ckdict.ContainsKey("logonuser"))
                 {
-               
                     var updater = ckdict["logonuser"].Split(new char[] { '|' })[0].ToUpper();
                     var tempmonth = 1;
                     if (string.IsNullOrEmpty(month))
                     {
                         tempmonth = 1;
+                        ViewBag.month = "";
                     }
                     else
                     {
-                        try { tempmonth = Convert.ToInt32(month); }
-                        catch (Exception ex) { tempmonth = 1; }
-
+                        try { tempmonth = Convert.ToInt32(month);
+                            ViewBag.month = month;
+                        }
+                        catch (Exception ex) { tempmonth = 1; ViewBag.month = ""; }
                     }
 
                     if (string.Compare(updater, usernm, true) == 0)
@@ -479,9 +596,50 @@ namespace Prometheus.Controllers
                     }
                 }
 
-                
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("LoginUser", "User");
+            }
+        }
 
-                return View(list1);
+        public ActionResult MyStatus(string username)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "UserCenter");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var usernm = "";
+            if (!string.IsNullOrEmpty(username))
+            {
+                usernm = username;
+            }
+            else if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+                usernm = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            }
+
+
+            if (!string.IsNullOrEmpty(usernm))
+            {
+                ViewBag.UserName = usernm.Split(new char[] { '@' })[0];
+                ViewBag.RealUserID = usernm;
+
+                ViewBag.myissuesummary = UserActionTrend.RetrieveMyIssuerSummary(this, usernm, 1);
+                ViewBag.myranksummary = UserActionTrend.RetrieveMyRankSummary(this, usernm, 1);
+
+                return View();
             }
             else
             {
@@ -517,16 +675,31 @@ namespace Prometheus.Controllers
             }
 
             dict.Add("username", updater);
-            
-            return RedirectToAction("UserCenter", "User", dict);
+            return RedirectToAction("ICare", "User", dict);
         }
 
         public ActionResult UserIssues(string username,string month)
         {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "AddBlogDoc");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            ViewBag.uname = updater.Split(new char[] { '@' })[0];
+            ViewBag.RealUserID = updater;
+
             if (!string.IsNullOrEmpty(username))
             {
                 ViewBag.UserName = username.Split(new char[] { '@' })[0];
-
                 var tempmonth = 1;
                 if (string.IsNullOrEmpty(month))
                 {
@@ -664,7 +837,7 @@ namespace Prometheus.Controllers
             ViewBag.taglist = CreateSelectList(tags);
         }
 
-        public ActionResult IBook()
+        public ActionResult ITag()
         {
             var ckdict = CookieUtility.UnpackCookie(this);
             if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
@@ -675,12 +848,15 @@ namespace Prometheus.Controllers
             {
                 var ck = new Dictionary<string, string>();
                 ck.Add("logonredirectctrl", "User");
-                ck.Add("logonredirectact", "IBook");
+                ck.Add("logonredirectact", "ITag");
                 CookieUtility.SetCookie(this, ck);
                 return RedirectToAction("LoginUser", "User");
             }
 
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            ViewBag.UserName = updater.Split(new char[] { '@' })[0];
+            ViewBag.RealUserID = updater;
+
             createpjlist();
             createtaglist();
 
@@ -739,7 +915,7 @@ namespace Prometheus.Controllers
             }
             ShareDocVM.SetUserBookTag(updater, usertag);
 
-            return RedirectToAction("IBook", "User");
+            return RedirectToAction("ITag", "User");
         }
 
         [HttpPost, ActionName("UpdateUserShareTag")]
@@ -778,7 +954,7 @@ namespace Prometheus.Controllers
             }
             ShareDocVM.SetUserBookTag(updater,tags);
 
-            return RedirectToAction("IBook","User");
+            return RedirectToAction("ITag","User");
         }
 
         public ActionResult ILearn()
@@ -798,6 +974,9 @@ namespace Prometheus.Controllers
             }
 
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            ViewBag.UserName = updater.Split(new char[] { '@' })[0];
+            ViewBag.RealUserID = updater;
+
             var asilist = UserViewModels.RetrieveAllUser();
             ViewBag.towholist = CreateSelectList(asilist,"");
 
@@ -950,10 +1129,12 @@ namespace Prometheus.Controllers
             }
 
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            ViewBag.UserName = updater.Split(new char[] { '@' })[0];
+            ViewBag.RealUserID = updater;
 
             var users = UserViewModels.RetrieveAllUser();
             ViewBag.towholist = CreateSelectList(users);
-
+            
             var vm = UserBlogVM.RetrieveAllBlogDoc(updater);
             return View(vm);
         }
@@ -1010,6 +1191,8 @@ namespace Prometheus.Controllers
             }
 
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            ViewBag.UserName = updater.Split(new char[] { '@' })[0];
+            ViewBag.RealUserID = updater;
 
             var tobechoosetags = new List<string>();
             var usertag = UserBlogVM.RetrieveUserTag(updater);
@@ -1166,6 +1349,24 @@ namespace Prometheus.Controllers
 
         public ActionResult ModifyBlogDoc(string DocKey)
         {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "AddBlogDoc");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            ViewBag.UserName = updater.Split(new char[] { '@' })[0];
+            ViewBag.RealUserID = updater;
+
             var vm = UserBlogVM.RetrieveBlogDoc(DocKey,this);
             return View(vm);
         }
@@ -1243,6 +1444,10 @@ namespace Prometheus.Controllers
                 CookieUtility.SetCookie(this, ck);
                 return RedirectToAction("LoginUser", "User");
             }
+
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            ViewBag.UserName = updater.Split(new char[] { '@' })[0];
+            ViewBag.RealUserID = updater;
 
             if (!string.IsNullOrEmpty(DocKey))
             {

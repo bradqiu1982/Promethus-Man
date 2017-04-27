@@ -36,7 +36,7 @@ namespace Prometheus.Controllers
         }
 
         // GET: PJReport
-        public ActionResult IBook()
+        public ActionResult ITag()
         {
             var ckdict = CookieUtility.UnpackCookie(this);
             if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
@@ -47,7 +47,7 @@ namespace Prometheus.Controllers
             {
                 var ck = new Dictionary<string, string>();
                 ck.Add("logonredirectctrl", "PJReport");
-                ck.Add("logonredirectact", "IBook");
+                ck.Add("logonredirectact", "ITag");
                 CookieUtility.SetCookie(this, ck);
                 return RedirectToAction("LoginUser", "User");
             }
@@ -79,7 +79,7 @@ namespace Prometheus.Controllers
             return View(vm);
         }
 
-        [HttpPost, ActionName("IBook")]
+        [HttpPost, ActionName("ITag")]
         [ValidateAntiForgeryToken]
         public ActionResult IBookPost()
         {
@@ -470,7 +470,7 @@ namespace Prometheus.Controllers
             var vm = PJReportViewModels.RetrieveBookReportRecord(updater);
             if (vm == null)
             {
-                return RedirectToAction("IBook");
+                return RedirectToAction("ITag");
             }
 
             var pjreportdict = new Dictionary<string, PJReportItem>();

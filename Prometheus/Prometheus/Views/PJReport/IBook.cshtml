@@ -1,14 +1,14 @@
 ﻿@model Prometheus.Models.PJReportViewModels
 @{
-    ViewBag.Title = "IBook";
+    ViewBag.Title = "ITag";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>IBook</h2>
+<h2>ITag</h2>
 
 <hr />
 
-@using (Html.BeginForm("IBook", "PJReport", FormMethod.Post, new { enctype = "multipart/form-data" }))
+@using (Html.BeginForm("ITag", "PJReport", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
 

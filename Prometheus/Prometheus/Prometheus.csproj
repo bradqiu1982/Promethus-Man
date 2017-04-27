@@ -547,22 +547,21 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
-    <Content Include="Content\images\Assign2Me.png" />
     <Content Include="Content\images\favicon.ico" />
     <Content Include="Content\images\FinisarBuilding.jpg" />
     <Content Include="Content\images\FinisarLogo.jpg" />
-    <Content Include="Content\images\IAssigned.png" />
-    <Content Include="Content\images\IBlog.png" />
-    <Content Include="Content\images\ICare.png" />
-    <Content Include="Content\images\ILearn.png" />
-    <Content Include="Content\images\IStatus.png" />
-    <Content Include="Content\images\ITag.png" />
-    <Content Include="Content\images\MyStatus.png" />
     <Content Include="Content\images\sort_asc.png" />
     <Content Include="Content\images\sort_asc_disabled.png" />
     <Content Include="Content\images\sort_both.png" />
     <Content Include="Content\images\sort_desc.png" />
     <Content Include="Content\images\sort_desc_disabled.png" />
+    <Content Include="Content\images\usercenter\Assign2Me.png" />
+    <Content Include="Content\images\usercenter\IAssigned.png" />
+    <Content Include="Content\images\usercenter\IBlog.png" />
+    <Content Include="Content\images\usercenter\ICare.png" />
+    <Content Include="Content\images\usercenter\ILearn.png" />
+    <Content Include="Content\images\usercenter\ITag.png" />
+    <Content Include="Content\images\usercenter\MyStatus.png" />
     <Content Include="Content\themes\base\accordion.css" />
     <Content Include="Content\themes\base\all.css" />
     <Content Include="Content\themes\base\autocomplete.css" />
@@ -830,7 +829,7 @@
     <Content Include="Views\CustomerData\ConfirmQualityData.cshtml" />
     <Content Include="Views\Issue\UpdateQuality.cshtml" />
     <Content Include="Views\User\AddShareTag.cshtml" />
-    <Content Include="Views\User\IBook.cshtml" />
+    <Content Include="Views\User\ITag.cshtml" />
     <Content Include="Views\User\ILearn.cshtml" />
     <Content Include="Views\User\IBLOG.cshtml" />
     <Content Include="Views\User\AddBlogDoc.cshtml" />
@@ -865,6 +864,10 @@
     <Content Include="Views\CustomerData\ReviewRelBackupData.cshtml" />
     <Content Include="Views\Project\LoadProjects.cshtml" />
     <Content Include="Views\User\UserCenter.cshtml" />
+    <Content Include="Views\User\Assign2Me.cshtml" />
+    <Content Include="Views\User\IAssigned.cshtml" />
+    <Content Include="Views\User\ICare.cshtml" />
+    <Content Include="Views\User\MyStatus.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

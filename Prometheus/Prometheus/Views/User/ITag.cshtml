@@ -1,8 +1,24 @@
 ﻿
 @{
-    ViewBag.Title = "IBook";
+    ViewBag.Title = "ITag";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+<div class="row">
+    <ol class="breadcrumb" style="font-size:18px">
+        <li><a href="/User/UserCenter?username=@(ViewBag.RealUserID)">@ViewBag.UserName Center</a></li>
+        <li class="active">I Tag</li>
+    </ol>
+</div>
+
 
 @if (ViewBag.projectlist != null && ViewBag.taglist != null)
 {
@@ -11,7 +27,7 @@
         @Html.AntiForgeryToken()
 
         <div class="row">
-            <div class="col-lg-4"><h2>Add New Tags</h2></div>
+            <div class="col-lg-4"><h3>Add New Tags</h3></div>
             <div class="col-lg-8"></div>
         </div>
         <hr/>
@@ -41,7 +57,7 @@
 
 
             <div class="row">
-                <div class="col-lg-3"><h2>User Booked Tags</h2></div>
+                <div class="col-lg-3"><h3>User Booked Tags</h3></div>
                 <div class="col-lg-9"></div>
             </div>
             <hr/>

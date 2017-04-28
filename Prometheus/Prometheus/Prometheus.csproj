@@ -559,6 +559,13 @@
     <Content Include="Content\images\sort_both.png" />
     <Content Include="Content\images\sort_desc.png" />
     <Content Include="Content\images\sort_desc_disabled.png" />
+    <Content Include="Content\images\ucicon\Assigned2MeIcons.png" />
+    <Content Include="Content\images\ucicon\IAssignedIcons.png" />
+    <Content Include="Content\images\ucicon\IBlogIcons.png" />
+    <Content Include="Content\images\ucicon\ICareIcons.png" />
+    <Content Include="Content\images\ucicon\ILearnIcons.png" />
+    <Content Include="Content\images\ucicon\ITagIcons.png" />
+    <Content Include="Content\images\ucicon\MystautesIcons.png" />
     <Content Include="Content\images\usercenter\Assign2Me.png" />
     <Content Include="Content\images\usercenter\IAssigned.png" />
     <Content Include="Content\images\usercenter\IBlog.png" />

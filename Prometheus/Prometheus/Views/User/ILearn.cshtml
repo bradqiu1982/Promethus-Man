@@ -25,7 +25,7 @@
 <script src="~/Scripts/exporting.js"></script>
 
 
-<ul class="nav nav-pills nav-stacked col-lg-2">
+<ul class="nav nav-pills nav-stacked col-lg-2" >
     <li class="active"><a href="#tab_a" data-toggle="pill">I Learn</a></li>
     <li><a href="#tab_b" data-toggle="pill">I Share</a></li>
     <li><a href="#tab_c" data-toggle="pill">Weekly Report</a></li>
@@ -40,22 +40,20 @@
             var i = 0;
 
         <table id="ilearndatatable" class="display" cellspacing="0">
-            <thead>
+            <thead style="background-color:#006DC0;font-family:'Arial Narrow';">
                     <tr>
-                        <th style="text-align:center;font-size:12px">
-                            <span class="input-group-addon">
-                                <input type="checkbox" readonly="readonly"/>
-                            </span>
-                        </th>
-                        <th style="text-align:center;font-size:12px">Share Summary</th>
-                        <th style="text-align:center;font-size:12px">Share Tag</th>
-                        <th style="text-align:center;font-size:12px">Product</th>
-                        <th style="text-align:center;font-size:12px">Creator</th>
-                        <th style="text-align:center;font-size:12px">Favor</th>
-                        <th style="text-align:center;font-size:12px"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></th>
-                        <th style="text-align:center;font-size:12px">Date</th>
-                        <th style="text-align:center;font-size:12px">I Like</th>
-                        <th style="text-align:center;font-size:12px">I Push</th>
+                        <th style="text-align:center;font-size:16px"><font color="white">
+                            <input type="checkbox" readonly="readonly" />
+                        </font></th>
+                        <th style="text-align:center;font-size:16px"><font color="white">Share Summary</font></th>
+                        <th style="text-align:center;font-size:16px"><font color="white">Share Tag</font></th>
+                        <th style="text-align:center;font-size:16px"><font color="white">Product</font></th>
+                        <th style="text-align:center;font-size:16px"><font color="white">Creator</font></th>
+                        <th style="text-align:center;font-size:16px"><font color="white">Favor</font></th>
+                        <th style="text-align:center;font-size:16px"><font color="white"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></font></th>
+                        <th style="text-align:center;font-size:16px"><font color="white">Date</font></th>
+                        <th style="text-align:center;font-size:16px"><font color="white">ILike</font></th>
+                        <th style="text-align:center;font-size:16px"><font color="white">IPush</font></th>
                     </tr>
             </thead>
 
@@ -64,9 +62,9 @@
                 {
                     <tr>
                         <td style="text-align:center;font-size:12px">
-                            <span class="input-group-addon">
+
                                 <input type="checkbox" id="check@(i)" name="check@(i)" value="true" />
-                            </span>
+
                             <input class="form-control text-box single-line" value="@line.DOCKey" id="HDocKey@(i)" name="HDocKey@(i)" type="hidden" />
                         </td>
 
@@ -99,9 +97,9 @@
 
         <div class="row">
             <div class="col-lg-1 text-center">
-                <span class="input-group-addon">
+
                     <input type="checkbox" id="checkall" name="checkall" onclick="ChooseAll(this)" />
-                </span>
+
             </div>
             <div class="col-lg-2 text-center">
                 <input type="submit" value="Remove" id="removeilearn" name="removeilearn" class="btn btn-default" />
@@ -120,7 +118,7 @@
                 "order": [],
                 "aoColumns": [
                 { sWidth: '5%' },
-                { sWidth: '18%' },
+                { sWidth: '16%' },
                 { sWidth: '15%' },
                 { sWidth: '8%' },
                 { sWidth: '8%' },
@@ -158,15 +156,15 @@
         {
             
             <table id="isharedatatable" class="display" cellspacing="0">
-                <thead>
+                <thead style="background-color:#006DC0;font-family:'Arial Narrow';">
                     <tr>
-                        <th style="text-align:center;font-size:12px">Summary</th>
-                        <th style="text-align:center;font-size:12px">Share Tag</th>
-                        <th style="text-align:center;font-size:12px">Product</th>
-                        <th style="text-align:center;font-size:12px">Favor</th>
-                        <th style="text-align:center;font-size:12px">Date</th>
-                        <th style="text-align:center;font-size:12px">Remove</th>
-                        <th style="text-align:center;font-size:12px">I Push</th>
+                        <th style="text-align:center;font-size:16px"><font color="white">Summary</font></th>
+                        <th style="text-align:center;font-size:16px"><font color="white">Share Tag</font></th>
+                        <th style="text-align:center;font-size:16px"><font color="white">Product</font></th>
+                        <th style="text-align:center;font-size:16px"><font color="white">Favor</font></th>
+                        <th style="text-align:center;font-size:16px"><font color="white">Date</font></th>
+                        <th style="text-align:center;font-size:16px"><font color="white">Remove</font></th>
+                        <th style="text-align:center;font-size:16px"><font color="white">IPush</font></th>
                     </tr>
                 </thead>
 
@@ -219,17 +217,17 @@
             if (ViewBag.IWeeklyReport != null)
             {
                 <table id="iweeklyreporttable" class="display" cellspacing="0">
-                    <thead>
+                    <thead style="background-color:#006DC0;font-family:'Arial Narrow';">
                         <tr>
-                            <th style="text-align:center;font-size:12px">Share Summary</th>
-                            <th style="text-align:center;font-size:12px">Share Tag</th>
-                            <th style="text-align:center;font-size:12px">Product</th>
-                            <th style="text-align:center;font-size:12px">Creator</th>
-                            <th style="text-align:center;font-size:12px">Favor</th>
-                            <th style="text-align:center;font-size:12px"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></th>
-                            <th style="text-align:center;font-size:12px">Date</th>
-                            <th style="text-align:center;font-size:12px">I Like</th>
-                            <th style="text-align:center;font-size:12px">I Push</th>
+                            <th style="text-align:center;font-size:16px"><font color="white">Share Summary</font></th>
+                            <th style="text-align:center;font-size:16px"><font color="white">Share Tag</font></th>
+                            <th style="text-align:center;font-size:16px"><font color="white">Product</font></th>
+                            <th style="text-align:center;font-size:16px"><font color="white">Creator</font></th>
+                            <th style="text-align:center;font-size:16px"><font color="white">Favor</font></th>
+                            <th style="text-align:center;font-size:16px"><font color="white"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></font></th>
+                            <th style="text-align:center;font-size:16px"><font color="white">Date</font></th>
+                            <th style="text-align:center;font-size:16px"><font color="white">ILike</font></th>
+                            <th style="text-align:center;font-size:16px"><font color="white">IPush</font></th>
                         </tr>
                     </thead>
 

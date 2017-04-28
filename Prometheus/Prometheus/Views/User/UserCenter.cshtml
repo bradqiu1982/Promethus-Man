@@ -26,6 +26,16 @@
     <div class="col-lg-1"></div>
     <div class="col-lg-2">
         <div class="row"><a href="/User/Assign2Me?username=@(ViewBag.RealUserID)"><img src="~/Content/images/usercenter/Assign2Me.png" style="height:158px; width:158px"></a></div>
+        <div class="row">
+            <div class="col-lg-1"></div>
+            <div class="col-lg-10">
+                <div class="well" style="background-color:white;border-left-color:#006DC0;border-top-color:snow;border-right-color:white;border-bottom-color:white;border-top-left-radius:0px;border-bottom-left-radius:0px">
+                    <div class="row">Pending&nbsp;&nbsp;&nbsp;&nbsp;@(ViewBag.pendinglist.Count)</div>
+                    <div class="row">Working&nbsp;&nbsp;&nbsp;&nbsp;@(ViewBag.workinglist.Count)</div>
+                </div>
+            </div>
+            <div class="col-lg-1"></div>
+        </div>
     </div>
     <div class="col-lg-1"></div>
     <div class="col-lg-2">

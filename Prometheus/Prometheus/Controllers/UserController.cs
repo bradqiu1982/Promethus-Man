@@ -824,17 +824,44 @@ namespace Prometheus.Controllers
             return pslist;
         }
 
+        private List<SelectListItem> CreateSelectList2(List<string> valist)
+        {
+            var pslist = new List<SelectListItem>();
+
+            foreach (var p in valist)
+            {
+                var pitem = new SelectListItem();
+                pitem.Text = p;
+                pitem.Value = p;
+                pslist.Add(pitem);
+            }
+
+            return pslist;
+        }
+
         private void createpjlist()
         {
             var projlist = ProjectViewModels.RetrieveAllProjectKey();
-            ViewBag.projectlist= CreateSelectList(projlist);
+            var newprojlist = new List<string>();
+            newprojlist.Add("Project Tag");
+            newprojlist.AddRange(projlist);
+            var projectlist= CreateSelectList2(newprojlist);
+            projectlist[0].Disabled = true;
+            projectlist[0].Selected = true;
+            ViewBag.projectlist = projectlist;
         }
 
         private void createtaglist()
         {
             var tags = ShareDocVM.RetrieveShareTags();
             tags.Sort();
-            ViewBag.taglist = CreateSelectList(tags);
+            var newtags = new List<string>();
+            newtags.Add("Technical Tag");
+            newtags.AddRange(tags);
+            var taglist = CreateSelectList2(newtags);
+            taglist[0].Disabled = true;
+            taglist[0].Selected = true;
+            ViewBag.taglist = taglist;
         }
 
         public ActionResult ITag()
@@ -895,8 +922,16 @@ namespace Prometheus.Controllers
             var usertagdict = ShareDocVM.RetrieveUserBookedTag(updater).DOCTagDict;
             usertaglist.AddRange(usertagdict.Keys);
 
-            var pjtag = Request.Form["projectlist"].ToString();
-            var normaltag = Request.Form["taglist"].ToString();
+            var pjtag = "NONE"; 
+            if (Request.Form["projectlist"] != null)
+            {
+                pjtag = Request.Form["projectlist"].ToString();
+            }
+            var normaltag = "NONE";
+            if (Request.Form["taglist"] != null)
+            {
+                normaltag = Request.Form["taglist"].ToString();
+            }
 
             if (string.Compare(pjtag, "NONE", true) != 0)
             {

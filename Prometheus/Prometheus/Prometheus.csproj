@@ -550,6 +550,10 @@
     <Content Include="Content\images\favicon.ico" />
     <Content Include="Content\images\FinisarBuilding.jpg" />
     <Content Include="Content\images\FinisarLogo.jpg" />
+    <Content Include="Content\images\icon\delete.png" />
+    <Content Include="Content\images\icon\eidt.png" />
+    <Content Include="Content\images\icon\extend.png" />
+    <Content Include="Content\images\icon\extendup.png" />
     <Content Include="Content\images\sort_asc.png" />
     <Content Include="Content\images\sort_asc_disabled.png" />
     <Content Include="Content\images\sort_both.png" />

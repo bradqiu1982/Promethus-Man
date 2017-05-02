@@ -7,58 +7,47 @@
     var idx = 0;
 }
 
-
 <div class="row">
-    <div class="col-lg-2">
-        <h2>All Projects</h2>
-    </div>
-    <div class="col-lg-2">
-
-    </div>
-    <div class="col-lg-8"></div>
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
 </div>
 
+<div class="row">
+    <div class="col-lg-2" style="font-size:20px"><strong>All Projects</strong></div>
+    <div class="col-lg-5"></div>
+    <div class="col-lg-3">@Html.DropDownList("pjfilterlist", null, new { @id = "pjfilterlist", @class = "form-control", @style = "font-family:'Arial Narrow';border-color:#006DC0;", @onchange = "ShowProjectDetail()" })</div>
+    <div class="col-lg-1"><button class="btn btn-default" type="button" style="background-color:#006DC0;color:white;" onclick="LoadProject()">Load Projects</button></div>
+    <div class="col-lg-1"></div>
+    <script type="text/javascript">
+            function ShowProjectDetail() {
+                if (document.getElementById("pjfilterlist").value && document.getElementById("pjfilterlist").value != 'NONE') {
+                    window.location.href = '/Project/ProjectDetail?ProjectKey=' + document.getElementById("pjfilterlist").value;
+                }
+            }
 
-<hr />
-
-    <div class="row col-lg-12">
-        <div class="col-lg-1">
-            <label class="control-label" for="pjfilterlist">Filter:</label>
-        </div>
-        <div class="col-lg-4">
-            @Html.DropDownList("pjfilterlist", null, new { @id = "pjfilterlist", @class = "form-control",@onchange = "ShowProjectDetail()" })
-        </div>
-        <div class="col-lg-1">
-        </div>
-        <div class="col-lg-1">
-            <button class="btn btn-default" type="button" onclick="LoadProject()">Load Projects</button>
-        </div>
-        <div class="col-lg-5">
-        </div>
-        <script type="text/javascript">
             function LoadProject()
             {
                 window.location.href = '/Project/LoadProjects';
             }
-        </script>
-    </div>
-
-    <script type="text/javascript">
-        function ShowProjectDetail() {
-            if (document.getElementById("pjfilterlist").value && document.getElementById("pjfilterlist").value != 'NONE')
-            {
-                window.location.href = '/Project/ProjectDetail?ProjectKey=' + document.getElementById("pjfilterlist").value;
-            }
-        }
     </script>
-<hr/>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
 
 <div class="panel-group" id="accordion">
     @foreach (var pjtype in ViewBag.pjtypelist)
     {
         if (ViewBag.pjtpdict.ContainsKey(pjtype))
         {
-            <div class="panel panel-default" id="panel@(idx)">
+            <div class="panel panel-default" id="panel@(idx)" style="border-left-color:white;border-right-color:white;border-bottom-color:white;border-bottom-width:0px">
                 <div class="panel-heading" style="background-color:#0F4FA8;">
                     <h4 class="panel-title">
                         <a data-toggle="collapse" data-target="#collapse@(idx)" href="#collapse@(idx)" class="collapsed"><font color="white">@pjtype</font></a>
@@ -76,7 +65,7 @@
                             <div class="col-lg-12">
                                 <div class="col-lg-2">
 
-                                        <div class="well"  style="background-color:white;border-left-color:#006DC0;border-top-color:snow;border-right-color:white;border-bottom-color:white;border-top-left-radius:0px;border-bottom-left-radius:0px">
+                                        <div class="well"  style="background-color:white;border-left-color:#006DC0;border-top-color:snow;border-right-color:white;border-bottom-color:white;border-top-left-radius:0px;border-bottom-left-radius:0px;">
                                             <div class="row text-left">
                                                 <a href="/Project/ProjectDetail?ProjectKey=@item.ProjectKey" style="font-size:18px;">@item.ProjectName</a>
                                             </div>
@@ -99,6 +88,10 @@
                                                     <div class="col-lg-1"></div>
                                                     <div class="col-lg-11" style="font-size:14px;">@item.MVTDate</div>
                                                 </div>
+                                                <div class="row text-left">
+                                                    <div class="col-lg-1"></div>
+                                                    <div class="col-lg-11"><a href="/Project/EditProject?ProjectKey=@item.ProjectKey"><img src="~/Content/images/icon/edit.png" style="height:34px; width:24px"></a></div>
+                                                </div>
                                             }
                                             else
                                             {
@@ -111,6 +104,10 @@
                                                 <div class="row">
                                                     <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                                 </div>
+                                                <div class="row text-left">
+                                                    <div class="col-lg-1"></div>
+                                                    <div class="col-lg-11"><a href="/Project/EditProject?ProjectKey=@item.ProjectKey"><img src="~/Content/images/icon/edit.png" style="height:34px; width:24px"></a></div>
+                                                </div>
                                             }
                                         </div>
                                 </div>
@@ -119,13 +116,23 @@
                                 {
                                     <div class="col-lg-2">
                                         <div class="col-lg-7" data-toggle="tooltip" title="Yield">
-                                            <a href="/Project/ProjectYieldMain?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/Yield.png" style="height:100px; width:100px"></a>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                <a href="/Project/ProjectYieldMain?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/Yield.png" style="height:100px; width:100px"></a>
+                                            </div>
                                         </div>
                                         <div class="col-lg-5">
                                             <div class="row">
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                             </div>
-
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
                                             @if (item.FirstYield > 0)
                                             {
                                                 <div class="row"><span class="badge" style="color:white;background-color:red">FPY @((item.FirstYield * 100.0).ToString("0.0")) %</span></div>
@@ -151,11 +158,24 @@
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="col-lg-7">
-                                            <a href="/Project/ProjectFA?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/FA.png" style="height:100px; width:100px"></a>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                <a href="/Project/ProjectFA?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/FA.png" style="height:100px; width:100px"></a>
+                                            </div>
                                         </div>
                                         <div class="col-lg-5">
                                             <div class="row">
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
                                                 @if (item.FinishRating < 90)
                                                 {
                                                     <div class="row"><span class="badge" style="color:white;background-color:red">@item.PendingFACount</span></div>
@@ -169,25 +189,59 @@
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="col-lg-7" data-toggle="tooltip" title="Task">
-                                            <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/Task.png" style="height:100px; width:100px"></a>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/Task.png" style="height:100px; width:100px"></a>
+                                            </div>
                                         </div>
                                         <div class="col-lg-5">
-                                            <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
                                             <div class="row"><span class="badge" style="color:white;background-color:red">@item.PendingTaskCount</span></div>
                                         </div>
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="col-lg-7">
-                                            <a href="/Project/ProjectRMAStatus?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/RMA.png" style="height:100px; width:100px"></a>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                <a href="/Project/ProjectRMAStatus?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/RMA.png" style="height:100px; width:100px"></a>
+                                            </div>
                                         </div>
                                         <div class="col-lg-5">
-                                            <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
                                             <div class="row"><span class="badge" style="color:white;background-color:red">@item.PendingRMACount</span></div>
                                         </div>
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="col-lg-7"  data-toggle="tooltip" title="Debug Tree">
-                                            <a href="/Project/ProjectError?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/DebugTreeicon.png" style="height:100px; width:100px"></a>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                <a href="/Project/ProjectError?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/DebugTreeicon.png" style="height:100px; width:100px"></a>
+                                            </div>
                                         </div>
                                         <div class="col-lg-5">
                                         </div>
@@ -196,36 +250,88 @@
                                 else
                                 {
                                     <div class="col-lg-2">
-                                        <div class="col-lg-7">
-                                            <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/Task.png" style="height:100px; width:100px"></a>
+                                        <div class="col-lg-7"  data-toggle="tooltip" title="Task">
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/Task.png" style="height:100px; width:100px"></a>
+                                            </div>
                                         </div>
                                         <div class="col-lg-5">
-                                            <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
                                             <div class="row"><span class="badge" style="color:white;background-color:red">@item.PendingTaskCount</span></div>
                                         </div>
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="col-lg-7"  data-toggle="tooltip" title="OBA">
-                                            <a href="/Project/ProjectOBA?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/Task.png" style="height:100px; width:100px"></a>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                <a href="/Project/ProjectOBA?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/OBA.png" style="height:100px; width:100px"></a>
+                                            </div>
                                         </div>
                                         <div class="col-lg-5">
-                                            <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="col-lg-7" data-toggle="tooltip" title="Quality">
-                                            <a href="/Project/ProjectQuality?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/Task.png" style="height:100px; width:100px"></a>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                <a href="/Project/ProjectQuality?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/quailty.png" style="height:100px; width:100px"></a>
+                                            </div>
                                         </div>
                                         <div class="col-lg-5">
-                                            <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="col-lg-7" data-toggle="tooltip" title="Reliability">
-                                            <a href="/Project/ProjectReliability?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/Task.png" style="height:100px; width:100px"></a>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                <a href="/Project/ProjectReliability?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/REL.png" style="height:100px; width:100px"></a>
+                                            </div>
                                         </div>
                                         <div class="col-lg-5">
-                                            <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-lg-2">

@@ -6,125 +6,42 @@
 }
 
 <div class="row">
-    <div class="col-lg-4">
-    @if (Model != null && Model.Count() > 0)
-    {
-         <h2>@Model.ElementAt(0).ProjectKey RMA Status</h2>
-    }
-    else
-    {
-        <h2>Project RMA Status</h2>
-    }
-        
-    </div>
-
-    <div class="col-lg-1">
-        @if (Model != null && Model.Count() > 0)
-        {
-            <h2><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ElementAt(0).ProjectKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
-        }
-        else
-        {
-            <h2><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
-        }
-    </div>
-    <div class="col-lg-7"></div>
+    <div class="col-lg-12">&nbsp;</div>
 </div>
-
-<hr/>
 
 <div class="row">
-@if (Model != null && Model.Count() > 0)
-{
-    <div class="col-lg-1">
-        <label class="control-label" for="StartDate">StartDate</label>
-    </div>
-    <div class="col-lg-2">
-        <input class="form-control text-box single-line" id="StartDate" name="StartDate" type="text" value="" />
-    </div>
-    <div class="col-lg-1">
-        <label class="control-label" for="EndDate">EndDate</label>
-    </div>
-    <div class="col-lg-2">
-        <input class="form-control text-box single-line" id="EndDate" name="EndDate" type="text" value="" />
-    </div>
-}
-else
-{
-    <div class="col-lg-6">
-    </div>
-}
+    <div class="col-lg-12">&nbsp;</div>
+</div>
 
-    <div class="col-lg-1">
-        @if (Model != null && Model.Count() > 0)
-        {
-            <button class="form-control" data-toggle="tooltip" title="Export RMA Report" onclick="ShareRMA()" type="button"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span></button>
-        }
-        @*<h2><a data-toggle="tooltip" title="Export RMA Report" href="/Issue/ExportRMAData?ProjectKey=@Model.ElementAt(0).ProjectKey" target="_blank"><span class="glyphicon glyphicon-share" aria-hidden="true"></span></a></h2>*@
-    </div>
-    <div class="col-lg-1">
-        @if (Model != null && Model.Count() > 0)
-        {
-            <button class="form-control" data-toggle="tooltip" title="Export All RMA Report" onclick="ShareAllRMA()" type="button"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span>ALL</button>
-        }
-         @*<h2><a data-toggle="tooltip" title="Export All RMA Report" href="/Issue/ExportAllRMAData" target="_blank"><span class="glyphicon glyphicon-share" aria-hidden="true"></span>ALL</a></h2>*@
-    </div>
-    
-    <div class="col-lg-1">
 
-        @*<h2><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>*@
+<div class="row">
+    <div class="col-lg-1 text-right">
+        <img src="~/Content/images/PJ/RMA.png" style="height:45px; width:45px">
     </div>
-    <div class="col-lg-3"></div>
-    
-    <script type="text/javascript">
-        function GoToAll() {
-            window.location.href = '/Project/ViewAll';
-        }
-    </script>
-
-@if (Model != null && Model.Count() > 0)
-{
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $("#StartDate").datepicker({
-                changeMonth: true,
-                changeYear: true,
-                dateFormat: 'yy-mm-dd'
-            });
-            $("#EndDate").datepicker({
-                changeMonth: true,
-                changeYear: true,
-                dateFormat: 'yy-mm-dd'
-            });
-        });
-
-            function ShareRMA() {
-                if (document.getElementById("StartDate").value && document.getElementById("EndDate").value) {
-                    var myurl = '/Issue/ExportRMAData?ProjectKey=@Model.ElementAt(0).ProjectKey&StartDate=' + document.getElementById("StartDate").value + '&EndDate=' + document.getElementById("EndDate").value;
-                    window.open(myurl, '_blank');
-                }
-                else {
-                    var myurl = '/Issue/ExportRMAData?ProjectKey=@Model.ElementAt(0).ProjectKey&StartDate=NONE&EndDate=NONE';
-                    window.open(myurl, '_blank');
-                }
+    <div class="col-lg-11">
+        <ol class="breadcrumb" style="font-size:18px">
+            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
+            @if (Model != null && Model.Count() > 0)
+            {
+                <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ElementAt(0).ProjectKey)">Project Detail</a></li>
             }
 
-            function ShareAllRMA() {
-                if (document.getElementById("StartDate").value && document.getElementById("EndDate").value) {
-                    var myurl = '/Issue/ExportAllRMAData?StartDate=' + document.getElementById("StartDate").value + '&EndDate=' + document.getElementById("EndDate").value;
-                    window.open(myurl, '_blank');
-                }
-                else
-                {
-                    var myurl = '/Issue/ExportAllRMAData?StartDate=NONE&EndDate=NONE';
-                    window.open(myurl, '_blank');
-                }
-        }
-</script>
-}
-
+            @if (Model != null && Model.Count() > 0)
+            {
+                <li class="active">@(Model.ElementAt(0).ProjectKey) RMA Status</li>
+            }
+            else
+            {
+                <li class="active">Project RMA Status</li>
+            }
+        </ol>
+    </div>
 </div>
-    <hr />
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
 
     @if (Model != null)
     {
@@ -136,18 +53,15 @@ else
             @Html.Raw(ViewBag.chartscript)
 
             <div class="row">
-                <div class="col-lg-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Failure</h3>
-                        </div>
-                        <div class="panel-body">
-                            <div class="col-lg-12">
-                                <div id="failurepie" style="min-width: 310px; height: 300px; margin: 0 auto"></div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="col-lg-2"></div>
+                <div class="col-lg-8">
+                    <div id="failurepie" style="min-width: 310px; height: 300px; margin: 0 auto"></div>
                 </div>
+                <div class="col-lg-2"></div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-12">&nbsp;</div>
             </div>
         }
 
@@ -155,17 +69,17 @@ else
         <table id="firsttable" name="firsttable" class="table table-bordered table-hover">
             <thead class="header">
                 <tr>
-                    <th width="10%">RMA#</th>
-                    <th width="10%">SN</th>
-                    <th width="8%">RootCause</th>
-                    <th width="8%">FV</th>
-                    <th width="8%">RMA Failure Code</th>
-                    <th width="8%">Containment Action</th>
-                    <th width="8%">Corrective Action</th>
-                    <th width="10%">Internal Report</th>
-                    <th width="10%">Customer Report</th>
-                    <th width="10%">Owner</th>
-                    <th width="10%">Report Date</th>
+                    <th width="10%"><font color="white">RMA#</font></th>
+                    <th width="10%"><font color="white">SN</font></th>
+                    <th width="8%"><font color="white">RootCause</font></th>
+                    <th width="8%"><font color="white">FV</font></th>
+                    <th width="8%"><font color="white">RMA Failure</font></th>
+                    <th width="8%"><font color="white">Containment</font></th>
+                    <th width="8%"><font color="white">Corrective</font></th>
+                    <th width="10%"><font color="white">Internal RPT</font></th>
+                    <th width="10%"><font color="white">Customer RPT</font></th>
+                    <th width="10%"><font color="white">Owner</font></th>
+                    <th width="10%"><font color="white">Report Date</font></th>
                 </tr>
             </thead>
             <tbody>
@@ -285,6 +199,7 @@ else
         <script type="text/javascript">
             $(document).ready(function () {
                 var offset = $('.navbar').height();
+                offset = 1.6 * offset;
                 $("#firsttable").stickyTableHeaders({ fixedOffset: offset });
             });
 
@@ -295,4 +210,92 @@ else
                 }
             }
         </script>
+
+        <div class="row">
+            <div class="col-lg-12">&nbsp;</div>
+        </div>
+
+        <div class="row">
+            @if (Model != null && Model.Count() > 0)
+            {
+                <div class="col-lg-1">
+                    <label class="control-label" for="StartDate">StartDate</label>
+                </div>
+                <div class="col-lg-2">
+                    <input class="form-control text-box single-line" id="StartDate" name="StartDate" type="text" value="" />
+                </div>
+                <div class="col-lg-1">
+                    <label class="control-label" for="EndDate">EndDate</label>
+                </div>
+                <div class="col-lg-2">
+                    <input class="form-control text-box single-line" id="EndDate" name="EndDate" type="text" value="" />
+                </div>
+            }
+            else
+            {
+                <div class="col-lg-6">
+                </div>
+            }
+
+            <div class="col-lg-1">
+                @if (Model != null && Model.Count() > 0)
+                {
+                    <button class="form-control" data-toggle="tooltip" title="Export RMA Report" onclick="ShareRMA()" type="button"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span></button>
+                }
+
+            </div>
+            <div class="col-lg-1">
+                @if (Model != null && Model.Count() > 0)
+                {
+                    <button class="form-control" data-toggle="tooltip" title="Export All RMA Report" onclick="ShareAllRMA()" type="button"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span>ALL</button>
+                }
+
+            </div>
+
+            <div class="col-lg-1">
+            </div>
+            <div class="col-lg-3"></div>
+
+            @if (Model != null && Model.Count() > 0)
+            {
+                <script type="text/javascript">
+        $(document).ready(function () {
+            $("#StartDate").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: 'yy-mm-dd'
+            });
+            $("#EndDate").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: 'yy-mm-dd'
+            });
+        });
+
+            function ShareRMA() {
+                if (document.getElementById("StartDate").value && document.getElementById("EndDate").value) {
+                    var myurl = '/Issue/ExportRMAData?ProjectKey=@Model.ElementAt(0).ProjectKey&StartDate=' + document.getElementById("StartDate").value + '&EndDate=' + document.getElementById("EndDate").value;
+                    window.open(myurl, '_blank');
+                }
+                else {
+                    var myurl = '/Issue/ExportRMAData?ProjectKey=@Model.ElementAt(0).ProjectKey&StartDate=NONE&EndDate=NONE';
+                    window.open(myurl, '_blank');
+                }
+            }
+
+            function ShareAllRMA() {
+                if (document.getElementById("StartDate").value && document.getElementById("EndDate").value) {
+                    var myurl = '/Issue/ExportAllRMAData?StartDate=' + document.getElementById("StartDate").value + '&EndDate=' + document.getElementById("EndDate").value;
+                    window.open(myurl, '_blank');
+                }
+                else
+                {
+                    var myurl = '/Issue/ExportAllRMAData?StartDate=NONE&EndDate=NONE';
+                    window.open(myurl, '_blank');
+                }
+        }
+                </script>
+            }
+
+        </div>
     }

@@ -551,11 +551,14 @@
     <Content Include="Content\images\FinisarBuilding.jpg" />
     <Content Include="Content\images\FinisarLogo.jpg" />
     <Content Include="Content\images\icon\delete.png" />
-    <Content Include="Content\images\icon\eidt.png" />
+    <Content Include="Content\images\icon\edit.png" />
     <Content Include="Content\images\icon\extend.png" />
     <Content Include="Content\images\icon\extendup.png" />
     <Content Include="Content\images\PJ\DebugTreeicon.png" />
     <Content Include="Content\images\PJ\FA.png" />
+    <Content Include="Content\images\PJ\OBA.png" />
+    <Content Include="Content\images\PJ\quailty.png" />
+    <Content Include="Content\images\PJ\REL.png" />
     <Content Include="Content\images\PJ\RMA.png" />
     <Content Include="Content\images\PJ\Task.png" />
     <Content Include="Content\images\PJ\Yield.png" />

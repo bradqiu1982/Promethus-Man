@@ -7,25 +7,45 @@
 }
 
 
-
 <div class="row">
-    <div class="col-lg-4">
-        <h2>Update Debug Tree</h2>
-    </div>
-    <div class="col-lg-2">
-        @if (Model != null)
-        {
-            <h2><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectError?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
-        }
-        else
-        {
-            <h2><a data-toggle="tooltip" title="Goto ViewAll Page" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
-        }
-    </div>
-    <div class="col-lg-6"></div>
+    <div class="col-lg-12">&nbsp;</div>
 </div>
 
-<hr />
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+
+<div class="row">
+    <div class="col-lg-1 text-right">
+        <img src="~/Content/images/PJ/DebugTreeicon.png" style="height:45px; width:45px">
+    </div>
+    <div class="col-lg-11">
+        <ol class="breadcrumb" style="font-size:18px">
+            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
+
+            @if (Model != null)
+            {
+                <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ProjectKey)">Project Detail</a></li>
+            }
+
+            @if (Model != null)
+            {
+                <li><a data-toggle="tooltip" href="/Project/ProjectError?ProjectKey=@(Model.ProjectKey)">@(Model.ProjectKey) Debug Tree</a></li>
+            }
+            <li class="active">Update Debug Tree</li>
+        </ol>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
 
 <script src="../../ckeditor/ckeditor.js"></script>
 
@@ -36,94 +56,109 @@
         @Html.AntiForgeryToken()
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-        <div class="row col-lg-12">
-            <div class="form-group">
-                <div class="form-horizontal">
-                    <div class="form-group">
-                        <div class="col-lg-6">
-                            <label class="control-label col-lg-2" for="ProjectKey">Project Key</label>
-                            <div class="col-lg-10">
-                                <input class="form-control text-box single-line" id="ProjectKey" name="ProjectKey" type="text" value="@Model.ProjectKey" readonly="readonly" />
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <label class="control-label col-lg-2" for="ErrorCode">Error Code</label>
-                            <div class="col-lg-10">
-                                <input class="form-control text-box single-line" id="ErrorCode" name="ErrorCode" type="text" value="@Model.OrignalCode" readonly="readonly" />
-                            </div>
+        <div class="row" style="font-size:18px"><strong>&nbsp;&nbsp;&nbsp;Information</strong></div>
+        <div class="row">
+            <div class="col-lg-12">&nbsp;</div>
+        </div>
+        <div class="row">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-lg-6">
+                        <div class="col-lg-2"><label class="control-label" for="ProjectKey">Project Key</label></div>
+                        <div class="col-lg-10">
+                            <input class="form-control text-box single-line" id="ProjectKey" name="ProjectKey" type="text" value="@Model.ProjectKey" readonly="readonly" />
                         </div>
                     </div>
+                    <div class="col-lg-6">
+                        <div class="col-lg-2"><label class="control-label" for="ErrorCode">Error Code</label></div>
 
-                    <div class="form-group">
-                        <div class="col-lg-6">
-                            <label class="control-label col-lg-2" for="ShortDesc">Short Desc</label>
-                            <div class="col-lg-10">
-                                @if (ViewBag.assigee != null && ViewBag.assigee)
-                                {
+                        <div class="col-lg-10">
+                            <input class="form-control text-box single-line" id="ErrorCode" name="ErrorCode" type="text" value="@Model.OrignalCode" readonly="readonly" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-lg-6">
+                        <div class="col-lg-2"><label class="control-label" for="ShortDesc">Short Desc</label></div>
+                        <div class="col-lg-10">
+                            @if (ViewBag.assigee != null && ViewBag.assigee)
+                            {
                                 <input class="form-control text-box single-line" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 25." data-val-length-max="25" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="ShortDesc" name="ShortDesc" type="text" value="@Model.ShortDesc" />
                                 <span class="field-validation-valid text-danger" data-valmsg-for="ShortDesc" data-valmsg-replace="true"></span>
-                                }
-                                else
-                                {
-                                    <input class="form-control text-box single-line" readonly="readonly" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 25." data-val-length-max="25" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="ShortDesc" name="ShortDesc" type="text" value="@Model.ShortDesc" />
-                                }
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <label class="control-label col-lg-2" for="ErrorCount">Error Count</label>
-                            <div class="col-lg-10">
-                                <input class="form-control text-box single-line" data-val="true" id="ErrorCount" name="ErrorCount" type="text" value="@Model.ErrorCount" readonly="readonly" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-lg-6"><input class="form-control text-box single-line" value="@(Model.ErrorKey)" id="ErrorKey" name="ErrorKey" type="hidden" /></div>
-                        <div class="col-lg-6"></div>
-                    </div>
-                    <hr />
-                    <div class="form-group">
-                        <div class="col-lg-12">
-                            <div class="col-lg-4">
-                                <span class="btn btn-default btn-file" id="choosefile3">
-                                    Attachment <input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
-                                </span>
-                            </div>
-                            <div class="col-lg-8">
-                                <div class="col-lg-11">
-                                    <label class="control-label" id="showfile3" name="showfile3"></label>
-                                </div>
-                                <div class="col-lg-1">
-                                    <input class="form-control text-box single-line" value="" id="attachmentupload" name="attachmentupload" type="hidden" />
-                                </div>
-                            </div>
-                        </div>
-                        <script type="text/javascript">
-                            function ShowFileNames3(oFile) {
-                                $('#showfile3').text(oFile.value);
-                                document.getElementById("attachmentupload").value = oFile.value;
                             }
-                        </script>
+                            else
+                            {
+                                <input class="form-control text-box single-line" readonly="readonly" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 25." data-val-length-max="25" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="ShortDesc" name="ShortDesc" type="text" value="@Model.ShortDesc" />
+                            }
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="col-lg-2"><label class="control-label" for="ErrorCount">Error Count</label></div>
+
+                        <div class="col-lg-10">
+                            <input class="form-control text-box single-line" data-val="true" id="ErrorCount" name="ErrorCount" type="text" value="@Model.ErrorCount" readonly="readonly" />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-lg-6"><input class="form-control text-box single-line" value="@(Model.ErrorKey)" id="ErrorKey" name="ErrorKey" type="hidden" /></div>
+                    <div class="col-lg-6"></div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="col-lg-4 text-left">
+                    <span class="btn btn-default btn-file" id="choosefile3">
+                        Attachment <input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
+                    </span>
+                </div>
+                <div class="col-lg-8">
+                    <div class="col-lg-11">
+                        <label class="control-label" id="showfile3" name="showfile3"></label>
+                    </div>
+                    <div class="col-lg-1">
+                        <input class="form-control text-box single-line" value="" id="attachmentupload" name="attachmentupload" type="hidden" />
                     </div>
                 </div>
             </div>
+            <script type="text/javascript">
+                function ShowFileNames3(oFile) {
+                    $('#showfile3').text(oFile.value);
+                    document.getElementById("attachmentupload").value = oFile.value;
+                }
+            </script>
         </div>
 
         if (Model != null && Model.AttachList.Count > 0)
         {
-            <hr />
             <div class="row">
-                <div class="col-lg-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Attachments</h3>
-                        </div>
-                        <div class="panel-body">
-                            @foreach (var item in Model.AttachList)
-                            {
-                                var realfn = "";
-                                var tempfns = item.Split(new string[] { "/" }, StringSplitOptions.None);
-                                realfn = tempfns[tempfns.Length - 1].Trim();
+                <div class="col-lg-12">&nbsp;</div>
+            </div>
 
+            <div class="row">
+                <div class="col-lg-12">&nbsp;</div>
+            </div>
+
+            <div class="row">
+                <div class="row" style="margin-left:3px"><a data-toggle="collapse" href="#attachwell" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';font-size:18px"><font color="black"><strong>&nbsp;&nbsp;@(Model.AttachList.Count) Attachements</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:20px; width:12px"></a></div>
+                <div class="row">
+                    <div class="col-lg-12">&nbsp;</div>
+                </div>
+                <div class="row" style="margin-left:10px">
+                    <div class="collapse" id="attachwell">
+                        @foreach (var item in Model.AttachList)
+                        {
+                            var realfn = "";
+                            var tempfns = item.Split(new string[] { "/" }, StringSplitOptions.None);
+                            realfn = tempfns[tempfns.Length - 1].Trim();
+
+                            <div class="well" style="background-color:white;border-left-color:#006DC0;border-top-color:white;border-right-color:white;border-bottom-color:white;border-top-left-radius:0px;border-bottom-left-radius:0px">
                                 <div class="row">
                                     <div class="col-lg-6">
                                         <a href="@item" target="_blank">
@@ -133,161 +168,163 @@
                                     <div class="col-lg-1">
                                         @if (ViewBag.assigee != null && ViewBag.assigee)
                                         {
-                                            <button class="form-control" value="@realfn" type="button"  onclick="DeleteAttachment(this)">
+                                            <button class="form-control" value="@realfn" type="button" onclick="DeleteAttachment(this)">
                                                 <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                                             </button>
                                         }
                                     </div>
                                     <div class="col-lg-5"></div>
                                 </div>
-                            }
-                        </div>
-                    </div>
-                    <script type="text/javascript">
-                        function DeleteAttachment(oBT) {
-                            if (confirm("Notice: Do you really want to delete this attachment?")) {
-                                window.location.href = '/Project/DeleteErrorAttachment?errorkey=' + document.getElementById("ErrorKey").value + '&filename=' + oBT.value
-                            }
-                            else {
-                                window.location.href = '/Project/UpdateProjectError?errorkey=' + document.getElementById("ErrorKey").value
-                            }
+                            </div>
                         }
-
-                    </script>
+                    </div>
                 </div>
             </div>
         }
 
-
-        foreach (var paircoment in Model.PairComments)
-        {
-            idx = idx + 1;
-
-            var analyzetitle = "";
-            foreach (var item in paircoment)
-            {
-                if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.AnalyzeTitle) == 0)
-                {
-                    analyzetitle = item.Comment;
+        <script type="text/javascript">
+            function DeleteAttachment(oBT) {
+                if (confirm("Notice: Do you really want to delete this attachment?")) {
+                    window.location.href = '/Project/DeleteErrorAttachment?errorkey=' + document.getElementById("ErrorKey").value + '&filename=' + oBT.value
+                }
+                else {
+                    window.location.href = '/Project/UpdateProjectError?errorkey=' + document.getElementById("ErrorKey").value
                 }
             }
 
-            <hr />
-                        <div class="form-group">
-                            <div class="col-lg-12">
+        </script>
+
+        <div class="panel-group" id="accordion">
+            @foreach (var paircoment in Model.PairComments)
+            {
+                idx = idx + 1;
+
+                var analyzetitle = "";
+                foreach (var item in paircoment)
+                {
+                    if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.AnalyzeTitle) == 0)
+                    {
+                        analyzetitle = item.Comment;
+                    }
+                }
+                <div class="panel panel-default" id="panel@(idx)" style="border-left-color:white;border-right-color:white;border-bottom-color:white;border-bottom-width:0px">
+                    <div class="panel-heading" style="background-color:#0F4FA8;">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-target="#collapse@(idx)" href="#collapse@(idx)" class="collapsed"><font color="white">Analyse @idx @analyzetitle</font></a>
+                        </h4>
+                    </div>
+
+                    <div id="collapse@(idx)" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            @foreach (var item in paircoment)
+                            {
+                                if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.AnalyzeTitle) == 0)
+                                {
+                                    continue;
+                                }
+
                                 <div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        <h3 class="panel-title">Analyse @idx @analyzetitle</h3>
-                                    </div>
-                                    <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
-                                        @foreach (var item in paircoment)
+
+                                    @if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.Result) == 0)
+                                    {
+                                        if (!string.IsNullOrEmpty(item.ResultClosed) && string.Compare(item.ResultClosed, "CLOSED") == 0)
                                         {
-                                            if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.AnalyzeTitle) == 0)
-                                            {
-                                                continue;
-                                            }
-
-                                            <div class="panel panel-default">
-
-                                                @if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.Result) == 0)
+                                            <div class="panel-heading">
+                                                @if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.RootCause) == 0)
                                                 {
-                                                    if (!string.IsNullOrEmpty(item.ResultClosed) && string.Compare(item.ResultClosed, "CLOSED") == 0)
-                                                    {
-                                                        <div class="panel-heading">
-                                                            @if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.RootCause) == 0)
-                                                            {
-                                                                <h3 class="panel-title">@item.CommentType Investigation</h3>
-                                                            }
-                                                            else
-                                                            {
-                                                                <h3 class="panel-title">@item.CommentType</h3>
-                                                            }
-                                                        </div>
-                                                    }
-                                                    else
-                                                    {
-                                                        <div class="panel-heading panel-heading-open">
-                                                            @if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.RootCause) == 0)
-                                                            {
-                                                                <h3 class="panel-title">@item.CommentType Investigation</h3>
-                                                            }
-                                                            else
-                                                            {
-                                                                <h3 class="panel-title">@item.CommentType</h3>
-                                                            }
-                                                        </div>
-                                                    }
+                                                    <h3 class="panel-title">@item.CommentType Investigation</h3>
                                                 }
                                                 else
                                                 {
-                                                    <div class="panel-heading">
-                                                        @if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.RootCause) == 0)
+                                                    <h3 class="panel-title">@item.CommentType</h3>
+                                                }
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="panel-heading panel-heading-open">
+                                                @if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.RootCause) == 0)
+                                                {
+                                                    <h3 class="panel-title">@item.CommentType Investigation</h3>
+                                                }
+                                                else
+                                                {
+                                                    <h3 class="panel-title">@item.CommentType</h3>
+                                                }
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="panel-heading">
+                                            @if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.RootCause) == 0)
+                                            {
+                                                <h3 class="panel-title">@item.CommentType Investigation</h3>
+                                            }
+                                            else
+                                            {
+                                                <h3 class="panel-title">@item.CommentType</h3>
+                                            }
+                                        </div>
+                                    }
+
+                                    <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
+                                        <div class="row col-lg-12">
+                                            @Html.Raw(item.Comment)
+                                        </div>
+                                        <div class="row col-lg-12">
+                                            <div class="col-lg-5"></div>
+                                            <div class="col-lg-1">
+                                                @if (ViewBag.assigee != null && ViewBag.assigee)
+                                                {
+                                                    if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.Result) == 0)
+                                                    {
+                                                        if (!string.IsNullOrEmpty(item.ResultClosed) && string.Compare(item.ResultClosed, "CLOSED") == 0)
                                                         {
-                                                            <h3 class="panel-title">@item.CommentType Investigation</h3>
                                                         }
                                                         else
                                                         {
-                                                            <h3 class="panel-title">@item.CommentType</h3>
+                                                            <button class="form-control" type="button" data-toggle="tooltip" title="Do not trace this result" value="ErrorKey=@(item.ErrorKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="CloseResultComment(this)">
+                                                                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                                                            </button>
                                                         }
-                                                    </div>
+                                                    }
                                                 }
-
-                                                <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
-                                                    <div class="row col-lg-12">
-                                                        @Html.Raw(item.Comment)
-                                                    </div>
-                                                    <div class="row col-lg-12">
-                                                        <div class="col-lg-5"></div>
-                                                        <div class="col-lg-1">
-                                                            @if (ViewBag.assigee != null && ViewBag.assigee)
-                                                            {
-                                                                if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.Result) == 0)
-                                                                {
-                                                                    if (!string.IsNullOrEmpty(item.ResultClosed) && string.Compare(item.ResultClosed, "CLOSED") == 0)
-                                                                    { }
-                                                                    else
-                                                                    {
-                                                                        <button class="form-control" type="button" data-toggle="tooltip" title="Do not trace this result" value="ErrorKey=@(item.ErrorKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="CloseResultComment(this)">
-                                                                            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-                                                                        </button>
-                                                                    }
-                                                                }
-                                                            }
-                                                        </div>
-                                                        <div class="col-lg-1">
-                                                            @if (ViewBag.assigee != null && ViewBag.assigee)
-                                                            {
-                                                                <button class="form-control" type="button" value="ErrorKey=@(item.ErrorKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="UpdateErrorComment(this)">
-                                                                    <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                                                                </button>
-                                                            }
-                                                        </div>
-                                                        <div class="col-lg-2">
-                                                            Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>
-                                                        </div>
-                                                        <div class="col-lg-2">
-                                                            @item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")
-                                                        </div>
-                                                        <div class="row col-lg-1">
-                                                            @if (ViewBag.assigee != null && ViewBag.assigee)
-                                                            {
-                                                                <button class="form-control" type="button" value="ErrorKey=@(item.ErrorKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="DeleteComment(this)">
-                                                                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                                                                </button>
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                </div>
-
                                             </div>
-                                            
-                                        }
+                                            <div class="col-lg-1">
+                                                @if (ViewBag.assigee != null && ViewBag.assigee)
+                                                {
+                                                    <button class="form-control" type="button" value="ErrorKey=@(item.ErrorKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="UpdateErrorComment(this)">
+                                                        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                                                    </button>
+                                                }
+                                            </div>
+                                            <div class="col-lg-2">
+                                                Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>
+                                            </div>
+                                            <div class="col-lg-2">
+                                                @item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")
+                                            </div>
+                                            <div class="row col-lg-1">
+                                                @if (ViewBag.assigee != null && ViewBag.assigee)
+                                                {
+                                                    <button class="form-control" type="button" value="ErrorKey=@(item.ErrorKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="DeleteComment(this)">
+                                                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                                    </button>
+                                                }
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-        }
 
+                                </div>
+
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            }
+        </div>
 
         <script type="text/javascript">
 
@@ -305,422 +342,366 @@
 
             function CloseResultComment(oBT) {
                 if (oBT.value) {
-                    if (confirm("Warning: Can you make sure this result do not need to trace any more?"))
-                    {
+                    if (confirm("Warning: Can you make sure this result do not need to trace any more?")) {
                         window.location.href = "/Project/CloseResultComment?" + oBT.value;
                     }
                 }
             }
         </script>
 
-        foreach (var item in Model.GeneralCommentList)
+        <div class="row">
+            <div class="col-lg-12">&nbsp;</div>
+        </div>
+
+        if (Model.GeneralCommentList.Count > 0)
         {
-            <hr />
-                <div class="form-group">
-                    <div class="col-lg-12">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
+            <div class="row">
+                <div class="row" style="margin-left:3px"><a data-toggle="collapse" href="#commentswell" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';"><font color="black"><strong>&nbsp;&nbsp;@(Model.GeneralCommentList.Count) Comments</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:20px; width:12px"></a></div>
+                <div class="row">
+                    <div class="col-lg-12">&nbsp;</div>
+                </div>
+                <div class="row" style="margin-left:10px">
+                    <div class="collapse" id="commentswell">
+                        @foreach (var item in Model.GeneralCommentList)
+                        {
+                            <div class="well" style="background-color:white;border-left-color:#006DC0;border-top-color:white;border-right-color:white;border-bottom-color:white;border-top-left-radius:0px;border-bottom-left-radius:0px">
                                 <div class="row">
-                                    <div class="col-lg-12">
-                                        <div class="col-lg-1">
-                                            <h3 class="panel-title">Comment</h3>
-                                        </div>
-                                        <div class="col-lg-8"></div>
-                                        <div class="col-lg-1">
-                                            @if (ViewBag.assigee != null && ViewBag.assigee)
-                                            {
-                                                <button class="form-control" type="button" value="ErrorKey=@(item.ErrorKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="UpdateErrorComment(this)">
-                                                    <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                                                </button>
-                                            }
-                                        </div>
-                                        <div class="col-lg-1"></div>
-                                        <div class="col-lg-1">
-                                            @if (ViewBag.assigee != null && ViewBag.assigee) { 
-                                            <button class="form-control" type="button"  value="ErrorKey=@(item.ErrorKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())"  onclick="DeleteComment(this)">
-                                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                                            </button>
-                                            }
-                                        </div>
+                                    <div class="col-lg-6">
+                                        <div class="col-lg-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")</div>
+                                        <div class="col-lg-2"><button class="form-control" type="button" value="ErrorKey=@(item.ErrorKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="UpdateErrorComment(this)"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></div>
                                     </div>
+                                    <div class="col-lg-6"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-11"><hr /></div>
+                                    <div class="col-lg-1"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-1"></div>
+                                    <div class="col-lg-11">@Html.Raw(item.Comment)</div>
                                 </div>
                             </div>
-                            <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
-                                @Html.Raw(item.Comment)
-                            </div>
-                            <div class="panel-footer text-right">
-                                Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")
-                            </div>
-                        </div>
+                        }
                     </div>
                 </div>
+
+
+            </div>
         }
 
         if (ViewBag.assigee != null && ViewBag.assigee)
         {
-        <hr />
-
             <div class="row">
-                <div class="form-group">
-                            <div class="col-lg-6">
-                                <div class="col-lg-2">
-                                    <label class="control-label" for="analysetitle">Analyse Title</label>
-                                </div>
-                                
-                                <div class="col-lg-10">
-                                        <input class="form-control text-box single-line"  id="analysetitle" name="analysetitle" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 200." data-val-length-max="200" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" type="text" value="" />
+                <div class="row" style="margin-left:3px"><a data-toggle="collapse" href="#AnalyseInput" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';"><font color="black"><strong>&nbsp;&nbsp;Analyse Input</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:20px; width:12px"></a></div>
+                <div class="row">
+                    <div class="col-lg-12">&nbsp;</div>
+                </div>
+                <div class="row" style="margin-left:10px">
+                    <div class="collapse" id="AnalyseInput">
+                        <div class="row">
+                            <div class="form-group">
+                                <div class="col-lg-12">
+                                    <div class="col-lg-2">
+                                        <label class="control-label" for="analysetitle">Analyse Title</label>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <input class="form-control text-box single-line" id="analysetitle" name="analysetitle" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 200." data-val-length-max="200" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" type="text" value="" />
                                         <span class="field-validation-valid text-danger" data-valmsg-for="analysetitle" data-valmsg-replace="true"></span>
+                                    </div>
+                                    <div class="col-lg-6">
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-12">&nbsp;</div>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group">
+                                Failure Detail
+                            </div>
+
+                            <div class="form-group">
+                                <div>
+                                    <textarea name="editor3" id="editor3" rows="10" cols="80"></textarea>
+                                    <script>
+                                        CKEDITOR.replace('editor3', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
+                                    </script>
                                 </div>
                             </div>
-                            <div class="col-lg-6">
-                            </div>
-                </div>
-            </div>
-            <hr/>
-            <div class="row">
-                <div class="form-group">
-                    Failure Detail
-                </div>
 
-                <div class="form-group">
-                    <div>
-                        <textarea name="editor3" id="editor3" rows="10" cols="80"></textarea>
-                        <script>
-                            CKEDITOR.replace('editor3', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
-                        </script>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="col-lg-4">
+                                            <span class="btn btn-default btn-file" id="choosefile6">
+                                                Editor Attachment <input type="file" name="file6" id="file6" runat="server" onchange="ShowFileNames6(this)" />
+                                            </span>
+                                        </div>
+                                        <div class="col-lg-1"></div>
+                                        <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                                        <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                                        <div class="col-lg-5"></div>
+                                    </div>
+                                    <script type="text/javascript">
+                                        function ShowFileNames6(oFile) {
+                                            ajaxFileUpload6();
+                                        }
+                                        function ajaxFileUpload6() {
+                                            $.ajaxFileUpload
+                                            (
+                                                {
+                                                    url: '/userfiles/ImageUpload.ashx',
+                                                    secureuri: false,
+                                                    fileElementId: 'file6',
+                                                    dataType: 'HTML',
+                                                    success: function (data, status) {
+                                                        var wholeval = CKEDITOR.instances.editor3.getData() + data;
+                                                        CKEDITOR.instances.editor3.setData(wholeval);
+                                                    },
+                                                    error: function (e) {
+                                                        alert(e);
+                                                    }
+                                                }
+                                            )
+                                            return false;
+                                        }
+                                    </script>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-12">&nbsp;</div>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group">
+                                Root Cause Investigation
+                            </div>
+
+                            <div class="form-group">
+                                <div>
+                                    <textarea name="editor2" id="editor2" rows="10" cols="80"></textarea>
+                                    <script>
+                                        CKEDITOR.replace('editor2', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
+                                    </script>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="col-lg-4">
+                                            <span class="btn btn-default btn-file" id="choosefile7">
+                                                Editor Attachment <input type="file" name="file7" id="file7" runat="server" onchange="ShowFileNames7(this)" />
+                                            </span>
+                                        </div>
+                                        <div class="col-lg-1"></div>
+                                        <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                                        <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                                        <div class="col-lg-5"></div>
+                                    </div>
+                                    <script type="text/javascript">
+                                        function ShowFileNames7(oFile) {
+                                            ajaxFileUpload7();
+                                        }
+                                        function ajaxFileUpload7() {
+                                            $.ajaxFileUpload
+                                            (
+                                                {
+                                                    url: '/userfiles/ImageUpload.ashx',
+                                                    secureuri: false,
+                                                    fileElementId: 'file7',
+                                                    dataType: 'HTML',
+                                                    success: function (data, status) {
+                                                        var wholeval = CKEDITOR.instances.editor2.getData() + data;
+                                                        CKEDITOR.instances.editor2.setData(wholeval);
+                                                    },
+                                                    error: function (e) {
+                                                        alert(e);
+                                                    }
+                                                }
+                                            )
+                                            return false;
+                                        }
+                                    </script>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-12">&nbsp;</div>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group">
+                                Result
+                            </div>
+
+                            <div class="form-group">
+                                <div>
+                                    <textarea name="resulteditor" id="resulteditor" rows="10" cols="80"></textarea>
+                                    <script>
+                                        CKEDITOR.replace('resulteditor', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
+                                    </script>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="col-lg-4">
+                                            <span class="btn btn-default btn-file" id="choosefile8">
+                                                Editor Attachment <input type="file" name="file8" id="file8" runat="server" onchange="ShowFileNames8(this)" />
+                                            </span>
+                                        </div>
+                                        <div class="col-lg-1"></div>
+                                        <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                                        <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                                        <div class="col-lg-5"></div>
+                                    </div>
+                                    <script type="text/javascript">
+                                        function ShowFileNames8(oFile) {
+                                            ajaxFileUpload8();
+                                        }
+                                        function ajaxFileUpload8() {
+                                            $.ajaxFileUpload
+                                            (
+                                                {
+                                                    url: '/userfiles/ImageUpload.ashx',
+                                                    secureuri: false,
+                                                    fileElementId: 'file8',
+                                                    dataType: 'HTML',
+                                                    success: function (data, status) {
+                                                        var wholeval = CKEDITOR.instances.resulteditor.getData() + data;
+                                                        CKEDITOR.instances.resulteditor.setData(wholeval);
+                                                    },
+                                                    error: function (e) {
+                                                        alert(e);
+                                                    }
+                                                }
+                                            )
+                                            return false;
+                                        }
+                                    </script>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="form-group">
+        }
+
+        <div class="row">
+            <div class="row" style="margin-left:3px"><a data-toggle="collapse" href="#CommentInput" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';"><font color="black"><strong>&nbsp;&nbsp;General Comment Input</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:20px; width:12px"></a></div>
+            <div class="row">
+                <div class="col-lg-12">&nbsp;</div>
+            </div>
+            <div class="row" style="margin-left:10px">
+                <div class="collapse" id="CommentInput">
                     <div class="row">
-                        <div class="col-lg-12">
-                            <div class="col-lg-4">
-                                <span class="btn btn-default btn-file" id="choosefile6">
-                                    Editor Attachment <input type="file" name="file6" id="file6" runat="server" onchange="ShowFileNames6(this)" />
-                                </span>
+                        <div class="form-group">
+                            <div>
+                                <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
+                                <script>
+                                        CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
+                                </script>
                             </div>
-                            <div class="col-lg-1"></div>
-                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                            <div class="col-lg-5"></div>
                         </div>
-                        <script type="text/javascript">
-                                            function ShowFileNames6(oFile) {
-                                                ajaxFileUpload6();
-                                            }
-                                            function ajaxFileUpload6() {
-                                                $.ajaxFileUpload
-                                                (
-                                                    {
-                                                        url: '/userfiles/ImageUpload.ashx',
-                                                        secureuri: false,
-                                                        fileElementId: 'file6',
-                                                        dataType: 'HTML',
-                                                        success: function (data, status)
-                                                        {
-                                                            var wholeval = CKEDITOR.instances.editor3.getData() + data;
-                                                            CKEDITOR.instances.editor3.setData(wholeval);
-                                                        },
-                                                        error: function (e)
-                                                        {
-                                                            alert(e);
-                                                        }
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="col-lg-4">
+                                        <span class="btn btn-default btn-file" id="choosefile9">
+                                            Editor Attachment <input type="file" name="file9" id="file9" runat="server" onchange="ShowFileNames9(this)" />
+                                        </span>
+                                    </div>
+                                    <div class="col-lg-1"></div>
+                                    <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                                    <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                                    <div class="col-lg-5"></div>
+                                </div>
+                                <script type="text/javascript">
+                                        function ShowFileNames9(oFile) {
+                                            ajaxFileUpload9();
+                                        }
+                                        function ajaxFileUpload9() {
+                                            $.ajaxFileUpload
+                                            (
+                                                {
+                                                    url: '/userfiles/ImageUpload.ashx',
+                                                    secureuri: false,
+                                                    fileElementId: 'file9',
+                                                    dataType: 'HTML',
+                                                    success: function (data, status) {
+                                                        var wholeval = CKEDITOR.instances.editor1.getData() + data;
+                                                        CKEDITOR.instances.editor1.setData(wholeval);
+                                                    },
+                                                    error: function (e) {
+                                                        alert(e);
                                                     }
-                                                )
+                                                }
+                                            )
+                                            return false;
+                                        }
+                                </script>
+                                @if (ViewBag.assigee != null && ViewBag.assigee)
+                                {
+                                    <script type="text/javascript">
+                                            function SaveUserContent() {
+                                                RealSaveUserContent(CKEDITOR.instances.editor1.getData());
+                                                RealSaveUserContent(CKEDITOR.instances.editor2.getData());
+                                                RealSaveUserContent(CKEDITOR.instances.editor3.getData());
+                                                RealSaveUserContent(CKEDITOR.instances.resulteditor.getData());
                                                 return false;
                                             }
-                        </script>
-                    </div>
-                </div>
-
-                @*<div class="form-group">
-                    <div class="col-lg-12">
-                        <div class="col-lg-4">
-                            <span class="btn btn-default btn-file" id="choosefile1">
-                                Failure Detail Attachement <input type="file" name="files1" id="file1" runat="server" onchange="ShowFileNames1(this)" />
-                            </span>
-                        </div>
-                        <div class="col-lg-8">
-                            <div class="col-lg-11">
-                                <label class="control-label" id="showfile1" name="showfile1"></label>
-                            </div>
-                            <div class="col-lg-1">
-                                <input class="form-control text-box single-line" value="" id="detailattach" name="detailattach" type="hidden" />
-                            </div>
-                        </div>
-                    </div>
-                    <script type="text/javascript">
-                        function ShowFileNames1(oFile) {
-                            $('#showfile1').text(oFile.value);
-                            document.getElementById("detailattach").value = oFile.value;
-                        }
-                    </script>
-                </div>*@
-            </div>
-
-            <hr />
-
-            <div class="row">
-                <div class="form-group">
-                    Root Cause Investigation
-                </div>
-
-                <div class="form-group">
-                    <div>
-                        <textarea name="editor2" id="editor2" rows="10" cols="80"></textarea>
-                        <script>
-                            CKEDITOR.replace('editor2', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
-                        </script>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="col-lg-4">
-                                <span class="btn btn-default btn-file" id="choosefile7">
-                                    Editor Attachment <input type="file" name="file7" id="file7" runat="server" onchange="ShowFileNames7(this)" />
-                                </span>
-                            </div>
-                            <div class="col-lg-1"></div>
-                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                            <div class="col-lg-5"></div>
-                        </div>
-                        <script type="text/javascript">
-                                            function ShowFileNames7(oFile) {
-                                                ajaxFileUpload7();
-                                            }
-                                            function ajaxFileUpload7() {
-                                                $.ajaxFileUpload
-                                                (
-                                                    {
-                                                        url: '/userfiles/ImageUpload.ashx',
-                                                        secureuri: false,
-                                                        fileElementId: 'file7',
-                                                        dataType: 'HTML',
-                                                        success: function (data, status)
-                                                        {
-                                                            var wholeval = CKEDITOR.instances.editor2.getData() + data;
-                                                            CKEDITOR.instances.editor2.setData(wholeval);
-                                                        },
-                                                        error: function (e)
-                                                        {
-                                                            alert(e);
-                                                        }
-                                                    }
-                                                )
+                                    </script>
+                                }
+                                else
+                                {
+                                    <script type="text/javascript">
+                                            function SaveUserContent() {
+                                                RealSaveUserContent(CKEDITOR.instances.editor1.getData());
                                                 return false;
                                             }
-                        </script>
-                    </div>
-                </div>
+                                    </script>
+                                }
+                            </div>
+                        </div>
 
-                @*<div class="form-group">
-                    <div class="col-lg-12">
-                        <div class="col-lg-4">
-                            <span class="btn btn-default btn-file" id="choosefile2">
-                                Root Cause Attachement <input type="file" name="files2" id="file2" runat="server" onchange="ShowFileNames2(this)" />
-                            </span>
-                        </div>
-                        <div class="col-lg-8">
-                            <div class="col-lg-11">
-                                <label class="control-label" id="showfile2" name="showfile2"></label>
-                            </div>
-                            <div class="col-lg-1">
-                                <input class="form-control text-box single-line" value="" id="rootattach" name="rootattach" type="hidden" />
-                            </div>
-                        </div>
                     </div>
-                    <script type="text/javascript">
-                        function ShowFileNames2(oFile) {
-                            $('#showfile2').text(oFile.value);
-                            document.getElementById("rootattach").value = oFile.value;
-                        }
-                    </script>
-                </div>*@
+
+                </div>
             </div>
+        </div>
 
-            <hr />
 
-            <div class="row">
-                <div class="form-group">
-                    Result
-                </div>
 
-                <div class="form-group">
-                    <div>
-                        <textarea name="resulteditor" id="resulteditor" rows="10" cols="80"></textarea>
-                        <script>
-                            CKEDITOR.replace('resulteditor', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
-                        </script>
+        <div class="row">
+            <div class="col-lg-12">&nbsp;</div>
+        </div>
+
+        <div class="row">
+            <div class="form-group">
+                <div class="col-lg-12">
+                    <div class="col-lg-2">
+                        <input type="submit" value="Submit" class="btn btn-default" />
                     </div>
+                    <div class="col-lg-2">
+                        <button class="btn btn-default" type="button" value="ErrorKey=@(Model.ErrorKey)&ToWho=" onclick="PushTask(this)">Push</button>
+                    </div>
+                    <div class="col-lg-8"><input class="form-control text-box single-line" value="" id="pushtowho" name="pushtowho" type="hidden" /></div>
                 </div>
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="col-lg-4">
-                                <span class="btn btn-default btn-file" id="choosefile8">
-                                    Editor Attachment <input type="file" name="file8" id="file8" runat="server" onchange="ShowFileNames8(this)" />
-                                </span>
-                            </div>
-                            <div class="col-lg-1"></div>
-                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                            <div class="col-lg-5"></div>
-                        </div>
-                        <script type="text/javascript">
-                                            function ShowFileNames8(oFile) {
-                                                ajaxFileUpload8();
-                                            }
-                                            function ajaxFileUpload8() {
-                                                $.ajaxFileUpload
-                                                (
-                                                    {
-                                                        url: '/userfiles/ImageUpload.ashx',
-                                                        secureuri: false,
-                                                        fileElementId: 'file8',
-                                                        dataType: 'HTML',
-                                                        success: function (data, status)
-                                                        {
-                                                            var wholeval = CKEDITOR.instances.resulteditor.getData() + data;
-                                                            CKEDITOR.instances.resulteditor.setData(wholeval);
-                                                        },
-                                                        error: function (e)
-                                                        {
-                                                            alert(e);
-                                                        }
-                                                    }
-                                                )
-                                                return false;
-                                            }
-                        </script>
-                    </div>
-                </div>
-                @*<div class="form-group">
-                    <div class="col-lg-12">
-                        <div class="col-lg-4">
-                            <span class="btn btn-default btn-file" id="choosefile4">
-                                Result Attachement <input type="file" name="files4" id="file4" runat="server" onchange="ShowFileNames4(this)" />
-                            </span>
-                        </div>
-                        <div class="col-lg-8">
-                            <div class="col-lg-11">
-                                <label class="control-label" id="showfile4" name="showfile4"></label>
-                            </div>
-                            <div class="col-lg-1">
-                                <input class="form-control text-box single-line" value="" id="resultattach" name="resultattach" type="hidden" />
-                            </div>
-                        </div>
-                    </div>
-                    <script type="text/javascript">
-                        function ShowFileNames4(oFile) {
-                            $('#showfile4').text(oFile.value);
-                            document.getElementById("resultattach").value = oFile.value;
-                        }
-                    </script>
-                </div>*@
             </div>
-
-            }
-
-            <hr />
-            <div class="row">
-                <div class="form-group">
-                    Comment
-                </div>
-
-                <div class="form-group">
-                    <div>
-                        <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
-                        <script>
-                            CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
-                        </script>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="col-lg-4">
-                                <span class="btn btn-default btn-file" id="choosefile9">
-                                    Editor Attachment <input type="file" name="file9" id="file9" runat="server" onchange="ShowFileNames9(this)" />
-                                </span>
-                            </div>
-                            <div class="col-lg-1"></div>
-                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                            <div class="col-lg-5"></div>
-                        </div>
-                        <script type="text/javascript">
-                                            function ShowFileNames9(oFile) {
-                                                ajaxFileUpload9();
-                                            }
-                                            function ajaxFileUpload9() {
-                                                $.ajaxFileUpload
-                                                (
-                                                    {
-                                                        url: '/userfiles/ImageUpload.ashx',
-                                                        secureuri: false,
-                                                        fileElementId: 'file9',
-                                                        dataType: 'HTML',
-                                                        success: function (data, status)
-                                                        {
-                                                            var wholeval = CKEDITOR.instances.editor1.getData() + data;
-                                                            CKEDITOR.instances.editor1.setData(wholeval);
-                                                        },
-                                                        error: function (e)
-                                                        {
-                                                            alert(e);
-                                                        }
-                                                    }
-                                                )
-                                                return false;
-                                            }
-                        </script>
-                        @if (ViewBag.assigee != null && ViewBag.assigee)
-                        {
-                            <script type="text/javascript">
-                            function SaveUserContent() {
-                                RealSaveUserContent(CKEDITOR.instances.editor1.getData());
-                                RealSaveUserContent(CKEDITOR.instances.editor2.getData());
-                                RealSaveUserContent(CKEDITOR.instances.editor3.getData());
-                                RealSaveUserContent(CKEDITOR.instances.resulteditor.getData());
-                                return false;
-                            }
-                            </script>
-                        }
-                        else
-                        {
-                            <script type="text/javascript">
-                            function SaveUserContent() {
-                                RealSaveUserContent(CKEDITOR.instances.editor1.getData());
-                                return false;
-                            }
-                            </script>
-                        }
-                    </div>
-                </div>
-
-            </div>
-
-            <hr />
-
-            <div class="row">
-                <div class="form-group">
-                    <div class="col-lg-12">
-                        <div class="col-lg-2">
-                            <input type="submit" value="Submit" class="btn btn-default" />
-                        </div>
-                        <div class="col-lg-2">
-                            <button class="btn btn-default" type="button" value="ErrorKey=@(Model.ErrorKey)&ToWho=" onclick="PushTask(this)">Push</button>
-                        </div>
-                        <div class="col-lg-8"><input class="form-control text-box single-line" value="" id="pushtowho" name="pushtowho" type="hidden" /></div>
-                    </div>
-                </div>
-                <script type="text/javascript">
-                function PushTask(oBT)
-                {
+            <script type="text/javascript">
+                function PushTask(oBT) {
                     document.getElementById("pushtowho").value = oBT.value;
                     if (CKEDITOR.instances.editor1.getData()) {
                         document.getElementById("issuereason").value = 'WITHCOMMENT:' + CKEDITOR.instances.editor1.getData();
@@ -747,60 +728,58 @@
 
                     window.location.href = myurl
                 }
-                </script>
-            </div>
-            
-            <div class="modal" id="towhotag" tabindex="-1" role="dialog" aria-labelledby="towhoLabel">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title" id="towhoLabel">Push Debug Tree</h4>
+            </script>
+        </div>
+
+        <div class="modal" id="towhotag" tabindex="-1" role="dialog" aria-labelledby="towhoLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="towhoLabel">Push Debug Tree</h4>
+                    </div>
+                    <div class="row"></div>
+                    <div class="row col-lg-12">
+                        <div class="col-lg-3">
+                            <label class="control-label">To Who</label>
                         </div>
-                        <div class="row"></div>
-                        <div class="row col-lg-12">
-                            <div class="col-lg-3">
-                                <label class="control-label">To Who</label>
-                            </div>
-                            <div class="col-lg-9">
-                                @if (ViewBag.towholist != null)
-                                {
-                                    @Html.DropDownList("towholist", null, new { @id = "towholist", @class = "form-control", @onchange = "chooseapusher()" })
-                                }
-                            </div>
-                            <script type="text/javascript">
-                                function chooseapusher()
-                                {
-                                    document.getElementById("towhoinput").value = document.getElementById("towholist").value + ';' + document.getElementById("towhoinput").value;
-                                }
-                            </script>
+                        <div class="col-lg-9">
+                            @if (ViewBag.towholist != null)
+                            {
+                                @Html.DropDownList("towholist", null, new { @id = "towholist", @class = "form-control", @onchange = "chooseapusher()" })
+                            }
                         </div>
-                        <hr />
-                        <div class="row col-lg-12">
-                            <div class="col-lg-3">
-                                <label class="control-label">To who Input</label>
-                            </div>
-                            <div class="col-lg-9" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
-                                <textarea class="form-control col-lg-12" name="towhoinput" id="towhoinput" style="height:100px;min-width:300px;"></textarea>
-                            </div>
+                        <script type="text/javascript">
+                            function chooseapusher() {
+                                document.getElementById("towhoinput").value = document.getElementById("towholist").value + ';' + document.getElementById("towhoinput").value;
+                            }
+                        </script>
+                    </div>
+                    <hr />
+                    <div class="row col-lg-12">
+                        <div class="col-lg-3">
+                            <label class="control-label">To who Input</label>
                         </div>
-                        <hr />
-                        <div class="row col-lg-12">
-                            <div class="col-lg-3">
-                                <label class="control-label">Push Comment<font color="red">*</font></label>
-                            </div>
-                            <div class="col-lg-9" data-toggle="tooltip" data-placement="center" title="Your Comment">
-                                <textarea class="form-control col-lg-12" name="issuereason" id="issuereason" style="height:100px;min-width:300px;"></textarea>
-                            </div>
+                        <div class="col-lg-9" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
+                            <textarea class="form-control col-lg-12" name="towhoinput" id="towhoinput" style="height:100px;min-width:300px;"></textarea>
                         </div>
-                        <div class="row"></div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-success" onclick="realpush()">Push</button>
+                    </div>
+                    <hr />
+                    <div class="row col-lg-12">
+                        <div class="col-lg-3">
+                            <label class="control-label">Push Comment<font color="red">*</font></label>
                         </div>
+                        <div class="col-lg-9" data-toggle="tooltip" data-placement="center" title="Your Comment">
+                            <textarea class="form-control col-lg-12" name="issuereason" id="issuereason" style="height:100px;min-width:300px;"></textarea>
+                        </div>
+                    </div>
+                    <div class="row"></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-success" onclick="realpush()">Push</button>
                     </div>
                 </div>
             </div>
-
+        </div>
     }
 
 

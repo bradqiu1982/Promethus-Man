@@ -6,32 +6,42 @@
 }
 
 <div class="row">
-    <div class="col-lg-3">
-
-@if (Model != null && Model.Count() > 0)
-{
-    <h2>@(Model.ElementAt(0).ProjectKey) Debug Tree</h2>
-}
-else
-{
-    <h2>Debug Tree</h2>
-}
-
-    </div>
-    <div class="col-lg-2">
-        @if (Model != null && Model.Count() > 0)
-        {
-            <h2><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ElementAt(0).ProjectKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
-        }
-        else
-        {
-            <h2><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
-        }
-    </div>
-    <div class="col-lg-7"></div>
+    <div class="col-lg-12">&nbsp;</div>
 </div>
-    
-<hr/>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+
+<div class="row">
+    <div class="col-lg-1 text-right">
+        <img src="~/Content/images/PJ/DebugTreeicon.png" style="height:45px; width:45px">
+    </div>
+    <div class="col-lg-11">
+        <ol class="breadcrumb" style="font-size:18px">
+            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
+            @if (Model != null && Model.Count() > 0)
+            {
+                <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ElementAt(0).ProjectKey)">Project Detail</a></li>
+            }
+
+            @if (Model != null && Model.Count() > 0)
+            {
+                <li class="active">@(Model.ElementAt(0).ProjectKey) Debug Tree</li>
+            }
+            else
+            {
+                <li class="active">Project Debug Tree</li>
+            }
+        </ol>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
 
 <script src="~/Scripts/highcharts.js"></script>
 <script src="~/Scripts/exporting.js"></script>
@@ -41,31 +51,27 @@ else
     @Html.Raw(ViewBag.chartscript)
 
     <div class="row">
-        <div class="col-lg-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Failure</h3>
-                </div>
-                <div class="panel-body">
-                    <div class="col-lg-12">
-                        <div id="failurepie" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-                    </div>
-                </div>
-            </div>
+        <div class="col-lg-2"></div>
+        <div class="col-lg-8">
+            <div id="failurepie" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
         </div>
+        <div class="col-lg-2"></div>
     </div>
 }
 
-<hr/>
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
 
 @if (Model != null)
 {
-    <div class="row">
-        <div class="col-lg-2 text-center">Error Code</div>
-        <div class="col-lg-3 text-center">Short Desc</div>
-        <div class="col-lg-2 text-center">Count</div>
-        <div class="col-lg-1 text-center">Attachement</div>
-        <div class="col-lg-1 text-center">FA</div>
+    <div class="row" style="background-color:#006DC0;font-family:'Arial Narrow';font-size:18px">
+        <div class="col-lg-2 text-center"><font color="white">Error Code</font></div>
+        <div class="col-lg-3 text-center"><font color="white">Short Desc</font></div>
+        <div class="col-lg-2 text-center"><font color="white">Count</font></div>
+        <div class="col-lg-1 text-center"><font color="white">Attachement</font></div>
+        <div class="col-lg-1 text-center"><font color="white">FA</font></div>
         <div class="col-lg-3 text-center"></div>
     </div>
 

@@ -108,8 +108,8 @@ namespace Prometheus.Controllers
 
             var filterlist = new List<SelectListItem>();
             var filteritem = new SelectListItem();
-            filteritem.Text = "NONE";
-            filteritem.Value = "NONE";
+            filteritem.Text = "Find Project";
+            filteritem.Value = "Find Project";
             filterlist.Add(filteritem);
 
             var startdate = DateTime.Now.AddDays(-7);
@@ -170,6 +170,7 @@ namespace Prometheus.Controllers
                 item.PendingRMACount = rmadone.ToString()+ "/" + rmatotal.ToString();
             }
 
+            filterlist[0].Disabled = true;
             filterlist[0].Selected = true;
             ViewBag.pjfilterlist = filterlist;
             SortPJ(projlist);

@@ -7,49 +7,55 @@
 }
 
 <div class="row">
-    <div class="col-lg-2">
-        @if (ViewBag.projectkey != null)
-        {
-            <h2>@ViewBag.projectkey FA</h2>
-        }
-        else
-        {
-            <h2>Project FA</h2>
-        }
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+<div class="row">
+    <div class="col-lg-1 text-right">
+        <img src="~/Content/images/PJ/FA.png" style="height:45px; width:45px">
     </div>
-    <div class="col-lg-2">
-        @if (ViewBag.chartscript == null && ViewBag.projectkey != null)
-        {
-            <h2><a data-toggle="tooltip" title="Goto FA Page" href="/Project/ProjectFA?ProjectKey=@(ViewBag.projectkey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
-        }
-        else if (ViewBag.projectkey != null)
-        {
-            <h2><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(ViewBag.projectkey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+    <div class="col-lg-9">
+        <ol class="breadcrumb" style="font-size:18px">
+            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
 
-        }
-        else
-        {
-            <h2><a data-toggle="tooltip" title="Goto ViewAll Page" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
-        }
-     </div>
-        
-
-    <div class="col-lg-2">
+            @if (ViewBag.projectkey != null)
+            {
+                <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(ViewBag.projectkey)">Project Detail</a></li>
+                <li><a href="/Project/ProjectFA?ProjectKey=@(ViewBag.projectkey)">All Pending FA</a></li>
+                <li class="active">@ViewBag.projectkey FA</li>
+            }
+            else
+            {
+                <li class="active">Project FA</li>
+            }
+        </ol>
+    </div>
+    <div class="col-lg-1 text-right">
         @if (ViewBag.projectkey != null)
         {
             using (Html.BeginForm("ProjectDoneFA", "Project", FormMethod.Post, new { enctype = "multipart/form-data" }))
             {
                 @Html.AntiForgeryToken()
                 <input class="form-control text-box single-line" value="@(ViewBag.projectkey)" id="HProjectKey" name="HProjectKey" type="hidden" />
-                <button data-toggle="tooltip" title="Done FA" type="submit" class="btn btn-default" style="font-size:1.5em; margin-top: 0.83em;margin-bottom: 0.83em;width:100%;">FA Done</button>
+                <button data-toggle="tooltip" title="Done FA" type="submit" class="btn btn-default"  style="background-color:#006DC0;color:white;">FA Done</button>
             }
         }
     </div>
-
-    <div class="col-lg-6"></div>
+    <div class="col-lg-1 text-right"></div>
 </div>
 
-<hr/>
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
 
 <script src="~/Scripts/highcharts.js"></script>
 <script src="~/Scripts/exporting.js"></script>
@@ -59,35 +65,34 @@
         @Html.Raw(ViewBag.chartscript)
 
         <div class="row">
-            <div class="col-lg-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Failure</h3>
-                    </div>
-                    <div class="panel-body">
-                        <div class="col-lg-12">
-                            <div id="failurepie" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-                        </div>
-                    </div>
-                </div>
+            <div class="col-lg-2"></div>
+            <div class="col-lg-8">
+                <div id="failurepie" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
             </div>
+            <div class="col-lg-2"></div>
         </div>
     }
 
-    <div class="row">
-        <div class="col-lg-3 text-center">ModuleSN</div>
-        <div class="col-lg-2 text-center">ErrAbbr</div>
-        <div class="col-lg-1 text-center">FA Status</div>
-        <div class="col-lg-1 text-center">Assignee</div>
-        <div class="col-lg-3 text-center">Issue</div>
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+    <div class="row" style="background-color:#006DC0;font-family:'Arial Narrow';font-size:18px">
+        <div class="col-lg-3 text-center"><font color="white">ModuleSN</font></div>
+        <div class="col-lg-2 text-center"><font color="white">ErrAbbr</font></div>
+        <div class="col-lg-1 text-center"><font color="white">FA Status</font></div>
+        <div class="col-lg-1 text-center"><font color="white">Assignee</font></div>
+        <div class="col-lg-3 text-center"><font color="white">Failure Desc</font></div>
         <div class="col-lg-2">
-            <div class="col-lg-4 text-center">Date</div>
-            <div class="col-lg-3 text-center"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></div>
-            <div class="col-lg-5 text-center">LYT</div>
+            <div class="col-lg-4 text-center"><font color="white">Date</font></div>
+            <div class="col-lg-3 text-center"><font color="white"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></font></div>
+            <div class="col-lg-5 text-center"><font color="white">LYT</font></div>
         </div>
     </div>
 
-    <hr />
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
 
 
     @if (Model != null)
@@ -101,12 +106,10 @@
                 var i = 0;
                 foreach (var item in Model)
                 {
-                            <div class="row">
+                            <div class="row" style="font-family:'Arial Narrow';">
                                 <div class="col-lg-3">
                                     <div class="col-lg-3 text-center">
-                                        <span class="input-group-addon">
                                             <input type="checkbox" id="check@(i)" name="check@(i)" value="true"/>
-                                        </span>
                                         <input class="form-control text-box single-line" value="@item.IssueData.IssueKey" id="HIssueKey@(i)" name="HIssueKey@(i)" type="hidden" />
                                     </div>
 
@@ -173,9 +176,7 @@
                 {
                     <div class="row">
                         <div class="col-lg-1 text-center">
-                            <span class="input-group-addon">
                                 <input type="checkbox" id="checkall" name="checkall" onclick="ChooseAll(this)" />
-                            </span>
                         </div>
                         <div class="col-lg-2 text-center">
                             <input type="submit" value="Same As" class="btn btn-default" />
@@ -236,12 +237,12 @@
                 var i = 0;
                 foreach (var item in Model)
                 {
-                    <div class="row">
+                    <div class="row" style="font-family:'Arial Narrow';">
                         <div class="col-lg-3">
                             <div class="col-lg-3 text-center">
-                                <span class="input-group-addon">
+ 
                                     <input type="checkbox" id="check@(i)" name="check@(i)" value="true" />
-                                </span>
+
                                 <input class="form-control text-box single-line" value="@item.IssueData.IssueKey" id="HIssueKey@(i)" name="HIssueKey@(i)" type="hidden" />
                             </div>
                             <div class="col-lg-4 text-center">
@@ -314,9 +315,7 @@
                 {
                     <div class="row">
                         <div class="col-lg-1 text-center">
-                            <span class="input-group-addon">
                                 <input type="checkbox" id="checkall" name="checkall" onclick="ChooseAll(this)" />
-                            </span>
                         </div>
                         <div class="col-lg-2 text-center">
                             <input type="submit" value="Assign To" class="btn btn-default" />

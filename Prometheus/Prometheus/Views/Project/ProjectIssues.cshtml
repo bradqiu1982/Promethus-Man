@@ -30,195 +30,115 @@
     }
 }
 
-@if (Model != null && Model.Count() > 0)
-{
-    <div class="row">
-        <div class="col-lg-3">
-            <h2>@(Model.ElementAt(0).ProjectKey) Tasks</h2>
-        </div>
-        <div class="col-lg-2">
-            <h2><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ElementAt(0).ProjectKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
-        </div>
-        <div class="col-lg-7"></div>
-    </div>
-}
-else
-{
-    <div class="row">
-        <div class="col-lg-3">
-            <h2>Project Issues</h2>
-        </div>
-        <div class="col-lg-2">
-            <h2><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
-        </div>
-        <div class="col-lg-7"></div>
-    </div>
-}
-
-<hr />
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
 
 <div class="row">
-    <div class="col-lg-12">
-        <div class="col-lg-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Pending</h3>
-                </div>
-                <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;height:420px;">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
 
-                    <table id="pendingtable" class="display" cellspacing="0">
-                        <thead>
-                            <tr>
-                                <th style="text-align:center;font-size:12px">Issue Summary</th>
-                                <th style="text-align:center;font-size:12px">Owner</th>
-                                <th style="text-align:center;font-size:12px">Date</th>
-                            </tr>
-                        </thead>
+<div class="row">
+    <div class="col-lg-1 text-right">
+        <img src="~/Content/images/PJ/Task.png" style="height:45px; width:45px">
+    </div>
+    <div class="col-lg-11">
+        <ol class="breadcrumb" style="font-size:18px">
+            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
+            @if (Model != null && Model.Count() > 0)
+            {
+                <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ElementAt(0).ProjectKey)">Project Detail</a></li>
+            }
+            <li class="active">Project Tasks</li>
+        </ol>
+    </div>
+</div>
 
-                        <tbody>
-                           @foreach (var item in pendinglist)
-                           {
-                                <tr>
-                                    <td style="text-align:center;font-size:12px"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></td>
-                                    <td style="text-align:center;font-size:12px"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></td>
-                                    <td style="text-align:center;font-size:12px">@item.ReportDate.ToString("dd/MM")</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+<div class="row" style="font-size:18px"><strong>&nbsp;&nbsp;Task List</strong></div>
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
 
-                    <script type="text/javascript">
-                        $(document).ready(function() {
-                            $('#pendingtable').DataTable({
-                                'iDisplayLength': 50,
-                                'bLengthChange': false,
-                                "bAutoWidth": false,
-                                "aaSorting": [],
-                                "order": []
-                            });
-                        });
-                    </script>
-
-                    @*@foreach (var item in pendinglist)
-                    {
-                        <div class="panel-body">
-                            <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a> Asingned To <a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a>
+<div class="panel-group" id="accordion">
+    <div class="panel panel-default" id="panelpending">
+        <div class="panel-heading" style="background-color:#00A4BB;">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-target="#collapsepending" href="#collapsepending" class="collapsed" style="font-family:'Arial Narrow'"><font color="white">Pending&nbsp;&nbsp;&nbsp;@(pendinglist.Count)</font></a>
+            </h4>
+        </div>
+        <div id="collapsepending" class="panel-collapse collapse">
+            <div class="panel-body">
+                @foreach (var item in pendinglist)
+                {
+                    <div class="row">
+                        <div class="col-lg-5"><a href="/Project/ProjectDetail?ProjectKey=@item.ProjectKey">[@item.ProjectKey]&nbsp;</a> <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></div>
+                        <div class="col-lg-1"></div>
+                        <div class="col-lg-2">Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a></div>
+                        <div class="col-lg-1">@item.ReportDate.ToString("MM/dd-yy")</div>
+                        <div class="col-lg-1"><a data-toggle="tooltip" title="move to working" href="/Issue/MoveTask2Working?issuekey=@(item.IssueKey)"><font color="#006DC0"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span></font></a></div>
+                        <div class="col-lg-2"></div>
+                    </div>
+                        <div class="row" style="margin:-0.25em;">
+                            <div class="col-lg-12">&nbsp;</div>
                         </div>
-                            <div class="panel-body text-right">
-                                Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString()
-                            </div>
-                            <hr />
-                    }*@
-                </div>
+                }
             </div>
         </div>
-        <div class="col-lg-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Working</h3>
-                </div>
+    </div>
 
-                <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;height:420px;">
-
-                    <table id="workingtable" class="display" cellspacing="0">
-                        <thead>
-                            <tr>
-                                <th style="text-align:center;font-size:12px">Issue Summary</th>
-                                <th style="text-align:center;font-size:12px">Owner</th>
-                                <th style="text-align:center;font-size:12px">Date</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            @foreach (var item in workinglist)
-                            {
-                                <tr>
-                                    <td style="text-align:center;font-size:12px"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></td>
-                                    <td style="text-align:center;font-size:12px"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></td>
-                                    <td style="text-align:center;font-size:12px">@item.ReportDate.ToString("dd/MM")</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-
-                    <script type="text/javascript">
-                        $(document).ready(function() {
-                            $('#workingtable').DataTable({
-                                'iDisplayLength': 50,
-                                'bLengthChange': false,
-                                "bAutoWidth": false,
-                                "aaSorting": [],
-                                "order": []
-                            });
-                        });
-                    </script>
-
-                    @*@foreach (var item in workinglist)
-                    {
-                        <div class="panel-body">
-                            <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a> Asingned To <a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a>
+    <div class="panel panel-default" id="panelworking">
+        <div class="panel-heading" style="background-color:#006DC0;">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-target="#collapseworking" href="#collapseworking" class="collapsed" style="font-family:'Arial Narrow'"><font color="white">Working&nbsp;&nbsp;&nbsp;@(workinglist.Count)</font></a>
+            </h4>
+        </div>
+        <div id="collapseworking" class="panel-collapse collapse">
+            <div class="panel-body">
+                @foreach (var item in workinglist)
+                {
+                    <div class="row">
+                        <div class="col-lg-5"><a href="/Project/ProjectDetail?ProjectKey=@item.ProjectKey">[@item.ProjectKey]&nbsp;</a> <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></div>
+                        <div class="col-lg-1"></div>
+                        <div class="col-lg-2">Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a></div>
+                        <div class="col-lg-1">@item.ReportDate.ToString("MM/dd-yy")</div>
+                        <div class="col-lg-1"></div>
+                        <div class="col-lg-2"></div>
+                    </div>
+                        <div class="row" style="margin:-0.25em;">
+                            <div class="col-lg-12">&nbsp;</div>
                         </div>
-                            <div class="panel-body text-right">
-                                Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString()
-                            </div>
-                            <hr />
-                    }*@
-                </div>
+                }
             </div>
         </div>
-        <div class="col-lg-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Done</h3>
-                </div>
+    </div>
 
-                <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;height:420px;">
-
-                    <table id="donetable" class="display" cellspacing="0">
-                        <thead>
-                            <tr>
-                                <th style="text-align:center;font-size:12px">Issue Summary</th>
-                                <th style="text-align:center;font-size:12px">Owner</th>
-                                <th style="text-align:center;font-size:12px">Date</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            @foreach (var item in donelist)
-                            {
-                                <tr>
-                                    <td style="text-align:center;font-size:12px"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></td>
-                                    <td style="text-align:center;font-size:12px"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></td>
-                                    <td style="text-align:center;font-size:12px">@item.ReportDate.ToString("dd/MM")</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-
-                    <script type="text/javascript">
-                        $(document).ready(function() {
-                            $('#donetable').DataTable({
-                                'iDisplayLength': 50,
-                                'bLengthChange': false,
-                                "bAutoWidth": false,
-                                "aaSorting": [],
-                                "order": []
-                            });
-                        });
-                    </script>
-
-                    @*@foreach (var item in donelist)
-                    {
-                        <div class="panel-body">
-                            <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a> Asingned To <a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a>
+    <div class="panel panel-default" id="paneldone">
+        <div class="panel-heading" style="background-color:#00C28D;">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-target="#collapsedone" href="#collapsedone" class="collapsed" style="font-family:'Arial Narrow'"><font color="white">Done&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@(donelist.Count)</font></a>
+            </h4>
+        </div>
+        <div id="collapsedone" class="panel-collapse collapse">
+            <div class="panel-body">
+                @foreach (var item in donelist)
+                {
+                    <div class="row">
+                        <div class="col-lg-5"><a href="/Project/ProjectDetail?ProjectKey=@item.ProjectKey">[@item.ProjectKey]&nbsp;</a> <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></div>
+                        <div class="col-lg-1"></div>
+                        <div class="col-lg-2">Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a></div>
+                        <div class="col-lg-1">@item.ReportDate.ToString("MM/dd-yy")</div>
+                        <div class="col-lg-1"></div>
+                        <div class="col-lg-2"></div>
+                    </div>
+                        <div class="row" style="margin:-0.25em;">
+                            <div class="col-lg-12">&nbsp;</div>
                         </div>
-                            <div class="panel-body text-right">
-                                Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.ReportDate.ToString()
-                            </div>
-                            <hr />
-                    }*@
-                </div>
+                }
             </div>
         </div>
     </div>
 </div>
+

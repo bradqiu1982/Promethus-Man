@@ -31,36 +31,72 @@
 <script src="~/Scripts/highcharts.js"></script>
 <script src="~/Scripts/exporting.js"></script>
 
-@if (ViewBag.myranksummary != null)
+@if (ViewBag.myranksummary != null
+    && ViewBag.myissuesummary != null)
 {
-    <div class="row col-lg-12">
-        <h2>Total Rank @ViewBag.myranksummary[0].TotalRank</h2>
+    var item2 = ViewBag.myissuesummary[0];
+
+    <div class="row col-lg-12" style="font-family:'Arial Narrow';font-size:20px">
+        Total Rank @ViewBag.myranksummary[0].TotalRank
     </div>
-            <hr />
-    foreach (var item in ViewBag.myranksummary)
+
+    <div class="row">
+        <div class="col-lg-12">&nbsp;</div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="col-lg-1">Task</div>
+            <div class="col-lg-2 text-left" style="font-family:'Arial Narrow';font-size:16px">
+                <a href="/User/UserIssues?username=@item2.CurrentUser&month=1" target="_blank">
+                    Pending Issue <span class="badge alert-danger">@item2.PendingIssueCount.ToString()</span>
+                </a>
+            </div>
+            <div class="col-lg-2 text-left" style="font-family:'Arial Narrow';font-size:16px">
+                <a href="/User/UserIssues?username=@item2.CurrentUser&month=1" target="_blank">
+                    Working Issue <span class="badge alert-info">@item2.WorkingIssueCount.ToString()</span>
+                </a>
+            </div>
+            <div class="col-lg-2 text-left" style="font-family:'Arial Narrow';font-size:16px">
+                <a href="/User/UserIssues?username=@item2.CurrentUser&month=1" target="_blank">
+                    Done Issue <span class="badge alert-success">@item2.DoneIssueCount.ToString()</span>
+                </a>
+            </div>
+            <div class="col-lg-5"></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">&nbsp;</div>
+    </div>
+
     {
+        var item1 = ViewBag.myranksummary[0];
+        
         <div class="row">
             <div class="col-lg-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title"><a href="/User/UserCenter?username=@item.CurrentUser">@item.CurrentUser.Split(new char[] { '@' })[0] Rank</a></h3>
-                    </div>
-                    <div class="panel-body">
-                        <div class="row col-lg-12">
-                            <div class="row">
-                                <div id="@((item.CurrentUser.Split(new char[] { '@' })[0]).Replace(".",""))userrankchart" style="height: 400px; margin: 0 auto;width:648px"></div>
-                            </div>
-                        </div>
-
-                    </div>
+                <div class="col-lg-6">
+                    @Html.Raw(item1.UserRankTrend)
+                    <div id="@((item1.CurrentUser.Split(new char[] { '@' })[0]).Replace(".",""))userrankchart" style="margin: 0 auto;"></div>
+                </div>
+                <div class="col-lg-6">
+                    @Html.Raw(item2.UserIssueTrend)
+                    <div id="@((item2.CurrentUser.Split(new char[] { '@' })[0]).Replace(".",""))issuetrendchart" style="margin: 0 auto;"></div>
                 </div>
             </div>
         </div>
-                @Html.Raw(item.UserRankTrend)
     }
 }
 
-@if (ViewBag.myissuesummary != null)
+@*@if (ViewBag.myissuesummary != null)
+{
+    foreach (var item in ViewBag.myissuesummary)
+    {
+        @Html.Raw(item.UserIssueTrend)
+    }
+}*@
+
+@*@if (ViewBag.myissuesummary != null)
 {
     <hr />
     foreach (var item in ViewBag.myissuesummary)
@@ -103,7 +139,7 @@
         </div>
                 @Html.Raw(item.UserIssueTrend)
     }
-}
+}*@
 
 <div class="row">
     <div class="col-lg-12">&nbsp;</div>

@@ -114,15 +114,11 @@
         <div class="row">
             <div class="col-lg-12">&nbsp;</div>
         </div>
-        <div class="row">
-            <div class="col-lg-12">&nbsp;</div>
-        </div>
+
 
 
         }
-        <hr />
 }
-
 
 
 @if (ViewBag.icareissuelist != null && ViewBag.icareranklist != null)
@@ -130,70 +126,59 @@
     var idx = 0;
     foreach (var item in ViewBag.icareissuelist)
     {
+        <hr style="border-color:#0F4FA8;" />
+
+        <div class="row col-lg-12" style="font-family:'Arial Narrow';font-size:20px">
+           @ViewBag.icareranklist[idx].CurrentUser.Split(new char[] { '@' })[0] Total Rank @ViewBag.icareranklist[idx].TotalRank
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">&nbsp;</div>
+        </div>
 
         <div class="row">
             <div class="col-lg-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">
-                            <a href="/User/UserCenter?username=@ViewBag.icareranklist[idx].CurrentUser">@ViewBag.icareranklist[idx].CurrentUser.Split(new char[] { '@' })[0] Total Rank @ViewBag.icareranklist[idx].TotalRank</a>
-                        </h3>
-                    </div>
-                    <div class="panel-body">
-                        <div class="row col-lg-12">
-                            <div class="row">
-                                <div id="@((ViewBag.icareranklist[idx].CurrentUser.Split(new char[] { '@' })[0]).Replace(".",""))userrankchart" style="height: 400px; margin: 0 auto;width:648px"></div>
-                            </div>
-                        </div>
+                <div class="col-lg-1">Task</div>
+                <div class="col-lg-2 text-left" style="font-family:'Arial Narrow';font-size:16px">
+                    <a href="/User/UserIssues?username=@item.CurrentUser&month=@ViewBag.icaremonth" target="_blank">
+                        Pending Issue <span class="badge alert-danger">@item.PendingIssueCount.ToString()</span>
+                    </a>
+                </div>
+                <div class="col-lg-2 text-left" style="font-family:'Arial Narrow';font-size:16px">
+                    <a href="/User/UserIssues?username=@item.CurrentUser&month=@ViewBag.icaremonth" target="_blank">
+                        Working Issue <span class="badge alert-info">@item.WorkingIssueCount.ToString()</span>
+                    </a>
+                </div>
+                <div class="col-lg-2 text-left" style="font-family:'Arial Narrow';font-size:16px">
+                    <a href="/User/UserIssues?username=@item.CurrentUser&month=@ViewBag.icaremonth" target="_blank">
+                        Done Issue <span class="badge alert-success">@item.DoneIssueCount.ToString()</span>
+                    </a>
+                </div>
+                <div class="col-lg-5"></div>
+            </div>
+        </div>
 
-                    </div>
+        <div class="row">
+            <div class="col-lg-12">&nbsp;</div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="col-lg-6">
+                    @Html.Raw(ViewBag.icareranklist[idx].UserRankTrend)
+                    <div id="@((ViewBag.icareranklist[idx].CurrentUser.Split(new char[] { '@' })[0]).Replace(".",""))userrankchart" style="margin: 0 auto;"></div>
+                </div>
+                <div class="col-lg-6">
+                    @Html.Raw(item.UserIssueTrend)
+                    <div id="@((item.CurrentUser.Split(new char[] { '@' })[0]).Replace(".",""))issuetrendchart" style="margin: 0 auto;"></div>
                 </div>
             </div>
         </div>
-                @Html.Raw(ViewBag.icareranklist[idx].UserRankTrend)
-
         idx = idx + 1;
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title"><a href="/User/UserCenter?username=@item.CurrentUser">@item.CurrentUser.Split(new char[] { '@' })[0] Issues</a></h3>
-                    </div>
-                    <div class="panel-body">
-                        <div class="row col-lg-12">
-                            <div class="col-lg-3">
-                                <a href="/User/UserIssues?username=@item.CurrentUser&month=@ViewBag.icaremonth" target="_blank">
-                                    Working Issue <span class="badge alert-info">@item.WorkingIssueCount.ToString()</span>
-                                </a>
-                            </div>
-                            <div class="col-lg-3">
-                                <a href="/User/UserIssues?username=@item.CurrentUser&month=@ViewBag.icaremonth" target="_blank">
-                                    Done Issue <span class="badge alert-success">@item.DoneIssueCount.ToString()</span>
-                                </a>
-                            </div>
-                            <div class="col-lg-3">
-                                <a href="/User/UserIssues?username=@item.CurrentUser&month=@ViewBag.icaremonth" target="_blank">
-                                    Pending Issue <span class="badge alert-danger">@item.PendingIssueCount.ToString()</span>
-                                </a>
-                            </div>
-                            <div class="col-lg-3"></div>
-                        </div>
-                        <hr />
-                        <div class="row col-lg-12">
-                            <div class="row">
-                                <div id="@((item.CurrentUser.Split(new char[] { '@' })[0]).Replace(".",""))issuetrendchart" style="height: 400px; margin: 0 auto;width:648px"></div>
-                            </div>
-                        </div>
 
-                    </div>
-                </div>
-            </div>
-        </div>
-                @Html.Raw(item.UserIssueTrend)
+
+
     }
 
 }
 
-<div class="row">
-    <div class="col-lg-12">&nbsp;</div>
-</div>

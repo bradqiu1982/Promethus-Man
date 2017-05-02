@@ -10,3 +10,7 @@ Prometheus/Prometheus.Tests/obj/Release/
 Prometheus/Prometheus/userfiles/VCSEL-EMAIL-CHECK
 Prometheus/Prometheus.Tests/obj
 Prometheus/Prometheus/obj/
+Prometheus/Prometheus/App_Data/Prometheus.mdf
+Prometheus/Prometheus/App_Data/Prometheus_log.ldf
+Prometheus/Prometheus/Properties/PublishProfiles/Test.pubxml.user
+Prometheus/Prometheus/userfiles/log2017-04-26

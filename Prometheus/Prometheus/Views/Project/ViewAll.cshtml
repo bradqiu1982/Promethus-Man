@@ -72,164 +72,181 @@
                     {
                         if (string.Compare(item.ProjectType, pjtype, true) != 0)
                         { continue; }
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="col-lg-2">
 
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="panel panel-default">
-                                        <div class="panel-heading">
+                                        <div class="well"  style="background-color:white;border-left-color:#006DC0;border-top-color:snow;border-right-color:white;border-bottom-color:white;border-top-left-radius:0px;border-bottom-left-radius:0px">
+                                            <div class="row text-left">
+                                                <a href="/Project/ProjectDetail?ProjectKey=@item.ProjectKey" style="font-size:18px;">@item.ProjectName</a>
+                                            </div>
+
+                                            @if (!string.IsNullOrEmpty(item.CurrentNPIProc)
+                                                && !string.IsNullOrEmpty(item.PIP1Date)
+                                                && !string.IsNullOrEmpty(item.MVTDate))
+                                            {
+                                                <div class="row text-left">
+                                                    <div class="col-lg-1"></div>
+                                                    <div class="col-lg-11">
+                                                        <a href="/Issue/UpdateIssue?issuekey=@item.CurrentNPIProcKey" style="font-size:14px;">@item.CurrentNPIProc</a>
+                                                    </div>
+                                                </div>
+                                                <div class="row text-left">
+                                                    <div class="col-lg-1"></div>
+                                                    <div class="col-lg-11" style="font-size:14px;">@item.PIP1Date</div>
+                                                </div>
+                                                <div class="row text-left">
+                                                    <div class="col-lg-1"></div>
+                                                    <div class="col-lg-11" style="font-size:14px;">@item.MVTDate</div>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="row">
+                                                    <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                                </div>
+                                            }
+                                        </div>
+                                </div>
+
+                                @if (string.Compare(item.ProjectType, Prometheus.Models.ProjectTypeInf.QM) != 0)
+                                {
+                                    <div class="col-lg-2">
+                                        <div class="col-lg-7" data-toggle="tooltip" title="Yield">
+                                            <a href="/Project/ProjectYieldMain?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/Yield.png" style="height:100px; width:100px"></a>
+                                        </div>
+                                        <div class="col-lg-5">
                                             <div class="row">
-                                                <div class="col-lg-3">
-                                                    <a href="/Project/ProjectDetail?ProjectKey=@item.ProjectKey">
-                                                        <span class="glyphicon glyphicon-home" aria-hidden="true"></span> @item.ProjectName
-                                                    </a>
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+
+                                            @if (item.FirstYield > 0)
+                                            {
+                                                <div class="row"><span class="badge" style="color:white;background-color:red">FPY @((item.FirstYield * 100.0).ToString("0.0")) %</span></div>
+                                            }
+                                            else
+                                            {
+                                                <div class="row">
+                                                    <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                                 </div>
-                                                <div class="col-lg-6"></div>
-                                                <div class="col-lg-3 text-right">
-                                                    <a href="/Project/EditProject?ProjectKey=@item.ProjectKey">
-                                                        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Modify
-                                                    </a>
+                                            }
+                                            @if (item.RetestYield > 0)
+                                            {
+                                                <div class="row"><span class="badge" style="color:white;background-color:red">FY @((item.RetestYield * 100.0).ToString("0.0")) %</span></div>
+                                            }
+                                            else
+                                            {
+                                                <div class="row">
+                                                    <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                                 </div>
+                                            }
+
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <div class="col-lg-7">
+                                            <a href="/Project/ProjectFA?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/FA.png" style="height:100px; width:100px"></a>
+                                        </div>
+                                        <div class="col-lg-5">
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                                @if (item.FinishRating < 90)
+                                                {
+                                                    <div class="row"><span class="badge" style="color:white;background-color:red">@item.PendingFACount</span></div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="row"><span class="badge" style="color:white;background-color:forestgreen">@item.PendingFACount</span></div>
+                                                }
                                             </div>
                                         </div>
-                                        @if (string.Compare(item.ProjectType, Prometheus.Models.ProjectTypeInf.QM) != 0)
-                                        {
-                                            <div class="panel-body col-lg-12">
-                                                <div class="row col-lg-12">
-                                                    <div class="col-lg-2 text-left">
-                                                        @if (item.FirstYield > 0)
-                                                        {
-                                                            <a href="/Project/ProjectYieldMain?ProjectKey=@item.ProjectKey">
-                                                                <span class="glyphicon glyphicon-stats" aria-hidden="true"></span> FPY @((item.FirstYield * 100.0).ToString("0.0")) %
-                                                            </a>
-                                                        }
-                                                        else
-                                                        {
-                                                            <a href="/Project/ProjectYieldMain?ProjectKey=@item.ProjectKey">
-                                                                <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>Project Yield
-                                                            </a>
-                                                        }
-                                                    </div>
-                                                    <div class="col-lg-2">
-                                                        @if (item.RetestYield > 0)
-                                                        {
-                                                            <a href="/Project/ProjectYieldMain?ProjectKey=@item.ProjectKey">
-                                                                <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>FY @((item.RetestYield * 100.0).ToString("0.0")) %
-                                                            </a>
-                                                        }
-                                                    </div>
-
-                                                    <div class="col-lg-2 text-center">
-                                                        <a href="/Project/ProjectFA?ProjectKey=@item.ProjectKey">
-                                                            <span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span> Project FA
-                                                            @if (item.FinishRating < 90)
-                                                            {
-                                                                <span class="badge alert-danger">@item.PendingFACount</span>
-                                                            }
-                                                            else
-                                                            {
-                                                                <span class="badge alert-success">@item.PendingFACount</span>
-                                                            }
-                                                        </a>
-                                                    </div>
-
-                                                    <div class="col-lg-2 text-center">
-                                                        <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey">
-                                                            <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span> Project Tasks <span class="badge alert-danger">@item.PendingTaskCount</span>
-                                                        </a>
-                                                    </div>
-
-                                                    <div class="col-lg-2 text-center">
-                                                        <a href="/BurnIn/BurnInMainPage?ProjectKey=@item.ProjectKey" target="_blank">
-                                                            <span class="glyphicon glyphicon-fire" aria-hidden="true"></span> Project Burn-In
-                                                        </a>
-                                                    </div>
-
-                                                    <div class="col-lg-2 text-center">
-                                                        <a href="/Project/ProjectRMAStatus?ProjectKey=@item.ProjectKey">
-                                                            <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> RMA Status<span class="badge alert-danger">@item.PendingRMACount</span>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                                <hr />
-                                                <div class="row col-lg-12">
-                                                    <div class="col-lg-2 text-left">
-                                                        <a href="/Project/ProjectError?ProjectKey=@item.ProjectKey">
-                                                            <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span> Debug Tree
-                                                        </a>
-                                                    </div>
-
-                                                    <div class="col-lg-2 text-center">
-                                                        <a href="/Project/ProjectNPI?ProjectKey=@item.ProjectKey">
-                                                            <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Project NPI Process
-                                                        </a>
-                                                    </div>
-
-                                                    @if (!string.IsNullOrEmpty(item.CurrentNPIProc)
-                                                         && !string.IsNullOrEmpty(item.PIP1Date)
-                                                         && !string.IsNullOrEmpty(item.MVTDate))
-                                                    {
-                                                        <div class="col-lg-1 text-center active"><a href="/Issue/UpdateIssue?issuekey=@item.CurrentNPIProcKey">@item.CurrentNPIProc</a></div>
-                                                        <div class="col-lg-2 text-center active">@item.PIP1Date</div>
-                                                        <div class="col-lg-2 text-center active">@item.MVTDate</div>
-                                                        <div class="col-lg-3 text-center"></div>
-                                                    }
-                                                    else
-                                                    {
-                                                        <div class="col-lg-8 text-center"></div>
-                                                    }
-
-                                                </div>
-
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            <div class="panel-body col-lg-12">
-                                                <div class="row col-lg-12">
-                                                    
-                                                    <div class="col-lg-2 text-center">
-                                                        <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey">
-                                                            <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span> Project Tasks <span class="badge alert-danger">@item.PendingTaskCount</span>
-                                                        </a>
-                                                    </div>
-
-                                                    <div class="col-lg-2 text-center">
-                                                        <a href="/Project/ProjectRMAStatus?ProjectKey=@item.ProjectKey">
-                                                            <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> RMA Status<span class="badge alert-danger">@item.PendingRMACount</span>
-                                                        </a>
-                                                    </div>
-
-                                                    <div class="col-lg-2 text-left">
-                                                        <a href="/Project/ProjectOBA?ProjectKey=@item.ProjectKey">
-                                                            <span class="glyphicon glyphicon-record" aria-hidden="true"></span> Project OBA
-                                                        </a>
-                                                    </div>
-
-                                                    <div class="col-lg-2 text-left">
-                                                        <a href="/Project/ProjectQuality?ProjectKey=@item.ProjectKey">
-                                                            <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> Quality Issue
-                                                        </a>
-                                                    </div>
-
-                                                    <div class="col-lg-2 text-left">
-                                                        <a href="/Project/ProjectReliability?ProjectKey=@item.ProjectKey">
-                                                            <span class="glyphicon glyphicon-registration-mark" aria-hidden="true"></span> Reliability Issue
-                                                        </a>
-                                                    </div>
-
-                                                    <div class="col-lg-2 text-center"></div>
-                                                </div>
-                                            </div>
-                                        }
                                     </div>
-                                </div>
-                            </div>
-                            <hr/>
-                        }
+                                    <div class="col-lg-2">
+                                        <div class="col-lg-7" data-toggle="tooltip" title="Task">
+                                            <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/Task.png" style="height:100px; width:100px"></a>
+                                        </div>
+                                        <div class="col-lg-5">
+                                            <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            <div class="row"><span class="badge" style="color:white;background-color:red">@item.PendingTaskCount</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <div class="col-lg-7">
+                                            <a href="/Project/ProjectRMAStatus?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/RMA.png" style="height:100px; width:100px"></a>
+                                        </div>
+                                        <div class="col-lg-5">
+                                            <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            <div class="row"><span class="badge" style="color:white;background-color:red">@item.PendingRMACount</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <div class="col-lg-7"  data-toggle="tooltip" title="Debug Tree">
+                                            <a href="/Project/ProjectError?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/DebugTreeicon.png" style="height:100px; width:100px"></a>
+                                        </div>
+                                        <div class="col-lg-5">
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="col-lg-2">
+                                        <div class="col-lg-7">
+                                            <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/Task.png" style="height:100px; width:100px"></a>
+                                        </div>
+                                        <div class="col-lg-5">
+                                            <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            <div class="row"><span class="badge" style="color:white;background-color:red">@item.PendingTaskCount</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <div class="col-lg-7"  data-toggle="tooltip" title="OBA">
+                                            <a href="/Project/ProjectOBA?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/Task.png" style="height:100px; width:100px"></a>
+                                        </div>
+                                        <div class="col-lg-5">
+                                            <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <div class="col-lg-7" data-toggle="tooltip" title="Quality">
+                                            <a href="/Project/ProjectQuality?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/Task.png" style="height:100px; width:100px"></a>
+                                        </div>
+                                        <div class="col-lg-5">
+                                            <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <div class="col-lg-7" data-toggle="tooltip" title="Reliability">
+                                            <a href="/Project/ProjectReliability?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/Task.png" style="height:100px; width:100px"></a>
+                                        </div>
+                                        <div class="col-lg-5">
+                                            <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2">
+                                    </div>
+                                }
 
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-12">&nbsp;</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">&nbsp;</div>
+                        </div>
+
+                        }
+                        </div>
                     </div>
                 </div>
-            </div>
+
             idx = idx + 1;
         }
     }

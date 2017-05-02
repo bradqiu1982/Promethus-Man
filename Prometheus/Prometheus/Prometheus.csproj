@@ -554,6 +554,11 @@
     <Content Include="Content\images\icon\eidt.png" />
     <Content Include="Content\images\icon\extend.png" />
     <Content Include="Content\images\icon\extendup.png" />
+    <Content Include="Content\images\PJ\DebugTreeicon.png" />
+    <Content Include="Content\images\PJ\FA.png" />
+    <Content Include="Content\images\PJ\RMA.png" />
+    <Content Include="Content\images\PJ\Task.png" />
+    <Content Include="Content\images\PJ\Yield.png" />
     <Content Include="Content\images\sort_asc.png" />
     <Content Include="Content\images\sort_asc_disabled.png" />
     <Content Include="Content\images\sort_both.png" />

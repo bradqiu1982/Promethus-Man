@@ -3596,7 +3596,7 @@ namespace Prometheus.Controllers
 
         }
 
-        public ActionResult MoveTask2Working(string issuekey)
+        public ActionResult MoveTask2Working(string issuekey,string myaction)
         {
             var ckdict = CookieUtility.UnpackCookie(this);
             if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
@@ -3614,12 +3614,27 @@ namespace Prometheus.Controllers
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
             var originalissue = IssueViewModels.RetrieveIssueByIssueKey(issuekey, this);
-            originalissue.Resolution = Resolute.Working;
-            originalissue.UpdateIssue();
+            if (string.Compare(originalissue.Reporter.ToUpper(), updater.ToUpper()) == 0
+                || string.Compare(originalissue.Assignee.ToUpper(), updater.ToUpper()) == 0)
+            {
+                originalissue.Resolution = Resolute.Working;
+                originalissue.UpdateIssue();
+            }
 
-            var dict = new RouteValueDictionary();
-            dict.Add("username", updater);
-            return RedirectToAction("Assign2Me", "User", dict);
+            if (!string.IsNullOrEmpty(myaction)
+                && string.Compare(myaction, "Assign2Me") == 0)
+            {
+                var dict = new RouteValueDictionary();
+                dict.Add("username", updater);
+                return RedirectToAction("Assign2Me", "User", dict);
+            }
+            else
+            {
+                var dict = new RouteValueDictionary();
+                dict.Add("ProjectKey", originalissue.ProjectKey);
+                return RedirectToAction("ProjectIssues", "Project", dict);
+            }
+
         }
     }
 }

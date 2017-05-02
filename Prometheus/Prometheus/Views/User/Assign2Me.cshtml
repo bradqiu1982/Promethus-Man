@@ -47,7 +47,7 @@
                             <div class="col-lg-1"></div>
                             <div class="col-lg-2">Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a></div>
                             <div class="col-lg-1">@item.ReportDate.ToString("MM/dd-yy")</div>
-                            <div class="col-lg-1"><a data-toggle="tooltip" title="move to working" href="/Issue/MoveTask2Working?issuekey=@(item.IssueKey)"><font color="#006DC0"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span></font></a></div>
+                            <div class="col-lg-1"><a data-toggle="tooltip" title="move to working" href="/Issue/MoveTask2Working?issuekey=@(item.IssueKey)&myaction=Assign2Me"><font color="#006DC0"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span></font></a></div>
                             <div class="col-lg-2"></div>
                         </div>
                         <div class="row" style="margin:-0.25em;">

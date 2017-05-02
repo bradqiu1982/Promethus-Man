@@ -13,10 +13,15 @@
 </div>
 
 <div class="row">
-    <ol class="breadcrumb" style="font-size:18px">
-        <li><a href="/User/UserCenter?username=@(ViewBag.RealUserID)&month=@(ViewBag.month)">@ViewBag.UserName Center</a></li>
-        <li class="active">I Care</li>
-    </ol>
+    <div class="col-lg-1 text-right">
+        <img src="~/Content/images/ucicon/ICareIcons.png" style="height:60px; width:60px">
+    </div>
+    <div class="col-lg-11">
+        <ol class="breadcrumb" style="font-size:18px">
+            <li><a href="/User/UserCenter?username=@(ViewBag.RealUserID)&month=@(ViewBag.month)">@ViewBag.UserName Center</a></li>
+            <li class="active">I Care</li>
+        </ol>
+    </div>
 </div>
 
 <div class="row">
@@ -33,76 +38,87 @@
         @Html.AntiForgeryToken()
 
         <div class="row">
+            <div class="col-lg-3"><h3 style="font-family:'Arial Narrow';">Add People</h3></div>
+            <div class="col-lg-9"></div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">&nbsp;</div>
+        </div>
+
+        <div class="row">
             <div class="col-lg-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Add People</h3>
+                <div class="col-lg-8">
+                    <div class="col-lg-7">
+                        @Html.DropDownList("chooseuserlist", null, new { @id = "chooseuserlist", @class = "form-control", @style = "font-family:'Arial Narrow';border-color:#006DC0;" })
                     </div>
-                    <div class="panel-body">
-                        <div class="form-group">
-                            <div class="row col-lg-12">
-                                <div class="col-lg-8">
-                                    <div class="col-lg-7">
-                                        @Html.DropDownList("chooseuserlist", null, new { @id = "chooseuserlist", @class = "form-control" })
-                                    </div>
-                                    <div class="col-lg-1">
+                    <div class="col-lg-1">
 
-                                    </div>
-                                    <div class="col-lg-2">
-                                        <button id="adduser" name="adduser" class="form-control"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
-                                        @*<input type="submit" value="Submit" id="updaterma" name="updaterma" class="btn btn-default" />*@
-                                    </div>
-                                    <div class="col-lg-2">
-                                        <button id="deleteuser" name="deleteuser" class="form-control"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-
-                                </div>
-                            </div>
-                        </div>
                     </div>
+                    <div class="col-lg-2">
+                        <button id="adduser" name="adduser" class="form-control" style="background-color:#006DC0;color:white;"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                    </div>
+                    <div class="col-lg-2">
+                        <button id="deleteuser" name="deleteuser" class="form-control" style="background-color:#006DC0;color:white;"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+
                 </div>
             </div>
         </div>
-    }
-    
-    <hr />
 
-    using (Html.BeginForm("OperateICare", "User", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    }
+
+    <div class="row">
+        <div class="col-lg-12">&nbsp;</div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">&nbsp;</div>
+    </div>
+
+    using (Html.BeginForm("OperateICare", "User", FormMethod.Post, new { enctype = "multipart/form-data", id = "viewform", name = "viewform" }))
     {
         @Html.AntiForgeryToken()
 
         <div class="row">
-            <div class="col-lg-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">View By Month</h3>
-                    </div>
-                    <div class="panel-body">
-                        <div class="form-group">
-                            <div class="row col-lg-12">
+            <div class="col-lg-3"><h3 style="font-family:'Arial Narrow';">View By Month</h3></div>
+            <div class="col-lg-9"></div>
+        </div>
 
-                                <div class="col-lg-8">
-                                    <div class="col-lg-7">
-                                        @Html.DropDownList("monthlist", null, new { @id = "monthlist", @class = "form-control" })
-                                    </div>
-                                    <div class="col-lg-1">
-                                    </div>
-                                    <div class="col-lg-2">
-                                        <button id="viewuser" name="viewuser" class="form-control"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>
-                                    </div>
-                                    <div class="col-lg-2">
-                                    </div>
-                                </div>
-                                <div class="col-lg-5">
-                                </div>
-                            </div>
-                        </div>
+        <div class="row">
+            <div class="col-lg-12">&nbsp;</div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="col-lg-8">
+                    <div class="col-lg-7">
+                        @Html.DropDownList("monthlist", null, new { @id = "monthlist", @class = "form-control", @style = "font-family:'Arial Narrow';border-color:#006DC0;", @onchange = "ViewCare()" })
                     </div>
+                    <div class="col-lg-5">
+                    </div>
+                </div>
+                <div class="col-lg-4">
                 </div>
             </div>
         </div>
+
+        <script type="text/javascript">
+            function ViewCare()
+            {
+                $('#viewform').submit();
+            }
+        </script>
+
+        <div class="row">
+            <div class="col-lg-12">&nbsp;</div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">&nbsp;</div>
+        </div>
+
+
         }
         <hr />
 }

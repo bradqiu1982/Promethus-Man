@@ -660,6 +660,8 @@ namespace Prometheus.Controllers
                 var other = Request.Form["chooseuserlist"].ToString();
                 UserViewModels.AddICare(updater, other);
                 dict.Add("month", "1");
+                dict.Add("username", updater);
+                return RedirectToAction("ICare", "User", dict);
             }
 
             if (Request.Form["deleteuser"] != null)
@@ -667,13 +669,12 @@ namespace Prometheus.Controllers
                 var other = Request.Form["chooseuserlist"].ToString();
                 UserViewModels.RemoveICare(updater, other);
                 dict.Add("month", "1");
+                dict.Add("username", updater);
+                return RedirectToAction("ICare", "User", dict);
             }
 
-            if (Request.Form["viewuser"] != null)
-            {
-                dict.Add("month", Request.Form["monthlist"].ToString());
-            }
 
+            dict.Add("month", Request.Form["monthlist"].ToString());
             dict.Add("username", updater);
             return RedirectToAction("ICare", "User", dict);
         }

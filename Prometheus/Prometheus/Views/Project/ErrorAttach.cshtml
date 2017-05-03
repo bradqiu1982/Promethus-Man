@@ -5,34 +5,39 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@if (Model != null)
-{
-    <div class="row col-lg-12">
-        <div class="col-lg-3">
-            <h2>@Model.ProjectKey @Model.OrignalCode Error Attach</h2>
-        </div>
-        <div class="col-lg-2">
-            <h2><a data-toggle="tooltip" title="Goto Error Page" href="/Project/ProjectError?ProjectKey=@(Model.ProjectKey)">
-                    <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span> Debug Tree
-                </a></h2>
-        </div>
-        <div class="col-lg-2">
-                <h2><a data-toggle="tooltip" title="Goto FA Page" href="/Project/ProjectFA?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span> FA</a></h2>
-        </div>
-        <div class="col-lg-2">
-                <h2><a data-toggle="tooltip" title="Goto RMA Page" href="/Project/ProjectRMAStatus?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> RMA</a></h2>
-        </div>
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <ol class="breadcrumb" style="font-size:18px">
+            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
+            @if (Model != null)
+            {
+                <li><a data-toggle="tooltip" title="Goto Debug Tree" href="/Project/ProjectError?ProjectKey=@(Model.ProjectKey)">Debug Tree</a></li>
+            }
+
+            @if (Model != null)
+            {
+                <li class="active">@Model.ProjectKey @Model.OrignalCode Error Attach</li>
+            }
+            else
+            {
+                <li class="active">Debug Tree Attach</li>
+            }
+        </ol>
     </div>
-    }
-    else
-    {
-    <div class="row col-lg-12">
-        <div class="col-lg-3">
-            <h2>Error Attach</h2>
-        </div>
-        <div class="col-lg-9"></div>
-        </div>
-    }
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
 
         @if (Model != null && Model.AttachList.Count > 0)
         {

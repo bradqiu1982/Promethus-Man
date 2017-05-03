@@ -66,36 +66,50 @@
 
 @if (Model != null)
 {
-    <div class="row" style="background-color:#006DC0;font-family:'Arial Narrow';font-size:18px">
-        <div class="col-lg-2 text-center"><font color="white">Error Code</font></div>
-        <div class="col-lg-3 text-center"><font color="white">Short Desc</font></div>
-        <div class="col-lg-2 text-center"><font color="white">Count</font></div>
-        <div class="col-lg-1 text-center"><font color="white">Attachement</font></div>
-        <div class="col-lg-1 text-center"><font color="white">FA</font></div>
-        <div class="col-lg-3 text-center"></div>
-    </div>
-
-    <hr/>
-
-    foreach (var item in Model)
-    {
-        <div class="row">
-            <div class="col-lg-2 text-center">
-            @if (item.CommentList.Count > 0)
-            {<span class="badge alert-success">C</span>}<a href="/Project/UpdateProjectError?ErrorKey=@item.ErrorKey">@item.OrignalCode</a></div>
-            <div class="col-lg-3 text-center">@item.ShortDesc</div>
-            <div class="col-lg-2 text-center">@item.ErrorCount</div>
-            @if (item.AttachList.Count > 0)
+    <table id="pndatatable" class="display" cellspacing="0">
+        <thead>
+            <tr style="color:white;">
+                <th>Error Code</th>
+                <th>Short Desc</th>
+                <th>Count</th>
+                <th>Attachement</th>
+                <th>FA</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
             {
-                <div class="col-lg-1 text-center"><a href="/Project/ErrorAttach?ErrorKey=@item.ErrorKey" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></a></div>
+                <tr>
+                    <td>
+                        <a href="/Project/UpdateProjectError?ErrorKey=@item.ErrorKey">@item.OrignalCode</a>@if (item.CommentList.Count > 0){<span class="badge alert-success">C</span>}
+                    </td>
+                    <td>@item.ShortDesc</td>
+                    <td>@item.ErrorCount</td>
+                    @if (item.AttachList.Count > 0)
+                    {
+                        <td><a href="/Project/ErrorAttach?ErrorKey=@item.ErrorKey" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></a></td>
+                    }
+                    else
+                    {
+                        <td>&nbsp;</td>
+                    }
+                    <td><a href="/Project/ProjectErrAbbr?ProjectKey=@item.ProjectKey&ErrAbbr=@item.OrignalCode"><span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span></a></td>
+                </tr>
             }
-            else
-            {
-                <div class="col-lg-1 text-center"></div>
-            }
-            <div class="col-lg-1 text-center"><a href="/Project/ProjectErrAbbr?ProjectKey=@item.ProjectKey&ErrAbbr=@item.OrignalCode"><span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span></a></div>
-            <div class="col-lg-3 text-center"></div>
-        </div>
-        <hr/>
-     }
+        </tbody>
+    </table>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#pndatatable').DataTable({
+                'iDisplayLength': 10,
+                'aLengthMenu': [[10, 20, 30, -1],
+                                [10, 20, 30, "All"]],
+                "bAutoWidth": false,
+                "aaSorting": [],
+                "order": []
+            });
+                    } );
+    </script>
+
 }

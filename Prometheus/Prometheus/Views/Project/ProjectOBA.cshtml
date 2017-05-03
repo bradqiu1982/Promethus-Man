@@ -7,32 +7,42 @@
 
 
 <div class="row">
-    <div class="col-lg-4">
-        @if (Model != null && Model.Count() > 0)
-        {
-            <h2>@Model.ElementAt(0).ProjectKey OBA Status</h2>
-        }
-        else
-        {
-            <h2>Project OBA Status</h2>
-        }
-
-    </div>
-
-    <div class="col-lg-1">
-        @if (Model != null && Model.Count() > 0)
-        {
-            <h2><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ElementAt(0).ProjectKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
-        }
-        else
-        {
-            <h2><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
-        }
-    </div>
-    <div class="col-lg-7"></div>
+    <div class="col-lg-12">&nbsp;</div>
 </div>
 
-<hr />
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+
+<div class="row">
+    <div class="col-lg-1 text-right">
+        <img src="~/Content/images/PJ/OBA.png" style="height:45px; width:45px">
+    </div>
+    <div class="col-lg-11">
+        <ol class="breadcrumb" style="font-size:18px">
+            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
+            @if (Model != null && Model.Count() > 0)
+            {
+                <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ElementAt(0).ProjectKey)">Project Detail</a></li>
+            }
+
+            @if (Model != null && Model.Count() > 0)
+            {
+                <li class="active">@(Model.ElementAt(0).ProjectKey) OBA Task</li>
+            }
+            else
+            {
+                <li class="active">OBA Task</li>
+            }
+        </ol>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
 
 <div class="row">
     @if (Model != null && Model.Count() > 0)
@@ -121,7 +131,10 @@
     }
 
 </div>
-<hr />
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
 
 @if (Model != null)
 {
@@ -151,7 +164,7 @@
     var i = 0;
     <table id="firsttable" name="firsttable" class="table table-bordered table-hover">
         <thead class="header">
-            <tr>
+            <tr style="color:white;">
                 <th width="12%">DMR#</th>
                 <th width="8%">SN</th>
                 <th width="8%">FailureRate</th>

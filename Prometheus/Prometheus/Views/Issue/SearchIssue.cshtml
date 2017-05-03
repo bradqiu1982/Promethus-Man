@@ -1,11 +1,11 @@
 ﻿@model IEnumerable<Prometheus.Models.IssueViewModels>
 
 @{
-    ViewBag.Title = "SearchIssue";
+    ViewBag.Title = "SearchTask";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Search Issue</h2>
+<h2>Search Task</h2>
 
 @Html.Raw(string.IsNullOrEmpty(ViewBag.SearchError) ? "&nbsp;" : ViewBag.SearchError)
 @if (!string.IsNullOrEmpty(ViewBag.SearchError))

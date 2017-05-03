@@ -1,11 +1,11 @@
 ﻿@model Prometheus.Models.IssueViewModels
 
 @{
-    ViewBag.Title = "CreateIssue";
+    ViewBag.Title = "CreateTask";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Create Issue</h2>
+<h2>Create Task</h2>
 
 @Html.Raw(string.IsNullOrEmpty(ViewBag.CreateError) ? "&nbsp;" : ViewBag.CreateError)
 @if (!string.IsNullOrEmpty(ViewBag.CreateError))

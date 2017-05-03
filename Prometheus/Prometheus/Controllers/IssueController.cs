@@ -943,7 +943,7 @@ namespace Prometheus.Controllers
                 && string.IsNullOrEmpty(ed)
                 && string.IsNullOrEmpty(desp))
             {
-                ViewBag.SearchError = "At least choose one condition to search issue";
+                ViewBag.SearchError = "At least choose one condition to search Task";
                 CreateAllSearchLists();
                 return View();
             }

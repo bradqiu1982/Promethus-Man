@@ -1754,13 +1754,21 @@ namespace Prometheus.Controllers
         {
             var sarray = new string []{ "8", "16", "24", "32", "40", "48", "56" };
             var slist = new List<string>();
+            slist.Add("Weekly Yield Trend");
             slist.AddRange(sarray);
-            ViewBag.weeklylist = CreateSelectList1(slist, "");
+            var weeklylist = CreateSelectList1(slist,"");
+            weeklylist[0].Selected = true;
+            weeklylist[0].Disabled = true;
+            ViewBag.weeklylist = weeklylist;
 
             sarray = new string[] { "1", "2", "3", "4", "5", "6", "12","18","24" };
             slist = new List<string>();
+            slist.Add("Monthly Yield Trend");
             slist.AddRange(sarray);
-            ViewBag.monthlylist = CreateSelectList1(slist, "");
+            var monthlylist = CreateSelectList1(slist, "");
+            monthlylist[0].Selected = true;
+            monthlylist[0].Disabled = true;
+            ViewBag.monthlylist = monthlylist;
 
             sarray = new string[] { YIELDTYPE.BR, YIELDTYPE.JO};
             slist = new List<string>();

@@ -5,35 +5,46 @@
 }
 
 
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
 
-@if (ViewBag.pjkey != null)
-{
-    <div class="row">
-        <div class="col-lg-4">
-            <h2>@ViewBag.pjkey Weekly Trend Yield</h2>
-        </div>
-        <div class="col-lg-2">
-            <h2><a data-toggle="tooltip" title="Goto Yield Main Page" href="/Project/ProjectYieldMain?ProjectKey=@(ViewBag.pjkey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
-        </div>
-        <div class="col-lg-6"></div>
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+<div class="row">
+    <div class="col-lg-1 text-right">
+        <img src="~/Content/images/PJ/Yield.png" style="height:45px; width:45px">
     </div>
-}
-else
-{
-    <div class="row">
-        <div class="col-lg-4">
-            <h2>Project  Weekly Trend  Yield</h2>
-        </div>
-        <div class="col-lg-2">
-            <h2><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
-        </div>
-        <div class="col-lg-6"></div>
+    <div class="col-lg-11">
+        <ol class="breadcrumb" style="font-size:18px">
+            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
+            @if (ViewBag.pjkey != null)
+            {
+                <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(ViewBag.pjkey)">Project Detail</a></li>
+            }
+
+            @if (ViewBag.pjkey != null)
+            {
+                <li><a data-toggle="tooltip" title="Goto Yield Main Page" href="/Project/ProjectYieldMain?ProjectKey=@(ViewBag.pjkey)">Yield Main</a></li>
+            }
+
+            @if (ViewBag.pjkey != null)
+            {
+                <li class="active">@ViewBag.pjkey Yield</li>
+            }
+            else
+            {
+                <li class="active">Project Yield</li>
+            }
+        </ol>
     </div>
-}
+</div>
 
-
-
-<hr/>
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
 
 <form>
     @if (ViewBag.pjkey != null)
@@ -50,17 +61,6 @@ else
     <script src="~/Scripts/exporting.js"></script>
 
     <div class="row">
-        <div class="col-lg-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Yield</h3>
-                </div>
-                <div class="panel-body">
-                    <div class="col-lg-12">
                         <div id="weeklyyield" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 }

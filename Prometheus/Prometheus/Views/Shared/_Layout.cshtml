@@ -52,6 +52,42 @@
         .panel-default > .panel-heading-open {
             background: #E41B17;
         }
+        
+        input[type="text"]{
+            border:1px;border-style:solid;border-color:#006DC0;font-family:'Arial Narrow';
+        }
+
+        textarea.form-control {
+            border:1px;border-style:solid;border-color:#006DC0;
+        }
+
+        select.form-control {
+            border:1px;border-style:solid;border-color:#006DC0;font-family:'Arial Narrow';
+        }
+
+        span:hover {
+            background-color:lightgrey;
+        }
+
+        img[MYTP="BT"]:hover {
+            background-color:lightgrey;
+        }
+
+        thead {
+             background-color:#006DC0;font-family:'Arial Narrow';
+        }
+
+        tbody {
+            font-family:'Arial Narrow';
+        }
+
+        table.dataTable tbody td {
+                    padding: 4px 10px;
+                }
+
+        label {
+            font-family:'Arial Narrow';
+        }
     </style>
     <script src="~/Scripts/jquery.stickytableheaders.js"></script>
 </head>
@@ -199,6 +235,7 @@
         <footer>
             <p style="font-family:'Arial';">&copy; @DateTime.Now.Year - WUXI Engineering System</p>
         </footer>
+        <script src="~/Scripts/placeholders.min.js"></script>
         <script type="text/javascript">
                         function RealSaveUserContent(myval)
                         {

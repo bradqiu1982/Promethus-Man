@@ -161,10 +161,10 @@
                                         }
                                     </div>
                                     <div class="col-lg-5 text-center">
-                                        <button data-toggle="tooltip" title="Low Yield Trigger" class="form-control" value="@item.IssueData.IssueKey" type="button" onclick="LowYieldWarning(this)">
-                                            <span class="glyphicon glyphicon-share" aria-hidden="true"></span>
-                                        </button>
-                                    </div>
+                                        @*<button data-toggle="tooltip" title="Low Yield Trigger" class="form-control" value="@item.IssueData.IssueKey" type="button" onclick="LowYieldWarning(this)">*@
+                                            <span class="glyphicon glyphicon-share" aria-hidden="true" value="@item.IssueData.IssueKey" onclick="LowYieldWarning(this)"></span>
+                                        @*</button>*@
+                                    </div> 
                                 </div>
                             </div>
                     i = i + 1;
@@ -300,8 +300,9 @@
                                 }
                             </div>
                             <div class="col-lg-5 text-center">
-                                <button data-toggle="tooltip" title="Low Yield Trigger" class="form-control" value="@item.IssueData.IssueKey" type="button" onclick="LowYieldWarning(this)">
-                                    <span class="glyphicon glyphicon-share" aria-hidden="true"></span></button>
+                                @*<button data-toggle="tooltip" title="Low Yield Trigger" class="form-control" value="@item.IssueData.IssueKey" type="button" onclick="LowYieldWarning(this)">*@
+                                    <span class="glyphicon glyphicon-share" aria-hidden="true" value="@item.IssueData.IssueKey" onclick="LowYieldWarning(this)"></span>
+                                @*</button>*@
                             </div>
                         </div>
                     </div>

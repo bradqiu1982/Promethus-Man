@@ -67,76 +67,79 @@
     </div>
 }
 
-<hr />
+
+<hr style="border-color:#006DC0;"/>
+
+<div class="row" style="font-family:'Arial Narrow'">
+    <div class="col-lg-2" style="font-size:18px">
+        Yield By Period
+    </div>
+    <div class="col-lg-10">
+        <div class="row">
+            <div class="col-lg-3 text-left">
+                @Html.DropDownList("weeklylist", null, new { @id = "weeklylist", @class = "form-control", @onchange = "ShowWeeklYYield()" })                
+            </div>
+            <div class="col-lg-9 text-left"></div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">&nbsp;</div>
+        </div>
+        <div class="row">
+            <div class="col-lg-3 text-left">
+                @Html.DropDownList("monthlylist", null, new { @id = "monthlylist", @class = "form-control", @onchange = "ShowMonthlyYield()" })
+            </div>
+            <div class="col-lg-9 text-left"></div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">&nbsp;</div>
+        </div>
+        <div class="row">
+            <div class="col-lg-2 text-left">
+                Other Period
+            </div>
+            <div class="col-lg-2">
+                <input class="form-control text-box single-line" id="StartDate" placeholder="Start Date" name="StartDate" type="text" value="" style="margin-left:12px"/>
+            </div>
+            <div class="col-lg-2">
+                <input class="form-control text-box single-line" id="EndDate" placeholder="End Date" name="EndDate" type="text" value="" />
+            </div>
+            <div class="col-lg-4">
+                <div class="col-lg-5"><button class="form-control" type="button" onclick="ShowPeriodYield()">In Period</button></div>
+                <div class="col-lg-5"><button class="form-control" type="button" onclick="ShowDailyYield()">In Days</button></div>
+                <div class="col-lg-2"></div>
+            </div>
+            <div class="col-lg-2"></div>
+        </div>
+    </div>
+</div>
+
+<hr style="border-color:#006DC0;" />
+
+<div class="row" style="font-family:'Arial Narrow'">
+    <div class="col-lg-2" style="font-size:18px">
+        Yield By BR/JO
+    </div>
+    <div class="col-lg-2 text-left">
+        @Html.DropDownList("yieldtypelist", null, new { @id = "yieldtypelist", @class = "form-control" })
+    </div>
+    <div class="col-lg-3">
+        <input class="form-control text-box single-line" id="BRNUM" name="BRNUM" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 250." data-val-length-max="250" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" type="text" value="" />
+        <span class="field-validation-valid text-danger" data-valmsg-for="BRNUM" data-valmsg-replace="true"></span>
+    </div>
+    <div class="col-lg-2">
+        <div class="col-lg-9"><button class="form-control" type="button" onclick="showbryield()">Yield</button></div>
+        <div class="col-lg-3 text-center"></div>
+    </div>
+    <div class="col-lg-3">
+    </div>
+</div>
 
 <div class="row">
-    <div class="col-lg-12">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Yield By Time</h3>
-            </div>
+    <div class="col-lg-12">&nbsp;</div>
+</div>
 
-            <div class="panel-body">
 
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="col-lg-2">
-                                <label class="control-label">Weeks</label>
-                            </div>
-                            <div class="col-lg-10">
-                                @Html.DropDownList("weeklylist", null, new { @id = "weeklylist", @class = "form-control" })
-                            </div>
-                        </div>
-                        <div class="col-lg-2">
-                            <button class="form-control" type="button" onclick="ShowWeeklYYield()">Weekly Trend Yield</button>
-                        </div>
-                        <div class="col-lg-4"></div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="col-lg-2">
-                                <label class="control-label">Months</label>
-                            </div>
-                            <div class="col-lg-10">
-                                @Html.DropDownList("monthlylist", null, new { @id = "monthlylist", @class = "form-control" })
-                            </div>
-                        </div>
-                        <div class="col-lg-2">
-                            <button class="form-control" type="button" onclick="ShowMonthlyYield()">Monthly Trend Yield</button>
-                        </div>
-                        <div class="col-lg-4"></div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-lg-12">
-                        <div class="col-lg-1">
-                            <label class="control-label" for="StartDate">StartDate</label>
-                        </div>
-                        <div class="col-lg-2">
-                            <input class="form-control text-box single-line" id="StartDate" name="StartDate" type="text" value="" />
-                        </div>
-                        <div class="col-lg-1">
-                            <label class="control-label" for="EndDate">EndDate</label>
-                        </div>
-                        <div class="col-lg-2">
-                            <input class="form-control text-box single-line" id="EndDate" name="EndDate" type="text" value="" />
-                        </div>
-                        <div class="col-lg-2">
-                            <button class="form-control" type="button" onclick="ShowPeriodYield()">Yield In Period</button>
-                        </div>
-                        <div class="col-lg-2">
-                            <button class="form-control" type="button" onclick="ShowDailyYield()">Yield In Days</button>
-                        </div>
-                        <div class="col-lg-2">
-                        </div>
-                        </div>
-                        <script type="text/javascript">
+<script type="text/javascript">
                             $(document).ready(function () {
                                 $("#StartDate").datepicker({
                                     changeMonth: true,
@@ -149,42 +152,7 @@
                                     dateFormat: 'yy-mm-dd'
                                 });
                             });
-                        </script>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-lg-12">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Yield By BR/JO/LOT</h3>
-            </div>
-            <div class="panel-body">
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="col-lg-4">
-                            @Html.DropDownList("yieldtypelist", null, new { @id = "yieldtypelist", @class = "form-control" })
-                        </div>
-                        <div class="col-lg-8">
-                            <input class="form-control text-box single-line" id="BRNUM" name="BRNUM" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 250." data-val-length-max="250" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" type="text" value="" />
-                            <span class="field-validation-valid text-danger" data-valmsg-for="BRNUM" data-valmsg-replace="true"></span>
-                        </div>
-                    </div>
-                    <div class="col-lg-2">
-                        <button class="form-control" type="button" onclick="showbryield()"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Yield</button>
-                    </div>
-                    <div class="col-lg-4">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+</script>
 
 <script type="text/javascript">
     function ShowWeeklYYield()

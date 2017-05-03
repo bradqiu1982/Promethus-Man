@@ -782,7 +782,6 @@
     <Content Include="Views\Project\EditProject.cshtml" />
     <Content Include="Views\User\RegisterUser.cshtml" />
     <Content Include="Views\User\LoginUser.cshtml" />
-    <Content Include="Views\User\UserCenter1.cshtml" />
     <Content Include="Views\Issue\CreateIssue.cshtml" />
     <Content Include="Views\User\ValidateNoticeA.cshtml" />
     <Content Include="Views\User\ValidateNoticeB.cshtml" />

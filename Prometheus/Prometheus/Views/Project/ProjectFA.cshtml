@@ -78,15 +78,15 @@
 </div>
 
     <div class="row" style="background-color:#006DC0;font-family:'Arial Narrow';font-size:18px">
-        <div class="col-lg-3 text-center"><font color="white">ModuleSN</font></div>
-        <div class="col-lg-2 text-center"><font color="white">ErrAbbr</font></div>
-        <div class="col-lg-1 text-center"><font color="white">FA Status</font></div>
-        <div class="col-lg-1 text-center"><font color="white">Assignee</font></div>
-        <div class="col-lg-3 text-center"><font color="white">Failure Desc</font></div>
+        <div class="col-lg-3 text-left"><font color="white">ModuleSN</font></div>
+        <div class="col-lg-2 text-left"><font color="white">ErrAbbr</font></div>
+        <div class="col-lg-1 text-left"><font color="white">FA Status</font></div>
+        <div class="col-lg-1 text-left"><font color="white">Assignee</font></div>
+        <div class="col-lg-3 text-left"><font color="white">Failure Desc</font></div>
         <div class="col-lg-2">
-            <div class="col-lg-4 text-center"><font color="white">Date</font></div>
-            <div class="col-lg-3 text-center"><font color="white"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></font></div>
-            <div class="col-lg-5 text-center"><font color="white">LYT</font></div>
+            <div class="col-lg-4 text-left"><font color="white">Date</font></div>
+            <div class="col-lg-3 text-left"><font color="white"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></font></div>
+            <div class="col-lg-5 text-left"><font color="white">LYT</font></div>
         </div>
     </div>
 
@@ -108,12 +108,12 @@
                 {
                             <div class="row" style="font-family:'Arial Narrow';">
                                 <div class="col-lg-3">
-                                    <div class="col-lg-3 text-center">
+                                    <div class="col-lg-3 text-left">
                                             <input type="checkbox" id="check@(i)" name="check@(i)" value="true"/>
                                         <input class="form-control text-box single-line" value="@item.IssueData.IssueKey" id="HIssueKey@(i)" name="HIssueKey@(i)" type="hidden" />
                                     </div>
 
-                                    <div class="col-lg-4 text-center">
+                                    <div class="col-lg-4 text-left">
                                         @if (item.IssueData.RootCauseCommentList.Count > 0
                                             || item.IssueData.ResultCommentList.Count > 0
                                             || item.IssueData.CommentList.Count > 2
@@ -128,16 +128,16 @@
                                         }
                                     </div>
 
-                                    <div class="col-lg-3 text-center">
+                                    <div class="col-lg-3 text-left">
                                     <a href="/Project/SNIssue?ProjectKey=@item.TestData.ProjectKey&SN=@item.TestData.ModuleSerialNum">@item.TestData.ModuleSerialNum</a></div>
 
-                                    <div class="col-lg-2 text-center">
+                                    <div class="col-lg-2 text-left">
                                         <a href="http://cn-traceview/?search=@item.TestData.ModuleSerialNum"  target='_blank'><span class="badge alert-success">T</span></a>
                                     </div>
                                 </div>
                             
 
-                                <div class="col-lg-2 text-center">
+                                <div class="col-lg-2 text-left">
                                     <div class="col-lg-8">
                                         <a href="/Project/ProjectErrAbbr?ProjectKey=@item.TestData.ProjectKey&ErrAbbr=@item.TestData.ErrAbbr">@item.TestData.ErrAbbr</a>
                                     </div>
@@ -145,14 +145,14 @@
                                         <a href="/Project/UpdateProjectError2?ProjectKey=@item.TestData.ProjectKey&ErrorCode=@item.TestData.ErrAbbr"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
                                     </div>
                                 </div>
-                                <div class="col-lg-1 text-center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(@item.IssueData.Resolution))</div>
+                                <div class="col-lg-1 text-left">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(@item.IssueData.Resolution))</div>
                                 
-                                <div class="col-lg-1 text-center"><a href="/User/UserCenter?username=@item.IssueData.Assignee">@item.IssueData.Assignee.Split(new char[] { '@' })[0]</a></div>
+                                <div class="col-lg-1 text-left"><a href="/User/UserCenter?username=@item.IssueData.Assignee">@item.IssueData.Assignee.Split(new char[] { '@' })[0]</a></div>
 
-                                <div class="col-lg-3 text-center"><a href="/Issue/UpdateIssue?issuekey=@item.IssueData.IssueKey">@item.IssueData.Summary</a></div>
+                                <div class="col-lg-3 text-left"><a href="/Issue/UpdateIssue?issuekey=@item.IssueData.IssueKey">@item.IssueData.Summary</a></div>
                                 <div class="col-lg-2">
-                                    <div class="col-lg-4 text-center">@item.IssueData.ReportDate.ToString("MM/dd")</div>
-                                    <div class="col-lg-3 text-center">
+                                    <div class="col-lg-4 text-left">@item.IssueData.ReportDate.ToString("MM/dd")</div>
+                                    <div class="col-lg-3 text-left">
                                         @if (item.IssueData.AttachList.Count > 0)
                                         {
                                             <a href="/Issue/IssueAttach?issuekey=@item.IssueData.IssueKey" target="_blank">
@@ -160,7 +160,7 @@
                                             </a>
                                         }
                                     </div>
-                                    <div class="col-lg-5 text-center">
+                                    <div class="col-lg-5 text-left">
                                         @*<button data-toggle="tooltip" title="Low Yield Trigger" class="form-control" value="@item.IssueData.IssueKey" type="button" onclick="LowYieldWarning(this)">*@
                                             <span class="glyphicon glyphicon-share" aria-hidden="true" value="@item.IssueData.IssueKey" onclick="LowYieldWarning(this)"></span>
                                         @*</button>*@
@@ -175,19 +175,19 @@
                 if (ViewBag.logined != null && ViewBag.logined)
                 {
                     <div class="row">
-                        <div class="col-lg-1 text-center">
+                        <div class="col-lg-1 text-left">
                                 <input type="checkbox" id="checkall" name="checkall" onclick="ChooseAll(this)" />
                         </div>
-                        <div class="col-lg-2 text-center">
+                        <div class="col-lg-2 text-left">
                             <input type="submit" value="Same As" class="btn btn-default" />
                         </div>
-                        <div class="col-lg-4 text-center">
+                        <div class="col-lg-4 text-left">
                             @Html.DropDownList("DoneIssueList", null, new { @id = "DoneIssueList", @class = "form-control" })
                         </div>
-                        <div class="col-lg-1 text-center">
+                        <div class="col-lg-1 text-left">
                             <button class="form-control" data-toggle="tooltip" title="View Selected Issue" onclick="ShowSelectIssue()" type="button"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>
                         </div>
-                        <div class="col-lg-4 text-center">
+                        <div class="col-lg-4 text-left">
                         </div>
                         <script type="text/javascript">
 
@@ -239,13 +239,13 @@
                 {
                     <div class="row" style="font-family:'Arial Narrow';">
                         <div class="col-lg-3">
-                            <div class="col-lg-3 text-center">
+                            <div class="col-lg-3 text-left">
  
                                     <input type="checkbox" id="check@(i)" name="check@(i)" value="true" />
 
                                 <input class="form-control text-box single-line" value="@item.IssueData.IssueKey" id="HIssueKey@(i)" name="HIssueKey@(i)" type="hidden" />
                             </div>
-                            <div class="col-lg-4 text-center">
+                            <div class="col-lg-4 text-left">
                                 @if (item.IssueData.RootCauseCommentList.Count > 0
                                     ||item.IssueData.ResultCommentList.Count > 0
                                     ||item.IssueData.CommentList.Count > 2
@@ -258,15 +258,15 @@
                                     <span class="badge alert-danger">LYT</span>
                                 }
                             </div>
-                            <div class="col-lg-3 text-center">
+                            <div class="col-lg-3 text-left">
                             <a href="/Project/SNIssue?ProjectKey=@item.TestData.ProjectKey&SN=@item.TestData.ModuleSerialNum">@item.TestData.ModuleSerialNum</a></div>
 
-                            <div class="col-lg-2 text-center">
+                            <div class="col-lg-2 text-left">
                                 <a href="http://cn-traceview/?search=@item.TestData.ModuleSerialNum"  target='_blank'><span class="badge alert-success">T</span></a>
                             </div>
                         </div>
 
-                        <div class="col-lg-2 text-center">
+                        <div class="col-lg-2 text-left">
                             <div class="col-lg-8">
                                 <a href="/Project/ProjectErrAbbr?ProjectKey=@item.TestData.ProjectKey&ErrAbbr=@item.TestData.ErrAbbr">@item.TestData.ErrAbbr</a>
                             </div>
@@ -274,8 +274,8 @@
                                 <a href="/Project/UpdateProjectError2?ProjectKey=@item.TestData.ProjectKey&ErrorCode=@item.TestData.ErrAbbr"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
                             </div>
                         </div>
-                        <div class="col-lg-1 text-center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(@item.IssueData.Resolution))</div>
-                        <div class="col-lg-1 text-center">
+                        <div class="col-lg-1 text-left">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(@item.IssueData.Resolution))</div>
+                        <div class="col-lg-1 text-left">
                             <a href="/User/UserCenter?username=@item.IssueData.Assignee">@item.IssueData.Assignee.Split(new char[] { '@' })[0]</a>
                             
                             <input class="form-control text-box single-line" value="@item.IssueData.Assignee.ToUpper()" id="HAssignee@(i)" name="HAssignee@(i)" type="hidden" />
@@ -288,10 +288,10 @@
                                 <input class="form-control text-box single-line" value="" id="HUpdater@(i)" name="HUpdater@(i)" type="hidden" />
                             }
                         </div>
-                        <div class="col-lg-3 text-center"><a href="/Issue/UpdateIssue?issuekey=@item.IssueData.IssueKey">@item.IssueData.Summary</a></div>
+                        <div class="col-lg-3 text-left"><a href="/Issue/UpdateIssue?issuekey=@item.IssueData.IssueKey">@item.IssueData.Summary</a></div>
                         <div class="col-lg-2">
-                            <div class="col-lg-4 text-center">@item.IssueData.ReportDate.ToString("MM/dd")</div>
-                            <div class="col-lg-3 text-center">
+                            <div class="col-lg-4 text-left">@item.IssueData.ReportDate.ToString("MM/dd")</div>
+                            <div class="col-lg-3 text-left">
                                 @if (item.IssueData.AttachList.Count > 0)
                                 {
                                     <a href="/Issue/IssueAttach?issuekey=@item.IssueData.IssueKey" target="_blank">
@@ -299,7 +299,7 @@
                                     </a>
                                 }
                             </div>
-                            <div class="col-lg-5 text-center">
+                            <div class="col-lg-5 text-left">
                                 @*<button data-toggle="tooltip" title="Low Yield Trigger" class="form-control" value="@item.IssueData.IssueKey" type="button" onclick="LowYieldWarning(this)">*@
                                     <span class="glyphicon glyphicon-share" aria-hidden="true" value="@item.IssueData.IssueKey" onclick="LowYieldWarning(this)"></span>
                                 @*</button>*@
@@ -315,18 +315,18 @@
                 if (ViewBag.logined != null && ViewBag.logined)
                 {
                     <div class="row">
-                        <div class="col-lg-1 text-center">
+                        <div class="col-lg-1 text-left">
                                 <input type="checkbox" id="checkall" name="checkall" onclick="ChooseAll(this)" />
                         </div>
-                        <div class="col-lg-2 text-center">
+                        <div class="col-lg-2 text-left">
                             <input type="submit" value="Assign To" class="btn btn-default" />
                         </div>
-                        <div class="col-lg-4 text-center">
+                        <div class="col-lg-4 text-left">
                             @Html.DropDownList("AllUserList", null, new { @id = "AllUserList", @class = "form-control" })
                         </div>
-                        <div class="col-lg-1 text-center">
+                        <div class="col-lg-1 text-left">
                         </div>
-                        <div class="col-lg-4 text-center">
+                        <div class="col-lg-4 text-left">
                         </div>
 
                         <script type="text/javascript">

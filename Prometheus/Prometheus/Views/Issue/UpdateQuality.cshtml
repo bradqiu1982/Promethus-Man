@@ -5,15 +5,59 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@if (ViewBag.isassignee != null && ViewBag.isassignee)
+{
+}
+else
+{
+    <script type="text/javascript">
+            $(document).ready(function () {
+                npireadmode();
+        });
+    </script>
+}
+
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+<div class="row">
+    <div class="col-lg-1 text-right">
+        <img src="~/Content/images/PJ/quailty.png" style="height:45px; width:45px">
+    </div>
+    <div class="col-lg-11">
+        <ol class="breadcrumb" style="font-size:18px">
+            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
+            @if (Model != null)
+            {
+                <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ProjectKey)">Project Detail</a></li>
+            }
+            @if (Model != null)
+            {
+                <li><a data-toggle="tooltip" title="Goto Quality Task" href="/Project/ProjectQuality?ProjectKey=@Model.ProjectKey">Project Quality</a></li>
+            }
+            <li class="active">Update Quality</li>
+        </ol>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+
+
 <div class="row">
     <div class="col-lg-3">
-        <h2>Update Quality</h2>
+
     </div>
     <div class="col-lg-1">
-        @if (Model != null)
-        {
-            <h2><a data-toggle="tooltip" title="Goto Quality Issue" href="/Project/ProjectQuality?ProjectKey=@Model.ProjectKey"><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span></a></h2>
-        }
+
     </div>
     <div class="col-lg-3">
         @if (Model != null && string.IsNullOrEmpty(Model.ParentIssueKey))

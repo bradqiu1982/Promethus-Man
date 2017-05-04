@@ -50,43 +50,43 @@
         <div class="form-horizontal">
             <div class="form-group">
 
-                    <div class="panel panel-default">
-                        <div class="panel-heading" style="background-color:whitesmoke;">
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="col-lg-11"><h3 class="panel-title">@Model.Title</h3></div>
-                                    <div class="col-lg-1">
-                                        <a href="/User/ModifyBlogDoc?DocKey=@Model.DocKey">
-                                            <img src="~/Content/images/icon/edit.png" MYTP="BT" style="height:34px; width:24px">
-                                        </a>
+                <div class="panel panel-default">
+                    <div class="panel-heading" style="background-color:whitesmoke;">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="col-lg-11"><h3 class="panel-title">@Model.Title</h3></div>
+                                <div class="col-lg-1">
+                                    <a href="/User/ModifyBlogDoc?DocKey=@Model.DocKey">
+                                        <img src="~/Content/images/icon/edit.png" MYTP="BT" style="height:34px; width:24px">
+                                    </a>
 
-                                        @*<button class="form-control" type="button" value="DocKey=@Model.DocKey" onclick="ModifyBlogDoc(this)">
+                                    @*<button class="form-control" type="button" value="DocKey=@Model.DocKey" onclick="ModifyBlogDoc(this)">
                                             <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                                         </button>*@
-                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
-                            @Html.Raw(Model.Content)
-                        </div>
                     </div>
-                    <script type="text/javascript">
-                        function ModifyBlogDoc(oBT) {
-                            if (oBT.value) {
-                                window.location.href = "/User/ModifyBlogDoc?" + oBT.value;
-                            }
+                    <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
+                        @Html.Raw(Model.Content)
+                    </div>
+                </div>
+                <script type="text/javascript">
+                    function ModifyBlogDoc(oBT) {
+                        if (oBT.value) {
+                            window.location.href = "/User/ModifyBlogDoc?" + oBT.value;
                         }
-                    </script>
+                    }
+                </script>
             </div>
         </div>
     }
 
     if (Model.CommentList.Count > 0)
     {
-        <hr/>
+        <hr />
         <div class="row">
-            <div class="row" style="margin-left:3px"><a data-toggle="collapse" href="#commentswell" aria-expanded="false" aria-controls="collapseExample"style="font-size:18px;font-family:'Arial Narrow';"><font color="black">@(Model.CommentList.Count) Comments</font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:20px; width:12px"></a></div>
+            <div class="row" style="margin-left:3px"><a data-toggle="collapse" href="#commentswell" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';"><font color="black">@(Model.CommentList.Count) Comments</font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:20px; width:12px"></a></div>
             <div class="row">
                 <div class="col-lg-12">&nbsp;</div>
             </div>
@@ -94,132 +94,146 @@
                 <div class="collapse" id="commentswell">
                     @foreach (var item in Model.CommentList)
                     {
-                            <div class="well" style="background-color:white;border-left-color:#006DC0;border-top-color:white;border-right-color:white;border-bottom-color:white;border-top-left-radius:0px;border-bottom-left-radius:0px">
-                                <div class="row">
+                        <div class="well" MYTP="HOVER" style="margin-bottom:2px;padding-bottom:2px;margin-top:2px;padding-top:2px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px;border-top-width:0px">
+                            <div class="row" MYTP="HOVER" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
                                     <div class="col-lg-6">
                                         <div class="col-lg-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")</div>
                                         <div class="col-lg-2">
                                             <a href="/User/UpdateWebDocComment?ErrorKey=@(item.ErrorKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())&Creator=@(Model.UserName)">
                                                 <img src="~/Content/images/icon/edit.png" MYTP="BT" style="height:34px; width:24px">
                                             </a>
-                                            @*<button class="form-control" type="button" value="ErrorKey=@(item.ErrorKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())&Creator=@(Model.UserName)" onclick="UpdateErrorComment(this)"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button>*@
                                         </div>
                                     </div>
                                     <div class="col-lg-6"></div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-lg-11"><hr /></div>
-                                    <div class="col-lg-1"></div>
-                                </div>
-                                <div class="row">
+                                <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
                                     <div class="col-lg-1"></div>
                                     <div class="col-lg-11">@Html.Raw(item.Comment)</div>
                                 </div>
-                                <script type="text/javascript">
-                                    function UpdateErrorComment(oBT) {
-                                        if (oBT.value) {
-                                            window.location.href = "/User/UpdateWebDocComment?" + oBT.value;
-                                        }
+                            </div>
+                            <script type="text/javascript">
+                                function UpdateErrorComment(oBT) {
+                                    if (oBT.value) {
+                                        window.location.href = "/User/UpdateWebDocComment?" + oBT.value;
                                     }
-                                </script>
+                                }
+                            </script>
+                        </div>
+
+                            <div class="row">
+                                <div class="col-lg-12">&nbsp;</div>
                             </div>
                     }
                 </div>
             </div>
-            
+
 
         </div>
     }
 
-            <hr />
+    <hr />
 
-            using (Html.BeginForm("WebDoc", "User", FormMethod.Post, new { enctype = "multipart/form-data" }))
-            {
-            @Html.AntiForgeryToken()
-            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    using (Html.BeginForm("WebDoc", "User", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-            <div class="form-horizontal">
-                <div class="form-group">
-                    <div class="col-lg-12">
-                        <label class="control-label">Comment</label>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="col-lg-12">
-                        <textarea name="docinputeditor" id="docinputeditor" rows="30" cols="80"></textarea>
-                        <script>
-                            CKEDITOR.replace('docinputeditor', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
-                        </script>
-                    </div>
-                </div>
-
-                <div class="form-group">
-
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="col-lg-4">
-                                <span class="btn btn-default btn-file" id="choosefile6">
-                                    Editor Attachment <input type="file" name="file6" id="file6" runat="server" onchange="ShowFileNames6(this)" />
-                                </span>
+        <div class="row">
+            <div class="row" style="margin-left:3px"><a data-toggle="collapse" href="#CommentInput" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';"><font color="black">Comment Input</font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:20px; width:12px"></a></div>
+            <div class="row">
+                <div class="col-lg-12">&nbsp;</div>
+            </div>
+            <div class="row" style="margin-left:10px">
+                <div class="collapse" id="CommentInput">
+                    <div class="form-horizontal">
+                        @*<div class="form-group">
+                            <div class="col-lg-12">
+                                <label class="control-label">Comment</label>
                             </div>
-                            <div class="col-lg-1"></div>
-                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                            <div class="col-lg-5"></div>
-                        </div>
-                        <script type="text/javascript">
-                            function ShowFileNames6(oFile) {
-                                ajaxFileUpload();
-                            }
-                            function ajaxFileUpload() {
-                                $.ajaxFileUpload
-                                (
-                                    {
-                                        url: '/userfiles/ImageUpload.ashx',
-                                        secureuri: false,
-                                        fileElementId: 'file6',
-                                        dataType: 'HTML',
-                                        success: function (data, status) {
-                                            var wholeval = CKEDITOR.instances.docinputeditor.getData() + data;
-                                            CKEDITOR.instances.docinputeditor.setData(wholeval);
-                                        },
-                                        error: function (e) {
-                                            alert(e);
-                                        }
-                                    }
-                                )
-                                return false;
-                            }
-                            function SaveUserContent() {
-                                RealSaveUserContent(CKEDITOR.instances.docinputeditor.getData());
-                                return false;
-                            }
-                        </script>
-                    </div>
-                </div>
+                        </div>*@
 
-                <hr />
-                <div class="form-group">
-                    <div class="row">
-                        <input class="form-control text-box single-line" value="@(Model.DocKey)" id="DocKey" name="DocKey" type="hidden" />
-                    </div>
-                    <div class="row">
-                        <input class="form-control text-box single-line" value="@(Model.DocURL)" id="DOCURL" name="DOCURL" type="hidden" />
-                    </div>
-                    <div class="row">
-                        <input class="form-control text-box single-line" value="@(Model.UserName)" id="DOCCREATOR" name="DOCCREATOR" type="hidden" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-lg-12">
-                        <div class="col-lg-10"></div>
-                        <div class="col-lg-2">
-                            <input type="submit" value="Submit" class="btn btn-default" />
+                        <div class="form-group">
+                            <div class="col-lg-12">
+                                <textarea name="docinputeditor" id="docinputeditor" rows="30" cols="80"></textarea>
+                                <script>
+                                    CKEDITOR.replace('docinputeditor', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
+                                </script>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="col-lg-4">
+                                        <span class="btn btn-default btn-file" id="choosefile6">
+                                            Editor Attachment <input type="file" name="file6" id="file6" runat="server" onchange="ShowFileNames6(this)" />
+                                        </span>
+                                    </div>
+                                    <div class="col-lg-1"></div>
+                                    <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                                    <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                                    <div class="col-lg-3"></div>
+                                    <div class="col-lg-2 text-right"><input style="background-color:#006DC0;color:white;" type="submit" value="Submit" class="btn btn-default" /></div>
+                                </div>
+                                <script type="text/javascript">
+                                    function ShowFileNames6(oFile) {
+                                        ajaxFileUpload();
+                                    }
+                                    function ajaxFileUpload() {
+                                        $.ajaxFileUpload
+                                        (
+                                            {
+                                                url: '/userfiles/ImageUpload.ashx',
+                                                secureuri: false,
+                                                fileElementId: 'file6',
+                                                dataType: 'HTML',
+                                                success: function (data, status) {
+                                                    var wholeval = CKEDITOR.instances.docinputeditor.getData() + data;
+                                                    CKEDITOR.instances.docinputeditor.setData(wholeval);
+                                                },
+                                                error: function (e) {
+                                                    alert(e);
+                                                }
+                                            }
+                                        )
+                                        return false;
+                                    }
+                                    function SaveUserContent() {
+                                        RealSaveUserContent(CKEDITOR.instances.docinputeditor.getData());
+                                        return false;
+                                    }
+                                </script>
+                            </div>
+                        </div>
+
+                        <hr />
+                        <div class="form-group">
+                            <div class="row">
+                                <input class="form-control text-box single-line" value="@(Model.DocKey)" id="DocKey" name="DocKey" type="hidden" />
+                            </div>
+                            <div class="row">
+                                <input class="form-control text-box single-line" value="@(Model.DocURL)" id="DOCURL" name="DOCURL" type="hidden" />
+                            </div>
+                            <div class="row">
+                                <input class="form-control text-box single-line" value="@(Model.UserName)" id="DOCCREATOR" name="DOCCREATOR" type="hidden" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-lg-12">
+                                <div class="col-lg-10"></div>
+                                <div class="col-lg-2">
+                                    @*<input type="submit" value="Submit" class="btn btn-default" />*@
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            }
-            }
+        </div>
+
+
+                    }
+                    }
 

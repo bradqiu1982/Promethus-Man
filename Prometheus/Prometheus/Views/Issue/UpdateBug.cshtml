@@ -1,7 +1,7 @@
 ﻿@model Prometheus.Models.IssueViewModels
 
 @{
-    ViewBag.Title = "UpdateBug";
+    ViewBag.Title = "Update FA";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -11,22 +11,53 @@
 else
 {
     <script type="text/javascript">
-    $(document).ready(function () {
-        npireadmode();
+        $(document).ready(function () {
+            npireadmode();
         });
     </script>
 }
 
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
 
 <div class="row">
-    <div class="col-lg-3">
-        <h2>Update Bug</h2>
-    </div>
+    <div class="col-lg-12">&nbsp;</div>
+</div>
 
+<div class="row">
+    <div class="col-lg-1 text-right">
+        <img src="~/Content/images/PJ/FA.png" style="height:45px; width:45px">
+    </div>
+    <div class="col-lg-9">
+        <ol class="breadcrumb" style="font-size:18px">
+            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
+            @if (Model != null)
+            {
+                <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ProjectKey)">Project Detail</a></li>
+            }
+            @if (Model != null)
+            {
+                <li><a data-toggle="tooltip" title="Goto FA Task" href="/Project/ProjectFA?ProjectKey=@Model.ProjectKey">Project FA</a></li>
+            }
+            @if (Model != null)
+            {
+                if (Model.Summary.Contains("@Burn-In Step"))
+                {
+                    <li><a data-toggle="tooltip" title="Goto Debug Tree" href="/BurnIn/UpdateBIError2?ErrorCode=@(Model.ErrAbbr)">Debug Tree</a></li>
+                }
+                else
+                {
+                    <li><a data-toggle="tooltip" title="Goto Debug Tree" href="/Project/UpdateProjectError2?ProjectKey=@(Model.ProjectKey)&ErrorCode=@(Model.ErrAbbr)">Debug Tree</a></li>
+                }
+            }
+            <li class="active">Update FA</li>
+        </ol>
+    </div>
     <div class="col-lg-2">
         @if (Model != null && string.IsNullOrEmpty(Model.ParentIssueKey))
         {
-            using (Html.BeginForm("PrepareSubIssue", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            using (Html.BeginForm("PrepareSubIssue", "Issue", FormMethod.Post, new { enctype = "multipart/form-data", id = "subtaskid", name = "subtaskid" }))
             {
                 @Html.AntiForgeryToken()
                 if (Model != null && !string.IsNullOrEmpty(Model.IssueKey))
@@ -45,40 +76,29 @@ else
                 {
                     <input class="form-control text-box single-line" id="HProjectKey" name="HProjectKey" type="hidden" value="" />
                 }
-                <button data-toggle="tooltip" title="Add Sub Issue" type="submit" class="btn btn-default glyphicon-plus" style="font-size:1.5em; margin-top: 0.83em;margin-bottom: 0.83em;width:100px;"></button>
+                @*<img src="~/Content/images/icon/Add.png" data-toggle="tooltip" title="Add Sub Task" style="height:40px; width:26px" onclick="AddSubTask()">*@
+                <button type="submit" class="form-control" style="background-color:#006DC0;height:3em;color:white;">Add Sub-Task</button>
             }
         }
         else if (Model != null && !string.IsNullOrEmpty(Model.ParentIssueKey))
         {
-            <h2><a data-toggle="tooltip" title="Goto Parent Task" href="/Issue/UpdateIssue?issuekey=@(Model.ParentIssueKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+
         }
+        <script type="text/javascript">
+            function AddSubTask() {
+                $("#subtaskid").submit();
+            }
+        </script>
     </div>
+</div>
 
-    <div class="col-lg-1">
-        @if (Model.Summary.Contains("@Burn-In Step"))
-        {
-            <h2><a data-toggle="tooltip" title="Goto Debug Tree" href="/BurnIn/UpdateBIError2?ErrorCode=@(Model.ErrAbbr)"><span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span></a></h2>
-        }
-        else
-        {
-            <h2><a data-toggle="tooltip" title="Goto Debug Tree" href="/Project/UpdateProjectError2?ProjectKey=@(Model.ProjectKey)&ErrorCode=@(Model.ErrAbbr)"><span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span></a></h2>
-        }
-    </div>
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
 
-    <div class="col-lg-1">
-        <h2><a data-toggle="tooltip" title="Goto Project Task" href="/Project/ProjectIssues?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span></a></h2>
-    </div>
 
-    <div class="col-lg-1">
-        <h2><a data-toggle="tooltip" title="Goto Project FA" href="/Project/ProjectFA?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span></a></h2>
-    </div>
-
-    <div class="col-lg-1">
-        <h2><a data-toggle="tooltip" title="Goto Project RMA" href="/Project/ProjectRMAStatus?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span></a></h2>
-    </div>
-
-    <div class="col-lg-1">
-        <h2><a data-toggle="tooltip" title="Goto Project NPI" href="/Project/ProjectNPI?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></a></h2>
+<div class="row">
+    <div class="col-lg-10">
     </div>
 
     <div class="col-lg-2">
@@ -88,7 +108,7 @@ else
         }
     </div>
 </div>
-<hr />
+
 
 <script src="../../ckeditor/ckeditor.js"></script>
 
@@ -97,113 +117,114 @@ else
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-    <div class="form-group">
-
-        <div class="form-horizontal">
-
+    <div class="row">
+        <div class="col-lg-2" style="font-family:'Arial Narrow';font-size:18px"><strong>&nbsp;&nbsp;Information</strong></div>
+        <div class="col-lg-10">
             <div class="form-group">
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="projectlist">Project<font color="red">*</font></label>
-                    <div class="col-lg-10">
-                        @Html.DropDownList("projectlist", null, new { @id = "projectlist", @class = "form-control", @readonly = "readonly" })
+                <div class="row">
+                    <div class="col-lg-6">
+                        <label class="control-label col-lg-2" for="projectlist">Project<font color="red">*</font></label>
+                        <div class="col-lg-10">
+                            @Html.DropDownList("projectlist", null, new { @id = "projectlist", @class = "form-control", @readonly = "readonly" })
+                        </div>
                     </div>
-                </div>
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="issuetypelist">IssueType<font color="red">*</font></label>
-                    <div class="col-lg-10">
-                        @Html.DropDownList("issuetypelist", null, new { @id = "issuetypelist", @class = "form-control" })
+                    <div class="col-lg-6">
+                        <label class="control-label col-lg-2" for="issuetypelist">IssueType</label>
+                        <div class="col-lg-10">
+                            @Html.DropDownList("issuetypelist", null, new { @id = "issuetypelist", @class = "form-control", @readonly = "readonly" })
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="form-group">
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="Summary">Summary<font color="red">*</font></label>
-                    <div class="col-lg-10">
-                        @if (Model != null && !string.IsNullOrEmpty(Model.Summary))
-                        {
-                            <input class="form-control text-box single-line" value="@Model.Summary" readonly="readonly" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 180." data-val-length-max="180" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="Summary" name="Summary" type="text" />
-                        }
-                        else
-                        {
-                            <input class="form-control text-box single-line" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 180." data-val-length-max="180" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="Summary" name="Summary" type="text" value="" />
-                        }
-
-                        <span class="field-validation-valid text-danger" data-valmsg-for="Summary" data-valmsg-replace="true"></span>
-                    </div>
-
-                </div>
-
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="resolutionlist">Status<font color="red">*</font></label>
-                    <div class="col-lg-10">
-                        @if (ViewBag.isassignee != null && ViewBag.isassignee)
-                        {
-                            @Html.DropDownList("resolutionlist", null, new { @id = "resolutionlist", @class = "form-control",@onchange="chooseissuetag()" })
-                        }
-                        else
-                        {
-                            @Html.DropDownList("resolutionlist", null, new { @id = "resolutionlist", @class = "form-control", @readonly = "readonly" })
-                        }
-
-                    </div>
-                    @if (ViewBag.isassignee != null
-                        && ViewBag.isassignee
-                        && Model.FailureDetailCommentList.Count > 0
-                        && Model.RootCauseCommentList.Count > 0)
-                    {
-                        <script type="text/javascript">
-                            function chooseissuetag()
+                <div class="row">
+                    <div class="col-lg-6">
+                        <label class="control-label col-lg-2" for="Summary">Summary<font color="red">*</font></label>
+                        <div class="col-lg-10">
+                            @if (Model != null && !string.IsNullOrEmpty(Model.Summary))
                             {
-                                if (document.getElementById("resolutionlist")
-                                    && (document.getElementById("resolutionlist").value === "Fixed"
-                                    || document.getElementById("resolutionlist").value === "Done")) {
-                                    $('#issuetag').modal({ backdrop: 'static' });
+                                <input class="form-control text-box single-line" value="@Model.Summary" readonly="readonly" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 180." data-val-length-max="180" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="Summary" name="Summary" type="text" />
+                            }
+                            else
+                            {
+                                <input class="form-control text-box single-line" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 180." data-val-length-max="180" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="Summary" name="Summary" type="text" value="" />
+                            }
+
+                            <span class="field-validation-valid text-danger" data-valmsg-for="Summary" data-valmsg-replace="true"></span>
+                        </div>
+
+                    </div>
+                    <div class="col-lg-6">
+                        <label class="control-label col-lg-2" for="resolutionlist">Status<font color="red">*</font></label>
+                        <div class="col-lg-10">
+                            @if (ViewBag.isassignee != null && ViewBag.isassignee)
+                            {
+                                @Html.DropDownList("resolutionlist", null, new { @id = "resolutionlist", @class = "form-control", @onchange = "chooseissuetag()" })
+                            }
+                            else
+                            {
+                                @Html.DropDownList("resolutionlist", null, new { @id = "resolutionlist", @class = "form-control", @readonly = "readonly" })
+                            }
+
+                        </div>
+                        @if (ViewBag.isassignee != null
+    && ViewBag.isassignee
+    && Model.FailureDetailCommentList.Count > 0
+    && Model.RootCauseCommentList.Count > 0)
+                        {
+                            <script type="text/javascript">
+                                function chooseissuetag() {
+                                    if (document.getElementById("resolutionlist")
+                                        && (document.getElementById("resolutionlist").value === "Fixed"
+                                        || document.getElementById("resolutionlist").value === "Done")) {
+                                        $('#issuetag').modal({ backdrop: 'static' });
+                                    }
                                 }
-                            }
-                        </script>
-                    }
-                    else
-                    {
-                        <script type="text/javascript">
-                            function chooseissuetag()
-                            {
-                            }
-                        </script>
-                    }
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="prioritylist">Priority</label>
-                    <div class="col-lg-10">
-                        @Html.DropDownList("prioritylist", null, new { @id = "prioritylist", @class = "form-control" })
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="assigneelist">Assignee</label>
-                    <div class="col-lg-10">
-                        @Html.DropDownList("assigneelist", null, new { @id = "assigneelist", @class = "form-control" })
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="DueDate">DueDate<font color="red">*</font></label>
-                    <div class="col-lg-10">
-                        @if (Model != null && string.Compare(Model.DueDate.ToString("yyyy-MM-dd"), "0001-01-01") != 0)
-                        {
-                            <input class="form-control text-box single-line" value="@Model.DueDate.ToString("yyyy-MM-dd")" data-val="true" data-val-required="The DueDate field is required." id="DueDate" name="DueDate" type="text" />
+                            </script>
                         }
                         else
                         {
-                            <input class="form-control text-box single-line" data-val="true" data-val-required="The DueDate field is required." id="DueDate" name="DueDate" type="text" value="" />
+                            <script type="text/javascript">
+                                function chooseissuetag() {
+                                }
+                            </script>
                         }
-                        <span class="field-validation-valid text-danger" data-valmsg-for="DueDate" data-valmsg-replace="true"></span>
                     </div>
-
                 </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <label class="control-label col-lg-2" for="prioritylist">Priority</label>
+                        <div class="col-lg-10">
+                            @Html.DropDownList("prioritylist", null, new { @id = "prioritylist", @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <label class="control-label col-lg-2" for="assigneelist">Assignee</label>
+                        <div class="col-lg-10">
+                            @Html.DropDownList("assigneelist", null, new { @id = "assigneelist", @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <label class="control-label col-lg-2" for="DueDate">DueDate<font color="red">*</font></label>
+                        <div class="col-lg-10">
+                            @if (Model != null && string.Compare(Model.DueDate.ToString("yyyy-MM-dd"), "0001-01-01") != 0)
+                            {
+                                <input class="form-control text-box single-line" value="@Model.DueDate.ToString("yyyy-MM-dd")" data-val="true" data-val-required="The DueDate field is required." id="DueDate" name="DueDate" type="text" />
+                            }
+                            else
+                            {
+                                <input class="form-control text-box single-line" data-val="true" data-val-required="The DueDate field is required." id="DueDate" name="DueDate" type="text" value="" />
+                            }
+                            <span class="field-validation-valid text-danger" data-valmsg-for="DueDate" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
 
                     <div class="col-lg-6">
                         <label class="control-label col-lg-2">Creator</label>
@@ -219,935 +240,1007 @@ else
                         </div>
                     </div>
 
-                <script type="text/javascript">
-                    $(document).ready(function () {
-                        $("#DueDate").datepicker({
-                            changeMonth: true,
-                            changeYear: true,
-                            dateFormat: 'yy-mm-dd'
+                    <script type="text/javascript">
+                        $(document).ready(function () {
+                            $("#DueDate").datepicker({
+                                changeMonth: true,
+                                changeYear: true,
+                                dateFormat: 'yy-mm-dd'
+                            });
                         });
-                    });
-                </script>
+                    </script>
+                </div>
             </div>
-
             @if (ViewBag.birootcauselist != null)
             {
                 <div class="form-group">
-
-                    <div class="col-lg-6">
-                        <label class="control-label col-lg-2" for="birootcauselist">BI RootCause</label>
-                        <div class="col-lg-10">
-                            @Html.DropDownList("birootcauselist", null, new { @id = "birootcauselist", @class = "form-control" })
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <label class="control-label col-lg-2" for="birootcauselist">BI RootCause</label>
+                            <div class="col-lg-10">
+                                @Html.DropDownList("birootcauselist", null, new { @id = "birootcauselist", @class = "form-control" })
+                            </div>
                         </div>
+                        <div class="col-lg-6"></div>
+                    </div>
+
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">&nbsp;</div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-2" style="font-family:'Arial Narrow';font-size:18px"><strong>&nbsp;&nbsp;Related People</strong></div>
+        <div class="col-lg-10">
+            <div class="row">
+                <div class="form-group">
+                    <div class="col-lg-12" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
+                        @if (Model != null && !string.IsNullOrEmpty(Model.RelativePeoples))
+                        {
+                            <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" onclick="chooserelatedpeople()" style="min-width: 100%;min-height:40px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 800." data-val-length-max="800" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$">@Model.RelativePeoples</textarea>
+                        }
+                        else
+                        {
+                            <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" onclick="chooserelatedpeople()" style="min-width: 100%;min-height:40px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 800." data-val-length-max="800" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$"></textarea>
+                        }
+                    </div>
+                    <span class="field-validation-valid text-danger" data-valmsg-for="RPeopleAddr" data-valmsg-replace="true"></span>
+                </div>
+                <script type="text/javascript">
+                    function chooserelatedpeople() {
+                        $('#relatedmodal').modal({ backdrop: 'static' });
+                    }
+
+                    function fillreleatepeople() {
+                        $('#relatedmodal').modal('hide');
+                        document.getElementById("RPeopleAddr").value = document.getElementById("towhoinput1").value;
+                        document.getElementById("RPeopleAddr").focus();
+                    }
+                </script>
+            </div>
+        </div>
+    </div>
+
+    <hr style="border-color:#006DC0;" />
+
+    <div class="row">
+        <div class="row" style="margin-left:3px">
+            <div class="col-lg-2">
+                <a data-toggle="collapse" href="#attachwell" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
+                    <font color="black"><strong>&nbsp;&nbsp;@(Model.AttachList.Count) Attachements</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
+                </a>
+            </div>
+            <div class="col-lg-10">
+                <div class="col-lg-3">
+                    <span class="btn btn-default btn-file" id="choosefile3" style="padding:0px;background-color:transparent !important;border-color:transparent !important;">
+                        <img src="~/Content/images/icon/Upload.png" style="height:20px; width:34px"> <input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
+                    </span>
+                </div>
+                <div class="col-lg-9">
+                    <div class="col-lg-11">
+                        <label class="control-label" id="showfile3" name="showfile3"></label>
+                    </div>
+                    <div class="col-lg-1">
+                        <input class="form-control text-box single-line" value="" id="attachmentupload" name="attachmentupload" type="hidden" />
+                    </div>
+                </div>
+            </div>
+            <script type="text/javascript">
+                function ShowFileNames3(oFile) {
+                    $('#showfile3').text(oFile.value);
+                    document.getElementById("attachmentupload").value = oFile.value;
+                    $('#attachtag').modal({ backdrop: 'static' });
+                }
+
+                function attachsubmit() {
+                    $('#attachtag').modal('hide');
+                    $('#issueform').submit();
+                }
+            </script>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">&nbsp;</div>
+        </div>
+
+        <div class="row" style="margin-left:10px">
+            <div class="collapse" id="attachwell">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            @if (Model != null && Model.AttachList.Count > 0)
+                            {
+                                foreach (var item in Model.AttachList)
+                                {
+                                    var realfn = "";
+                                    if (item.Contains("<a href"))
+                                    {
+                                        var tempfn = item.Split(new string[] { "<a href=", "target=" }, StringSplitOptions.None)[1].Replace("\"", "").Trim();
+                                        var tempfns = tempfn.Split(new string[] { "/" }, StringSplitOptions.None);
+                                        realfn = tempfns[tempfns.Length - 1];
+                                    }
+                                    else
+                                    {
+                                        var tempfns = item.Split(new string[] { "/" }, StringSplitOptions.None);
+                                        realfn = tempfns[tempfns.Length - 1].Trim();
+                                    }
+
+                                    if (item.Contains("<a href"))
+                                    {
+                                        <div class="row">
+                                            @Html.Raw(item);
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        var fns = item.Split(new char[] { '/' });
+                                        var fn = fns[fns.Length - 1];
+
+                                        <div class="row">
+                                            <div class="col-lg-1"></div>
+                                            <div class="col-lg-6">
+                                                <a href="@item" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>@fn</a>
+                                            </div>
+                                            <div class="col-lg-1" data-toggle="tooltip" title="Delete">
+                                                @if (ViewBag.isassignee != null && ViewBag.isassignee)
+                                                {
+                                                    <img src="~/Content/images/icon/delete2.png" style="height:30px; width:18px" onclick="DeleteAttachment('@realfn')">
+                                                }
+                                            </div>
+                                            <div class="col-lg-4"></div>
+                                        </div>
+                                    }
+                                }
+
+                                <script type="text/javascript">
+                                    function DeleteAttachment(oBT) {
+                                        if (confirm("Do you real want to delete this attachment?")) {
+                                            window.location.href = '/Issue/DeleteAttachment?issuekey=' + document.getElementById("HIssueKeyForDelete").value + '&filename=' + oBT
+                                        }
+                                        else {
+                                            window.location.href = '/Issue/UpdateIssue?issuekey=' + document.getElementById("HIssueKeyForDelete").value
+                                        }
+                                    }
+                                </script>
+                            }
+
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <hr style="border-color:#006DC0;" />
+
+    if (Model != null && Model.SubIssues.Count > 0)
+    {
+        <div class="row">
+            <div class="row" style="margin-left:3px">
+                <div class="col-lg-12">
+                    <a data-toggle="collapse" href="#subtasks" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
+                        <font color="black"><strong>&nbsp;&nbsp;@(Model.SubIssues.Count) Sub Tasks</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
+                    </a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">&nbsp;</div>
+            </div>
+            <div class="row" style="margin-left:10px">
+                <div class="collapse" id="subtasks">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-1"></div>
+                            <div class="col-lg-8">
+                                <div class="well" style="margin-bottom:8px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px;padding-top:4px;padding-bottom:4px">
+                                    <div class="row">
+                                        <div class="col-lg-4">Summary</div>
+                                        <div class="col-lg-2">Status</div>
+                                        <div class="col-lg-2">Asignee</div>
+                                        <div class="col-lg-2">DueDate</div>
+                                        <div class="col-lg-2"></div>
+                                    </div>
+                                    @foreach (var item in Model.SubIssues)
+                                    {
+                                        <div class="row">
+                                            <div class="col-lg-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></div>
+                                            <div class="col-lg-2">@item.Resolution</div>
+                                            <div class="col-lg-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
+                                            <div class="col-lg-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
+                                            <div class="col-lg-2"></div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-lg-3"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr style="border-color:#006DC0;" />
+    }
+
+    if (ViewBag.isassignee != null
+        && ViewBag.isassignee
+        && Model.FailureDetailCommentList.Count == 0)
+    {
+        <div class="row">
+            <div class="row" style="margin-left:3px">
+                <div class="col-lg-12">
+                    <a data-toggle="collapse" href="#analyseinput" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
+                        <font color="black"><strong>&nbsp;&nbsp;Analyse Input</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
+                    </a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">&nbsp;</div>
+            </div>
+            <div class="row" style="margin-left:10px">
+                <div class="collapse" id="analyseinput">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-1"></div>
+                            <div class="col-lg-10">
+                                <div class="row">
+                                    <div class="form-group">
+                                        <label class="control-label">Failure Detail</label>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div>
+                                            <textarea name="failureeditor" id="failureeditor" rows="10" cols="80"></textarea>
+                                            <script>
+                                                CKEDITOR.replace('failureeditor', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
+                                            </script>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="col-lg-4">
+                                                    <span class="btn btn-default btn-file" id="choosefile6">
+                                                        Editor Attachment <input type="file" name="file6" id="file6" runat="server" onchange="ShowFileNames6(this)" />
+                                                    </span>
+                                                </div>
+                                                <div class="col-lg-1"></div>
+                                                <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                                                <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                                                <div class="col-lg-5"></div>
+                                            </div>
+                                            <script type="text/javascript">
+                                                function ShowFileNames6(oFile) {
+                                                    ajaxFileUpload6();
+                                                }
+                                                function ajaxFileUpload6() {
+                                                    $.ajaxFileUpload
+                                                    (
+                                                        {
+                                                            url: '/userfiles/ImageUpload.ashx',
+                                                            secureuri: false,
+                                                            fileElementId: 'file6',
+                                                            dataType: 'HTML',
+                                                            success: function (data, status) {
+                                                                var wholeval = CKEDITOR.instances.failureeditor.getData() + data;
+                                                                CKEDITOR.instances.failureeditor.setData(wholeval);
+                                                            },
+                                                            error: function (e) {
+                                                                alert(e);
+                                                            }
+                                                        }
+                                                    )
+                                                    return false;
+                                                }
+                                            </script>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-12">&nbsp;</div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="form-group">
+                                        <label class="control-label">Root Cause Investigation</label>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div>
+                                            <textarea name="rootcauseeditor" id="rootcauseeditor" rows="10" cols="80"></textarea>
+                                            <script>
+                                                CKEDITOR.replace('rootcauseeditor', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
+                                            </script>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="col-lg-4">
+                                                    <span class="btn btn-default btn-file" id="choosefile7">
+                                                        Editor Attachment <input type="file" name="file7" id="file7" runat="server" onchange="ShowFileNames7(this)" />
+                                                    </span>
+                                                </div>
+                                                <div class="col-lg-1"></div>
+                                                <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                                                <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                                                <div class="col-lg-5"></div>
+                                            </div>
+                                            <script type="text/javascript">
+                                                function ShowFileNames7(oFile) {
+                                                    ajaxFileUpload7();
+                                                }
+                                                function ajaxFileUpload7() {
+                                                    $.ajaxFileUpload
+                                                    (
+                                                        {
+                                                            url: '/userfiles/ImageUpload.ashx',
+                                                            secureuri: false,
+                                                            fileElementId: 'file7',
+                                                            dataType: 'HTML',
+                                                            success: function (data, status) {
+                                                                var wholeval = CKEDITOR.instances.rootcauseeditor.getData() + data;
+                                                                CKEDITOR.instances.rootcauseeditor.setData(wholeval);
+                                                            },
+                                                            error: function (e) {
+                                                                alert(e);
+                                                            }
+                                                        }
+                                                    )
+                                                    return false;
+                                                }
+                                            </script>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-12">&nbsp;</div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="form-group">
+                                        <label class="control-label">Result</label>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div>
+                                            <textarea name="resulteditor" id="resulteditor" rows="10" cols="80"></textarea>
+                                            <script>
+                                                CKEDITOR.replace('resulteditor', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
+                                            </script>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="col-lg-4">
+                                                    <span class="btn btn-default btn-file" id="choosefile8">
+                                                        Editor Attachment <input type="file" name="file8" id="file8" runat="server" onchange="ShowFileNames8(this)" />
+                                                    </span>
+                                                </div>
+                                                <div class="col-lg-1"></div>
+                                                <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                                                <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                                                <div class="col-lg-5"></div>
+                                            </div>
+                                            <script type="text/javascript">
+                                                function ShowFileNames8(oFile) {
+                                                    ajaxFileUpload8();
+                                                }
+                                                function ajaxFileUpload8() {
+                                                    $.ajaxFileUpload
+                                                    (
+                                                        {
+                                                            url: '/userfiles/ImageUpload.ashx',
+                                                            secureuri: false,
+                                                            fileElementId: 'file8',
+                                                            dataType: 'HTML',
+                                                            success: function (data, status) {
+                                                                var wholeval = CKEDITOR.instances.resulteditor.getData() + data;
+                                                                CKEDITOR.instances.resulteditor.setData(wholeval);
+                                                            },
+                                                            error: function (e) {
+                                                                alert(e);
+                                                            }
+                                                        }
+                                                    )
+                                                    return false;
+                                                }
+                                            </script>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-1"></div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr style="border-color:#006DC0;" />
+    }
+
+
+    if (Model.FailureDetailCommentList.Count > 0)
+    {
+        <div class="row">
+            <div class="row" style="margin-left:3px">
+                <div class="col-lg-12">
+                    <a data-toggle="collapse" href="#failurecom" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
+                        <font color="black"><strong>&nbsp;&nbsp;Failure Detail</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
+                    </a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">&nbsp;</div>
+            </div>
+            <div class="row" style="margin-left:10px">
+                <div class="collapse" id="failurecom">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-1"></div>
+                            <div class="col-lg-11">
+                                @foreach (var item in Model.FailureDetailCommentList)
+                                {
+                                    <div class="well"  style="margin-bottom:2px;padding-bottom:2px;margin-top:2px;padding-top:2px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px;border-top-width:0px">
+                                        <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                            <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                                <div class="col-lg-6">
+                                                    <div class="col-lg-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")</div>
+                                                    <div class="col-lg-2">
+                                                        <a href="/Issue/ModifyIssueComment?IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
+                                                            <img src="~/Content/images/icon/edit.png" MYTP="BT" style="height:34px; width:24px">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6"></div>
+                                            </div>
+                                            <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                                <div class="col-lg-1"></div>
+                                                <div class="col-lg-11">@Html.Raw(item.Comment)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    }
+
+    if (Model.RootCauseCommentList.Count > 0)
+    {
+        <div class="row">
+            <div class="row" style="margin-left:3px">
+                <div class="col-lg-12">
+                    <a data-toggle="collapse" href="#rootcausecom" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
+                        <font color="black"><strong>&nbsp;&nbsp;RootCause Investigation</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
+                    </a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">&nbsp;</div>
+            </div>
+            <div class="row" style="margin-left:10px">
+                <div class="collapse" id="rootcausecom">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-1"></div>
+                            <div class="col-lg-11">
+                                @foreach (var item in Model.RootCauseCommentList)
+                                {
+                                    <div class="well"  style="margin-bottom:2px;padding-bottom:2px;margin-top:2px;padding-top:2px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px;border-top-width:0px">
+                                        <div class="row"  style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                            <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                                <div class="col-lg-6">
+                                                    <div class="col-lg-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")</div>
+                                                    <div class="col-lg-2">
+                                                        <a href="/Issue/ModifyIssueComment?IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
+                                                            <img src="~/Content/images/icon/edit.png" MYTP="BT" style="height:34px; width:24px">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6"></div>
+                                            </div>
+                                            <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                                <div class="col-lg-1"></div>
+                                                <div class="col-lg-11">@Html.Raw(item.Comment)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                }
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    }
+
+    if (Model.ResultCommentList.Count > 0)
+    {
+        <div class="row">
+            <div class="row" style="margin-left:3px">
+                <div class="col-lg-12">
+                    <a data-toggle="collapse" href="#resultcom" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
+                        <font color="black"><strong>&nbsp;&nbsp;Result</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
+                    </a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">&nbsp;</div>
+            </div>
+            <div class="row" style="margin-left:10px">
+                <div class="collapse" id="resultcom">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-1"></div>
+                            <div class="col-lg-11">
+                                @foreach (var item in Model.ResultCommentList)
+                                {
+                                    <div class="well"  style="margin-bottom:2px;padding-bottom:2px;margin-top:2px;padding-top:2px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px;border-top-width:0px">
+                                        <div class="row"  style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                            <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                                <div class="col-lg-6">
+                                                    <div class="col-lg-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")</div>
+                                                    <div class="col-lg-2">
+                                                        <a href="/Issue/ModifyIssueComment?IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
+                                                            <img src="~/Content/images/icon/edit.png" MYTP="BT" style="height:34px; width:24px">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6"></div>
+                                            </div>
+                                            <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                                <div class="col-lg-1"></div>
+                                                <div class="col-lg-11">@Html.Raw(item.Comment)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                }
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr style="border-color:#006DC0;" />
+    }
+
+
+
+    if (Model.GeneralCommentList.Count > 0)
+    {
+        <div class="row">
+            <div class="row" style="margin-left:3px">
+                <div class="col-lg-12">
+                    <a data-toggle="collapse" href="#generalcomment" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
+                        <font color="black"><strong>&nbsp;&nbsp;@(Model.GeneralCommentList.Count) Comments</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
+                    </a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">&nbsp;</div>
+            </div>
+            <div class="row" style="margin-left:10px">
+                <div class="collapse" id="generalcomment">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-1"></div>
+                            <div class="col-lg-11">
+                                @foreach (var item in Model.GeneralCommentList)
+                                {
+                                    <div class="well" MYTP="HOVER" style="margin-bottom:2px;padding-bottom:2px;margin-top:2px;padding-top:2px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px;border-top-width:0px">
+                                        <div class="row" MYTP="HOVER" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                            <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                                <div class="col-lg-6">
+                                                    <div class="col-lg-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")</div>
+                                                    <div class="col-lg-2">
+                                                        <a href="/Issue/ModifyIssueComment?IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
+                                                            <img src="~/Content/images/icon/edit.png" MYTP="BT" style="height:34px; width:24px">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6"></div>
+                                            </div>
+                                            <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                                <div class="col-lg-1"></div>
+                                                <div class="col-lg-11">@Html.Raw(item.Comment)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr style="border-color:#006DC0;" />
+    }
+
+    <div class="row">
+        <div class="row" style="margin-left:3px">
+            <div class="col-lg-12">
+                <a data-toggle="collapse" href="#commentinput" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
+                    <font color="black"><strong>&nbsp;&nbsp;Comment Input</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
+                </a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">&nbsp;</div>
+        </div>
+        <div class="row" style="margin-left:10px">
+            <div class="collapse" id="commentinput">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-1"></div>
+                        <div class="col-lg-10">
+                            <div class="form-group">
+                                <div>
+                                    <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
+                                    <script>
+                                        CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
+                                    </script>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="col-lg-4">
+                                            <span class="btn btn-default btn-file" id="choosefile9">
+                                                Editor Attachment <input type="file" name="file9" id="file9" runat="server" onchange="ShowFileNames9(this)" />
+                                            </span>
+                                        </div>
+                                        <div class="col-lg-1"></div>
+                                        <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                                        <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                                        <div class="col-lg-5"></div>
+                                    </div>
+                                    <script type="text/javascript">
+                                        function ShowFileNames9(oFile) {
+                                            ajaxFileUpload9();
+                                        }
+                                        function ajaxFileUpload9() {
+                                            $.ajaxFileUpload
+                                            (
+                                                {
+                                                    url: '/userfiles/ImageUpload.ashx',
+                                                    secureuri: false,
+                                                    fileElementId: 'file9',
+                                                    dataType: 'HTML',
+                                                    success: function (data, status) {
+                                                        var wholeval = CKEDITOR.instances.editor1.getData() + data;
+                                                        CKEDITOR.instances.editor1.setData(wholeval);
+                                                    },
+                                                    error: function (e) {
+                                                        alert(e);
+                                                    }
+                                                }
+                                            )
+                                            return false;
+                                        }
+                                    </script>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-1"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div class="form-group">
+        <div class="col-lg-6">
+            @if (Model != null && !string.IsNullOrEmpty(Model.IssueKey))
+                {
+                <input class="form-control text-box single-line" value="@(Model.IssueKey)" id="IssueKey" name="IssueKey" type="hidden" />
+            }
+            else
+            {
+                <input class="form-control text-box single-line" id="IssueKey" name="IssueKey" type="hidden" value="" />
+            }
+        </div>
+        <div class="col-lg-6"></div>
+    </div>
+
+
+        <script type="text/javascript">
+            function DeleteSPIssueComment(oBT) {
+                if (oBT.value) {
+                    if (confirm("Do you really want to delete this comment?")) {
+                        window.location.href = "/Issue/DeleteSPIssueComment?" + oBT.value;
+                    }
+                }
+            }
+
+            function ModifyIssueComment(oBT) {
+                if (oBT.value) {
+                    window.location.href = "/Issue/ModifyIssueComment?" + oBT.value;
+                }
+            }
+        </script>
+
+        <div class="row">
+            <div class="col-lg-12">&nbsp;</div>
+        </div>
+
+        <div class="row">
+            <div class="form-group">
+                <div class="row col-lg-12">
+                    <div class="col-lg-2">
+                        <input style="background-color:dodgerblue;" type="submit" value="Submit" id="updateisu" name="updateisu" class="btn btn-default" />
+                    </div>
+                    <div class="col-lg-2">
+                        @if (ViewBag.isassignee != null && ViewBag.isassignee)
+                        {
+                            <input style="background-color:red;" type="submit" value="Delete" id="deleteisu" name="deleteisu" class="btn btn-default" />
+                        }
+                    </div>
+                    <div class="col-lg-2">
+                        <button style="background-color:forestgreen;" class="btn btn-default" type="button" value="IssueKey=@(Model.IssueKey)&ToWho=" onclick="PushTask(this)">Push</button>
+                        <input class="form-control text-box single-line" value="" id="pushtowho" name="pushtowho" type="hidden" />
                     </div>
                     <div class="col-lg-6"></div>
                 </div>
-            }
-
-            <hr />
-
-            <div class="form-group">
-                <div class="col-lg-12">
-                    <div class="col-lg-4">
-                        <span class="btn btn-default btn-file" id="choosefile3">
-                            Attachment <input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
-                        </span>
-                    </div>
-                    <div class="col-lg-8">
-                        <div class="col-lg-11">
-                            <label class="control-label" id="showfile3" name="showfile3"></label>
-                        </div>
-                        <div class="col-lg-1">
-                            <input class="form-control text-box single-line" value="" id="attachmentupload" name="attachmentupload" type="hidden" />
-                        </div>
-                    </div>
-                </div>
-                <script type="text/javascript">
-                        function ShowFileNames3(oFile) {
-                            $('#showfile3').text(oFile.value);
-                            document.getElementById("attachmentupload").value = oFile.value;
-                            $('#attachtag').modal({ backdrop: 'static' });
-                        }
-
-                        function attachsubmit() {
-                            $('#attachtag').modal('hide');
-                            $('#issueform').submit();
-                        }
-
-                </script>
             </div>
-
-
-                <hr />
-                    <div class="col-lg-12">
-                        <div class="form-group">
-                            <label>Related People Email</label>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="col-lg-12" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
-                                @if (Model != null && !string.IsNullOrEmpty(Model.RelativePeoples))
-                                {
-                                    <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" onclick="chooserelatedpeople()" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 800." data-val-length-max="800" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$">@Model.RelativePeoples</textarea>
-                                }
-                                else
-                                {
-                                    <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" onclick="chooserelatedpeople()" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 800." data-val-length-max="800" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$"></textarea>
-                                }
-                            </div>
-                            <span class="field-validation-valid text-danger" data-valmsg-for="RPeopleAddr" data-valmsg-replace="true"></span>
-                        </div>
-                        <script type="text/javascript">
-                            function chooserelatedpeople()
-                            {
-                                $('#relatedmodal').modal({ backdrop: 'static' });
-                            }
-
-                            function fillreleatepeople()
-                            {
-                                $('#relatedmodal').modal('hide');
-                                document.getElementById("RPeopleAddr").value = document.getElementById("towhoinput1").value;
-                                document.getElementById("RPeopleAddr").focus();
-                            }
-                        </script>
-                    </div>
-
-            <hr />
-
-            <div class="form-group">
-                <div class="col-lg-6">
-                    @if (Model != null && !string.IsNullOrEmpty(Model.IssueKey))
-                    {
-                        <input class="form-control text-box single-line" value="@(Model.IssueKey)" id="IssueKey" name="IssueKey" type="hidden" />
-                    }
-                    else
-                    {
-                        <input class="form-control text-box single-line" id="IssueKey" name="IssueKey" type="hidden" value="" />
-                    }
-                </div>
-                <div class="col-lg-6"></div>
-            </div>
-
-            @if (Model != null && Model.SubIssues.Count > 0)
-                {
-                <div class="form-group">
-                    <div class="col-lg-12">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Sub Issues</h3>
-                            </div>
-                            <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
-                                <div class="row">
-                                    <div class="col-lg-4">Summary</div>
-                                    <div class="col-lg-2">Status</div>
-                                    <div class="col-lg-2">Asignee</div>
-                                    <div class="col-lg-2">DueDate</div>
-                                    <div class="col-lg-2"></div>
-                                </div>
-                                @foreach (var item in Model.SubIssues)
-                                {
-                                    <div class="row">
-                                        <div class="col-lg-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></div>
-                                        <div class="col-lg-2">@item.Resolution</div>
-                                        <div class="col-lg-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
-                                        <div class="col-lg-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
-                                        <div class="col-lg-2"></div>
-                                    </div>
-                                }
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            }
-
-            @if (Model != null && Model.AttachList.Count > 0)
-                {
-                <hr />
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">Attachments</h3>
-                                </div>
-                                <div class="panel-body">
-                                    @foreach (var item in Model.AttachList)
-                                    {
-                                        var realfn = "";
-                                        if (item.Contains("<a href"))
-                                        {
-                                            var tempfn = item.Split(new string[] { "<a href=", "target=" }, StringSplitOptions.None)[1].Replace("\"", "").Trim();
-                                            var tempfns = tempfn.Split(new string[] { "/" }, StringSplitOptions.None);
-                                            realfn = tempfns[tempfns.Length - 1];
-                                        }
-                                        else
-                                        {
-                                            var tempfns = item.Split(new string[] { "/" }, StringSplitOptions.None);
-                                            realfn = tempfns[tempfns.Length - 1].Trim();
-                                        }
-
-                                        if (item.Contains("<a href"))
-                                        {
-                                            <div class="row">
-                                                @Html.Raw(item);
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            var fns = item.Split(new char[] { '/' });
-                                            var fn = fns[fns.Length - 1];
-
-                                            <div class="row">
-                                                <div class="col-lg-6">
-                                                    <a href="@item" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>@fn</a>
-                                                </div>
-                                                <div class="col-lg-1">
-                                                    @if (ViewBag.isassignee != null && ViewBag.isassignee)
-                                                    {
-                                                        <button class="form-control" value="@realfn" type="button" onclick="DeleteAttachment(this)">
-                                                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                                                        </button>
-                                                    }
-                                                </div>
-                                                <div class="col-lg-5"></div>
-                                            </div>
-                                        }
-                                    }
-                                </div>
-                            </div>
-
-                            <script type="text/javascript">
-                                function DeleteAttachment(oBT) {
-                                    if (confirm("Do you real want to delete this attachment?")) {
-                                        window.location.href = '/Issue/DeleteAttachment?issuekey=' + document.getElementById("HIssueKeyForDelete").value + '&filename=' + oBT.value
-                                    }
-                                    else {
-                                        window.location.href = '/Issue/UpdateIssue?issuekey=' + document.getElementById("HIssueKeyForDelete").value
-                                    }
-                                }
-                            </script>
-
-                        </div>
-                    </div>
-            }
-
-            @if (Model.FailureDetailCommentList.Count > 0)
-            {
-
-            <div class="form-group">
-                <div class="col-lg-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Failure Detail</h3>
-                        </div>
-                        <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
-                            @foreach (var item in Model.FailureDetailCommentList)
-                            {
-                                <div class="row col-lg-12">
-                                    @Html.Raw(item.Comment)
-                                </div>
-                                    <div class="row col-lg-12">
-                                        <div class="col-lg-6"></div>
-                                        <div class="col-lg-1">
-                                            @if (ViewBag.isassignee != null && ViewBag.isassignee)
-                                            {
-                                                <button class="form-control" type="button" value="IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="ModifyIssueComment(this)">
-                                                    <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                                                </button>
-                                            }
-                                        </div>
-                                        <div class="col-lg-2">
-                                            Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>
-                                        </div>
-                                        <div class="col-lg-2">
-                                            @item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")
-                                        </div>
-                                        <div class="col-lg-1">
-                                            @if (ViewBag.isassignee != null && ViewBag.isassignee)
-                                            {
-                                                <button class="form-control" type="button" value="IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="DeleteSPIssueComment(this)">
-                                                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                                                </button>
-                                            }
-                                        </div>
-                                    </div>
-                                    <hr />
-                            }
-                        </div>
-                    </div>
-                </div>
-            </div>
-            }
-
-            @if (Model.RootCauseCommentList.Count > 0)
-            {
-            <hr />
-
-            <div class="form-group">
-                <div class="col-lg-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Root Cause Investigation</h3>
-                        </div>
-                        <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
-                            @foreach (var item in Model.RootCauseCommentList)
-                            {
-                                <div class="row col-lg-12">
-                                    @Html.Raw(item.Comment)
-                                </div>
-                                <div class="row col-lg-12">
-                                    <div class="col-lg-6"></div>
-                                    <div class="col-lg-1">
-                                        @if (ViewBag.isassignee != null && ViewBag.isassignee)
-                                        {
-                                            <button class="form-control" type="button" value="IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="ModifyIssueComment(this)">
-                                                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                                            </button>
-                                        }
-                                    </div>
-                                    <div class="col-lg-2">
-                                        Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>
-                                    </div>
-                                    <div class="col-lg-2">
-                                        @item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")
-                                    </div>
-                                    <div class="col-lg-1">
-                                        @if (ViewBag.isassignee != null && ViewBag.isassignee)
-                                        {
-                                            <button class="form-control" type="button" value="IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="DeleteSPIssueComment(this)">
-                                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                                            </button>
-                                        }
-                                    </div>
-
-                                </div>
-                                    <hr />
-                            }
-                        </div>
-                    </div>
-                </div>
-            </div>
-            }
-
-            @if (Model.ResultCommentList.Count > 0)
-            {
-                <hr />
-
-                <div class="form-group">
-                    <div class="col-lg-12">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Result</h3>
-                            </div>
-                            <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
-                                @foreach (var item in Model.ResultCommentList)
-                                {
-                                    <div class="row col-lg-12">
-                                        @Html.Raw(item.Comment)
-                                    </div>
-                                    <div class="row col-lg-12">
-                                        <div class="col-lg-6"></div>
-                                        <div class="col-lg-1">
-                                            @if (ViewBag.isassignee != null && ViewBag.isassignee)
-                                            {
-                                                <button class="form-control" type="button" value="IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="ModifyIssueComment(this)">
-                                                    <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                                                </button>
-                                            }
-                                        </div>
-                                        <div class="col-lg-2">
-                                            Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>
-                                        </div>
-                                        <div class="col-lg-2">
-                                            @item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")
-                                        </div>
-                                        <div class="col-lg-1">
-                                            @if (ViewBag.isassignee != null && ViewBag.isassignee)
-                                            {
-                                                <button class="form-control" type="button" value="IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="DeleteSPIssueComment(this)">
-                                                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                                                </button>
-                                            }
-                                        </div>
-                                    </div>
-                                    <hr />
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            }
-
-            @foreach (var item in Model.GeneralCommentList)
-                {
-                <hr />
-                    <div class="form-group">
-                        <div class="col-lg-12">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <div class="row">
-                                        <div class="col-lg-2"><h3 class="panel-title">Comment</h3></div>
-                                        <div class="col-lg-7"></div>
-                                        <div class="col-lg-1">
-                                            @if (ViewBag.isassignee != null && ViewBag.isassignee)
-                                            {
-                                                <button class="form-control" type="button" value="IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="ModifyIssueComment(this)">
-                                                    <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                                                </button>
-                                            }
-                                        </div>
-                                        <div class="col-lg-1"></div>
-                                        <div class="col-lg-1">
-                                            @if (ViewBag.isassignee != null && ViewBag.isassignee)
-                                            {
-                                                <button class="form-control" type="button" value="IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="DeleteSPIssueComment(this)">
-                                                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                                                </button>
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
-                                    @Html.Raw(item.Comment)
-                                </div>
-                                <div class="panel-footer text-right">
-                                    Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a> @item.CommentDate.ToString()
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-            }
-            <hr />
-
             <script type="text/javascript">
-                function DeleteSPIssueComment(oBT) {
-                    if (oBT.value) {
-                            if (confirm("Do you really want to delete this comment?"))
-                            {
-                                window.location.href = "/Issue/DeleteSPIssueComment?" + oBT.value;
-                            }
-                        }
+                function PushTask(oBT) {
+                    document.getElementById("pushtowho").value = oBT.value;
+
+                    if (document.getElementById("RPeopleAddr").value) {
+                        document.getElementById("towhoinput").value = document.getElementById("RPeopleAddr").value;
+                    }
+
+                    if (CKEDITOR.instances.editor1.getData()) {
+                        document.getElementById("issuereason").value = 'WITHCOMMENT:' + CKEDITOR.instances.editor1.getData();
+                    }
+
+                    $('#towhotag').modal({ backdrop: 'static' });
                 }
 
-                function ModifyIssueComment(oBT) {
-                    if (oBT.value) {
-                            window.location.href = "/Issue/ModifyIssueComment?" + oBT.value;
+                function realpush() {
+                    var myurl = ""
+                    $.base64.utf8encode = true;
+                    var tempreason = "";
+                    if (document.getElementById("issuereason").value) {
+                        tempreason = $.base64.btoa(document.getElementById("issuereason").value);
                     }
+
+                    if (document.getElementById("towhoinput").value) {
+                        myurl = "/Issue/IPush?" + document.getElementById("pushtowho").value + document.getElementById("towhoinput").value + "&Reason=" + tempreason;
+                    }
+                    else {
+                        myurl = "/Issue/IPush?" + document.getElementById("pushtowho").value + document.getElementById("towholist").value + "&Reason=" + tempreason;
+                    }
+
+                    $('#towhotag').modal('hide');
+
+                    window.location.href = myurl;
                 }
             </script>
         </div>
 
-        @if (ViewBag.isassignee != null && ViewBag.isassignee)
-        {
-            <div class="col-lg-12">
-                <div class="form-group">
-                    <label class="control-label">Failure Detail</label>
-                </div>
-
-                <div class="form-group">
-                    <div>
-                        <textarea name="failureeditor" id="failureeditor" rows="10" cols="80"></textarea>
-                        <script>
-                            CKEDITOR.replace('failureeditor', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
-                        </script>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="col-lg-4">
-                                <span class="btn btn-default btn-file" id="choosefile6">
-                                    Editor Attachment <input type="file" name="file6" id="file6" runat="server" onchange="ShowFileNames6(this)" />
-                                </span>
-                            </div>
-                            <div class="col-lg-1"></div>
-                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                            <div class="col-lg-5"></div>
-                        </div>
-                        <script type="text/javascript">
-                                            function ShowFileNames6(oFile) {
-                                                ajaxFileUpload6();
-                                            }
-                                            function ajaxFileUpload6() {
-                                                $.ajaxFileUpload
-                                                (
-                                                    {
-                                                        url: '/userfiles/ImageUpload.ashx',
-                                                        secureuri: false,
-                                                        fileElementId: 'file6',
-                                                        dataType: 'HTML',
-                                                        success: function (data, status)
-                                                        {
-                                                            var wholeval = CKEDITOR.instances.failureeditor.getData() + data;
-                                                            CKEDITOR.instances.failureeditor.setData(wholeval);
-                                                        },
-                                                        error: function (e)
-                                                        {
-                                                            alert(e);
-                                                        }
-                                                    }
-                                                )
-                                                return false;
-                                            }
-                        </script>
-                    </div>
-                </div>
-
-            </div>
-
-            <hr />
-
-            <div class="col-lg-12">
-                <div class="form-group">
-                    <label class="control-label">Root Cause Investigation</label>
-                </div>
-
-                <div class="form-group">
-                    <div>
-                        <textarea name="rootcauseeditor" id="rootcauseeditor" rows="10" cols="80"></textarea>
-                        <script>
-                            CKEDITOR.replace('rootcauseeditor', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
-                        </script>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="col-lg-4">
-                                <span class="btn btn-default btn-file" id="choosefile7">
-                                    Editor Attachment <input type="file" name="file7" id="file7" runat="server" onchange="ShowFileNames7(this)" />
-                                </span>
-                            </div>
-                            <div class="col-lg-1"></div>
-                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                            <div class="col-lg-5"></div>
-                        </div>
-                        <script type="text/javascript">
-                                            function ShowFileNames7(oFile) {
-                                                ajaxFileUpload7();
-                                            }
-                                            function ajaxFileUpload7() {
-                                                $.ajaxFileUpload
-                                                (
-                                                    {
-                                                        url: '/userfiles/ImageUpload.ashx',
-                                                        secureuri: false,
-                                                        fileElementId: 'file7',
-                                                        dataType: 'HTML',
-                                                        success: function (data, status)
-                                                        {
-                                                            var wholeval = CKEDITOR.instances.rootcauseeditor.getData() + data;
-                                                            CKEDITOR.instances.rootcauseeditor.setData(wholeval);
-                                                        },
-                                                        error: function (e)
-                                                        {
-                                                            alert(e);
-                                                        }
-                                                    }
-                                                )
-                                                return false;
-                                            }
-                        </script>
-                    </div>
-                </div>
-
-            </div>
-
-            <hr />
-
-            <div class="col-lg-12">
-                <div class="form-group">
-                    <label class="control-label">Result</label>
-                </div>
-
-                <div class="form-group">
-                    <div>
-                        <textarea name="resulteditor" id="resulteditor" rows="10" cols="80"></textarea>
-                        <script>
-                            CKEDITOR.replace('resulteditor', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
-                        </script>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="col-lg-4">
-                                <span class="btn btn-default btn-file" id="choosefile8">
-                                    Editor Attachment <input type="file" name="file8" id="file8" runat="server" onchange="ShowFileNames8(this)" />
-                                </span>
-                            </div>
-                            <div class="col-lg-1"></div>
-                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                            <div class="col-lg-5"></div>
-                        </div>
-                        <script type="text/javascript">
-                                            function ShowFileNames8(oFile) {
-                                                ajaxFileUpload8();
-                                            }
-                                            function ajaxFileUpload8() {
-                                                $.ajaxFileUpload
-                                                (
-                                                    {
-                                                        url: '/userfiles/ImageUpload.ashx',
-                                                        secureuri: false,
-                                                        fileElementId: 'file8',
-                                                        dataType: 'HTML',
-                                                        success: function (data, status)
-                                                        {
-                                                            var wholeval = CKEDITOR.instances.resulteditor.getData() + data;
-                                                            CKEDITOR.instances.resulteditor.setData(wholeval);
-                                                        },
-                                                        error: function (e)
-                                                        {
-                                                            alert(e);
-                                                        }
-                                                    }
-                                                )
-                                                return false;
-                                            }
-                        </script>
-                    </div>
-                </div>
-
-            </div>
-            <hr/>
-        }
-
-        <div class="row">
-
-                <div class="form-group">
-                    <label class="control-label">Comment</label>
-                </div>
-
-                    <div class="form-group">
-                        <div>
-                            <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
-                            <script>
-                                CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
-                            </script>
-                        </div>
-                    </div>
-                    
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="col-lg-4">
-                            <span class="btn btn-default btn-file" id="choosefile9">
-                                Editor Attachment <input type="file" name="file9" id="file9" runat="server" onchange="ShowFileNames9(this)" />
-                            </span>
-                        </div>
-                        <div class="col-lg-1"></div>
-                        <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                        <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                        <div class="col-lg-5"></div>
-                    </div>
-                    <script type="text/javascript">
-                                            function ShowFileNames9(oFile) {
-                                                ajaxFileUpload9();
-                                            }
-                                            function ajaxFileUpload9() {
-                                                $.ajaxFileUpload
-                                                (
-                                                    {
-                                                        url: '/userfiles/ImageUpload.ashx',
-                                                        secureuri: false,
-                                                        fileElementId: 'file9',
-                                                        dataType: 'HTML',
-                                                        success: function (data, status)
-                                                        {
-                                                            var wholeval = CKEDITOR.instances.editor1.getData() + data;
-                                                            CKEDITOR.instances.editor1.setData(wholeval);
-                                                        },
-                                                        error: function (e)
-                                                        {
-                                                            alert(e);
-                                                        }
-                                                    }
-                                                )
-                                                return false;
-                                            }
-                    </script>
-                    @if (ViewBag.isassignee != null && ViewBag.isassignee)
-                    {
-                        <script type="text/javascript">
-                            function SaveUserContent() {
-                                RealSaveUserContent($("#RPeopleAddr").val());
-                                RealSaveUserContent(CKEDITOR.instances.editor1.getData());
-                                RealSaveUserContent(CKEDITOR.instances.failureeditor.getData());
-                                RealSaveUserContent(CKEDITOR.instances.rootcauseeditor.getData());
-                                RealSaveUserContent(CKEDITOR.instances.resulteditor.getData());
-                                return false;
-                            }
-                        </script>
-                    }
-                    else
-                    {
-                        <script type="text/javascript">
-                            function SaveUserContent() {
-                                RealSaveUserContent(CKEDITOR.instances.editor1.getData());
-                                return false;
-                            }
-                        </script>
-                    }
-                </div>
-            </div>
-        </div>
-
-        <hr/>
-        <div class="row">
-            <div class="form-group">
-                @if (ViewBag.isassignee != null
-                    && ViewBag.isassignee
-                    && Model.FailureDetailCommentList.Count > 0
-                    && Model.RootCauseCommentList.Count > 0)
-                {
-                    <div class="col-lg-6">
-                        <div class="col-lg-2">
-                            <label class="control-label" for="analysetitle">DebugTree Analyse Title</label>
-                        </div>
-                        <div class="col-lg-10">
-                            <input class="form-control text-box single-line" id="analysetitle" name="analysetitle" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 200." data-val-length-max="200" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" type="text" value="" />
-                            <span class="field-validation-valid text-danger" data-valmsg-for="analysetitle" data-valmsg-replace="true"></span>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                    </div>
-                }
-            </div>
-        </div>
-        
-    </div>
-
-    <div class="row">
-        <div class="form-group">
-            <div class="row col-lg-12">
-                <div class="form-group">
-                    <div class="col-lg-3">
-                        <input type="submit" value="Submit" id="updateisu" name="updateisu" class="btn btn-default" />
-                    </div>
-                    <div class="col-lg-3">
-                        @if (ViewBag.isassignee != null && ViewBag.isassignee)
-                {
-                            <input type="submit" value="Delete" id="deleteisu" name="deleteisu" class="btn btn-default" />
-                        }
-                    </div>
-                    <div class="col-lg-3">
-                        @if (ViewBag.isassignee != null
+    if (ViewBag.isassignee != null
         && ViewBag.isassignee
         && Model.FailureDetailCommentList.Count > 0
         && Model.RootCauseCommentList.Count > 0)
-                        {
-                            <input type="submit" value="Link2DebugTree" id="linkisu" name="linkisu" class="btn btn-default" />
-                        }
-                        else if (ViewBag.isassignee != null
-                            && ViewBag.isassignee)
-                        {
-                            <button type="button" disabled>Link2DebugTree</button>
-                        }
-                    </div>
-                    <div class="col-lg-3">
-                            <button class="btn btn-default" type="button" value="IssueKey=@(Model.IssueKey)&ToWho=" onclick="PushTask(this)">Push</button>
-                            <input class="form-control text-box single-line" value="" id="pushtowho" name="pushtowho" type="hidden" />
-                    </div>
+    {
+        <hr style="border-color:#006DC0;" />
 
-                    <script type="text/javascript">
-                        function PushTask(oBT)
-                        {
-                            document.getElementById("pushtowho").value = oBT.value;
-
-                            if (document.getElementById("RPeopleAddr").value) {
-                                document.getElementById("towhoinput").value = document.getElementById("RPeopleAddr").value;
-                            }
-
-                            if (CKEDITOR.instances.editor1.getData()) {
-                                document.getElementById("issuereason").value = 'WITHCOMMENT:' + CKEDITOR.instances.editor1.getData();
-                            }
-
-                            $('#towhotag').modal({ backdrop: 'static' });
-                        }
-
-                        function realpush() {
-                            var myurl = ""
-                            $.base64.utf8encode = true;
-                            var tempreason = "";
-                            if (document.getElementById("issuereason").value) {
-                                tempreason = $.base64.btoa(document.getElementById("issuereason").value);
-                            }
-
-                            if (document.getElementById("towhoinput").value) {
-                                myurl = "/Issue/IPush?" + document.getElementById("pushtowho").value + document.getElementById("towhoinput").value + "&Reason=" + tempreason;
-                            }
-                            else {
-                                myurl = "/Issue/IPush?" + document.getElementById("pushtowho").value + document.getElementById("towholist").value + "&Reason=" + tempreason;
-                            }
-
-                            $('#towhotag').modal('hide');
-
-                            window.location.href = myurl;
-                        }
-                    </script>
+            <div class="row">
+                <div class="col-lg-2" style="font-family:'Arial Narrow';font-size:18px"><strong>&nbsp;&nbsp;Debug Tree</strong></div>
+                <div class="col-lg-4">
+                    <input class="form-control text-box single-line" placeholder="Debug Tree Analyse Title" id="analysetitle" name="analysetitle" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 200." data-val-length-max="200" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" type="text" value="" />
+                    <span class="field-validation-valid text-danger" data-valmsg-for="analysetitle" data-valmsg-replace="true"></span>
                 </div>
-            </div>
-        </div>
-        </div>
-
-        <div class="modal" id="attachtag" tabindex="-1" role="dialog" aria-labelledby="attachtagLabel">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title" id="attachtagLabel">Share Document Tag</h4>
+                <div class="col-lg-1"  data-toggle="tooltip" title="Link 2 Debug Tree">
+                        <img src="~/Content/images/PJ/DebugTreeicon.png" style="height:30px; width:30px" onclick="link2dbgtree()">
                     </div>
-                    <div class="row"></div>
-                    <hr />
-                    <div class="row"></div>
-                    @if (ViewBag.tobechoosetags != null)
+                <div class="col-lg-5">
+                    <input type="submit" value="Link2DebugTree" id="linkisu" name="linkisu" class="btn btn-default" style="display:none;"/>
+                </div>
+                <script type="text/javascript">
+                    function link2dbgtree()
                     {
-                        for (var idx = 0; idx < ViewBag.tobechoosetags.Count; idx++)
-                        {
-                            <div class="col-lg-4">
+                        $("#linkisu").click();
+                    }
+                </script>
+            </div>
+    }
+    else if (ViewBag.isassignee != null
+                && ViewBag.isassignee)
+    {
+        <hr style="border-color:#006DC0;" />
+
+            <div class="row" data-toggle="tooltip" title="Link 2 Debug Tree">
+                <button type="button" style="padding:0px;background-color:transparent !important;border-color:transparent !important;" disabled>
+                    <img src="~/Content/images/PJ/DebugTreeicon.png" style="height:30px; width:30px">
+                </button>              
+            </div>
+        }
+
+  
+                <div class="modal" id="attachtag" tabindex="-1" role="dialog" aria-labelledby="attachtagLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="attachtagLabel">Share Document Tag</h4>
+                            </div>
+                            <div class="row"></div>
+                            <hr />
+                            <div class="row"></div>
+                            @if (ViewBag.tobechoosetags != null)
+                            {
+                                for (var idx = 0; idx < ViewBag.tobechoosetags.Count; idx++)
+                                {
+                                    <div class="col-lg-4">
+                                        <div class="col-lg-3">
+                                            <input type="checkbox" id="attachtagcheck@(idx)" name="attachtagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
+                                        </div>
+                                        <div class="col-lg-9">
+                                            <label class="control-label">@(ViewBag.tobechoosetags[idx])</label>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            <div class="row"></div>
+                            <hr />
+                            <div class="row"></div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
+                                <button type="button" class="btn btn-success" onclick="attachsubmit()">Upload Now</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal" id="issuetag" tabindex="-1" role="dialog" aria-labelledby="issuetagLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="issuetagLabel">Share Issue Tag</h4>
+                            </div>
+                            <div class="row"></div>
+                            <hr />
+                            <div class="row"></div>
+                            @if (ViewBag.tobechoosetags != null)
+                            {
+                                for (var idx = 0; idx < ViewBag.tobechoosetags.Count; idx++)
+                                {
+                                    <div class="col-lg-4">
+                                        <div class="col-lg-3">
+                                            <input type="checkbox" id="issuetagcheck@(idx)" name="issuetagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
+                                        </div>
+                                        <div class="col-lg-9">
+                                            <label class="control-label">@(ViewBag.tobechoosetags[idx])</label>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            <div class="row"></div>
+                            <hr />
+                            <div class="row"></div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">Done</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal" id="towhotag" tabindex="-1" role="dialog" aria-labelledby="towhoLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="towhoLabel">Push Bug</h4>
+                            </div>
+                            <div class="row"></div>
+                            <div class="row col-lg-12">
                                 <div class="col-lg-3">
-                                    <input type="checkbox" id="attachtagcheck@(idx)" name="attachtagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
+                                    <label class="control-label">To Who</label>
                                 </div>
                                 <div class="col-lg-9">
-                                    <label class="control-label">@(ViewBag.tobechoosetags[idx])</label>
+                                    @Html.DropDownList("towholist", null, new { @id = "towholist", @class = "form-control", @onchange = "chooseapusher()" })
+                                </div>
+                                <script type="text/javascript">
+                                    function chooseapusher() {
+                                        document.getElementById("towhoinput").value = document.getElementById("towholist").value + ';' + document.getElementById("towhoinput").value;
+                                    }
+                                </script>
+                            </div>
+                            <hr />
+                            <div class="row col-lg-12">
+                                <div class="col-lg-3">
+                                    <label class="control-label">To who Input</label>
+                                </div>
+                                <div class="col-lg-9" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
+                                    <textarea class="form-control col-lg-12" name="towhoinput" id="towhoinput" style="height:100px;min-width:300px;"></textarea>
                                 </div>
                             </div>
-                        }
-                    }
-                    <div class="row"></div>
-                    <hr />
-                    <div class="row"></div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
-                        <button type="button" class="btn btn-success" onclick="attachsubmit()">Upload Now</button>
+                            <hr />
+                            <div class="row col-lg-12">
+                                <div class="col-lg-3">
+                                    <label class="control-label">Push Comment<font color="red">*</font></label>
+                                </div>
+                                <div class="col-lg-9" data-toggle="tooltip" data-placement="center" title="Your Comment">
+                                    <textarea class="form-control col-lg-12" name="issuereason" id="issuereason" style="height:100px;min-width:300px;"></textarea>
+                                </div>
+                            </div>
+                            <div class="row"></div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-success" onclick="realpush()">Push</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="modal" id="issuetag" tabindex="-1" role="dialog" aria-labelledby="issuetagLabel">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title" id="issuetagLabel">Share Issue Tag</h4>
-                    </div>
-                    <div class="row"></div>
-                    <hr />
-                    <div class="row"></div>
-                    @if (ViewBag.tobechoosetags != null)
-                {
-                    for (var idx = 0; idx < ViewBag.tobechoosetags.Count; idx++)
-                    {
-                            <div class="col-lg-4">
+                <div class="modal" id="relatedmodal" tabindex="-1" role="dialog" aria-labelledby="relatedmodalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="relatedmodalLabel">Choose People</h4>
+                            </div>
+                            <div class="row"></div>
+                            <div class="row col-lg-12">
                                 <div class="col-lg-3">
-                                    <input type="checkbox" id="issuetagcheck@(idx)" name="issuetagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
+                                    <label class="control-label">To Who</label>
                                 </div>
                                 <div class="col-lg-9">
-                                    <label class="control-label">@(ViewBag.tobechoosetags[idx])</label>
+                                    @Html.DropDownList("towholist1", null, new { @id = "towholist1", @class = "form-control", @onchange = "chooseapusher1()" })
+                                </div>
+                                <script type="text/javascript">
+                                    function chooseapusher1() {
+                                        document.getElementById("towhoinput1").value = document.getElementById("towholist1").value + ';' + document.getElementById("towhoinput1").value;
+                                    }
+                                </script>
+                            </div>
+                            <hr />
+                            <div class="row col-lg-12">
+                                <div class="col-lg-3">
+                                    <label class="control-label">To who Input</label>
+                                </div>
+                                <div class="col-lg-9" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
+                                    <textarea class="form-control col-lg-12" name="towhoinput1" id="towhoinput1" style="height:100px;min-width:300px;"></textarea>
                                 </div>
                             </div>
-                        }
-                    }
-                    <div class="row"></div>
-                    <hr />
-                    <div class="row"></div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal">Done</button>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-success" onclick="fillreleatepeople()">OK</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <div class="modal" id="towhotag" tabindex="-1" role="dialog" aria-labelledby="towhoLabel">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title" id="towhoLabel">Push Bug</h4>
-                    </div>
-                    <div class="row"></div>
-                    <div class="row col-lg-12">
-                        <div class="col-lg-3">
-                            <label class="control-label">To Who</label>
-                        </div>
-                        <div class="col-lg-9">
-                            @Html.DropDownList("towholist", null, new { @id = "towholist", @class = "form-control",@onchange="chooseapusher()" })
-                        </div>
-                        <script type="text/javascript">
-                            function chooseapusher()
-                            {
-                                document.getElementById("towhoinput").value = document.getElementById("towholist").value + ';' + document.getElementById("towhoinput").value;
-                            }
-                        </script>
-                    </div>
-                    <hr />
-                    <div class="row col-lg-12">
-                        <div class="col-lg-3">
-                            <label class="control-label">To who Input</label>
-                        </div>
-                        <div class="col-lg-9" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
-                            <textarea class="form-control col-lg-12" name="towhoinput" id="towhoinput" style="height:100px;min-width:300px;"></textarea>
-                        </div>
-                    </div>
-                    <hr />
-                    <div class="row col-lg-12">
-                        <div class="col-lg-3">
-                            <label class="control-label">Push Comment<font color="red">*</font></label>
-                        </div>
-                        <div class="col-lg-9" data-toggle="tooltip" data-placement="center" title="Your Comment">
-                            <textarea class="form-control col-lg-12" name="issuereason" id="issuereason" style="height:100px;min-width:300px;"></textarea>
-                        </div>
-                    </div>
-                    <div class="row"></div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-success" onclick="realpush()">Push</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal" id="relatedmodal" tabindex="-1" role="dialog" aria-labelledby="relatedmodalLabel">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title" id="relatedmodalLabel">Choose People</h4>
-                    </div>
-                    <div class="row"></div>
-                    <div class="row col-lg-12">
-                        <div class="col-lg-3">
-                            <label class="control-label">To Who</label>
-                        </div>
-                        <div class="col-lg-9">
-                            @Html.DropDownList("towholist1", null, new { @id = "towholist1", @class = "form-control", @onchange = "chooseapusher1()" })
-                        </div>
-                        <script type="text/javascript">
-                            function chooseapusher1()
-                            {
-                                document.getElementById("towhoinput1").value = document.getElementById("towholist1").value + ';' + document.getElementById("towhoinput1").value;
-                            }
-                        </script>
-                    </div>
-                    <hr />
-                    <div class="row col-lg-12">
-                        <div class="col-lg-3">
-                            <label class="control-label">To who Input</label>
-                        </div>
-                        <div class="col-lg-9" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
-                            <textarea class="form-control col-lg-12" name="towhoinput1" id="towhoinput1" style="height:100px;min-width:300px;"></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-success" onclick="fillreleatepeople()">OK</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-}
+                }
 
 

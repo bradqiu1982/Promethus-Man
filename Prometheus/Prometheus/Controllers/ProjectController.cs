@@ -3794,153 +3794,8 @@ namespace Prometheus.Controllers
             }
 
             var urls = ReceiveAttachFiles();
-
-            var detailcontenturl = string.Empty;
-            var detailcontentreffile = string.Empty;
-            if (!string.IsNullOrEmpty(Request.Form["detailattach"]))
-            {
-                var internalreportfile = Request.Form["detailattach"];
-                var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
-                    .Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                foreach (var r in urls)
-                {
-                    if (r.Contains(originalname))
-                    {
-                        detailcontentreffile = originalname;
-                        detailcontenturl = r;
-                        break;
-                    }
-                }
-            }
-
-            var rootcontenturl = string.Empty;
-            var rootcontentreffile = string.Empty;
-            if (!string.IsNullOrEmpty(Request.Form["rootattach"]))
-            {
-                var internalreportfile = Request.Form["rootattach"];
-                var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
-                    .Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                foreach (var r in urls)
-                {
-                    if (r.Contains(originalname))
-                    {
-                        rootcontentreffile = originalname;
-                        rootcontenturl = r;
-                        break;
-                    }
-                }
-            }
-
-            var resultcontenturl = string.Empty;
-            var resultcontentreffile = string.Empty;
-            if (!string.IsNullOrEmpty(Request.Form["resultattach"]))
-            {
-                var internalreportfile = Request.Form["resultattach"];
-                var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
-                    .Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                foreach (var r in urls)
-                {
-                    if (r.Contains(originalname))
-                    {
-                        resultcontentreffile = originalname;
-                        resultcontenturl = r;
-                        break;
-                    }
-                }
-            }
-
-            var failuredetail = string.Empty;
-            var result = string.Empty;
-
-            if (!string.IsNullOrEmpty(Request.Form["analysetitle"]))
-            {
-                var com = new ErrorComments();
-                com.Comment = Request.Form["analysetitle"];
-                ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.AnalyzeTitle, vm.Reporter, currenttime);
-            }
-
-            if (Request.Form["editor3"] != null)
-            {
-                var com = new ErrorComments();
-                com.Comment = SeverHtmlDecode.Decode(this,Request.Form["editor3"]);
-                if (!string.IsNullOrEmpty(com.Comment))
-                {
-                    if (!string.IsNullOrEmpty(detailcontenturl))
-                    {
-                        com.Comment = com.Comment + "<p><a href='" + detailcontenturl + "' target='_blank'>Reference File: " + detailcontentreffile + " " + "</a></p>";
-                    }
-
-                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.FailureDetail, vm.Reporter, currenttime);
-                        UserRankViewModel.UpdateUserRank(updater, 2);
-                    failuredetail = com.Comment;
-                }
-            }
-
-            if (Request.Form["resulteditor"] != null)
-            {
-                var com = new ErrorComments();
-                com.Comment = SeverHtmlDecode.Decode(this,Request.Form["resulteditor"]);
-                if (!string.IsNullOrEmpty(com.Comment))
-                {
-                    if (!string.IsNullOrEmpty(resultcontenturl))
-                    {
-                        com.Comment = com.Comment + "<p><a href='" + resultcontenturl + "' target='_blank'>Reference File: " + resultcontentreffile + " " + "</a></p>";
-                    }
-
-                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.Result, vm.Reporter, currenttime);
-                        UserRankViewModel.UpdateUserRank(updater, 2);
-                    result = com.Comment;
-                }
-            }
-
-            if (Request.Form["editor2"] != null)
-            {
-                var com = new ErrorComments();
-                com.Comment = SeverHtmlDecode.Decode(this,Request.Form["editor2"]);
-                if (!string.IsNullOrEmpty(com.Comment))
-                {
-                    if (!string.IsNullOrEmpty(rootcontenturl))
-                    {
-                        com.Comment = com.Comment + "<p><a href='" + rootcontenturl + "' target='_blank'>Reference File: " + rootcontentreffile + " " + "</a></p>";
-                    }
-
-                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.RootCause, vm.Reporter, currenttime);
-                    UserRankViewModel.UpdateUserRank(updater, 5);
-
-                    if (string.IsNullOrEmpty(failuredetail))
-                    {
-                        var com1 = new ErrorComments();
-                        com1.Comment = "<p>To Be Edit</p>";
-                        if (!string.IsNullOrEmpty(detailcontenturl))
-                        {
-                            com1.Comment = com1.Comment + "<p><a href='" + detailcontenturl + "' target='_blank'>Reference File: " + detailcontentreffile + " " + "</a></p>";
-                        }
-                        ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.FailureDetail, vm.Reporter, currenttime);
-                    }
-
-                    if (string.IsNullOrEmpty(result))
-                    {
-                        var com1 = new ErrorComments();
-                        com1.Comment = "<p>To Be Edit</p>";
-                        if (!string.IsNullOrEmpty(resultcontenturl))
-                        {
-                            com1.Comment = com1.Comment + "<p><a href='" + resultcontenturl + "' target='_blank'>Reference File: " + resultcontentreffile + " " + "</a></p>";
-                        }
-                        ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.Result, vm.Reporter, currenttime);
-                    }
-                }
-            }
-
-
             if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
             {
-                
                 var internalreportfile = Request.Form["attachmentupload"];
                 var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
                     .Replace(" ", "_").Replace("#", "").Replace("'", "")
@@ -3963,23 +3818,84 @@ namespace Prometheus.Controllers
                 }
             }
 
+            if (!string.IsNullOrEmpty(Request.Form["analysetitle"]))
+            {
+                var com = new ErrorComments();
+                com.Comment = Request.Form["analysetitle"];
+                ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.AnalyzeTitle, vm.Reporter, currenttime);
+            }
+
+            bool analyseinputed = false;
+            var failurestr = string.Empty;
+            var resulutstr = string.Empty;
+            var rootcausestr = string.Empty;
+
+            if (Request.Form["editor3"] != null)
+            {
+                var com = new ErrorComments();
+                com.Comment = SeverHtmlDecode.Decode(this, Request.Form["editor3"]);
+                failurestr = com.Comment;
+                if (!string.IsNullOrEmpty(com.Comment))
+                {
+                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.FailureDetail, vm.Reporter, currenttime);
+                    UserRankViewModel.UpdateUserRank(updater, 2);
+                    analyseinputed = true;
+                }
+            }
+
+            if (Request.Form["resulteditor"] != null)
+            {
+                var com = new ErrorComments();
+                com.Comment = SeverHtmlDecode.Decode(this, Request.Form["resulteditor"]);
+                resulutstr = com.Comment;
+                if (!string.IsNullOrEmpty(com.Comment))
+                {
+                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.Result, vm.Reporter, currenttime);
+                    UserRankViewModel.UpdateUserRank(updater, 2);
+                    analyseinputed = true;
+                }
+            }
+
+            if (Request.Form["editor2"] != null)
+            {
+                var com = new ErrorComments();
+                com.Comment = SeverHtmlDecode.Decode(this, Request.Form["editor2"]);
+                rootcausestr = com.Comment;
+                if (!string.IsNullOrEmpty(com.Comment))
+                {
+                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.RootCause, vm.Reporter, currenttime);
+                    UserRankViewModel.UpdateUserRank(updater, 5);
+                    analyseinputed = true;
+                }
+            }
+
+            if (analyseinputed)
+            {
+                    if (string.IsNullOrEmpty(failurestr))
+                    {
+                        var com1 = new ErrorComments();
+                        com1.Comment = "<p>To Be Edit</p>";
+                        ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.FailureDetail, vm.Reporter, currenttime);
+                    }
+
+                    if (string.IsNullOrEmpty(resulutstr))
+                    {
+                        var com1 = new ErrorComments();
+                        com1.Comment = "<p>To Be Edit</p>";
+                        ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.Result, vm.Reporter, currenttime);
+                    }
+
+                    if (string.IsNullOrEmpty(rootcausestr))
+                    {
+                        var com1 = new ErrorComments();
+                        com1.Comment = "<p>To Be Edit</p>";
+                        ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.RootCause, vm.Reporter, currenttime);
+                    }
+            }
+
             var dict = new RouteValueDictionary();
             dict.Add("ErrorKey", vm.ErrorKey);
             return RedirectToAction("UpdateProjectError", "Project", dict);
-
-            //var tempvm = ProjectErrorViewModels.RetrieveErrorByErrorKey(vm.ErrorKey);
-            //var FirstEngineer = ProjectViewModels.RetrieveOneProject(tempvm[0].ProjectKey).FirstEngineer;
-
-            //if (string.Compare(FirstEngineer, updater, true) == 0)
-            //{
-            //    ViewBag.assigee = true;
-            //}
-            //else
-            //{
-            //    ViewBag.assigee = false;
-            //}
-
-            //return View(tempvm[0]);
         }
 
         public ActionResult ErrorAttach(string ErrorKey)

@@ -550,10 +550,13 @@
     <Content Include="Content\images\favicon.ico" />
     <Content Include="Content\images\FinisarBuilding.jpg" />
     <Content Include="Content\images\FinisarLogo.jpg" />
+    <Content Include="Content\images\icon\Add.png" />
     <Content Include="Content\images\icon\delete.png" />
+    <Content Include="Content\images\icon\delete2.png" />
     <Content Include="Content\images\icon\edit.png" />
     <Content Include="Content\images\icon\extend.png" />
     <Content Include="Content\images\icon\extendup.png" />
+    <Content Include="Content\images\icon\Upload.png" />
     <Content Include="Content\images\PJ\BI.png" />
     <Content Include="Content\images\PJ\DebugTreeicon.png" />
     <Content Include="Content\images\PJ\FA.png" />

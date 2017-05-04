@@ -311,6 +311,15 @@ namespace Prometheus.Controllers
         {
             var val = CookieUtility.UnpackCookie(this);
             val["logonuser"] = "";
+            if (val.ContainsKey("logonredirectact"))
+            {
+                val["logonredirectact"] = "";
+            }
+            else
+            {
+                val.Add("logonredirectact", "");
+            }
+
             CookieUtility.SetCookie(this, val);
             return RedirectToAction("ViewAll", "Project");
         }

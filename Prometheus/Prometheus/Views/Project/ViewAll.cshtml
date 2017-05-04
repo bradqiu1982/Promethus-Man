@@ -48,7 +48,7 @@
         if (ViewBag.pjtpdict.ContainsKey(pjtype))
         {
             <div class="panel panel-default" id="panel@(idx)" style="border-left-color:white;border-right-color:white;border-bottom-color:white;border-bottom-width:0px">
-                <div class="panel-heading" style="background-color:#0F4FA8;">
+                <div class="panel-heading" style="background-color:#006DC0;">
                     <h4 class="panel-title">
                         <a data-toggle="collapse" data-target="#collapse@(idx)" href="#collapse@(idx)" class="collapsed"><font color="white">@pjtype</font></a>
                     </h4>
@@ -61,11 +61,11 @@
                     {
                         if (string.Compare(item.ProjectType, pjtype, true) != 0)
                         { continue; }
-                        <div class="row">
+                        <div class="row" MYTP="HOVER" style="margin-top:8px;margin-bottom:8px;">
                             <div class="col-lg-12">
                                 <div class="col-lg-2">
 
-                                        <div class="well"  style="background-color:white;border-left-color:#006DC0;border-top-color:snow;border-right-color:white;border-bottom-color:white;border-top-left-radius:0px;border-bottom-left-radius:0px;">
+                                        <div class="well"  style="margin-bottom:8px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px;padding-top:4px;padding-bottom:4px">
                                             <div class="row text-left">
                                                 <a href="/Project/ProjectDetail?ProjectKey=@item.ProjectKey" style="font-size:18px;">@item.ProjectName</a>
                                             </div>
@@ -116,9 +116,7 @@
                                 {
                                     <div class="col-lg-2">
                                         <div class="col-lg-7" data-toggle="tooltip" title="Yield">
-                                            <div class="row">
-                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
-                                            </div>
+
                                             <div class="row">
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                             </div>
@@ -127,9 +125,7 @@
                                             </div>
                                         </div>
                                         <div class="col-lg-5">
-                                            <div class="row">
-                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
-                                            </div>
+
                                             <div class="row">
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                             </div>
@@ -158,9 +154,7 @@
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="col-lg-7">
-                                            <div class="row">
-                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
-                                            </div>
+
                                             <div class="row">
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                             </div>
@@ -169,9 +163,7 @@
                                             </div>
                                         </div>
                                         <div class="col-lg-5">
-                                            <div class="row">
-                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
-                                            </div>
+
                                             <div class="row">
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                             </div>
@@ -189,9 +181,7 @@
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="col-lg-7" data-toggle="tooltip" title="Task">
-                                            <div class="row">
-                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
-                                            </div>
+ 
                                             <div class="row">
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                             </div>
@@ -200,9 +190,7 @@
                                             </div>
                                         </div>
                                         <div class="col-lg-5">
-                                            <div class="row">
-                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
-                                            </div>
+
                                             <div class="row">
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                             </div>
@@ -211,9 +199,7 @@
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="col-lg-7">
-                                            <div class="row">
-                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
-                                            </div>
+
                                             <div class="row">
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                             </div>
@@ -225,17 +211,12 @@
                                             <div class="row">
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                             </div>
-                                            <div class="row">
-                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
-                                            </div>
                                             <div class="row"><span class="badge" style="color:white;background-color:red">@item.PendingRMACount</span></div>
                                         </div>
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="col-lg-7"  data-toggle="tooltip" title="Debug Tree">
-                                            <div class="row">
-                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
-                                            </div>
+
                                             <div class="row">
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                             </div>
@@ -251,9 +232,7 @@
                                 {
                                     <div class="col-lg-2">
                                         <div class="col-lg-7"  data-toggle="tooltip" title="Task">
-                                            <div class="row">
-                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
-                                            </div>
+
                                             <div class="row">
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                             </div>
@@ -262,9 +241,7 @@
                                             </div>
                                         </div>
                                         <div class="col-lg-5">
-                                            <div class="row">
-                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
-                                            </div>
+
                                             <div class="row">
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                             </div>
@@ -273,9 +250,7 @@
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="col-lg-7"  data-toggle="tooltip" title="OBA">
-                                            <div class="row">
-                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
-                                            </div>
+
                                             <div class="row">
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                             </div>
@@ -284,9 +259,7 @@
                                             </div>
                                         </div>
                                         <div class="col-lg-5">
-                                            <div class="row">
-                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
-                                            </div>
+
                                             <div class="row">
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                             </div>
@@ -294,9 +267,7 @@
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="col-lg-7" data-toggle="tooltip" title="Quality">
-                                            <div class="row">
-                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
-                                            </div>
+
                                             <div class="row">
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                             </div>
@@ -305,9 +276,7 @@
                                             </div>
                                         </div>
                                         <div class="col-lg-5">
-                                            <div class="row">
-                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
-                                            </div>
+ 
                                             <div class="row">
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                             </div>
@@ -315,9 +284,7 @@
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="col-lg-7" data-toggle="tooltip" title="Reliability">
-                                            <div class="row">
-                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
-                                            </div>
+
                                             <div class="row">
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                             </div>
@@ -326,9 +293,7 @@
                                             </div>
                                         </div>
                                         <div class="col-lg-5">
-                                            <div class="row">
-                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
-                                            </div>
+
                                             <div class="row">
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                             </div>
@@ -341,7 +306,7 @@
                             </div>
                         </div>
 
-                        @*<hr style="border-color:#006DC0;"/>*@
+                        <hr style="border-color:#ECECEC;margin-top:4px;margin-bottom:4px;"/>
 
                         }
                     </div>

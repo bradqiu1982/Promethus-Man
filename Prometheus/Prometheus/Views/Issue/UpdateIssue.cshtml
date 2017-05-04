@@ -1,7 +1,7 @@
 ﻿@model Prometheus.Models.IssueViewModels
 
 @{
-    ViewBag.Title = "UpdateIssue";
+    ViewBag.Title = "Update Task";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -17,9 +17,49 @@ else
     </script>
 }
 
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+<div class="row">
+    <div class="col-lg-1 text-right">
+        <img src="~/Content/images/PJ/RMA.png" style="height:45px; width:45px">
+    </div>
+    <div class="col-lg-11">
+        <ol class="breadcrumb" style="font-size:18px">
+            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
+            @if (Model != null)
+            {
+                <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ProjectKey)">Project Detail</a></li>
+            }
+            @if (Model != null)
+            {
+                <li><a data-toggle="tooltip" title="Goto Project Task" href="/Project/ProjectIssues?ProjectKey=@(Model.ProjectKey)">Project Task</a></li>
+            }
+
+            @if (Model != null && !string.IsNullOrEmpty(Model.ParentIssueKey))
+            {
+                <li><a data-toggle="tooltip" title="Goto Parent Task" href="/Issue/UpdateIssue?issuekey=@(Model.ParentIssueKey)">Parent Task</a></li>
+            }
+
+            <li class="active">Update Task</li>
+        </ol>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+
+
 <div class="row">
     <div class="col-lg-3">
-        <h2>Update Issue</h2>
     </div>
 
     <div class="col-lg-2">
@@ -49,24 +89,19 @@ else
         }
         else if (Model != null && !string.IsNullOrEmpty(Model.ParentIssueKey))
         {
-           <h2><a data-toggle="tooltip" title="Goto Parent Task" href="/Issue/UpdateIssue?issuekey=@(Model.ParentIssueKey)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
         }
     </div>
 
     <div class="col-lg-1">
-            <h2><a data-toggle="tooltip" title="Goto Project Task" href="/Project/ProjectIssues?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span></a></h2>
     </div>
 
     <div class="col-lg-1">
-        <h2><a data-toggle="tooltip" title="Goto Project FA" href="/Project/ProjectFA?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span></a></h2>
     </div>
 
     <div class="col-lg-1">
-        <h2><a data-toggle="tooltip" title="Goto Project RMA" href="/Project/ProjectRMAStatus?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span></a></h2>
     </div>
 
     <div class="col-lg-1">
-        <h2><a data-toggle="tooltip" title="Goto Project NPI" href="/Project/ProjectNPI?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></a></h2>
     </div>
 
     <div class="col-lg-3">

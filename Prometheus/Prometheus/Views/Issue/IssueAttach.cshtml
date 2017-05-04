@@ -7,36 +7,31 @@
 
 
 <div class="row">
-    <div class="col-lg-3">
-        <h2>Task Attachment</h2>
-    </div>
-    <div class="col-lg-2">
-        @if (Model != null)
-        {
-            <h2><a data-toggle="tooltip" title="Goto Issue" href="/Issue/UpdateIssue?issuekey=@(Model.IssueKey)"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span> Issue</a></h2>
-        }
-        
-    </div>
-
-    <div class="col-lg-2">
-        @if (Model != null)
-        {
-            <h2><a data-toggle="tooltip" title="Goto FA Page" href="/Project/ProjectFA?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span> FA</a></h2>
-        }
-        
-    </div>
-    <div class="col-lg-2">
-        @if (Model != null)
-        {
-            <h2><a data-toggle="tooltip" title="Goto RMA Page" href="/Project/ProjectRMAStatus?ProjectKey=@(Model.ProjectKey)"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> RMA</a></h2>
-        }
-
-    </div>
-    <div class="col-lg-3"></div>
+    <div class="col-lg-12">&nbsp;</div>
 </div>
 
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
 
-<hr />
+<div class="row">
+    <div class="col-lg-1 text-right">
+        <img src="~/Content/images/PJ/Task.png" style="height:45px; width:45px">
+    </div>
+    <div class="col-lg-11">
+        <ol class="breadcrumb" style="font-size:18px">
+            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
+            <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ProjectKey)">Project Detail</a></li>
+            <li><a data-toggle="tooltip" title="Goto Task" href="/Issue/UpdateIssue?issuekey=@(Model.IssueKey)">Update Task</a></li>
+            <li class="active">Task Attachment</li>
+        </ol>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
 
 @if (Model != null && Model.AttachList.Count > 0)
 {

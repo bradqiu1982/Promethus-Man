@@ -58,7 +58,8 @@
         }
 
         textarea.form-control {
-            border:1px;border-style:solid;border-color:#006DC0;
+            border:1px;border-style:solid;border-color:#006DC0;font-family:'Arial Narrow';
+            overflow-y:auto !important;overflow-x: auto !important;
         }
 
         select.form-control {
@@ -85,6 +86,17 @@
         label {
             font-family:'Arial Narrow';
         }
+
+        div[MYTP="HOVER"]:hover {
+            background-color:#ECECEC;
+        }
+
+        input[readonly],select.form-control[readonly]
+        ,input[disabled],select.form-control[disabled]
+        ,textarea.form-control[disabled] {
+            background-color:#DEEBF7 !important;
+        }
+
     </style>
     <script src="~/Scripts/jquery.stickytableheaders.js"></script>
 </head>

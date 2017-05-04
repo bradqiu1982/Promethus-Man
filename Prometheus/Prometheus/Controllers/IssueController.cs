@@ -1427,6 +1427,8 @@ namespace Prometheus.Controllers
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
             vm.RelativePeoples = Request.Form["RPeopleAddr"];
 
+            bool analyzeinputed = false;
+
             if (!string.IsNullOrEmpty(Request.Form["failureeditor"]))
             {
                 var failure = SeverHtmlDecode.Decode(this,Request.Form["failureeditor"]);
@@ -1434,6 +1436,8 @@ namespace Prometheus.Controllers
                 var commenttype = COMMENTTYPE.FailureDetail;
                 IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
                 UserRankViewModel.UpdateUserRank(updater, 2);
+
+                analyzeinputed = true;
             }
 
             if (!string.IsNullOrEmpty(Request.Form["rootcauseeditor"]))
@@ -1443,6 +1447,8 @@ namespace Prometheus.Controllers
                 var commenttype = COMMENTTYPE.RootCause;
                 IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
                 UserRankViewModel.UpdateUserRank(updater, 5);
+
+                analyzeinputed = true;
             }
 
             if (!string.IsNullOrEmpty(Request.Form["resulteditor"]))
@@ -1452,6 +1458,30 @@ namespace Prometheus.Controllers
                 var commenttype = COMMENTTYPE.Result;
                 IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
                 UserRankViewModel.UpdateUserRank(updater,2);
+
+                analyzeinputed = true;
+            }
+
+            if (analyzeinputed)
+            {
+                if (string.IsNullOrEmpty(Request.Form["failureeditor"]) && originaldata.FailureDetailCommentList.Count == 0)
+                {
+                    var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes("<p>To Be Edit</p>"));
+                    var commenttype = COMMENTTYPE.FailureDetail;
+                    IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
+                }
+                if (string.IsNullOrEmpty(Request.Form["rootcauseeditor"]) && originaldata.RootCauseCommentList.Count == 0)
+                {
+                    var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes("<p>To Be Edit</p>"));
+                    var commenttype = COMMENTTYPE.RootCause;
+                    IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
+                }
+                if (string.IsNullOrEmpty(Request.Form["resulteditor"]) && originaldata.ResultCommentList.Count == 0)
+                {
+                    var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes("<p>To Be Edit</p>"));
+                    var commenttype = COMMENTTYPE.Result;
+                    IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
+                }
             }
 
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))

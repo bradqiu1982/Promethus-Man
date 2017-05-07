@@ -21,6 +21,13 @@ namespace Prometheus.Models
         public static string Rel = "Rel";
     }
 
+    public class ISSUEATTACHTYPE
+    {
+        public static string Normal = "Normal";
+        public static string InternalRMA = "InternalRMA";
+        public static string CustomRMA = "CustomRMA";
+    }
+
     public class ISSUEPR
     {
         public static string Major = "Major";
@@ -394,6 +401,35 @@ namespace Prometheus.Models
             }
         }
 
+        private List<string> internalattachlist = new List<string>();
+        public List<string> InternalAttachList
+        {
+            set
+            {
+                internalattachlist.Clear();
+                internalattachlist.AddRange(value);
+            }
+            get
+            {
+                return internalattachlist;
+            }
+        }
+
+        private List<string> customattachlist = new List<string>();
+        public List<string> CustomAttachList
+        {
+            set
+            {
+                customattachlist.Clear();
+                customattachlist.AddRange(value);
+            }
+            get
+            {
+                return customattachlist;
+            }
+        }
+
+
         public string ParentIssueKey { set; get; }
 
         private List<IssueViewModels> sissue = new List<IssueViewModels>();
@@ -406,6 +442,10 @@ namespace Prometheus.Models
 
                 containmentactionlist.Clear();
                 Correctiveactionlist.Clear();
+                failureverifyactionlist.Clear();
+                correctivverifyactionlist.Clear();
+                generalactionlist.Clear();
+
                 foreach (var item in value)
                 {
                     if (item.Summary.Contains("[Containment]")
@@ -413,18 +453,22 @@ namespace Prometheus.Models
                     {
                         containmentactionlist.Add(item);
                     }
-                    if (item.Summary.Contains("[Corrective]")
+                    else if (item.Summary.Contains("[Corrective]")
                         || item.Summary.Contains(RELSubIssueType.CORRECTIVEACTION))
                     {
                         Correctiveactionlist.Add(item);
                     }
-                    if (item.Summary.Contains(RELSubIssueType.FAILVERIFYACTION))
+                    else if (item.Summary.Contains(RELSubIssueType.FAILVERIFYACTION))
                     {
                         failureverifyactionlist.Add(item);
                     }
-                    if (item.Summary.Contains(RELSubIssueType.VERIFYCORRECTIVEACTION))
+                    else if (item.Summary.Contains(RELSubIssueType.VERIFYCORRECTIVEACTION))
                     {
                         correctivverifyactionlist.Add(item);
+                    }
+                    else
+                    {
+                        generalactionlist.Add(item);
                     }
                 }//end foreach
             }
@@ -440,6 +484,12 @@ namespace Prometheus.Models
         private List<IssueViewModels> Correctiveactionlist = new List<IssueViewModels>();
         private List<IssueViewModels> failureverifyactionlist = new List<IssueViewModels>();
         private List<IssueViewModels> correctivverifyactionlist = new List<IssueViewModels>();
+        private List<IssueViewModels> generalactionlist = new List<IssueViewModels>();
+
+        public List<IssueViewModels> GeneralActions
+        {
+            get { return generalactionlist; }
+        }
 
         public List<IssueViewModels> ContainmentActions
         {
@@ -874,34 +924,12 @@ namespace Prometheus.Models
                     sql = sql.Replace("<IssueKey>", item.IssueKey);
                     DBUtility.ExeLocalSqlNoRes(sql);
 
-                    //sql = "delete from IssueRMA where IssueKey = '<IssueKey>'";
-                    //sql = sql.Replace("<IssueKey>", item.IssueKey);
-                    //DBUtility.ExeLocalSqlNoRes(sql);
-
-                    //sql = "delete from IssueAttachment where IssueKey = '<IssueKey>'";
-                    //sql = sql.Replace("<IssueKey>", item.IssueKey);
-                    //DBUtility.ExeLocalSqlNoRes(sql);
-
-                    //sql = "delete from IssueComments where IssueKey = '<IssueKey>'";
-                    //sql = sql.Replace("<IssueKey>", item.IssueKey);
-                    //DBUtility.ExeLocalSqlNoRes(sql);
                 }
 
                 sql = "update Issue  set APVal1 = 'delete' where IssueKey = '<IssueKey>'";
                 sql = sql.Replace("<IssueKey>", issuekey);
                 DBUtility.ExeLocalSqlNoRes(sql);
 
-                //sql = "delete from IssueRMA where IssueKey = '<IssueKey>'";
-                //sql = sql.Replace("<IssueKey>", issuekey);
-                //DBUtility.ExeLocalSqlNoRes(sql);
-
-                //sql = "delete from IssueAttachment where IssueKey = '<IssueKey>'";
-                //sql = sql.Replace("<IssueKey>", issuekey);
-                //DBUtility.ExeLocalSqlNoRes(sql);
-
-                //sql = "delete from IssueComments where IssueKey = '<IssueKey>'";
-                //sql = sql.Replace("<IssueKey>", issuekey);
-                //DBUtility.ExeLocalSqlNoRes(sql);
             }
             catch (Exception ex)
             {
@@ -947,28 +975,80 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
+        
 
-        public static void StoreIssueAttachment(string issuekey,string attachmenturl)
+        public static void StoreIssueAttachment(string issuekey,string attachmenturl,string attachtype = "Normal")
         {
-            var sql = "insert into IssueAttachment(IssueKey,Attachment,UpdateTime) values('<IssueKey>',N'<Attachment>','<UpdateTime>')";
-            sql = sql.Replace("<IssueKey>", issuekey).Replace("<Attachment>", attachmenturl).Replace("<UpdateTime>", DateTime.Now.ToString());
+            var sql = "insert into IssueAttachment(IssueKey,Attachment,UpdateTime,APVal1) values('<IssueKey>',N'<Attachment>','<UpdateTime>','<attachtype>')";
+            sql = sql.Replace("<IssueKey>", issuekey).Replace("<Attachment>", attachmenturl).Replace("<UpdateTime>", DateTime.Now.ToString()).Replace("<attachtype>", attachtype);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
         public void RetrieveAttachment(string issuekey)
         {
-            var ret = new List<string>();
-            var csql = "select Attachment from IssueAttachment where IssueKey = '<IssueKey>' order by UpdateTime ASC";
+            var csql = "select Attachment,APVal1 from IssueAttachment where IssueKey = '<IssueKey>' order by UpdateTime ASC";
             csql = csql.Replace("<IssueKey>", issuekey);
+
+            AttachList.Clear();
+            InternalAttachList.Clear();
+            CustomAttachList.Clear();
 
             var cdbret = DBUtility.ExeLocalSqlWithRes(csql,null);
             foreach (var r in cdbret)
             {
-                ret.Add(Convert.ToString(r[0]));
+                var type = Convert.ToString(r[1]);
+                
+                if (string.IsNullOrEmpty(type))
+                {
+                    AttachList.Add(Convert.ToString(r[0]));
+                }
+                else if (string.Compare(type,ISSUEATTACHTYPE.Normal) == 0)
+                {
+                    AttachList.Add(Convert.ToString(r[0]));
+                }
+                else if (string.Compare(type, ISSUEATTACHTYPE.InternalRMA) == 0)
+                {
+                    InternalAttachList.Add(Convert.ToString(r[0]));
+                }
+                else if (string.Compare(type, ISSUEATTACHTYPE.CustomRMA) == 0)
+                {
+                    CustomAttachList.Add(Convert.ToString(r[0]));
+                }
+                else
+                {
+                    AttachList.Add(Convert.ToString(r[0]));
+                }
             }
-
-            AttachList = ret;
         }
+
+        //public static void RepairAttachUrl()
+        //{
+        //    //IssueComments(IssueKey, Comment, Reporter, CommentDate, CommentType)
+        //    var sql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where CommentType = '<CommentType2>'";
+        //    sql = sql.Replace("<CommentType2>", COMMENTTYPE.CustomReport);
+        //    var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+        //    foreach (var r in dbret)
+        //    {
+        //        var tempcomment = new IssueComments();
+        //        tempcomment.IssueKey = Convert.ToString(r[0]);
+        //        tempcomment.dbComment = Convert.ToString(r[1]);
+        //        tempcomment.Reporter = Convert.ToString(r[2]);
+        //        tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
+        //        tempcomment.CommentType = Convert.ToString(r[4]);
+
+        //        if (tempcomment.Comment.Contains("<p><a href=\"")
+        //            && tempcomment.Comment.Contains("\" target"))
+        //        {
+        //            var attachtype = ISSUEATTACHTYPE.CustomRMA;
+        //            var splitstr = tempcomment.Comment.Split(new string[] { "<a href=\"" }, StringSplitOptions.RemoveEmptyEntries);
+
+        //            var url = splitstr[1].Split(new string[] { "\" target" }, StringSplitOptions.RemoveEmptyEntries)[0];
+        //            var csql = "insert into IssueAttachment (IssueKey,Attachment,UpdateTime,APVal1) values('<IssueKey>',N'<Attachment>','<UpdateTime>','<attachtype>')";
+        //            csql = csql.Replace("<IssueKey>", tempcomment.IssueKey).Replace("<Attachment>", url).Replace("<UpdateTime>", tempcomment.CommentDate.ToString()).Replace("<attachtype>", attachtype);
+        //            DBUtility.ExeLocalSqlNoRes(csql);
+        //        }
+        //    }
+        //}
 
         public void UpdateIssue()
         {
@@ -2435,18 +2515,18 @@ namespace Prometheus.Models
             }//end if
         }
 
-        public static void DeleteAttachComment(string issuekey, string cond)
-        {
-            var csql = "select Comment from IssueComments where IssueKey = '<IssueKey>' and Comment = '<cond>'";
-            csql = csql.Replace("<IssueKey>", issuekey).Replace("<cond>", cond);
-            var cdbret = DBUtility.ExeLocalSqlWithRes(csql,null);
-            if (cdbret.Count > 0 && cdbret.Count < 3)
-            {
-                csql = "delete from IssueComments where IssueKey = '<IssueKey>' and Comment = '<cond>'";
-                csql = csql.Replace("<IssueKey>", issuekey).Replace("<cond>", cond);
-                DBUtility.ExeLocalSqlNoRes(csql);
-            }//end if
-        }
+        //public static void DeleteAttachComment(string issuekey, string cond)
+        //{
+        //    var csql = "select Comment from IssueComments where IssueKey = '<IssueKey>' and Comment = '<cond>'";
+        //    csql = csql.Replace("<IssueKey>", issuekey).Replace("<cond>", cond);
+        //    var cdbret = DBUtility.ExeLocalSqlWithRes(csql,null);
+        //    if (cdbret.Count > 0 && cdbret.Count < 3)
+        //    {
+        //        csql = "delete from IssueComments where IssueKey = '<IssueKey>' and Comment = '<cond>'";
+        //        csql = csql.Replace("<IssueKey>", issuekey).Replace("<cond>", cond);
+        //        DBUtility.ExeLocalSqlNoRes(csql);
+        //    }//end if
+        //}
 
 
         public static void StoreBIRootCause(string pjkey, string sn,string rootcause)

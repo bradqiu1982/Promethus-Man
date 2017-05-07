@@ -97,7 +97,7 @@
 
                 <tr>
                     <td style="text-align:center">@item.ProductType</td>
-                     <td style="text-align:center;font-size:9px;"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></td>
+                     <td style="text-align:center;font-size:9px;" data-toggle="tooltip" title="@item.Summary"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></td>
                     <td style="text-align:center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus2(item.Resolution))</td>
                     <td style="text-align:center">@item.FVCode</td>
 

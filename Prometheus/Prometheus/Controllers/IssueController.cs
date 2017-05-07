@@ -45,8 +45,7 @@ namespace Prometheus.Controllers
             ViewBag.projectlist = slist;
 
             var typelist = new List<string>();
-            string[] tlist = { ISSUETP.Bug,ISSUETP.Task,ISSUETP.RMA,ISSUETP.OBA, ISSUETP.NewFeature
-            ,ISSUETP.Improvement,ISSUETP.Document,ISSUETP.NPIPROC};
+            string[] tlist = { ISSUETP.Task,ISSUETP.Bug,ISSUETP.RMA,ISSUETP.OBA,ISSUETP.NPIPROC};
 
             typelist.AddRange(tlist);
             slist = CreateSelectList(typelist, vm.IssueType);
@@ -615,40 +614,6 @@ namespace Prometheus.Controllers
                 }
             }
 
-            //ViewBag.isassignee = false;
-            //if (string.Compare(updater, newdata.Assignee, true) == 0
-            //        || string.Compare(updater, newdata.Reporter,true) == 0
-            //        || string.Compare(updater, newdata.Creator, true) == 0)
-            //{
-            //    ViewBag.isassignee = true;
-            //}
-
-            //ViewBag.authrized = true;
-            //if (string.Compare(newdata.IssueType, ISSUETP.NPIPROC) == 0)
-            //{
-            //    ViewBag.authrized = false;
-            //}
-            //var pj = ProjectViewModels.RetrieveOneProject(newdata.ProjectKey);
-            //foreach (var item in pj.MemberList)
-            //{
-            //    if (string.Compare(item.Name, updater, true) == 0)
-            //    {
-            //        ViewBag.authrized = true;
-            //        break;
-            //    }
-            //}
-
-            //CreateAllLists(newdata);
-
-            //if (newdata.Summary.Contains(" @Burn-In Step "))
-            //{
-            //    var sn = newdata.Summary.Split(new string[] { " " }, StringSplitOptions.None)[1].Trim().ToUpper();
-            //    ViewBag.birootcauselist = CreateBIRootIssue(newdata.ProjectKey, sn);
-            //}
-
-
-            //ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
-            //return View(newdata);
 
             var dict1 = new RouteValueDictionary();
             dict1.Add("issuekey", originaldata.IssueKey);
@@ -732,6 +697,11 @@ namespace Prometheus.Controllers
 
             var asilist = UserViewModels.RetrieveAllUser();
             ViewBag.towholist = CreateSelectList(asilist, "");
+
+            var typelist = new List<string>();
+            string[] tlist = { ISSUETP.Task,ISSUETP.Bug};
+            typelist.AddRange(tlist);
+            ViewBag.issuetypelist = CreateSelectList(typelist, vm.IssueType);
 
             return View(vm);
         }
@@ -1614,28 +1584,28 @@ namespace Prometheus.Controllers
                 }
             }
 
-            //ViewBag.isassignee = false;
-            //if (string.Compare(updater, newdata.Assignee, true) == 0
-            //        || string.Compare(updater, newdata.Reporter, true) == 0
-            //        || string.Compare(updater, newdata.Creator, true) == 0)
-            //{
-            //    ViewBag.isassignee = true;
-            //}
-
-            //CreateAllLists(newdata);
-
-            //if (newdata.Summary.Contains(" @Burn-In Step "))
-            //{
-            //    var sn = newdata.Summary.Split(new string[] { " " }, StringSplitOptions.None)[1].Trim().ToUpper();
-            //    ViewBag.birootcauselist = CreateBIRootIssue(newdata.ProjectKey, sn);
-            //}
-
-            //ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
-            //return View(newdata);
 
             var dict1 = new RouteValueDictionary();
             dict1.Add("issuekey", originaldata.IssueKey);
             return RedirectToAction("UpdateBug", "Issue", dict1);
+        }
+
+        private static void CreateRMASubIssue(string presum, string sum, string pjkey, string parentkey, string analyser, string reporter, DateTime duedate)
+        {
+            var vm = new IssueViewModels();
+            vm.ProjectKey = pjkey;
+            vm.IssueKey = IssueViewModels.GetUniqKey();
+            vm.ParentIssueKey = parentkey;
+            vm.IssueType = ISSUETP.Task;
+            vm.Summary = presum + sum;
+            vm.Priority = ISSUEPR.Major;
+            vm.DueDate = duedate;
+            vm.ReportDate = DateTime.Now;
+            vm.Assignee = analyser;
+            vm.Reporter = reporter;
+            vm.Resolution = Resolute.Pending;
+            vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+            vm.StoreSubIssue();
         }
 
         public ActionResult UpdateRMA(string issuekey)
@@ -1676,6 +1646,9 @@ namespace Prometheus.Controllers
             {
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);
+                var asilist = UserViewModels.RetrieveAllUser();
+                ViewBag.towholist = CreateSelectList(asilist, "");
+                ViewBag.towholist1 = CreateSelectList(asilist, "");
                 return View();
             }
 
@@ -1683,6 +1656,18 @@ namespace Prometheus.Controllers
             if (ret != null)
             {
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+                if (ret.ContainmentActions.Count == 0)
+                {
+                    CreateRMASubIssue(RMASubIssueType.CONTAINMENTACTION, "Cotainment Action for RMA " + ret.FinisarRMA, ret.ProjectKey, ret.IssueKey, ret.Assignee, ret.Reporter, ret.DueDate.AddDays(18));
+                    ret = IssueViewModels.RetrieveIssueByIssueKey(key, this);
+                }
+
+                if (ret.CorrectiveActions.Count == 0)
+                {
+                    CreateRMASubIssue(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for RMA " + ret.FinisarRMA, ret.ProjectKey, ret.IssueKey, ret.Assignee, ret.Reporter, ret.DueDate.AddDays(48));
+                    ret = IssueViewModels.RetrieveIssueByIssueKey(key, this);
+                }
 
                 ViewBag.isassignee = false;
                 if (string.Compare(updater, ret.Assignee, true) == 0 
@@ -1695,12 +1680,18 @@ namespace Prometheus.Controllers
 
                 ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
                 CreateAllLists(ret);
+                var asilist = UserViewModels.RetrieveAllUser();
+                ViewBag.towholist = CreateSelectList(asilist, "");
+                ViewBag.towholist1 = CreateSelectList(asilist, "");
                 return View(ret);
             }
             else
             {
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);
+                var asilist = UserViewModels.RetrieveAllUser();
+                ViewBag.towholist = CreateSelectList(asilist, "");
+                ViewBag.towholist1 = CreateSelectList(asilist, "");
                 return View();
             }
         }
@@ -1924,10 +1915,8 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(url))
                 {
                     var linkstr = url;
-                    var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(linkstr));
-                    var commenttype = COMMENTTYPE.CustomReport;
-                    IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
-                    IssueViewModels.StoreIssueAttachment(vm.IssueKey, linkstr);
+
+                    IssueViewModels.StoreIssueAttachment(vm.IssueKey, linkstr,ISSUEATTACHTYPE.CustomRMA);
                     if (!string.IsNullOrEmpty(customertag))
                     {
                         var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
@@ -1958,10 +1947,8 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(url))
                 {
                     var linkstr = url;
-                    var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(linkstr));
-                    var commenttype = COMMENTTYPE.InternalReport;
-                    IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
-                    IssueViewModels.StoreIssueAttachment(vm.IssueKey, linkstr);
+
+                    IssueViewModels.StoreIssueAttachment(vm.IssueKey, linkstr,ISSUEATTACHTYPE.InternalRMA);
                     if (!string.IsNullOrEmpty(internaltag))
                     {
                         var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
@@ -2010,19 +1997,6 @@ namespace Prometheus.Controllers
                 }
             }
 
-            //var newdata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
-            //CreateAllLists(newdata);
-
-            //ViewBag.isassignee = false;
-            //if (string.Compare(updater, newdata.Assignee, true) == 0
-            //        || string.Compare(updater, newdata.Reporter,true) == 0
-            //        || string.Compare(updater, newdata.Creator, true) == 0)
-            //{
-            //    ViewBag.isassignee = true;
-            //}
-
-            //ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
-            //return View(newdata);
 
             var dict1 = new RouteValueDictionary();
             dict1.Add("issuekey", originaldata.IssueKey);
@@ -2932,14 +2906,9 @@ namespace Prometheus.Controllers
 
             var originalname = filename.Split(new string[] { "-" + tempdatestr }, StringSplitOptions.None)[0];
 
-
             var url = "/userfiles/docs/" + tempdatestr + "/" + filename;
-            var linkstr1 = "<p><a href=\"" + url + "\" target=\"_blank\">[Report 4 Customer] " + originalname + "</a></p>";
-            var linkstr2 = "<p><a href=\"" + url + "\" target=\"_blank\">[Internal Report] " + originalname + "</a></p>";
 
             ret.Add(url);
-            ret.Add(linkstr1);
-            ret.Add(linkstr2);
             return ret;
         }
 
@@ -2951,12 +2920,6 @@ namespace Prometheus.Controllers
                 foreach (var item in attachcond)
                 {
                     IssueViewModels.DeleteAttachment(issuekey, item);
-                }
-
-                foreach (var item in attachcond)
-                {
-                    IssueViewModels.DeleteAttachComment(issuekey
-                        , Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(item)));
                 }
 
                 var dict = new RouteValueDictionary();

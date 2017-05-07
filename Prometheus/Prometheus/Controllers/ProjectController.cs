@@ -4705,6 +4705,7 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
+
             //AssignPJ2User();
 
             //ExternalDataCollector.RefreshRMAData(this);

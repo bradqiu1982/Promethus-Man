@@ -147,8 +147,8 @@
                             <td width="8%">N/A</td>
                         }
 
-                        @if (item.InternalReportCommentList.Count > 0)
-                    {
+                       @if (item.InternalReportCommentList.Count > 0)
+                       {
                         if (item.InternalReportCommentList[item.InternalReportCommentList.Count - 1].Comment.Contains("<a href"))
                         {
                             var originalstr = System.Text.RegularExpressions.Regex.Replace(
@@ -161,7 +161,10 @@
                             {
                                 <td width="10%"><p><a href="@item.InternalReportCommentList[item.InternalReportCommentList.Count - 1].Comment" target="_blank">@Html.Raw(Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></p></td>
                             }
-
+                        }
+                        else if (item.InternalAttachList.Count > 0)
+                        {
+                            <td width="10%"><p><a href="@item.InternalAttachList[item.InternalAttachList.Count - 1]" target="_blank">@Html.Raw(Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></p></td>
                         }
                         else
                         {
@@ -183,6 +186,10 @@
                             {
                                 <td width="10%"><p><a href="@item.Report4CustomerCommentList[item.Report4CustomerCommentList.Count - 1].Comment" target="_blank">@Html.Raw(Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></p></td>
                             }
+                        }
+                        else if (item.CustomAttachList.Count > 0)
+                        {
+                            <td width="10%"><p><a href="@item.CustomAttachList[item.CustomAttachList.Count - 1]" target="_blank">@Html.Raw(Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></p></td>
                         }
                         else
                         {

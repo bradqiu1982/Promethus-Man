@@ -129,7 +129,7 @@ else
                         </div>
                     </div>
                     <div class="col-lg-6">
-                        <label class="control-label col-lg-2" for="issuetypelist">IssueType</label>
+                        <label class="control-label col-lg-2" for="issuetypelist">TaskType</label>
                         <div class="col-lg-10">
                             @Html.DropDownList("issuetypelist", null, new { @id = "issuetypelist", @class = "form-control", @readonly = "readonly" })
                         </div>
@@ -703,7 +703,7 @@ else
                                                     <div class="col-lg-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")</div>
                                                     <div class="col-lg-2">
                                                         <a href="/Issue/ModifyIssueComment?IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
-                                                            <img src="~/Content/images/icon/edit.png" MYTP="BT" style="height:34px; width:24px">
+                                                            <img src="~/Content/images/icon/edit2.png" MYTP="BT" style="height:34px; width:24px">
                                                         </a>
                                                     </div>
                                                 </div>
@@ -754,7 +754,7 @@ else
                                                     <div class="col-lg-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")</div>
                                                     <div class="col-lg-2">
                                                         <a href="/Issue/ModifyIssueComment?IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
-                                                            <img src="~/Content/images/icon/edit.png" MYTP="BT" style="height:34px; width:24px">
+                                                            <img src="~/Content/images/icon/edit2.png" MYTP="BT" style="height:34px; width:24px">
                                                         </a>
                                                     </div>
                                                 </div>
@@ -806,7 +806,7 @@ else
                                                     <div class="col-lg-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")</div>
                                                     <div class="col-lg-2">
                                                         <a href="/Issue/ModifyIssueComment?IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
-                                                            <img src="~/Content/images/icon/edit.png" MYTP="BT" style="height:34px; width:24px">
+                                                            <img src="~/Content/images/icon/edit2.png" MYTP="BT" style="height:34px; width:24px">
                                                         </a>
                                                     </div>
                                                 </div>
@@ -861,7 +861,7 @@ else
                                                     <div class="col-lg-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")</div>
                                                     <div class="col-lg-2">
                                                         <a href="/Issue/ModifyIssueComment?IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
-                                                            <img src="~/Content/images/icon/edit.png" MYTP="BT" style="height:34px; width:24px">
+                                                            <img src="~/Content/images/icon/edit2.png" MYTP="BT" style="height:34px; width:24px">
                                                         </a>
                                                     </div>
                                                 </div>
@@ -959,8 +959,6 @@ else
     </div>
 
 
-
-
     <div class="form-group">
         <div class="col-lg-6">
             @if (Model != null && !string.IsNullOrEmpty(Model.IssueKey))
@@ -1000,16 +998,16 @@ else
             <div class="form-group">
                 <div class="row col-lg-12">
                     <div class="col-lg-2">
-                        <input style="background-color:dodgerblue;" type="submit" value="Submit" id="updateisu" name="updateisu" class="btn btn-default" />
+                        <input style="background-color:#006DC0;color:white;" type="submit" value="Submit" id="updateisu" name="updateisu" class="btn btn-default" />
                     </div>
                     <div class="col-lg-2">
                         @if (ViewBag.isassignee != null && ViewBag.isassignee)
                         {
-                            <input style="background-color:red;" type="submit" value="Delete" id="deleteisu" name="deleteisu" class="btn btn-default" />
+                            <input style="background-color:#CC0000;color:white;" type="submit" value="Delete" id="deleteisu" name="deleteisu" class="btn btn-default" />
                         }
                     </div>
                     <div class="col-lg-2">
-                        <button style="background-color:forestgreen;" class="btn btn-default" type="button" value="IssueKey=@(Model.IssueKey)&ToWho=" onclick="PushTask(this)">Push</button>
+                        <button style="background-color:#00B050;color:white;" class="btn btn-default" type="button" value="IssueKey=@(Model.IssueKey)&ToWho=" onclick="PushTask(this)">Push</button>
                         <input class="form-control text-box single-line" value="" id="pushtowho" name="pushtowho" type="hidden" />
                     </div>
                     <div class="col-lg-6"></div>
@@ -1085,9 +1083,13 @@ else
         <hr style="border-color:#006DC0;" />
 
             <div class="row" data-toggle="tooltip" title="Link 2 Debug Tree">
-                <button type="button" style="padding:0px;background-color:transparent !important;border-color:transparent !important;" disabled>
-                    <img src="~/Content/images/PJ/DebugTreeicon.png" style="height:30px; width:30px">
-                </button>              
+                <div class="col-lg-2">
+                    <button type="button" style="padding:0px;background-color:transparent !important;border-color:transparent !important;" disabled>
+                        <img src="~/Content/images/PJ/DebugTreeicon.png" style="height:30px; width:30px">
+                    </button>  
+                </div>
+                <div class="col-lg-10"></div>
+            
             </div>
         }
 

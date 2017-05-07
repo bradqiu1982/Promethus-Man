@@ -248,6 +248,9 @@ CREATE TABLE [dbo].[IssueAttachment] (
     [Attachment] NVARCHAR (MAX) NOT NULL,
     [UpdateTime] DATETIME       NOT NULL
 );
+ALTER TABLE IssueAttachment Add  APVal1 NVARCHAR (100) DEFAULT('') NOT NULL
+ALTER TABLE IssueAttachment Add  APVal2 NVARCHAR (100) DEFAULT('') NOT NULL
+ALTER TABLE IssueAttachment Add  APVal3 NVARCHAR (MAX) DEFAULT('') NOT NULL
 
 CREATE TABLE [dbo].[Issue] (
     [ProjectKey]           NVARCHAR (50)  NOT NULL,

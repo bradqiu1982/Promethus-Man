@@ -238,6 +238,12 @@ namespace Prometheus.Models
         public static string VERIFYCORRECTIVEACTION = "[VERIFYCORRECTIVEACTION]";
     }
 
+    public class RMASubIssueType
+    {
+        public static string CONTAINMENTACTION = "[Containment]";
+        public static string CORRECTIVEACTION = "[Corrective]";
+    }
+
     public class ExternalDataCollector
     {
         private static List<List<string>> RetrieveDataFromExcelWithAuth(Controller ctrl, string filename)
@@ -684,6 +690,24 @@ namespace Prometheus.Models
             }//analyser in usermatrisx
         }
 
+        private static void CreateRMASubIssue(string presum, string sum, string pjkey, string parentkey, string analyser, string reporter, DateTime duedate)
+        {
+            var vm = new IssueViewModels();
+            vm.ProjectKey = pjkey;
+            vm.IssueKey = IssueViewModels.GetUniqKey();
+            vm.ParentIssueKey = parentkey;
+            vm.IssueType = ISSUETP.Task;
+            vm.Summary = presum + sum;
+            vm.Priority = ISSUEPR.Major;
+            vm.DueDate = duedate;
+            vm.ReportDate = DateTime.Now;
+            vm.Assignee = analyser;
+            vm.Reporter = reporter;
+            vm.Resolution = Resolute.Pending;
+            vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+            vm.StoreSubIssue();
+        }
+
         private static void CreateRMAIssue(RMARAWData rawdata,Controller ctrl)
         {
             var vm = new IssueViewModels();
@@ -764,6 +788,8 @@ namespace Prometheus.Models
 
             UserViewModels.RegisterUserAuto(vm.Assignee);
 
+            CreateRMASubIssue(RMASubIssueType.CONTAINMENTACTION, "Cotainment Action for RMA " + vm.FinisarRMA, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(18));
+            CreateRMASubIssue(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for RMA " + vm.FinisarRMA, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(48));
             SendRMAEvent(vm, "created",ctrl, true);
         }
 

@@ -557,6 +557,7 @@
     <Content Include="Content\images\icon\edit2.png" />
     <Content Include="Content\images\icon\extend.png" />
     <Content Include="Content\images\icon\extendup.png" />
+    <Content Include="Content\images\icon\pageloadingicon.gif" />
     <Content Include="Content\images\icon\LowYield.png" />
     <Content Include="Content\images\icon\Upload.png" />
     <Content Include="Content\images\PJ\BI.png" />

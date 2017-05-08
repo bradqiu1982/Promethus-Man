@@ -95,6 +95,8 @@ namespace Prometheus.Models
         {
             MonitorVcsel = "";
             ProjectType = "";
+            PMListStr = string.Empty;
+            EngListStr = string.Empty;
         }
 
         public ProjectViewModels(string prokey, string proname, string startdate, double finshrate, string sdescription,string monitorvcsel,string vcselwarning,string pjtype)
@@ -118,7 +120,12 @@ namespace Prometheus.Models
             }
 
             WaferYieldExceptList = "";
+            PMListStr = string.Empty;
+            EngListStr = string.Empty;
         }
+
+        public string PMListStr { set; get; }
+        public string EngListStr { set; get; }
 
         public string WaferYieldExceptList { set; get; }
 

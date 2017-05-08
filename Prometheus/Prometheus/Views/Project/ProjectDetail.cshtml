@@ -15,7 +15,7 @@
 
 
 <div class="row">
-    <div class="col-lg-12">
+    <div class="col-lg-11">
         <ol class="breadcrumb" style="font-size:18px">
             <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
 
@@ -28,6 +28,12 @@
                 <li class="active">Project Detail</li>
             }
         </ol>
+    </div>
+    <div class="col-lg-1">
+@if (Model != null)
+{
+        <a href="/Project/EditProject?ProjectKey=@Model.ProjectKey"><img  MYTP="HOVER" src="~/Content/images/icon/edit.png" style="height:34px; width:24px"></a>
+}
     </div>
 </div>
 

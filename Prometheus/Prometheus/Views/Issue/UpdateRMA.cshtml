@@ -67,7 +67,7 @@ else
                 {
                     <input class="form-control text-box single-line" id="HProjectKey" name="HProjectKey" type="hidden" value="" />
                 }
-                @*<img src="~/Content/images/icon/Add.png" data-toggle="tooltip" title="Add Sub Task" style="height:40px; width:26px" onclick="AddSubTask()">*@
+
                 <button type="submit" class="form-control" style="background-color:#006DC0;height:3em;color:white;">Add Sub-Task</button>
             }
         }
@@ -409,7 +409,7 @@ else
             <div class="col-lg-10">
                 <div class="col-lg-3">
                     <span class="btn btn-default btn-file" id="choosefile3" style="padding:0px;background-color:transparent !important;border-color:transparent !important;">
-                        <img src="~/Content/images/icon/Upload.png" style="height:20px; width:34px"> <input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
+                        <img src="~/Content/images/icon/Upload.png" MYTP="HOVER" style="height:20px; width:34px"> <input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
                     </span>
                 </div>
                 <div class="col-lg-9">
@@ -479,7 +479,7 @@ else
                                     <div class="col-lg-1" data-toggle="tooltip" title="Delete">
                                         @if (ViewBag.isassignee != null && ViewBag.isassignee)
                                                     {
-                                                    <img src="~/Content/images/icon/delete2.png" style="height:30px; width:18px" onclick="DeleteAttachment('@realfn')">
+                                                    <img src="~/Content/images/icon/delete2.png" MYTP="HOVER" style="height:30px; width:18px" onclick="DeleteAttachment('@realfn')">
                                                     }
                                     </div>
                                     <div class="col-lg-4"></div>
@@ -513,7 +513,7 @@ else
                         @if (ViewBag.isassignee != null && ViewBag.isassignee)
                         {
                             <span class="btn btn-default btn-file" id="choosefile2" style="padding:0px;background-color:transparent !important;border-color:transparent !important;">
-                                <img src="~/Content/images/icon/Upload.png" style="height:20px; width:34px"> <input type="file" name="files2" id="file2" runat="server" onchange="ShowFileNames2(this)" />
+                                <img src="~/Content/images/icon/Upload.png" MYTP="HOVER" style="height:20px; width:34px"> <input type="file" name="files2" id="file2" runat="server" onchange="ShowFileNames2(this)" />
                             </span>
                         }
                     </div>
@@ -585,7 +585,7 @@ else
                                                 <div class="col-lg-1" data-toggle="tooltip" title="Delete">
                                                     @if (ViewBag.isassignee != null && ViewBag.isassignee)
                                                     {
-                                                        <img src="~/Content/images/icon/delete2.png" style="height:30px; width:18px" onclick="DeleteAttachment('@realfn')">
+                                                        <img src="~/Content/images/icon/delete2.png" MYTP="HOVER" style="height:30px; width:18px" onclick="DeleteAttachment('@realfn')">
                                                     }
                                                 </div>
                                                 <div class="col-lg-4"></div>
@@ -620,7 +620,7 @@ else
                         @if (ViewBag.isassignee != null && ViewBag.isassignee)
                         {
                             <span class="btn btn-default btn-file" id="choosefile1" style="padding:0px;background-color:transparent !important;border-color:transparent !important;">
-                                <img src="~/Content/images/icon/Upload.png" style="height:20px; width:34px"> <input type="file" name="files1" id="file1" runat="server" onchange="ShowFileNames1(this)" />
+                                <img src="~/Content/images/icon/Upload.png" MYTP="HOVER" style="height:20px; width:34px"> <input type="file" name="files1" id="file1" runat="server" onchange="ShowFileNames1(this)" />
                             </span>
                         }
                     </div>
@@ -692,7 +692,7 @@ else
                                                 <div class="col-lg-1" data-toggle="tooltip" title="Delete">
                                                     @if (ViewBag.isassignee != null && ViewBag.isassignee)
                                                     {
-                                                        <img src="~/Content/images/icon/delete2.png" style="height:30px; width:18px" onclick="DeleteAttachment('@realfn')">
+                                                        <img src="~/Content/images/icon/delete2.png" MYTP="HOVER" style="height:30px; width:18px" onclick="DeleteAttachment('@realfn')">
                                                     }
                                                 </div>
                                                 <div class="col-lg-4"></div>
@@ -925,7 +925,7 @@ else
                                                     <div class="col-lg-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")</div>
                                                     <div class="col-lg-2">
                                                         <a href="/Issue/ModifyIssueComment?IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
-                                                            <img src="~/Content/images/icon/edit2.png" MYTP="BT" style="height:34px; width:24px">
+                                                            <img src="~/Content/images/icon/edit2.png" MYTP="HOVER" style="height:34px; width:24px">
                                                         </a>
                                                     </div>
                                                 </div>
@@ -1028,7 +1028,7 @@ else
                                                     <div class="col-lg-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")</div>
                                                     <div class="col-lg-2">
                                                         <a href="/Issue/ModifyIssueComment?IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
-                                                            <img src="~/Content/images/icon/edit2.png" MYTP="BT" style="height:34px; width:24px">
+                                                            <img src="~/Content/images/icon/edit2.png" MYTP="HOVER" style="height:34px; width:24px">
                                                         </a>
                                                     </div>
                                                 </div>

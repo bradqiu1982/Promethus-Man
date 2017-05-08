@@ -57,7 +57,7 @@
                                 <div class="col-lg-11"><h3 class="panel-title">@Model.Title</h3></div>
                                 <div class="col-lg-1">
                                     <a href="/User/ModifyBlogDoc?DocKey=@Model.DocKey">
-                                        <img src="~/Content/images/icon/edit.png" MYTP="BT" style="height:34px; width:24px">
+                                        <img src="~/Content/images/icon/edit.png" MYTP="HOVER" style="height:34px; width:24px">
                                     </a>
 
                                     @*<button class="form-control" type="button" value="DocKey=@Model.DocKey" onclick="ModifyBlogDoc(this)">
@@ -101,7 +101,7 @@
                                         <div class="col-lg-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")</div>
                                         <div class="col-lg-2">
                                             <a href="/User/UpdateWebDocComment?ErrorKey=@(item.ErrorKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())&Creator=@(Model.UserName)">
-                                                <img src="~/Content/images/icon/edit.png" MYTP="BT" style="height:34px; width:24px">
+                                                <img src="~/Content/images/icon/edit.png" MYTP="HOVER" style="height:34px; width:24px">
                                             </a>
                                         </div>
                                     </div>

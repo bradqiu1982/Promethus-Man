@@ -553,6 +553,7 @@
     <Content Include="Content\images\icon\Add.png" />
     <Content Include="Content\images\icon\delete.png" />
     <Content Include="Content\images\icon\delete2.png" />
+    <Content Include="Content\images\icon\delete3.png" />
     <Content Include="Content\images\icon\edit.png" />
     <Content Include="Content\images\icon\edit2.png" />
     <Content Include="Content\images\icon\extend.png" />

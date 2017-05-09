@@ -71,7 +71,7 @@
 @if (projectdata != null)
 {
     <div class="row">
-        <div class="col-lg-2" style="font-size:18px"><strong>&nbsp;&nbsp;Information</strong></div>
+        <div MYTP="orange" class="col-lg-2" style="font-size:18px"><strong>&nbsp;&nbsp;Information</strong></div>
         <div class="col-lg-10">
             <div class="form-group">
                 <div class="row">
@@ -94,7 +94,7 @@
 
                     <div class="col-lg-6">
                         <div class="col-lg-4">
-                            <label class="control-label" for="startdatev">StartDate</label>
+                            <label class="control-label" for="startdatev">Start Date</label>
                         </div>
                         <div class="col-lg-8">
                             <input id="startdatev" name="startdatev" class="form-control text-box single-line" value="@projectdata.StartDate.ToString("yyyy-MM-dd")" readonly="readonly" />
@@ -138,7 +138,7 @@
                             @if (Model != null && PMList.Count > (i * 2))
                             {
                                 <div class="col-lg-4">
-                                    <label class="control-label" for="PM@(i * 2 + 1)">PM@(i * 2 + 1)</label>
+                                    <label class="control-label" for="PM@(i * 2 + 1)">PM @(i * 2 + 1)</label>
                                 </div>
                                 <div class="col-lg-8">
                                     @Html.ActionLink(@PMList[(i * 2)].Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = @PMList[(i * 2)].Name }, null)
@@ -149,7 +149,7 @@
                             @if (Model != null && PMList.Count > (i * 2 + 1))
                             {
                                 <div class="col-lg-4">
-                                    <label class="control-label" for="PM@(i * 2 + 2)">PM@(i * 2 + 2)</label>
+                                    <label class="control-label" for="PM@(i * 2 + 2)">PM @(i * 2 + 2)</label>
                                 </div>
                                 <div class="col-lg-8">
                                     @Html.ActionLink(@PMList[(i * 2 + 1)].Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = @PMList[(i * 2 + 1)].Name }, null)
@@ -170,7 +170,7 @@
                             @if (Model != null && ENGList.Count > (i * 2))
                             {
                                 <div class="col-lg-4">
-                                    <label class="control-label" for="Engineer@(i * 2 + 1)">Engineer@(i * 2 + 1)</label>
+                                    <label class="control-label" for="Engineer@(i * 2 + 1)">Engineer @(i * 2 + 1)</label>
                                 </div>
                                 <div class="col-lg-8">
                                     @Html.ActionLink(@ENGList[(i * 2)].Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = @ENGList[(i * 2)].Name }, null)
@@ -181,7 +181,7 @@
                             @if (Model != null && ENGList.Count > (i * 2 + 1))
                             {
                                 <div class="col-lg-4">
-                                    <label class="control-label" for="Engineer@(i * 2 + 2)">Engineer@(i * 2 + 2)</label>
+                                    <label class="control-label" for="Engineer@(i * 2 + 2)">Engineer @(i * 2 + 2)</label>
                                 </div>
                                 <div class="col-lg-8">
                                     @Html.ActionLink(@ENGList[(i * 2 + 1)].Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = @ENGList[(i * 2 + 1)].Name }, null)
@@ -198,7 +198,7 @@
             <hr style="border-color:#006DC0;" />
 
             <div class="form-group">
-                <div class="row">
+                <div  MYTP="yello"  class="row">
                     @if (!string.IsNullOrEmpty(projectdata.CurrentNPIProc)
                          && !string.IsNullOrEmpty(projectdata.PIP1Date)
                          && !string.IsNullOrEmpty(projectdata.MVTDate))
@@ -462,7 +462,7 @@
         <div class="row">
             @if (!string.IsNullOrEmpty(projectdata.Description))
             {
-                <div class="col-lg-2 text-left" style="font-size:18px"><strong>Description</strong></div>
+                <div MYTP="blue"  class="col-lg-2 text-left" style="font-size:18px"><strong>Description</strong></div>
                 <div class="col-lg-10 text-left">@Html.Raw(projectdata.Description)</div>
             }
             else

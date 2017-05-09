@@ -56,140 +56,142 @@
         @Html.AntiForgeryToken()
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-        <div class="row" style="font-size:18px"><strong>&nbsp;&nbsp;&nbsp;Information</strong></div>
+        <div class="row" MYTP="orange" style="font-size:18px"><strong>&nbsp;&nbsp;&nbsp;Information</strong></div>
         <div class="row">
             <div class="col-lg-12">&nbsp;</div>
         </div>
         <div class="row">
-            <div class="form-horizontal">
-                <div class="form-group">
-                    <div class="col-lg-6">
-                        <div class="col-lg-2"><label class="control-label" for="ProjectKey">Project Key</label></div>
-                        <div class="col-lg-10">
-                            <input class="form-control text-box single-line" id="ProjectKey" name="ProjectKey" type="text" value="@Model.ProjectKey" readonly="readonly" />
+            <div class="col-lg-1"></div>
+            <div class="col-lg-11">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <div class="col-lg-6">
+                            <div class="col-lg-2"><label class="control-label" for="ProjectKey">Project Key</label></div>
+                            <div class="col-lg-10">
+                                <input class="form-control text-box single-line" id="ProjectKey" name="ProjectKey" type="text" value="@Model.ProjectKey" readonly="readonly" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="col-lg-2"><label class="control-label" for="ErrorCode">Error Code</label></div>
+                        <div class="col-lg-6">
+                            <div class="col-lg-2"><label class="control-label" for="ErrorCode">Error Code</label></div>
 
-                        <div class="col-lg-10">
-                            <input class="form-control text-box single-line" id="ErrorCode" name="ErrorCode" type="text" value="@Model.OrignalCode" readonly="readonly" />
+                            <div class="col-lg-10">
+                                <input class="form-control text-box single-line" id="ErrorCode" name="ErrorCode" type="text" value="@Model.OrignalCode" readonly="readonly" />
+                            </div>
                         </div>
                     </div>
+
+                    <div class="form-group">
+                        <div class="col-lg-6">
+                            <div class="col-lg-2"><label class="control-label" for="ShortDesc">Short Desc</label></div>
+                            <div class="col-lg-10">
+                                @if (ViewBag.assigee != null && ViewBag.assigee)
+                                {
+                                    <input class="form-control text-box single-line" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 25." data-val-length-max="25" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="ShortDesc" name="ShortDesc" type="text" value="@Model.ShortDesc" />
+                                    <span class="field-validation-valid text-danger" data-valmsg-for="ShortDesc" data-valmsg-replace="true"></span>
+                                }
+                                else
+                                {
+                                    <input class="form-control text-box single-line" readonly="readonly" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 25." data-val-length-max="25" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="ShortDesc" name="ShortDesc" type="text" value="@Model.ShortDesc" />
+                                }
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="col-lg-2"><label class="control-label" for="ErrorCount">Error Count</label></div>
+
+                            <div class="col-lg-10">
+                                <input class="form-control text-box single-line" id="ErrorCount" name="ErrorCount" type="text" value="@Model.ErrorCount" readonly="readonly" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-lg-6"><input class="form-control text-box single-line" value="@(Model.ErrorKey)" id="ErrorKey" name="ErrorKey" type="hidden" /></div>
+                        <div class="col-lg-6"></div>
+                    </div>
+
+
+
                 </div>
-
-                <div class="form-group">
-                    <div class="col-lg-6">
-                        <div class="col-lg-2"><label class="control-label" for="ShortDesc">Short Desc</label></div>
-                        <div class="col-lg-10">
-                            @if (ViewBag.assigee != null && ViewBag.assigee)
-                            {
-                                <input class="form-control text-box single-line"  data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 25." data-val-length-max="25" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="ShortDesc" name="ShortDesc" type="text" value="@Model.ShortDesc" />
-                                <span class="field-validation-valid text-danger" data-valmsg-for="ShortDesc" data-valmsg-replace="true"></span>
-                            }
-                            else
-                            {
-                                <input class="form-control text-box single-line" readonly="readonly" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 25." data-val-length-max="25" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="ShortDesc" name="ShortDesc" type="text" value="@Model.ShortDesc" />
-                            }
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="col-lg-2"><label class="control-label" for="ErrorCount">Error Count</label></div>
-
-                        <div class="col-lg-10">
-                            <input class="form-control text-box single-line"  id="ErrorCount" name="ErrorCount" type="text" value="@Model.ErrorCount" readonly="readonly" />
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-lg-6"><input class="form-control text-box single-line" value="@(Model.ErrorKey)" id="ErrorKey" name="ErrorKey" type="hidden" /></div>
-                    <div class="col-lg-6"></div>
-                </div>
-
-
-
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="col-lg-4 text-left">
-                    <span class="btn btn-default btn-file" id="choosefile3">
-                        Attachment <input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
-                    </span>
-                </div>
-                <div class="col-lg-8">
-                    <div class="col-lg-11">
-                        <label class="control-label" id="showfile3" name="showfile3"></label>
-                    </div>
-                    <div class="col-lg-1">
-                        <input class="form-control text-box single-line" value="" id="attachmentupload" name="attachmentupload" type="hidden" />
-                    </div>
-                </div>
-            </div>
-            <script type="text/javascript">
-                function ShowFileNames3(oFile) {
-                    $('#showfile3').text(oFile.value);
-                    document.getElementById("attachmentupload").value = oFile.value;
-                }
-            </script>
-        </div>
+
+
 
         <div class="row">
             <div class="col-lg-12">&nbsp;</div>
         </div>
 
-        if (Model != null && Model.AttachList.Count > 0)
-        {
-            <div class="row">
-                <div class="col-lg-12">&nbsp;</div>
-            </div>
 
-            <div class="row">
-                <div class="col-lg-12">&nbsp;</div>
-            </div>
+            <div  class="row">
+                <div MYTP="green" class="row" style="margin-left:3px">
+                    <div class="col-lg-2">
+                        <a data-toggle="collapse" href="#attachwell" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';font-size:18px"><font color="black"><strong>@(Model.AttachList.Count) Attachements</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:20px; width:12px"></a>
+                    </div>
+                    <div class="col-lg-10">
+                        <div class="col-lg-3">
+                            <span class="btn btn-default btn-file" id="choosefile3" style="padding:0px;background-color:transparent !important;border-color:transparent !important;">
+                                <img src="~/Content/images/icon/Upload.png" MYTP="HOVER" style="height:20px; width:34px"><input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
+                            </span>
+                        </div>
+                        <div class="col-lg-9">
+                            <div class="col-lg-11">
+                                <label class="control-label" id="showfile3" name="showfile3"></label>
+                            </div>
+                            <div class="col-lg-1">
+                                <input class="form-control text-box single-line" value="" id="attachmentupload" name="attachmentupload" type="hidden" />
+                            </div>
+                        </div>
+                        <script type="text/javascript">
+                            function ShowFileNames3(oFile) {
+                                $('#showfile3').text(oFile.value);
+                                document.getElementById("attachmentupload").value = oFile.value;
+                            }
+                        </script>
+                    </div>
+                </div>
 
-            <div class="row">
-                <div class="row" style="margin-left:3px"><a data-toggle="collapse" href="#attachwell" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';font-size:18px"><font color="black"><strong>&nbsp;&nbsp;@(Model.AttachList.Count) Attachements</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:20px; width:12px"></a></div>
                 <div class="row">
                     <div class="col-lg-12">&nbsp;</div>
                 </div>
-                <div class="row" style="margin-left:10px">
-                    <div class="collapse" id="attachwell">
-                        @foreach (var item in Model.AttachList)
-                        {
-                            var realfn = "";
-                            var tempfns = item.Split(new string[] { "/" }, StringSplitOptions.None);
-                            realfn = tempfns[tempfns.Length - 1].Trim();
 
-                            <div class="well" style="background-color:white;border-left-color:#006DC0;border-top-color:white;border-right-color:white;border-bottom-color:white;border-top-left-radius:0px;border-bottom-left-radius:0px">
-                                <div class="row">
-                                    <div class="col-lg-6">
-                                        <a href="@item" target="_blank">
-                                            <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>@realfn
-                                        </a>
+                <div class="row" style="margin-left:10px">
+                    <div class="col-lg-1"></div>
+                    <div class="col-lg-11">
+                        <div class="collapse" id="attachwell">
+                            @foreach (var item in Model.AttachList)
+                            {
+                                var realfn = "";
+                                var tempfns = item.Split(new string[] { "/" }, StringSplitOptions.None);
+                                realfn = tempfns[tempfns.Length - 1].Trim();
+
+                                <div class="well" style="background-color:white;border-left-color:#006DC0;border-top-color:white;border-right-color:white;border-bottom-color:white;border-top-left-radius:0px;border-bottom-left-radius:0px">
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <a href="@item" target="_blank">
+                                                <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>@realfn
+                                            </a>
+                                        </div>
+                                        <div class="col-lg-1">
+                                            @if (ViewBag.assigee != null && ViewBag.assigee)
+                                            {
+                                                <img src="~/Content/images/icon/delete2.png" MYTP="HOVER" style="height:30px; width:18px" onclick="DeleteAttachment('@realfn')">
+                                            }
+                                        </div>
+                                        <div class="col-lg-5"></div>
                                     </div>
-                                    <div class="col-lg-1">
-                                        @if (ViewBag.assigee != null && ViewBag.assigee)
-                                        {
-                                            <button class="form-control" value="@realfn" type="button" onclick="DeleteAttachment(this)">
-                                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                                            </button>
-                                        }
-                                    </div>
-                                    <div class="col-lg-5"></div>
                                 </div>
-                            </div>
-                        }
+                            }
+                        </div>
                     </div>
+
                 </div>
             </div>
-        }
+
 
         <script type="text/javascript">
             function DeleteAttachment(oBT) {
                 if (confirm("Notice: Do you really want to delete this attachment?")) {
-                    window.location.href = '/Project/DeleteErrorAttachment?errorkey=' + document.getElementById("ErrorKey").value + '&filename=' + oBT.value
+                    window.location.href = '/Project/DeleteErrorAttachment?errorkey=' + document.getElementById("ErrorKey").value + '&filename=' + oBT
                 }
                 else {
                     window.location.href = '/Project/UpdateProjectError?errorkey=' + document.getElementById("ErrorKey").value
@@ -212,10 +214,20 @@
                     }
                 }
                 <div class="panel panel-default" id="panel@(idx)" style="border-left-color:white;border-right-color:white;border-bottom-color:white;border-bottom-width:0px">
-                    <div class="panel-heading" style="background-color:#0F4FA8;">
-                        <h4 class="panel-title">
-                            <a data-toggle="collapse" data-target="#collapse@(idx)" href="#collapse@(idx)" class="collapsed"><font color="white">Analyse @idx @analyzetitle</font></a>
-                        </h4>
+                    <div class="panel-heading" style="background-color:#0F4FA8;padding-top:4px;padding-bottom:4px;">
+                        <div class="row">
+                            <div class="panel-title">
+                                <div class="col-lg-11">
+                                    <a data-toggle="collapse" data-target="#collapse@(idx)" href="#collapse@(idx)" class="collapsed"><font color="white">Analyse @idx @analyzetitle</font></a>
+                                </div>
+                                <div class="col-lg-1">
+                                    @if (ViewBag.assigee != null && ViewBag.assigee)
+                                    {
+                                        <img src="~/Content/images/icon/delete.png" MYTP="HOVER" style="height:24px; width:14px" onclick="DeleteAnalyse('ErrorKey=@(paircoment[0].ErrorKey)&Date=@(paircoment[0].CommentDate.ToString())')">
+                                    }
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div id="collapse@(idx)" class="panel-collapse collapse">
@@ -296,16 +308,6 @@
                                                 }
                                             </div>
                                             <div class="col-lg-1">
-                                                @if (ViewBag.assigee != null && ViewBag.assigee)
-                                                {
-                                                    <a href="/Project/UpdateErrorComment?ErrorKey=@(item.ErrorKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
-                                                        <img src="~/Content/images/icon/edit.png" MYTP="HOVER" style="height:34px; width:24px">
-                                                    </a>
-
-                                                    @*<button class="form-control" type="button" value="ErrorKey=@(item.ErrorKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="UpdateErrorComment(this)">
-                                                        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                                                    </button>*@
-                                                }
                                             </div>
                                             <div class="col-lg-2">
                                                 Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>
@@ -314,12 +316,12 @@
                                                 @item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")
                                             </div>
                                             <div class="row col-lg-1">
-                                                @*@if (ViewBag.assigee != null && ViewBag.assigee)
+                                                @if (ViewBag.assigee != null && ViewBag.assigee)
                                                 {
-                                                    <button class="form-control" type="button" value="ErrorKey=@(item.ErrorKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="DeleteComment(this)">
-                                                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                                                    </button>
-                                                }*@
+                                                    <a href="/Project/UpdateErrorComment?ErrorKey=@(item.ErrorKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
+                                                        <img src="~/Content/images/icon/edit.png" MYTP="HOVER" style="height:34px; width:24px">
+                                                    </a>
+                                                }
                                             </div>
                                         </div>
                                     </div>
@@ -336,9 +338,12 @@
 
         <script type="text/javascript">
 
-            function DeleteComment(oBT) {
-                if (oBT.value) {
-                    window.location.href = "/Project/DeleteErrorComment?" + oBT.value;
+            function DeleteAnalyse(oBT) {
+                if (oBT) {
+                    if (confirm("Do you really want to remove this analyse?"))
+                    {
+                        window.location.href = "/Project/DeleteAnalyse?" + oBT;
+                    }
                 }
             }
 
@@ -364,39 +369,44 @@
         if (Model.GeneralCommentList.Count > 0)
         {
             <div class="row">
-                <div class="row" style="margin-left:3px"><a data-toggle="collapse" href="#commentswell" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';"><font color="black"><strong>&nbsp;&nbsp;@(Model.GeneralCommentList.Count) Comments</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:20px; width:12px"></a></div>
+                <div MYTP="blue" class="row" style="margin-left:3px"><a data-toggle="collapse" href="#commentswell" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';"><font color="black"><strong>&nbsp;&nbsp;@(Model.GeneralCommentList.Count) Comments</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:20px; width:12px"></a></div>
                 <div class="row">
                     <div class="col-lg-12">&nbsp;</div>
                 </div>
                 <div class="row" style="margin-left:10px">
                     <div class="collapse" id="commentswell">
-                        @foreach (var item in Model.GeneralCommentList)
-                        {
-                            <div class="well" style="background-color:white;border-left-color:#006DC0;border-top-color:white;border-right-color:white;border-bottom-color:white;border-top-left-radius:0px;border-bottom-left-radius:0px">
-                                <div class="row">
-                                    <div class="col-lg-6">
-                                        <div class="col-lg-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")</div>
-                                        <div class="col-lg-2">
-                                            <a href="/Project/UpdateErrorComment?ErrorKey=@(item.ErrorKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
-                                                <img src="~/Content/images/icon/edit.png" MYTP="HOVER" style="height:34px; width:24px">
-                                            </a>
-                                            @*<button class="form-control" type="button" value="ErrorKey=@(item.ErrorKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="UpdateErrorComment(this)">
-                                                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                                            </button>*@
+                        <div class="row">
+                            <div class="col-lg-1"></div>
+                            <div class="col-lg-10">
+                                @foreach (var item in Model.GeneralCommentList)
+                                {
+                                    <div class="well" MYTP="HOVER" style="margin-bottom:2px;padding-bottom:2px;margin-top:2px;padding-top:2px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px">
+                                        <div class="row" MYTP="HOVER" style="margin-bottom:2px;padding-bottom:2px;margin-top:2px;padding-top:2px;">
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <div class="col-lg-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")</div>
+                                                    <div class="col-lg-2">
+                                                        <a href="/Project/UpdateErrorComment?ErrorKey=@(item.ErrorKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
+                                                            <img src="~/Content/images/icon/edit.png" MYTP="HOVER" style="height:34px; width:24px">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6"></div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-lg-1"></div>
+                                                <div class="col-lg-11">@Html.Raw(item.Comment)</div>
+                                            </div>
                                         </div>
+
                                     </div>
-                                    <div class="col-lg-6"></div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-lg-11"><hr /></div>
-                                    <div class="col-lg-1"></div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-lg-1"></div>
-                                    <div class="col-lg-11">@Html.Raw(item.Comment)</div>
-                                </div>
+                                }
                             </div>
-                        }
+                            <div class="col-lg-1"></div>
+                        </div>
+
+
                     </div>
                 </div>
 
@@ -407,61 +417,64 @@
         if (ViewBag.assigee != null && ViewBag.assigee)
         {
             <div class="row">
-                <div class="row" style="margin-left:3px"><a data-toggle="collapse" href="#AnalyseInput" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';"><font color="black"><strong>&nbsp;&nbsp;Analyse Input</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:20px; width:12px"></a></div>
+                <div  MYTP="red" class="row" style="margin-left:3px"><a data-toggle="collapse" href="#AnalyseInput" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';"><font color="black"><strong>&nbsp;&nbsp;Analyse Input</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:20px; width:12px"></a></div>
                 <div class="row">
                     <div class="col-lg-12">&nbsp;</div>
                 </div>
                 <div class="row" style="margin-left:10px">
                     <div class="collapse" id="AnalyseInput">
                         <div class="row">
-                            <div class="form-group">
-                                <div class="col-lg-12">
-                                    <div class="col-lg-2">
-                                        <label class="control-label" for="analysetitle">Analyse Title</label>
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <input class="form-control text-box single-line" id="analysetitle" name="analysetitle" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 200." data-val-length-max="200" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" type="text" value="" />
-                                        <span class="field-validation-valid text-danger" data-valmsg-for="analysetitle" data-valmsg-replace="true"></span>
-                                    </div>
-                                    <div class="col-lg-6">
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-lg-12">&nbsp;</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="form-group">
-                                Failure Detail
-                            </div>
-
-                            <div class="form-group">
-                                <div>
-                                    <textarea name="editor3" id="editor3" rows="10" cols="80"></textarea>
-                                    <script>
-                                        CKEDITOR.replace('editor3', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
-                                    </script>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
+                            <div class="col-lg-1"></div>
+                            <div class="col-lg-10">
                                 <div class="row">
-                                    <div class="col-lg-12">
-                                        <div class="col-lg-4">
-                                            <span class="btn btn-default btn-file" id="choosefile6">
-                                                Editor Attachment <input type="file" name="file6" id="file6" runat="server" onchange="ShowFileNames6(this)" />
-                                            </span>
+                                    <div class="form-group">
+                                        <div class="col-lg-12">
+                                            <div class="col-lg-2">
+                                                <label class="control-label" for="analysetitle">Analyse Title</label>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <input class="form-control text-box single-line" id="analysetitle" name="analysetitle" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 200." data-val-length-max="200" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" type="text" value="" />
+                                                <span class="field-validation-valid text-danger" data-valmsg-for="analysetitle" data-valmsg-replace="true"></span>
+                                            </div>
+                                            <div class="col-lg-6">
+                                            </div>
                                         </div>
-                                        <div class="col-lg-1"></div>
-                                        <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                                        <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                                        <div class="col-lg-5"></div>
+
                                     </div>
-                                    <script type="text/javascript">
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-12">&nbsp;</div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="form-group">
+                                        Failure Detail
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div>
+                                            <textarea name="editor3" id="editor3" rows="10" cols="80"></textarea>
+                                            <script>
+                                        CKEDITOR.replace('editor3', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
+                                            </script>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="col-lg-4">
+                                                    <span class="btn btn-default btn-file" id="choosefile6">
+                                                        Editor Attachment <input type="file" name="file6" id="file6" runat="server" onchange="ShowFileNames6(this)" />
+                                                    </span>
+                                                </div>
+                                                <div class="col-lg-1"></div>
+                                                <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                                                <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                                                <div class="col-lg-5"></div>
+                                            </div>
+                                            <script type="text/javascript">
                                         function ShowFileNames6(oFile) {
                                             ajaxFileUpload6();
                                         }
@@ -484,44 +497,44 @@
                                             )
                                             return false;
                                         }
-                                    </script>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <div class="row">
-                            <div class="col-lg-12">&nbsp;</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="form-group">
-                                Root Cause Investigation
-                            </div>
-
-                            <div class="form-group">
-                                <div>
-                                    <textarea name="editor2" id="editor2" rows="10" cols="80"></textarea>
-                                    <script>
-                                        CKEDITOR.replace('editor2', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
-                                    </script>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-lg-12">
-                                        <div class="col-lg-4">
-                                            <span class="btn btn-default btn-file" id="choosefile7">
-                                                Editor Attachment <input type="file" name="file7" id="file7" runat="server" onchange="ShowFileNames7(this)" />
-                                            </span>
+                                            </script>
                                         </div>
-                                        <div class="col-lg-1"></div>
-                                        <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                                        <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                                        <div class="col-lg-5"></div>
                                     </div>
-                                    <script type="text/javascript">
+
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-12">&nbsp;</div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="form-group">
+                                        Root Cause Investigation
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div>
+                                            <textarea name="editor2" id="editor2" rows="10" cols="80"></textarea>
+                                            <script>
+                                        CKEDITOR.replace('editor2', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
+                                            </script>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="col-lg-4">
+                                                    <span class="btn btn-default btn-file" id="choosefile7">
+                                                        Editor Attachment <input type="file" name="file7" id="file7" runat="server" onchange="ShowFileNames7(this)" />
+                                                    </span>
+                                                </div>
+                                                <div class="col-lg-1"></div>
+                                                <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                                                <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                                                <div class="col-lg-5"></div>
+                                            </div>
+                                            <script type="text/javascript">
                                         function ShowFileNames7(oFile) {
                                             ajaxFileUpload7();
                                         }
@@ -544,43 +557,43 @@
                                             )
                                             return false;
                                         }
-                                    </script>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <div class="row">
-                            <div class="col-lg-12">&nbsp;</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="form-group">
-                                Result
-                            </div>
-
-                            <div class="form-group">
-                                <div>
-                                    <textarea name="resulteditor" id="resulteditor" rows="10" cols="80"></textarea>
-                                    <script>
-                                        CKEDITOR.replace('resulteditor', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
-                                    </script>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-lg-12">
-                                        <div class="col-lg-4">
-                                            <span class="btn btn-default btn-file" id="choosefile8">
-                                                Editor Attachment <input type="file" name="file8" id="file8" runat="server" onchange="ShowFileNames8(this)" />
-                                            </span>
+                                            </script>
                                         </div>
-                                        <div class="col-lg-1"></div>
-                                        <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                                        <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                                        <div class="col-lg-5"></div>
                                     </div>
-                                    <script type="text/javascript">
+
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-12">&nbsp;</div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="form-group">
+                                        Result
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div>
+                                            <textarea name="resulteditor" id="resulteditor" rows="10" cols="80"></textarea>
+                                            <script>
+                                        CKEDITOR.replace('resulteditor', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
+                                            </script>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="col-lg-4">
+                                                    <span class="btn btn-default btn-file" id="choosefile8">
+                                                        Editor Attachment <input type="file" name="file8" id="file8" runat="server" onchange="ShowFileNames8(this)" />
+                                                    </span>
+                                                </div>
+                                                <div class="col-lg-1"></div>
+                                                <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                                                <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                                                <div class="col-lg-5"></div>
+                                            </div>
+                                            <script type="text/javascript">
                                         function ShowFileNames8(oFile) {
                                             ajaxFileUpload8();
                                         }
@@ -603,10 +616,14 @@
                                             )
                                             return false;
                                         }
-                                    </script>
+                                            </script>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+                            <div class="col-lg-1"></div>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -614,36 +631,38 @@
         }
 
         <div class="row">
-            <div class="row" style="margin-left:3px"><a data-toggle="collapse" href="#CommentInput" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';"><font color="black"><strong>&nbsp;&nbsp;General Comment Input</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:20px; width:12px"></a></div>
+            <div MYTP="red" class="row" style="margin-left:3px"><a data-toggle="collapse" href="#CommentInput" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';"><font color="black"><strong>&nbsp;&nbsp;General Comment Input</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:20px; width:12px"></a></div>
             <div class="row">
                 <div class="col-lg-12">&nbsp;</div>
             </div>
             <div class="row" style="margin-left:10px">
                 <div class="collapse" id="CommentInput">
                     <div class="row">
-                        <div class="form-group">
-                            <div>
-                                <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
-                                <script>
+                        <div class="row">
+                            <div class="col-lg-1"></div>
+                            <div class="col-lg-10">
+                                <div class="form-group">
+                                    <div>
+                                        <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
+                                        <script>
                                         CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
-                                </script>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="col-lg-4">
-                                        <span class="btn btn-default btn-file" id="choosefile9">
-                                            Editor Attachment <input type="file" name="file9" id="file9" runat="server" onchange="ShowFileNames9(this)" />
-                                        </span>
+                                        </script>
                                     </div>
-                                    <div class="col-lg-1"></div>
-                                    <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                                    <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                                    <div class="col-lg-5"></div>
                                 </div>
-                                <script type="text/javascript">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="col-lg-4">
+                                                <span class="btn btn-default btn-file" id="choosefile9">
+                                                    Editor Attachment <input type="file" name="file9" id="file9" runat="server" onchange="ShowFileNames9(this)" />
+                                                </span>
+                                            </div>
+                                            <div class="col-lg-1"></div>
+                                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                                            <div class="col-lg-5"></div>
+                                        </div>
+                                        <script type="text/javascript">
                                         function ShowFileNames9(oFile) {
                                             ajaxFileUpload9();
                                         }
@@ -666,29 +685,12 @@
                                             )
                                             return false;
                                         }
-                                </script>
-                                @if (ViewBag.assigee != null && ViewBag.assigee)
-                                {
-                                    <script type="text/javascript">
-                                            function SaveUserContent() {
-                                                RealSaveUserContent(CKEDITOR.instances.editor1.getData());
-                                                RealSaveUserContent(CKEDITOR.instances.editor2.getData());
-                                                RealSaveUserContent(CKEDITOR.instances.editor3.getData());
-                                                RealSaveUserContent(CKEDITOR.instances.resulteditor.getData());
-                                                return false;
-                                            }
-                                    </script>
-                                }
-                                else
-                                {
-                                    <script type="text/javascript">
-                                            function SaveUserContent() {
-                                                RealSaveUserContent(CKEDITOR.instances.editor1.getData());
-                                                return false;
-                                            }
-                                    </script>
-                                }
+                                        </script>
+
+                                    </div>
+                                </div>
                             </div>
+                            <div class="col-lg-1"></div>
                         </div>
 
                     </div>

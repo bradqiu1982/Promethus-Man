@@ -498,7 +498,7 @@ namespace Prometheus.Controllers
                 title.Add("Project");
                 title.Add("Summary");
                 title.Add("Priority");
-                title.Add("IssueType");
+                title.Add("TaskType");
                 title.Add("Assignee");
                 title.Add("Status");
                 title.Add("Due Date");

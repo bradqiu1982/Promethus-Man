@@ -516,6 +516,16 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
+        public static void DeleteAnalyse(string ErrorKey, string Date)
+        {
+            var sql = "update ErrorComments set APVal1 = 'delete' where ErrorKey='<ErrorKey>' and CommentDate > '<CommentDate1>' and CommentDate < '<CommentDate2>'";
+            sql = sql.Replace("<ErrorKey>", ErrorKey).Replace("<CommentDate1>",DateTime.Parse(Date).AddSeconds(-3).ToString())
+                .Replace("<CommentDate2>", DateTime.Parse(Date).AddSeconds(3).ToString());
+
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+
         public static ErrorComments RetrieveSPComment(string ErrorKey, string CommentType, string Date)
         {
             var tempcomment = new ErrorComments();

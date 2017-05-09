@@ -87,6 +87,31 @@
             background-color:#ECECEC;
         }
 
+        a[MYTP="HOVER"]:hover {
+            cursor:pointer;
+        }
+
+        div[MYTP="orange"] {
+            border-left-width:8px;border-left-style:solid;border-left-color:#FF7400;
+        }
+        
+        div[MYTP="yello"] {
+            border-left-width:8px;border-left-style:solid;border-left-color:#FFC000;
+        }
+        
+        div[MYTP="green"] {
+            border-left-width:8px;border-left-style:solid;border-left-color:#00B050;
+        }
+        
+
+        div[MYTP="blue"] {
+            border-left-width:8px;border-left-style:solid;border-left-color:#00B0CC;
+        }
+
+        div[MYTP="red"] {
+            border-left-width:8px;border-left-style:solid;border-left-color:#DF118C;
+        }
+
         input[readonly],select.form-control[readonly]
         ,input[disabled],select.form-control[disabled]
         ,textarea.form-control[disabled] {
@@ -146,7 +171,7 @@
                                                 @Html.ActionLink("View Projects", "ViewAll", "Project")
                                             </li>
                                             <li>
-                                                @Html.ActionLink("Create Project", "CreateProject", "Project")
+                                                @Html.ActionLink("Create Projects", "CreateProject", "Project")
                                             </li>
                                         </ul>
                                     </li>
@@ -177,10 +202,10 @@
 
                                 <ul class="nav navbar-nav">
                                     <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">3rd Part Data<span class="caret"></span></a>
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">3rd Party Data<span class="caret"></span></a>
                                         <ul class="dropdown-menu">
                                             <li>
-                                                @Html.ActionLink("Commit Vcsel Data", "CommitVcselData", "CustomerData")
+                                                @Html.ActionLink("Submit Vcsel Data", "CommitVcselData", "CustomerData")
                                             </li>
                                             <li>
                                                 @Html.ActionLink("Review Vcsel Data", "ReviewVcselData", "CustomerData")
@@ -220,13 +245,13 @@
 
                                 <ul class="nav navbar-nav navbar-right">
                                     <li>
-                                        <a id="editablebt" name="editablebt" onclick="changepagemode()">Edit Mode</a>
+                                        <a MYTP="HOVER" id="editablebt" name="editablebt" onclick="changepagemode()">Edit Mode</a>
                                     </li>
                                 </ul>
 
                                 <ul class="nav navbar-nav navbar-right">
                                     <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Friend Site<span class="caret"></span></a>
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Friendly Links<span class="caret"></span></a>
                                         <ul class="dropdown-menu">
                                             <li>
                                                 <a href="http://cn-traceview/" target="_blank">Trace View</a>

@@ -5,13 +5,32 @@
 }
 
 <div class="row">
-    <div class="col-lg-12">
-        <div class="col-lg-4"><h2>Create Quality Issue</h2></div>
-        <div class="col-lg-2"></div>
-        <div class="col-lg-3 text-center"><a href="~/Scripts/project_list.xlsx" target="_blank">Project List File</a></div>
-        <div class="col-lg-3 text-center"><a href="~/Scripts/standard quality data file.xlsx" target="_blank">Sample Data File</a></div>
-    </div>
+    <div class="col-lg-12">&nbsp;</div>
 </div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+<div class="row">
+    <div class="col-lg-1 text-right">
+        <img src="~/Content/images/PJ/quailty.png" style="height:45px; width:45px">
+    </div>
+    <div class="col-lg-7">
+        <ol class="breadcrumb" style="font-size:18px">
+            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
+            <li class="active">Create Quality Task</li>
+        </ol>
+    </div>
+    <div class="col-lg-2 text-center"><a href="~/Scripts/project_list.xlsx" target="_blank">Project List File</a></div>
+    <div class="col-lg-2 text-center"><a href="~/Scripts/standard quality data file.xlsx" target="_blank">Sample Data File</a></div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+
 
 @using (Html.BeginForm("CommitQualityData", "CustomerData", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {

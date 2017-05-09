@@ -3714,6 +3714,20 @@ namespace Prometheus.Controllers
             return RedirectToAction("ViewAll", "Project");
         }
 
+        public ActionResult DeleteAnalyse(string ErrorKey, string Date)
+        {
+            if (!string.IsNullOrEmpty(ErrorKey) && !string.IsNullOrEmpty(Date))
+            {
+                ProjectErrorViewModels.DeleteAnalyse(ErrorKey, Date);
+
+                var dict = new RouteValueDictionary();
+                dict.Add("ErrorKey", ErrorKey);
+                return RedirectToAction("UpdateProjectError", "Project", dict);
+            }
+            return RedirectToAction("ViewAll", "Project");
+        }
+
+
         public ActionResult UpdateProjectError2(string ProjectKey,string ErrorCode)
         {
             var tempvm = ProjectErrorViewModels.RetrieveErrorByPJKey(ProjectKey, ErrorCode,this);

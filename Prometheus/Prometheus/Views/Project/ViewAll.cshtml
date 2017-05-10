@@ -18,8 +18,14 @@
 </div>
 
 <div class="row">
-    <div class="col-lg-2" style="font-size:20px"><strong>All Projects</strong></div>
-    <div class="col-lg-5"></div>
+    <div class="col-lg-1">
+        <img src="~/Content/images/ucicon/IProjectIcons.png" style="height:45px; width:45px">
+    </div>
+    <div class="col-lg-6">
+        <ol class="breadcrumb" style="font-size:18px">
+            <li><a href="/Project/ViewAll">All Projects</a></li>
+        </ol>
+    </div>
     <div class="col-lg-3">@Html.DropDownList("pjfilterlist", null, new { @id = "pjfilterlist", @class = "form-control", @style = "font-family:'Arial Narrow';border-color:#006DC0;", @onchange = "ShowProjectDetail()" })</div>
     <div class="col-lg-1"><button class="btn btn-default" type="button" style="background-color:#006DC0;color:white;" onclick="LoadProject()">Load Projects</button></div>
     <div class="col-lg-1"></div>
@@ -42,19 +48,19 @@
 </div>
 
 
-<div class="panel-group" id="accordion">
+@*<div class="panel-group" id="accordion"  style="border-left-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-color:transparent !important;border:none;">*@
     @foreach (var pjtype in ViewBag.pjtypelist)
     {
         if (ViewBag.pjtpdict.ContainsKey(pjtype))
         {
-            <div class="panel panel-default" id="panel@(idx)" style="border-left-color:white;border-right-color:white;border-bottom-color:white;border-bottom-width:0px">
-                <div class="panel-heading" style="background-color:#006DC0;">
+            <div class="panel panel-default" id="panel@(idx)" style="border:none !important;margin-bottom:8px;">
+                <div class="panel-heading" style="background-color:#006DC0;border-left-color:transparent !important;border-right-color:transparent !important;">
                     <h4 class="panel-title">
                         <a data-toggle="collapse" data-target="#collapse@(idx)" href="#collapse@(idx)" class="collapsed"><font color="white">@pjtype</font></a>
                     </h4>
                 </div>
 
-                <div id="collapse@(idx)" class="panel-collapse collapse">
+                <div id="collapse@(idx)" class="panel-collapse collapse" style="border:none !important;">
                     <div class="panel-body">
 
                     @foreach (var item in Model)
@@ -77,16 +83,16 @@
                                                 <div class="row text-left">
                                                     <div class="col-lg-1"></div>
                                                     <div class="col-lg-11">
-                                                        <a href="/Issue/UpdateIssue?issuekey=@item.CurrentNPIProcKey" style="font-size:14px;">@item.CurrentNPIProc</a>
+                                                        <a href="/Issue/UpdateIssue?issuekey=@item.CurrentNPIProcKey" style="font-size:14px;"><strong>@item.CurrentNPIProc</strong></a>
                                                     </div>
                                                 </div>
                                                 <div class="row text-left">
                                                     <div class="col-lg-1"></div>
-                                                    <div class="col-lg-11" style="font-size:14px;">@item.PIP1Date</div>
+                                                    <div class="col-lg-11" style="font-size:14px;"><strong>@item.PIP1Date</strong></div>
                                                 </div>
                                                 <div class="row text-left">
                                                     <div class="col-lg-1"></div>
-                                                    <div class="col-lg-11" style="font-size:14px;">@item.MVTDate</div>
+                                                    <div class="col-lg-11" style="font-size:14px;"><strong>@item.MVTDate</strong></div>
                                                 </div>
                                                 <div class="row text-left">
                                                     <div class="col-lg-1"></div>
@@ -121,7 +127,7 @@
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                             </div>
                                             <div class="row">
-                                                <a href="/Project/ProjectYieldMain?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/Yield.png" MYTP="HOVER" style="height:100px; width:100px"></a>
+                                                <a href="/Project/ProjectYieldMain?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/Yield.png" MYTP="HOVER" style="height:80px; width:80px"></a>
                                             </div>
                                         </div>
                                         <div class="col-lg-5">
@@ -159,7 +165,7 @@
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                             </div>
                                             <div class="row">
-                                                <a href="/Project/ProjectFA?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/FA.png" MYTP="HOVER" style="height:100px; width:100px"></a>
+                                                <a href="/Project/ProjectFA?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/FA.png" MYTP="HOVER" style="height:80px; width:80px"></a>
                                             </div>
                                         </div>
                                         <div class="col-lg-5">
@@ -186,7 +192,7 @@
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                             </div>
                                             <div class="row">
-                                                <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/Task.png" MYTP="HOVER" style="height:100px; width:100px"></a>
+                                                <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/Task.png" MYTP="HOVER" style="height:80px; width:80px"></a>
                                             </div>
                                         </div>
                                         <div class="col-lg-5">
@@ -204,7 +210,7 @@
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                             </div>
                                             <div class="row">
-                                                <a href="/Project/ProjectRMAStatus?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/RMA.png" MYTP="HOVER" style="height:100px; width:100px"></a>
+                                                <a href="/Project/ProjectRMAStatus?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/RMA.png" MYTP="HOVER" style="height:80px; width:80px"></a>
                                             </div>
                                         </div>
                                         <div class="col-lg-5">
@@ -221,7 +227,7 @@
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                             </div>
                                             <div class="row">
-                                                <a href="/Project/ProjectError?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/DebugTreeicon.png" MYTP="HOVER" style="height:100px; width:100px"></a>
+                                                <a href="/Project/ProjectError?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/DebugTreeicon.png" MYTP="HOVER" style="height:80px; width:80px"></a>
                                             </div>
                                         </div>
                                         <div class="col-lg-5">
@@ -237,7 +243,7 @@
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                             </div>
                                             <div class="row">
-                                                <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/Task.png" MYTP="HOVER" style="height:100px; width:100px"></a>
+                                                <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/Task.png" MYTP="HOVER" style="height:80px; width:80px"></a>
                                             </div>
                                         </div>
                                         <div class="col-lg-5">
@@ -249,47 +255,13 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-2">
-                                        <div class="col-lg-7"  data-toggle="tooltip" title="OBA">
-
-                                            <div class="row">
-                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
-                                            </div>
-                                            <div class="row">
-                                                <a href="/Project/ProjectOBA?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/OBA.png" MYTP="HOVER" style="height:100px; width:100px"></a>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-5">
-
-                                            <div class="row">
-                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-2">
-                                        <div class="col-lg-7" data-toggle="tooltip" title="Quality">
-
-                                            <div class="row">
-                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
-                                            </div>
-                                            <div class="row">
-                                                <a href="/Project/ProjectQuality?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/quailty.png" MYTP="HOVER" style="height:100px; width:100px"></a>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-5">
-
-                                            <div class="row">
-                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-2">
                                         <div class="col-lg-7" data-toggle="tooltip" title="Reliability">
 
                                             <div class="row">
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                             </div>
                                             <div class="row">
-                                                <a href="/Project/ProjectReliability?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/REL.png" MYTP="HOVER" style="height:100px; width:100px"></a>
+                                                <a href="/Project/ProjectReliability?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/REL.png" MYTP="HOVER" style="height:80px; width:80px"></a>
                                             </div>
                                         </div>
                                         <div class="col-lg-5">
@@ -298,6 +270,40 @@
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                             </div>
                                         </div>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        @*<div class="col-lg-7"  data-toggle="tooltip" title="OBA">
+
+                                                <div class="row">
+                                                    <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                                </div>
+                                                <div class="row">
+                                                    <a href="/Project/ProjectOBA?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/OBA.png" MYTP="HOVER" style="height:80px; width:80px"></a>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-5">
+
+                                                <div class="row">
+                                                    <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                                </div>
+                                            </div>*@
+                                    </div>
+                                    <div class="col-lg-2">
+                                        @*<div class="col-lg-7" data-toggle="tooltip" title="Quality">
+
+                                                <div class="row">
+                                                    <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                                </div>
+                                                <div class="row">
+                                                    <a href="/Project/ProjectQuality?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/quailty.png" MYTP="HOVER" style="height:80px; width:80px"></a>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-5">
+
+                                                <div class="row">
+                                                    <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                                </div>
+                                            </div>*@
                                     </div>
                                     <div class="col-lg-2">
                                     </div>
@@ -316,6 +322,6 @@
         idx = idx + 1;
         }
     }
-</div>
+@*</div>*@
 
 

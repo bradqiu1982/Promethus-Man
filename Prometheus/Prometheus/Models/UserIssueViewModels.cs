@@ -186,7 +186,7 @@ namespace Prometheus.Models
 
 
             //yaxis
-            ChartSearies = "{name:'Issue Increase',data:[<fvalue>]},{name:'Issue Solved',data:[<cvalue>]}";
+            ChartSearies = "{name:'Task Increase',data:[<fvalue>]},{name:'Task Solved',data:[<cvalue>]}";
 
             var tempvalue = "";
             foreach (var item in pendinglist)
@@ -206,7 +206,7 @@ namespace Prometheus.Models
 
             var tempscript = System.IO.File.ReadAllText(ctrl.Server.MapPath("~/Scripts/AreaChart.xml"));
             uservm.UserIssueTrend = tempscript.Replace("#ElementID#", (uservm.CurrentUser.Split(new char[] { '@' })[0]).Replace(".", "") + "issuetrendchart")
-                .Replace("#Title#", "Issue Count Trend")
+                .Replace("#Title#", "Task Count Trend")
                 .Replace("#ChartxAxisValues#", ChartxAxisValues)
                 .Replace("#NAMEVALUEPAIRS#", ChartSearies);
         }

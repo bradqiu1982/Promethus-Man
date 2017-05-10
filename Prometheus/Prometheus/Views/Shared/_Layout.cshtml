@@ -50,7 +50,7 @@
         }
 
         .panel-default > .panel-heading-open {
-            background: #E41B17;
+            background: #E41B17;color:white;
         }
         
         input[type="text"]{
@@ -111,6 +111,11 @@
         div[MYTP="red"] {
             border-left-width:8px;border-left-style:solid;border-left-color:#DF118C;
         }
+
+        div[MYTP="realred"] {
+            border-left-width:8px;border-left-style:solid;border-left-color:red;
+        }
+
 
         input[readonly],select.form-control[readonly]
         ,input[disabled],select.form-control[disabled]
@@ -232,6 +237,22 @@
                                         <ul class="dropdown-menu">
                                             <li>
                                                 @Html.ActionLink("User Center", "UserCenter", "User")
+                                            </li>
+                                            <li>
+                                                @if (ViewBag.RealUserID != null)
+                                                {
+                                                    <a href="/User/MyStatus?username=@(ViewBag.RealUserID)">I Status</a>
+                                                }
+                                            </li>
+                                            <li>
+                                                @if (ViewBag.RealUserID != null && ViewBag.month != null)
+                                                {
+                                                    <a href="/User/ICare?username=@(ViewBag.RealUserID)&month=@(ViewBag.month)">I Focus</a>
+                                                }
+                                                else if (ViewBag.RealUserID != null)
+                                                {
+                                                    <a href="/User/ICare?username=@(ViewBag.RealUserID)&month=">I Focus</a>
+                                                }
                                             </li>
                                              <li>
                                                 @if (ViewBag.IsSuper != null && ViewBag.IsSuper)

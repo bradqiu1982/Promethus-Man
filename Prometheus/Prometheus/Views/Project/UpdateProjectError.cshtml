@@ -114,91 +114,9 @@
             </div>
         </div>
 
-
-
-
         <div class="row">
             <div class="col-lg-12">&nbsp;</div>
         </div>
-
-
-            <div  class="row">
-                <div MYTP="green" class="row" style="margin-left:3px">
-                    <div class="col-lg-2">
-                        <a data-toggle="collapse" href="#attachwell" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';font-size:18px"><font color="black"><strong>@(Model.AttachList.Count) Attachements</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:20px; width:12px"></a>
-                    </div>
-                    <div class="col-lg-10">
-                        <div class="col-lg-3">
-                            <span class="btn btn-default btn-file" id="choosefile3" style="padding:0px;background-color:transparent !important;border-color:transparent !important;">
-                                <img src="~/Content/images/icon/Upload.png" MYTP="HOVER" style="height:20px; width:34px"><input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
-                            </span>
-                        </div>
-                        <div class="col-lg-9">
-                            <div class="col-lg-11">
-                                <label class="control-label" id="showfile3" name="showfile3"></label>
-                            </div>
-                            <div class="col-lg-1">
-                                <input class="form-control text-box single-line" value="" id="attachmentupload" name="attachmentupload" type="hidden" />
-                            </div>
-                        </div>
-                        <script type="text/javascript">
-                            function ShowFileNames3(oFile) {
-                                $('#showfile3').text(oFile.value);
-                                document.getElementById("attachmentupload").value = oFile.value;
-                            }
-                        </script>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-lg-12">&nbsp;</div>
-                </div>
-
-                <div class="row" style="margin-left:10px">
-                    <div class="col-lg-1"></div>
-                    <div class="col-lg-11">
-                        <div class="collapse" id="attachwell">
-                            @foreach (var item in Model.AttachList)
-                            {
-                                var realfn = "";
-                                var tempfns = item.Split(new string[] { "/" }, StringSplitOptions.None);
-                                realfn = tempfns[tempfns.Length - 1].Trim();
-
-                                <div class="well" style="background-color:white;border-left-color:#006DC0;border-top-color:white;border-right-color:white;border-bottom-color:white;border-top-left-radius:0px;border-bottom-left-radius:0px">
-                                    <div class="row">
-                                        <div class="col-lg-6">
-                                            <a href="@item" target="_blank">
-                                                <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>@realfn
-                                            </a>
-                                        </div>
-                                        <div class="col-lg-1">
-                                            @if (ViewBag.assigee != null && ViewBag.assigee)
-                                            {
-                                                <img src="~/Content/images/icon/delete2.png" MYTP="HOVER" style="height:30px; width:18px" onclick="DeleteAttachment('@realfn')">
-                                            }
-                                        </div>
-                                        <div class="col-lg-5"></div>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-
-        <script type="text/javascript">
-            function DeleteAttachment(oBT) {
-                if (confirm("Notice: Do you really want to delete this attachment?")) {
-                    window.location.href = '/Project/DeleteErrorAttachment?errorkey=' + document.getElementById("ErrorKey").value + '&filename=' + oBT
-                }
-                else {
-                    window.location.href = '/Project/UpdateProjectError?errorkey=' + document.getElementById("ErrorKey").value
-                }
-            }
-
-        </script>
 
         <div class="panel-group" id="accordion">
             @foreach (var paircoment in Model.PairComments)
@@ -206,24 +124,56 @@
                 idx = idx + 1;
 
                 var analyzetitle = "";
+                var closed = false;
+
                 foreach (var item in paircoment)
                 {
                     if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.AnalyzeTitle) == 0)
                     {
                         analyzetitle = item.Comment;
                     }
+
+                    if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.Result) == 0)
+                    {
+                        if (!string.IsNullOrEmpty(item.ResultClosed) && string.Compare(item.ResultClosed, "CLOSED") == 0)
+                        {
+                            closed = true;
+                        }
+                    }
                 }
-                <div class="panel panel-default" id="panel@(idx)" style="border-left-color:white;border-right-color:white;border-bottom-color:white;border-bottom-width:0px">
-                    <div class="panel-heading" style="background-color:#0F4FA8;padding-top:4px;padding-bottom:4px;">
+
+                <div class="panel panel-default" id="panel@(idx)" style="border-left-color:transparent;border-right-color:transparent;border-top-color:#0F4FA8;border-bottom-color:white;border-bottom-width:0px;border-top-right-radius:0px;">
+                    <div class="panel-heading" style="padding-top:0px;padding-bottom:0px;background-color:transparent;border-bottom-color:white;border-top-color:#0F4FA8;border-bottom-width:0px;">
                         <div class="row">
-                            <div class="panel-title">
-                                <div class="col-lg-11">
-                                    <a data-toggle="collapse" data-target="#collapse@(idx)" href="#collapse@(idx)" class="collapsed"><font color="white">Analyse @idx @analyzetitle</font></a>
+
+                            @if (closed)
+                            {
+                                <div class="col-lg-4" style="background-color:#0F4FA8;">
+                                    <div class="panel-title">
+                                        <div class="col-lg-12">
+                                            <a data-toggle="collapse" data-target="#collapse@(idx)" href="#collapse@(idx)" class="collapsed"><font color="white">Analyse @idx @analyzetitle</font></a>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-lg-1">
+                            }
+                            else
+                            {
+                                <div MYTP="realred" class="col-lg-4" style="background-color:#0F4FA8;">
+                                    <div class="panel-title">
+                                        <div class="col-lg-12">
+                                            <a data-toggle="collapse" data-target="#collapse@(idx)" href="#collapse@(idx)" class="collapsed"><font color="white">Analyse @idx @analyzetitle</font></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+
+                            <div class="col-lg-8">
+                                <div class="col-lg-10"></div>
+                                <div class="col-lg-2">
                                     @if (ViewBag.assigee != null && ViewBag.assigee)
                                     {
-                                        <img src="~/Content/images/icon/delete.png" MYTP="HOVER" style="height:24px; width:14px" onclick="DeleteAnalyse('ErrorKey=@(paircoment[0].ErrorKey)&Date=@(paircoment[0].CommentDate.ToString())')">
+                                        <img src="~/Content/images/icon/delete2.png" MYTP="HOVER" style="height:24px; width:14px" onclick="DeleteAnalyse('ErrorKey=@(paircoment[0].ErrorKey)&Date=@(paircoment[0].CommentDate.ToString())')">
                                     }
                                 </div>
                             </div>
@@ -231,7 +181,7 @@
                     </div>
 
                     <div id="collapse@(idx)" class="panel-collapse collapse">
-                        <div class="panel-body">
+                        <div class="panel-body" style="border-left-color:transparent;border-right-color:transparent;border-top-color:transparent;border-bottom-color:white;border-bottom-width:0px;">
                             @foreach (var item in paircoment)
                             {
                                 if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.AnalyzeTitle) == 0)
@@ -239,48 +189,34 @@
                                     continue;
                                 }
 
+                                var paneltitle = item.CommentType;
+                                if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.RootCause) == 0)
+                                {
+                                    paneltitle = item.CommentType+ " Investigation";
+                                }
+
+
                                 <div class="panel panel-default">
 
                                     @if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.Result) == 0)
                                     {
-                                        if (!string.IsNullOrEmpty(item.ResultClosed) && string.Compare(item.ResultClosed, "CLOSED") == 0)
+                                        if (closed)
                                         {
                                             <div class="panel-heading">
-                                                @if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.RootCause) == 0)
-                                                {
-                                                    <h3 class="panel-title">@item.CommentType Investigation</h3>
-                                                }
-                                                else
-                                                {
-                                                    <h3 class="panel-title">@item.CommentType</h3>
-                                                }
+                                               <h3 class="panel-title">@paneltitle</h3>
                                             </div>
                                         }
                                         else
                                         {
                                             <div class="panel-heading panel-heading-open">
-                                                @if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.RootCause) == 0)
-                                                {
-                                                    <h3 class="panel-title">@item.CommentType Investigation</h3>
-                                                }
-                                                else
-                                                {
-                                                    <h3 class="panel-title">@item.CommentType</h3>
-                                                }
+                                                <h3 class="panel-title">@paneltitle</h3>
                                             </div>
                                         }
                                     }
                                     else
                                     {
                                         <div class="panel-heading">
-                                            @if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.RootCause) == 0)
-                                            {
-                                                <h3 class="panel-title">@item.CommentType Investigation</h3>
-                                            }
-                                            else
-                                            {
-                                                <h3 class="panel-title">@item.CommentType</h3>
-                                            }
+                                            <h3 class="panel-title">@paneltitle</h3>
                                         </div>
                                     }
 
@@ -365,6 +301,86 @@
         <div class="row">
             <div class="col-lg-12">&nbsp;</div>
         </div>
+
+
+            <div  class="row">
+                <div MYTP="green" class="row" style="margin-left:3px">
+                    <div class="col-lg-2">
+                        <a data-toggle="collapse" href="#attachwell" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';font-size:18px"><font color="black"><strong>@(Model.AttachList.Count) Attachements</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:20px; width:12px"></a>
+                    </div>
+                    <div class="col-lg-10">
+                        <div class="col-lg-3">
+                            <span class="btn btn-default btn-file" id="choosefile3" style="padding:0px;background-color:transparent !important;border-color:transparent !important;">
+                                <img src="~/Content/images/icon/Upload.png" MYTP="HOVER" style="height:20px; width:34px"><input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
+                            </span>
+                        </div>
+                        <div class="col-lg-9">
+                            <div class="col-lg-11">
+                                <label class="control-label" id="showfile3" name="showfile3"></label>
+                            </div>
+                            <div class="col-lg-1">
+                                <input class="form-control text-box single-line" value="" id="attachmentupload" name="attachmentupload" type="hidden" />
+                            </div>
+                        </div>
+                        <script type="text/javascript">
+                            function ShowFileNames3(oFile) {
+                                $('#showfile3').text(oFile.value);
+                                document.getElementById("attachmentupload").value = oFile.value;
+                            }
+                        </script>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-12">&nbsp;</div>
+                </div>
+
+                <div class="row" style="margin-left:10px">
+                    <div class="col-lg-1"></div>
+                    <div class="col-lg-11">
+                        <div class="collapse" id="attachwell">
+                            @foreach (var item in Model.AttachList)
+                            {
+                                var realfn = "";
+                                var tempfns = item.Split(new string[] { "/" }, StringSplitOptions.None);
+                                realfn = tempfns[tempfns.Length - 1].Trim();
+
+                                <div class="well" style="background-color:white;border-left-color:#006DC0;border-top-color:white;border-right-color:white;border-bottom-color:white;border-top-left-radius:0px;border-bottom-left-radius:0px">
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <a href="@item" target="_blank">
+                                                <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>@realfn
+                                            </a>
+                                        </div>
+                                        <div class="col-lg-1">
+                                            @if (ViewBag.assigee != null && ViewBag.assigee)
+                                            {
+                                                <img src="~/Content/images/icon/delete2.png" MYTP="HOVER" style="height:30px; width:18px" onclick="DeleteAttachment('@realfn')">
+                                            }
+                                        </div>
+                                        <div class="col-lg-5"></div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+        <script type="text/javascript">
+            function DeleteAttachment(oBT) {
+                if (confirm("Notice: Do you really want to delete this attachment?")) {
+                    window.location.href = '/Project/DeleteErrorAttachment?errorkey=' + document.getElementById("ErrorKey").value + '&filename=' + oBT
+                }
+                else {
+                    window.location.href = '/Project/UpdateProjectError?errorkey=' + document.getElementById("ErrorKey").value
+                }
+            }
+
+        </script>
+
 
         if (Model.GeneralCommentList.Count > 0)
         {

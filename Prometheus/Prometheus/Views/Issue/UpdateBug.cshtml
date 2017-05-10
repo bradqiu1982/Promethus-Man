@@ -1072,7 +1072,13 @@ else
                 <script type="text/javascript">
                     function link2dbgtree()
                     {
-                        $("#linkisu").click();
+                        if (document.getElementById("analysetitle").value) {
+                            $("#linkisu").click();
+                        }
+                        else
+                        {
+                            window.alert("Please input the analyse title!");
+                        }
                     }
                 </script>
             </div>

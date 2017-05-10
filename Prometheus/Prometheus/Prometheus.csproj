@@ -581,6 +581,7 @@
     <Content Include="Content\images\ucicon\IBlogIcons.png" />
     <Content Include="Content\images\ucicon\ICareIcons.png" />
     <Content Include="Content\images\ucicon\ILearnIcons.png" />
+    <Content Include="Content\images\ucicon\IProjectIcons.png" />
     <Content Include="Content\images\ucicon\ITagIcons.png" />
     <Content Include="Content\images\ucicon\MystautesIcons.png" />
     <Content Include="Content\images\usercenter\Assign2Me.png" />
@@ -588,6 +589,7 @@
     <Content Include="Content\images\usercenter\IBlog.png" />
     <Content Include="Content\images\usercenter\ICare.png" />
     <Content Include="Content\images\usercenter\ILearn.png" />
+    <Content Include="Content\images\usercenter\IProject.png" />
     <Content Include="Content\images\usercenter\ITag.png" />
     <Content Include="Content\images\usercenter\MyStatus.png" />
     <Content Include="Content\themes\base\accordion.css" />

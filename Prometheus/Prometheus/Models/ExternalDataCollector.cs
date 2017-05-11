@@ -1285,10 +1285,10 @@ namespace Prometheus.Models
 
                         UpdateRELData(rawdata);
 
-                        if (allpjdict.ContainsKey(RELPJKEY))
-                        {
+                        //if (allpjdict.ContainsKey(RELPJKEY))
+                        //{
                             Try2CreateREL(RELPJKEY,rawdata, rmaissuedict, ctrl);
-                        }
+                        //}
 
                         var uniquekey = DateTime.Parse(rawdata.AppV_C).ToString("yyyy-MM-dd") + "-" + rawdata.AppV_I + "-" + rawdata.AppV_K;
                         if (solvedrmanum.ContainsKey(uniquekey))
@@ -1415,6 +1415,17 @@ namespace Prometheus.Models
             }//check raw data status
         }
 
+        public static bool IsDebug()
+        {
+            bool debugging = false;
+#if DEBUG
+            debugging = true;
+#else
+            debugging = false;
+#endif
+            return debugging;
+        }
+
         private static void CreateRELssue(string RELPJKEY,string analyser,string reporter, RELRAWData rawdata,Controller ctrl)
         {
             var vm = new IssueViewModels();
@@ -1462,7 +1473,11 @@ namespace Prometheus.Models
             comment.Comment = "ROOTCAUSE: to be edited";
             IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, analyser, COMMENTTYPE.RootCause);
 
-            SendRMAEvent(vm, "created", ctrl, true);
+            if (!IsDebug())
+            {
+                SendRMAEvent(vm, "created", ctrl, true);
+            }
+
         }
 
         private static void CreateRelSubIssue(string presum, string sum, string pjkey, string parentkey, string analyser, string reporter, DateTime duedate)

@@ -1,0 +1,241 @@
+﻿@model IEnumerable<Prometheus.Models.ProjectFAViewModules>
+
+@{
+    ViewBag.Title = "ProjectFA";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var fadata = (List<Prometheus.Models.ProjectFAViewModules>)Model;
+}
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+<div class="row">
+    <div class="col-lg-1 text-right">
+        <img src="~/Content/images/PJ/FA.png" style="height:45px; width:45px">
+    </div>
+    <div class="col-lg-9">
+        <ol class="breadcrumb" style="font-size:18px">
+            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
+
+            @if (ViewBag.projectkey != null)
+            {
+                <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(ViewBag.projectkey)">Project Detail</a></li>
+                <li><a href="/Project/ProjectFA?ProjectKey=@(ViewBag.projectkey)">All Pending FA</a></li>
+                <li class="active">@ViewBag.projectkey FA</li>
+            }
+            else
+            {
+                <li class="active">Project FA</li>
+            }
+        </ol>
+    </div>
+    <div class="col-lg-1 text-right">
+        @if (ViewBag.projectkey != null)
+        {
+            using (Html.BeginForm("ProjectDoneFA", "Project", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+                <input class="form-control text-box single-line" value="@(ViewBag.projectkey)" id="HProjectKey" name="HProjectKey" type="hidden" />
+                <button data-toggle="tooltip" title="Done FA" type="submit" class="btn btn-default" style="background-color:#006DC0;color:white;">FA Done</button>
+            }
+        }
+    </div>
+    <div class="col-lg-1 text-right"></div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+
+<script src="~/Scripts/highcharts.js"></script>
+<script src="~/Scripts/exporting.js"></script>
+
+@if (ViewBag.chartscript != null)
+{
+    @Html.Raw(ViewBag.chartscript)
+
+    <div class="row">
+        <div class="col-lg-2"></div>
+        <div class="col-lg-8">
+            <div id="failurepie" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+        </div>
+        <div class="col-lg-2"></div>
+    </div>
+}
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+<div class="row" style="background-color:#006DC0;font-family:'Arial Narrow';font-size:18px">
+    <div class="col-lg-3 text-left"><font color="white">ModuleSN</font></div>
+    <div class="col-lg-2 text-left"><font color="white">ErrAbbr</font></div>
+    <div class="col-lg-1 text-left"><font color="white">FA Status</font></div>
+    <div class="col-lg-1 text-left"><font color="white">Assignee</font></div>
+    <div class="col-lg-3 text-left"><font color="white">Failure Desc</font></div>
+    <div class="col-lg-2">
+        <div class="col-lg-4 text-left"><font color="white">Date</font></div>
+        <div class="col-lg-3 text-left"><font color="white"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></font></div>
+        <div class="col-lg-5 text-left"><font color="white">LYT</font></div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+
+@if (Model != null)
+{
+        using (Html.BeginForm("AsignIssues", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+
+            var i = 0;
+            foreach (var item in Model)
+            {
+                <div class="row" style="font-family:'Arial Narrow';">
+                    <div class="col-lg-3">
+                        @*<div class="col-lg-3 text-left">
+                            <input type="checkbox" id="check@(i)" name="check@(i)" value="true" />
+                            <input class="form-control text-box single-line" value="@item.IssueData.IssueKey" id="HIssueKey@(i)" name="HIssueKey@(i)" type="hidden" />
+                        </div>*@
+                        <div class="col-lg-6 text-left">
+                            @if (item.IssueData.RootCauseCommentList.Count > 0
+                                    || item.IssueData.ResultCommentList.Count > 0
+                                    || item.IssueData.CommentList.Count > 2
+                                    || (item.IssueData.CommentList.Count > 1 && item.IssueData.CommentList[1].Comment.Length > 150))
+                            {
+                                <span class="badge alert-success">C</span>
+                            }
+                            @if (!string.IsNullOrEmpty(item.IssueData.LYT))
+                            {
+                                <span class="badge alert-danger">LYT</span>
+                            }
+                        </div>
+                        <div class="col-lg-4 text-left">
+                            <a href="/Project/SNIssue?ProjectKey=@item.TestData.ProjectKey&SN=@item.TestData.ModuleSerialNum">@item.TestData.ModuleSerialNum</a>
+                        </div>
+
+                        <div class="col-lg-2 text-left">
+                            <a href="http://cn-traceview/?search=@item.TestData.ModuleSerialNum" target='_blank'><span class="badge alert-success">T</span></a>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2 text-left">
+                        <div class="col-lg-8">
+                            <a href="/Project/ProjectErrAbbr?ProjectKey=@item.TestData.ProjectKey&ErrAbbr=@item.TestData.ErrAbbr">@item.TestData.ErrAbbr</a>
+                        </div>
+                        <div class="col-lg-4">
+                            <a href="/Project/UpdateProjectError2?ProjectKey=@item.TestData.ProjectKey&ErrorCode=@item.TestData.ErrAbbr"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-1 text-left">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(@item.IssueData.Resolution))</div>
+                    <div class="col-lg-1 text-left">
+                        <a href="/User/UserCenter?username=@item.IssueData.Assignee">@item.IssueData.Assignee.Split(new char[] { '@' })[0]</a>
+
+                        <input class="form-control text-box single-line" value="@item.IssueData.Assignee.ToUpper()" id="HAssignee@(i)" name="HAssignee@(i)" type="hidden" />
+                        @if (@ViewBag.UpdaterName != null)
+                            {
+                            <input class="form-control text-box single-line" value="@ViewBag.UpdaterName" id="HUpdater@(i)" name="HUpdater@(i)" type="hidden" />
+                        }
+                        else
+                        {
+                            <input class="form-control text-box single-line" value="" id="HUpdater@(i)" name="HUpdater@(i)" type="hidden" />
+                        }
+                    </div>
+                    <div class="col-lg-3 text-left"><a href="/Issue/UpdateIssue?issuekey=@item.IssueData.IssueKey">@item.IssueData.Summary</a></div>
+                    <div class="col-lg-2">
+                        <div class="col-lg-4 text-left">@item.IssueData.ReportDate.ToString("MM/dd")</div>
+                        <div class="col-lg-3 text-left">
+                            @if (item.IssueData.AttachList.Count > 0)
+                            {
+                                <a href="/Issue/IssueAttach?issuekey=@item.IssueData.IssueKey" target="_blank">
+                                    <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>
+                                </a>
+                            }
+                        </div>
+                        <div class="col-lg-5 text-left">
+                            <img src="~/Content/images/icon/LowYield.png" MYTP="HOVER" style="height:16px;width:16px" onclick="LowYieldWarning('@item.IssueData.IssueKey')">
+                        </div>
+                    </div>
+                </div>
+
+                i = i + 1;
+            }
+
+            @*if (ViewBag.logined != null && ViewBag.logined)
+            {
+                <div class="row">
+                    <div class="col-lg-1 text-left">
+                        <input type="checkbox" id="checkall" name="checkall" onclick="ChooseAll(this)" />
+                    </div>
+                    <div class="col-lg-2 text-left">
+                        <input type="submit" value="Assign To" class="btn btn-default" />
+                    </div>
+                    <div class="col-lg-4 text-left">
+                        @Html.DropDownList("AllUserList", null, new { @id = "AllUserList", @class = "form-control" })
+                    </div>
+                    <div class="col-lg-1 text-left">
+                    </div>
+                    <div class="col-lg-4 text-left">
+                    </div>
+
+                    <script type="text/javascript">
+                            function ChooseAll(oBox) {
+                            if (oBox.checked === true)
+                            {
+                                for (var idx = 0; idx < 600; idx++)
+                                {
+                                    if (document.getElementById("HAssignee" + idx)
+                                        && document.getElementById("HUpdater" + idx)
+                                        && document.getElementById("HAssignee" + idx).value === document.getElementById("HUpdater" + idx).value)
+                                    {
+                                        if (document.getElementById("check" + idx)){
+                                            document.getElementById("check" + idx).checked = true;
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                for (var idx = 0; idx < 600; idx++)
+                                {
+                                    if (document.getElementById("HAssignee" + idx)
+                                        &&document.getElementById("HUpdater" + idx)
+                                        &&document.getElementById("HAssignee" + idx).value === document.getElementById("HUpdater" + idx).value)
+                                    {
+                                        if (document.getElementById("check" + idx)) {
+                                            document.getElementById("check" + idx).checked = false;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    </script>
+                </div>
+            }//end if*@
+        }
+
+}
+
+<script type="text/javascript">
+        function LowYieldWarning(oBT)
+        {
+            if (confirm("Warning: only FA assignee can trigger Low Yield Trigger."))
+            {
+                var myurl = "/Project/LowYieldWarn?IssueKey=" + oBT;
+                window.open(myurl, '_blank');
+            }
+        }
+</script>

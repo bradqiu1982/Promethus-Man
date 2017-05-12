@@ -1463,7 +1463,7 @@ namespace Prometheus.Controllers
 
                 pendingitems.AddRange(tempitems);
 
-                return View("ProjectFA", pendingitems);
+                return View(pendingitems);
             }
             return RedirectToAction("ViewAll","Project");
         }
@@ -1483,7 +1483,7 @@ namespace Prometheus.Controllers
                 {
                     ViewBag.logined = true;
                 }
-                return View("ProjectFA", vm);
+                return View(vm);
             }
             return RedirectToAction("ViewAll", "Project");
         }
@@ -1537,7 +1537,7 @@ namespace Prometheus.Controllers
                 ViewBag.logined = true;
             }
 
-            return View("ProjectFA", vm);
+            return View(vm);
         }
 
         public ActionResult ProjectNPI(string ProjectKey)

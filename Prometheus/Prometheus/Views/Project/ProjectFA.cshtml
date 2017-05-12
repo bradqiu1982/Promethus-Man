@@ -97,140 +97,6 @@
 
     @if (Model != null)
     {
-        if (ViewBag.chartscript == null && fadata != null && fadata.Count > 0 && ViewBag.DoneIssueList != null)
-        {
-            using (Html.BeginForm("SameAsIssue", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
-            {
-                @Html.AntiForgeryToken()
-
-                var i = 0;
-                foreach (var item in Model)
-                {
-                            <div class="row" style="font-family:'Arial Narrow';">
-                                <div class="col-lg-3">
-                                    <div class="col-lg-3 text-left">
-                                            <input type="checkbox" id="check@(i)" name="check@(i)" value="true"/>
-                                        <input class="form-control text-box single-line" value="@item.IssueData.IssueKey" id="HIssueKey@(i)" name="HIssueKey@(i)" type="hidden" />
-                                    </div>
-
-                                    <div class="col-lg-4 text-left">
-                                        @if (item.IssueData.RootCauseCommentList.Count > 0
-                                            || item.IssueData.ResultCommentList.Count > 0
-                                            || item.IssueData.CommentList.Count > 2
-                                            || (item.IssueData.CommentList.Count > 1 && item.IssueData.CommentList[1].Comment.Length > 150))
-                                            {
-                                                <span class="badge alert-success">C</span>
-                                            }
-
-                                        @if (!string.IsNullOrEmpty(item.IssueData.LYT))
-                                        {
-                                            <span class="badge alert-danger">LYT</span>
-                                        }
-                                    </div>
-
-                                    <div class="col-lg-3 text-left">
-                                    <a href="/Project/SNIssue?ProjectKey=@item.TestData.ProjectKey&SN=@item.TestData.ModuleSerialNum">@item.TestData.ModuleSerialNum</a></div>
-
-                                    <div class="col-lg-2 text-left">
-                                        <a href="http://cn-traceview/?search=@item.TestData.ModuleSerialNum"  target='_blank'><span class="badge alert-success">T</span></a>
-                                    </div>
-                                </div>
-                            
-
-                                <div class="col-lg-2 text-left">
-                                    <div class="col-lg-8">
-                                        <a href="/Project/ProjectErrAbbr?ProjectKey=@item.TestData.ProjectKey&ErrAbbr=@item.TestData.ErrAbbr">@item.TestData.ErrAbbr</a>
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <a href="/Project/UpdateProjectError2?ProjectKey=@item.TestData.ProjectKey&ErrorCode=@item.TestData.ErrAbbr"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
-                                    </div>
-                                </div>
-                                <div class="col-lg-1 text-left">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(@item.IssueData.Resolution))</div>
-                                
-                                <div class="col-lg-1 text-left"><a href="/User/UserCenter?username=@item.IssueData.Assignee">@item.IssueData.Assignee.Split(new char[] { '@' })[0]</a></div>
-
-                                <div class="col-lg-3 text-left"><a href="/Issue/UpdateIssue?issuekey=@item.IssueData.IssueKey">@item.IssueData.Summary</a></div>
-                                <div class="col-lg-2">
-                                    <div class="col-lg-4 text-left">@item.IssueData.ReportDate.ToString("MM/dd")</div>
-                                    <div class="col-lg-3 text-left">
-                                        @if (item.IssueData.AttachList.Count > 0)
-                                        {
-                                            <a href="/Issue/IssueAttach?issuekey=@item.IssueData.IssueKey" target="_blank">
-                                                <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>
-                                            </a>
-                                        }
-                                    </div>
-                                    <div class="col-lg-5 text-left">
-                                        <img src="~/Content/images/icon/LowYield.png" MYTP="HOVER" style="height:16px;width:16px" onclick="LowYieldWarning('@item.IssueData.IssueKey')">
-                                        @*<button data-toggle="tooltip" title="Low Yield Trigger" class="form-control" value="@item.IssueData.IssueKey" type="button" onclick="LowYieldWarning(this)">*@
-                                            @*<span class="glyphicon glyphicon-share" aria-hidden="true" value="@item.IssueData.IssueKey" onclick="LowYieldWarning(this)"></span>*@
-                                        @*</button>*@
-                                    </div> 
-                                </div>
-                            </div>
-                    i = i + 1;
-                }
-
-                <hr />
-
-                if (ViewBag.logined != null && ViewBag.logined)
-                {
-                    <div class="row">
-                        <div class="col-lg-1 text-left">
-                                <input type="checkbox" id="checkall" name="checkall" onclick="ChooseAll(this)" />
-                        </div>
-                        <div class="col-lg-2 text-left">
-                            <input type="submit" value="Same As" class="btn btn-default" />
-                        </div>
-                        <div class="col-lg-4 text-left">
-                            @Html.DropDownList("DoneIssueList", null, new { @id = "DoneIssueList", @class = "form-control" })
-                        </div>
-                        <div class="col-lg-1 text-left">
-                            <button class="form-control" data-toggle="tooltip" title="View Selected Issue" onclick="ShowSelectIssue()" type="button"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>
-                        </div>
-                        <div class="col-lg-4 text-left">
-                        </div>
-                        <script type="text/javascript">
-
-                    function ChooseAll(oBox) {
-                    if (oBox.checked === true)
-                    {
-                        for (var idx = 0; idx < 600; idx++)
-                        {
-                            if (document.getElementById("check" + idx)){
-                                document.getElementById("check" + idx).checked = true;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        for (var idx = 0; idx < 600; idx++) {
-                            if (document.getElementById("check" + idx)) {
-                                document.getElementById("check" + idx).checked = false;
-                            }
-                        }
-                    }
-                }
-
-                function ShowSelectIssue()
-                {
-                    if (document.getElementById("DoneIssueList").value)
-                    {
-                        var myurl = '/Issue/UpdateIssue?issuekey=' + document.getElementById("DoneIssueList").value;
-                        window.open(myurl, '_blank');
-                    }
-                }
-
-                        </script>
-                    </div>
-                }
-
-
-            }
-        }
-        else
-        {
-
             using (Html.BeginForm("AsignIssues", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
             {
                 @Html.AntiForgeryToken()
@@ -364,9 +230,9 @@
                         }
                         </script>
                     </div>
-                }//end if
-            }
-        }
+            }//end if
+    }
+
 
     }
 

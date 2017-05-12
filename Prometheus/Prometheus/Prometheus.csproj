@@ -924,6 +924,9 @@
     <Content Include="Views\User\IAssigned.cshtml" />
     <Content Include="Views\User\ICare.cshtml" />
     <Content Include="Views\User\MyStatus.cshtml" />
+    <Content Include="Views\Project\ProjectErrAbbr.cshtml" />
+    <Content Include="Views\Project\SNIssue.cshtml" />
+    <Content Include="Views\Project\ProjectDoneFA.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

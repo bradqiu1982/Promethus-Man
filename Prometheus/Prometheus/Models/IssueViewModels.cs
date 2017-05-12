@@ -2269,18 +2269,21 @@ namespace Prometheus.Models
                 fixresolve = Resolute.Done;
             }
 
-            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples,ModuleSN from Issue where APVal1 <> 'delete' and  Assignee = '<Assignee>' and Resolution in <cond> and IssueType <> '<IssueType1>' and  Reporter <> 'System' order by ReportDate DESC";
+            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples,ModuleSN,ParentIssueKey from Issue where APVal1 <> 'delete' and  Assignee = '<Assignee>' and Resolution in <cond> and IssueType <> '<IssueType1>' and  Reporter <> 'System' order by ReportDate DESC";
             sql = sql.Replace("<Assignee>", assignee).Replace("<topnum>", Convert.ToString(topnum)).Replace("<cond>", cond).Replace("<IssueType1>", ISSUETP.NPIPROC);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)
             {
-                ret.Add(new IssueViewModels(Convert.ToString(line[0])
+                var vm = new IssueViewModels(Convert.ToString(line[0])
                     , Convert.ToString(line[1]), Convert.ToString(line[2])
                     , Convert.ToString(line[3]), Convert.ToString(line[4])
                     , Convert.ToString(line[5]), Convert.ToString(line[6])
                     , Convert.ToString(line[7]), Convert.ToString(line[8])
-                    , Convert.ToString(line[9]), fixresolve,"", Convert.ToString(line[11])));
+                    , Convert.ToString(line[9]), fixresolve, "", Convert.ToString(line[11]));
+                vm.ModuleSN = Convert.ToString(line[12]);
+                vm.ParentIssueKey = Convert.ToString(line[13]);
+                ret.Add(vm);
             }
 
             return ret;
@@ -2306,18 +2309,22 @@ namespace Prometheus.Models
                 fixresolve = Resolute.Done;
             }
 
-            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples,ModuleSN from Issue where APVal1 <> 'delete' and  Assignee = '<Assignee>' and Resolution in <cond> order by ReportDate DESC";
+            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples,ModuleSN,ParentIssueKey from Issue where APVal1 <> 'delete' and  Assignee = '<Assignee>' and Resolution in <cond> order by ReportDate DESC";
             sql = sql.Replace("<Assignee>", assignee).Replace("<topnum>", Convert.ToString(topnum)).Replace("<cond>", cond).Replace("<IssueType>", ISSUETP.Bug);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)
             {
-                ret.Add(new IssueViewModels(Convert.ToString(line[0])
+                var vm = new IssueViewModels(Convert.ToString(line[0])
                     , Convert.ToString(line[1]), Convert.ToString(line[2])
                     , Convert.ToString(line[3]), Convert.ToString(line[4])
                     , Convert.ToString(line[5]), Convert.ToString(line[6])
                     , Convert.ToString(line[7]), Convert.ToString(line[8])
-                    , Convert.ToString(line[9]), fixresolve, "", Convert.ToString(line[11])));
+                    , Convert.ToString(line[9]), fixresolve, "", Convert.ToString(line[11]));
+                vm.ModuleSN = Convert.ToString(line[12]);
+                vm.ParentIssueKey = Convert.ToString(line[13]);
+
+                ret.Add(vm);
             }
 
             return ret;

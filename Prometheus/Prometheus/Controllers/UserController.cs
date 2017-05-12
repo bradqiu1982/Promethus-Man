@@ -393,8 +393,16 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(usernm))
             {
                 //asign to me
-                ViewBag.pendinglist = IssueViewModels.RetrieveIssueByAssignee(usernm, Resolute.Pending, 60);
-                ViewBag.workinglist = IssueViewModels.RetrieveIssueByAssigneeWorking(usernm, Resolute.Working, 60);
+                var alllist = new List<IssueViewModels>();
+                var pendinglist = IssueViewModels.RetrieveIssueByAssignee(usernm, Resolute.Pending, 120);
+                var workinglist = IssueViewModels.RetrieveIssueByAssigneeWorking(usernm, Resolute.Working, 120);
+                var donelist = IssueViewModels.RetrieveIssueByAssignee(usernm, Resolute.Done, 360);
+                alllist.AddRange(pendinglist);
+                alllist.AddRange(workinglist);
+                alllist.AddRange(donelist);
+
+                ViewBag.pendinglist = FilterSubIssue(pendinglist, alllist);
+                ViewBag.workinglist = FilterSubIssue(workinglist, alllist);
 
                 ViewBag.UserName = usernm.Split(new char[] { '@' })[0];
                 ViewBag.RealUserID = usernm;
@@ -414,6 +422,37 @@ namespace Prometheus.Controllers
             {
                 return RedirectToAction("LoginUser", "User");
             }
+        }
+
+
+        private List<IssueViewModels> FilterSubIssue(List<IssueViewModels> tobefiter, List<IssueViewModels> allissue)
+        {
+            var alldict = new Dictionary<string, bool>();
+            foreach (var item in allissue)
+            {
+                if (!alldict.ContainsKey(item.IssueKey))
+                {
+                    alldict.Add(item.IssueKey, true);
+                }
+            }
+
+
+            var ret = new List<IssueViewModels>();
+            foreach (var item in tobefiter)
+            {
+                if (string.IsNullOrEmpty(item.ParentIssueKey))
+                {
+                    ret.Add(item);
+                }
+                else
+                {
+                    if (!alldict.ContainsKey(item.ParentIssueKey))
+                    {
+                        ret.Add(item);
+                    }
+                }
+            }
+            return ret;
         }
 
         public ActionResult Assign2Me(string username)
@@ -442,15 +481,22 @@ namespace Prometheus.Controllers
                 usernm = ckdict["logonuser"].Split(new char[] { '|' })[0];
             }
 
-
+            
             if (!string.IsNullOrEmpty(usernm))
             {
                 ViewBag.UserName = usernm.Split(new char[] { '@' })[0];
                 ViewBag.RealUserID = usernm;
 
-                ViewBag.pendinglist = IssueViewModels.RetrieveIssueByAssignee(usernm, Resolute.Pending, 60);
-                ViewBag.workinglist = IssueViewModels.RetrieveIssueByAssigneeWorking(usernm, Resolute.Working, 60);
-                ViewBag.donelist = IssueViewModels.RetrieveIssueByAssignee(usernm, Resolute.Done, 200);
+                var alllist = new List<IssueViewModels>();
+                var pendinglist = IssueViewModels.RetrieveIssueByAssignee(usernm, Resolute.Pending, 120);
+                var workinglist = IssueViewModels.RetrieveIssueByAssigneeWorking(usernm, Resolute.Working, 120);
+                var donelist = IssueViewModels.RetrieveIssueByAssignee(usernm, Resolute.Done, 360);
+                alllist.AddRange(pendinglist);
+                alllist.AddRange(workinglist);
+                alllist.AddRange(donelist);
+                ViewBag.pendinglist = FilterSubIssue(pendinglist, alllist);
+                ViewBag.workinglist = FilterSubIssue(workinglist, alllist);
+                ViewBag.donelist = FilterSubIssue(donelist, alllist);
 
                 return View();
             }

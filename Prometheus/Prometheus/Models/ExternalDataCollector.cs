@@ -1,8 +1,10 @@
 ﻿using Prometheus.Controllers;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
@@ -123,6 +125,14 @@ namespace Prometheus.Models
             AppV_AA = -99999;
             AppV_AB = -99999;
             AppV_AC = -99999;
+
+            AppV_AD = -99999;
+            AppV_AE = -99999;
+            AppV_AF = -99999;
+            AppV_AG = -99999;
+            AppV_AH = DateTime.Parse("1982-05-06 07:30:00");
+            AppV_AI = string.Empty;
+            AppV_AJ = string.Empty;
         }
 
         public string AppV_A { set; get; }
@@ -154,6 +164,14 @@ namespace Prometheus.Models
         public double AppV_AA { set; get; }
         public double AppV_AB { set; get; }
         public double AppV_AC { set; get; }
+
+        public double AppV_AD { set; get; }
+        public double AppV_AE { set; get; }
+        public double AppV_AF { set; get; }
+        public double AppV_AG { set; get; }
+        public DateTime AppV_AH { set; get; }
+        public string AppV_AI { set; get; }
+        public string AppV_AJ { set; get; }
     }
 
     public class RELRAWData
@@ -995,6 +1013,20 @@ namespace Prometheus.Models
         #endregion
 
         #region NEOMAP
+
+        private static string WaferWithBin(string waferwithoutbin)
+        {
+            var ret = string.Empty;
+            var sql = "select top 1 ParamValueString from insite.dc_AOC_ManualInspection where ParamValueString like '%<wafer>%'";
+            sql = sql.Replace("<wafer>", waferwithoutbin);
+            var dbret = DBUtility.ExeMESSqlWithRes(sql);
+            if (dbret.Count > 0)
+            {
+                ret = Convert.ToString(dbret[0][0]);
+            }
+            return ret;
+        }
+
         public static void RefreshNeoMAPData(Controller ctrl)
         {
             var syscfgdict = CfgUtility.GetSysConfig(ctrl);
@@ -1002,7 +1034,7 @@ namespace Prometheus.Models
             var neodatafiles = DirectoryEnumerateFiles(ctrl, neodatafolder);
 
             string datestring = DateTime.Now.ToString("yyyyMMdd");
-            string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+            string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\NeoMapData\\" + datestring + "\\";
             if (!DirectoryExists(ctrl, imgdir))
             {
                 Directory.CreateDirectory(imgdir);
@@ -1019,11 +1051,21 @@ namespace Prometheus.Models
                     if (!loadedfiles.ContainsKey(filename))
                     {
                         var des = imgdir + filename;
-                        File.Copy(srcf, des, true);
+                        FileCopy(ctrl,srcf, des, true);
 
-                        NeoMAPVM.UpdateNeoMAPFile(filename);
-                        var data = RetrieveDataFromExcelWithAuth(ctrl, des);
-
+                        if (FileExist(ctrl, des))
+                        {
+                            var data = RetrieveDataFromExcelWithAuth(ctrl, des);
+                            if (data.Count > 1)
+                            {
+                                var waferwithbin = WaferWithBin(data[1][0]);
+                                if (!string.IsNullOrEmpty(waferwithbin))
+                                {
+                                    NeoMAPVM.UpdateNeoMAPFile(filename);
+                                    SolveNeoMAPData(data, waferwithbin, ctrl);
+                                }
+                            }
+                        }//end if
                     }//end if
                 }
                 catch (Exception ex) { }
@@ -1031,21 +1073,106 @@ namespace Prometheus.Models
 
         }
 
-        private static void SolveNeoMAPData(List<List<string>> data, Controller ctrl)
+        private static void SolveNeoMAPData(List<List<string>> data,string waferwithbin, Controller ctrl)
         {
             if (data.Count == 0)
                 return;
             if (!data[0][0].ToUpper().Contains("WAFER"))
                 return;
-            var idx = 0;
-            foreach (var line in data)
+
+            var wafers = waferwithbin.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+            var bin = wafers[wafers.Length - 1].Trim();
+            try
             {
-                if (idx != 0)
+                var datatable = new System.Data.DataTable();
+                datatable.Columns.Add("AppV_A", typeof(string));
+                datatable.Columns.Add("AppV_B", typeof(string));
+                datatable.Columns.Add("AppV_C", typeof(string));
+                datatable.Columns.Add("AppV_D", typeof(string));
+                datatable.Columns.Add("AppV_E", typeof(string));
+                datatable.Columns.Add("AppV_F", typeof(double));
+                datatable.Columns.Add("AppV_G", typeof(string));
+                datatable.Columns.Add("AppV_H", typeof(double));
+                datatable.Columns.Add("AppV_I", typeof(double));
+                datatable.Columns.Add("AppV_J", typeof(double));
+                datatable.Columns.Add("AppV_K", typeof(double));
+                datatable.Columns.Add("AppV_L", typeof(double));
+                datatable.Columns.Add("AppV_M", typeof(double));
+                datatable.Columns.Add("AppV_N", typeof(double));
+                datatable.Columns.Add("AppV_O", typeof(double));
+                datatable.Columns.Add("AppV_P", typeof(double));
+                datatable.Columns.Add("AppV_Q", typeof(double));
+                datatable.Columns.Add("AppV_R", typeof(double));
+                datatable.Columns.Add("AppV_S", typeof(double));
+                datatable.Columns.Add("AppV_T", typeof(double));
+                datatable.Columns.Add("AppV_U", typeof(double));
+                datatable.Columns.Add("AppV_V", typeof(double));
+                datatable.Columns.Add("AppV_W", typeof(double));
+                datatable.Columns.Add("AppV_X", typeof(double));
+                datatable.Columns.Add("AppV_Y", typeof(double));
+                datatable.Columns.Add("AppV_Z", typeof(double));
+                datatable.Columns.Add("AppV_AA", typeof(double));
+                datatable.Columns.Add("AppV_AB", typeof(double));
+                datatable.Columns.Add("AppV_AC", typeof(double));
+                datatable.Columns.Add("AppV_AD", typeof(double));
+                datatable.Columns.Add("AppV_AE", typeof(double));
+                datatable.Columns.Add("AppV_AF", typeof(double));
+                datatable.Columns.Add("AppV_AG", typeof(double));
+                datatable.Columns.Add("AppV_AH", typeof(DateTime));
+                datatable.Columns.Add("AppV_AI", typeof(string));
+                datatable.Columns.Add("AppV_AJ", typeof(string));
+
+                var idx = 0;
+                foreach (var line in data)
                 {
-                    UpdateNeoMapData(line);
-                }//end if
-            }//end foreach
+                    if (idx != 0)
+                    {
+                        var neodata = OfferNEOData(line);
+                        if (string.Compare(neodata.AppV_G, bin) == 0)
+                        {
+                            PropertyInfo[] properties = typeof(NEOMAPData).GetProperties();
+                            var temprow = new object[properties.Length];
+                            var i = 0;
+                            for (i= 0;i < properties.Length;)
+                            {
+                                temprow[i] = properties[i].GetValue(neodata);
+                                i = i + 1;
+                            }
+                            datatable.Rows.Add(temprow);
+                        }//end if
+                    }//end if
+                    idx = idx + 1;
+                }//end foreach
+                WriteDBWithTable(datatable);
+            }
+            catch (Exception ex)
+            {
+            }
         }
+
+        private static void WriteDBWithTable(System.Data.DataTable dt)
+        {
+            if (dt.Rows.Count > 0)
+            {
+                var targetcon = DBUtility.GetLocalConnector();
+                using (SqlBulkCopy bulkCopy = new SqlBulkCopy(targetcon))
+                {
+                    bulkCopy.DestinationTableName = "NeoMapData";
+                    try
+                    {
+                        for (int i = 1; i < dt.Columns.Count; i++)
+                        {
+                            bulkCopy.ColumnMappings.Add(dt.Columns[i].ColumnName, dt.Columns[i].ColumnName);
+                        }
+                        bulkCopy.WriteToServer(dt);
+                        dt.Clear();
+                    }
+                    catch (Exception ex) { }
+                }//end using
+                DBUtility.CloseConnector(targetcon);
+            }//end if
+        }
+        
 
         private static NEOMAPData OfferNEOData(List<string> line)
         {
@@ -1079,55 +1206,62 @@ namespace Prometheus.Models
             tempdata.AppV_AA = ConvertToDoubleVal(line[26]);
             tempdata.AppV_AB = ConvertToDoubleVal(line[27]);
             tempdata.AppV_AC = ConvertToDoubleVal(line[28]);
+            tempdata.AppV_AD = ConvertToDoubleVal(line[29]);
+            tempdata.AppV_AE = ConvertToDoubleVal(line[30]);
+            tempdata.AppV_AF = ConvertToDoubleVal(line[31]);
+            tempdata.AppV_AG = ConvertToDoubleVal(line[32]);
+            tempdata.AppV_AH = DateTime.Parse("1982-05-06 07:30:00");
+            tempdata.AppV_AI = line[34]; 
+            tempdata.AppV_AJ = line[35];
             return tempdata;
         }
 
-        private static bool NEOMAPDataExist(NEOMAPData neomapdata)
-        {
-            var sql = "select AppV_A from NeoMapData where AppV_A='<AppV_A>' and AppV_C='<AppV_C>' and AppV_D='<AppV_D>' and AppV_E='<AppV_E>'";
-            sql = sql.Replace("<AppV_A>", neomapdata.AppV_A).Replace("<AppV_C>", neomapdata.AppV_C)
-                .Replace("<AppV_D>", neomapdata.AppV_D).Replace("<AppV_E>", neomapdata.AppV_E);
+        //private static bool NEOMAPDataExist(NEOMAPData neomapdata)
+        //{
+        //    var sql = "select AppV_A from NeoMapData where AppV_A='<AppV_A>' and AppV_C='<AppV_C>' and AppV_D='<AppV_D>' and AppV_E='<AppV_E>'";
+        //    sql = sql.Replace("<AppV_A>", neomapdata.AppV_A).Replace("<AppV_C>", neomapdata.AppV_C)
+        //        .Replace("<AppV_D>", neomapdata.AppV_D).Replace("<AppV_E>", neomapdata.AppV_E);
 
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
-            if (dbret.Count > 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
+        //    var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+        //    if (dbret.Count > 0)
+        //    {
+        //        return true;
+        //    }
+        //    else
+        //    {
+        //        return false;
+        //    }
+        //}
 
-        private static void UpdateNeoMapData(List<string> rawdata)
-        {
-            var neodata = OfferNEOData(rawdata);
-            if (!NEOMAPDataExist(neodata))
-            {
-                var sql = "insert into NeoMapData(AppV_A,AppV_B,AppV_C,AppV_D,AppV_E,AppV_F"
-                    + ",AppV_G,AppV_H,AppV_I,AppV_J,AppV_K,AppV_L,AppV_M,AppV_N,AppV_O"
-                    + ",AppV_P,AppV_Q,AppV_R,AppV_S,AppV_T,AppV_U,AppV_V,AppV_W,AppV_X"
-                    + ",AppV_Y,AppV_Z,AppV_AA,AppV_AB,AppV_AC,AppV_AD,AppV_AE,AppV_AF,AppV_AG)"
-                    + " values(N'<AppV_A>',N'<AppV_B>',N'<AppV_C>',N'<AppV_D>',N'<AppV_E>',N'<AppV_F>'"
-                    + ",N'<AppV_G>',N'<AppV_H>',N'<AppV_I>',N'<AppV_J>',N'<AppV_K>',N'<AppV_L>',N'<AppV_M>',N'<AppV_N>',N'<AppV_O>'"
-                    + ",'<AppV_P>','<AppV_Q>','<AppV_R>','<AppV_S>','<AppV_T>',N'<AppV_U>','<AppV_V>','<AppV_W>',N'<AppV_X>'"
-                    + ",N'<AppV_Y>',N'<AppV_Z>',N'<AppV_AA>',N'<AppV_AB>','<AppV_AC>',N'<AppV_AD>',N'<AppV_AE>',N'<AppV_AF>',N'<AppV_AG>')";
+        //private static void UpdateNeoMapData(List<string> rawdata)
+        //{
+        //    var neodata = OfferNEOData(rawdata);
+        //    if (!NEOMAPDataExist(neodata))
+        //    {
+        //        var sql = "insert into NeoMapData(AppV_A,AppV_B,AppV_C,AppV_D,AppV_E,AppV_F"
+        //            + ",AppV_G,AppV_H,AppV_I,AppV_J,AppV_K,AppV_L,AppV_M,AppV_N,AppV_O"
+        //            + ",AppV_P,AppV_Q,AppV_R,AppV_S,AppV_T,AppV_U,AppV_V,AppV_W,AppV_X"
+        //            + ",AppV_Y,AppV_Z,AppV_AA,AppV_AB,AppV_AC)"
+        //            + " values(N'<AppV_A>',N'<AppV_B>',N'<AppV_C>',N'<AppV_D>',N'<AppV_E>',<AppV_F>"
+        //            + ",N'<AppV_G>',<AppV_H>,<AppV_I>,<AppV_J>,<AppV_K>,<AppV_L>,<AppV_M>,<AppV_N>,<AppV_O>"
+        //            + ",<AppV_P>,<AppV_Q>,<AppV_R>,<AppV_S>,<AppV_T>,<AppV_U>,<AppV_V>,<AppV_W>,<AppV_X>"
+        //            + ",<AppV_Y>,<AppV_Z>,<AppV_AA>,<AppV_AB>,<AppV_AC>)";
 
 
-                sql = sql.Replace("<AppV_A>", neodata.AppV_A).Replace("<AppV_B>", neodata.AppV_B).Replace("<AppV_C>", neodata.AppV_C)
-                    .Replace("<AppV_D>", neodata.AppV_D).Replace("<AppV_E>", neodata.AppV_E).Replace("<AppV_F>", neodata.AppV_F.ToString())
-                    .Replace("<AppV_G>", neodata.AppV_G).Replace("<AppV_H>", neodata.AppV_H.ToString()).Replace("<AppV_I>", neodata.AppV_I.ToString())
-                    .Replace("<AppV_J>", neodata.AppV_J.ToString()).Replace("<AppV_K>", neodata.AppV_K.ToString()).Replace("<AppV_L>", neodata.AppV_L.ToString())
-                    .Replace("<AppV_M>", neodata.AppV_M.ToString()).Replace("<AppV_N>", neodata.AppV_N.ToString()).Replace("<AppV_O>", neodata.AppV_O.ToString())
-                    .Replace("<AppV_P>", neodata.AppV_P.ToString()).Replace("<AppV_Q>", neodata.AppV_Q.ToString()).Replace("<AppV_R>", neodata.AppV_R.ToString())
-                    .Replace("<AppV_S>", neodata.AppV_S.ToString()).Replace("<AppV_T>", neodata.AppV_T.ToString()).Replace("<AppV_U>", neodata.AppV_U.ToString())
-                    .Replace("<AppV_V>", neodata.AppV_V.ToString()).Replace("<AppV_W>", neodata.AppV_W.ToString()).Replace("<AppV_X>", neodata.AppV_X.ToString())
-                    .Replace("<AppV_Y>", neodata.AppV_Y.ToString()).Replace("<AppV_Z>", neodata.AppV_Z.ToString()).Replace("<AppV_AA>", neodata.AppV_AA.ToString())
-                    .Replace("<AppV_AB>", neodata.AppV_AB.ToString()).Replace("<AppV_AC>", neodata.AppV_AC.ToString());
+        //        sql = sql.Replace("<AppV_A>", neodata.AppV_A).Replace("<AppV_B>", neodata.AppV_B).Replace("<AppV_C>", neodata.AppV_C)
+        //            .Replace("<AppV_D>", neodata.AppV_D).Replace("<AppV_E>", neodata.AppV_E).Replace("<AppV_F>", neodata.AppV_F.ToString())
+        //            .Replace("<AppV_G>", neodata.AppV_G).Replace("<AppV_H>", neodata.AppV_H.ToString()).Replace("<AppV_I>", neodata.AppV_I.ToString())
+        //            .Replace("<AppV_J>", neodata.AppV_J.ToString()).Replace("<AppV_K>", neodata.AppV_K.ToString()).Replace("<AppV_L>", neodata.AppV_L.ToString())
+        //            .Replace("<AppV_M>", neodata.AppV_M.ToString()).Replace("<AppV_N>", neodata.AppV_N.ToString()).Replace("<AppV_O>", neodata.AppV_O.ToString())
+        //            .Replace("<AppV_P>", neodata.AppV_P.ToString()).Replace("<AppV_Q>", neodata.AppV_Q.ToString()).Replace("<AppV_R>", neodata.AppV_R.ToString())
+        //            .Replace("<AppV_S>", neodata.AppV_S.ToString()).Replace("<AppV_T>", neodata.AppV_T.ToString()).Replace("<AppV_U>", neodata.AppV_U.ToString())
+        //            .Replace("<AppV_V>", neodata.AppV_V.ToString()).Replace("<AppV_W>", neodata.AppV_W.ToString()).Replace("<AppV_X>", neodata.AppV_X.ToString())
+        //            .Replace("<AppV_Y>", neodata.AppV_Y.ToString()).Replace("<AppV_Z>", neodata.AppV_Z.ToString()).Replace("<AppV_AA>", neodata.AppV_AA.ToString())
+        //            .Replace("<AppV_AB>", neodata.AppV_AB.ToString()).Replace("<AppV_AC>", neodata.AppV_AC.ToString());
 
-                DBUtility.ExeLocalSqlNoRes(sql);
-            }
-        }
+        //        DBUtility.ExeLocalSqlNoRes(sql);
+        //    }
+        //}
         #endregion
 
         #region REL

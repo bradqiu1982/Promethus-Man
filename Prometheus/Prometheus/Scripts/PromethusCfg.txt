@@ -8,3 +8,4 @@ RMASHAREFOLDER:::\\wux-fs\PUBLIC\Quality\10.Quality case summary\Customer Qualit
 RMACLOSEATTACHES:::\\wux-fs\PUBLIC\Quality\10.Quality case summary\Customer Quality Case Summary\RMA Close Data\RMA
 NeoMAPDataFolder:::\\wux-file01\Public\Wuxi Parallel NPI\NeoMAP Data
 RELSHAREFOLDER:::\\cn-file01\Public\Quality\Reliability\Failure Analysis\FA-AutoTracking\SummaryTable
+

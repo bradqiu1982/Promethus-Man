@@ -14,12 +14,12 @@ namespace Prometheus.Models
     {
         public static void UpdateNeoMAPFile(string filename)
         {
-            var sql = "select AppV_A from LoadedData where AppV_A = N'<AppV_A>' and AppV_B=N'<AppV_B>'";
+            var sql = "select AppV_A from FileLoadedData where AppV_A = N'<AppV_A>' and AppV_B=N'<AppV_B>'";
             sql = sql.Replace("<AppV_A>", filename).Replace("<AppV_B>", SYSLOADFILETYPE.NEOMAP);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             if (dbret.Count == 0)
             {
-                sql = "insert into LoadedData(AppV_A,AppV_B) values(N'<AppV_A>',N'<AppV_B>')";
+                sql = "insert into FileLoadedData(AppV_A,AppV_B) values(N'<AppV_A>',N'<AppV_B>')";
                 sql = sql.Replace("<AppV_A>", filename).Replace("<AppV_B>", SYSLOADFILETYPE.NEOMAP);
                 DBUtility.ExeLocalSqlNoRes(sql);
             }//end if
@@ -29,7 +29,7 @@ namespace Prometheus.Models
         {
             var ret = new Dictionary<string, bool>();
 
-            var sql = "select AppV_A from LoadedData where AppV_B=N'<AppV_B>'";
+            var sql = "select AppV_A from FileLoadedData where AppV_B=N'<AppV_B>'";
             sql = sql.Replace("<AppV_B>", SYSLOADFILETYPE.NEOMAP);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)

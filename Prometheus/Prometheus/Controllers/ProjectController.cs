@@ -4772,7 +4772,8 @@ namespace Prometheus.Controllers
             //AssignPJ2User();
 
             //ExternalDataCollector.RefreshRMAData(this);
-            ExternalDataCollector.RefreshRELData(this);
+            //ExternalDataCollector.RefreshRELData(this);
+            ExternalDataCollector.RefreshNeoMAPData(this);
             //var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
             //foreach (var pjkey in pjkeylist)
             //{

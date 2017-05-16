@@ -564,21 +564,21 @@ namespace Prometheus.Controllers
                     templine.Add(item.IssueType);
 
                     wholedata.Add(templine);
-                    foreach (var item1 in item.SubIssues)
-                    {
-                        templine = new List<string>();
-                        templine.Add(item1.ProjectKey);
-                        templine.Add(item1.Summary);
-                        templine.Add(item1.Priority);
-                        templine.Add(item1.Assignee);
-                        templine.Add(item1.Resolution);
-                        templine.Add(item1.DueDate.ToString("MM/dd-yy"));
-                        templine.Add(item1.IssueKey);
-                        templine.Add("SUB");
-                        templine.Add(item1.IssueType);
+                    //foreach (var item1 in item.SubIssues)
+                    //{
+                    //    templine = new List<string>();
+                    //    templine.Add(item1.ProjectKey);
+                    //    templine.Add(item1.Summary);
+                    //    templine.Add(item1.Priority);
+                    //    templine.Add(item1.Assignee);
+                    //    templine.Add(item1.Resolution);
+                    //    templine.Add(item1.DueDate.ToString("MM/dd-yy"));
+                    //    templine.Add(item1.IssueKey);
+                    //    templine.Add("SUB");
+                    //    templine.Add(item1.IssueType);
 
-                        wholedata.Add(templine);
-                    }
+                    //    wholedata.Add(templine);
+                    //}
                 }
 
                 ViewBag.iassignlist = wholedata;

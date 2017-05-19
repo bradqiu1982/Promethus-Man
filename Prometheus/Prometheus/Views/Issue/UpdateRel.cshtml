@@ -517,6 +517,16 @@ else
 
                 </div>
             </div>
+            <script type="text/javascript">
+                function DeleteAttachment(oBT) {
+                    if (confirm("Do you real want to delete this attachment?")) {
+                        window.location.href = '/Issue/DeleteAttachment?issuekey=' + document.getElementById("HIssueKeyForDelete").value + '&filename=' + oBT
+                    }
+                    else {
+                        window.location.href = '/Issue/UpdateIssue?issuekey=' + document.getElementById("HIssueKeyForDelete").value
+                    }
+                }
+            </script>
         </div>
 
         <hr style="border-color:#006DC0;" />
@@ -1143,7 +1153,7 @@ else
                                 <script type="text/javascript">
                                     function chooseapusher()
                                     {
-                                        document.getElementById("towhoinput").value = document.getElementById("towholist").value + ';' + document.getElementById("towhoinput").value;
+                                        document.getElementById("towhoinput").value = document.getElementById("towhoinput").value + ';' + document.getElementById("towholist").value;
                                     }
                                 </script>
                             </div>
@@ -1191,7 +1201,7 @@ else
                                 <script type="text/javascript">
                             function chooseapusher1()
                             {
-                                document.getElementById("towhoinput1").value = document.getElementById("towholist1").value + ';' + document.getElementById("towhoinput1").value;
+                                document.getElementById("towhoinput1").value = document.getElementById("towhoinput1").value + ';' + document.getElementById("towholist1").value;
                             }
                                 </script>
                             </div>

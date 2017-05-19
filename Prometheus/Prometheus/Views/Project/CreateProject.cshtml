@@ -150,7 +150,7 @@
                     </div>
                     <script type="text/javascript">
                         function chooseapusher1() {
-                            document.getElementById("towhoinput1").value = document.getElementById("towholist1").value + ';' + document.getElementById("towhoinput1").value;
+                            document.getElementById("towhoinput1").value = document.getElementById("towhoinput1").value + ';' + document.getElementById("towholist1").value;
                         }
                     </script>
                 </div>
@@ -220,7 +220,7 @@
                     </div>
                     <script type="text/javascript">
                         function chooseapusher2() {
-                            document.getElementById("towhoinput2").value = document.getElementById("towholist2").value + ';' + document.getElementById("towhoinput2").value;
+                            document.getElementById("towhoinput2").value = document.getElementById("towhoinput2").value + ';' + document.getElementById("towholist2").value;
                         }
                     </script>
                 </div>
@@ -367,11 +367,11 @@
                                     <div class="col-lg-7" data-toggle="tooltip" data-placement="center" title="Exampel: PN Desc1; PN Desc2;BI PN1;BI PN2">
                                         @if (Model != null && !string.IsNullOrEmpty(Model.PNs))
                                         {
-                                            <textarea class="form-control" placeholder="PNs contains Project PN Descriptions and Burn-In PNs. eg:FTLC9141;1183638;1228361;1183636" name="PNs" id="PNs" style="min-width: 100%;min-height:40px;overflow-y: scroll;overflow-x: scroll;"  data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required.">@(Model.PNs)</textarea>
+                                            <textarea class="form-control"  name="PNs" id="PNs" style="min-width: 100%;min-height:40px;overflow-y: scroll;overflow-x: scroll;"  data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required.">@(Model.PNs)</textarea>
                                         }
                                         else
                                         {
-                                            <textarea class="form-control" placeholder="PNs contains Project PN Descriptions and Burn-In PNs. eg:FTLC9141;1183638;1228361;1183636" name="PNs" id="PNs" style="min-width: 100%;min-height:40px;overflow-y: scroll;overflow-x: scroll;"  data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required."></textarea>
+                                            <textarea class="form-control"  name="PNs" id="PNs" style="min-width: 100%;min-height:40px;overflow-y: scroll;overflow-x: scroll;"  data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required."></textarea>
                                         }
                                         <span class="field-validation-valid text-danger" data-valmsg-for="PNs" data-valmsg-replace="true"></span>
                                     </div>
@@ -405,11 +405,11 @@
                                     <div class="col-lg-12" data-toggle="tooltip" data-placement="center" title="Exampel: Station ; Station ;Station">
                                         @if (Model != null && !string.IsNullOrEmpty(Model.Stations))
                                         {
-                                            <textarea class="form-control" placeholder="stations" name="Stations" id="Stations" style="min-width: 100%;min-height:40px;overflow-y: scroll;overflow-x: scroll;"  data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required.">@(Model.Stations)</textarea>
+                                            <textarea class="form-control"  name="Stations" id="Stations" style="min-width: 100%;min-height:40px;overflow-y: scroll;overflow-x: scroll;"  data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required.">@(Model.Stations)</textarea>
                                         }
                                         else
                                         {
-                                            <textarea class="form-control" placeholder="stations" name="Stations" id="Stations" style="min-width: 100%;min-height:40px;overflow-y: scroll;overflow-x: scroll;"  data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required."></textarea>
+                                            <textarea class="form-control"  name="Stations" id="Stations" style="min-width: 100%;min-height:40px;overflow-y: scroll;overflow-x: scroll;"  data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required."></textarea>
                                         }
                                         <span class="field-validation-valid text-danger" data-valmsg-for="Stations" data-valmsg-replace="true"></span>
                                     </div>
@@ -447,11 +447,11 @@
                                     <div class="col-lg-7" data-toggle="tooltip" data-placement="center" title="Exampel: Model_ID1;Model_ID2....">
                                         @if (Model != null && !string.IsNullOrEmpty(Model.ModelIDs))
                                         {
-                                            <textarea class="form-control" placeholder="Project Model_ID. eg:FTLX6871;FTLX6872;FTLX6672" name="ModelIDs" id="ModelIDs" style="min-width: 100%;min-height:40px;overflow-y: scroll;overflow-x: scroll;"  data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required.">@(Model.ModelIDs)</textarea>
+                                            <textarea class="form-control"  name="ModelIDs" id="ModelIDs" style="min-width: 100%;min-height:40px;overflow-y: scroll;overflow-x: scroll;"  data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required.">@(Model.ModelIDs)</textarea>
                                         }
                                         else
                                         {
-                                            <textarea class="form-control" placeholder="Project Model_ID. eg:FTLX6871;FTLX6872;FTLX6672" name="ModelIDs" id="ModelIDs" style="min-width: 100%;min-height:40px;overflow-y: scroll;overflow-x: scroll;" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required."></textarea>
+                                            <textarea class="form-control"  name="ModelIDs" id="ModelIDs" style="min-width: 100%;min-height:40px;overflow-y: scroll;overflow-x: scroll;" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required."></textarea>
                                         }
                                         <span class="field-validation-valid text-danger" data-valmsg-for="ModelIDs" data-valmsg-replace="true"></span>
                                     </div>
@@ -467,11 +467,11 @@
                                     <div class="col-lg-7" data-toggle="tooltip" data-placement="center" title="Exampel: DataSetName1;DataSetName2....">
                                         @if (Model != null && !string.IsNullOrEmpty(Model.SumDatasets))
                                         {
-                                            <textarea class="form-control" placeholder="Indicative DataSet Name. eg:final;assembly;tune_rf;tune;temp_test_7up" name="SumDatasets" id="SumDatasets" style="min-width: 100%;min-height:40px;overflow-y: scroll;overflow-x: scroll;"  data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required.">@(Model.SumDatasets)</textarea>
+                                            <textarea class="form-control"  name="SumDatasets" id="SumDatasets" style="min-width: 100%;min-height:40px;overflow-y: scroll;overflow-x: scroll;"  data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required.">@(Model.SumDatasets)</textarea>
                                         }
                                         else
                                         {
-                                            <textarea class="form-control" placeholder="Indicative DataSet Name. eg:final;assembly;tune_rf;tune;temp_test_7up" name="SumDatasets" id="SumDatasets" style="min-width: 100%;min-height:40px;overflow-y: scroll;overflow-x: scroll;"  data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required."></textarea>
+                                            <textarea class="form-control"  name="SumDatasets" id="SumDatasets" style="min-width: 100%;min-height:40px;overflow-y: scroll;overflow-x: scroll;"  data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required."></textarea>
                                         }
                                         <span class="field-validation-valid text-danger" data-valmsg-for="SumDatasets" data-valmsg-replace="true"></span>
                                     </div>

@@ -1,13 +1,140 @@
 ﻿using Prometheus.Controllers;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
 
 namespace Prometheus.Models
 {
+    public class BITestResult
+    {
+        public BITestResult()
+        {
+            Init();
+        }
+
+        public BITestResult(string sn,string testname,string station,string failure,DateTime testtime,string pn,string jo,string bitable)
+        {
+            Init();
+            SN = sn;
+            TestName = testname;
+            Station = station;
+            Failure = failure;
+            TestTimeStamp = testtime;
+            PN = pn;
+            JO = jo;
+            BITable = bitable;
+        }
+
+        private void Init()
+        {
+            SN=string.Empty;
+            TestName=string.Empty;
+            Station=string.Empty;
+            Failure=string.Empty;
+            TestTimeStamp = DateTime.Parse("1982-05-06 07:30:00");
+            PN=string.Empty;
+            Wafer=string.Empty;
+            JO=string.Empty;
+            BITable=string.Empty;
+            Appv_1=string.Empty;
+            Appv_2=string.Empty;
+            Appv_3=string.Empty;
+            Appv_4 = DateTime.Parse("1982-05-06 07:30:00");
+        }
+
+        public string SN { set; get; }
+        public string TestName { set; get; }
+        public string Station { set; get; }
+        public string Failure { set; get; }
+        public DateTime TestTimeStamp { set; get; }
+        public string PN { set; get; }
+        public string Wafer { set; get; }
+        public string JO { set; get; }
+        public string BITable {set;get;}
+        public string Appv_1 { set; get; }
+        public string Appv_2 { set; get; }
+        public string Appv_3 { set; get; }
+        public DateTime Appv_4 { set; get; }
+    }
+
+    public class BITestResultDataField
+    {
+        public BITestResultDataField()
+        {
+            Init();
+        }
+
+        public BITestResultDataField(string sn, string testname, DateTime testtime, string pn, string jo
+            ,string ch,double slope,double pold,double pouniformity,double thold,double dpold,double dslope,double dthold,double dpouniformity)
+        {
+            Init();
+            SN = sn;
+            TestName = testname;
+            TestTimeStamp = testtime;
+            PN = pn;
+            JO = jo;
+            Channel = ch;
+            SLOPE = slope;
+            PO_LD = pold;
+            PO_Uniformity = pouniformity;
+            THOLD = thold;
+            Delta_PO_LD = dpold;
+            Delta_SLOPE = dslope;
+            Delta_THOLD = dthold;
+            Delta_PO_Uniformity = dpouniformity;
+        }
+
+        private void Init()
+        {
+            SN = string.Empty;
+            TestName = string.Empty;
+            TestTimeStamp = DateTime.Parse("1982-05-06 07:30:00");
+            PN = string.Empty;
+            Wafer = string.Empty;
+            JO = string.Empty;
+            Channel = string.Empty;
+            SLOPE = 0;
+            PO_LD = 0;
+            PO_Uniformity = 0;
+            THOLD = 0;
+            Delta_PO_LD = 0;
+            Delta_SLOPE = 0;
+            Delta_THOLD = 0;
+            Delta_PO_Uniformity = 0;
+            Appv_1 = 0;
+            Appv_2 = 0;
+            Appv_3 = string.Empty;
+            Appv_4 = string.Empty;
+            Appv_5 = DateTime.Parse("1982-05-06 07:30:00");
+        }
+
+        public string SN { set; get; }
+        public string TestName { set; get; }
+        public DateTime TestTimeStamp { set; get; }
+        public string PN { set; get; }
+        public string Wafer { set; get; }
+        public string JO { set; get; }
+        public string Channel { set; get; }
+        public double SLOPE { set; get; }
+        public double PO_LD { set; get; }
+        public double PO_Uniformity { set; get; }
+        public double THOLD { set; get; }
+        public double Delta_PO_LD { set; get; }
+        public double Delta_SLOPE { set; get; }
+        public double Delta_THOLD { set; get; }
+        public double Delta_PO_Uniformity { set; get; }
+        public double Appv_1 { set; get; }
+        public double Appv_2 { set; get; }
+        public string Appv_3 { set; get; }
+        public string Appv_4 { set; get; }
+        public DateTime Appv_5 { set; get; }
+    }
+
     public class BIDataUtility
     {
         private static bool IsDigitsOnly(string str)
@@ -459,6 +586,197 @@ namespace Prometheus.Models
             }
         }
 
+        private static string RetrieveLatestTimeStampOfAnBITable(string bt,string bizerotime)
+        {
+            var sql = "select top 1 TestTimeStamp from BITestResult where BITable = '<BITable>'";
+            sql = sql.Replace("<BITable>", bt);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
+            if (dbret.Count > 0)
+            {
+                try
+                {
+                    return DateTime.Parse(Convert.ToString(dbret[0][0])).ToString();
+                }
+                catch (Exception ex)
+                {
+                    return bizerotime;
+                }
+            }
+            else
+            {
+                return bizerotime;
+            }
+        }
 
+        private static string ConvertToDateStr(object datestr)
+        {
+            try
+            {
+                return Convert.ToDateTime(datestr).ToString();
+            }
+            catch (Exception ex) { return "1982-05-06 10:00:00"; }
+        }
+
+        public static void LoadBITestDateFromAuto(Controller ctrl)
+        {
+            var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+            var bitables = syscfgdict["BIAUTOTABLES"].Split(new string[] { ";"},StringSplitOptions.RemoveEmptyEntries);
+            var bizerotime = syscfgdict["BIZEROTIME"];
+
+            foreach (var bt in bitables)
+            {
+                var testresultlist = new List<BITestResult>();
+                var testresultfieldlist = new List<BITestResultDataField>();
+
+                var bilatesttime = RetrieveLatestTimeStampOfAnBITable(bt, bizerotime);
+
+                var sql = "select ContainerName,ProcessStep,DateTime,Failure_Mode,Station,Work_Order,PN,Channel,SLOPE,PO_LD,PO_Uniformity,THOLD,Delta_PO_LD,Delta_SLOPE,Delta_THOLD,Delta_PO_Uniformity from <bitable> where DateTime > '<bilatesttime>' "
+                    + " and  ProcessStep is not null and PN is not null and Work_Order is not null and ContainerName is not null and Failure_Mode is not null and ContainerName <> '' and Failure_Mode <> '--' and Failure_Mode <> '' and Failure_Mode is not null order by ContainerName,DateTime";
+                sql = sql.Replace("<bitable>", bt).Replace("<bilatesttime>", bilatesttime);
+
+                var dbret = DBUtility.ExeAutoSqlWithRes(sql);
+                foreach (var line in dbret)
+                {
+                    var sn = Convert.ToString(line[0]);
+                    var testname = Convert.ToString(line[1]);
+                    var testtime = DateTime.Parse(ConvertToDateStr(line[2]));
+                    var failure = Convert.ToString(line[3]);
+                    var station = Convert.ToString(line[4]);
+                    var jo = Convert.ToString(line[5]);
+                    var pn = Convert.ToString(line[6]);
+                    var ch = Convert.ToString(line[7]);
+                    var slope = Convert.ToDouble(line[8]);
+                    var pold = Convert.ToDouble(line[9]);
+                    var pouniformity = Convert.ToDouble(line[10]);
+                    var thold = Convert.ToDouble(line[11]);
+                    var dpold = Convert.ToDouble(line[12]);
+                    var dslope = Convert.ToDouble(line[13]);
+                    var dthold = Convert.ToDouble(line[14]);
+                    var dpouniformity = Convert.ToDouble(line[15]);
+
+                    var tempresult = new BITestResult(sn, testname, station, failure,testtime, pn, jo, bt);
+                    testresultlist.Add(tempresult);
+
+                    var tempfield = new BITestResultDataField(sn, testname, testtime, pn, jo, ch, slope, pold, pouniformity, thold, dpold, dslope, dthold, dpouniformity);
+                    testresultfieldlist.Add(tempfield);
+                }//end foreach
+
+                StoreBITestResult(testresultlist);
+                StoreBITestResultDateField(testresultfieldlist);
+            }//end foreach
+        }
+
+        private static void StoreBITestResult(List<BITestResult> testresultlist)
+        {
+            //BITestResult
+            var datatable = new System.Data.DataTable();
+
+            PropertyInfo[] properties = typeof(BITestResult).GetProperties();
+            var i = 0;
+            for (i = 0; i < properties.Length;)
+            {
+                datatable.Columns.Add(properties[i].Name, properties[i].PropertyType);
+                i = i + 1;
+            }
+
+            foreach (var testresult in testresultlist)
+            {
+                properties = typeof(BITestResult).GetProperties();
+                var temprow = new object[properties.Length];
+                for (i = 0; i < properties.Length;)
+                {
+                    temprow[i] = properties[i].GetValue(testresult);
+                    i = i + 1;
+                }
+                datatable.Rows.Add(temprow);
+            }
+
+            //WriteDBWithTable(datatable, "BITestResult");
+
+            //datatable.Columns.Add("SN", typeof(string));
+            //datatable.Columns.Add("TestName", typeof(string));
+            //datatable.Columns.Add("Station", typeof(string));
+            //datatable.Columns.Add("Failure", typeof(string));
+            //datatable.Columns.Add("TestTimeStamp", typeof(DateTime));
+            //datatable.Columns.Add("PN", typeof(string));
+            //datatable.Columns.Add("Wafer", typeof(string));
+            //datatable.Columns.Add("JO", typeof(string));
+            //datatable.Columns.Add("BITable", typeof(string));
+            //datatable.Columns.Add("Appv_1", typeof(string));
+            //datatable.Columns.Add("Appv_2", typeof(string));
+            //datatable.Columns.Add("Appv_3", typeof(string));
+            //datatable.Columns.Add("Appv_4", typeof(DateTime));
+        }
+
+        private static void StoreBITestResultDateField(List<BITestResultDataField> testresultfieldlist)
+        {
+            //BITestResultDataField
+            var datatable = new System.Data.DataTable();
+            PropertyInfo[] properties = typeof(BITestResultDataField).GetProperties();
+            var i = 0;
+            for (i = 0; i < properties.Length;)
+            {
+                datatable.Columns.Add(properties[i].Name, properties[i].PropertyType);
+                i = i + 1;
+            }
+
+            foreach (var df in testresultfieldlist)
+            {
+                properties = typeof(BITestResultDataField).GetProperties();
+                var temprow = new object[properties.Length];
+                for (i = 0; i < properties.Length;)
+                {
+                    temprow[i] = properties[i].GetValue(df);
+                    i = i + 1;
+                }
+                datatable.Rows.Add(temprow);
+            }
+
+            //WriteDBWithTable(datatable, "BITestResultDataField");
+
+            //datatable.Columns.Add("SN", typeof(string));
+            //datatable.Columns.Add("TestName", typeof(string));
+            //datatable.Columns.Add("TestTimeStamp", typeof(DateTime));
+            //datatable.Columns.Add("PN", typeof(string));
+            //datatable.Columns.Add("Wafer", typeof(string));
+            //datatable.Columns.Add("JO", typeof(string));
+            //datatable.Columns.Add("Channel", typeof(string));
+            //datatable.Columns.Add("SLOPE", typeof(double));
+            //datatable.Columns.Add("PO_LD", typeof(double));
+            //datatable.Columns.Add("PO_Uniformity", typeof(double));
+            //datatable.Columns.Add("THOLD", typeof(double));
+            //datatable.Columns.Add("Delta_PO_LD", typeof(double));
+            //datatable.Columns.Add("Delta_SLOPE", typeof(double));
+            //datatable.Columns.Add("Delta_THOLD", typeof(double));
+            //datatable.Columns.Add("Delta_PO_Uniformity", typeof(double));
+            //datatable.Columns.Add("Appv_1", typeof(double));
+            //datatable.Columns.Add("Appv_2", typeof(double));
+            //datatable.Columns.Add("Appv_3", typeof(string));
+            //datatable.Columns.Add("Appv_4", typeof(string));
+            //datatable.Columns.Add("Appv_5", typeof(DateTime));
+        }
+
+        private static void WriteDBWithTable(System.Data.DataTable dt,string tablename)
+        {
+            if (dt.Rows.Count > 0)
+            {
+                var targetcon = DBUtility.GetLocalConnector();
+                using (SqlBulkCopy bulkCopy = new SqlBulkCopy(targetcon))
+                {
+                    bulkCopy.DestinationTableName = tablename;
+                    try
+                    {
+                        for (int i = 1; i < dt.Columns.Count; i++)
+                        {
+                            bulkCopy.ColumnMappings.Add(dt.Columns[i].ColumnName, dt.Columns[i].ColumnName);
+                        }
+                        bulkCopy.WriteToServer(dt);
+                        dt.Clear();
+                    }
+                    catch (Exception ex) { }
+                }//end using
+                DBUtility.CloseConnector(targetcon);
+            }//end if
+        }
     }
 }

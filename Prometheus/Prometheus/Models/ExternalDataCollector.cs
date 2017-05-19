@@ -1130,27 +1130,33 @@ namespace Prometheus.Models
                         var neodata = OfferNEOData(line);
                         if (string.Compare(neodata.AppV_G, bin) == 0)
                         {
-                            PropertyInfo[] properties = typeof(NEOMAPData).GetProperties();
-                            var temprow = new object[properties.Length];
-                            var i = 0;
-                            for (i= 0;i < properties.Length;)
-                            {
-                                temprow[i] = properties[i].GetValue(neodata);
-                                i = i + 1;
-                            }
-                            datatable.Rows.Add(temprow);
-                        }//end if
+                            neodata.AppV_AD = 1;
+                        }
+                        else
+                        {
+                            neodata.AppV_AD = 0;
+                        }
+
+                        PropertyInfo[] properties = typeof(NEOMAPData).GetProperties();
+                        var temprow = new object[properties.Length];
+                        var i = 0;
+                        for (i= 0;i < properties.Length;)
+                        {
+                            temprow[i] = properties[i].GetValue(neodata);
+                            i = i + 1;
+                        }
+                        datatable.Rows.Add(temprow);
                     }//end if
                     idx = idx + 1;
                 }//end foreach
-                WriteDBWithTable(datatable);
+                WriteNeoMapDBWithTable(datatable);
             }
             catch (Exception ex)
             {
             }
         }
 
-        private static void WriteDBWithTable(System.Data.DataTable dt)
+        private static void WriteNeoMapDBWithTable(System.Data.DataTable dt)
         {
             if (dt.Rows.Count > 0)
             {

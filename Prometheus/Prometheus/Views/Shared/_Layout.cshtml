@@ -265,6 +265,18 @@
                                                     @Html.ActionLink("UserMatrix", "CommitUserMatrix", "CustomerData")
                                                 }
                                             </li>
+                                            <li>
+                                                @if (ViewBag.IsSuper != null && ViewBag.IsSuper)
+                                                {
+                                                    @Html.ActionLink("Add Share Tag", "AddShareTag", "User")
+                                                }
+                                            </li>
+                                            <li>
+                                                @if (ViewBag.IsSuper != null && ViewBag.IsSuper)
+                                                {
+                                                    @Html.ActionLink("I Group", "IGroup", "User")
+                                                }
+                                            </li>
                                         </ul>
                                     </li>
                                 </ul>

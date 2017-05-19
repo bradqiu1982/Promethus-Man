@@ -232,6 +232,7 @@
     <Compile Include="Models\ShareDocVM.cs" />
     <Compile Include="Models\UserBlogVM.cs" />
     <Compile Include="Models\UserCacheVM.cs" />
+    <Compile Include="Models\UserGroupVM.cs" />
     <Compile Include="Models\UserIssueViewModels.cs" />
     <Compile Include="Models\UserMatrixVM.cs" />
     <Compile Include="Models\UserRankViewModel.cs" />
@@ -927,6 +928,7 @@
     <Content Include="Views\Project\ProjectErrAbbr.cshtml" />
     <Content Include="Views\Project\SNIssue.cshtml" />
     <Content Include="Views\Project\ProjectDoneFA.cshtml" />
+    <Content Include="Views\User\IGroup.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

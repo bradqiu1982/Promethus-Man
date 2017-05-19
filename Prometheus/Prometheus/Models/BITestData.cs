@@ -388,6 +388,5 @@ namespace Prometheus.Models
                 ResetUpdatePJLock(projectkey);
             }
         }
-
     }
 }

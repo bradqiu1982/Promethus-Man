@@ -1761,5 +1761,26 @@ namespace Prometheus.Controllers
             return View(vm);
         }
 
+        public ActionResult IGroup()
+        {
+            var asilist = UserViewModels.RetrieveAllUser();
+            ViewBag.towholist1 = CreateSelectList(asilist, "");
+
+            var grouptype = new string[] { "Please choose your group type", UserGroupType.WorkGroup,UserGroupType.ReportGroup,UserGroupType.LYTGroup};
+            var grouptypelist = CreateSelectList(asilist, "");
+            grouptypelist[0].Selected = true;
+            grouptypelist[0].Disabled = true;
+            ViewBag.grouptypelist = grouptypelist;
+
+            return View();
+        }
+
+        [HttpPost, ActionName("IGroup")]
+        [ValidateAntiForgeryToken]
+        public ActionResult IGroupPost()
+        {
+
+            return RedirectToAction("IGroup", "User");
+        }
     }
 }

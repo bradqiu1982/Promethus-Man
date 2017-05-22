@@ -13,6 +13,13 @@ namespace Prometheus.Models
         public static string TAG = "TAG";
     }
 
+    public class SPECIALBLOGType
+    {
+        public static string WEEKLYREPORT = "WEEKLYREPORT";
+        public static string TRAINING = "TRAINING";
+        public static string DEFAULT = "DEFAULT";
+    }
+
     public class UserBlogVM
     {
         public UserBlogVM()
@@ -158,9 +165,11 @@ namespace Prometheus.Models
 
         public void StoreBlogDoc()
         {
+            DocKey = GetUniqKey();
+
             var sql = "insert into UserBlog(UserName,APVal1,APVal2,APVal3,APVal4,APVal5,APVal9) "
                 + " values('<UserName>','<APVal1>','<APVal2>','<APVal3>','<APVal4>','<APVal5>','<APVal9>')";
-            sql = sql.Replace("<UserName>", UserName).Replace("<APVal1>", ContentType).Replace("<APVal2>", GetUniqKey()).Replace("<APVal3>", dbTitle)
+            sql = sql.Replace("<UserName>", UserName).Replace("<APVal1>", ContentType).Replace("<APVal2>", DocKey).Replace("<APVal3>", dbTitle)
                     .Replace("<APVal4>", dbContent).Replace("<APVal5>", Tag).Replace("<APVal9>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
@@ -234,16 +243,15 @@ namespace Prometheus.Models
                 ret.Tag = Convert.ToString(line[5]);
                 ret.CreateDate = DateTime.Parse(Convert.ToString(line[6]));
 
-                if (string.Compare(ret.ContentType, UserBlogContentType.COMMENT) == 0)
-                {
+                //if (string.Compare(ret.ContentType, UserBlogContentType.COMMENT) == 0)
+                //{
                     ret.DocURL = "/User/WebDoc?DocKey=" + ret.DocKey;
-                }
+                //}
 
-                if (string.Compare(ret.ContentType, UserBlogContentType.ATTACH) == 0)
-                {
-                    ret.DocURL = "/User/WebDoc?DocKey=" + ret.DocKey;
-                    //ret.DocURL = ret.Content;
-                }
+                //if (string.Compare(ret.ContentType, UserBlogContentType.ATTACH) == 0)
+                //{
+                    //ret.DocURL = "/User/WebDoc?DocKey=" + ret.DocKey;
+                //}
             }
 
             return ret;

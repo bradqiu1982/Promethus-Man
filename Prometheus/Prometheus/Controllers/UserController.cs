@@ -392,6 +392,8 @@ namespace Prometheus.Controllers
             
             if (!string.IsNullOrEmpty(usernm))
             {
+                UserAuth(usernm);
+
                 //asign to me
                 var alllist = new List<IssueViewModels>();
                 var pendinglist = IssueViewModels.RetrieveIssueByAssignee(usernm, Resolute.Pending, 120);
@@ -1073,13 +1075,19 @@ namespace Prometheus.Controllers
 
             var ilearntable = new List<ShareDocVM>();
             var iweeklytable = new List<ShareDocVM>();
+            var itrainingtable = new List<ShareDocVM>();
+
             var allileanrn =  ShareDocVM.RetrieveMyLearn(updater,this);
             foreach (var item in allileanrn)
             {
-                if (item.DOCTag.ToUpper().Contains("WEEKLYREPORT")
+                if (item.DOCTag.ToUpper().Contains(SPECIALBLOGType.WEEKLYREPORT)
                     || item.DOCTag.ToUpper().Contains("WEEKLY REPORT"))
                 {
                     iweeklytable.Add(item);
+                }
+                else if (item.DOCTag.ToUpper().Contains(SPECIALBLOGType.TRAINING))
+                {
+                    itrainingtable.Add(item);
                 }
                 else
                 {
@@ -1090,6 +1098,7 @@ namespace Prometheus.Controllers
             ViewBag.ILearn = ilearntable;
             ViewBag.IShare = ShareDocVM.RetrieveMyShare(updater,this);
             ViewBag.IWeeklyReport = iweeklytable;
+            ViewBag.ITrainingReport = itrainingtable;
             return View();
         }
 
@@ -1287,14 +1296,19 @@ namespace Prometheus.Controllers
 
             var tobechoosetags = new List<string>();
             var usertag = UserBlogVM.RetrieveUserTag(updater);
-            if (!usertag.ToUpper().Contains("WeeklyReport".ToUpper()))
+            if (!usertag.ToUpper().Contains(SPECIALBLOGType.WEEKLYREPORT))
             {
-                tobechoosetags.Add("WeeklyReport".ToUpper());
+                tobechoosetags.Add(SPECIALBLOGType.WEEKLYREPORT);
             }
-            if (!usertag.ToUpper().Contains("Default".ToUpper()))
+            if (!usertag.ToUpper().Contains(SPECIALBLOGType.DEFAULT))
             {
-                tobechoosetags.Add("Default".ToUpper());
+                tobechoosetags.Add(SPECIALBLOGType.DEFAULT);
             }
+            if (!usertag.ToUpper().Contains(SPECIALBLOGType.TRAINING))
+            {
+                tobechoosetags.Add(SPECIALBLOGType.TRAINING);
+            }
+
             var usertags = usertag.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
             if (usertags.Length > 0)
             {
@@ -1343,6 +1357,34 @@ namespace Prometheus.Controllers
             return ret;
         }
 
+        private void DefaultActionForBlogDoc(UserBlogVM blog,string updater)
+        {
+            if (blog.Tag.ToUpper().Contains(SPECIALBLOGType.WEEKLYREPORT))
+            {
+                var reportgroup = UserGroupVM.RetreiveUserGroup(updater, UserGroupType.ReportGroup);
+                if (!string.IsNullOrEmpty(reportgroup))
+                {
+                    var mbs = reportgroup.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var mb in mbs)
+                    {
+                        ShareDocVM.PushDoc(mb.ToUpper(), "ALL", ShareDocType.BLOG, blog.DocKey, blog.Tag, blog.UserName, DateTime.Now.ToString(), "");
+                    }
+                }
+            }
+
+            if (blog.Tag.ToUpper().Contains(SPECIALBLOGType.TRAINING))
+            {
+                var workgroup = UserGroupVM.RetreiveUserGroup(updater, UserGroupType.WorkGroup);
+                if (!string.IsNullOrEmpty(workgroup))
+                {
+                    var mbs = workgroup.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var mb in mbs)
+                    {
+                        ShareDocVM.PushDoc(mb.ToUpper(), "ALL", ShareDocType.BLOG, blog.DocKey, blog.Tag, blog.UserName, DateTime.Now.ToString(), "");
+                    }
+                }
+            }
+        }
 
         [HttpPost, ActionName("AddBlogDoc")]
         [ValidateAntiForgeryToken]
@@ -1387,28 +1429,12 @@ namespace Prometheus.Controllers
                     blog.Content = url;
                     blog.Tag = tag;
                     blog.StoreBlogDoc();
+
+                    var currentblog = UserBlogVM.RetrieveBlogDoc(blog.DocKey, this);
+                    DefaultActionForBlogDoc(currentblog, updater);
                 }
             }//end if
 
-            var contenturl = string.Empty;
-            var contentreffile = string.Empty;
-            if (!string.IsNullOrEmpty(Request.Form["contentattach"]))
-            {
-                var internalreportfile = Request.Form["contentattach"];
-                var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
-                    .Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                foreach (var r in urls)
-                {
-                    if (r.Contains(originalname))
-                    {
-                        contentreffile = originalname;
-                        contenturl = r;
-                        break;
-                    }
-                }
-            }
 
             if (!string.IsNullOrEmpty(Request.Form["docinputeditor"]))
             {
@@ -1416,11 +1442,6 @@ namespace Prometheus.Controllers
                 blog.UserName = updater;
                 blog.ContentType = UserBlogContentType.COMMENT;
                 blog.Content = SeverHtmlDecode.Decode(this,Request.Form["docinputeditor"]);
-
-                if (!string.IsNullOrEmpty(contenturl))
-                {
-                    blog.Content = blog.Content + "<hr/><p><a href='" + contenturl + "' target='_blank'>Reference File: " + contentreffile + " " + "</a></p>";
-                }
 
                 blog.Tag = tag;
                 if (string.IsNullOrEmpty(Request.Form["DocTitle"]))
@@ -1433,6 +1454,9 @@ namespace Prometheus.Controllers
                     blog.Title = Request.Form["DocTitle"];
                 }
                 blog.StoreBlogDoc();
+
+                var currentblog = UserBlogVM.RetrieveBlogDoc(blog.DocKey, this);
+                DefaultActionForBlogDoc(currentblog, updater);
             }
 
             return RedirectToAction("IBLOG", "User");
@@ -1767,20 +1791,30 @@ namespace Prometheus.Controllers
             ViewBag.towholist1 = CreateSelectList(asilist, "");
 
             var grouptype = new string[] { "Please choose your group type", UserGroupType.WorkGroup,UserGroupType.ReportGroup,UserGroupType.LYTGroup};
-            var grouptypelist = CreateSelectList(asilist, "");
+            var grouptypelist = CreateSelectList(grouptype.ToList(), "");
             grouptypelist[0].Selected = true;
             grouptypelist[0].Disabled = true;
             ViewBag.grouptypelist = grouptypelist;
 
-            return View();
+            var vm = UserGroupVM.RetreiveAllGroup();
+            return View(vm);
         }
 
         [HttpPost, ActionName("IGroup")]
         [ValidateAntiForgeryToken]
         public ActionResult IGroupPost()
         {
-
+            var grouptype = Request.Form["grouptypelist"].ToString();
+            var groupmember = Request.Form["RPeopleAddr"];
+            UserGroupVM.AddGroup(grouptype, groupmember);
             return RedirectToAction("IGroup", "User");
         }
+
+        public ActionResult DeleteGroup(string GroupID)
+        {
+            UserGroupVM.DeleteGroup(GroupID);
+            return RedirectToAction("IGroup", "User");
+        }
+
     }
 }

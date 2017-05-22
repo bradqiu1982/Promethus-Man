@@ -7,9 +7,9 @@ namespace Prometheus.Models
 {
     public class UserGroupType
     {
-        public static string WorkGroup = "WorkGroup";
-        public static string ReportGroup = "ReportGroup";
-        public static string LYTGroup = "LYTGroup";
+        public static string WorkGroup = "Work Group";
+        public static string ReportGroup = "Report Group";
+        public static string LYTGroup = "LYT Group";
     }
 
     public class UserGroupVM
@@ -71,7 +71,7 @@ namespace Prometheus.Models
 
             foreach (var kv in tempdict)
             {
-                ret = ret + ";" + kv.Value;
+                ret = ret + ";" + kv.Key;
             }//end foreach
 
             return ret;

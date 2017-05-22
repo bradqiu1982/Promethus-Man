@@ -292,11 +292,11 @@ namespace Prometheus.Models
                     }
 
                     tempvm.Summary = issue.Summary;
-                    tempvm.DocURL = "/Issue/UpdateIssue?issuekey="+ tempvm.DOCKey;
+                    tempvm.DocURL = "/Issue/UpdateIssue?issuekey=" + tempvm.DOCKey;
                 }
                 else if (string.Compare(tempvm.DOCType, ShareDocType.DEBUG, true) == 0)
                 {
-                    var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(tempvm.DOCKey,ctrl);
+                    var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(tempvm.DOCKey, ctrl);
                     tempvm.Summary = debugtree[0].ProjectKey + "-" + debugtree[0].OrignalCode;
                     tempvm.DocURL = "/Project/UpdateProjectError?ErrorKey=" + tempvm.DOCKey;
                 }
@@ -306,7 +306,7 @@ namespace Prometheus.Models
                     //var tempstrs = tempvm.Summary.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
                     //var datestr = tempstrs[tempstrs.Length - 1].Substring(0,8);
                     //tempvm.DocURL = "/userfiles/docs/" + datestr + "/" + tempvm.DOCKey;
-                    tempvm.DocURL = "/User/WebDoc?DocKey=" + tempvm.DOCKey+ "&Creator="+tempvm.DOCCreator;
+                    tempvm.DocURL = "/User/WebDoc?DocKey=" + tempvm.DOCKey + "&Creator=" + tempvm.DOCCreator;
                 }
 
                 ret.Add(tempvm);

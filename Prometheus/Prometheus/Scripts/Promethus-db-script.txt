@@ -509,6 +509,15 @@ CREATE TABLE [dbo].[NeoMapData] (
 	[AppV_AJ]   NVARCHAR (MAX) DEFAULT ('') NOT NULL
 );
 
+CREATE TABLE [dbo].[UserGroupVM] (
+    [GroupID]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[GroupTag]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[GroupMember]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[TimeStamp]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[AppV_A]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[AppV_B]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[AppV_C]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+	);
 
 Create index idx on ErrorComments(ErrorKey);
 Create index idx on UserTable(UserName);

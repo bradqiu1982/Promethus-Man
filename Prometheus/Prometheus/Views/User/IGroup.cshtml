@@ -1,13 +1,9 @@
-﻿@Model System.Collections.Generic.List<Prometheus.Models.UserGroupVM>
+﻿@model System.Collections.Generic.List<Prometheus.Models.UserGroupVM>
 
     @{
         ViewBag.Title = "IGroup";
         Layout = "~/Views/Shared/_Layout.cshtml";
     }
-
-    <h2>IGroup</h2>
-
-
     <div class="row">
         <div class="col-lg-12">&nbsp;</div>
     </div>
@@ -17,10 +13,10 @@
     </div>
 
     <div class="row">
-        <div class="col-lg-1 text-right">
+        @*<div class="col-lg-1 text-right">
             <img src="~/Content/images/ucicon/ITagIcons.png" style="height:60px; width:60px">
-        </div>
-        <div class="col-lg-11">
+        </div>*@
+        <div class="col-lg-12">
             <ol class="breadcrumb" style="font-size:18px">
                 <li><a href="/User/UserCenter?username=@(ViewBag.RealUserID)">@ViewBag.UserName Center</a></li>
                 <li class="active">I Group</li>
@@ -49,7 +45,20 @@
         </div>
 
         <div class="row">
+            <div class="col-lg-12">&nbsp;</div>
+        </div>
+
+        <div class="row">
             <div class="col-lg-2" style="font-family:'Arial Narrow';font-size:18px"><strong>&nbsp;&nbsp;Related People</strong></div>
+            <div class="col-lg-10">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">&nbsp;</div>
+        </div>
+
+        <div class="row">
             <div class="col-lg-10">
                 <div class="row">
                     <div class="form-group">
@@ -71,6 +80,7 @@
                     </script>
                 </div>
             </div>
+            <div class="col-lg-2"></div>
         </div>
 
         <div class="row">
@@ -81,19 +91,19 @@
             <div class="form-group">
                 <div class="row col-lg-12">
                     <div class="col-lg-2">
-                        <button  style="background-color: #006DC0;color:white;" type="button" onclick="submitform()" >Submit</button>
+                        <button  MYTP="BT"  type="button" class="btn btn-default" onclick="submitform()" >Submit</button>
                     </div>
                     <div class="col-lg-10"></div>
                 </div>
                 <script type="text/javascript">
                     function submitform()
                     {
-                        if (document.getElementById("grouptypelist").value) {
-                            $('#igroupform').submit();
+                        if (document.getElementById("grouptypelist").value == 'Please choose your group type') {
+                            window.alert("You need to choose group type to create a group");
                         }
                         else
                         {
-                            window.alert("You need to choose group type to create a group")
+                            $('#igroupform').submit();
                         }
                     }
                 </script>
@@ -101,7 +111,7 @@
         </div>
 
 
-        if (Model.Count)
+        if (Model.Count > 0)
         {
             <div class="row">
                 <div class="col-lg-12">&nbsp;</div>
@@ -120,8 +130,8 @@
                     {
                         <tr>
                             <td>@(g.GroupTag)</td>
-                            <td>@(g.GroupMember)</td>
-                            <td><img src="~/Content/images/icon/delete2.png" MYTP="HOVER" style="height:30px; width:18px" onclick="DeleteGroup(@(g.GroupID))"></td>
+                            <td>@(g.GroupMember.Replace("@FINISAR.COM",""))</td>
+                            <td><img src="~/Content/images/icon/delete2.png" MYTP="HOVER" style="height:30px; width:18px" onclick="DeleteGroup('@(g.GroupID)')"></td>
                         </tr>
                     }
                 </tbody>
@@ -152,9 +162,7 @@
                     }
             </script>
         }
-
-
-
+        
                 <div class="modal" id="relatedmodal" tabindex="-1" role="dialog" aria-labelledby="relatedmodalLabel">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">

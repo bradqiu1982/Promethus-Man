@@ -90,7 +90,7 @@
                         }
                         
                         <td style="text-align:center;font-size:12px">@(line.DOCDate.ToString("dd/MM"))</td>
-                        <td style="text-align:center;font-size:12px"><button class="form-control" type="button" value="DOCPJK=@(line.DOCPJK)&DOCKey=@(line.DOCKey)" onclick="LikeThisDoc(this)"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></button></td>
+                        <td style="text-align:center;font-size:12px"><button class="form-control" type="button" value="DOCKey=@(line.DOCKey)&DOCCreator=@(line.DOCCreator)" onclick="LikeThisDoc(this)"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></button></td>
                         <td style="text-align:center;font-size:12px"><button class="form-control" type="button" value="DOCPJK=@(line.DOCPJK)&DOCKey=@(line.DOCKey)&ToWho=" onclick="PushThisDoc(this)">Push</button></td>
                     </tr>
 
@@ -198,7 +198,7 @@
                                 }
 
                                 <td style="text-align:center;font-size:12px">@(line.DOCDate.ToString("dd/MM"))</td>
-                                <td style="text-align:center;font-size:12px"><button class="form-control" type="button" value="DOCPJK=@(line.DOCPJK)&DOCKey=@(line.DOCKey)" onclick="LikeThisDoc(this)"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></button></td>
+                                <td style="text-align:center;font-size:12px"><button class="form-control" type="button" value="DOCKey=@(line.DOCKey)&DOCCreator=@(line.DOCCreator)" onclick="LikeThisDoc(this)"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></button></td>
                                 <td style="text-align:center;font-size:12px"><button class="form-control" type="button" value="DOCPJK=@(line.DOCPJK)&DOCKey=@(line.DOCKey)&ToWho=" onclick="PushThisDoc(this)">Push</button></td>
                             </tr>
 
@@ -274,7 +274,7 @@
                                 }
 
                                 <td style="text-align:center;font-size:12px">@(line.DOCDate.ToString("dd/MM"))</td>
-                                <td style="text-align:center;font-size:12px"><button class="form-control" type="button" value="DOCPJK=@(line.DOCPJK)&DOCKey=@(line.DOCKey)" onclick="LikeThisDoc(this)"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></button></td>
+                                <td style="text-align:center;font-size:12px"><button class="form-control" type="button" value="DOCKey=@(line.DOCKey)&DOCCreator=@(line.DOCCreator)" onclick="LikeThisDoc(this)"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></button></td>
                                 <td style="text-align:center;font-size:12px"><button class="form-control" type="button" value="DOCPJK=@(line.DOCPJK)&DOCKey=@(line.DOCKey)&ToWho=" onclick="PushThisDoc(this)">Push</button></td>
                             </tr>
 

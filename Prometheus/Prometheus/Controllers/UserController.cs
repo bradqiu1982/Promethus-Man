@@ -1126,7 +1126,7 @@ namespace Prometheus.Controllers
             return RedirectToAction("ILearn", "User");
         }
 
-        public ActionResult ILike(string DOCPJK, string DOCKey)
+        public ActionResult ILike(string DOCKey,string DOCCreator)
         {
             var ckdict = CookieUtility.UnpackCookie(this);
             if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
@@ -1144,10 +1144,10 @@ namespace Prometheus.Controllers
 
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
-            if (!string.IsNullOrEmpty(DOCPJK)
-                && !string.IsNullOrEmpty(DOCKey))
+            if (!string.IsNullOrEmpty(DOCKey)
+                && !string.IsNullOrEmpty(DOCCreator))
             {
-                ShareDocVM.LikeDoc(DOCPJK, DOCKey, updater);
+                ShareDocVM.LikeDoc(DOCKey, DOCCreator, updater);
             }
             return RedirectToAction("ILearn", "User");
         }
@@ -1261,10 +1261,11 @@ namespace Prometheus.Controllers
 
             var vm = UserBlogVM.RetrieveBlogDoc(DOCKey,this);
 
+            ShareDocVM.ShareDoc("ALL", ShareDocType.BLOG, DOCKey, vm.Tag, vm.UserName, vm.CreateDate.ToString());
+
             var whoes = ToWho.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var w in whoes)
             {
-                //ShareDocVM.PushDoc(w.Trim().ToUpper(), "ALL",ShareDocType.BLOG, DOCKey,vm.Tag,vm.UserName,vm.CreateDate.ToString(), "");
                 ShareDocVM.PushDoc(w.Trim().ToUpper(), "ALL", ShareDocType.BLOG, DOCKey, vm.Tag, vm.UserName, DateTime.Now.ToString(), "");
                 ShareDocVM.SendPushDocEvent("a new document about " + vm.Tag, vm.DocURL, ToWho, updater.ToUpper(), this, tempreason);
             }
@@ -1364,6 +1365,8 @@ namespace Prometheus.Controllers
                 var reportgroup = UserGroupVM.RetreiveUserGroup(updater, UserGroupType.ReportGroup);
                 if (!string.IsNullOrEmpty(reportgroup))
                 {
+
+                    ShareDocVM.ShareDoc("ALL", ShareDocType.BLOG, blog.DocKey, blog.Tag, blog.UserName, blog.CreateDate.ToString());
                     var mbs = reportgroup.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (var mb in mbs)
                     {
@@ -1377,6 +1380,7 @@ namespace Prometheus.Controllers
                 var workgroup = UserGroupVM.RetreiveUserGroup(updater, UserGroupType.WorkGroup);
                 if (!string.IsNullOrEmpty(workgroup))
                 {
+                    ShareDocVM.ShareDoc("ALL", ShareDocType.BLOG, blog.DocKey, blog.Tag, blog.UserName, blog.CreateDate.ToString());
                     var mbs = workgroup.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (var mb in mbs)
                     {

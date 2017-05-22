@@ -337,9 +337,31 @@ namespace Prometheus.Models
 
         public static void RemoveMyLearn(string dockey, string username)
         {
-            var sql = "delete from UserLearn where DOCKey='<DOCKey>' and UserName='<UserName>'";
+            var sql = "delete from UserLearn where DOCKey=N'<DOCKey>' and UserName='<UserName>'";
             sql = sql.Replace("<DOCKey>", dockey).Replace("<UserName>", username);
             DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        public static int RetrieveBlogFavorTimes(string DOCKey, string DOCCreator)
+        {
+                var sql = "select DOCFavorTimes from ShareDoc where  DOCKey=N'<DOCKey>' and DOCCreator = '<DOCCreator>'";
+                sql = sql.Replace("<DOCKey>", DOCKey).Replace("<DOCCreator>", DOCCreator);
+                var dbret2 = DBUtility.ExeLocalSqlWithRes(sql, null);
+                if (dbret2.Count > 0)
+                {
+                    try
+                    {
+                        return  Convert.ToInt32(dbret2[0][0]);
+                    }
+                    catch (Exception ex)
+                    {
+                        return 0;
+                    }
+                }
+                else
+                {
+                    return 0;
+                }
         }
 
         private static List<ShareDocVM> RetrieveMyLearnBlog(string UserName, Controller ctrl)
@@ -360,7 +382,7 @@ namespace Prometheus.Models
                 tempvm.DOCDate = DateTime.Parse(Convert.ToString(line[5]));
                 tempvm.DOCPusher = Convert.ToString(line[6]);
                 tempvm.DOCFavor = Convert.ToString(line[7]);
-                tempvm.DOCFavorTimes = 0;
+                tempvm.DOCFavorTimes = RetrieveBlogFavorTimes(tempvm.DOCKey, tempvm.DOCCreator);
 
                 var blog = UserBlogVM.RetrieveBlogDoc(tempvm.DOCKey,ctrl);
                 tempvm.Summary = blog.Title;
@@ -520,11 +542,12 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static void LikeDoc(string DOCPJK, string DOCKey,string updater)
+        public static void LikeDoc(string DOCKey,string DOCCreator, string updater)
         {
             var ret = new List<ShareDocVM>();
-            var sql = "select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,a.DOCDate,b.DOCPusher,b.DOCFavor,a.DOCFavorTimes from ShareDoc a left join UserLearn b ON a.DOCKey = b.DOCKey where a.DOCPJK = '<DOCPJK>' and a.DOCKey = '<DOCKey>' and b.UserName='<UserName>'";
-            sql = sql.Replace("<DOCPJK>", DOCPJK).Replace("<DOCKey>", DOCKey).Replace("<UserName>",updater);
+            var sql = "select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,a.DOCDate,b.DOCPusher,b.DOCFavor,a.DOCFavorTimes from ShareDoc a left join UserLearn b ON a.DOCKey = b.DOCKey "
+                + " where  a.DOCKey = N'<DOCKey>' and a.DOCCreator = '<DOCCreator>'  and b.UserName='<UserName>'";
+            sql = sql.Replace("<DOCKey>", DOCKey).Replace("<DOCCreator>", DOCCreator).Replace("<UserName>",updater);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
             {
@@ -543,20 +566,18 @@ namespace Prometheus.Models
 
             if (ret.Count > 0)
             {
-                var sql1 = "Update ShareDoc set DOCFavorTimes = <DOCFavorTimes> where DOCPJK = '<DOCPJK>' and DOCKey = N'<DOCKey>'";
-                sql1 = sql1.Replace("<DOCPJK>", DOCPJK).Replace("<DOCKey>", DOCKey).Replace("<DOCFavorTimes>", (ret[0].DOCFavorTimes+1).ToString());
+                var sql1 = "Update ShareDoc set DOCFavorTimes = <DOCFavorTimes> where DOCKey = N'<DOCKey>' and DOCCreator = '<DOCCreator>'";
+                sql1 = sql1.Replace("<DOCKey>", DOCKey).Replace("<DOCCreator>", DOCCreator).Replace("<DOCFavorTimes>", (ret[0].DOCFavorTimes + 1).ToString());
                 DBUtility.ExeLocalSqlNoRes(sql1);
-
-                sql1 = "Update UserLearn set DOCFavor='LIKE' where DOCPJK = '<DOCPJK>' and DOCKey = N'<DOCKey>' and UserName='<UserName>'";
-                sql1 = sql1.Replace("<DOCPJK>", DOCPJK).Replace("<DOCKey>", DOCKey).Replace("<UserName>", updater);
-                DBUtility.ExeLocalSqlNoRes(sql1);
-
-                UserRankViewModel.UpdateUserRank(ret[0].DOCCreator, 3);
-                if (!string.IsNullOrEmpty(ret[0].DOCPusher))
-                {
-                    UserRankViewModel.UpdateUserRank(ret[0].DOCPusher, 3);
-                }
             }
+
+            UserRankViewModel.UpdateUserRank(DOCCreator, 3);
+
+            var sql2 = "Update UserLearn set DOCFavor='LIKE' where DOCKey = N'<DOCKey>' and DOCCreator = '<DOCCreator>' and UserName='<UserName>'";
+            sql2 = sql2.Replace("<DOCKey>", DOCKey).Replace("<DOCCreator>", DOCCreator).Replace("<UserName>", updater);
+            DBUtility.ExeLocalSqlNoRes(sql2);
+
+                
         }
 
         //public static void RemoveDoc(string DOCPJK, string DOCKey)

@@ -18,6 +18,27 @@ namespace Prometheus.Models
 {
     public class EmailUtility
     {
+        private static void logthdinfo(string info)
+        {
+            try
+            {
+                var filename = "d:\\log\\emailexception-" + DateTime.Now.ToString("yyyy-MM-dd");
+                if (System.IO.File.Exists(filename))
+                {
+                    var content = System.IO.File.ReadAllText(filename);
+                    content = content + "\r\n" + DateTime.Now.ToString() + " : " + info;
+                    System.IO.File.WriteAllText(filename, content);
+                }
+                else
+                {
+                    System.IO.File.WriteAllText(filename, DateTime.Now.ToString() + " : " + info);
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+
         public static bool SendEmail(Controller ctrl,string title, List<string> tolist, string content)
         {
             try
@@ -34,7 +55,7 @@ namespace Prometheus.Models
                     {
                         message.To.Add(item);
                     }
-                    catch (Exception e) { }
+                    catch (Exception e) { logthdinfo("Address exception: " + e.Message); }
                 }
 
                 message.Subject = title;
@@ -57,13 +78,39 @@ namespace Prometheus.Models
                     {
                         client.Send(message);
                     }
+                    catch (SmtpFailedRecipientsException ex)
+                    {
+                        logthdinfo("SmtpFailedRecipientsException exception: " + ex.Message);
+                        try
+                        {
+                            message.To.Clear();
+                            foreach (var item in tolist)
+                            {
+                                if (ex.Message.Contains(item))
+                                {
+                                    try
+                                    {
+                                        message.To.Add(item);
+                                    }
+                                    catch (Exception e) { logthdinfo("Address exception2: " + e.Message); }
+                                }
+                            }
+                            client.Send(message);
+                        }
+                        catch (Exception ex1)
+                        {
+                            logthdinfo("nest exception1: " + ex1.Message);
+                        }
+                    }
                     catch (Exception ex)
-                    { }
+                    {
+                        logthdinfo("send exception: " + ex.Message);
+                    }
                 }).Start();
             }
             catch (Exception ex)
             {
-                //System.Windows.MessageBox.Show(ex.ToString());
+                logthdinfo("main exception: " + ex.Message);
                 return false;
             }
             return true;

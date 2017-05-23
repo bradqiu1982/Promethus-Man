@@ -86,7 +86,12 @@
             <tbody>
                 @foreach (var item in Model)
                 {
-                    var rmatitle = item.Summary.Split(new string[] { "from" }, StringSplitOptions.None)[1].Trim();
+                    var splitstrs = item.Summary.Split(new string[] { "from" }, StringSplitOptions.None);
+                    var rmatitle = item.Summary;
+                    if (splitstrs.Length > 1)
+                    {
+                        rmatitle = splitstrs[1].Trim();
+                    }
 
                     <tr>
                         <td width="10%">

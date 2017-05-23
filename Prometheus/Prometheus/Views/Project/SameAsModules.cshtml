@@ -1,0 +1,90 @@
+﻿@model System.Collections.Generic.List<Prometheus.Models.SameAsDBTVM>
+
+@{
+    ViewBag.Title = "SameAsModules";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+<div class="row">
+    <div class="col-lg-1 text-right">
+            <img src="~/Content/images/PJ/DebugTreeicon.png" style="height:45px; width:45px">
+    </div>
+    <div class="col-lg-11">
+        <ol class="breadcrumb" style="font-size:18px">
+            @if (Model != null && Model.Count > 0)
+            {
+                <li><a href="/Project/UpdateProjectError?ErrorKey=@(Model[0].ErrorKey)">Debug Tree</a></li>
+            }
+            <li class="active">Same As Modules</li>
+        </ol>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+@if (Model != null && Model.Count > 0)
+{
+    int linenum = (Model.Count / (int)6);
+    int left = Model.Count % (int)6;
+    var lineidx = 0;
+    <div class="row">
+        <table id="pndatatable" class="display" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>Module SN</th>
+                    <th>Module SN</th>
+                    <th>Module SN</th>
+                    <th>Module SN</th>
+                    <th>Module SN</th>
+                    <th>Module SN</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (; lineidx < linenum; lineidx++)
+                {
+                    <tr>
+                        @for (var idx = 0; idx < 6; idx++)
+                    {
+                            <td><a href="/Issue/UpdateIssue?issuekey=@(Model[lineidx * 6 + idx].SameAsIssueKey)">@(Model[lineidx * 6 + idx].SameAsSN)</a></td>
+                        }
+                    </tr>
+                }
+                <tr>
+                    @for (var idx = 0; idx < left; idx++)
+                {
+                        <td><a href="/Issue/UpdateIssue?issuekey=@(Model[lineidx * 6 + idx].SameAsIssueKey)">@(Model[lineidx * 6 + idx].SameAsSN)</a></td>
+                    }
+
+                    @for (var idx = 0; idx < 6 - left; idx++)
+                    {
+                        <td>&nbsp;</td>
+                    }
+                </tr>
+            </tbody>
+        </table>
+
+        <script type="text/javascript">
+                    $(document).ready(function() {
+                        $('#pndatatable').DataTable({
+                            'iDisplayLength': 50,
+                            'aLengthMenu': [[25, 50, 100, -1],
+                                            [25, 50, 100, "All"]],
+                            "aaSorting": [],
+                            "order": []
+                        });
+                    });
+
+        </script>
+    </div>
+
+}

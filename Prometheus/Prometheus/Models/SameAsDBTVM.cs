@@ -60,7 +60,7 @@ namespace Prometheus.Models
             }
         }
 
-        public static List<SameAsDBTVM>  SameAsIssues(string errorkey, string linktime)
+        public static List<SameAsDBTVM>  RetriveSameAsIssues(string errorkey, string linktime)
         {
             var ret = new List<SameAsDBTVM>();
 

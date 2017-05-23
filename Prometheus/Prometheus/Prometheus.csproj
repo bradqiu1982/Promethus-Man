@@ -930,6 +930,7 @@
     <Content Include="Views\Project\SNIssue.cshtml" />
     <Content Include="Views\Project\ProjectDoneFA.cshtml" />
     <Content Include="Views\User\IGroup.cshtml" />
+    <Content Include="Views\Project\SameAsModules.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

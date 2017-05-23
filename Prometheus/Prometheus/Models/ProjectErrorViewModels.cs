@@ -256,6 +256,34 @@ namespace Prometheus.Models
                     {
                         if (r.CommentDate > starttime && r.CommentDate < endtime)
                         {
+                            var sameascount = SameAsDBTVM.SameAsIssueCount(r.ErrorKey, item.CommentDate.ToString());
+
+                            if (sameascount == 0)
+                            {
+                                var originalissuekey = string.Empty;
+                                var originalmodulesn = string.Empty;
+                                if (item.Comment.Contains("<a href='/Issue/UpdateIssue?issuekey=")
+                                    && item.Comment.Contains("' target='_blank'>")
+                                    && item.Comment.Contains(" Issue Link</a>"))
+                                {
+                                    var splitstr = item.Comment.Split(new string[] { "<a href='/Issue/UpdateIssue?issuekey=" , "' target='_blank'>" , " Issue Link</a>" }, StringSplitOptions.RemoveEmptyEntries);
+                                    if (splitstr.Length > 2)
+                                    {
+                                        originalissuekey = splitstr[1].Trim();
+                                        originalmodulesn = splitstr[2].Trim();
+                                        if (!string.IsNullOrEmpty(originalissuekey)
+                                            && !string.IsNullOrEmpty(originalmodulesn))
+                                        {
+                                            SameAsDBTVM.StoreLinkDBTIssue(item.ErrorKey, item.CommentDate.ToString(), originalissuekey, originalissuekey, originalmodulesn);
+                                        }//end if
+                                    }//end if
+                                }//end if
+                            }//end if
+
+                            if (sameascount > 1)
+                            {
+                                r.Comment = r.Comment + "<p><a href='/Project/SameAsModules?ErrorKey=" + r.ErrorKey+"&LinkTime="+item.CommentDate.ToString() + "' target='_blank'>" + sameascount.ToString()+" Modules Same As This Module" + "</a></p>";
+                            }
                             temppitem.Add(r);
                         }
                     }//end foreach

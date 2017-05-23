@@ -5170,5 +5170,16 @@ namespace Prometheus.Controllers
 
             return RedirectToAction("ViewAll", "Project");
         }
+
+        public ActionResult SameAsModules(string ErrorKey, string LinkTime)
+        {
+            if (!string.IsNullOrEmpty(ErrorKey) && !string.IsNullOrEmpty(LinkTime))
+            {
+                var vm = SameAsDBTVM.RetriveSameAsIssues(ErrorKey, LinkTime);
+                return View(vm);
+            }
+            return RedirectToAction("ViewAll", "Project");
+        }
+
     }
 }

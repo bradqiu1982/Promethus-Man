@@ -544,8 +544,16 @@ namespace Prometheus.Models
 
         public static void LikeDoc(string DOCKey,string DOCCreator, string updater)
         {
+            var sql = "select DOCFavor from UserLearn where DOCKey = N'<DOCKey>' and DOCCreator = '<DOCCreator>' and UserName = '<UserName>'";
+            sql = sql.Replace("<DOCKey>", DOCKey).Replace("<DOCCreator>", DOCCreator).Replace("<UserName>", updater);
+            var dbret2 = DBUtility.ExeLocalSqlWithRes(sql, null);
+            if (dbret2.Count == 0)
+                return;
+            if (!string.IsNullOrEmpty(Convert.ToString(dbret2[0][0])))
+                return;
+
             var ret = new List<ShareDocVM>();
-            var sql = "select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,a.DOCDate,b.DOCPusher,b.DOCFavor,a.DOCFavorTimes from ShareDoc a left join UserLearn b ON a.DOCKey = b.DOCKey "
+            sql = "select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,a.DOCDate,b.DOCPusher,b.DOCFavor,a.DOCFavorTimes from ShareDoc a left join UserLearn b ON a.DOCKey = b.DOCKey "
                 + " where  a.DOCKey = N'<DOCKey>' and a.DOCCreator = '<DOCCreator>'  and b.UserName='<UserName>'";
             sql = sql.Replace("<DOCKey>", DOCKey).Replace("<DOCCreator>", DOCCreator).Replace("<UserName>",updater);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);

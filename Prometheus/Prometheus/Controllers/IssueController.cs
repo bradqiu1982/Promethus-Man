@@ -112,6 +112,12 @@ namespace Prometheus.Controllers
                 var asilist = UserViewModels.RetrieveAllUser();
                 ViewBag.towholist = CreateSelectList(asilist, "");
 
+
+                var typelist = new List<string>();
+                string[] tlist = { ISSUETP.Task, ISSUETP.Bug, ISSUETP.NPIPROC };
+                typelist.AddRange(tlist);
+                ViewBag.issuetypelist = CreateSelectList(typelist, "");
+
                 return View(vm);
             }
             else

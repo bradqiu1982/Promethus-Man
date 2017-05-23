@@ -1312,6 +1312,8 @@ namespace Prometheus.Controllers
                                     ProjectErrorViewModels.StoreErrorAttachment(perrlist[0].ErrorKey, item);
                                 }
 
+                                SameAsDBTVM.StoreLinkDBTIssue(perrlist[0].ErrorKey, linktime, originaldata.IssueKey, originaldata.IssueKey, testdata[0].ModuleSerialNum);
+
                                 UserRankViewModel.UpdateUserRank(updater, 10);
 
                                 var dict = new RouteValueDictionary();
@@ -1366,6 +1368,8 @@ namespace Prometheus.Controllers
                                 {
                                     ProjectErrorViewModels.StoreErrorAttachment(perrlist[0].ErrorKey, item);
                                 }
+
+                                SameAsDBTVM.StoreLinkDBTIssue(perrlist[0].ErrorKey, linktime, originaldata.IssueKey, originaldata.IssueKey, testdata[0].ModuleSerialNum);
 
                                 UserRankViewModel.UpdateUserRank(updater, 10);
 
@@ -2838,7 +2842,13 @@ namespace Prometheus.Controllers
                 tobedata.Description = "<p>Issue Same As <a href=\"/Issue/UpdateIssue?issuekey=" + targetdata.IssueKey+"\">"+targetdata.Summary +"</a></p>";
                 tobedata.UpdateIssue();
                 tobedata.CloseIssue();
+
+                if (!string.IsNullOrEmpty(tobedata.ModuleSN))
+                {
+                    SameAsDBTVM.StoreSameAsIssue(targetdata.IssueKey, tobedata.IssueKey, tobedata.ModuleSN);
+                }
             }
+
             var pjdata = ProjectTestData.RetrieveProjectTestData(targetissuekey);
             if (pjdata.Count == 0)
             {

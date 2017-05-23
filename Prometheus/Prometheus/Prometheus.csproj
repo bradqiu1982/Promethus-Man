@@ -229,6 +229,7 @@
     <Compile Include="Models\ProjectTestData.cs" />
     <Compile Include="Models\ProjectViewModels.cs" />
     <Compile Include="Models\ProjectYieldViewModule.cs" />
+    <Compile Include="Models\SameAsDBTVM.cs" />
     <Compile Include="Models\ShareDocVM.cs" />
     <Compile Include="Models\UserBlogVM.cs" />
     <Compile Include="Models\UserCacheVM.cs" />

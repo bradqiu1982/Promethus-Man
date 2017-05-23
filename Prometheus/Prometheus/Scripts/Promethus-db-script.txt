@@ -519,6 +519,18 @@ CREATE TABLE [dbo].[UserGroupVM] (
 	[AppV_C]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
 	);
 
+CREATE TABLE [dbo].[SameAsDBTVM] (
+    [ErrorKey]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[LinkTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[OriginalIssueKey]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[SameAsIssueKey]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[SameAsSN]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[SameAsTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[AppV_A]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[AppV_B]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[AppV_C]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+	);
+
 Create index idx on ErrorComments(ErrorKey);
 Create index idx on UserTable(UserName);
 Create index idx on IssueAttachment(IssueKey);

@@ -10,6 +10,41 @@ NeoMAPDataFolder:::\\wux-file01\Public\Wuxi Parallel NPI\NeoMAP Data
 RELSHAREFOLDER:::\\cn-file01\Public\Quality\Reliability\Failure Analysis\FA-AutoTracking\SummaryTable
 BIAUTOTABLES:::dbo.v_BICFP2Output;dbo.v_BICFP4Output;dbo.v_BICXPOutput;dbo.v_BIEDROutput;dbo.v_BIFDROutput;dbo.v_BIOEOutput;dbo.v_BIQSFP28GOutput;dbo.v_BIQSFPGen3Output;dbo.v_BIQWireOutput;dbo.v_BITopazOutput;
 BIZEROTIME:::2017-05-01 07:30:00
-OBAADMIN:::Pingping.Zhu@finisar.com
+OBAADMIN:::Nevin.Niu
+OBADEFAULTPJ:::PQE
+RELDEFAULTPJ:::RELIABILITY
 BIADMIN:::daly.li@finisar.com
 BITEAM:::daly.li@finisar.com;tyler.zhang@finisar.com;tony.lv@finisar.com;windy.ju@finisar.com;Zhongxi.Yu@finisar.com;Zhijun.Chen@finisar.com
+
+OBA--PARA-10G OE:::Nevin.Niu
+OBA--PARA-25G OE:::Bright.Zhang
+OBA--PARA-CFP2 SR10:::Hao.Xu
+OBA--PARA-CFP4 SR4:::Hao.Xu
+OBA--PARA-C-Wire GEN1 10.5G:::Hao.Xu
+OBA--PARA-C-Wire GEN1 12.5G:::Hao.Xu
+OBA--PARA-C-Wire GEN2 10.5G:::Hao.Xu
+OBA--PARA-C-Wire GEN2 12.5G:::Hao.Xu
+OBA--PARA-C-Wire GEN2 300M:::Hao.Xu
+OBA--PARA-CXP GEN1 10.5G:::Hao.Xu
+OBA--PARA-CXP GEN1 12.5G:::Hao.Xu
+OBA--PARA-CXP GEN2 10.5G:::Hao.Xu
+OBA--PARA-CXP GEN2 12.5G:::Hao.Xu
+OBA--PARA-CXP GEN2 300M:::Hao.Xu
+OBA--PARA-EDR:::Doris.Kong
+OBA--PARA-FDR:::Doris.Kong
+OBA--PARA-FDR Lite transceiver:::Doris.Kong
+OBA--PARA-Octopus:::Hao.Xu
+OBA--PARA-OE28LP:::Bright.Zhang
+OBA--PARA-QSFP FDR transceiver:::Doris.Kong
+OBA--PARA-QSFP GEN4:::Doris.Kong
+OBA--PARA-QSFP SR4 Gen4:::Doris.Kong
+OBA--PARA-QSFP28G-PSM4:::Nevin.Niu
+OBA--PARA-QSFP28G-SR4:::Bright.Zhang
+OBA--PARA-QSFP-GEN2:::Doris.Kong
+OBA--PARA-QSFP-GEN3:::Doris.Kong
+OBA--PARA-Q-Wire Cisco:::Bright.Zhang
+OBA--PARA-Q-Wire Gen3:::Bright.Zhang
+OBA--PARA-Q-Wire(10.5G):::Bright.Zhang
+OBA--PARA-SR4 GEN3:::Doris.Kong
+OBA--PARA-Topaz OE:::Nevin.Niu
+OBA--SFP-Wire:::Hao.Xu

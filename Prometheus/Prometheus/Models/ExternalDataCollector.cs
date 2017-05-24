@@ -262,8 +262,35 @@ namespace Prometheus.Models
         public static string CORRECTIVEACTION = "[Corrective]";
     }
 
+    public class RawDMR
+    {
+        public RawDMR()
+        {
+            DMR_ID = string.Empty;
+            CreateTime = string.Empty;
+            Product = string.Empty;
+            TotalQty = string.Empty;
+            DefectQty = string.Empty;
+            Summary = string.Empty;
+            ModuleSN = "SN";
+            Owner = string.Empty;
+        }
+
+        public string DMR_ID{ set; get; }
+        public string CreateTime { set; get; }
+        public string Product { set; get; }
+        public string TotalQty { set; get; }
+        public string DefectQty { set; get; }
+        public string Summary { set; get; }
+        public string ModuleSN { set; get; }
+        public string Owner { set; get; }
+    }
+
     public class ExternalDataCollector
     {
+
+        #region FILEOPERATE
+
         private static List<List<string>> RetrieveDataFromExcelWithAuth(Controller ctrl, string filename)
         {
             try
@@ -422,6 +449,8 @@ namespace Prometheus.Models
             { }
 
         }
+
+        #endregion
 
         #region RMA
 
@@ -1400,7 +1429,9 @@ namespace Prometheus.Models
             {
                 allpjdict.Add(pjk, true);
             }
-            var RELPJKEY = RMSpectialCh("Reliability");
+
+            var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+            var RELPJKEY =  RMSpectialCh(syscfgdict["RELDEFAULTPJ"]);
 
             var rmaattaches = RetrieveRelAttach(); //all rel attach
             var solvedrmanum = new Dictionary<string, bool>();
@@ -1780,5 +1811,224 @@ namespace Prometheus.Models
 
         #endregion
 
+        #region OBA
+
+        private static string RetrieveOBAUpdateTime()
+        {
+            var OBAUpdateTime = DateTime.Parse("2017-05-23 01:00:00");
+
+            var sql = "select top 1 ReportDate from Issue where IssueType = '"+ISSUETP.OBA+"' order by ReportDate DESC";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            if (dbret.Count > 0)
+            {
+                try
+                {
+                    OBAUpdateTime = DateTime.Parse(Convert.ToString(dbret[0][0]));
+                }
+                catch (Exception ex)
+                {
+                    OBAUpdateTime = DateTime.Parse("2017-05-23 01:00:00");
+                }
+            }
+
+            return OBAUpdateTime.ToString();
+        }
+
+        private static Dictionary<string, bool> RetrieveExistDMRDict(Controller ctrl)
+        {
+            var ret = new Dictionary<string, bool>();
+            var obalist = IssueViewModels.RetrieveAllIssueTypeIssue("NONE", "NONE", ISSUETP.OBA, ctrl);
+            foreach (var item in obalist)
+            {
+                if (!string.IsNullOrEmpty(item.FinisarDMR.Trim()) && !ret.ContainsKey(item.FinisarDMR.Trim()))
+                {
+                    ret.Add(item.FinisarDMR.Trim(), true);
+                }
+            }
+            return ret;
+        }
+
+        private static List<RawDMR> RetrieveDMRFromITDB(string OBAUpdateTime, Dictionary<string, bool> DMRDict)
+        {
+            var ret = new List<RawDMR>();
+
+            var sql = "select DMR_ID,Created_at,Prod_Line,Defect_Qty,Inspected_Qty,Actual_Problem from dbo.DMR_Detail_List_View where Created_at > '<CreateTime>'";
+            sql = sql.Replace("<CreateTime>", OBAUpdateTime);
+            var dbret = DBUtility.ExeFAISqlWithRes(sql);
+
+            foreach (var line in dbret)
+            {
+                var dmrid = Convert.ToString(line[0]).Trim();
+                if (!string.IsNullOrEmpty(dmrid) && !DMRDict.ContainsKey(dmrid))
+                {
+                    var tempdmr = new RawDMR();
+                    tempdmr.DMR_ID = dmrid;
+                    tempdmr.CreateTime = ConvertToDateStr(Convert.ToString(line[1]));
+                    tempdmr.Product = Convert.ToString(line[2]);
+                    tempdmr.DefectQty = Convert.ToString(line[3]);
+                    tempdmr.TotalQty = Convert.ToString(line[4]);
+                    tempdmr.Summary = Convert.ToString(line[5]);
+                    if (tempdmr.Summary.Contains("SN:"))
+                    {
+                        var idx = tempdmr.Summary.IndexOf("SN:");
+                        var splitstr = tempdmr.Summary.Substring(idx + 3).Split(new string[] { " "},StringSplitOptions.RemoveEmptyEntries);
+                        tempdmr.ModuleSN = splitstr[0];
+                    }
+                    else if (tempdmr.Summary.Contains("SN :"))
+                    {
+                        var idx = tempdmr.Summary.IndexOf("SN :");
+                        var splitstr = tempdmr.Summary.Substring(idx + 4).Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                        tempdmr.ModuleSN = splitstr[0];
+                    }
+                    ret.Add(tempdmr);
+                }//end if
+            }//end foreach
+
+            return ret;
+        }
+
+        private static void CreateOBATask(RawDMR dmr, string OBAAdmin,string defaultpj, Dictionary<string, string> OBARelateDict,Controller ctrl)
+        {
+            var vm = new IssueViewModels();
+            vm.ProjectKey = defaultpj;
+            vm.IssueKey = IssueViewModels.GetUniqKey();
+            vm.IssueType = ISSUETP.OBA;
+
+            vm.FinisarDMR = dmr.DMR_ID;
+            if (vm.FinisarDMR.Length > 50)
+            {
+                vm.FinisarDMR = vm.FinisarDMR.Substring(0, 48);
+            }
+
+            vm.ModuleSN = dmr.ModuleSN;
+
+            vm.OBAFailureRate =dmr.DefectQty+"/"+dmr.TotalQty;
+            if (vm.OBAFailureRate.Length > 50)
+            {
+                vm.OBAFailureRate = vm.OBAFailureRate.Substring(0, 48);
+            }
+
+            vm.RelativePeoples = "";
+
+            vm.Summary = "OBA " + vm.FinisarDMR + " " +dmr.Summary;
+            if (vm.Summary.Length > 200)
+            {
+                vm.Summary = vm.Summary.Substring(0, 198);
+            }
+
+            vm.Priority = ISSUEPR.Major;
+
+            vm.ProductType = dmr.Product;
+            if (vm.ProductType.Length > 50)
+            {
+                vm.ProductType = vm.ProductType.Substring(0, 48);
+            }
+
+            vm.ReportDate = DateTime.Parse(dmr.CreateTime);
+
+
+            if (OBARelateDict.ContainsKey(dmr.Product.ToUpper()))
+            {
+                vm.Assignee = OBARelateDict[dmr.Product.ToUpper()];
+            }
+            else
+            {
+                vm.Assignee = OBAAdmin;
+            }
+            if (!vm.Assignee.Contains("@"))
+            {
+                vm.Assignee = vm.Assignee+"@finisar.com";
+            }
+            vm.Assignee = vm.Assignee.ToUpper();
+            if (vm.Assignee.Length > 200)
+            {
+                vm.Assignee = vm.Assignee.Substring(0, 198);
+            }
+            vm.Reporter = vm.Assignee;
+
+
+            try
+            {
+                vm.DueDate = DateTime.Parse(dmr.CreateTime).AddDays(6);
+            }
+            catch (Exception e) { vm.DueDate = DateTime.Now.AddDays(6); }
+
+            vm.Resolution = Resolute.Pending;
+            vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+
+            vm.Description = vm.Summary;
+            vm.CommentType = COMMENTTYPE.Description;
+
+            vm.DataID = "";
+            vm.ErrAbbr = "";
+            vm.FVCode = "";
+            vm.MaterialDisposition = "";
+
+            vm.StoreIssue();
+
+            UserViewModels.RegisterUserAuto(vm.Assignee);
+            SendOBAEvent(vm, "created",ctrl, true);
+
+            CreateRMASubIssue(RMASubIssueType.CONTAINMENTACTION, "Cotainment Action for OBA " + vm.FinisarDMR, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(14));
+            CreateRMASubIssue(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for OBA " + vm.FinisarDMR, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(28));
+
+            var comment = new IssueComments();
+            comment.Comment = "ROOTCAUSE: to be edited";
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, vm.Assignee, COMMENTTYPE.RootCause);
+        }
+
+        private static void SendOBAEvent(IssueViewModels vm, string operate, Controller ctrl, bool nocheck = false)
+        {
+            var alertime = vm.RetrieveAlertEmailDate(vm.IssueKey);
+            if ((!string.IsNullOrEmpty(alertime) && DateTime.Parse(alertime).AddHours(24) < DateTime.Now) || nocheck)
+            {
+                vm.UpdateAlertEmailDate();
+
+                var routevalue = new RouteValueDictionary();
+                routevalue.Add("issuekey", vm.IssueKey);
+                //send validate email
+                string scheme = ctrl.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                string validatestr = ctrl.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+
+                var netcomputername = "";
+                try { netcomputername = System.Net.Dns.GetHostName(); }
+                catch (Exception ex) { }
+                validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
+
+                var content = vm.Summary + " is " + operate + " by " + vm.Reporter + " :\r\n " + validatestr;
+
+                var toaddrs = new List<string>();
+                toaddrs.Add(vm.Assignee);
+                toaddrs.Add(vm.Reporter);
+                EmailUtility.SendEmail(ctrl, "WUXI NPI System", toaddrs, content);
+                new System.Threading.ManualResetEvent(false).WaitOne(200);
+            }
+        }
+
+        public static void RefreshOBAFromDMR(Controller ctrl)
+        {
+            var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+            var OBAAdmin = syscfgdict["OBAADMIN"];
+            var OBADefaultPJ = syscfgdict["OBADEFAULTPJ"];
+
+            var OBARelateDict = new Dictionary<string, string>();
+            foreach (var kv in syscfgdict)
+            {
+                if (kv.Key.Contains("OBA--"))
+                {
+                    OBARelateDict.Add(kv.Key.Replace("OBA--", "").ToUpper(), kv.Value);
+                }
+            }
+
+            var OBAUpdateTime = RetrieveOBAUpdateTime();
+            var DMRDict = RetrieveExistDMRDict(ctrl);
+            var dmrlist = RetrieveDMRFromITDB(OBAUpdateTime, DMRDict);
+            foreach (var dmr in dmrlist)
+            {
+                CreateOBATask(dmr, OBAAdmin, OBADefaultPJ, OBARelateDict,ctrl);
+            }
+        }
+
+        #endregion
     }
 }

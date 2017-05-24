@@ -162,8 +162,8 @@
     }
 
     var i = 0;
-    <table id="firsttable" name="firsttable" class="table table-bordered table-hover">
-        <thead class="header">
+    <table id="firsttable" name="firsttable"   class="display" cellspacing="0">
+        <thead>
             <tr style="color:white;">
                 <th width="12%">DMR#</th>
                 <th width="8%">SN</th>
@@ -203,6 +203,15 @@
                             @rmatitle.Substring(0, rmatitle.Length > 125 ? 125 : rmatitle.Length)
                         </a>
                     </td>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
                     <td width="8%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus2(item.Resolution))</td>
                 </tr>
                     <tr>
@@ -262,9 +271,19 @@
         </tbody>
     </table>
         <script type="text/javascript">
+            //$(document).ready(function () {
+            //    var offset = $('.navbar').height();
+            //    $("#firsttable").stickyTableHeaders({ fixedOffset: offset });
+            //});
+
             $(document).ready(function () {
-                var offset = $('.navbar').height();
-                $("#firsttable").stickyTableHeaders({ fixedOffset: offset });
+                $('#firsttable').DataTable({
+                    'iDisplayLength': 20,
+                    'aLengthMenu': [[20, 50, 100, -1],
+                                    [20, 50, 100, "All"]],
+                    "aaSorting": [],
+                    "order": []
+                });
             });
 
             function LowYieldWarning(oBT) {

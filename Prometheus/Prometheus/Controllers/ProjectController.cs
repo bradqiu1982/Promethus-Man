@@ -4682,7 +4682,13 @@ namespace Prometheus.Controllers
                 ExternalDataCollector.RefreshRELData(this);
             }
             catch (Exception ex) { }
-            
+
+            try
+            {
+                ExternalDataCollector.RefreshOBAFromDMR(this);
+            }
+            catch (Exception ex) { }
+
             try
             {
                 var filename = "log" + DateTime.Now.ToString("yyyy-MM-dd");

@@ -2267,6 +2267,9 @@ namespace Prometheus.Controllers
             {
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);
+                var asilist = UserViewModels.RetrieveAllUser();
+                ViewBag.towholist = CreateSelectList(asilist, "");
+                ViewBag.towholist1 = CreateSelectList(asilist, "");
                 return View();
             }
 
@@ -2286,12 +2289,18 @@ namespace Prometheus.Controllers
 
                 ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
                 CreateAllLists(ret);
+                var asilist = UserViewModels.RetrieveAllUser();
+                ViewBag.towholist = CreateSelectList(asilist, "");
+                ViewBag.towholist1 = CreateSelectList(asilist, "");
                 return View(ret);
             }
             else
             {
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);
+                var asilist = UserViewModels.RetrieveAllUser();
+                ViewBag.towholist = CreateSelectList(asilist, "");
+                ViewBag.towholist1 = CreateSelectList(asilist, "");
                 return View();
             }
         }

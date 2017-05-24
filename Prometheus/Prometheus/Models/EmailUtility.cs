@@ -126,14 +126,6 @@ namespace Prometheus.Models
                 md.IsBodyHtml = true;
 
                 var message = md.CreateMailMessage("WXNPI.Trace@finisar.com", new Dictionary<string, string>(), content, new System.Web.UI.Control());
-                //message.From = new MailAddress("brad.qiu@finisar.com");
-                //foreach (var item in tolist)
-                //{
-                //    message.To.Add(item);
-                //}
-                //message.Subject = title;
-                //message.Body = content;
-
                 SmtpClient client = new SmtpClient();
                 client.Host = "wmail.finisar.com";
                 client.EnableSsl = true;

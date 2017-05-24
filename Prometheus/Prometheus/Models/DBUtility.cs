@@ -557,49 +557,16 @@ namespace Prometheus.Models
             }
             catch (SqlException ex)
             {
-                logthdinfo("fail to connect to the parallel summary database:" + ex.Message);
+                logthdinfo("fail to connect to the auto  database:" + ex.Message);
                 //System.Windows.MessageBox.Show(ex.ToString());
                 return null;
             }
             catch (Exception ex)
             {
-                logthdinfo("fail to connect to the parallel summary database" + ex.Message);
+                logthdinfo("fail to connect to the auto  database" + ex.Message);
                 //System.Windows.MessageBox.Show(ex.ToString());
                 return null;
             }
-        }
-
-        public static bool ExeAutoSqlNoRes(string sql)
-        {
-            //var syscfgdict = CfgUtility.GetSysConfig(ctrl);
-
-            var conn = GetAutoConnector();
-            if (conn == null)
-                return false;
-
-            try
-            {
-                var command = conn.CreateCommand();
-                command.CommandText = sql;
-                command.ExecuteNonQuery();
-                CloseConnector(conn);
-                return true;
-            }
-            catch (SqlException ex)
-            {
-                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
-                CloseConnector(conn);
-                //System.Windows.MessageBox.Show(ex.ToString());
-                return false;
-            }
-            catch (Exception ex)
-            {
-                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
-                CloseConnector(conn);
-                //System.Windows.MessageBox.Show(ex.ToString());
-                return false;
-            }
-
         }
 
         public static List<List<object>> ExeAutoSqlWithRes(string sql)
@@ -608,6 +575,81 @@ namespace Prometheus.Models
 
             var ret = new List<List<object>>();
             var conn = GetAutoConnector();
+            try
+            {
+                if (conn == null)
+                    return ret;
+
+                var command = conn.CreateCommand();
+                command.CommandTimeout = 60;
+                command.CommandText = sql;
+                var sqlreader = command.ExecuteReader();
+                if (sqlreader.HasRows)
+                {
+
+                    while (sqlreader.Read())
+                    {
+                        var newline = new List<object>();
+                        for (var i = 0; i < sqlreader.FieldCount; i++)
+                        {
+                            newline.Add(sqlreader.GetValue(i));
+                        }
+                        ret.Add(newline);
+                    }
+                }
+
+                sqlreader.Close();
+                CloseConnector(conn);
+                return ret;
+            }
+            catch (SqlException ex)
+            {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                //System.Windows.MessageBox.Show(ex.ToString());
+                CloseConnector(conn);
+                ret.Clear();
+                return ret;
+            }
+            catch (Exception ex)
+            {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                //System.Windows.MessageBox.Show(ex.ToString());
+                CloseConnector(conn);
+                ret.Clear();
+                return ret;
+            }
+        }
+
+
+        private static SqlConnection GetFAIConnector()
+        {
+            var conn = new SqlConnection();
+            try
+            {
+                conn.ConnectionString = @"Server=wux-prod03\prod01;uid=OA_FAI_Reader;pwd=123_FAI_#;Database=eDMR;Connection Timeout=30;";
+                conn.Open();
+                return conn;
+            }
+            catch (SqlException ex)
+            {
+                logthdinfo("fail to connect to the FAI summary database:" + ex.Message);
+                //System.Windows.MessageBox.Show(ex.ToString());
+                return null;
+            }
+            catch (Exception ex)
+            {
+                logthdinfo("fail to connect to the FAI summary database" + ex.Message);
+                //System.Windows.MessageBox.Show(ex.ToString());
+                return null;
+            }
+        }
+
+        public static List<List<object>> ExeFAISqlWithRes(string sql)
+        {
+            //var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+
+            var ret = new List<List<object>>();
+            var conn = GetFAIConnector();
             try
             {
                 if (conn == null)

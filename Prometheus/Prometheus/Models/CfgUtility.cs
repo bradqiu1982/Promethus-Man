@@ -107,9 +107,12 @@ namespace Prometheus.Models
                 if (line.Contains(":::"))
                 {
                     var kvpair = line.Split(new string[] { ":::" }, StringSplitOptions.RemoveEmptyEntries);
-                    ret.Add(kvpair[0].Trim(), kvpair[1].Trim());
-                }
-            }
+                    if (!ret.ContainsKey(kvpair[0].Trim()))
+                    {
+                        ret.Add(kvpair[0].Trim(), kvpair[1].Trim());
+                    }
+                }//end if
+            }//end foreach
             return ret;
         }
     }

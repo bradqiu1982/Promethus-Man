@@ -716,9 +716,6 @@ else
                 if (confirm("Do you real want to delete this attachment?")) {
                     window.location.href = '/Issue/DeleteAttachment?issuekey=' + document.getElementById("HIssueKeyForDelete").value + '&filename=' + oBT
                 }
-                else {
-                    window.location.href = '/Issue/UpdateIssue?issuekey=' + document.getElementById("HIssueKeyForDelete").value
-                }
             }
         </script>
 
@@ -1227,7 +1224,7 @@ else
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="towhoLabel">Push Bug</h4>
+                    <h4 class="modal-title" id="towhoLabel">Push RMA</h4>
                 </div>
                 <div class="row"></div>
                 <div class="row col-lg-12">

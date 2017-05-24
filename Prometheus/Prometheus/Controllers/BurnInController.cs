@@ -1063,9 +1063,9 @@ namespace Prometheus.Controllers
                 var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key,this);
                 //var FirstEngineer = ProjectViewModels.RetrieveOneProject(vm[0].ProjectKey).FirstEngineer;
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
-                if (string.Compare("daly.li@finisar.com", updater, true) == 0
-                    || string.Compare("tony.lv@finisar.com", updater, true) == 0
-                    || string.Compare("tyler.zhang@finisar.com", updater, true) == 0)
+
+                var syscfgdict = CfgUtility.GetSysConfig(this);
+                if(syscfgdict["BITEAM"].ToUpper().Contains(updater.ToUpper()))
                 {
                     ViewBag.assigee = true;
                 }
@@ -1125,9 +1125,8 @@ namespace Prometheus.Controllers
                 var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key,this);
                 //var FirstEngineer = ProjectViewModels.RetrieveOneProject(vm[0].ProjectKey).FirstEngineer;
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
-                if (string.Compare("daly.li@finisar.com", updater, true) == 0
-                    || string.Compare("tony.lv@finisar.com", updater, true) == 0
-                    || string.Compare("tyler.zhang@finisar.com", updater, true) == 0)
+                var syscfgdict = CfgUtility.GetSysConfig(this);
+                if (syscfgdict["BITEAM"].ToUpper().Contains(updater.ToUpper()))
                 {
                     ViewBag.assigee = true;
                 }

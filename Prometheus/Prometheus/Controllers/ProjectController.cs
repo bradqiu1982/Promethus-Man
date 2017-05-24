@@ -4212,13 +4212,13 @@ namespace Prometheus.Controllers
                     validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
                     var toaddrs = new List<string>();
-                    toaddrs.Add("windy.ju@finisar.com");
-                    toaddrs.Add("daly.li@finisar.com");
-                    toaddrs.Add("tyler.zhang@finisar.com");
-                    toaddrs.Add("tony.lv@finisar.com");
-                    toaddrs.Add("Zhongxi.Yu@finisar.com");
-                    toaddrs.Add("Zhijun.Chen@finisar.com");
-                    //toaddrs.Add("brad.qiu@finisar.com");
+                    var syscfgdict = CfgUtility.GetSysConfig(this);
+                    var bimembs = syscfgdict["BITEAM"].Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var bm in bimembs)
+                    {
+                        toaddrs.Add(bm.ToUpper());
+                    }
+
                     EmailUtility.SendEmail(this,"WUXI NPI System - VCSEL WAFER YIELD WARNING", toaddrs, content1 + "\r\nWafer SN File: " + validatestr);
                     new System.Threading.ManualResetEvent(false).WaitOne(5000);
                 }
@@ -4773,7 +4773,8 @@ namespace Prometheus.Controllers
 
             //ExternalDataCollector.RefreshRMAData(this);
             //ExternalDataCollector.RefreshRELData(this);
-            ExternalDataCollector.RefreshNeoMAPData(this);
+            //ExternalDataCollector.RefreshNeoMAPData(this);
+            ExternalDataCollector.RefreshOBAFromDMR(this);
             //var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
             //foreach (var pjkey in pjkeylist)
             //{

@@ -434,7 +434,7 @@ namespace Prometheus.Models
 
                             if (DateTime.Parse(starttime) != vm.StartDate)
                             {
-                                CreateSystemIssues(failurelist);
+                                CreateSystemIssues(failurelist,ctrl);
                                 IssueViewModels.CloseBIIssueAutomaticlly(passlist);
                             }
                         }
@@ -557,7 +557,7 @@ namespace Prometheus.Models
 
         }
 
-        private static void CreateSystemIssues(List<BITestData> failurelist)
+        private static void CreateSystemIssues(List<BITestData> failurelist, Controller ctrl)
         {
             if (failurelist.Count > 0)
             {
@@ -571,7 +571,9 @@ namespace Prometheus.Models
                     vm.Priority = ISSUEPR.Major;
                     vm.DueDate = DateTime.Now.AddDays(7);
                     vm.ReportDate = item.TestTimeStamp;
-                    vm.Assignee = "DALY.LI@FINISAR.COM";
+
+                    var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+                    vm.Assignee = syscfgdict["BIADMIN"].ToUpper();
                     vm.Reporter = "System";
                     vm.Resolution = Resolute.Pending;
                     vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");

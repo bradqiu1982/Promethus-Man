@@ -4911,6 +4911,12 @@ namespace Prometheus.Controllers
             var ret = IssueViewModels.RetrieveIssueByIssueKey(key, this);
             if (ret != null)
             {
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                var defaultlytteam = UserGroupVM.RetreiveUserGroup(updater, UserGroupType.LYTGroup);
+                if (!string.IsNullOrEmpty(defaultlytteam))
+                {
+                    ViewBag.defaultlytteam = defaultlytteam;
+                }
                 return View(ret);
             }
             else
@@ -4957,11 +4963,13 @@ namespace Prometheus.Controllers
                 {
                     var comment = Request.Form["commentcontent"];
                     var addrs = Request.Form["RPeopleAddr"].Split(new string[] {";"},StringSplitOptions.RemoveEmptyEntries);
+
+
+
+
                     var addrlist = new List<string>();
                     addrlist.AddRange(addrs);
-
                     SendLYTEvent(vm, comment, addrlist);
-
                     var dict = new RouteValueDictionary();
                     dict.Add("ProjectKey", vm.ProjectKey);
                     return RedirectToAction("ProjectDetail", "Project", dict);
@@ -4976,6 +4984,40 @@ namespace Prometheus.Controllers
             return RedirectToAction("ViewAll", "Project");
         }
 
+        private static void CreateLYTSubTask(string presum, string sum, string pjkey, string parentkey, string analyser, string reporter, DateTime duedate)
+        {
+            var vm = new IssueViewModels();
+            vm.ProjectKey = pjkey;
+            vm.IssueKey = IssueViewModels.GetUniqKey();
+            vm.ParentIssueKey = parentkey;
+            vm.IssueType = ISSUETP.Task;
+            vm.Summary = presum + sum;
+            vm.Priority = ISSUEPR.Major;
+            vm.DueDate = duedate;
+            vm.ReportDate = DateTime.Now;
+            vm.Assignee = analyser;
+            vm.Reporter = reporter;
+            vm.Resolution = Resolute.Pending;
+            vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+            vm.StoreSubIssue();
+        }
+        private static void CreateLYTTask(string presum, string sum, string pjkey, string parentkey, string analyser, string reporter, DateTime duedate)
+        {
+            var vm = new IssueViewModels();
+            vm.ProjectKey = pjkey;
+            vm.IssueKey = IssueViewModels.GetUniqKey();
+            vm.ParentIssueKey = parentkey;
+            vm.IssueType = ISSUETP.Task;
+            vm.Summary = presum + sum;
+            vm.Priority = ISSUEPR.Major;
+            vm.DueDate = duedate;
+            vm.ReportDate = DateTime.Now;
+            vm.Assignee = analyser;
+            vm.Reporter = reporter;
+            vm.Resolution = Resolute.Pending;
+            vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+            vm.StoreSubIssue();
+        }
 
         public ActionResult CloseResultComment(string ErrorKey, string CommentType, string Date)
         {

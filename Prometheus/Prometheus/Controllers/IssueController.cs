@@ -2450,6 +2450,12 @@ namespace Prometheus.Controllers
                 //ProjectEvent.AssignIssueEvent(originaldata.ProjectKey, updater, vm.Assignee, originaldata.Summary, originaldata.IssueKey);
                 vm.Summary = originaldata.Summary;
                 SendTaskEvent(vm, "asigned to you", updater, vm.Assignee);
+
+                foreach (var subissue in originaldata.SubIssues)
+                {
+                    subissue.Assignee = vm.Assignee;
+                    subissue.UpdateIssue();
+                }
             }
 
             if (string.Compare(originaldata.Resolution, vm.Resolution, true) != 0)

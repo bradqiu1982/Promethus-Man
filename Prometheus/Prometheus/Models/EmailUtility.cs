@@ -53,7 +53,18 @@ namespace Prometheus.Models
                         continue;
                     try
                     {
-                        message.To.Add(item);
+                        if (item.Contains(";"))
+                        {
+                            var ts = item.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+                            foreach (var t in ts)
+                            {
+                                message.To.Add(t);
+                            }
+                        }
+                        else
+                        {
+                            message.To.Add(item);
+                        }
                     }
                     catch (Exception e) { logthdinfo("Address exception: " + e.Message); }
                 }

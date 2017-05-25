@@ -14,6 +14,7 @@ namespace Prometheus.Models
         public static string BLOG = "BLOG";
         public static string DEBUG = "DEBUG";
     }
+
     public class ShareDocVM
     {
         public string BookerName { set; get; }
@@ -61,24 +62,50 @@ namespace Prometheus.Models
 
         public string DocURL { set; get; }
 
-        public static void ShareDoc(string DOCPJK, string DOCType, string DOCKey, string DOCTag, string DOCCreator, string DOCDate)
+        public string DocID { set; get; }
+
+        public string BACKLink { set; get; }
+
+
+        private static string UpdateDocID(string DOCPJK, string DOCKey)
         {
-            var sql = "select DOCPJK,DOCKey from ShareDoc where DOCPJK='<DOCPJK>' and DOCKey=N'<DOCKey>'";
+            var docid = IssueViewModels.GetUniqKey();
+            var sql = "Update ShareDoc set APVal1 = '<DocID>' where  DOCPJK = '<DOCPJK>' and DOCKey = N'<DOCKey>'";
+            sql = sql.Replace("<DocID>", docid).Replace("<DOCPJK>", DOCPJK).Replace("<DOCKey>", DOCKey);
+            DBUtility.ExeLocalSqlNoRes(sql);
+            sql = "Update UserLearn set APVal1 = '<DocID>' where  DOCPJK = '<DOCPJK>' and DOCKey = N'<DOCKey>'";
+            sql = sql.Replace("<DocID>", docid).Replace("<DOCPJK>", DOCPJK).Replace("<DOCKey>", DOCKey);
+            DBUtility.ExeLocalSqlNoRes(sql);
+            return docid;
+        }
+
+        public static string ShareDoc(string DOCPJK, string DOCType, string DOCKey, string DOCTag, string DOCCreator, string DOCDate,string BackLink)
+        {
+            var sql = "select DOCID from ShareDoc where DOCPJK='<DOCPJK>' and DOCKey=N'<DOCKey>'";
             sql = sql.Replace("<DOCPJK>", DOCPJK).Replace("<DOCKey>", DOCKey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
             {
-                return;
+                var docid1 =  Convert.ToString(dbret[0][0]);
+                if (string.IsNullOrEmpty(docid1))
+                {
+                    docid1 = UpdateDocID(DOCPJK,DOCKey);
+                }
+                return docid1;
             }
 
-            sql = "insert into ShareDoc(DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate) values('<DOCPJK>','<DOCType>',N'<DOCKey>','<DOCTag>','<DOCCreator>','<DOCDate>')";
+            var docid = IssueViewModels.GetUniqKey();
+
+            sql = "insert into ShareDoc(DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,APVal1,BackLink) values('<DOCPJK>','<DOCType>',N'<DOCKey>','<DOCTag>','<DOCCreator>','<DOCDate>','<DOCID>','<BackLink>')";
             sql = sql.Replace("<DOCPJK>", DOCPJK).Replace("<DOCType>", DOCType)
                 .Replace("<DOCKey>", DOCKey).Replace("<DOCTag>", DOCTag)
-                .Replace("<DOCCreator>", DOCCreator).Replace("<DOCDate>", DOCDate);
+                .Replace("<DOCCreator>", DOCCreator).Replace("<DOCDate>", DOCDate)
+                .Replace("<DOCID>", docid).Replace("<BackLink>", BackLink);
             DBUtility.ExeLocalSqlNoRes(sql);
+            return docid;
         }
 
-        public static void PushDoc(string BookerName, string DOCPJK, string DOCType, string DOCKey, string DOCTag, string DOCCreator, string DOCDate,string DOCPusher)
+        public static void PushDoc(string BookerName, string DOCPJK, string DOCType, string DOCKey, string DOCTag, string DOCCreator, string DOCDate,string DOCPusher,string DOCID,string BackLink)
         {
             var sql = "select DOCPJK,DOCKey from UserLearn where UserName = '<BookerName>' and DOCPJK='<DOCPJK>' and DOCKey=N'<DOCKey>'";
             sql = sql.Replace("<BookerName>", BookerName).Replace("<DOCPJK>", DOCPJK).Replace("<DOCKey>", DOCKey);
@@ -88,10 +115,11 @@ namespace Prometheus.Models
                 return;
             }
 
-            sql = "insert into UserLearn(UserName,DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,DOCPusher) values('<BookerName>','<DOCPJK>','<DOCType>',N'<DOCKey>','<DOCTag>','<DOCCreator>','<DOCDate>','<DOCPusher>')";
+            sql = "insert into UserLearn(UserName,DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,DOCPusher,APVal1,BackLink) values('<BookerName>','<DOCPJK>','<DOCType>',N'<DOCKey>','<DOCTag>','<DOCCreator>','<DOCDate>','<DOCPusher>','<DOCID>','<BackLink>')";
             sql = sql.Replace("<BookerName>", BookerName).Replace("<DOCPJK>", DOCPJK).Replace("<DOCType>", DOCType)
                 .Replace("<DOCKey>", DOCKey).Replace("<DOCTag>", DOCTag)
-                .Replace("<DOCCreator>", DOCCreator).Replace("<DOCDate>", DOCDate).Replace("<DOCPusher>", DOCPusher);
+                .Replace("<DOCCreator>", DOCCreator).Replace("<DOCDate>", DOCDate).Replace("<DOCPusher>", DOCPusher)
+                .Replace("<DOCID>", DOCID).Replace("<BackLink>", BackLink);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
@@ -163,7 +191,7 @@ namespace Prometheus.Models
 
         public static void IPushDoc(string DOCPJK, string DOCKey, string ToWho,string Pusher, Controller ctrl,string reason="")
         {
-            var sql = "select DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,DOCFavorTimes from ShareDoc where DOCPJK = '<DOCPJK>' and DOCKey = N'<DOCKey>'";
+            var sql = "select DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,DOCFavorTimes,APVal1,BackLink from ShareDoc where DOCPJK = '<DOCPJK>' and DOCKey = N'<DOCKey>'";
             sql = sql.Replace("<DOCPJK>", DOCPJK).Replace("<DOCKey>", DOCKey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
@@ -176,6 +204,8 @@ namespace Prometheus.Models
                 tempvm.DOCCreator = Convert.ToString(line[4]);
                 tempvm.DOCDate = DateTime.Parse(Convert.ToString(line[5]));
                 tempvm.DOCFavorTimes = Convert.ToInt32(line[6]);
+                tempvm.DocID = Convert.ToString(line[7]);
+                tempvm.BACKLink = Convert.ToString(line[8]);
 
                 if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
                 {
@@ -202,7 +232,7 @@ namespace Prometheus.Models
                     tempvm.DocURL = "/userfiles/docs/" + datestr + "/" + tempvm.DOCKey;
                 }
 
-                PushDoc(ToWho, tempvm.DOCPJK, tempvm.DOCType, tempvm.DOCKey, tempvm.DOCTag, tempvm.DOCCreator, tempvm.DOCDate.ToString(), Pusher);
+                PushDoc(ToWho, tempvm.DOCPJK, tempvm.DOCType, tempvm.DOCKey, tempvm.DOCTag, tempvm.DOCCreator, tempvm.DOCDate.ToString(), Pusher,tempvm.DocID,tempvm.BACKLink);
 
                 if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
                 {
@@ -266,7 +296,7 @@ namespace Prometheus.Models
         public static List<ShareDocVM> RetrieveMyLearn(string UserName, Controller ctrl)
         {
             var ret = new List<ShareDocVM>();
-            var sql = "select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,a.DOCDate,a.DOCPusher,a.DOCFavor,b.DOCFavorTimes from UserLearn a left join ShareDoc b ON a.DOCKey = b.DOCKey where a.UserName= '<UserName>' and a.DOCType <> '<DOCType>' order by a.DOCDate DESC";
+            var sql = "select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,a.DOCDate,a.DOCPusher,a.DOCFavor,b.DOCFavorTimes,b.APVal1,a.BackLink from UserLearn a left join ShareDoc b ON a.DOCKey = b.DOCKey where a.UserName= '<UserName>' and a.DOCType <> '<DOCType>' order by a.DOCDate DESC";
             sql = sql.Replace("<UserName>", UserName).Replace("<DOCType>", ShareDocType.BLOG);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
@@ -282,6 +312,8 @@ namespace Prometheus.Models
                 tempvm.DOCPusher = Convert.ToString(line[6]);
                 tempvm.DOCFavor = Convert.ToString(line[7]);
                 tempvm.DOCFavorTimes = Convert.ToInt32(line[8]);
+                tempvm.DocID = Convert.ToString(line[9]);
+                tempvm.BACKLink = Convert.ToString(line[10]);
 
                 if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
                 {
@@ -303,13 +335,18 @@ namespace Prometheus.Models
                 else if (string.Compare(tempvm.DOCType, ShareDocType.DOCUMENT, true) == 0)
                 {
                     tempvm.Summary = tempvm.DOCKey;
-                    //var tempstrs = tempvm.Summary.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
-                    //var datestr = tempstrs[tempstrs.Length - 1].Substring(0,8);
-                    //tempvm.DocURL = "/userfiles/docs/" + datestr + "/" + tempvm.DOCKey;
                     tempvm.DocURL = "/User/WebDoc?DocKey=" + tempvm.DOCKey + "&Creator=" + tempvm.DOCCreator;
                 }
 
                 ret.Add(tempvm);
+            }
+
+            foreach (var doc in ret)
+            {
+                if (string.IsNullOrEmpty(doc.DocID))
+                {
+                    doc.DocID = UpdateDocID(doc.DOCPJK, doc.DOCKey);
+                }
             }
 
             var bloglist = RetrieveMyLearnBlog(UserName,ctrl);
@@ -367,7 +404,7 @@ namespace Prometheus.Models
         private static List<ShareDocVM> RetrieveMyLearnBlog(string UserName, Controller ctrl)
         {
             var ret = new List<ShareDocVM>();
-            var sql = "select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,a.DOCDate,a.DOCPusher,a.DOCFavor from UserLearn a where a.UserName= '<UserName>' and a.DOCType = '<DOCType>' order by a.DOCDate DESC";
+            var sql = "select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,a.DOCDate,a.DOCPusher,a.DOCFavor,a.APVal1,a.BackLink from UserLearn a where a.UserName= '<UserName>' and a.DOCType = '<DOCType>' order by a.DOCDate DESC";
             sql = sql.Replace("<UserName>", UserName).Replace("<DOCType>", ShareDocType.BLOG);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
@@ -383,6 +420,8 @@ namespace Prometheus.Models
                 tempvm.DOCPusher = Convert.ToString(line[6]);
                 tempvm.DOCFavor = Convert.ToString(line[7]);
                 tempvm.DOCFavorTimes = RetrieveBlogFavorTimes(tempvm.DOCKey, tempvm.DOCCreator);
+                tempvm.DocID = Convert.ToString(line[8]);
+                tempvm.BACKLink = Convert.ToString(line[9]);
 
                 var blog = UserBlogVM.RetrieveBlogDoc(tempvm.DOCKey,ctrl);
                 tempvm.Summary = blog.Title;
@@ -391,13 +430,21 @@ namespace Prometheus.Models
                 ret.Add(tempvm);
             }
 
+            foreach (var doc in ret)
+            {
+                if (string.IsNullOrEmpty(doc.DocID))
+                {
+                    doc.DocID = UpdateDocID(doc.DOCPJK, doc.DOCKey);
+                }
+            }
+
             return ret;
         }
 
         public static List<ShareDocVM> RetrieveMyShare(string UserName,Controller ctrl)
         {
             var ret = new List<ShareDocVM>();
-            var sql = "select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,a.DOCDate,a.DOCFavorTimes from ShareDoc a  where a.DOCCreator= '<UserName>' order by a.DOCDate DESC";
+            var sql = "select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,a.DOCDate,a.DOCFavorTimes,a.APVal1,a.BackLink from ShareDoc a  where a.DOCCreator= '<UserName>' order by a.DOCDate DESC";
             sql = sql.Replace("<UserName>", UserName);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
@@ -411,6 +458,8 @@ namespace Prometheus.Models
                 tempvm.DOCCreator = Convert.ToString(line[4]);
                 tempvm.DOCDate = DateTime.Parse(Convert.ToString(line[5]));
                 tempvm.DOCFavorTimes = Convert.ToInt32(line[6]);
+                tempvm.DocID = Convert.ToString(line[7]);
+                tempvm.BACKLink = Convert.ToString(line[8]);
 
                 if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
                 {
@@ -440,10 +489,17 @@ namespace Prometheus.Models
 
                 ret.Add(tempvm);
             }
+
+            foreach (var doc in ret)
+            {
+                if (string.IsNullOrEmpty(doc.DocID))
+                {
+                    doc.DocID = UpdateDocID(doc.DOCPJK, doc.DOCKey);
+                }
+            }
+
             return ret;
         }
-
-
 
         public static List<ShareDocVM> RetrieveYesterdayDocs(Controller ctrl)
         {
@@ -452,7 +508,7 @@ namespace Prometheus.Models
             var starttime = tempdate + " 00:00:01";
             var endtime = tempdate + " 23:59:59";
 
-            var sql = "select DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,DOCFavorTimes from ShareDoc where DOCDate >= '<starttime>' and DOCDate <= '<endtime>'";
+            var sql = "select DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,DOCFavorTimes,APVal1,BackLink from ShareDoc where DOCDate >= '<starttime>' and DOCDate <= '<endtime>'";
             sql = sql.Replace("<starttime>", starttime).Replace("<endtime>",endtime);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
@@ -465,6 +521,8 @@ namespace Prometheus.Models
                 tempvm.DOCCreator = Convert.ToString(line[4]);
                 tempvm.DOCDate = DateTime.Parse(Convert.ToString(line[5]));
                 tempvm.DOCFavorTimes = Convert.ToInt32(line[6]);
+                tempvm.DocID = Convert.ToString(line[7]);
+                tempvm.BACKLink = Convert.ToString(line[8]);
 
                 if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
                 {
@@ -499,7 +557,7 @@ namespace Prometheus.Models
         public static List<ShareDocVM> RetrieveAllSharedDocs(Controller ctrl)
         {
             var ret = new List<ShareDocVM>();
-            var sql = "select DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,DOCFavorTimes from ShareDoc order by DOCDate";
+            var sql = "select DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,DOCFavorTimes,APVal1,BackLink from ShareDoc order by DOCDate";
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
             {
@@ -511,6 +569,8 @@ namespace Prometheus.Models
                 tempvm.DOCCreator = Convert.ToString(line[4]);
                 tempvm.DOCDate = DateTime.Parse(Convert.ToString(line[5]));
                 tempvm.DOCFavorTimes = Convert.ToInt32(line[6]);
+                tempvm.DocID = Convert.ToString(line[7]);
+                tempvm.BACKLink = Convert.ToString(line[8]);
 
                 if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
                 {
@@ -553,7 +613,7 @@ namespace Prometheus.Models
                 return;
 
             var ret = new List<ShareDocVM>();
-            sql = "select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,a.DOCDate,b.DOCPusher,b.DOCFavor,a.DOCFavorTimes from ShareDoc a left join UserLearn b ON a.DOCKey = b.DOCKey "
+            sql = "select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,a.DOCDate,b.DOCPusher,b.DOCFavor,a.DOCFavorTimes,a.APVal1,a.BackLink from ShareDoc a left join UserLearn b ON a.DOCKey = b.DOCKey "
                 + " where  a.DOCKey = N'<DOCKey>' and a.DOCCreator = '<DOCCreator>'  and b.UserName='<UserName>'";
             sql = sql.Replace("<DOCKey>", DOCKey).Replace("<DOCCreator>", DOCCreator).Replace("<UserName>",updater);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
@@ -569,6 +629,8 @@ namespace Prometheus.Models
                 tempvm.DOCPusher = Convert.ToString(line[6]);
                 tempvm.DOCFavor = Convert.ToString(line[7]);
                 tempvm.DOCFavorTimes = Convert.ToInt32(line[8]);
+                tempvm.DocID = Convert.ToString(line[9]);
+                tempvm.BACKLink = Convert.ToString(line[10]);
                 ret.Add(tempvm);
             }
 
@@ -703,7 +765,7 @@ namespace Prometheus.Models
 
                 if (push)
                 {
-                    PushDoc(username, doc.DOCPJK, doc.DOCType, doc.DOCKey, doc.DOCTag, doc.DOCCreator, doc.DOCDate.ToString(), "");
+                    PushDoc(username, doc.DOCPJK, doc.DOCType, doc.DOCKey, doc.DOCTag, doc.DOCCreator, doc.DOCDate.ToString(), "",doc.DocID,doc.BACKLink);
                 }
             }//end foreach
         }
@@ -731,7 +793,7 @@ namespace Prometheus.Models
 
                     if (push)
                     {
-                        PushDoc(u.BookerName, doc.DOCPJK, doc.DOCType, doc.DOCKey, doc.DOCTag, doc.DOCCreator, doc.DOCDate.ToString(), "");
+                        PushDoc(u.BookerName, doc.DOCPJK, doc.DOCType, doc.DOCKey, doc.DOCTag, doc.DOCCreator, doc.DOCDate.ToString(), "",doc.DocID,doc.BACKLink);
 
                         if (string.Compare(doc.DOCType, ShareDocType.ISSUE, true) == 0)
                         {

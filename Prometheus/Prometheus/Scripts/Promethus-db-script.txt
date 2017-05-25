@@ -65,7 +65,8 @@ CREATE TABLE [dbo].[UserLearn] (
     [DOCDate]    DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
     [APVal1]     NVARCHAR (200) DEFAULT ('') NOT NULL,
     [APVal2]     NVARCHAR (200) DEFAULT ('') NOT NULL,
-    [APVal3]     DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+    [APVal3]     DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[BackLink]     NVARCHAR (MAX) DEFAULT ('')  NOT NULL
 );
 
 CREATE TABLE [dbo].[UserBlog] (
@@ -102,7 +103,8 @@ CREATE TABLE [dbo].[ShareDoc] (
     [DOCDate]       DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
     [APVal1]        NVARCHAR (200) DEFAULT ('') NOT NULL,
     [APVal2]        NVARCHAR (200) DEFAULT ('') NOT NULL,
-    [APVal3]        DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+    [APVal3]        DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[BackLink]     NVARCHAR (MAX) DEFAULT ('')  NOT NULL
 );
 
 CREATE TABLE [dbo].[ProjectTestData] (

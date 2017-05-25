@@ -64,6 +64,8 @@ namespace Prometheus.Models
             UpdateUserDailyRank(username.ToUpper(), rank);
         }
 
+
+
         public static string RetrieveTotalRank(string username)
         {
             var sql = "select TotalRank from UserTable where UserName = N'<UserName>'";

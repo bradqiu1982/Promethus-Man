@@ -5084,7 +5084,7 @@ namespace Prometheus.Controllers
             }
 
             var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(ErrorKey,this);
-            ShareDocVM.ShareDoc(debugtree[0].ProjectKey, ShareDocType.DEBUG, debugtree[0].ErrorKey, debugtree[0].OrignalCode, updater, DateTime.Now.ToString());
+            ShareDocVM.ShareDoc(debugtree[0].ProjectKey, ShareDocType.DEBUG, debugtree[0].ErrorKey, debugtree[0].OrignalCode, updater, DateTime.Now.ToString(), "/Project/UpdateProjectError?ErrorKey=" + debugtree[0].ErrorKey);
 
             var whoes = ToWho.Split(new string[] { ";", ",", " " }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var w in whoes)

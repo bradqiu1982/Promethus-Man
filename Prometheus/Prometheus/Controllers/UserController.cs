@@ -1261,12 +1261,12 @@ namespace Prometheus.Controllers
 
             var vm = UserBlogVM.RetrieveBlogDoc(DOCKey,this);
 
-            ShareDocVM.ShareDoc("ALL", ShareDocType.BLOG, DOCKey, vm.Tag, vm.UserName, vm.CreateDate.ToString());
+            var docid = ShareDocVM.ShareDoc("ALL", ShareDocType.BLOG, DOCKey, vm.Tag, vm.UserName, vm.CreateDate.ToString(),vm.DocURL);
 
             var whoes = ToWho.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var w in whoes)
             {
-                ShareDocVM.PushDoc(w.Trim().ToUpper(), "ALL", ShareDocType.BLOG, DOCKey, vm.Tag, vm.UserName, DateTime.Now.ToString(), "");
+                ShareDocVM.PushDoc(w.Trim().ToUpper(), "ALL", ShareDocType.BLOG, DOCKey, vm.Tag, vm.UserName, DateTime.Now.ToString(), "",docid,vm.DocURL);
                 ShareDocVM.SendPushDocEvent("a new document about " + vm.Tag, vm.DocURL, ToWho, updater.ToUpper(), this, tempreason);
             }
 
@@ -1366,11 +1366,11 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(reportgroup))
                 {
 
-                    ShareDocVM.ShareDoc("ALL", ShareDocType.BLOG, blog.DocKey, blog.Tag, blog.UserName, blog.CreateDate.ToString());
+                    var docid = ShareDocVM.ShareDoc("ALL", ShareDocType.BLOG, blog.DocKey, blog.Tag, blog.UserName, blog.CreateDate.ToString(),blog.DocURL);
                     var mbs = reportgroup.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (var mb in mbs)
                     {
-                        ShareDocVM.PushDoc(mb.ToUpper(), "ALL", ShareDocType.BLOG, blog.DocKey, blog.Tag, blog.UserName, DateTime.Now.ToString(), "");
+                        ShareDocVM.PushDoc(mb.ToUpper(), "ALL", ShareDocType.BLOG, blog.DocKey, blog.Tag, blog.UserName, DateTime.Now.ToString(), "",docid,blog.DocURL);
                     }
                 }
             }
@@ -1380,11 +1380,11 @@ namespace Prometheus.Controllers
                 var workgroup = UserGroupVM.RetreiveUserGroup(updater, UserGroupType.WorkGroup);
                 if (!string.IsNullOrEmpty(workgroup))
                 {
-                    ShareDocVM.ShareDoc("ALL", ShareDocType.BLOG, blog.DocKey, blog.Tag, blog.UserName, blog.CreateDate.ToString());
+                    var docid = ShareDocVM.ShareDoc("ALL", ShareDocType.BLOG, blog.DocKey, blog.Tag, blog.UserName, blog.CreateDate.ToString(),blog.DocURL);
                     var mbs = workgroup.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (var mb in mbs)
                     {
-                        ShareDocVM.PushDoc(mb.ToUpper(), "ALL", ShareDocType.BLOG, blog.DocKey, blog.Tag, blog.UserName, DateTime.Now.ToString(), "");
+                        ShareDocVM.PushDoc(mb.ToUpper(), "ALL", ShareDocType.BLOG, blog.DocKey, blog.Tag, blog.UserName, DateTime.Now.ToString(), "",docid,blog.DocURL);
                     }
                 }
             }

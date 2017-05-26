@@ -1147,7 +1147,7 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(DOCKey)
                 && !string.IsNullOrEmpty(DOCCreator))
             {
-                ShareDocVM.LikeDoc(DOCKey, DOCCreator, updater);
+                ShareDocVM.LikeDoc(DOCKey, DOCCreator, updater,this);
             }
             return RedirectToAction("ILearn", "User");
         }

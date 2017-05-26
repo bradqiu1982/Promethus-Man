@@ -235,6 +235,7 @@
     <Compile Include="Models\UserCacheVM.cs" />
     <Compile Include="Models\UserGroupVM.cs" />
     <Compile Include="Models\UserIssueViewModels.cs" />
+    <Compile Include="Models\UserKPIVM.cs" />
     <Compile Include="Models\UserMatrixVM.cs" />
     <Compile Include="Models\UserRankViewModel.cs" />
     <Compile Include="Models\UserViewModels.cs" />

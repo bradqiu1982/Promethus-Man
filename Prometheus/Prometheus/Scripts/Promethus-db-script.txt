@@ -35,12 +35,29 @@ CREATE TABLE [dbo].[UserTable] (
     [APVal3]     DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
 );
 
+
+
 CREATE TABLE [dbo].[UserRank] (
     [UserName]   NVARCHAR (200) NOT NULL,
     [UpdateDate] DATETIME       NOT NULL,
     [Rank]       NVARCHAR (50)  DEFAULT ('0') NOT NULL,
     [APVal1]     NVARCHAR (50)  DEFAULT ('') NOT NULL,
     [APVal2]     NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [APVal3]     DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+);
+
+
+CREATE TABLE [dbo].[UserKPIVM] (
+	[RankKey]   NVARCHAR (200) NOT NULL,
+	[UserName]   NVARCHAR (200) NOT NULL,
+	[RankType]   NVARCHAR (200) NOT NULL,
+    [Summary]   NVARCHAR (MAX) NOT NULL,
+	[BackLink]   NVARCHAR (MAX) NOT NULL,
+	[Rank]  INT            DEFAULT ((0)) NOT NULL,
+    [ADMIRERank]   INT            DEFAULT ((0)) NOT NULL,
+    [UpdateTime] DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+    [APVal1]     NVARCHAR (200)  DEFAULT ('') NOT NULL,
+    [APVal2]     NVARCHAR (MAX)  DEFAULT ('') NOT NULL,
     [APVal3]     DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
 );
 

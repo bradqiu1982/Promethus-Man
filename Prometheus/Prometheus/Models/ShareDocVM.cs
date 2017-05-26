@@ -544,9 +544,10 @@ namespace Prometheus.Models
                 else
                 {
                     tempvm.Summary = tempvm.DOCKey;
-                    var tempstrs = tempvm.Summary.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
-                    var datestr = tempstrs[tempstrs.Length - 1].Substring(0, 8);
-                    tempvm.DocURL = "/userfiles/docs/" + datestr + "/" + tempvm.DOCKey;
+                    //var tempstrs = tempvm.Summary.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+                    //var datestr = tempstrs[tempstrs.Length - 1].Substring(0, 8);
+                    //tempvm.DocURL = "/userfiles/docs/" + datestr + "/" + tempvm.DOCKey;
+                    tempvm.DocURL = "/User/WebDoc?DocKey=" + tempvm.DOCKey + "&Creator=" + tempvm.DOCCreator;
                 }
 
                 ret.Add(tempvm);
@@ -592,9 +593,10 @@ namespace Prometheus.Models
                 else
                 {
                     tempvm.Summary = tempvm.DOCKey;
-                    var tempstrs = tempvm.Summary.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
-                    var datestr = tempstrs[tempstrs.Length - 1].Substring(0, 8);
-                    tempvm.DocURL = "/userfiles/docs/" + datestr + "/" + tempvm.DOCKey;
+                    //var tempstrs = tempvm.Summary.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+                    //var datestr = tempstrs[tempstrs.Length - 1].Substring(0, 8);
+                    //tempvm.DocURL = "/userfiles/docs/" + datestr + "/" + tempvm.DOCKey;
+                    tempvm.DocURL = "/User/WebDoc?DocKey=" + tempvm.DOCKey + "&Creator=" + tempvm.DOCCreator;
                 }
 
                 ret.Add(tempvm);
@@ -602,7 +604,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static void LikeDoc(string DOCKey,string DOCCreator, string updater)
+        public static void LikeDoc(string DOCKey,string DOCCreator, string updater,Controller ctrl)
         {
             var sql = "select DOCFavor from UserLearn where DOCKey = N'<DOCKey>' and DOCCreator = '<DOCCreator>' and UserName = '<UserName>'";
             sql = sql.Replace("<DOCKey>", DOCKey).Replace("<DOCCreator>", DOCCreator).Replace("<UserName>", updater);
@@ -641,12 +643,55 @@ namespace Prometheus.Models
                 DBUtility.ExeLocalSqlNoRes(sql1);
             }
 
-            UserRankViewModel.UpdateUserRank(DOCCreator, 3);
 
             var sql2 = "Update UserLearn set DOCFavor='LIKE' where DOCKey = N'<DOCKey>' and DOCCreator = '<DOCCreator>' and UserName='<UserName>'";
             sql2 = sql2.Replace("<DOCKey>", DOCKey).Replace("<DOCCreator>", DOCCreator).Replace("<UserName>", updater);
             DBUtility.ExeLocalSqlNoRes(sql2);
 
+            if (ret.Count > 0)
+            {
+                if (string.Compare(ret[0].DOCType, ShareDocType.ISSUE, true) == 0)
+                {
+                    var issue = IssueViewModels.RetrieveIssueByIssueKey(ret[0].DOCKey, ctrl);
+                    if (issue != null)
+                    {
+                        var Summary = issue.Summary;
+                        var DocURL = "/Issue/UpdateIssue?issuekey=" + ret[0].DOCKey;
+                        UserKPIVM.AddUserDailyRank(ret[0].DOCKey, issue.Assignee, UserRankType.VOTE, "Like your task analyse: " + Summary, DocURL, 1);
+                    }
+                }
+                else if (string.Compare(ret[0].DOCType, ShareDocType.DEBUG, true) == 0)
+                {
+                    var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(ret[0].DOCKey, ctrl);
+                    var Summary = debugtree[0].ProjectKey + "-" + debugtree[0].OrignalCode;
+                    var DocURL = "/Project/UpdateProjectError?ErrorKey=" + ret[0].DOCKey;
+
+                    UserKPIVM.AddUserDailyRank(ret[0].DOCKey, ret[0].DOCCreator, UserRankType.VOTE, "Like your Debug Tree analyse: " + Summary, DocURL, 1);
+                }
+                else if (string.Compare(ret[0].DOCType, ShareDocType.DOCUMENT, true) == 0)
+                {
+                    var Summary = ret[0].DOCKey;
+                    if (!UserKPIVM.ValueableAttach(Summary, ctrl))
+                        return;
+
+                    var DocURL = "/User/WebDoc?DocKey=" + ret[0].DOCKey + "&Creator=" + ret[0].DOCCreator;
+                    if (!string.IsNullOrEmpty(ret[0].BACKLink))
+                    {
+                        UserKPIVM.AddUserDailyRank(ret[0].DocID, ret[0].DOCCreator, UserRankType.VOTE, "Like your technical document: " + Summary, ret[0].BACKLink, 1);
+                    }
+                    else
+                    {
+                        UserKPIVM.AddUserDailyRank(ret[0].DocID, ret[0].DOCCreator, UserRankType.VOTE, "Like your technical document: " + Summary, DocURL, 1);
+                    }
+
+                }
+                else if (string.Compare(ret[0].DOCType, ShareDocType.BLOG, true) == 0)
+                {
+                    var vm = UserBlogVM.RetrieveBlogDoc(ret[0].DOCKey, ctrl);
+                    var DocURL = "/User/WebDoc?DocKey=" + ret[0].DOCKey;
+                    UserKPIVM.AddUserDailyRank(ret[0].DOCKey, ret[0].DOCCreator, UserRankType.VOTE, "Like your blog: " + vm.Title, DocURL, 1);
+                }
+            }
                 
         }
 

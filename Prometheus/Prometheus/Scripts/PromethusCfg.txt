@@ -15,6 +15,7 @@ OBADEFAULTPJ:::PQE
 RELDEFAULTPJ:::RELIABILITY
 BIADMIN:::daly.li@finisar.com
 BITEAM:::daly.li@finisar.com;tyler.zhang@finisar.com;tony.lv@finisar.com;windy.ju@finisar.com;Zhongxi.Yu@finisar.com;Zhijun.Chen@finisar.com
+VALUEABLEATTACH:::PDF;DOCX;DOC;XLS;XLSX;XLSM;PPTX;PPT;ODP;ODT;ODS;WPS
 
 OBA--PARA-10G OE:::Nevin.Niu
 OBA--PARA-25G OE:::Bright.Zhang

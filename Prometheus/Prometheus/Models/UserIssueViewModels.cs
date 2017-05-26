@@ -89,7 +89,7 @@ namespace Prometheus.Models
 
         private static void RankTrend(Controller ctrl, UserActionTrend uservm, string username, int month)
         {
-            uservm.TotalRank = UserRankViewModel.RetrieveTotalRank(username.ToUpper());
+            uservm.TotalRank = UserKPIVM.RetrieveTotalRank(username.ToUpper());
 
             var timeranklist = UserRankViewModel.RetrieveRankByMonth(username.ToUpper(), month);
 

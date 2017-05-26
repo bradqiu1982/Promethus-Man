@@ -14,23 +14,23 @@ namespace Prometheus.Models
     public class UserRankViewModel
     {
 
-        private static void UpdateUserTotalRank(string username, int rank)
-        {
-            var sql = "select TotalRank from UserTable where UserName = N'<UserName>'";
-            sql = sql.Replace("<UserName>", username);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
-            if (dbret.Count > 0)
-            {
-                var temprank = 0;
-                try { temprank = Convert.ToInt32(Convert.ToString(dbret[0][0])); }
-                catch (Exception ex) { temprank = 0; }
-                temprank = temprank + rank;
+        //private static void UpdateUserTotalRank(string username, int rank)
+        //{
+        //    var sql = "select TotalRank from UserTable where UserName = N'<UserName>'";
+        //    sql = sql.Replace("<UserName>", username);
+        //    var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
+        //    if (dbret.Count > 0)
+        //    {
+        //        var temprank = 0;
+        //        try { temprank = Convert.ToInt32(Convert.ToString(dbret[0][0])); }
+        //        catch (Exception ex) { temprank = 0; }
+        //        temprank = temprank + rank;
 
-                sql = "Update UserTable set TotalRank = '<TotalRank>' where  UserName = N'<UserName>'";
-                sql = sql.Replace("<UserName>", username).Replace("<TotalRank>", Convert.ToString(temprank));
-                DBUtility.ExeLocalSqlNoRes(sql);
-            }
-        }
+        //        sql = "Update UserTable set TotalRank = '<TotalRank>' where  UserName = N'<UserName>'";
+        //        sql = sql.Replace("<UserName>", username).Replace("<TotalRank>", Convert.ToString(temprank));
+        //        DBUtility.ExeLocalSqlNoRes(sql);
+        //    }
+        //}
 
         private static void UpdateUserDailyRank(string username, int rank)
         {
@@ -60,29 +60,29 @@ namespace Prometheus.Models
 
         public static void UpdateUserRank(string username, int rank)
         {
-            UpdateUserTotalRank(username.ToUpper(), rank);
+            //UpdateUserTotalRank(username.ToUpper(), rank);
             UpdateUserDailyRank(username.ToUpper(), rank);
         }
 
 
 
-        public static string RetrieveTotalRank(string username)
-        {
-            var sql = "select TotalRank from UserTable where UserName = N'<UserName>'";
-            sql = sql.Replace("<UserName>", username);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
-            if (dbret.Count > 0)
-            {
-                var temprank = 0;
-                try { temprank = Convert.ToInt32(Convert.ToString(dbret[0][0])); }
-                catch (Exception ex) { temprank = 0; }
-                return Convert.ToString(temprank);
-            }
-            else
-            {
-                return "0";
-            }
-        }
+        //public static string RetrieveTotalRank(string username)
+        //{
+        //    var sql = "select TotalRank from UserTable where UserName = N'<UserName>'";
+        //    sql = sql.Replace("<UserName>", username);
+        //    var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
+        //    if (dbret.Count > 0)
+        //    {
+        //        var temprank = 0;
+        //        try { temprank = Convert.ToInt32(Convert.ToString(dbret[0][0])); }
+        //        catch (Exception ex) { temprank = 0; }
+        //        return Convert.ToString(temprank);
+        //    }
+        //    else
+        //    {
+        //        return "0";
+        //    }
+        //}
 
         public static List<TimeRank> RetrieveRankByMonth(string username,int month)
         {

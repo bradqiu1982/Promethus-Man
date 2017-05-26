@@ -1314,7 +1314,8 @@ namespace Prometheus.Controllers
 
                                 SameAsDBTVM.StoreLinkDBTIssue(perrlist[0].ErrorKey, linktime, originaldata.IssueKey, originaldata.IssueKey, testdata[0].ModuleSerialNum);
 
-                                UserRankViewModel.UpdateUserRank(updater, 10);
+                                UserKPIVM.AddUserDailyRank(originaldata.IssueKey, updater, UserRankType.SPECIAL, "Link To "+originaldata.ProjectKey+" Debug Tree "+ errabbr
+                                    , "/Issue/UpdateIssue?issuekey=" + originaldata.IssueKey, 6);
 
                                 var dict = new RouteValueDictionary();
                                 dict.Add("ErrorKey", perrlist[0].ErrorKey);
@@ -1371,7 +1372,8 @@ namespace Prometheus.Controllers
 
                                 SameAsDBTVM.StoreLinkDBTIssue(perrlist[0].ErrorKey, linktime, originaldata.IssueKey, originaldata.IssueKey, testdata[0].ModuleSerialNum);
 
-                                UserRankViewModel.UpdateUserRank(updater, 10);
+                                UserKPIVM.AddUserDailyRank(originaldata.IssueKey, updater, UserRankType.SPECIAL, "Link To Burn-In Debug Tree " + errabbr
+                                    , "/Issue/UpdateIssue?issuekey=" + originaldata.IssueKey, 6);
 
                                 var dict = new RouteValueDictionary();
                                 dict.Add("ErrorKey", perrlist[0].ErrorKey);

@@ -4924,7 +4924,7 @@ namespace Prometheus.Controllers
         }
 
 
-        private void SendLYTEvent(IssueViewModels vm, string comment,List<string> addrlist)
+        private void SendLYTEvent(IssueViewModels LYTTASK,IssueViewModels vm, string comment,List<string> addrlist)
         {
             var routevalue = new RouteValueDictionary();
             routevalue.Add("issuekey", vm.IssueKey);
@@ -4932,19 +4932,32 @@ namespace Prometheus.Controllers
             string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
             string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
 
+            routevalue["issuekey"] = LYTTASK.IssueKey;
+            string validatestr2 = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+
             var netcomputername = "";
             try { netcomputername = System.Net.Dns.GetHostName(); }
             catch (Exception ex) { }
             validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
+            validatestr2 = validatestr2.Replace("//localhost", "//" + netcomputername);
 
-            var content = "Hi All,\r\n\r\nThis is a LYT(low yield trigger) information. Please pay your attention to it. Thanks!\r\n\r\nFailure mode: " + vm.Summary + "\r\n\r\nLYT Reason:\r\n\r\n" + comment + " \r\n\r\nDetail Information: " + validatestr;
 
+            var content = "Hi All,\r\n\r\nThis is a LYT(low yield trigger) information. Please pay your attention to it. Thanks!";
+            content = content + "\r\n\r\n[" + LYTTASK.Summary + "]  is created base on analyse of task: ";
+            content = content + "\r\n\r\n" + vm.Summary;
+            content = content + "\r\n\r\nLYT TASK LINK: " + validatestr2;
+            content = content + "\r\n\r\nTRIGGER TASK LINK: " + validatestr;
+            
             var toaddrs = new List<string>();
             toaddrs.AddRange(addrlist);
             toaddrs.Add(vm.Assignee);
+            toaddrs.Add(vm.Reporter);
+            toaddrs.Add(LYTTASK.Assignee);
+
             EmailUtility.SendEmail(this,"WUXI NPI System - Project LYT", toaddrs, content);
+
             IssueViewModels.UpdateLYT(vm.IssueKey);
-            new System.Threading.ManualResetEvent(false).WaitOne(2000);
+            new System.Threading.ManualResetEvent(false).WaitOne(500);
         }
 
         [HttpPost, ActionName("LowYieldWarn")]
@@ -4964,15 +4977,27 @@ namespace Prometheus.Controllers
                     var comment = Request.Form["commentcontent"];
                     var addrs = Request.Form["RPeopleAddr"].Split(new string[] {";"},StringSplitOptions.RemoveEmptyEntries);
 
+                    var LYTTASK = CreateLYTTask("[LYT TASK]", comment,vm.ProjectKey,updater,updater,DateTime.Now.AddDays(14),vm.IssueKey);
+                    CreateLYTSubTask("[LYT SUB TASK]", "Stop Product Line for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(1));
+                    CreateLYTSubTask(RMASubIssueType.CONTAINMENTACTION, "Containment Action for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(7));
+                    CreateLYTSubTask(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(14));
+                    CreateLYTSubTask("[LYT SUB TASK]", "Restart Product Line for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(14));
 
+                    var comment1 = new IssueComments();
+                    comment1.Comment = "ROOTCAUSE: to be edited";
+                    IssueViewModels.StoreIssueComment(LYTTASK.IssueKey, comment1.dbComment, vm.Assignee, COMMENTTYPE.RootCause);
 
+                    var originalcomment = new IssueComments();
+                    originalcomment.Comment = "<p>A LYT task is create base on this task:</p>" + "<p><a href='/Issue/UpdateIssue?issuekey=" + LYTTASK.IssueKey + "'>LYT TASK</a></p>";
+                    IssueViewModels.StoreIssueComment(vm.IssueKey, originalcomment.dbComment, vm.Assignee, COMMENTTYPE.Description);
 
                     var addrlist = new List<string>();
                     addrlist.AddRange(addrs);
-                    SendLYTEvent(vm, comment, addrlist);
+                    SendLYTEvent(LYTTASK, vm, comment, addrlist);
+
                     var dict = new RouteValueDictionary();
-                    dict.Add("ProjectKey", vm.ProjectKey);
-                    return RedirectToAction("ProjectDetail", "Project", dict);
+                    dict.Add("issuekey", LYTTASK.IssueKey);
+                    return RedirectToAction("UpdateIssue", "Issue", dict);
                 }
                 else
                 {
@@ -5000,13 +5025,17 @@ namespace Prometheus.Controllers
             vm.Resolution = Resolute.Pending;
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
             vm.StoreSubIssue();
+
+            var comment1 = new IssueComments();
+            comment1.Comment = vm.Summary;
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment1.dbComment, vm.Assignee, COMMENTTYPE.Description);
         }
-        private static void CreateLYTTask(string presum, string sum, string pjkey, string parentkey, string analyser, string reporter, DateTime duedate)
+
+        private static IssueViewModels CreateLYTTask(string presum, string sum, string pjkey, string analyser, string reporter, DateTime duedate,string triggleissuekey)
         {
             var vm = new IssueViewModels();
             vm.ProjectKey = pjkey;
             vm.IssueKey = IssueViewModels.GetUniqKey();
-            vm.ParentIssueKey = parentkey;
             vm.IssueType = ISSUETP.Task;
             vm.Summary = presum + sum;
             vm.Priority = ISSUEPR.Major;
@@ -5017,6 +5046,12 @@ namespace Prometheus.Controllers
             vm.Resolution = Resolute.Pending;
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
             vm.StoreSubIssue();
+
+            var comment1 = new IssueComments();
+            comment1.Comment = sum+ "<p><a href='/Issue/UpdateIssue?issuekey="+ triggleissuekey + "'>Triggle Task</a></p>";
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment1.dbComment, vm.Assignee, COMMENTTYPE.Description);
+
+            return vm;
         }
 
         public ActionResult CloseResultComment(string ErrorKey, string CommentType, string Date)

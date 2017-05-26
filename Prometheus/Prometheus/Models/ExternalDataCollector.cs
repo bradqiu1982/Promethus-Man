@@ -262,6 +262,14 @@ namespace Prometheus.Models
         public static string CORRECTIVEACTION = "[Corrective]";
     }
 
+    public class LYTTASKType
+    {
+        public static string LYTTASK = "[LYT TASK]";
+        public static string LYTSUBTASK = "[LYT SUB TASK]";
+        public static string CONTAINMENTACTION = "[Containment]";
+        public static string CORRECTIVEACTION = "[Corrective]";
+    }
+
     public class RawDMR
     {
         public RawDMR()

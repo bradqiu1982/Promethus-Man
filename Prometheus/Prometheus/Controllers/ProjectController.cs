@@ -4977,11 +4977,11 @@ namespace Prometheus.Controllers
                     var comment = Request.Form["commentcontent"];
                     var addrs = Request.Form["RPeopleAddr"].Split(new string[] {";"},StringSplitOptions.RemoveEmptyEntries);
 
-                    var LYTTASK = CreateLYTTask("[LYT TASK]", comment,vm.ProjectKey,updater,updater,DateTime.Now.AddDays(14),vm.IssueKey);
-                    CreateLYTSubTask("[LYT SUB TASK]", "Stop Product Line for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(1));
-                    CreateLYTSubTask(RMASubIssueType.CONTAINMENTACTION, "Containment Action for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(7));
-                    CreateLYTSubTask(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(14));
-                    CreateLYTSubTask("[LYT SUB TASK]", "Restart Product Line for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(14));
+                    var LYTTASK = CreateLYTTask(LYTTASKType.LYTTASK, comment,vm.ProjectKey,updater,updater,DateTime.Now.AddDays(14),vm.IssueKey);
+                    CreateLYTSubTask(LYTTASKType.LYTSUBTASK, "Stop Product Line for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(1));
+                    CreateLYTSubTask(LYTTASKType.CONTAINMENTACTION, "Containment Action for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(7));
+                    CreateLYTSubTask(LYTTASKType.CORRECTIVEACTION, "Corrective Action for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(14));
+                    CreateLYTSubTask(LYTTASKType.LYTSUBTASK, "Restart Product Line for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(14));
 
                     var comment1 = new IssueComments();
                     comment1.Comment = "ROOTCAUSE: to be edited";

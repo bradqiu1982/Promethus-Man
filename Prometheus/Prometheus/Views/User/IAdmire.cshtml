@@ -1,0 +1,111 @@
+﻿@model System.Collections.Generic.List<Prometheus.Models.UserKPIVM>
+
+@{
+    ViewBag.Title = "IAdmire";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var idx = 0;
+}
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+
+
+<div class="row">
+    <div class="col-lg-1 text-right">
+        <img src="~/Content/images/usercenter/IKPI.png" style="height:60px; width:60px">
+    </div>
+    <div class="col-lg-11">
+        <ol class="breadcrumb" style="font-size:18px">
+            <li><a href="/User/UserCenter?username=@(ViewBag.RealUserID)">@ViewBag.UserName Center</a></li>
+            <li class="active">I Admire</li>
+        </ol>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+<div class="form-group">
+    <div class="row">
+        <div class="col-lg-3 text-left">
+            @Html.DropDownList("monthlylist", null, new { @id = "monthlylist", @class = "form-control", @onchange = "ShowMonthKPI()" })
+        </div>
+        <div class="col-lg-9 text-left"></div>
+        <script type="text/javascript">
+        function ShowMonthKPI()
+        {
+            if (document.getElementById("monthlylist").value) {
+                window.location.href = "/User/IKPI?month=" + document.getElementById("monthlylist").value;
+            }
+        }
+        </script>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+<div class="form-group">
+    <div class="row">
+        <table id="pndatatable" class="display" cellspacing="0">
+            <thead>
+                <tr>
+                    <td>User Name</td>
+                    <td>Rank Type</td>
+                    <td>Summary</td>
+                    <td>Rank</td>
+                    <td>TimeStamp</td>
+                    <td>Admire Rank</td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+            {
+                    <tr>
+                        <td>@item.UserName.Trim().Split('@')[0]</td>
+                        <td>@item.RankType</td>
+                        <td><a href="@item.BackLink" target="_blank">@item.Summary</a></td>
+                        <td>@item.Rank.ToString()</td>
+                        <td>@item.UpdateTime.ToString()</td>
+                        <td>
+                            @if (item.ADMIRERank == 0)
+                            {
+                                <input class="form-control text-box single-line" id="admirerank@(idx)" name="admirerank@(idx)" style="width:4em!important;"/>
+                                <input class="form-control text-box single-line" id="rankid@(idx)" name="rankid@(idx)" type="hidden" value="@item.RankKey" />
+                            }
+                            else
+                            {
+                                @item.ADMIRERank.ToString()
+                            }
+                        </td>
+                    </tr>
+
+                    idx = idx + 1;
+                }
+            </tbody>
+        </table>
+
+        <script type="text/javascript">
+        $(document).ready(function() {
+            $('#pndatatable').DataTable({
+                'iDisplayLength': 50,
+                'aLengthMenu': [[25, 50, 100, -1],
+                                [25, 50, 100, "All"]],
+                "bAutoWidth": false,
+                "aaSorting": [],
+                "order": []
+            });
+                    });
+        </script>
+    </div>
+</div>
+
+
+

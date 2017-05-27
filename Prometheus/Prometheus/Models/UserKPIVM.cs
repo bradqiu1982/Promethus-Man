@@ -172,11 +172,33 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<UserKPIVM> RetrieveRankByDate(string starttime, string ranktype)
+        public static List<UserKPIVM> RetrieveRank4Admire(string UserName, string starttime)
         {
             var ret = new List<UserKPIVM>();
-            var sql = "select RankKey,UserName,RankType,Summary,BackLink,Rank,ADMIRERank,UpdateTime from UserKPIVM where UpdateTime >= '<UpdateTime>' and RankType='<RankType>' order by UserName,UpdateTime DESC";
-            sql = sql.Replace("<UpdateTime>", starttime).Replace("RankType", ranktype);
+            var sql = "select RankKey,UserName,RankType,Summary,BackLink,Rank,ADMIRERank,UpdateTime from UserKPIVM where UserName=N'<UserName>' and UpdateTime >= '<UpdateTime>' and RankType <> '<RankType1>' and RankType <> '<RankType2>'  order by UpdateTime DESC";
+            sql = sql.Replace("<UserName>", UserName).Replace("<UpdateTime>", starttime).Replace("<RankType1>", UserRankType.ADMIRE).Replace("<RankType2>", UserRankType.VOTE);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var tempvm = new UserKPIVM();
+                tempvm.RankKey = Convert.ToString(line[0]);
+                tempvm.UserName = Convert.ToString(line[1]);
+                tempvm.RankType = Convert.ToString(line[2]);
+                tempvm.Summary = Convert.ToString(line[3]);
+                tempvm.BackLink = Convert.ToString(line[4]);
+                tempvm.Rank = Convert.ToInt32(line[5]);
+                tempvm.ADMIRERank = Convert.ToInt32(line[6]);
+                tempvm.UpdateTime = DateTime.Parse(Convert.ToString(line[7]));
+                ret.Add(tempvm);
+            }
+            return ret;
+        }
+
+        public static List<UserKPIVM> RetrieveRankByDate(string starttime)
+        {
+            var ret = new List<UserKPIVM>();
+            var sql = "select RankKey,UserName,RankType,Summary,BackLink,Rank,ADMIRERank,UpdateTime from UserKPIVM where UpdateTime >= '<UpdateTime>' and RankType <> '<RankType1>' and RankType <> '<RankType2>' order by UserName,UpdateTime DESC";
+            sql = sql.Replace("<UpdateTime>", starttime).Replace("<RankType1>", UserRankType.ADMIRE).Replace("<RankType2>", UserRankType.VOTE);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
             {

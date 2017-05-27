@@ -41,11 +41,22 @@ namespace Prometheus.Controllers
                 {
                     ViewBag.IsAdmin = false;
                 }
+
+                if (string.Compare(userdict[username.ToUpper()].ToUpper(), USERAUTH.MANAGE.ToUpper()) == 0)
+                {
+                    ViewBag.IsAdmin = true;
+                    ViewBag.IsManage = true;
+                }
+                else
+                {
+                    ViewBag.IsManage = false;
+                }
             }//end if
             else
             {
                 ViewBag.IsSuper = false;
                 ViewBag.IsAdmin = false;
+                ViewBag.IsManage = false;
             }
 
         }
@@ -1814,6 +1825,106 @@ namespace Prometheus.Controllers
         {
             UserGroupVM.DeleteGroup(GroupID);
             return RedirectToAction("IGroup", "User");
+        }
+
+        public ActionResult IKPI(string month)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "IBLOG");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            ViewBag.UserName = updater.Split(new char[] { '@' })[0];
+            ViewBag.RealUserID = updater;
+
+
+            var tempmonth = 1;
+            if (!string.IsNullOrEmpty(month))
+            {
+                try
+                {
+                    tempmonth = Convert.ToInt32(month);
+                }
+                catch (Exception ex)
+                { tempmonth = 1; }
+            }
+
+            var vm = UserKPIVM.RetrieveRankByUserName(updater, DateTime.Now.AddMonths(0 - tempmonth).ToString());
+
+            var sarray = new string[] { "1", "2", "3", "4", "5", "6", "12", "18", "24","30","36" };
+            var slist = new List<string>();
+            slist.Add("KPI In Months");
+            slist.AddRange(sarray);
+            var monthlylist = CreateSelectList(slist, "");
+            monthlylist[0].Selected = true;
+            monthlylist[0].Disabled = true;
+            ViewBag.monthlylist = monthlylist;
+
+            return View(vm);
+        }
+
+        public ActionResult IAdmire(string month)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "IBLOG");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            ViewBag.UserName = updater.Split(new char[] { '@' })[0];
+            ViewBag.RealUserID = updater;
+
+
+            var tempmonth = 1;
+            if (!string.IsNullOrEmpty(month))
+            {
+                try
+                {
+                    tempmonth = Convert.ToInt32(month);
+                }
+                catch (Exception ex)
+                { tempmonth = 1; }
+            }
+
+            var vm = new List<UserKPIVM>();
+            var usergroup = UserGroupVM.RetreiveUserGroup(updater, UserGroupType.ReportGroup);
+            var userlist = usergroup.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var user in userlist)
+            {
+                var tempvm = UserKPIVM.RetrieveRank4Admire(user, DateTime.Now.AddMonths(0 - tempmonth).ToString());
+                vm.AddRange(tempvm);
+            }
+
+            var sarray = new string[] { "1", "2", "3", "4", "5", "6", "12", "18", "24", "30", "36" };
+            var slist = new List<string>();
+            slist.Add("KPI In Months");
+            slist.AddRange(sarray);
+            var monthlylist = CreateSelectList(slist, "");
+            monthlylist[0].Selected = true;
+            monthlylist[0].Disabled = true;
+            ViewBag.monthlylist = monthlylist;
+
+            return View(vm);
+
         }
 
     }

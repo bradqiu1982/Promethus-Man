@@ -615,6 +615,7 @@
     <Content Include="Content\images\usercenter\IAssigned.png" />
     <Content Include="Content\images\usercenter\IBlog.png" />
     <Content Include="Content\images\usercenter\ICare.png" />
+    <Content Include="Content\images\usercenter\IKPI.png" />
     <Content Include="Content\images\usercenter\ILearn.png" />
     <Content Include="Content\images\usercenter\IProject.png" />
     <Content Include="Content\images\usercenter\ITag.png" />
@@ -932,6 +933,8 @@
     <Content Include="Views\Project\ProjectDoneFA.cshtml" />
     <Content Include="Views\User\IGroup.cshtml" />
     <Content Include="Views\Project\SameAsModules.cshtml" />
+    <Content Include="Views\User\IKPI.cshtml" />
+    <Content Include="Views\User\IAdmire.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

@@ -8,6 +8,7 @@ namespace Prometheus.Models
     public class USERAUTH
     {
         public static string SUPER = "Super";
+        public static string MANAGE = "Manage";
         public static string ADMIN = "Admin";
         public static string GENERAL = "General";
         public static string NONE = "None";

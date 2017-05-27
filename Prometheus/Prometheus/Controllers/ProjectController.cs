@@ -52,11 +52,22 @@ namespace Prometheus.Controllers
                 {
                     ViewBag.IsAdmin = false;
                 }
+
+                if (string.Compare(userdict[username.ToUpper()].ToUpper(), USERAUTH.MANAGE.ToUpper()) == 0)
+                {
+                    ViewBag.IsAdmin = true;
+                    ViewBag.IsManage = true;
+                }
+                else
+                {
+                    ViewBag.IsManage = false;
+                }
             }//end if
             else
             {
                 ViewBag.IsSuper = false;
                 ViewBag.IsAdmin = false;
+                ViewBag.IsManage = false;
             }
 
         }

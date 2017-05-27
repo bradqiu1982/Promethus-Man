@@ -285,6 +285,13 @@
                                                     @Html.ActionLink("I Group", "IGroup", "User")
                                                 }
                                             </li>
+                                            <li>
+                                                @if ((ViewBag.IsSuper != null && ViewBag.IsSuper)
+                                                    || (ViewBag.IsManage != null && ViewBag.IsManage))
+                                                {
+                                                    @Html.ActionLink("I Admire", "IAdmire", "User")
+                                                }
+                                            </li>
                                         </ul>
                                     </li>
                                 </ul>

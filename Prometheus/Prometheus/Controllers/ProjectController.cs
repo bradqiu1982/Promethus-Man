@@ -3857,7 +3857,6 @@ namespace Prometheus.Controllers
             {
                 vm.Description = SeverHtmlDecode.Decode(this,temphtml);
                 ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey,vm.dbDescription,PJERRORCOMMENTTYPE.Description,vm.Reporter, currenttime);
-                UserRankViewModel.UpdateUserRank(updater, 2);
             }
 
             var urls = ReceiveAttachFiles();
@@ -3881,7 +3880,11 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(url))
                 {
                     ProjectErrorViewModels.StoreErrorAttachment(vm.ErrorKey, url);
-                    UserRankViewModel.UpdateUserRank(updater, 5);
+
+                    var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+                    var dockey = tempkeys[tempkeys.Length - 1];
+                    UserKPIVM.AddUserAttachDailyRank(vm.ErrorKey, updater, UserRankType.ADDITIONAL
+                        , "Add attachment to " + vm.ProjectKey + " " + vm.OrignalCode, "/Project/UpdateProjectError?ErrorKey=" + vm.ErrorKey, 2,dockey,this);
                 }
             }
 
@@ -3905,7 +3908,6 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(com.Comment))
                 {
                     ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.FailureDetail, vm.Reporter, currenttime);
-                    UserRankViewModel.UpdateUserRank(updater, 2);
                     analyseinputed = true;
                 }
             }
@@ -3918,7 +3920,6 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(com.Comment))
                 {
                     ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.Result, vm.Reporter, currenttime);
-                    UserRankViewModel.UpdateUserRank(updater, 2);
                     analyseinputed = true;
                 }
             }
@@ -3931,7 +3932,6 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(com.Comment))
                 {
                     ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.RootCause, vm.Reporter, currenttime);
-                    UserRankViewModel.UpdateUserRank(updater, 5);
                     analyseinputed = true;
                 }
             }
@@ -3952,12 +3952,17 @@ namespace Prometheus.Controllers
                         ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.Result, vm.Reporter, currenttime);
                     }
 
-                    if (string.IsNullOrEmpty(rootcausestr))
-                    {
-                        var com1 = new ErrorComments();
-                        com1.Comment = "<p>To Be Edit</p>";
-                        ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.RootCause, vm.Reporter, currenttime);
-                    }
+                if (string.IsNullOrEmpty(rootcausestr))
+                {
+                    var com1 = new ErrorComments();
+                    com1.Comment = "<p>To Be Edit</p>";
+                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.RootCause, vm.Reporter, currenttime);
+                }
+                else
+                {
+                    UserKPIVM.AddUserDailyRank(vm.ErrorKey, updater, UserRankType.ADDITIONAL
+                        , "Add analyse to " + vm.ProjectKey + " " + vm.OrignalCode, "/Project/UpdateProjectError?ErrorKey=" + vm.ErrorKey, 6);
+                }
             }
 
             var dict = new RouteValueDictionary();

@@ -671,17 +671,15 @@ namespace Prometheus.Models
                 else if (string.Compare(ret[0].DOCType, ShareDocType.DOCUMENT, true) == 0)
                 {
                     var Summary = ret[0].DOCKey;
-                    if (!UserKPIVM.ValueableAttach(Summary, ctrl))
-                        return;
 
                     var DocURL = "/User/WebDoc?DocKey=" + ret[0].DOCKey + "&Creator=" + ret[0].DOCCreator;
                     if (!string.IsNullOrEmpty(ret[0].BACKLink))
                     {
-                        UserKPIVM.AddUserDailyRank(ret[0].DocID, ret[0].DOCCreator, UserRankType.VOTE, "Like your technical document: " + Summary, ret[0].BACKLink, 1);
+                        UserKPIVM.AddUserAttachDailyRank(ret[0].DocID, ret[0].DOCCreator, UserRankType.VOTE, "Like your technical document: " + Summary, ret[0].BACKLink, 1, ret[0].DOCKey,ctrl);
                     }
                     else
                     {
-                        UserKPIVM.AddUserDailyRank(ret[0].DocID, ret[0].DOCCreator, UserRankType.VOTE, "Like your technical document: " + Summary, DocURL, 1);
+                        UserKPIVM.AddUserAttachDailyRank(ret[0].DocID, ret[0].DOCCreator, UserRankType.VOTE, "Like your technical document: " + Summary, DocURL, 1, ret[0].DOCKey,ctrl);
                     }
 
                 }

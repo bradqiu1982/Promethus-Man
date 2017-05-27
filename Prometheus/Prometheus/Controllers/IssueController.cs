@@ -521,7 +521,6 @@ namespace Prometheus.Controllers
                     SendTaskCommentEmail(originaldata.IssueKey,originaldata.Summary,commenter,towho, commentcontent);
                 }
 
-                UserRankViewModel.UpdateUserRank(updater, 2);
             }
             else
                 vm.Description = "";
@@ -550,7 +549,6 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(url))
                 {
                     IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
-                    UserRankViewModel.UpdateUserRank(updater, 5);
 
                     var attachtag = string.Empty;
                     for (var i = 0; i < 200; i++)
@@ -565,6 +563,17 @@ namespace Prometheus.Controllers
                         var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
                         var dockey = tempkeys[tempkeys.Length - 1];
                         ShareDocVM.ShareDoc(originaldata.ProjectKey, ShareDocType.DOCUMENT, dockey, attachtag, updater, DateTime.Now.ToString(), "/Issue/UpdateIssue?issuekey=" + originaldata.IssueKey);
+
+                        UserKPIVM.AddUserAttachDailyRank(vm.IssueKey, updater, UserRankType.ADDITIONAL
+                        , "Add attachement with tag to task: " + dockey, "/Issue/UpdateIssue?issuekey=" + vm.IssueKey, 2,dockey,this);
+                    }
+                    else
+                    {
+                        var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+                        var dockey = tempkeys[tempkeys.Length - 1];
+
+                        UserKPIVM.AddUserAttachDailyRank(vm.IssueKey, updater, UserRankType.ADDITIONAL
+                        , "Add attachement to task: " + dockey, "/Issue/UpdateIssue?issuekey=" + vm.IssueKey, 1, dockey, this);
                     }
                 }
             }
@@ -584,15 +593,17 @@ namespace Prometheus.Controllers
                 if (vm.IssueClosed())
                 {
                     var realissue = IssueViewModels.RetrieveIssueByIssueKey(vm.IssueKey,this);
-                    if (realissue.AttachList.Count > 0)
+                    if (realissue.Summary.Contains(LYTTASKType.LYTTASK))
                     {
-                        UserRankViewModel.UpdateUserRank(updater, 5);
+                        UserKPIVM.AddUserDailyRank(realissue.IssueKey, realissue.Assignee, UserRankType.BASE
+                            , "Close LYT Task: " + realissue.Summary, "/Issue/UpdateIssue?issuekey=" + realissue.IssueKey, 4);
                     }
-                    else if (realissue.CommentList.Count > 1)
+                    else
                     {
-                        UserRankViewModel.UpdateUserRank(updater, 2);
+                        UserKPIVM.AddUserDailyRank(realissue.IssueKey, realissue.Assignee, UserRankType.BASE
+                            , "Close General Task: " + realissue.Summary, "/Issue/UpdateIssue?issuekey=" + realissue.IssueKey, 2);
                     }
-                    
+
                     //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
                     vm.CloseIssue();
                 }
@@ -793,6 +804,17 @@ namespace Prometheus.Controllers
                         var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
                         var dockey = tempkeys[tempkeys.Length - 1];
                         ShareDocVM.ShareDoc(vm.ProjectKey, ShareDocType.DOCUMENT, dockey, attachtag, updater, DateTime.Now.ToString(), "/Issue/UpdateIssue?issuekey=" + vm.IssueKey);
+
+                        UserKPIVM.AddUserAttachDailyRank(vm.IssueKey, updater, UserRankType.ADDITIONAL
+                        , "Add attachement with tag to task: " + dockey, "/Issue/UpdateIssue?issuekey=" + vm.IssueKey, 2, dockey, this);
+                    }
+                    else
+                    {
+                        var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+                        var dockey = tempkeys[tempkeys.Length - 1];
+
+                        UserKPIVM.AddUserAttachDailyRank(vm.IssueKey, updater, UserRankType.ADDITIONAL
+                        , "Add attachement to task: " + dockey, "/Issue/UpdateIssue?issuekey=" + vm.IssueKey, 1, dockey, this);
                     }
                 }
             }
@@ -1109,6 +1131,17 @@ namespace Prometheus.Controllers
                         var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
                         var dockey = tempkeys[tempkeys.Length - 1];
                         ShareDocVM.ShareDoc(vm.ProjectKey, ShareDocType.DOCUMENT, dockey, attachtag, updater, DateTime.Now.ToString(), "/Issue/UpdateIssue?issuekey=" + vm.IssueKey);
+
+                        UserKPIVM.AddUserAttachDailyRank(vm.IssueKey, updater, UserRankType.ADDITIONAL
+                        , "Add attachement with tag to task: " + dockey, "/Issue/UpdateIssue?issuekey=" + vm.IssueKey, 2, dockey, this);
+                    }
+                    else
+                    {
+                        var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+                        var dockey = tempkeys[tempkeys.Length - 1];
+
+                        UserKPIVM.AddUserAttachDailyRank(vm.IssueKey, updater, UserRankType.ADDITIONAL
+                        , "Add attachement to task: " + dockey, "/Issue/UpdateIssue?issuekey=" + vm.IssueKey, 1, dockey, this);
                     }
                 }
             }
@@ -1417,7 +1450,6 @@ namespace Prometheus.Controllers
                 var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(failure));
                 var commenttype = COMMENTTYPE.FailureDetail;
                 IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
-                UserRankViewModel.UpdateUserRank(updater, 2);
 
                 analyzeinputed = true;
             }
@@ -1428,7 +1460,6 @@ namespace Prometheus.Controllers
                 var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(rootcause));
                 var commenttype = COMMENTTYPE.RootCause;
                 IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
-                UserRankViewModel.UpdateUserRank(updater, 5);
 
                 analyzeinputed = true;
             }
@@ -1439,7 +1470,6 @@ namespace Prometheus.Controllers
                 var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(rootcause));
                 var commenttype = COMMENTTYPE.Result;
                 IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
-                UserRankViewModel.UpdateUserRank(updater,2);
 
                 analyzeinputed = true;
             }
@@ -1483,7 +1513,6 @@ namespace Prometheus.Controllers
                     SendTaskCommentEmail(originaldata.IssueKey, originaldata.Summary, commenter, towho, commentcontent);
                 }
 
-                UserRankViewModel.UpdateUserRank(updater, 2);
             }
             else
                 vm.Description = "";
@@ -1521,7 +1550,6 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(url))
                 {
                     IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
-                    UserRankViewModel.UpdateUserRank(updater, 5);
 
                     var attachtag = string.Empty;
                     for (var i = 0; i < 200; i++)
@@ -1536,6 +1564,17 @@ namespace Prometheus.Controllers
                         var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
                         var dockey = tempkeys[tempkeys.Length - 1];
                         ShareDocVM.ShareDoc(originaldata.ProjectKey, ShareDocType.DOCUMENT, dockey, attachtag, updater, DateTime.Now.ToString(), "/Issue/UpdateIssue?issuekey=" + vm.IssueKey);
+
+                        UserKPIVM.AddUserAttachDailyRank(vm.IssueKey, updater, UserRankType.ADDITIONAL
+                        , "Add attachement with tag to task: " + dockey, "/Issue/UpdateIssue?issuekey=" + vm.IssueKey, 2, dockey, this);
+                    }
+                    else
+                    {
+                        var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+                        var dockey = tempkeys[tempkeys.Length - 1];
+
+                        UserKPIVM.AddUserAttachDailyRank(vm.IssueKey, updater, UserRankType.ADDITIONAL
+                        , "Add attachement to task: " + dockey, "/Issue/UpdateIssue?issuekey=" + vm.IssueKey, 1, dockey, this);
                     }
                 }
             }
@@ -1555,14 +1594,9 @@ namespace Prometheus.Controllers
                 if (vm.IssueClosed())
                 {
                     var realissue = IssueViewModels.RetrieveIssueByIssueKey(vm.IssueKey,this);
-                    if (realissue.AttachList.Count > 0)
-                    {
-                        UserRankViewModel.UpdateUserRank(updater, 5);
-                    }
-                    else if (realissue.CommentList.Count > 1)
-                    {
-                        UserRankViewModel.UpdateUserRank(updater, 2);
-                    }
+
+                    UserKPIVM.AddUserDailyRank(realissue.IssueKey, realissue.Assignee, UserRankType.BASE
+                        , "Close FA Task: " + realissue.Summary, "/Issue/UpdateIssue?issuekey=" + realissue.IssueKey, 1);
 
                     //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
                     vm.CloseIssue();
@@ -1823,7 +1857,6 @@ namespace Prometheus.Controllers
             {
                 vm.Description = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
                 vm.CommentType = COMMENTTYPE.Description;
-                UserRankViewModel.UpdateUserRank(updater, 2);
             }
             else
                 vm.Description = "";
@@ -1834,7 +1867,6 @@ namespace Prometheus.Controllers
                 var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(rootcause));
                 var commenttype = COMMENTTYPE.RootCause;
                 IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
-                UserRankViewModel.UpdateUserRank(updater, 5);
             }
 
             var issuetag = string.Empty;
@@ -1902,8 +1934,18 @@ namespace Prometheus.Controllers
                         var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
                         var dockey = tempkeys[tempkeys.Length - 1];
                         ShareDocVM.ShareDoc(originaldata.ProjectKey, ShareDocType.DOCUMENT, dockey, attachtag, updater, DateTime.Now.ToString(), "/Issue/UpdateIssue?issuekey=" + vm.IssueKey);
+
+                        UserKPIVM.AddUserAttachDailyRank(vm.IssueKey, updater, UserRankType.ADDITIONAL
+                        , "Add attachement with tag to task: " + dockey, "/Issue/UpdateIssue?issuekey=" + vm.IssueKey, 2, dockey, this);
                     }
-                    UserRankViewModel.UpdateUserRank(updater, 5);
+                    else
+                    {
+                        var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+                        var dockey = tempkeys[tempkeys.Length - 1];
+
+                        UserKPIVM.AddUserAttachDailyRank(vm.IssueKey, updater, UserRankType.ADDITIONAL
+                        , "Add attachement to task: " + dockey, "/Issue/UpdateIssue?issuekey=" + vm.IssueKey, 1, dockey, this);
+                    }
                 }
             }
 
@@ -1934,8 +1976,17 @@ namespace Prometheus.Controllers
                         var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
                         var dockey = tempkeys[tempkeys.Length - 1];
                         ShareDocVM.ShareDoc(originaldata.ProjectKey, ShareDocType.DOCUMENT, dockey, customertag, updater, DateTime.Now.ToString(), "/Issue/UpdateIssue?issuekey=" + vm.IssueKey);
+
+                        UserKPIVM.AddUserAttachDailyRank(vm.IssueKey, updater, UserRankType.ADDITIONAL
+                        , "Add attachement with tag to task: " + dockey, "/Issue/UpdateIssue?issuekey=" + vm.IssueKey, 2, dockey, this);
                     }
-                    UserRankViewModel.UpdateUserRank(updater, 5);
+                    else
+                    {
+                        var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+                        var dockey = tempkeys[tempkeys.Length - 1];
+                        UserKPIVM.AddUserAttachDailyRank(vm.IssueKey, updater, UserRankType.ADDITIONAL
+                        , "Add attachement to task: " + dockey, "/Issue/UpdateIssue?issuekey=" + vm.IssueKey, 2, dockey, this);
+                    }
                 }
             }
 
@@ -1966,8 +2017,18 @@ namespace Prometheus.Controllers
                         var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
                         var dockey = tempkeys[tempkeys.Length - 1];
                         ShareDocVM.ShareDoc(originaldata.ProjectKey, ShareDocType.DOCUMENT, dockey, internaltag, updater, DateTime.Now.ToString(), "/Issue/UpdateIssue?issuekey=" + vm.IssueKey);
+
+                        UserKPIVM.AddUserAttachDailyRank(vm.IssueKey, updater, UserRankType.ADDITIONAL
+                        , "Add attachement with tag to task: " + dockey, "/Issue/UpdateIssue?issuekey=" + vm.IssueKey, 2, dockey, this);
                     }
-                    UserRankViewModel.UpdateUserRank(updater, 10);
+                    else
+                    {
+                        var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+                        var dockey = tempkeys[tempkeys.Length - 1];
+
+                        UserKPIVM.AddUserAttachDailyRank(vm.IssueKey, updater, UserRankType.ADDITIONAL
+                        , "Add attachement to task: " + dockey, "/Issue/UpdateIssue?issuekey=" + vm.IssueKey, 2, dockey, this);
+                    }
                 }
             }
 
@@ -1987,7 +2048,9 @@ namespace Prometheus.Controllers
             {
                 if (vm.IssueClosed())
                 {
-                    UserRankViewModel.UpdateUserRank(updater, 5);
+                    UserKPIVM.AddUserDailyRank(vm.IssueKey, vm.Assignee, UserRankType.BASE
+                        , "Close RMA Task: " + vm.Summary, "/Issue/UpdateIssue?issuekey=" + vm.IssueKey, 4);
+
                     if (!string.IsNullOrEmpty(issuetag))
                     {
                         ShareDocVM.ShareDoc(originaldata.ProjectKey, ShareDocType.ISSUE, originaldata.IssueKey, issuetag, updater, DateTime.Now.ToString(), "/Issue/UpdateIssue?issuekey=" + vm.IssueKey);
@@ -2140,7 +2203,6 @@ namespace Prometheus.Controllers
             {
                 originaldata.Description = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
                 originaldata.CommentType = COMMENTTYPE.Description;
-                UserRankViewModel.UpdateUserRank(updater, 2);
             }
             else
                 originaldata.Description = "";
@@ -2191,8 +2253,18 @@ namespace Prometheus.Controllers
                         var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
                         var dockey = tempkeys[tempkeys.Length - 1];
                         ShareDocVM.ShareDoc(originaldata.ProjectKey, ShareDocType.DOCUMENT, dockey, attachtag, updater, DateTime.Now.ToString(), "/Issue/UpdateIssue?issuekey=" + originaldata.IssueKey);
+
+                        UserKPIVM.AddUserAttachDailyRank(originaldata.IssueKey, updater, UserRankType.ADDITIONAL
+                        , "Add attachement with tag to task: " + dockey, "/Issue/UpdateIssue?issuekey=" + originaldata.IssueKey, 2, dockey, this);
                     }
-                    UserRankViewModel.UpdateUserRank(updater, 5);
+                    else
+                    {
+                        var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+                        var dockey = tempkeys[tempkeys.Length - 1];
+
+                        UserKPIVM.AddUserAttachDailyRank(originaldata.IssueKey, updater, UserRankType.ADDITIONAL
+                        , "Add attachement to task: " + dockey, "/Issue/UpdateIssue?issuekey=" + originaldata.IssueKey, 1, dockey, this);
+                    }
                 }
             }
 
@@ -2208,7 +2280,9 @@ namespace Prometheus.Controllers
             {
                 if (originaldata.IssueClosed())
                 {
-                    UserRankViewModel.UpdateUserRank(updater, 5);
+                    UserKPIVM.AddUserDailyRank(originaldata.IssueKey, originaldata.Assignee, UserRankType.BASE
+                        , "Close REL Task: " + originaldata.Summary, "/Issue/UpdateIssue?issuekey=" + originaldata.IssueKey, 4);
+
                     if (!string.IsNullOrEmpty(issuetag))
                     {
                         ShareDocVM.ShareDoc(originaldata.ProjectKey, ShareDocType.ISSUE, originaldata.IssueKey, issuetag, updater, DateTime.Now.ToString(), "/Issue/UpdateIssue?issuekey=" + originaldata.IssueKey);
@@ -2377,7 +2451,6 @@ namespace Prometheus.Controllers
             {
                 vm.Description = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
                 vm.CommentType = COMMENTTYPE.Description;
-                UserRankViewModel.UpdateUserRank(updater, 2);
             }
             else
                 vm.Description = "";
@@ -2388,7 +2461,6 @@ namespace Prometheus.Controllers
                 var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(rootcause));
                 var commenttype = COMMENTTYPE.RootCause;
                 IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
-                UserRankViewModel.UpdateUserRank(updater, 5);
             }
 
 
@@ -2432,12 +2504,20 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(url))
                 {
                     IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
-                    UserRankViewModel.UpdateUserRank(updater, 3);
                     if (!string.IsNullOrEmpty(attachtag))
                     {
                         var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
                         var dockey = tempkeys[tempkeys.Length - 1];
                         ShareDocVM.ShareDoc(originaldata.ProjectKey, ShareDocType.DOCUMENT, dockey, attachtag, updater, DateTime.Now.ToString(), "/Issue/UpdateIssue?issuekey=" + vm.IssueKey);
+                        UserKPIVM.AddUserAttachDailyRank(vm.IssueKey, updater, UserRankType.ADDITIONAL
+                       , "Add attachement with tag to task: " + dockey, "/Issue/UpdateIssue?issuekey=" + vm.IssueKey, 2, dockey, this);
+                    }
+                    else
+                    {
+                        var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+                        var dockey = tempkeys[tempkeys.Length - 1];
+                        UserKPIVM.AddUserAttachDailyRank(vm.IssueKey, updater, UserRankType.ADDITIONAL
+                       , "Add attachement to task: " + dockey, "/Issue/UpdateIssue?issuekey=" + vm.IssueKey, 1, dockey, this);
                     }
                 }
             }
@@ -2464,7 +2544,8 @@ namespace Prometheus.Controllers
             {
                 if (vm.IssueClosed())
                 {
-                    UserRankViewModel.UpdateUserRank(updater, 5);
+                    UserKPIVM.AddUserDailyRank(vm.IssueKey, vm.Assignee, UserRankType.BASE
+                        , "Close OBA Task: " + vm.Summary, "/Issue/UpdateIssue?issuekey=" + vm.IssueKey, 4);
 
                     if (!string.IsNullOrEmpty(issuetag))
                     {
@@ -2644,7 +2725,6 @@ namespace Prometheus.Controllers
             {
                 vm.Description = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
                 vm.CommentType = COMMENTTYPE.Description;
-                UserRankViewModel.UpdateUserRank(updater, 2);
             }
             else
                 vm.Description = "";
@@ -2655,7 +2735,6 @@ namespace Prometheus.Controllers
                 var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(analysis));
                 var commenttype = COMMENTTYPE.Analysis;
                 IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
-                UserRankViewModel.UpdateUserRank(updater, 3);
             }
 
             if (!string.IsNullOrEmpty(Request.Form["rootcauseeditor"]))
@@ -2664,7 +2743,6 @@ namespace Prometheus.Controllers
                 var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(rootcause));
                 var commenttype = COMMENTTYPE.RootCause;
                 IssueViewModels.StoreIssueComment(vm.IssueKey, dbstr, vm.Reporter, commenttype);
-                UserRankViewModel.UpdateUserRank(updater, 5);
             }
 
             var urls = ReceiveRMAFiles();
@@ -2690,8 +2768,6 @@ namespace Prometheus.Controllers
                 {
                     IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
 
-                    UserRankViewModel.UpdateUserRank(updater, 3);
-
                     var attachtag = string.Empty;
                     for (var i = 0; i < 200; i++)
                     {
@@ -2705,6 +2781,17 @@ namespace Prometheus.Controllers
                         var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
                         var dockey = tempkeys[tempkeys.Length - 1];
                         ShareDocVM.ShareDoc(originaldata.ProjectKey, ShareDocType.DOCUMENT, dockey, attachtag, updater, DateTime.Now.ToString(), "/Issue/UpdateIssue?issuekey=" + vm.IssueKey);
+
+                        UserKPIVM.AddUserAttachDailyRank(vm.IssueKey, updater, UserRankType.ADDITIONAL
+                        , "Add attachement with tag to task: " + dockey, "/Issue/UpdateIssue?issuekey=" + vm.IssueKey, 2, dockey, this);
+                    }
+                    else
+                    {
+                        var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+                        var dockey = tempkeys[tempkeys.Length - 1];
+
+                        UserKPIVM.AddUserAttachDailyRank(vm.IssueKey, updater, UserRankType.ADDITIONAL
+                        , "Add attachement to task: " + dockey, "/Issue/UpdateIssue?issuekey=" + vm.IssueKey, 1, dockey, this);
                     }
                 }
             }
@@ -2725,7 +2812,8 @@ namespace Prometheus.Controllers
             {
                 if (vm.IssueClosed())
                 {
-                    UserRankViewModel.UpdateUserRank(updater, 5);
+                    UserKPIVM.AddUserDailyRank(vm.IssueKey, vm.Assignee, UserRankType.BASE
+                        , "Close Quaulity Task: " + vm.Summary, "/Issue/UpdateIssue?issuekey="+vm.IssueKey, 2);
 
                     //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
                     vm.CloseIssue();

@@ -6,6 +6,12 @@ using System.Web.Mvc;
 
 namespace Prometheus.Models
 {
+    public class TimeRank
+    {
+        public int Rank { set; get; }
+        public DateTime UpdateDate { set; get; }
+    }
+
     public class UserRankType
     {
         public static string BASE = "BASE";
@@ -68,6 +74,37 @@ namespace Prometheus.Models
             sql = sql.Replace("<RankKey>", rankkey).Replace("<UserName>", username).Replace("<RankType>", ranktype).Replace("<Summary>", summary)
                 .Replace("<BackLink>", backlink).Replace("<Rank>", rank.ToString()).Replace("<ADMIRERank>", "0")
                 .Replace("<UpdateTime>",DateTime.Now.ToString());
+            DBUtility.ExeLocalSqlNoRes(sql);
+
+            UpdateUserTotalRank(username, rank);
+        }
+
+        public static void AddUserAttachDailyRank(string rankkey, string username, string ranktype, string summary, string backlink, int rank,string filename,Controller ctrl)
+        {
+            if (!ValueableAttach(filename, ctrl))
+                return;
+
+            if (string.Compare(ranktype, UserRankType.BASE, true) == 0)
+            {
+                if (RetrieveRankItems(rankkey, UserRankType.BASE).Count > 0)
+                {
+                    return;
+                }
+            }
+
+            if (string.Compare(ranktype, UserRankType.SPECIAL, true) == 0)
+            {
+                if (RetrieveRankItems(rankkey, UserRankType.SPECIAL).Count > 0)
+                {
+                    return;
+                }
+            }
+
+            var sql = "insert into UserKPIVM(RankKey,UserName,RankType,Summary,BackLink,Rank,ADMIRERank,UpdateTime) "
+                + " values('<RankKey>',N'<UserName>','<RankType>',N'<Summary>',N'<BackLink>',<Rank>,<ADMIRERank>,'<UpdateTime>')";
+            sql = sql.Replace("<RankKey>", rankkey).Replace("<UserName>", username).Replace("<RankType>", ranktype).Replace("<Summary>", summary)
+                .Replace("<BackLink>", backlink).Replace("<Rank>", rank.ToString()).Replace("<ADMIRERank>", "0")
+                .Replace("<UpdateTime>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
 
             UpdateUserTotalRank(username, rank);

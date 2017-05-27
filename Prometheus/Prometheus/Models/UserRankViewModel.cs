@@ -5,11 +5,6 @@ using System.Web;
 
 namespace Prometheus.Models
 {
-    public class TimeRank
-    {
-        public int Rank { set; get; }
-        public DateTime UpdateDate { set; get; }
-    }
 
     public class UserRankViewModel
     {
@@ -32,38 +27,37 @@ namespace Prometheus.Models
         //    }
         //}
 
-        private static void UpdateUserDailyRank(string username, int rank)
-        {
-            var updatetime = DateTime.Now.ToString("yyyy-MM-dd") + " 07:30:00";
+        //private static void UpdateUserDailyRank(string username, int rank)
+        //{
+        //    var updatetime = DateTime.Now.ToString("yyyy-MM-dd") + " 07:30:00";
 
-            var sql = "select Rank from UserRank where UserName = N'<UserName>' and UpdateDate = '<UpdateDate>'";
-            sql = sql.Replace("<UserName>", username).Replace("<UpdateDate>", updatetime);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
-            if (dbret.Count > 0)
-            {
-                var temprank = 0;
-                try { temprank = Convert.ToInt32(Convert.ToString(dbret[0][0])); }
-                catch (Exception ex) { temprank = 0; }
-                temprank = temprank + rank;
+        //    var sql = "select Rank from UserRank where UserName = N'<UserName>' and UpdateDate = '<UpdateDate>'";
+        //    sql = sql.Replace("<UserName>", username).Replace("<UpdateDate>", updatetime);
+        //    var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
+        //    if (dbret.Count > 0)
+        //    {
+        //        var temprank = 0;
+        //        try { temprank = Convert.ToInt32(Convert.ToString(dbret[0][0])); }
+        //        catch (Exception ex) { temprank = 0; }
+        //        temprank = temprank + rank;
 
-                sql = "Update UserRank set Rank = '<Rank>' where  UserName = N'<UserName>' and UpdateDate = '<UpdateDate>'";
-                sql = sql.Replace("<UserName>", username).Replace("<UpdateDate>", updatetime).Replace("<Rank>", Convert.ToString(temprank));
-                DBUtility.ExeLocalSqlNoRes(sql);
-            }
-            else
-            {
-                sql = "Insert into UserRank(UserName,UpdateDate,Rank) values(N'<UserName>','<UpdateDate>','<Rank>')";
-                sql = sql.Replace("<UserName>", username).Replace("<UpdateDate>", updatetime).Replace("<Rank>", Convert.ToString(rank));
-                DBUtility.ExeLocalSqlNoRes(sql);
-            }
-        }
+        //        sql = "Update UserRank set Rank = '<Rank>' where  UserName = N'<UserName>' and UpdateDate = '<UpdateDate>'";
+        //        sql = sql.Replace("<UserName>", username).Replace("<UpdateDate>", updatetime).Replace("<Rank>", Convert.ToString(temprank));
+        //        DBUtility.ExeLocalSqlNoRes(sql);
+        //    }
+        //    else
+        //    {
+        //        sql = "Insert into UserRank(UserName,UpdateDate,Rank) values(N'<UserName>','<UpdateDate>','<Rank>')";
+        //        sql = sql.Replace("<UserName>", username).Replace("<UpdateDate>", updatetime).Replace("<Rank>", Convert.ToString(rank));
+        //        DBUtility.ExeLocalSqlNoRes(sql);
+        //    }
+        //}
 
-        public static void UpdateUserRank(string username, int rank)
-        {
-            //UpdateUserTotalRank(username.ToUpper(), rank);
-            UpdateUserDailyRank(username.ToUpper(), rank);
-        }
-
+        //public static void UpdateUserRank(string username, int rank)
+        //{
+        //    //UpdateUserTotalRank(username.ToUpper(), rank);
+        //    UpdateUserDailyRank(username.ToUpper(), rank);
+        //}
 
 
         //public static string RetrieveTotalRank(string username)

@@ -298,6 +298,12 @@
                                                     @Html.ActionLink("User Reviewed Info", "UserReviewedInfo", "User")
                                                 }
                                             </li>
+                                            <li>
+                                                @if (ViewBag.IsSuper != null && ViewBag.IsSuper)
+                                                {
+                                                    @Html.ActionLink("User Shared Info", "UserSharedInfo", "User")
+                                                }
+                                            </li>
                                         </ul>
                                     </li>
                                 </ul>

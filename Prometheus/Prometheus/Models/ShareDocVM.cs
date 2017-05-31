@@ -514,6 +514,68 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static List<ShareDocVM> RetrieveUserShare(string starttime, Controller ctrl)
+        {
+            var ret = new List<ShareDocVM>();
+            var sql = "select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,a.DOCDate,a.DOCFavorTimes,a.APVal1,a.BackLink from ShareDoc a  where a.DOCDate >= '<DOCDate>' order by a.DOCDate DESC";
+            sql = sql.Replace("<DOCDate>", starttime);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var tempvm = new ShareDocVM();
+                tempvm.BookerName = "";
+                tempvm.DOCPJK = Convert.ToString(line[0]);
+                tempvm.DOCType = Convert.ToString(line[1]);
+                tempvm.DOCKey = Convert.ToString(line[2]);
+                tempvm.DOCTag = Convert.ToString(line[3]);
+                tempvm.DOCCreator = Convert.ToString(line[4]);
+                tempvm.DOCDate = DateTime.Parse(Convert.ToString(line[5]));
+                tempvm.DOCFavorTimes = Convert.ToInt32(line[6]);
+                tempvm.DocID = Convert.ToString(line[7]);
+                tempvm.BACKLink = Convert.ToString(line[8]);
+
+                if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
+                {
+                    var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey, ctrl);
+                    if (issue == null)
+                    {
+                        continue;
+                    }
+
+                    tempvm.Summary = issue.Summary;
+                    tempvm.DocURL = "/Issue/UpdateIssue?issuekey=" + tempvm.DOCKey;
+                }
+                else if (string.Compare(tempvm.DOCType, ShareDocType.DEBUG, true) == 0)
+                {
+                    var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(tempvm.DOCKey, ctrl);
+                    tempvm.Summary = debugtree[0].ProjectKey + "-" + debugtree[0].OrignalCode;
+                    tempvm.DocURL = "/Project/UpdateProjectError?ErrorKey=" + tempvm.DOCKey;
+                }
+                else
+                {
+                    tempvm.Summary = tempvm.DOCKey;
+                    //var tempstrs = tempvm.Summary.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+                    //var datestr = tempstrs[tempstrs.Length - 1].Substring(0, 8);
+                    //tempvm.DocURL = "/userfiles/docs/" + datestr + "/" + tempvm.DOCKey;
+                    tempvm.DocURL = "/User/WebDoc?DocKey=" + tempvm.DOCKey + "&Creator=" + tempvm.DOCCreator;
+                }
+
+                ret.Add(tempvm);
+            }
+
+            foreach (var doc in ret)
+            {
+                if (string.IsNullOrEmpty(doc.DocID))
+                {
+                    doc.DocID = UpdateDocID(doc.DOCPJK, doc.DOCKey);
+                }
+            }
+
+            return ret;
+        }
+
+
+
         public static List<ShareDocVM> RetrieveYesterdayDocs(Controller ctrl)
         {
             var ret = new List<ShareDocVM>();

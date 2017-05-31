@@ -936,6 +936,7 @@
     <Content Include="Views\User\IKPI.cshtml" />
     <Content Include="Views\User\IAdmire.cshtml" />
     <Content Include="Views\User\UserReviewedInfo.cshtml" />
+    <Content Include="Views\User\UserSharedInfo.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

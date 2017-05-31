@@ -1633,7 +1633,7 @@ namespace Prometheus.Controllers
                     var tempscript = System.IO.File.ReadAllText(ctrl.Server.MapPath("~/Scripts/ColumnChart.xml"));
                     ctrl.ViewBag.chartscript = tempscript.Replace("#ElementID#", "weeklyyield")
                         .Replace("#ChartType#", "column")
-                        .Replace("#Title#", "Weekly Yiled Trend")
+                        .Replace("#Title#", "Weekly Yield Trend")
                         .Replace("#ChartxAxisValues#", ChartxAxisValues)
                         .Replace("#yAxisTitle#", "Yield Percent")
                         .Replace("#ChartSearies#", ChartSearies)
@@ -1778,7 +1778,7 @@ namespace Prometheus.Controllers
 
                 var tempscript = System.IO.File.ReadAllText(ctrl.Server.MapPath("~/Scripts/SuperYield.xml"));
                 ctrl.ViewBag.chartscript = tempscript.Replace("#ElementID#", "weeklyyield")
-                    .Replace("#Title#", "Weekly Yiled Trend")
+                    .Replace("#Title#", "Weekly Yield Trend")
                     .Replace("#ChartxAxisValues#", ChartxAxisValues)
                     .Replace("#XAxisTitle#", "Date")
                     .Replace("#AmountMAX#", maxamout.ToString())
@@ -2268,7 +2268,7 @@ namespace Prometheus.Controllers
                     var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ColumnChart.xml"));
                     ViewBag.chartscript = tempscript.Replace("#ElementID#", "monthlyyield")
                         .Replace("#ChartType#", "column")
-                        .Replace("#Title#", "Monthly Yiled")
+                        .Replace("#Title#", "Monthly Yield")
                         .Replace("#ChartxAxisValues#", ChartxAxisValues)
                         .Replace("#yAxisTitle#", "Yield Percent")
                         .Replace("#ChartSearies#", ChartSearies)

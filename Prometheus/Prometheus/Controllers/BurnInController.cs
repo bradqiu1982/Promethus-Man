@@ -75,7 +75,7 @@ namespace Prometheus.Controllers
 
                 var tempscript = System.IO.File.ReadAllText(ctrl.Server.MapPath("~/Scripts/BISuperYield.xml"));
                 ctrl.ViewBag.chartscript = tempscript.Replace("#ElementID#", "weeklyyield")
-                    .Replace("#Title#", "Weekly Yiled Trend")
+                    .Replace("#Title#", "Weekly Yield Trend")
                     .Replace("#ChartxAxisValues#", ChartxAxisValues)
                     .Replace("#XAxisTitle#", "Date")
                     .Replace("#AmountMAX#", maxamout.ToString())
@@ -599,7 +599,7 @@ namespace Prometheus.Controllers
 
                     var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/BISuperYield.xml"));
                     ViewBag.chartscript = tempscript.Replace("#ElementID#", "periodyield")
-                        .Replace("#Title#", "Period Yiled")
+                        .Replace("#Title#", "Period Yield")
                         .Replace("#ChartxAxisValues#", ChartxAxisValues)
                         .Replace("#XAxisTitle#", "Date")
                         .Replace("#AmountMAX#", maxamout.ToString())
@@ -758,7 +758,7 @@ namespace Prometheus.Controllers
 
                     var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/BISuperYield.xml"));
                     ViewBag.chartscript = tempscript.Replace("#ElementID#", "waferyield")
-                        .Replace("#Title#", "Project Wafer "+ Wafer + " Yiled")
+                        .Replace("#Title#", "Project Wafer "+ Wafer + " Yield")
                         .Replace("#ChartxAxisValues#", ChartxAxisValues)
                         .Replace("#XAxisTitle#", "Date")
                         .Replace("#AmountMAX#", maxamout.ToString())
@@ -841,7 +841,7 @@ namespace Prometheus.Controllers
 
                 var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/BISuperYield.xml"));
                 ViewBag.wholechartscript = tempscript.Replace("#ElementID#", "wholewaferyield")
-                    .Replace("#Title#", "Whole Wafer "+ Wafer + " Yiled")
+                    .Replace("#Title#", "Whole Wafer "+ Wafer + " Yield")
                     .Replace("#ChartxAxisValues#", ChartxAxisValues)
                     .Replace("#XAxisTitle#", "Date")
                     .Replace("#AmountMAX#", maxamout.ToString())

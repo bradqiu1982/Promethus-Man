@@ -437,6 +437,9 @@ namespace Prometheus.Models
                 tempvm.BACKLink = Convert.ToString(line[9]);
 
                 var blog = UserBlogVM.RetrieveBlogDoc(tempvm.DOCKey,ctrl);
+                if (string.IsNullOrEmpty(blog.DocKey))
+                    continue;
+
                 tempvm.Summary = blog.Title;
                 tempvm.DocURL = blog.DocURL;
 
@@ -476,7 +479,7 @@ namespace Prometheus.Models
 
                 if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
                 {
-                    var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey,ctrl);
+                    var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey, ctrl);
                     if (issue == null)
                     {
                         continue;
@@ -491,13 +494,22 @@ namespace Prometheus.Models
                     tempvm.Summary = debugtree[0].ProjectKey + "-" + debugtree[0].OrignalCode;
                     tempvm.DocURL = "/Project/UpdateProjectError?ErrorKey=" + tempvm.DOCKey;
                 }
+                else if (string.Compare(tempvm.DOCType, ShareDocType.BLOG, true) == 0)
+                {
+                    var blog = UserBlogVM.RetrieveBlogDoc(tempvm.DOCKey, ctrl);
+                    if (string.IsNullOrEmpty(blog.DocKey))
+                        continue;
+
+                    tempvm.Summary = blog.Title;
+                    tempvm.DocURL = blog.DocURL;
+                }
                 else
                 {
                     tempvm.Summary = tempvm.DOCKey;
                     //var tempstrs = tempvm.Summary.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
                     //var datestr = tempstrs[tempstrs.Length - 1].Substring(0, 8);
                     //tempvm.DocURL = "/userfiles/docs/" + datestr + "/" + tempvm.DOCKey;
-                    tempvm.DocURL = "/User/WebDoc?DocKey=" + tempvm.DOCKey + "&Creator="+tempvm.DOCCreator;
+                    tempvm.DocURL = "/User/WebDoc?DocKey=" + tempvm.DOCKey + "&Creator=" + tempvm.DOCCreator;
                 }
 
                 ret.Add(tempvm);
@@ -550,6 +562,15 @@ namespace Prometheus.Models
                     var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(tempvm.DOCKey, ctrl);
                     tempvm.Summary = debugtree[0].ProjectKey + "-" + debugtree[0].OrignalCode;
                     tempvm.DocURL = "/Project/UpdateProjectError?ErrorKey=" + tempvm.DOCKey;
+                }
+                else if (string.Compare(tempvm.DOCType, ShareDocType.BLOG, true) == 0)
+                {
+                    var blog = UserBlogVM.RetrieveBlogDoc(tempvm.DOCKey, ctrl);
+                    if (string.IsNullOrEmpty(blog.DocKey))
+                        continue;
+
+                    tempvm.Summary = blog.Title;
+                    tempvm.DocURL = blog.DocURL;
                 }
                 else
                 {
@@ -664,6 +685,15 @@ namespace Prometheus.Models
                     var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(tempvm.DOCKey, ctrl);
                     tempvm.Summary = debugtree[0].ProjectKey + "-" + debugtree[0].OrignalCode;
                     tempvm.DocURL = "/Project/UpdateProjectError?ErrorKey=" + tempvm.DOCKey;
+                }
+                else if (string.Compare(tempvm.DOCType, ShareDocType.BLOG, true) == 0)
+                {
+                    var blog = UserBlogVM.RetrieveBlogDoc(tempvm.DOCKey, ctrl);
+                    if (string.IsNullOrEmpty(blog.DocKey))
+                        continue;
+
+                    tempvm.Summary = blog.Title;
+                    tempvm.DocURL = blog.DocURL;
                 }
                 else
                 {
@@ -825,12 +855,22 @@ namespace Prometheus.Models
                     tempvm.Summary = debugtree[0].ProjectKey + "-" + debugtree[0].OrignalCode;
                     tempvm.DocURL = "/Project/UpdateProjectError?ErrorKey=" + tempvm.DOCKey;
                 }
+                else if (string.Compare(tempvm.DOCType, ShareDocType.BLOG, true) == 0)
+                {
+                    var blog = UserBlogVM.RetrieveBlogDoc(tempvm.DOCKey, ctrl);
+                    if (string.IsNullOrEmpty(blog.DocKey))
+                        continue;
+
+                    tempvm.Summary = blog.Title;
+                    tempvm.DocURL = blog.DocURL;
+                }
                 else
                 {
                     tempvm.Summary = tempvm.DOCKey;
-                    var tempstrs = tempvm.Summary.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
-                    var datestr = tempstrs[tempstrs.Length - 1].Substring(0, 8);
-                    tempvm.DocURL = "/userfiles/docs/" + datestr + "/" + tempvm.DOCKey;
+                    //var tempstrs = tempvm.Summary.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+                    //var datestr = tempstrs[tempstrs.Length - 1].Substring(0, 8);
+                    //tempvm.DocURL = "/userfiles/docs/" + datestr + "/" + tempvm.DOCKey;
+                    tempvm.DocURL = "/User/WebDoc?DocKey=" + tempvm.DOCKey + "&Creator=" + tempvm.DOCCreator;
                 }
 
                 ret.Add(tempvm);

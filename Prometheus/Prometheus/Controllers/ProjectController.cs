@@ -3697,9 +3697,9 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(key))
             {
                 var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key,this);
-                var FirstEngineer = ProjectViewModels.RetrieveOneProject(vm[0].ProjectKey).FirstEngineer;
+                var AllPJMember = ProjectViewModels.RetrieveOneProject(vm[0].ProjectKey).AllPJMember;
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
-                if (string.Compare(FirstEngineer, updater, true) == 0)
+                if (AllPJMember.ToUpper().Contains(updater.ToUpper()))
                 {
                     ViewBag.assigee = true;
                 }
@@ -3787,9 +3787,9 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(key))
             {
                 var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key,this);
-                var FirstEngineer = ProjectViewModels.RetrieveOneProject(vm[0].ProjectKey).FirstEngineer;
+                var AllPJMember = ProjectViewModels.RetrieveOneProject(vm[0].ProjectKey).AllPJMember;
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
-                if (string.Compare(FirstEngineer, updater, true) == 0)
+                if (AllPJMember.ToUpper().Contains(updater.ToUpper()))
                 {
                     ViewBag.assigee = true;
                 }
@@ -3996,11 +3996,11 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(errorkey) && !string.IsNullOrEmpty(filename))
             {
                 var tempvm = ProjectErrorViewModels.RetrieveErrorByErrorKey(errorkey,this);
-                var FirstEngineer = ProjectViewModels.RetrieveOneProject(tempvm[0].ProjectKey).FirstEngineer;
+                var AllPJMember = ProjectViewModels.RetrieveOneProject(tempvm[0].ProjectKey).AllPJMember;
                 var ckdict = CookieUtility.UnpackCookie(this);
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
-                if (string.Compare(FirstEngineer, updater, true) == 0)
+                if (AllPJMember.ToUpper().Contains(updater.ToUpper()))
                 {
                     ProjectErrorViewModels.DeleteAttachment(errorkey,filename);
                 }

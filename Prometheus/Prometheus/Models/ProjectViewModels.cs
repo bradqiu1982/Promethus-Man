@@ -450,19 +450,20 @@ namespace Prometheus.Models
             {
                 lmeb.Clear();
                 lmeb.AddRange(value);
-
-                foreach (var eg in lmeb)
-                {
-                    if (string.Compare(eg.Role, Prometheus.Models.ProjectViewModels.ENGROLE) == 0)
-                    {
-                        FirstEngineer = eg.Name;
-                        break;
-                    }
-                }
             }
         }
 
-        public string FirstEngineer { set; get; }
+        public string AllPJMember {
+            get
+            {
+                var allmemb = string.Empty;
+                foreach (var eg in lmeb)
+                {
+                    allmemb = allmemb + ";" + eg;
+                }
+                return allmemb;
+            }
+        }
 
         //public string DVTDate { set; get; }
         //public string DVTStatus { set; get; }

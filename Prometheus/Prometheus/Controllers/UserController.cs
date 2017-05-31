@@ -1932,6 +1932,8 @@ namespace Prometheus.Controllers
             monthlylist[0].Disabled = true;
             ViewBag.monthlylist = monthlylist;
 
+            ViewBag.TotalRank = UserKPIVM.RetrieveTotalRank(updater);
+
             return View(vm);
         }
 

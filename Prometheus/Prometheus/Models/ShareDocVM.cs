@@ -81,7 +81,7 @@ namespace Prometheus.Models
 
         public static string ShareDoc(string DOCPJK, string DOCType, string DOCKey, string DOCTag, string DOCCreator, string DOCDate,string BackLink)
         {
-            var sql = "select DOCID from ShareDoc where DOCPJK='<DOCPJK>' and DOCKey=N'<DOCKey>'";
+            var sql = "select APVal1 from ShareDoc where DOCPJK='<DOCPJK>' and DOCKey=N'<DOCKey>'";
             sql = sql.Replace("<DOCPJK>", DOCPJK).Replace("<DOCKey>", DOCKey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
@@ -103,6 +103,19 @@ namespace Prometheus.Models
                 .Replace("<DOCID>", docid).Replace("<BackLink>", BackLink);
             DBUtility.ExeLocalSqlNoRes(sql);
             return docid;
+        }
+
+        public static string RetrieveBackLink(string Dockey)
+        {
+            var sql = "select BackLink from ShareDoc where DOCKey=N'<DOCKey>'";
+            sql = sql.Replace("<DOCKey>", Dockey);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            if (dbret.Count > 0)
+            {
+                var backlink = Convert.ToString(dbret[0][0]);
+                return backlink;
+            }
+            return string.Empty;
         }
 
         public static void PushDoc(string BookerName, string DOCPJK, string DOCType, string DOCKey, string DOCTag, string DOCCreator, string DOCDate,string DOCPusher,string DOCID,string BackLink)

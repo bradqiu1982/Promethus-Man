@@ -16,7 +16,14 @@
 <div class="row">
     <ol class="breadcrumb" style="font-size:18px">
         <li><a href="/User/UserCenter?username=@(ViewBag.RealUserID)">@ViewBag.UserName Center</a></li>
-        <li><a href="/User/IBLOG">I BLOG</a></li>
+        @if (Model != null && !string.IsNullOrEmpty(Model.BackLink))
+        {
+            <li><a href="@(Model.BackLink)">Back Link</a></li>
+        }
+        else
+        {
+            <li><a href="/User/IBLOG">I BLOG</a></li>
+        }
         <li class="active">BLOG Doc</li>
     </ol>
 </div>

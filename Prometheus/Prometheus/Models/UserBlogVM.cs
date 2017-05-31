@@ -30,8 +30,10 @@ namespace Prometheus.Models
             Title = string.Empty;
             Content = string.Empty;
             Tag = string.Empty;
+            BackLink = string.Empty;
         }
 
+        public string BackLink { set; get; }
         public string UserName { set; get; }
         public string ContentType { set; get; }
         public string DocKey { set; get; }

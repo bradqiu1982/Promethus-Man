@@ -61,6 +61,17 @@ CREATE TABLE [dbo].[UserKPIVM] (
     [APVal3]     DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
 );
 
+CREATE TABLE [dbo].[UserReviewedItems] (
+	[UserName]   NVARCHAR (200) NOT NULL,
+	[PJKey]   NVARCHAR (200) NOT NULL,
+    [Summary]   NVARCHAR (MAX) NOT NULL,
+	[Link]   NVARCHAR (MAX) NOT NULL,
+    [UpdateTime] DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+    [APVal1]     NVARCHAR (200)  DEFAULT ('') NOT NULL,
+    [APVal2]     NVARCHAR (MAX)  DEFAULT ('') NOT NULL,
+    [APVal3]     DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+);
+
 CREATE TABLE [dbo].[UserNet] (
     [ME]     NVARCHAR (100) NOT NULL,
     [OTHER]  NVARCHAR (100) NOT NULL,

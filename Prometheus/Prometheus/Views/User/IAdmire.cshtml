@@ -38,12 +38,11 @@
         </div>
         <div class="col-lg-9 text-left"></div>
         <script type="text/javascript">
-        function ShowMonthKPI()
-        {
-            if (document.getElementById("monthlylist").value) {
-                window.location.href = "/User/IKPI?month=" + document.getElementById("monthlylist").value;
+            function ShowMonthKPI() {
+                if (document.getElementById("monthlylist").value) {
+                    window.location.href = "/User/IKPI?month=" + document.getElementById("monthlylist").value;
+                }
             }
-        }
         </script>
     </div>
 </div>
@@ -52,60 +51,86 @@
     <div class="col-lg-12">&nbsp;</div>
 </div>
 
-<div class="form-group">
-    <div class="row">
-        <table id="pndatatable" class="display" cellspacing="0">
-            <thead>
-                <tr>
-                    <td>User Name</td>
-                    <td>Rank Type</td>
-                    <td>Summary</td>
-                    <td>Rank</td>
-                    <td>TimeStamp</td>
-                    <td>Admire Rank</td>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-            {
+@using (Html.BeginForm("IAdmire", "User", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    if (Model != null)
+    {
+        <div class="row">
+            <div class="col-lg-12"><input class="form-control text-box single-line" id="rankcount" name="rankcount" type="hidden" value="@Model.Count" /></div>
+        </div>
+    }
+
+    <div class="form-group">
+        <div class="row">
+            <table id="pndatatable" class="display" cellspacing="0">
+                <thead>
                     <tr>
-                        <td>@item.UserName.Trim().Split('@')[0]</td>
-                        <td>@item.RankType</td>
-                        <td><a href="@item.BackLink" target="_blank">@item.Summary</a></td>
-                        <td>@item.Rank.ToString()</td>
-                        <td>@item.UpdateTime.ToString()</td>
-                        <td>
-                            @if (item.ADMIRERank == 0)
-                            {
-                                <input class="form-control text-box single-line" id="admirerank@(idx)" name="admirerank@(idx)" style="width:4em!important;"/>
-                                <input class="form-control text-box single-line" id="rankid@(idx)" name="rankid@(idx)" type="hidden" value="@item.RankKey" />
-                            }
-                            else
-                            {
-                                @item.ADMIRERank.ToString()
-                            }
-                        </td>
+                        <td>User Name</td>
+                        <td>Rank Type</td>
+                        <td>Summary</td>
+                        <td>Rank</td>
+                        <td>TimeStamp</td>
+                        <td>Admire Rank</td>
                     </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                {
+                        <tr>
+                            <td>@item.UserName.Trim().Split('@')[0]</td>
+                            <td>@item.RankType</td>
+                            <td><a href="@item.BackLink" target="_blank">@item.Summary</a></td>
+                            <td>@item.Rank.ToString()</td>
+                            <td>@item.UpdateTime.ToString()</td>
+                            <td>
+                                @if (item.ADMIRERank == 0)
+                                {
+                                    <input class="form-control text-box single-line" id="admirerank@(idx)" name="admirerank@(idx)" style="width:4em!important;" />
+                                    <input class="form-control text-box single-line" id="rankid@(idx)" name="rankid@(idx)" type="hidden" value="@item.RankKey" />
+                                }
+                                else
+                                {
+                                    @item.ADMIRERank.ToString()
+                                }
+                            </td>
+                        </tr>
 
-                    idx = idx + 1;
-                }
-            </tbody>
-        </table>
+                        idx = idx + 1;
+                    }
+                </tbody>
+            </table>
 
-        <script type="text/javascript">
-        $(document).ready(function() {
-            $('#pndatatable').DataTable({
-                'iDisplayLength': 50,
-                'aLengthMenu': [[25, 50, 100, -1],
-                                [25, 50, 100, "All"]],
-                "bAutoWidth": false,
-                "aaSorting": [],
-                "order": []
-            });
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $('#pndatatable').DataTable({
+                        'iDisplayLength': 50,
+                        'aLengthMenu': [[25, 50, 100, -1],
+                                        [25, 50, 100, "All"]],
+                        "bAutoWidth": false,
+                        "aaSorting": [],
+                        "order": []
                     });
-        </script>
+                });
+            </script>
+        </div>
     </div>
-</div>
 
+    <div class="row">
+        <div class="col-lg-12">&nbsp;</div>
+    </div>
 
+    <div class="row">
+        <div class="form-group">
+            <div class="row col-lg-12">
+                <div class="col-lg-2">
+                    <input style="background-color: #006DC0;color:white;" type="submit" value="Submit" id="updateisu" name="updateisu" class="btn btn-default" />
+                </div>
+                <div class="col-lg-10"></div>
+            </div>
+        </div>
+    </div>
+
+}
 

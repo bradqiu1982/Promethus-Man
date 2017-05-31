@@ -328,7 +328,7 @@ namespace Prometheus.Controllers
             }
 
             CookieUtility.SetCookie(this, val);
-            return RedirectToAction("ViewAll", "Project");
+            return RedirectToAction("UserCenter", "User");
         }
 
         private List<SelectListItem> CreateSelectList(List<string> valist, string defVal)
@@ -1109,6 +1109,61 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        public ActionResult ReviewILearn(string DOCTYPE,string DOCKEY,string DOCCreator)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            if (string.Compare(DOCTYPE, ShareDocType.ISSUE, true) == 0)
+            {
+                var issue = IssueViewModels.RetrieveIssueByIssueKey(DOCKEY, this);
+                if (issue == null)
+                {
+                    return RedirectToAction("ILearn", "User");
+                }
+
+                UserKPIVM.StoreUserReviewed(updater, issue.ProjectKey,"View Task: "+issue.Summary, "/Issue/UpdateIssue?issuekey=" + DOCKEY);
+
+                var dict = new RouteValueDictionary();
+                dict.Add("issuekey", DOCKEY);
+                return RedirectToAction("UpdateIssue", "Issue", dict);
+            }
+            else if (string.Compare(DOCTYPE, ShareDocType.DEBUG, true) == 0)
+            {
+                var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(DOCKEY, this);
+                var Summary = debugtree[0].ProjectKey + "-" + debugtree[0].OrignalCode;
+
+                UserKPIVM.StoreUserReviewed(updater, debugtree[0].ProjectKey, "View DebugTree: "+Summary, "/Project/UpdateProjectError?ErrorKey=" + DOCKEY);
+
+                var dict = new RouteValueDictionary();
+                dict.Add("ErrorKey", DOCKEY);
+                return RedirectToAction("UpdateProjectError", "Project", dict);
+            }
+            else if (string.Compare(DOCTYPE, ShareDocType.DOCUMENT, true) == 0)
+            {
+                var Summary = DOCKEY;
+                UserKPIVM.StoreUserReviewed(updater,"ALL", "View Document: " + Summary, "/User/WebDoc?DocKey=" + DOCKEY + "&Creator=" + DOCCreator);
+
+                var dict = new RouteValueDictionary();
+                dict.Add("DocKey", DOCKEY);
+                dict.Add("Creator", DOCCreator);
+                return RedirectToAction("WebDoc", "User", dict);
+            }
+            else if (string.Compare(DOCTYPE, ShareDocType.BLOG, true) == 0)
+            {
+                var blog = UserBlogVM.RetrieveBlogDoc(DOCKEY, this);
+                var Summary = blog.Title;
+
+                UserKPIVM.StoreUserReviewed(updater, "ALL", "View BLOG: " + Summary, "/User/WebDoc?DocKey=" + DOCKEY);
+
+                var dict = new RouteValueDictionary();
+                dict.Add("DocKey", DOCKEY);
+                return RedirectToAction("WebDoc", "User", dict);
+            }
+
+            return RedirectToAction("ILearn", "User");
+        }
+
         [HttpPost, ActionName("ILearnOperate")]
         [ValidateAntiForgeryToken]
         public ActionResult ILearnOperate()
@@ -1581,6 +1636,8 @@ namespace Prometheus.Controllers
 
                 if (string.IsNullOrEmpty(vm.DocKey))
                 {
+                    var backlink = ShareDocVM.RetrieveBackLink(DocKey);
+
                     var tempstrs = DocKey.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
                     var datestr = tempstrs[tempstrs.Length - 1].Substring(0,8);
                     vm.ContentType = UserBlogContentType.ATTACH;
@@ -1589,6 +1646,7 @@ namespace Prometheus.Controllers
                     vm.DocKey = DocKey;
                     vm.UserName = Creator;
                     vm.DocURL = "/User/WebDoc?DocKey=" + DocKey + "&Creator=" + Creator;
+                    vm.BackLink = backlink;
                 }
 
                 return View(vm);
@@ -1602,6 +1660,8 @@ namespace Prometheus.Controllers
                     var tempDocKey = ckdict["DocKey"];
                     if (string.IsNullOrEmpty(vm.DocKey))
                     {
+                        var backlink = ShareDocVM.RetrieveBackLink(DocKey);
+
                         var tempstrs = tempDocKey.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
                         var datestr = tempstrs[tempstrs.Length - 1].Substring(0, 8);
                         vm.ContentType = UserBlogContentType.ATTACH;
@@ -1610,6 +1670,8 @@ namespace Prometheus.Controllers
                         vm.DocKey = tempDocKey;
                         vm.UserName = Creator;
                         vm.DocURL = "/User/WebDoc?DocKey=" + DocKey + "&Creator=" + Creator;
+
+                        vm.BackLink = backlink;
                     }
 
                     return View(vm);
@@ -1838,7 +1900,7 @@ namespace Prometheus.Controllers
             {
                 var ck = new Dictionary<string, string>();
                 ck.Add("logonredirectctrl", "User");
-                ck.Add("logonredirectact", "IBLOG");
+                ck.Add("logonredirectact", "IKPI");
                 CookieUtility.SetCookie(this, ck);
                 return RedirectToAction("LoginUser", "User");
             }
@@ -1884,7 +1946,7 @@ namespace Prometheus.Controllers
             {
                 var ck = new Dictionary<string, string>();
                 ck.Add("logonredirectctrl", "User");
-                ck.Add("logonredirectact", "IBLOG");
+                ck.Add("logonredirectact", "IAdmire");
                 CookieUtility.SetCookie(this, ck);
                 return RedirectToAction("LoginUser", "User");
             }
@@ -1925,6 +1987,83 @@ namespace Prometheus.Controllers
 
             return View(vm);
 
+        }
+
+        [HttpPost, ActionName("IAdmire")]
+        [ValidateAntiForgeryToken]
+        public ActionResult IAdmirePost()
+        {
+            var rankcount = 0;
+            if (!string.IsNullOrEmpty(Request.Form["rankcount"]))
+            {
+                rankcount = Convert.ToInt32(Request.Form["rankcount"]);
+            }
+
+            for (var idx = 0; idx < rankcount; idx++)
+            {
+                if (!string.IsNullOrEmpty(Request.Form["admirerank"+idx.ToString()]) 
+                    && !string.IsNullOrEmpty(Request.Form["rankid"+idx.ToString()]))
+                {
+                    var admirerank = 0;
+                    try
+                    {
+                        admirerank = Convert.ToInt32(Request.Form["admirerank" + idx.ToString()]);
+                    }
+                    catch (Exception ex)
+                    { admirerank = 0; }
+                    var rankid = (Request.Form["rankid" + idx.ToString()]);
+
+                    UserKPIVM.UpdateAdmireRank(rankid, admirerank);
+                }
+            }
+
+            return RedirectToAction("IAdmire", "User");
+        }
+
+
+        public ActionResult UserReviewedInfo(string month)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "IAdmire");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            ViewBag.UserName = updater.Split(new char[] { '@' })[0];
+            ViewBag.RealUserID = updater;
+
+            var tempmonth = 1;
+            if (!string.IsNullOrEmpty(month))
+            {
+                try
+                {
+                    tempmonth = Convert.ToInt32(month);
+                }
+                catch (Exception ex)
+                { tempmonth = 1; }
+            }
+
+            var vm = UserKPIVM.RetrieveUserReviewed(DateTime.Now.AddMonths(0 - tempmonth).ToString());
+
+            var sarray = new string[] { "1", "2", "3", "4", "5", "6", "12", "18", "24", "30", "36" };
+            var slist = new List<string>();
+            slist.Add("User Reviewed In Months");
+            slist.AddRange(sarray);
+            var monthlylist = CreateSelectList(slist, "");
+            monthlylist[0].Selected = true;
+            monthlylist[0].Disabled = true;
+            ViewBag.monthlylist = monthlylist;
+
+            return View(vm);
         }
 
     }

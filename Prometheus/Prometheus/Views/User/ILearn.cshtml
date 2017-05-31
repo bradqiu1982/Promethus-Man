@@ -74,7 +74,8 @@
                             <input class="form-control text-box single-line" value="@line.DOCKey" id="HDocKey@(i)" name="HDocKey@(i)" type="hidden" />
                         </td>
 
-                        <td style="text-align:center;font-size:12px"><a href="@(line.DocURL)" target="_blank">@(line.Summary)</a></td>
+                        <td style="text-align:center;font-size:12px"><a href="/User/ReviewILearn?DOCTYPE=@(line.DOCType)&DOCKEY=@(line.DOCKey)&DOCCreator=@(line.DOCCreator)" target="_blank">@(line.Summary)</a></td>
+                        @*<td style="text-align:center;font-size:12px"><a href="@(line.DocURL)" target="_blank">@(line.Summary)</a></td>*@
                         <td style="text-align:center;font-size:12px">@(line.DOCTag)</td>
                         <td style="text-align:center;font-size:12px">@(line.DOCPJK)</td>
                         <td style="text-align:center;font-size:12px">@(line.DOCCreator.Split(new char[] { '@' })[0])</td>

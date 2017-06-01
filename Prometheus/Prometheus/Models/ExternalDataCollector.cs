@@ -1594,7 +1594,7 @@ namespace Prometheus.Models
             sql = sql.Replace("<AppV_B>", rmadata.AppV_B).Replace("<AppV_C>", rmadata.AppV_C)
                 .Replace("<AppV_D>", rmadata.AppV_D).Replace("<AppV_E>", rmadata.AppV_E).Replace("<AppV_F>", rmadata.AppV_F)
                 .Replace("<AppV_G>", rmadata.AppV_G).Replace("<AppV_H>", rmadata.AppV_H).Replace("<AppV_I>", rmadata.AppV_I)
-                .Replace("<AppV_J>", rmadata.AppV_J).Replace("<AppV_K>", rmadata.AppV_K).Replace("<AppV_L>", rmadata.AppV_L)
+                .Replace("<AppV_J>", rmadata.AppV_J).Replace("<AppV_K>", ReconstructSN(rmadata.AppV_K)).Replace("<AppV_L>", rmadata.AppV_L)
                 .Replace("<AppV_M>", rmadata.AppV_M).Replace("<AppV_N>", rmadata.AppV_N).Replace("<AppV_O>", rmadata.AppV_O)
                 .Replace("<AppV_P>", rmadata.AppV_P).Replace("<AppV_Q>", rmadata.AppV_Q).Replace("<AppV_R>", rmadata.AppV_R)
                 .Replace("<AppV_S>", rmadata.AppV_S).Replace("<AppV_T>", rmadata.AppV_T).Replace("<AppV_U>", rmadata.AppV_U)

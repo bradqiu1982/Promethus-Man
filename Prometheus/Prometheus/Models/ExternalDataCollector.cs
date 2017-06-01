@@ -1413,6 +1413,17 @@ namespace Prometheus.Models
             }//end foreach
         }
 
+        private static string ReconstructSN(string originalSN)
+        {
+            var ret = string.Empty;
+            var sns = originalSN.Split(new string[] { " ",",",";",":","\r","\n" }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var sn in sns)
+            {
+                ret = ret + ";" + sn;
+            }
+            return ret;
+        }
+
         private static void SolveRELData(List<List<string>> data, Controller ctrl)
         {
             if (data.Count == 0)
@@ -1424,19 +1435,30 @@ namespace Prometheus.Models
             var rmaissuedict = new Dictionary<string, bool>();
             foreach (var issue in allrmaissue)
             {
-                var uniquekey = issue.ReportDate.ToString("yyyy-MM-dd") + "-" + issue.TestType + "-" + issue.ModuleSN;
+                var uniquekey = issue.ReportDate.ToString("yyyy-MM-dd") + "-" + issue.TestType + "-" + ReconstructSN(issue.ModuleSN);
                 if (!rmaissuedict.ContainsKey(uniquekey))
                 {
                     rmaissuedict.Add(uniquekey, true);
                 }
             }//end foreach
 
-            var pjkeys = ProjectViewModels.RetrieveAllProjectKey(); //all pjkey
-            var allpjdict = new Dictionary<string, bool>();
-            foreach (var pjk in pjkeys)
+            var allbacupdata = ExternalDataCollector.RetrieveAllRELData();
+            var allbackupdict = new Dictionary<string, int>();
+            foreach (var bdata in allbacupdata)
             {
-                allpjdict.Add(pjk, true);
+                var uniquekey = DateTime.Parse(bdata.AppV_C).ToString("yyyy-MM-dd") + "-" + bdata.AppV_I + "-" + ReconstructSN(bdata.AppV_K);
+                if (!allbackupdict.ContainsKey(uniquekey))
+                {
+                    allbackupdict.Add(uniquekey, bdata.AppV_A);
+                }
             }
+
+            //var pjkeys = ProjectViewModels.RetrieveAllProjectKey(); //all pjkey
+            //var allpjdict = new Dictionary<string, bool>();
+            //foreach (var pjk in pjkeys)
+            //{
+            //    allpjdict.Add(pjk, true);
+            //}
 
             var syscfgdict = CfgUtility.GetSysConfig(ctrl);
             var RELPJKEY =  RMSpectialCh(syscfgdict["RELDEFAULTPJ"]);
@@ -1462,14 +1484,14 @@ namespace Prometheus.Models
                             caseid = caseid + 1;
                         }
 
-                        UpdateRELData(rawdata);
+                        UpdateRELData(rawdata, allbackupdict);
 
                         //if (allpjdict.ContainsKey(RELPJKEY))
                         //{
                             Try2CreateREL(RELPJKEY,rawdata, rmaissuedict, ctrl);
                         //}
 
-                        var uniquekey = DateTime.Parse(rawdata.AppV_C).ToString("yyyy-MM-dd") + "-" + rawdata.AppV_I + "-" + rawdata.AppV_K;
+                        var uniquekey = DateTime.Parse(rawdata.AppV_C).ToString("yyyy-MM-dd") + "-" + rawdata.AppV_I + "-" + ReconstructSN(rawdata.AppV_K);
                         if (solvedrmanum.ContainsKey(uniquekey))
                         {
                             continue;
@@ -1513,25 +1535,33 @@ namespace Prometheus.Models
             }
         }
 
-        private static bool RELDataExist(RELRAWData rmadata)
+        private static string RELDataExist(RELRAWData rmadata, Dictionary<string, int> allbackupdict)
         {
-            var sql = "select AppV_A from RELBackupData where AppV_C=N'<AppV_C>' and AppV_I=N'<AppV_I>' and AppV_K=N'<AppV_K>'";
-            sql = sql.Replace("<AppV_C>", rmadata.AppV_C).Replace("<AppV_I>", rmadata.AppV_I).Replace("<AppV_K>", rmadata.AppV_K);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
-            if (dbret.Count > 0)
+            var uniquekey = DateTime.Parse(rmadata.AppV_C).ToString("yyyy-MM-dd") + "-" + rmadata.AppV_I + "-" + ReconstructSN(rmadata.AppV_K);
+            var ret = string.Empty;
+            if (allbackupdict.ContainsKey(uniquekey))
             {
-                return true;
+                ret = allbackupdict[uniquekey].ToString();
             }
-            else
-            {
-                return false;
-            }
+            return ret;
+            //var sql = "select AppV_A from RELBackupData where AppV_C=N'<AppV_C>' and AppV_I=N'<AppV_I>' and AppV_K=N'<AppV_K>'";
+            //sql = sql.Replace("<AppV_C>", rmadata.AppV_C).Replace("<AppV_I>", rmadata.AppV_I).Replace("<AppV_K>", rmadata.AppV_K);
+            //var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            //if (dbret.Count > 0)
+            //{
+            //    return true;
+            //}
+            //else
+            //{
+            //    return false;
+            //}
         }
 
-        private static void UpdateRELData(RELRAWData rmadata)
+        private static void UpdateRELData(RELRAWData rmadata,Dictionary<string,int> allbackupdict)
         {
             var sql = "";
-            if (RELDataExist(rmadata))
+            var relid = RELDataExist(rmadata, allbackupdict);
+            if (!string.IsNullOrEmpty(relid))
             {
                 sql = "update RELBackupData set AppV_B = N'<AppV_B>',AppV_D = N'<AppV_D>'"
                     + ",AppV_E = N'<AppV_E>',AppV_F = N'<AppV_F>',AppV_G = N'<AppV_G>',AppV_H = N'<AppV_H>'"
@@ -1539,7 +1569,8 @@ namespace Prometheus.Models
                     + ",AppV_O = N'<AppV_O>',AppV_P = '<AppV_P>',AppV_Q = '<AppV_Q>',AppV_R = '<AppV_R>',AppV_S = '<AppV_S>'"
                     + ",AppV_T = '<AppV_T>',AppV_U = N'<AppV_U>',AppV_V = '<AppV_V>',AppV_W = '<AppV_W>',AppV_X = N'<AppV_X>'"
                     + ",AppV_Y = N'<AppV_Y>',AppV_Z = N'<AppV_Z>',AppV_AA = N'<AppV_AA>',AppV_AB = N'<AppV_AB>',AppV_AC = '<AppV_AC>'"
-                    + ",AppV_AD = N'<AppV_AD>',AppV_AE = N'<AppV_AE>',AppV_AF = N'<AppV_AF>',AppV_AG = N'<AppV_AG>'  where AppV_C=N'<AppV_C>' and AppV_I=N'<AppV_I>' and AppV_K=N'<AppV_K>'";
+                    + ",AppV_AD = N'<AppV_AD>',AppV_AE = N'<AppV_AE>',AppV_AF = N'<AppV_AF>',AppV_AG = N'<AppV_AG>'  where AppV_A=<AppV_A>";
+                sql = sql.Replace("<AppV_A>", relid);
             }
             else
             {
@@ -1551,9 +1582,16 @@ namespace Prometheus.Models
                     + ",N'<AppV_G>',N'<AppV_H>',N'<AppV_I>',N'<AppV_J>',N'<AppV_K>',N'<AppV_L>',N'<AppV_M>',N'<AppV_N>',N'<AppV_O>'"
                     + ",'<AppV_P>','<AppV_Q>','<AppV_R>','<AppV_S>','<AppV_T>',N'<AppV_U>','<AppV_V>','<AppV_W>',N'<AppV_X>'"
                     + ",N'<AppV_Y>',N'<AppV_Z>',N'<AppV_AA>',N'<AppV_AB>','<AppV_AC>',N'<AppV_AD>',N'<AppV_AE>',N'<AppV_AF>',N'<AppV_AG>')";
+                sql = sql.Replace("<AppV_A>", rmadata.AppV_A.ToString());
+
+                var uniquekey = DateTime.Parse(rmadata.AppV_C).ToString("yyyy-MM-dd") + "-" + rmadata.AppV_I + "-" + ReconstructSN(rmadata.AppV_K);
+                if (!allbackupdict.ContainsKey(uniquekey))
+                {
+                    allbackupdict.Add(uniquekey, rmadata.AppV_A);
+                }
             }
 
-            sql = sql.Replace("<AppV_A>", rmadata.AppV_A.ToString()).Replace("<AppV_B>", rmadata.AppV_B).Replace("<AppV_C>", rmadata.AppV_C)
+            sql = sql.Replace("<AppV_B>", rmadata.AppV_B).Replace("<AppV_C>", rmadata.AppV_C)
                 .Replace("<AppV_D>", rmadata.AppV_D).Replace("<AppV_E>", rmadata.AppV_E).Replace("<AppV_F>", rmadata.AppV_F)
                 .Replace("<AppV_G>", rmadata.AppV_G).Replace("<AppV_H>", rmadata.AppV_H).Replace("<AppV_I>", rmadata.AppV_I)
                 .Replace("<AppV_J>", rmadata.AppV_J).Replace("<AppV_K>", rmadata.AppV_K).Replace("<AppV_L>", rmadata.AppV_L)
@@ -1586,7 +1624,7 @@ namespace Prometheus.Models
                 UserViewModels.RegisterUserAuto(analyser);
                 UserViewModels.RegisterUserAuto(reporter);
 
-                var uniquekey = DateTime.Parse(rawdata.AppV_C).ToString("yyyy-MM-dd") + "-" + rawdata.AppV_I + "-" + rawdata.AppV_K;
+                var uniquekey = DateTime.Parse(rawdata.AppV_C).ToString("yyyy-MM-dd") + "-" + rawdata.AppV_I + "-" + ReconstructSN(rawdata.AppV_K);
                 if (!rmaissuedict.ContainsKey(uniquekey))
                 {
                     CreateRELssue(RELPJKEY, analyser, reporter, rawdata, ctrl);

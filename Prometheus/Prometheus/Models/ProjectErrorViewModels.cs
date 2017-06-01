@@ -291,6 +291,11 @@ namespace Prometheus.Models
                     {
                         if (r.CommentDate > starttime && r.CommentDate < endtime)
                         {
+                            var sameascount = SameAsDBTVM.SameAsIssueCount(r.ErrorKey, item.CommentDate.ToString());
+                            if (sameascount > 1)
+                            {
+                                r.Comment = r.Comment + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='/Project/SameAsModules?ErrorKey=" + r.ErrorKey + "&LinkTime=" + item.CommentDate.ToString() + "' target='_blank' style='Color:white !important;text-decoration: none !important;'><strong>  QTY:" + sameascount.ToString() + "</strong></a>";
+                            }
                             temppitem.Add(r);
                         }
                     }//end foreach

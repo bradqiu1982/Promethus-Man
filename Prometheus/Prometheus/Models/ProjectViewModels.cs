@@ -459,7 +459,7 @@ namespace Prometheus.Models
                 var allmemb = string.Empty;
                 foreach (var eg in lmeb)
                 {
-                    allmemb = allmemb + ";" + eg;
+                    allmemb = allmemb + ";" + eg.Name;
                 }
                 return allmemb;
             }

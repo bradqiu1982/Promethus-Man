@@ -5066,7 +5066,7 @@ namespace Prometheus.Controllers
             vm.StoreSubIssue();
 
             var comment1 = new IssueComments();
-            comment1.Comment = sum+ "<p><a href='/Issue/UpdateIssue?issuekey="+ triggleissuekey + "'>Triggle Task</a></p>";
+            comment1.Comment = sum+ "<p><a href='/Issue/UpdateIssue?issuekey="+ triggleissuekey + "'>Trigger Task</a></p>";
             IssueViewModels.StoreIssueComment(vm.IssueKey, comment1.dbComment, vm.Assignee, COMMENTTYPE.Description);
 
             return vm;

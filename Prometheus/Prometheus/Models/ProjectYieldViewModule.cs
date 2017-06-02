@@ -514,110 +514,93 @@ namespace Prometheus.Models
                 return ret;
             }
 
-            var plist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, DateTime.Parse(enddate).AddYears(5).ToString(), false,mycache);
-            if (plist.Count == 0)
+            var datatfromstart = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, DateTime.Parse(enddate).AddYears(5).ToString(), false,null);
+            if (datatfromstart.Count == 0)
             {
                 return ret;
             }
 
 
-            var fdatalist = new List<ProjectTestData>();
+            var datawithstartend = new List<ProjectTestData>();
             var enddatet = DateTime.Parse(enddate);
-            foreach (var item in plist)
+            foreach (var item in datatfromstart)
             {
                 if (enddatet >= item.TestTimeStamp)
                 {
-                    fdatalist.Add(item);
+                    datawithstartend.Add(item);
                 }
             }
+            RetrieveRealTimeYield(ret, datawithstartend, pvm);
 
-            //var fdatalist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, enddate, false);
-            RetrieveRealTimeYield(ret, fdatalist, pvm);
-
-            var tplist = new List<ProjectTestData>();
-            var datacount = fdatalist.Count - 1;
+            
+            var reversedatawithstartend = new List<ProjectTestData>();
+            var datacount = datawithstartend.Count - 1;
             for (int idx = datacount; idx >= 0; idx--)
             {
-                tplist.Add(fdatalist[idx]);
+                reversedatawithstartend.Add(datawithstartend[idx]);
             }
 
-            //var tplist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, enddate, true);
+            var previoussnstationdict = ProjectTestData.RetrieveSNBeforeDateWithStation(pjkey, startdate,null);
 
-            var snstationdict = ProjectTestData.RetrieveSNBeforeDateWithStation(pjkey, startdate,mycache);
             var sndict = new Dictionary<string, bool>();
-            foreach (var kvpair in snstationdict)
+            foreach (var kvpair in previoussnstationdict)
             {
-                var endindex = kvpair.Key.LastIndexOf('-');
+                var endindex = kvpair.Key.LastIndexOf(':');
                 var sn = kvpair.Key.Substring(0, endindex);
                 if (!sndict.ContainsKey(sn))
                 {
                     sndict.Add(sn, true);
                 }
             }
-
-
-            //var sndict = ProjectTestData.RetrieveSNBeforeDate(pjkey, startdate);
-            var validatedict = new Dictionary<string, bool>();
-
-            foreach (var item in tplist)
+            var validatedict4snyield = new Dictionary<string, bool>();
+            foreach (var item in reversedatawithstartend)
             {
                 if (!sndict.ContainsKey(item.ModuleSerialNum))
                 {
-                    if (!validatedict.ContainsKey(item.ModuleSerialNum))
+                    if (!validatedict4snyield.ContainsKey(item.ModuleSerialNum))
                     {
-                        validatedict.Add(item.ModuleSerialNum, true);
+                        validatedict4snyield.Add(item.ModuleSerialNum, true);
                     }
                 }
             }
-
-            //var plist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate,DateTime.Parse(enddate).AddYears(5).ToString(), false);
             var filteredPjData2 = new List<ProjectTestData>();
-            foreach (var item in plist)
+            foreach (var item in datatfromstart)
             {
-                if (validatedict.ContainsKey(item.ModuleSerialNum))
+                if (validatedict4snyield.ContainsKey(item.ModuleSerialNum))
                 {
-                    filteredPjData2.Add(item);
+                        filteredPjData2.Add(item);
                 }
             }
             RetrieveSNYield(ret, filteredPjData2, pvm);
+            filteredPjData2.Clear();
 
 
-            //plist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, enddate, true);
-            //snlist = ProjectTestData.RetrieveSNBeforeDateWithStation(pjkey, startdate);
-            validatedict = new Dictionary<string, bool>();
+
             var filteredPjData = new List<ProjectTestData>();
-
-            foreach (var item in tplist)
+            foreach (var item in reversedatawithstartend)
             {
-                if (!snstationdict.ContainsKey(item.ModuleSerialNum+"-"+item.WhichTest))
+                if (!previoussnstationdict.ContainsKey(item.ModuleSerialNum+":"+item.WhichTest))
                 {
                     filteredPjData.Add(item);
-                    if (!validatedict.ContainsKey(item.ModuleSerialNum))
-                    {
-                        validatedict.Add(item.ModuleSerialNum,true);
-                    }
                 }
             }
-
             RetrieveFirstYield(ret, filteredPjData, pvm);
 
 
-            //plist = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, enddate, false);
             filteredPjData2 = new List<ProjectTestData>();
-            foreach (var item in fdatalist)
+            foreach (var item in datawithstartend)
             {
-                if (validatedict.ContainsKey(item.ModuleSerialNum))
+                if (!previoussnstationdict.ContainsKey(item.ModuleSerialNum + ":" + item.WhichTest))
                 {
                     filteredPjData2.Add(item);
                 }
             }
-
             RetrieveCummYield(ret, filteredPjData2, pvm);
 
-            plist.Clear();
-            snstationdict.Clear();
+            datatfromstart.Clear();
+            previoussnstationdict.Clear();
             sndict.Clear();
-            validatedict.Clear();
+            validatedict4snyield.Clear();
             GC.Collect();
             GC.WaitForPendingFinalizers();
 

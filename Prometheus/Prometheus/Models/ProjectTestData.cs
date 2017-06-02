@@ -389,16 +389,16 @@ namespace Prometheus.Models
         {
             var ret = new Dictionary<string, bool>();
             //var sql = "select ModuleSerialNum,WhichTest from ProjectTestData where ProjectKey = '<ProjectKey>' and TestTimeStamp < '<ENDDATE>'";
-            var sql = "select ModuleSerialNum,WhichTest from ProjectTestData where ProjectKey = '<ProjectKey>' and TestTimeStamp < '<ENDDATE>' and TestTimeStamp > '" + DateTime.Parse(edate).AddMonths(-6).ToString() + "' order by TestTimeStamp DESC";
+            var sql = "select ModuleSerialNum,WhichTest from ProjectTestData where ProjectKey = '<ProjectKey>' and TestTimeStamp < '<ENDDATE>' and TestTimeStamp > '" + DateTime.Parse(edate).AddMonths(-12).ToString() + "' order by TestTimeStamp DESC";
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<ENDDATE>", edate);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, mycache);
             foreach (var item in dbret)
             {
                 var key = Convert.ToString(item[0]);
                 var key2 = Convert.ToString(item[1]);
-                if (!ret.ContainsKey(key+"-"+ key2))
+                if (!ret.ContainsKey(key+":"+ key2))
                 {
-                    ret.Add(key + "-" + key2, true);
+                    ret.Add(key + ":" + key2, true);
                 }
             }
 

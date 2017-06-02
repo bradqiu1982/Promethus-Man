@@ -1649,6 +1649,11 @@ namespace Prometheus.Controllers
                     vm.BackLink = backlink;
                 }
 
+                if (string.Compare(vm.UserName, updater, true) == 0)
+                {
+                    ViewBag.Owner = true;
+                }
+
                 return View(vm);
             }
             else
@@ -1672,6 +1677,11 @@ namespace Prometheus.Controllers
                         vm.DocURL = "/User/WebDoc?DocKey=" + DocKey + "&Creator=" + Creator;
 
                         vm.BackLink = backlink;
+                    }
+
+                    if (string.Compare(vm.UserName, updater, true) == 0)
+                    {
+                        ViewBag.Owner = true;
                     }
 
                     return View(vm);

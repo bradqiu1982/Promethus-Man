@@ -130,7 +130,7 @@ $(function () {
         {
             type: 'line',
             name: 'SN Trace Yield',
-            visible: false,
+            visible: true,
             data: [#SNYield#],
             marker: {
                 lineWidth: 2,

@@ -714,8 +714,8 @@ namespace Prometheus.Models
                     }
                 }
 
-                //StoreBITestResult(testresultlist);
-                //StoreBITestResultDateField(testresultfieldlist);
+                StoreBITestResult(testresultlist);
+                StoreBITestResultDateField(testresultfieldlist);
 
 
             }//end foreach
@@ -746,7 +746,7 @@ namespace Prometheus.Models
                 datatable.Rows.Add(temprow);
             }
 
-            //WriteDBWithTable(datatable, "BITestResult");
+            WriteDBWithTable(datatable, "BITestResult");
 
             //datatable.Columns.Add("SN", typeof(string));
             //datatable.Columns.Add("TestName", typeof(string));
@@ -787,7 +787,7 @@ namespace Prometheus.Models
                 datatable.Rows.Add(temprow);
             }
 
-            //WriteDBWithTable(datatable, "BITestResultDataField");
+            WriteDBWithTable(datatable, "BITestResultDataField");
 
             //datatable.Columns.Add("SN", typeof(string));
             //datatable.Columns.Add("TestName", typeof(string));
@@ -821,7 +821,7 @@ namespace Prometheus.Models
                     bulkCopy.DestinationTableName = tablename;
                     try
                     {
-                        for (int i = 1; i < dt.Columns.Count; i++)
+                        for (int i = 0; i < dt.Columns.Count; i++)
                         {
                             bulkCopy.ColumnMappings.Add(dt.Columns[i].ColumnName, dt.Columns[i].ColumnName);
                         }

@@ -193,6 +193,19 @@ namespace Prometheus.Models
                 return null;
         }
 
+        public static string RetrieveLatestTimeOfLocalProjectWithTestName(string projectkey,string whichtest)
+        {
+            var sql = "select top 1 TestTimeStamp from ProjectTestData where ProjectKey = '<ProjectKey>' and WhichTest = '<WhichTest>' order by TestTimeStamp DESC";
+            sql = sql.Replace("<ProjectKey>", projectkey).Replace("<WhichTest>", whichtest);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            if (dbret.Count > 0)
+            {
+                return Convert.ToString(dbret[0][0]);
+            }
+            else
+                return null;
+        }
+
         public static List<ProjectTestData> RetrieveProjectTestData(int topnum,string projectkey)
         {
             //ProjectTestData.PrePareLatestData(projectkey);

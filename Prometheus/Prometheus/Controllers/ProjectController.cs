@@ -4800,7 +4800,8 @@ namespace Prometheus.Controllers
             //ExternalDataCollector.RefreshRMAData(this);
             //ExternalDataCollector.RefreshRELData(this);
             //ExternalDataCollector.RefreshNeoMAPData(this);
-            ExternalDataCollector.RefreshOBAFromDMR(this);
+            //ExternalDataCollector.RefreshOBAFromDMR(this);
+            BIDataUtility.LoadBITestDateFromAuto(this);
             //var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
             //foreach (var pjkey in pjkeylist)
             //{

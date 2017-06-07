@@ -197,6 +197,7 @@
     <Compile Include="Controllers\BurnInController.cs" />
     <Compile Include="Controllers\CustomerDataController.cs" />
     <Compile Include="Controllers\DashBoardController.cs" />
+    <Compile Include="Controllers\DataAnalyzeController.cs" />
     <Compile Include="Controllers\DBManageController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\IssueController.cs" />
@@ -949,6 +950,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />
+    <Folder Include="Views\DataAnalyze\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

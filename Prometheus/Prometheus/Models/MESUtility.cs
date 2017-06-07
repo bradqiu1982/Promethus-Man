@@ -285,9 +285,16 @@ namespace Prometheus.Models
                 var sqls = RetrieveSqlFromProjectModel(vm);
                 foreach (var s in sqls)
                 {
+                    
                     if (string.IsNullOrEmpty(s.Value))
                     {
                         continue;
+                    }
+
+                    var realstarttime = ProjectTestData.RetrieveLatestTimeOfLocalProjectWithTestName(vm.ProjectKey, s.Key);
+                    if (!string.IsNullOrEmpty(realstarttime))
+                    {
+                        starttime = realstarttime;
                     }
 
                     var sndict = new Dictionary<string, bool>();

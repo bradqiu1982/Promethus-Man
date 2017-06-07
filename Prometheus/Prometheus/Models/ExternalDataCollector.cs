@@ -1050,6 +1050,65 @@ namespace Prometheus.Models
         #endregion
 
         #region NEOMAP
+        public static Dictionary<string, string> NeoMapDataField2RealName()
+        {
+            var dict = new Dictionary<string, string>();
+            dict.Add("AppV_A", "NEOMAP-wafer");
+            dict.Add("AppV_B", "NEOMAP-partfmly");
+            dict.Add("AppV_C", "NEOMAP-die#");
+            dict.Add("AppV_D", "NEOMAP-X");
+            dict.Add("AppV_E", "NEOMAP-Y");
+            dict.Add("AppV_F", "NEOMAP-radius");
+            dict.Add("AppV_G", "NEOMAP-bin#");
+            dict.Add("AppV_H", "NEOMAP-Vf2");
+            dict.Add("AppV_I", "NEOMAP-Vf6");
+            dict.Add("AppV_J", "NEOMAP-Pwr6");
+            dict.Add("AppV_K", "NEOMAP-SeriesR");
+            dict.Add("AppV_L", "NEOMAP-PkWave");
+            dict.Add("AppV_M", "NEOMAP-Ith");
+            dict.Add("AppV_N", "NEOMAP-SlopEff");
+            dict.Add("AppV_O", "NEOMAP-Kink2");
+            dict.Add("AppV_P", "NEOMAP-Delta15");
+            dict.Add("AppV_Q", "NEOMAP-BVr");
+            dict.Add("AppV_R", "NEOMAP-Pwr8");
+            dict.Add("AppV_S", "NEOMAP-RMSBDW");
+            dict.Add("AppV_T", "NEOMAP-MinPwr");
+            dict.Add("AppV_U", "NEOMAP-Imax");
+            dict.Add("AppV_V", "NEOMAP-Pmax");
+            dict.Add("AppV_W", "NEOMAP-_To");
+            dict.Add("AppV_X", "NEOMAP-_dn/dT_2");
+            dict.Add("AppV_Y", "NEOMAP-_Droop");
+            dict.Add("AppV_Z", "NEOMAP-_IthUfm");
+            dict.Add("AppV_AA", "NEOMAP-_PmaxUfm");
+            dict.Add("AppV_AB", "NEOMAP-_Vniformity");
+            dict.Add("AppV_AC", "NEOMAP-RadiusCalc_um");
+            return dict;
+        }
+
+        public static Dictionary<string, string> NeoMapRealName2DataField()
+        {
+            var dict = new Dictionary<string, string>();
+            var tempdict = NeoMapDataField2RealName();
+            foreach (var kv in tempdict)
+            {
+                dict.Add(kv.Value, kv.Key);
+            }
+            return dict;
+        }
+
+        public static List<string> NeoMapMainFieldNameList()
+        {
+            var list = new List<string>();
+            list.Add("NEOMAP-Pwr6");
+            list.Add("NEOMAP-Pwr8");
+            list.Add("NEOMAP-Ith");
+            list.Add("NEOMAP-RMSBDW");
+            list.Add("NEOMAP-SeriesR");
+            list.Add("NEOMAP-SlopEff");
+            list.Add("NEOMAP-Vf2");
+            list.Add("NEOMAP-Vf6");
+            return list;
+        }
 
         private static string WaferWithBin(string waferwithoutbin)
         {
@@ -1203,7 +1262,7 @@ namespace Prometheus.Models
                     bulkCopy.DestinationTableName = "NeoMapData";
                     try
                     {
-                        for (int i = 1; i < dt.Columns.Count; i++)
+                        for (int i = 0; i < dt.Columns.Count; i++)
                         {
                             bulkCopy.ColumnMappings.Add(dt.Columns[i].ColumnName, dt.Columns[i].ColumnName);
                         }

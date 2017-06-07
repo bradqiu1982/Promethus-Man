@@ -770,7 +770,9 @@
     <Content Include="Scripts\exporting.js" />
     <Content Include="Scripts\HeartBeat.exe" />
     <Content Include="Scripts\heartbeat.txt" />
+    <Content Include="Scripts\heatmap.js" />
     <Content Include="Scripts\highcharts.js" />
+    <Content Include="Scripts\HotMap.xml" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
@@ -938,10 +940,10 @@
     <Content Include="Views\User\IAdmire.cshtml" />
     <Content Include="Views\User\UserReviewedInfo.cshtml" />
     <Content Include="Views\User\UserSharedInfo.cshtml" />
+    <Content Include="Views\DataAnalyze\TXOTestData.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />
-    <Folder Include="Views\DataAnalyze\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

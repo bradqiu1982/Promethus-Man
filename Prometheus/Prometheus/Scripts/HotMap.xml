@@ -1,0 +1,55 @@
+﻿<script type="text/javascript">
+  $(function () {
+  $('##ElementID#').highcharts({
+    title: {
+      text: '#Title#'
+    },
+    chart: {
+        type: 'heatmap',
+    },
+    boost: {
+        useGPUTranslations: true
+    },
+    xAxis:{
+            title: {
+                text: 'X'
+            },
+            min: #XMIN#,
+            max: #XMAX#
+        },
+    yAxis:{
+            title: {
+                text: 'Y'
+            },
+            min: #YMIN#,
+            max: #YMAX#
+        },
+     colorAxis: {
+            min: #VALUEMIN#,
+            max: #VALUEMAX#,
+            stops: [
+            [0, '#bf00ff'],
+            [0.1, '#0000ff'],
+            [0.2, '#0080ff'],
+            [0.3, '#00ffff'],
+            [0.4, '#00ff80'],
+            [0.5, '#00ff00'],
+            [0.6, '#80ff00'],
+            [0.7, '#ffff00'],
+            [0.8, '#ff8000'],
+            [0.9, '#ff0000']
+            ]
+        },
+     series: [{
+        boostThreshold: 100,
+        borderWidth: 0,
+        nullColor: '#EFEFEF',
+        tooltip: {
+            headerFormat: '#DATAFIELDNAME#<br/>',
+            pointFormat: '{point.x} , {point.y}: <b>{point.value}</b>'
+        },
+        data: [#MAPDATA#]
+      }]
+  });
+  });
+</script>

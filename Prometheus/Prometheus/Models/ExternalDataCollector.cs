@@ -294,6 +294,21 @@ namespace Prometheus.Models
         public string Owner { set; get; }
     }
 
+    public class TXOQUERYCOND
+    {
+        public static string NEOMAP = "NEOMAP-";
+        public static string BURNIN = "BURNIN-";
+        public static string TEST = "TEST-";
+        public static string PROCESS = "PROCESS-";
+    }
+
+    public class NeoMapDataWithPos
+    {
+        public int x { set; get; }
+        public int y { set; get; }
+        public double value { set; get; }
+    }
+
     public class ExternalDataCollector
     {
 
@@ -1050,45 +1065,45 @@ namespace Prometheus.Models
         #endregion
 
         #region NEOMAP
-        public static Dictionary<string, string> NeoMapDataField2RealName()
+        public static Dictionary<string, string> NeoMapDBColName2RealName()
         {
             var dict = new Dictionary<string, string>();
-            dict.Add("AppV_A", "NEOMAP-wafer");
-            dict.Add("AppV_B", "NEOMAP-partfmly");
-            dict.Add("AppV_C", "NEOMAP-die#");
-            dict.Add("AppV_D", "NEOMAP-X");
-            dict.Add("AppV_E", "NEOMAP-Y");
-            dict.Add("AppV_F", "NEOMAP-radius");
-            dict.Add("AppV_G", "NEOMAP-bin#");
-            dict.Add("AppV_H", "NEOMAP-Vf2");
-            dict.Add("AppV_I", "NEOMAP-Vf6");
-            dict.Add("AppV_J", "NEOMAP-Pwr6");
-            dict.Add("AppV_K", "NEOMAP-SeriesR");
-            dict.Add("AppV_L", "NEOMAP-PkWave");
-            dict.Add("AppV_M", "NEOMAP-Ith");
-            dict.Add("AppV_N", "NEOMAP-SlopEff");
-            dict.Add("AppV_O", "NEOMAP-Kink2");
-            dict.Add("AppV_P", "NEOMAP-Delta15");
-            dict.Add("AppV_Q", "NEOMAP-BVr");
-            dict.Add("AppV_R", "NEOMAP-Pwr8");
-            dict.Add("AppV_S", "NEOMAP-RMSBDW");
-            dict.Add("AppV_T", "NEOMAP-MinPwr");
-            dict.Add("AppV_U", "NEOMAP-Imax");
-            dict.Add("AppV_V", "NEOMAP-Pmax");
-            dict.Add("AppV_W", "NEOMAP-_To");
-            dict.Add("AppV_X", "NEOMAP-_dn/dT_2");
-            dict.Add("AppV_Y", "NEOMAP-_Droop");
-            dict.Add("AppV_Z", "NEOMAP-_IthUfm");
-            dict.Add("AppV_AA", "NEOMAP-_PmaxUfm");
-            dict.Add("AppV_AB", "NEOMAP-_Vniformity");
-            dict.Add("AppV_AC", "NEOMAP-RadiusCalc_um");
+            dict.Add("AppV_A", TXOQUERYCOND.NEOMAP + "wafer");
+            dict.Add("AppV_B", TXOQUERYCOND.NEOMAP + "partfmly");
+            dict.Add("AppV_C", TXOQUERYCOND.NEOMAP + "die#");
+            dict.Add("AppV_D", TXOQUERYCOND.NEOMAP + "X");
+            dict.Add("AppV_E", TXOQUERYCOND.NEOMAP + "Y");
+            dict.Add("AppV_F", TXOQUERYCOND.NEOMAP + "radius");
+            dict.Add("AppV_G", TXOQUERYCOND.NEOMAP + "bin#");
+            dict.Add("AppV_H", TXOQUERYCOND.NEOMAP + "Vf2");
+            dict.Add("AppV_I", TXOQUERYCOND.NEOMAP + "Vf6");
+            dict.Add("AppV_J", TXOQUERYCOND.NEOMAP + "Pwr6");
+            dict.Add("AppV_K", TXOQUERYCOND.NEOMAP + "SeriesR");
+            dict.Add("AppV_L", TXOQUERYCOND.NEOMAP + "PkWave");
+            dict.Add("AppV_M", TXOQUERYCOND.NEOMAP + "Ith");
+            dict.Add("AppV_N", TXOQUERYCOND.NEOMAP + "SlopEff");
+            dict.Add("AppV_O", TXOQUERYCOND.NEOMAP + "Kink2");
+            dict.Add("AppV_P", TXOQUERYCOND.NEOMAP + "Delta15");
+            dict.Add("AppV_Q", TXOQUERYCOND.NEOMAP + "BVr");
+            dict.Add("AppV_R", TXOQUERYCOND.NEOMAP + "Pwr8");
+            dict.Add("AppV_S", TXOQUERYCOND.NEOMAP + "RMSBDW");
+            dict.Add("AppV_T", TXOQUERYCOND.NEOMAP + "MinPwr");
+            dict.Add("AppV_U", TXOQUERYCOND.NEOMAP + "Imax");
+            dict.Add("AppV_V", TXOQUERYCOND.NEOMAP + "Pmax");
+            dict.Add("AppV_W", TXOQUERYCOND.NEOMAP + "_To");
+            dict.Add("AppV_X", TXOQUERYCOND.NEOMAP + "_dn/dT_2");
+            dict.Add("AppV_Y", TXOQUERYCOND.NEOMAP + "_Droop");
+            dict.Add("AppV_Z", TXOQUERYCOND.NEOMAP + "_IthUfm");
+            dict.Add("AppV_AA", TXOQUERYCOND.NEOMAP + "_PmaxUfm");
+            dict.Add("AppV_AB", TXOQUERYCOND.NEOMAP + "_Vniformity");
+            dict.Add("AppV_AC", TXOQUERYCOND.NEOMAP + "RadiusCalc_um");
             return dict;
         }
 
-        public static Dictionary<string, string> NeoMapRealName2DataField()
+        public static Dictionary<string, string> NeoMapRealName2DBColName()
         {
             var dict = new Dictionary<string, string>();
-            var tempdict = NeoMapDataField2RealName();
+            var tempdict = NeoMapDBColName2RealName();
             foreach (var kv in tempdict)
             {
                 dict.Add(kv.Value, kv.Key);
@@ -1099,14 +1114,14 @@ namespace Prometheus.Models
         public static List<string> NeoMapMainFieldNameList()
         {
             var list = new List<string>();
-            list.Add("NEOMAP-Pwr6");
-            list.Add("NEOMAP-Pwr8");
-            list.Add("NEOMAP-Ith");
-            list.Add("NEOMAP-RMSBDW");
-            list.Add("NEOMAP-SeriesR");
-            list.Add("NEOMAP-SlopEff");
-            list.Add("NEOMAP-Vf2");
-            list.Add("NEOMAP-Vf6");
+            list.Add(TXOQUERYCOND.NEOMAP + "Pwr6");
+            list.Add(TXOQUERYCOND.NEOMAP + "Pwr8");
+            list.Add(TXOQUERYCOND.NEOMAP + "Ith");
+            list.Add(TXOQUERYCOND.NEOMAP + "RMSBDW");
+            list.Add(TXOQUERYCOND.NEOMAP + "SeriesR");
+            list.Add(TXOQUERYCOND.NEOMAP + "SlopEff");
+            list.Add(TXOQUERYCOND.NEOMAP + "Vf2");
+            list.Add(TXOQUERYCOND.NEOMAP + "Vf6");
             return list;
         }
 
@@ -1318,52 +1333,41 @@ namespace Prometheus.Models
             return tempdata;
         }
 
-        //private static bool NEOMAPDataExist(NEOMAPData neomapdata)
-        //{
-        //    var sql = "select AppV_A from NeoMapData where AppV_A='<AppV_A>' and AppV_C='<AppV_C>' and AppV_D='<AppV_D>' and AppV_E='<AppV_E>'";
-        //    sql = sql.Replace("<AppV_A>", neomapdata.AppV_A).Replace("<AppV_C>", neomapdata.AppV_C)
-        //        .Replace("<AppV_D>", neomapdata.AppV_D).Replace("<AppV_E>", neomapdata.AppV_E);
-
-        //    var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
-        //    if (dbret.Count > 0)
-        //    {
-        //        return true;
-        //    }
-        //    else
-        //    {
-        //        return false;
-        //    }
-        //}
-
-        //private static void UpdateNeoMapData(List<string> rawdata)
-        //{
-        //    var neodata = OfferNEOData(rawdata);
-        //    if (!NEOMAPDataExist(neodata))
-        //    {
-        //        var sql = "insert into NeoMapData(AppV_A,AppV_B,AppV_C,AppV_D,AppV_E,AppV_F"
-        //            + ",AppV_G,AppV_H,AppV_I,AppV_J,AppV_K,AppV_L,AppV_M,AppV_N,AppV_O"
-        //            + ",AppV_P,AppV_Q,AppV_R,AppV_S,AppV_T,AppV_U,AppV_V,AppV_W,AppV_X"
-        //            + ",AppV_Y,AppV_Z,AppV_AA,AppV_AB,AppV_AC)"
-        //            + " values(N'<AppV_A>',N'<AppV_B>',N'<AppV_C>',N'<AppV_D>',N'<AppV_E>',<AppV_F>"
-        //            + ",N'<AppV_G>',<AppV_H>,<AppV_I>,<AppV_J>,<AppV_K>,<AppV_L>,<AppV_M>,<AppV_N>,<AppV_O>"
-        //            + ",<AppV_P>,<AppV_Q>,<AppV_R>,<AppV_S>,<AppV_T>,<AppV_U>,<AppV_V>,<AppV_W>,<AppV_X>"
-        //            + ",<AppV_Y>,<AppV_Z>,<AppV_AA>,<AppV_AB>,<AppV_AC>)";
+        public static List<string> RetrieveNeoMapWaferList()
+        {
+            var ret = new List<string>();
+            var sql = "select distinct AppV_A from NeoMapData";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                ret.Add(Convert.ToString(line[0]));
+            }
+            return ret;
+        }
 
 
-        //        sql = sql.Replace("<AppV_A>", neodata.AppV_A).Replace("<AppV_B>", neodata.AppV_B).Replace("<AppV_C>", neodata.AppV_C)
-        //            .Replace("<AppV_D>", neodata.AppV_D).Replace("<AppV_E>", neodata.AppV_E).Replace("<AppV_F>", neodata.AppV_F.ToString())
-        //            .Replace("<AppV_G>", neodata.AppV_G).Replace("<AppV_H>", neodata.AppV_H.ToString()).Replace("<AppV_I>", neodata.AppV_I.ToString())
-        //            .Replace("<AppV_J>", neodata.AppV_J.ToString()).Replace("<AppV_K>", neodata.AppV_K.ToString()).Replace("<AppV_L>", neodata.AppV_L.ToString())
-        //            .Replace("<AppV_M>", neodata.AppV_M.ToString()).Replace("<AppV_N>", neodata.AppV_N.ToString()).Replace("<AppV_O>", neodata.AppV_O.ToString())
-        //            .Replace("<AppV_P>", neodata.AppV_P.ToString()).Replace("<AppV_Q>", neodata.AppV_Q.ToString()).Replace("<AppV_R>", neodata.AppV_R.ToString())
-        //            .Replace("<AppV_S>", neodata.AppV_S.ToString()).Replace("<AppV_T>", neodata.AppV_T.ToString()).Replace("<AppV_U>", neodata.AppV_U.ToString())
-        //            .Replace("<AppV_V>", neodata.AppV_V.ToString()).Replace("<AppV_W>", neodata.AppV_W.ToString()).Replace("<AppV_X>", neodata.AppV_X.ToString())
-        //            .Replace("<AppV_Y>", neodata.AppV_Y.ToString()).Replace("<AppV_Z>", neodata.AppV_Z.ToString()).Replace("<AppV_AA>", neodata.AppV_AA.ToString())
-        //            .Replace("<AppV_AB>", neodata.AppV_AB.ToString()).Replace("<AppV_AC>", neodata.AppV_AC.ToString());
+        public static List<NeoMapDataWithPos> RetrieveNeoMapData(string querycond, string datafield)
+        {
+            var real2db = NeoMapRealName2DBColName();
+            var ret = new List<NeoMapDataWithPos>();
+            var sql = "select AppV_D,AppV_E,<datafield> from NeoMapData where AppV_AD = 1 and  AppV_A = '<AppV_A>' and <datafield> <> -99999";
+            sql = sql.Replace("<AppV_A>", querycond).Replace("<datafield>", real2db[datafield]);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                try
+                {
+                    var tempdata = new NeoMapDataWithPos();
+                    tempdata.x = Convert.ToInt32(line[0]);
+                    tempdata.y = Convert.ToInt32(line[1]);
+                    tempdata.value = Convert.ToDouble(line[2]);
+                    ret.Add(tempdata);
+                }
+                catch (Exception ex) { }
+            }
+            return ret;
+        }
 
-        //        DBUtility.ExeLocalSqlNoRes(sql);
-        //    }
-        //}
         #endregion
 
         #region REL

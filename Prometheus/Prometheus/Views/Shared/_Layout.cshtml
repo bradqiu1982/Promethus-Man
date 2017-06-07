@@ -206,11 +206,11 @@
                                                 @Html.ActionLink("Create RMA Task", "CreateRMA", "Issue")
                                             </li>
                                             @*<li>
-                                                @Html.ActionLink("Create OBA Task", "CommitOBAData", "CustomerData")
-                                            </li>
-                                            <li>
-                                                @Html.ActionLink("Create Quality Task", "CommitQualityData", "CustomerData")
-                                            </li>*@
+                            @Html.ActionLink("Create OBA Task", "CommitOBAData", "CustomerData")
+                        </li>
+                        <li>
+                            @Html.ActionLink("Create Quality Task", "CommitQualityData", "CustomerData")
+                        </li>*@
                                             <li>
                                                 @Html.ActionLink("Search Task", "SearchIssue", "Issue")
                                             </li>
@@ -235,10 +235,7 @@
                                                 }
                                             </li>
                                             <li>
-                                                @*@if ((ViewBag.IsSuper != null && ViewBag.IsSuper) || (ViewBag.IsAdmin != null && ViewBag.IsAdmin))*@
-
                                                 @Html.ActionLink("Review REL Data", "ReviewRelBackupData", "CustomerData")
-
                                             </li>
                                         </ul>
                                     </li>
@@ -267,7 +264,7 @@
                                                     <a href="/User/ICare?username=@(ViewBag.RealUserID)&month=">I Focus</a>
                                                 }
                                             </li>
-                                             <li>
+                                            <li>
                                                 @if (ViewBag.IsSuper != null && ViewBag.IsSuper)
                                                 {
                                                     @Html.ActionLink("UserMatrix", "CommitUserMatrix", "CustomerData")
@@ -287,7 +284,7 @@
                                             </li>
                                             <li>
                                                 @if ((ViewBag.IsSuper != null && ViewBag.IsSuper)
-                                                    || (ViewBag.IsManage != null && ViewBag.IsManage))
+                || (ViewBag.IsManage != null && ViewBag.IsManage))
                                                 {
                                                     @Html.ActionLink("I Admire", "IAdmire", "User")
                                                 }
@@ -308,28 +305,40 @@
                                     </li>
                                 </ul>
 
-                                <ul class="nav navbar-nav navbar-right">
-                                    <li>
-                                        <a MYTP="HOVER" id="editablebt" name="editablebt" onclick="changepagemode()">Edit Mode</a>
-                                    </li>
-                                </ul>
-
-                                <ul class="nav navbar-nav navbar-right">
+                                <ul class="nav navbar-nav">
                                     <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Friendly Links<span class="caret"></span></a>
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Analysis<span class="caret"></span></a>
                                         <ul class="dropdown-menu">
                                             <li>
-                                                <a href="http://cn-traceview/" target="_blank">Trace View</a>
-                                            </li>
-                                            <li>
-                                                <a href="http://wux-parallel/activeme/" target="_blank">Active ME</a>
+                                                @Html.ActionLink("TXO Analysis", "TXOTestData", "DataAnalyze")
                                             </li>
                                         </ul>
                                     </li>
                                 </ul>
 
-                                @Html.Partial("_LoginPartial")
+                                            <ul class="nav navbar-nav navbar-right">
+                                                <li>
+                                                    <a MYTP="HOVER" id="editablebt" name="editablebt" onclick="changepagemode()">Edit Mode</a>
+                                                </li>
+                                            </ul>
+
+                                            <ul class="nav navbar-nav navbar-right">
+                                                <li class="dropdown">
+                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Friendly Links<span class="caret"></span></a>
+                                                    <ul class="dropdown-menu">
+                                                        <li>
+                                                            <a href="http://cn-traceview/" target="_blank">Trace View</a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="http://wux-parallel/activeme/" target="_blank">Active ME</a>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+
+                                            @Html.Partial("_LoginPartial")
                             </div>
+
                         </div>
 
                     </div>

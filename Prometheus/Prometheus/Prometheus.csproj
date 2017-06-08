@@ -767,6 +767,8 @@
     <Content Include="ckeditor\skins\moono-lisa\readme.md" />
     <None Include="Properties\PublishProfiles\Test.pubxml" />
     <Content Include="Scripts\burn_in_pn_list.xlsx" />
+    <Content Include="Scripts\intro\arial-narrow_d0eb64ed2b91fe9a67f7800c1b14868b.ttf" />
+    <Content Include="Scripts\intro\arial-narrow_d0eb64ed2b91fe9a67f7800c1b14868b.woff" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\exporting.js" />
     <Content Include="Scripts\HeartBeat.exe" />

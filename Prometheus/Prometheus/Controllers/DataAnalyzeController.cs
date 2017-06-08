@@ -98,13 +98,10 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        private void NeoMapDataAnalysis(string querycond, string datafield,bool left =true)
+        private void HeatMap4NeoMap(List<NeoMapDataWithPos> vm, string querycond, string datafield, bool left)
         {
-            var vm = ExternalDataCollector.RetrieveNeoMapData(querycond, datafield);
-            if (vm.Count > 0)
-            {
                 var DATAFIELDNAME = datafield.Replace(TXOQUERYCOND.NEOMAP, "");
-                var Title = querycond + datafield.Replace(TXOQUERYCOND.NEOMAP, "") + " Heat Map";
+                var Title = querycond + " " + datafield.Replace(TXOQUERYCOND.NEOMAP, "") + " Heat Map";
                 var ElementID = "lefthotscript";
                 if (!left)
                 {
@@ -164,9 +161,107 @@ namespace Prometheus.Controllers
                 {
                     ViewBag.righthotscript = scritpttxt;
                 }
+        }
+
+        private void NormalDistributeChart(List<NeoMapDataWithPos> vm, string querycond, string datafield, bool left)
+        {
+            var ylist = new List<double>();
+                var valuelist = new List<double>();
+                foreach (var item in vm)
+                {
+                    valuelist.Add(item.value);
+                }
+                valuelist.Sort();
+
+                var mean = NormalDistributeAlg.Mean(valuelist);
+                var stddev = NormalDistributeAlg.StandardDeviation(valuelist, mean);
+                foreach (var item in valuelist)
+                {
+                    ylist.Add(NormalDistributeAlg.getY(item, stddev, mean));
+                }
+
+            var DATAFIELDNAME = datafield.Replace(TXOQUERYCOND.NEOMAP, "").Replace(TXOQUERYCOND.BURNIN,"");
+            var Title = querycond +" "+ datafield.Replace(TXOQUERYCOND.NEOMAP, "").Replace(TXOQUERYCOND.BURNIN, "") 
+                + " Normal Distribution";
+
+            var ElementID = "leftnormaldistr";
+            if (!left)
+            {
+                ElementID = "rightnormaldistr";
+            }
+            var sumy = 0.0;
+
+
+            var count = valuelist.Count;
+            for (var idx = 0; idx < count; idx++)
+            {
+                sumy = sumy + ylist[idx]/100.0;
             }
 
+            var xmin = valuelist[0];
+            var xmax = valuelist[0];
 
+            var ymin = ylist[0]/sumy;
+            var ymax = ylist[0]/sumy;
+
+            var YVALUES = string.Empty;
+
+            for (var idx = 0; idx < count; idx++)
+            {
+                if (valuelist[idx] < xmin)
+                    xmin = valuelist[idx];
+                if (valuelist[idx] > xmax)
+                    xmax = valuelist[idx];
+
+                if (ylist[idx]/sumy < ymin)
+                    ymin = ylist[idx]/sumy;
+                if (ylist[idx]/sumy > ymax)
+                    ymax = ylist[idx]/sumy;
+
+                YVALUES = YVALUES + "[" + valuelist[idx].ToString() + "," + ((ylist[idx]/sumy)*100).ToString() + "],";
+            }
+
+            YVALUES = YVALUES.Substring(0, YVALUES.Length - 1);
+
+            var left3sigma = (mean - stddev * 3.0);
+            var right3sigma = (mean + stddev * 3.0);
+            if (left3sigma < xmin)
+                xmin = left3sigma;
+            if (right3sigma > xmax)
+                xmax = right3sigma;
+
+            var scritpttxt = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/NormalDistribution.xml"));
+            scritpttxt = scritpttxt.Replace("#ElementID#", ElementID)
+                    .Replace("#Title#", Title)
+                    .Replace("#XMIN#", xmin.ToString())
+                    .Replace("#XMAX#", xmax.ToString())
+                    .Replace("#YMIN#", (ymin*100).ToString())
+                    .Replace("#YMAX#", (ymax*100).ToString())
+                    .Replace("#DATAFIELDNAME#", DATAFIELDNAME)
+                    .Replace("#MEAN#", mean.ToString("f6"))
+                    .Replace("#StDev#", stddev.ToString("f6"))
+                    .Replace("#StDevLeft#", left3sigma.ToString())
+                    .Replace("#StDevRight#", right3sigma.ToString())
+                    .Replace("#YVALUES#", YVALUES);
+
+            if (left)
+            {
+                ViewBag.leftnormaldistr = scritpttxt;
+            }
+            else
+            {
+                ViewBag.rightnormaldistr = scritpttxt;
+            }
+        }
+
+        private void NeoMapDataAnalysis(string querycond, string datafield,bool left =true)
+        {
+            var vm = ExternalDataCollector.RetrieveNeoMapData(querycond, datafield);
+            if (vm.Count > 2)
+            {
+                HeatMap4NeoMap(vm, querycond, datafield, left);
+                NormalDistributeChart(vm, querycond, datafield, left);
+            }
         }
 
         [HttpPost, ActionName("TXOTestData")]

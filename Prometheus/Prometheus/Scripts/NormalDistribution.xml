@@ -1,0 +1,62 @@
+﻿<script type="text/javascript">
+  $(function () {
+  $('##ElementID#').highcharts({
+    title: {
+      text: '#Title#'
+    },
+    chart: {
+        type: 'areaspline',
+    },
+    boost: {
+        useGPUTranslations: true
+    },
+    xAxis:{
+            title: {
+                text: 'X'
+            },
+            min: #XMIN#,
+            max: #XMAX#,
+            plotLines: [{
+                value: #MEAN#,
+                color: 'gray',
+                dashStyle: 'shortdash',
+                width: 2,
+                label: {
+                    text: 'Mean #MEAN#'
+                }
+            }, {
+                value: #StDevLeft#,
+                color: 'green',
+                dashStyle: 'shortdash',
+                width: 2,
+                label: {
+                    text: 'StDev #StDev#'
+                }
+            }, {
+                value: #StDevRight#,
+                color: 'green',
+                dashStyle: 'shortdash',
+                width: 2,
+                label: {
+                    text: 'StDev #StDev#'
+                }
+            }]
+        },
+    yAxis:{
+            title: {
+                text: 'Y'
+            },
+            min: #YMIN#,
+            max: #YMAX#
+        },
+     series: [{
+        boostThreshold: 100,
+        tooltip: {
+            headerFormat: '#DATAFIELDNAME#<br/>',
+            pointFormat: '{point.x} : <b>{point.y} %</b>'
+        },
+        data: [#YVALUES#]
+      }]
+  });
+  });
+</script>

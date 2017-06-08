@@ -1350,7 +1350,7 @@ namespace Prometheus.Models
         {
             var real2db = NeoMapRealName2DBColName();
             var ret = new List<NeoMapDataWithPos>();
-            var sql = "select AppV_D,AppV_E,<datafield> from NeoMapData where AppV_AD = 1 and  AppV_A = '<AppV_A>' and <datafield> <> -99999";
+            var sql = "select  AppV_D,AppV_E,<datafield> from NeoMapData where AppV_AD = 1 and  AppV_A = '<AppV_A>' and <datafield> <> -99999";
             sql = sql.Replace("<AppV_A>", querycond).Replace("<datafield>", real2db[datafield]);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)

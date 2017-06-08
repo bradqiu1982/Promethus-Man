@@ -221,6 +221,7 @@
     <Compile Include="Models\IssueViewModels.cs" />
     <Compile Include="Models\MESUtility.cs" />
     <Compile Include="Models\NeoMAPVM.cs" />
+    <Compile Include="Models\NormalDistributeAlg.cs" />
     <Compile Include="Models\ParetoData.cs" />
     <Compile Include="Models\PJReportViewModels.cs" />
     <Compile Include="Models\ProjectBIYieldViewModule.cs" />
@@ -790,6 +791,7 @@
     <Content Include="Scripts\moment-with-locales.min.js" />
     <Content Include="Scripts\moment.js" />
     <Content Include="Scripts\moment.min.js" />
+    <Content Include="Scripts\NormalDistribution.xml" />
     <Content Include="Scripts\ParetoChart.xml" />
     <Content Include="Scripts\PieChart.xml" />
     <Content Include="Scripts\placeholders.min.js" />

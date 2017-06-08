@@ -156,11 +156,11 @@ else
                         <div class="col-lg-10">
                             @if (Model != null && !string.IsNullOrEmpty(Model.ModuleSN))
                             {
-                                <input class="form-control text-box single-line" value="@Model.ModuleSN" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="ModuleSN" name="ModuleSN" type="text" />
+                                <input class="form-control text-box single-line" value="@Model.ModuleSN" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 1800." data-val-length-max="1800" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="ModuleSN" name="ModuleSN" type="text" />
                             }
                             else
                             {
-                                <input class="form-control text-box single-line" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="ModuleSN" name="ModuleSN" type="text" value="" />
+                                <input class="form-control text-box single-line" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 1800." data-val-length-max="1800" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="ModuleSN" name="ModuleSN" type="text" value="" />
                             }
                             <span class="field-validation-valid text-danger" data-valmsg-for="ModuleSN" data-valmsg-replace="true"></span>
                         </div>

@@ -773,9 +773,8 @@
     <Content Include="Scripts\heartbeat.txt" />
     <Content Include="Scripts\heatmap.js" />
     <Content Include="Scripts\highcharts.js" />
-
     <Content Include="Scripts\HotMap.xml" />
-
+    <Content Include="Scripts\intro\arial-narrow.css" />
     <Content Include="Scripts\intro\intro.min.js" />
     <Content Include="Scripts\intro\introjs-dark.css" />
     <Content Include="Scripts\intro\introjs-flattener.css" />
@@ -785,7 +784,6 @@
     <Content Include="Scripts\intro\introjs-royal.css" />
     <Content Include="Scripts\intro\introjs-rtl.min.css" />
     <Content Include="Scripts\intro\introjs.min.css" />
-
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />

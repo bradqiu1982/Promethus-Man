@@ -4,13 +4,13 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="row">
+@*<div class="row">
     <div class="col-lg-12">&nbsp;</div>
 </div>
 
 <div class="row">
     <div class="col-lg-12">&nbsp;</div>
-</div>
+</div>*@
 
 <div class="row">
     <div class="col-lg-12">
@@ -25,7 +25,7 @@
 <div class="row">
     <div class="col-lg-1"></div>
     <div class="col-lg-2">
-        <div class="row"><a href="/User/Assign2Me?username=@(ViewBag.RealUserID)"><img src="~/Content/images/usercenter/Assign2Me.png" MYTP="HOVER" style="height:158px; width:158px"></a></div>
+        <div class="row"><a href="/User/Assign2Me?username=@(ViewBag.RealUserID)"><img src="~/Content/images/usercenter/Assign2Me.png" MYTP="HOVER" style="height:158px; width:158px" data-intro = "Tasks you need to do."  data-step="1" ></a></div>
         <div class="row">
             <div class="col-lg-1"></div>
             <div class="col-lg-10">
@@ -39,22 +39,22 @@
     </div>
     <div class="col-lg-1"></div>
     <div class="col-lg-2">
-        <div class="row"><a href="/User/IAssigned?username=@(ViewBag.RealUserID)"><img src="~/Content/images/usercenter/IAssigned.png" MYTP="HOVER" style="height:158px; width:158px"></a></div>
+        <div class="row"><a href="/User/IAssigned?username=@(ViewBag.RealUserID)"><img src="~/Content/images/usercenter/IAssigned.png" MYTP="HOVER" style="height:158px; width:158px" data-intro = "Assigned task to others."  data-step="2" ></a></div>
         <div class="row">&nbsp;</div>
-        <div class="row"><a href="/User/ILearn"><img src="~/Content/images/usercenter/ILearn.png" MYTP="HOVER" style="height:158px; width:158px"></a></div>
+        <div class="row"><a href="/User/ILearn"><img src="~/Content/images/usercenter/ILearn.png" MYTP="HOVER" style="height:158px; width:158px" data-intro = "Knowledge need to learn."  data-step="3" ></a></div>
     </div>
     <div class="col-lg-1"></div>
     <div class="col-lg-2">
-        <div class="row"><a href="/Project/ViewAll"><img src="~/Content/images/usercenter/IProject.png" MYTP="HOVER" style="height:158px; width:158px"></a></div>
+        <div class="row"><a href="/Project/ViewAll"><img src="~/Content/images/usercenter/IProject.png" MYTP="HOVER" style="height:158px; width:158px" data-intro = "Show all projects you have link."  data-step="4" ></a></div>
         <div class="row">&nbsp;</div>
-        <div class="row"><a href="/User/ITag"><img src="~/Content/images/usercenter/ITag.png" MYTP="HOVER" style="height:158px; width:158px"></a></div>
+        <div class="row"><a href="/User/ITag"><img src="~/Content/images/usercenter/ITag.png" MYTP="HOVER" style="height:158px; width:158px" data-intro = "Add tag for projects or technicals."  data-step="5" ></a></div>
         @*<div class="row"><a href="/User/MyStatus?username=@(ViewBag.RealUserID)"><img src="~/Content/images/usercenter/MyStatus.png" MYTP="HOVER" style="height:158px; width:158px"></a></div>*@
     </div>
     <div class="col-lg-1"></div>
     <div class="col-lg-2">
-        <div class="row"><a href="/User/IBLOG"><img src="~/Content/images/usercenter/IBlog.png" MYTP="HOVER" style="height:158px; width:158px"></a></div>
+        <div class="row"><a href="/User/IBLOG"><img src="~/Content/images/usercenter/IBlog.png" MYTP="HOVER" style="height:158px; width:158px" data-intro = "Just a blog, you can record some information here."  data-step="6" ></a></div>
         <div class="row">&nbsp;</div>
-        <div class="row" data-toggle="tooltip" title="IKPI"><a href="/User/IKPI"><img src="~/Content/images/usercenter/IKPI.png" MYTP="HOVER" style="height:158px; width:158px"></a></div>
+        <div class="row" data-toggle="tooltip" title="IKPI"><a href="/User/IKPI"><img src="~/Content/images/usercenter/IKPI.png" MYTP="HOVER" style="height:158px; width:158px" data-intro = "Show your KPI."  data-step="7" ></a></div>
     </div>
 </div>
 

@@ -15,12 +15,12 @@
 
 
 <div class="row">
-    <div class="col-lg-1">
+    <div class="nav navbar-nav navbar-left">
         <img src="~/Content/images/ucicon/IProjectIcons.png" style="height:45px; width:45px">
     </div>
-    <div class="col-lg-10">
+    <div class="nav navbar-nav navbar-left">
         <ol class="breadcrumb" style="font-size:18px">
-            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
+            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll" data-intro = "Back to ALL Project."  data-step="6" >All Projects</a></li>
 
             @if (Model != null)
             {
@@ -32,10 +32,10 @@
             }
         </ol>
     </div>
-    <div class="col-lg-1">
+    <div class="nav navbar-nav navbar-right">
 @if (Model != null)
 {
-        <a href="/Project/EditProject?ProjectKey=@Model.ProjectKey"><img  MYTP="HOVER" src="~/Content/images/icon/edit.png" style="height:34px; width:24px"></a>
+        <a href="/Project/EditProject?ProjectKey=@Model.ProjectKey"><img  MYTP="HOVER" src="~/Content/images/icon/edit.png" style="height:34px; width:24px" data-intro = "Edit project here."  data-step="1" ></a>
 }
     </div>
 </div>
@@ -73,7 +73,7 @@
 
 @if (projectdata != null)
 {
-    <div class="row">
+    <div class="row" data-intro = "Base information of this project."  data-step="2" >
         <div MYTP="orange" class="col-lg-2" style="font-size:18px"><strong>&nbsp;&nbsp;Information</strong></div>
         <div class="col-lg-10">
             <div class="form-group">
@@ -200,7 +200,7 @@
 
             <hr style="border-color:#006DC0;" />
 
-            <div class="form-group">
+            <div class="form-group" data-intro = "Project status."  data-step="3" >
                 <div  MYTP="yello"  class="row">
                     @if (!string.IsNullOrEmpty(projectdata.CurrentNPIProc)
                          && !string.IsNullOrEmpty(projectdata.PIP1Date)
@@ -227,130 +227,131 @@
 
     if (string.Compare(projectdata.ProjectType, Prometheus.Models.ProjectTypeInf.QM) != 0)
     {
-        <div class="form-group">
-            <div class="row" MYTP="HOVER">
-                <div class="col-lg-12">
-                    <div class="col-lg-1">
-                    </div>
-                    <div class="col-lg-2">
-                        <div class="col-lg-7" data-toggle="tooltip" title="Yield">
-                            <div class="row">
-                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
-                            </div>
-                            <div class="row">
-                                <a href="/Project/ProjectYieldMain?ProjectKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/Yield.png" style="height:100px; width:100px"></a>
-                            </div>
+        <div class="form-group" data-intro="detail informaton show here." data-step="4">
+            <div class="form-group">
+                <div class="row" MYTP="HOVER">
+                    <div class="col-lg-12">
+                        <div class="col-lg-1">
                         </div>
-                        <div class="col-lg-5">
-                            <div class="row">
-                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
-                            </div>
-                            @if (projectdata.FirstYield > 0)
-                            {
-                                <div class="row"><span class="badge" style="color:white;background-color:red">FPY @((projectdata.FirstYield * 100.0).ToString("0.0")) %</span></div>
-                            }
-                            else
-                            {
+                        <div class="col-lg-2">
+                            <div class="col-lg-7" data-toggle="tooltip" title="Yield">
                                 <div class="row">
                                     <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                 </div>
-                            }
-                            @if (projectdata.RetestYield > 0)
-                            {
-                                <div class="row"><span class="badge" style="color:white;background-color:red">FY @((projectdata.RetestYield * 100.0).ToString("0.0")) %</span></div>
-                            }
-                            else
-                            {
+                                <div class="row">
+                                    <a href="/Project/ProjectYieldMain?ProjectKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/Yield.png" style="height:100px; width:100px"></a>
+                                </div>
+                            </div>
+                            <div class="col-lg-5">
                                 <div class="row">
                                     <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                 </div>
+                                @if (projectdata.FirstYield > 0)
+                            {
+                            <div class="row"><span class="badge" style="color:white;background-color:red">FPY @((projectdata.FirstYield * 100.0).ToString("0.0")) %</span></div>
+                            }
+                            else
+                            {
+                            <div class="row">
+                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                            </div>
+                            }
+                                @if (projectdata.RetestYield > 0)
+                            {
+                            <div class="row"><span class="badge" style="color:white;background-color:red">FY @((projectdata.RetestYield * 100.0).ToString("0.0")) %</span></div>
+                            }
+                            else
+                            {
+                            <div class="row">
+                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                            </div>
                             }
 
-                        </div>
-                    </div>
-                    <div class="col-lg-2">
-                        <div class="col-lg-7">
-
-                            <div class="row">
-                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
-                            </div>
-                            <div class="row">
-                                <a href="/Project/ProjectFA?ProjectKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/FA.png" style="height:100px; width:100px"></a>
                             </div>
                         </div>
-                        <div class="col-lg-5">
+                        <div class="col-lg-2">
+                            <div class="col-lg-7">
 
-                            <div class="row">
-                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                <div class="row">
+                                    <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                </div>
+                                <div class="row">
+                                    <a href="/Project/ProjectFA?ProjectKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/FA.png" style="height:100px; width:100px"></a>
+                                </div>
                             </div>
-                            <div class="row">
-                                @if (projectdata.FinishRating < 90)
+                            <div class="col-lg-5">
+
+                                <div class="row">
+                                    <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                </div>
+                                <div class="row">
+                                    @if (projectdata.FinishRating < 90)
                                 {
-                                    <div class="row"><span class="badge" style="color:white;background-color:red">@projectdata.PendingFACount</span></div>
+                                <div class="row"><span class="badge" style="color:white;background-color:red">@projectdata.PendingFACount</span></div>
                                 }
                                 else
                                 {
-                                    <div class="row"><span class="badge" style="color:white;background-color:forestgreen">@projectdata.PendingFACount</span></div>
+                                <div class="row"><span class="badge" style="color:white;background-color:forestgreen">@projectdata.PendingFACount</span></div>
                                 }
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-lg-2">
-                        <div class="col-lg-7" data-toggle="tooltip" title="Task">
+                        <div class="col-lg-2">
+                            <div class="col-lg-7" data-toggle="tooltip" title="Task">
 
-                            <div class="row">
-                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                <div class="row">
+                                    <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                </div>
+                                <div class="row">
+                                    <a href="/Project/ProjectIssues?ProjectKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/Task.png" style="height:100px; width:100px"></a>
+                                </div>
                             </div>
-                            <div class="row">
-                                <a href="/Project/ProjectIssues?ProjectKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/Task.png" style="height:100px; width:100px"></a>
-                            </div>
-                        </div>
-                        <div class="col-lg-5">
+                            <div class="col-lg-5">
 
-                            <div class="row">
-                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                <div class="row">
+                                    <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                </div>
+                                <div class="row"><span class="badge" style="color:white;background-color:red">@projectdata.PendingTaskCount</span></div>
                             </div>
-                            <div class="row"><span class="badge" style="color:white;background-color:red">@projectdata.PendingTaskCount</span></div>
                         </div>
-                    </div>
-                    <div class="col-lg-2">
-                        <div class="col-lg-7">
+                        <div class="col-lg-2">
+                            <div class="col-lg-7">
 
-                            <div class="row">
-                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                <div class="row">
+                                    <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                </div>
+                                <div class="row">
+                                    <a href="/Project/ProjectRMAStatus?ProjectKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/RMA.png" style="height:100px; width:100px"></a>
+                                </div>
                             </div>
-                            <div class="row">
-                                <a href="/Project/ProjectRMAStatus?ProjectKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/RMA.png" style="height:100px; width:100px"></a>
-                            </div>
-                        </div>
-                        <div class="col-lg-5">
+                            <div class="col-lg-5">
 
-                            <div class="row">
-                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                <div class="row">
+                                    <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                </div>
+                                <div class="row"><span class="badge" style="color:white;background-color:red">@projectdata.PendingRMACount</span></div>
                             </div>
-                            <div class="row"><span class="badge" style="color:white;background-color:red">@projectdata.PendingRMACount</span></div>
                         </div>
-                    </div>
-                    <div class="col-lg-2">
-                        <div class="col-lg-7" data-toggle="tooltip" title="Debug Tree">
+                        <div class="col-lg-2">
+                            <div class="col-lg-7" data-toggle="tooltip" title="Debug Tree">
 
-                            <div class="row">
-                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                <div class="row">
+                                    <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                </div>
+                                <div class="row">
+                                    <a href="/Project/ProjectError?ProjectKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/DebugTreeicon.png" style="height:100px; width:100px"></a>
+                                </div>
                             </div>
-                            <div class="row">
-                                <a href="/Project/ProjectError?ProjectKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/DebugTreeicon.png" style="height:100px; width:100px"></a>
+                            <div class="col-lg-5">
                             </div>
                         </div>
-                        <div class="col-lg-5">
-                        </div>
-                    </div>
 
-                    <div class="col-lg-1">
+                        <div class="col-lg-1">
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="form-group">
+            <div class="form-group">
                 <div class="row" MYTP="HOVER">
                     <div class="col-lg-12">
                         <div class="col-lg-1">
@@ -395,27 +396,27 @@
 
                         <div class="col-lg-2">
                             @*<div class="col-lg-7">
-                                <div class="row">
-                                    <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                    <div class="row">
+                                        <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                    </div>
+                                    <div class="row">
+                                        <a href="/Project/ProjectOBA?ProjectKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/OBA.png" style="height:100px; width:100px"></a>
+                                    </div>
                                 </div>
-                                <div class="row">
-                                    <a href="/Project/ProjectOBA?ProjectKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/OBA.png" style="height:100px; width:100px"></a>
-                                </div>
-                            </div>
-                            <div class="col-lg-5">
-                            </div>*@
+                                <div class="col-lg-5">
+                                </div>*@
                         </div>
                         <div class="col-lg-2">
                             @*<div class="col-lg-7" data-toggle="tooltip" title="Quality">
-                                <div class="row">
-                                    <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                    <div class="row">
+                                        <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                    </div>
+                                    <div class="row">
+                                        <a href="/Project/ProjectQuality?ProjectKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/quailty.png" style="height:100px; width:100px"></a>
+                                    </div>
                                 </div>
-                                <div class="row">
-                                    <a href="/Project/ProjectQuality?ProjectKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/quailty.png" style="height:100px; width:100px"></a>
-                                </div>
-                            </div>
-                            <div class="col-lg-5">
-                            </div>*@
+                                <div class="col-lg-5">
+                                </div>*@
                         </div>
 
                         <div class="col-lg-1">
@@ -423,10 +424,11 @@
                     </div>
                 </div>
             </div>
+        </div>
     }
     else
     {
-        <div class="form-group">
+        <div class="form-group" data-intro="Edit project here." data-step="4">
             <div class="row" MYTP="HOVER">
                 <div class="col-lg-12">
                     <div class="col-lg-1">
@@ -480,7 +482,7 @@
         <hr style="border-color:#006DC0;" />
     }
 
-    <div class="form-group">
+    <div class="form-group" data-intro="Project Description." data-step="5">
         <div class="row">
             @if (!string.IsNullOrEmpty(projectdata.Description))
             {

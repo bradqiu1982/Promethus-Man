@@ -55,6 +55,7 @@ namespace Prometheus.Models
             JO=string.Empty;
             BITable=string.Empty;
             ProductName = string.Empty;
+            ProjectKey = string.Empty;
             DataID = string.Empty;
             Appv_1 =string.Empty;
             Appv_2=string.Empty;
@@ -126,6 +127,7 @@ namespace Prometheus.Models
             Delta_THOLD = 0;
             Delta_PO_Uniformity = 0;
             ProductName = string.Empty;
+            ProjectKey = string.Empty;
             DataID = string.Empty;
             Appv_1 = 0;
             Appv_2 = 0;
@@ -614,7 +616,7 @@ namespace Prometheus.Models
 
         private static string RetrieveLatestTimeStampOfAnBITable(string bt,string bizerotime)
         {
-            var sql = "select top 1 TestTimeStamp from BITestResult where BITable = '<BITable>'";
+            var sql = "select top 1 TestTimeStamp from BITestResult where BITable = '<BITable>' order by TestTimeStamp DESC";
             sql = sql.Replace("<BITable>", bt);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
@@ -657,7 +659,10 @@ namespace Prometheus.Models
                 var bilatesttime = RetrieveLatestTimeStampOfAnBITable(bt, bizerotime);
 
                 var sql = "select ContainerName,ProcessStep,DateTime,Failure_Mode,Station,Work_Order,PN,Channel,SLOPE,PO_LD,PO_Uniformity,THOLD,Delta_PO_LD,Delta_SLOPE,Delta_THOLD,Delta_PO_Uniformity from <bitable> where DateTime > '<bilatesttime>' "
-                    + " and  ProcessStep is not null and PN is not null and Work_Order is not null and ContainerName is not null and Failure_Mode is not null and ContainerName <> '' and Failure_Mode <> '--' and Failure_Mode <> '' and Failure_Mode is not null order by ContainerName,DateTime";
+                    + " and  ProcessStep is not null and PN is not null and Work_Order is not null and ContainerName is not null and Failure_Mode is not null and ContainerName <> '' "
+                    + " and Failure_Mode <> '--' and Failure_Mode <> '' and Failure_Mode is not null and Delta_PO_LD is not null and Delta_SLOPE is not null and Delta_THOLD is not null "
+                    + " and Delta_PO_Uniformity is not null  order by ContainerName,DateTime";
+
                 sql = sql.Replace("<bitable>", bt).Replace("<bilatesttime>", bilatesttime);
 
 
@@ -667,36 +672,52 @@ namespace Prometheus.Models
                 var dbret = DBUtility.ExeAutoSqlWithRes(sql);
                 foreach (var line in dbret)
                 {
-                    var sn = Convert.ToString(line[0]);
-                    var testname = Convert.ToString(line[1]);
-                    var testtime = DateTime.Parse(ConvertToDateStr(line[2]));
-                    var failure = Convert.ToString(line[3]);
-                    var station = Convert.ToString(line[4]);
-                    var jo = Convert.ToString(line[5]);
-                    var pn = Convert.ToString(line[6]);
-                    var ch = Convert.ToString(line[7]);
-                    var slope = Convert.ToDouble(line[8]);
-                    var pold = Convert.ToDouble(line[9]);
-                    var pouniformity = Convert.ToDouble(line[10]);
-                    var thold = Convert.ToDouble(line[11]);
-                    var dpold = Convert.ToDouble(line[12]);
-                    var dslope = Convert.ToDouble(line[13]);
-                    var dthold = Convert.ToDouble(line[14]);
-                    var dpouniformity = Convert.ToDouble(line[15]);
-
-                    if (string.Compare(previoussn, sn, true) != 0)
+                    try
                     {
-                        previoussn = sn;
-                        dataid = IssueViewModels.GetUniqKey();
-                        var tempresult = new BITestResult(sn, testname, station, failure,testtime, pn, jo, bt,dataid);
-                        testresultlist.Add(tempresult);
-                    }
+                        var sn = Convert.ToString(line[0]);
+                        var testname = Convert.ToString(line[1]);
+                        var testtime = DateTime.Parse(ConvertToDateStr(line[2]));
+                        var failure = Convert.ToString(line[3]);
+                        var station = Convert.ToString(line[4]);
+                        var jo = Convert.ToString(line[5]);
+                        var pn = Convert.ToString(line[6]);
+                        var ch = Convert.ToString(line[7]);
+                        var slope = Convert.ToDouble(line[8]);
+                        var pold = Convert.ToDouble(line[9]);
+                        var pouniformity = Convert.ToDouble(line[10]);
+                        var thold = Convert.ToDouble(line[11]);
+                        var dpold = Convert.ToDouble(line[12]);
+                        var dslope = Convert.ToDouble(line[13]);
+                        var dthold = Convert.ToDouble(line[14]);
+                        var dpouniformity = Convert.ToDouble(line[15]);
 
-                    var tempfield = new BITestResultDataField(sn, testname, testtime, pn, jo, ch, slope, pold, pouniformity, thold, dpold, dslope, dthold, dpouniformity,dataid);
-                    testresultfieldlist.Add(tempfield);
+                        if (string.Compare(previoussn, sn + ":" + testname, true) != 0)
+                        {
+                            previoussn = sn+":"+testname;
+                            dataid = IssueViewModels.GetUniqKey();
+                            var tempresult = new BITestResult(sn, testname, station, failure,testtime, pn, jo, bt,dataid);
+                            testresultlist.Add(tempresult);
+                        }
+
+                        var tempfield = new BITestResultDataField(sn, testname, testtime, pn, jo, ch, slope, pold, pouniformity, thold, dpold, dslope, dthold, dpouniformity,dataid);
+                        testresultfieldlist.Add(tempfield);
+                    }
+                    catch (Exception ex) { }
+
                 }//end foreach
 
-                var snwaferdict = RetrieveBIWaferBySN(testresultlist);
+                var snwaferdict = new Dictionary<string, BISNRelation>();
+                var sumdblist = new List<string>();
+                sumdblist.Add("SummaryDB.dbo.PRLL_VcselInfoSummary_2017");
+                sumdblist.Add("SummaryDB.dbo.PRLL_VcselInfoSummary_2016");
+                sumdblist.Add("SummaryDB.dbo.PRLL_VcselInfoSummary_2018");
+                sumdblist.Add("SummaryDB.dbo.PRLL_VcselInfoSummary_2019");
+
+                foreach (var tab in sumdblist)
+                {
+                    RetrieveBIWaferBySN(testresultlist, snwaferdict,tab);
+                }
+
                 foreach (var item in testresultlist)
                 {
                     if (snwaferdict.ContainsKey(item.SN))
@@ -716,7 +737,6 @@ namespace Prometheus.Models
 
                 StoreBITestResult(testresultlist);
                 StoreBITestResultDateField(testresultfieldlist);
-
 
             }//end foreach
         }
@@ -829,65 +849,139 @@ namespace Prometheus.Models
                         dt.Clear();
                     }
                     catch (Exception ex) { }
+                    
                 }//end using
                 DBUtility.CloseConnector(targetcon);
             }//end if
         }
 
-        private static Dictionary<string, BISNRelation> RetrieveBIWaferBySN(List<BITestResult> testresultlist)
-        {
-            var snwaferdict = new Dictionary<string, BISNRelation>();
 
+        private static void RealBIWaferBySN(List<string> snlist, Dictionary<string, BISNRelation> snwaferdict, string tab)
+        {
             var sncond = "('";
-            var sndict = new Dictionary<string, bool>();
-            foreach (var item in testresultlist)
+            foreach (var item in snlist)
             {
-                if (!sndict.ContainsKey(item.SN))
-                {
-                    sncond = sncond + item.SN + "','";
-                    sndict.Add(item.SN,true);
-                }
+                    sncond = sncond + item + "','";
             }
 
             if (sncond.Length > 5)
                 sncond = sncond.Substring(0, sncond.Length - 2);
             sncond = sncond + ")";
 
-            var sql = "SELECT distinct c.ContainerName as SN,dc.[ParamValueString] as wafer,pb.productname MaterialPN,pf.productfamilyname FROM insite.container c with(nolock)"
-            + " inner join insite.currentStatus cs(nolock) on c.currentStatusId = cs.currentStatusId "
-            + "inner join insite.workflowstep ws(nolock) on cs.WorkflowStepId = ws.WorkflowStepId "
-            + "inner join insite.historyMainline hml with (nolock) on c.containerId = hml.containerId "
-            + "inner join insite.componentIssueHistory cih with (nolock) on hml.historyMainlineId=cih.historyMainlineId "
-            + "inner join insite.issueHistoryDetail ihd with (nolock) on cih.componentIssueHistoryId = ihd.componentIssueHistoryId "
-            + "inner join insite.issueActualsHistory iah with (nolock) on ihd.issueHistoryDetailId = iah.issueHistoryDetailId "
-            + "inner join insite.container cFrom with (nolock) on iah.fromContainerId = cFrom.containerId "
-            + "inner join insite.product p with (nolock) on cFrom.productId = p.productId "
-            + "inner join insite.productBase pb with (nolock) on p.productBaseId  = pb.productBaseId "
-            + "inner join insite.historyMainline hmll with (nolock)on cFrom.containerId=hmll.historyid "
-            + "inner join insite.product pp with (nolock) on c.productid=pp.productid "
-            + "left outer join insite.productfamily pf (nolock) on pp.productFamilyId = pf.productFamilyId "
-            + "inner join insite.productbase pbb with (nolock) on pp.productbaseid=pbb.productbaseid "
-            + "inner join[InsiteDB].[insite].[dc_AOC_ManualInspection] dc (nolock) on hmll.[HistoryMainlineId]= dc.[HistoryMainlineId] "
-            + "where dc.parametername= 'Trace_ID'  and p.description like '%VCSEL%'  and c.containername in <SNCOND> order by c.ContainerName,pb.productname ";
+            var sql = "  select distinct ModuleSerialNum,wafer,productfamilyname from <tab> where ModuleSerialNum in <SNCOND> order by ModuleSerialNum";
 
-            sql = sql.Replace("<SNCOND>", sncond);
+            sql = sql.Replace("<SNCOND>", sncond).Replace("<tab>",tab);
 
-            var dbret = DBUtility.ExeMESBackupSqlWithRes(null, sql);
+            var dbret = DBUtility.ExePRLSqlWithRes(null, sql);
             foreach (var line in dbret)
             {
                 var sn = Convert.ToString(line[0]);
                 var snitems = new BISNRelation();
                 snitems.wafer = Convert.ToString(line[1]);
-                snitems.productname = Convert.ToString(line[3]);
+                snitems.productname = Convert.ToString(line[2]);
                 if (!snwaferdict.ContainsKey(sn))
                 {
                     snwaferdict.Add(sn, snitems);
                 }
             }
-
-            return snwaferdict;
         }
 
+        private static void RetrieveBIWaferBySN(List<BITestResult> testresultlist, Dictionary<string, BISNRelation> snwaferdict,string tab)
+        {
+            var sndict = new Dictionary<string, bool>();
+            foreach (var item in testresultlist)
+            {
+                if (!sndict.ContainsKey(item.SN))
+                { sndict.Add(item.SN, true); }
+            }
+            var snlist = sndict.Keys.ToList();
+            var startidx = 0;
+            var totalsn = snlist.Count;
 
-}
+            while (true)
+            {
+                var done = false;
+                var tempsnlist = new List<string>();
+                for (var idx = startidx; idx < startidx + 20000; idx++)
+                {
+                    if (idx < totalsn)
+                    {
+                        tempsnlist.Add(snlist[idx]);
+                    }
+                    else
+                    {
+                        done = true;
+                        break;
+                    }
+                }
+
+                if (tempsnlist.Count > 0)
+                {
+                    RealBIWaferBySN(tempsnlist, snwaferdict, tab);
+                }
+
+                if (done)
+                    break;
+
+                startidx = startidx + 20000;
+            }//end while(true)
+
+        }
+
+        //private static Dictionary<string, BISNRelation> RetrieveBIWaferBySN(List<BITestResult> testresultlist)
+        //{
+        //    var snwaferdict = new Dictionary<string, BISNRelation>();
+
+        //    var sncond = "('";
+        //    var sndict = new Dictionary<string, bool>();
+        //    foreach (var item in testresultlist)
+        //    {
+        //        if (!sndict.ContainsKey(item.SN))
+        //        {
+        //            sncond = sncond + item.SN + "','";
+        //            sndict.Add(item.SN,true);
+        //        }
+        //    }
+
+        //    if (sncond.Length > 5)
+        //        sncond = sncond.Substring(0, sncond.Length - 2);
+        //    sncond = sncond + ")";
+
+        //    var sql = "SELECT distinct c.ContainerName as SN,dc.[ParamValueString] as wafer,pb.productname MaterialPN,pf.productfamilyname FROM insite.container c with(nolock)"
+        //    + " inner join insite.currentStatus cs(nolock) on c.currentStatusId = cs.currentStatusId "
+        //    + "inner join insite.workflowstep ws(nolock) on cs.WorkflowStepId = ws.WorkflowStepId "
+        //    + "inner join insite.historyMainline hml with (nolock) on c.containerId = hml.containerId "
+        //    + "inner join insite.componentIssueHistory cih with (nolock) on hml.historyMainlineId=cih.historyMainlineId "
+        //    + "inner join insite.issueHistoryDetail ihd with (nolock) on cih.componentIssueHistoryId = ihd.componentIssueHistoryId "
+        //    + "inner join insite.issueActualsHistory iah with (nolock) on ihd.issueHistoryDetailId = iah.issueHistoryDetailId "
+        //    + "inner join insite.container cFrom with (nolock) on iah.fromContainerId = cFrom.containerId "
+        //    + "inner join insite.product p with (nolock) on cFrom.productId = p.productId "
+        //    + "inner join insite.productBase pb with (nolock) on p.productBaseId  = pb.productBaseId "
+        //    + "inner join insite.historyMainline hmll with (nolock)on cFrom.containerId=hmll.historyid "
+        //    + "inner join insite.product pp with (nolock) on c.productid=pp.productid "
+        //    + "left outer join insite.productfamily pf (nolock) on pp.productFamilyId = pf.productFamilyId "
+        //    + "inner join insite.productbase pbb with (nolock) on pp.productbaseid=pbb.productbaseid "
+        //    + "inner join[InsiteDB].[insite].[dc_AOC_ManualInspection] dc (nolock) on hmll.[HistoryMainlineId]= dc.[HistoryMainlineId] "
+        //    + "where dc.parametername= 'Trace_ID'  and p.description like '%VCSEL%'  and c.containername in <SNCOND> order by c.ContainerName,pb.productname ";
+
+        //    sql = sql.Replace("<SNCOND>", sncond);
+
+        //    var dbret = DBUtility.ExeMESBackupSqlWithRes(null, sql);
+        //    foreach (var line in dbret)
+        //    {
+        //        var sn = Convert.ToString(line[0]);
+        //        var snitems = new BISNRelation();
+        //        snitems.wafer = Convert.ToString(line[1]);
+        //        snitems.productname = Convert.ToString(line[3]);
+        //        if (!snwaferdict.ContainsKey(sn))
+        //        {
+        //            snwaferdict.Add(sn, snitems);
+        //        }
+        //    }
+
+        //    return snwaferdict;
+        //}
+
+
+    }
 }

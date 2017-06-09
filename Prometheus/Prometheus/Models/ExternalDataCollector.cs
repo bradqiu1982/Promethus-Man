@@ -282,6 +282,9 @@ namespace Prometheus.Models
             Summary = string.Empty;
             ModuleSN = "SN";
             Owner = string.Empty;
+
+            RootCause = string.Empty;
+            CorrectiveAction = string.Empty;
         }
 
         public string DMR_ID{ set; get; }
@@ -292,6 +295,9 @@ namespace Prometheus.Models
         public string Summary { set; get; }
         public string ModuleSN { set; get; }
         public string Owner { set; get; }
+
+        public string RootCause { set; get; }
+        public string CorrectiveAction { set; get; }
     }
 
     public class TXOQUERYCOND
@@ -1943,25 +1949,72 @@ namespace Prometheus.Models
             return OBAUpdateTime.ToString();
         }
 
-        private static Dictionary<string, bool> RetrieveExistDMRDict(Controller ctrl)
+        private static Dictionary<string, IssueViewModels> RetrieveExistDMRDict(Controller ctrl)
         {
-            var ret = new Dictionary<string, bool>();
+            var ret = new Dictionary<string, IssueViewModels>();
             var obalist = IssueViewModels.RetrieveAllIssueTypeIssue("NONE", "NONE", ISSUETP.OBA, ctrl);
             foreach (var item in obalist)
             {
                 if (!string.IsNullOrEmpty(item.FinisarDMR.Trim()) && !ret.ContainsKey(item.FinisarDMR.Trim()))
                 {
-                    ret.Add(item.FinisarDMR.Trim(), true);
+                    ret.Add(item.FinisarDMR.Trim(), item);
                 }
             }
             return ret;
         }
 
-        private static List<RawDMR> RetrieveDMRFromITDB(string OBAUpdateTime, Dictionary<string, bool> DMRDict)
+        private static string Conver2Str(object obj)
+        {
+            try
+            {
+                return Convert.ToString(obj);
+            }
+            catch (Exception ex) { return string.Empty; }
+        }
+
+        private static void UpdateOBARootCause(IssueViewModels obaissue,string rootcause)
+        {
+            if (obaissue.RootCauseCommentList.Count > 0)
+            {
+                var rootcomment = obaissue.RootCauseCommentList[0];
+                if (string.Compare(rootcomment.Comment, "ROOTCAUSE: to be edited") == 0)
+                {
+                    var temprootcomment = new IssueComments();
+                    temprootcomment.Comment = rootcause;
+                    IssueViewModels.UpdateSPComment(obaissue.IssueKey, rootcomment.CommentType, rootcomment.CommentDate.ToString(), temprootcomment.dbComment);
+                }
+            }
+            else
+            {
+                var rootcomment = new IssueComments();
+                rootcomment.Comment = rootcause;
+                rootcomment.CommentType = COMMENTTYPE.RootCause;
+                rootcomment.CommentDate = DateTime.Now;
+                rootcomment.Reporter = obaissue.Assignee;
+                rootcomment.IssueKey = obaissue.IssueKey;
+                IssueViewModels.StoreIssueComment(rootcomment.IssueKey, rootcomment.dbComment, rootcomment.Reporter, rootcomment.CommentType);
+            }
+            
+        }
+
+        private static void UpdateCorrectiveAction(IssueViewModels obaissue, string correctiveinfo)
+        {
+            if (obaissue.CorrectiveActions.Count > 0)
+            {
+                if (obaissue.CorrectiveActions[0].CommentList.Count == 0)
+                {
+                    var tempcomment = new IssueComments();
+                    tempcomment.Comment = correctiveinfo;
+                    IssueViewModels.StoreIssueComment(obaissue.CorrectiveActions[0].IssueKey, tempcomment.dbComment, obaissue.Assignee, COMMENTTYPE.Description);
+                }
+            }
+        }
+
+        private static List<RawDMR> RetrieveDMRFromITDB(string OBAUpdateTime, Dictionary<string, IssueViewModels> DMRDict)
         {
             var ret = new List<RawDMR>();
 
-            var sql = "select DMR_ID,Created_at,Prod_Line,Defect_Qty,Inspected_Qty,Actual_Problem from dbo.DMR_Detail_List_View where Created_at > '<CreateTime>'";
+            var sql = "select DMR_ID,Created_at,Prod_Line,Defect_Qty,Inspected_Qty,Actual_Problem,Justification,Remark from dbo.DMR_Detail_List_View where Created_at > '<CreateTime>'";
             sql = sql.Replace("<CreateTime>", OBAUpdateTime);
             var dbret = DBUtility.ExeFAISqlWithRes(sql);
 
@@ -1980,7 +2033,7 @@ namespace Prometheus.Models
                     if (tempdmr.Summary.Contains("SN:"))
                     {
                         var idx = tempdmr.Summary.IndexOf("SN:");
-                        var splitstr = tempdmr.Summary.Substring(idx + 3).Split(new string[] { " "},StringSplitOptions.RemoveEmptyEntries);
+                        var splitstr = tempdmr.Summary.Substring(idx + 3).Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
                         tempdmr.ModuleSN = splitstr[0];
                     }
                     else if (tempdmr.Summary.Contains("SN :"))
@@ -1991,6 +2044,22 @@ namespace Prometheus.Models
                     }
                     ret.Add(tempdmr);
                 }//end if
+                else if (!string.IsNullOrEmpty(dmrid) && DMRDict.ContainsKey(dmrid))
+                {
+                    var obaissue = DMRDict[dmrid];
+                    var tempdmr = new RawDMR();
+                    tempdmr.DMR_ID = dmrid;
+                    tempdmr.RootCause = Conver2Str(line[6]);
+                    tempdmr.CorrectiveAction = Conver2Str(line[7]);
+                    if (!string.IsNullOrEmpty(tempdmr.RootCause))
+                    {
+                        UpdateOBARootCause(obaissue, tempdmr.RootCause);
+                    }
+                    if (!string.IsNullOrEmpty(tempdmr.CorrectiveAction))
+                    {
+                        UpdateCorrectiveAction(obaissue, tempdmr.CorrectiveAction);
+                    }
+                }
             }//end foreach
 
             return ret;
@@ -2134,7 +2203,7 @@ namespace Prometheus.Models
             var dmrlist = RetrieveDMRFromITDB(OBAUpdateTime, DMRDict);
             foreach (var dmr in dmrlist)
             {
-                CreateOBATask(dmr, OBAAdmin, OBADefaultPJ, OBARelateDict,ctrl);
+                CreateOBATask(dmr, OBAAdmin, OBADefaultPJ, OBARelateDict, ctrl);
             }
         }
 

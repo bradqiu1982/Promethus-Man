@@ -285,6 +285,7 @@ namespace Prometheus.Models
 
             RootCause = string.Empty;
             CorrectiveAction = string.Empty;
+            Attachment = string.Empty;
         }
 
         public string DMR_ID{ set; get; }
@@ -298,6 +299,7 @@ namespace Prometheus.Models
 
         public string RootCause { set; get; }
         public string CorrectiveAction { set; get; }
+        public string Attachment { set; get; }
     }
 
     public class TXOQUERYCOND
@@ -2010,11 +2012,41 @@ namespace Prometheus.Models
             }
         }
 
-        private static List<RawDMR> RetrieveDMRFromITDB(string OBAUpdateTime, Dictionary<string, IssueViewModels> DMRDict)
+        private static void UpdateOBAAttachement(IssueViewModels obaissue, string attachment, Controller ctrl)
+        {
+            var srcfilename = Path.GetFileNameWithoutExtension(attachment);
+            bool attachementexist = false;
+            foreach (var att in obaissue.AttachList)
+            {
+                if (att.Contains(srcfilename))
+                {
+                    attachementexist = true;
+                    break;
+                }
+            }
+
+            if (!attachementexist)
+            {
+                string datestring = DateTime.Now.ToString("yyyyMMdd");
+                string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+                if (!DirectoryExists(ctrl, imgdir))
+                    Directory.CreateDirectory(imgdir);
+
+                var desfilename = Path.GetFileNameWithoutExtension(attachment) 
+                    + DateTime.Now.ToString("-yyyyMMddhhmmss") + Path.GetExtension(attachment);
+                var attpath = imgdir + desfilename;
+                var url = "/userfiles/docs/" + datestring + "/" + desfilename;
+
+                FileCopy(ctrl, attachment, attpath, true);
+                IssueViewModels.StoreIssueAttachment(obaissue.IssueKey, url);
+            }
+        }
+
+        private static List<RawDMR> RetrieveDMRFromITDB(string OBAUpdateTime, Dictionary<string, IssueViewModels> DMRDict, Controller ctrl)
         {
             var ret = new List<RawDMR>();
 
-            var sql = "select DMR_ID,Created_at,Prod_Line,Defect_Qty,Inspected_Qty,Actual_Problem,Justification,Remark from dbo.DMR_Detail_List_View where Created_at > '<CreateTime>'";
+            var sql = "select DMR_ID,Created_at,Prod_Line,Defect_Qty,Inspected_Qty,Actual_Problem,Justification,Remark,File_URL from dbo.DMR_Detail_List_View where Created_at > '<CreateTime>'";
             sql = sql.Replace("<CreateTime>", OBAUpdateTime);
             var dbret = DBUtility.ExeFAISqlWithRes(sql);
 
@@ -2023,26 +2055,30 @@ namespace Prometheus.Models
                 var dmrid = Convert.ToString(line[0]).Trim();
                 if (!string.IsNullOrEmpty(dmrid) && !DMRDict.ContainsKey(dmrid))
                 {
-                    var tempdmr = new RawDMR();
-                    tempdmr.DMR_ID = dmrid;
-                    tempdmr.CreateTime = ConvertToDateStr(Convert.ToString(line[1]));
-                    tempdmr.Product = Convert.ToString(line[2]);
-                    tempdmr.DefectQty = Convert.ToString(line[3]);
-                    tempdmr.TotalQty = Convert.ToString(line[4]);
-                    tempdmr.Summary = Convert.ToString(line[5]);
-                    if (tempdmr.Summary.Contains("SN:"))
+                    try
                     {
-                        var idx = tempdmr.Summary.IndexOf("SN:");
-                        var splitstr = tempdmr.Summary.Substring(idx + 3).Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-                        tempdmr.ModuleSN = splitstr[0];
+                        var tempdmr = new RawDMR();
+                        tempdmr.DMR_ID = dmrid;
+                        tempdmr.CreateTime = ConvertToDateStr(Convert.ToString(line[1]));
+                        tempdmr.Product = Convert.ToString(line[2]);
+                        tempdmr.DefectQty = Convert.ToString(line[3]);
+                        tempdmr.TotalQty = Convert.ToString(line[4]);
+                        tempdmr.Summary = Convert.ToString(line[5]);
+                        if (tempdmr.Summary.Contains("SN:"))
+                        {
+                            var idx = tempdmr.Summary.IndexOf("SN:");
+                            var splitstr = tempdmr.Summary.Substring(idx + 3).Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                            tempdmr.ModuleSN = splitstr[0];
+                        }
+                        else if (tempdmr.Summary.Contains("SN :"))
+                        {
+                            var idx = tempdmr.Summary.IndexOf("SN :");
+                            var splitstr = tempdmr.Summary.Substring(idx + 4).Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                            tempdmr.ModuleSN = splitstr[0];
+                        }
+                        ret.Add(tempdmr);
                     }
-                    else if (tempdmr.Summary.Contains("SN :"))
-                    {
-                        var idx = tempdmr.Summary.IndexOf("SN :");
-                        var splitstr = tempdmr.Summary.Substring(idx + 4).Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-                        tempdmr.ModuleSN = splitstr[0];
-                    }
-                    ret.Add(tempdmr);
+                    catch (Exception ex) { }
                 }//end if
                 else if (!string.IsNullOrEmpty(dmrid) && DMRDict.ContainsKey(dmrid))
                 {
@@ -2051,13 +2087,21 @@ namespace Prometheus.Models
                     tempdmr.DMR_ID = dmrid;
                     tempdmr.RootCause = Conver2Str(line[6]);
                     tempdmr.CorrectiveAction = Conver2Str(line[7]);
+                    tempdmr.Attachment = Conver2Str(line[8]);
+
                     if (!string.IsNullOrEmpty(tempdmr.RootCause))
                     {
                         UpdateOBARootCause(obaissue, tempdmr.RootCause);
                     }
+
                     if (!string.IsNullOrEmpty(tempdmr.CorrectiveAction))
                     {
                         UpdateCorrectiveAction(obaissue, tempdmr.CorrectiveAction);
+                    }
+
+                    if (!string.IsNullOrEmpty(tempdmr.Attachment) && File.Exists(tempdmr.Attachment))
+                    {
+                        UpdateOBAAttachement(obaissue, tempdmr.Attachment, ctrl);
                     }
                 }
             }//end foreach
@@ -2200,10 +2244,15 @@ namespace Prometheus.Models
 
             var OBAUpdateTime = RetrieveOBAUpdateTime();
             var DMRDict = RetrieveExistDMRDict(ctrl);
-            var dmrlist = RetrieveDMRFromITDB(OBAUpdateTime, DMRDict);
+            var dmrlist = RetrieveDMRFromITDB(OBAUpdateTime, DMRDict,ctrl);
+            var currentdbdmrfilter = new Dictionary<string, bool>();
             foreach (var dmr in dmrlist)
             {
-                CreateOBATask(dmr, OBAAdmin, OBADefaultPJ, OBARelateDict, ctrl);
+                if (!currentdbdmrfilter.ContainsKey(dmr.DMR_ID))
+                {
+                    CreateOBATask(dmr, OBAAdmin, OBADefaultPJ, OBARelateDict, ctrl);
+                    currentdbdmrfilter.Add(dmr.DMR_ID, true);
+                }
             }
         }
 

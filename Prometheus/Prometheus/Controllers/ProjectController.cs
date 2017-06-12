@@ -4711,6 +4711,12 @@ namespace Prometheus.Controllers
 
             try
             {
+                ExternalDataCollector.RefreshNeoMAPData(this);
+            }
+            catch (Exception ex) { }
+
+            try
+            {
                 var filename = "log" + DateTime.Now.ToString("yyyy-MM-dd");
                 var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
 
@@ -4799,9 +4805,9 @@ namespace Prometheus.Controllers
 
             //ExternalDataCollector.RefreshRMAData(this);
             //ExternalDataCollector.RefreshRELData(this);
-            //ExternalDataCollector.RefreshNeoMAPData(this);
+            ExternalDataCollector.RefreshNeoMAPData(this);
             //ExternalDataCollector.RefreshOBAFromDMR(this);
-            BIDataUtility.LoadBITestDateFromAuto(this);
+            //BIDataUtility.LoadBITestDateFromAuto(this);
             //var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
             //foreach (var pjkey in pjkeylist)
             //{

@@ -269,7 +269,7 @@ namespace Prometheus.Models
 
         public static void StoreUserReviewed(string UserName, string pjkey, string Summary, string Link)
         {
-            var sql = "insert into UserReviewedItems(UserName,PJKey,Summary,Link,UpdateTime) values('<UserName>','<PJKey>',N'<Summary>','<Link>','<UpdateTime>')";
+            var sql = "insert into UserReviewedItems(UserName,PJKey,Summary,Link,UpdateTime) values('<UserName>','<PJKey>',N'<Summary>',N'<Link>','<UpdateTime>')";
             sql = sql.Replace("<UserName>", UserName).Replace("<PJKey>", pjkey).Replace("<Summary>", Summary)
                 .Replace("<Link>", Link).Replace("<UpdateTime>",DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);

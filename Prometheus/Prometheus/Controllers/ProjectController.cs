@@ -5012,7 +5012,7 @@ namespace Prometheus.Controllers
                     addrlist.AddRange(addrs);
                     SendLYTEvent(LYTTASK, vm, comment, addrlist);
 
-                    UserKPIVM.AddUserDailyRank(LYTTASK.IssueKey, updater, UserRankType.SPECIAL, "Create LYT Task: " + comment, "/Issue/UpdateIssue?issuekey=" + LYTTASK.IssueKey, 8);
+                    UserKPIVM.AddUserDailyRank(LYTTASK.IssueKey, updater, UserRankType.SPECIAL, "Create LYT Task: " + comment, "/Issue/UpdateIssue?issuekey=" + LYTTASK.IssueKey, 6);
 
                     var dict = new RouteValueDictionary();
                     dict.Add("issuekey", LYTTASK.IssueKey);

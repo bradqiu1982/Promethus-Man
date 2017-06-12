@@ -596,12 +596,28 @@ namespace Prometheus.Controllers
                     if (realissue.Summary.Contains(LYTTASKType.LYTTASK))
                     {
                         UserKPIVM.AddUserDailyRank(realissue.IssueKey, realissue.Assignee, UserRankType.BASE
-                            , "Close LYT Task: " + realissue.Summary, "/Issue/UpdateIssue?issuekey=" + realissue.IssueKey, 4);
+                            , "Close LYT Task: " + realissue.Summary, "/Issue/UpdateIssue?issuekey=" + realissue.IssueKey, 2);
                     }
                     else
                     {
-                        UserKPIVM.AddUserDailyRank(realissue.IssueKey, realissue.Assignee, UserRankType.BASE
-                            , "Close General Task: " + realissue.Summary, "/Issue/UpdateIssue?issuekey=" + realissue.IssueKey, 2);
+                        if (string.Compare(realissue.IssueType, ISSUETP.NPIPROC) != 0)
+                        {
+                            if (string.IsNullOrEmpty(realissue.ParentIssueKey))
+                            {
+                                UserKPIVM.AddUserDailyRank(realissue.IssueKey, realissue.Assignee, UserRankType.BASE
+                                    , "Close General Task: " + realissue.Summary, "/Issue/UpdateIssue?issuekey=" + realissue.IssueKey, 1);
+                            }
+                            else
+                            {
+                                var parentissue = IssueViewModels.RetrieveIssueByIssueKey(realissue.ParentIssueKey, this);
+                                if (string.Compare(parentissue.Assignee, realissue.Assignee, true) != 0)
+                                {
+                                    UserKPIVM.AddUserDailyRank(realissue.IssueKey, realissue.Assignee, UserRankType.BASE
+                                    , "Close General Task: " + realissue.Summary, "/Issue/UpdateIssue?issuekey=" + realissue.IssueKey, 1);
+                                }
+                            }
+                        }//end if
+
                     }
 
                     //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);

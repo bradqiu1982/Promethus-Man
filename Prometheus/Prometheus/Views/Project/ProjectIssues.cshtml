@@ -30,40 +30,31 @@
     }
 }
 
-<div class="row">
-    <div class="col-lg-12">&nbsp;</div>
-</div>
 
 <div class="row">
-    <div class="col-lg-12">&nbsp;</div>
-</div>
 
-<div class="row">
-    <div class="col-lg-1 text-right">
-        <img src="~/Content/images/PJ/Task.png" style="height:45px; width:45px">
-    </div>
-    <div class="col-lg-11">
-        <ol class="breadcrumb" style="font-size:18px">
-            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
-            @if (Model != null && Model.Count() > 0)
-            {
-                <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ElementAt(0).ProjectKey)">Project Detail</a></li>
-            }
-            <li class="active">Project Tasks</li>
-        </ol>
+    <div class="col-lg-7">
+        <div class="nav navbar-nav navbar-left">
+            <img src="~/Content/images/PJ/Task.png" style="height:40px; width:40px;margin-right: 10px;">
+        </div>
+        <div class="nav navbar-nav navbar-left">
+            <ol class="breadcrumb" style="width:600px">
+                <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
+                @if (Model != null && Model.Count() > 0)
+                {
+                    <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ElementAt(0).ProjectKey)">Project Detail</a></li>
+                }
+                <li class="active">Project Tasks</li>
+            </ol>
+        </div>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-lg-12">&nbsp;</div>
-</div>
-<div class="row" style="font-size:18px"><strong>&nbsp;&nbsp;Task List</strong></div>
-<div class="row">
-    <div class="col-lg-12">&nbsp;</div>
-</div>
+<div class="row" style="font-size:18px;margin-bottom: 20px;"><strong>Task List</strong></div>
+
 
 <div class="panel-group" id="accordion">
-    <div class="panel panel-default" id="panelpending">
+    <div class="panel panel-default" id="panelpending" data-intro = "Tasks which you need to do."  data-step="1" mytp="HOVER">
         <div class="panel-heading" style="background-color:#00A4BB;">
             <h4 class="panel-title">
                 <a data-toggle="collapse" data-target="#collapsepending" href="#collapsepending" class="collapsed" style="font-family:'Arial Narrow'"><font color="white">Pending&nbsp;&nbsp;&nbsp;@(pendinglist.Count)</font></a>
@@ -81,15 +72,13 @@
                         <div class="col-lg-1"><a data-toggle="tooltip" title="move to working" href="/Issue/MoveTask2Working?issuekey=@(item.IssueKey)"><font color="#006DC0"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span></font></a></div>
                         <div class="col-lg-2"></div>
                     </div>
-                        <div class="row" style="margin:-0.25em;">
-                            <div class="col-lg-12">&nbsp;</div>
-                        </div>
+
                 }
             </div>
         </div>
     </div>
 
-    <div class="panel panel-default" id="panelworking">
+    <div class="panel panel-default" id="panelworking" data-intro = "Tasks which you are doing."  data-step="2" mytp="HOVER">
         <div class="panel-heading" style="background-color:#006DC0;">
             <h4 class="panel-title">
                 <a data-toggle="collapse" data-target="#collapseworking" href="#collapseworking" class="collapsed" style="font-family:'Arial Narrow'"><font color="white">Working&nbsp;&nbsp;&nbsp;@(workinglist.Count)</font></a>
@@ -107,15 +96,12 @@
                         <div class="col-lg-1"></div>
                         <div class="col-lg-2"></div>
                     </div>
-                        <div class="row" style="margin:-0.25em;">
-                            <div class="col-lg-12">&nbsp;</div>
-                        </div>
                 }
             </div>
         </div>
     </div>
 
-    <div class="panel panel-default" id="paneldone">
+    <div class="panel panel-default" id="paneldone" data-intro = "Tasks which you have done."  data-step="3" mytp="HOVER">
         <div class="panel-heading" style="background-color:#00C28D;">
             <h4 class="panel-title">
                 <a data-toggle="collapse" data-target="#collapsedone" href="#collapsedone" class="collapsed" style="font-family:'Arial Narrow'"><font color="white">Done&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@(donelist.Count)</font></a>
@@ -133,9 +119,6 @@
                         <div class="col-lg-1"></div>
                         <div class="col-lg-2"></div>
                     </div>
-                        <div class="row" style="margin:-0.25em;">
-                            <div class="col-lg-12">&nbsp;</div>
-                        </div>
                 }
             </div>
         </div>

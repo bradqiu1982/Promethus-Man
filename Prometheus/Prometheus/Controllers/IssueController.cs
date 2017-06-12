@@ -605,7 +605,7 @@ namespace Prometheus.Controllers
                             if (string.IsNullOrEmpty(realissue.ParentIssueKey))
                             {
                                 UserKPIVM.AddUserDailyRank(realissue.IssueKey, realissue.Assignee, UserRankType.BASE
-                                    , "Close General Task: " + realissue.Summary, "/Issue/UpdateIssue?issuekey=" + realissue.IssueKey, 1);
+                                    , "Close General Task: " + realissue.Summary, "/Issue/UpdateIssue?issuekey=" + realissue.IssueKey, 4);
                             }
                             else
                             {
@@ -613,7 +613,7 @@ namespace Prometheus.Controllers
                                 if (string.Compare(parentissue.Assignee, realissue.Assignee, true) != 0)
                                 {
                                     UserKPIVM.AddUserDailyRank(realissue.IssueKey, realissue.Assignee, UserRankType.BASE
-                                    , "Close General Task: " + realissue.Summary, "/Issue/UpdateIssue?issuekey=" + realissue.IssueKey, 1);
+                                    , "Close General Task: " + realissue.Summary, "/Issue/UpdateIssue?issuekey=" + realissue.IssueKey, 3);
                                 }
                             }
                         }//end if
@@ -1611,8 +1611,8 @@ namespace Prometheus.Controllers
                 {
                     var realissue = IssueViewModels.RetrieveIssueByIssueKey(vm.IssueKey,this);
 
-                    UserKPIVM.AddUserDailyRank(realissue.IssueKey, realissue.Assignee, UserRankType.BASE
-                        , "Close FA Task: " + realissue.Summary, "/Issue/UpdateIssue?issuekey=" + realissue.IssueKey, 1);
+                    //UserKPIVM.AddUserDailyRank(realissue.IssueKey, realissue.Assignee, UserRankType.BASE
+                    //    , "Close FA Task: " + realissue.Summary, "/Issue/UpdateIssue?issuekey=" + realissue.IssueKey, 1);
 
                     //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
                     vm.CloseIssue();

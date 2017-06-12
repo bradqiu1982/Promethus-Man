@@ -93,20 +93,9 @@ namespace Prometheus.Models
             if (!ValueableAttach(filename, ctrl))
                 return;
 
-            if (string.Compare(ranktype, UserRankType.BASE, true) == 0)
+            if (string.Compare(ranktype, UserRankType.VOTE, true) != 0)
             {
-                if (RetrieveRankItems(rankkey, UserRankType.BASE).Count > 0)
-                {
                     return;
-                }
-            }
-
-            if (string.Compare(ranktype, UserRankType.SPECIAL, true) == 0)
-            {
-                if (RetrieveRankItems(rankkey, UserRankType.SPECIAL).Count > 0)
-                {
-                    return;
-                }
             }
 
             var sql = "insert into UserKPIVM(RankKey,UserName,RankType,Summary,BackLink,Rank,ADMIRERank,UpdateTime) "
@@ -117,6 +106,35 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
 
             UpdateUserTotalRank(username, rank);
+
+
+            //if (!ValueableAttach(filename, ctrl))
+            //    return;
+
+            //if (string.Compare(ranktype, UserRankType.BASE, true) == 0)
+            //{
+            //    if (RetrieveRankItems(rankkey, UserRankType.BASE).Count > 0)
+            //    {
+            //        return;
+            //    }
+            //}
+
+            //if (string.Compare(ranktype, UserRankType.SPECIAL, true) == 0)
+            //{
+            //    if (RetrieveRankItems(rankkey, UserRankType.SPECIAL).Count > 0)
+            //    {
+            //        return;
+            //    }
+            //}
+
+            //var sql = "insert into UserKPIVM(RankKey,UserName,RankType,Summary,BackLink,Rank,ADMIRERank,UpdateTime) "
+            //    + " values('<RankKey>',N'<UserName>','<RankType>',N'<Summary>',N'<BackLink>',<Rank>,<ADMIRERank>,'<UpdateTime>')";
+            //sql = sql.Replace("<RankKey>", rankkey).Replace("<UserName>", username).Replace("<RankType>", ranktype).Replace("<Summary>", summary)
+            //    .Replace("<BackLink>", backlink).Replace("<Rank>", rank.ToString()).Replace("<ADMIRERank>", "0")
+            //    .Replace("<UpdateTime>", DateTime.Now.ToString());
+            //DBUtility.ExeLocalSqlNoRes(sql);
+
+            //UpdateUserTotalRank(username, rank);
         }
 
         public static List<UserKPIVM> RetrieveRankItems(string rankkey,string ranktype)
@@ -142,7 +160,7 @@ namespace Prometheus.Models
         }
 
 
-        public static void UpdateAdmireRank(string rankkey, int admirerank)
+        public static void UpdateAdmireRank(string rankkey, int admirerank,string updatetime)
         {
             var baserankitem = RetrieveRankItems(rankkey, UserRankType.BASE);
             var specialitem = RetrieveRankItems(rankkey, UserRankType.SPECIAL);
@@ -157,8 +175,8 @@ namespace Prometheus.Models
                 return;
             
             AddUserDailyRank(admirebaseitem[0].RankKey, admirebaseitem[0].UserName, UserRankType.ADMIRE, admirebaseitem[0].Summary, admirebaseitem[0].BackLink, admirerank);
-            var sql = "update UserKPIVM set ADMIRERank = <ADMIRERank> where RankKey='<RankKey>'";
-            sql = sql.Replace("<RankKey>", rankkey).Replace("<ADMIRERank>", admirerank.ToString());
+            var sql = "update UserKPIVM set ADMIRERank = <ADMIRERank> where RankKey='<RankKey>' and UpdateTime = '<UpdateTime>'";
+            sql = sql.Replace("<RankKey>", rankkey).Replace("<ADMIRERank>", admirerank.ToString()).Replace("<UpdateTime>",updatetime);
             DBUtility.ExeLocalSqlNoRes(sql);
             
             UpdateUserTotalRank(admirebaseitem[0].UserName, admirerank);

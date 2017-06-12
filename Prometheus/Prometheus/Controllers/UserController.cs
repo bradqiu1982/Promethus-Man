@@ -2032,7 +2032,8 @@ namespace Prometheus.Controllers
             for (var idx = 0; idx < rankcount; idx++)
             {
                 if (!string.IsNullOrEmpty(Request.Form["admirerank"+idx.ToString()]) 
-                    && !string.IsNullOrEmpty(Request.Form["rankid"+idx.ToString()]))
+                    && !string.IsNullOrEmpty(Request.Form["rankid"+idx.ToString()])
+                    && !string.IsNullOrEmpty(Request.Form["updatetime" + idx.ToString()]))
                 {
                     var admirerank = 0;
                     try
@@ -2042,8 +2043,8 @@ namespace Prometheus.Controllers
                     catch (Exception ex)
                     { admirerank = 0; }
                     var rankid = (Request.Form["rankid" + idx.ToString()]);
-
-                    UserKPIVM.UpdateAdmireRank(rankid, admirerank);
+                    var updatetime = Request.Form["updatetime" + idx.ToString()];
+                    UserKPIVM.UpdateAdmireRank(rankid, admirerank,updatetime);
                 }
             }
 

@@ -5,15 +5,12 @@
       text: '#Title#'
     },
     chart: {
-        type: 'areaspline',
+        type: 'area',
     },
     boost: {
         useGPUTranslations: true
     },
     xAxis:{
-            title: {
-                text: 'X'
-            },
             min: #XMIN#,
             max: #XMAX#,
             plotLines: [{
@@ -30,7 +27,7 @@
                 dashStyle: 'shortdash',
                 width: 2,
                 label: {
-                    text: 'StDev #StDev#'
+                    text: '3-sigma  3*#StDev#'
                 }
             }, {
                 value: #StDevRight#,
@@ -38,25 +35,22 @@
                 dashStyle: 'shortdash',
                 width: 2,
                 label: {
-                    text: 'StDev #StDev#'
+                    text: '3-sigma  3*#StDev#'
                 }
             }]
         },
     yAxis:{
             title: {
-                text: 'Y'
+                text: 'Percent'
             },
             min: #YMIN#,
             max: #YMAX#
         },
-     series: [{
-        boostThreshold: 100,
         tooltip: {
-            headerFormat: '#DATAFIELDNAME#<br/>',
-            pointFormat: '{point.x} : <b>{point.y} %</b>'
-        },
-        data: [#YVALUES#]
-      }]
+              headerFormat: '#DATAFIELDNAME#<br/>',
+              pointFormat: '{point.x} : <b>{point.y}</b>'
+          },
+     series: [{boostThreshold: 100,name: '#SERIESNAME#',data: [#YVALUES#]}]
   });
   });
 </script>

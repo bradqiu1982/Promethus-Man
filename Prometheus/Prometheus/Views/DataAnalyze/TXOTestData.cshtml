@@ -32,15 +32,15 @@
                 @Html.DropDownList("leftquerylist", null, new { @id = "leftquerylist", @name = "leftquerylist", @class = "form-control" })
             </div>
             <div class="col-lg-5">
-                @Html.DropDownList("leftdatafieldlist", null, new { @id = "leftdatafieldlist", @name = "leftdatafieldlist", @class = "form-control" })
+                @Html.DropDownList("leftdatafieldlist", null, new { @id = "leftdatafieldlist", @name = "leftdatafieldlist", @class = "form-control"})
             </div>
         </div>
         <div class="col-lg-6">
             <div class="col-lg-7">
-                @Html.DropDownList("rightquerylist", null, new { @id = "rightquerylist", @name = "rightquerylist", @class = "form-control" })
+                @Html.DropDownList("rightquerylist", null, new { @id = "rightquerylist", @name = "rightquerylist", @class = "form-control"})
             </div>
             <div class="col-lg-5">
-                @Html.DropDownList("rightdatafieldlist", null, new { @id = "rightdatafieldlist", @name = "rightdatafieldlist", @class = "form-control" })
+                @Html.DropDownList("rightdatafieldlist", null, new { @id = "rightdatafieldlist", @name = "rightdatafieldlist", @class = "form-control"})
             </div>
         </div>
     </div>
@@ -80,6 +80,26 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-1">
+                    </div>
+                    <div class="col-11">
+                        @if (ViewBag.righthotscript != null)
+                        {
+                            @Html.Raw(ViewBag.righthotscript)
+                            <div id="righthotscript" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6">
             <div class="form-group">
                 <div class="row">
                     <div class="col-11">
@@ -104,19 +124,6 @@
                     <div class="col-1">
                     </div>
                     <div class="col-11">
-                        @if (ViewBag.righthotscript != null)
-                        {
-                            @Html.Raw(ViewBag.righthotscript)
-                            <div id="righthotscript" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
-                        }
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-1">
-                    </div>
-                    <div class="col-11">
                         @if (ViewBag.rightnormaldistr != null)
                         {
                             @Html.Raw(ViewBag.rightnormaldistr)
@@ -131,5 +138,26 @@
             </div>
         </div>
     </div>
+
+
+    <div class="row">
+        <div class="col-lg-1">
+        </div>
+        <div class="col-lg-10">
+            <div class="form-group">
+                <div class="row">
+                    @if (ViewBag.leftnormaldistr != null)
+                    {
+                        @Html.Raw(ViewBag.leftnormaldistr)
+                        <div id="combinenormaldistr" style="min-width: 600px; height: 600px; margin: 0 auto"></div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-1">
+        </div>
+    </div>
+
+
 </div>
 }

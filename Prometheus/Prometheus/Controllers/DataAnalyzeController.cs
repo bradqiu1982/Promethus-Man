@@ -166,19 +166,20 @@ namespace Prometheus.Controllers
         private void NormalDistributeChart(List<NeoMapDataWithPos> vm, string querycond, string datafield, bool left)
         {
             var ylist = new List<double>();
-                var valuelist = new List<double>();
-                foreach (var item in vm)
-                {
-                    valuelist.Add(item.value);
-                }
-                valuelist.Sort();
+            var valuelist = new List<double>();
+            foreach (var item in vm)
+            {
+                valuelist.Add(item.value);
+            }
 
-                var mean = NormalDistributeAlg.Mean(valuelist);
-                var stddev = NormalDistributeAlg.StandardDeviation(valuelist, mean);
-                foreach (var item in valuelist)
-                {
-                    ylist.Add(NormalDistributeAlg.getY(item, stddev, mean));
-                }
+            valuelist.Sort();
+
+            var mean = NormalDistributeAlg.Mean(valuelist);
+            var stddev = NormalDistributeAlg.StandardDeviation(valuelist, mean);
+            foreach (var item in valuelist)
+            {
+                ylist.Add(NormalDistributeAlg.getY(item, stddev, mean));
+            }
 
             var DATAFIELDNAME = datafield.Replace(TXOQUERYCOND.NEOMAP, "").Replace(TXOQUERYCOND.BURNIN,"");
             var Title = querycond +" "+ datafield.Replace(TXOQUERYCOND.NEOMAP, "").Replace(TXOQUERYCOND.BURNIN, "") 
@@ -189,23 +190,13 @@ namespace Prometheus.Controllers
             {
                 ElementID = "rightnormaldistr";
             }
-            var sumy = 0.0;
-
-
+            
             var count = valuelist.Count;
-            for (var idx = 0; idx < count; idx++)
-            {
-                sumy = sumy + ylist[idx]/100.0;
-            }
 
             var xmin = valuelist[0];
             var xmax = valuelist[0];
-
-            var ymin = ylist[0]/sumy;
-            var ymax = ylist[0]/sumy;
-
-            var YVALUES = string.Empty;
-
+            var ymin = ylist[0];
+            var ymax = ylist[0];
             for (var idx = 0; idx < count; idx++)
             {
                 if (valuelist[idx] < xmin)
@@ -213,36 +204,67 @@ namespace Prometheus.Controllers
                 if (valuelist[idx] > xmax)
                     xmax = valuelist[idx];
 
-                if (ylist[idx]/sumy < ymin)
-                    ymin = ylist[idx]/sumy;
-                if (ylist[idx]/sumy > ymax)
-                    ymax = ylist[idx]/sumy;
+                if (ylist[idx] < ymin)
+                    ymin = ylist[idx];
+                if (ylist[idx] > ymax)
+                    ymax = ylist[idx];
+            }
 
-                YVALUES = YVALUES + "[" + valuelist[idx].ToString() + "," + ((ylist[idx]/sumy)*100).ToString() + "],";
+            double rate = 1.0;
+            var tempymax = ymax;
+            if (tempymax > 100)
+            {
+                while (tempymax > 100.0)
+                {
+                    tempymax = tempymax / 10.0;
+                    rate = rate * 10.0;
+                }
+            }
+            else if (tempymax < 1.0 && tempymax > 0.0)
+            {
+                while (tempymax < 1.0 )
+                {
+                    tempymax = tempymax / 0.1;
+                    rate = rate * 0.1;
+                }
+            }
+
+            var YVALUES = string.Empty;
+            for (var idx = 0; idx < count; idx++)
+            {
+                YVALUES = YVALUES + "[" + valuelist[idx].ToString() + "," + (ylist[idx]/rate).ToString() + "],";
             }
 
             YVALUES = YVALUES.Substring(0, YVALUES.Length - 1);
 
+            ymin = ymin / rate;
+            ymax = ymax / rate;
+
             var left3sigma = (mean - stddev * 3.0);
             var right3sigma = (mean + stddev * 3.0);
-            if (left3sigma < xmin)
-                xmin = left3sigma;
-            if (right3sigma > xmax)
-                xmax = right3sigma;
+
+            var left4sigma = (mean - stddev * 4.0);
+            var right4sigma = (mean + stddev * 4.0);
+
+            if (left4sigma < xmin)
+                xmin = left4sigma;
+            if (right4sigma > xmax)
+                xmax = right4sigma;
 
             var scritpttxt = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/NormalDistribution.xml"));
             scritpttxt = scritpttxt.Replace("#ElementID#", ElementID)
                     .Replace("#Title#", Title)
                     .Replace("#XMIN#", xmin.ToString())
                     .Replace("#XMAX#", xmax.ToString())
-                    .Replace("#YMIN#", (ymin*100).ToString())
-                    .Replace("#YMAX#", (ymax*100).ToString())
+                    .Replace("#YMIN#", ymin.ToString())
+                    .Replace("#YMAX#", ymax.ToString())
                     .Replace("#DATAFIELDNAME#", DATAFIELDNAME)
                     .Replace("#MEAN#", mean.ToString("f6"))
                     .Replace("#StDev#", stddev.ToString("f6"))
                     .Replace("#StDevLeft#", left3sigma.ToString())
                     .Replace("#StDevRight#", right3sigma.ToString())
-                    .Replace("#YVALUES#", YVALUES);
+                    .Replace("#YVALUES#", YVALUES)
+                    .Replace("#SERIESNAME#", datafield);
 
             if (left)
             {
@@ -254,7 +276,7 @@ namespace Prometheus.Controllers
             }
         }
 
-        private void NeoMapDataAnalysis(string querycond, string datafield,bool left =true)
+        private void NeoMapDataAnalysis(string querycond, string datafield,bool left)
         {
             var vm = ExternalDataCollector.RetrieveNeoMapData(querycond, datafield);
             if (vm.Count > 2)
@@ -264,40 +286,65 @@ namespace Prometheus.Controllers
             }
         }
 
+        private void NeoMapDataAnalysisCombine(string lquerycond, string ldatafield, string rquerycond, string rdatafield)
+        {
+            var lvm = ExternalDataCollector.RetrieveNeoMapData(lquerycond, ldatafield);
+            var rvm = ExternalDataCollector.RetrieveNeoMapData(rquerycond, rdatafield);
+            if (lvm.Count > 2)
+            {
+                HeatMap4NeoMap(lvm, lquerycond, ldatafield,true);
+            }
+
+            if (rvm.Count > 2)
+            {
+                HeatMap4NeoMap(rvm, rquerycond, rdatafield, false);
+            }
+        }
+
+
         [HttpPost, ActionName("TXOTestData")]
         [ValidateAntiForgeryToken]
         public ActionResult TXOTestDataPost()
         {
-            var leftcond = string.Empty;
-            var leftfield = string.Empty;
-            var rightcond = string.Empty;
-            var rightfield = string.Empty;
+            var leftcond = Request.Form["leftquerylist"];
+            var leftfield = Request.Form["leftdatafieldlist"];
+            var rightcond = Request.Form["rightquerylist"];
+            var rightfield = Request.Form["rightdatafieldlist"];
 
-            if (!string.IsNullOrEmpty(Request.Form["leftquerylist"])
-                && !string.IsNullOrEmpty(Request.Form["leftdatafieldlist"]))
+            if (!string.IsNullOrEmpty(leftcond)
+                    && !string.IsNullOrEmpty(leftfield)
+                    && !string.IsNullOrEmpty(rightcond)
+                    && !string.IsNullOrEmpty(rightfield)
+                    && string.Compare(leftfield, rightfield) == 0)
             {
-                var querycond = Request.Form["leftquerylist"].ToString();
-                var datafield = Request.Form["leftdatafieldlist"];
-                leftcond = querycond;
-                leftfield = datafield;
-                if (datafield.Contains(TXOQUERYCOND.NEOMAP))
+                if (leftfield.Contains(TXOQUERYCOND.NEOMAP))
                 {
-                    NeoMapDataAnalysis(querycond, datafield);
+                    NeoMapDataAnalysisCombine(leftcond, leftfield, rightcond, rightfield);
                 }
             }
-
-            if (!string.IsNullOrEmpty(Request.Form["rightquerylist"])
-                && !string.IsNullOrEmpty(Request.Form["rightdatafieldlist"]))
+            else
             {
-                var querycond = Request.Form["rightquerylist"].ToString();
-                var datafield = Request.Form["rightdatafieldlist"];
-                rightcond = querycond;
-                rightfield = datafield;
-                if (datafield.Contains(TXOQUERYCOND.NEOMAP))
+                if (!string.IsNullOrEmpty(leftcond)
+                    && !string.IsNullOrEmpty(leftfield))
                 {
-                    NeoMapDataAnalysis(querycond, datafield,false);
+                
+                    if (leftfield.Contains(TXOQUERYCOND.NEOMAP))
+                    {
+                        NeoMapDataAnalysis(leftcond, leftfield,true);
+                    }
                 }
+
+                if (!string.IsNullOrEmpty(rightcond)
+                    && !string.IsNullOrEmpty(rightfield))
+                {
+                    if (rightfield.Contains(TXOQUERYCOND.NEOMAP))
+                    {
+                        NeoMapDataAnalysis(rightcond, rightfield, false);
+                    }
+                }                
             }
+
+
 
             var ckdict = CookieUtility.UnpackCookie(this);
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];

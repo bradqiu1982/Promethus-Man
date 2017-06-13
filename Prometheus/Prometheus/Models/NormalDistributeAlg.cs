@@ -32,5 +32,6 @@ namespace Prometheus.Models
             double b = 1.0 / (stddev * Math.Sqrt(2 * Math.PI));
             return a*b;
         }
-    }
+
+      }
 }

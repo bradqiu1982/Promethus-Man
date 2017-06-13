@@ -1,0 +1,88 @@
+﻿<script type="text/javascript">
+  $(function () {
+  $('##ElementID#').highcharts({
+    title: {
+      text: '#Title#'
+    },
+    boost: {
+        useGPUTranslations: true
+    },
+    xAxis:{
+            min: #XMIN#,
+            max: #XMAX#,
+            plotLines: [{
+                value: #LMEAN#,
+                color: 'gray',
+                dashStyle: 'shortdash',
+                width: 2,
+                label: {
+                    text: 'Mean #LMEAN#'
+                }
+            }, {
+                value: #LStDevLeft#,
+                color: 'green',
+                dashStyle: 'shortdash',
+                width: 2,
+                label: {
+                    text: '3-sigma  3*#LStDev#'
+                }
+            }, {
+                value: #LStDevRight#,
+                color: 'green',
+                dashStyle: 'shortdash',
+                width: 2,
+                label: {
+                    text: '3-sigma  3*#LStDev#'
+                }
+            },{
+                value: #RMEAN#,
+                color: 'gray',
+                dashStyle: 'longdash',
+                width: 2,
+                label: {
+                    text: 'Mean #RMEAN#'
+                }
+            }, {
+                value: #RStDevLeft#,
+                color: 'orange',
+                dashStyle: 'longdash',
+                width: 2,
+                label: {
+                    text: '3-sigma  3*#RStDev#'
+                }
+            }, {
+                value: #RStDevRight#,
+                color: 'orange',
+                dashStyle: 'longdash',
+                width: 2,
+                label: {
+                    text: '3-sigma  3*#RStDev#'
+                }
+            }
+            ]
+        },
+    yAxis:{
+            title: {
+                text: 'Percent'
+            },
+            min: #YMIN#,
+            max: #YMAX#
+        },
+        tooltip: {
+              headerFormat: '#DATAFIELDNAME#<br/>',
+              pointFormat: '{point.x} : <b>{point.y}</b>'
+          },
+     series: [{
+            type: 'line',
+            boostThreshold: 100,
+            name: '#LSERIESNAME#',
+            data: [#LYVALUES#]
+     },{
+            type: 'line',
+            boostThreshold: 100,
+            name: '#RSERIESNAME#',
+            data: [#RYVALUES#]
+     }]
+  });
+  });
+</script>

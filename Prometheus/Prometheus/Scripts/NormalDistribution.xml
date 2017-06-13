@@ -4,9 +4,6 @@
     title: {
       text: '#Title#'
     },
-    chart: {
-        type: 'area',
-    },
     boost: {
         useGPUTranslations: true
     },
@@ -50,7 +47,12 @@
               headerFormat: '#DATAFIELDNAME#<br/>',
               pointFormat: '{point.x} : <b>{point.y}</b>'
           },
-     series: [{boostThreshold: 100,name: '#SERIESNAME#',data: [#YVALUES#]}]
+     series: [{
+            type: 'line',
+            boostThreshold: 100,
+            name: '#SERIESNAME#',
+            data: [#YVALUES#]
+     }]
   });
   });
 </script>

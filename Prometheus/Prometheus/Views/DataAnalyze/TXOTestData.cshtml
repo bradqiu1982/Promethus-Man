@@ -146,9 +146,9 @@
         <div class="col-lg-10">
             <div class="form-group">
                 <div class="row">
-                    @if (ViewBag.leftnormaldistr != null)
+                    @if (ViewBag.combinenormaldistr != null)
                     {
-                        @Html.Raw(ViewBag.leftnormaldistr)
+                        @Html.Raw(ViewBag.combinenormaldistr)
                         <div id="combinenormaldistr" style="min-width: 600px; height: 600px; margin: 0 auto"></div>
                     }
                 </div>
@@ -158,6 +158,64 @@
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-11">
+                        @if (ViewBag.leftboxplot != null)
+                        {
+                            @Html.Raw(ViewBag.leftboxplot)
+                            <div id="leftboxplot" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+                        }
+                    </div>
+                    <div class="col-1">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-1">
+                    </div>
+                    <div class="col-11">
+                        @if (ViewBag.rightboxplot != null)
+                        {
+                            @Html.Raw(ViewBag.rightboxplot)
+                            <div id="rightboxplot" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-1">
+        </div>
+        <div class="col-lg-10">
+            <div class="form-group">
+                <div class="row">
+                    @if (ViewBag.combineboxplot != null)
+                    {
+                        @Html.Raw(ViewBag.combineboxplot)
+                        <div id="combineboxplot" style="min-width: 600px; height: 600px; margin: 0 auto"></div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-1">
+        </div>
+    </div>
 
 </div>
 }

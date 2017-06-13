@@ -7,6 +7,22 @@ using Prometheus.Models;
 
 namespace Prometheus.Controllers
 {
+
+    public class NormalDistributionData
+    {
+        public double mean { set; get; }
+        public double stddev { set; get; }
+        public double xmin { set; get; }
+        public double xmax { set; get; }
+        public double ymin { set; get; }
+        public double ymax { set; get; }
+        public double left3sigma { set; get; }
+        public double right3sigma { set; get; }
+        public string YVALUES { set; get; }
+        public double yrate { set; get; }
+    }
+
+
     public class DataAnalyzeController : Controller
     {
         private List<SelectListItem> CreateSelectList(List<string> valist, string defVal)
@@ -163,34 +179,26 @@ namespace Prometheus.Controllers
                 }
         }
 
-        private void NormalDistributeChart(List<NeoMapDataWithPos> vm, string querycond, string datafield, bool left)
+        private NormalDistributionData GetNormalDistrData(List<NeoMapDataWithPos> vm,double comparerate)
         {
+            var ret = new NormalDistributionData();
+
             var ylist = new List<double>();
             var valuelist = new List<double>();
             foreach (var item in vm)
             {
                 valuelist.Add(item.value);
             }
-
             valuelist.Sort();
 
             var mean = NormalDistributeAlg.Mean(valuelist);
             var stddev = NormalDistributeAlg.StandardDeviation(valuelist, mean);
+
             foreach (var item in valuelist)
             {
                 ylist.Add(NormalDistributeAlg.getY(item, stddev, mean));
             }
 
-            var DATAFIELDNAME = datafield.Replace(TXOQUERYCOND.NEOMAP, "").Replace(TXOQUERYCOND.BURNIN,"");
-            var Title = querycond +" "+ datafield.Replace(TXOQUERYCOND.NEOMAP, "").Replace(TXOQUERYCOND.BURNIN, "") 
-                + " Normal Distribution";
-
-            var ElementID = "leftnormaldistr";
-            if (!left)
-            {
-                ElementID = "rightnormaldistr";
-            }
-            
             var count = valuelist.Count;
 
             var xmin = valuelist[0];
@@ -211,28 +219,37 @@ namespace Prometheus.Controllers
             }
 
             double rate = 1.0;
-            var tempymax = ymax;
-            if (tempymax > 100)
+
+            if (comparerate != 1.0)
             {
-                while (tempymax > 100.0)
+                rate = comparerate;
+            }
+            else
+            {
+                var tempymax = ymax;
+                if (tempymax > 100)
                 {
-                    tempymax = tempymax / 10.0;
-                    rate = rate * 10.0;
+                    while (tempymax > 100.0)
+                    {
+                        tempymax = tempymax / 10.0;
+                        rate = rate * 10.0;
+                    }
+                }
+                else if (tempymax < 1.0 && tempymax > 0.0)
+                {
+                    while (tempymax < 1.0)
+                    {
+                        tempymax = tempymax / 0.1;
+                        rate = rate * 0.1;
+                    }
                 }
             }
-            else if (tempymax < 1.0 && tempymax > 0.0)
-            {
-                while (tempymax < 1.0 )
-                {
-                    tempymax = tempymax / 0.1;
-                    rate = rate * 0.1;
-                }
-            }
+
 
             var YVALUES = string.Empty;
             for (var idx = 0; idx < count; idx++)
             {
-                YVALUES = YVALUES + "[" + valuelist[idx].ToString() + "," + (ylist[idx]/rate).ToString() + "],";
+                YVALUES = YVALUES + "[" + valuelist[idx].ToString() + "," + (ylist[idx] / rate).ToString() + "],";
             }
 
             YVALUES = YVALUES.Substring(0, YVALUES.Length - 1);
@@ -251,19 +268,86 @@ namespace Prometheus.Controllers
             if (right4sigma > xmax)
                 xmax = right4sigma;
 
-            var scritpttxt = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/NormalDistribution.xml"));
+            ret.mean = mean;
+            ret.stddev = stddev;
+            ret.xmax = xmax;
+            ret.xmin = xmin;
+            ret.ymax = ymax;
+            ret.ymin = ymin;
+            ret.left3sigma = left3sigma;
+            ret.right3sigma = right3sigma;
+            ret.YVALUES = YVALUES;
+            ret.yrate = rate;
+
+            return ret;
+        }
+
+        private void NormalDistributeCombineChart(List<NeoMapDataWithPos> lvm, List<NeoMapDataWithPos> rvm
+            , string lquerycond, string rquerycond, string datafield)
+        {
+            var lds = GetNormalDistrData(lvm,1.0);
+            var rds = GetNormalDistrData(rvm,lds.yrate);
+
+            var xmax = lds.xmax > rds.xmax ? lds.xmax : rds.xmax;
+            var xmin = lds.xmin < rds.xmin ? lds.xmin : rds.xmin;
+            var ymax = lds.ymax > rds.ymax ? lds.ymax : rds.ymax;
+            var ymin = lds.ymin < rds.ymin ? lds.ymin : rds.ymin;
+
+            var DATAFIELDNAME = datafield.Replace(TXOQUERYCOND.NEOMAP, "").Replace(TXOQUERYCOND.BURNIN, "");
+            var Title = DATAFIELDNAME+ " Normal Distribution";
+            var ElementID = "combinenormaldistr";
+
+            var scritpttxt = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/NormalDistributionCombine.xml"));
             scritpttxt = scritpttxt.Replace("#ElementID#", ElementID)
                     .Replace("#Title#", Title)
+                    .Replace("#DATAFIELDNAME#", DATAFIELDNAME)
                     .Replace("#XMIN#", xmin.ToString())
                     .Replace("#XMAX#", xmax.ToString())
                     .Replace("#YMIN#", ymin.ToString())
                     .Replace("#YMAX#", ymax.ToString())
+                    .Replace("#LMEAN#", lds.mean.ToString("f6"))
+                    .Replace("#RMEAN#", rds.mean.ToString("f6"))
+                    .Replace("#LStDev#", lds.stddev.ToString("f6"))
+                    .Replace("#RStDev#", rds.stddev.ToString("f6"))
+                    .Replace("#LStDevLeft#", lds.left3sigma.ToString())
+                    .Replace("#RStDevLeft#", rds.left3sigma.ToString())
+                    .Replace("#LStDevRight#", lds.right3sigma.ToString())
+                    .Replace("#RStDevRight#", rds.right3sigma.ToString())
+                    .Replace("#LYVALUES#", lds.YVALUES)
+                    .Replace("#RYVALUES#", rds.YVALUES)
+                    .Replace("#LSERIESNAME#", lquerycond)
+                    .Replace("#RSERIESNAME#", rquerycond);
+
+            ViewBag.combinenormaldistr = scritpttxt;
+        }
+
+        
+        private void NormalDistributeChart(List<NeoMapDataWithPos> vm, string querycond, string datafield, bool left)
+        {
+            var ds = GetNormalDistrData(vm,1.0);
+
+            var DATAFIELDNAME = datafield.Replace(TXOQUERYCOND.NEOMAP, "").Replace(TXOQUERYCOND.BURNIN,"");
+            var Title = querycond +" "+ DATAFIELDNAME + " Normal Distribution";
+
+            var ElementID = "leftnormaldistr";
+            if (!left)
+            {
+                ElementID = "rightnormaldistr";
+            }
+            
+            var scritpttxt = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/NormalDistribution.xml"));
+            scritpttxt = scritpttxt.Replace("#ElementID#", ElementID)
+                    .Replace("#Title#", Title)
+                    .Replace("#XMIN#", ds.xmin.ToString())
+                    .Replace("#XMAX#", ds.xmax.ToString())
+                    .Replace("#YMIN#", ds.ymin.ToString())
+                    .Replace("#YMAX#", ds.ymax.ToString())
                     .Replace("#DATAFIELDNAME#", DATAFIELDNAME)
-                    .Replace("#MEAN#", mean.ToString("f6"))
-                    .Replace("#StDev#", stddev.ToString("f6"))
-                    .Replace("#StDevLeft#", left3sigma.ToString())
-                    .Replace("#StDevRight#", right3sigma.ToString())
-                    .Replace("#YVALUES#", YVALUES)
+                    .Replace("#MEAN#", ds.mean.ToString("f6"))
+                    .Replace("#StDev#", ds.stddev.ToString("f6"))
+                    .Replace("#StDevLeft#", ds.left3sigma.ToString())
+                    .Replace("#StDevRight#", ds.right3sigma.ToString())
+                    .Replace("#YVALUES#", ds.YVALUES)
                     .Replace("#SERIESNAME#", datafield);
 
             if (left)
@@ -299,6 +383,8 @@ namespace Prometheus.Controllers
             {
                 HeatMap4NeoMap(rvm, rquerycond, rdatafield, false);
             }
+
+            NormalDistributeCombineChart(lvm, rvm, lquerycond, rquerycond, ldatafield);
         }
 
 

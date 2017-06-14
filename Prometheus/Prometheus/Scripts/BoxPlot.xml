@@ -1,0 +1,19 @@
+﻿<script type="text/javascript">
+  $(function () {
+  $('##ElementID#').highcharts({
+    chart : {
+      type: 'boxplot'
+    },  
+    title: {
+      text: '#Title#'
+    },
+    xAxis:{
+        },
+    yAxis:{
+            min:#YMIN#,
+            max:#YMAX#
+        },
+     series: [#SERIESVALUE#]
+  });
+  });
+</script>

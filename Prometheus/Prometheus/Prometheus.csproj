@@ -767,6 +767,7 @@
     <Content Include="ckeditor\skins\moono-lisa\readme.md" />
     <None Include="Properties\PublishProfiles\Test.pubxml" />
     <Content Include="Scripts\burn_in_pn_list.xlsx" />
+    <Content Include="Scripts\highcharts-more.js" />
     <Content Include="Scripts\intro\arial-narrow_d0eb64ed2b91fe9a67f7800c1b14868b.ttf" />
     <Content Include="Scripts\intro\arial-narrow_d0eb64ed2b91fe9a67f7800c1b14868b.woff" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
@@ -777,6 +778,7 @@
     <Content Include="Scripts\highcharts.js" />
     <Content Include="Scripts\HotMap.xml" />
     <Content Include="Scripts\intro\arial-narrow.css" />
+    <Content Include="Scripts\BoxPlot.xml" />
     <Content Include="Scripts\intro\intro.min.js" />
     <Content Include="Scripts\intro\introjs-dark.css" />
     <Content Include="Scripts\intro\introjs-flattener.css" />

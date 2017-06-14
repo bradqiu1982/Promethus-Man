@@ -22,6 +22,14 @@ namespace Prometheus.Controllers
         public double yrate { set; get; }
     }
 
+    public class BoxPlotData
+    {
+        public double Min { set; get; }
+        public double LowerQuart { set; get; }
+        public double Mean { set; get; }
+        public double UpperQuart { set; get; }
+        public double Max { set; get; }
+    }
 
     public class DataAnalyzeController : Controller
     {
@@ -282,7 +290,7 @@ namespace Prometheus.Controllers
             return ret;
         }
 
-        private void NormalDistributeCombineChart(List<NeoMapDataWithPos> lvm, List<NeoMapDataWithPos> rvm
+        private void NEONormalDistributeCombineChart(List<NeoMapDataWithPos> lvm, List<NeoMapDataWithPos> rvm
             , string lquerycond, string rquerycond, string datafield)
         {
             var lds = GetNormalDistrData(lvm,1.0);
@@ -321,8 +329,51 @@ namespace Prometheus.Controllers
             ViewBag.combinenormaldistr = scritpttxt;
         }
 
-        
-        private void NormalDistributeChart(List<NeoMapDataWithPos> vm, string querycond, string datafield, bool left)
+        private void NEOBoxPlotCombine(List<NeoMapDataWithPos> lvm, List<NeoMapDataWithPos> rvm
+            , string lquerycond, string rquerycond, string datafield)
+        {
+            //{name: '#SERIESNAME#',data: [#YVALUES#]}
+            var lrawdata = new List<double>();
+            foreach (var item in lvm)
+            {
+                lrawdata.Add(item.value);
+            }
+            var lboxdata = GetBoxPlotData(lrawdata);
+
+            var rrawdata = new List<double>();
+            foreach (var item in rvm)
+            {
+                rrawdata.Add(item.value);
+            }
+            var rboxdata = GetBoxPlotData(rrawdata);
+
+            var DATAFIELDNAME = datafield.Replace(TXOQUERYCOND.NEOMAP, "").Replace(TXOQUERYCOND.BURNIN, "");
+            var Title =  DATAFIELDNAME + " Box Plot";
+
+            var LYVALUES = lboxdata.Min.ToString() + "," + lboxdata.LowerQuart.ToString() + "," + lboxdata.Mean.ToString() + "," + lboxdata.UpperQuart.ToString() + "," + lboxdata.Max.ToString();
+            var RYVALUES = rboxdata.Min.ToString() + "," + rboxdata.LowerQuart.ToString() + "," + rboxdata.Mean.ToString() + "," + rboxdata.UpperQuart.ToString() + "," + rboxdata.Max.ToString();
+
+            var min = lboxdata.Min < rboxdata.Min ? lboxdata.Min : rboxdata.Min;
+            var max = lboxdata.Max > rboxdata.Max ? lboxdata.Max : rboxdata.Max;
+
+            var lseriesstr = "{name: '#SERIESNAME#',data: [[#YVALUES#]]}";
+            var rseriesstr = "{name: '#SERIESNAME#',data: [[#YVALUES#]]}";
+            var mainseriesstr = lseriesstr.Replace("#SERIESNAME#", lquerycond).Replace("#YVALUES#", LYVALUES) + ","
+                                + rseriesstr.Replace("#SERIESNAME#", rquerycond).Replace("#YVALUES#", RYVALUES);
+
+            var ElementID = "combineboxplot";
+
+            var scritpttxt = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/BoxPlot.xml"));
+            scritpttxt = scritpttxt.Replace("#ElementID#", ElementID)
+                    .Replace("#Title#", Title)
+                    .Replace("#YMIN#", min.ToString())
+                    .Replace("#YMAX#", max.ToString())
+                    .Replace("#SERIESVALUE#", mainseriesstr);
+
+            ViewBag.combineboxplot = scritpttxt;
+         }
+
+        private void NEONormalDistributeChart(List<NeoMapDataWithPos> vm, string querycond, string datafield, bool left)
         {
             var ds = GetNormalDistrData(vm,1.0);
 
@@ -360,13 +411,124 @@ namespace Prometheus.Controllers
             }
         }
 
+        private double GetBoxMeanValue(List<double> rawdata)
+        {
+            if ((rawdata.Count % 2) == 0)
+            {
+                var mididx1 = rawdata.Count / 2;
+                var mididx2 = mididx1 + 1;
+                return (rawdata[mididx1] + rawdata[mididx2]) / 2.0;
+            }
+            else
+            {
+                var mididx = (rawdata.Count + 1) / 2;
+                return rawdata[mididx];
+            }
+        }
+
+        private BoxPlotData GetBoxPlotData(List<double> rawdata)
+        {
+            rawdata.Sort();
+            var ret = new BoxPlotData();
+            if ((rawdata.Count % 2) == 0)
+            {
+                var mididx1 = rawdata.Count / 2;
+                var mididx2 = mididx1 + 1;
+
+                ret.Mean = (rawdata[mididx1]+rawdata[mididx2]) / 2.0;
+                ret.Min = rawdata[0];
+                ret.Max = rawdata[rawdata.Count - 1];
+
+                var lowlist = new List<double>();
+                var upperlist = new List<double>();
+                for (var idx = 0; idx < mididx2; idx++)
+                {
+                    lowlist.Add(rawdata[idx]);
+                }
+                for (var idx = mididx2; idx < rawdata.Count; idx++)
+                {
+                    upperlist.Add(rawdata[idx]);
+                }
+
+                ret.LowerQuart = GetBoxMeanValue(lowlist);
+                ret.UpperQuart = GetBoxMeanValue(upperlist);
+            }
+            else
+            {
+                var mididx = (rawdata.Count + 1) / 2;
+                ret.Mean = rawdata[mididx];
+                ret.Min = rawdata[0];
+                ret.Max = rawdata[rawdata.Count - 1];
+
+                var lowlist = new List<double>();
+                var upperlist = new List<double>();
+                for (var idx = 0; idx < mididx; idx++)
+                {
+                    lowlist.Add(rawdata[idx]);
+                }
+                for (var idx = mididx+1; idx < rawdata.Count; idx++)
+                {
+                    upperlist.Add(rawdata[idx]);
+                }
+
+                ret.LowerQuart = GetBoxMeanValue(lowlist);
+                ret.UpperQuart = GetBoxMeanValue(upperlist);
+            }
+
+            return ret;
+        }
+
+        private void NEOBoxPlot(List<NeoMapDataWithPos> vm, string querycond, string datafield, bool left)
+        {
+            //{name: '#SERIESNAME#',data: [#YVALUES#]}
+            var rawdata = new List<double>();
+            foreach (var item in vm)
+            {
+                rawdata.Add(item.value);
+            }
+            var boxdata = GetBoxPlotData(rawdata);
+            var DATAFIELDNAME = datafield.Replace(TXOQUERYCOND.NEOMAP, "").Replace(TXOQUERYCOND.BURNIN, "");
+            var Title = querycond + " " + DATAFIELDNAME + " Box Plot";
+
+            var YVALUES = boxdata.Min.ToString() + "," + boxdata.LowerQuart.ToString() + "," + boxdata.Mean.ToString() + "," + boxdata.UpperQuart.ToString() + "," + boxdata.Max.ToString();
+            var seriesstr = "{name: '#SERIESNAME#',data: [[#YVALUES#]]}";
+            seriesstr = seriesstr.Replace("#SERIESNAME#", DATAFIELDNAME).Replace("#YVALUES#", YVALUES);
+
+            var ElementID = "leftboxplot";
+            if (!left)
+            {
+                ElementID = "rightboxplot";
+            }
+
+            var scritpttxt = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/BoxPlot.xml"));
+            scritpttxt = scritpttxt.Replace("#ElementID#", ElementID)
+                    .Replace("#Title#", Title)
+                    .Replace("#YMIN#", boxdata.Min.ToString())
+                    .Replace("#YMAX#", boxdata.Max.ToString())
+                    .Replace("#SERIESVALUE#", seriesstr);
+
+            if (left)
+            {
+                ViewBag.leftboxplot = scritpttxt;
+            }
+            else
+            {
+                ViewBag.rightboxplot = scritpttxt;
+            }
+        }
+
         private void NeoMapDataAnalysis(string querycond, string datafield,bool left)
         {
             var vm = ExternalDataCollector.RetrieveNeoMapData(querycond, datafield);
             if (vm.Count > 2)
             {
                 HeatMap4NeoMap(vm, querycond, datafield, left);
-                NormalDistributeChart(vm, querycond, datafield, left);
+                NEONormalDistributeChart(vm, querycond, datafield, left);
+            }
+
+            if (vm.Count > 5)
+            {
+                NEOBoxPlot(vm, querycond, datafield,left);
             }
         }
 
@@ -383,8 +545,15 @@ namespace Prometheus.Controllers
             {
                 HeatMap4NeoMap(rvm, rquerycond, rdatafield, false);
             }
+            if (rvm.Count > 2 && lvm.Count > 2)
+            {
+                NEONormalDistributeCombineChart(lvm, rvm, lquerycond, rquerycond, ldatafield);
+            }
 
-            NormalDistributeCombineChart(lvm, rvm, lquerycond, rquerycond, ldatafield);
+            if (rvm.Count > 5 && lvm.Count > 5)
+            {
+                NEOBoxPlotCombine(lvm, rvm, lquerycond, rquerycond, ldatafield);
+            }
         }
 
 

@@ -1253,7 +1253,9 @@ namespace Prometheus.Models
                         }
                         else
                         {
-                            neodata.AppV_AD = 0;
+                            idx = idx + 1;
+                            continue;
+                            //neodata.AppV_AD = 0;
                         }
 
                         PropertyInfo[] properties = typeof(NEOMAPData).GetProperties();

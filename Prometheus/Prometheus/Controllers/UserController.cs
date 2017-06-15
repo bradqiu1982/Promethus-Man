@@ -567,7 +567,7 @@ namespace Prometheus.Controllers
                     templine.Add(item.Priority);
                     templine.Add(item.Assignee);
                     templine.Add(item.Resolution);
-                    templine.Add(item.DueDate.ToString("MM/dd-yy"));
+                    templine.Add(item.DueDate.ToString("yy-MM-dd"));
                     templine.Add(item.IssueKey);
                     templine.Add("MAIN");
                     templine.Add(item.IssueType);

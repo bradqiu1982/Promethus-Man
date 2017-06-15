@@ -100,9 +100,7 @@
                                     @(Model.Count() - i)
                                 </div>
                                 <div class="col-lg-8">
-                                    <button data-toggle="tooltip" title="Low Yield Trigger" class="form-control" value="@item.IssueKey" type="button" onclick="LowYieldWarning(this)">
-                                        <span class="glyphicon glyphicon-share" aria-hidden="true"></span>
-                                    </button>
+                                    <img src="~/Content/images/icon/LowYield.png" MYTP="HOVER" data-toggle="tooltip" title="Low Yield Trigger"  style="height:16px;width:16px" onclick="LowYieldWarning('@item.IssueKey')">
                                 </div>
                             </div>
                         </td>
@@ -235,8 +233,8 @@
             });
 
             function LowYieldWarning(oBT) {
-                if (confirm("Warning: only RMA assignee can trigger Low Yield Trigger.")) {
-                    var myurl = "/Project/LowYieldWarn?IssueKey=" + oBT.value;
+                if (confirm("Warning: only FA assignee can trigger Low Yield Trigger.")) {
+                    var myurl = "/Project/LowYieldWarn?IssueKey=" + oBT;
                     window.open(myurl, '_blank');
                 }
             }

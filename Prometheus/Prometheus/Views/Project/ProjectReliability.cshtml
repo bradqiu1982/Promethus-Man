@@ -88,7 +88,8 @@
 
                 <th style="text-align:center">Owner</th>
                 <th style="text-align:center">Rel.Engineer</th>
-                <th style="text-align:center">ReportDate</th>
+                <th style="text-align:center">DueDate</th>
+                <th style="text-align:center">LYT</th>
             </tr>
         </thead>
         <tbody>
@@ -155,7 +156,8 @@
 
                     <td style="text-align:center"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
                     <td style="text-align:center"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
-                    <td style="text-align:center">@item.ReportDate.ToString("MM/dd-yy")</td>
+                    <td style="text-align:center">@item.DueDate.ToString("yy-MM-dd")</td>
+                    <td style="text-align:center"><img src="~/Content/images/icon/LowYield.png" MYTP="HOVER" data-toggle="tooltip" title="Low Yield Trigger"  style="height:16px;width:16px" onclick="LowYieldWarning('@item.IssueKey')"></td>
                 </tr>
                 i = i + 1;
             }
@@ -172,7 +174,12 @@
                     "order": []
                 });
             });
-
+            function LowYieldWarning(oBT) {
+                if (confirm("Warning: only FA assignee can trigger Low Yield Trigger.")) {
+                    var myurl = "/Project/LowYieldWarn?IssueKey=" + oBT;
+                    window.open(myurl, '_blank');
+                }
+            }
         </script>
 }
 

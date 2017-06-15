@@ -10,6 +10,8 @@ NeoMAPDataFolder:::\\wux-file01\Public\Wuxi Parallel NPI\NeoMAP Data
 RELSHAREFOLDER:::\\Cn-file01\public\Quality\Reliability\Failure Analysis\FA-AutoTracking\SummaryTable
 BIAUTOTABLES:::dbo.v_BICFP2Output;dbo.v_BICFP4Output;dbo.v_BICXPOutput;dbo.v_BIEDROutput;dbo.v_BIFDROutput;dbo.v_BIOEOutput;dbo.v_BIQSFP28GOutput;dbo.v_BIQSFPGen3Output;dbo.v_BIQWireOutput;dbo.v_BITopazOutput;
 BIZEROTIME:::2017-05-01 07:30:00
+TXPOWERTABLES:::ersetup;ertempcomp;
+TXPOWERZEROTIME:::2017-06-01 07:30:00
 OBAADMIN:::Nevin.Niu
 OBADEFAULTPJ:::PQE
 RELDEFAULTPJ:::RELIABILITY

@@ -22,6 +22,18 @@ namespace Prometheus.Models
         public string productname { set; get; }
     }
 
+    public class ModuleSNRelation
+    {
+        public ModuleSNRelation()
+        {
+            wafer = string.Empty;
+            jo = string.Empty;
+        }
+
+        public string wafer { set; get; }
+        public string jo { set; get; }
+    }
+
     public class BITestResult
     {
         public BITestResult()
@@ -154,6 +166,47 @@ namespace Prometheus.Models
         public string ProductName { set; get; }
         public string ProjectKey { set; get; }
         public string DataID { set; get; }
+        public double Appv_1 { set; get; }
+        public double Appv_2 { set; get; }
+        public string Appv_3 { set; get; }
+        public string Appv_4 { set; get; }
+        public DateTime Appv_5 { set; get; }
+    }
+
+    public class ModuleTXOData
+    {
+        public ModuleTXOData()
+        {
+            Init();
+        }
+
+        private void Init()
+        {
+            SN = string.Empty;
+            TxPower = 0;
+            TestName = string.Empty;
+            TestTimeStamp = DateTime.Parse("1982-05-06 07:30:00");
+            PN = string.Empty;
+            Wafer = string.Empty;
+            JO = string.Empty;
+            Channel = string.Empty;
+            Temperature = 0;
+            Appv_1 = 0;
+            Appv_2 = 0;
+            Appv_3 = string.Empty;
+            Appv_4 = string.Empty;
+            Appv_5 = DateTime.Parse("1982-05-06 07:30:00");
+        }
+
+        public string SN { set; get; }
+        public double TxPower { set; get; }
+        public string TestName { set; get; }
+        public DateTime TestTimeStamp { set; get; }
+        public string PN { set; get; }
+        public string Wafer { set; get; }
+        public string JO { set; get; }
+        public string Channel { set; get; }
+        public double Temperature { set; get; }
         public double Appv_1 { set; get; }
         public double Appv_2 { set; get; }
         public string Appv_3 { set; get; }
@@ -981,6 +1034,151 @@ namespace Prometheus.Models
 
         //    return snwaferdict;
         //}
+
+        private static string RetrieveLatestTimeStampOfATxpTable(string bt, string bizerotime)
+        {
+            var sql = "select top 1 TestTimeStamp from ModuleTXOData where TestName = '<TestName>' order by TestTimeStamp DESC";
+            sql = sql.Replace("<TestName>", bt);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            if (dbret.Count > 0)
+            {
+                try
+                {
+                    return DateTime.Parse(Convert.ToString(dbret[0][0])).ToString();
+                }
+                catch (Exception ex)
+                {
+                    return bizerotime;
+                }
+            }
+            else
+            {
+                return bizerotime;
+            }
+        }
+
+        private static void RealModuleWaferBySN(List<string> snlist, Dictionary<string, ModuleSNRelation> snwaferdict)
+        {
+            var sncond = "('";
+            foreach (var item in snlist)
+            {
+                sncond = sncond + item + "','";
+            }
+
+            if (sncond.Length > 5)
+                sncond = sncond.Substring(0, sncond.Length - 2);
+            sncond = sncond + ")";
+
+            var sql = "select distinct SN,Wafer,JO from dbo.BITestResult where SN in <SNCOND> order by SN";
+            sql = sql.Replace("<SNCOND>", sncond);
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
+            foreach (var line in dbret)
+            {
+                var sn = Convert.ToString(line[0]);
+                var snitems = new ModuleSNRelation();
+                snitems.wafer = Convert.ToString(line[1]);
+                snitems.jo = Convert.ToString(line[2]);
+                if (!snwaferdict.ContainsKey(sn))
+                {
+                    snwaferdict.Add(sn, snitems);
+                }
+            }
+        }
+
+        private static void RetrieveModuleWaferBySN(List<ModuleTXOData> txplist, Dictionary<string, ModuleSNRelation> snwaferdict)
+        {
+            var sndict = new Dictionary<string, bool>();
+            foreach (var item in txplist)
+            {
+                if (!sndict.ContainsKey(item.SN))
+                { sndict.Add(item.SN, true); }
+            }
+            var snlist = sndict.Keys.ToList();
+            var startidx = 0;
+            var totalsn = snlist.Count;
+
+            while (true)
+            {
+                var done = false;
+                var tempsnlist = new List<string>();
+                for (var idx = startidx; idx < startidx + 20000; idx++)
+                {
+                    if (idx < totalsn)
+                    {
+                        tempsnlist.Add(snlist[idx]);
+                    }
+                    else
+                    {
+                        done = true;
+                        break;
+                    }
+                }
+
+                if (tempsnlist.Count > 0)
+                {
+                    RealModuleWaferBySN(tempsnlist, snwaferdict);
+                }
+
+                if (done)
+                    break;
+
+                startidx = startidx + 20000;
+            }//end while(true)
+        }
+
+        public static void LoadModuleTXOFromMESBackup(Controller ctrl)
+        {
+            var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+            var txptables = syscfgdict["TXPOWERTABLES"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+            var txpzerotime = syscfgdict["TXPOWERZEROTIME"];
+
+            foreach (var bt in txptables)
+            {
+                var txpdatalist = new List<ModuleTXOData>();
+                var txplatesttime = RetrieveLatestTimeStampOfATxpTable(bt, txpzerotime);
+
+                var sql = "select  c.moduleserialnum,m.TxPower_dBm,c.TestTimeStamp,m.OvenTemp_C,m.ChannelNumber,c.AssemblyPartNum from insitedb.insite.dc_<dctab> c(nolock) "
+                    + " left join insitedb.insite.dce_<dctab>_main m(nolock) on  c.dc_<dctab>HistoryId=m.parenthistoryid "
+                    + " where m.TxPower_dBm is not null and c.moduleserialnum is not null and c.TestTimeStamp > '<TestTimeStamp>'";
+                sql = sql.Replace("<dctab>", bt).Replace("<TestTimeStamp>", txplatesttime);
+
+                var dbret = DBUtility.ExeMESBackupSqlWithRes(ctrl, sql);
+                foreach (var line in dbret)
+                {
+                    try
+                    {
+                        var tempdata = new ModuleTXOData();
+                        tempdata.SN = Convert.ToString(line[0]);
+                        tempdata.TxPower = Convert.ToDouble(line[1]);
+                        tempdata.TestTimeStamp = Convert.ToDateTime(line[2]);
+                        tempdata.Temperature = Convert.ToDouble(line[3]);
+                        tempdata.Channel = Convert.ToString(line[4]);
+                        tempdata.PN = Convert.ToString(line[5]);
+                        tempdata.TestName = bt;
+                        txpdatalist.Add(tempdata);
+                    }
+                    catch (Exception ex) { }
+
+                }//end foreach
+
+                var snwaferdict = new Dictionary<string, ModuleSNRelation>();
+                RetrieveModuleWaferBySN(txpdatalist, snwaferdict);
+
+
+                foreach (var item in txpdatalist)
+                {
+                    if (snwaferdict.ContainsKey(item.SN))
+                    {
+                        item.Wafer = snwaferdict[item.SN].wafer;
+                        item.JO = snwaferdict[item.SN].jo;
+                    }
+                }//end foreach
+
+                StoreModuleTestResult(txpdatalist);
+            }//end foreach
+        }
+
 
 
     }

@@ -183,7 +183,7 @@ namespace Prometheus.Models
         private void Init()
         {
             SN = string.Empty;
-            TxPower = 0;
+            TxPower = -99999;
             TestName = string.Empty;
             TestTimeStamp = DateTime.Parse("1982-05-06 07:30:00");
             PN = string.Empty;
@@ -1179,7 +1179,34 @@ namespace Prometheus.Models
             }//end foreach
         }
 
+        private static void StoreModuleTestResult(List<ModuleTXOData> testresultlist)
+        {
+            //BITestResult
+            var datatable = new System.Data.DataTable();
 
+            PropertyInfo[] properties = typeof(ModuleTXOData).GetProperties();
+            var i = 0;
+            for (i = 0; i < properties.Length;)
+            {
+                datatable.Columns.Add(properties[i].Name, properties[i].PropertyType);
+                i = i + 1;
+            }
+
+            foreach (var testresult in testresultlist)
+            {
+                properties = typeof(ModuleTXOData).GetProperties();
+                var temprow = new object[properties.Length];
+                for (i = 0; i < properties.Length;)
+                {
+                    temprow[i] = properties[i].GetValue(testresult);
+                    i = i + 1;
+                }
+                datatable.Rows.Add(temprow);
+            }
+
+            WriteDBWithTable(datatable, "ModuleTXOData");
+
+        }
 
     }
 }

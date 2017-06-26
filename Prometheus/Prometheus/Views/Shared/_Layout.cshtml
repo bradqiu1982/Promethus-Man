@@ -287,13 +287,13 @@
                                                 }
                                             </li>
                                             <li>
-                                                @if (ViewBag.IsSuper != null && ViewBag.IsSuper)
+                                                @if ((ViewBag.IsSuper != null && ViewBag.IsSuper) || (ViewBag.IsManage != null && ViewBag.IsManage))
                                                 {
                                                     @Html.ActionLink("User Reviewed Info", "UserReviewedInfo", "User")
                                                 }
                                             </li>
                                             <li>
-                                                @if (ViewBag.IsSuper != null && ViewBag.IsSuper)
+                                                @if ((ViewBag.IsSuper != null && ViewBag.IsSuper) || (ViewBag.IsManage != null && ViewBag.IsManage))
                                                 {
                                                     @Html.ActionLink("User Shared Info", "UserSharedInfo", "User")
                                                 }

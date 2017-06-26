@@ -4823,6 +4823,19 @@ namespace Prometheus.Controllers
             return View("HeartBeat");
         }
 
+        public ActionResult HeartBeat3()
+        {
+
+                try
+                {
+                ExternalDataCollector.RefreshOBAFromDMR(this);
+                //ExternalDataCollector.RefreshNeoMAPData(this);
+                }
+                catch (Exception ex)
+                { }
+
+            return View("HeartBeat");
+        }
 
         private static bool IsDigitsOnly(string str)
         {

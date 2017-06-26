@@ -49,26 +49,133 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        //public ActionResult MoveDataBase()
+        //{
+        //    return View();
+
+        //    //var targetdb = "Server=wux-parallel;uid=NPI;pwd=NPI@IPN;Database=NPITrace;Connection Timeout=30;";
+        //    var targetdb = "Server=wuxinpi;User ID=dbg;Password=dbgpwd;Database=DebugDB;Connection Timeout=30;";
+
+        //    var tablelist = new List<string>();
+        //    tablelist.Add("BIError");
+        //    tablelist.Add("BIROOTCAUSE");
+        //    tablelist.Add("BITestData");
+        //    tablelist.Add("BITestDataField");
+        //    tablelist.Add("BookReportRecord");
+        //    tablelist.Add("ErrorComments");
+        //    tablelist.Add("Issue");
+        //    tablelist.Add("IssueAttachment");
+        //    tablelist.Add("IssueAttribute");
+        //    tablelist.Add("IssueComments");
+        //    tablelist.Add("IssueOBA");
+        //    tablelist.Add("IssueRMA");
+        //    tablelist.Add("PJErrorAttachment");
+        //    tablelist.Add("Project");
+        //    tablelist.Add("ProjectError");
+        //    tablelist.Add("ProjectEvent");
+        //    tablelist.Add("ProjectException");
+        //    tablelist.Add("ProjectMembers");
+        //    tablelist.Add("ProjectMesTable");
+        //    tablelist.Add("ProjectModelID");
+        //    tablelist.Add("ProjectPn");
+        //    tablelist.Add("ProjectStation");
+        //    tablelist.Add("ProjectSumDataSet");
+        //    tablelist.Add("ProjectTestData");
+        //    tablelist.Add("ShareDoc");
+        //    tablelist.Add("ShareTags");
+        //    tablelist.Add("UserBlog");
+        //    tablelist.Add("UserCacheInfo");
+        //    tablelist.Add("UserLearn");
+        //    tablelist.Add("UserNet");
+        //    tablelist.Add("UserRank");
+        //    tablelist.Add("UserTable");
+        //    tablelist.Add("VCSELUsageTable");
+
+        //    foreach (var tab in tablelist)
+        //    {
+        //        SqlConnection targetcon = null;
+        //        try
+        //        {
+        //            targetcon = DBUtility.GetConnector(targetdb);
+        //            var tempsql = "delete from " + tab;
+        //            DBUtility.ExeSqlNoRes(targetcon, tempsql);
+
+        //            for(int idx = 0; ;)
+        //            {
+        //                var endidx = idx + 100000;
+
+        //                    //load data to memory
+        //                    var sql = "select * from(select ROW_NUMBER() OVER(order by(select null)) as mycount, * from " + tab + ") s1 where s1.mycount > "+ idx.ToString() +" and s1.mycount <= "+endidx.ToString();
+        //                    var dt = DBUtility.ExecuteLocalQueryReturnTable(sql);
+        //                if (dt.Rows.Count == 0)
+        //                {
+        //                    break;
+        //                }
+
+        //                    if (dt != null && dt.Rows.Count > 0)
+        //                    {
+        //                        using (SqlBulkCopy bulkCopy = new SqlBulkCopy(targetcon))
+        //                        {
+        //                            bulkCopy.DestinationTableName = tab;
+        //                            try
+        //                            {
+        //                                for (int i = 1; i < dt.Columns.Count; i++)
+        //                                {
+        //                                    bulkCopy.ColumnMappings.Add(dt.Columns[i].ColumnName, dt.Columns[i].ColumnName);
+        //                                }
+        //                                bulkCopy.WriteToServer(dt);
+        //                                dt.Clear();
+        //                            }
+        //                            catch (Exception ex){}
+        //                        }//end using
+        //                    }//end if
+
+        //                idx = idx + 100000;
+        //            }//end for
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            if (targetcon != null)
+        //            {
+        //                DBUtility.CloseConnector(targetcon);
+        //                targetcon = null;
+        //            }
+        //        }
+
+        //        if (targetcon != null)
+        //        {
+        //            DBUtility.CloseConnector(targetcon);
+        //        }
+        //    }
+        //    return View();
+        //}
+
         public ActionResult MoveDataBase()
         {
-            return View();
-
-            //var targetdb = "Server=wux-parallel;uid=NPI;pwd=NPI@IPN;Database=NPITrace;Connection Timeout=30;";
-            var targetdb = "Server=wuxinpi;User ID=dbg;Password=dbgpwd;Database=DebugDB;Connection Timeout=30;";
+            //var sourcedb = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=" + System.IO.Path.Combine(HttpRuntime.AppDomainAppPath, "App_Data\\Prometheus.mdf") + ";Integrated Security=True;";
+            //var targetdb = "Server=SHG-L80003583;User ID=dbg;Password=dbgpwd;Database=DebugDB;Connection Timeout=30;";
+            var targetdb = "Server=SHG-L80003583;User ID=NPI;Password=NPI@NPI;Database=NPITrace;Connection Timeout=30;";
+            //var targetdb = "Server=WUX-D80008792;User ID=dbg;Password=dbgpwd;Database=DebugDB;Connection Timeout=30;";
+            var sourcedb = "Server=WUX-D80008792;User ID=NPI;Password=NPI@NPI;Database=NPITrace;Connection Timeout=30;";
 
             var tablelist = new List<string>();
             tablelist.Add("BIError");
             tablelist.Add("BIROOTCAUSE");
             tablelist.Add("BITestData");
             tablelist.Add("BITestDataField");
+            tablelist.Add("BITestResult");
+            tablelist.Add("BITestResultDataField");
             tablelist.Add("BookReportRecord");
             tablelist.Add("ErrorComments");
+            tablelist.Add("FileLoadedData");
             tablelist.Add("Issue");
             tablelist.Add("IssueAttachment");
             tablelist.Add("IssueAttribute");
             tablelist.Add("IssueComments");
             tablelist.Add("IssueOBA");
             tablelist.Add("IssueRMA");
+            tablelist.Add("ModuleTXOData");
+            tablelist.Add("NeoMapData");
             tablelist.Add("PJErrorAttachment");
             tablelist.Add("Project");
             tablelist.Add("ProjectError");
@@ -81,54 +188,68 @@ namespace Prometheus.Controllers
             tablelist.Add("ProjectStation");
             tablelist.Add("ProjectSumDataSet");
             tablelist.Add("ProjectTestData");
+            tablelist.Add("RELBackupData");
+            tablelist.Add("RELMapData");
+            tablelist.Add("RMABackupData");
+            tablelist.Add("RMAMapData");
+            tablelist.Add("SameAsDBTVM");
             tablelist.Add("ShareDoc");
             tablelist.Add("ShareTags");
             tablelist.Add("UserBlog");
             tablelist.Add("UserCacheInfo");
+            tablelist.Add("UserGroupVM");
+            tablelist.Add("UserKPIVM");
             tablelist.Add("UserLearn");
+            tablelist.Add("UserMatrix");
             tablelist.Add("UserNet");
             tablelist.Add("UserRank");
+            tablelist.Add("UserReviewedItems");
             tablelist.Add("UserTable");
             tablelist.Add("VCSELUsageTable");
 
+
             foreach (var tab in tablelist)
             {
+                SqlConnection sourcecon = null;
                 SqlConnection targetcon = null;
+
                 try
                 {
+                    sourcecon = DBUtility.GetConnector(sourcedb);
+
                     targetcon = DBUtility.GetConnector(targetdb);
                     var tempsql = "delete from " + tab;
                     DBUtility.ExeSqlNoRes(targetcon, tempsql);
 
-                    for(int idx = 0; ;)
+                    for (int idx = 0; ;)
                     {
                         var endidx = idx + 100000;
 
-                            //load data to memory
-                            var sql = "select * from(select ROW_NUMBER() OVER(order by(select null)) as mycount, * from " + tab + ") s1 where s1.mycount > "+ idx.ToString() +" and s1.mycount <= "+endidx.ToString();
-                            var dt = DBUtility.ExecuteLocalQueryReturnTable(sql);
+                        //load data to memory
+                        var sql = "select * from(select ROW_NUMBER() OVER(order by(select null)) as mycount, * from " + tab + ") s1 where s1.mycount > " + idx.ToString() + " and s1.mycount <= " + endidx.ToString();
+                        var dt = DBUtility.ExecuteSqlReturnTable(sourcecon, sql);
                         if (dt.Rows.Count == 0)
                         {
                             break;
                         }
 
-                            if (dt != null && dt.Rows.Count > 0)
+                        if (dt != null && dt.Rows.Count > 0)
+                        {
+                            using (SqlBulkCopy bulkCopy = new SqlBulkCopy(targetcon))
                             {
-                                using (SqlBulkCopy bulkCopy = new SqlBulkCopy(targetcon))
+                                bulkCopy.DestinationTableName = tab;
+                                try
                                 {
-                                    bulkCopy.DestinationTableName = tab;
-                                    try
+                                    for (int i = 1; i < dt.Columns.Count; i++)
                                     {
-                                        for (int i = 1; i < dt.Columns.Count; i++)
-                                        {
-                                            bulkCopy.ColumnMappings.Add(dt.Columns[i].ColumnName, dt.Columns[i].ColumnName);
-                                        }
-                                        bulkCopy.WriteToServer(dt);
-                                        dt.Clear();
+                                        bulkCopy.ColumnMappings.Add(dt.Columns[i].ColumnName, dt.Columns[i].ColumnName);
                                     }
-                                    catch (Exception ex){}
-                                }//end using
-                            }//end if
+                                    bulkCopy.WriteToServer(dt);
+                                    dt.Clear();
+                                }
+                                catch (Exception ex) { System.Windows.MessageBox.Show("db exception:" + ex.Message); }
+                            }//end using
+                        }//end if
 
                         idx = idx + 100000;
                     }//end for
@@ -140,14 +261,26 @@ namespace Prometheus.Controllers
                         DBUtility.CloseConnector(targetcon);
                         targetcon = null;
                     }
+
+                    if (sourcecon != null)
+                    {
+                        DBUtility.CloseConnector(sourcecon);
+                        sourcecon = null;
+                    }
                 }
 
                 if (targetcon != null)
                 {
                     DBUtility.CloseConnector(targetcon);
                 }
+
+                if (sourcecon != null)
+                {
+                    DBUtility.CloseConnector(sourcecon);
+                }
             }
             return View();
         }
+
     }
 }

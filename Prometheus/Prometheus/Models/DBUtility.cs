@@ -204,9 +204,33 @@ namespace Prometheus.Models
         }
 
 
-        public static DataTable ExecuteLocalQueryReturnTable(string sql)
+        //public static DataTable ExecuteLocalQueryReturnTable(string sql)
+        //{
+        //    var conn = GetLocalConnector();
+        //    try
+        //    {
+        //        var dt = new DataTable();
+        //        SqlDataAdapter myAd = new SqlDataAdapter(sql, conn);
+        //        myAd.SelectCommand.CommandTimeout = 0;
+        //        myAd.Fill(dt);
+        //        return dt;
+        //    }
+        //    catch (SqlException ex)
+        //    {
+        //        CloseConnector(conn);
+        //        //System.Windows.MessageBox.Show(ex.ToString());
+        //        return null;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        CloseConnector(conn);
+        //        //System.Windows.MessageBox.Show(ex.ToString());
+        //        return null;
+        //    }
+        //}
+
+        public static DataTable ExecuteSqlReturnTable(SqlConnection conn,string sql)
         {
-            var conn = GetLocalConnector();
             try
             {
                 var dt = new DataTable();

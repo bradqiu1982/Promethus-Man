@@ -145,6 +145,9 @@ namespace Prometheus.Models
         private Dictionary<string, Dictionary<string, int>> lemap = new Dictionary<string, Dictionary<string, int>>();
         public Dictionary<string, Dictionary<string, int>> LErrorMap { get { return lemap; } }
 
+        private Dictionary<string, Dictionary<string, int>> semap = new Dictionary<string, Dictionary<string, int>>();
+        public Dictionary<string, Dictionary<string, int>> SNErrorMap { get { return semap; } }
+
         public static void RegisterError(string errorcode1, string whichtest, Dictionary<string, Dictionary<string, int>> emap)
         {
             var errorcode = errorcode1;
@@ -346,6 +349,7 @@ namespace Prometheus.Models
                         yielddict[p.WhichTest].InputCount = yielddict[p.WhichTest].InputCount + 1;
                         if (string.Compare(p.ErrAbbr, "PASS", true) == 0)
                             yielddict[p.WhichTest].OutputCount = yielddict[p.WhichTest].OutputCount + 1;
+                        RegisterError(p.ErrAbbr, p.WhichTest, pyvm.SNErrorMap);
                     }
                     else
                     {
@@ -358,6 +362,7 @@ namespace Prometheus.Models
                         tempyield.WhichTest = p.WhichTest;
 
                         yielddict.Add(p.WhichTest, tempyield);
+                        RegisterError(p.ErrAbbr, p.WhichTest, pyvm.SNErrorMap);
                     }
                 }
             }

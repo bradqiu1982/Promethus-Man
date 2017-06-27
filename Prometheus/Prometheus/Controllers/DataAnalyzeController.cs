@@ -22,6 +22,12 @@ namespace Prometheus.Controllers
         public double yrate { set; get; }
     }
 
+    public class FrequenceDataRange
+    {
+        public double lowval { set; get; }
+        public double highval { set; get; }
+    }
+
     public class CleanDataWithStdDev
     {
         public double Mean { set; get; }
@@ -31,6 +37,19 @@ namespace Prometheus.Controllers
         private List<double> outlierlist = new List<double>();
         public List<double> FiltedList { get { return filtedlist; } }
         public List<double> OutlierList { get { return outlierlist; } }
+
+        private Dictionary<double, int> frequencedict = new Dictionary<double, int>();
+        public Dictionary<double, int> FrequenceDict {
+            set {
+                frequencedict.Clear();
+                foreach (var kv in value)
+                {
+                    frequencedict.Add(kv.Key, kv.Value);
+                }
+            }
+            get{ return frequencedict; }
+        }
+
     }
 
 
@@ -305,6 +324,59 @@ namespace Prometheus.Controllers
             return ret;
         }
 
+        private Dictionary<double, int> RetrieveStdDevFrequence(double mean, double stddev, List<double> filterlist)
+        {
+            var ret = new Dictionary<double, int>();
+
+            var xlist = new List<double>();
+            var valrange = new List<FrequenceDataRange>();
+
+            for (var idx = -8; idx <= 8; idx++)
+            {
+                var tempval = mean + 0.5 * idx * stddev;
+                xlist.Add(tempval);
+
+                var temprang = new FrequenceDataRange();
+                if (idx == -8)
+                {
+                    temprang.lowval = filterlist[0] - stddev;
+                    temprang.highval = tempval + 0.25 * stddev;
+                }
+                else if (idx == 8)
+                {
+                    temprang.lowval = tempval - 0.25 * stddev;
+                    temprang.highval = filterlist[filterlist.Count - 1] + stddev;
+                }
+                else
+                {
+                    temprang.lowval = tempval - 0.25 * stddev;
+                    temprang.highval = tempval + 0.25 * stddev;
+                }
+                valrange.Add(temprang);
+            }
+
+            foreach (var item in filterlist)
+            {
+                for (var idx = 0; idx < valrange.Count; idx++)
+                {
+                    if (item > valrange[idx].lowval && item <= valrange[idx].highval)
+                    {
+                        if (ret.ContainsKey(xlist[idx]))
+                        {
+                            ret[xlist[idx]] = ret[xlist[idx]] + 1;
+                        }
+                        else
+                        {
+                            ret.Add(xlist[idx], 1);
+                        }
+                        break;
+                    }//end if
+                }//end for
+            }//end foreach
+
+            return ret;
+        }
+
         private CleanDataWithStdDev GetCleanDataWithStdDev(List<double> rawdata)
         {
             var ret = new CleanDataWithStdDev();
@@ -328,7 +400,7 @@ namespace Prometheus.Controllers
                     ret.OutlierList.Add(item);
                 }
             }
-
+            ret.FrequenceDict = RetrieveStdDevFrequence(mean, stddev, ret.FiltedList);
             return ret;
         }
 

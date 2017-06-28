@@ -761,10 +761,7 @@ namespace Prometheus.Models
 
                 var snwaferdict = new Dictionary<string, BISNRelation>();
                 var sumdblist = new List<string>();
-                sumdblist.Add("SummaryDB.dbo.PRLL_VcselInfoSummary_2017");
-                sumdblist.Add("SummaryDB.dbo.PRLL_VcselInfoSummary_2016");
-                sumdblist.Add("SummaryDB.dbo.PRLL_VcselInfoSummary_2018");
-                sumdblist.Add("SummaryDB.dbo.PRLL_VcselInfoSummary_2019");
+                sumdblist.Add("SummaryDB.dbo.ComponentIssueSummary");
 
                 foreach (var tab in sumdblist)
                 {
@@ -921,22 +918,28 @@ namespace Prometheus.Models
                 sncond = sncond.Substring(0, sncond.Length - 2);
             sncond = sncond + ")";
 
-            var sql = "  select distinct ModuleSerialNum,wafer,productfamilyname from <tab> where ModuleSerialNum in <SNCOND> order by ModuleSerialNum";
-
+            var sql = "select ToContainer,Wafer,FromProductName,FromPNDescription from <tab> where ToContainer in <SNCOND> and Wafer is not null";
             sql = sql.Replace("<SNCOND>", sncond).Replace("<tab>",tab);
 
             var dbret = DBUtility.ExePRLSqlWithRes(null, sql);
             foreach (var line in dbret)
             {
                 var sn = Convert.ToString(line[0]);
-                var snitems = new BISNRelation();
-                snitems.wafer = Convert.ToString(line[1]);
-                snitems.productname = Convert.ToString(line[2]);
+                var wafer = Convert.ToString(line[1]);
+                var productname = Convert.ToString(line[2]);
+                var pndesc = Convert.ToString(line[3]);
                 if (!snwaferdict.ContainsKey(sn))
                 {
-                    snwaferdict.Add(sn, snitems);
+                    if (pndesc.ToUpper().Contains("LD,")
+                        && pndesc.ToUpper().Contains("VCSEL,"))
+                    {
+                        var snitems = new BISNRelation();
+                        snitems.wafer = wafer;
+                        snitems.productname = productname;
+                        snwaferdict.Add(sn, snitems);
+                    }//end if
                 }
-            }
+            }//end foreach
         }
 
         private static void RetrieveBIWaferBySN(List<BITestResult> testresultlist, Dictionary<string, BISNRelation> snwaferdict,string tab)

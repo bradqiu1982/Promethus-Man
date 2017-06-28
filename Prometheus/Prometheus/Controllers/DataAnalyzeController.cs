@@ -20,6 +20,8 @@ namespace Prometheus.Controllers
         public double right3sigma { set; get; }
         public string YVALUES { set; get; }
         public double yrate { set; get; }
+        public int AmountMAX { set; get; }
+        public string YVALUES2 { set; get; }
     }
 
     public class FrequenceDataRange
@@ -310,6 +312,19 @@ namespace Prometheus.Controllers
             if (right4sigma > xmax)
                 xmax = right4sigma;
 
+            var freqdict = rawdata.FrequenceDict;
+            var keylist = freqdict.Keys.ToList();
+            keylist.Sort();
+            var amount = 0;
+            var YVALUES2 = string.Empty;
+            foreach (var key in keylist)
+            {
+                YVALUES2 = YVALUES2 + "[" + key.ToString() + "," + (freqdict[key]).ToString() + "],";
+                if (freqdict[key] > amount)
+                    amount = freqdict[key];
+            }
+            YVALUES2 = YVALUES2.Substring(0, YVALUES2.Length - 1);
+
             ret.mean = mean;
             ret.stddev = stddev;
             ret.xmax = xmax;
@@ -320,6 +335,9 @@ namespace Prometheus.Controllers
             ret.right3sigma = right3sigma;
             ret.YVALUES = YVALUES;
             ret.yrate = rate;
+
+            ret.AmountMAX = amount;
+            ret.YVALUES2 = YVALUES2;
 
             return ret;
         }
@@ -415,6 +433,7 @@ namespace Prometheus.Controllers
             var xmin = lds.xmin < rds.xmin ? lds.xmin : rds.xmin;
             var ymax = lds.ymax > rds.ymax ? lds.ymax : rds.ymax;
             var ymin = lds.ymin < rds.ymin ? lds.ymin : rds.ymin;
+            var amount = lds.AmountMAX > rds.AmountMAX ? lds.AmountMAX : rds.AmountMAX;
 
             var DATAFIELDNAME = datafield.Replace(TXOQUERYCOND.NEOMAP, "").Replace(TXOQUERYCOND.BURNIN, "");
             var Title = DATAFIELDNAME+ " Normal Distribution";
@@ -439,7 +458,12 @@ namespace Prometheus.Controllers
                     .Replace("#LYVALUES#", lds.YVALUES)
                     .Replace("#RYVALUES#", rds.YVALUES)
                     .Replace("#LSERIESNAME#", lquerycond)
-                    .Replace("#RSERIESNAME#", rquerycond);
+                    .Replace("#RSERIESNAME#", rquerycond)
+                    .Replace("#AmountMAX#", amount.ToString())
+                    .Replace("#LYVALUES2#", lds.YVALUES2)
+                    .Replace("#RYVALUES2#", rds.YVALUES2)
+                    .Replace("#LSERIESNAME2#", lquerycond + "-freq")
+                    .Replace("#RSERIESNAME2#", rquerycond + "-freq");
 
             ViewBag.combinenormaldistr = scritpttxt;
         }
@@ -490,7 +514,9 @@ namespace Prometheus.Controllers
             {
                 ElementID = "rightnormaldistr";
             }
-            
+
+            var SERIESNAME2 = datafield + "-freq";
+
             var scritpttxt = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/NormalDistribution.xml"));
             scritpttxt = scritpttxt.Replace("#ElementID#", ElementID)
                     .Replace("#Title#", Title)
@@ -504,7 +530,10 @@ namespace Prometheus.Controllers
                     .Replace("#StDevLeft#", ds.left3sigma.ToString())
                     .Replace("#StDevRight#", ds.right3sigma.ToString())
                     .Replace("#YVALUES#", ds.YVALUES)
-                    .Replace("#SERIESNAME#", datafield);
+                    .Replace("#SERIESNAME#", datafield)
+                    .Replace("#AmountMAX#", ds.AmountMAX.ToString())
+                    .Replace("#SERIESNAME2#", SERIESNAME2)
+                    .Replace("#YVALUES2#", ds.YVALUES2);
 
             if (left)
             {

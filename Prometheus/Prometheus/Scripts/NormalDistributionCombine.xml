@@ -61,13 +61,20 @@
             }
             ]
         },
-    yAxis:{
+    yAxis:[{
             title: {
                 text: 'Percent'
             },
             min: #YMIN#,
             max: #YMAX#
-        },
+        },{
+        title: {
+                text: 'Frequence'
+            },
+            min: 0,
+            max: #AmountMAX#,
+            opposite: true
+        }],
         tooltip: {
               headerFormat: '#DATAFIELDNAME#<br/>',
               pointFormat: '{point.x} : <b>{point.y}</b>'
@@ -82,6 +89,34 @@
             boostThreshold: 100,
             name: '#RSERIESNAME#',
             data: [#RYVALUES#]
+     },{
+            type: 'column',
+            name: '#LSERIESNAME2#',
+            data: [#LYVALUES2#],
+            yAxis:1,
+            pointWidth: 10,
+            dataLabels: {
+                enabled: true,
+                rotation: -90,
+                color: '#FFFFFF',
+                align: 'right',
+                format: '{point.y}',
+                y: 10
+            }
+     },{
+            type: 'column',
+            name: '#RSERIESNAME2#',
+            data: [#RYVALUES2#],
+            yAxis:1,
+            pointWidth: 10,
+            dataLabels: {
+                enabled: true,
+                rotation: -90,
+                color: '#FFFFFF',
+                align: 'right',
+                format: '{point.y}',
+                y: 10
+            }
      }]
   });
   });

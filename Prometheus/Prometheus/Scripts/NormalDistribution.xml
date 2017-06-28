@@ -4,6 +4,10 @@
     title: {
       text: '#Title#'
     },
+    chart:
+    {
+      alignTicks: false
+    },
     boost: {
         useGPUTranslations: true
     },
@@ -36,13 +40,20 @@
                 }
             }]
         },
-    yAxis:{
+    yAxis:[{
             title: {
                 text: 'Percent'
             },
             min: #YMIN#,
             max: #YMAX#
-        },
+        },{
+        title: {
+                text: 'Frequence'
+            },
+            min: 0,
+            max: #AmountMAX#,
+            opposite: true
+        }],
         tooltip: {
               headerFormat: '#DATAFIELDNAME#<br/>',
               pointFormat: '{point.x} : <b>{point.y}</b>'
@@ -51,7 +62,22 @@
             type: 'line',
             boostThreshold: 100,
             name: '#SERIESNAME#',
-            data: [#YVALUES#]
+            data: [#YVALUES#],
+            yAxis:0
+     },{
+            type: 'column',
+            name: '#SERIESNAME2#',
+            data: [#YVALUES2#],
+            yAxis:1,
+            pointWidth: 10,
+            dataLabels: {
+                enabled: true,
+                rotation: -90,
+                color: '#FFFFFF',
+                align: 'right',
+                format: '{point.y}',
+                y: 10
+            }
      }]
   });
   });

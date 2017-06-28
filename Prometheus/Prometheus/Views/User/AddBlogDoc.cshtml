@@ -5,11 +5,17 @@
 }
 
 <div class="row">
-    <ol class="breadcrumb">
-        <li><a href="/User/UserCenter?username=@(ViewBag.RealUserID)">@ViewBag.UserName Center</a></li>
-        <li><a href="/User/IBLOG">I BLOG</a></li>
-        <li class="active">Add Blog Document</li>
-    </ol>
+    <div class="nav navbar-nav navbar-left">
+        <img src="~/Content/images/ucicon/IBlogIcons.png" style="height:40px; width:40px">
+    </div>
+    <div class="nav navbar-nav navbar-left">
+        <ol class="breadcrumb">
+            <li><a href="/User/UserCenter?username=@(ViewBag.RealUserID)">@ViewBag.UserName Center</a></li>
+            <li><a href="/User/IBLOG">I BLOG</a></li>
+            <li class="active">Add Blog Document</li>
+        </ol>
+
+    </div>
 </div>
 
 <script src="../../ckeditor/ckeditor.js"></script>

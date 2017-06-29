@@ -4052,6 +4052,34 @@ namespace Prometheus.Controllers
             return ret;
         }
 
+        private void SendDBGCommentEvent(string what, string urlstr, List<string> towho, string pusher)
+        {
+            try
+            {
+                var routevalue = new RouteValueDictionary();
+                routevalue.Add("issuekey", "ABC");
+                string scheme = Url.RequestContext.HttpContext.Request.Url.Scheme;
+                string validatestr = Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+                var netcomputername = "";
+                try { netcomputername = System.Net.Dns.GetHostName(); }
+                catch (Exception ex) { }
+                validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
+
+
+                validatestr = validatestr.Split(new string[] { "/Issue" }, StringSplitOptions.RemoveEmptyEntries)[0] + urlstr;
+                var content = what + " is added to your debug tree by " + pusher + ":\r\n\r\n" + validatestr;
+
+                var toaddrs = new List<string>();
+                toaddrs.AddRange(towho);
+
+                var reporter = pusher.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
+                EmailUtility.SendEmail(this, "WUXI NPI System_" + reporter, toaddrs, content);
+                new System.Threading.ManualResetEvent(false).WaitOne(20);
+            }
+            catch (Exception ex)
+            { }
+        }
+
         [HttpPost, ActionName("UpdateProjectError")]
         [ValidateAntiForgeryToken]
         public ActionResult UpdateProjectErrorPost()
@@ -4068,11 +4096,22 @@ namespace Prometheus.Controllers
 
             vm.UpdateShortDesc();
 
+
             var temphtml = Request.Form["editor1"];
             if (!string.IsNullOrEmpty(temphtml))
             {
                 vm.Description = SeverHtmlDecode.Decode(this,temphtml);
                 ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey,vm.dbDescription,PJERRORCOMMENTTYPE.Description,vm.Reporter, currenttime);
+
+                var updatevm = ProjectErrorViewModels.RetrieveErrorByErrorKey(vm.ErrorKey, this);
+                var pjmems = ProjectViewModels.RetrieveOneProject(updatevm[0].ProjectKey).MemberList;
+                var towho = new List<string>();
+                foreach (var w in pjmems)
+                {
+                    towho.Add(w.Name);
+                }
+
+                SendDBGCommentEvent("A mew comment", "/Project/UpdateProjectError?ErrorKey=" + vm.ErrorKey, towho, updater);
             }
 
             var urls = ReceiveAttachFiles();

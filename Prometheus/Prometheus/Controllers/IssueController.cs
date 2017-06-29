@@ -263,7 +263,7 @@ namespace Prometheus.Controllers
 
             //if (vm.RelativePeopleList.Count > 0)
             //{
-                SendTaskEvent(vm, "asigned to you");
+                SendTaskEvent(vm, "Created");
             //}
 
             var dict = new RouteValueDictionary();

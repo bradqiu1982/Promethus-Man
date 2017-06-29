@@ -4052,7 +4052,7 @@ namespace Prometheus.Controllers
             return ret;
         }
 
-        private void SendDBGCommentEvent(string what, string urlstr, List<string> towho, string pusher)
+        private void SendDBGCommentEvent(string what, string urlstr, List<string> towho, string pusher,string commentcontent)
         {
             try
             {
@@ -4067,7 +4067,7 @@ namespace Prometheus.Controllers
 
 
                 validatestr = validatestr.Split(new string[] { "/Issue" }, StringSplitOptions.RemoveEmptyEntries)[0] + urlstr;
-                var content = what + " is added to your debug tree by " + pusher + ":\r\n\r\n" + validatestr;
+                var content = what + " is added to your debug tree by " + pusher + ":\r\n\r\n" + validatestr + "\r\n\r\n" + commentcontent;
 
                 var toaddrs = new List<string>();
                 toaddrs.AddRange(towho);
@@ -4111,7 +4111,8 @@ namespace Prometheus.Controllers
                     towho.Add(w.Name);
                 }
 
-                SendDBGCommentEvent("A mew comment", "/Project/UpdateProjectError?ErrorKey=" + vm.ErrorKey, towho, updater);
+                var commentcontent = System.Text.RegularExpressions.Regex.Replace(vm.Description.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
+                SendDBGCommentEvent("A mew comment", "/Project/UpdateProjectError?ErrorKey=" + vm.ErrorKey, towho, updater,commentcontent);
             }
 
             var urls = ReceiveAttachFiles();

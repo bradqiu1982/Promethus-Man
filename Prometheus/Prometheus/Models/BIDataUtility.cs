@@ -1184,6 +1184,11 @@ namespace Prometheus.Models
                 sql = sql.Replace("<dctab>", bt).Replace("<TestTimeStamp>", txplatesttime);
 
                 var dbret = DBUtility.ExeMESBackupSqlWithRes(ctrl, sql);
+                if (dbret.Count == 0)
+                {
+                    continue;
+                }
+
                 foreach (var line in dbret)
                 {
                     try

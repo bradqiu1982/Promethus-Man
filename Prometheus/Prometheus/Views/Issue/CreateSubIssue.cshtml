@@ -7,19 +7,11 @@
 
 
 <div class="row">
-    <div class="col-lg-12">&nbsp;</div>
-</div>
-
-<div class="row">
-    <div class="col-lg-12">&nbsp;</div>
-</div>
-
-<div class="row">
-    <div class="col-lg-1 text-right">
-        <img src="~/Content/images/PJ/Task.png" style="height:45px; width:45px">
+    <div class="nav navbar-nav navbar-left">
+        <img src="~/Content/images/PJ/Task.png" style="height:35px; width:35px;margin-right: 15px;">
     </div>
-    <div class="col-lg-11">
-        <ol class="breadcrumb" style="font-size:18px">
+    <div class="nav navbar-nav navbar-left">
+        <ol class="breadcrumb" style="width:600px">
             <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
             @if (Model != null && !string.IsNullOrEmpty(Model.ParentIssueKey))
             {
@@ -30,7 +22,7 @@
     </div>
 </div>
 
-<div class="row">
+@*<div class="row">
     <div class="col-lg-12">&nbsp;</div>
 </div>
 
@@ -43,7 +35,7 @@
 
 <div class="row">
     <div class="col-lg-12">&nbsp;</div>
-</div>
+</div>*@
 
 
 <script src="../../ckeditor/ckeditor.js"></script>
@@ -55,34 +47,36 @@
 
     <div class="form-group">
 
-        <div class="form-horizontal">
-
-            <div class="form-group">
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="ProjectName">Project<font color="red">*</font></label>
-                    <div class="col-lg-10">
-                        @Html.DropDownList("projectlist", null, new { @id = "ProjectKey", @class = "form-control", @readonly = "readonly" })
+        <div class="form-horizontal" data-intro="Type Information." data-step="1">
+            <div class="row">
+                <div class="col-lg-2" MYTP="orange" style="font-family:'Arial Narrow';font-size:18px"><strong>&nbsp;&nbsp;Information</strong></div>
+                <div class="col-lg-10">
+                    <div class="form-group">
+                        <div class="col-lg-6">
+                            <label class="control-label col-lg-2" for="ProjectName">Project<font color="red">*</font></label>
+                            <div class="col-lg-10">
+                                @Html.DropDownList("projectlist", null, new { @id = "ProjectKey", @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <label class="control-label col-lg-2" for="IssueType">TaskType<font color="red">*</font></label>
+                            <div class="col-lg-10">
+                                @Html.DropDownList("issuetypelist", null, new { @id = "IssueType", @class = "form-control" })
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="IssueType">TaskType<font color="red">*</font></label>
-                    <div class="col-lg-10">
-                        @Html.DropDownList("issuetypelist", null, new { @id = "IssueType", @class = "form-control" })
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="Summary">Summary<font color="red">*</font></label>
-                    <div class="col-lg-10">
-                        @if (Model != null && !string.IsNullOrEmpty(Model.Summary))
-                        {
-                            <input class="form-control text-box single-line" value="@Model.Summary" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 180." data-val-length-max="180" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="Summary" name="Summary" type="text" />
-                        }
-                        else
-                        {
-                            <input class="form-control text-box single-line" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 180." data-val-length-max="180" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="Summary" name="Summary" type="text" value="" />
-                        }
+                    <div class="form-group">
+                        <div class="col-lg-6">
+                            <label class="control-label col-lg-2" for="Summary">Summary<font color="red">*</font></label>
+                            <div class="col-lg-10">
+                                @if (Model != null && !string.IsNullOrEmpty(Model.Summary))
+                            {
+                                    <input class="form-control text-box single-line" value="@Model.Summary" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 180." data-val-length-max="180" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="Summary" name="Summary" type="text" />
+                            }
+                            else
+                            {
+                                    <input class="form-control text-box single-line" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 180." data-val-length-max="180" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="Summary" name="Summary" type="text" value="" />
+                            }
 
                         <span class="field-validation-valid text-danger" data-valmsg-for="Summary" data-valmsg-replace="true"></span>
                     </div>
@@ -113,20 +107,25 @@
 
             <div class="form-group">
 
-                
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="DueDate">DueDate<font color="red">*</font></label>
-                    <div class="col-lg-10">
-                        @if (Model != null && string.Compare(Model.DueDate.ToString("yyyy-MM-dd"), "0001-01-01") != 0)
-                        {
-                            <input class="form-control text-box single-line" value="@Model.DueDate.ToString("yyyy-MM-dd")" data-val="true"  data-val-required="The DueDate field is required." id="DueDate" name="DueDate" type="text" />
-                        }
-                        else
-                        {
-                            <input class="form-control text-box single-line" data-val="true"  data-val-required="The DueDate field is required." id="DueDate" name="DueDate" type="text" value="" />
-                        }
-                        <span class="field-validation-valid text-danger" data-valmsg-for="DueDate" data-valmsg-replace="true"></span>
-                    </div>
+                        @*<div class="col-lg-6">
+                        <label class="control-label col-lg-2" for="Reporter">Reporter<font color="red">*</font></label>
+                        <div class="col-lg-10">
+                            @Html.DropDownList("reporterlist", null, new { @id = "Reporter", @class = "form-control" })
+                        </div>
+                    </div>*@
+                        <div class="col-lg-6">
+                            <label class="control-label col-lg-2" for="DueDate">DueDate<font color="red">*</font></label>
+                            <div class="col-lg-10">
+                                @if (Model != null && string.Compare(Model.DueDate.ToString("yyyy-MM-dd"), "0001-01-01") != 0)
+                            {
+                                    <input class="form-control text-box single-line" value="@Model.DueDate.ToString("yyyy-MM-dd")" data-val="true" data-val-required="The DueDate field is required." id="DueDate" name="DueDate" type="text" />
+                            }
+                            else
+                            {
+                                    <input class="form-control text-box single-line" data-val="true" data-val-required="The DueDate field is required." id="DueDate" name="DueDate" type="text" value="" />
+                            }
+                                <span class="field-validation-valid text-danger" data-valmsg-for="DueDate" data-valmsg-replace="true"></span>
+                            </div>
 
                 </div>
                 <div class="col-lg-6">
@@ -145,49 +144,48 @@
                             });
                 </script>
             </div>
-
-            <hr />
-            <div class="col-lg-12">
-                <div class="form-group">
+                </div>
+            </div>
+            <div class="row">
+                <div class="control-label col-lg-2">
                     <label>Related People Email</label>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group col-lg-10">
                     <div class="col-lg-12" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
                         @if (Model != null && !string.IsNullOrEmpty(Model.RelativePeoples))
                         {
-                            <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" onclick="chooserelatedpeople()" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 800." data-val-length-max="800" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$">@Model.RelativePeoples</textarea>
+                    <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" onclick="chooserelatedpeople()" style="min-width: 100%;height:32px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 800." data-val-length-max="800" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$">@Model.RelativePeoples</textarea>
                         }
                         else
                         {
-                            <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" onclick="chooserelatedpeople()" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 800." data-val-length-max="800" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$"></textarea>
+                    <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" onclick="chooserelatedpeople()" style="min-width: 100%;height:32px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 800." data-val-length-max="800" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$"></textarea>
                         }
                     </div>
                     <span class="field-validation-valid text-danger" data-valmsg-for="RPeopleAddr" data-valmsg-replace="true"></span>
                 </div>
 
                 <script type="text/javascript">
-                    function chooserelatedpeople()
-                    {
+                    function chooserelatedpeople() {
                         $('#relatedmodal').modal({ backdrop: 'static' });
                     }
 
-                    function fillreleatepeople()
-                    {
+                    function fillreleatepeople() {
                         $('#relatedmodal').modal('hide');
                         document.getElementById("RPeopleAddr").value = document.getElementById("towhoinput1").value;
                         document.getElementById("RPeopleAddr").focus();
                     }
                 </script>
-            </div>
-
-            <hr />
-
-            <div class="form-group">
-                <div class="col-lg-12">
+             </div>
+        </div>
+        <hr />
+        <div class="form-horizontal" >
+            <div class="row">
+                <div class="col-lg-2" MYTP="orange" style="font-family:'Arial Narrow';font-size:18px"><strong>&nbsp;&nbsp;Attachment</strong></div>
+                <div class="col-lg-10">
                     <div class="col-lg-4">
-                        <span class="btn btn-default btn-file" id="choosefile3">
-                            Attachment <input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
+                        <span class="btn btn-success btn-file" id="choosefile3" data-intro="Click to add attachment." data-step="2">
+                            <strong>Attachment</strong> <input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
                         </span>
                     </div>
                     <div class="col-lg-8">
@@ -199,7 +197,8 @@
                         </div>
                     </div>
                 </div>
-                <script type="text/javascript">
+            </div>
+            <script type="text/javascript">
                 function ShowFileNames3(oFile) {
                     $('#showfile3').text(oFile.value);
                     document.getElementById("attachmentupload").value = oFile.value;
@@ -211,47 +210,54 @@
                     $('#issueform').submit();
                 }
                 </script>
-            </div>
-
         </div>
-
         <hr />
-
-        <div class="col-lg-12">
-            <div class="form-group">
-                <label class="control-label">Description</label>
-            </div>
-
-            <div class="form-group">
-                <div>
-                    @if (Model != null && !string.IsNullOrEmpty(Model.Description))
-                    {
-                        <textarea name="editor1" id="editor1" rows="10" cols="80">@(Model.Description)</textarea>
-                    }
-                    else
-                    {
-                        <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
-                    }
-                    <script>
-                        CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
-                    </script>
+        <div class="form-horizontal">
+            <div class="row">
+                <div class="col-lg-2" MYTP="red" style="font-family:'Arial Narrow';font-size:18px">
+                    <strong>&nbsp;&nbsp;Description<font color="red">*</font></strong>
+                    <a data-toggle="collapse" data-target="#commentinput">
+                        <img src="~/Content/images/icon/extend.png" style="height:25px; width:auto; margin-left: 20px;">
+                    </a>
                 </div>
+                <div class="col-lg-10"></div>
             </div>
+            <div class="row" style="margin-left:10px">
+                <div class="collapse in" id="commentinput">
+                    <div class="form-group">
+                        <div class="row" style="margin-top: 30px;">
+                            <div class="col-lg-1"></div>
+                            <div class="col-lg-10">
+                                <div class="form-group" data-intro="Click to Type description." data-step="3">
+                                    <div>
+                                        @if (Model != null && !string.IsNullOrEmpty(Model.Description))
+                                        {
+                                            <textarea name="editor1" id="editor1" rows="10" cols="80">@Model.Description</textarea>
+                                        }
+                                        else
+                                        {
+                                            <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
+                                        }
 
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="col-lg-4">
-                            <span class="btn btn-default btn-file" id="choosefile6">
-                                Editor Attachment <input type="file" name="file6" id="file6" runat="server" onchange="ShowFileNames6(this)" />
-                            </span>
-                        </div>
-                        <div class="col-lg-1"></div>
-                        <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                        <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                        <div class="col-lg-5"></div>
-                    </div>
-                    <script type="text/javascript">
+                                        <script>
+                                            CKEDITOR.replace('editor1', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
+                                        </script>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="col-lg-4">
+                                                <span class="btn btn-success btn-file" id="choosefile6" data-intro="Click to add attachment in description." data-step="4">
+                                                    <strong>Editor Attachment </strong><input type="file" name="file6" id="file6" runat="server" onchange="ShowFileNames6(this)" />
+                                                </span>
+                                            </div>
+                                            <div class="col-lg-1"></div>
+                                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                                            <div class="col-lg-5"></div>
+                                        </div>
+                                        <script type="text/javascript">
                                             function ShowFileNames6(oFile) {
                                                 ajaxFileUpload();
                                             }
@@ -263,13 +269,11 @@
                                                         secureuri: false,
                                                         fileElementId: 'file6',
                                                         dataType: 'HTML',
-                                                        success: function (data, status)
-                                                        {
+                                                        success: function (data, status) {
                                                             var wholeval = CKEDITOR.instances.editor1.getData() + data;
                                                             CKEDITOR.instances.editor1.setData(wholeval);
                                                         },
-                                                        error: function (e)
-                                                        {
+                                                        error: function (e) {
                                                             alert(e);
                                                         }
                                                     }
@@ -281,12 +285,17 @@
                                                 RealSaveUserContent(CKEDITOR.instances.editor1.getData());
                                                 return false;
                                             }
-                    </script>
+                                        </script>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-1"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-        </div>
-
+         </div>
+        <hr />
         <div class="form-group">
             <div>
                 @if (Model != null && !string.IsNullOrEmpty(Model.ParentIssueKey))
@@ -297,7 +306,10 @@
                 {
                     <input class="form-control text-box single-line" id="HParentIssueKey" name="HParentIssueKey" type="hidden" value="" />
                 }
-                <input type="submit" value="Submit" class="btn btn-default" />
+                <div class="col-lg-2">
+                    <input style="background-color:#006DC0;color:white;font-weight:bold;" type="submit" value="Submit" class="btn btn-default" data-intro="Click here to submit." data-step="5" />
+                </div>
+                <div class="col-lg-10"></div>
             </div>
         </div>
 
@@ -335,25 +347,22 @@
             </div>
         </div>
 
-    </div>
-
-    <div class="modal" id="relatedmodal" tabindex="-1" role="dialog" aria-labelledby="relatedmodalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title" id="relatedmodalLabel">Choose People</h4>
-                </div>
-                <div class="row"></div>
-                <div class="row col-lg-12">
-                    <div class="col-lg-3">
-                        <label class="control-label">To Who</label>
+        <div class="modal" id="relatedmodal" tabindex="-1" role="dialog" aria-labelledby="relatedmodalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="relatedmodalLabel">Choose People</h4>
                     </div>
-                    <div class="col-lg-9">
-                        @Html.DropDownList("towholist", null, new { @id = "towholist", @class = "form-control", @onchange = "chooseapusher()" })
-                    </div>
-                    <script type="text/javascript">
-                            function chooseapusher()
-                            {
+                    <div class="row"></div>
+                    <div class="row col-lg-12">
+                        <div class="col-lg-3">
+                            <label class="control-label">To Who</label>
+                        </div>
+                        <div class="col-lg-9">
+                            @Html.DropDownList("towholist", null, new { @id = "towholist", @class = "form-control", @onchange = "chooseapusher()" })
+                        </div>
+                        <script type="text/javascript">
+                            function chooseapusher() {
                                 document.getElementById("towhoinput1").value = document.getElementById("towhoinput1").value + ';' + document.getElementById("towholist").value;
                             }
                     </script>
@@ -373,5 +382,13 @@
             </div>
         </div>
     </div>
+
+        </div>
+
+
+
+
+
+
 
 }

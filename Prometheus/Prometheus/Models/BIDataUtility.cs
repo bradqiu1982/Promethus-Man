@@ -1193,6 +1193,13 @@ namespace Prometheus.Models
                 {
                     try
                     {
+                        if (line[1] == null
+                            || line[2] == null
+                            || line[3] == null)
+                        {
+                            continue;
+                        }
+
                         var tempdata = new ModuleTXOData();
                         tempdata.SN = Convert.ToString(line[0]);
                         tempdata.TxPower = Convert.ToDouble(line[1]);

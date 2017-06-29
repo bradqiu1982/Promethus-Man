@@ -644,6 +644,81 @@ namespace Prometheus.Models
             }
         }
 
+        private static SqlConnection GetMESReportConnector()
+        {
+            var conn = new SqlConnection();
+            try
+            {
+                conn.ConnectionString = @"Server=wux-prod02\mes_report;uid=ParaRead;pwd=Para@123;Database=PDMS;Connection Timeout=30;";
+                //conn.ConnectionString = "Data Source=cn-csrpt;Initial Catalog=SummaryDB;Integrated Security=True;Connection Timeout=30;";
+                conn.Open();
+                return conn;
+            }
+            catch (SqlException ex)
+            {
+                logthdinfo("fail to connect to the mes report pdms database:" + ex.Message);
+                //System.Windows.MessageBox.Show(ex.ToString());
+                return null;
+            }
+            catch (Exception ex)
+            {
+                logthdinfo("fail to connect to the mes report pdms database" + ex.Message);
+                //System.Windows.MessageBox.Show(ex.ToString());
+                return null;
+            }
+        }
+
+        public static List<List<object>> ExeMESReportSqlWithRes(Controller ctrl, string sql)
+        {
+            //var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+
+            var ret = new List<List<object>>();
+            var conn = GetMESReportConnector();
+            try
+            {
+                if (conn == null)
+                    return ret;
+
+                var command = conn.CreateCommand();
+                command.CommandTimeout = 60;
+                command.CommandText = sql;
+                var sqlreader = command.ExecuteReader();
+                if (sqlreader.HasRows)
+                {
+
+                    while (sqlreader.Read())
+                    {
+                        var newline = new List<object>();
+                        for (var i = 0; i < sqlreader.FieldCount; i++)
+                        {
+                            newline.Add(sqlreader.GetValue(i));
+                        }
+                        ret.Add(newline);
+                    }
+                }
+
+                sqlreader.Close();
+                CloseConnector(conn);
+                return ret;
+            }
+            catch (SqlException ex)
+            {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                //System.Windows.MessageBox.Show(ex.ToString());
+                CloseConnector(conn);
+                ret.Clear();
+                return ret;
+            }
+            catch (Exception ex)
+            {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                //System.Windows.MessageBox.Show(ex.ToString());
+                CloseConnector(conn);
+                ret.Clear();
+                return ret;
+            }
+        }
+
         private static SqlConnection GetAutoConnector()
         {
             var conn = new SqlConnection();

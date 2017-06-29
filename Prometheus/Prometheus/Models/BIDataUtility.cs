@@ -723,6 +723,11 @@ namespace Prometheus.Models
                 var dataid = string.Empty;
 
                 var dbret = DBUtility.ExeAutoSqlWithRes(sql);
+                if (dbret.Count == 0)
+                {
+                    continue;
+                }
+
                 foreach (var line in dbret)
                 {
                     try
@@ -760,13 +765,7 @@ namespace Prometheus.Models
                 }//end foreach
 
                 var snwaferdict = new Dictionary<string, BISNRelation>();
-                var sumdblist = new List<string>();
-                sumdblist.Add("SummaryDB.dbo.ComponentIssueSummary");
-
-                foreach (var tab in sumdblist)
-                {
-                    RetrieveBIWaferBySN(testresultlist, snwaferdict,tab);
-                }
+                RetrieveBIWaferBySN(testresultlist, snwaferdict);
 
                 foreach (var item in testresultlist)
                 {
@@ -906,7 +905,7 @@ namespace Prometheus.Models
         }
 
 
-        private static void RealBIWaferBySN(List<string> snlist, Dictionary<string, BISNRelation> snwaferdict, string tab)
+        private static void RealBIWaferBySN(List<string> snlist, Dictionary<string, BISNRelation> snwaferdict)
         {
             var sncond = "('";
             foreach (var item in snlist)
@@ -918,31 +917,69 @@ namespace Prometheus.Models
                 sncond = sncond.Substring(0, sncond.Length - 2);
             sncond = sncond + ")";
 
-            var sql = "select ToContainer,Wafer,FromProductName,FromPNDescription from <tab> where ToContainer in <SNCOND> and Wafer is not null";
-            sql = sql.Replace("<SNCOND>", sncond).Replace("<tab>",tab);
+            var sql = "select ToContainer,Wafer,FromProductName,FromPNDescription,Vendorlot from dbo.ComponentIssueSummary where ToContainer in <SNCOND>";
+            sql = sql.Replace("<SNCOND>", sncond);
 
-            var dbret = DBUtility.ExePRLSqlWithRes(null, sql);
+            var dbret = DBUtility.ExeMESReportSqlWithRes(null, sql);
             foreach (var line in dbret)
             {
-                var sn = Convert.ToString(line[0]);
-                var wafer = Convert.ToString(line[1]);
-                var productname = Convert.ToString(line[2]);
-                var pndesc = Convert.ToString(line[3]);
-                if (!snwaferdict.ContainsKey(sn))
+                try
                 {
-                    if (pndesc.ToUpper().Contains("LD,")
-                        && pndesc.ToUpper().Contains("VCSEL,"))
+                    var pndesc = Convert.ToString(line[3]);
+
+                    if ((pndesc.ToUpper().Contains("LD,") && pndesc.ToUpper().Contains("VCSEL,"))
+                        ||(pndesc.ToUpper().Contains("CSG") && (pndesc.ToUpper().Contains("INGAAS VCSEL") || pndesc.ToUpper().Contains("VCSEL ARRAY")) ))
                     {
-                        var snitems = new BISNRelation();
-                        snitems.wafer = wafer;
-                        snitems.productname = productname;
-                        snwaferdict.Add(sn, snitems);
+                        var sn = Convert.ToString(line[0]);
+                        var wafer = Convert.ToString(line[1]);
+                        var productname = Convert.ToString(line[2]);
+                        var vendlot = Convert.ToString(line[4]);
+                        if (!string.IsNullOrEmpty(wafer) && wafer.Contains("-"))
+                        {
+                            var fidx = wafer.IndexOf("-");
+                            var ridx = wafer.IndexOf("-", fidx + 1);
+                            if (ridx != -1)
+                            {
+                                var head = wafer.Substring(0, ridx);
+                                var bin = wafer.Substring(ridx);
+                                if (bin.Length >= 3)
+                                {
+                                    if (!snwaferdict.ContainsKey(sn))
+                                    {
+                                        var snitems = new BISNRelation();
+                                        snitems.wafer = head + bin.Substring(0, 3);
+                                        snitems.productname = productname;
+                                        snwaferdict.Add(sn, snitems);
+                                    }//end if
+                                }
+                            }
+                        }
+                        else if (!string.IsNullOrEmpty(vendlot) && vendlot.Contains("-"))
+                        {
+                            var fidx = vendlot.IndexOf("-");
+                            var ridx = vendlot.IndexOf("-",fidx+1);
+                            if (ridx != -1)
+                            {
+                                var head = vendlot.Substring(0, ridx);
+                                var bin = vendlot.Substring(ridx);
+                                if (bin.Length >= 3)
+                                {
+                                    if (!snwaferdict.ContainsKey(sn))
+                                    {
+                                        var snitems = new BISNRelation();
+                                        snitems.wafer = head+bin.Substring(0, 3);
+                                        snitems.productname = productname;
+                                        snwaferdict.Add(sn, snitems);
+                                    }//end if
+                                }//end if
+                            }//end if
+                        }//end else if
                     }//end if
-                }
+                } catch (Exception ex) { }
             }//end foreach
         }
 
-        private static void RetrieveBIWaferBySN(List<BITestResult> testresultlist, Dictionary<string, BISNRelation> snwaferdict,string tab)
+        private static void RetrieveBIWaferBySN(List<BITestResult> testresultlist, Dictionary<string, BISNRelation> snwaferdict)
         {
             var sndict = new Dictionary<string, bool>();
             foreach (var item in testresultlist)
@@ -973,7 +1010,7 @@ namespace Prometheus.Models
 
                 if (tempsnlist.Count > 0)
                 {
-                    RealBIWaferBySN(tempsnlist, snwaferdict, tab);
+                    RealBIWaferBySN(tempsnlist, snwaferdict);
                 }
 
                 if (done)

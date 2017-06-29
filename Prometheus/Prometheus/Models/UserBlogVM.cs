@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -226,6 +227,65 @@ namespace Prometheus.Models
             return ret;
         }
 
+        private static string WriteBase64ImgFile(string commentcontent, Controller ctrl)
+        {
+            try
+            {
+                var idx = commentcontent.IndexOf("<img alt=\"\" src=\"data:image/png;base64");
+                var base64idx = commentcontent.IndexOf("data:image/png;base64,", idx) + 22;
+                var base64end = commentcontent.IndexOf("\"", base64idx);
+                var imgstrend = commentcontent.IndexOf("/>", base64end) + 2;
+                var base64img = commentcontent.Substring(base64idx, base64end - base64idx);
+                var imgbytes = Convert.FromBase64String(base64img);
+
+                var imgkey = Guid.NewGuid().ToString("N");
+                string datestring = DateTime.Now.ToString("yyyyMMdd");
+                string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\images\\" + datestring + "\\";
+
+                if (!Directory.Exists(imgdir))
+                {
+                    Directory.CreateDirectory(imgdir);
+                }
+                var realpath = imgdir + imgkey + ".jpg";
+
+                var fs = File.Create(realpath);
+                fs.Write(imgbytes, 0, imgbytes.Length);
+                fs.Close();
+
+
+                var url = "/userfiles/images/" + datestring + "/" + imgkey + ".jpg";
+                var ret = commentcontent;
+                ret = ret.Remove(idx, imgstrend - idx);
+                ret = ret.Insert(idx, "<img src='" + url + "'/>");
+
+                return ret;
+            }
+            catch (Exception ex)
+            {
+                return string.Empty;
+            }
+
+        }
+
+        private static string ReplaceBase64data2File(string commentcontent, Controller ctrl)
+        {
+            var ret = commentcontent;
+            if (commentcontent.Contains("<img alt=\"\" src=\"data:image/png;base64"))
+            {
+                while (ret.Contains("<img alt=\"\" src=\"data:image/png;base64"))
+                {
+                    ret = WriteBase64ImgFile(ret, ctrl);
+                    if (string.IsNullOrEmpty(ret))
+                    {
+                        ret = commentcontent;
+                        break;
+                    }
+                }
+            }
+
+            return ret;
+        }
+
         public static UserBlogVM RetrieveBlogDoc(string dockey, Controller ctrl)
         {
             var ret = new UserBlogVM();
@@ -254,6 +314,14 @@ namespace Prometheus.Models
                 //{
                     //ret.DocURL = "/User/WebDoc?DocKey=" + ret.DocKey;
                 //}
+            }
+
+            if (ret.Content.Contains("<img alt=\"\" src=\"data:image/png;base64"))
+            {
+                ret.Content = ReplaceBase64data2File(ret.Content, ctrl);
+                sql = "update UserBlog set APVal4 = '<APVal4>' where APVal2='<APVal2>'";
+                sql = sql.Replace("<APVal2>", dockey).Replace("<APVal4>", ret.dbContent);
+                DBUtility.ExeLocalSqlNoRes(sql);
             }
 
             return ret;

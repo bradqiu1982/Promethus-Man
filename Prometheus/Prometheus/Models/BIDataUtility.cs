@@ -941,17 +941,13 @@ namespace Prometheus.Models
                             if (ridx != -1)
                             {
                                 var head = wafer.Substring(0, ridx);
-                                var bin = wafer.Substring(ridx);
-                                if (bin.Length >= 3)
-                                {
                                     if (!snwaferdict.ContainsKey(sn))
                                     {
                                         var snitems = new BISNRelation();
-                                        snitems.wafer = head + bin.Substring(0, 3);
+                                        snitems.wafer = head;
                                         snitems.productname = productname;
                                         snwaferdict.Add(sn, snitems);
                                     }//end if
-                                }
                             }
                         }
                         else if (!string.IsNullOrEmpty(vendlot) && vendlot.Contains("-"))
@@ -961,17 +957,13 @@ namespace Prometheus.Models
                             if (ridx != -1)
                             {
                                 var head = vendlot.Substring(0, ridx);
-                                var bin = vendlot.Substring(ridx);
-                                if (bin.Length >= 3)
-                                {
                                     if (!snwaferdict.ContainsKey(sn))
                                     {
                                         var snitems = new BISNRelation();
-                                        snitems.wafer = head+bin.Substring(0, 3);
+                                        snitems.wafer = head;
                                         snitems.productname = productname;
                                         snwaferdict.Add(sn, snitems);
                                     }//end if
-                                }//end if
                             }//end if
                         }//end else if
                     }//end if

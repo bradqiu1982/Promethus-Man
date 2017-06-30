@@ -30,19 +30,51 @@
     <div class="row">
         <div class="col-lg-6">
             <div class="col-lg-7">
-                @Html.DropDownList("leftquerylist", null, new { @id = "leftquerylist", @name = "leftquerylist", @class = "form-control" })
+                @*@Html.DropDownList("leftquerylist", null, new { @id = "leftquerylist", @name = "leftquerylist", @class = "form-control" })*@
+                <input id="leftquerylist" name="leftquerylist" list="leftquerys" placeholder = "Please input query key"  class="form-control text-box single-line" type="text" />
+                <datalist id="leftquerys">
+                    @foreach (var item in ViewBag.queryvallist)
+                    {
+                        <option value="@item">@item</option>
+                    }
+                </datalist>
             </div>
             <div class="col-lg-5">
                 @Html.DropDownList("leftdatafieldlist", null, new { @id = "leftdatafieldlist", @name = "leftdatafieldlist", @class = "form-control"})
             </div>
+            <script type="text/javascript">
+                            $(document).ready(function () {
+                                $("#leftquerylist").flexdatalist({
+                                    minLength: 0,
+                                    searchContain: true,
+                                    maxShownResults:300
+                                });
+                            });
+            </script>
         </div>
         <div class="col-lg-6">
             <div class="col-lg-7">
-                @Html.DropDownList("rightquerylist", null, new { @id = "rightquerylist", @name = "rightquerylist", @class = "form-control"})
+                @*@Html.DropDownList("rightquerylist", null, new { @id = "rightquerylist", @name = "rightquerylist", @class = "form-control"})*@
+                <input id="rightquerylist" name="rightquerylist" list="rightquerys" placeholder="Please input compare query key" class="form-control text-box single-line" type="text" />
+                <datalist id="rightquerys">
+                    @foreach (var item in ViewBag.queryvallist)
+                    {
+                        <option value="@item">@item</option>
+                    }
+                </datalist>
             </div>
             <div class="col-lg-5">
                 @Html.DropDownList("rightdatafieldlist", null, new { @id = "rightdatafieldlist", @name = "rightdatafieldlist", @class = "form-control"})
             </div>
+            <script type="text/javascript">
+                            $(document).ready(function () {
+                                $("#rightquerylist").flexdatalist({
+                                    minLength: 0,
+                                    searchContain: true,
+                                    maxShownResults:300
+                                });
+                            });
+            </script>
         </div>
     </div>
 </div>
@@ -56,8 +88,8 @@
     <script type="text/javascript">
         function compairtxo()
         {
-            if ((document.getElementById("leftquerylist").value.indexOf("Please") == -1 && document.getElementById("leftdatafieldlist").value.indexOf("Please") == -1)
-                || (document.getElementById("rightquerylist").value.indexOf("Please") == -1 && document.getElementById("rightdatafieldlist").value.indexOf("Please") == -1))
+            if ((document.getElementById("leftquerylist").value  && document.getElementById("leftdatafieldlist").value.indexOf("Please") == -1)
+                || (document.getElementById("rightquerylist").value && document.getElementById("rightdatafieldlist").value.indexOf("Please") == -1))
             {
                 $('#txoform').submit();
             }

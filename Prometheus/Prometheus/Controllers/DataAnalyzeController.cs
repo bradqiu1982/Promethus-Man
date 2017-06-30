@@ -108,25 +108,29 @@ namespace Prometheus.Controllers
             var datafieldlist = ExternalDataCollector.NeoMapMainFieldNameList();
 
             var selectlist = new List<string>();
-            selectlist.Add("Please select query key");
-            selectlist.AddRange(waferlist);
-            var selectcontrol = CreateSelectList(selectlist, leftcond);
-            selectcontrol[0].Disabled = true;
-            selectcontrol[0].Selected = true;
-            ViewBag.leftquerylist = selectcontrol;
+            //selectlist.Add("Please select query key");
+            //selectlist.AddRange(waferlist);
+            //var selectcontrol = CreateSelectList(selectlist, leftcond);
+            //selectcontrol[0].Disabled = true;
+            //selectcontrol[0].Selected = true;
+            //ViewBag.leftquerylist = selectcontrol;
 
-            selectlist = new List<string>();
-            selectlist.Add("Please select compare query key");
-            selectlist.AddRange(waferlist);
-            selectcontrol = CreateSelectList(selectlist, rightcond);
-            selectcontrol[0].Disabled = true;
-            selectcontrol[0].Selected = true;
-            ViewBag.rightquerylist = selectcontrol;
+            var tempcondlist = new List<string>();
+            tempcondlist.AddRange(waferlist);
+            ViewBag.queryvallist = tempcondlist;
+
+            //selectlist = new List<string>();
+            //selectlist.Add("Please select compare query key");
+            //selectlist.AddRange(waferlist);
+            //selectcontrol = CreateSelectList(selectlist, rightcond);
+            //selectcontrol[0].Disabled = true;
+            //selectcontrol[0].Selected = true;
+            //ViewBag.rightquerylist = selectcontrol;
 
             selectlist = new List<string>();
             selectlist.Add("Please select data field");
             selectlist.AddRange(datafieldlist);
-            selectcontrol = CreateSelectList(selectlist, leftfield);
+            var selectcontrol = CreateSelectList(selectlist, leftfield);
             selectcontrol[0].Disabled = true;
             selectcontrol[0].Selected = true;
             ViewBag.leftdatafieldlist = selectcontrol;
@@ -707,15 +711,22 @@ namespace Prometheus.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult TXOTestDataPost()
         {
-            var leftcond = Request.Form["leftquerylist"];
+            var leftcond = Request.Form["leftquerylist"].Trim();
             var leftfield = Request.Form["leftdatafieldlist"];
-            var rightcond = Request.Form["rightquerylist"];
+            var rightcond = Request.Form["rightquerylist"].Trim();
             var rightfield = Request.Form["rightdatafieldlist"];
+
+            if (leftfield != null)
+                leftfield = leftfield.Trim();
+            if (rightfield != null)
+                rightfield = rightfield.Trim();
 
             if (!string.IsNullOrEmpty(leftcond)
                     && !string.IsNullOrEmpty(leftfield)
                     && !string.IsNullOrEmpty(rightcond)
                     && !string.IsNullOrEmpty(rightfield)
+                    && !leftcond.ToUpper().Contains("PLEASE")
+                    && !rightcond.ToUpper().Contains("PLEASE")
                     && string.Compare(leftfield, rightfield) == 0)
             {
                 if (leftfield.Contains(TXOQUERYCOND.NEOMAP))
@@ -726,6 +737,7 @@ namespace Prometheus.Controllers
             else
             {
                 if (!string.IsNullOrEmpty(leftcond)
+                    && !leftcond.ToUpper().Contains("PLEASE")
                     && !string.IsNullOrEmpty(leftfield))
                 {
                 
@@ -736,6 +748,7 @@ namespace Prometheus.Controllers
                 }
 
                 if (!string.IsNullOrEmpty(rightcond)
+                    && !rightcond.ToUpper().Contains("PLEASE")
                     && !string.IsNullOrEmpty(rightfield))
                 {
                     if (rightfield.Contains(TXOQUERYCOND.NEOMAP))

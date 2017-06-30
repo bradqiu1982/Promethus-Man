@@ -1873,6 +1873,16 @@ namespace Prometheus.Controllers
             {
                 vm.Description = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
                 vm.CommentType = COMMENTTYPE.Description;
+                var commenter = updater.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
+
+                var towho = new List<string>();
+                towho.Add(vm.Assignee);
+                if (originaldata.Reporter.Contains("@"))
+                    towho.Add(originaldata.Reporter);
+                towho.AddRange(vm.RelativePeopleList);
+
+                var commentcontent = System.Text.RegularExpressions.Regex.Replace(vm.Description.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
+                SendTaskCommentEmail(originaldata.IssueKey, vm.Summary, commenter, towho, commentcontent);
             }
             else
                 vm.Description = "";
@@ -2057,7 +2067,7 @@ namespace Prometheus.Controllers
                 vm.UpdateIAssign();
                 //ProjectEvent.AssignIssueEvent(originaldata.ProjectKey, updater, vm.Assignee, originaldata.Summary, originaldata.IssueKey);
                 vm.Summary = originaldata.Summary;
-                SendTaskEvent(vm, "asigned to you", updater, vm.Assignee);
+                SendTaskEvent(vm, "changed", updater, vm.Assignee);
             }
 
             if (string.Compare(originaldata.Resolution, vm.Resolution, true) != 0)

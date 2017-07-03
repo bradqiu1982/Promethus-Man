@@ -6,33 +6,19 @@
     }
 
 <div class="row">
-    <div class="col-lg-12">&nbsp;</div>
-</div>
-
-<div class="row">
-    <div class="col-lg-12">&nbsp;</div>
-</div>
-
-
-
-<div class="row">
-    <div class="col-lg-1 text-right">
-            <img src="~/Content/images/usercenter/IKPI.png" style="height:60px; width:60px">
-        </div>
-    <div class="col-lg-11">
-        <ol class="breadcrumb" style="font-size:18px">
+    <div class="nav navbar-nav navbar-left">
+        <img src="~/Content/images/ucicon/IKPIIcons.png" style="height:40px; width:40px">
+    </div>
+    <div class="nav navbar-nav navbar-left">
+        <ol class="breadcrumb" style="width:600px">
             <li><a href="/User/UserCenter?username=@(ViewBag.RealUserID)">@ViewBag.UserName Center</a></li>
             <li class="active">I KPI</li>
         </ol>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-lg-12">&nbsp;</div>
-</div>
-<div class="form-group">
     <div class="row">
-        <div class="col-lg-3 text-left">
+        <div class="col-lg-3 text-left" style="padding-left: 0px;" data-intro="Select KPI month you need." data-step="1">
             @Html.DropDownList("monthlylist", null, new { @id = "monthlylist", @class = "form-control", @onchange = "ShowMonthKPI()" })
         </div>
         <div class="col-lg-9 text-left"></div>
@@ -45,20 +31,16 @@
         }
         </script>
     </div>
-</div>
 
 <div class="form-group">
     <div class="row">
         <h3 style="font-family:'Arial Narrow'!important;">Total Rank: @(ViewBag.TotalRank)</h3>
     </div>
 </div>
-<div class="row">
-    <div class="col-lg-12">&nbsp;</div>
-</div>
 
 <div class="form-group">
     <div class="row">
-        <table id="pndatatable" class="display" cellspacing="0">
+        <table id="pndatatable" class="display" cellspacing="0" data-intro="See KPI here." data-step="2">
             <thead>
                 <tr>
                     <td>Rank Type</td>

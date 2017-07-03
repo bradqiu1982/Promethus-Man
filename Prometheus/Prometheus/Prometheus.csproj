@@ -609,6 +609,7 @@
     <Content Include="Content\images\ucicon\IAssignedIcons.png" />
     <Content Include="Content\images\ucicon\IBlogIcons.png" />
     <Content Include="Content\images\ucicon\ICareIcons.png" />
+    <Content Include="Content\images\ucicon\IKPIIcons.png" />
     <Content Include="Content\images\ucicon\ILearnIcons.png" />
     <Content Include="Content\images\ucicon\IProjectIcons.png" />
     <Content Include="Content\images\ucicon\ITagIcons.png" />

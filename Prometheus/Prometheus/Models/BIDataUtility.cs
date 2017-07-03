@@ -309,12 +309,12 @@ namespace Prometheus.Models
             return dict;
         }
 
-        public static List<double> RetrieveModuleTestData(string querycond, string datafield, string condtype)
+        public static List<double> RetrieveModuleTestData(string querycond, string datafield, string condtype,string optionalcond)
         {
             var real2db = ModuleRealName2DBColName();
             var realdatafield = real2db[datafield];
 
-            var sql = "select <datafield> from ModuleTXOData";
+            var sql = "select <datafield> from ModuleTXOData ";
             if (condtype.Contains(TXOQUERYTYPE.BR))
             {
                 sql = sql + " where JO like '%<cond>%' ";
@@ -330,6 +330,7 @@ namespace Prometheus.Models
 
             var ret = new List<double>();
             sql = sql.Replace("<datafield>", realdatafield).Replace("<cond>", querycond);
+            sql = sql + optionalcond;
 
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)

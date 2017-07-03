@@ -144,6 +144,46 @@ namespace Prometheus.Controllers
             selectcontrol[0].Disabled = true;
             selectcontrol[0].Selected = true;
             ViewBag.rightdatafieldlist = selectcontrol;
+
+            selectlist = new List<string>();
+            selectlist.Add("Please select module station");
+            selectlist.Add("ersetup");
+            selectlist.Add("ertempcomp");
+            selectcontrol = CreateSelectList(selectlist, leftfield);
+            selectcontrol[0].Disabled = true;
+            selectcontrol[0].Selected = true;
+            ViewBag.leftmdstationlist = selectcontrol;
+
+            selectlist = new List<string>();
+            selectlist.Add("Please select module station");
+            selectlist.Add("ersetup");
+            selectlist.Add("ertempcomp");
+            selectcontrol = CreateSelectList(selectlist, leftfield);
+            selectcontrol[0].Disabled = true;
+            selectcontrol[0].Selected = true;
+            ViewBag.rightmdstationlist = selectcontrol;
+
+            selectlist = new List<string>();
+            selectlist.Add("Please select module channel");
+            for (var idx = 0; idx < 24; idx++)
+            {
+                selectlist.Add(idx.ToString());
+            }
+            selectcontrol = CreateSelectList(selectlist, leftfield);
+            selectcontrol[0].Disabled = true;
+            selectcontrol[0].Selected = true;
+            ViewBag.leftmdchannellist = selectcontrol;
+
+            selectlist = new List<string>();
+            selectlist.Add("Please select module channel");
+            for (var idx = 0; idx < 24; idx++)
+            {
+                selectlist.Add(idx.ToString());
+            }
+            selectcontrol = CreateSelectList(selectlist, leftfield);
+            selectcontrol[0].Disabled = true;
+            selectcontrol[0].Selected = true;
+            ViewBag.rightmdchannellist = selectcontrol;
         }
 
         public ActionResult TXOTestData()
@@ -701,12 +741,38 @@ namespace Prometheus.Controllers
 
         private void ModuleTestDataAnalysis(string cond, string field, string condtype, bool left)
         {
-            var rawlist = ModuleTXOData.RetrieveModuleTestData(cond, field, condtype);
+            var station = string.Empty;
+            var channel = string.Empty;
+            if (left)
+            {
+                station = Request.Form["leftmdstationlist"];
+                channel = Request.Form["leftmdchannellist"];
+            }
+            else
+            {
+                station = Request.Form["rightmdstationlist"];
+                channel = Request.Form["rightmdchannellist"];
+            }
+
+            var optioncond = string.Empty;
+            var fieldappend = string.Empty;
+            if (!string.IsNullOrEmpty(station))
+            {
+                optioncond = " and TestName ='" + station + "' ";
+                fieldappend = "-" + station;
+            }
+            if (!string.IsNullOrEmpty(channel))
+            {
+                optioncond = optioncond + " and Channel ='" + channel + "' ";
+                fieldappend = fieldappend + "-CH" + channel;
+            }
+
+            var rawlist = ModuleTXOData.RetrieveModuleTestData(cond, field, condtype, optioncond);
             if (rawlist.Count > 5)
             {
                 var filteddata = GetCleanDataWithStdDev(rawlist);
-                NEONormalDistributeChart(filteddata, cond, field, left);
-                NEOBoxPlot(filteddata, cond, field, left);
+                NEONormalDistributeChart(filteddata, cond, field+ fieldappend, left);
+                NEOBoxPlot(filteddata, cond, field + fieldappend, left);
             }
         }
 

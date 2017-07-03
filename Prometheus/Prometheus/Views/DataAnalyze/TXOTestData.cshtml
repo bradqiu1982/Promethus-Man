@@ -79,176 +79,212 @@
     </div>
 </div>
 
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
 <div class="form-group">
     <div class="row">
         <div class="col-lg-12">
-            <button MYTP="BT" type="button" onclick="compairtxo()" class="btn btn-default" style="width:10.5em;">Submit</button>
+            <div class="row"><a data-toggle="collapse" href="#CommentInput" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';text-decoration: none;"><font color="black">Module Test Data Condition (Optional)</font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:20px; width:12px"></a></div>
+            <div class="row">
+                <div class="col-lg-12">&nbsp;</div>
+            </div>
+            <div class="row">
+                <div class="collapse" id="CommentInput">
+
+                        <div class="col-lg-6">
+                            <div class="col-lg-7">
+                                @Html.DropDownList("leftmdstationlist", null, new { @id = "leftmdstationlist", @name = "leftmdstationlist", @class = "form-control" })
+                            </div>
+                            <div class="col-lg-5">
+                                @Html.DropDownList("leftmdchannellist", null, new { @id = "leftmdchannellist", @name = "leftmdchannellist", @class = "form-control" })
+                            </div>
+                            
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="col-lg-7">
+                                @Html.DropDownList("rightmdstationlist", null, new { @id = "rightmdstationlist", @name = "rightmdstationlist", @class = "form-control" })
+                            </div>
+                            <div class="col-lg-5">
+                                @Html.DropDownList("rightmdchannellist", null, new { @id = "rightmdchannellist", @name = "rightmdchannellist", @class = "form-control" })
+                            </div>
+                        </div>
+
+                </div>
+            </div>
         </div>
     </div>
-    <script type="text/javascript">
-        function compairtxo()
-        {
-            if ((document.getElementById("leftquerylist").value  && document.getElementById("leftdatafieldlist").value.indexOf("Please") == -1)
-                || (document.getElementById("rightquerylist").value && document.getElementById("rightdatafieldlist").value.indexOf("Please") == -1))
-            {
-                $('#txoform').submit();
+</div>
+
+    <div class="form-group">
+        <div class="row">
+            <div class="col-lg-12">
+                <button MYTP="BT" type="button" onclick="compairtxo()" class="btn btn-default" style="width:10.5em;">Submit</button>
+            </div>
+        </div>
+        <script type="text/javascript">
+            function compairtxo() {
+                if ((document.getElementById("leftquerylist").value && document.getElementById("leftdatafieldlist").value.indexOf("Please") == -1)
+                    || (document.getElementById("rightquerylist").value && document.getElementById("rightdatafieldlist").value.indexOf("Please") == -1)) {
+                    $('#txoform').submit();
+                }
             }
-        }
-    </script>
-</div>
-
-<div class="form-group">
-    <div class="row">
-        <div class="col-lg-6">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-11">
-                        @if (ViewBag.lefthotscript != null)
-                        {
-                            @Html.Raw(ViewBag.lefthotscript)
-                            <div id="lefthotscript" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
-                        }
-                    </div>
-                    <div class="col-1">
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-1">
-                    </div>
-                    <div class="col-11">
-                        @if (ViewBag.righthotscript != null)
-                        {
-                            @Html.Raw(ViewBag.righthotscript)
-                            <div id="righthotscript" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
-                        }
-                    </div>
-                </div>
-            </div>
-        </div>
+        </script>
     </div>
 
-    <div class="row">
-        <div class="col-lg-6">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-11">
-                        @if (ViewBag.leftnormaldistr != null)
-                        {
-                            @Html.Raw(ViewBag.leftnormaldistr)
-                            <div id="leftnormaldistr" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
-                        }
-                    </div>
-                    <div class="col-1">
+    <div class="form-group">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-11">
+                            @if (ViewBag.lefthotscript != null)
+                            {
+                                @Html.Raw(ViewBag.lefthotscript)
+                                <div id="lefthotscript" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+                            }
+                        </div>
+                        <div class="col-1">
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="form-group">
-                <div class="row">
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-1">
+                        </div>
+                        <div class="col-11">
+                            @if (ViewBag.righthotscript != null)
+                            {
+                                @Html.Raw(ViewBag.righthotscript)
+                                <div id="righthotscript" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+                            }
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-lg-6">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-1">
+
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-11">
+                            @if (ViewBag.leftnormaldistr != null)
+                            {
+                                @Html.Raw(ViewBag.leftnormaldistr)
+                                <div id="leftnormaldistr" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+                            }
+                        </div>
+                        <div class="col-1">
+                        </div>
                     </div>
-                    <div class="col-11">
-                        @if (ViewBag.rightnormaldistr != null)
-                        {
-                            @Html.Raw(ViewBag.rightnormaldistr)
-                            <div id="rightnormaldistr" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
-                        }
+                </div>
+                <div class="form-group">
+                    <div class="row">
                     </div>
                 </div>
             </div>
-            <div class="form-group">
-                <div class="row">
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-1">
+                        </div>
+                        <div class="col-11">
+                            @if (ViewBag.rightnormaldistr != null)
+                            {
+                                @Html.Raw(ViewBag.rightnormaldistr)
+                                <div id="rightnormaldistr" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
 
-    <div class="row">
-        <div class="col-lg-1">
-        </div>
-        <div class="col-lg-10">
-            <div class="form-group">
-                <div class="row">
-                    @if (ViewBag.combinenormaldistr != null)
-                    {
-                        @Html.Raw(ViewBag.combinenormaldistr)
-                        <div id="combinenormaldistr" style="min-width: 600px; height: 600px; margin: 0 auto"></div>
-                    }
-                </div>
+        <div class="row">
+            <div class="col-lg-1">
             </div>
-        </div>
-        <div class="col-lg-1">
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-lg-6">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-11">
-                        @if (ViewBag.leftboxplot != null)
+            <div class="col-lg-10">
+                <div class="form-group">
+                    <div class="row">
+                        @if (ViewBag.combinenormaldistr != null)
                         {
-                            @Html.Raw(ViewBag.leftboxplot)
-                            <div id="leftboxplot" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
-                        }
-                    </div>
-                    <div class="col-1">
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="row">
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-1">
-                    </div>
-                    <div class="col-11">
-                        @if (ViewBag.rightboxplot != null)
-                        {
-                            @Html.Raw(ViewBag.rightboxplot)
-                            <div id="rightboxplot" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+                            @Html.Raw(ViewBag.combinenormaldistr)
+                            <div id="combinenormaldistr" style="min-width: 600px; height: 600px; margin: 0 auto"></div>
                         }
                     </div>
                 </div>
             </div>
-            <div class="form-group">
-                <div class="row">
+            <div class="col-lg-1">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-11">
+                            @if (ViewBag.leftboxplot != null)
+                            {
+                                @Html.Raw(ViewBag.leftboxplot)
+                                <div id="leftboxplot" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+                            }
+                        </div>
+                        <div class="col-1">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-1">
+                        </div>
+                        <div class="col-11">
+                            @if (ViewBag.rightboxplot != null)
+                            {
+                                @Html.Raw(ViewBag.rightboxplot)
+                                <div id="rightboxplot" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="row">
-        <div class="col-lg-1">
-        </div>
-        <div class="col-lg-10">
-            <div class="form-group">
-                <div class="row">
-                    @if (ViewBag.combineboxplot != null)
-                    {
-                        @Html.Raw(ViewBag.combineboxplot)
-                        <div id="combineboxplot" style="min-width: 600px; height: 600px; margin: 0 auto"></div>
-                    }
+        <div class="row">
+            <div class="col-lg-1">
+            </div>
+            <div class="col-lg-10">
+                <div class="form-group">
+                    <div class="row">
+                        @if (ViewBag.combineboxplot != null)
+                        {
+                            @Html.Raw(ViewBag.combineboxplot)
+                            <div id="combineboxplot" style="min-width: 600px; height: 600px; margin: 0 auto"></div>
+                        }
+                    </div>
                 </div>
             </div>
+            <div class="col-lg-1">
+            </div>
         </div>
-        <div class="col-lg-1">
-        </div>
-    </div>
 
-</div>
-}
+    </div>
+    }

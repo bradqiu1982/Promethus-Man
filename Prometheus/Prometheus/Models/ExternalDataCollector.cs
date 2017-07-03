@@ -306,8 +306,15 @@ namespace Prometheus.Models
     {
         public static string NEOMAP = "NEOMAP-";
         public static string BURNIN = "BURNIN-";
-        public static string TEST = "TEST-";
+        public static string TEST = "MODULE-";
         public static string PROCESS = "PROCESS-";
+    }
+
+    public class TXOQUERYTYPE
+    {
+        public static string BR = "BR";
+        public static string WAFER = "WAFER";
+        public static string JO = "JO";
     }
 
     public class NeoMapDataWithPos
@@ -1343,14 +1350,17 @@ namespace Prometheus.Models
             return tempdata;
         }
 
-        public static List<string> RetrieveNeoMapWaferList()
+        public static Dictionary<string,bool> RetrieveNeoMapWaferList()
         {
-            var ret = new List<string>();
+            var ret = new Dictionary<string, bool>();
             var sql = "select distinct AppV_A from NeoMapData";
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
             {
-                ret.Add(Convert.ToString(line[0]));
+                if (!ret.ContainsKey(Convert.ToString(line[0])))
+                {
+                    ret.Add(Convert.ToString(line[0]),true);
+                }
             }
             return ret;
         }
@@ -1371,6 +1381,10 @@ namespace Prometheus.Models
                     tempdata.x = Convert.ToInt32(line[0]);
                     tempdata.y = Convert.ToInt32(line[1]);
                     tempdata.value = Convert.ToDouble(line[2]);
+                    if (real2db[datafield].ToUpper().Contains("PWR"))
+                    {
+                        tempdata.value = 10*Math.Log10(tempdata.value * 1000);
+                    }
                     ret.Add(tempdata);
                 }
                 catch (Exception ex) { }

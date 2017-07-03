@@ -148,6 +148,103 @@ namespace Prometheus.Models
             Appv_5 = DateTime.Parse("1982-05-06 07:30:00");
         }
 
+        public static List<string> BIMainFieldNameList()
+        {
+            var list = new List<string>();
+            list.Add(TXOQUERYCOND.BURNIN + "PO_LD");
+            return list;
+        }
+
+        public static Dictionary<string, string> BIRealName2DBColName()
+        {
+            var dict = new Dictionary<string, string>();
+            dict.Add(TXOQUERYCOND.BURNIN + "PO_LD", "PO_LD");
+            return dict;
+        }
+
+        public static List<double> RetrieveBITestData(string querycond, string datafield,string condtype)
+        {
+            var real2db = BIRealName2DBColName();
+            var realdatafield = real2db[datafield];
+
+            var sql = "select <datafield> from BITestResultDataField";
+            if (condtype.Contains(TXOQUERYTYPE.BR))
+            {
+                sql = sql + " where JO like '%<cond>%' ";
+            }
+            if (condtype.Contains(TXOQUERYTYPE.WAFER))
+            {
+                sql = sql + " where Wafer = '<cond>' ";
+            }
+            if (condtype.Contains(TXOQUERYTYPE.JO))
+            {
+                sql = sql + " where JO = '<cond>' ";
+            }
+
+            var ret = new List<double>();
+            sql = sql.Replace("<datafield>", realdatafield).Replace("<cond>", querycond);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                if (line[0] == null)
+                    continue;
+                var val = Convert.ToDouble(line[0]);
+                if (realdatafield.Contains("PO_LD"))
+                {
+                    val = 10 * Math.Log10(val);
+                }
+
+                if (double.IsNaN(val))
+                {
+                    //ret.Add(val);
+                }
+                else if (double.IsInfinity(-val))
+                {
+                    //ret.Add(val);
+                }
+                else if (double.IsInfinity(val))
+                {
+                    //ret.Add(val);
+                }
+                else
+                {
+                    ret.Add(val);
+                }
+
+            }
+            return ret;
+        }
+
+        public static Dictionary<string, bool> RetrieveBIJOList()
+        {
+            var ret = new Dictionary<string, bool>();
+            var sql = "select distinct JO from BITestResult";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                if (!ret.ContainsKey(Convert.ToString(line[0])))
+                {
+                    ret.Add(Convert.ToString(line[0]),true);
+                }
+            }
+            return ret;
+        }
+
+        public static Dictionary<string, bool> RetrieveBIWaferDict()
+        {
+            var ret = new Dictionary<string, bool>();
+            var sql = "select distinct Wafer from BITestResult where Wafer <> ''";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                if (!ret.ContainsKey(Convert.ToString(line[0])))
+                {
+                    ret.Add(Convert.ToString(line[0]), true);
+                }
+            }
+            return ret;
+        }
+
         public string SN { set; get; }
         public string TestName { set; get; }
         public DateTime TestTimeStamp { set; get; }
@@ -196,6 +293,70 @@ namespace Prometheus.Models
             Appv_3 = string.Empty;
             Appv_4 = string.Empty;
             Appv_5 = DateTime.Parse("1982-05-06 07:30:00");
+        }
+
+        public static List<string> ModuleFieldNameList()
+        {
+            var list = new List<string>();
+            list.Add(TXOQUERYCOND.TEST + "TxPower");
+            return list;
+        }
+
+        public static Dictionary<string, string> ModuleRealName2DBColName()
+        {
+            var dict = new Dictionary<string, string>();
+            dict.Add(TXOQUERYCOND.TEST + "TxPower", "TxPower");
+            return dict;
+        }
+
+        public static List<double> RetrieveModuleTestData(string querycond, string datafield, string condtype)
+        {
+            var real2db = ModuleRealName2DBColName();
+            var realdatafield = real2db[datafield];
+
+            var sql = "select <datafield> from ModuleTXOData";
+            if (condtype.Contains(TXOQUERYTYPE.BR))
+            {
+                sql = sql + " where JO like '%<cond>%' ";
+            }
+            if (condtype.Contains(TXOQUERYTYPE.WAFER))
+            {
+                sql = sql + " where Wafer = '<cond>' ";
+            }
+            if (condtype.Contains(TXOQUERYTYPE.JO))
+            {
+                sql = sql + " where JO = '<cond>' ";
+            }
+
+            var ret = new List<double>();
+            sql = sql.Replace("<datafield>", realdatafield).Replace("<cond>", querycond);
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                if (line[0] == null)
+                    continue;
+                var val = Convert.ToDouble(line[0]);
+
+                if (double.IsNaN(val))
+                {
+                    //ret.Add(val);
+                }
+                else if (double.IsInfinity(-val))
+                {
+                    //ret.Add(val);
+                }
+                else if (double.IsInfinity(val))
+                {
+                    //ret.Add(val);
+                }
+                else
+                {
+                    ret.Add(val);
+                }
+
+            }
+            return ret;
         }
 
         public string SN { set; get; }

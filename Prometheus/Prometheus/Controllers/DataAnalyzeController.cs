@@ -102,10 +102,12 @@ namespace Prometheus.Controllers
         }
 
 
-        private void preparetxotestdata(string leftcond, string leftfield, string rightcond, string rightfield)
+        private void preparetxotestdata(List<string> waferlist,string leftcond, string leftfield, string rightcond, string rightfield)
         {
-            var waferlist = ExternalDataCollector.RetrieveNeoMapWaferList();
+            
             var datafieldlist = ExternalDataCollector.NeoMapMainFieldNameList();
+            datafieldlist.AddRange(BITestResultDataField.BIMainFieldNameList());
+            datafieldlist.AddRange(ModuleTXOData.ModuleFieldNameList());
 
             var selectlist = new List<string>();
             //selectlist.Add("Please select query key");
@@ -164,7 +166,21 @@ namespace Prometheus.Controllers
             ViewBag.UserName = updater.Split(new char[] { '@' })[0];
             ViewBag.RealUserID = updater;
 
-            preparetxotestdata("","","","");
+            var waferdict = ExternalDataCollector.RetrieveNeoMapWaferList();
+            var biwaferdict = BITestResultDataField.RetrieveBIWaferDict();
+            foreach (var kv in biwaferdict)
+            {
+                if (!waferdict.ContainsKey(kv.Key))
+                { waferdict.Add(kv.Key, true); }
+            }
+
+            var bijodict = BITestResultDataField.RetrieveBIJOList();
+            var waferlist = waferdict.Keys.ToList();
+            var bijolist = bijodict.Keys.ToList();
+
+            waferlist.AddRange(bijolist);
+
+            preparetxotestdata(waferlist,"","","","");
 
             return View();
         }
@@ -510,7 +526,7 @@ namespace Prometheus.Controllers
         {
             var ds = GetNormalDistrData(filteddata, 1.0);
 
-            var DATAFIELDNAME = datafield.Replace(TXOQUERYCOND.NEOMAP, "").Replace(TXOQUERYCOND.BURNIN,"");
+            var DATAFIELDNAME = datafield.Replace(TXOQUERYCOND.NEOMAP, "").Replace(TXOQUERYCOND.BURNIN,"").Replace(TXOQUERYCOND.TEST, "");
             var Title = querycond +" "+ DATAFIELDNAME + " Normal Distribution";
 
             var ElementID = "leftnormaldistr";
@@ -623,7 +639,7 @@ namespace Prometheus.Controllers
             //{name: '#SERIESNAME#',data: [#YVALUES#]}
             var boxdata = GetBoxPlotData(filteddata);
 
-            var DATAFIELDNAME = datafield.Replace(TXOQUERYCOND.NEOMAP, "").Replace(TXOQUERYCOND.BURNIN, "");
+            var DATAFIELDNAME = datafield.Replace(TXOQUERYCOND.NEOMAP, "").Replace(TXOQUERYCOND.BURNIN, "").Replace(TXOQUERYCOND.TEST, "");
             var Title = querycond + " " + DATAFIELDNAME + " Box Plot";
 
             var YVALUES = boxdata.Min.ToString() + "," + boxdata.LowerQuart.ToString() + "," + boxdata.Mean.ToString() + "," + boxdata.UpperQuart.ToString() + "," + boxdata.Max.ToString();
@@ -672,6 +688,28 @@ namespace Prometheus.Controllers
             }
         }
 
+        private void BITestDataAnalysis(string cond, string field, string condtype, bool left)
+        {
+            var rawlist = BITestResultDataField.RetrieveBITestData(cond, field, condtype);
+            if (rawlist.Count > 5)
+            {
+                var filteddata = GetCleanDataWithStdDev(rawlist);
+                NEONormalDistributeChart(filteddata, cond, field, left);
+                NEOBoxPlot(filteddata, cond, field, left);
+            }
+        }
+
+        private void ModuleTestDataAnalysis(string cond, string field, string condtype, bool left)
+        {
+            var rawlist = ModuleTXOData.RetrieveModuleTestData(cond, field, condtype);
+            if (rawlist.Count > 5)
+            {
+                var filteddata = GetCleanDataWithStdDev(rawlist);
+                NEONormalDistributeChart(filteddata, cond, field, left);
+                NEOBoxPlot(filteddata, cond, field, left);
+            }
+        }
+
         private void NeoMapDataAnalysisCombine(string lquerycond, string ldatafield, string rquerycond, string rdatafield)
         {
             var lvm = ExternalDataCollector.RetrieveNeoMapData(lquerycond, ldatafield);
@@ -706,6 +744,118 @@ namespace Prometheus.Controllers
             }
         }
 
+        private void DataSolveWithSide(string cond,string field,Dictionary<string,bool> waferdict, Dictionary<string, bool> bijodict,bool left) 
+        {
+            if (!string.IsNullOrEmpty(cond)
+            && !cond.ToUpper().Contains("PLEASE")
+            && !string.IsNullOrEmpty(field))
+            {
+                var condtype = TXOQUERYTYPE.BR;
+                if (waferdict.ContainsKey(cond))
+                {
+                    condtype = TXOQUERYTYPE.WAFER;
+                }
+                else if (bijodict.ContainsKey(cond))
+                {
+                    condtype = TXOQUERYTYPE.JO;
+                }
+
+                if (field.Contains(TXOQUERYCOND.NEOMAP))
+                {
+                    if (condtype.Contains(TXOQUERYTYPE.WAFER))
+                    {
+                        NeoMapDataAnalysis(cond, field, left);
+                    }
+                }
+                else
+                {
+                    if (condtype.Contains(TXOQUERYTYPE.BR))
+                    {
+                        if (cond.Length > 4)
+                        {
+                            if (field.Contains(TXOQUERYCOND.BURNIN))
+                            {
+                                BITestDataAnalysis(cond, field, condtype, left);
+                            }
+                            if (field.Contains(TXOQUERYCOND.TEST))
+                            {
+                                ModuleTestDataAnalysis(cond, field, condtype, left);
+                            }
+                        }//end if
+                    }//end if
+                    else
+                    {
+                        if (field.Contains(TXOQUERYCOND.BURNIN))
+                        {
+                            BITestDataAnalysis(cond, field, condtype,left);
+                        }
+                        if (field.Contains(TXOQUERYCOND.TEST))
+                        {
+                            ModuleTestDataAnalysis(cond, field, condtype, left);
+                        }
+                    }//end else
+                }//end else
+            }
+        }
+
+        private void DataSolveCombine(string leftcond, string leftfield
+            , string rightcond, string rightfield, Dictionary<string, bool> waferdict, Dictionary<string, bool> bijodict)
+        {
+                var lcondtype = TXOQUERYTYPE.BR;
+                var rcondtype = TXOQUERYTYPE.BR;
+
+                if (waferdict.ContainsKey(leftcond))
+                {
+                    lcondtype = TXOQUERYTYPE.WAFER;
+                }
+                else if (bijodict.ContainsKey(leftcond))
+                {
+                    lcondtype = TXOQUERYTYPE.JO;
+                }
+
+                if (waferdict.ContainsKey(rightcond))
+                {
+                    rcondtype = TXOQUERYTYPE.WAFER;
+                }
+                else if (bijodict.ContainsKey(rightcond))
+                {
+                    rcondtype = TXOQUERYTYPE.JO;
+                }
+
+            if (string.Compare(lcondtype, rcondtype) == 0)
+            {
+                if (lcondtype.Contains(TXOQUERYTYPE.BR))
+                {
+
+                }
+                else if (lcondtype.Contains(TXOQUERYTYPE.JO))
+                {
+
+                }
+                else if (lcondtype.Contains(TXOQUERYTYPE.WAFER))
+                {
+                    if (leftfield.Contains(TXOQUERYCOND.NEOMAP))
+                    {
+                        NeoMapDataAnalysisCombine(leftcond, leftfield, rightcond, rightfield);
+                    }
+                }
+            }
+            else
+            {
+                if (lcondtype.Contains(TXOQUERYTYPE.BR))
+                {
+                    
+                }
+                else if (lcondtype.Contains(TXOQUERYTYPE.JO))
+                {
+
+                }
+                else if (lcondtype.Contains(TXOQUERYTYPE.WAFER))
+                {
+                    
+                }
+            }
+        }
 
         [HttpPost, ActionName("TXOTestData")]
         [ValidateAntiForgeryToken]
@@ -721,50 +871,41 @@ namespace Prometheus.Controllers
             if (rightfield != null)
                 rightfield = rightfield.Trim();
 
-            if (!string.IsNullOrEmpty(leftcond)
-                    && !string.IsNullOrEmpty(leftfield)
-                    && !string.IsNullOrEmpty(rightcond)
-                    && !string.IsNullOrEmpty(rightfield)
-                    && !leftcond.ToUpper().Contains("PLEASE")
-                    && !rightcond.ToUpper().Contains("PLEASE")
-                    && string.Compare(leftfield, rightfield) == 0)
+            var waferdict = ExternalDataCollector.RetrieveNeoMapWaferList();
+            var biwaferdict = BITestResultDataField.RetrieveBIWaferDict();
+            foreach (var kv in biwaferdict)
             {
-                if (leftfield.Contains(TXOQUERYCOND.NEOMAP))
-                {
-                    NeoMapDataAnalysisCombine(leftcond, leftfield, rightcond, rightfield);
-                }
+                if (!waferdict.ContainsKey(kv.Key))
+                { waferdict.Add(kv.Key, true); }
             }
-            else
-            {
-                if (!string.IsNullOrEmpty(leftcond)
-                    && !leftcond.ToUpper().Contains("PLEASE")
-                    && !string.IsNullOrEmpty(leftfield))
-                {
-                
-                    if (leftfield.Contains(TXOQUERYCOND.NEOMAP))
-                    {
-                        NeoMapDataAnalysis(leftcond, leftfield,true);
-                    }
-                }
+            var bijodict = BITestResultDataField.RetrieveBIJOList();
+            var waferlist = waferdict.Keys.ToList();
+            var bijolist = bijodict.Keys.ToList();
 
-                if (!string.IsNullOrEmpty(rightcond)
-                    && !rightcond.ToUpper().Contains("PLEASE")
-                    && !string.IsNullOrEmpty(rightfield))
-                {
-                    if (rightfield.Contains(TXOQUERYCOND.NEOMAP))
-                    {
-                        NeoMapDataAnalysis(rightcond, rightfield, false);
-                    }
-                }                
-            }
-
-
+            //if (!string.IsNullOrEmpty(leftcond)
+            //        && !string.IsNullOrEmpty(leftfield)
+            //        && !string.IsNullOrEmpty(rightcond)
+            //        && !string.IsNullOrEmpty(rightfield)
+            //        && !leftcond.ToUpper().Contains("PLEASE")
+            //        && !rightcond.ToUpper().Contains("PLEASE")
+            //        && string.Compare(leftfield, rightfield) == 0)
+            //{
+            //    DataSolveCombine(leftcond, leftfield
+            //        , rightcond, rightfield, waferdict, bijodict);
+            //}
+            //else
+            //{
+                DataSolveWithSide(leftcond, leftfield, waferdict,bijodict, true);
+                DataSolveWithSide(rightcond, rightfield, waferdict, bijodict, false);
+            //}
 
             var ckdict = CookieUtility.UnpackCookie(this);
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
             ViewBag.UserName = updater.Split(new char[] { '@' })[0];
             ViewBag.RealUserID = updater;
-            preparetxotestdata("", "", "", "");
+
+            waferlist.AddRange(bijolist);
+            preparetxotestdata(waferlist,"", "", "", "");
             return View();
         }
     }

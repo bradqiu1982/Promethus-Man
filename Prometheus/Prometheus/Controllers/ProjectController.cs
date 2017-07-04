@@ -4956,6 +4956,18 @@ namespace Prometheus.Controllers
 
             try
             {
+                BIDataUtility.LoadBITestDateFromAuto(this);
+            }
+            catch (Exception ex) { }
+
+            try
+            {
+                BIDataUtility.LoadModuleTXOFromMESBackup(this);
+            }
+            catch (Exception ex) { }
+
+            try
+            {
                 ExternalDataCollector.RefreshNeoMAPData(this);
             }
             catch (Exception ex) { }
@@ -5052,8 +5064,8 @@ namespace Prometheus.Controllers
             //ExternalDataCollector.RefreshRELData(this);
             //ExternalDataCollector.RefreshNeoMAPData(this);
             //ExternalDataCollector.RefreshOBAFromDMR(this);
-            //BIDataUtility.LoadBITestDateFromAuto(this);
-            //BIDataUtility.LoadModuleTXOFromMESBackup(this);
+            BIDataUtility.LoadBITestDateFromAuto(this);
+            BIDataUtility.LoadModuleTXOFromMESBackup(this);
             //var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
             //foreach (var pjkey in pjkeylist)
             //{

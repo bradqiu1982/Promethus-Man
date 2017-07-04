@@ -376,6 +376,122 @@ namespace Prometheus.Models
         public DateTime Appv_5 { set; get; }
     }
 
+    public class AlignmentPowerType
+    {
+        public static string AlignmentPower = "AlignmentPower";
+        public static string PowerCheck = "PowerCheck";
+    }
+
+    public class AlignmentPower
+    {
+        public AlignmentPower()
+        {
+            Init();
+        }
+
+        private void Init()
+        {
+            SN = string.Empty;
+            TxPower = -99999;
+            TestName = string.Empty;
+            TestTimeStamp = DateTime.Parse("1982-05-06 07:30:00");
+            Wafer = string.Empty;
+            JO = string.Empty;
+            Channel = string.Empty;
+            Appv_1 = 0;
+            Appv_2 = 0;
+            Appv_3 = string.Empty;
+            Appv_4 = string.Empty;
+            Appv_5 = DateTime.Parse("1982-05-06 07:30:00");
+        }
+
+        public static List<string> ProcessFieldNameList()
+        {
+            var list = new List<string>();
+            list.Add(TXOQUERYCOND.PROCESS + "TxPower");
+            return list;
+        }
+
+        public static Dictionary<string, string> ProcessRealName2DBColName()
+        {
+            var dict = new Dictionary<string, string>();
+            dict.Add(TXOQUERYCOND.PROCESS + "TxPower", "TxPower");
+            return dict;
+        }
+
+        public static List<double> RetrieveAlignmentTestData(string querycond, string datafield, string condtype, string optionalcond)
+        {
+            var real2db = ProcessRealName2DBColName();
+            var realdatafield = real2db[datafield];
+
+            var sql = "select <datafield> from AlignmentPower ";
+            if (condtype.Contains(TXOQUERYTYPE.BR))
+            {
+                sql = sql + " where JO like '%<cond>%' ";
+            }
+            if (condtype.Contains(TXOQUERYTYPE.WAFER))
+            {
+                sql = sql + " where Wafer = '<cond>' ";
+            }
+            if (condtype.Contains(TXOQUERYTYPE.JO))
+            {
+                sql = sql + " where JO = '<cond>' ";
+            }
+
+            var ret = new List<double>();
+            sql = sql.Replace("<datafield>", realdatafield).Replace("<cond>", querycond);
+            if (string.IsNullOrEmpty(optionalcond))
+            {
+                sql = sql + " and TestName ='"+AlignmentPowerType.AlignmentPower+"' ";
+            }
+            else
+            {
+                sql = sql + optionalcond;
+            }
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                if (line[0] == null)
+                    continue;
+                var val = Convert.ToDouble(line[0]);
+
+                if (double.IsNaN(val))
+                {
+                    //ret.Add(val);
+                }
+                else if (double.IsInfinity(-val))
+                {
+                    //ret.Add(val);
+                }
+                else if (double.IsInfinity(val))
+                {
+                    //ret.Add(val);
+                }
+                else
+                {
+                    ret.Add(val);
+                }
+
+            }
+            return ret;
+        }
+
+
+        public string SN { set; get; }
+        public double TxPower { set; get; }
+        public string TestName { set; get; }
+        public DateTime TestTimeStamp { set; get; }
+        public string Wafer { set; get; }
+        public string JO { set; get; }
+        public string Channel { set; get; }
+        public double Appv_1 { set; get; }
+        public double Appv_2 { set; get; }
+        public string Appv_3 { set; get; }
+        public string Appv_4 { set; get; }
+        public DateTime Appv_5 { set; get; }
+    }
+
     public class BIDataUtility
     {
         private static bool IsDigitsOnly(string str)
@@ -1280,13 +1396,13 @@ namespace Prometheus.Models
             }
         }
 
-        private static void RetrieveModuleWaferBySN(List<ModuleTXOData> txplist, Dictionary<string, ModuleSNRelation> snwaferdict)
+        private static void RetrieveModuleWaferBySN(List<string> txplist, Dictionary<string, ModuleSNRelation> snwaferdict)
         {
             var sndict = new Dictionary<string, bool>();
             foreach (var item in txplist)
             {
-                if (!sndict.ContainsKey(item.SN))
-                { sndict.Add(item.SN, true); }
+                if (!sndict.ContainsKey(item))
+                { sndict.Add(item, true); }
             }
             var snlist = sndict.Keys.ToList();
             var startidx = 0;
@@ -1331,6 +1447,7 @@ namespace Prometheus.Models
             {
                 var txpdatalist = new List<ModuleTXOData>();
                 var txplatesttime = RetrieveLatestTimeStampOfATxpTable(bt, txpzerotime);
+                var snlist = new List<string>();
 
                 var sql = "select  c.moduleserialnum,m.TxPower_dBm,c.TestTimeStamp,m.OvenTemp_C,m.ChannelNumber,c.AssemblyPartNum from insitedb.insite.dc_<dctab> c(nolock) "
                     + " left join insitedb.insite.dce_<dctab>_main m(nolock) on  c.dc_<dctab>HistoryId=m.parenthistoryid "
@@ -1363,13 +1480,14 @@ namespace Prometheus.Models
                         tempdata.PN = Convert.ToString(line[5]);
                         tempdata.TestName = bt;
                         txpdatalist.Add(tempdata);
+                        snlist.Add(tempdata.SN);
                     }
                     catch (Exception ex) { }
 
                 }//end foreach
 
                 var snwaferdict = new Dictionary<string, ModuleSNRelation>();
-                RetrieveModuleWaferBySN(txpdatalist, snwaferdict);
+                RetrieveModuleWaferBySN(snlist, snwaferdict);
 
 
                 foreach (var item in txpdatalist)
@@ -1413,6 +1531,151 @@ namespace Prometheus.Models
             WriteDBWithTable(datatable, "ModuleTXOData");
 
         }
+
+
+        private static string RetrieveLatestTimeStampOfProcessTable(string prozerotime)
+        {
+            var sql = "select top 1 TestTimeStamp from AlignmentPower order by TestTimeStamp DESC";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            if (dbret.Count > 0)
+            {
+                try
+                {
+                    return DateTime.Parse(Convert.ToString(dbret[0][0])).ToString();
+                }
+                catch (Exception ex)
+                {
+                    return prozerotime;
+                }
+            }
+            else
+            {
+                return prozerotime;
+            }
+        }
+
+        private static AlignmentPower CreateAlignmentItem(string SN,object txpower,string testname,object timestamp,string channel)
+        {
+            try
+            {
+                if (txpower == null)
+                    return null;
+
+                var txp = Convert.ToDouble(txpower);
+                var time = Convert.ToDateTime(timestamp);
+                if (txp > -20 && txp < 20)
+                {
+                    var ret = new AlignmentPower();
+                    ret.SN = SN;
+                    ret.TxPower = txp;
+                    ret.TestName = testname;
+                    ret.TestTimeStamp = time;
+                    ret.Channel = channel;
+                    return ret;
+                }
+            }
+            catch (Exception ex) { return null; }
+
+            return null;
+        }
+
+
+        public static void LoadProcessTXOFromAuto(Controller ctrl)
+        {
+            var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+            var prozerotime = syscfgdict["PROCESSZEROTIME"];
+            var datalist = new List<AlignmentPower>();
+            var prolatesttime = RetrieveLatestTimeStampOfProcessTable(prozerotime);
+            var snlist = new List<string>();
+
+            var sql = "select [Serial_Number],[Data_Time],[Final_Power_On_Align_CH1st] "
+                    +" ,[Final_Power_On_Align_CH2nd],[Final_Power_On_Align_CH3rd],[Final_Power_On_Align_CH4th]"
+                    +" ,[Tx1_Power_For_Second],[Tx2_Power_For_Second],[Tx3_Power_For_Second],[Tx4_Power_For_Second]"
+                    +"  from[Parallel].[dbo].[Parallel_LensAligner]"
+                    + "  where Data_Time > '<TestTimeStamp>' and Process_Mode = 'Lens Alignment' and Tx_Power_Name_For_Second = 'Check PostUV TxPower (dBm)'";
+            sql = sql.Replace("<TestTimeStamp>", prolatesttime);
+
+            var dbret = DBUtility.ExeAutoSqlWithRes(sql);
+            if (dbret.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var line in dbret)
+            {
+                try
+                {
+                    if (line[0] != null)
+                    {
+                        var sn = Convert.ToString(line[0]);
+                        snlist.Add(sn);
+
+                        var temptxp = CreateAlignmentItem(sn, line[2], AlignmentPowerType.AlignmentPower, line[1], "0");
+                        if (temptxp != null) datalist.Add(temptxp);
+                        temptxp = CreateAlignmentItem(sn, line[3], AlignmentPowerType.AlignmentPower, line[1], "1");
+                        if (temptxp != null) datalist.Add(temptxp);
+                        temptxp = CreateAlignmentItem(sn, line[4], AlignmentPowerType.AlignmentPower, line[1], "2");
+                        if (temptxp != null) datalist.Add(temptxp);
+                        temptxp = CreateAlignmentItem(sn, line[5], AlignmentPowerType.AlignmentPower, line[1], "3");
+                        if (temptxp != null) datalist.Add(temptxp);
+
+                        temptxp = CreateAlignmentItem(sn, line[6], AlignmentPowerType.PowerCheck, line[1], "0");
+                        if (temptxp != null) datalist.Add(temptxp);
+                        temptxp = CreateAlignmentItem(sn, line[7], AlignmentPowerType.PowerCheck, line[1], "1");
+                        if (temptxp != null) datalist.Add(temptxp);
+                        temptxp = CreateAlignmentItem(sn, line[8], AlignmentPowerType.PowerCheck, line[1], "2");
+                        if (temptxp != null) datalist.Add(temptxp);
+                        temptxp = CreateAlignmentItem(sn, line[9], AlignmentPowerType.PowerCheck, line[1], "3");
+                        if (temptxp != null) datalist.Add(temptxp);
+                    }
+                }
+                catch (Exception ex) { }
+            }//end foreach
+
+            var snwaferdict = new Dictionary<string, ModuleSNRelation>();
+            RetrieveModuleWaferBySN(snlist, snwaferdict);
+
+            foreach (var item in datalist)
+            {
+                if (snwaferdict.ContainsKey(item.SN))
+                {
+                    item.Wafer = snwaferdict[item.SN].wafer;
+                    item.JO = snwaferdict[item.SN].jo;
+                }
+            }//end foreach
+
+            StoreAlignmentTestResult(datalist);
+        }
+
+        private static void StoreAlignmentTestResult(List<AlignmentPower> testresultlist)
+        {
+            //BITestResult
+            var datatable = new System.Data.DataTable();
+
+            PropertyInfo[] properties = typeof(AlignmentPower).GetProperties();
+            var i = 0;
+            for (i = 0; i < properties.Length;)
+            {
+                datatable.Columns.Add(properties[i].Name, properties[i].PropertyType);
+                i = i + 1;
+            }
+
+            foreach (var testresult in testresultlist)
+            {
+                properties = typeof(AlignmentPower).GetProperties();
+                var temprow = new object[properties.Length];
+                for (i = 0; i < properties.Length;)
+                {
+                    temprow[i] = properties[i].GetValue(testresult);
+                    i = i + 1;
+                }
+                datatable.Rows.Add(temprow);
+            }
+
+            WriteDBWithTable(datatable, "AlignmentPower");
+        }
+
+
 
     }
 }

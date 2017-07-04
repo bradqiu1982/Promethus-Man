@@ -108,6 +108,7 @@ namespace Prometheus.Controllers
             var datafieldlist = ExternalDataCollector.NeoMapMainFieldNameList();
             datafieldlist.AddRange(BITestResultDataField.BIMainFieldNameList());
             datafieldlist.AddRange(ModuleTXOData.ModuleFieldNameList());
+            datafieldlist.AddRange(AlignmentPower.ProcessFieldNameList());
 
             var selectlist = new List<string>();
             //selectlist.Add("Please select query key");
@@ -184,6 +185,47 @@ namespace Prometheus.Controllers
             selectcontrol[0].Disabled = true;
             selectcontrol[0].Selected = true;
             ViewBag.rightmdchannellist = selectcontrol;
+
+
+            selectlist = new List<string>();
+            selectlist.Add("Please select alignment test");
+            selectlist.Add(AlignmentPowerType.AlignmentPower);
+            selectlist.Add(AlignmentPowerType.PowerCheck);
+            selectcontrol = CreateSelectList(selectlist, leftfield);
+            selectcontrol[0].Disabled = true;
+            selectcontrol[0].Selected = true;
+            ViewBag.leftaligntestlist = selectcontrol;
+
+            selectlist = new List<string>();
+            selectlist.Add("Please select alignment test");
+            selectlist.Add(AlignmentPowerType.AlignmentPower);
+            selectlist.Add(AlignmentPowerType.PowerCheck);
+            selectcontrol = CreateSelectList(selectlist, leftfield);
+            selectcontrol[0].Disabled = true;
+            selectcontrol[0].Selected = true;
+            ViewBag.rightaligntestlist = selectcontrol;
+
+            selectlist = new List<string>();
+            selectlist.Add("Please select alignment channel");
+            for (var idx = 0; idx < 4; idx++)
+            {
+                selectlist.Add(idx.ToString());
+            }
+            selectcontrol = CreateSelectList(selectlist, leftfield);
+            selectcontrol[0].Disabled = true;
+            selectcontrol[0].Selected = true;
+            ViewBag.leftalignchannellist = selectcontrol;
+
+            selectlist = new List<string>();
+            selectlist.Add("Please select alignment channel");
+            for (var idx = 0; idx < 4; idx++)
+            {
+                selectlist.Add(idx.ToString());
+            }
+            selectcontrol = CreateSelectList(selectlist, leftfield);
+            selectcontrol[0].Disabled = true;
+            selectcontrol[0].Selected = true;
+            ViewBag.rightalignchannellist = selectcontrol;
         }
 
         public ActionResult TXOTestData()
@@ -495,7 +537,7 @@ namespace Prometheus.Controllers
             var ymin = lds.ymin < rds.ymin ? lds.ymin : rds.ymin;
             var amount = lds.AmountMAX > rds.AmountMAX ? lds.AmountMAX : rds.AmountMAX;
 
-            var DATAFIELDNAME = datafield.Replace(TXOQUERYCOND.NEOMAP, "").Replace(TXOQUERYCOND.BURNIN, "");
+            var DATAFIELDNAME = datafield.Replace(TXOQUERYCOND.NEOMAP, "").Replace(TXOQUERYCOND.BURNIN, "").Replace(TXOQUERYCOND.TEST, "");
             var Title = DATAFIELDNAME+ " Normal Distribution";
             var ElementID = "combinenormaldistr";
 
@@ -536,7 +578,7 @@ namespace Prometheus.Controllers
             var lboxdata = GetBoxPlotData(lvm);
             var rboxdata = GetBoxPlotData(rvm);
 
-            var DATAFIELDNAME = datafield.Replace(TXOQUERYCOND.NEOMAP, "").Replace(TXOQUERYCOND.BURNIN, "");
+            var DATAFIELDNAME = datafield.Replace(TXOQUERYCOND.NEOMAP, "").Replace(TXOQUERYCOND.BURNIN, "").Replace(TXOQUERYCOND.TEST, "");
             var Title =  DATAFIELDNAME + " Box Plot";
 
             var LYVALUES = lboxdata.Min.ToString() + "," + lboxdata.LowerQuart.ToString() + "," + lboxdata.Mean.ToString() + "," + lboxdata.UpperQuart.ToString() + "," + lboxdata.Max.ToString();
@@ -776,6 +818,43 @@ namespace Prometheus.Controllers
             }
         }
 
+        private void AlignTestDataAnalysis(string cond, string field, string condtype, bool left)
+        {
+            var station = string.Empty;
+            var channel = string.Empty;
+            if (left)
+            {
+                station = Request.Form["leftaligntestlist"];
+                channel = Request.Form["leftalignchannellist"];
+            }
+            else
+            {
+                station = Request.Form["rightaligntestlist"];
+                channel = Request.Form["rightalignchannellist"];
+            }
+
+            var optioncond = string.Empty;
+            var fieldappend = string.Empty;
+            if (!string.IsNullOrEmpty(station))
+            {
+                optioncond = " and TestName ='" + station + "' ";
+                fieldappend = "-" + station;
+            }
+            if (!string.IsNullOrEmpty(channel))
+            {
+                optioncond = optioncond + " and Channel ='" + channel + "' ";
+                fieldappend = fieldappend + "-CH" + channel;
+            }
+
+            var rawlist = AlignmentPower.RetrieveAlignmentTestData(cond, field, condtype, optioncond);
+            if (rawlist.Count > 5)
+            {
+                var filteddata = GetCleanDataWithStdDev(rawlist);
+                NEONormalDistributeChart(filteddata, cond, field + fieldappend, left);
+                NEOBoxPlot(filteddata, cond, field + fieldappend, left);
+            }
+        }
+
         private void NeoMapDataAnalysisCombine(string lquerycond, string ldatafield, string rquerycond, string rdatafield)
         {
             var lvm = ExternalDataCollector.RetrieveNeoMapData(lquerycond, ldatafield);
@@ -847,6 +926,10 @@ namespace Prometheus.Controllers
                             {
                                 ModuleTestDataAnalysis(cond, field, condtype, left);
                             }
+                            if (field.Contains(TXOQUERYCOND.PROCESS))
+                            {
+                                AlignTestDataAnalysis(cond, field, condtype, left);
+                            }
                         }//end if
                     }//end if
                     else
@@ -858,6 +941,10 @@ namespace Prometheus.Controllers
                         if (field.Contains(TXOQUERYCOND.TEST))
                         {
                             ModuleTestDataAnalysis(cond, field, condtype, left);
+                        }
+                        if (field.Contains(TXOQUERYCOND.PROCESS))
+                        {
+                            AlignTestDataAnalysis(cond, field, condtype, left);
                         }
                     }//end else
                 }//end else

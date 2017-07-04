@@ -755,7 +755,7 @@ namespace Prometheus.Models
                     return ret;
 
                 var command = conn.CreateCommand();
-                command.CommandTimeout = 60;
+                command.CommandTimeout = 120;
                 command.CommandText = sql;
                 var sqlreader = command.ExecuteReader();
                 if (sqlreader.HasRows)

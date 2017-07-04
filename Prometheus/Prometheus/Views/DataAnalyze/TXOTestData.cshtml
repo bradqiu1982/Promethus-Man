@@ -117,6 +117,44 @@
     </div>
 </div>
 
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+<div class="form-group">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="row"><a data-toggle="collapse" href="#aligncond" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';text-decoration: none;"><font color="black">Alignment Test Data Condition (Optional)</font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:20px; width:12px"></a></div>
+            <div class="row">
+                <div class="col-lg-12">&nbsp;</div>
+            </div>
+            <div class="row">
+                <div class="collapse" id="aligncond">
+
+                    <div class="col-lg-6">
+                        <div class="col-lg-7">
+                            @Html.DropDownList("leftaligntestlist", null, new { @id = "leftaligntestlist", @name = "leftaligntestlist", @class = "form-control" })
+                        </div>
+                        <div class="col-lg-5">
+                            @Html.DropDownList("leftalignchannellist", null, new { @id = "leftalignchannellist", @name = "leftalignchannellist", @class = "form-control" })
+                        </div>
+
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="col-lg-7">
+                            @Html.DropDownList("rightaligntestlist", null, new { @id = "rightaligntestlist", @name = "rightaligntestlist", @class = "form-control" })
+                        </div>
+                        <div class="col-lg-5">
+                            @Html.DropDownList("rightalignchannellist", null, new { @id = "rightalignchannellist", @name = "rightalignchannellist", @class = "form-control" })
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
     <div class="form-group">
         <div class="row">
             <div class="col-lg-12">

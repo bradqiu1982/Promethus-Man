@@ -4968,6 +4968,12 @@ namespace Prometheus.Controllers
 
             try
             {
+                BIDataUtility.LoadProcessTXOFromAuto(this);
+            }
+            catch (Exception ex) { }
+
+            try
+            {
                 ExternalDataCollector.RefreshNeoMAPData(this);
             }
             catch (Exception ex) { }

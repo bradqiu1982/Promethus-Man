@@ -2000,6 +2000,8 @@ namespace Prometheus.Models
                     var temprootcomment = new IssueComments();
                     temprootcomment.Comment = rootcause;
                     IssueViewModels.UpdateSPComment(obaissue.IssueKey, rootcomment.CommentType, rootcomment.CommentDate.ToString(), temprootcomment.dbComment);
+                    obaissue.RootCauseCommentList.Clear();
+                    obaissue.RootCauseCommentList.Add(temprootcomment);
                 }
             }
             else
@@ -2011,6 +2013,7 @@ namespace Prometheus.Models
                 rootcomment.Reporter = obaissue.Assignee;
                 rootcomment.IssueKey = obaissue.IssueKey;
                 IssueViewModels.StoreIssueComment(rootcomment.IssueKey, rootcomment.dbComment, rootcomment.Reporter, rootcomment.CommentType);
+                obaissue.RootCauseCommentList.Add(rootcomment);
             }
             
         }
@@ -2024,6 +2027,7 @@ namespace Prometheus.Models
                     var tempcomment = new IssueComments();
                     tempcomment.Comment = correctiveinfo;
                     IssueViewModels.StoreIssueComment(obaissue.CorrectiveActions[0].IssueKey, tempcomment.dbComment, obaissue.Assignee, COMMENTTYPE.Description);
+                    obaissue.CorrectiveActions[0].CommentList.Add(tempcomment);
                 }
             }
         }
@@ -2055,15 +2059,17 @@ namespace Prometheus.Models
 
                 FileCopy(ctrl, attachment, attpath, true);
                 IssueViewModels.StoreIssueAttachment(obaissue.IssueKey, url);
+                obaissue.AttachList.Add(url);
             }
         }
 
         private static List<RawDMR> RetrieveDMRFromITDB(string OBAUpdateTime, Dictionary<string, IssueViewModels> DMRDict, Controller ctrl)
         {
             var ret = new List<RawDMR>();
+            var onemonthago = DateTime.Parse(OBAUpdateTime).AddMonths(-1).ToString();
 
             var sql = "select DMR_ID,Created_at,Prod_Line,Defect_Qty,Inspected_Qty,Actual_Problem,Justification,Remark,File_URL from dbo.DMR_Detail_List_View where Created_at > '<CreateTime>'";
-            sql = sql.Replace("<CreateTime>", OBAUpdateTime);
+            sql = sql.Replace("<CreateTime>", onemonthago);
             var dbret = DBUtility.ExeFAISqlWithRes(sql);
 
             foreach (var line in dbret)

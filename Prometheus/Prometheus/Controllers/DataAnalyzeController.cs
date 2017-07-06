@@ -916,7 +916,7 @@ namespace Prometheus.Controllers
                 {
                     if (condtype.Contains(TXOQUERYTYPE.BR))
                     {
-                        if (cond.Length > 4)
+                        if (cond.Length > 3)
                         {
                             if (field.Contains(TXOQUERYCOND.BURNIN))
                             {

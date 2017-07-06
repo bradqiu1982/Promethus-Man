@@ -69,7 +69,7 @@
             name: '#SERIESNAME2#',
             data: [#YVALUES2#],
             yAxis:1,
-            pointWidth: 10,
+            pointWidth: 15,
             dataLabels: {
                 enabled: true,
                 rotation: -90,

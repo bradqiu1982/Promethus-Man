@@ -438,8 +438,16 @@ namespace Prometheus.Models
                 {
                     var dsnm = Convert.ToString(line[0]);
                     var v1 = Convert.ToString(line[1]);
-                    var v2 = Convert.ToString(line[2]);
-                    var v3 = Convert.ToString(line[3]);
+                    var v2 = string.Empty;
+                    if (line[2] != null)
+                    {
+                        v2 = Convert.ToString(line[2]);
+                    }
+                    var v3 = string.Empty;
+                    if (line[3] != null)
+                    {
+                        v3 = Convert.ToString(line[3]);
+                    }
 
                     if (v2.ToUpper().Contains("PASS"))
                     {
@@ -483,25 +491,29 @@ namespace Prometheus.Models
 
                 foreach (var item in failurelist)
                 {
-                    var vm = new IssueViewModels();
-                    vm.ProjectKey = item.ProjectKey;
-                    vm.IssueKey = GetUniqKey(); //item.DataID;
-                    vm.IssueType = ISSUETP.Bug;
-                    vm.Summary = "Module " + item.ModuleSerialNum + " failed for " + item.ErrAbbr + " @ " + item.WhichTest;
-                    vm.Priority = ISSUEPR.Major;
-                    vm.DueDate = DateTime.Now.AddDays(7);
-                    vm.ReportDate = item.TestTimeStamp;
-                    vm.Assignee = firstengineer;
-                    vm.Reporter = "System";
-                    vm.Resolution = Resolute.Pending;
-                    vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
-                    vm.Description = "Module " + item.ModuleSerialNum + " failed for " + item.ErrAbbr + " @ " + item.WhichTest + " on tester " + item.TestStation + " " + item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss")+ DataFieldStr(item.DataID);
-                    vm.CommentType = COMMENTTYPE.Description;
-                    vm.ModuleSN = item.ModuleSerialNum;
-                    vm.ErrAbbr = item.ErrAbbr;
-                    vm.DataID = item.DataID;
-                    //ProjectEvent.CreateIssueEvent(vm.ProjectKey, "System", vm.Assignee, vm.Summary, vm.IssueKey);
-                    vm.StoreIssue();
+                    try
+                    {
+                        var vm = new IssueViewModels();
+                        vm.ProjectKey = item.ProjectKey;
+                        vm.IssueKey = GetUniqKey(); //item.DataID;
+                        vm.IssueType = ISSUETP.Bug;
+                        vm.Summary = "Module " + item.ModuleSerialNum + " failed for " + item.ErrAbbr + " @ " + item.WhichTest;
+                        vm.Priority = ISSUEPR.Major;
+                        vm.DueDate = DateTime.Now.AddDays(7);
+                        vm.ReportDate = item.TestTimeStamp;
+                        vm.Assignee = firstengineer;
+                        vm.Reporter = "System";
+                        vm.Resolution = Resolute.Pending;
+                        vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+                        vm.Description = "Module " + item.ModuleSerialNum + " failed for " + item.ErrAbbr + " @ " + item.WhichTest + " on tester " + item.TestStation + " " + item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss")+ DataFieldStr(item.DataID);
+                        vm.CommentType = COMMENTTYPE.Description;
+                        vm.ModuleSN = item.ModuleSerialNum;
+                        vm.ErrAbbr = item.ErrAbbr;
+                        vm.DataID = item.DataID;
+                        //ProjectEvent.CreateIssueEvent(vm.ProjectKey, "System", vm.Assignee, vm.Summary, vm.IssueKey);
+                        vm.StoreIssue();
+                    }
+                    catch (Exception ex) { }
                 }
             }
         }

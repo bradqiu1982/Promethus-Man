@@ -34,7 +34,17 @@ namespace Prometheus.Models
                 if (d.Summary.Contains("@Burn-In Step"))
                 {
                     var sn = "";
-                    var pjdata = BITestData.RetrieveProjectTestDataByDataID(d.IssueKey);
+
+                    var pjdata = new List<ProjectTestData>();
+                    if (!string.IsNullOrEmpty(d.DataID))
+                    {
+                        pjdata = BITestData.RetrieveProjectTestDataByDataID(d.DataID);
+                    }
+                    else
+                    {
+                        pjdata = BITestData.RetrieveProjectTestDataByDataID(d.IssueKey);
+                    }
+
                     if (pjdata.Count > 0)
                     {
                         sn = pjdata[0].ModuleSerialNum;
@@ -58,7 +68,16 @@ namespace Prometheus.Models
                 else
                 {
                     var sn = "";
-                    var pjdata = ProjectTestData.RetrieveProjectTestData(d.IssueKey);
+                    var pjdata = new List<ProjectTestData>();
+                    if (!string.IsNullOrEmpty(d.DataID))
+                    {
+                        pjdata = ProjectTestData.RetrieveProjectTestData(d.DataID);
+                    }
+                    else
+                    {
+                        pjdata = ProjectTestData.RetrieveProjectTestData(d.IssueKey);
+                    }
+
                     if (pjdata.Count > 0)
                     {
                         sn = pjdata[0].ModuleSerialNum;

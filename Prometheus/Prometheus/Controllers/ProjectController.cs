@@ -402,7 +402,7 @@ namespace Prometheus.Controllers
                 if (string.Compare(pm.Role, Prometheus.Models.ProjectViewModels.PMROLE) == 0)
                 {
                     pmlist.Add(pm);
-                    vm.PMListStr = pm.Name + ";" + vm.PMListStr;
+                    vm.PMListStr =  vm.PMListStr+ ";" + pm.Name;
                 }
             }
 
@@ -411,7 +411,7 @@ namespace Prometheus.Controllers
                 if (string.Compare(eg.Role, Prometheus.Models.ProjectViewModels.ENGROLE) == 0)
                 {
                     eglist.Add(eg);
-                    vm.EngListStr = eg.Name + ";" + vm.EngListStr;
+                    vm.EngListStr = vm.EngListStr+ ";" + eg.Name ;
                 }
             }
 
@@ -5064,8 +5064,21 @@ namespace Prometheus.Controllers
             //ExternalDataCollector.RefreshRELData(this);
             //ExternalDataCollector.RefreshNeoMAPData(this);
             //ExternalDataCollector.RefreshOBAFromDMR(this);
-            BIDataUtility.LoadBITestDateFromAuto(this);
-            BIDataUtility.LoadModuleTXOFromMESBackup(this);
+            //BIDataUtility.LoadBITestDateFromAuto(this);
+            //BIDataUtility.LoadModuleTXOFromMESBackup(this);
+            //BIDataUtility.LoadProcessTXOFromAuto(this);
+            //ExternalDataCollector.RefreshOBAFromDMR(this);
+
+            //var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
+            //foreach (var pjkey in pjkeylist)
+            //{
+                //try
+                //{
+                //    ProjectTestData.PrePareATELatestData("COHERENTCFP2");
+                //}
+                //catch (Exception ex)
+                //{ }
+            //}
             //var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
             //foreach (var pjkey in pjkeylist)
             //{

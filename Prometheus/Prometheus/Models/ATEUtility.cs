@@ -139,6 +139,7 @@ namespace Prometheus.Models
                                 var tempdata = new ProjectTestData(vm.ProjectKey, GetUniqKey(), Convert.ToString(item[0])
                                             , Convert.ToString(item[1]), Convert.ToString(item[2]), Convert.ToString(item[3]).ToUpper()
                                             , stdtime, Convert.ToString(item[5]), Convert.ToString(item[6]));
+                                tempdata.DataID = tempdatasetid;
 
                                 pjdatalist.Add(tempdata);
                             }

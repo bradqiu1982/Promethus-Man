@@ -1292,6 +1292,8 @@ namespace Prometheus.Models
                 using (SqlBulkCopy bulkCopy = new SqlBulkCopy(targetcon))
                 {
                     bulkCopy.DestinationTableName = "NeoMapData";
+                    bulkCopy.BulkCopyTimeout = 120;
+
                     try
                     {
                         for (int i = 0; i < dt.Columns.Count; i++)

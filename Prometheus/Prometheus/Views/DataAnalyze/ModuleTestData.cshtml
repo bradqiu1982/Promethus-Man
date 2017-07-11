@@ -1,0 +1,198 @@
+﻿@{
+    ViewBag.Title = "Module TXO Analysis";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+<div class="row">
+    <ol class="breadcrumb" style="font-size:18px">
+        <li><a href="/User/UserCenter?username=@(ViewBag.RealUserID)">@ViewBag.UserName Center</a></li>
+        <li class="active">Module TXO Analysis</li>
+    </ol>
+</div>
+
+<script src="~/Scripts/highcharts.js"></script>
+<script src="~/Scripts/heatmap.js"></script>
+<script src="~/Scripts/exporting.js"></script>
+<script src="~/Scripts/highcharts-more.js"></script>
+
+@using (Html.BeginForm("ModuleTestData", "DataAnalyze", FormMethod.Post, new { enctype = "multipart/form-data", id = "moduletxoform", name = "moduletxoform" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-group">
+        <div class="row">
+            <div class="col-lg-6">
+
+                    <input id="ModuleSNList" name="ModuleSNList" list="leftquerys" placeholder="Please input module sn" class="form-control text-box single-line" type="text" />
+                    <datalist id="leftquerys">
+                        @foreach (var item in ViewBag.modulequeryvallist)
+                        {
+                            <option value="@item">@item</option>
+                        }
+                    </datalist>
+
+                <script type="text/javascript">
+                            $(document).ready(function () {
+                                $("#ModuleSNList").flexdatalist({
+                                    minLength: 0,
+                                    searchContain: true,
+                                    maxShownResults:300
+                                });
+                            });
+                </script>
+            </div>
+            <div class="col-lg-6">
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">&nbsp;</div>
+    </div>
+
+    <div class="form-group">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="row"><a data-toggle="collapse" href="#CommentInput" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';text-decoration: none;"><font color="black">Module Test Data Condition (Optional)</font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:20px; width:12px"></a></div>
+                <div class="row">
+                    <div class="col-lg-12">&nbsp;</div>
+                </div>
+                <div class="row">
+                    <div class="collapse" id="CommentInput">
+
+                        <div class="col-lg-6">
+                            <div class="col-lg-7">
+                                @Html.DropDownList("leftmdstationlist", null, new { @id = "leftmdstationlist", @name = "leftmdstationlist", @class = "form-control" })
+                            </div>
+                            <div class="col-lg-5">
+                                @Html.DropDownList("leftmdchannellist", null, new { @id = "leftmdchannellist", @name = "leftmdchannellist", @class = "form-control" })
+                            </div>
+
+                        </div>
+                        <div class="col-lg-6">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">&nbsp;</div>
+    </div>
+
+    <div class="form-group">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="row"><a data-toggle="collapse" href="#aligncond" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';text-decoration: none;"><font color="black">Alignment Test Data Condition (Optional)</font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:20px; width:12px"></a></div>
+                <div class="row">
+                    <div class="col-lg-12">&nbsp;</div>
+                </div>
+                <div class="row">
+                    <div class="collapse" id="aligncond">
+
+                        <div class="col-lg-6">
+                            <div class="col-lg-7">
+                                @Html.DropDownList("leftaligntestlist", null, new { @id = "leftaligntestlist", @name = "leftaligntestlist", @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="row">
+            <div class="col-lg-12">
+                <button MYTP="BT" type="button" onclick="moduletxo()" class="btn btn-default" style="width:10.5em;">Submit</button>
+            </div>
+        </div>
+        <script type="text/javascript">
+            function moduletxo() {
+                if (document.getElementById("ModuleSNList").value && document.getElementById("ModuleSNList").value.indexOf("Please") == -1) {
+                    $('#moduletxoform').submit();
+                }
+            }
+        </script>
+    </div>
+
+    <div class="form-group">
+        <div class="row">
+            <div class="col-lg-2">
+            </div>
+            <div class="col-lg-8">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-12">
+                            @if (ViewBag.binormaldistr != null)
+                            {
+                                @Html.Raw(ViewBag.binormaldistr)
+                                <div id="leftnormaldistr" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2">
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="row">
+            <div class="col-lg-2">
+            </div>
+            <div class="col-lg-8">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-12">
+                            @if (ViewBag.alignnormaldistr != null)
+                            {
+                                @Html.Raw(ViewBag.alignnormaldistr)
+                                <div id="alignnormaldistr" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2">
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="row">
+            <div class="col-lg-2">
+            </div>
+            <div class="col-lg-8">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-12">
+                            @if (ViewBag.modulenormaldistr != null)
+                            {
+                                @Html.Raw(ViewBag.modulenormaldistr)
+                                <div id="modulenormaldistr" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2">
+            </div>
+        </div>
+    </div>
+
+}

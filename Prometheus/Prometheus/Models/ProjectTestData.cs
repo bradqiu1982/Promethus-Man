@@ -473,6 +473,35 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static List<string> Last300FailedModuleForUser(string UserName)
+        {
+            var projectlist = UserViewModels.RetrieveUserProjectKeyDict(UserName);
+            if (projectlist.Count == 0)
+            {
+                return new List<string>();
+            }
+
+            var pjcond = " ('";
+            foreach (var kv in projectlist)
+            {
+                pjcond = pjcond + kv.Key + "','";
+            }
+            pjcond = pjcond.Substring(0, pjcond.Length - 2) + ") ";
+
+            var sql = "select distinct top 500 ModuleSN,ReportDate from Issue where ProjectKey in <pjcond> and ModuleSN <> '' order by ReportDate DESC";
+            sql = sql.Replace("<pjcond>", pjcond);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
+            var ret = new Dictionary<string,bool>();
+            foreach (var line in dbret)
+            {
+                var val = Convert.ToString(line[0]);
+                if (!ret.ContainsKey(val))
+                {
+                    ret.Add(val,true);
+                }
+            }
+            return ret.Keys.ToList();
+        }
 
     }
 }

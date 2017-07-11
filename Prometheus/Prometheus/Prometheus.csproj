@@ -961,6 +961,7 @@
     <Content Include="Views\User\UserReviewedInfo.cshtml" />
     <Content Include="Views\User\UserSharedInfo.cshtml" />
     <Content Include="Views\DataAnalyze\TXOTestData.cshtml" />
+    <Content Include="Views\DataAnalyze\ModuleTestData.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

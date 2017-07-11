@@ -239,6 +239,8 @@ namespace Prometheus.Controllers
                             using (SqlBulkCopy bulkCopy = new SqlBulkCopy(targetcon))
                             {
                                 bulkCopy.DestinationTableName = tab;
+                                bulkCopy.BulkCopyTimeout = 120;
+
                                 try
                                 {
                                     for (int i = 1; i < dt.Columns.Count; i++)

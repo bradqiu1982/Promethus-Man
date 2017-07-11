@@ -147,6 +147,46 @@ namespace Prometheus.Controllers
             ViewBag.rightdatafieldlist = selectcontrol;
 
             selectlist = new List<string>();
+            selectlist.Add("Please select BI station");
+            selectlist.Add("Pre Burn In");
+            selectlist.Add("Post Burn In");
+            selectcontrol = CreateSelectList(selectlist, leftfield);
+            selectcontrol[0].Disabled = true;
+            selectcontrol[0].Selected = true;
+            ViewBag.leftbistationlist = selectcontrol;
+
+            selectlist = new List<string>();
+            selectlist.Add("Please select BI station");
+            selectlist.Add("Pre Burn In");
+            selectlist.Add("Post Burn In");
+            selectcontrol = CreateSelectList(selectlist, leftfield);
+            selectcontrol[0].Disabled = true;
+            selectcontrol[0].Selected = true;
+            ViewBag.rightbistationlist = selectcontrol;
+
+            selectlist = new List<string>();
+            selectlist.Add("Please select BI channel");
+            for (var idx = 0; idx < 24; idx++)
+            {
+                selectlist.Add(idx.ToString());
+            }
+            selectcontrol = CreateSelectList(selectlist, leftfield);
+            selectcontrol[0].Disabled = true;
+            selectcontrol[0].Selected = true;
+            ViewBag.leftbichannellist = selectcontrol;
+
+            selectlist = new List<string>();
+            selectlist.Add("Please select BI channel");
+            for (var idx = 0; idx < 24; idx++)
+            {
+                selectlist.Add(idx.ToString());
+            }
+            selectcontrol = CreateSelectList(selectlist, leftfield);
+            selectcontrol[0].Disabled = true;
+            selectcontrol[0].Selected = true;
+            ViewBag.rightbichannellist = selectcontrol;
+
+            selectlist = new List<string>();
             selectlist.Add("Please select module station");
             selectlist.Add("ersetup");
             selectlist.Add("ertempcomp");
@@ -186,6 +226,25 @@ namespace Prometheus.Controllers
             selectcontrol[0].Selected = true;
             ViewBag.rightmdchannellist = selectcontrol;
 
+            selectlist = new List<string>();
+            selectlist.Add("Please select test temperature");
+            selectlist.Add("low");
+            selectlist.Add("normal");
+            selectlist.Add("high");
+            selectcontrol = CreateSelectList(selectlist, leftfield);
+            selectcontrol[0].Disabled = true;
+            selectcontrol[0].Selected = true;
+            ViewBag.leftmdtemplist = selectcontrol;
+
+            selectlist = new List<string>();
+            selectlist.Add("Please select test temperature");
+            selectlist.Add("low");
+            selectlist.Add("normal");
+            selectlist.Add("high");
+            selectcontrol = CreateSelectList(selectlist, leftfield);
+            selectcontrol[0].Disabled = true;
+            selectcontrol[0].Selected = true;
+            ViewBag.rightmdtemplist = selectcontrol;
 
             selectlist = new List<string>();
             selectlist.Add("Please select alignment test");
@@ -772,28 +831,17 @@ namespace Prometheus.Controllers
 
         private void BITestDataAnalysis(string cond, string field, string condtype, bool left)
         {
-            var rawlist = BITestResultDataField.RetrieveBITestData(cond, field, condtype);
-            if (rawlist.Count > 5)
-            {
-                var filteddata = GetCleanDataWithStdDev(rawlist);
-                NEONormalDistributeChart(filteddata, cond, field, left);
-                NEOBoxPlot(filteddata, cond, field, left);
-            }
-        }
-
-        private void ModuleTestDataAnalysis(string cond, string field, string condtype, bool left)
-        {
             var station = string.Empty;
             var channel = string.Empty;
             if (left)
             {
-                station = Request.Form["leftmdstationlist"];
-                channel = Request.Form["leftmdchannellist"];
+                station = Request.Form["leftbistationlist"];
+                channel = Request.Form["leftbichannellist"];
             }
             else
             {
-                station = Request.Form["rightmdstationlist"];
-                channel = Request.Form["rightmdchannellist"];
+                station = Request.Form["rightbistationlist"];
+                channel = Request.Form["rightbichannellist"];
             }
 
             var optioncond = string.Empty;
@@ -807,6 +855,64 @@ namespace Prometheus.Controllers
             {
                 optioncond = optioncond + " and Channel ='" + channel + "' ";
                 fieldappend = fieldappend + "-CH" + channel;
+            }
+
+            var rawlist = BITestResultDataField.RetrieveBITestData(cond, field, condtype, optioncond);
+            if (rawlist.Count > 5)
+            {
+                var filteddata = GetCleanDataWithStdDev(rawlist);
+                NEONormalDistributeChart(filteddata, cond, field+ fieldappend, left);
+                NEOBoxPlot(filteddata, cond, field+ fieldappend, left);
+            }
+        }
+
+        private void ModuleTestDataAnalysis(string cond, string field, string condtype, bool left)
+        {
+            var station = string.Empty;
+            var channel = string.Empty;
+            var temp = string.Empty;
+
+            if (left)
+            {
+                station = Request.Form["leftmdstationlist"];
+                channel = Request.Form["leftmdchannellist"];
+                temp = Request.Form["leftmdtemplist"];
+            }
+            else
+            {
+                station = Request.Form["rightmdstationlist"];
+                channel = Request.Form["rightmdchannellist"];
+                temp = Request.Form["rightmdtemplist"];
+            }
+
+            var optioncond = string.Empty;
+            var fieldappend = string.Empty;
+            if (!string.IsNullOrEmpty(station))
+            {
+                optioncond = " and TestName ='" + station + "' ";
+                fieldappend = "-" + station;
+            }
+            if (!string.IsNullOrEmpty(channel))
+            {
+                optioncond = optioncond + " and Channel ='" + channel + "' ";
+                fieldappend = fieldappend + "-CH" + channel;
+            }
+
+            if (!string.IsNullOrEmpty(temp))
+            {
+                if (string.Compare(temp, "low", true) == 0)
+                {
+                    optioncond = optioncond + " and Temperature < 15 ";
+                }
+                else if (string.Compare(temp, "high", true) == 0)
+                {
+                    optioncond = optioncond + " and Temperature > 45 ";
+                }
+                else
+                {
+                    optioncond = optioncond + " and Temperature > 15 and Temperature < 45 ";
+                }
+                fieldappend = fieldappend+"-" + temp;
             }
 
             var rawlist = ModuleTXOData.RetrieveModuleTestData(cond, field, condtype, optioncond);
@@ -1061,5 +1167,78 @@ namespace Prometheus.Controllers
             preparetxotestdata(waferlist,"", "", "", "");
             return View();
         }
+
+        private void preparemoduletxotestdata(string UserName)
+        {
+            ViewBag.modulequeryvallist = ProjectTestData.Last300FailedModuleForUser(UserName);
+            
+            var selectlist = new List<string>();
+            selectlist.Add("Please select module station");
+            selectlist.Add("ersetup");
+            selectlist.Add("ertempcomp");
+            var selectcontrol = CreateSelectList(selectlist,"");
+            selectcontrol[0].Disabled = true;
+            selectcontrol[0].Selected = true;
+            ViewBag.leftmdstationlist = selectcontrol;
+
+
+            selectlist = new List<string>();
+            selectlist.Add("Please select module channel");
+            for (var idx = 0; idx < 24; idx++)
+            {
+                selectlist.Add(idx.ToString());
+            }
+            selectcontrol = CreateSelectList(selectlist, "");
+            selectcontrol[0].Disabled = true;
+            selectcontrol[0].Selected = true;
+            ViewBag.leftmdchannellist = selectcontrol;
+
+
+            selectlist = new List<string>();
+            selectlist.Add("Please select alignment test");
+            selectlist.Add(AlignmentPowerType.AlignmentPower);
+            selectlist.Add(AlignmentPowerType.PowerCheck);
+            selectcontrol = CreateSelectList(selectlist, "");
+            selectcontrol[0].Disabled = true;
+            selectcontrol[0].Selected = true;
+            ViewBag.leftaligntestlist = selectcontrol;
+        }
+
+        public ActionResult ModuleTestData()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "DataAnalyze");
+                ck.Add("logonredirectact", "TXOTestData");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            ViewBag.UserName = updater.Split(new char[] { '@' })[0];
+            ViewBag.RealUserID = updater;
+            preparemoduletxotestdata(updater);
+            return View();
+        }
+
+        [HttpPost, ActionName("ModuleTestData")]
+        [ValidateAntiForgeryToken]
+        public ActionResult ModuleTestDataPost()
+        {
+            var ModuleSn = Request.Form["ModuleSNList"];
+
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            ViewBag.UserName = updater.Split(new char[] { '@' })[0];
+            ViewBag.RealUserID = updater;
+            preparemoduletxotestdata(updater);
+            return View();
+        }
+
     }
 }

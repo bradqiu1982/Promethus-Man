@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Title = "TXO Analysis";
+    ViewBag.Title = "TXO Trend Compare";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -14,7 +14,7 @@
 <div class="row">
     <ol class="breadcrumb" style="font-size:18px">
         <li><a href="/User/UserCenter?username=@(ViewBag.RealUserID)">@ViewBag.UserName Center</a></li>
-        <li class="active">TXO Analysis</li>
+        <li class="active">TXO Trend Compare</li>
     </ol>
 </div>
 
@@ -92,25 +92,45 @@
             </div>
             <div class="row">
                 <div class="collapse" id="CommentInput">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="col-lg-7">
+                                    @Html.DropDownList("leftmdstationlist", null, new { @id = "leftmdstationlist", @name = "leftmdstationlist", @class = "form-control" })
+                                </div>
+                                <div class="col-lg-5">
+                                    @Html.DropDownList("leftmdchannellist", null, new { @id = "leftmdchannellist", @name = "leftmdchannellist", @class = "form-control" })
+                                </div>
 
-                        <div class="col-lg-6">
-                            <div class="col-lg-7">
-                                @Html.DropDownList("leftmdstationlist", null, new { @id = "leftmdstationlist", @name = "leftmdstationlist", @class = "form-control" })
                             </div>
-                            <div class="col-lg-5">
-                                @Html.DropDownList("leftmdchannellist", null, new { @id = "leftmdchannellist", @name = "leftmdchannellist", @class = "form-control" })
-                            </div>
-                            
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="col-lg-7">
-                                @Html.DropDownList("rightmdstationlist", null, new { @id = "rightmdstationlist", @name = "rightmdstationlist", @class = "form-control" })
-                            </div>
-                            <div class="col-lg-5">
-                                @Html.DropDownList("rightmdchannellist", null, new { @id = "rightmdchannellist", @name = "rightmdchannellist", @class = "form-control" })
+                            <div class="col-lg-6">
+                                <div class="col-lg-7">
+                                    @Html.DropDownList("rightmdstationlist", null, new { @id = "rightmdstationlist", @name = "rightmdstationlist", @class = "form-control" })
+                                </div>
+                                <div class="col-lg-5">
+                                    @Html.DropDownList("rightmdchannellist", null, new { @id = "rightmdchannellist", @name = "rightmdchannellist", @class = "form-control" })
+                                </div>
                             </div>
                         </div>
-
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="col-lg-7">
+                                    @Html.DropDownList("leftmdtemplist", null, new { @id = "leftmdtemplist", @name = "leftmdtemplist", @class = "form-control" })
+                                </div>
+                                <div class="col-lg-5">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="col-lg-7">
+                                    @Html.DropDownList("rightmdtemplist", null, new { @id = "rightmdtemplist", @name = "rightmdtemplist", @class = "form-control" })
+                                </div>
+                                <div class="col-lg-5">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -146,6 +166,45 @@
                         </div>
                         <div class="col-lg-5">
                             @Html.DropDownList("rightalignchannellist", null, new { @id = "rightalignchannellist", @name = "rightalignchannellist", @class = "form-control" })
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+<div class="form-group">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="row"><a data-toggle="collapse" href="#bicond" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';text-decoration: none;"><font color="black">Burn-In Test Data Condition (Optional)</font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:20px; width:12px"></a></div>
+            <div class="row">
+                <div class="col-lg-12">&nbsp;</div>
+            </div>
+            <div class="row">
+                <div class="collapse" id="bicond">
+
+                    <div class="col-lg-6">
+                        <div class="col-lg-7">
+                            @Html.DropDownList("leftbistationlist", null, new { @id = "leftbistationlist", @name = "leftbistationlist", @class = "form-control" })
+                        </div>
+                        <div class="col-lg-5">
+                            @Html.DropDownList("leftbichannellist", null, new { @id = "leftbichannellist", @name = "leftbichannellist", @class = "form-control" })
+                        </div>
+
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="col-lg-7">
+                            @Html.DropDownList("rightbistationlist", null, new { @id = "rightbistationlist", @name = "rightbistationlist", @class = "form-control" })
+                        </div>
+                        <div class="col-lg-5">
+                            @Html.DropDownList("rightbichannellist", null, new { @id = "rightbichannellist", @name = "rightbichannellist", @class = "form-control" })
                         </div>
                     </div>
 

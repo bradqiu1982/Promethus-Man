@@ -162,7 +162,7 @@ namespace Prometheus.Models
             return dict;
         }
 
-        public static List<double> RetrieveBITestData(string querycond, string datafield,string condtype)
+        public static List<double> RetrieveBITestData(string querycond, string datafield,string condtype,string optioncond)
         {
             var real2db = BIRealName2DBColName();
             var realdatafield = real2db[datafield];
@@ -183,6 +183,8 @@ namespace Prometheus.Models
 
             var ret = new List<double>();
             sql = sql.Replace("<datafield>", realdatafield).Replace("<cond>", querycond);
+
+            sql = sql + optioncond;
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
             {
@@ -214,6 +216,36 @@ namespace Prometheus.Models
             }
             return ret;
         }
+
+        public static List<BITestResultDataField> RetrieveAllDataFieldBySN(string sn,string optioncond)
+        {
+            var sql = "select SN,PO_LD,TestName,TestTimeStamp,Wafer,JO,Channel from BITestResultDataField where SN = '<SN>' <optioncond> order by TestTimeStamp DESC";
+            sql = sql.Replace("<SN>", sn).Replace("<optioncond>", optioncond);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            var ret = new List<BITestResultDataField>();
+            foreach (var line in dbret)
+            {
+                try
+                {
+                    var temp = new BITestResultDataField();
+                    temp.SN = Convert.ToString(line[0]);
+                    var val = Convert.ToDouble(line[1]);
+                    val = 10 * Math.Log10(val);
+                    if (double.IsNaN(val) || double.IsInfinity(-val) || double.IsInfinity(val))
+                        continue;
+                    temp.PO_LD = val;
+                    temp.TestName = Convert.ToString(line[2]);
+                    temp.TestTimeStamp = Convert.ToDateTime(line[3]);
+                    temp.Wafer = Convert.ToString(line[4]);
+                    temp.JO = Convert.ToString(line[5]);
+                    temp.Channel = Convert.ToString(line[6]);
+                    ret.Add(temp);
+                }
+                catch (Exception ex) { }
+            }
+            return ret;
+        }
+
 
         public static Dictionary<string, bool> RetrieveBIJOList()
         {
@@ -360,6 +392,34 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static List<ModuleTXOData> RetrieveAllDataFieldBySN(string sn, string optioncond)
+        {
+            var sql = "select SN,TxPower,TestName,TestTimeStamp,Wafer,JO,Channel,Temperature from ModuleTXOData where SN = '<SN>' <optioncond> order by TestTimeStamp DESC";
+            sql = sql.Replace("<SN>", sn).Replace("<optioncond>", optioncond);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            var ret = new List<ModuleTXOData>();
+            foreach (var line in dbret)
+            {
+                try
+                {
+                    var temp = new ModuleTXOData();
+                    temp.SN = Convert.ToString(line[0]);
+                    var val = Convert.ToDouble(line[1]);
+                    if (double.IsNaN(val) || double.IsInfinity(-val) || double.IsInfinity(val))
+                        continue;
+                    temp.TxPower = val;
+                    temp.TestName = Convert.ToString(line[2]);
+                    temp.TestTimeStamp = Convert.ToDateTime(line[3]);
+                    temp.Wafer = Convert.ToString(line[4]);
+                    temp.JO = Convert.ToString(line[5]);
+                    temp.Channel = Convert.ToString(line[6]);
+                    temp.Temperature = Convert.ToDouble(line[7]);
+                    ret.Add(temp);
+                } catch (Exception ex) { }
+            }
+            return ret;
+        }
+
         public string SN { set; get; }
         public double TxPower { set; get; }
         public string TestName { set; get; }
@@ -477,6 +537,33 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static List<AlignmentPower> RetrieveAllDataFieldBySN(string sn, string optioncond)
+        {
+            var sql = "select SN,TxPower,TestName,TestTimeStamp,Wafer,JO,Channel from AlignmentPower where SN = '<SN>' <optioncond> order by TestTimeStamp DESC";
+            sql = sql.Replace("<SN>", sn).Replace("<optioncond>", optioncond);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            var ret = new List<AlignmentPower>();
+            foreach (var line in dbret)
+            {
+                try
+                {
+                    var temp = new AlignmentPower();
+                    temp.SN = Convert.ToString(line[0]);
+                    var val = Convert.ToDouble(line[1]);
+                    if (double.IsNaN(val) || double.IsInfinity(-val) || double.IsInfinity(val))
+                        continue;
+                    temp.TxPower = val;
+                    temp.TestName = Convert.ToString(line[2]);
+                    temp.TestTimeStamp = Convert.ToDateTime(line[3]);
+                    temp.Wafer = Convert.ToString(line[4]);
+                    temp.JO = Convert.ToString(line[5]);
+                    temp.Channel = Convert.ToString(line[6]);
+                    ret.Add(temp);
+                }
+                catch (Exception ex) { }
+            }
+            return ret;
+        }
 
         public string SN { set; get; }
         public double TxPower { set; get; }
@@ -1166,6 +1253,8 @@ namespace Prometheus.Models
                 using (SqlBulkCopy bulkCopy = new SqlBulkCopy(targetcon))
                 {
                     bulkCopy.DestinationTableName = tablename;
+                    bulkCopy.BulkCopyTimeout = 120;
+
                     try
                     {
                         for (int i = 0; i < dt.Columns.Count; i++)
@@ -1175,7 +1264,7 @@ namespace Prometheus.Models
                         bulkCopy.WriteToServer(dt);
                         dt.Clear();
                     }
-                    catch (Exception ex) { }
+                    catch (Exception ex) { System.Windows.MessageBox.Show(ex.Message); }
                     
                 }//end using
                 DBUtility.CloseConnector(targetcon);
@@ -1561,6 +1650,9 @@ namespace Prometheus.Models
                 if (txpower == null)
                     return null;
 
+                if (string.IsNullOrEmpty(Convert.ToString(txpower)))
+                    return null;
+
                 var txp = Convert.ToDouble(txpower);
                 var time = Convert.ToDateTime(timestamp);
                 if (txp > -20 && txp < 20)
@@ -1608,6 +1700,8 @@ namespace Prometheus.Models
                     if (line[0] != null)
                     {
                         var sn = Convert.ToString(line[0]);
+                        if (string.IsNullOrEmpty(sn)) continue;
+
                         snlist.Add(sn);
 
                         var temptxp = CreateAlignmentItem(sn, line[2], AlignmentPowerType.AlignmentPower, line[1], "0");

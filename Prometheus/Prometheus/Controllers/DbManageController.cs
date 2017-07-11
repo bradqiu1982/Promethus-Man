@@ -159,6 +159,7 @@ namespace Prometheus.Controllers
             var sourcedb = "Server=WUX-D80008792;User ID=NPI;Password=NPI@NPI;Database=NPITrace;Connection Timeout=30;";
 
             var tablelist = new List<string>();
+            tablelist.Add("AlignmentPower");
             tablelist.Add("BIError");
             tablelist.Add("BIROOTCAUSE");
             tablelist.Add("BITestData");

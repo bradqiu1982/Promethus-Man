@@ -219,7 +219,7 @@ namespace Prometheus.Models
 
         public static List<BITestResultDataField> RetrieveAllDataFieldBySN(string sn,string optioncond)
         {
-            var sql = "select SN,PO_LD,TestName,TestTimeStamp,Wafer,JO,Channel from BITestResultDataField where SN = '<SN>' <optioncond> order by TestTimeStamp DESC";
+            var sql = "select SN,PO_LD,TestName,TestTimeStamp,Wafer,JO,Channel from BITestResultDataField where SN = '<SN>' <optioncond> order by TestTimeStamp ASC";
             sql = sql.Replace("<SN>", sn).Replace("<optioncond>", optioncond);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             var ret = new List<BITestResultDataField>();
@@ -394,7 +394,7 @@ namespace Prometheus.Models
 
         public static List<ModuleTXOData> RetrieveAllDataFieldBySN(string sn, string optioncond)
         {
-            var sql = "select SN,TxPower,TestName,TestTimeStamp,Wafer,JO,Channel,Temperature from ModuleTXOData where SN = '<SN>' <optioncond> order by TestTimeStamp DESC";
+            var sql = "select SN,TxPower,TestName,TestTimeStamp,Wafer,JO,Channel,Temperature from ModuleTXOData where SN = '<SN>' <optioncond> order by TestTimeStamp ASC";
             sql = sql.Replace("<SN>", sn).Replace("<optioncond>", optioncond);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             var ret = new List<ModuleTXOData>();
@@ -539,7 +539,7 @@ namespace Prometheus.Models
 
         public static List<AlignmentPower> RetrieveAllDataFieldBySN(string sn, string optioncond)
         {
-            var sql = "select SN,TxPower,TestName,TestTimeStamp,Wafer,JO,Channel from AlignmentPower where SN = '<SN>' <optioncond> order by TestTimeStamp DESC";
+            var sql = "select SN,TxPower,TestName,TestTimeStamp,Wafer,JO,Channel from AlignmentPower where SN = '<SN>' <optioncond> order by TestTimeStamp ASC";
             sql = sql.Replace("<SN>", sn).Replace("<optioncond>", optioncond);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             var ret = new List<AlignmentPower>();

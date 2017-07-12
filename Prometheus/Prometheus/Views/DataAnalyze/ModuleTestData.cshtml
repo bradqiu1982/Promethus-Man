@@ -30,23 +30,29 @@
     <div class="form-group">
         <div class="row">
             <div class="col-lg-6">
-
+                @if (ViewBag.ModuleSn != null)
+                {
+                    <input id="ModuleSNList" name="ModuleSNList" list="leftquerys" placeholder="Please input module sn" class="form-control text-box single-line" type="text" value="@ViewBag.ModuleSn" />
+                }
+                else
+                {
                     <input id="ModuleSNList" name="ModuleSNList" list="leftquerys" placeholder="Please input module sn" class="form-control text-box single-line" type="text" />
-                    <datalist id="leftquerys">
-                        @foreach (var item in ViewBag.modulequeryvallist)
-                        {
-                            <option value="@item">@item</option>
-                        }
-                    </datalist>
+                }
+                <datalist id="leftquerys">
+                    @foreach (var item in ViewBag.modulequeryvallist)
+                    {
+                        <option value="@item">@item</option>
+                    }
+                </datalist>
 
                 <script type="text/javascript">
-                            $(document).ready(function () {
-                                $("#ModuleSNList").flexdatalist({
-                                    minLength: 0,
-                                    searchContain: true,
-                                    maxShownResults:300
-                                });
-                            });
+                    $(document).ready(function () {
+                        $("#ModuleSNList").flexdatalist({
+                            minLength: 0,
+                            searchContain: true,
+                            maxShownResults: 300
+                        });
+                    });
                 </script>
             </div>
             <div class="col-lg-6">
@@ -61,23 +67,42 @@
     <div class="form-group">
         <div class="row">
             <div class="col-lg-12">
-                <div class="row"><a data-toggle="collapse" href="#CommentInput" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';text-decoration: none;"><font color="black">Module Test Data Condition (Optional)</font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:20px; width:12px"></a></div>
+                <div class="row"><a data-toggle="collapse" href="#CommentInput" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';text-decoration: none;"><font color="black">Module Chart Condition (Optional)</font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:20px; width:12px"></a></div>
                 <div class="row">
                     <div class="col-lg-12">&nbsp;</div>
                 </div>
-                <div class="row">
-                    <div class="collapse" id="CommentInput">
-
-                        <div class="col-lg-6">
-                            <div class="col-lg-7">
-                                @Html.DropDownList("leftmdstationlist", null, new { @id = "leftmdstationlist", @name = "leftmdstationlist", @class = "form-control" })
+                <div class="collapse in" id="CommentInput">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="col-lg-6">
+                                    @Html.DropDownList("leftmdchannellist", null, new { @id = "leftmdchannellist", @name = "leftmdchannellist", @class = "form-control" })
+                                </div>
+                                <div class="col-lg-6">
+                                    @Html.DropDownList("leftmdtemplist", null, new { @id = "leftmdtemplist", @name = "leftmdtemplist", @class = "form-control" })
+                                </div>
                             </div>
-                            <div class="col-lg-5">
-                                @Html.DropDownList("leftmdchannellist", null, new { @id = "leftmdchannellist", @name = "leftmdchannellist", @class = "form-control" })
+                            <div class="col-lg-6">
                             </div>
-
                         </div>
-                        <div class="col-lg-6">
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="col-lg-6">
+                                    @Html.DropDownList("leftmdstationlist", null, new { @id = "leftmdstationlist", @name = "leftmdstationlist", @class = "form-control" })
+                                </div>
+                                <div class="col-lg-6">
+                                    @Html.DropDownList("leftaligntestlist", null, new { @id = "leftaligntestlist", @name = "leftaligntestlist", @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="col-lg-6">
+                                    @Html.DropDownList("leftbistationlist", null, new { @id = "leftbistationlist", @name = "leftbistationlist", @class = "form-control" })
+                                </div>
+                                <div class="col-lg-6">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -87,29 +112,6 @@
 
     <div class="row">
         <div class="col-lg-12">&nbsp;</div>
-    </div>
-
-    <div class="form-group">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="row"><a data-toggle="collapse" href="#aligncond" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';text-decoration: none;"><font color="black">Alignment Test Data Condition (Optional)</font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:20px; width:12px"></a></div>
-                <div class="row">
-                    <div class="col-lg-12">&nbsp;</div>
-                </div>
-                <div class="row">
-                    <div class="collapse" id="aligncond">
-
-                        <div class="col-lg-6">
-                            <div class="col-lg-7">
-                                @Html.DropDownList("leftaligntestlist", null, new { @id = "leftaligntestlist", @name = "leftaligntestlist", @class = "form-control" })
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <div class="form-group">
@@ -127,72 +129,150 @@
         </script>
     </div>
 
+    <div class="row">
+        <div class="col-lg-12">&nbsp;</div>
+    </div>
     <div class="form-group">
         <div class="row">
-            <div class="col-lg-2">
-            </div>
-            <div class="col-lg-8">
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-12">
-                            @if (ViewBag.binormaldistr != null)
+            @if (ViewBag.hasdata != null && ViewBag.hasdata)
+            {
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>SN</th>
+                            <th>TxPower</th>
+                            <th>TestName</th>
+                            <th>Channel</th>
+                            <th>Temperature</th>
+                            <th>TestTimeStamp</th>
+                            <th>Wafer</th>
+                            <th>JO</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.aligntestdata != null)
+                        {
+                            foreach (var item in ViewBag.aligntestdata)
                             {
-                                @Html.Raw(ViewBag.binormaldistr)
-                                <div id="leftnormaldistr" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+                                <tr>
+                                    <td>@item.SN</td>
+                                    <td>@item.TxPower.ToString("0.00")</td>
+                                    <td>@item.TestName</td>
+                                    <td>@item.Channel</td>
+                                    <td>&nbsp;</td>
+                                    <td>@item.TestTimeStamp</td>
+                                    <td>@item.Wafer</td>
+                                    <td>@item.JO</td>
+                                </tr>
                             }
+                        }
+                        @if (ViewBag.bitestdata != null)
+                        {
+                            foreach (var item in ViewBag.bitestdata)
+                            {
+                                <tr>
+                                    <td>@item.SN</td>
+                                    <td>@item.PO_LD.ToString("0.00")</td>
+                                    <td>@item.TestName</td>
+                                    <td>@item.Channel</td>
+                                    <td>&nbsp;</td>
+                                    <td>@item.TestTimeStamp</td>
+                                    <td>@item.Wafer</td>
+                                    <td>@item.JO</td>
+                                </tr>
+                            }
+                        }
+
+                        @if (ViewBag.moduletestdata != null)
+                        {
+                            foreach (var item in ViewBag.moduletestdata)
+                            {
+                                <tr>
+                                    <td>@item.SN</td>
+                                    <td>@item.TxPower.ToString("0.00")</td>
+                                    <td>@item.TestName</td>
+                                    <td>@item.Channel</td>
+                                    <td>@item.Temperature</td>
+                                    <td>@item.TestTimeStamp</td>
+                                    <td>@item.Wafer</td>
+                                    <td>@item.JO</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">&nbsp;</div>
+    </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-lg-2">
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-12">
+                                    @if (ViewBag.binormaldistr != null)
+                                    {
+                                        @Html.Raw(ViewBag.binormaldistr)
+                                        <div id="leftnormaldistr" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+                                    }
+                                </div>
+                            </div>
                         </div>
+                    </div>
+                    <div class="col-lg-2">
                     </div>
                 </div>
             </div>
-            <div class="col-lg-2">
-            </div>
-        </div>
-    </div>
 
-    <div class="form-group">
-        <div class="row">
-            <div class="col-lg-2">
-            </div>
-            <div class="col-lg-8">
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-12">
-                            @if (ViewBag.alignnormaldistr != null)
-                            {
-                                @Html.Raw(ViewBag.alignnormaldistr)
-                                <div id="alignnormaldistr" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
-                            }
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-lg-2">
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-12">
+                                    @if (ViewBag.alignnormaldistr != null)
+                                    {
+                                        @Html.Raw(ViewBag.alignnormaldistr)
+                                        <div id="alignnormaldistr" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+                                    }
+                                </div>
+
+                            </div>
                         </div>
-
+                    </div>
+                    <div class="col-lg-2">
                     </div>
                 </div>
             </div>
-            <div class="col-lg-2">
-            </div>
-        </div>
-    </div>
 
-    <div class="form-group">
-        <div class="row">
-            <div class="col-lg-2">
-            </div>
-            <div class="col-lg-8">
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-12">
-                            @if (ViewBag.modulenormaldistr != null)
-                            {
-                                @Html.Raw(ViewBag.modulenormaldistr)
-                                <div id="modulenormaldistr" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
-                            }
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-lg-2">
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-12">
+                                    @if (ViewBag.modulenormaldistr != null)
+                                    {
+                                        @Html.Raw(ViewBag.modulenormaldistr)
+                                        <div id="modulenormaldistr" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+                                    }
+                                </div>
+
+                            </div>
                         </div>
-
+                    </div>
+                    <div class="col-lg-2">
                     </div>
                 </div>
             </div>
-            <div class="col-lg-2">
-            </div>
-        </div>
-    </div>
-
-}
+            }

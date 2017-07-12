@@ -1193,6 +1193,15 @@ namespace Prometheus.Controllers
             selectcontrol[0].Selected = true;
             ViewBag.leftmdchannellist = selectcontrol;
 
+            selectlist = new List<string>();
+            selectlist.Add("Please select test temperature");
+            selectlist.Add("low");
+            selectlist.Add("normal");
+            selectlist.Add("high");
+            selectcontrol = CreateSelectList(selectlist, "");
+            selectcontrol[0].Disabled = true;
+            selectcontrol[0].Selected = true;
+            ViewBag.leftmdtemplist = selectcontrol;
 
             selectlist = new List<string>();
             selectlist.Add("Please select alignment test");
@@ -1202,6 +1211,15 @@ namespace Prometheus.Controllers
             selectcontrol[0].Disabled = true;
             selectcontrol[0].Selected = true;
             ViewBag.leftaligntestlist = selectcontrol;
+
+            selectlist = new List<string>();
+            selectlist.Add("Please select BI station");
+            selectlist.Add("Pre Burn In");
+            selectlist.Add("Post Burn In");
+            selectcontrol = CreateSelectList(selectlist, "");
+            selectcontrol[0].Disabled = true;
+            selectcontrol[0].Selected = true;
+            ViewBag.leftbistationlist = selectcontrol;
         }
 
         public ActionResult ModuleTestData()
@@ -1231,6 +1249,18 @@ namespace Prometheus.Controllers
         public ActionResult ModuleTestDataPost()
         {
             var ModuleSn = Request.Form["ModuleSNList"];
+            ViewBag.ModuleSn = ModuleSn;
+
+            var bitestdata = BITestResultDataField.RetrieveAllDataFieldBySN(ModuleSn, string.Empty);
+            var aligntestdata = AlignmentPower.RetrieveAllDataFieldBySN(ModuleSn, string.Empty);
+            var moduletestdata = ModuleTXOData.RetrieveAllDataFieldBySN(ModuleSn, string.Empty);
+
+            ViewBag.bitestdata = bitestdata;
+            ViewBag.aligntestdata = aligntestdata;
+            ViewBag.moduletestdata = moduletestdata;
+
+            if (bitestdata.Count > 0 || aligntestdata.Count > 0 || moduletestdata.Count > 0)
+                ViewBag.hasdata = true;
 
             var ckdict = CookieUtility.UnpackCookie(this);
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];

@@ -22,15 +22,16 @@
 <script src="~/Scripts/exporting.js"></script>
 
 
-<ul class="nav nav-pills nav-stacked col-lg-2" >
+<ul class="nav nav-pills nav-stacked col-lg-2" data-intro = "Select tab to see detail."  data-step="1">
     <li class="active"><a href="#tab_a" data-toggle="pill">I Learn</a></li>
     <li><a href="#tab_b" data-toggle="pill">Weekly Report</a></li>
     <li><a href="#tab_c" data-toggle="pill">Training</a></li>
     <li><a href="#tab_d" data-toggle="pill">I Share</a></li>
 </ul>
 
-<div class="tab-content col-lg-10">
+<div class="tab-content col-lg-10" data-intro = "Show detail of tab"  data-step="2">
     <div class="tab-pane active" id="tab_a">
+        
     @using (Html.BeginForm("ILearnOperate", "User", FormMethod.Post, new { enctype = "multipart/form-data" }))
     {
         @Html.AntiForgeryToken()
@@ -49,7 +50,7 @@
                         <th style="text-align:center;font-size:16px"><font color="white">Product</font></th>
                         <th style="text-align:center;font-size:16px"><font color="white">Creator</font></th>
                         <th style="text-align:center;font-size:16px"><font color="white">Favor</font></th>
-                        <th style="text-align:center;font-size:16px"><font color="white"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></font></th>
+                        <th style="text-align:center;font-size:16px"><font color="white"><span class="glyphicon glyphicon-heart" aria-hidden="true" ></span></font></th>
                         <th style="text-align:center;font-size:16px"><font color="white">Date</font></th>
                         <th style="text-align:center;font-size:16px"><font color="white">ILike</font></th>
                         <th style="text-align:center;font-size:16px"><font color="white">IPush</font></th>
@@ -76,7 +77,7 @@
 
                         @if (!string.IsNullOrEmpty(line.DOCFavor))
                         {
-                            <td style="text-align:center;font-size:12px"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></td>
+                            <td style="text-align:center;font-size:12px"><span class="glyphicon glyphicon-heart" aria-hidden="true" style="color:red;"></span></td>
                         }
                         else
                         {
@@ -84,8 +85,8 @@
                         }
                         
                         <td style="text-align:center;font-size:12px">@(line.DOCDate.ToString("dd/MM"))</td>
-                        <td style="text-align:center;font-size:12px"><button class="form-control" type="button" value="DOCKey=@(line.DOCKey)&DOCCreator=@(line.DOCCreator)" onclick="LikeThisDoc(this)"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></button></td>
-                        <td style="text-align:center;font-size:12px"><button class="form-control" type="button" value="DOCPJK=@(line.DOCPJK)&DOCKey=@(line.DOCKey)&ToWho=" onclick="PushThisDoc(this)">Push</button></td>
+                        <td style="text-align:center;font-size:12px"><button class="btn btn-default" value="DOCKey=@(line.DOCKey)&DOCCreator=@(line.DOCCreator)" onclick="LikeThisDoc(this)" style="background-color:transparent;border-color:transparent;"><span class="glyphicon glyphicon-heart" aria-hidden="true" data-intro = "If you love this you can click to mark!"  data-step="3"></span></button></td>
+                        <td style="text-align:center;font-size:12px"><button class="btn btn-success" value="DOCPJK=@(line.DOCPJK)&DOCKey=@(line.DOCKey)&ToWho=" onclick="PushThisDoc(this)" data-intro = "If you love this you can Push!"  data-step="4">Push</button></td>
                     </tr>
 
                     i = i + 1;
@@ -102,7 +103,7 @@
 
             </div>
             <div class="col-lg-2 text-center">
-                <input type="submit" value="Remove" id="removeilearn" name="removeilearn" class="btn btn-default" />
+                <input type="submit" value="Remove" id="removeilearn" name="removeilearn" class="btn btn-danger" />
             </div>
             <div class="col-lg-9 text-center"></div>
         </div>
@@ -184,7 +185,7 @@
 
                                 @if (!string.IsNullOrEmpty(line.DOCFavor))
                         {
-                                    <td style="text-align:center;font-size:12px"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></td>
+                                    <td style="text-align:center;font-size:12px"><span class="glyphicon glyphicon-heart" aria-hidden="true" style="color:red;"></span></td>
                                 }
                                 else
                                 {
@@ -260,7 +261,7 @@
 
                                 @if (!string.IsNullOrEmpty(line.DOCFavor))
                         {
-                                    <td style="text-align:center;font-size:12px"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></td>
+                                    <td style="text-align:center;font-size:12px"><span class="glyphicon glyphicon-heart" aria-hidden="true" style="color:red;"></span></td>
                                 }
                                 else
                                 {

@@ -963,6 +963,7 @@
     <Content Include="Views\User\UserSharedInfo.cshtml" />
     <Content Include="Views\DataAnalyze\TXOTestData.cshtml" />
     <Content Include="Views\DataAnalyze\ModuleTestData.cshtml" />
+    <Content Include="Views\User\AddPJCriticalError.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

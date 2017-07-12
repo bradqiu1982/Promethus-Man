@@ -251,6 +251,12 @@
                                             <li>
                                                 @if (ViewBag.RealUserID != null)
                                                 {
+                                                    @Html.ActionLink("Add Project Critical Error", "AddPJCriticalError", "User")
+                                                }
+                                            </li>
+                                            <li>
+                                                @if (ViewBag.RealUserID != null)
+                                                {
                                                     <a href="/User/MyStatus?username=@(ViewBag.RealUserID)">I Status</a>
                                                 }
                                             </li>

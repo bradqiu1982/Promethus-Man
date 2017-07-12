@@ -1829,7 +1829,7 @@ namespace Prometheus.Controllers
             {
                 var ck = new Dictionary<string, string>();
                 ck.Add("logonredirectctrl", "User");
-                ck.Add("logonredirectact", "IAdmire");
+                ck.Add("logonredirectact", "IGroup");
                 CookieUtility.SetCookie(this, ck);
                 return RedirectToAction("LoginUser", "User");
             }
@@ -1859,6 +1859,68 @@ namespace Prometheus.Controllers
             var groupmember = Request.Form["RPeopleAddr"];
             UserGroupVM.AddGroup(grouptype, groupmember);
             return RedirectToAction("IGroup", "User");
+        }
+
+        public ActionResult AddPJCriticalError()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "AddPJCriticalError");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            ViewBag.UserName = updater.Split(new char[] { '@' })[0];
+            ViewBag.RealUserID = updater;
+
+            var pjlist = UserViewModels.RetrieveUserProjectKeyDict(updater).Keys.ToList();
+            var errordict = new Dictionary<string, bool>();
+            foreach (var pj in pjlist)
+            {
+                var pjerrorlist = ProjectErrorViewModels.RetrieveErrorByPJKey(pj, this);
+                foreach (var item in pjerrorlist)
+                {
+                    if (!errordict.ContainsKey(item.OrignalCode))
+                    {
+                        errordict.Add(item.OrignalCode,true);
+                    }
+                }//end foreach
+            }//end foreach
+
+            var errorlist = errordict.Keys.ToList();
+
+            var selectlist = new List<string>();
+            selectlist.Add("Please select project");
+            selectlist.AddRange(pjlist);
+            var selectcontrol = CreateSelectList(selectlist, "");
+            selectcontrol[0].Disabled = true;
+            selectcontrol[0].Selected = true;
+            ViewBag.pjlist = selectcontrol;
+
+            selectlist = new List<string>();
+            selectlist.Add("Please select error code");
+            selectlist.AddRange(errorlist);
+            selectcontrol = CreateSelectList(selectlist, "");
+            selectcontrol[0].Disabled = true;
+            selectcontrol[0].Selected = true;
+            ViewBag.errorlist = selectcontrol;
+
+            return View();
+        }
+
+        [HttpPost, ActionName("AddPJCriticalError")]
+        [ValidateAntiForgeryToken]
+        public ActionResult AddPJCriticalErrorPost()
+        {
+            return RedirectToAction("AddPJCriticalError", "User");
         }
 
         public ActionResult DeleteGroup(string GroupID)

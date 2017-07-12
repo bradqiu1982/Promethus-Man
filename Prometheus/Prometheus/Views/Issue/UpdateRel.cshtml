@@ -17,21 +17,12 @@ else
     </script>
 }
 
-
 <div class="row">
-    <div class="col-lg-12">&nbsp;</div>
-</div>
-
-<div class="row">
-    <div class="col-lg-12">&nbsp;</div>
-</div>
-
-<div class="row">
-    <div class="col-lg-1 text-right">
-        <img src="~/Content/images/PJ/REL.png" style="height:45px; width:45px">
+    <div class="nav navbar-nav navbar-left">
+        <img src="~/Content/images/PJ/REL.png" style="height:35px; width:35px;margin-right: 15px;">
     </div>
-    <div class="col-lg-9">
-        <ol class="breadcrumb" style="font-size:18px">
+    <div class="nav navbar-nav navbar-left">
+        <ol class="breadcrumb" style="width:600px">
             <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
             @if (Model != null)
             {
@@ -45,7 +36,7 @@ else
         </ol>
     </div>
 
-    <div class="col-lg-2">
+    <div class="nav navbar-nav navbar-right">
         @if (Model != null && string.IsNullOrEmpty(Model.ParentIssueKey))
         {
             using (Html.BeginForm("PrepareSubIssue", "Issue", FormMethod.Post, new { enctype = "multipart/form-data", id = "subtaskid", name = "subtaskid" }))
@@ -68,12 +59,12 @@ else
                     <input class="form-control text-box single-line" id="HProjectKey" name="HProjectKey" type="hidden" value="" />
                 }
 
-                <button type="submit" class="form-control" style="background-color:#006DC0;height:3em;color:white;">Add Sub-Task</button>
+                <button type="submit" class="btn btn-success" data-intro="Using edit mode to add sub task." data-step="1">Add Sub-Task</button>
             }
         }
         else if (Model != null && !string.IsNullOrEmpty(Model.ParentIssueKey))
         {
-
+           
         }
         <script type="text/javascript">
             function AddSubTask() {
@@ -120,14 +111,14 @@ else
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="col-lg-6">
-                                <label class="control-label col-lg-2" for="projectlist">Project</label>
-                                <div class="col-lg-10">
+                                <label class="control-label col-lg-4" for="projectlist">Project</label>
+                                <div class="col-lg-8">
                                     @Html.DropDownList("projectlist", null, new { @id = "projectlist", @class = "form-control", @readonly = "readonly" })
                                 </div>
                             </div>
                             <div class="col-lg-6">
-                                <label class="control-label col-lg-2">Summary</label>
-                                <div class="col-lg-10">
+                                <label class="control-label col-lg-4">Summary</label>
+                                <div class="col-lg-8">
                                     <input class="form-control" data-toggle="tooltip" title="@Model.Summary" text-box single-line" value="@Model.Summary" readonly="readonly" type="text" />
                                 </div>
                             </div>
@@ -139,14 +130,14 @@ else
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="col-lg-6">
-                                <div class="col-lg-2"><label class="control-label">Case ID</label></div>
-                                <div class="col-lg-10">
+                                <div class="col-lg-4"><label class="control-label">Case ID</label></div>
+                                <div class="col-lg-8">
                                     <input class="form-control text-box single-line" value="@Model.CaseID" readonly="readonly" type="text" />
                                 </div>
                             </div>
                             <div class="col-lg-6">
-                                <div class="col-lg-2"><label class="control-label">Product</label></div>
-                                <div class="col-lg-10">
+                                <div class="col-lg-4"><label class="control-label">Product</label></div>
+                                <div class="col-lg-8">
                                     <input class="form-control text-box single-line" value="@Model.ProductType" readonly="readonly" type="text" />
                                 </div>
                             </div>
@@ -158,14 +149,14 @@ else
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="col-lg-6">
-                                <div class="col-lg-2"><label class="control-label">Issue Open Date</label></div>
-                                <div class="col-lg-10">
+                                <div class="col-lg-4"><label class="control-label">Issue Open Date</label></div>
+                                <div class="col-lg-8">
                                     <input class="form-control text-box single-line" value="@Model.ReportDate.ToString("yyyy-MM-dd")" readonly="readonly" type="text" />
                                 </div>
                             </div>
                             <div class="col-lg-6">
-                                <div class="col-lg-2"><label class="control-label">Close Date</label></div>
-                                <div class="col-lg-10">
+                                <div class="col-lg-4"><label class="control-label">Close Date</label></div>
+                                <div class="col-lg-8">
                                     @if (string.Compare(Model.ResolvedDate.ToString("yyyy-MM-dd"), "1982-05-06") == 0)
                                     {
                                         <input class="form-control text-box single-line" value="" readonly="readonly" type="text" />
@@ -184,14 +175,14 @@ else
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="col-lg-6">
-                                <div class="col-lg-2"><label class="control-label">Line Category</label></div>
-                                <div class="col-lg-10">
+                                <div class="col-lg-4"><label class="control-label">Line Category</label></div>
+                                <div class="col-lg-8">
                                     <input class="form-control text-box single-line" value="@Model.LineCategory" readonly="readonly" type="text" />
                                 </div>
                             </div>
                             <div class="col-lg-6">
-                                <div class="col-lg-2"><label class="control-label">Qual Type</label></div>
-                                <div class="col-lg-10">
+                                <div class="col-lg-4"><label class="control-label">Qual Type</label></div>
+                                <div class="col-lg-8">
                                     <input class="form-control text-box single-line" value="@Model.QualType" readonly="readonly" type="text" />
                                 </div>
                             </div>
@@ -203,14 +194,14 @@ else
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="col-lg-6">
-                                <div class="col-lg-2"><label class="control-label">Test Type</label></div>
-                                <div class="col-lg-10">
+                                <div class="col-lg-4"><label class="control-label">Test Type</label></div>
+                                <div class="col-lg-8">
                                     <input class="form-control text-box single-line" value="@Model.TestType" readonly="readonly" type="text" />
                                 </div>
                             </div>
                             <div class="col-lg-6">
-                                <div class="col-lg-2"><label class="control-label">Failure Interval</label></div>
-                                <div class="col-lg-10">
+                                <div class="col-lg-4"><label class="control-label">Failure Interval</label></div>
+                                <div class="col-lg-8">
                                     <input class="form-control text-box single-line" value="@Model.FailureInterval" readonly="readonly" type="text" />
                                 </div>
                             </div>
@@ -222,14 +213,14 @@ else
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="col-lg-6">
-                                <div class="col-lg-2"><label class="control-label">Failure</label></div>
-                                <div class="col-lg-10">
+                                <div class="col-lg-4"><label class="control-label">Failure</label></div>
+                                <div class="col-lg-8">
                                     <input class="form-control text-box single-line" data-toggle="tooltip" title="@Model.TestFailure" value="@Model.TestFailure" readonly="readonly" type="text" />
                                 </div>
                             </div>
                             <div class="col-lg-6">
-                                <div class="col-lg-2"><label class="control-label">Location</label></div>
-                                <div class="col-lg-10">
+                                <div class="col-lg-4"><label class="control-label">Location</label></div>
+                                <div class="col-lg-8">
                                     <input class="form-control text-box single-line" value="@Model.Location" readonly="readonly" type="text" />
                                 </div>
                             </div>
@@ -241,14 +232,14 @@ else
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="col-lg-6">
-                                <div class="col-lg-2"><label class="control-label">Request ID</label></div>
-                                <div class="col-lg-10">
+                                <div class="col-lg-4"><label class="control-label">Request ID</label></div>
+                                <div class="col-lg-8">
                                     <input class="form-control text-box single-line" value="@Model.RequestID" readonly="readonly" type="text" />
                                 </div>
                             </div>
                             <div class="col-lg-6">
-                                <div class="col-lg-2"><label class="control-label">Module SN</label></div>
-                                <div class="col-lg-10">
+                                <div class="col-lg-4"><label class="control-label">Module SN</label></div>
+                                <div class="col-lg-8">
                                     <input class="form-control text-box single-line" data-toggle="tooltip" title="@Model.ModuleSN" value="@Model.ModuleSN" readonly="readonly" type="text" />
                                 </div>
                             </div>
@@ -260,14 +251,14 @@ else
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="col-lg-6">
-                                <div class="col-lg-2"><label class="control-label">Fail Rate</label></div>
-                                <div class="col-lg-10">
+                                <div class="col-lg-4"><label class="control-label">Fail Rate</label></div>
+                                <div class="col-lg-8">
                                     <input class="form-control text-box single-line" value="@Model.FailQTY/@Model.TotalQTY" readonly="readonly" type="text" />
                                 </div>
                             </div>
                             <div class="col-lg-6">
-                                <div class="col-lg-2"><label class="control-label">Rel Engineer</label></div>
-                                <div class="col-lg-10">
+                                <div class="col-lg-4"><label class="control-label">Rel Engineer</label></div>
+                                <div class="col-lg-8">
                                     <input class="form-control text-box single-line" value="@Model.Reporter" readonly="readonly" type="text" />
                                 </div>
                             </div>
@@ -275,20 +266,18 @@ else
                     </div>
                 </div>
 
-                <hr style="border-color:#006DC0;" />
-
                 <div class="form-group">
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="col-lg-6">
-                                <label class="control-label col-lg-2" for="prioritylist">Priority</label>
-                                <div class="col-lg-10">
+                                <label class="control-label col-lg-4" for="prioritylist">Priority</label>
+                                <div class="col-lg-8">
                                     @Html.DropDownList("prioritylist", null, new { @id = "prioritylist", @class = "form-control" })
                                 </div>
                             </div>
                             <div class="col-lg-6">
-                                <label class="control-label col-lg-2" for="assigneelist">Assignee</label>
-                                <div class="col-lg-10">
+                                <label class="control-label col-lg-4" for="assigneelist">Assignee</label>
+                                <div class="col-lg-8">
                                     @Html.DropDownList("assigneelist", null, new { @id = "assigneelist", @class = "form-control" })
                                 </div>
                             </div>
@@ -300,8 +289,8 @@ else
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="col-lg-6">
-                                <label class="control-label col-lg-2" for="resolutionlist">Status<font color="red">*</font></label>
-                                <div class="col-lg-10">
+                                <label class="control-label col-lg-4" for="resolutionlist">Status<font color="red">*</font></label>
+                                <div class="col-lg-8">
                                     @if (ViewBag.isassignee != null && ViewBag.isassignee)
                                     {
                                         @Html.DropDownList("resolutionlist", null, new { @id = "resolutionlist", @class = "form-control", @onchange = "chooseissuetag()" })
@@ -334,8 +323,8 @@ else
                                 }
                             </div>
                             <div class="col-lg-6">
-                                <label class="control-label col-lg-2" for="DueDate">DueDate<font color="red">*</font></label>
-                                <div class="col-lg-10">
+                                <label class="control-label col-lg-4" for="DueDate">DueDate<font color="red">*</font></label>
+                                <div class="col-lg-8">
                                     @if (Model != null && string.Compare(Model.DueDate.ToString("yyyy-MM-dd"), "0001-01-01") != 0)
                                     {
                                         <input class="form-control text-box single-line" value="@Model.DueDate.ToString("yyyy-MM-dd")" data-val="true" data-val-required="The DueDate field is required." id="DueDate" name="DueDate" type="text" />
@@ -364,8 +353,8 @@ else
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="col-lg-6">
-                                <label class="control-label col-lg-2" for="FVCode">FV</label>
-                                <div class="col-lg-10">
+                                <label class="control-label col-lg-4" for="FVCode">FV</label>
+                                <div class="col-lg-8">
                                     @if (Model != null && !string.IsNullOrEmpty(Model.FVCode))
                                     {
                                         <input class="form-control text-box single-line" value="@Model.FVCode" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 25." data-val-length-max="25" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="FVCode" name="FVCode" type="text" />
@@ -425,13 +414,14 @@ else
             <div MYTP="green" class="row" style="margin-left:3px">
                 <div class="col-lg-2">
                     <a data-toggle="collapse" href="#attachwell" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
-                        <font color="black"><strong>&nbsp;&nbsp;@(Model.AttachList.Count) Attachements</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
+                        <font color="black"><strong>&nbsp;&nbsp;@(Model.AttachList.Count) Attachements</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:auto">
                     </a>
                 </div>
                 <div class="col-lg-10">
                     <div class="col-lg-3">
                         <span class="btn btn-default btn-file" id="choosefile3" style="padding:0px;background-color:transparent !important;border-color:transparent !important;">
-                            <img src="~/Content/images/icon/Upload.png" MYTP="HOVER" style="height:20px; width:34px"> <input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
+                            <img src="~/Content/images/icon/Add.png" MYTP="HOVER" style="height:25px; width:auto" data-intro="Using edit mode to add attachment." data-step="2"> 
+                            <input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
                         </span>
                     </div>
                     <div class="col-lg-9">
@@ -537,7 +527,7 @@ else
             <div  MYTP="yello"  class="row" style="margin-left:3px">
                 <div class="col-lg-12">
                     <a data-toggle="collapse" href="#subtasks" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
-                        <font color="black"><strong>&nbsp;&nbsp;@(Model.GeneralActions.Count) Sub Tasks</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
+                        <font color="black"><strong>&nbsp;&nbsp;@(Model.GeneralActions.Count) Sub Tasks</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:auto">
                     </a>
                 </div>
             </div>
@@ -586,7 +576,7 @@ else
             <div  MYTP="yello"  class="row" style="margin-left:3px">
                 <div class="col-lg-12">
                     <a data-toggle="collapse" href="#failureverifytasks" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
-                        <font color="black"><strong>&nbsp;&nbsp;Failure Verification</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
+                        <font color="black"><strong>&nbsp;&nbsp;Failure Verification</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:auto">
                     </a>
                 </div>
             </div>
@@ -636,7 +626,7 @@ else
             <div  MYTP="yello"  class="row" style="margin-left:3px">
                 <div class="col-lg-12">
                     <a data-toggle="collapse" href="#containmenttasks" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
-                        <font color="black"><strong>&nbsp;&nbsp;Containment Action</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
+                        <font color="black"><strong>&nbsp;&nbsp;Containment Action</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:auto">
                     </a>
                 </div>
             </div>
@@ -685,7 +675,7 @@ else
             <div MYTP="blue"  class="row" style="margin-left:3px">
                 <div class="col-lg-12">
                     <a data-toggle="collapse" href="#rootcausecom" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
-                        <font color="black"><strong>&nbsp;&nbsp;RootCause Investigation</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
+                        <font color="black"><strong>&nbsp;&nbsp;RootCause Investigation</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:auto">
                     </a>
                 </div>
             </div>
@@ -707,7 +697,7 @@ else
                                                     <div class="col-lg-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")</div>
                                                     <div class="col-lg-2">
                                                         <a href="/Issue/ModifyIssueComment?IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
-                                                            <img src="~/Content/images/icon/edit2.png" MYTP="HOVER" style="height:34px; width:24px">
+                                                            <img src="~/Content/images/icon/edit2.png" MYTP="HOVER" style="height:34px; width:auto">
                                                         </a>
                                                     </div>
                                                 </div>
@@ -738,7 +728,7 @@ else
             <div MYTP="yello"  class="row" style="margin-left:3px">
                 <div class="col-lg-12">
                     <a data-toggle="collapse" href="#correctivetasks" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
-                        <font color="black"><strong>&nbsp;&nbsp;Corrective Action</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
+                        <font color="black"><strong>&nbsp;&nbsp;Corrective Action</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:auto">
                     </a>
                 </div>
             </div>
@@ -787,7 +777,7 @@ else
             <div MYTP="yello"  class="row" style="margin-left:3px">
                 <div class="col-lg-12">
                     <a data-toggle="collapse" href="#correctiveverifytasks" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
-                        <font color="black"><strong>&nbsp;&nbsp;Corrective/Preventive Verification</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
+                        <font color="black"><strong>&nbsp;&nbsp;Corrective/Preventive Verification</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:auto">
                     </a>
                 </div>
             </div>
@@ -837,7 +827,7 @@ else
             <div MYTP="blue" class="row" style="margin-left:3px">
                 <div class="col-lg-12">
                     <a data-toggle="collapse" href="#generalcomment" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
-                        <font color="black"><strong>&nbsp;&nbsp;@(Model.GeneralCommentList.Count) Comments</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
+                        <font color="black"><strong>&nbsp;&nbsp;@(Model.GeneralCommentList.Count) Comments</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:auto">
                     </a>
                 </div>
             </div>
@@ -859,7 +849,7 @@ else
                                                     <div class="col-lg-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")</div>
                                                     <div class="col-lg-2">
                                                         <a href="/Issue/ModifyIssueComment?IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
-                                                            <img src="~/Content/images/icon/edit2.png" MYTP="HOVER" style="height:34px; width:24px">
+                                                            <img src="~/Content/images/icon/edit2.png" MYTP="HOVER" style="height:34px; width:auto">
                                                         </a>
                                                     </div>
                                                 </div>
@@ -904,7 +894,7 @@ else
         <div MYTP="red"  class="row" style="margin-left:3px">
             <div class="col-lg-12">
                 <a data-toggle="collapse" href="#commentinput" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
-                    <font color="black"><strong>&nbsp;&nbsp;Comment Input</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
+                    <font color="black"><strong>&nbsp;&nbsp;Comment Input</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:auto">
                 </a>
             </div>
         </div>
@@ -995,7 +985,7 @@ else
                     }
                 </div>
                 <div class="col-lg-2">
-                    <button style="background-color:#00B050;color:white;" class="btn btn-default" type="button" value="IssueKey=@(Model.IssueKey)&ToWho=" onclick="PushTask(this)">Push</button>
+                    <button class="btn btn-success" type="button" value="IssueKey=@(Model.IssueKey)&ToWho=" onclick="PushTask(this)">Push</button>
                     <input class="form-control text-box single-line" value="" id="pushtowho" name="pushtowho" type="hidden" />
                 </div>
                 <div class="col-lg-6"></div>

@@ -5,24 +5,13 @@
         Layout = "~/Views/Shared/_Layout.cshtml";
     }
     <div class="row">
-        <div class="col-lg-12">&nbsp;</div>
+    <div class="nav navbar-nav navbar-left">
+        <ol class="breadcrumb" style="width:600px">
+            <li><a href="/User/UserCenter?username=@(ViewBag.RealUserID)">@ViewBag.UserName Center</a></li>
+            <li class="active">I Group</li>
+        </ol>
     </div>
-
-    <div class="row">
-        <div class="col-lg-12">&nbsp;</div>
-    </div>
-
-    <div class="row">
-        @*<div class="col-lg-1 text-right">
-            <img src="~/Content/images/ucicon/ITagIcons.png" style="height:60px; width:60px">
-        </div>*@
-        <div class="col-lg-12">
-            <ol class="breadcrumb" style="font-size:18px">
-                <li><a href="/User/UserCenter?username=@(ViewBag.RealUserID)">@ViewBag.UserName Center</a></li>
-                <li class="active">I Group</li>
-            </ol>
-        </div>
-    </div>
+</div>
 
 
 
@@ -31,7 +20,7 @@
         @Html.AntiForgeryToken()
 
         <div class="row">
-            <div class="col-lg-4"><h3 style="font-family:'Arial Narrow';">Add New Group</h3></div>
+            <div class="col-lg-4" MYTP="orange" style="font-family:'Arial Narrow';font-size:18px"><strong>&nbsp;&nbsp;Add New Group</strong></div>
             <div class="col-lg-8"></div>
         </div>
 
@@ -91,7 +80,7 @@
             <div class="form-group">
                 <div class="row col-lg-12">
                     <div class="col-lg-2">
-                        <button  MYTP="BT"  type="button" class="btn btn-default" onclick="submitform()" >Submit</button>
+                        <button type="button" class="btn btn-primary" onclick="submitform()" >Submit</button>
                     </div>
                     <div class="col-lg-10"></div>
                 </div>

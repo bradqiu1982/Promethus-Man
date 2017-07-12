@@ -458,6 +458,38 @@ namespace Prometheus.Controllers
             new System.Threading.ManualResetEvent(false).WaitOne(50);
         }
 
+        private List<string> RetrieveUserFromComment(string comment)
+        {
+            var ret = new List<string>();
+            var startidx = 0;
+            while (comment.IndexOf("@", startidx) != -1)
+            {
+                var namestartidx = comment.IndexOf("@", startidx);
+                var namestart = comment.Substring(namestartidx);
+                var spaceidx = namestart.IndexOf(" ");
+                if (spaceidx == -1)
+                    break;
+                var name = namestart.Substring(1, spaceidx-1);
+                if (name.Length > 3)
+                {
+                    if (name.ToUpper().Contains("@FINISAR.COM"))
+                    {
+                        ret.Add(name.ToUpper());
+                    }
+                    else if (name.Contains("."))
+                    {
+                        ret.Add(name.ToUpper()+ "@FINISAR.COM");
+                    }
+                    startidx = spaceidx + 1;
+                }
+                else
+                {
+                    startidx = startidx + 1;
+                }
+            }
+            return ret;
+        }
+
         [HttpPost, ActionName("UpdateIssue")]
         [ValidateAntiForgeryToken]
         public ActionResult UpdateIssuePost()
@@ -509,17 +541,24 @@ namespace Prometheus.Controllers
                 vm.Description = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
                 vm.CommentType = COMMENTTYPE.Description;
 
-                if (string.Compare(updater.ToUpper(), originaldata.Assignee) != 0)
-                {
-                    var commenter = updater.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace("."," ");
-                    var towho = new List<string>();
-                    towho.Add(vm.Assignee);
-                    if (originaldata.Reporter.Contains("@"))
-                        towho.Add(originaldata.Reporter);
+                
+                //if (string.Compare(updater.ToUpper(), originaldata.Assignee) != 0)
+                //{
+                var commenter = updater.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace("."," ");
 
-                    var commentcontent = System.Text.RegularExpressions.Regex.Replace(vm.Description.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
-                    SendTaskCommentEmail(originaldata.IssueKey,originaldata.Summary,commenter,towho, commentcontent);
-                }
+                var towho = new List<string>();
+                towho.Add(vm.Assignee);
+                if (originaldata.Reporter.Contains("@"))
+                    towho.Add(originaldata.Reporter);
+                towho.Add(updater);
+
+                if(vm.RelativePeopleList.Count > 0) towho.AddRange(vm.RelativePeopleList);
+                var atlist = RetrieveUserFromComment(vm.Description);
+                if(atlist.Count > 0) towho.AddRange(atlist);
+
+                var commentcontent = System.Text.RegularExpressions.Regex.Replace(vm.Description.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
+                SendTaskCommentEmail(originaldata.IssueKey,originaldata.Summary,commenter,towho, commentcontent);
+                //}
 
             }
             else
@@ -1517,17 +1556,22 @@ namespace Prometheus.Controllers
                 vm.Description = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
                 vm.CommentType = COMMENTTYPE.Description;
 
-                if (string.Compare(updater.ToUpper(), originaldata.Assignee) != 0)
-                {
-                    var commenter = updater.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
-                    var towho = new List<string>();
-                    towho.Add(vm.Assignee);
-                    if (originaldata.Reporter.Contains("@"))
-                        towho.Add(originaldata.Reporter);
+                //if (string.Compare(updater.ToUpper(), originaldata.Assignee) != 0)
+                //{
+                var commenter = updater.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
+                var towho = new List<string>();
+                towho.Add(vm.Assignee);
+                if (originaldata.Reporter.Contains("@"))
+                    towho.Add(originaldata.Reporter);
+                towho.Add(updater);
 
-                    var commentcontent = System.Text.RegularExpressions.Regex.Replace(vm.Description.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
-                    SendTaskCommentEmail(originaldata.IssueKey, originaldata.Summary, commenter, towho, commentcontent);
-                }
+                if (vm.RelativePeopleList.Count > 0) towho.AddRange(vm.RelativePeopleList);
+                var atlist = RetrieveUserFromComment(vm.Description);
+                if (atlist.Count > 0) towho.AddRange(atlist);
+
+                var commentcontent = System.Text.RegularExpressions.Regex.Replace(vm.Description.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
+                SendTaskCommentEmail(originaldata.IssueKey, originaldata.Summary, commenter, towho, commentcontent);
+                //}
 
             }
             else
@@ -1872,6 +1916,8 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
                 vm.Description = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
+
+
                 vm.CommentType = COMMENTTYPE.Description;
                 var commenter = updater.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
 
@@ -1880,6 +1926,10 @@ namespace Prometheus.Controllers
                 if (originaldata.Reporter.Contains("@"))
                     towho.Add(originaldata.Reporter);
                 towho.AddRange(vm.RelativePeopleList);
+                towho.Add(updater);
+                if (vm.RelativePeopleList.Count > 0) towho.AddRange(vm.RelativePeopleList);
+                var atlist = RetrieveUserFromComment(vm.Description);
+                if (atlist.Count > 0) towho.AddRange(atlist);
 
                 var commentcontent = System.Text.RegularExpressions.Regex.Replace(vm.Description.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
                 SendTaskCommentEmail(originaldata.IssueKey, vm.Summary, commenter, towho, commentcontent);
@@ -3110,47 +3160,17 @@ namespace Prometheus.Controllers
             var commenttype = Request.Form["HType"];
             var commentdate = Request.Form["HDate"];
 
-            var urls = ReceiveRMAFiles();
-            var contenturl = string.Empty;
-            var contentreffile = string.Empty;
-            if (!string.IsNullOrEmpty(Request.Form["contentattach"]))
-            {
-                var internalreportfile = Request.Form["contentattach"];
-                var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
-                    .Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                foreach (var r in urls)
-                {
-                    if (r.Contains(originalname))
-                    {
-                        contentreffile = originalname;
-                        contenturl = r;
-                        break;
-                    }
-                }
-            }
 
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
                 var tempcommment = new IssueComments();
                 tempcommment.Comment = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
-                if (!string.IsNullOrEmpty(contenturl))
-                {
-                    tempcommment.Comment = tempcommment.Comment + "<p><a href='" + contenturl + "' target='_blank'>Reference File: " + contentreffile + " " + "</a></p>";
-                }
-
                 IssueViewModels.UpdateSPComment(issuekey, commenttype, commentdate, tempcommment.dbComment);
             }
             else
             {
                 var tempcommment = new IssueComments();
                 tempcommment.Comment = "<p>To Be Edit</p>";
-                if (!string.IsNullOrEmpty(contenturl))
-                {
-                    tempcommment.Comment = tempcommment.Comment + "<p><a href='" + contenturl + "' target='_blank'>Reference File: " + contentreffile + " " + "</a></p>";
-                }
-
                 IssueViewModels.UpdateSPComment(issuekey, commenttype, commentdate, tempcommment.dbComment);
             }
 

@@ -4079,6 +4079,37 @@ namespace Prometheus.Controllers
             catch (Exception ex)
             { }
         }
+        private List<string> RetrieveUserFromComment(string comment)
+        {
+            var ret = new List<string>();
+            var startidx = 0;
+            while (comment.IndexOf("@", startidx) != -1)
+            {
+                var namestartidx = comment.IndexOf("@", startidx);
+                var namestart = comment.Substring(namestartidx);
+                var spaceidx = namestart.IndexOf(" ");
+                if (spaceidx == -1)
+                    break;
+                var name = namestart.Substring(1, spaceidx - 1);
+                if (name.Length > 3)
+                {
+                    if (name.ToUpper().Contains("@FINISAR.COM"))
+                    {
+                        ret.Add(name.ToUpper());
+                    }
+                    else if(name.Contains("."))
+                    {
+                        ret.Add(name.ToUpper() + "@FINISAR.COM");
+                    }
+                    startidx = spaceidx + 1;
+                }
+                else
+                {
+                    startidx = startidx + 1;
+                }
+            }
+            return ret;
+        }
 
         [HttpPost, ActionName("UpdateProjectError")]
         [ValidateAntiForgeryToken]
@@ -4110,6 +4141,8 @@ namespace Prometheus.Controllers
                 {
                     towho.Add(w.Name);
                 }
+                var atlist = RetrieveUserFromComment(vm.Description);
+                if (atlist.Count > 0) towho.AddRange(atlist);
 
                 var commentcontent = System.Text.RegularExpressions.Regex.Replace(vm.Description.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
                 SendDBGCommentEvent("A mew comment", "/Project/UpdateProjectError?ErrorKey=" + vm.ErrorKey, towho, updater,commentcontent);
@@ -5401,47 +5434,16 @@ namespace Prometheus.Controllers
             var commenttype = Request.Form["HType"];
             var commentdate = Request.Form["HDate"];
 
-            var urls = ReceiveAttachFiles();
-            var contenturl = string.Empty;
-            var contentreffile = string.Empty;
-            if (!string.IsNullOrEmpty(Request.Form["contentattach"]))
-            {
-                var internalreportfile = Request.Form["contentattach"];
-                var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
-                    .Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                foreach (var r in urls)
-                {
-                    if (r.Contains(originalname))
-                    {
-                        contentreffile = originalname;
-                        contenturl = r;
-                        break;
-                    }
-                }
-            }
-
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
                 var tempcommment = new ErrorComments();
                 tempcommment.Comment = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
-                if (!string.IsNullOrEmpty(contenturl))
-                {
-                    tempcommment.Comment = tempcommment.Comment + "<p><a href='" + contenturl + "' target='_blank'>Reference File: " + contentreffile + " " + "</a></p>";
-                }
-
                 ProjectErrorViewModels.UpdateSPComment(errorkey, commenttype, commentdate, tempcommment.dbComment);
             }
             else
             {
                 var tempcommment = new ErrorComments();
                 tempcommment.Comment = "<p>To Be Edit</p>";
-                if (!string.IsNullOrEmpty(contenturl))
-                {
-                    tempcommment.Comment = tempcommment.Comment + "<p><a href='" + contenturl + "' target='_blank'>Reference File: " + contentreffile + " " + "</a></p>";
-                }
-
                 ProjectErrorViewModels.UpdateSPComment(errorkey, commenttype, commentdate, tempcommment.dbComment);
             }
 

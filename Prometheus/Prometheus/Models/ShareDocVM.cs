@@ -169,15 +169,10 @@ namespace Prometheus.Models
             { }
         }
 
-        public static void SendPushCommentEvent(string what, string urlstr, string towho, string pusher, Controller ctrl)
+        public static void SendPushCommentEvent(string what, string urlstr, List<string> towho, string pusher, Controller ctrl,string commentcontent)
         {
             try
             {
-                if (string.Compare(towho, pusher, true) == 0)
-                {
-                    return;
-                }
-
                 var routevalue = new RouteValueDictionary();
                 routevalue.Add("issuekey", "ABC");
                 string scheme = ctrl.Url.RequestContext.HttpContext.Request.Url.Scheme;
@@ -189,10 +184,10 @@ namespace Prometheus.Models
 
 
                 validatestr = validatestr.Split(new string[] { "/Issue" }, StringSplitOptions.RemoveEmptyEntries)[0] + urlstr;
-                var content = what + " is added to your shared file by " + pusher + ":\r\n\r\n" + validatestr;
+                var content = what + " is added by " + pusher + ":\r\n\r\n" + commentcontent + "\r\n\r\n" + validatestr;
 
                 var toaddrs = new List<string>();
-                toaddrs.Add(towho);
+                toaddrs.AddRange(towho);
 
                 var reporter = pusher.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
                 EmailUtility.SendEmail(ctrl, "WUXI NPI System_"+reporter, toaddrs, content);

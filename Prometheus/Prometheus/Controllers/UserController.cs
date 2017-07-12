@@ -1560,45 +1560,14 @@ namespace Prometheus.Controllers
             var vm = UserBlogVM.RetrieveBlogDoc(dockey,this);
 
 
-            var urls = ReceiveRMAFiles();
-            var contenturl = string.Empty;
-            var contentreffile = string.Empty;
-            if (!string.IsNullOrEmpty(Request.Form["contentattach"]))
-            {
-                var internalreportfile = Request.Form["contentattach"];
-                var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
-                    .Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                foreach (var r in urls)
-                {
-                    if (r.Contains(originalname))
-                    {
-                        contentreffile = originalname;
-                        contenturl = r;
-                        break;
-                    }
-                }
-            }
-
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
                 vm.Content = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
-
-                if (!string.IsNullOrEmpty(contenturl))
-                {
-                    vm.Content = vm.Content + "<p><a href='" + contenturl + "' target='_blank'>Reference File: " + contentreffile + " " + "</a></p>";
-                }
                 vm.UpdateBlogDoc();
             }
             else
             {
                 vm.Content = "<p>To Be Edit</p>";
-
-                if (!string.IsNullOrEmpty(contenturl))
-                {
-                    vm.Content = vm.Content + "<p><a href='" + contenturl + "' target='_blank'>Reference File: " + contentreffile + " " + "</a></p>";
-                }
                 vm.UpdateBlogDoc();
             }
 
@@ -1691,6 +1660,38 @@ namespace Prometheus.Controllers
             return RedirectToAction("IBLOG", "User");
         }
 
+        private List<string> RetrieveUserFromComment(string comment)
+        {
+            var ret = new List<string>();
+            var startidx = 0;
+            while (comment.IndexOf("@", startidx) != -1)
+            {
+                var namestartidx = comment.IndexOf("@", startidx);
+                var namestart = comment.Substring(namestartidx);
+                var spaceidx = namestart.IndexOf(" ");
+                if (spaceidx == -1)
+                    break;
+                var name = namestart.Substring(1, spaceidx - 1);
+                if (name.Length > 3)
+                {
+                    if (name.ToUpper().Contains("@FINISAR.COM"))
+                    {
+                        ret.Add(name.ToUpper());
+                    }
+                    else if (name.Contains("."))
+                    {
+                        ret.Add(name.ToUpper() + "@FINISAR.COM");
+                    }
+                    startidx = spaceidx + 1;
+                }
+                else
+                {
+                    startidx = startidx + 1;
+                }
+            }
+            return ret;
+        }
+
         [HttpPost, ActionName("WebDoc")]
         [ValidateAntiForgeryToken]
         public ActionResult WebDocPost()
@@ -1702,41 +1703,21 @@ namespace Prometheus.Controllers
             var docurl = Request.Form["DOCURL"];
             var doccreator = Request.Form["DOCCREATOR"];
 
-            var urls = ReceiveRMAFiles();
-            var contenturl = string.Empty;
-            var contentreffile = string.Empty;
-            if (!string.IsNullOrEmpty(Request.Form["contentattach"]))
-            {
-                var internalreportfile = Request.Form["contentattach"];
-                var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
-                    .Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                foreach (var r in urls)
-                {
-                    if (r.Contains(originalname))
-                    {
-                        contentreffile = originalname;
-                        contenturl = r;
-                        break;
-                    }
-                }
-            }
-
             if (!string.IsNullOrEmpty(Request.Form["docinputeditor"]))
             {
                 var com = new ErrorComments();
                 com.Comment = SeverHtmlDecode.Decode(this,Request.Form["docinputeditor"]);
                 if (!string.IsNullOrEmpty(com.Comment))
                 {
-                    if (!string.IsNullOrEmpty(contenturl))
-                    {
-                        com.Comment = com.Comment + "<hr/><p><a href='" + contenturl + "' target='_blank'>Reference File: " + contentreffile + " " + "</a></p>";
-                    }
+                    var towholist = new List<string>();
+                    var atlist = RetrieveUserFromComment(com.Comment);
+                    if (atlist.Count > 0) towholist.AddRange(atlist);
+                    towholist.Add(doccreator);
 
                     ProjectErrorViewModels.StoreErrorComment(dockey, com.dbComment, PJERRORCOMMENTTYPE.Description, updater, DateTime.Now.ToString());
-                    //send comment mesage
-                    ShareDocVM.SendPushCommentEvent("a new comment", docurl, doccreator, updater, this);
+
+                    var commentcontent = System.Text.RegularExpressions.Regex.Replace(com.Comment.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
+                    ShareDocVM.SendPushCommentEvent("a new comment", docurl, towholist, updater, this, commentcontent);
                 }
             }
 
@@ -1781,47 +1762,16 @@ namespace Prometheus.Controllers
             var commentdate = Request.Form["HDate"];
             var creator = Request.Form["HCreator"];
 
-            var urls = ReceiveRMAFiles();
-            var contenturl = string.Empty;
-            var contentreffile = string.Empty;
-            if (!string.IsNullOrEmpty(Request.Form["contentattach"]))
-            {
-                var internalreportfile = Request.Form["contentattach"];
-                var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
-                    .Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                foreach (var r in urls)
-                {
-                    if (r.Contains(originalname))
-                    {
-                        contentreffile = originalname;
-                        contenturl = r;
-                        break;
-                    }
-                }
-            }
-
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
                 var tempcommment = new ErrorComments();
                 tempcommment.Comment = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
-
-                if (!string.IsNullOrEmpty(contenturl))
-                {
-                    tempcommment.Comment = tempcommment.Comment + "<hr/><p><a href='" + contenturl + "' target='_blank'>Reference File: " + contentreffile + " " + "</a></p>";
-                }
                 ProjectErrorViewModels.UpdateSPComment(errorkey, commenttype, commentdate, tempcommment.dbComment);
             }
             else
             {
                 var tempcommment = new ErrorComments();
                 tempcommment.Comment = "<p>To Be Edit</p>";
-
-                if (!string.IsNullOrEmpty(contenturl))
-                {
-                    tempcommment.Comment = tempcommment.Comment + "<hr/><p><a href='" + contenturl + "' target='_blank'>Reference File: " + contentreffile + " " + "</a></p>";
-                }
                 ProjectErrorViewModels.UpdateSPComment(errorkey, commenttype, commentdate, tempcommment.dbComment);
             }
 

@@ -706,6 +706,37 @@ namespace Prometheus.Controllers
             }
         }
 
+        private string NEONormalDistributeChart1(CleanDataWithStdDev filteddata, string querycond, string datafield, bool left,string ElementID,string modulevalue)
+        {
+            var ds = GetNormalDistrData(filteddata, 1.0);
+
+            var DATAFIELDNAME = datafield.Replace(TXOQUERYCOND.NEOMAP, "").Replace(TXOQUERYCOND.BURNIN, "").Replace(TXOQUERYCOND.TEST, "");
+            var Title = querycond + " " + DATAFIELDNAME + " Normal Distribution";
+
+            var SERIESNAME2 = datafield + "-freq";
+
+            var scritpttxt = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/NormalDistribution1.xml"));
+            scritpttxt = scritpttxt.Replace("#ElementID#", ElementID)
+                    .Replace("#Title#", Title)
+                    .Replace("#XMIN#", ds.xmin.ToString())
+                    .Replace("#XMAX#", ds.xmax.ToString())
+                    .Replace("#YMIN#", ds.ymin.ToString())
+                    .Replace("#YMAX#", ds.ymax.ToString())
+                    .Replace("#DATAFIELDNAME#", DATAFIELDNAME)
+                    .Replace("#MEAN#", ds.mean.ToString("f6"))
+                    .Replace("#StDev#", ds.stddev.ToString("f6"))
+                    .Replace("#StDevLeft#", ds.left3sigma.ToString())
+                    .Replace("#StDevRight#", ds.right3sigma.ToString())
+                    .Replace("#YVALUES#", ds.YVALUES)
+                    .Replace("#SERIESNAME#", datafield)
+                    .Replace("#AmountMAX#", ds.AmountMAX.ToString())
+                    .Replace("#SERIESNAME2#", SERIESNAME2)
+                    .Replace("#YVALUES2#", ds.YVALUES2)
+                    .Replace("#ModuleValue#", modulevalue);
+
+            return scritpttxt;
+        }
+
         private double GetBoxMeanValue(List<double> rawdata)
         {
             if ((rawdata.Count % 2) == 0)
@@ -853,7 +884,7 @@ namespace Prometheus.Controllers
             }
             if (!string.IsNullOrEmpty(channel))
             {
-                optioncond = optioncond + " and Channel ='" + channel + "' ";
+                optioncond = optioncond + " and Channel ='" + (Convert.ToInt32(channel) + 1).ToString() + "' ";
                 fieldappend = fieldappend + "-CH" + channel;
             }
 
@@ -1233,7 +1264,7 @@ namespace Prometheus.Controllers
             {
                 var ck = new Dictionary<string, string>();
                 ck.Add("logonredirectctrl", "DataAnalyze");
-                ck.Add("logonredirectact", "TXOTestData");
+                ck.Add("logonredirectact", "ModuleTestData");
                 CookieUtility.SetCookie(this, ck);
                 return RedirectToAction("LoginUser", "User");
             }
@@ -1244,6 +1275,174 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        private void ModuleInBI(string BR,string modulevalue)
+        {
+            var channel = Request.Form["leftmdchannellist"];
+            var bitestname = Request.Form["leftbistationlist"];
+
+            var optioncond = string.Empty;
+            var fieldappend = string.Empty;
+            if (!string.IsNullOrEmpty(bitestname))
+            {
+                optioncond = " and TestName ='" + bitestname + "' ";
+                fieldappend = "-" + bitestname;
+            }
+            if (!string.IsNullOrEmpty(channel))
+            {
+                optioncond = optioncond + " and Channel ='" + (Convert.ToInt32(channel)+1).ToString() + "' ";
+                fieldappend = fieldappend + "-CH" + channel;
+            }
+
+            var rawlist = BITestResultDataField.RetrieveBITestData(BR, TXOQUERYCOND.BURNIN + "PO_LD", TXOQUERYTYPE.BR, optioncond);
+            if (rawlist.Count > 5)
+            {
+                var filteddata = GetCleanDataWithStdDev(rawlist);
+                ViewBag.leftbinormaldistr =  NEONormalDistributeChart1(filteddata, BR.Replace("-", ""), "TxPower" + fieldappend, true, "leftbinormaldistr",modulevalue);
+            }
+        }
+
+        private void ModuleInAlign(string BR, string modulevalue)
+        {
+            var channel = Request.Form["leftmdchannellist"];
+            var aligntestname = Request.Form["leftaligntestlist"];
+
+            var optioncond = string.Empty;
+            var fieldappend = string.Empty;
+            if (!string.IsNullOrEmpty(aligntestname))
+            {
+                optioncond = " and TestName ='" + aligntestname + "' ";
+                fieldappend = "-" + aligntestname;
+            }
+            if (!string.IsNullOrEmpty(channel))
+            {
+                optioncond = optioncond + " and Channel ='" + channel + "' ";
+                fieldappend = fieldappend + "-CH" + channel;
+            }
+
+            var rawlist = AlignmentPower.RetrieveAlignmentTestData(BR, TXOQUERYCOND.PROCESS + "TxPower", TXOQUERYTYPE.BR, optioncond);
+            if (rawlist.Count > 5)
+            {
+                var filteddata = GetCleanDataWithStdDev(rawlist);
+                ViewBag.alignnormaldistr = NEONormalDistributeChart1(filteddata, BR.Replace("-", ""), "TxPower" + fieldappend, true, "alignnormaldistr", modulevalue);
+            }
+        }
+
+        private void ModuleInModule(string BR, string modulevalue)
+        {
+            var channel = Request.Form["leftmdchannellist"];
+            var temperature = Request.Form["leftmdtemplist"];
+            var moduletestname = Request.Form["leftmdstationlist"];
+
+            var optioncond = string.Empty;
+            var fieldappend = string.Empty;
+            if (!string.IsNullOrEmpty(moduletestname))
+            {
+                optioncond = " and TestName ='" + moduletestname + "' ";
+                fieldappend = "-" + moduletestname;
+            }
+            if (!string.IsNullOrEmpty(channel))
+            {
+                optioncond = optioncond + " and Channel ='" + channel + "' ";
+                fieldappend = fieldappend + "-CH" + channel;
+            }
+
+            if (!string.IsNullOrEmpty(temperature))
+            {
+                if (string.Compare(temperature, "low", true) == 0)
+                {
+                    optioncond = optioncond + " and Temperature < 15 ";
+                }
+                else if (string.Compare(temperature, "high", true) == 0)
+                {
+                    optioncond = optioncond + " and Temperature > 45 ";
+                }
+                else
+                {
+                    optioncond = optioncond + " and Temperature > 15 and Temperature < 45 ";
+                }
+                fieldappend = fieldappend + "-" + temperature;
+            }
+
+            var rawlist = ModuleTXOData.RetrieveModuleTestData(BR, TXOQUERYCOND.TEST + "TxPower", TXOQUERYTYPE.BR, optioncond);
+            if (rawlist.Count > 5)
+            {
+                var filteddata = GetCleanDataWithStdDev(rawlist);
+                ViewBag.modulenormaldistr = NEONormalDistributeChart1(filteddata, BR.Replace("-", ""), "TxPower" + fieldappend, true, "modulenormaldistr", modulevalue);
+            }
+        }
+
+        private List<BITestResultDataField> RetrieveModuleTestDataBySN_BI(string ModuleSn)
+        {
+            var channel = Request.Form["leftmdchannellist"];
+            var bitestname = Request.Form["leftbistationlist"];
+
+            var optioncond = string.Empty;
+            if (!string.IsNullOrEmpty(bitestname))
+            {
+                optioncond = " and TestName ='" + bitestname + "' ";
+            }
+            if (!string.IsNullOrEmpty(channel))
+            {
+                optioncond = optioncond + " and Channel ='" + (Convert.ToInt32(channel) + 1).ToString() + "' ";
+            }
+
+            return BITestResultDataField.RetrieveAllDataFieldBySN(ModuleSn, optioncond);
+        }
+
+        private List<AlignmentPower> RetrieveModuleTestDataBySN_AG(string ModuleSn)
+        {
+            var channel = Request.Form["leftmdchannellist"];
+            var aligntestname = Request.Form["leftaligntestlist"];
+
+            var optioncond = string.Empty;
+            if (!string.IsNullOrEmpty(aligntestname))
+            {
+                optioncond = " and TestName ='" + aligntestname + "' ";
+            }
+            if (!string.IsNullOrEmpty(channel))
+            {
+                optioncond = optioncond + " and Channel ='" + channel + "' ";
+            }
+
+            return AlignmentPower.RetrieveAllDataFieldBySN(ModuleSn, optioncond);
+        }
+
+        private List<ModuleTXOData> RetrieveModuleTestDataBySN_MD(string ModuleSn)
+        {
+            var channel = Request.Form["leftmdchannellist"];
+            var temperature = Request.Form["leftmdtemplist"];
+            var moduletestname = Request.Form["leftmdstationlist"];
+
+            var optioncond = string.Empty;
+            if (!string.IsNullOrEmpty(moduletestname))
+            {
+                optioncond = " and TestName ='" + moduletestname + "' ";
+            }
+            if (!string.IsNullOrEmpty(channel))
+            {
+                optioncond = optioncond + " and Channel ='" + channel + "' ";
+            }
+
+            if (!string.IsNullOrEmpty(temperature))
+            {
+                if (string.Compare(temperature, "low", true) == 0)
+                {
+                    optioncond = optioncond + " and Temperature < 15 ";
+                }
+                else if (string.Compare(temperature, "high", true) == 0)
+                {
+                    optioncond = optioncond + " and Temperature > 45 ";
+                }
+                else
+                {
+                    optioncond = optioncond + " and Temperature > 15 and Temperature < 45 ";
+                }
+            }
+
+            return ModuleTXOData.RetrieveAllDataFieldBySN(ModuleSn, optioncond);
+        }
+
+
         [HttpPost, ActionName("ModuleTestData")]
         [ValidateAntiForgeryToken]
         public ActionResult ModuleTestDataPost()
@@ -1251,16 +1450,48 @@ namespace Prometheus.Controllers
             var ModuleSn = Request.Form["ModuleSNList"];
             ViewBag.ModuleSn = ModuleSn;
 
-            var bitestdata = BITestResultDataField.RetrieveAllDataFieldBySN(ModuleSn, string.Empty);
-            var aligntestdata = AlignmentPower.RetrieveAllDataFieldBySN(ModuleSn, string.Empty);
-            var moduletestdata = ModuleTXOData.RetrieveAllDataFieldBySN(ModuleSn, string.Empty);
+            var bitestdata = RetrieveModuleTestDataBySN_BI(ModuleSn);
+            var aligntestdata = RetrieveModuleTestDataBySN_AG(ModuleSn);
+            var moduletestdata = RetrieveModuleTestDataBySN_MD(ModuleSn);
 
             ViewBag.bitestdata = bitestdata;
             ViewBag.aligntestdata = aligntestdata;
             ViewBag.moduletestdata = moduletestdata;
-
             if (bitestdata.Count > 0 || aligntestdata.Count > 0 || moduletestdata.Count > 0)
                 ViewBag.hasdata = true;
+
+            if (bitestdata.Count > 0)
+            {
+                var jo = bitestdata[0].JO;
+                var jos = jo.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+                if (jos.Length == 3)
+                {
+                    var BR = "-" + jos[1] + "-";
+                    ModuleInBI(BR,bitestdata[bitestdata.Count-1].PO_LD.ToString());
+                }
+            }
+
+            if (aligntestdata.Count > 0)
+            {
+                var jo = aligntestdata[0].JO;
+                var jos = jo.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+                if (jos.Length == 3)
+                {
+                    var BR = "-" + jos[1] + "-";
+                    ModuleInAlign(BR, aligntestdata[aligntestdata.Count -1].TxPower.ToString());
+                }
+            }
+
+            if (moduletestdata.Count > 0)
+            {
+                var jo = moduletestdata[0].JO;
+                var jos = jo.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+                if (jos.Length == 3)
+                {
+                    var BR = "-" + jos[1] + "-";
+                    ModuleInModule(BR, moduletestdata[moduletestdata.Count -1].TxPower.ToString());
+                }
+            }
 
             var ckdict = CookieUtility.UnpackCookie(this);
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];

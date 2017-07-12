@@ -1,0 +1,92 @@
+﻿<script type="text/javascript">
+  $(function () {
+  $('##ElementID#').highcharts({
+    title: {
+      text: '#Title#'
+    },
+    chart:
+    {
+      alignTicks: false
+    },
+    boost: {
+        useGPUTranslations: true
+    },
+    xAxis:{
+            min: #XMIN#,
+            max: #XMAX#,
+            plotLines: [{
+                value: #MEAN#,
+                color: 'gray',
+                dashStyle: 'shortdash',
+                width: 2,
+                label: {
+                    text: 'Mean #MEAN#'
+                }
+            }, {
+                value: #StDevLeft#,
+                color: 'green',
+                dashStyle: 'shortdash',
+                width: 2,
+                label: {
+                    text: '3-sigma  3*#StDev#'
+                }
+            }, {
+                value: #StDevRight#,
+                color: 'green',
+                dashStyle: 'shortdash',
+                width: 2,
+                label: {
+                    text: '3-sigma  3*#StDev#'
+                }
+            }, {
+                value: #ModuleValue#,
+                color: 'red',
+                dashStyle: 'longdash',
+                width: 2,
+                label: {
+                    text: 'module value'
+                }
+            }]
+        },
+    yAxis:[{
+            title: {
+                text: 'Percent'
+            },
+            min: #YMIN#,
+            max: #YMAX#
+        },{
+        title: {
+                text: 'Frequence'
+            },
+            min: 0,
+            max: #AmountMAX#,
+            opposite: true
+        }],
+        tooltip: {
+              headerFormat: '#DATAFIELDNAME#<br/>',
+              pointFormat: '{point.x} : <b>{point.y}</b>'
+          },
+     series: [{
+            type: 'line',
+            boostThreshold: 100,
+            name: '#SERIESNAME#',
+            data: [#YVALUES#],
+            yAxis:0
+     },{
+            type: 'column',
+            name: '#SERIESNAME2#',
+            data: [#YVALUES2#],
+            yAxis:1,
+            pointWidth: 15,
+            dataLabels: {
+                enabled: true,
+                rotation: -90,
+                color: '#FFFFFF',
+                align: 'right',
+                format: '{point.y}',
+                y: 10
+            }
+     }]
+  });
+  });
+</script>

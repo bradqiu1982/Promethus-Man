@@ -1555,7 +1555,10 @@ namespace Prometheus.Models
                     {
                         if (line[1] == null
                             || line[2] == null
-                            || line[3] == null)
+                            || line[3] == null
+                            || string.IsNullOrEmpty(Convert.ToString(line[1]))
+                            || string.IsNullOrEmpty(Convert.ToString(line[2]))
+                            || string.IsNullOrEmpty(Convert.ToString(line[3])))
                         {
                             continue;
                         }

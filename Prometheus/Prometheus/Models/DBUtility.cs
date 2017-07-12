@@ -58,7 +58,7 @@ namespace Prometheus.Models
                 }
                 else
                 {
-                    conn.ConnectionString = "Server=wuxinpi;User ID=NPI;Password=NPI@NPI;Database=NPITrace;Connection Timeout=30;";
+                    conn.ConnectionString = "Server=wuxinpi;User ID=NPI;Password=NPI@NPI;Database=NPITrace;Connection Timeout=120;";
                 }
 
                 conn.Open();
@@ -605,7 +605,7 @@ namespace Prometheus.Models
                     return ret;
 
                 var command = conn.CreateCommand();
-                command.CommandTimeout = 60;
+                command.CommandTimeout = 180;
                 command.CommandText = sql;
                 var sqlreader = command.ExecuteReader();
                 if (sqlreader.HasRows)

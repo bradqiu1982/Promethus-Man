@@ -124,6 +124,7 @@
             function moduletxo() {
                 if (document.getElementById("ModuleSNList").value && document.getElementById("ModuleSNList").value.indexOf("Please") == -1) {
                     $('#moduletxoform').submit();
+                    return false;
                 }
             }
         </script>

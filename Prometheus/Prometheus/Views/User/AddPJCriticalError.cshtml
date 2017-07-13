@@ -1,4 +1,5 @@
-﻿
+﻿@model IEnumerable<Prometheus.Models.ProjectCriticalErrorVM>
+
 @{
     ViewBag.Title = "Add Project Critical Error";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -29,7 +30,7 @@
         <div class="form-group">
             <div class="row">
                 <div class="col-lg-12">
-                    <div class="col-lg-5">
+                    <div class="col-lg-6">
                         <div class="col-lg-6">
                             @Html.DropDownList("pjlist", null, new { @id = "pjlist", @name = "pjlist", @class = "form-control" })
                         </div>
@@ -38,15 +39,78 @@
                         </div>
                     </div>
                     <div class="col-lg-3">
-                        <input id="matchcond" name="matchcond"  placeholder="Please input match condition" class="form-control text-box single-line" type="text" />
+                        <input id="matchcond" name="matchcond"  placeholder="Please input match condition" class="form-control text-box single-line" type="text"  data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 180." data-val-length-max="180" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." />
                     </div>
-                    <div class="col-lg-4">
+                    <div class="col-lg-3">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="col-lg-6">
                         <div class="col-lg-6">
-                            <input id="lowlimit" name="lowlimit" placeholder="low limit" class="form-control text-box single-line" type="text" /> 
+                            @Html.DropDownList("templist", null, new { @id = "templist", @name = "templist", @class = "form-control" })
                         </div>
                         <div class="col-lg-6">
-                            <input id="highlimit" name="highlimit" placeholder="high limit" class="form-control text-box single-line" type="text" />
+                            @Html.DropDownList("channellist", null, new { @id = "channellist", @name = "channellist", @class = "form-control" })
                         </div>
+                    </div>
+                    <div class="col-lg-6">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="col-lg-1">
+                        <div class="col-lg-6">
+                        </div>
+                        <div class="col-lg-6">
+                            <input type="checkbox" id="withlimit" name="withlimit" value="withlimit" />
+                        </div>
+                    </div>
+                    <div class="col-lg-2">
+                        <label class="control-label" style="font-family:'Arial Narrow'">With Limit</label>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="col-lg-6">
+                            <input id="lowlimit" name="lowlimit" placeholder="low limit" class="form-control text-box single-line" type="text" data-val="true" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" />
+                        </div>
+                        <div class="col-lg-6">
+                            <input id="highlimit" name="highlimit" placeholder="high limit" class="form-control text-box single-line" type="text" data-val="true" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" />
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="col-lg-1">
+                        <div class="col-lg-6">
+                        </div>
+                        <div class="col-lg-6">
+                            <input type="checkbox" id="withalgorithm" name="withalgorithm" value="withalgorithm" />
+                        </div>
+                    </div>
+                    <div class="col-lg-2">
+                        <label class="control-label" style="font-family:'Arial Narrow'">With Algorithm</label>
+                    </div>
+                    <div class="col-lg-3">
+                        @Html.DropDownList("algorithmlist", null, new { @id = "algorithmlist", @name = "algorithmlist", @class = "form-control" })
+                    </div>
+                    <div class="col-lg-3">
+                        <input id="algorithmparam" name="algorithmparam"  data-toggle="tooltip" title="For UNIFORMITY algorithm,inputing 3 means 3*sigma" placeholder="algorithm params" class="form-control text-box single-line" type="text" />
+                    </div>
+                    <div class="col-lg-3">
                     </div>
                 </div>
             </div>
@@ -67,14 +131,20 @@
                         if (document.getElementById("pjlist").value.indexOf("Please") == -1 
                             && document.getElementById("errorlist").value.indexOf("Please") == -1 
                             && document.getElementById("matchcond").value
+                            &&((document.getElementById("withlimit").checked
                             && document.getElementById("lowlimit").value
-                            && document.getElementById("highlimit").value) {
+                            && document.getElementById("highlimit").value)
+                            || (document.getElementById("withalgorithm").checked
+                            && document.getElementById("algorithmlist").value.indexOf("Please") == -1))) {
                             $('#igroupform').submit();
+                            return false;
                         }
                     }
             </script>
         </div>
 
+    if (Model != null && Model.Count() > 0)
+    {
         <div class="form-group">
             <div class="row">
                 <div class="col-lg-12">
@@ -84,12 +154,61 @@
                                 <th>Project</th>
                                 <th>Error Code</th>
                                 <th>Match Condition</th>
+                                <th>Temperature</th>
+                                <th>Channel</th>
                                 <th>Low Limit</th>
                                 <th>High Limit</th>
+                                <th>Algorithm</th>
+                                <th>Algorithm Param</th>
+                                <th>&nbsp;</th>
                             </tr>
                         </thead>
-                   </table>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.ProjectKey</td>
+                                    <td>@item.ErrorCode</td>
+                                    <td>@item.MatchCond</td>
+                                    <td>@item.Temperature</td>
+                                    <td>@item.Channel</td>
+                                    @if (item.WithLimit == 1)
+                                    {
+                                        <td>@item.LowLimit</td>
+                                        <td>@item.HighLimit</td>
+                                    }
+                                    else
+                                    {
+                                        <td>&nbsp;</td>
+                                        <td>&nbsp;</td>
+                                    }
+                                    @if (item.WithAlgorithm == 1)
+                                    {
+                                        <td>@item.Algorithm</td>
+                                        <td>@item.AlgorithmParam</td>
+                                    }
+                                    else
+                                    {
+                                        <td>&nbsp;</td>
+                                        <td>&nbsp;</td>
+                                    }
+                                    <td><img src="~/Content/images/icon/delete2.png" MYTP="HOVER" style="height:30px; width:18px" onclick="DeletePJCriticalError('PJKey=@(item.ProjectKey)&ErrorCode=@(item.ErrorCode)')"></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <script type="text/javascript">
+                        function DeletePJCriticalError(obt)
+                        {
+                            if (confirm("Do you really want to delete this condition?"))
+                            {
+                                window.location.href = '/User/DeletePJCriticalError?' + obt;
+                            }
+                        }
+                    </script>
                 </div>
             </div>
         </div>
+    }
+
 }

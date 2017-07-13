@@ -666,6 +666,27 @@ CREATE TABLE [dbo].[AlignmentPower] (
 	[Appv_5]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
 	);
 
+CREATE TABLE [dbo].[ProjectCriticalError] (
+    [ProjectKey]  NVARCHAR (100) NOT NULL,
+    [ErrorCode] NVARCHAR (200) NOT NULL,
+    [MatchCond]    NVARCHAR (MAX) NOT NULL,
+	[WithLimit]   INT DEFAULT (0) NOT NULL,
+	[LowLimit]   FLOAT DEFAULT (-99999.0) NOT NULL,
+	[HighLimit]   FLOAT DEFAULT (99999.0) NOT NULL,
+	[WithAlgorithm]   INT DEFAULT (0) NOT NULL,
+	[Algorithm]  NVARCHAR (100) NOT NULL,
+	[AlgorithmParam]  NVARCHAR (MAX) NOT NULL,
+	[Creater]   NVARCHAR (300) DEFAULT ('') NOT NULL,
+	[Temperature]   NVARCHAR (50) DEFAULT ('') NOT NULL,
+	[Channel]   NVARCHAR (20) DEFAULT ('') NOT NULL,
+    [Appv_1]   FLOAT DEFAULT (-99999.0) NOT NULL,
+	[Appv_2]   FLOAT DEFAULT (-99999.0) NOT NULL,
+	[Appv_3]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Appv_4]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[Appv_5]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+);
+
+
 
 Create index idx on ErrorComments(ErrorKey);
 Create index idx on UserTable(UserName);

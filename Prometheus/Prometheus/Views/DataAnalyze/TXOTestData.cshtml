@@ -217,6 +217,7 @@
                 if ((document.getElementById("leftquerylist").value && document.getElementById("leftdatafieldlist").value.indexOf("Please") == -1)
                     || (document.getElementById("rightquerylist").value && document.getElementById("rightdatafieldlist").value.indexOf("Please") == -1)) {
                     $('#txoform').submit();
+                    return false;
                 }
             }
         </script>

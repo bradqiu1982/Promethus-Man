@@ -225,6 +225,7 @@
     <Compile Include="Models\ParetoData.cs" />
     <Compile Include="Models\PJReportViewModels.cs" />
     <Compile Include="Models\ProjectBIYieldViewModule.cs" />
+    <Compile Include="Models\ProjectCriticalErrorVM.cs" />
     <Compile Include="Models\ProjectErrorViewModels.cs" />
     <Compile Include="Models\ProjectEvent.cs" />
     <Compile Include="Models\ProjectFAViewModules.cs" />

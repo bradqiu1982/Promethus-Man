@@ -1896,7 +1896,6 @@ namespace Prometheus.Controllers
             }//end foreach
 
             var errorlist = errordict.Keys.ToList();
-
             var selectlist = new List<string>();
             selectlist.Add("Please select project");
             selectlist.AddRange(pjlist);
@@ -1913,13 +1912,87 @@ namespace Prometheus.Controllers
             selectcontrol[0].Selected = true;
             ViewBag.errorlist = selectcontrol;
 
-            return View();
+            selectlist = new List<string>();
+            selectlist.Add("Please select temperature (Optional)");
+            selectlist.Add("Low");
+            selectlist.Add("Normal");
+            selectlist.Add("High");
+            selectcontrol = CreateSelectList(selectlist, "");
+            selectcontrol[0].Disabled = true;
+            selectcontrol[0].Selected = true;
+            ViewBag.templist = selectcontrol;
+
+            selectlist = new List<string>();
+            selectlist.Add("Please select Channel (Optional)");
+            for (var idx = 0; idx < 24; idx++)
+            {
+                selectlist.Add(idx.ToString());
+            }
+            selectcontrol = CreateSelectList(selectlist, "");
+            selectcontrol[0].Disabled = true;
+            selectcontrol[0].Selected = true;
+            ViewBag.channellist = selectcontrol;
+
+            selectlist = new List<string>();
+            selectlist.Add("Please select algorithm");
+            selectlist.Add("UNIFORMITY");
+            selectcontrol = CreateSelectList(selectlist, "");
+            selectcontrol[0].Disabled = true;
+            selectcontrol[0].Selected = true;
+            ViewBag.algorithmlist = selectcontrol;
+
+            var vm = new List<ProjectCriticalErrorVM>();
+            foreach (var pj in pjlist)
+            {
+                var tempvm = ProjectCriticalErrorVM.RetrievePJCriticalError(pj, null);
+                if (tempvm.Count > 0)
+                {
+                    vm.AddRange(tempvm);
+                }
+            }
+
+            return View(vm);
         }
 
         [HttpPost, ActionName("AddPJCriticalError")]
         [ValidateAntiForgeryToken]
         public ActionResult AddPJCriticalErrorPost()
         {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            try
+            {
+                var vm = new ProjectCriticalErrorVM();
+                vm.Creater = updater;
+                vm.ProjectKey = Request.Form["pjlist"];
+                vm.ErrorCode = Request.Form["errorlist"];
+                vm.MatchCond = Request.Form["matchcond"];
+                if (Request.Form["withlimit"] != null)
+                {
+                    vm.WithLimit = 1;
+                    vm.LowLimit = Convert.ToDouble(Request.Form["lowlimit"]);
+                    vm.HighLimit = Convert.ToDouble(Request.Form["highlimit"]);
+                }
+                if (Request.Form["withalgorithm"] != null)
+                {
+                    vm.WithAlgorithm = 1;
+                    vm.Algorithm = Request.Form["algorithmlist"];
+                    vm.AlgorithmParam = Request.Form["algorithmparam"];
+                }
+
+                vm.Temperature = Request.Form["templist"];
+                vm.Channel = Request.Form["channellist"];
+
+                vm.StorePJCriticalError();
+            }
+            catch (Exception ex) { }
+            return RedirectToAction("AddPJCriticalError", "User");
+        }
+
+        public ActionResult DeletePJCriticalError(string PJKey, string ErrorCode)
+        {
+            ProjectCriticalErrorVM.RemovePJCriticalError(PJKey, ErrorCode);
             return RedirectToAction("AddPJCriticalError", "User");
         }
 

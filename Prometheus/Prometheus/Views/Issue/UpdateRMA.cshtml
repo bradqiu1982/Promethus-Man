@@ -78,6 +78,7 @@ else
         <script type="text/javascript">
             function AddSubTask() {
                 $("#subtaskid").submit();
+                return false;
             }
         </script>
     </div>
@@ -432,6 +433,7 @@ else
                 function attachsubmit() {
                     $('#attachtag').modal('hide');
                     $('#issueform').submit();
+                    return false;
                 }
             </script>
         </div>
@@ -537,6 +539,7 @@ else
                     function attachinternalsubmit() {
                         $('#internaltag').modal('hide');
                         $('#issueform').submit();
+                        return false;
                     }
                 </script>
             </div>
@@ -644,6 +647,7 @@ else
                     function attachcustomersubmit() {
                         $('#customertag').modal('hide');
                         $('#issueform').submit();
+                        return false;
                     }
                 </script>
             </div>

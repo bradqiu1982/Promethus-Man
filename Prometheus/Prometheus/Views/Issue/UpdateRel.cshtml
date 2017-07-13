@@ -394,7 +394,8 @@ else
                         <span class="field-validation-valid text-danger" data-valmsg-for="RPeopleAddr" data-valmsg-replace="true"></span>
                     </div>
                     <script type="text/javascript">
-                    function chooserelatedpeople() {
+                        function chooserelatedpeople() {
+                            document.getElementById("towhoinput1").value = document.getElementById("RPeopleAddr").value;
                         $('#relatedmodal').modal({ backdrop: 'static' });
                     }
 

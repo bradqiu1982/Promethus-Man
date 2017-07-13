@@ -11,6 +11,7 @@ namespace Prometheus.Models
         {
             ProjectKey = string.Empty;
             ErrorCode = string.Empty;
+            TestCaseName = string.Empty;
             MatchCond = string.Empty;
 
             WithLimit = 0;
@@ -33,6 +34,7 @@ namespace Prometheus.Models
 
         public string ProjectKey { set; get; }
         public string ErrorCode { set; get; }
+        public string TestCaseName { set; get; }
         public string MatchCond { set; get; }
         public int WithLimit { set; get; } 
         public double LowLimit { set; get; }
@@ -52,10 +54,10 @@ namespace Prometheus.Models
 
         public void StorePJCriticalError()
         {
-            var sql = "insert into ProjectCriticalError(ProjectKey,ErrorCode,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel) "
-                +" values('<ProjectKey>','<ErrorCode>','<MatchCond>',<WithLimit>,<LowLimit>,<HighLimit>,<WithAlgorithm>,'<Algorithm>','<AlgorithmParam>','<Creater>','<Temperature>','<Channel>')";
+            var sql = "insert into ProjectCriticalError(ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel) "
+                + " values('<ProjectKey>','<ErrorCode>','<TestCaseName>','<MatchCond>',<WithLimit>,<LowLimit>,<HighLimit>,<WithAlgorithm>,'<Algorithm>','<AlgorithmParam>','<Creater>','<Temperature>','<Channel>')";
 
-            sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ErrorCode>", ErrorCode).Replace("<MatchCond>", MatchCond)
+            sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ErrorCode>", ErrorCode).Replace("<MatchCond>", MatchCond).Replace("<TestCaseName>", TestCaseName)
                 .Replace("<WithLimit>", WithLimit.ToString()).Replace("<LowLimit>", LowLimit.ToString()).Replace("<HighLimit>", HighLimit.ToString())
                 .Replace("<WithAlgorithm>", WithAlgorithm.ToString()).Replace("<Algorithm>", Algorithm).Replace("<AlgorithmParam>", AlgorithmParam)
                 .Replace("<Creater>", Creater).Replace("<Temperature>", Temperature).Replace("<Channel>", Channel);
@@ -75,12 +77,12 @@ namespace Prometheus.Models
             var sql = string.Empty;
             if (!string.IsNullOrEmpty(errorcode))
             {
-                sql = "select ProjectKey,ErrorCode,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel from ProjectCriticalError where ProjectKey='<ProjectKey>' and ErrorCode='<ErrorCode>'";
+                sql = "select ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel from ProjectCriticalError where ProjectKey='<ProjectKey>' and ErrorCode='<ErrorCode>'";
                 sql = sql.Replace("<ProjectKey>", pjkey).Replace("<ErrorCode>", errorcode);
             }
             else
             {
-                sql = "select ProjectKey,ErrorCode,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel from ProjectCriticalError where ProjectKey='<ProjectKey>'";
+                sql = "select ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel from ProjectCriticalError where ProjectKey='<ProjectKey>'";
                 sql = sql.Replace("<ProjectKey>", pjkey);
             }
 
@@ -90,16 +92,17 @@ namespace Prometheus.Models
                 var tempvm = new ProjectCriticalErrorVM();
                 tempvm.ProjectKey = Convert.ToString(line[0]);
                 tempvm.ErrorCode = Convert.ToString(line[1]);
-                tempvm.MatchCond = Convert.ToString(line[2]);
-                tempvm.WithLimit = Convert.ToInt32(line[3]);
-                tempvm.LowLimit = Convert.ToDouble(line[4]);
-                tempvm.HighLimit = Convert.ToDouble(line[5]);
-                tempvm.WithAlgorithm = Convert.ToInt32(line[6]);
-                tempvm.Algorithm = Convert.ToString(line[7]);
-                tempvm.AlgorithmParam = Convert.ToString(line[8]);
-                tempvm.Creater = Convert.ToString(line[9]);
-                tempvm.Temperature = Convert.ToString(line[10]);
-                tempvm.Channel = Convert.ToString(line[11]);
+                tempvm.TestCaseName = Convert.ToString(line[2]);
+                tempvm.MatchCond = Convert.ToString(line[3]);
+                tempvm.WithLimit = Convert.ToInt32(line[4]);
+                tempvm.LowLimit = Convert.ToDouble(line[5]);
+                tempvm.HighLimit = Convert.ToDouble(line[6]);
+                tempvm.WithAlgorithm = Convert.ToInt32(line[7]);
+                tempvm.Algorithm = Convert.ToString(line[8]);
+                tempvm.AlgorithmParam = Convert.ToString(line[9]);
+                tempvm.Creater = Convert.ToString(line[10]);
+                tempvm.Temperature = Convert.ToString(line[11]);
+                tempvm.Channel = Convert.ToString(line[12]);
                 ret.Add(tempvm);
             }
             return ret;

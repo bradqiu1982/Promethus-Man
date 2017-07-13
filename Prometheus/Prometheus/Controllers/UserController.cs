@@ -1967,12 +1967,17 @@ namespace Prometheus.Controllers
                 vm.Creater = updater;
                 vm.ProjectKey = Request.Form["pjlist"];
                 vm.ErrorCode = Request.Form["errorlist"];
+                vm.TestCaseName = Request.Form["testcase"];
                 vm.MatchCond = Request.Form["matchcond"];
                 if (Request.Form["withlimit"] != null)
                 {
                     vm.WithLimit = 1;
                     vm.LowLimit = Convert.ToDouble(Request.Form["lowlimit"]);
                     vm.HighLimit = Convert.ToDouble(Request.Form["highlimit"]);
+                    if (vm.LowLimit > vm.HighLimit)
+                    {
+                        return RedirectToAction("AddPJCriticalError", "User");
+                    }
                 }
                 if (Request.Form["withalgorithm"] != null)
                 {

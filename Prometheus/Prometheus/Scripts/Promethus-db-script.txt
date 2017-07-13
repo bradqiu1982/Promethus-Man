@@ -669,6 +669,7 @@ CREATE TABLE [dbo].[AlignmentPower] (
 CREATE TABLE [dbo].[ProjectCriticalError] (
     [ProjectKey]  NVARCHAR (100) NOT NULL,
     [ErrorCode] NVARCHAR (200) NOT NULL,
+	[TestCaseName]    NVARCHAR (MAX) NOT NULL,
     [MatchCond]    NVARCHAR (MAX) NOT NULL,
 	[WithLimit]   INT DEFAULT (0) NOT NULL,
 	[LowLimit]   FLOAT DEFAULT (-99999.0) NOT NULL,

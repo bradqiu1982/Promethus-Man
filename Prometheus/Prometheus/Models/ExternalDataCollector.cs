@@ -2391,8 +2391,7 @@ namespace Prometheus.Models
             var traceviewscrfolder = syscfgdict["TRACEVIEWFOLDER"]+"\\"+tester;
             var allsrcfiles = DirectoryEnumerateFiles(ctrl, traceviewscrfolder);
 
-            string datestring = DateTime.Now.ToString("yyyyMMdd");
-            string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+            string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\TraceView\\";
             if (!DirectoryExists(ctrl, imgdir))
             {
                 Directory.CreateDirectory(imgdir);

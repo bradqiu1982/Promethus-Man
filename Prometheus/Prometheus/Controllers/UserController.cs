@@ -1995,9 +1995,9 @@ namespace Prometheus.Controllers
             return RedirectToAction("AddPJCriticalError", "User");
         }
 
-        public ActionResult DeletePJCriticalError(string PJKey, string ErrorCode)
+        public ActionResult DeletePJCriticalError(string PJKey, string ErrorCode,string TestCase,string MatchCond)
         {
-            ProjectCriticalErrorVM.RemovePJCriticalError(PJKey, ErrorCode);
+            ProjectCriticalErrorVM.RemovePJCriticalError(PJKey, ErrorCode,TestCase,MatchCond);
             return RedirectToAction("AddPJCriticalError", "User");
         }
 

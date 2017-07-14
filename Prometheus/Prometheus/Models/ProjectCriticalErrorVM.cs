@@ -76,10 +76,10 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
-        public static void RemovePJCriticalError(string pjkey, string errorcode)
+        public static void RemovePJCriticalError(string pjkey, string errorcode,string testcase,string matchcond)
         {
-            var sql = "delete from ProjectCriticalError where ProjectKey='<ProjectKey>' and ErrorCode='<ErrorCode>'";
-            sql = sql.Replace("<ProjectKey>", pjkey).Replace("<ErrorCode>", errorcode);
+            var sql = "delete from ProjectCriticalError where ProjectKey='<ProjectKey>' and ErrorCode='<ErrorCode>' and TestCaseName='<TestCaseName>' and MatchCond='<MatchCond>'";
+            sql = sql.Replace("<ProjectKey>", pjkey).Replace("<ErrorCode>", errorcode).Replace("<TestCaseName>", testcase).Replace("<MatchCond>", matchcond);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 

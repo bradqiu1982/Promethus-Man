@@ -4942,7 +4942,7 @@ namespace Prometheus.Controllers
             {
                 try
                 {
-                    ProjectTestData.PrePareMESLatestData(pjkey);
+                    ProjectTestData.PrePareMESLatestData(pjkey,this);
                 }
                 catch (Exception ex)
                 { }
@@ -5097,6 +5097,18 @@ namespace Prometheus.Controllers
         public ActionResult HeartBeat2()
         {
 
+            //var traceviewlist = ExternalDataCollector.LoadTraceView2Local("IPH_TEST322", "XXC00RT", "ER Setup", "2017-07-01 12:23:20 AM", this);
+            //foreach (var item in traceviewlist)
+            //{
+            //    ExternalDataCollector.RetrieveTestDataFromTraceView(item, "Test_Base_TxPower", "TxPower");
+            //}
+
+            //var traceviewlist = ExternalDataCollector.LoadTraceView2Local("IPH_TEST322", "XXC00QN", "ER Setup", "2017-07-04 08:33:06", this);
+            //foreach (var item in traceviewlist)
+            //{
+            //    ExternalDataCollector.RetrieveTestDataFromTraceView(item, "Test_MultiChannel_DCSetup_2", "LDI");
+            //}
+
             //AssignPJ2User();
 
             //ExternalDataCollector.RefreshRMAData(this);
@@ -5111,12 +5123,12 @@ namespace Prometheus.Controllers
             //var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
             //foreach (var pjkey in pjkeylist)
             //{
-                //try
-                //{
-                //    ProjectTestData.PrePareATELatestData("COHERENTCFP2");
-                //}
-                //catch (Exception ex)
-                //{ }
+            try
+            {
+                ProjectTestData.PrePareMESLatestData("EDRLP",this);
+            }
+            catch (Exception ex)
+            { }
             //}
             //var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
             //foreach (var pjkey in pjkeylist)

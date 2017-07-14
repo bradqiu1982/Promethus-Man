@@ -1914,9 +1914,9 @@ namespace Prometheus.Controllers
 
             selectlist = new List<string>();
             selectlist.Add("Please select temperature (Optional)");
-            selectlist.Add("Low");
-            selectlist.Add("Normal");
-            selectlist.Add("High");
+            selectlist.Add(TestTemperatureType.Low);
+            selectlist.Add(TestTemperatureType.Nomal);
+            selectlist.Add(TestTemperatureType.High);
             selectcontrol = CreateSelectList(selectlist, "");
             selectcontrol[0].Disabled = true;
             selectcontrol[0].Selected = true;
@@ -1935,7 +1935,7 @@ namespace Prometheus.Controllers
 
             selectlist = new List<string>();
             selectlist.Add("Please select algorithm");
-            selectlist.Add("UNIFORMITY");
+            selectlist.Add(PJCriticalAlgorithm.UNIFORMITY);
             selectcontrol = CreateSelectList(selectlist, "");
             selectcontrol[0].Disabled = true;
             selectcontrol[0].Selected = true;

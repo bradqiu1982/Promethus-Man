@@ -30,31 +30,6 @@ namespace Prometheus.Controllers
         public double highval { set; get; }
     }
 
-    public class CleanDataWithStdDev
-    {
-        public double Mean { set; get; }
-        public double StdDev { set; get; }
-
-        private List<double> filtedlist = new List<double>();
-        private List<double> outlierlist = new List<double>();
-        public List<double> FiltedList { get { return filtedlist; } }
-        public List<double> OutlierList { get { return outlierlist; } }
-
-        private Dictionary<double, int> frequencedict = new Dictionary<double, int>();
-        public Dictionary<double, int> FrequenceDict {
-            set {
-                frequencedict.Clear();
-                foreach (var kv in value)
-                {
-                    frequencedict.Add(kv.Key, kv.Value);
-                }
-            }
-            get{ return frequencedict; }
-        }
-
-    }
-
-
     public class BoxPlotData
     {
         public double Min { set; get; }
@@ -228,9 +203,9 @@ namespace Prometheus.Controllers
 
             selectlist = new List<string>();
             selectlist.Add("Please select test temperature");
-            selectlist.Add("low");
-            selectlist.Add("normal");
-            selectlist.Add("high");
+            selectlist.Add(TestTemperatureType.Low);
+            selectlist.Add(TestTemperatureType.Nomal);
+            selectlist.Add(TestTemperatureType.High);
             selectcontrol = CreateSelectList(selectlist, leftfield);
             selectcontrol[0].Disabled = true;
             selectcontrol[0].Selected = true;
@@ -238,9 +213,9 @@ namespace Prometheus.Controllers
 
             selectlist = new List<string>();
             selectlist.Add("Please select test temperature");
-            selectlist.Add("low");
-            selectlist.Add("normal");
-            selectlist.Add("high");
+            selectlist.Add(TestTemperatureType.Low);
+            selectlist.Add(TestTemperatureType.Nomal);
+            selectlist.Add(TestTemperatureType.High);
             selectcontrol = CreateSelectList(selectlist, leftfield);
             selectcontrol[0].Disabled = true;
             selectcontrol[0].Selected = true;
@@ -931,11 +906,11 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(temp))
             {
-                if (string.Compare(temp, "low", true) == 0)
+                if (string.Compare(temp, TestTemperatureType.Low, true) == 0)
                 {
                     optioncond = optioncond + " and Temperature < 15 ";
                 }
-                else if (string.Compare(temp, "high", true) == 0)
+                else if (string.Compare(temp, TestTemperatureType.High, true) == 0)
                 {
                     optioncond = optioncond + " and Temperature > 45 ";
                 }
@@ -1226,9 +1201,9 @@ namespace Prometheus.Controllers
 
             selectlist = new List<string>();
             selectlist.Add("Please select test temperature");
-            selectlist.Add("low");
-            selectlist.Add("normal");
-            selectlist.Add("high");
+            selectlist.Add(TestTemperatureType.Low);
+            selectlist.Add(TestTemperatureType.Nomal);
+            selectlist.Add(TestTemperatureType.High);
             selectcontrol = CreateSelectList(selectlist, "");
             selectcontrol[0].Disabled = true;
             selectcontrol[0].Selected = true;
@@ -1348,11 +1323,11 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(temperature))
             {
-                if (string.Compare(temperature, "low", true) == 0)
+                if (string.Compare(temperature, TestTemperatureType.Low, true) == 0)
                 {
                     optioncond = optioncond + " and Temperature < 15 ";
                 }
-                else if (string.Compare(temperature, "high", true) == 0)
+                else if (string.Compare(temperature, TestTemperatureType.High, true) == 0)
                 {
                     optioncond = optioncond + " and Temperature > 45 ";
                 }
@@ -1425,11 +1400,11 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(temperature))
             {
-                if (string.Compare(temperature, "low", true) == 0)
+                if (string.Compare(temperature, TestTemperatureType.Low, true) == 0)
                 {
                     optioncond = optioncond + " and Temperature < 15 ";
                 }
-                else if (string.Compare(temperature, "high", true) == 0)
+                else if (string.Compare(temperature, TestTemperatureType.High, true) == 0)
                 {
                     optioncond = optioncond + " and Temperature > 45 ";
                 }

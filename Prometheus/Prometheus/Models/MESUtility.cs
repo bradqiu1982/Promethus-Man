@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
+using System.Web.Mvc;
 
 namespace Prometheus.Models
 {
@@ -103,7 +104,242 @@ namespace Prometheus.Models
             return ret;
         }
 
-        private static void CreateSystemIssues(List<ProjectTestData> failurelist)
+        private static void CreateFA(ProjectTestData item,string firstengineer)
+        {
+            var vm = new IssueViewModels();
+            vm.ProjectKey = item.ProjectKey;
+            vm.IssueKey = item.DataID;
+            vm.IssueType = ISSUETP.Bug;
+            vm.Summary = "Module " + item.ModuleSerialNum + " failed for "+item.ErrAbbr + " @ "+item.WhichTest;
+            vm.Priority = ISSUEPR.Major;
+            vm.DueDate = DateTime.Now.AddDays(7);
+            vm.ReportDate = item.TestTimeStamp;
+            vm.Assignee = firstengineer;
+            vm.Reporter = "System";
+            vm.Resolution = Resolute.Pending;
+            vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+            vm.Description = "Module " + item.ModuleSerialNum + " failed for " + item.ErrAbbr + " @ " + item.WhichTest +" on tester "+item.TestStation + " "+item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss");
+            vm.CommentType = COMMENTTYPE.Description;
+            vm.ModuleSN = item.ModuleSerialNum;
+            vm.ErrAbbr = item.ErrAbbr;
+            vm.DataID = item.DataID;
+            //ProjectEvent.CreateIssueEvent(vm.ProjectKey, "System", vm.Assignee, vm.Summary, vm.IssueKey);
+            //vm.StoreIssue();
+        }
+
+        private static List<TraceViewData> RetrieveTraceViewData(ProjectCriticalErrorVM pjerror, ProjectTestData pjdata, Controller ctrl)
+        {
+            var ret = new List<TraceViewData>();
+
+            var traceviewlist = ExternalDataCollector.LoadTraceView2Local(pjdata.TestStation, pjdata.ModuleSerialNum, pjdata.WhichTest, pjdata.TestTimeStamp.ToString(), ctrl);
+            foreach (var filename in traceviewlist)
+            {
+                var tempret = ExternalDataCollector.RetrieveTestDataFromTraceView(filename, pjerror.TestCaseName, pjerror.MatchCond);
+                if (tempret.Count > 0)
+                {
+                    ret.AddRange(tempret);
+                }
+            }
+            return ret;
+        }
+
+        private static CleanDataWithStdDev GetCleanDataWithStdDev(List<double> rawdata,int sigma)
+        {
+            var ret = new CleanDataWithStdDev();
+
+            rawdata.Sort();
+            var mean = NormalDistributeAlg.Mean(rawdata);
+            var stddev = NormalDistributeAlg.StandardDeviation(rawdata, mean);
+            ret.Mean = mean;
+            ret.StdDev = stddev;
+
+            var startvalue = mean - sigma * stddev;
+            var endvalue = mean + sigma * stddev;
+            foreach (var item in rawdata)
+            {
+                if (item >= startvalue && item <= endvalue)
+                {
+                    ret.FiltedList.Add(item);
+                }
+                else
+                {
+                    ret.OutlierList.Add(item);
+                }
+            }
+            return ret;
+        }
+
+        private static bool UniformityAlgorithm(List<TraceViewData> tempfiltereddata,int sigma)
+        {
+            var lowtemplist = new List<double>();
+            var hightemplist = new List<double>();
+            var normaltemplist = new List<double>();
+            foreach (var item in tempfiltereddata)
+            {
+                if (item.Temp > 45)
+                {
+                    hightemplist.Add(item.Value);
+                }
+                else if (item.Temp < 15)
+                {
+                    lowtemplist.Add(item.Value);
+                }
+                else
+                {
+                    normaltemplist.Add(item.Value);
+                }
+            }
+
+            try
+            {
+                if (lowtemplist.Count > 2)
+                {
+                    
+                    var ret = GetCleanDataWithStdDev(lowtemplist, sigma);
+                    if (ret.OutlierList.Count > 0)
+                    {
+                        return true;
+                    }
+                }
+                if (hightemplist.Count > 2)
+                {
+                    var ret = GetCleanDataWithStdDev(hightemplist, sigma);
+                    if (ret.OutlierList.Count > 0)
+                    {
+                        return true;
+                    }
+                }
+                if (normaltemplist.Count > 2)
+                {
+                    var ret = GetCleanDataWithStdDev(normaltemplist, sigma);
+                    if (ret.OutlierList.Count > 0)
+                    {
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex) { }
+
+            return false;
+        }
+
+        private static List<TraceViewData> FilterTraceViewDataWithCHTEMP(List<TraceViewData> traceviewdata, ProjectCriticalErrorVM pjerror)
+        {
+            var chfiltereddata = new List<TraceViewData>();
+            var tempfiltereddata = new List<TraceViewData>();
+
+            if (!string.IsNullOrEmpty(pjerror.Channel))
+            {
+                foreach (var item in traceviewdata)
+                {
+                    if (item.CH == Convert.ToInt32(pjerror.Channel))
+                    {
+                        chfiltereddata.Add(item);
+                    }
+                }//end foreach
+            }
+            else
+            {
+                chfiltereddata.AddRange(traceviewdata);
+            }
+
+            if (!string.IsNullOrEmpty(pjerror.Temperature))
+            {
+                foreach (var item in chfiltereddata)
+                {
+                    if (pjerror.Temperature.ToUpper().Contains(TestTemperatureType.High.ToUpper()))
+                    {
+                        if (item.Temp > 45)
+                        {
+                            tempfiltereddata.Add(item);
+                        }
+                    }
+                    else if (pjerror.Temperature.ToUpper().Contains(TestTemperatureType.Low.ToUpper()))
+                    {
+                        if (item.Temp < 15)
+                        {
+                            tempfiltereddata.Add(item);
+                        }
+                    }
+                    else
+                    {
+                        if (item.Temp > 15 && item.Temp < 45)
+                        {
+                            tempfiltereddata.Add(item);
+                        }
+                    }
+                }//end foreach
+            }
+            else
+            {
+                tempfiltereddata.AddRange(chfiltereddata);
+            }
+
+            return tempfiltereddata;
+        }
+
+        private static bool CheckPJCriticalRule(List<TraceViewData> traceviewdata, ProjectCriticalErrorVM pjerror,List<TraceViewData> filtereddata)
+        {
+
+            var tempfiltereddata = FilterTraceViewDataWithCHTEMP(traceviewdata, pjerror);
+            if (tempfiltereddata.Count == 0)
+                return false;
+            filtereddata.AddRange(tempfiltereddata);
+
+            if (pjerror.WithLimit == 1)
+            {
+                foreach (var item in tempfiltereddata)
+                {
+                    if (item.Value > pjerror.LowLimit && item.Value < pjerror.HighLimit)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            if (pjerror.WithAlgorithm == 1)
+            {
+                if (string.Compare(pjerror.Algorithm, PJCriticalAlgorithm.UNIFORMITY, true) == 0)
+                {
+                    try
+                    {
+                        var sigma = Convert.ToInt32(pjerror.AlgorithmParam.Trim());
+                        if (UniformityAlgorithm(tempfiltereddata, sigma))
+                        {
+                            return true;
+                        }
+                    }
+                    catch (Exception ex) { }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool CheckPJCriticalError(ProjectTestData pjdata, List<ProjectCriticalErrorVM> pjcriticalerrorlist, Controller ctrl)
+        {
+            foreach (var item in pjcriticalerrorlist)
+            {
+                if (string.Compare(item.ErrorCode, pjdata.ErrAbbr, true) == 0)
+                {
+                    var filtereddata = new List<TraceViewData>();
+
+                    var traceviewdata = RetrieveTraceViewData(item, pjdata, ctrl);
+                    if (traceviewdata.Count == 0)
+                        continue;
+                    if (!CheckPJCriticalRule(traceviewdata, item,filtereddata))
+                        continue;
+                    //match rule
+
+                    return true;
+                }
+            }
+
+            return false;
+
+        }
+
+        private static void CreateSystemIssues(List<ProjectTestData> failurelist, Controller ctrl)
         {
             if (failurelist.Count > 0)
             {
@@ -117,28 +353,14 @@ namespace Prometheus.Models
                         break;
                     }
                 }
+                var pjcriticalerrorlist = ProjectCriticalErrorVM.RetrievePJCriticalError(failurelist[0].ProjectKey, null);
 
                 foreach (var item in failurelist)
                 {
-                    var vm = new IssueViewModels();
-                    vm.ProjectKey = item.ProjectKey;
-                    vm.IssueKey = item.DataID;
-                    vm.IssueType = ISSUETP.Bug;
-                    vm.Summary = "Module " + item.ModuleSerialNum + " failed for "+item.ErrAbbr + " @ "+item.WhichTest;
-                    vm.Priority = ISSUEPR.Major;
-                    vm.DueDate = DateTime.Now.AddDays(7);
-                    vm.ReportDate = item.TestTimeStamp;
-                    vm.Assignee = firstengineer;
-                    vm.Reporter = "System";
-                    vm.Resolution = Resolute.Pending;
-                    vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
-                    vm.Description = "Module " + item.ModuleSerialNum + " failed for " + item.ErrAbbr + " @ " + item.WhichTest +" on tester "+item.TestStation + " "+item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss");
-                    vm.CommentType = COMMENTTYPE.Description;
-                    vm.ModuleSN = item.ModuleSerialNum;
-                    vm.ErrAbbr = item.ErrAbbr;
-                    vm.DataID = item.DataID;
-                    //ProjectEvent.CreateIssueEvent(vm.ProjectKey, "System", vm.Assignee, vm.Summary, vm.IssueKey);
-                    vm.StoreIssue();
+                    if (!CheckPJCriticalError(item,pjcriticalerrorlist,ctrl))
+                    {
+                        CreateFA(item, firstengineer);
+                    }
                 }
             }
         }
@@ -257,7 +479,7 @@ namespace Prometheus.Models
         }
 
 
-        public static void UpdateProjectData(ProjectViewModels vm,string starttime,string endtime)
+        public static void UpdateProjectData(ProjectViewModels vm,string starttime,string endtime, Controller ctrl)
         {
             try
             {
@@ -312,7 +534,7 @@ namespace Prometheus.Models
 
                             if (!bondinged)
                             {
-                                tempdata.StoreProjectTestData();
+                                //tempdata.StoreProjectTestData();
 
                                 if (!sndict.ContainsKey(tempdata.ModuleSerialNum))
                                 {
@@ -339,7 +561,7 @@ namespace Prometheus.Models
                                 {
                                     bondingeddatadict.Add(tempdata.DataID,true);
 
-                                    tempdata.StoreProjectTestData();
+                                    //tempdata.StoreProjectTestData();
 
                                     if (!sndict.ContainsKey(tempdata.ModuleSerialNum))
                                     {
@@ -375,7 +597,7 @@ namespace Prometheus.Models
                             IssueViewModels.CloseIssueAutomaticllyWithFailedSN(item.ProjectKey, item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss"));
                         }
 
-                        CreateSystemIssues(failurelist);
+                        CreateSystemIssues(failurelist,ctrl);
                 }
 
                 if (vm.FinishRating < 90 && DateTime.Parse(starttime) != vm.StartDate)

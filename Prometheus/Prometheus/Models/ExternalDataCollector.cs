@@ -13,6 +13,7 @@ using System.Web.Routing;
 namespace Prometheus.Models
 {
 
+
     public class RMAMAPDATATYPE
     {
         public static string ATTACH = "ATTACH";
@@ -322,6 +323,20 @@ namespace Prometheus.Models
         public int x { set; get; }
         public int y { set; get; }
         public double value { set; get; }
+    }
+
+    public class TraceViewData
+    {
+        public TraceViewData()
+        {
+            Temp = 25;
+            CH = 0;
+            Value = 0;
+        }
+
+        public double Temp { set; get; }
+        public int CH { set; get; }
+        public double Value { set; get; }
     }
 
     public class ExternalDataCollector
@@ -2280,6 +2295,147 @@ namespace Prometheus.Models
             }
         }
 
+        #endregion
+
+        #region TraceView
+
+        private static string RetrieveTimeFromTraceViewName(string filename)
+        {
+            var tracestrs = filename.Split(new string[] { "_TRACEVIEW_" }, StringSplitOptions.RemoveEmptyEntries);
+            if (tracestrs.Length > 1)
+            {
+                var dutstrs = tracestrs[1].Split(new string[] { "_DUTORDERED_" }, StringSplitOptions.RemoveEmptyEntries);
+                var timestr = dutstrs[0].Replace("_", "").Replace(" ", "");
+                return timestr.Substring(0, 4) + "-" + timestr.Substring(4, 2) + "-" + timestr.Substring(6, 2) + " " + timestr.Substring(8, 2) + ":" + timestr.Substring(10, 2) + ":" + timestr.Substring(12, 2);
+            }
+            return null;
+        }
+
+        public static List<TraceViewData> RetrieveTestDataFromTraceView(string filename,string testcase,string datafield)
+        {
+            var ret = new List<TraceViewData>();
+
+            if (!File.Exists(filename))
+                return ret;
+
+            var allline = System.IO.File.ReadAllLines(filename);
+            var crttemp = 25.0;
+            var crtch = 0;
+
+            var entertestcase = false;
+
+            foreach (var line in allline)
+            {
+                var uline = line.ToUpper();
+
+                if (uline.Contains(testcase.ToUpper()) && uline.Contains("STARTED"))
+                {
+                    entertestcase = true;
+                    if (uline.Contains("C ---") && uline.Contains("@"))
+                    {
+                        var head = uline.Split(new string[] { "C ---" }, StringSplitOptions.RemoveEmptyEntries);
+                        var tempstrs = head[0].Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries);
+                        if (tempstrs.Length > 1)
+                        {
+                            try
+                            {
+                                crttemp = Convert.ToDouble(tempstrs[1].Trim());
+                            }
+                            catch (Exception ex) { }
+                        }
+                    }
+                }//end if
+
+                if (uline.Contains(testcase.ToUpper()) && uline.Contains("COMPLETED"))
+                {
+                    entertestcase = false;
+                }
+
+                if (entertestcase && line.Contains("] --- ") && uline.Contains(" "+datafield.ToUpper()+" "))
+                {
+                    var fields = uline.Split(new string[] { " " + datafield.ToUpper() + " " }, StringSplitOptions.RemoveEmptyEntries);
+                    if (fields.Length > 1)
+                    {
+                        var chstr = fields[0].Replace("\t", "").Replace(" ", "").Replace("[", "").Replace("]", "").Replace("-", "");
+                        try
+                        { crtch = Convert.ToInt32(chstr); }
+                        catch (Exception ex) { }
+
+                        var tmpvaluestr = fields[1].Trim();
+                        var tmpvals = tmpvaluestr.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                        try
+                        {
+                            if (!tmpvals[0].Contains("<NM>"))
+                            {
+                                var tempval = Convert.ToDouble(tmpvals[0]);
+                                var temptraceviewdata = new TraceViewData();
+                                temptraceviewdata.Temp = crttemp;
+                                temptraceviewdata.CH = crtch;
+                                temptraceviewdata.Value = tempval;
+                                ret.Add(temptraceviewdata);
+                            }
+                        }
+                        catch (Exception ex) { }
+                    }//end if
+                }//en if
+
+            }//end foreach
+            return ret;
+        }
+
+        public static List<string> LoadTraceView2Local(string tester, string sn, string whichtest, string dbtimestr, Controller ctrl)
+        {
+            var ret = new List<string>();
+
+            var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+            var traceviewscrfolder = syscfgdict["TRACEVIEWFOLDER"]+"\\"+tester;
+            var allsrcfiles = DirectoryEnumerateFiles(ctrl, traceviewscrfolder);
+
+            string datestring = DateTime.Now.ToString("yyyyMMdd");
+            string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+            if (!DirectoryExists(ctrl, imgdir))
+            {
+                Directory.CreateDirectory(imgdir);
+            }
+
+            foreach (var srcf in allsrcfiles)
+            {
+                var filename = Path.GetFileName(srcf).ToUpper();
+
+                if (filename.Contains(sn.ToUpper())
+                    && filename.Contains(whichtest.ToUpper())
+                    && filename.Contains("_DUTORDERED_")
+                    && filename.Contains("_TRACEVIEW_"))
+                {
+                    var traceviewtimestr = RetrieveTimeFromTraceViewName(filename);
+                    if (traceviewtimestr == null)
+                        continue;
+
+                    try
+                    {
+                        var traceviewtime = DateTime.Parse(traceviewtimestr);
+                        var dbtime = DateTime.Parse(dbtimestr);
+                        if (traceviewtime > dbtime.AddSeconds(-5) && traceviewtime < dbtime.AddSeconds(5))
+                        {
+                            logthdinfo("\r\nStart to copy file: " + srcf);
+                            var desfile = imgdir + filename;
+                            FileCopy(ctrl, srcf, desfile, true);
+                            if (FileExist(ctrl, desfile))
+                            {
+                                logthdinfo("try to add data from file: " + desfile);
+                                ret.Add(desfile);
+                            }//copied file exist
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        logthdinfo("LoadTraceView2Local Exception: " + ex.Message);
+                    }
+                }//end if
+            }//end foreach
+
+            return ret;
+        }
         #endregion
     }
 }

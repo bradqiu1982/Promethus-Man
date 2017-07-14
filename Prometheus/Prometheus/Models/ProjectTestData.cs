@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Caching;
+using System.Web.Mvc;
 
 namespace Prometheus.Models
 {
@@ -109,7 +110,7 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(isql);
         }
 
-        public static void PrePareMESLatestData(string projectkey)
+        public static void PrePareMESLatestData(string projectkey, Controller ctrl)
         {
             if (UpdatePJLockUsing(projectkey))
                 return;
@@ -128,12 +129,12 @@ namespace Prometheus.Models
                         //vlast = vlast.AddMinutes(18);
                         //if (vlast < DateTime.Now)
                         //{
-                            MESUtility.UpdateProjectData(vm, lastupdatetime, DateTime.Now.ToString());
+                            MESUtility.UpdateProjectData(vm, lastupdatetime, DateTime.Now.ToString(),ctrl);
                         //}
                     }
                     else
                     {
-                        MESUtility.UpdateProjectData(vm, vm.StartDate.ToString(), DateTime.Now.ToString());
+                        MESUtility.UpdateProjectData(vm, vm.StartDate.ToString(), DateTime.Now.ToString(),ctrl);
                     }
                 }
 

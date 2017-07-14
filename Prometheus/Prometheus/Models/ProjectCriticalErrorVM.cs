@@ -5,6 +5,18 @@ using System.Web;
 
 namespace Prometheus.Models
 {
+    public class TestTemperatureType
+    {
+        public static string Low = "Low";
+        public static string High = "High";
+        public static string Nomal = "Nomal";
+    }
+
+    public class PJCriticalAlgorithm
+    {
+        public static string UNIFORMITY = "UNIFORMITY";
+    }
+
     public class ProjectCriticalErrorVM
     {
         public ProjectCriticalErrorVM()

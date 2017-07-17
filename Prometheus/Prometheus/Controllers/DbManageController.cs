@@ -179,6 +179,7 @@ namespace Prometheus.Controllers
             tablelist.Add("NeoMapData");
             tablelist.Add("PJErrorAttachment");
             tablelist.Add("Project");
+            tablelist.Add("ProjectCriticalError");
             tablelist.Add("ProjectError");
             tablelist.Add("ProjectEvent");
             tablelist.Add("ProjectException");

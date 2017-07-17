@@ -124,7 +124,7 @@ namespace Prometheus.Models
             vm.ErrAbbr = item.ErrAbbr;
             vm.DataID = item.DataID;
             //ProjectEvent.CreateIssueEvent(vm.ProjectKey, "System", vm.Assignee, vm.Summary, vm.IssueKey);
-            //vm.StoreIssue();
+            vm.StoreIssue();
         }
 
         private static List<TraceViewData> RetrieveTraceViewData(ProjectCriticalErrorVM pjerror, ProjectTestData pjdata, Controller ctrl)
@@ -534,7 +534,7 @@ namespace Prometheus.Models
 
                             if (!bondinged)
                             {
-                                //tempdata.StoreProjectTestData();
+                                tempdata.StoreProjectTestData();
 
                                 if (!sndict.ContainsKey(tempdata.ModuleSerialNum))
                                 {
@@ -561,7 +561,7 @@ namespace Prometheus.Models
                                 {
                                     bondingeddatadict.Add(tempdata.DataID,true);
 
-                                    //tempdata.StoreProjectTestData();
+                                    tempdata.StoreProjectTestData();
 
                                     if (!sndict.ContainsKey(tempdata.ModuleSerialNum))
                                     {

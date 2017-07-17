@@ -124,6 +124,81 @@ namespace Prometheus.Models
             }
         }
 
+        public static List<List<object>> ExeSqlWithRes(SqlConnection conn, string sql)
+        {
+
+            var ret = new List<List<object>>();
+            if (conn == null)
+                return ret;
+
+            SqlDataReader sqlreader = null;
+            SqlCommand command = null;
+
+            try
+            {
+                command = conn.CreateCommand();
+                command.CommandText = sql;
+                command.CommandTimeout = 180;
+                sqlreader = command.ExecuteReader();
+                if (sqlreader.HasRows)
+                {
+
+                    while (sqlreader.Read())
+                    {
+                        var newline = new List<object>();
+                        for (var i = 0; i < sqlreader.FieldCount; i++)
+                        {
+                            newline.Add(sqlreader.GetValue(i));
+                        }
+                        ret.Add(newline);
+                    }
+
+                }
+                sqlreader.Close();
+                return ret;
+            }
+            catch (SqlException ex)
+            {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+
+                try
+                {
+                    if (sqlreader != null)
+                    {
+                        sqlreader.Close();
+                    }
+                    if (command != null)
+                    {
+                        command.Dispose();
+                    }
+                }
+                catch (Exception e)
+                { }
+                ret.Clear();
+                return ret;
+            }
+            catch (Exception ex)
+            {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+
+                try
+                {
+                    if (sqlreader != null)
+                    {
+                        sqlreader.Close();
+                    }
+                    if (command != null)
+                    {
+                        command.Dispose();
+                    }
+                }
+                catch (Exception e)
+                { }
+                ret.Clear();
+                return ret;
+            }
+        }
+
         public static void CloseConnector(SqlConnection conn)
         {
             if (conn == null)

@@ -756,13 +756,13 @@ namespace Prometheus.Models
 
         public void StoreIssue()
         {
-            var sql = "insert into Issue(ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,Creator,AlertEmailUpdateDate,RelativePeoples,ModuleSN,ErrAbbr,DataID) values('<ProjectKey>','<IssueKey>','<IssueType>',N'<Summary>','<Priority>','<DueDate>','<ResolvedDate>','<ReportDate>','<Assignee>','<Reporter>','<Resolution>','<Creator>','<AlertEmailUpdateDate>','<RelativePeoples>',N'<ModuleSN>','<ErrAbbr>','<DataID>')";
+            var sql = "insert into Issue(ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,Creator,AlertEmailUpdateDate,RelativePeoples,ModuleSN,ErrAbbr,DataID,databackuptm) values('<ProjectKey>','<IssueKey>','<IssueType>',N'<Summary>','<Priority>','<DueDate>','<ResolvedDate>','<ReportDate>','<Assignee>','<Reporter>','<Resolution>','<Creator>','<AlertEmailUpdateDate>','<RelativePeoples>',N'<ModuleSN>','<ErrAbbr>','<DataID>','<databackuptm>')";
             sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<IssueKey>", IssueKey).Replace("<IssueType>", IssueType)
                 .Replace("<Summary>", Summary).Replace("<Priority>", Priority).Replace("<DueDate>", DueDate.ToString())
                 .Replace("<ResolvedDate>", ResolvedDate.ToString()).Replace("<ReportDate>", ReportDate.ToString()).Replace("<Assignee>", Assignee)
                 .Replace("<Reporter>", Reporter).Replace("<Resolution>", Resolution).Replace("<Creator>", Reporter)
                 .Replace("<AlertEmailUpdateDate>", DateTime.Now.AddHours(-25).ToString()).Replace("<RelativePeoples>", RelativePeoples)
-                .Replace("<ModuleSN>", ModuleSN).Replace("<ErrAbbr>", ErrAbbr).Replace("<DataID>", DataID);
+                .Replace("<ModuleSN>", ModuleSN).Replace("<ErrAbbr>", ErrAbbr).Replace("<DataID>", DataID).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
 
             StoreIssueComment(DateTime.Now.ToString());
@@ -790,17 +790,17 @@ namespace Prometheus.Models
 
         private void StoreOBA()
         {
-            var sql = "insert into IssueOBA(IssueKey,FinisarDMR,OBAFailureRate,MaterialDisposition,ModuleSN,FVCode,APVal1) values('<IssueKey>','<FinisarDMR>','<OBAFailureRate>','<MaterialDisposition>',N'<ModuleSN>','<FVCode>','<ProductType>')";
+            var sql = "insert into IssueOBA(IssueKey,FinisarDMR,OBAFailureRate,MaterialDisposition,ModuleSN,FVCode,APVal1,databackuptm) values('<IssueKey>','<FinisarDMR>','<OBAFailureRate>','<MaterialDisposition>',N'<ModuleSN>','<FVCode>','<ProductType>','<databackuptm>')";
             sql = sql.Replace("<IssueKey>", IssueKey).Replace("<FinisarDMR>", FinisarDMR).Replace("<OBAFailureRate>", OBAFailureRate).Replace("<FVCode>", FVCode)
-                .Replace("<MaterialDisposition>", MaterialDisposition).Replace("<ModuleSN>", ModuleSN).Replace("<ProductType>", ProductType);
+                .Replace("<MaterialDisposition>", MaterialDisposition).Replace("<ModuleSN>", ModuleSN).Replace("<ProductType>", ProductType).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
         private void StoreQuality()
         {
-            var sql = "insert into IssueAttribute(IssueKey,APVal1,APVal2,APVal3,APVal4) values('<IssueKey>','<RMAFailureCode>','<ProductType>','<AffectRange>','<MaterialDisposition>')";
+            var sql = "insert into IssueAttribute(IssueKey,APVal1,APVal2,APVal3,APVal4,databackuptm) values('<IssueKey>','<RMAFailureCode>','<ProductType>','<AffectRange>','<MaterialDisposition>','<databackuptm>')";
             sql = sql.Replace("<IssueKey>", IssueKey).Replace("<RMAFailureCode>", RMAFailureCode).Replace("<ProductType>", ProductType).Replace("<AffectRange>", AffectRange)
-                .Replace("<MaterialDisposition>", MaterialDisposition);
+                .Replace("<MaterialDisposition>", MaterialDisposition).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
@@ -819,12 +819,12 @@ namespace Prometheus.Models
 
         private void StoreReliability()
         {
-            var sql = "insert into IssueAttribute(IssueKey,APVal1,APVal2,APVal3,APVal4,APVal5,APVal6,APVal7,APVal8,APVal9,APVal10,APVal11,APVal12) "
-                + " values('<IssueKey>','<CaseID>',N'<ProductType>',N'<LineCategory>',N'<QualType>',N'<TestType>',N'<FailureInterval>',N'<TestFailure>',N'<Location>',N'<RequestID>',N'<FailQTY>',N'<TotalQTY>',N'<FVCode>')";
+            var sql = "insert into IssueAttribute(IssueKey,APVal1,APVal2,APVal3,APVal4,APVal5,APVal6,APVal7,APVal8,APVal9,APVal10,APVal11,APVal12,databackuptm) "
+                + " values('<IssueKey>','<CaseID>',N'<ProductType>',N'<LineCategory>',N'<QualType>',N'<TestType>',N'<FailureInterval>',N'<TestFailure>',N'<Location>',N'<RequestID>',N'<FailQTY>',N'<TotalQTY>',N'<FVCode>','<databackuptm>')";
 
             sql = sql.Replace("<IssueKey>", IssueKey).Replace("<CaseID>", CaseID).Replace("<ProductType>", ProductType).Replace("<LineCategory>", LineCategory)
                 .Replace("<QualType>", QualType).Replace("<TestType>", TestType).Replace("<FailureInterval>", FailureInterval).Replace("<TestFailure>", TestFailure)
-                .Replace("<Location>", Location).Replace("<RequestID>", RequestID).Replace("<FailQTY>", FailQTY).Replace("<TotalQTY>", TotalQTY).Replace("<FVCode>", FVCode);
+                .Replace("<Location>", Location).Replace("<RequestID>", RequestID).Replace("<FailQTY>", FailQTY).Replace("<TotalQTY>", TotalQTY).Replace("<FVCode>", FVCode).Replace("<databackuptm>", DateTime.Now.ToString());
 
             DBUtility.ExeLocalSqlNoRes(sql);
         }
@@ -886,10 +886,10 @@ namespace Prometheus.Models
         private void StoreRMA()
         {
 
-            var sql = "insert into IssueRMA(IssueKey,FinisarRMA,FinisarModel,ECustomer,CRMANUM,CReport,ModuleSN,RMAFailureCode,FVCode) values('<IssueKey>','<FinisarRMA>','<FinisarModel>','<ECustomer>','<CRMANUM>','<CReport>',N'<ModuleSN>','<RMAFailureCode>','<FVCode>')";
+            var sql = "insert into IssueRMA(IssueKey,FinisarRMA,FinisarModel,ECustomer,CRMANUM,CReport,ModuleSN,RMAFailureCode,FVCode,databackuptm) values('<IssueKey>','<FinisarRMA>','<FinisarModel>','<ECustomer>','<CRMANUM>','<CReport>',N'<ModuleSN>','<RMAFailureCode>','<FVCode>','<databackuptm>')";
             sql = sql.Replace("<IssueKey>", IssueKey).Replace("<FinisarRMA>", FinisarRMA).Replace("<RMAFailureCode>", RMAFailureCode).Replace("<FVCode>", FVCode)
                 .Replace("<FinisarModel>", FinisarModel).Replace("<ECustomer>", ECustomer)
-                .Replace("<CRMANUM>", CRMANUM).Replace("<CReport>", CReport).Replace("<ModuleSN>", ModuleSN);
+                .Replace("<CRMANUM>", CRMANUM).Replace("<CReport>", CReport).Replace("<ModuleSN>", ModuleSN).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
@@ -940,12 +940,12 @@ namespace Prometheus.Models
 
         public void StoreSubIssue()
         {
-            var sql = "insert into Issue(ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,Creator,AlertEmailUpdateDate,RelativePeoples) values('<ProjectKey>','<IssueKey>','<IssueType>',N'<Summary>','<Priority>','<DueDate>','<ResolvedDate>','<ReportDate>','<Assignee>','<Reporter>','<Resolution>','<ParentIssueKey>','<Creator>','<AlertEmailUpdateDate>','<RelativePeoples>')";
+            var sql = "insert into Issue(ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,Creator,AlertEmailUpdateDate,RelativePeoples,databackuptm) values('<ProjectKey>','<IssueKey>','<IssueType>',N'<Summary>','<Priority>','<DueDate>','<ResolvedDate>','<ReportDate>','<Assignee>','<Reporter>','<Resolution>','<ParentIssueKey>','<Creator>','<AlertEmailUpdateDate>','<RelativePeoples>','<databackuptm>')";
             sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<IssueKey>", IssueKey).Replace("<IssueType>", IssueType)
                 .Replace("<Summary>", Summary).Replace("<Priority>", Priority).Replace("<DueDate>", DueDate.ToString())
                 .Replace("<ResolvedDate>", ResolvedDate.ToString()).Replace("<ReportDate>", ReportDate.ToString()).Replace("<Assignee>", Assignee)
                 .Replace("<Reporter>", Reporter).Replace("<Resolution>", Resolution).Replace("<ParentIssueKey>", ParentIssueKey).Replace("<Creator>", Reporter)
-                .Replace("<AlertEmailUpdateDate>", DateTime.Now.AddHours(-6).ToString()).Replace("<RelativePeoples>", RelativePeoples);
+                .Replace("<AlertEmailUpdateDate>", DateTime.Now.AddHours(-6).ToString()).Replace("<RelativePeoples>", RelativePeoples).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
 
             StoreIssueComment(DateTime.Now.ToString());
@@ -960,18 +960,18 @@ namespace Prometheus.Models
                     CommentType = COMMENTTYPE.Description;
                 }
 
-                var sql = "insert into IssueComments(IssueKey,Comment,Reporter,CommentDate,CommentType) values('<IssueKey>','<Comment>','<Reporter>','<CommentDate>','<CommentType>')";
+                var sql = "insert into IssueComments(IssueKey,Comment,Reporter,CommentDate,CommentType,databackuptm) values('<IssueKey>','<Comment>','<Reporter>','<CommentDate>','<CommentType>','<databackuptm>')";
                 sql = sql.Replace("<IssueKey>", IssueKey).Replace("<Comment>", dbDescription)
-                    .Replace("<Reporter>", Reporter).Replace("<CommentDate>", CommentDate).Replace("<CommentType>", CommentType);
+                    .Replace("<Reporter>", Reporter).Replace("<CommentDate>", CommentDate).Replace("<CommentType>", CommentType).Replace("<databackuptm>", DateTime.Now.ToString());
                 DBUtility.ExeLocalSqlNoRes(sql);
             }
         }
 
         public static void StoreIssueComment(string isk,string desc,string rept,string cmtype)
         {
-            var sql = "insert into IssueComments(IssueKey,Comment,Reporter,CommentDate,CommentType) values('<IssueKey>','<Comment>','<Reporter>','<CommentDate>','<CommentType>')";
+            var sql = "insert into IssueComments(IssueKey,Comment,Reporter,CommentDate,CommentType,databackuptm) values('<IssueKey>','<Comment>','<Reporter>','<CommentDate>','<CommentType>','<databackuptm>')";
             sql = sql.Replace("<IssueKey>", isk).Replace("<Comment>", desc).Replace("<Reporter>", rept)
-                .Replace("<CommentDate>", DateTime.Now.ToString()).Replace("<CommentType>", cmtype);
+                .Replace("<CommentDate>", DateTime.Now.ToString()).Replace("<CommentType>", cmtype).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
@@ -979,8 +979,8 @@ namespace Prometheus.Models
 
         public static void StoreIssueAttachment(string issuekey,string attachmenturl,string attachtype = "Normal")
         {
-            var sql = "insert into IssueAttachment(IssueKey,Attachment,UpdateTime,APVal1) values('<IssueKey>',N'<Attachment>','<UpdateTime>','<attachtype>')";
-            sql = sql.Replace("<IssueKey>", issuekey).Replace("<Attachment>", attachmenturl).Replace("<UpdateTime>", DateTime.Now.ToString()).Replace("<attachtype>", attachtype);
+            var sql = "insert into IssueAttachment(IssueKey,Attachment,UpdateTime,APVal1,databackuptm) values('<IssueKey>',N'<Attachment>','<UpdateTime>','<attachtype>','<databackuptm>')";
+            sql = sql.Replace("<IssueKey>", issuekey).Replace("<Attachment>", attachmenturl).Replace("<UpdateTime>", DateTime.Now.ToString()).Replace("<attachtype>", attachtype).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
@@ -2564,8 +2564,8 @@ namespace Prometheus.Models
             csql = csql.Replace("<ProjectKey>", pjkey).Replace("<ModuleSN>", sn);
             DBUtility.ExeLocalSqlNoRes(csql);
 
-            var sql = "insert into BIROOTCAUSE(ProjectKey,ModuleSN,RootCause) values('<ProjectKey>',N'<ModuleSN>','<RootCause>')";
-            sql = sql.Replace("<ProjectKey>", pjkey).Replace("<ModuleSN>", sn).Replace("<RootCause>", rootcause);
+            var sql = "insert into BIROOTCAUSE(ProjectKey,ModuleSN,RootCause,databackuptm) values('<ProjectKey>',N'<ModuleSN>','<RootCause>','<databackuptm>')";
+            sql = sql.Replace("<ProjectKey>", pjkey).Replace("<ModuleSN>", sn).Replace("<RootCause>", rootcause).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 

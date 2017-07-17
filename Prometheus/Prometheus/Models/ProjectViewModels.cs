@@ -492,11 +492,12 @@ namespace Prometheus.Models
             sql = sql.Replace("<ProjectKey>", ProjectKey);
             DBUtility.ExeLocalSqlNoRes(sql);
 
-            sql = "insert into Project(ProjectKey,ProjectName,StartDate,Description,FinishRate,APVal1,APVal2,ProjectType) values('<ProjectKey>','<ProjectName>','<StartDate>','<Description>',<FinishRate>,'<MonitorVcsel>','<VcselWarningYield>','<ProjectType>')";
+            sql = "insert into Project(ProjectKey,ProjectName,StartDate,Description,FinishRate,APVal1,APVal2,ProjectType,databackuptm) values('<ProjectKey>','<ProjectName>','<StartDate>','<Description>',<FinishRate>,'<MonitorVcsel>','<VcselWarningYield>','<ProjectType>','<databackuptm>')";
             sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ProjectName>", dbProjectName)
                 .Replace("<StartDate>", StartDate.ToString("yyyy-MM-dd"))
                 .Replace("<Description>", dbDescription).Replace("<FinishRate>", Convert.ToString(FinishRating))
-                .Replace("<MonitorVcsel>", MonitorVcsel).Replace("<VcselWarningYield>", VcselWarningYield).Replace("<ProjectType>", ProjectType);
+                .Replace("<MonitorVcsel>", MonitorVcsel).Replace("<VcselWarningYield>", VcselWarningYield)
+                .Replace("<ProjectType>", ProjectType).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
@@ -511,8 +512,8 @@ namespace Prometheus.Models
 
             foreach (var item in MemberList)
             {
-                var sql = "insert into ProjectMembers(ProjectKey,Name,Role) values('<ProjectKey>','<Name>','<Role>')";
-                sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<Name>", item.Name).Replace("<Role>", item.Role);
+                var sql = "insert into ProjectMembers(ProjectKey,Name,Role,databackuptm) values('<ProjectKey>','<Name>','<Role>','<databackuptm>')";
+                sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<Name>", item.Name).Replace("<Role>", item.Role).Replace("<databackuptm>", DateTime.Now.ToString());
                 DBUtility.ExeLocalSqlNoRes(sql);
 
                 UserViewModels.UpdateUserProject(item.Name.ToUpper(), ProjectKey);
@@ -530,8 +531,8 @@ namespace Prometheus.Models
 
             foreach (var item in TabList)
             {
-                var sql = "insert into ProjectMesTable(ProjectKey,Station,TableName) values('<ProjectKey>','<Station>','<TableName>')";
-                sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<Station>", item.Station).Replace("<TableName>", item.TableName);
+                var sql = "insert into ProjectMesTable(ProjectKey,Station,TableName,databackuptm) values('<ProjectKey>','<Station>','<TableName>','<databackuptm>')";
+                sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<Station>", item.Station).Replace("<TableName>", item.TableName).Replace("<databackuptm>", DateTime.Now.ToString());
                 DBUtility.ExeLocalSqlNoRes(sql);
             }
         }
@@ -547,8 +548,8 @@ namespace Prometheus.Models
 
             foreach (var item in PNList)
             {
-                var sql = "insert into ProjectPn(ProjectKey,PN) values('<ProjectKey>','<PN>')";
-                sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<PN>", item.Pn);
+                var sql = "insert into ProjectPn(ProjectKey,PN,databackuptm) values('<ProjectKey>','<PN>','<databackuptm>')";
+                sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<PN>", item.Pn).Replace("<databackuptm>", DateTime.Now.ToString());
                 DBUtility.ExeLocalSqlNoRes(sql);
             }
         }
@@ -564,8 +565,8 @@ namespace Prometheus.Models
 
             foreach (var item in MDIDList)
             {
-                var sql = "insert into ProjectModelID(ProjectKey,ModelID) values('<ProjectKey>','<ModelID>')";
-                sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ModelID>", item.Pn);
+                var sql = "insert into ProjectModelID(ProjectKey,ModelID,databackuptm) values('<ProjectKey>','<ModelID>','<databackuptm>')";
+                sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ModelID>", item.Pn).Replace("<databackuptm>", DateTime.Now.ToString());
                 DBUtility.ExeLocalSqlNoRes(sql);
             }
         }
@@ -581,8 +582,8 @@ namespace Prometheus.Models
 
             foreach (var item in StationList)
             {
-                var sql = "insert into ProjectStation(ProjectKey,Station) values('<ProjectKey>','<Station>')";
-                sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<Station>", item.Station);
+                var sql = "insert into ProjectStation(ProjectKey,Station,databackuptm) values('<ProjectKey>','<Station>','<databackuptm>')";
+                sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<Station>", item.Station).Replace("<databackuptm>", DateTime.Now.ToString());
                 DBUtility.ExeLocalSqlNoRes(sql);
             }
         }
@@ -598,8 +599,8 @@ namespace Prometheus.Models
 
             foreach (var item in SumDatasetList)
             {
-                var sql = "insert into ProjectSumDataSet(ProjectKey,SumDataSet) values('<ProjectKey>','<SumDataSet>')";
-                sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<SumDataSet>", item.Station);
+                var sql = "insert into ProjectSumDataSet(ProjectKey,SumDataSet,databackuptm) values('<ProjectKey>','<SumDataSet>','<databackuptm>')";
+                sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<SumDataSet>", item.Station).Replace("<databackuptm>", DateTime.Now.ToString());
                 DBUtility.ExeLocalSqlNoRes(sql);
             }
         }
@@ -791,8 +792,8 @@ namespace Prometheus.Models
             }
             else
             {
-                sql = "insert into ProjectException(ProjectKey,Exception,ExceptionType) values('<ProjectKey>','<Except>','<ExceptType>')";
-                sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ExceptType>", ExceptType).Replace("<Except>", Except);
+                sql = "insert into ProjectException(ProjectKey,Exception,ExceptionType,databackuptm) values('<ProjectKey>','<Except>','<ExceptType>','<databackuptm>')";
+                sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ExceptType>", ExceptType).Replace("<Except>", Except).Replace("<databackuptm>", DateTime.Now.ToString());
                 DBUtility.ExeLocalSqlNoRes(sql);
             }
         }

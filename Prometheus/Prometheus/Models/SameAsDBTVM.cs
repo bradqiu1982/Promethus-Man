@@ -24,9 +24,9 @@ namespace Prometheus.Models
 
         public static void StoreLinkDBTIssue(string errorkey,string linktime, string originalissuekey, string sameasissuekey, string sameassn)
         {
-            var sql = "insert into SameAsDBTVM(ErrorKey,LinkTime,OriginalIssueKey,SameAsIssueKey,SameAsSN,SameAsTime) values('<ErrorKey>','<LinkTime>','<OriginalIssueKey>','<SameAsIssueKey>','<SameAsSN>','<SameAsTime>')";
+            var sql = "insert into SameAsDBTVM(ErrorKey,LinkTime,OriginalIssueKey,SameAsIssueKey,SameAsSN,SameAsTime,databackuptm) values('<ErrorKey>','<LinkTime>','<OriginalIssueKey>','<SameAsIssueKey>','<SameAsSN>','<SameAsTime>','<databackuptm>')";
             sql = sql.Replace("<ErrorKey>", errorkey).Replace("<LinkTime>", linktime).Replace("<OriginalIssueKey>", originalissuekey)
-                .Replace("<SameAsIssueKey>", sameasissuekey).Replace("<SameAsSN>", sameassn).Replace("<SameAsTime>",DateTime.Now.ToString());
+                .Replace("<SameAsIssueKey>", sameasissuekey).Replace("<SameAsSN>", sameassn).Replace("<SameAsTime>",DateTime.Now.ToString()).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 

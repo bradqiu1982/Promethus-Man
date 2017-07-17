@@ -343,9 +343,9 @@ namespace Prometheus.Models
             }
             else
             {
-                sql = "insert into ProjectError(ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount) values('<ProjectKey>','<ErrorKey>','<OrignalCode>','<ShortDesc>',1)";
+                sql = "insert into ProjectError(ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount,databackuptm) values('<ProjectKey>','<ErrorKey>','<OrignalCode>','<ShortDesc>',1,'<databackuptm>')";
                 sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ErrorKey>", ErrorKey)
-                    .Replace("<OrignalCode>", OrignalCode).Replace("<ShortDesc>", ShortDesc);
+                    .Replace("<OrignalCode>", OrignalCode).Replace("<ShortDesc>", ShortDesc).Replace("<databackuptm>", DateTime.Now.ToString());
                 DBUtility.ExeLocalSqlNoRes(sql);
             }
         }
@@ -372,9 +372,9 @@ namespace Prometheus.Models
 
         public static void StoreErrorComment(string ErrorKey, string dbComment,string CommentType, string Reporter, string CommentDate)
         {
-            var sql = "insert into ErrorComments(ErrorKey,Comment,Reporter,CommentDate,CommentType) values('<ErrorKey>','<Comment>','<Reporter>','<CommentDate>','<CommentType>')";
+            var sql = "insert into ErrorComments(ErrorKey,Comment,Reporter,CommentDate,CommentType,databackuptm) values('<ErrorKey>','<Comment>','<Reporter>','<CommentDate>','<CommentType>','<databackuptm>')";
             sql = sql.Replace("<ErrorKey>", ErrorKey).Replace("<Comment>", dbComment)
-                .Replace("<Reporter>", Reporter).Replace("<CommentDate>", CommentDate).Replace("<CommentType>", CommentType);
+                .Replace("<Reporter>", Reporter).Replace("<CommentDate>", CommentDate).Replace("<CommentType>", CommentType).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
@@ -594,8 +594,8 @@ namespace Prometheus.Models
 
         public static void StoreErrorAttachment(string errorkey, string attachmenturl)
         {
-            var sql = "insert into PJErrorAttachment(ErrorKey,Attachment,UpdateTime) values('<ErrorKey>',N'<Attachment>','<UpdateTime>')";
-            sql = sql.Replace("<ErrorKey>", errorkey).Replace("<Attachment>", attachmenturl).Replace("<UpdateTime>", DateTime.Now.ToString());
+            var sql = "insert into PJErrorAttachment(ErrorKey,Attachment,UpdateTime,databackuptm) values('<ErrorKey>',N'<Attachment>','<UpdateTime>','<databackuptm>')";
+            sql = sql.Replace("<ErrorKey>", errorkey).Replace("<Attachment>", attachmenturl).Replace("<UpdateTime>", DateTime.Now.ToString()).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 

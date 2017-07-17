@@ -20,8 +20,9 @@ namespace Prometheus.Models
 
         public static void AddGroup(string grouptag, string groupmember)
         {
-            var sql = "insert into UserGroupVM(GroupID,GroupTag,GroupMember,TimeStamp) values('<GroupID>','<GroupTag>','<GroupMember>','<TimeStamp>')";
-            sql = sql.Replace("<GroupID>", IssueViewModels.GetUniqKey()).Replace("<GroupTag>", grouptag).Replace("<GroupMember>", groupmember.ToUpper()).Replace("<TimeStamp>", DateTime.Now.ToString());
+            var sql = "insert into UserGroupVM(GroupID,GroupTag,GroupMember,TimeStamp,databackuptm) values('<GroupID>','<GroupTag>','<GroupMember>','<TimeStamp>','<databackuptm>')";
+            sql = sql.Replace("<GroupID>", IssueViewModels.GetUniqKey()).Replace("<GroupTag>", grouptag)
+                .Replace("<GroupMember>", groupmember.ToUpper()).Replace("<TimeStamp>", DateTime.Now.ToString()).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
         

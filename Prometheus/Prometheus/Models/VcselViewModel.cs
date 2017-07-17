@@ -22,6 +22,7 @@ namespace Prometheus.Models
                 valuestring = valuestring + "'" + line[i] + "',";
             }
             valuestring = valuestring.Substring(0, valuestring.Length - 1);
+            valuestring = valuestring + ",'" + DateTime.Now.ToString() + "'";
             sql = sql.Replace("<v>", valuestring);
             DBUtility.ExeLocalSqlNoRes(sql);
         }

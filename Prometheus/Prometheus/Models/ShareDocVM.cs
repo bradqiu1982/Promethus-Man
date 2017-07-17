@@ -96,11 +96,11 @@ namespace Prometheus.Models
 
             var docid = IssueViewModels.GetUniqKey();
 
-            sql = "insert into ShareDoc(DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,APVal1,BackLink) values('<DOCPJK>','<DOCType>',N'<DOCKey>','<DOCTag>','<DOCCreator>','<DOCDate>','<DOCID>','<BackLink>')";
+            sql = "insert into ShareDoc(DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,APVal1,BackLink,databackuptm) values('<DOCPJK>','<DOCType>',N'<DOCKey>','<DOCTag>','<DOCCreator>','<DOCDate>','<DOCID>','<BackLink>','<databackuptm>')";
             sql = sql.Replace("<DOCPJK>", DOCPJK).Replace("<DOCType>", DOCType)
                 .Replace("<DOCKey>", DOCKey).Replace("<DOCTag>", DOCTag)
                 .Replace("<DOCCreator>", DOCCreator).Replace("<DOCDate>", DOCDate)
-                .Replace("<DOCID>", docid).Replace("<BackLink>", BackLink);
+                .Replace("<DOCID>", docid).Replace("<BackLink>", BackLink).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
             return docid;
         }
@@ -128,11 +128,11 @@ namespace Prometheus.Models
                 return;
             }
 
-            sql = "insert into UserLearn(UserName,DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,DOCPusher,APVal1,BackLink) values('<BookerName>','<DOCPJK>','<DOCType>',N'<DOCKey>','<DOCTag>','<DOCCreator>','<DOCDate>','<DOCPusher>','<DOCID>','<BackLink>')";
+            sql = "insert into UserLearn(UserName,DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,DOCPusher,APVal1,BackLink,databackuptm) values('<BookerName>','<DOCPJK>','<DOCType>',N'<DOCKey>','<DOCTag>','<DOCCreator>','<DOCDate>','<DOCPusher>','<DOCID>','<BackLink>','<databackuptm>')";
             sql = sql.Replace("<BookerName>", BookerName).Replace("<DOCPJK>", DOCPJK).Replace("<DOCType>", DOCType)
                 .Replace("<DOCKey>", DOCKey).Replace("<DOCTag>", DOCTag)
                 .Replace("<DOCCreator>", DOCCreator).Replace("<DOCDate>", DOCDate).Replace("<DOCPusher>", DOCPusher)
-                .Replace("<DOCID>", DOCID).Replace("<BackLink>", BackLink);
+                .Replace("<DOCID>", DOCID).Replace("<BackLink>", BackLink).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
@@ -880,8 +880,8 @@ namespace Prometheus.Models
                 var sql = "delete from ShareTags where DOCTag = '<Tag>'";
                 sql = sql.Replace("<Tag>", tag.Trim());
                 DBUtility.ExeLocalSqlNoRes(sql);
-                sql = "insert into ShareTags(DOCTag) values('<DOCTag>')";
-                sql = sql.Replace("<DOCTag>", tag.Trim());
+                sql = "insert into ShareTags(DOCTag,databackuptm) values('<DOCTag>','<databackuptm>')";
+                sql = sql.Replace("<DOCTag>", tag.Trim()).Replace("<databackuptm>", DateTime.Now.ToString());
                 DBUtility.ExeLocalSqlNoRes(sql);
             }
         }

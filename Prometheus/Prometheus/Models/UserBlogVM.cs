@@ -170,10 +170,10 @@ namespace Prometheus.Models
         {
             DocKey = GetUniqKey();
 
-            var sql = "insert into UserBlog(UserName,APVal1,APVal2,APVal3,APVal4,APVal5,APVal9) "
-                + " values('<UserName>','<APVal1>','<APVal2>','<APVal3>','<APVal4>','<APVal5>','<APVal9>')";
+            var sql = "insert into UserBlog(UserName,APVal1,APVal2,APVal3,APVal4,APVal5,APVal9,databackuptm) "
+                + " values('<UserName>','<APVal1>','<APVal2>','<APVal3>','<APVal4>','<APVal5>','<APVal9>','<databackuptm>')";
             sql = sql.Replace("<UserName>", UserName).Replace("<APVal1>", ContentType).Replace("<APVal2>", DocKey).Replace("<APVal3>", dbTitle)
-                    .Replace("<APVal4>", dbContent).Replace("<APVal5>", Tag).Replace("<APVal9>", DateTime.Now.ToString());
+                    .Replace("<APVal4>", dbContent).Replace("<APVal5>", Tag).Replace("<APVal9>", DateTime.Now.ToString()).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
@@ -354,9 +354,10 @@ namespace Prometheus.Models
             sql = sql.Replace("<UserName>", username).Replace("<APVal1>", UserBlogContentType.TAG);
             DBUtility.ExeLocalSqlNoRes(sql);
 
-            sql = "insert into UserBlog(UserName,APVal1,APVal2) "
-                + " values('<UserName>','<APVal1>','<APVal2>')";
-            sql = sql.Replace("<UserName>", username).Replace("<APVal1>", UserBlogContentType.TAG).Replace("<APVal2>", filtertag);
+            sql = "insert into UserBlog(UserName,APVal1,APVal2,databackuptm) "
+                + " values('<UserName>','<APVal1>','<APVal2>','<databackuptm>')";
+            sql = sql.Replace("<UserName>", username).Replace("<APVal1>", UserBlogContentType.TAG)
+                .Replace("<APVal2>", filtertag).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 

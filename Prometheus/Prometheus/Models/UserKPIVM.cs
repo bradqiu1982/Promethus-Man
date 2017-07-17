@@ -78,11 +78,11 @@ namespace Prometheus.Models
                 }
             }
 
-            var sql = "insert into UserKPIVM(RankKey,UserName,RankType,Summary,BackLink,Rank,ADMIRERank,UpdateTime) "
-                + " values('<RankKey>',N'<UserName>','<RankType>',N'<Summary>',N'<BackLink>',<Rank>,<ADMIRERank>,'<UpdateTime>')";
+            var sql = "insert into UserKPIVM(RankKey,UserName,RankType,Summary,BackLink,Rank,ADMIRERank,UpdateTime,databackuptm) "
+                + " values('<RankKey>',N'<UserName>','<RankType>',N'<Summary>',N'<BackLink>',<Rank>,<ADMIRERank>,'<UpdateTime>','<databackuptm>')";
             sql = sql.Replace("<RankKey>", rankkey).Replace("<UserName>", username).Replace("<RankType>", ranktype).Replace("<Summary>", summary)
                 .Replace("<BackLink>", backlink).Replace("<Rank>", rank.ToString()).Replace("<ADMIRERank>", "0")
-                .Replace("<UpdateTime>",DateTime.Now.ToString());
+                .Replace("<UpdateTime>",DateTime.Now.ToString()).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
 
             UpdateUserTotalRank(username, rank);
@@ -98,11 +98,11 @@ namespace Prometheus.Models
                     return;
             }
 
-            var sql = "insert into UserKPIVM(RankKey,UserName,RankType,Summary,BackLink,Rank,ADMIRERank,UpdateTime) "
-                + " values('<RankKey>',N'<UserName>','<RankType>',N'<Summary>',N'<BackLink>',<Rank>,<ADMIRERank>,'<UpdateTime>')";
+            var sql = "insert into UserKPIVM(RankKey,UserName,RankType,Summary,BackLink,Rank,ADMIRERank,UpdateTime,databackuptm) "
+                + " values('<RankKey>',N'<UserName>','<RankType>',N'<Summary>',N'<BackLink>',<Rank>,<ADMIRERank>,'<UpdateTime>','<databackuptm>')";
             sql = sql.Replace("<RankKey>", rankkey).Replace("<UserName>", username).Replace("<RankType>", ranktype).Replace("<Summary>", summary)
                 .Replace("<BackLink>", backlink).Replace("<Rank>", rank.ToString()).Replace("<ADMIRERank>", "0")
-                .Replace("<UpdateTime>", DateTime.Now.ToString());
+                .Replace("<UpdateTime>", DateTime.Now.ToString()).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
 
             UpdateUserTotalRank(username, rank);
@@ -287,9 +287,9 @@ namespace Prometheus.Models
 
         public static void StoreUserReviewed(string UserName, string pjkey, string Summary, string Link)
         {
-            var sql = "insert into UserReviewedItems(UserName,PJKey,Summary,Link,UpdateTime) values('<UserName>','<PJKey>',N'<Summary>',N'<Link>','<UpdateTime>')";
+            var sql = "insert into UserReviewedItems(UserName,PJKey,Summary,Link,UpdateTime,databackuptm) values('<UserName>','<PJKey>',N'<Summary>',N'<Link>','<UpdateTime>','<databackuptm>')";
             sql = sql.Replace("<UserName>", UserName).Replace("<PJKey>", pjkey).Replace("<Summary>", Summary)
-                .Replace("<Link>", Link).Replace("<UpdateTime>",DateTime.Now.ToString());
+                .Replace("<Link>", Link).Replace("<UpdateTime>",DateTime.Now.ToString()).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 

@@ -24,8 +24,8 @@ namespace Prometheus.Models
             sql = sql.Replace("<UpdateTime>", DateTime.Now.AddMonths(-2).ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
 
-            sql = "insert into UserCacheInfo(UserName,CacheInfo,UpdateTime) values('<UserName>','<CacheInfo>','<UpdateTime>')";
-            sql = sql.Replace("<UserName>", username.ToUpper()).Replace("<CacheInfo>", cacheinfo).Replace("<UpdateTime>", DateTime.Now.ToString());
+            sql = "insert into UserCacheInfo(UserName,CacheInfo,UpdateTime,databackuptm) values('<UserName>','<CacheInfo>','<UpdateTime>','<databackuptm>')";
+            sql = sql.Replace("<UserName>", username.ToUpper()).Replace("<CacheInfo>", cacheinfo).Replace("<UpdateTime>", DateTime.Now.ToString()).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 

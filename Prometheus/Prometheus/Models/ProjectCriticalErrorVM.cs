@@ -66,13 +66,13 @@ namespace Prometheus.Models
 
         public void StorePJCriticalError()
         {
-            var sql = "insert into ProjectCriticalError(ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel) "
-                + " values('<ProjectKey>','<ErrorCode>','<TestCaseName>','<MatchCond>',<WithLimit>,<LowLimit>,<HighLimit>,<WithAlgorithm>,'<Algorithm>','<AlgorithmParam>','<Creater>','<Temperature>','<Channel>')";
+            var sql = "insert into ProjectCriticalError(ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel,databackuptm) "
+                + " values('<ProjectKey>','<ErrorCode>','<TestCaseName>','<MatchCond>',<WithLimit>,<LowLimit>,<HighLimit>,<WithAlgorithm>,'<Algorithm>','<AlgorithmParam>','<Creater>','<Temperature>','<Channel>','<databackuptm>')";
 
             sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ErrorCode>", ErrorCode).Replace("<MatchCond>", MatchCond).Replace("<TestCaseName>", TestCaseName)
                 .Replace("<WithLimit>", WithLimit.ToString()).Replace("<LowLimit>", LowLimit.ToString()).Replace("<HighLimit>", HighLimit.ToString())
                 .Replace("<WithAlgorithm>", WithAlgorithm.ToString()).Replace("<Algorithm>", Algorithm).Replace("<AlgorithmParam>", AlgorithmParam)
-                .Replace("<Creater>", Creater).Replace("<Temperature>", Temperature).Replace("<Channel>", Channel);
+                .Replace("<Creater>", Creater).Replace("<Temperature>", Temperature).Replace("<Channel>", Channel).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 

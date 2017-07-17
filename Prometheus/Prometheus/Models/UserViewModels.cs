@@ -46,8 +46,8 @@ namespace Prometheus.Models
 
         public void RegistUser()
         {
-            var sql = "insert into UserTable(UserName,PassWD,UpdateDate) values(N'<UserName>','<PassWD>','<UpdateDate>')";
-            sql = sql.Replace("<UserName>", Email.ToUpper()).Replace("<PassWD>", Password).Replace("<UpdateDate>", UpdateDate.ToString());
+            var sql = "insert into UserTable(UserName,PassWD,UpdateDate,databackuptm) values(N'<UserName>','<PassWD>','<UpdateDate>','<databackuptm>')";
+            sql = sql.Replace("<UserName>", Email.ToUpper()).Replace("<PassWD>", Password).Replace("<UpdateDate>", UpdateDate.ToString()).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
@@ -115,8 +115,8 @@ namespace Prometheus.Models
         public static void AddICare(string me,string other)
         {
             RemoveICare(me, other);
-            var sql = "insert into UserNet(ME,OTHER) values('<ME>','<OTHER>')";
-            sql = sql.Replace("<ME>", me.ToUpper()).Replace("<OTHER>", other.ToUpper());
+            var sql = "insert into UserNet(ME,OTHER,databackuptm) values('<ME>','<OTHER>','<databackuptm>')";
+            sql = sql.Replace("<ME>", me.ToUpper()).Replace("<OTHER>", other.ToUpper()).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 

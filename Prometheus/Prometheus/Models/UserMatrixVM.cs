@@ -29,8 +29,8 @@ namespace Prometheus.Models
             sql = sql.Replace("<UserName>", username);
             DBUtility.ExeLocalSqlNoRes(sql);
 
-            sql = "insert into UserMatrix(UserName,Auth,Depart) values('<UserName>','<Auth>','<Depart>')";
-            sql = sql.Replace("<UserName>", username).Replace("<Auth>", auth).Replace("<Depart>", depart);
+            sql = "insert into UserMatrix(UserName,Auth,Depart,databackuptm) values('<UserName>','<Auth>','<Depart>','<databackuptm>')";
+            sql = sql.Replace("<UserName>", username).Replace("<Auth>", auth).Replace("<Depart>", depart).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 

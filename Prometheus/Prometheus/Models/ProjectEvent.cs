@@ -89,8 +89,8 @@ namespace Prometheus.Models
 
         public void StoreEvent()
         {
-            var sql = "insert into ProjectEvent(ProjectKey,EventKey,Event,UpdateDate) values('<ProjectKey>','<EventKey>','<Event>','<UpdateDate>')";
-            sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<EventKey>", EventKey).Replace("<Event>", dbEvent).Replace("<UpdateDate>", UpdateDate.ToString());
+            var sql = "insert into ProjectEvent(ProjectKey,EventKey,Event,UpdateDate,databackuptm) values('<ProjectKey>','<EventKey>','<Event>','<UpdateDate>','<databackuptm>')";
+            sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<EventKey>", EventKey).Replace("<Event>", dbEvent).Replace("<UpdateDate>", UpdateDate.ToString()).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 

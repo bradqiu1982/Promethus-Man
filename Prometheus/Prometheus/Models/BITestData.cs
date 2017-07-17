@@ -28,11 +28,12 @@ namespace Prometheus.Models
 
         public void StoreBIDateField()
         {
-            var isql = "insert into BITestDataField values('<DataID>','<ChannelNum>',<SLOPE>,<THOLD>,<PO_LD>,<PO_LD_18>,<PO_LD_25>,<PO_LD_127>,<PO_Uniformity>,<Delta_SLOPE>,<Delta_THOLD>,<Delta_PO_LD>,<Delta_PO_LD_18>,<Delta_PO_LD_25>,<Delta_PO_LD_127>,<Delta_PO_Uniformity>)";
+            var isql = "insert into BITestDataField values('<DataID>','<ChannelNum>',<SLOPE>,<THOLD>,<PO_LD>,<PO_LD_18>,<PO_LD_25>,<PO_LD_127>,<PO_Uniformity>,<Delta_SLOPE>,<Delta_THOLD>,<Delta_PO_LD>,<Delta_PO_LD_18>,<Delta_PO_LD_25>,<Delta_PO_LD_127>,<Delta_PO_Uniformity>,'<databackuptm>')";
             isql = isql.Replace("<DataID>", DataID).Replace("<ChannelNum>", ChannelNum).Replace("<SLOPE>", SLOPE.ToString()).Replace("<THOLD>", THOLD.ToString())
                 .Replace("<PO_LD>", PO_LD.ToString()).Replace("<PO_LD_18>", PO_LD_18.ToString()).Replace("<PO_LD_25>", PO_LD_25.ToString()).Replace("<PO_LD_127>", PO_LD_127.ToString())
                 .Replace("<PO_Uniformity>", PO_Uniformity.ToString()).Replace("<Delta_SLOPE>", Delta_SLOPE.ToString()).Replace("<Delta_THOLD>", Delta_THOLD.ToString()).Replace("<Delta_PO_LD>", Delta_PO_LD.ToString())
-                .Replace("<Delta_PO_LD_18>", Delta_PO_LD_18.ToString()).Replace("<Delta_PO_LD_25>", Delta_PO_LD_25.ToString()).Replace("<Delta_PO_LD_127>", Delta_PO_LD_127.ToString()).Replace("<Delta_PO_Uniformity>", Delta_PO_Uniformity.ToString());
+                .Replace("<Delta_PO_LD_18>", Delta_PO_LD_18.ToString()).Replace("<Delta_PO_LD_25>", Delta_PO_LD_25.ToString()).Replace("<Delta_PO_LD_127>", Delta_PO_LD_127.ToString())
+                .Replace("<Delta_PO_Uniformity>", Delta_PO_Uniformity.ToString()).Replace("<databackuptm>",DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(isql);
         }
     }
@@ -79,11 +80,11 @@ namespace Prometheus.Models
 
         public void StoreBIData()
         {
-            var isql = "insert into BITestData(ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN,UpdateTime,Wafer,Waferpn) values('<ProjectKey>','<DataID>','<ModuleSerialNum>','<WhichTest>','<ModuleType>','<ErrAbbr>','<TestTimeStamp>','<TestStation>','<PN>','<UpdateTime>','<Wafer>','<Waferpn>')";
+            var isql = "insert into BITestData(ProjectKey,DataID,ModuleSerialNum,WhichTest,ModuleType,ErrAbbr,TestTimeStamp,TestStation,PN,UpdateTime,Wafer,Waferpn,databackuptm) values('<ProjectKey>','<DataID>','<ModuleSerialNum>','<WhichTest>','<ModuleType>','<ErrAbbr>','<TestTimeStamp>','<TestStation>','<PN>','<UpdateTime>','<Wafer>','<Waferpn>','<databackuptm>')";
             isql = isql.Replace("<ProjectKey>", ProjectKey).Replace("<DataID>", DataID).Replace("<ModuleSerialNum>", ModuleSerialNum)
                 .Replace("<WhichTest>", WhichTest).Replace("<ModuleType>", ModuleType).Replace("<ErrAbbr>", ErrAbbr)
                 .Replace("<TestTimeStamp>", TestTimeStamp.ToString()).Replace("<TestStation>", TestStation).Replace("<PN>", PN)
-                .Replace("<UpdateTime>", DateTime.Now.ToString()).Replace("<Wafer>", Wafer).Replace("<Waferpn>", Waferpn);
+                .Replace("<UpdateTime>", DateTime.Now.ToString()).Replace("<Wafer>", Wafer).Replace("<Waferpn>", Waferpn).Replace("<databackuptm>",DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(isql);
 
             //foreach (var item in DataFields)

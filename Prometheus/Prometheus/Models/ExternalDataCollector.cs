@@ -926,11 +926,11 @@ namespace Prometheus.Models
                 sql = "insert into RMABackupData(AppV_A,AppV_B,AppV_C,AppV_D,AppV_E,AppV_F"
                     + ",AppV_G,AppV_H,AppV_I,AppV_J,AppV_K,AppV_L,AppV_M,AppV_N,AppV_O"
                     + ",AppV_P,AppV_Q,AppV_R,AppV_S,AppV_T,AppV_U,AppV_V,AppV_W,AppV_X"
-                    + ",AppV_Y,AppV_Z,AppV_AA,AppV_AB,AppV_AC,AppV_AD,AppV_AE,AppV_AF,AppV_AG)"
+                    + ",AppV_Y,AppV_Z,AppV_AA,AppV_AB,AppV_AC,AppV_AD,AppV_AE,AppV_AF,AppV_AG,databackuptm)"
                     + " values(N'<AppV_A>',N'<AppV_B>',N'<AppV_C>',N'<AppV_D>',N'<AppV_E>',N'<AppV_F>'"
                     + ",N'<AppV_G>',N'<AppV_H>',N'<AppV_I>',N'<AppV_J>',N'<AppV_K>',N'<AppV_L>',N'<AppV_M>',N'<AppV_N>',N'<AppV_O>'"
                     + ",'<AppV_P>','<AppV_Q>','<AppV_R>','<AppV_S>','<AppV_T>',N'<AppV_U>','<AppV_V>','<AppV_W>',N'<AppV_X>'"
-                    + ",N'<AppV_Y>',N'<AppV_Z>',N'<AppV_AA>',N'<AppV_AB>','<AppV_AC>',N'<AppV_AD>',N'<AppV_AE>',N'<AppV_AF>',N'<AppV_AG>')";
+                    + ",N'<AppV_Y>',N'<AppV_Z>',N'<AppV_AA>',N'<AppV_AB>','<AppV_AC>',N'<AppV_AD>',N'<AppV_AE>',N'<AppV_AF>',N'<AppV_AG>','<databackuptm>')";
             }
 
             sql = sql.Replace("<AppV_A>", rmadata.AppV_A).Replace("<AppV_B>", rmadata.AppV_B).Replace("<AppV_C>", rmadata.AppV_C)
@@ -943,7 +943,8 @@ namespace Prometheus.Models
                 .Replace("<AppV_V>", rmadata.AppV_V).Replace("<AppV_W>", rmadata.AppV_W).Replace("<AppV_X>", rmadata.AppV_X)
                 .Replace("<AppV_Y>", rmadata.AppV_Y).Replace("<AppV_Z>", rmadata.AppV_Z).Replace("<AppV_AA>", rmadata.AppV_AA)
                 .Replace("<AppV_AB>", rmadata.AppV_AB).Replace("<AppV_AC>", rmadata.AppV_AC).Replace("<AppV_AD>", rmadata.AppV_AD)
-                .Replace("<AppV_AE>", rmadata.AppV_AE).Replace("<AppV_AF>", rmadata.AppV_AF).Replace("<AppV_AG>", rmadata.AppV_AG);
+                .Replace("<AppV_AE>", rmadata.AppV_AE).Replace("<AppV_AF>", rmadata.AppV_AF).Replace("<AppV_AG>", rmadata.AppV_AG)
+                .Replace("<databackuptm>",DateTime.Now.ToString());
 
             DBUtility.ExeLocalSqlNoRes(sql);
         }
@@ -1087,8 +1088,8 @@ namespace Prometheus.Models
 
         private static void StoreRMAAttach(string RMANum, string attach)
         {
-            var sql = "insert into RMAMapData(AppV_A,AppV_B,AppV_C) values(N'<AppV_A>',N'<AppV_B>',N'<AppV_C>')";
-            sql = sql.Replace("<AppV_A>", RMANum).Replace("<AppV_B>", attach).Replace("<AppV_C>", RMAMAPDATATYPE.ATTACH);
+            var sql = "insert into RMAMapData(AppV_A,AppV_B,AppV_C,databackuptm) values(N'<AppV_A>',N'<AppV_B>',N'<AppV_C>','<databackuptm>')";
+            sql = sql.Replace("<AppV_A>", RMANum).Replace("<AppV_B>", attach).Replace("<AppV_C>", RMAMAPDATATYPE.ATTACH).Replace("<databackuptm>",DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
@@ -1681,11 +1682,11 @@ namespace Prometheus.Models
                 sql = "insert into RELBackupData(AppV_A,AppV_B,AppV_C,AppV_D,AppV_E,AppV_F"
                     + ",AppV_G,AppV_H,AppV_I,AppV_J,AppV_K,AppV_L,AppV_M,AppV_N,AppV_O"
                     + ",AppV_P,AppV_Q,AppV_R,AppV_S,AppV_T,AppV_U,AppV_V,AppV_W,AppV_X"
-                    + ",AppV_Y,AppV_Z,AppV_AA,AppV_AB,AppV_AC,AppV_AD,AppV_AE,AppV_AF,AppV_AG)"
+                    + ",AppV_Y,AppV_Z,AppV_AA,AppV_AB,AppV_AC,AppV_AD,AppV_AE,AppV_AF,AppV_AG,databackuptm)"
                     + " values(<AppV_A>,N'<AppV_B>',N'<AppV_C>',N'<AppV_D>',N'<AppV_E>',N'<AppV_F>'"
                     + ",N'<AppV_G>',N'<AppV_H>',N'<AppV_I>',N'<AppV_J>',N'<AppV_K>',N'<AppV_L>',N'<AppV_M>',N'<AppV_N>',N'<AppV_O>'"
                     + ",'<AppV_P>','<AppV_Q>','<AppV_R>','<AppV_S>','<AppV_T>',N'<AppV_U>','<AppV_V>','<AppV_W>',N'<AppV_X>'"
-                    + ",N'<AppV_Y>',N'<AppV_Z>',N'<AppV_AA>',N'<AppV_AB>','<AppV_AC>',N'<AppV_AD>',N'<AppV_AE>',N'<AppV_AF>',N'<AppV_AG>')";
+                    + ",N'<AppV_Y>',N'<AppV_Z>',N'<AppV_AA>',N'<AppV_AB>','<AppV_AC>',N'<AppV_AD>',N'<AppV_AE>',N'<AppV_AF>',N'<AppV_AG>','<databackuptm>')";
                 sql = sql.Replace("<AppV_A>", rmadata.AppV_A.ToString());
 
                 var uniquekey = DateTime.Parse(rmadata.AppV_C).ToString("yyyy-MM-dd") + "-" + rmadata.AppV_I + "-" + ReconstructSN(rmadata.AppV_K);
@@ -1705,7 +1706,7 @@ namespace Prometheus.Models
                 .Replace("<AppV_V>", rmadata.AppV_V).Replace("<AppV_W>", rmadata.AppV_W).Replace("<AppV_X>", rmadata.AppV_X)
                 .Replace("<AppV_Y>", rmadata.AppV_Y).Replace("<AppV_Z>", rmadata.AppV_Z).Replace("<AppV_AA>", rmadata.AppV_AA)
                 .Replace("<AppV_AB>", rmadata.AppV_AB).Replace("<AppV_AC>", rmadata.AppV_AC).Replace("<AppV_AD>", rmadata.AppV_AD)
-                .Replace("<AppV_AE>", rmadata.AppV_AE).Replace("<AppV_AF>", rmadata.AppV_AF).Replace("<AppV_AG>", rmadata.AppV_AG);
+                .Replace("<AppV_AE>", rmadata.AppV_AE).Replace("<AppV_AF>", rmadata.AppV_AF).Replace("<AppV_AG>", rmadata.AppV_AG).Replace("<databackuptm>", DateTime.Now.ToString());
 
             DBUtility.ExeLocalSqlNoRes(sql);
         }
@@ -1898,8 +1899,8 @@ namespace Prometheus.Models
 
         private static void StoreRELAttach(string combinekey, string CaseID, string attach)
         {
-            var sql = "insert into RELMapData(AppV_A,AppV_B,AppV_C,AppV_D) values(N'<AppV_A>',N'<AppV_B>',N'<AppV_C>',N'<AppV_D>')";
-            sql = sql.Replace("<AppV_A>", combinekey).Replace("<AppV_B>", CaseID).Replace("<AppV_C>", attach).Replace("<AppV_D>", RMAMAPDATATYPE.ATTACH);
+            var sql = "insert into RELMapData(AppV_A,AppV_B,AppV_C,AppV_D,databackuptm) values(N'<AppV_A>',N'<AppV_B>',N'<AppV_C>',N'<AppV_D>','<databackuptm>')";
+            sql = sql.Replace("<AppV_A>", combinekey).Replace("<AppV_B>", CaseID).Replace("<AppV_C>", attach).Replace("<AppV_D>", RMAMAPDATATYPE.ATTACH).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 

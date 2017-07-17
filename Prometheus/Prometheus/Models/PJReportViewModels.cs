@@ -179,9 +179,9 @@ namespace Prometheus.Models
                 sql = sql.Replace("<username>", username);
                 DBUtility.ExeLocalSqlNoRes(sql);
 
-                sql = "insert into BookReportRecord(username,projects,reporttypes,reporttime,lastupdatetime) values('<username>','<projects>','<reporttypes>','<reporttime>','<lastupdatetime>')";
+                sql = "insert into BookReportRecord(username,projects,reporttypes,reporttime,lastupdatetime,databackuptm) values('<username>','<projects>','<reporttypes>','<reporttime>','<lastupdatetime>','<databackuptm>')";
                 sql = sql.Replace("<username>", username).Replace("<projects>", projects)
-                    .Replace("<reporttypes>", reporttypes).Replace("<reporttime>", reporttime).Replace("<lastupdatetime>", lastupdatetime.ToString());
+                    .Replace("<reporttypes>", reporttypes).Replace("<reporttime>", reporttime).Replace("<lastupdatetime>", lastupdatetime.ToString()).Replace("<databackuptm>", DateTime.Now.ToString());
                 DBUtility.ExeLocalSqlNoRes(sql);
             }
         }

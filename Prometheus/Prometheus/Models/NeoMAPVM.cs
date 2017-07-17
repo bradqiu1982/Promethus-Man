@@ -19,8 +19,8 @@ namespace Prometheus.Models
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             if (dbret.Count == 0)
             {
-                sql = "insert into FileLoadedData(AppV_A,AppV_B) values(N'<AppV_A>',N'<AppV_B>')";
-                sql = sql.Replace("<AppV_A>", filename).Replace("<AppV_B>", SYSLOADFILETYPE.NEOMAP);
+                sql = "insert into FileLoadedData(AppV_A,AppV_B,databackuptm) values(N'<AppV_A>',N'<AppV_B>','<databackuptm>')";
+                sql = sql.Replace("<AppV_A>", filename).Replace("<AppV_B>", SYSLOADFILETYPE.NEOMAP).Replace("<databackuptm>", DateTime.Now.ToString());
                 DBUtility.ExeLocalSqlNoRes(sql);
             }//end if
         }

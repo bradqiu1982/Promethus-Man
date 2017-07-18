@@ -801,7 +801,9 @@ delete from UserTable;
 delete from VCSELUsageTable;
 
 
-
+DECLARE @Subject  nvarchar(255);
+SET @Subject = N'\\Wux-d80008792\D\log\DebugDB'+ REPLACE(REPLACE(REPLACE(CONVERT(varchar,GETDATE(), 20),'-',''),':',''),' ','') +N'.BAK';
+BACKUP DATABASE [DebugDB]  TO DISK =  @Subject;
 
 
 

@@ -1936,6 +1936,7 @@ namespace Prometheus.Controllers
             selectlist = new List<string>();
             selectlist.Add("Please select algorithm");
             selectlist.Add(PJCriticalAlgorithm.UNIFORMITY);
+            selectlist.Add(PJCriticalAlgorithm.STDDEV);
             selectcontrol = CreateSelectList(selectlist, "");
             selectcontrol[0].Disabled = true;
             selectcontrol[0].Selected = true;

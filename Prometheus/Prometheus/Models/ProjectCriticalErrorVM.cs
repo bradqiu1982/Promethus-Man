@@ -15,6 +15,7 @@ namespace Prometheus.Models
     public class PJCriticalAlgorithm
     {
         public static string UNIFORMITY = "UNIFORMITY";
+        public static string STDDEV = "STDDEV";
     }
 
     public class ProjectCriticalErrorVM

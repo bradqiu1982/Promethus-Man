@@ -541,8 +541,8 @@ namespace Prometheus.Controllers
             ret.Mean = mean;
             ret.StdDev = stddev;
 
-            var startvalue = mean - 10 * stddev;
-            var endvalue = mean + 10 * stddev;
+            var startvalue = mean - 6 * stddev;
+            var endvalue = mean + 6 * stddev;
             foreach (var item in rawdata)
             {
                 if (item >= startvalue && item <= endvalue)

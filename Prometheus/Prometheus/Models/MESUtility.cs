@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Routing;
 
 namespace Prometheus.Models
 {
@@ -143,7 +144,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        private static CleanDataWithStdDev GetCleanDataWithStdDev(List<double> rawdata,int sigma)
+        private static CleanDataWithStdDev GetCleanDataWithStdDev(List<double> rawdata,double sigma)
         {
             var ret = new CleanDataWithStdDev();
 
@@ -169,7 +170,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        private static bool UniformityAlgorithm(List<TraceViewData> tempfiltereddata,int sigma)
+        private static bool StdDevAlgorithm(List<TraceViewData> tempfiltereddata,double sigma)
         {
             var lowtemplist = new List<double>();
             var hightemplist = new List<double>();
@@ -197,25 +198,72 @@ namespace Prometheus.Models
                     
                     var ret = GetCleanDataWithStdDev(lowtemplist, sigma);
                     if (ret.OutlierList.Count > 0)
-                    {
                         return true;
-                    }
                 }
                 if (hightemplist.Count > 2)
                 {
                     var ret = GetCleanDataWithStdDev(hightemplist, sigma);
                     if (ret.OutlierList.Count > 0)
-                    {
                         return true;
-                    }
                 }
                 if (normaltemplist.Count > 2)
                 {
                     var ret = GetCleanDataWithStdDev(normaltemplist, sigma);
                     if (ret.OutlierList.Count > 0)
-                    {
                         return true;
-                    }
+                }
+            }
+            catch (Exception ex) { }
+
+            return false;
+        }
+
+        private static bool UniformityAlgorithm(List<TraceViewData> tempfiltereddata, double rate)
+        {
+            var lowtemplist = new List<double>();
+            var hightemplist = new List<double>();
+            var normaltemplist = new List<double>();
+            foreach (var item in tempfiltereddata)
+            {
+                if (item.Temp > 45)
+                {
+                    hightemplist.Add(item.Value);
+                }
+                else if (item.Temp < 15)
+                {
+                    lowtemplist.Add(item.Value);
+                }
+                else
+                {
+                    normaltemplist.Add(item.Value);
+                }
+            }
+
+            try
+            {
+                if (lowtemplist.Count > 2)
+                {
+                    lowtemplist.Sort();
+                    var mean = NormalDistributeAlg.Mean(lowtemplist);
+                    var uniformity = (lowtemplist[lowtemplist.Count - 1] - lowtemplist[0]) / mean;
+                    if (uniformity > rate)
+                        return true;
+                }
+                if (hightemplist.Count > 2)
+                {
+                    hightemplist.Sort();
+                    var mean = NormalDistributeAlg.Mean(hightemplist);
+                    var uniformity = (hightemplist[hightemplist.Count - 1] - hightemplist[0]) / mean;
+                    if (uniformity > rate)
+                        return true;
+                }
+                if (normaltemplist.Count > 2)
+                {
+                    normaltemplist.Sort();
+                    var mean = NormalDistributeAlg.Mean(normaltemplist);
+                    var uniformity = (normaltemplist[normaltemplist.Count - 1] - normaltemplist[0]) / mean;
+                    if (uniformity > rate)
+                        return true;
                 }
             }
             catch (Exception ex) { }
@@ -299,12 +347,25 @@ namespace Prometheus.Models
 
             if (pjerror.WithAlgorithm == 1)
             {
+                if (string.Compare(pjerror.Algorithm, PJCriticalAlgorithm.STDDEV, true) == 0)
+                {
+                    try
+                    {
+                        var sigma = Convert.ToDouble(pjerror.AlgorithmParam.Trim());
+                        if (StdDevAlgorithm(tempfiltereddata, sigma))
+                        {
+                            return true;
+                        }
+                    }
+                    catch (Exception ex) { }
+                }
+
                 if (string.Compare(pjerror.Algorithm, PJCriticalAlgorithm.UNIFORMITY, true) == 0)
                 {
                     try
                     {
-                        var sigma = Convert.ToInt32(pjerror.AlgorithmParam.Trim());
-                        if (UniformityAlgorithm(tempfiltereddata, sigma))
+                        var rate = Convert.ToDouble(pjerror.AlgorithmParam.Trim());
+                        if (UniformityAlgorithm(tempfiltereddata, rate))
                         {
                             return true;
                         }
@@ -316,6 +377,72 @@ namespace Prometheus.Models
             return false;
         }
 
+
+        private static void SendTaskEvent(IssueViewModels vm,string comment,Controller ctrl)
+        {
+            var routevalue = new RouteValueDictionary();
+            routevalue.Add("issuekey", vm.IssueKey);
+            //send validate email
+            string scheme = ctrl.Url.RequestContext.HttpContext.Request.Url.Scheme;
+            string validatestr = ctrl.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+
+            var netcomputername = "";
+            try { netcomputername = System.Net.Dns.GetHostName(); }
+            catch (Exception ex) { }
+            validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
+
+            var content = vm.Summary + " is created :\r\n " + validatestr;
+            content = content +"\r\n\r\n"+ comment;
+
+            var toaddrs = new List<string>();
+            toaddrs.Add(vm.Assignee);
+
+            var reporter = vm.Reporter.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
+            EmailUtility.SendEmail(ctrl, "WUXI NPI System_" + reporter, toaddrs, content);
+            new System.Threading.ManualResetEvent(false).WaitOne(30);
+        }
+
+        private static void Create2ndCheckTask(ProjectTestData pjdata, ProjectCriticalErrorVM item, Controller ctrl)
+        {
+            try
+            {
+                var asignee = item.Creater;
+                var now = DateTime.Now;
+                var vm = new IssueViewModels();
+                vm.ProjectKey = item.ProjectKey;
+                vm.IssueKey = IssueViewModels.GetUniqKey();
+                vm.IssueType = ISSUETP.Task;
+                vm.Summary = "[2nd Match] " + pjdata.ModuleSerialNum + " failed for " + pjdata.ErrAbbr + " @ " + pjdata.WhichTest;
+                vm.ModuleSN = pjdata.ModuleSerialNum;
+                vm.ErrAbbr = pjdata.ErrAbbr;
+                vm.Priority = ISSUEPR.Major;
+                vm.DueDate = now.AddDays(7);
+                vm.ReportDate = DateTime.Now;
+                vm.Assignee = asignee;
+                vm.Reporter = asignee;
+                vm.Creator = asignee;
+                vm.Resolution = Resolute.Pending;
+                vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+                vm.StoreIssue();
+
+                var comment1 = new IssueComments();
+                comment1.Comment = "<p>"+ pjdata.ModuleSerialNum + " failed for " + pjdata.ErrAbbr + " @ " + pjdata.WhichTest + "</p>";
+                comment1.Comment = comment1.Comment+"<p> match rule: test case -- " +item.TestCaseName+" datefield -- "+item.MatchCond+ "</p>";
+                if (item.WithLimit == 1)
+                {
+                    comment1.Comment = comment1.Comment + "<p> with limit: low limit -- " + item.LowLimit.ToString() + " high limit -- " + item.HighLimit.ToString() + "</p>";
+                }
+                if (item.WithAlgorithm == 1)
+                {
+                    comment1.Comment = comment1.Comment + "<p> with algorithm: argorithm -- " + item.Algorithm + " param -- " + item.AlgorithmParam + "</p>";
+                }
+                IssueViewModels.StoreIssueComment(vm.IssueKey, comment1.dbComment, vm.Assignee, COMMENTTYPE.Description);
+
+                SendTaskEvent(vm, comment1.Comment, ctrl);
+            }
+            catch (Exception ex) { }
+        }
+
         private static bool CheckPJCriticalError(ProjectTestData pjdata, List<ProjectCriticalErrorVM> pjcriticalerrorlist, Controller ctrl)
         {
             foreach (var item in pjcriticalerrorlist)
@@ -323,21 +450,20 @@ namespace Prometheus.Models
                 if (string.Compare(item.ErrorCode, pjdata.ErrAbbr, true) == 0)
                 {
                     var filtereddata = new List<TraceViewData>();
-
                     var traceviewdata = RetrieveTraceViewData(item, pjdata, ctrl);
                     if (traceviewdata.Count == 0)
                         continue;
                     if (!CheckPJCriticalRule(traceviewdata, item,filtereddata))
                         continue;
                     //match rule
-
+                    Create2ndCheckTask(pjdata, item, ctrl);
                     return true;
                 }
             }
 
             return false;
-
         }
+
 
         private static void CreateSystemIssues(List<ProjectTestData> failurelist, Controller ctrl)
         {

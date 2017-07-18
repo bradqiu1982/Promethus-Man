@@ -591,6 +591,7 @@
     <Content Include="Content\images\icon\pageloadingicon.gif" />
     <Content Include="Content\images\icon\LowYield.png" />
     <Content Include="Content\images\icon\Upload.png" />
+    <Content Include="Content\images\Loading.gif" />
     <Content Include="Content\images\PJ\BI.png" />
     <Content Include="Content\images\PJ\DebugTreeicon.png" />
     <Content Include="Content\images\PJ\FA.png" />
@@ -624,6 +625,13 @@
     <Content Include="Content\images\usercenter\IProject.png" />
     <Content Include="Content\images\usercenter\ITag.png" />
     <Content Include="Content\images\usercenter\MyStatus.png" />
+    <Content Include="Scripts\g-spinner\btn.js" />
+    <Content Include="Scripts\g-spinner\g-spinner.js" />
+    <Content Include="Scripts\g-spinner\g-spinner.min.js" />
+    <Content Include="Scripts\g-spinner\gspinner.css" />
+    <Content Include="Scripts\g-spinner\gspinner.min.css" />
+    <Content Include="Scripts\g-spinner\img.js" />
+    <Content Include="Scripts\g-spinner\jQuery3.2.1.js" />
     <Content Include="Scripts\jquery.flexdatalist.min.css" />
     <Content Include="Content\themes\base\accordion.css" />
     <Content Include="Content\themes\base\all.css" />

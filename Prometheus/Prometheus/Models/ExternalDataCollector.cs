@@ -179,6 +179,81 @@ namespace Prometheus.Models
         public DateTime databackuptm { set; get; }
     }
 
+    public class WaferRecord
+    {
+        public WaferRecord()
+        {
+            Wafer = string.Empty;
+            WaferBinYield = string.Empty;
+            WaferBinCount = string.Empty;
+            SumCount = string.Empty;
+            databackuptm = DateTime.Now;
+
+            AppV_A = string.Empty;
+            AppV_B = string.Empty;
+            AppV_C = string.Empty;
+            AppV_D = string.Empty;
+            AppV_E = string.Empty;
+            AppV_F = string.Empty;
+            AppV_G = -99999;
+            AppV_H = -99999;
+            AppV_I = -99999;
+            AppV_J = -99999;
+            AppV_K = -99999;
+            AppV_L = -99999;
+        }
+
+        public void StoreWaferRecord()
+        {
+            var sql = "delete from WaferRecord where Wafer = '<Wafer>'";
+            DBUtility.ExeLocalSqlNoRes(sql);
+
+            sql = "insert into WaferRecord(Wafer,WaferBinYield,WaferBinCount,SumCount,databackuptm) "
+                +" values('<Wafer>','<WaferBinYield>','<WaferBinCount>','<SumCount>','<databackuptm>')";
+            sql = sql.Replace("<Wafer>", Wafer).Replace("<WaferBinYield>", WaferBinYield).Replace("<WaferBinCount>", WaferBinCount)
+                .Replace("<SumCount>", SumCount).Replace("<databackuptm>", databackuptm.ToString("yyyy-MM-dd hh:mm:ss"));
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        public static List<WaferRecord> RetrieveWaferRecord()
+        {
+            var ret = new List<WaferRecord>();
+            var sql = "select Wafer,WaferBinYield,WaferBinCount,SumCount,databackuptm from WaferRecord order by databackuptm DESC";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var tempvm = new WaferRecord();
+                tempvm.Wafer = Convert.ToString(line[0]);
+                tempvm.WaferBinYield = Convert.ToString(line[1]);
+                tempvm.WaferBinCount = Convert.ToString(line[2]);
+                tempvm.SumCount = Convert.ToString(line[3]);
+                tempvm.databackuptm = Convert.ToDateTime(line[4]);
+                ret.Add(tempvm);
+            }
+            return ret;
+        }
+
+        public string Wafer { set; get; }
+        public string WaferBinYield { set; get; }
+        public string WaferBinCount { set; get; }
+        public string SumCount { set; get; }
+        public DateTime databackuptm { set; get; }
+
+        public string AppV_A { set; get; }
+        public string AppV_B { set; get; }
+        public string AppV_C { set; get; }
+        public string AppV_D { set; get; }
+        public string AppV_E { set; get; }
+        public string AppV_F { set; get; }
+        public double AppV_G { set; get; }
+        public double AppV_H { set; get; }
+        public double AppV_I { set; get; }
+        public double AppV_J { set; get; }
+        public double AppV_K { set; get; }
+        public double AppV_L { set; get; }
+    }
+
+
     public class RELRAWData
     {
         public RELRAWData()
@@ -1228,6 +1303,9 @@ namespace Prometheus.Models
 
             var wafers = waferwithbin.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
             var bin = wafers[wafers.Length - 1].Trim();
+
+            var bincount = 0;
+            var nonbincount = 0;
             try
             {
                 var datatable = new System.Data.DataTable();
@@ -1278,9 +1356,11 @@ namespace Prometheus.Models
                         if (string.Compare(neodata.AppV_G, bin) == 0)
                         {
                             neodata.AppV_AD = 1;
+                            bincount++;
                         }
                         else
                         {
+                            nonbincount++;
                             idx = idx + 1;
                             continue;
                             //neodata.AppV_AD = 0;
@@ -1299,6 +1379,17 @@ namespace Prometheus.Models
                     idx = idx + 1;
                 }//end foreach
                 WriteNeoMapDBWithTable(datatable);
+
+                if ((bincount + nonbincount) > 0)
+                {
+                    double binyield = bincount /(double)(bincount + nonbincount);
+                    var wrecord = new WaferRecord();
+                    wrecord.Wafer = waferwithbin;
+                    wrecord.WaferBinYield = binyield.ToString();
+                    wrecord.WaferBinCount = bincount.ToString();
+                    wrecord.SumCount = (bincount + nonbincount).ToString();
+                    wrecord.StoreWaferRecord();
+                }
             }
             catch (Exception ex)
             {

@@ -1,0 +1,54 @@
+﻿@model IEnumerable<Prometheus.Models.WaferRecord>
+
+@{
+    ViewBag.Title = "ReviewWaferInfo";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row col-lg-12">
+    <div class="col-lg-4">
+        <h2>Review Vcsel Data</h2>
+    </div>
+    <div class="col-lg-8">
+    </div>
+</div>
+<hr />
+
+@if (Model != null)
+{
+    <table id="vcseldatatable" class="display" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Wafer</th>
+                <th>Wafer Yield</th>
+                <th>Bin Count</th>
+                <th>Sum Count</th>
+                <th>Update Time</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var line in Model)
+            {
+                <tr>
+                    <td>@line.Wafer</td>
+                    <td>@line.WaferBinYield</td>
+                    <td>@line.WaferBinCount</td>
+                    <td>@line.SumCount</td>
+                    <td>@line.databackuptm.ToString()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#vcseldatatable').DataTable({
+                'iDisplayLength': 50,
+                'aLengthMenu': [[25, 50, 100, -1],
+                                [25, 50, 100, "All"]],
+                "aaSorting": [],
+                "order": []
+            });
+                    } );
+    </script>
+}

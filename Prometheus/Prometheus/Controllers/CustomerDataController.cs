@@ -1652,5 +1652,11 @@ namespace Prometheus.Controllers
             return File(filename, "application/vnd.ms-excel", fn);
         }
 
+        public ActionResult ReviewWaferInfo()
+        {
+            var vm = WaferRecord.RetrieveWaferRecord();
+            return View(vm);
+        }
+
     }
 }

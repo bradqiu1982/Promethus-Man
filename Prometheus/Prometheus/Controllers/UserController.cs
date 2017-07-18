@@ -778,9 +778,9 @@ namespace Prometheus.Controllers
 
                 var edate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd") + " 07:30:00");
                 var sdate = edate.AddMonths(0 - tempmonth);
-                var pendingissues = IssueViewModels.RetrieveIssuePendingByUser(username, sdate.ToString());
-                var workingissues = IssueViewModels.RetrieveIssueWorkingByUser(username, sdate.ToString());
-                var solvedissues = IssueViewModels.RetrieveIssueDoneByUser(username, sdate.ToString(), this);
+                var pendingissues = IssueViewModels.RetrieveIssuePendingByUser(username, sdate.ToString("yyyy-MM-dd hh:mm:ss"));
+                var workingissues = IssueViewModels.RetrieveIssueWorkingByUser(username, sdate.ToString("yyyy-MM-dd hh:mm:ss"));
+                var solvedissues = IssueViewModels.RetrieveIssueDoneByUser(username, sdate.ToString("yyyy-MM-dd hh:mm:ss"), this);
                 workingissues.AddRange(solvedissues);
                 workingissues.AddRange(pendingissues);
 

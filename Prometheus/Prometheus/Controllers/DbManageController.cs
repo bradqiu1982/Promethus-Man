@@ -284,7 +284,7 @@ namespace Prometheus.Controllers
                     {
                         try
                         {
-                            targetbackuptime = DateTime.Parse(Convert.ToString(tempdbret[0][0])).ToString();
+                            targetbackuptime = DateTime.Parse(Convert.ToString(tempdbret[0][0])).ToString("yyyy-MM-dd hh:mm:ss");
                         }
                         catch (Exception ex) { targetbackuptime = string.Empty; }
                     }

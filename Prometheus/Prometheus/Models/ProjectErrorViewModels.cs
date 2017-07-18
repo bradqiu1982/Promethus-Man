@@ -552,8 +552,8 @@ namespace Prometheus.Models
         public static void DeleteAnalyse(string ErrorKey, string Date)
         {
             var sql = "update ErrorComments set APVal1 = 'delete' where ErrorKey='<ErrorKey>' and CommentDate > '<CommentDate1>' and CommentDate < '<CommentDate2>'";
-            sql = sql.Replace("<ErrorKey>", ErrorKey).Replace("<CommentDate1>",DateTime.Parse(Date).AddSeconds(-3).ToString())
-                .Replace("<CommentDate2>", DateTime.Parse(Date).AddSeconds(3).ToString());
+            sql = sql.Replace("<ErrorKey>", ErrorKey).Replace("<CommentDate1>",DateTime.Parse(Date).AddSeconds(-3).ToString("yyyy-MM-dd hh:mm:ss"))
+                .Replace("<CommentDate2>", DateTime.Parse(Date).AddSeconds(3).ToString("yyyy-MM-dd hh:mm:ss"));
 
             DBUtility.ExeLocalSqlNoRes(sql);
         }

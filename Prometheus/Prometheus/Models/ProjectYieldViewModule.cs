@@ -519,7 +519,7 @@ namespace Prometheus.Models
                 return ret;
             }
 
-            var datatfromstart = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, DateTime.Parse(enddate).AddYears(5).ToString(), false,null);
+            var datatfromstart = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, DateTime.Parse(enddate).AddYears(5).ToString("yyyy-MM-dd hh:mm:ss"), false,null);
             if (datatfromstart.Count == 0)
             {
                 return ret;

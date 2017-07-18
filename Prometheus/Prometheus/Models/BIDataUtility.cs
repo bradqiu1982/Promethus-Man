@@ -53,6 +53,7 @@ namespace Prometheus.Models
             JO = jo;
             BITable = bitable;
             DataID = dataid;
+            databackuptm = DateTime.Now;
         }
 
         private void Init()
@@ -91,6 +92,7 @@ namespace Prometheus.Models
         public string Appv_2 { set; get; }
         public string Appv_3 { set; get; }
         public DateTime Appv_4 { set; get; }
+        public DateTime databackuptm { set; get; }
     }
 
     public class BITestResultDataField
@@ -119,6 +121,7 @@ namespace Prometheus.Models
             Delta_THOLD = dthold;
             Delta_PO_Uniformity = dpouniformity;
             DataID = dataid;
+            databackuptm = DateTime.Now;
         }
 
         private void Init()
@@ -300,6 +303,7 @@ namespace Prometheus.Models
         public string Appv_3 { set; get; }
         public string Appv_4 { set; get; }
         public DateTime Appv_5 { set; get; }
+        public DateTime databackuptm { set; get; }
     }
 
     public class ModuleTXOData
@@ -307,6 +311,7 @@ namespace Prometheus.Models
         public ModuleTXOData()
         {
             Init();
+            databackuptm = DateTime.Now;
         }
 
         private void Init()
@@ -434,6 +439,7 @@ namespace Prometheus.Models
         public string Appv_3 { set; get; }
         public string Appv_4 { set; get; }
         public DateTime Appv_5 { set; get; }
+        public DateTime databackuptm { set; get; }
     }
 
     public class AlignmentPowerType
@@ -447,6 +453,7 @@ namespace Prometheus.Models
         public AlignmentPower()
         {
             Init();
+            databackuptm = DateTime.Now;
         }
 
         private void Init()
@@ -577,6 +584,7 @@ namespace Prometheus.Models
         public string Appv_3 { set; get; }
         public string Appv_4 { set; get; }
         public DateTime Appv_5 { set; get; }
+        public DateTime databackuptm { set; get; }
     }
 
     public class BIDataUtility
@@ -699,7 +707,7 @@ namespace Prometheus.Models
                             return;
                         }
 
-                            sql = sql.Replace("<PNCOND>",pncond).Replace("<TIMECOND>", vm.StartDate.ToString());
+                            sql = sql.Replace("<PNCOND>",pncond).Replace("<TIMECOND>", vm.StartDate.ToString("yyyy-MM-dd hh:mm:ss"));
 
                             var tempdataiddict = new Dictionary<string, BITestData>();
                             var dbret = DBUtility.ExePRLSqlWithRes(ctrl,sql);
@@ -791,7 +799,7 @@ namespace Prometheus.Models
                             var starttime = BITestData.RetrieveLatestTimeOfLocalBI(vm.ProjectKey);
                             if (string.IsNullOrEmpty(starttime))
                             {
-                                starttime = vm.StartDate.ToString();
+                                starttime = vm.StartDate.ToString("yyyy-MM-dd hh:mm:ss");
                             }
 
                             var sql = "select ModuleSerialNum,Step,ModuleType,ErrAbbr,TestTimeStamp,TestStation,ModulePartNum,wafer,waferpn from  "+vt+"(nolock) where wafer <> 'NULL' and waferpn  <> 'NULL' and ErrAbbr  <> 'NULL' and ModulePartNum in <PNCOND> and TestTimeStamp > '<TIMECOND>' order by TestTimeStamp Desc,ModuleSerialNum";
@@ -1041,7 +1049,7 @@ namespace Prometheus.Models
             {
                 try
                 {
-                    return DateTime.Parse(Convert.ToString(dbret[0][0])).ToString();
+                    return DateTime.Parse(Convert.ToString(dbret[0][0])).ToString("yyyy-MM-dd hh:mm:ss");
                 }
                 catch (Exception ex)
                 {
@@ -1443,7 +1451,7 @@ namespace Prometheus.Models
             {
                 try
                 {
-                    return DateTime.Parse(Convert.ToString(dbret[0][0])).ToString();
+                    return DateTime.Parse(Convert.ToString(dbret[0][0])).ToString("yyyy-MM-dd hh:mm:ss");
                 }
                 catch (Exception ex)
                 {
@@ -1633,7 +1641,7 @@ namespace Prometheus.Models
             {
                 try
                 {
-                    return DateTime.Parse(Convert.ToString(dbret[0][0])).ToString();
+                    return DateTime.Parse(Convert.ToString(dbret[0][0])).ToString("yyyy-MM-dd hh:mm:ss");
                 }
                 catch (Exception ex)
                 {

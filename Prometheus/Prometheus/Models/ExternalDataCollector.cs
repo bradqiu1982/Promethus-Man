@@ -134,6 +134,8 @@ namespace Prometheus.Models
             AppV_AH = DateTime.Parse("1982-05-06 07:30:00");
             AppV_AI = string.Empty;
             AppV_AJ = string.Empty;
+
+            databackuptm = DateTime.Now;
         }
 
         public string AppV_A { set; get; }
@@ -173,6 +175,8 @@ namespace Prometheus.Models
         public DateTime AppV_AH { set; get; }
         public string AppV_AI { set; get; }
         public string AppV_AJ { set; get; }
+
+        public DateTime databackuptm { set; get; }
     }
 
     public class RELRAWData
@@ -1263,6 +1267,7 @@ namespace Prometheus.Models
                 datatable.Columns.Add("AppV_AH", typeof(DateTime));
                 datatable.Columns.Add("AppV_AI", typeof(string));
                 datatable.Columns.Add("AppV_AJ", typeof(string));
+                datatable.Columns.Add("databackuptm", typeof(DateTime));
 
                 var idx = 0;
                 foreach (var line in data)
@@ -2084,7 +2089,7 @@ namespace Prometheus.Models
         private static List<RawDMR> RetrieveDMRFromITDB(string OBAUpdateTime, Dictionary<string, IssueViewModels> DMRDict, Controller ctrl)
         {
             var ret = new List<RawDMR>();
-            var onemonthago = DateTime.Parse(OBAUpdateTime).AddMonths(-1).ToString();
+            var onemonthago = DateTime.Parse(OBAUpdateTime).AddMonths(-1).ToString("yyyy-MM-dd hh:mm:ss");
 
             var sql = "select DMR_ID,Created_at,Prod_Line,Defect_Qty,Inspected_Qty,Actual_Problem,Justification,Remark,File_URL from dbo.DMR_Detail_List_View where Created_at > '<CreateTime>'";
             sql = sql.Replace("<CreateTime>", onemonthago);

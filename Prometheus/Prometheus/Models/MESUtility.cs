@@ -140,11 +140,12 @@ namespace Prometheus.Models
 
         }
 
-        private static List<TraceViewData> RetrieveTraceViewData(ProjectCriticalErrorVM pjerror, ProjectTestData pjdata, Controller ctrl)
+        private static List<TraceViewData> RetrieveTraceViewData(ProjectCriticalErrorVM pjerror, ProjectTestData pjdata, Controller ctrl,List<string> traceviewfilelist)
         {
             var ret = new List<TraceViewData>();
 
             var traceviewlist = ExternalDataCollector.LoadTraceView2Local(pjdata.TestStation, pjdata.ModuleSerialNum, pjdata.WhichTest, pjdata.TestTimeStamp.ToString(), ctrl);
+            traceviewfilelist.AddRange(traceviewlist);
             foreach (var filename in traceviewlist)
             {
                 var tempret = ExternalDataCollector.RetrieveTestDataFromTraceView(filename, pjerror.TestCaseName, pjerror.MatchCond);
@@ -414,7 +415,7 @@ namespace Prometheus.Models
             new System.Threading.ManualResetEvent(false).WaitOne(30);
         }
 
-        private static void Create2ndCheckTask(ProjectTestData pjdata, ProjectCriticalErrorVM item, Controller ctrl)
+        private static void Create2ndCheckTask(ProjectTestData pjdata, ProjectCriticalErrorVM item, Controller ctrl,List<string> traceviewfilelist)
         {
             try
             {
@@ -450,6 +451,16 @@ namespace Prometheus.Models
                 }
                 IssueViewModels.StoreIssueComment(vm.IssueKey, comment1.dbComment, vm.Assignee, COMMENTTYPE.Description);
 
+                foreach (var trace in traceviewfilelist)
+                {
+                    var traces = trace.Split(new string[] { "userfiles\\" }, StringSplitOptions.RemoveEmptyEntries);
+                    if (traces.Length == 2)
+                    {
+                        var url = "/userfiles/" + traces[1].Replace("\\", "/");
+                        IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
+                    }
+                }//end foreach
+
                 SendTaskEvent(vm, comment1.Comment, ctrl);
             }
             catch (Exception ex) { }
@@ -466,7 +477,8 @@ namespace Prometheus.Models
                 if (string.Compare(item.ErrorCode, pjdata.ErrAbbr, true) == 0)
                 {
                     var filtereddata = new List<TraceViewData>();
-                    var traceviewdata = RetrieveTraceViewData(item, pjdata, ctrl);
+                    var traceviewfilelist = new List<string>();
+                    var traceviewdata = RetrieveTraceViewData(item, pjdata, ctrl, traceviewfilelist);
                     if (traceviewdata.Count == 0)
                         continue;
                     if (!CheckPJCriticalRule(traceviewdata, item,filtereddata))
@@ -475,7 +487,7 @@ namespace Prometheus.Models
                     //check previous match date
                     if ((DateTime.Now - item.Appv_5).Days < 3)
                         continue;
-                    Create2ndCheckTask(pjdata, item, ctrl);
+                    Create2ndCheckTask(pjdata, item, ctrl, traceviewfilelist);
 
                     item.Appv_3 = "MATCHED";
                     item.UpdateMatchDate();

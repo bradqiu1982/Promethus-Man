@@ -447,6 +447,10 @@ namespace Prometheus.Models
         {
             foreach (var item in pjcriticalerrorlist)
             {
+                //no more match
+                if (item.Appv_3.Contains("MATCHED"))
+                    continue;
+
                 if (string.Compare(item.ErrorCode, pjdata.ErrAbbr, true) == 0)
                 {
                     var filtereddata = new List<TraceViewData>();
@@ -456,7 +460,13 @@ namespace Prometheus.Models
                     if (!CheckPJCriticalRule(traceviewdata, item,filtereddata))
                         continue;
                     //match rule
+                    //check previous match date
+                    if ((DateTime.Now - item.Appv_5).Days < 3)
+                        continue;
                     Create2ndCheckTask(pjdata, item, ctrl);
+
+                    item.Appv_3 = "MATCHED";
+                    item.UpdateMatchDate();
                     return true;
                 }
             }

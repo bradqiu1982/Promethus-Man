@@ -90,12 +90,12 @@ namespace Prometheus.Models
             var sql = string.Empty;
             if (!string.IsNullOrEmpty(errorcode))
             {
-                sql = "select ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel from ProjectCriticalError where ProjectKey='<ProjectKey>' and ErrorCode='<ErrorCode>'";
+                sql = "select ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel,Appv_5 from ProjectCriticalError where ProjectKey='<ProjectKey>' and ErrorCode='<ErrorCode>'";
                 sql = sql.Replace("<ProjectKey>", pjkey).Replace("<ErrorCode>", errorcode);
             }
             else
             {
-                sql = "select ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel from ProjectCriticalError where ProjectKey='<ProjectKey>'";
+                sql = "select ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel,Appv_5 from ProjectCriticalError where ProjectKey='<ProjectKey>'";
                 sql = sql.Replace("<ProjectKey>", pjkey);
             }
 
@@ -116,10 +116,17 @@ namespace Prometheus.Models
                 tempvm.Creater = Convert.ToString(line[10]);
                 tempvm.Temperature = Convert.ToString(line[11]);
                 tempvm.Channel = Convert.ToString(line[12]);
+                tempvm.Appv_5 = Convert.ToDateTime(line[13]);
                 ret.Add(tempvm);
             }
             return ret;
         }
 
+        public void UpdateMatchDate()
+        {
+            var sql = "update ProjectCriticalError set Appv_5 = '<MatchDate>' where ProjectKey='<ProjectKey>' and ErrorCode='<ErrorCode>' and TestCaseName='<TestCaseName>' and MatchCond='<MatchCond>'";
+            sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ErrorCode>", ErrorCode).Replace("<TestCaseName>", TestCaseName).Replace("<MatchCond>", MatchCond).Replace("<MatchDate>",DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"));
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
     }
 }

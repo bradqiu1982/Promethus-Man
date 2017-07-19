@@ -105,7 +105,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        private static void CreateFA(ProjectTestData item,string firstengineer)
+        private static void CreateFA(ProjectTestData item,string firstengineer,Controller ctrl)
         {
             var vm = new IssueViewModels();
             vm.ProjectKey = item.ProjectKey;
@@ -126,6 +126,18 @@ namespace Prometheus.Models
             vm.DataID = item.DataID;
             //ProjectEvent.CreateIssueEvent(vm.ProjectKey, "System", vm.Assignee, vm.Summary, vm.IssueKey);
             vm.StoreIssue();
+
+            var traceviewlist = ExternalDataCollector.LoadTraceView2Local(item.TestStation, item.ModuleSerialNum, item.WhichTest, item.TestTimeStamp.ToString(), ctrl);
+            foreach (var trace in traceviewlist)
+            {
+                var traces = trace.Split(new string[] { "userfiles\\" }, StringSplitOptions.RemoveEmptyEntries);
+                if (traces.Length == 2)
+                {
+                    var url = "/userfiles/" + traces[1].Replace("\\", "/");
+                    IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
+                }
+            }//end foreach
+
         }
 
         private static List<TraceViewData> RetrieveTraceViewData(ProjectCriticalErrorVM pjerror, ProjectTestData pjdata, Controller ctrl)
@@ -495,7 +507,7 @@ namespace Prometheus.Models
                 {
                     if (!CheckPJCriticalError(item,pjcriticalerrorlist,ctrl))
                     {
-                        CreateFA(item, firstengineer);
+                        CreateFA(item, firstengineer,ctrl);
                     }
                 }
             }

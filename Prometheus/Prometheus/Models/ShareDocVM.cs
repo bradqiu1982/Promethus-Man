@@ -535,6 +535,8 @@ namespace Prometheus.Models
                 tempvm.DOCType = Convert.ToString(line[1]);
                 tempvm.DOCKey = Convert.ToString(line[2]);
                 tempvm.DOCTag = Convert.ToString(line[3]);
+                if (tempvm.DOCTag.Contains(SPECIALBLOGType.WEEKLYREPORT))
+                    continue;
                 tempvm.DOCCreator = Convert.ToString(line[4]);
                 tempvm.DOCDate = DateTime.Parse(Convert.ToString(line[5]));
                 tempvm.DOCFavorTimes = Convert.ToInt32(line[6]);

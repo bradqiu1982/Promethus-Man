@@ -189,12 +189,19 @@ namespace Prometheus.Controllers
 
             ViewBag.pjtpdict = new Dictionary<string, bool>();
             ViewBag.pjtypelist = new List<string>();
-            ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.Parallel);
-            ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.Tunable);
-            ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.OSA);
-            ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.LineCard);
-            ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.QM);
-            ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.Others);
+
+            var syscfg = CfgUtility.GetSysConfig(this);
+            var pjtylist = syscfg["PROJECTTYPE"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var pjt in pjtylist)
+            {
+                ViewBag.pjtypelist.Add(pjt);
+            }
+            //ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.Parallel);
+            //ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.Tunable);
+            //ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.OSA);
+            //ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.LineCard);
+            //ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.QM);
+            //ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.Others);
 
             foreach (var item in projlist)
             {
@@ -967,12 +974,18 @@ namespace Prometheus.Controllers
         private void CreateProjectTypeList(ProjectViewModels vm)
         {
             var pjtypelist = new List<string>();
-            pjtypelist.Add(ProjectTypeInf.Parallel);
-            pjtypelist.Add(ProjectTypeInf.Tunable);
-            pjtypelist.Add(ProjectTypeInf.OSA);
-            pjtypelist.Add(ProjectTypeInf.LineCard);
-            pjtypelist.Add(ProjectTypeInf.QM);
-            pjtypelist.Add(ProjectTypeInf.Others);
+            var syscfg = CfgUtility.GetSysConfig(this);
+            var pjtylist = syscfg["PROJECTTYPE"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var pjt in pjtylist)
+            {
+                pjtypelist.Add(pjt);
+            }
+            //pjtypelist.Add(ProjectTypeInf.Parallel);
+            //pjtypelist.Add(ProjectTypeInf.Tunable);
+            //pjtypelist.Add(ProjectTypeInf.OSA);
+            //pjtypelist.Add(ProjectTypeInf.LineCard);
+            //pjtypelist.Add(ProjectTypeInf.QM);
+            //pjtypelist.Add(ProjectTypeInf.Others);
 
             bool selected = false;
             var pslist = new List<SelectListItem>();
@@ -5518,12 +5531,19 @@ namespace Prometheus.Controllers
 
             ViewBag.pjtpdict = new Dictionary<string, bool>();
             ViewBag.pjtypelist = new List<string>();
-            ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.Parallel);
-            ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.Tunable);
-            ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.OSA);
-            ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.LineCard);
-            ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.QM);
-            ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.Others);
+            var syscfg = CfgUtility.GetSysConfig(this);
+            var pjtylist = syscfg["PROJECTTYPE"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var pjt in pjtylist)
+            {
+                ViewBag.pjtypelist.Add(pjt);
+            }
+
+            //ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.Parallel);
+            //ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.Tunable);
+            //ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.OSA);
+            //ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.LineCard);
+            //ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.QM);
+            //ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.Others);
 
             foreach (var item in allprojlist)
             {

@@ -1587,7 +1587,7 @@ namespace Prometheus.Controllers
                     issuetag = issuetag + Request.Form["issuetagcheck" + i] + ";";
                 }
             }
-
+            
 
             if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
             {
@@ -1660,6 +1660,14 @@ namespace Prometheus.Controllers
 
                     //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
                     vm.CloseIssue();
+
+                    if (vm.Summary.Contains(LYTTASKType.LYTTASK))
+                    {
+                        if (!issuetag.Contains("LYT"))
+                        {
+                            issuetag = issuetag + "LYT" + ";";
+                        }
+                    }
 
                     if (!string.IsNullOrEmpty(issuetag))
                     {

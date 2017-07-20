@@ -146,6 +146,19 @@ namespace Prometheus.Models
                 return null;
         }
 
+        public static string RetrieveLatestTimeOfLocalBIByPN(string PN)
+        {
+            var sql = "select top 1 TestTimeStamp from BITestData where PN = '<PN>' order by TestTimeStamp DESC";
+            sql = sql.Replace("<PN>", PN);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            if (dbret.Count > 0)
+            {
+                return Convert.ToString(dbret[0][0]);
+            }
+            else
+                return null;
+        }
+
         public static Dictionary<string, bool> RetrieveSNBeforeDate(string projectkey, string edate)
         {
             var ret = new Dictionary<string, bool>();

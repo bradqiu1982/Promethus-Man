@@ -10,6 +10,7 @@ using System.Web.Mvc;
 
 namespace Prometheus.Models
 {
+    #region DATACLASS
     public class BISNRelation
     {
         public BISNRelation()
@@ -586,9 +587,12 @@ namespace Prometheus.Models
         public DateTime Appv_5 { set; get; }
         public DateTime databackuptm { set; get; }
     }
+    #endregion
 
     public class BIDataUtility
     {
+        #region YIELDDATA
+
         private static bool IsDigitsOnly(string str)
         {
             foreach (char c in str)
@@ -638,6 +642,20 @@ namespace Prometheus.Models
             return ret;
         }
 
+        private static List<string> PNCondition2List(List<ProjectPn> pns)
+        {
+            var ret = new List<string>();
+
+            foreach (var pn in pns)
+            {
+                if (IsDigitsOnly(pn.Pn.Trim()))
+                {
+                    ret.Add(pn.Pn.Trim());
+                }
+            }
+            return ret;
+        }
+
         private static string GetUniqKey()
         {
             return Guid.NewGuid().ToString("N");
@@ -683,6 +701,88 @@ namespace Prometheus.Models
 
         public static void StartProjectBonding(Controller ctrl, ProjectViewModels vm)
         {
+            try
+            {
+                if (BITestData.UpdatePJLockUsing(vm.ProjectKey))
+                    return;
+
+                var PNList = PNCondition2List(vm.PNList);
+                foreach (var pn in PNList)
+                {
+                    var pntemptime = BITestData.RetrieveLatestTimeOfLocalBIByPN(pn);
+                    if (pntemptime == null)
+                    {
+                        pntemptime = vm.StartDate.ToString("yyyy-MM-dd hh:mm:ss");
+                    }
+
+                    var sql = "select SN,TestName,BITable,Failure,TestTimeStamp,Station,PN,Wafer,JO from BITestResult where PN='<PN>' and TestTimeStamp > '<TestTimeStamp>' order by TestTimeStamp Desc,SN";
+                    sql = sql.Replace("<PN>", pn).Replace("<TestTimeStamp>", pntemptime);
+                    var tempdataiddict = new Dictionary<string, BITestData>();
+                    var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+                    foreach (var line in dbret)
+                    {
+                        try
+                        {
+                            var tempid = ConvertString(line[0]) + "_" + ConvertString(line[1]);
+
+                            if (tempdataiddict.ContainsKey(tempid))
+                            {
+                                if (string.Compare(ConvertString(line[3]), "Pass", true) != 0)
+                                {
+                                    var ekey = ProjectErrorViewModels.GetUniqKey();
+                                    var pjerror = new ProjectErrorViewModels(ProjectErrorViewModels.BURNIN, ekey, ConvertString(line[3]), "", 1);
+                                    pjerror.Reporter = "System";
+                                    pjerror.Description = "";
+                                    pjerror.AddandUpdateProjectError();
+                                }
+                            }
+                            else
+                            {
+                                var tempdata = new BITestData();
+                                tempdata.DataID = GetUniqKey();
+                                tempdata.ProjectKey = vm.ProjectKey;
+                                tempdata.ModuleSerialNum = ConvertString(line[0]);
+                                tempdata.WhichTest = ConvertString(line[1]);
+                                tempdata.ModuleType = ConvertString(line[2]);
+                                tempdata.ErrAbbr = ConvertString(line[3]);
+                                tempdata.TestTimeStamp = DateTime.Parse(ConvertString(line[4]));
+                                tempdata.TestStation = ConvertString(line[5]);
+                                tempdata.PN = ConvertString(line[6]);
+                                tempdata.Wafer = ConvertString(line[7]);
+                                tempdata.Waferpn = ConvertString(line[8]);
+
+                                if (string.Compare(ConvertString(line[3]), "Pass", true) != 0)
+                                {
+                                    var ekey = ProjectErrorViewModels.GetUniqKey();
+                                    var pjerror = new ProjectErrorViewModels(ProjectErrorViewModels.BURNIN, ekey, ConvertString(line[3]), "", 1);
+                                    pjerror.Reporter = "System";
+                                    pjerror.Description = "";
+                                    pjerror.AddandUpdateProjectError();
+                                }
+
+                                tempdataiddict.Add(tempid, tempdata);
+                            }
+                        }
+                        catch (Exception ex) { }
+                    }//end foreach
+
+                    foreach (var kv in tempdataiddict)
+                    {
+                        kv.Value.StoreBIData();
+                    }//end foreach
+                }//end foreach
+
+                BITestData.ResetUpdatePJLock(vm.ProjectKey);
+            }
+            catch (Exception ex)
+            {
+                BITestData.ResetUpdatePJLock(vm.ProjectKey);
+            }
+        }
+
+        public static void StartProjectBonding1(Controller ctrl, ProjectViewModels vm)
+        {
+
             var vtab = new List<string>();
             vtab.Add("dbo.PRLL_VcselInfoSummary_2016");
             vtab.Add("dbo.PRLL_VcselInfoSummary_2017");
@@ -780,8 +880,102 @@ namespace Prometheus.Models
 
         }
 
-
         public static void UpdateProjectData(Controller ctrl, ProjectViewModels vm)
+        {
+            try
+            {
+                var failurelist = new List<BITestData>();
+                var failuredict = new Dictionary<string, bool>();
+                var passlist = new List<BITestData>();
+                var starttime = BITestData.RetrieveLatestTimeOfLocalBI(vm.ProjectKey);
+
+                var PNList = PNCondition2List(vm.PNList);
+                foreach (var pn in PNList)
+                {
+                    var pntemptime = BITestData.RetrieveLatestTimeOfLocalBIByPN(pn);
+                    if (pntemptime == null)
+                    {
+                        pntemptime = vm.StartDate.ToString("yyyy-MM-dd hh:mm:ss");
+                    }
+
+                    var sql = "select SN,TestName,BITable,Failure,TestTimeStamp,Station,PN,Wafer,JO from BITestResult where PN='<PN>' and TestTimeStamp > '<TestTimeStamp>' order by TestTimeStamp Desc,SN";
+                    sql = sql.Replace("<PN>", pn).Replace("<TestTimeStamp>", pntemptime);
+                    var tempdataiddict = new Dictionary<string, BITestData>();
+                    var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+
+                    foreach (var line in dbret)
+                    {
+                        try
+                        {
+                            var tempid = ConvertString(line[0]) + "_" + ConvertString(line[1]);
+                            if (tempdataiddict.ContainsKey(tempid))
+                            {
+                                if (string.Compare(ConvertString(line[3]), "Pass", true) != 0)
+                                {
+                                    var ekey = ProjectErrorViewModels.GetUniqKey();
+                                    var pjerror = new ProjectErrorViewModels(ProjectErrorViewModels.BURNIN, ekey, ConvertString(line[3]), "", 1);
+                                    pjerror.Reporter = "System";
+                                    pjerror.Description = "";
+                                    pjerror.AddandUpdateProjectError();
+                                }
+                            }
+                            else
+                            {
+                                var tempdata = new BITestData();
+                                tempdata.DataID = GetUniqKey();
+                                tempdata.ProjectKey = vm.ProjectKey;
+                                tempdata.ModuleSerialNum = ConvertString(line[0]);
+                                tempdata.WhichTest = ConvertString(line[1]);
+                                tempdata.ModuleType = ConvertString(line[2]);
+                                tempdata.ErrAbbr = ConvertString(line[3]);
+                                tempdata.TestTimeStamp = DateTime.Parse(ConvertString(line[4]));
+                                tempdata.TestStation = ConvertString(line[5]);
+                                tempdata.PN = ConvertString(line[6]);
+                                tempdata.Wafer = ConvertString(line[7]);
+                                tempdata.Waferpn = ConvertString(line[8]);
+                                tempdataiddict.Add(tempid, tempdata);
+
+                                if (string.Compare(tempdata.ErrAbbr, "Pass", true) != 0)
+                                {
+                                    if (!failuredict.ContainsKey(tempdata.ModuleSerialNum))
+                                    {
+                                        failuredict.Add(tempdata.ModuleSerialNum, true);
+                                        failurelist.Add(tempdata);
+                                    }
+
+                                    var ekey = ProjectErrorViewModels.GetUniqKey();
+                                    var pjerror = new ProjectErrorViewModels(ProjectErrorViewModels.BURNIN, ekey, tempdata.ErrAbbr, "", 1);
+                                    pjerror.Reporter = "System";
+                                    pjerror.Description = "";
+                                    pjerror.AddandUpdateProjectError();
+                                }
+                                else
+                                {
+                                    passlist.Add(tempdata);
+                                }
+                            }
+                        } catch (Exception ex) { }
+                    }//end foreach
+
+                    foreach (var kv in tempdataiddict)
+                    {
+                        kv.Value.StoreBIData();
+                    }//end foreach
+                }//end foreach
+
+                if ((starttime != null) && (DateTime.Parse(starttime) != vm.StartDate))
+                {
+                    IssueViewModels.CloseBIIssueAutomaticlly(failurelist);
+                    IssueViewModels.CloseBIIssueAutomaticlly(passlist);
+
+                    CreateSystemIssues(failurelist, ctrl);
+                }
+
+            }
+            catch (Exception ex) { }
+        }
+
+        public static void UpdateProjectData1(Controller ctrl, ProjectViewModels vm)
         {
             var vtab = new List<string>();
             vtab.Add("dbo.PRLL_VcselInfoSummary_2016");
@@ -886,8 +1080,9 @@ namespace Prometheus.Models
 
                             if (DateTime.Parse(starttime) != vm.StartDate)
                             {
-                                CreateSystemIssues(failurelist,ctrl);
+                                IssueViewModels.CloseBIIssueAutomaticlly(failurelist);
                                 IssueViewModels.CloseBIIssueAutomaticlly(passlist);
+                                CreateSystemIssues(failurelist,ctrl);
                             }
                         }
 
@@ -896,12 +1091,81 @@ namespace Prometheus.Models
                 {
                 }
             }
-
-
-
         }
 
         public static void RetrievePjWaferAllData(Controller ctrl, ProjectViewModels vm)
+        {
+            try
+            {
+                var bondeddatadict = BITestData.RetrieveAllDataIDASC(vm.ProjectKey);
+                var tempdataiddict = new Dictionary<string, BITestData>();
+
+                var wafers = BITestData.RetrieveAllWafer(vm.ProjectKey);
+                var PNList = PNCondition2List(vm.PNList);
+                foreach (var pn in PNList)
+                {
+                    foreach (var wf in wafers)
+                    {
+                        var sql = "select SN,TestName,BITable,Failure,TestTimeStamp,Station,PN,Wafer,JO from BITestResult where PN='<PN>' and Wafer = '<Wafer>' order by TestTimeStamp Desc,SN";
+                        sql = sql.Replace("<PN>", pn).Replace("<Wafer>", wf);
+                        var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+
+                        foreach (var line in dbret)
+                        {
+                            try
+                            {
+                                var tempid = ConvertString(line[0]) + "_" + ConvertString(line[1]);
+                                if (!bondeddatadict.ContainsKey(tempid))
+                                {
+
+                                        if (tempdataiddict.ContainsKey(tempid))
+                                        {
+                                                if (string.Compare(ConvertString(line[3]), "Pass", true) != 0)
+                                                {
+                                                        var ekey = ProjectErrorViewModels.GetUniqKey();
+                                                        var pjerror = new ProjectErrorViewModels(ProjectErrorViewModels.BURNIN, ekey, ConvertString(line[3]), "", 1);
+                                                        pjerror.Reporter = "System";
+                                                        pjerror.Description = "";
+                                                        pjerror.AddandUpdateProjectError();
+                                                }
+                                        }
+                                        else
+                                        {
+                                            var tempdata = new BITestData();
+                                            tempdata.DataID = GetUniqKey();
+                                            tempdata.ProjectKey = vm.ProjectKey;
+                                            tempdata.ModuleSerialNum = ConvertString(line[0]);
+                                            tempdata.WhichTest = ConvertString(line[1]);
+                                            tempdata.ModuleType = ConvertString(line[2]);
+                                            tempdata.ErrAbbr = ConvertString(line[3]);
+                                            tempdata.TestTimeStamp = DateTime.Parse(ConvertString(line[4]));
+                                            tempdata.TestStation = ConvertString(line[5]);
+                                            tempdata.PN = ConvertString(line[6]);
+                                            tempdata.Wafer = ConvertString(line[7]);
+                                            tempdata.Waferpn = ConvertString(line[8]);
+
+                                            tempdataiddict.Add(tempid, tempdata);
+                                        }
+                                
+
+                                }//end if (!bondeddatadict.ContainsKey(tempid))
+                            }catch (Exception ex) { }
+                        }//end foreach
+
+                    }//end foreach
+                }//end foreach
+
+                foreach (var kv in tempdataiddict)
+                {
+                    kv.Value.StoreBIData();
+                }//end foreach
+
+            }
+            catch (Exception ex) { }
+        }
+
+
+        public static void RetrievePjWaferAllData1(Controller ctrl, ProjectViewModels vm)
         {
             var vtab = new List<string>();
             vtab.Add("dbo.PRLL_VcselInfoSummary_2016");
@@ -1040,6 +1304,9 @@ namespace Prometheus.Models
             }
         }
 
+        #endregion
+
+        #region AUTOBI
         private static string RetrieveLatestTimeStampOfAnBITable(string bt,string bizerotime)
         {
             var sql = "select top 1 TestTimeStamp from BITestResult where BITable = '<BITable>' order by TestTimeStamp DESC";
@@ -1387,6 +1654,7 @@ namespace Prometheus.Models
             }//end while(true)
 
         }
+        #endregion
 
         //private static Dictionary<string, BISNRelation> RetrieveBIWaferBySN(List<BITestResult> testresultlist)
         //{
@@ -1442,6 +1710,7 @@ namespace Prometheus.Models
         //    return snwaferdict;
         //}
 
+        #region module
         private static string RetrieveLatestTimeStampOfATxpTable(string bt, string bizerotime)
         {
             var sql = "select top 1 TestTimeStamp from ModuleTXOData where TestName = '<TestName>' order by TestTimeStamp DESC";
@@ -1631,8 +1900,9 @@ namespace Prometheus.Models
             WriteDBWithTable(datatable, "ModuleTXOData");
 
         }
+        #endregion
 
-
+        #region process
         private static string RetrieveLatestTimeStampOfProcessTable(string prozerotime)
         {
             var sql = "select top 1 TestTimeStamp from AlignmentPower order by TestTimeStamp DESC";
@@ -1780,7 +2050,7 @@ namespace Prometheus.Models
             WriteDBWithTable(datatable, "AlignmentPower");
         }
 
-
+        #endregion
 
     }
 }

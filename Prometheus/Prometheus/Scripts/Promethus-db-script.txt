@@ -707,6 +707,11 @@ CREATE TABLE [dbo].[WaferRecord] (
 	[AppV_L]   FLOAT DEFAULT (-99999.0) NOT NULL,
 	);
 
+   update [NPITrace].[dbo].[BITestData] set Waferpn = ''
+   update [NPITrace].[dbo].[BITestData] set WhichTest = 'Pre Burn In' where WhichTest = '3'
+   update [NPITrace].[dbo].[BITestData] set WhichTest = 'Post Burn In' where WhichTest = '4'
+   update [NPITrace].[dbo].[BITestData] set Wafer = SUBSTRING(Wafer,0,10)
+
 ALTER TABLE  AlignmentPower Add  databackuptm   DATETIME       DEFAULT ('2017-07-18 10:00:00') NOT NULL;
 ALTER TABLE  BIError Add  databackuptm   DATETIME       DEFAULT ('2017-07-18 10:00:00') NOT NULL;
 ALTER TABLE  BIROOTCAUSE Add  databackuptm   DATETIME       DEFAULT ('2017-07-18 10:00:00') NOT NULL;

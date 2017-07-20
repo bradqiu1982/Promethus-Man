@@ -266,6 +266,10 @@ namespace Prometheus.Controllers
         {
             var username = Request.Form["Email"].ToUpper();
             var password = Request.Form["Password"];
+            if (!username.ToUpper().Contains("@FINISAR.COM"))
+            {
+                return View();
+            }
 
             var dbret = UserViewModels.RetrieveUser(username);
             if (dbret == null)

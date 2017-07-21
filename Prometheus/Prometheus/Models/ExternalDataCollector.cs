@@ -2426,7 +2426,8 @@ namespace Prometheus.Models
             {
                 var uline = line.ToUpper();
 
-                if (uline.Contains(testcase.ToUpper()) && uline.Contains("STARTED"))
+                if ((string.Compare(testcase,"ALL",true) == 0) 
+                    || (uline.Contains(testcase.ToUpper()) && uline.Contains("STARTED")))
                 {
                     entertestcase = true;
                     if (uline.Contains("C ---") && uline.Contains("@"))
@@ -2447,6 +2448,11 @@ namespace Prometheus.Models
                 if (uline.Contains(testcase.ToUpper()) && uline.Contains("COMPLETED"))
                 {
                     entertestcase = false;
+                }
+
+                if (string.Compare(testcase, "ALL", true) == 0)
+                {
+                    entertestcase = true;
                 }
 
                 if (entertestcase && line.Contains("] --- ") && uline.Contains(" "+datafield.ToUpper()+" "))

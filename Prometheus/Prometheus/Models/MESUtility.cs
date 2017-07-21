@@ -231,6 +231,53 @@ namespace Prometheus.Models
             return false;
         }
 
+        private static bool DeltaAlgorithm(List<TraceViewData> tempfiltereddata, double delta)
+        {
+            var lowtemplist = new List<double>();
+            var hightemplist = new List<double>();
+            var normaltemplist = new List<double>();
+            foreach (var item in tempfiltereddata)
+            {
+                if (item.Temp > 45)
+                {
+                    hightemplist.Add(item.Value);
+                }
+                else if (item.Temp < 15)
+                {
+                    lowtemplist.Add(item.Value);
+                }
+                else
+                {
+                    normaltemplist.Add(item.Value);
+                }
+            }
+
+            try
+            {
+                if (lowtemplist.Count > 2)
+                {
+                    lowtemplist.Sort();
+                    if ((lowtemplist[lowtemplist.Count - 1] - lowtemplist[0]) > delta)
+                        return true;
+                }
+                if (hightemplist.Count > 2)
+                {
+                    hightemplist.Sort();
+                    if ((hightemplist[hightemplist.Count - 1] - hightemplist[0]) > delta)
+                        return true;
+                }
+                if (normaltemplist.Count > 2)
+                {
+                    normaltemplist.Sort();
+                    if ((normaltemplist[normaltemplist.Count - 1] - normaltemplist[0]) > delta)
+                        return true;
+                }
+            }
+            catch (Exception ex) { }
+
+            return false;
+        }
+
         private static bool UniformityAlgorithm(List<TraceViewData> tempfiltereddata, double rate)
         {
             var lowtemplist = new List<double>();
@@ -360,6 +407,19 @@ namespace Prometheus.Models
 
             if (pjerror.WithAlgorithm == 1)
             {
+                if (string.Compare(pjerror.Algorithm, PJCriticalAlgorithm.MAXDELTA, true) == 0)
+                {
+                    try
+                    {
+                        var delta = Convert.ToDouble(pjerror.AlgorithmParam.Trim());
+                        if (DeltaAlgorithm(tempfiltereddata, delta))
+                        {
+                            return true;
+                        }
+                    }
+                    catch (Exception ex) { }
+                }
+
                 if (string.Compare(pjerror.Algorithm, PJCriticalAlgorithm.STDDEV, true) == 0)
                 {
                     try

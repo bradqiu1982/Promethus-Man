@@ -14,6 +14,7 @@ namespace Prometheus.Models
 
     public class PJCriticalAlgorithm
     {
+        public static string MAXDELTA = "MAX DELTA";
         public static string UNIFORMITY = "UNIFORMITY";
         public static string STDDEV = "STDDEV";
     }

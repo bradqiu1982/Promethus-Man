@@ -235,6 +235,7 @@
                                 <th>High Limit</th>
                                 <th>Algorithm</th>
                                 <th>Algorithm Param</th>
+                                <th>FA Switch</th>
                                 <th>Related People</th>
                                 <th>&nbsp;</th>
                             </tr>
@@ -269,7 +270,20 @@
                                         <td>&nbsp;</td>
                                         <td>&nbsp;</td>
                                     }
-
+                                    <td>
+                                        @if (item.Appv_1 > 0)
+                                        {
+                                            <button class="form-control" type="button" data-toggle="tooltip" style="border:0px;border-color:transparent!important;background-color:transparent!important;" title="red means no FA will be create after test data fail to match this rule" onclick="OpenFASwitch('PJKey=@(item.ProjectKey)&ErrorCode=@(item.ErrorCode)&TestCase=@(item.TestCaseName)&MatchCond=@(item.MatchCond)')">
+                                                <span class="glyphicon glyphicon-filter" aria-hidden="true" style="color:red"></span>
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button class="form-control" type="button" data-toggle="tooltip" style="border:0px;border-color:transparent!important;background-color:transparent!important;" title="green means FA will be create after test data fail to match this rule" onclick="CloseFASwitch('PJKey=@(item.ProjectKey)&ErrorCode=@(item.ErrorCode)&TestCase=@(item.TestCaseName)&MatchCond=@(item.MatchCond)')">
+                                                <span class="glyphicon glyphicon-filter" aria-hidden="true" style="color:green"></span>
+                                            </button>
+                                        }
+                                    </td>
                                     <td>@item.Appv_4.Replace("@FINISAR.COM","")</td>
                                     <td><img src="~/Content/images/icon/delete2.png" MYTP="HOVER" style="height:30px; width:18px" onclick="DeletePJCriticalError('PJKey=@(item.ProjectKey)&ErrorCode=@(item.ErrorCode)&TestCase=@(item.TestCaseName)&MatchCond=@(item.MatchCond)')"></td>
                                 </tr>
@@ -283,6 +297,14 @@
                             {
                                 window.location.href = '/User/DeletePJCriticalError?' + obt;
                             }
+                        }
+                        function OpenFASwitch(obt)
+                        {
+                            window.location.href = '/User/Open2ndCheckFASwitch?' + obt;
+                        }
+                        function CloseFASwitch(obt)
+                        {
+                            window.location.href = '/User/Close2ndCheckFASwitch?' + obt;
                         }
                     </script>
                 </div>

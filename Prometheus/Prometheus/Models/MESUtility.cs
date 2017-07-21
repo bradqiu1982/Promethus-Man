@@ -476,10 +476,17 @@ namespace Prometheus.Models
 
         private static bool CheckPJCriticalError(ProjectTestData pjdata, List<ProjectCriticalErrorVM> pjcriticalerrorlist, Controller ctrl)
         {
+            var ret = false;
+
             foreach (var item in pjcriticalerrorlist)
             {
                 if (string.Compare(item.ErrorCode, pjdata.ErrAbbr, true) == 0)
                 {
+                    if (item.Appv_1 > 0)//FA SWITCH CLOSED
+                    {
+                        ret = true;
+                    }
+
                     var filtereddata = new List<TraceViewData>();
                     var traceviewfilelist = new List<string>();
                     var traceviewdata = RetrieveTraceViewData(item, pjdata, ctrl, traceviewfilelist);
@@ -527,7 +534,7 @@ namespace Prometheus.Models
                 }//end if
             }//end foreach
 
-            return false;
+            return ret;
         }
 
 

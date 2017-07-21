@@ -84,18 +84,32 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
+        public static void Open2ndCheckFASwitch(string pjkey, string errorcode, string testcase, string matchcond)
+        {
+            var sql = "update ProjectCriticalError set Appv_1 = -99999 where ProjectKey='<ProjectKey>' and ErrorCode='<ErrorCode>' and TestCaseName='<TestCaseName>' and MatchCond='<MatchCond>'";
+            sql = sql.Replace("<ProjectKey>", pjkey).Replace("<ErrorCode>", errorcode).Replace("<TestCaseName>", testcase).Replace("<MatchCond>", matchcond);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        public static void Close2ndCheckFASwitch(string pjkey, string errorcode, string testcase, string matchcond)
+        {
+            var sql = "update ProjectCriticalError set Appv_1 = 1  where ProjectKey='<ProjectKey>' and ErrorCode='<ErrorCode>' and TestCaseName='<TestCaseName>' and MatchCond='<MatchCond>'";
+            sql = sql.Replace("<ProjectKey>", pjkey).Replace("<ErrorCode>", errorcode).Replace("<TestCaseName>", testcase).Replace("<MatchCond>", matchcond);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
         public static List<ProjectCriticalErrorVM> RetrievePJCriticalError(string pjkey,string errorcode)
         {
             var ret = new List<ProjectCriticalErrorVM>();
             var sql = string.Empty;
             if (!string.IsNullOrEmpty(errorcode))
             {
-                sql = "select ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel,Appv_5,Appv_4,Appv_3 from ProjectCriticalError where ProjectKey='<ProjectKey>' and ErrorCode='<ErrorCode>'";
+                sql = "select ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel,Appv_5,Appv_4,Appv_3,Appv_1 from ProjectCriticalError where ProjectKey='<ProjectKey>' and ErrorCode='<ErrorCode>'";
                 sql = sql.Replace("<ProjectKey>", pjkey).Replace("<ErrorCode>", errorcode);
             }
             else
             {
-                sql = "select ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel,Appv_5,Appv_4,Appv_3 from ProjectCriticalError where ProjectKey='<ProjectKey>'";
+                sql = "select ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel,Appv_5,Appv_4,Appv_3,Appv_1 from ProjectCriticalError where ProjectKey='<ProjectKey>'";
                 sql = sql.Replace("<ProjectKey>", pjkey);
             }
 
@@ -119,6 +133,7 @@ namespace Prometheus.Models
                 tempvm.Appv_5 = Convert.ToDateTime(line[13]);
                 tempvm.Appv_4 = Convert.ToString(line[14]);
                 tempvm.Appv_3 = Convert.ToString(line[15]);
+                tempvm.Appv_1 = Convert.ToDouble(line[16]);
                 ret.Add(tempvm);
             }
             return ret;

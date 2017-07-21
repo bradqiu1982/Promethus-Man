@@ -2009,6 +2009,18 @@ namespace Prometheus.Controllers
             return RedirectToAction("AddPJCriticalError", "User");
         }
 
+        public ActionResult Open2ndCheckFASwitch(string PJKey, string ErrorCode, string TestCase, string MatchCond)
+        {
+            ProjectCriticalErrorVM.Open2ndCheckFASwitch(PJKey, ErrorCode, TestCase, MatchCond);
+            return RedirectToAction("AddPJCriticalError", "User");
+        }
+
+        public ActionResult Close2ndCheckFASwitch(string PJKey, string ErrorCode, string TestCase, string MatchCond)
+        {
+            ProjectCriticalErrorVM.Close2ndCheckFASwitch(PJKey, ErrorCode, TestCase, MatchCond);
+            return RedirectToAction("AddPJCriticalError", "User");
+        }
+
         public ActionResult DeleteGroup(string GroupID)
         {
             UserGroupVM.DeleteGroup(GroupID);

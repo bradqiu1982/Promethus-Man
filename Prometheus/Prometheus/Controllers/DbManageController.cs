@@ -107,7 +107,7 @@ namespace Prometheus.Controllers
             tablelist.Add("UserReviewedItems");
             tablelist.Add("UserTable");
             tablelist.Add("VCSELUsageTable");
-
+            tablelist.Add("WaferRecord");
 
             foreach (var tab in tablelist)
             {

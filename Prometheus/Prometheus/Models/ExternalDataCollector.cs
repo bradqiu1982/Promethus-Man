@@ -206,6 +206,7 @@ namespace Prometheus.Models
         public void StoreWaferRecord()
         {
             var sql = "delete from WaferRecord where Wafer = '<Wafer>'";
+            sql = sql.Replace("<Wafer>", Wafer);
             DBUtility.ExeLocalSqlNoRes(sql);
 
             sql = "insert into WaferRecord(Wafer,WaferBinYield,WaferBinCount,SumCount,databackuptm) "

@@ -823,6 +823,7 @@ delete from UserRank;
 delete from UserReviewedItems;
 delete from UserTable;
 delete from VCSELUsageTable;
+delete from WaferRecord;
 
 
 DECLARE @Subject  nvarchar(255);

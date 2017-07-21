@@ -409,13 +409,17 @@ namespace Prometheus.Models
 
             var toaddrs = new List<string>();
             toaddrs.Add(vm.Assignee);
+            if (vm.RelativePeopleList.Count > 0)
+            {
+                toaddrs.AddRange(vm.RelativePeopleList);
+            }
 
             var reporter = vm.Reporter.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
             EmailUtility.SendEmail(ctrl, "WUXI NPI System_" + reporter, toaddrs, content);
             new System.Threading.ManualResetEvent(false).WaitOne(30);
         }
 
-        private static void Create2ndCheckTask(ProjectTestData pjdata, ProjectCriticalErrorVM item, Controller ctrl,List<string> traceviewfilelist)
+        private static string Create2ndCheckTask(ProjectTestData pjdata, ProjectCriticalErrorVM item, Controller ctrl,List<string> traceviewfilelist)
         {
             try
             {
@@ -436,6 +440,7 @@ namespace Prometheus.Models
                 vm.Creator = asignee;
                 vm.Resolution = Resolute.Pending;
                 vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+                vm.RelativePeoples = item.Appv_4;
                 vm.StoreIssue();
 
                 var comment1 = new IssueComments();
@@ -462,22 +467,17 @@ namespace Prometheus.Models
                 }//end foreach
 
                 SendTaskEvent(vm, comment1.Comment, ctrl);
+
+                return vm.IssueKey;
             }
             catch (Exception ex) { }
+            return null;
         }
 
         private static bool CheckPJCriticalError(ProjectTestData pjdata, List<ProjectCriticalErrorVM> pjcriticalerrorlist, Controller ctrl)
         {
             foreach (var item in pjcriticalerrorlist)
             {
-                //no more match
-                if (item.Appv_3.Contains("MATCHED"))
-                    continue;
-
-                //check previous match date
-                if ((DateTime.Now - item.Appv_5).Days < 1)
-                    continue;
-
                 if (string.Compare(item.ErrorCode, pjdata.ErrAbbr, true) == 0)
                 {
                     var filtereddata = new List<TraceViewData>();
@@ -488,14 +488,44 @@ namespace Prometheus.Models
                     if (!CheckPJCriticalRule(traceviewdata, item,filtereddata))
                         continue;
                     //match rule
-                    
-                    Create2ndCheckTask(pjdata, item, ctrl, traceviewfilelist);
 
-                    item.Appv_3 = "MATCHED";
-                    item.UpdateMatchDate();
+                    //check previous match date
+                    if ((DateTime.Now - item.Appv_5).Days < 1)
+                    {
+                        if (!string.IsNullOrEmpty(item.Appv_3))
+                        {
+                            var commentlist = IssueViewModels.RetrieveIssueByIssueKey(item.Appv_3, ctrl).CommentList;
+                            if (commentlist.Count > 0)
+                            {
+                                var fcomment = commentlist[0];
+                                if (fcomment.Comment.Contains("</div>"))
+                                {
+                                    
+                                    fcomment.Comment = fcomment.Comment + "<div class=\"col-lg-2\">" + pjdata.ModuleSerialNum + "</div>";
+                                }
+                                else
+                                {
+                                    fcomment.Comment = fcomment.Comment + "<p>&nbsp;</p>";
+                                    fcomment.Comment = fcomment.Comment + "<div class=\"col-lg-2\">" + pjdata.ModuleSerialNum + "</div>";
+                                }
+
+                                IssueViewModels.UpdateSPComment(item.Appv_3, fcomment.CommentType, fcomment.CommentDate.ToString(), fcomment.dbComment);
+                            }//end if
+                        }//end if
+                    }
+                    else
+                    {
+                        item.Appv_3 = Create2ndCheckTask(pjdata, item, ctrl, traceviewfilelist);
+                        if (!string.IsNullOrEmpty(item.Appv_3))
+                        {
+                            item.Appv_5 = DateTime.Now;
+                            item.UpdateMatchDateandTaskKey();
+                        }
+                    }
+
                     return true;
-                }
-            }
+                }//end if
+            }//end foreach
 
             return false;
         }

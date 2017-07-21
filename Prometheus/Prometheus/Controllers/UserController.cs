@@ -1956,6 +1956,9 @@ namespace Prometheus.Controllers
                 }
             }
 
+            var asilist = UserViewModels.RetrieveAllUser();
+            ViewBag.towholist1 = CreateSelectList(asilist, "");
+
             return View(vm);
         }
 
@@ -1993,7 +1996,7 @@ namespace Prometheus.Controllers
 
                 vm.Temperature = Request.Form["templist"];
                 vm.Channel = Request.Form["channellist"];
-
+                vm.Appv_4 = Request.Form["RPeopleAddr"];
                 vm.StorePJCriticalError();
             }
             catch (Exception ex) { }

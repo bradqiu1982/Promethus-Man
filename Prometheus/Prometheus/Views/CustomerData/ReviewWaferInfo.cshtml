@@ -32,7 +32,7 @@
             {
                 <tr>
                     <td>@line.Wafer</td>
-                    <td>@line.WaferBinYield</td>
+                    <td>@Convert.ToDouble(line.WaferBinYield)*100</td>
                     <td>@line.WaferBinCount</td>
                     <td>@line.SumCount</td>
                     <td>@line.databackuptm.ToString()</td>

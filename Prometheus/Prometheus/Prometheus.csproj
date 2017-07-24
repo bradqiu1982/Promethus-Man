@@ -600,6 +600,7 @@
     <Content Include="Content\images\PJ\quailty.png" />
     <Content Include="Content\images\PJ\REL.png" />
     <Content Include="Content\images\PJ\RMA.png" />
+    <Content Include="Content\images\PJ\Spt.png" />
     <Content Include="Content\images\PJ\Task.png" />
     <Content Include="Content\images\PJ\Yield.png" />
     <Content Include="Content\images\sort_asc.png" />
@@ -974,6 +975,7 @@
     <Content Include="Views\DataAnalyze\ModuleTestData.cshtml" />
     <Content Include="Views\User\AddPJCriticalError.cshtml" />
     <Content Include="Views\CustomerData\ReviewWaferInfo.cshtml" />
+    <Content Include="Views\Project\ProjectSptTask.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

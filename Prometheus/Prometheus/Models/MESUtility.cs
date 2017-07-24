@@ -488,8 +488,8 @@ namespace Prometheus.Models
                 var vm = new IssueViewModels();
                 vm.ProjectKey = item.ProjectKey;
                 vm.IssueKey = IssueViewModels.GetUniqKey();
-                vm.IssueType = ISSUETP.Task;
-                vm.Summary = "[2nd Match] " + pjdata.ModuleSerialNum + " failed for " + pjdata.ErrAbbr + " @ " + pjdata.WhichTest;
+                vm.IssueType = ISSUETP.Bug;
+                vm.Summary = LYTTASKType.SECONDMATCH + " " + pjdata.ModuleSerialNum + " failed for " + pjdata.ErrAbbr + " @ " + pjdata.WhichTest;
                 vm.ModuleSN = pjdata.ModuleSerialNum;
                 vm.ErrAbbr = pjdata.ErrAbbr;
                 vm.Priority = ISSUEPR.Major;

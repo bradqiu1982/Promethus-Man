@@ -1371,6 +1371,12 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        public ActionResult ProjectSptTask()
+        {
+            var vm = IssueViewModels.RetrieveSptIssue(this);
+            return View(vm);
+        }
+
         public ActionResult ProjectError(string ProjectKey)
         {
             if (!string.IsNullOrEmpty(ProjectKey))
@@ -4965,17 +4971,6 @@ namespace Prometheus.Controllers
             {
                 try
                 {
-                    BITestData.PrePareLatestData(this,pjkey);
-                }
-                catch (Exception ex)
-                { }
-            }
-
-
-            foreach (var pjkey in pjkeylist)
-            {
-                try
-                {
                     ProjectTestData.PrePareATELatestData(pjkey);
                 }
                 catch (Exception ex)
@@ -5005,6 +5000,16 @@ namespace Prometheus.Controllers
                 BIDataUtility.LoadBITestDateFromAuto(this);
             }
             catch (Exception ex) { }
+
+            foreach (var pjkey in pjkeylist)
+            {
+                try
+                {
+                    BITestData.PrePareLatestData(this, pjkey);
+                }
+                catch (Exception ex)
+                { }
+            }
 
             try
             {
@@ -5109,7 +5114,6 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
-
             //var traceviewlist = ExternalDataCollector.LoadTraceView2Local("IPH_TEST322", "XXC00RT", "ER Setup", "2017-07-01 12:23:20 AM", this);
             //foreach (var item in traceviewlist)
             //{
@@ -5138,7 +5142,7 @@ namespace Prometheus.Controllers
             //{
             try
             {
-                ProjectTestData.PrePareMESLatestData("EDRLP",this);
+                ProjectTestData.PrePareMESLatestData("EDRLP", this);
             }
             catch (Exception ex)
             { }

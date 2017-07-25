@@ -5352,11 +5352,11 @@ namespace Prometheus.Controllers
                     var comment = Request.Form["commentcontent"];
                     var addrs = Request.Form["RPeopleAddr"].Split(new string[] {";"},StringSplitOptions.RemoveEmptyEntries);
 
-                    var LYTTASK = CreateLYTTask(LYTTASKType.LYTTASK, comment,vm.ProjectKey,updater,updater,DateTime.Now.AddDays(14),vm.IssueKey);
-                    CreateLYTSubTask(LYTTASKType.LYTSUBTASK, "Stop Product Line for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(1));
-                    CreateLYTSubTask(LYTTASKType.CONTAINMENTACTION, "Containment Action for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(7));
-                    CreateLYTSubTask(LYTTASKType.CORRECTIVEACTION, "Corrective Action for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(14));
-                    CreateLYTSubTask(LYTTASKType.LYTSUBTASK, "Restart Product Line for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(14));
+                    var LYTTASK = CreateLYTTask(CRITICALERRORTYPE.LYTTASK, comment,vm.ProjectKey,updater,updater,DateTime.Now.AddDays(14),vm.IssueKey);
+                    CreateLYTSubTask(CRITICALERRORTYPE.LYTSUBTASK, "Stop Product Line for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(1));
+                    CreateLYTSubTask(CRITICALERRORTYPE.CONTAINMENTACTION, "Containment Action for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(7));
+                    CreateLYTSubTask(CRITICALERRORTYPE.CORRECTIVEACTION, "Corrective Action for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(14));
+                    CreateLYTSubTask(CRITICALERRORTYPE.LYTSUBTASK, "Restart Product Line for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(14));
 
                     var comment1 = new IssueComments();
                     comment1.Comment = "ROOTCAUSE: to be edited";
@@ -5370,7 +5370,7 @@ namespace Prometheus.Controllers
                     addrlist.AddRange(addrs);
                     SendLYTEvent(LYTTASK, vm, comment, addrlist);
 
-                    UserKPIVM.AddUserDailyRank(LYTTASK.IssueKey, updater, UserRankType.SPECIAL, "Create LYT Task: " + comment, "/Issue/UpdateIssue?issuekey=" + LYTTASK.IssueKey, 6);
+                    UserKPIVM.AddUserDailyRank(LYTTASK.IssueKey, updater, UserRankType.SPECIAL, "Create LYT Task: " + comment, "/Issue/UpdateIssue?issuekey=" + LYTTASK.IssueKey, 4);
 
                     var dict = new RouteValueDictionary();
                     dict.Add("issuekey", LYTTASK.IssueKey);

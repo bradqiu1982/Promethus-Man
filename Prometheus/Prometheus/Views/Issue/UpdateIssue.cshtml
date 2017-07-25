@@ -147,7 +147,7 @@ else
                         <div class="col-lg-10">
                             @if (ViewBag.isassignee != null && ViewBag.isassignee)
                             {
-                                @Html.DropDownList("resolutionlist", null, new { @id = "resolutionlist", @class = "form-control" })
+                                @Html.DropDownList("resolutionlist", null, new { @id = "resolutionlist", @class = "form-control", @onchange = "chooseissuetag()" })
                             }
                             else
                             {
@@ -156,6 +156,15 @@ else
 
                         </div>
                     </div>
+                    <script type="text/javascript">
+                                function chooseissuetag() {
+                                    if (document.getElementById("resolutionlist")
+                                        && (document.getElementById("resolutionlist").value === "Fixed"
+                                        || document.getElementById("resolutionlist").value === "Done")) {
+                                        $('#issuetag').modal({ backdrop: 'static' });
+                                    }
+                                }
+                    </script>
                 </div>
             </div>
 
@@ -810,6 +819,39 @@ else
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
                     <button type="button" class="btn btn-success" onclick="attachsubmit()">Upload Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="issuetag" tabindex="-1" role="dialog" aria-labelledby="issuetagLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="issuetagLabel">Share Issue Tag</h4>
+                </div>
+                <div class="row"></div>
+                <hr />
+                <div class="row"></div>
+                @if (ViewBag.tobechoosetags != null)
+                {
+                    for (var idx = 0; idx < ViewBag.tobechoosetags.Count; idx++)
+                    {
+                        <div class="col-lg-4">
+                            <div class="col-lg-3">
+                                <input type="checkbox" id="issuetagcheck@(idx)" name="issuetagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
+                            </div>
+                            <div class="col-lg-9">
+                                <label class="control-label">@(ViewBag.tobechoosetags[idx])</label>
+                            </div>
+                        </div>
+                    }
+                }
+                <div class="row"></div>
+                <hr />
+                <div class="row"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Done</button>
                 </div>
             </div>
         </div>

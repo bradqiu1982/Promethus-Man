@@ -346,6 +346,7 @@ namespace Prometheus.Controllers
 
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);
+                ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
                 return View();
             }
 
@@ -437,6 +438,7 @@ namespace Prometheus.Controllers
 
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);
+                ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
                 return View();
             }
         }
@@ -566,6 +568,14 @@ namespace Prometheus.Controllers
 
             vm.UpdateIssue();
 
+            var issuetag = string.Empty;
+            for (var i = 0; i < 200; i++)
+            {
+                if (Request.Form["issuetagcheck" + i] != null)
+                {
+                    issuetag = issuetag + Request.Form["issuetagcheck" + i] + ";";
+                }
+            }
 
             if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
             {
@@ -632,10 +642,15 @@ namespace Prometheus.Controllers
                 if (vm.IssueClosed())
                 {
                     var realissue = IssueViewModels.RetrieveIssueByIssueKey(vm.IssueKey,this);
-                    if (realissue.Summary.Contains(LYTTASKType.LYTTASK))
+                    if (realissue.Summary.Contains(CRITICALERRORTYPE.LYTTASK)|| realissue.Summary.Contains(CRITICALERRORTYPE.LYTTASK1))
                     {
                         UserKPIVM.AddUserDailyRank(realissue.IssueKey, realissue.Assignee, UserRankType.BASE
-                            , "Close LYT Task: " + realissue.Summary, "/Issue/UpdateIssue?issuekey=" + realissue.IssueKey, 2);
+                            , "Close CRITICAL ERROR Task: " + realissue.Summary, "/Issue/UpdateIssue?issuekey=" + realissue.IssueKey, 4);
+
+                        if (!issuetag.Contains(CRITICALERRORTYPE.CRITICALERRORTAG))
+                        {
+                            issuetag = issuetag + CRITICALERRORTYPE.CRITICALERRORTAG + ";";
+                        }
                     }
                     else
                     {
@@ -657,6 +672,11 @@ namespace Prometheus.Controllers
                             }
                         }//end if
 
+                    }
+
+                    if (!string.IsNullOrEmpty(issuetag))
+                    {
+                        ShareDocVM.ShareDoc(originaldata.ProjectKey, ShareDocType.ISSUE, originaldata.IssueKey, issuetag, updater, DateTime.Now.ToString(), "/Issue/UpdateIssue?issuekey=" + originaldata.IssueKey);
                     }
 
                     //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
@@ -1661,12 +1681,15 @@ namespace Prometheus.Controllers
                     //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
                     vm.CloseIssue();
 
-                    if (vm.Summary.Contains(LYTTASKType.LYTTASK))
+                    if (vm.Summary.Contains(CRITICALERRORTYPE.LYTTASK)|| vm.Summary.Contains(CRITICALERRORTYPE.LYTTASK1))
                     {
-                        if (!issuetag.Contains("LYT"))
+                        if (!issuetag.Contains(CRITICALERRORTYPE.CRITICALERRORTAG))
                         {
-                            issuetag = issuetag + "LYT" + ";";
+                            issuetag = issuetag + CRITICALERRORTYPE.CRITICALERRORTAG + ";";
                         }
+
+                        UserKPIVM.AddUserDailyRank(realissue.IssueKey, realissue.Assignee, UserRankType.BASE
+                            , "Close CRITICAL ERROR Task: " + realissue.Summary, "/Issue/UpdateIssue?issuekey=" + realissue.IssueKey, 4);
                     }
 
                     if (!string.IsNullOrEmpty(issuetag))

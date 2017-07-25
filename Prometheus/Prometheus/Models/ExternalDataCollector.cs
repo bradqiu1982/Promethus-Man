@@ -343,13 +343,16 @@ namespace Prometheus.Models
         public static string CORRECTIVEACTION = "[Corrective]";
     }
 
-    public class LYTTASKType
+    public class CRITICALERRORTYPE
     {
-        public static string LYTTASK = "[LYT TASK]";
-        public static string LYTSUBTASK = "[LYT SUB TASK]";
+        public static string LYTTASK1 = "[LYT TASK]";
+        public static string LYTTASK = "[Critical Failure Alarm]";
+        public static string LYTSUBTASK = "[Critical Failure SUB TASK]";
         public static string CONTAINMENTACTION = "[Containment]";
         public static string CORRECTIVEACTION = "[Corrective]";
-        public static string SECONDMATCH = "[2nd Match]";
+        public static string SECONDMATCH1 = "[2nd Match]";
+        public static string SECONDMATCH = "[Critical Failure Alarm]";
+        public static string CRITICALERRORTAG = "CRITICALERROR";
     }
 
     public class RawDMR

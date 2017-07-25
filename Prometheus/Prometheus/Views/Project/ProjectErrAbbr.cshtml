@@ -152,7 +152,7 @@
                             }
                         </td>
                         <td>
-                            <img src="~/Content/images/icon/LowYield.png"  data-toggle="tooltip" title="Low Yield Trigger"  MYTP="HOVER" style="height:16px;width:16px" onclick="LowYieldWarning('@item.IssueData.IssueKey')">
+                            <img src="~/Content/images/icon/LowYield.png"  data-toggle="tooltip" title="Critical Error Alarm"  MYTP="HOVER" style="height:16px;width:16px" onclick="LowYieldWarning('@item.IssueData.IssueKey')">
                         </td>
                     </tr>
 
@@ -236,7 +236,7 @@
 <script type="text/javascript">
         function LowYieldWarning(oBT)
         {
-            if (confirm("Warning: only FA assignee can trigger Low Yield Trigger."))
+            if (confirm("Warning: only FA assignee can trigger Critical Error Alarm."))
             {
                 var myurl = "/Project/LowYieldWarn?IssueKey=" + oBT;
                 window.open(myurl, '_blank');

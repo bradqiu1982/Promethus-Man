@@ -5317,10 +5317,10 @@ namespace Prometheus.Controllers
             validatestr2 = validatestr2.Replace("//localhost", "//" + netcomputername);
 
 
-            var content = "Hi All,\r\n\r\nThis is a LYT(low yield trigger) information. Please pay your attention to it. Thanks!";
+            var content = "Hi All,\r\n\r\nThis is a Critical Error Alarm information. Please pay your attention to it. Thanks!";
             content = content + "\r\n\r\n[" + LYTTASK.Summary + "]  is created base on analyse of task: ";
             content = content + "\r\n\r\n" + vm.Summary;
-            content = content + "\r\n\r\nLYT TASK LINK: " + validatestr2;
+            content = content + "\r\n\r\nCritical Error TASK LINK: " + validatestr2;
             content = content + "\r\n\r\nTRIGGER TASK LINK: " + validatestr;
             
             var toaddrs = new List<string>();
@@ -5329,7 +5329,7 @@ namespace Prometheus.Controllers
             toaddrs.Add(vm.Reporter);
             toaddrs.Add(LYTTASK.Assignee);
 
-            EmailUtility.SendEmail(this,"WUXI NPI System - Project LYT", toaddrs, content);
+            EmailUtility.SendEmail(this, "WUXI NPI System - Project Critical Error Alarm", toaddrs, content);
 
             IssueViewModels.UpdateLYT(vm.IssueKey);
             new System.Threading.ManualResetEvent(false).WaitOne(500);

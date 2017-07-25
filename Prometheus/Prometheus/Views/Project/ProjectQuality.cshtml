@@ -188,7 +188,7 @@
                                 @(Model.Count() - i)
                             </div>
                             <div class="col-lg-8">
-                                <button data-toggle="tooltip" title="Low Yield Trigger" class="form-control" value="@item.IssueKey" type="button" onclick="LowYieldWarning(this)">
+                                <button data-toggle="tooltip" title="Critical Error Alarm" class="form-control" value="@item.IssueKey" type="button" onclick="LowYieldWarning(this)">
                                     <span class="glyphicon glyphicon-share" aria-hidden="true"></span>
                                 </button>
                             </div>
@@ -274,7 +274,7 @@
             });
 
             function LowYieldWarning(oBT) {
-                if (confirm("Warning: only OBA issue assignee can trigger Low Yield Trigger.")) {
+                if (confirm("Warning: only OBA issue assignee can trigger Critical Error Alarm.")) {
                     var myurl = "/Project/LowYieldWarn?IssueKey=" + oBT.value;
                     window.open(myurl, '_blank');
                 }

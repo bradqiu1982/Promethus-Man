@@ -1900,6 +1900,8 @@ namespace Prometheus.Controllers
             }//end foreach
 
             var errorlist = errordict.Keys.ToList();
+            errorlist.Sort();
+
             var selectlist = new List<string>();
             selectlist.Add("Please select project");
             selectlist.AddRange(pjlist);

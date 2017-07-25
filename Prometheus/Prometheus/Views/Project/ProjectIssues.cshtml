@@ -71,7 +71,7 @@
                         <div class="col-lg-1">@item.ReportDate.ToString("yy-MM-dd")</div>
                         <div class="col-lg-1">@item.DueDate.ToString("yy-MM-dd")</div>
                         <div class="col-lg-1"><a data-toggle="tooltip" title="move to working" href="/Issue/MoveTask2Working?issuekey=@(item.IssueKey)"><font color="#006DC0"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span></font></a></div>
-                        <div class="col-lg-1"><img src="~/Content/images/icon/LowYield.png" MYTP="HOVER" data-toggle="tooltip" title="Low Yield Trigger"  style="height:16px;width:16px" onclick="LowYieldWarning('@item.IssueKey')"></div>
+                        <div class="col-lg-1"><img src="~/Content/images/icon/LowYield.png" MYTP="HOVER" data-toggle="tooltip" title="Critical Error Alarm"  style="height:16px;width:16px" onclick="LowYieldWarning('@item.IssueKey')"></div>
                     </div>
 
                 }
@@ -96,7 +96,7 @@
                         <div class="col-lg-1">@item.ReportDate.ToString("yy-MM-dd")</div>
                         <div class="col-lg-1">@item.DueDate.ToString("yy-MM-dd")</div>
                         <div class="col-lg-1"></div>
-                        <div class="col-lg-1"><img src="~/Content/images/icon/LowYield.png" MYTP="HOVER" data-toggle="tooltip" title="Low Yield Trigger"  style="height:16px;width:16px" onclick="LowYieldWarning('@item.IssueKey')"></div>
+                        <div class="col-lg-1"><img src="~/Content/images/icon/LowYield.png" MYTP="HOVER" data-toggle="tooltip" title="Critical Error Alarm"  style="height:16px;width:16px" onclick="LowYieldWarning('@item.IssueKey')"></div>
                     </div>
                 }
             </div>
@@ -120,7 +120,7 @@
                         <div class="col-lg-1">@item.ReportDate.ToString("yy-MM-dd")</div>
                         <div class="col-lg-1">@item.DueDate.ToString("yy-MM-dd")</div>
                         <div class="col-lg-1"></div>
-                        <div class="col-lg-1"><img src="~/Content/images/icon/LowYield.png" MYTP="HOVER" data-toggle="tooltip" title="Low Yield Trigger"  style="height:16px;width:16px" onclick="LowYieldWarning('@item.IssueKey')"></div>
+                        <div class="col-lg-1"><img src="~/Content/images/icon/LowYield.png" MYTP="HOVER" data-toggle="tooltip" title="Critical Error Alarm"  style="height:16px;width:16px" onclick="LowYieldWarning('@item.IssueKey')"></div>
                     </div>
                 }
             </div>
@@ -130,7 +130,7 @@
     <script type="text/javascript">
         function LowYieldWarning(oBT)
         {
-            if (confirm("Warning: only FA assignee can trigger Low Yield Trigger."))
+            if (confirm("Warning: only FA assignee can trigger Critical Error Alarm."))
             {
                 var myurl = "/Project/LowYieldWarn?IssueKey=" + oBT;
                 window.open(myurl, '_blank');

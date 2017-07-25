@@ -1371,6 +1371,12 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        public ActionResult ProjectSptTask()
+        {
+            var vm = IssueViewModels.RetrieveSptIssue(this);
+            return View(vm);
+        }
+
         public ActionResult ProjectError(string ProjectKey)
         {
             if (!string.IsNullOrEmpty(ProjectKey))
@@ -4965,17 +4971,6 @@ namespace Prometheus.Controllers
             {
                 try
                 {
-                    BITestData.PrePareLatestData(this,pjkey);
-                }
-                catch (Exception ex)
-                { }
-            }
-
-
-            foreach (var pjkey in pjkeylist)
-            {
-                try
-                {
                     ProjectTestData.PrePareATELatestData(pjkey);
                 }
                 catch (Exception ex)
@@ -5005,6 +5000,16 @@ namespace Prometheus.Controllers
                 BIDataUtility.LoadBITestDateFromAuto(this);
             }
             catch (Exception ex) { }
+
+            foreach (var pjkey in pjkeylist)
+            {
+                try
+                {
+                    BITestData.PrePareLatestData(this, pjkey);
+                }
+                catch (Exception ex)
+                { }
+            }
 
             try
             {
@@ -5109,7 +5114,6 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
-
             //var traceviewlist = ExternalDataCollector.LoadTraceView2Local("IPH_TEST322", "XXC00RT", "ER Setup", "2017-07-01 12:23:20 AM", this);
             //foreach (var item in traceviewlist)
             //{
@@ -5138,7 +5142,7 @@ namespace Prometheus.Controllers
             //{
             try
             {
-                ProjectTestData.PrePareMESLatestData("EDRLP",this);
+                ProjectTestData.PrePareMESLatestData("EDRLP", this);
             }
             catch (Exception ex)
             { }
@@ -5313,10 +5317,10 @@ namespace Prometheus.Controllers
             validatestr2 = validatestr2.Replace("//localhost", "//" + netcomputername);
 
 
-            var content = "Hi All,\r\n\r\nThis is a LYT(low yield trigger) information. Please pay your attention to it. Thanks!";
+            var content = "Hi All,\r\n\r\nThis is a Critical Error Alarm information. Please pay your attention to it. Thanks!";
             content = content + "\r\n\r\n[" + LYTTASK.Summary + "]  is created base on analyse of task: ";
             content = content + "\r\n\r\n" + vm.Summary;
-            content = content + "\r\n\r\nLYT TASK LINK: " + validatestr2;
+            content = content + "\r\n\r\nCritical Error TASK LINK: " + validatestr2;
             content = content + "\r\n\r\nTRIGGER TASK LINK: " + validatestr;
             
             var toaddrs = new List<string>();
@@ -5325,7 +5329,7 @@ namespace Prometheus.Controllers
             toaddrs.Add(vm.Reporter);
             toaddrs.Add(LYTTASK.Assignee);
 
-            EmailUtility.SendEmail(this,"WUXI NPI System - Project LYT", toaddrs, content);
+            EmailUtility.SendEmail(this, "WUXI NPI System - Project Critical Error Alarm", toaddrs, content);
 
             IssueViewModels.UpdateLYT(vm.IssueKey);
             new System.Threading.ManualResetEvent(false).WaitOne(500);
@@ -5348,11 +5352,11 @@ namespace Prometheus.Controllers
                     var comment = Request.Form["commentcontent"];
                     var addrs = Request.Form["RPeopleAddr"].Split(new string[] {";"},StringSplitOptions.RemoveEmptyEntries);
 
-                    var LYTTASK = CreateLYTTask(LYTTASKType.LYTTASK, comment,vm.ProjectKey,updater,updater,DateTime.Now.AddDays(14),vm.IssueKey);
-                    CreateLYTSubTask(LYTTASKType.LYTSUBTASK, "Stop Product Line for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(1));
-                    CreateLYTSubTask(LYTTASKType.CONTAINMENTACTION, "Containment Action for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(7));
-                    CreateLYTSubTask(LYTTASKType.CORRECTIVEACTION, "Corrective Action for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(14));
-                    CreateLYTSubTask(LYTTASKType.LYTSUBTASK, "Restart Product Line for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(14));
+                    var LYTTASK = CreateLYTTask(CRITICALERRORTYPE.LYTTASK, comment,vm.ProjectKey,updater,updater,DateTime.Now.AddDays(14),vm.IssueKey);
+                    CreateLYTSubTask(CRITICALERRORTYPE.LYTSUBTASK, "Stop Product Line for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(1));
+                    CreateLYTSubTask(CRITICALERRORTYPE.CONTAINMENTACTION, "Containment Action for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(7));
+                    CreateLYTSubTask(CRITICALERRORTYPE.CORRECTIVEACTION, "Corrective Action for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(14));
+                    CreateLYTSubTask(CRITICALERRORTYPE.LYTSUBTASK, "Restart Product Line for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(14));
 
                     var comment1 = new IssueComments();
                     comment1.Comment = "ROOTCAUSE: to be edited";
@@ -5366,7 +5370,7 @@ namespace Prometheus.Controllers
                     addrlist.AddRange(addrs);
                     SendLYTEvent(LYTTASK, vm, comment, addrlist);
 
-                    UserKPIVM.AddUserDailyRank(LYTTASK.IssueKey, updater, UserRankType.SPECIAL, "Create LYT Task: " + comment, "/Issue/UpdateIssue?issuekey=" + LYTTASK.IssueKey, 6);
+                    UserKPIVM.AddUserDailyRank(LYTTASK.IssueKey, updater, UserRankType.SPECIAL, "Create LYT Task: " + comment, "/Issue/UpdateIssue?issuekey=" + LYTTASK.IssueKey, 4);
 
                     var dict = new RouteValueDictionary();
                     dict.Add("issuekey", LYTTASK.IssueKey);

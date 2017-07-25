@@ -9,7 +9,7 @@
     <div class="nav navbar-nav navbar-left">
         <img src="~/Content/images/ucicon/IProjectIcons.png" style="height:40px; width:40px">
     </div>
-    <div class="nav navbar-nav navbar-left">
+    <div class="nav navbar-nav navbar-left" data-toggle="modal" data-target="#myModal">
         <ol class="breadcrumb">
             <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll" data-intro = "Back to ALL Project."  data-step="6" >All Projects</a></li>
 
@@ -215,7 +215,7 @@
 
     if (string.Compare(projectdata.ProjectType, Prometheus.Models.ProjectTypeInf.QM) != 0)
     {
-        <div class="form-group" data-intro="detail informaton show here." data-step="4">
+        <div class="form-group" data-intro="detail informaton show here." data-step="4" data-toggle="modal" data-target="#myModal">
             <div class="form-group">
                 <div class="row" >
                     <div class="col-lg-12">
@@ -379,7 +379,7 @@
     }
     else
     {
-        <div class="form-group" data-intro="Edit project here." data-step="4">
+        <div class="form-group" data-intro="Edit project here." data-step="4" data-toggle="modal" data-target="#myModal">
             <div class="row">
                 <div class="col-lg-12">
                     <div class="col-lg-1">

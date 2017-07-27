@@ -2119,6 +2119,16 @@ namespace Prometheus.Controllers
                 vm.AddRange(tempvm);
             }
 
+            vm.Sort(delegate (UserKPIVM u1,UserKPIVM u2)
+            {
+                if (u1.UpdateTime > u2.UpdateTime)
+                    return -1;
+                else if (u1.UpdateTime < u2.UpdateTime)
+                    return 1;
+                else
+                    return 0;
+            });
+
             var sarray = new string[] { "1", "2", "3", "4", "5", "6", "12", "18", "24", "30", "36" };
             var slist = new List<string>();
             slist.Add("KPI In Months");

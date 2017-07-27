@@ -35,6 +35,8 @@ namespace Prometheus.Controllers
             var userdict = UserMatrixVM.RetrieveUserMatrixAuth();
             if (userdict.ContainsKey(username.ToUpper()))
             {
+                ViewBag.IsOutSide = false;
+
                 if (string.Compare(userdict[username.ToUpper()].ToUpper(), USERAUTH.SUPER.ToUpper()) == 0)
                 {
                     ViewBag.IsSuper = true;
@@ -68,6 +70,13 @@ namespace Prometheus.Controllers
                 ViewBag.IsSuper = false;
                 ViewBag.IsAdmin = false;
                 ViewBag.IsManage = false;
+                ViewBag.IsOutSide = true;
+                var syscfg = CfgUtility.GetSysConfig(this);
+                var outsideauth = syscfg["OUTSIDEPEOPLEAUTH"];
+                if (string.Compare(outsideauth, "TRUE", true) == 0)
+                {
+                    ViewBag.IsOutSide = false;
+                }
             }
 
         }
@@ -1262,6 +1271,22 @@ namespace Prometheus.Controllers
         {
             if (ProjectKey != null)
             {
+                var ckdict = CookieUtility.UnpackCookie(this);
+                if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+                {
+
+                }
+                else
+                {
+                    var ck = new Dictionary<string, string>();
+                    ck.Add("logonredirectctrl", "Project");
+                    ck.Add("logonredirectact", "ViewAll");
+                    CookieUtility.SetCookie(this, ck);
+                    return RedirectToAction("LoginUser", "User");
+                }
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                UserAuth(updater);
+
                 var vm = ProjectViewModels.RetrieveOneProject(ProjectKey);
 
                 if (vm != null)

@@ -19,7 +19,13 @@
         </div>
     </div>
     <div class="col-lg-3" data-intro = "Search specify product here."  data-step="1" >@Html.DropDownList("pjfilterlist", null, new { @id = "pjfilterlist", @class = "form-control", @style = "font-family:'Arial Narrow';border-color:#006DC0;", @onchange = "ShowProjectDetail()" })</div>
-    <div class="col-lg-1"><button class="btn btn-default" type="button" style="background-color:#006DC0;color:white;" onclick="LoadProject()" data-intro = "Add or delete product here."  data-step="2">Load Projects</button></div>
+    <div class="col-lg-1">
+        @if ((ViewBag.IsSuper != null && ViewBag.IsSuper)
+                || (ViewBag.IsManage != null && ViewBag.IsManage))
+        {
+            <button class="btn btn-default" type="button" style="background-color:#006DC0;color:white;" onclick="LoadProject()" data-intro="Add or delete product here." data-step="2">Load Projects</button>
+        }
+    </div>
     <div class="col-lg-1"></div>
     <script type="text/javascript">
             function ShowProjectDetail() {
@@ -66,7 +72,14 @@
 
                                     <div class="well" style="margin-bottom:8px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px;padding-top:4px;padding-bottom:4px">
                                         <div class="row text-left">
+                                        @if (!ViewBag.IsOutSide)
+                                        {
                                             <a href="/Project/ProjectDetail?ProjectKey=@item.ProjectKey" style="font-size:18px;">@item.ProjectName</a>
+                                        }
+                                        else
+                                        {
+                                            <strong>@item.ProjectName</strong>
+                                        }
                                         </div>
 
                                         @if (!string.IsNullOrEmpty(item.CurrentNPIProc)
@@ -152,31 +165,34 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
-                                    <div class="col-lg-7">
+                                    @if (!ViewBag.IsOutSide)
+                                    {
+                                        <div class="col-lg-7">
 
-                                        <div class="row">
-                                            <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                <a href="/Project/ProjectFA?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/FA.png" MYTP="HOVER" style="height:80px; width:80px"></a>
+                                            </div>
                                         </div>
-                                        <div class="row">
-                                            <a href="/Project/ProjectFA?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/FA.png" MYTP="HOVER" style="height:80px; width:80px"></a>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-5">
+                                        <div class="col-lg-5">
 
-                                        <div class="row">
-                                            <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
-                                        </div>
-                                        <div class="row">
-                                            @if (item.FinishRating < 90)
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                @if (item.FinishRating < 90)
                                                 {
-                                                <div class="row"><span class="badge" style="color:white;background-color:red">@item.PendingFACount</span></div>
+                                                    <div class="row"><span class="badge" style="color:white;background-color:red">@item.PendingFACount</span></div>
                                                 }
                                                 else
                                                 {
-                                                <div class="row"><span class="badge" style="color:white;background-color:forestgreen">@item.PendingFACount</span></div>
+                                                    <div class="row"><span class="badge" style="color:white;background-color:forestgreen">@item.PendingFACount</span></div>
                                                 }
+                                            </div>
                                         </div>
-                                    </div>
+                                    }
                                 </div>
                                 <div class="col-lg-2">
                                     <div class="col-lg-7" data-toggle="tooltip" title="Task">
@@ -214,17 +230,20 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
-                                    <div class="col-lg-7" data-toggle="tooltip" title="Debug Tree">
+                                    @if (!ViewBag.IsOutSide)
+                                    {
+                                        <div class="col-lg-7" data-toggle="tooltip" title="Debug Tree">
 
-                                        <div class="row">
-                                            <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            <div class="row">
+                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            </div>
+                                            <div class="row">
+                                                <a href="/Project/ProjectError?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/DebugTreeicon.png" MYTP="HOVER" style="height:80px; width:80px"></a>
+                                            </div>
                                         </div>
-                                        <div class="row">
-                                            <a href="/Project/ProjectError?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/DebugTreeicon.png" MYTP="HOVER" style="height:80px; width:80px"></a>
+                                        <div class="col-lg-5">
                                         </div>
-                                    </div>
-                                    <div class="col-lg-5">
-                                    </div>
+                                    }
                                 </div>
                                 }
                                 else

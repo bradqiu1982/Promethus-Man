@@ -220,6 +220,7 @@
     <Compile Include="Models\ExternalDataCollector.cs" />
     <Compile Include="Models\IssueViewModels.cs" />
     <Compile Include="Models\MESUtility.cs" />
+    <Compile Include="App_Start\MYStaticFileHandler.cs" />
     <Compile Include="Models\NeoMAPVM.cs" />
     <Compile Include="Models\NormalDistributeAlg.cs" />
     <Compile Include="Models\ParetoData.cs" />

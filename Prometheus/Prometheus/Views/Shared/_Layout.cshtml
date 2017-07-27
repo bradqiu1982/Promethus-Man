@@ -181,7 +181,7 @@
                     <div class="col-lg-9" style="padding-right: 0px;padding-left: 0px;">
                         <div class="row" style="margin-bottom:0px;margin-top: 30px;">
                             <div id="navbar" class="navbar-collapse collapse">
-                                <ul class="nav navbar-nav">
+                                <ul class="nav navbar-nav" data-toggle="modal" data-target="#myModal">
                                     <li class="dropdown">
                                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Projects<span class="caret"></span></a>
                                         <ul class="dropdown-menu">
@@ -195,7 +195,7 @@
                                     </li>
                                 </ul>
 
-                                <ul class="nav navbar-nav">
+                                <ul class="nav navbar-nav" data-toggle="modal" data-target="#myModal">
                                     <li class="dropdown">
                                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Task<span class="caret"></span></a>
                                         <ul class="dropdown-menu">
@@ -218,7 +218,7 @@
                                     </li>
                                 </ul>
 
-                                <ul class="nav navbar-nav">
+                                <ul class="nav navbar-nav" data-toggle="modal" data-target="#myModal">
                                     <li class="dropdown">
                                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">3rd Party Data<span class="caret"></span></a>
                                         <ul class="dropdown-menu">
@@ -244,7 +244,7 @@
                                     </li>
                                 </ul>
 
-                                <ul class="nav navbar-nav">
+                                <ul class="nav navbar-nav" data-toggle="modal" data-target="#myModal">
                                     <li class="dropdown">
                                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">User Center<span class="caret"></span></a>
                                         <ul class="dropdown-menu">
@@ -314,8 +314,7 @@
                                     </li>
                                 </ul>
 
-
-                                <ul class="nav navbar-nav">
+                                <ul class="nav navbar-nav" data-toggle="modal" data-target="#myModal">
                                     <li class="dropdown">
                                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Analysis<span class="caret"></span></a>
                                         <ul class="dropdown-menu">
@@ -444,6 +443,35 @@
                             }
                         }
         </script>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog" style="position:absolute;left:50%;top:20%;margin-left: -384px;">
+            <!--[if lt IE 9]>
+            <h1>Loading!  Please waiting...</h1>
+            <![endif]-->
+
+            <div class="row">
+                <div class="spinner">
+                    <div class="cube1"></div>
+                    <div class="cube2"></div>
+                </div>
+            </div>
+            <div class="row" style="font-family:Arial Narrow;">
+                <h4>
+                    <span class="col-lg-3"></span>
+                    <span class="col-lg-1">F</span>
+                    <span class="col-lg-1">I</span>
+                    <span class="col-lg-1">N</span>
+                    <span class="col-lg-1">I</span>
+                    <span class="col-lg-1">S</span>
+                    <span class="col-lg-1">A</span>
+                    <span class="col-lg-1">R</span>
+                    <span class="col-lg-2"></span>
+                </h4>
+            </div>
+        </div>
     </div>
 
 

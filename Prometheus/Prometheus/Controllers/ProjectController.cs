@@ -5647,5 +5647,10 @@ namespace Prometheus.Controllers
             return RedirectToAction("ViewAll", "Project");
         }
 
+        public ActionResult DashDemo()
+        {
+            return View();
+        }
+
     }
 }

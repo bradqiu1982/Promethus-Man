@@ -5652,5 +5652,282 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        [HttpGet]
+        public JsonResult InitPJMGTask(string PJKey)
+        {
+            var vm = new List<IssueViewModels>();
+
+            var tempvm = new IssueViewModels();
+            tempvm.IssueKey = IssueViewModels.GetUniqKey();
+            tempvm.Summary = "todo title1";
+            var tempcom = new IssueComments();
+            tempcom.Comment = "todo comment1";
+            tempvm.CommentList.Add(tempcom);
+            tempvm.DueDate = DateTime.Parse("2017-03-04 10:00:00");
+            tempvm.Resolution = Resolute.Pending;
+            vm.Add(tempvm);
+
+            tempvm = new IssueViewModels();
+            tempvm.IssueKey = IssueViewModels.GetUniqKey();
+            tempvm.Summary = "todo title2";
+            tempcom = new IssueComments();
+            tempcom.Comment = "todo comment2";
+            tempvm.CommentList.Add(tempcom);
+            tempvm.DueDate = DateTime.Parse("2017-03-04 10:00:00");
+            tempvm.Resolution = Resolute.Pending;
+            vm.Add(tempvm);
+
+            tempvm = new IssueViewModels();
+            tempvm.IssueKey = IssueViewModels.GetUniqKey();
+            tempvm.Summary = "doning title1";
+            tempcom = new IssueComments();
+            tempcom.Comment = "doing comment1";
+            tempvm.CommentList.Add(tempcom);
+            tempvm.DueDate = DateTime.Parse("2017-03-04 10:00:00");
+            tempvm.Resolution = Resolute.Working;
+            vm.Add(tempvm);
+
+            tempvm = new IssueViewModels();
+            tempvm.IssueKey = IssueViewModels.GetUniqKey();
+            tempvm.Summary = "doing title2";
+            tempcom = new IssueComments();
+            tempcom.Comment = "doing comment2";
+            tempvm.CommentList.Add(tempcom);
+            tempvm.DueDate = DateTime.Parse("2017-03-04 10:00:00");
+            tempvm.Resolution = Resolute.Reopen;
+            vm.Add(tempvm);
+
+
+            tempvm = new IssueViewModels();
+            tempvm.IssueKey = IssueViewModels.GetUniqKey();
+            tempvm.Summary = "done title1";
+            tempcom = new IssueComments();
+            tempcom.Comment = "done comment1";
+            tempvm.CommentList.Add(tempcom);
+            tempvm.DueDate = DateTime.Parse("2017-03-04 10:00:00");
+            tempvm.Resolution = Resolute.Fixed;
+            vm.Add(tempvm);
+
+            tempvm = new IssueViewModels();
+            tempvm.IssueKey = IssueViewModels.GetUniqKey();
+            tempvm.Summary = "done title2";
+            tempcom = new IssueComments();
+            tempcom.Comment = "done comment2";
+            tempvm.CommentList.Add(tempcom);
+            tempvm.DueDate = DateTime.Parse("2017-03-04 10:00:00");
+            tempvm.Resolution = Resolute.Done;
+            vm.Add(tempvm);
+
+            var pendinglist = new List<object>();
+            var donginglist = new List<object>();
+            var donelist = new List<object>();
+
+            foreach (var item in vm)
+            {
+                if (string.Compare(item.Resolution, Resolute.Pending, true) == 0)
+                {
+                    pendinglist.Add(
+                        new {
+                            id = item.IssueKey,
+                            title = item.Summary,
+                            description = item.CommentList.Count > 0 ? item.CommentList[0].Comment : string.Empty,
+                            dueDate = item.DueDate.ToString("yyyy-MM-dd")
+                        });
+                }
+
+                if (string.Compare(item.Resolution, Resolute.Working, true) == 0
+                    || string.Compare(item.Resolution, Resolute.Reopen, true) == 0)
+                {
+                    donginglist.Add(
+                        new {
+                            id = item.IssueKey,
+                            title = item.Summary,
+                            description = item.CommentList.Count > 0 ? item.CommentList[0].Comment : string.Empty,
+                            dueDate = item.DueDate.ToString("yyyy-MM-dd")
+                        });
+                }
+
+                if (string.Compare(item.Resolution, Resolute.Fixed, true) == 0
+                    || string.Compare(item.Resolution, Resolute.Done, true) == 0)
+                {
+                    donelist.Add(
+                        new {
+                            id = item.IssueKey,
+                            title = item.Summary,
+                            description = item.CommentList.Count > 0 ? item.CommentList[0].Comment : string.Empty,
+                            dueDate = item.DueDate.ToString("yyyy-MM-dd")
+                        });
+                }
+            }
+
+            var mylists = new List<object>();
+            mylists.Add(
+                new {
+                    id = "mytobelist",
+                    title = "TODO",
+                    defaultStyle = "lobilist-warning",
+                    controls = false,
+                    useCheckboxes = false,
+                    items = pendinglist
+                });
+
+            mylists.Add(
+                new
+                {
+                    id = "mydoinglist",
+                    title = "DOING",
+                    defaultStyle = "lobilist-info",
+                    controls = false,
+                    useCheckboxes = false,
+                    enableTodoRemove = false,
+                    items = donginglist
+                });
+
+            mylists.Add(
+                new
+                {
+                    id = "mydonelist",
+                    title = "DONE",
+                    defaultStyle = "lobilist-success",
+                    controls = false,
+                    useCheckboxes = false,
+                    items = donelist
+                });
+
+            var res = new JsonResult();
+            res.Data = new { lists = mylists };
+            res.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
+            return res;
+        }
+
+        private IssueViewModels ListOperateParse()
+        {
+            var ret = new IssueViewModels();
+            var jsonStringData = new System.IO.StreamReader(Request.InputStream).ReadToEnd();
+            var items = jsonStringData.Split(new string[] { "&" }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var it in items)
+            {
+                if (it.Contains("id="))
+                {
+                    ret.IssueKey = it.Replace("id=","").Trim();
+                }
+
+                if (it.Contains("title="))
+                {
+                    ret.Summary = SeverHtmlDecode.Decode(this, it.Replace("title=", "")).Replace("'","").Trim();
+                }
+
+                if (it.Contains("description="))
+                {
+                    var tempcom = new IssueComments();
+                    if (!string.IsNullOrEmpty(it.Replace("description=", "")))
+                    {
+                        tempcom.Comment = string.Empty;
+                    }
+                    else
+                    {
+                        tempcom.Comment = SeverHtmlDecode.Decode(this, it.Replace("description=", "")).Replace("'", "").Trim();
+                    }
+                    ret.CommentList.Add(tempcom);
+                }
+
+                if (it.Contains("dueDate="))
+                {
+                    try
+                    {
+                        ret.DueDate = DateTime.Parse( SeverHtmlDecode.Decode(this, it.Replace("dueDate=", "")).Replace("'", "").Trim() + " 10:00:00");
+                    }
+                    catch (Exception ex) { ret.Summary = string.Empty; }
+                }
+            }
+            return ret;
+        }
+
+        [HttpPost]
+        public JsonResult TodoListAdd()
+        {
+            var vm = ListOperateParse();
+            if (string.IsNullOrEmpty(vm.Summary))
+            {
+                var res1 = new JsonResult();
+                res1.Data = new { success = false };
+                return res1;
+            }
+
+            var ckdict = CookieUtility.UnpackCookie(this);
+
+            var res = new JsonResult();
+            res.Data = new { success = true, id = IssueViewModels.GetUniqKey() };
+            return res;
+        }
+
+        [HttpPost]
+        public JsonResult TodoListUpdate()
+        {
+            var vm = ListOperateParse();
+            if (string.IsNullOrEmpty(vm.Summary))
+            {
+                var res1 = new JsonResult();
+                res1.Data = new { success = false };
+                return res1;
+            }
+
+            var res = new JsonResult();
+            res.Data = new { success = true };
+            return res;
+        }
+
+        [HttpPost]
+        public JsonResult TodoListDelete()
+        {
+            var vm = ListOperateParse();
+            if (string.IsNullOrEmpty(vm.Summary))
+            {
+                var res1 = new JsonResult();
+                res1.Data = new { success = false };
+                return res1;
+            }
+
+            var res = new JsonResult();
+            res.Data = new { success = true };
+            res.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
+            return res;
+        }
+
+        private List<string> MoveOperateParse()
+        {
+            var ret = new List<string>();
+            var jsonStringData = new System.IO.StreamReader(Request.InputStream).ReadToEnd();
+            var items = jsonStringData.Split(new string[] { "&" }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var it in items)
+            {
+                if (it.Contains("id="))
+                {
+                    ret.Add(it.Replace("id=", "").Trim());
+                }
+
+                if (it.Contains("oldlist="))
+                {
+                    ret.Add(SeverHtmlDecode.Decode(this, it.Replace("oldlist=", "")).Replace("'", "").Trim());
+                }
+
+                if (it.Contains("newlist="))
+                {
+                    ret.Add(SeverHtmlDecode.Decode(this, it.Replace("oldlist=", "")).Replace("'", "").Trim());
+                }
+            }
+            return ret;
+        }
+
+        [HttpPost]
+        public JsonResult TodoListMove()
+        {
+            var ret = MoveOperateParse();
+
+            var res = new JsonResult();
+            res.Data = new { success = true };
+            return res;
+        }
+
     }
 }

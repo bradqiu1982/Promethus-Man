@@ -484,6 +484,12 @@ $(function () {
                 me._showFormError('title', 'Title can not be empty');
                 return;
             }
+
+            if (!me.$form[0].dueDate.value) {
+                me._showFormError('dueDate', 'dueDate can not be empty');
+                return;
+            }
+
             me.saveOrUpdateItem({
                 id: me.$form[0].id.value,
                 title: me.$form[0].title.value,
@@ -742,7 +748,15 @@ $(function () {
                         if (me != oldList){
                             delete oldList.$items[item.id];
                             me.$items[item.id] = item;
+
+                            if (me.$globalOptions.actions.move) {
+                                 $.ajax(me.$globalOptions.actions.move, {
+                                    data: '{id=' + item.id + '&oldlist=' + oldList.$title[0].innerText + '&newlist=' + me.$title[0].innerText + '}',
+                                    method: 'POST'
+                                });
+                                }
                         }
+
                         me._triggerEvent('afterItemReorder', [me, oldList, currentIndex, oldIndex, item, $todo]);
                     }
                 }
@@ -1118,7 +1132,8 @@ $(function () {
             'load': '',
             'update': '',
             'insert': '',
-            'delete': ''
+            'delete': '',
+            'move': ''
         },
         // Whether to show checkboxes or not
         useCheckboxes: true,

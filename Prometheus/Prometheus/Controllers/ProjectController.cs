@@ -5652,6 +5652,18 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        public ActionResult ProjectDash(string PJKey)
+        {
+            if (!string.IsNullOrEmpty(PJKey))
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("PJKey", PJKey);
+                CookieUtility.SetCookie(this, ck);
+                ViewBag.PJKey = PJKey;
+            }
+            return View();
+        }
+
         [HttpGet]
         public JsonResult InitPJMGTask(string PJKey)
         {
@@ -5855,6 +5867,12 @@ namespace Prometheus.Controllers
             }
 
             var ckdict = CookieUtility.UnpackCookie(this);
+            if (!ckdict.ContainsKey("PJKey"))
+            {
+                var res1 = new JsonResult();
+                res1.Data = new { success = false };
+                return res1;
+            }
 
             var res = new JsonResult();
             res.Data = new { success = true, id = IssueViewModels.GetUniqKey() };

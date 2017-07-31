@@ -751,7 +751,7 @@ $(function () {
 
                             if (me.$globalOptions.actions.move) {
                                  $.ajax(me.$globalOptions.actions.move, {
-                                    data: '{id=' + item.id + '&oldlist=' + oldList.$title[0].innerText + '&newlist=' + me.$title[0].innerText + '}',
+                                    data: 'id=' + item.id + '&oldlist=' + oldList.$title[0].innerText + '&newlist=' + me.$title[0].innerText,
                                     method: 'POST'
                                 });
                                 }

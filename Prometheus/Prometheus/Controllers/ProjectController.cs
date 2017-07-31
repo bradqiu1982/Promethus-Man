@@ -5820,7 +5820,7 @@ namespace Prometheus.Controllers
                 if (it.Contains("description="))
                 {
                     var tempcom = new IssueComments();
-                    if (!string.IsNullOrEmpty(it.Replace("description=", "")))
+                    if (string.IsNullOrEmpty(it.Replace("description=", "")))
                     {
                         tempcom.Comment = string.Empty;
                     }
@@ -5913,7 +5913,7 @@ namespace Prometheus.Controllers
 
                 if (it.Contains("newlist="))
                 {
-                    ret.Add(SeverHtmlDecode.Decode(this, it.Replace("oldlist=", "")).Replace("'", "").Trim());
+                    ret.Add(SeverHtmlDecode.Decode(this, it.Replace("newlist=", "")).Replace("'", "").Trim());
                 }
             }
             return ret;

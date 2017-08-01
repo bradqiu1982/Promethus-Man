@@ -353,6 +353,7 @@ namespace Prometheus.Models
         public static string SECONDMATCH1 = "[2nd Match]";
         public static string SECONDMATCH = "[Critical Failure Alarm]";
         public static string CRITICALERRORTAG = "CRITICALERROR";
+        public static string PMTASK = "[Project Manage]";
     }
 
     public class RawDMR

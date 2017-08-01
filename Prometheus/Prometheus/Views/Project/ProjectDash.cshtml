@@ -1,0 +1,87 @@
+﻿
+@{
+    ViewBag.Title = "ProjectDash";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="nav navbar-nav navbar-left">
+            <img src="~/Content/images/PJ/Task.png" style="height:40px; width:40px;margin-right: 10px;">
+        </div>
+        <div class="nav navbar-nav navbar-left">
+            <ol class="breadcrumb" style="width:600px">
+                <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
+                @if (ViewBag.PJKey != null)
+                {
+                    <li><a data-toggle="tooltip" title="Goto Project Task" href="/Project/ProjectIssues?ProjectKey=@ViewBag.PJKey">Project Task</a></li>
+                }
+                <li class="active">Project Dash Board</li>
+            </ol>
+        </div>
+    </div>
+    <div class="col-lg-4"></div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
+
+@if (ViewBag.PJKey != null)
+{
+    <script src="~/Scripts/lobilist/lib/jquery/jquery.min.js"></script>
+    <script src="~/Scripts/lobilist/lib/jquery/jquery-ui.min.js"></script>
+    <script src="~/Scripts/lobilist/lib/jquery/jquery.ui.touch-punch-improved.js"></script>
+    <script src="~/Scripts/lobilist/lib/bootstrap/js/bootstrap.min.js"></script>
+    <script src="~/Scripts/lobilist/dist/lobilist.js"></script>
+    <script src="~/Scripts/lobilist/lib/lobibox/js/lobibox.min.js"></script>
+    <script src="~/Scripts/lobilist/lib/highlight/highlight.pack.js"></script>
+
+    <div class="bs-example">
+        <div id="todo-lists-basic-demo"></div>
+    </div>
+
+    <script type="text/javascript">
+
+    $(function () {
+        //Basic example
+        $('#todo-lists-basic-demo').lobiList({
+            actions: {
+                load: '/Project/InitPJMGTask?PJKey=@ViewBag.PJKey',
+                insert: '/Project/TodoListAdd',
+                delete: '/Project/TodoListDelete',
+                update: '/Project/TodoListUpdate',
+                move: '/Project/TodoListMove'
+            }
+        });
+    });
+
+    $(document).ready(function () {
+        var $list = $('#mytobelist').data('lobiList');
+        var $dueDateInput = $list.$el.find('form [name=dueDate]');
+        $dueDateInput.datepicker({
+            changeMonth: true,
+            changeYear: true,
+            dateFormat: 'yy-mm-dd'
+        });
+
+        $list = $('#mydoinglist').data('lobiList');
+        $dueDateInput = $list.$el.find('form [name=dueDate]');
+        $dueDateInput.datepicker({
+            changeMonth: true,
+            changeYear: true,
+            dateFormat: 'yy-mm-dd'
+        });
+
+        $list = $('#mydonelist').data('lobiList');
+        $dueDateInput = $list.$el.find('form [name=dueDate]');
+        $dueDateInput.datepicker({
+            changeMonth: true,
+            changeYear: true,
+            dateFormat: 'yy-mm-dd'
+        });
+    });
+    </script>
+}
+

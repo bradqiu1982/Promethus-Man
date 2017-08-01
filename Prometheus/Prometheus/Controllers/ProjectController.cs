@@ -5656,9 +5656,25 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(PJKey))
             {
-                var ck = new Dictionary<string, string>();
-                ck.Add("PJKey", PJKey);
-                CookieUtility.SetCookie(this, ck);
+                var ckdict = CookieUtility.UnpackCookie(this);
+                if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+                {
+
+                }
+                else
+                {
+                    var ck = new Dictionary<string, string>();
+                    ck.Add("logonredirectctrl", "Project");
+                    ck.Add("logonredirectact", "ProjectDash");
+                    ck.Add("PJKey", PJKey);
+                    CookieUtility.SetCookie(this, ck);
+                    return RedirectToAction("LoginUser", "User");
+                }
+
+                var ck1 = new Dictionary<string, string>();
+                ck1.Add("PJKey", PJKey);
+                CookieUtility.SetCookie(this, ck1);
+
                 ViewBag.PJKey = PJKey;
             }
             return View();
@@ -5667,68 +5683,11 @@ namespace Prometheus.Controllers
         [HttpGet]
         public JsonResult InitPJMGTask(string PJKey)
         {
-            var vm = new List<IssueViewModels>();
-
-            var tempvm = new IssueViewModels();
-            tempvm.IssueKey = IssueViewModels.GetUniqKey();
-            tempvm.Summary = "todo title1";
-            var tempcom = new IssueComments();
-            tempcom.Comment = "todo comment1";
-            tempvm.CommentList.Add(tempcom);
-            tempvm.DueDate = DateTime.Parse("2017-03-04 10:00:00");
-            tempvm.Resolution = Resolute.Pending;
-            vm.Add(tempvm);
-
-            tempvm = new IssueViewModels();
-            tempvm.IssueKey = IssueViewModels.GetUniqKey();
-            tempvm.Summary = "todo title2";
-            tempcom = new IssueComments();
-            tempcom.Comment = "todo comment2";
-            tempvm.CommentList.Add(tempcom);
-            tempvm.DueDate = DateTime.Parse("2017-03-04 10:00:00");
-            tempvm.Resolution = Resolute.Pending;
-            vm.Add(tempvm);
-
-            tempvm = new IssueViewModels();
-            tempvm.IssueKey = IssueViewModels.GetUniqKey();
-            tempvm.Summary = "doning title1";
-            tempcom = new IssueComments();
-            tempcom.Comment = "doing comment1";
-            tempvm.CommentList.Add(tempcom);
-            tempvm.DueDate = DateTime.Parse("2017-03-04 10:00:00");
-            tempvm.Resolution = Resolute.Working;
-            vm.Add(tempvm);
-
-            tempvm = new IssueViewModels();
-            tempvm.IssueKey = IssueViewModels.GetUniqKey();
-            tempvm.Summary = "doing title2";
-            tempcom = new IssueComments();
-            tempcom.Comment = "doing comment2";
-            tempvm.CommentList.Add(tempcom);
-            tempvm.DueDate = DateTime.Parse("2017-03-04 10:00:00");
-            tempvm.Resolution = Resolute.Reopen;
-            vm.Add(tempvm);
-
-
-            tempvm = new IssueViewModels();
-            tempvm.IssueKey = IssueViewModels.GetUniqKey();
-            tempvm.Summary = "done title1";
-            tempcom = new IssueComments();
-            tempcom.Comment = "done comment1";
-            tempvm.CommentList.Add(tempcom);
-            tempvm.DueDate = DateTime.Parse("2017-03-04 10:00:00");
-            tempvm.Resolution = Resolute.Fixed;
-            vm.Add(tempvm);
-
-            tempvm = new IssueViewModels();
-            tempvm.IssueKey = IssueViewModels.GetUniqKey();
-            tempvm.Summary = "done title2";
-            tempcom = new IssueComments();
-            tempcom.Comment = "done comment2";
-            tempvm.CommentList.Add(tempcom);
-            tempvm.DueDate = DateTime.Parse("2017-03-04 10:00:00");
-            tempvm.Resolution = Resolute.Done;
-            vm.Add(tempvm);
+            var vm = IssueViewModels.RetrievePMTask(PJKey,Resolute.Pending,this);
+            var list1 = IssueViewModels.RetrievePMTask(PJKey, Resolute.Working,this);
+            var list2 = IssueViewModels.RetrievePMTask(PJKey, Resolute.Done,this);
+            vm.AddRange(list1);
+            vm.AddRange(list2);
 
             var pendinglist = new List<object>();
             var donginglist = new List<object>();
@@ -5741,7 +5700,7 @@ namespace Prometheus.Controllers
                     pendinglist.Add(
                         new {
                             id = item.IssueKey,
-                            title = item.Summary,
+                            title = item.Summary.Replace(CRITICALERRORTYPE.PMTASK,"").Trim(),
                             description = item.CommentList.Count > 0 ? item.CommentList[0].Comment : string.Empty,
                             dueDate = item.DueDate.ToString("yyyy-MM-dd")
                         });
@@ -5753,7 +5712,7 @@ namespace Prometheus.Controllers
                     donginglist.Add(
                         new {
                             id = item.IssueKey,
-                            title = item.Summary,
+                            title = item.Summary.Replace(CRITICALERRORTYPE.PMTASK, "").Trim(),
                             description = item.CommentList.Count > 0 ? item.CommentList[0].Comment : string.Empty,
                             dueDate = item.DueDate.ToString("yyyy-MM-dd")
                         });
@@ -5765,7 +5724,7 @@ namespace Prometheus.Controllers
                     donelist.Add(
                         new {
                             id = item.IssueKey,
-                            title = item.Summary,
+                            title = item.Summary.Replace(CRITICALERRORTYPE.PMTASK, "").Trim(),
                             description = item.CommentList.Count > 0 ? item.CommentList[0].Comment : string.Empty,
                             dueDate = item.DueDate.ToString("yyyy-MM-dd")
                         });
@@ -5791,7 +5750,6 @@ namespace Prometheus.Controllers
                     defaultStyle = "lobilist-info",
                     controls = false,
                     useCheckboxes = false,
-                    enableTodoRemove = false,
                     items = donginglist
                 });
 
@@ -5803,6 +5761,7 @@ namespace Prometheus.Controllers
                     defaultStyle = "lobilist-success",
                     controls = false,
                     useCheckboxes = false,
+                    enableTodoRemove = false,
                     items = donelist
                 });
 
@@ -5826,21 +5785,19 @@ namespace Prometheus.Controllers
 
                 if (it.Contains("title="))
                 {
-                    ret.Summary = SeverHtmlDecode.Decode(this, it.Replace("title=", "")).Replace("'","").Trim();
+                    ret.Summary = SeverHtmlDecode.Decode(this, it.Replace("title=", "")).Replace("'","").Replace("+", " ").Trim();
                 }
 
                 if (it.Contains("description="))
                 {
-                    var tempcom = new IssueComments();
                     if (string.IsNullOrEmpty(it.Replace("description=", "")))
                     {
-                        tempcom.Comment = string.Empty;
+                        ret.Description = string.Empty;
                     }
                     else
                     {
-                        tempcom.Comment = SeverHtmlDecode.Decode(this, it.Replace("description=", "")).Replace("'", "").Trim();
+                        ret.Description = SeverHtmlDecode.Decode(this, it.Replace("description=", "")).Replace("'", "").Replace("+", " ").Trim();
                     }
-                    ret.CommentList.Add(tempcom);
                 }
 
                 if (it.Contains("dueDate="))
@@ -5851,8 +5808,64 @@ namespace Prometheus.Controllers
                     }
                     catch (Exception ex) { ret.Summary = string.Empty; }
                 }
+
+                if (it.Contains("listId="))
+                {
+                    ret.DataID = SeverHtmlDecode.Decode(this, it.Replace("listId=", "")).Replace("'", "").Trim();
+                }
+
             }
             return ret;
+        }
+
+        private static void SendTaskEvent(IssueViewModels vm, string comment, Controller ctrl)
+        {
+            var routevalue = new RouteValueDictionary();
+            routevalue.Add("issuekey", vm.IssueKey);
+            //send validate email
+            string scheme = ctrl.Url.RequestContext.HttpContext.Request.Url.Scheme;
+            string validatestr = ctrl.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+
+            var netcomputername = "";
+            try { netcomputername = System.Net.Dns.GetHostName(); }
+            catch (Exception ex) { }
+            validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
+
+            var content = vm.Summary + " is created :\r\n " + validatestr;
+            content = content + "\r\n\r\n" + comment;
+
+            var toaddrs = new List<string>();
+            toaddrs.Add(vm.Assignee);
+            toaddrs.Add(vm.Reporter);
+            if (vm.RelativePeopleList.Count > 0)
+            {
+                toaddrs.AddRange(vm.RelativePeopleList);
+            }
+
+            var reporter = vm.Reporter.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
+            EmailUtility.SendEmail(ctrl, "WUXI NPI System_" + reporter, toaddrs, content);
+            new System.Threading.ManualResetEvent(false).WaitOne(30);
+        }
+
+        private IssueViewModels CreatePMTask(string pjkey, string summary, string duedate, string asignee, string creator, string desc)
+        {
+            var vm = new IssueViewModels();
+            vm.ProjectKey = pjkey;
+            vm.IssueKey = IssueViewModels.GetUniqKey();
+            vm.IssueType = ISSUETP.Task;
+            vm.Summary = CRITICALERRORTYPE.PMTASK + " " + summary;
+            vm.Priority = ISSUEPR.Major;
+            vm.DueDate = DateTime.Parse(duedate);
+            vm.ReportDate = DateTime.Now;
+            vm.Assignee = asignee;
+            vm.Reporter = creator;
+            vm.Creator = creator;
+            vm.Resolution = Resolute.Pending;
+            vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+            vm.Description = desc;
+            vm.StoreIssue();
+            //SendTaskEvent(vm, comment, this);
+            return vm;
         }
 
         [HttpPost]
@@ -5860,6 +5873,13 @@ namespace Prometheus.Controllers
         {
             var vm = ListOperateParse();
             if (string.IsNullOrEmpty(vm.Summary))
+            {
+                var res1 = new JsonResult();
+                res1.Data = new { success = false };
+                return res1;
+            }
+
+            if (string.Compare(vm.DataID, "mytobelist", true) != 0)
             {
                 var res1 = new JsonResult();
                 res1.Data = new { success = false };
@@ -5874,8 +5894,22 @@ namespace Prometheus.Controllers
                 return res1;
             }
 
+            var PJKey = ckdict["PJKey"];
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            var pj = ProjectViewModels.RetrieveOneProject(PJKey);
+            var pm = "";
+            foreach (var m in pj.MemberList)
+            {
+                if (string.Compare(m.Role, ProjectViewModels.PMROLE) == 0)
+                {
+                    pm = m.Name;
+                    break;
+                }
+            }
+
+            var task = CreatePMTask(PJKey, vm.Summary, vm.DueDate.ToString(), pm, updater, vm.Description);
             var res = new JsonResult();
-            res.Data = new { success = true, id = IssueViewModels.GetUniqKey() };
+            res.Data = new { success = true, id = task.IssueKey };
             return res;
         }
 
@@ -5890,6 +5924,34 @@ namespace Prometheus.Controllers
                 return res1;
             }
 
+            var realissue = IssueViewModels.RetrieveIssueByIssueKey(vm.IssueKey,this);
+            if (realissue != null)
+            {
+                if (!string.IsNullOrEmpty(vm.Description))
+                {
+                    if (realissue.CommentList.Count == 0)
+                    {
+                        var ckdict = CookieUtility.UnpackCookie(this);
+                        var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                        var com = new IssueComments();
+                        com.Comment = vm.Description;
+                        IssueViewModels.StoreIssueComment(realissue.IssueKey, com.dbComment, updater, COMMENTTYPE.Description);
+                    }
+                    else
+                    {
+                        realissue.CommentList[0].Comment = vm.Description;
+                        IssueViewModels.UpdateSPComment(realissue.IssueKey, realissue.CommentList[0].CommentType
+                            , realissue.CommentList[0].CommentDate.ToString("yyyy-MM-dd hh:mm:ss"), realissue.CommentList[0].dbComment);
+                    }
+                }
+
+                if (!vm.DueDate.Equals(realissue.DueDate))
+                {
+                    realissue.DueDate = vm.DueDate;
+                    realissue.UpdateIssue();
+                }
+            }
+            
             var res = new JsonResult();
             res.Data = new { success = true };
             return res;
@@ -5905,6 +5967,8 @@ namespace Prometheus.Controllers
                 res1.Data = new { success = false };
                 return res1;
             }
+
+            IssueViewModels.RemoveIssue(vm.IssueKey, this);
 
             var res = new JsonResult();
             res.Data = new { success = true };
@@ -5941,6 +6005,30 @@ namespace Prometheus.Controllers
         public JsonResult TodoListMove()
         {
             var ret = MoveOperateParse();
+            if (ret.Count == 3
+                && !string.IsNullOrEmpty(ret[0])
+                && !string.IsNullOrEmpty(ret[2]))
+            {
+                var realissue = IssueViewModels.RetrieveIssueByIssueKey(ret[0], this);
+                if (realissue != null)
+                {
+                    if (string.Compare(ret[2], "TODO", true) == 0)
+                    {
+                        realissue.Resolution = Resolute.Pending;
+                        realissue.UpdateIssue();
+                    }
+                    if (string.Compare(ret[2], "DOING", true) == 0)
+                    {
+                        realissue.Resolution = Resolute.Working;
+                        realissue.UpdateIssue();
+                    }
+                    if (string.Compare(ret[2], "DONE", true) == 0)
+                    {
+                        realissue.Resolution = Resolute.Done;
+                        realissue.UpdateIssue();
+                    }
+                }
+            }
 
             var res = new JsonResult();
             res.Data = new { success = true };

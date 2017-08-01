@@ -102,7 +102,8 @@ $(function () {
             if (me.$globalOptions.actions.insert) {
                 $.ajax(me.$globalOptions.actions.insert, {
                     data: item,
-                    method: 'POST'
+                    method: 'POST',
+                    cache: false
                 })
                     //res is JSON object of format {"success": Boolean, "id": Number, "msg": String}
                     .done(function (res) {
@@ -142,7 +143,8 @@ $(function () {
             if (me.$globalOptions.actions.update) {
                 $.ajax(me.$globalOptions.actions.update, {
                     data: item,
-                    method: 'POST'
+                    method: 'POST',
+                    cache: false
                 })
                     //res is JSON object of format {"id": Number, "success": Boolean, "msg": String}
                     .done(function (res) {
@@ -180,7 +182,8 @@ $(function () {
             if (me.$globalOptions.actions.delete) {
                 return me._sendAjax(me.$globalOptions.actions.delete, {
                     data: item,
-                    method: 'POST'
+                    method: 'POST',
+                    cache: false
                 })
                     //res is JSON object of format
                     .done(function (res) {
@@ -752,7 +755,8 @@ $(function () {
                             if (me.$globalOptions.actions.move) {
                                  $.ajax(me.$globalOptions.actions.move, {
                                     data: 'id=' + item.id + '&oldlist=' + oldList.$title[0].innerText + '&newlist=' + me.$title[0].innerText,
-                                    method: 'POST'
+                                    method: 'POST',
+                                    cache: false
                                 });
                                 }
                         }
@@ -930,7 +934,8 @@ $(function () {
             if (options.actions.load) {
                 $.ajax(options.actions.load, {
                     async: false,
-                    data: {name: options.name}
+                    data: {name: options.name},
+                    cache: false
                 }).done(function (res) {
                     options.lists = res.lists;
                 });

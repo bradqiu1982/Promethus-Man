@@ -599,6 +599,7 @@
     <Content Include="Content\images\PJ\FA.png" />
     <Content Include="Content\images\PJ\NPIProcess.png" />
     <Content Include="Content\images\PJ\OBA.png" />
+    <Content Include="Content\images\PJ\PM.png" />
     <Content Include="Content\images\PJ\quailty.png" />
     <Content Include="Content\images\PJ\REL.png" />
     <Content Include="Content\images\PJ\RMA.png" />
@@ -813,7 +814,6 @@
     <Content Include="Scripts\lobilist\dist\lobilist.css" />
     <Content Include="Scripts\lobilist\dist\lobilist.js" />
     <Content Include="Scripts\lobilist\dist\lobilist.min.css" />
-    <Content Include="Scripts\lobilist\dist\lobilist.min.js" />
     <Content Include="Scripts\lobilist\lib\bootstrap\css\bootstrap-theme.css" />
     <Content Include="Scripts\lobilist\lib\bootstrap\css\bootstrap-theme.min.css" />
     <Content Include="Scripts\lobilist\lib\bootstrap\css\bootstrap.css" />
@@ -1016,6 +1016,7 @@
     <Content Include="Scripts\lobilist\lib\lobibox\sounds\sound4.ogg" />
     <Content Include="Scripts\lobilist\lib\lobibox\sounds\sound5.ogg" />
     <Content Include="Scripts\lobilist\lib\lobibox\sounds\sound6.ogg" />
+    <Content Include="Views\Project\ProjectDash.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

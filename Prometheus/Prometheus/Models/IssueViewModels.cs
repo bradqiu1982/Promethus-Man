@@ -1235,6 +1235,50 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static List<IssueViewModels> RetrievePMTask(string pjkey,string resolution, Controller ctrl)
+        {
+            var sql = string.Empty;
+            var ret = new List<IssueViewModels>();
+
+            if (string.Compare(resolution, Resolute.Pending, true) == 0)
+            {
+                sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples,APVal2,ErrAbbr,Creator,ModuleSN from Issue where APVal1 <> 'delete' and Summary like '%<cond1>%' and ProjectKey= '<ProjectKey>' and Resolution = '<Resolution>' order by DueDate ASC";
+                sql = sql.Replace("<cond1>", CRITICALERRORTYPE.PMTASK.Replace("[", "").Replace("]", "")).Replace("<ProjectKey>", pjkey).Replace("<Resolution>", Resolute.Pending);
+            }
+            if (string.Compare(resolution, Resolute.Working, true) == 0)
+            {
+                sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples,APVal2,ErrAbbr,Creator,ModuleSN from Issue where APVal1 <> 'delete' and Summary like '%<cond1>%' and ProjectKey= '<ProjectKey>' and (Resolution = '<Resolution1>' or Resolution = '<Resolution2>') order by DueDate ASC";
+                sql = sql.Replace("<cond1>", CRITICALERRORTYPE.PMTASK.Replace("[", "").Replace("]", "")).Replace("<ProjectKey>", pjkey).Replace("<Resolution1>", Resolute.Working).Replace("<Resolution2>", Resolute.Reopen);
+            }
+            if (string.Compare(resolution, Resolute.Done, true) == 0)
+            {
+                sql = "select top 20 ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples,APVal2,ErrAbbr,Creator,ModuleSN from Issue where APVal1 <> 'delete' and Summary like '%<cond1>%' and ProjectKey= '<ProjectKey>' and (Resolution = '<Resolution1>' or Resolution = '<Resolution2>') order by ReportDate DESC";
+                sql = sql.Replace("<cond1>", CRITICALERRORTYPE.PMTASK.Replace("[", "").Replace("]", "")).Replace("<ProjectKey>", pjkey).Replace("<Resolution1>", Resolute.Fixed).Replace("<Resolution2>", Resolute.Done);
+            }
+
+            if (!string.IsNullOrEmpty(sql))
+            {
+                var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+                foreach (var line in dbret)
+                {
+                    var tempret = new IssueViewModels(Convert.ToString(line[0])
+                        , Convert.ToString(line[1]), Convert.ToString(line[2])
+                        , Convert.ToString(line[3]), Convert.ToString(line[4])
+                        , Convert.ToString(line[5]), Convert.ToString(line[6])
+                        , Convert.ToString(line[7]), Convert.ToString(line[8])
+                        , Convert.ToString(line[9]), Convert.ToString(line[10])
+                        , Convert.ToString(line[11]), Convert.ToString(line[12]));
+                    tempret.LYT = Convert.ToString(line[13]);
+                    tempret.ErrAbbr = Convert.ToString(line[14]);
+                    tempret.Creator = Convert.ToString(line[15]);
+                    tempret.ModuleSN = Convert.ToString(line[16]);
+                    tempret.RetrieveComment(ctrl);
+                    ret.Add(tempret);
+                }
+            }
+            return ret;
+        }
+
         public static IssueViewModels RetrieveIssueByIssueKey(string issuekey, Controller ctrl)
         {
             var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples,APVal2,ErrAbbr,Creator,ModuleSN from Issue where APVal1 <> 'delete' and IssueKey = '<IssueKey>'";

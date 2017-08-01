@@ -5700,7 +5700,7 @@ namespace Prometheus.Controllers
                     pendinglist.Add(
                         new {
                             id = item.IssueKey,
-                            title = item.Summary.Replace(CRITICALERRORTYPE.PMTASK,"").Trim(),
+                            title = item.Summary.Replace(CRITICALERRORTYPE.PMTASK,"").Trim()+ "  <a href='/Issue/UpdateIssue?issuekey="+item.IssueKey + "' target='_blank'>Detail</a>",
                             description = item.CommentList.Count > 0 ? item.CommentList[0].Comment : string.Empty,
                             dueDate = item.DueDate.ToString("yyyy-MM-dd")
                         });
@@ -5712,7 +5712,7 @@ namespace Prometheus.Controllers
                     donginglist.Add(
                         new {
                             id = item.IssueKey,
-                            title = item.Summary.Replace(CRITICALERRORTYPE.PMTASK, "").Trim(),
+                            title = item.Summary.Replace(CRITICALERRORTYPE.PMTASK, "").Trim() + "  <a href='/Issue/UpdateIssue?issuekey=" + item.IssueKey + "' target='_blank'>Detail</a>",
                             description = item.CommentList.Count > 0 ? item.CommentList[0].Comment : string.Empty,
                             dueDate = item.DueDate.ToString("yyyy-MM-dd")
                         });
@@ -5724,7 +5724,7 @@ namespace Prometheus.Controllers
                     donelist.Add(
                         new {
                             id = item.IssueKey,
-                            title = item.Summary.Replace(CRITICALERRORTYPE.PMTASK, "").Trim(),
+                            title = item.Summary.Replace(CRITICALERRORTYPE.PMTASK, "").Trim() + "  <a href='/Issue/UpdateIssue?issuekey=" + item.IssueKey + "' target='_blank'>Detail</a>",
                             description = item.CommentList.Count > 0 ? item.CommentList[0].Comment : string.Empty,
                             dueDate = item.DueDate.ToString("yyyy-MM-dd")
                         });
@@ -5864,7 +5864,7 @@ namespace Prometheus.Controllers
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
             vm.Description = desc;
             vm.StoreIssue();
-            //SendTaskEvent(vm, comment, this);
+            SendTaskEvent(vm, desc, this);
             return vm;
         }
 

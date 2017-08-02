@@ -712,6 +712,40 @@ CREATE TABLE [dbo].[WaferRecord] (
    update [NPITrace].[dbo].[BITestData] set WhichTest = 'Post Burn In' where WhichTest = '4'
    update [NPITrace].[dbo].[BITestData] set Wafer = SUBSTRING(Wafer,0,10)
 
+
+   CREATE TABLE [dbo].[ProjectWorkflow] (
+    [ProjectKey]  NVARCHAR (100) NOT NULL,
+    [ProductId]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[WorkflowStepID]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[WorkflowStepName]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[WorkflowID]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Sequence]   INT       DEFAULT (0) NOT NULL,
+	[Appv_1]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Appv_2]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Appv_3]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Appv_4]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[databackuptm]   DATETIME       DEFAULT ('2017-08-02 10:00:00') NOT NULL
+	);
+
+   CREATE TABLE [dbo].[ProjectMoveHistory] (
+	[ProjectKey]  NVARCHAR (100) NOT NULL,
+    [ProductId]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[WorkflowStepID]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[WorkflowStepName]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Qty]   INT       DEFAULT (0) NOT NULL,
+	[MoveInQty]   INT       DEFAULT (0) NOT NULL,
+	[MfgOrderId]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[TxnDetails]	NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[TxnDate]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[MfgOrderName]	NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Appv_1]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Appv_2]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Appv_3]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Appv_4]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[databackuptm]   DATETIME       DEFAULT ('2017-08-02 10:00:00') NOT NULL
+   );
+
+
 ALTER TABLE  AlignmentPower Add  databackuptm   DATETIME       DEFAULT ('2017-07-18 10:00:00') NOT NULL;
 ALTER TABLE  BIError Add  databackuptm   DATETIME       DEFAULT ('2017-07-18 10:00:00') NOT NULL;
 ALTER TABLE  BIROOTCAUSE Add  databackuptm   DATETIME       DEFAULT ('2017-07-18 10:00:00') NOT NULL;
@@ -831,7 +865,47 @@ SET @Subject = N'\\Wux-d80008792\D\log\DebugDB'+ REPLACE(REPLACE(REPLACE(CONVERT
 BACKUP DATABASE [DebugDB]  TO DISK =  @Subject;
 
 
+select ProductId,WorkflowBaseId,Description from InsiteDB.insite.Product 
+  where Description like '%FTLC9551%' and Description like '%GFA%' 
+  and WorkflowBaseId is not null and WorkflowBaseId <> '0000000000000000' order by WorkflowBaseId
 
+  select WorkflowId from InsiteDB.insite.Workflow 
+  where WorkflowBaseId in ('0005648000009958','0005648000009a50','000564800000a30e','000564800000bfc3')
+
+
+  select WorkflowID,WorkflowStepID, WorkflowStepName,Sequence from InsiteDB.insite.WorkflowStep 
+  where WorkflowID in ('0005aa800005dc14','0005aa800005e3ab','0005aa8000078d96','0005aa80000a3e45') order by WorkflowID,Sequence ASC
+
+ select top 10 Qty,MoveInQty,MfgOrderId,MoveInTime,TxnDetails from [InsiteDB].[insite].[MoveHistory] 
+  where ProductId = '00062c80000ebd0c' and StepId = '00074e800000faba' and MoveInTime > '2016-01-01 10:00:00'
+
+  select top 10 Qty,MoveInQty,MfgOrderId,MoveInTime,TxnDetails from [InsiteDB].[insite].[MoveHistory] 
+   where ProductId in('00062c800011a040','00062c8000114561','00062c800011a03f','00062c800011a1e8') and StepId in ('00074e800001a24a','00074e8000019e5d') and MoveInTime > '2017-01-01 10:00:00'
+
+
+select  Qty,MoveInQty,MfgOrderId,MoveInTime,TxnDetails,TxnDate from [InsiteDB].[insite].[MoveHistory]  where HistoryMainlineId in(
+SELECT  [HistoryMainlineId] 
+  FROM [InsiteDB].[insite].[HistoryMainline] 
+  where ProductId in('00062c80000fb541','00062c800012b648','00062c80000daad1','00062c80000ebd0c','00062c80000f8211','00062c80000ce252') 
+  and WorkflowStepId in ('00074e800000faaa','00074e800000faae') and TxnDate > '2017-03-01 10:00:00')
+
+
+ select  p.ProductId,s.WorkflowStepID, s.WorkflowStepName,s.WorkflowID,s.Sequence from InsiteDB.insite.WorkflowStep s (nolock)
+  left join InsiteDB.insite.Workflow w on s.WorkflowID = w.WorkflowID
+  left join InsiteDB.insite.Product p on w.WorkflowBaseId = p.WorkflowBaseId
+  where p.Description like '%FTLC9551%' and p.Description like '%GFA%' 
+  and p.WorkflowBaseId is not null and p.WorkflowBaseId <> '0000000000000000'
+
+ select p.ProductId,s.WorkflowStepID, s.WorkflowStepName,s.WorkflowID,s.Sequence from InsiteDB.insite.WorkflowStep s (nolock)
+  left join InsiteDB.insite.Workflow w (nolock) on s.WorkflowID = w.WorkflowID
+  left join InsiteDB.insite.Product p (nolock) on w.WorkflowBaseId = p.WorkflowBaseId
+  where p.Description like '%FTLC1551%' and p.Description like '%GFA%' 
+  and p.WorkflowBaseId is not null and p.WorkflowBaseId <> '0000000000000000'
+
+  select  ProductId,StepId,Qty,MoveInQty,MfgOrderId,TxnDetails,TxnDate from [InsiteDB].[insite].[MoveHistory] (nolock)  where HistoryMainlineId in(
+SELECT  [HistoryMainlineId]  FROM [InsiteDB].[insite].[HistoryMainline] (nolock)
+  where ProductId in('00062c80000fb541','00062c800012b648','00062c80000daad1','00062c80000ebd0c','00062c80000f8211','00062c80000ce252') 
+  and WorkflowStepId in ('00074e800000faaa','00074e800000faae') and TxnDate > '2017-03-01 10:00:00')
 
 
 

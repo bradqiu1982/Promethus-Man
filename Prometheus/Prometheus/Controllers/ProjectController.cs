@@ -899,6 +899,14 @@ namespace Prometheus.Controllers
 
             projectmodel.StoreProject();
 
+            var bondingprocess = Request.Form["ChoosedProcess"];
+            if (!string.IsNullOrEmpty(bondingprocess) 
+                && !bondingprocess.ToUpper().Contains("PLEASE"))
+            {
+                ProjectViewModels.StoreProjectProcessBonding(projectmodel.ProjectKey, bondingprocess);
+            }
+
+
             IssueViewModels.CreateNPIProcTasks(projectmodel.ProjectName, projectmodel.ProjectKey, projectmodel.MemberList[0].Name);
 
             var ckdict = CookieUtility.UnpackCookie(this);
@@ -1045,6 +1053,18 @@ namespace Prometheus.Controllers
 
                     var pjexcept = ProjectViewModels.RetrieveProjectExcept(realkey, ProjectExceptType.WAFERYIELDEXCEPT);
                     vm.WaferYieldExceptList = pjexcept.Except;
+
+                    var bondingedprocess = ProjectViewModels.RetriveProjectProcessBonding(realkey);
+                    if (bondingedprocess.Count > 0)
+                    {
+                        ViewBag.ChoosedProcessData = bondingedprocess[0].Except;
+                    }
+
+                    var projectprocesslist = ProcessData.GetCurrentProjectWorkflowSteps(realkey);
+                    if(projectprocesslist.Count > 0)
+                    {
+                        ViewBag.ProcessList = CreateSelectList(projectprocesslist, "");
+                    }
 
                     return View(vm);
                 }
@@ -1221,6 +1241,9 @@ namespace Prometheus.Controllers
             bool pnbondingchg = PNBondingChanged(oldpjdata, projectmodel);
 
             projectmodel.StoreProject();
+
+            var bondingprocess = Request.Form["ChoosedProcess"];
+            ProjectViewModels.StoreProjectProcessBonding(projectmodel.ProjectKey, bondingprocess);
 
             if (projectmodel.TabList.Count == 0)
             {
@@ -5167,10 +5190,16 @@ namespace Prometheus.Controllers
             //{
             try
             {
-                ProjectTestData.PrePareMESLatestData("EDRLP", this);
+                ProcessData.LoadMesWorkflow("EDRLP", this);
             }
             catch (Exception ex)
             { }
+            //try
+            //{
+            //    ProjectTestData.PrePareMESLatestData("EDRLP", this);
+            //}
+            //catch (Exception ex)
+            //{ }
             //}
             //var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
             //foreach (var pjkey in pjkeylist)

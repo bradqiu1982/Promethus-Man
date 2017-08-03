@@ -56,6 +56,7 @@ namespace Prometheus.Models
             ProductId = string.Empty;
             WorkflowStepID = string.Empty;
             WorkflowStepName = string.Empty;
+            Sequence = 0;
 
             Qty = 0;
             MoveInQty = 1;
@@ -76,6 +77,7 @@ namespace Prometheus.Models
         public string ProductId { set; get; }
         public string WorkflowStepID { set; get; }
         public string WorkflowStepName { set; get; }
+        public int Sequence { set; get; }
 
         public int Qty { set; get; }
         public int MoveInQty { set; get; }
@@ -158,6 +160,17 @@ namespace Prometheus.Models
                     + " and p.WorkflowBaseId is not null and p.WorkflowBaseId <> '0000000000000000' ";
                 sql = sql.Replace("<pncond>", pncond);
                 var dbret = DBUtility.ExeMESSqlWithRes(sql);
+                if (dbret.Count == 0)
+                {
+                    sql = "select p.ProductId,s.WorkflowStepID, s.WorkflowStepName,s.WorkflowID,s.Sequence from InsiteDB.insite.WorkflowStep s (nolock) "
+                    + " left join InsiteDB.insite.Workflow w (nolock) on s.WorkflowID = w.WorkflowID"
+                    + " left join InsiteDB.insite.Product p (nolock) on w.WorkflowBaseId = p.WorkflowBaseId"
+                    + " where (<pncond>) "
+                    + " and p.WorkflowBaseId is not null and p.WorkflowBaseId <> '0000000000000000' ";
+                    sql = sql.Replace("<pncond>", pncond);
+                    dbret = DBUtility.ExeMESSqlWithRes(sql);
+                }
+
                 foreach (var line in dbret)
                 {
                     try
@@ -204,7 +217,7 @@ namespace Prometheus.Models
         {
             var ret = new List<string>();
 
-            var sql = "select distinct WorkflowStepName from ProjectWorkflow where ProjectKey = '<ProjectKey>'";
+            var sql = "select distinct WorkflowStepName from ProjectWorkflow where ProjectKey = '<ProjectKey>' order by WorkflowStepName";
             sql = sql.Replace("<ProjectKey>", PJKey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
@@ -233,12 +246,12 @@ namespace Prometheus.Models
                 }
                 namecond = namecond.Substring(0, namecond.Length - 2);
 
-                sql = "select ProductId,WorkflowStepID,WorkflowStepName from ProjectWorkflow where WorkflowStepName in (<stepnamecond>) and ProjectKey = '<ProjectKey>'";
+                sql = "select ProductId,WorkflowStepID,WorkflowStepName,Sequence from ProjectWorkflow where WorkflowStepName in (<stepnamecond>) and ProjectKey = '<ProjectKey>'";
                 sql = sql.Replace("<ProjectKey>", PJKey).Replace("<stepnamecond>", namecond);
             }
             else
             {
-                sql = "select ProductId,WorkflowStepID,WorkflowStepName from ProjectWorkflow where ProjectKey = '<ProjectKey>'";
+                sql = "select ProductId,WorkflowStepID,WorkflowStepName,Sequence from ProjectWorkflow where ProjectKey = '<ProjectKey>'";
                 sql = sql.Replace("<ProjectKey>", PJKey);
             }
 
@@ -252,6 +265,7 @@ namespace Prometheus.Models
                     tempflow.ProductId = ConvertString(line[0]);
                     tempflow.WorkflowStepID = ConvertString(line[1]);
                     tempflow.WorkflowStepName = ConvertString(line[2]);
+                    tempflow.Sequence = Convert.ToInt32(line[3]);
                     ret.Add(tempflow);
                 }
                 catch (Exception ex) { }
@@ -372,6 +386,15 @@ namespace Prometheus.Models
                     }
                 }
 
+                var stepseqdict = new Dictionary<string, int>();
+                foreach (var item in allworkflow)
+                {
+                    if (!stepseqdict.ContainsKey(item.WorkflowStepID))
+                    {
+                        stepseqdict.Add(item.WorkflowStepID, item.Sequence);
+                    }
+                }
+
                 var sql = "select ProductId,StepId,Qty,MoveInQty,MfgOrderId,TxnDetails,TxnDate from InsiteDB.insite.MoveHistory (nolock)  where HistoryMainlineId in ( " 
                     + " SELECT  HistoryMainlineId  FROM InsiteDB.insite.HistoryMainline (nolock) " 
                     + " where ProductId in (<pidcond>) and WorkflowStepId in (<sidcond>) and TxnDate > '<timecond>') ";
@@ -395,6 +418,8 @@ namespace Prometheus.Models
                         tempmove.TxnDetails = ConvertString(line[5]);
                         tempmove.TxnDate = Convert.ToDateTime(line[6]);
                         tempmove.WorkflowStepName = stepnamedict[tempmove.WorkflowStepID];
+                        tempmove.Sequence = stepseqdict[tempmove.WorkflowStepID];
+
                         movelist.Add(tempmove);
 
                         if (!MfgOrdidDict.ContainsKey(tempmove.MfgOrderId))
@@ -479,7 +504,51 @@ namespace Prometheus.Models
             }//end if
         }
 
+        public List<ProjectMoveHistory> RetrieveProcessData(string PJKey, string MfgName)
+        {
+            var ret = new List<ProjectMoveHistory>();
+            var sql = string.Empty;
 
+            var bondingedprocess = ProjectViewModels.RetriveProjectProcessBonding(PJKey);
+            if (bondingedprocess.Count > 0)
+            {
+                var items = bondingedprocess[0].Except.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+                if (items.Length > 0)
+                {
+                    var namecond = "'";
+                    foreach (var item in items)
+                    {
+                        namecond = namecond + item + "','";
+                    }
+                    namecond = namecond.Substring(0, namecond.Length - 2);
+
+                    sql = "select Qty,MoveInQty,WorkflowStepName from ProjectMoveHistory where MfgOrderName like '%<MfgName>%' and WorkflowStepName in (<namecond>) order by Sequence ASC";
+                    sql = sql.Replace("<MfgName>", MfgName).Replace("<namecond>", namecond);
+                }
+                else
+                {
+                    sql = "select Qty,MoveInQty,WorkflowStepName from ProjectMoveHistory where MfgOrderName like '%<MfgName>%' order by Sequence ASC";
+                    sql = sql.Replace("<MfgName>", MfgName);
+                }
+
+            }
+            else
+            {
+                sql = "select Qty,MoveInQty,WorkflowStepName from ProjectMoveHistory where MfgOrderName like '%<MfgName>%' order by Sequence ASC";
+                sql = sql.Replace("<MfgName>", MfgName);
+            }
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var tempmove = new ProjectMoveHistory();
+                tempmove.ProjectKey = PJKey;
+                tempmove.Qty = Convert.ToInt32(line[0]);
+                tempmove.MoveInQty = Convert.ToInt32(line[1]);
+                tempmove.WorkflowStepName = Convert.ToString(line[2]);
+                ret.Add(tempmove);
+            }
+            return ret;
+        }
 
     }
 }

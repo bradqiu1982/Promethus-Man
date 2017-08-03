@@ -84,6 +84,7 @@ namespace Prometheus.Models
     public class ProjectExceptType
     {
         public static string WAFERYIELDEXCEPT = "WAFERYIELDEXCEPT";
+        public static string PROCESSEXCEPT = "PROCESSEXCEPT";
     }
 
     public class ProjectViewModels
@@ -829,6 +830,41 @@ namespace Prometheus.Models
             }
             return ret;
         }
+
+
+        public static void StoreProjectProcessBonding(string PJKey, string BondingProcess)
+        {
+
+            var sql = "delete from ProjectException where ProjectKey='<ProjectKey>' and ExceptionType='<ExceptType>'";
+            sql = sql.Replace("<ProjectKey>", PJKey).Replace("<ExceptType>", ProjectExceptType.PROCESSEXCEPT);
+            DBUtility.ExeLocalSqlNoRes(sql);
+
+            if (!string.IsNullOrEmpty(BondingProcess) && !BondingProcess.ToUpper().Contains("PLEASE"))
+            {
+                sql = "insert into ProjectException(ProjectKey,Exception,ExceptionType,databackuptm) values('<ProjectKey>','<Except>','<ExceptType>','<databackuptm>')";
+                sql = sql.Replace("<ProjectKey>", PJKey).Replace("<ExceptType>", ProjectExceptType.PROCESSEXCEPT).Replace("<Except>", BondingProcess).Replace("<databackuptm>", DateTime.Now.ToString());
+                DBUtility.ExeLocalSqlNoRes(sql);
+            }
+        }
+
+        public static List<ProjectExcept> RetriveProjectProcessBonding(string PJKey)
+        {
+            var ret = new List<ProjectExcept>();
+            var sql = "select ProjectKey,Exception,ExceptionType from ProjectException where ProjectKey='<ProjectKey>' and ExceptionType='<ExceptType>'";
+            sql = sql.Replace("<ProjectKey>", PJKey).Replace("<ExceptType>", ProjectExceptType.PROCESSEXCEPT);
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var temp = new ProjectExcept();
+                temp.ProjectKey = Convert.ToString(line[0]);
+                temp.Except = Convert.ToString(line[1]);
+                temp.ExceptType = Convert.ToString(line[2]);
+                ret.Add(temp);
+            }
+            return ret;
+        }
+
     }
 
     }

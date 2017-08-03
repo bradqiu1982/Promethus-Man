@@ -397,13 +397,22 @@
                                     <div class="col-lg-12" data-toggle="tooltip" data-placement="center" title="Exampel: Station ; Station ;Station">
                                         @if (Model != null && !string.IsNullOrEmpty(Model.Stations))
                                         {
-                                            <textarea class="form-control"  name="Stations" id="Stations" style="min-width: 100%;height:32px;overflow-y: scroll;overflow-x: scroll;"  data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required.">@(Model.Stations)</textarea>
+                                            <textarea class="form-control"  name="Stations" id="Stations" style="min-width: 100%;min-height:40px;overflow-y: scroll;overflow-x: scroll;"  data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required.">@(Model.Stations)</textarea>
                                         }
                                         else
                                         {
-                                            <textarea class="form-control"  name="Stations" id="Stations" style="min-width: 100%;height:32px;overflow-y: scroll;overflow-x: scroll;"  data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required."></textarea>
+                                            <textarea class="form-control"  name="Stations" id="Stations" style="min-width: 100%;min-height:40px;overflow-y: scroll;overflow-x: scroll;"  data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 18000." data-val-length-max="18000" data-val-length-min="2" data-val-required="The field is required."></textarea>
                                         }
                                         <span class="field-validation-valid text-danger" data-valmsg-for="Stations" data-valmsg-replace="true"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row" data-intro="Exampel: QSFP28G_Die Attach1;QSFP28G_WireBonding;QSFP28G_Lens Alignment;QSFP28G_HotBar...." data-step="10">
+                                    <div class="col-lg-12" data-toggle="tooltip" data-placement="center" title="Exampel: QSFP28G_Die Attach1;QSFP28G_WireBonding;QSFP28G_Lens Alignment;QSFP28G_HotBar....">
+                                            <textarea class="form-control" name="ChoosedProcess" id="ChoosedProcess" placeholder="Please Bonding Project Process" style="min-width: 100%;min-height:40px;overflow-y: scroll;overflow-x: scroll;"  data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" ></textarea>
+                                        <span class="field-validation-valid text-danger" data-valmsg-for="ChoosedProcess" data-valmsg-replace="true"></span>
                                     </div>
                                 </div>
                             </div>
@@ -436,7 +445,7 @@
                         <div class="col-lg-1"></div>
                         <div class="col-lg-11">
                             <div class="form-group">
-                                <div class="row" data-intro = "Exampel: Model_ID1;Model_ID2...."  data-step="10">
+                                <div class="row" data-intro = "Exampel: Model_ID1;Model_ID2...."  data-step="11">
                                     <div class="col-lg-7" data-toggle="tooltip" data-placement="center" title="Exampel: Model_ID1;Model_ID2....">
                                         @if (Model != null && !string.IsNullOrEmpty(Model.ModelIDs))
                                         {
@@ -456,7 +465,7 @@
 
 
                             <div class="form-group">
-                                <div class="row" data-intro = "Exampel: DataSetName1;DataSetName2...."  data-step="11">
+                                <div class="row" data-intro = "Exampel: DataSetName1;DataSetName2...."  data-step="12">
                                     <div class="col-lg-7" data-toggle="tooltip" data-placement="center" title="Exampel: DataSetName1;DataSetName2....">
                                         @if (Model != null && !string.IsNullOrEmpty(Model.SumDatasets))
                                         {
@@ -488,7 +497,7 @@
             <div class="form-group">
                 <div class="row">
                     <div class="col-lg-12">
-                        <input style="background-color:#006DC0;color:white;font-family:'Arial Narrow';" type="submit" value="Update" class="btn btn-default" data-intro = "Click here to submit."  data-step="12"/>
+                        <input style="background-color:#006DC0;color:white;font-family:'Arial Narrow';" type="submit" value="Update" class="btn btn-default" data-intro = "Click here to submit."  data-step="13"/>
                     </div>
                 </div>
             </div>

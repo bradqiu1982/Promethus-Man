@@ -8,6 +8,13 @@ using System.Web.Mvc;
 
 namespace Prometheus.Models
 {
+    public class TXNTYPENAME
+    {
+        public static int MoveStd = 0;
+        public static int MoveNonStd = 1;
+        public static int Other = 2;
+    }
+
     public class ProjectWorkflow
     {
         public ProjectWorkflow()
@@ -58,13 +65,16 @@ namespace Prometheus.Models
             WorkflowStepName = string.Empty;
             Sequence = 0;
 
-            Qty = 0;
+            MoveOutQty = 0;
             MoveInQty = 1;
 
             MfgOrderId = string.Empty;
-            TxnDetails = string.Empty;
-            TxnDate = DateTime.Parse("1982-05-06 10:00:00");
             MfgOrderName = string.Empty;
+            
+            MoveOutTime = DateTime.Parse("1982-05-06 10:00:00");
+            TxnTypeName = -1;
+            ContainerName = string.Empty;
+            Comments = string.Empty;
 
             Appv_1 = string.Empty;
             Appv_2 = string.Empty;
@@ -79,13 +89,16 @@ namespace Prometheus.Models
         public string WorkflowStepName { set; get; }
         public int Sequence { set; get; }
 
-        public int Qty { set; get; }
+        public int MoveOutQty { set; get; }
         public int MoveInQty { set; get; }
 
         public string MfgOrderId { set; get; }
-        public string TxnDetails { set; get; }
-        public DateTime TxnDate { set; get; }
         public string MfgOrderName { set; get; }
+
+        public DateTime MoveOutTime { set; get; }
+        public int TxnTypeName { set; get; }
+        public string ContainerName { set; get; }
+        public string Comments { set; get; }
 
         public string Appv_1 { set; get; }
         public string Appv_2 { set; get; }
@@ -276,7 +289,7 @@ namespace Prometheus.Models
 
         private static string RetriveProjectMoveHistoryLatetime(string PJKey,string movezerotime)
         {
-            var sql = "select top 1 TxnDate from ProjectMoveHistory where ProjectKey = '<ProjectKey>' order by TxnDate DESC";
+            var sql = "select top 1 MoveOutTime from ProjectMoveHistory where ProjectKey = '<ProjectKey>' order by MoveOutTime DESC";
             sql = sql.Replace("<ProjectKey>", PJKey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             if (dbret.Count > 0)
@@ -299,7 +312,7 @@ namespace Prometheus.Models
             }
             mfgcond = mfgcond.Substring(0, mfgcond.Length - 2);
 
-            var sql = "select MfgOrderId,MfgOrderName from InsiteDB.insite.MfgOrder where MfgOrderId in (<mfgcond>)";
+            var sql = "select MfgOrderId,MfgOrderName from InsiteDB.insite.MfgOrder (nolock) where MfgOrderId in (<mfgcond>)";
             sql = sql.Replace("<mfgcond>", mfgcond);
             var dbret = DBUtility.ExeMESSqlWithRes(sql);
             foreach (var line in dbret)
@@ -363,20 +376,6 @@ namespace Prometheus.Models
                 var movezerotime = syscfg["MOVEHISTORYZEROTIME"];
                 var latesttime = RetriveProjectMoveHistoryLatetime(PJKey, movezerotime);
 
-                var pidcond = "'";
-                foreach (var item in allworkflow)
-                {
-                    pidcond = pidcond + item.ProductId + "','";
-                }
-                pidcond = pidcond.Substring(0, pidcond.Length - 2);
-
-                var sidcond = "'";
-                foreach (var item in allworkflow)
-                {
-                    sidcond = sidcond + item.WorkflowStepID + "','";
-                }
-                sidcond = sidcond.Substring(0, sidcond.Length - 2);
-
                 var stepnamedict = new Dictionary<string, string>();
                 foreach (var item in allworkflow)
                 {
@@ -395,15 +394,30 @@ namespace Prometheus.Models
                     }
                 }
 
-                var sql = "select ProductId,StepId,Qty,MoveInQty,MfgOrderId,TxnDetails,TxnDate from InsiteDB.insite.MoveHistory (nolock)  where HistoryMainlineId in ( " 
-                    + " SELECT  HistoryMainlineId  FROM InsiteDB.insite.HistoryMainline (nolock) " 
-                    + " where ProductId in (<pidcond>) and WorkflowStepId in (<sidcond>) and TxnDate > '<timecond>') ";
-                sql = sql.Replace("<pidcond>", pidcond).Replace("<sidcond>", sidcond).Replace("<timecond>", latesttime);
+                var piddict = new Dictionary<string, bool>();
+                foreach (var item in allworkflow)
+                {
+                    if (!piddict.ContainsKey(item.ProductId))
+                    {
+                        piddict.Add(item.ProductId, true);
+                    }
+                }
+                var pidlist = piddict.Keys.ToList();
+                var pidcond = "'";
+                foreach (var item in pidlist)
+                {
+                    pidcond = pidcond + item + "','";
+                }
+                pidcond = pidcond.Substring(0, pidcond.Length - 2);
+
+                var sql = "select ProductId,WorkflowStepId,MoveOutQty,MoveInQty,MfgOrderId,MoveOutTime,TxnTypeName,ContainerName,Comments,WorkflowStepName "
+                    + " from PDMSMaster.dbo.HistStepMoveSummary (nolock) where MoveOutTime > '<MoveOutTime>' and ProductId in (<pidcond>)  and MFGOrderId is not null";
+                sql = sql.Replace("<pidcond>", pidcond).Replace("<MoveOutTime>", latesttime);
 
                 var MfgOrdidDict = new Dictionary<string, bool>();
                 var movelist = new List<ProjectMoveHistory>();
 
-                var dbret = DBUtility.ExeMESSqlWithRes(sql);
+                var dbret = DBUtility.ExeMESReportMasterSqlWithRes(sql);
                 foreach (var line in dbret)
                 {
                     try
@@ -412,14 +426,31 @@ namespace Prometheus.Models
                         tempmove.ProjectKey = PJKey;
                         tempmove.ProductId = ConvertString(line[0]);
                         tempmove.WorkflowStepID = ConvertString(line[1]);
-                        tempmove.Qty = Convert.ToInt32(line[2]);
+                        tempmove.MoveOutQty = Convert.ToInt32(line[2]);
                         tempmove.MoveInQty = Convert.ToInt32(line[3]);
                         tempmove.MfgOrderId = ConvertString(line[4]);
-                        tempmove.TxnDetails = ConvertString(line[5]);
-                        tempmove.TxnDate = Convert.ToDateTime(line[6]);
-                        tempmove.WorkflowStepName = stepnamedict[tempmove.WorkflowStepID];
-                        tempmove.Sequence = stepseqdict[tempmove.WorkflowStepID];
+                        tempmove.MoveOutTime = Convert.ToDateTime(line[5]);
 
+                        var TxnTypeName = ConvertString(line[6]);
+                        if (TxnTypeName.ToUpper().Contains("MOVESTD"))
+                        { tempmove.TxnTypeName = TXNTYPENAME.MoveStd; }
+                        else if (TxnTypeName.ToUpper().Contains("MOVENONSTD"))
+                        { tempmove.TxnTypeName = TXNTYPENAME.MoveNonStd; }
+                        else
+                        { tempmove.TxnTypeName = TXNTYPENAME.Other; }
+
+                        tempmove.ContainerName = ConvertString(line[7]);
+                        tempmove.Comments = ConvertString(line[8]);
+                        if (stepnamedict.ContainsKey(tempmove.WorkflowStepID))
+                        {
+                            tempmove.WorkflowStepName = stepnamedict[tempmove.WorkflowStepID];
+                            tempmove.Sequence = stepseqdict[tempmove.WorkflowStepID];
+                        }
+                        else
+                        {
+                            tempmove.WorkflowStepName = ConvertString(line[9]);
+                            tempmove.Sequence = 0;
+                        }
                         movelist.Add(tempmove);
 
                         if (!MfgOrdidDict.ContainsKey(tempmove.MfgOrderId))
@@ -522,19 +553,19 @@ namespace Prometheus.Models
                     }
                     namecond = namecond.Substring(0, namecond.Length - 2);
 
-                    sql = "select Qty,MoveInQty,WorkflowStepName from ProjectMoveHistory where MfgOrderName like '%<MfgName>%' and WorkflowStepName in (<namecond>) order by Sequence ASC";
+                    sql = "select MoveOutQty,MoveInQty,WorkflowStepName,TxnTypeName from ProjectMoveHistory where MfgOrderName like '%<MfgName>%' and WorkflowStepName in (<namecond>) order by Sequence ASC";
                     sql = sql.Replace("<MfgName>", MfgName).Replace("<namecond>", namecond);
                 }
                 else
                 {
-                    sql = "select Qty,MoveInQty,WorkflowStepName from ProjectMoveHistory where MfgOrderName like '%<MfgName>%' order by Sequence ASC";
+                    sql = "select MoveOutQty,MoveInQty,WorkflowStepName,TxnTypeName from ProjectMoveHistory where MfgOrderName like '%<MfgName>%' order by Sequence ASC";
                     sql = sql.Replace("<MfgName>", MfgName);
                 }
 
             }
             else
             {
-                sql = "select Qty,MoveInQty,WorkflowStepName from ProjectMoveHistory where MfgOrderName like '%<MfgName>%' order by Sequence ASC";
+                sql = "select MoveOutQty,MoveInQty,WorkflowStepName,TxnTypeName from ProjectMoveHistory where MfgOrderName like '%<MfgName>%' order by Sequence ASC";
                 sql = sql.Replace("<MfgName>", MfgName);
             }
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
@@ -542,9 +573,10 @@ namespace Prometheus.Models
             {
                 var tempmove = new ProjectMoveHistory();
                 tempmove.ProjectKey = PJKey;
-                tempmove.Qty = Convert.ToInt32(line[0]);
+                tempmove.MoveOutQty = Convert.ToInt32(line[0]);
                 tempmove.MoveInQty = Convert.ToInt32(line[1]);
                 tempmove.WorkflowStepName = Convert.ToString(line[2]);
+                tempmove.TxnTypeName = Convert.ToInt32(line[3]);
                 ret.Add(tempmove);
             }
             return ret;

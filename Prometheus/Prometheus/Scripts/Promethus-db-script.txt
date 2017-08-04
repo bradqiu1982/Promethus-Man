@@ -732,12 +732,15 @@ CREATE TABLE [dbo].[WaferRecord] (
     [ProductId]   NVARCHAR (200) DEFAULT ('') NOT NULL,
 	[WorkflowStepID]   NVARCHAR (200) DEFAULT ('') NOT NULL,
 	[WorkflowStepName]   NVARCHAR (200) DEFAULT ('') NOT NULL,
-	[Qty]   INT       DEFAULT (0) NOT NULL,
+	[Sequence]   INT       DEFAULT (0) NOT NULL,
+	[MoveOutQty]   INT       DEFAULT (0) NOT NULL,
 	[MoveInQty]   INT       DEFAULT (0) NOT NULL,
 	[MfgOrderId]   NVARCHAR (200) DEFAULT ('') NOT NULL,
-	[TxnDetails]	NVARCHAR (MAX) DEFAULT ('') NOT NULL,
-	[TxnDate]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
 	[MfgOrderName]	NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[MoveOutTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[TxnTypeName]   INT       DEFAULT (0) NOT NULL,
+	[ContainerName]	NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Comments]	NVARCHAR (200) DEFAULT ('') NOT NULL,
 	[Appv_1]   NVARCHAR (200) DEFAULT ('') NOT NULL,
 	[Appv_2]   NVARCHAR (200) DEFAULT ('') NOT NULL,
 	[Appv_3]   NVARCHAR (200) DEFAULT ('') NOT NULL,
@@ -908,6 +911,8 @@ SELECT  [HistoryMainlineId]  FROM [InsiteDB].[insite].[HistoryMainline] (nolock)
   and WorkflowStepId in ('00074e800000faaa','00074e800000faae') and TxnDate > '2017-03-01 10:00:00')
 
 
+  select ProductId,WorkflowStepId,MoveOutQty,MoveInQty,MfgOrderId,WorkflowStepName,GenerateTime,TxnTypeName,ContainerName,Comments
+	 from PDMSMaster.dbo.HistStepMoveSummary (nolock) where MoveOutTime > '2017-08-03 10:00:00' and ProductId in ('00062c80000fb541','00062c800012b648','00062c80000daad1','00062c80000ebd0c','00062c80000f8211','00062c80000ce252') and MFGOrderId is not null
 
 
 

@@ -5003,8 +5003,8 @@ namespace Prometheus.Controllers
             }
             catch (Exception ex) { }
 
-            
-             
+
+
             foreach (var pjkey in pjkeylist)
             {
                 try
@@ -5054,6 +5054,16 @@ namespace Prometheus.Controllers
                 try
                 {
                     BITestData.PrePareLatestData(this, pjkey);
+                }
+                catch (Exception ex)
+                { }
+            }
+
+            foreach (var pjkey in pjkeylist)
+            {
+                try
+                {
+                    ProcessData.LoadMesWorkflow(pjkey, this);
                 }
                 catch (Exception ex)
                 { }

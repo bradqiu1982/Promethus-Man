@@ -1906,9 +1906,93 @@ namespace Prometheus.Controllers
             {
                 ViewBag.pjkey = ProjectKey;
                 ProjectWeeklyTrend(this, ProjectKey,4);
+
+                var allprocname = new List<string>();
+                var bondingedprocess = ProjectViewModels.RetriveProjectProcessBonding(ProjectKey);
+                if (bondingedprocess.Count > 0)
+                {
+                    allprocname = bondingedprocess[0].Except.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                }
+                else
+                {
+                    allprocname = ProcessData.RetrieveLastWeekProcess(ProjectKey);
+                }
+
+                var detailinfo = new Dictionary<string, List<ProjectMoveHistory>>();
+                var procdata = ProcessData.RetrieveLastWeekProcessData(ProjectKey, detailinfo);
+                var processdatatable = new List<ProjectMoveHistory>();
+                foreach(var proc in allprocname)
+                {
+                    if (procdata.ContainsKey(proc))
+                    {
+                        processdatatable.Add(procdata[proc]);
+                    }
+                }
+                if(detailinfo.Count > 0)
+                    ViewBag.detailinfo = detailinfo;
+                if(processdatatable.Count > 0)
+                    ViewBag.processdatatable = processdatatable;
+
+                var jolist = new List<string>();
+                jolist.Add("Please select JO");
+                var templist = ProcessData.RetrieveJoList(ProjectKey);
+                jolist.AddRange(templist);
+                var selectcontrol = CreateSelectList1(jolist, "");
+                selectcontrol[0].Disabled = true;
+                selectcontrol[0].Selected = true;
+                ViewBag.procjolist = selectcontrol;
+
                 return View();
             }
 
+            return View();
+        }
+
+        public ActionResult ProjectProcessYield(string ProjectKey, string PBRNUM)
+        {
+            if (!string.IsNullOrEmpty(ProjectKey)
+                && !string.IsNullOrEmpty(PBRNUM))
+            {
+                ViewBag.pjkey = ProjectKey;
+                ViewBag.brnum = PBRNUM;
+
+                var allprocname = new List<string>();
+                var bondingedprocess = ProjectViewModels.RetriveProjectProcessBonding(ProjectKey);
+                if (bondingedprocess.Count > 0)
+                {
+                    allprocname = bondingedprocess[0].Except.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                }
+                else
+                {
+                    allprocname = ProcessData.RetrieveProcessWithSequenceByMfg(ProjectKey, PBRNUM);
+                }
+
+                var detailinfo = new Dictionary<string, List<ProjectMoveHistory>>();
+                var procdata = ProcessData.RetrieveProcessDataByMfg(ProjectKey, PBRNUM, detailinfo);
+                var processdatatable = new List<ProjectMoveHistory>();
+                foreach (var proc in allprocname)
+                {
+                    if (procdata.ContainsKey(proc))
+                    {
+                        processdatatable.Add(procdata[proc]);
+                    }
+                }
+                if (detailinfo.Count > 0)
+                    ViewBag.detailinfo = detailinfo;
+                if (processdatatable.Count > 0)
+                    ViewBag.processdatatable = processdatatable;
+
+                //var jolist = new List<string>();
+                //jolist.Add("Please select JO");
+                //var templist = ProcessData.RetrieveJoList(ProjectKey);
+                //jolist.AddRange(templist);
+                //var selectcontrol = CreateSelectList1(jolist, "");
+                //selectcontrol[0].Disabled = true;
+                //selectcontrol[0].Selected = true;
+                //ViewBag.procjolist = selectcontrol;
+
+                return View();
+            }
             return View();
         }
 
@@ -5069,6 +5153,16 @@ namespace Prometheus.Controllers
                 { }
             }
 
+            foreach (var pjkey in pjkeylist)
+            {
+                try
+                {
+                    ProcessData.LoadMESMoveHistory(pjkey, this);
+                }
+                catch (Exception ex)
+                { }
+            }
+
             try
             {
                 BIDataUtility.LoadModuleTXOFromMESBackup(this);
@@ -5195,15 +5289,11 @@ namespace Prometheus.Controllers
             //BIDataUtility.LoadProcessTXOFromAuto(this);
             //ExternalDataCollector.RefreshOBAFromDMR(this);
 
+            //ProcessData.LoadMESMoveHistory("EDRLP", this);
+
             //var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
             //foreach (var pjkey in pjkeylist)
             //{
-            try
-            {
-                ProcessData.LoadMESMoveHistory("EDRLP", this);
-            }
-            catch (Exception ex)
-            { }
             //try
             //{
             //    ProjectTestData.PrePareMESLatestData("EDRLP", this);

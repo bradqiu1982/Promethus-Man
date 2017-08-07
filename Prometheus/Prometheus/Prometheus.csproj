@@ -1018,6 +1018,7 @@
     <Content Include="Scripts\lobilist\lib\lobibox\sounds\sound5.ogg" />
     <Content Include="Scripts\lobilist\lib\lobibox\sounds\sound6.ogg" />
     <Content Include="Views\Project\ProjectDash.cshtml" />
+    <Content Include="Views\Project\ProjectProcessYield.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="userfiles\docs\" />

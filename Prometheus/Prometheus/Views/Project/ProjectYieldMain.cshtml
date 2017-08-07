@@ -9,7 +9,7 @@
 
 <div class="row">
     <div class="nav navbar-nav navbar-left">
-        <img src="~/Content/images/PJ/RMA.png" style="height:35px; width:35px;margin-right: 15px;">
+        <img src="~/Content/images/PJ/Yield.png" style="height:35px; width:35px;margin-right: 15px;">
     </div>
     <div class="nav navbar-nav navbar-left">
         <ol class="breadcrumb" style="width:600px">
@@ -31,98 +31,103 @@
     </div>
 </div>
 
-<form>
-    @if (ViewBag.pjkey != null)
-    {
-        <input value="@(ViewBag.pjkey)" id="pjkey" name="pjkey" type="hidden" />
-    }
-</form>
-
-@if (ViewBag.chartscript != null)
-{
-    @Html.Raw(ViewBag.chartscript)
-
-    <script src="~/Scripts/highcharts.js"></script>
-    <script src="~/Scripts/exporting.js"></script>
-
-    <div class="row" >
-        <div class="col-lg-1"></div>
-        <div class="col-lg-10" data-intro = "Click different point to get detail!"  data-step="1">
-            <div id="weeklyyield" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-        </div>
-        <div class="col-lg-1"></div>
+<div class="panel panel-info">
+    <div class="panel-heading">
+        <div class="panel-title">Module Yield</div>
     </div>
-}
+    <div class="panel-body">
+        <form>
+            @if (ViewBag.pjkey != null)
+            {
+            <input value="@(ViewBag.pjkey)" id="pjkey" name="pjkey" type="hidden" />
+            }
+        </form>
 
+        @if (ViewBag.chartscript != null)
+        {
+        @Html.Raw(ViewBag.chartscript)
 
-<hr style="border-color:#006DC0;"/>
+        <script src="~/Scripts/highcharts.js"></script>
+        <script src="~/Scripts/exporting.js"></script>
 
-<div class="row" style="font-family:'Arial Narrow'" data-intro = "Select period for detail!"  data-step="2">
-    <div class="col-lg-2" MYTP="orange" style="font-size:18px">Yield By Period</div>
-    <div class="col-lg-10">
         <div class="row">
-            <div class="col-lg-3 text-left">
-                @Html.DropDownList("weeklylist", null, new { @id = "weeklylist", @class = "form-control", @onchange = "ShowWeeklYYield()" })                
+            <div class="col-lg-1"></div>
+            <div class="col-lg-10" data-intro="Click different point to get detail!" data-step="1">
+                <div id="weeklyyield" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
             </div>
-            <div class="col-lg-9 text-left"></div>
+            <div class="col-lg-1"></div>
         </div>
-        <div class="row">
-            <div class="col-lg-12">&nbsp;</div>
-        </div>
-        <div class="row">
-            <div class="col-lg-3 text-left">
-                @Html.DropDownList("monthlylist", null, new { @id = "monthlylist", @class = "form-control", @onchange = "ShowMonthlyYield()" })
+        }
+
+
+        <hr style="border-color:#006DC0;" />
+
+        <div class="row" style="font-family:'Arial Narrow'" data-intro="Select period for detail!" data-step="2">
+            <div class="col-lg-2" MYTP="orange" style="font-size:18px">Yield By Period</div>
+            <div class="col-lg-10">
+                <div class="row">
+                    <div class="col-lg-3 text-left">
+                        @Html.DropDownList("weeklylist", null, new { @id = "weeklylist", @class = "form-control", @onchange = "ShowWeeklYYield()" })
+                    </div>
+                    <div class="col-lg-9 text-left"></div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">&nbsp;</div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3 text-left">
+                        @Html.DropDownList("monthlylist", null, new { @id = "monthlylist", @class = "form-control", @onchange = "ShowMonthlyYield()" })
+                    </div>
+                    <div class="col-lg-9 text-left"></div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">&nbsp;</div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-2 text-left">
+                        Other Period
+                    </div>
+                    <div class="col-lg-2">
+                        <input class="form-control text-box single-line" id="StartDate" placeholder="Start Date" name="StartDate" type="text" value="" style="margin-left:12px" />
+                    </div>
+                    <div class="col-lg-2">
+                        <input class="form-control text-box single-line" id="EndDate" placeholder="End Date" name="EndDate" type="text" value="" />
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="col-lg-5"><button class="btn btn-success" type="button" style="width:75px" onclick="ShowPeriodYield()">In Period</button></div>
+                        <div class="col-lg-5"><button class="btn btn-success" type="button" style="width:75px" onclick="ShowDailyYield()">In Days</button></div>
+                        <div class="col-lg-2"></div>
+                    </div>
+                    <div class="col-lg-2"></div>
+                </div>
             </div>
-            <div class="col-lg-9 text-left"></div>
         </div>
-        <div class="row">
-            <div class="col-lg-12">&nbsp;</div>
-        </div>
-        <div class="row">
+
+        <hr style="border-color:#006DC0;" />
+
+        <div class="row" style="font-family:'Arial Narrow'" data-intro="Select BR/JO for detail!" data-step="3">
+            <div class="col-lg-2" MYTP="orange" style="font-size:18px">Yield By BR/JO</div>
             <div class="col-lg-2 text-left">
-                Other Period
+                @Html.DropDownList("yieldtypelist", null, new { @id = "yieldtypelist", @class = "form-control" })
+            </div>
+            <div class="col-lg-3">
+                <input class="form-control text-box single-line" id="BRNUM" name="BRNUM" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 250." data-val-length-max="250" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" type="text" value="" />
+                <span class="field-validation-valid text-danger" data-valmsg-for="BRNUM" data-valmsg-replace="true"></span>
             </div>
             <div class="col-lg-2">
-                <input class="form-control text-box single-line" id="StartDate" placeholder="Start Date" name="StartDate" type="text" value="" style="margin-left:12px"/>
+                <div class="col-lg-9"><button class="btn btn-success" type="button" style="width:75px" onclick="showbryield()">Yield</button></div>
+                <div class="col-lg-3 text-center"></div>
             </div>
-            <div class="col-lg-2">
-                <input class="form-control text-box single-line" id="EndDate" placeholder="End Date" name="EndDate" type="text" value="" />
+            <div class="col-lg-3">
             </div>
-            <div class="col-lg-4">
-                <div class="col-lg-5"><button class="btn btn-success" type="button" style="width:75px" onclick="ShowPeriodYield()">In Period</button></div>
-                <div class="col-lg-5"><button class="btn btn-success" type="button" style="width:75px" onclick="ShowDailyYield()">In Days</button></div>
-                <div class="col-lg-2"></div>
-            </div>
-            <div class="col-lg-2"></div>
         </div>
-    </div>
-</div>
 
-<hr style="border-color:#006DC0;" />
-
-<div class="row" style="font-family:'Arial Narrow'" data-intro = "Select BR/JO for detail!"  data-step="3">
-    <div class="col-lg-2" MYTP="orange" style="font-size:18px">Yield By BR/JO</div>
-    <div class="col-lg-2 text-left">
-        @Html.DropDownList("yieldtypelist", null, new { @id = "yieldtypelist", @class = "form-control" })
-    </div>
-    <div class="col-lg-3">
-        <input class="form-control text-box single-line" id="BRNUM" name="BRNUM" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 250." data-val-length-max="250" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" type="text" value="" />
-        <span class="field-validation-valid text-danger" data-valmsg-for="BRNUM" data-valmsg-replace="true"></span>
-    </div>
-    <div class="col-lg-2">
-        <div class="col-lg-9"><button class="btn btn-success" type="button" style="width:75px" onclick="showbryield()">Yield</button></div>
-        <div class="col-lg-3 text-center"></div>
-    </div>
-    <div class="col-lg-3">
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-lg-12">&nbsp;</div>
-</div>
+        <div class="row">
+            <div class="col-lg-12">&nbsp;</div>
+        </div>
 
 
-<script type="text/javascript">
+        <script type="text/javascript">
                             $(document).ready(function () {
                                 $("#StartDate").datepicker({
                                     changeMonth: true,
@@ -135,45 +140,195 @@
                                     dateFormat: 'yy-mm-dd'
                                 });
                             });
-</script>
+        </script>
 
-<script type="text/javascript">
-    function ShowWeeklYYield()
-    {
-        if (document.getElementById("weeklylist").value) {
-            window.location.href = '/Project/ProjectYield?ProjectKey=@ViewBag.pjkey' + '&Weeks=' + document.getElementById("weeklylist").value;
-        }
-    }
+        <script type="text/javascript">
+            function ShowWeeklYYield()
+            {
+                if (document.getElementById("weeklylist").value) {
+                    window.location.href = '/Project/ProjectYield?ProjectKey=@ViewBag.pjkey' + '&Weeks=' + document.getElementById("weeklylist").value;
+                }
+            }
 
-    function ShowMonthlyYield()
-    {
-        if (document.getElementById("monthlylist").value) {
-            window.location.href = "/Project/ProjectMonthlyYield?ProjectKey=@ViewBag.pjkey" + '&Months=' + document.getElementById("monthlylist").value;
-        }
-    }
+            function ShowMonthlyYield()
+            {
+                if (document.getElementById("monthlylist").value) {
+                    window.location.href = "/Project/ProjectMonthlyYield?ProjectKey=@ViewBag.pjkey" + '&Months=' + document.getElementById("monthlylist").value;
+                }
+            }
 
-    function ShowPeriodYield() {
-        if (document.getElementById("StartDate").value && document.getElementById("EndDate").value)
+            function ShowPeriodYield() {
+                if (document.getElementById("StartDate").value && document.getElementById("EndDate").value)
+                {
+                    window.location.href = '/Project/ProjectPeriodYield?ProjectKey=@ViewBag.pjkey' + '&StartDate=' + document.getElementById("StartDate").value + '&EndDate=' + document.getElementById("EndDate").value;
+                }
+            }
+
+            function ShowDailyYield() {
+                if (document.getElementById("StartDate").value && document.getElementById("EndDate").value) {
+                    window.location.href = '/Project/ProjectDailyYield?ProjectKey=@ViewBag.pjkey' + '&StartDate=' + document.getElementById("StartDate").value + '&EndDate=' + document.getElementById("EndDate").value;
+                }
+            }
+
+            function showbryield()
+            {
+                if (document.getElementById("yieldtypelist").value == "BR" && document.getElementById("BRNUM").value)
+                {
+                    window.location.href = "/Project/ProjectBRYield?ProjectKey=@ViewBag.pjkey" + "&BRNUM=" + document.getElementById("BRNUM").value;
+                }
+                if (document.getElementById("yieldtypelist").value == "JO" && document.getElementById("BRNUM").value)
+                {
+                    window.location.href = "/Project/ProjectJOYield?ProjectKey=@ViewBag.pjkey" + "&BRNUM=" + document.getElementById("BRNUM").value;
+                }
+            }
+        </script>
+    </div>
+</div>
+
+<div class="panel panel-info">
+    <div class="panel-heading">
+        <div class="panel-title">Process Yield</div>
+    </div>
+    <div class="panel-body">
+
+        <div class="row" style="font-family:'Arial Narrow'" data-intro="Process Yield by BR or JO" data-step="4">
+            <div class="col-lg-2" MYTP="orange" style="font-size:18px">Yield By BR/JO</div>
+            <div class="col-lg-2 text-left">
+                @Html.DropDownList("procjolist", null, new { @id = "procjolist", @class = "form-control" })
+            </div>
+            <div class="col-lg-1"  style="font-family:'Arial Narrow';text-align:center"> or </div>
+            <div class="col-lg-2">
+                <input class="form-control text-box single-line" id="PBRNUM" name="PBRNUM" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 250." data-val-length-max="250" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" type="text" value="" />
+                <span class="field-validation-valid text-danger" data-valmsg-for="PBRNUM" data-valmsg-replace="true"></span>
+            </div>
+            <div class="col-lg-2">
+                <div class="col-lg-9"><button class="btn btn-success" type="button" style="width:75px" onclick="showpbryield()">Proc Yield</button></div>
+                <div class="col-lg-3 text-center"></div>
+            </div>
+            <div class="col-lg-3">
+            </div>
+            <script type="text/javascript">
+                function showpbryield()
+                {
+                    if(document.getElementById("PBRNUM").value)
+                    {
+                        var myurl = "/Project/ProjectProcessYield?ProjectKey=@ViewBag.pjkey" + "&PBRNUM=" + document.getElementById("PBRNUM").value;
+                        window.open(myurl, '_blank');
+                    }
+                    else if (document.getElementById("procjolist").value.indexOf("Please") == -1)
+                    {
+                        var myurl = "/Project/ProjectProcessYield?ProjectKey=@ViewBag.pjkey" + "&PBRNUM=" + document.getElementById("procjolist").value;
+                        window.open(myurl, '_blank');
+                    }
+                    return false;
+                }
+            </script>
+        </div>
+        
+        @if (ViewBag.processdatatable != null)
         {
-            window.location.href = '/Project/ProjectPeriodYield?ProjectKey=@ViewBag.pjkey' + '&StartDate=' + document.getElementById("StartDate").value + '&EndDate=' + document.getElementById("EndDate").value;
-        }
-    }
+            <hr style="border-color:#006DC0;" />
 
-    function ShowDailyYield() {
-        if (document.getElementById("StartDate").value && document.getElementById("EndDate").value) {
-            window.location.href = '/Project/ProjectDailyYield?ProjectKey=@ViewBag.pjkey' + '&StartDate=' + document.getElementById("StartDate").value + '&EndDate=' + document.getElementById("EndDate").value;
-        }
-    }
+            <div class="row">
+                <div class="col-lg-3" MYTP="green" style="font-size:18px">Process Weekly Yield</div>
+                <div class="col-lg-9"></div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">&nbsp;</div>
+            </div>
+            <div class="row">
+                <table id="vcseldatatable" class="display" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Workflow Name</th>
+                            <th>Input</th>
+                            <th>Output</th>
+                            <th>Yield</th>
+                            <th>Detial</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in ViewBag.processdatatable)
+                        {
+                            <tr>
+                                <td>@item.WorkflowStepName</td>
+                                <td>@item.MoveInQty</td>
+                                <td>@item.MoveOutQty</td>
+                                <td>@(((double)item.MoveOutQty/(double)item.MoveInQty*100.0).ToString("0.00")) %</td>
+                                <td><button class="form-control" type="button" style="border:0px!important;border-top-width:0px!important;border-color:transparent!important;background-color:transparent!important;" onclick="OpenDetailMode()">detail</button></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <script type="text/javascript">
+                $(document).ready(function() {
+                    $('#vcseldatatable').DataTable({
+                        'iDisplayLength': 50,
+                        'aLengthMenu': [[25, 50, 100, -1],
+                                        [25, 50, 100, "All"]],
+                        "aaSorting": [],
+                        "order": []
+                    });
+                            } );
+            </script>
 
-    function showbryield()
-    {
-        if (document.getElementById("yieldtypelist").value == "BR" && document.getElementById("BRNUM").value)
-        {
-            window.location.href = "/Project/ProjectBRYield?ProjectKey=@ViewBag.pjkey" + "&BRNUM=" + document.getElementById("BRNUM").value;
+            if (ViewBag.detailinfo != null)
+            {
+                <script type="text/javascript">
+                    function OpenDetailMode()
+                    {
+                        $('#processmodal').modal({ backdrop: 'static' });
+                    }
+                </script>
+
+                <div class="modal" id="processmodal" tabindex="-1" role="dialog" aria-labelledby="processmodalLabel2">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="processmodalLabel2">Process Detail</h4>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-1"></div>
+                                <div class="col-lg-10">
+                                    <table class="table table-hover" style="width:100%!important;">
+                                        <thead>
+                                            <tr>
+                                                <th>Contain Name</th>
+                                                <th>Work Flow</th>
+                                                <th>Comment</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var kv in ViewBag.detailinfo)
+                                            {
+                                                foreach (var com in kv.Value)
+                                                {
+                                                    <tr>
+                                                        <td>@(com.ContainerName)</td>
+                                                        <td>@(kv.Key)</td>
+                                                        <td>@(com.Comments)</td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-lg-1"></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <script type="text/javascript">
+                    function OpenDetailMode(){}
+                </script>
+            }
         }
-        if (document.getElementById("yieldtypelist").value == "JO" && document.getElementById("BRNUM").value)
-        {
-            window.location.href = "/Project/ProjectJOYield?ProjectKey=@ViewBag.pjkey" + "&BRNUM=" + document.getElementById("BRNUM").value;
-        }
-    }
-</script>
+    </div>
+</div>

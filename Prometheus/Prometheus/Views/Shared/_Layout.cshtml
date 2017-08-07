@@ -235,10 +235,7 @@
                                                 @Html.ActionLink("Review Vcsel Data", "ReviewVcselData", "CustomerData")
                                             </li>
                                             <li>
-                                                @if ((ViewBag.IsSuper != null && ViewBag.IsSuper) || (ViewBag.IsAdmin != null && ViewBag.IsAdmin))
-                                                {
-                                                    @Html.ActionLink("Review RMA Data", "ReviewRMABackupData", "CustomerData")
-                                                }
+                                                @Html.ActionLink("Review RMA Data", "ReviewRMABackupData", "CustomerData")
                                             </li>
                                             <li>
                                                 @Html.ActionLink("Review REL Data", "ReviewRelBackupData", "CustomerData")

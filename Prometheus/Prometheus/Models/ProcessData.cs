@@ -169,21 +169,11 @@ namespace Prometheus.Models
                 var sql = "select p.ProductId,s.WorkflowStepID, s.WorkflowStepName,s.WorkflowID,s.Sequence from InsiteDB.insite.WorkflowStep s (nolock) " 
                     + " left join InsiteDB.insite.Workflow w (nolock) on s.WorkflowID = w.WorkflowID"
                     + " left join InsiteDB.insite.Product p (nolock) on w.WorkflowBaseId = p.WorkflowBaseId"
-                    + " where (<pncond>) and p.Description like '%GFA%' "
+                    + " where (<pncond>) "
                     + " and p.WorkflowBaseId is not null and p.WorkflowBaseId <> '0000000000000000' ";
                 sql = sql.Replace("<pncond>", pncond);
                 var dbret = DBUtility.ExeMESSqlWithRes(sql);
-                if (dbret.Count == 0)
-                {
-                    sql = "select p.ProductId,s.WorkflowStepID, s.WorkflowStepName,s.WorkflowID,s.Sequence from InsiteDB.insite.WorkflowStep s (nolock) "
-                    + " left join InsiteDB.insite.Workflow w (nolock) on s.WorkflowID = w.WorkflowID"
-                    + " left join InsiteDB.insite.Product p (nolock) on w.WorkflowBaseId = p.WorkflowBaseId"
-                    + " where (<pncond>) "
-                    + " and p.WorkflowBaseId is not null and p.WorkflowBaseId <> '0000000000000000' ";
-                    sql = sql.Replace("<pncond>", pncond);
-                    dbret = DBUtility.ExeMESSqlWithRes(sql);
-                }
-
+               
                 foreach (var line in dbret)
                 {
                     try
@@ -365,12 +355,35 @@ namespace Prometheus.Models
             }//end while(true)
 
         }
-    
+
+        private static List<string> RetrieveAllProductIDs(string PJKey)
+        {
+            var ret = new List<string>();
+            var pvm = ProjectViewModels.RetrieveOneProject(PJKey);
+            var pncond = PNCondition(pvm.PNList);
+            if (!string.IsNullOrEmpty(pncond))
+            {
+                var sql = "select distinct p.ProductId from InsiteDB.insite.Product p (nolock) where (<pncond>) ";
+                sql = sql.Replace("<pncond>", pncond);
+                var dbret = DBUtility.ExeMESSqlWithRes(sql);
+                foreach (var line in dbret)
+                {
+                    var pid = ConvertString(line[0]);
+                    if (!string.IsNullOrEmpty(pid))
+                    {
+                        ret.Add(pid);
+                    }
+                }//end foreach
+            }//end if
+
+            return ret;
+        }
 
         public static void LoadMESMoveHistory(string PJKey,Controller ctrl)
         {
+            var allpids = RetrieveAllProductIDs(PJKey);
             var allworkflow = RetriveWorkflowByName(PJKey, new List<string>());
-            if (allworkflow.Count > 0)
+            if (allpids.Count > 0)
             {
                 var syscfg = CfgUtility.GetSysConfig(ctrl);
                 var movezerotime = syscfg["MOVEHISTORYZEROTIME"];
@@ -394,17 +407,8 @@ namespace Prometheus.Models
                     }
                 }
 
-                var piddict = new Dictionary<string, bool>();
-                foreach (var item in allworkflow)
-                {
-                    if (!piddict.ContainsKey(item.ProductId))
-                    {
-                        piddict.Add(item.ProductId, true);
-                    }
-                }
-                var pidlist = piddict.Keys.ToList();
                 var pidcond = "'";
-                foreach (var item in pidlist)
+                foreach (var item in allpids)
                 {
                     pidcond = pidcond + item + "','";
                 }
@@ -535,7 +539,7 @@ namespace Prometheus.Models
             }//end if
         }
 
-        public List<ProjectMoveHistory> RetrieveProcessData(string PJKey, string MfgName)
+        private static List<ProjectMoveHistory> RetrieveProcessData(string PJKey, string MfgName)
         {
             var ret = new List<ProjectMoveHistory>();
             var sql = string.Empty;
@@ -553,19 +557,19 @@ namespace Prometheus.Models
                     }
                     namecond = namecond.Substring(0, namecond.Length - 2);
 
-                    sql = "select MoveOutQty,MoveInQty,WorkflowStepName,TxnTypeName from ProjectMoveHistory where MfgOrderName like '%<MfgName>%' and WorkflowStepName in (<namecond>) order by Sequence ASC";
+                    sql = "select MoveOutQty,MoveInQty,WorkflowStepName,TxnTypeName,ContainerName,Comments from ProjectMoveHistory where MfgOrderName like '%<MfgName>%' and WorkflowStepName in (<namecond>) order by Sequence ASC";
                     sql = sql.Replace("<MfgName>", MfgName).Replace("<namecond>", namecond);
                 }
                 else
                 {
-                    sql = "select MoveOutQty,MoveInQty,WorkflowStepName,TxnTypeName from ProjectMoveHistory where MfgOrderName like '%<MfgName>%' order by Sequence ASC";
+                    sql = "select MoveOutQty,MoveInQty,WorkflowStepName,TxnTypeName,ContainerName,Comments from ProjectMoveHistory where MfgOrderName like '%<MfgName>%' order by Sequence ASC";
                     sql = sql.Replace("<MfgName>", MfgName);
                 }
 
             }
             else
             {
-                sql = "select MoveOutQty,MoveInQty,WorkflowStepName,TxnTypeName from ProjectMoveHistory where MfgOrderName like '%<MfgName>%' order by Sequence ASC";
+                sql = "select MoveOutQty,MoveInQty,WorkflowStepName,TxnTypeName,ContainerName,Comments from ProjectMoveHistory where MfgOrderName like '%<MfgName>%' order by Sequence ASC";
                 sql = sql.Replace("<MfgName>", MfgName);
             }
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
@@ -577,8 +581,315 @@ namespace Prometheus.Models
                 tempmove.MoveInQty = Convert.ToInt32(line[1]);
                 tempmove.WorkflowStepName = Convert.ToString(line[2]);
                 tempmove.TxnTypeName = Convert.ToInt32(line[3]);
+                tempmove.ContainerName = Convert.ToString(line[4]);
+                tempmove.Comments = Convert.ToString(line[5]);
                 ret.Add(tempmove);
             }
+            return ret;
+        }
+
+        private static List<string> RetrieveProcessWithSequence(string PJKey, string starttime, string endtime)
+        {
+            var ret = new List<string>();
+            var uniqukey = new Dictionary<string, bool>();
+
+            var sql = "select distinct Sequence,WorkflowStepName from ProjectMoveHistory "
+            + " where  ProjectKey = '<ProjectKey>' and  MoveOutTime >= '<starttime>' and MoveOutTime <= '<endtime>' order by  Sequence asc,WorkflowStepName asc ";
+            sql = sql.Replace("<ProjectKey>", PJKey).Replace("<starttime>", starttime).Replace("<endtime>", endtime);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var flowname = ConvertString(line[1]);
+                if (!string.IsNullOrEmpty(flowname))
+                {
+                    if (!uniqukey.ContainsKey(flowname))
+                    {
+                        uniqukey.Add(flowname, true);
+                        ret.Add(flowname);
+                    }
+                }
+            }
+            return ret;
+        }
+
+        public static List<string> RetrieveProcessWithSequenceByMfg(string PJKey, string mfg)
+        {
+            var ret = new List<string>();
+            var uniqukey = new Dictionary<string, bool>();
+
+            var sql = "select distinct Sequence,WorkflowStepName from ProjectMoveHistory "
+            + " where  ProjectKey = '<ProjectKey>' and MfgOrderName like '%<MfgOrderName>%' order by  Sequence asc,WorkflowStepName asc ";
+            sql = sql.Replace("<ProjectKey>", PJKey).Replace("<MfgOrderName>", mfg);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var flowname = ConvertString(line[1]);
+                if (!string.IsNullOrEmpty(flowname))
+                {
+                    if (!uniqukey.ContainsKey(flowname))
+                    {
+                        uniqukey.Add(flowname, true);
+                        ret.Add(flowname);
+                    }
+                }
+            }
+            return ret;
+        }
+
+        public static List<string> RetrieveJoList(string PJKey)
+        {
+            var ret = new List<string>();
+            var sql = "select distinct MfgOrderName from ProjectMoveHistory where MoveOutTime > '<starttime>' and ProjectKey= '<ProjectKey>'  order by MfgOrderName";
+            sql = sql.Replace("<starttime>", DateTime.Now.AddMonths(-6).ToString("yyyy-MM-dd hh:mm:ss")).Replace("<ProjectKey>", PJKey);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var MfgOrderName = ConvertString(line[0]);
+                if (!string.IsNullOrEmpty(MfgOrderName))
+                {
+                    ret.Add(MfgOrderName);
+                }
+            }
+            return ret;
+        }
+
+        private static List<ProjectMoveHistory> RetrieveProcessDataByTime(string PJKey, string starttime,string endtime)
+        {
+            var ret = new List<ProjectMoveHistory>();
+            var sql = string.Empty;
+
+            var bondingedprocess = ProjectViewModels.RetriveProjectProcessBonding(PJKey);
+            if (bondingedprocess.Count > 0)
+            {
+                var items = bondingedprocess[0].Except.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+                if (items.Length > 0)
+                {
+                    var namecond = "'";
+                    foreach (var item in items)
+                    {
+                        namecond = namecond + item + "','";
+                    }
+                    namecond = namecond.Substring(0, namecond.Length - 2);
+
+                    sql = "select MoveOutQty,MoveInQty,WorkflowStepName,TxnTypeName,ContainerName,Comments from ProjectMoveHistory where ProjectKey = '<ProjectKey>' and  MoveOutTime >= '<starttime>' and MoveOutTime <= '<endtime>'  and WorkflowStepName in (<namecond>)";
+                    sql = sql.Replace("<ProjectKey>", PJKey).Replace("<starttime>", starttime).Replace("<endtime>", endtime).Replace("<namecond>", namecond);
+                }
+                else
+                {
+                    sql = "select MoveOutQty,MoveInQty,WorkflowStepName,TxnTypeName,ContainerName,Comments from ProjectMoveHistory where  ProjectKey = '<ProjectKey>' and  MoveOutTime >= '<starttime>' and MoveOutTime <= '<endtime>'";
+                    sql = sql.Replace("<ProjectKey>", PJKey).Replace("<starttime>", starttime).Replace("<endtime>", endtime);
+                }
+
+            }
+            else
+            {
+                sql = "select MoveOutQty,MoveInQty,WorkflowStepName,TxnTypeName,ContainerName,Comments from ProjectMoveHistory where  ProjectKey = '<ProjectKey>' and  MoveOutTime >= '<starttime>' and MoveOutTime <= '<endtime>'";
+                sql = sql.Replace("<ProjectKey>", PJKey).Replace("<starttime>", starttime).Replace("<endtime>", endtime);
+            }
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var tempmove = new ProjectMoveHistory();
+                tempmove.ProjectKey = PJKey;
+                tempmove.MoveOutQty = Convert.ToInt32(line[0]);
+                tempmove.MoveInQty = Convert.ToInt32(line[1]);
+                tempmove.WorkflowStepName = Convert.ToString(line[2]);
+                tempmove.TxnTypeName = Convert.ToInt32(line[3]);
+                tempmove.ContainerName = Convert.ToString(line[4]);
+                tempmove.Comments = Convert.ToString(line[5]);
+                ret.Add(tempmove);
+            }
+            return ret;
+        }
+
+        private static DateTime RetrieveLastWeek()
+        {
+            var currentday = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd")+ " 07:30:00");
+
+            if (currentday.DayOfWeek > DayOfWeek.Thursday)
+            {
+                currentday = currentday.AddDays(4-(int)currentday.DayOfWeek);
+                return DateTime.Parse(currentday.ToString("yyyy-MM-dd") + " 07:30:00");
+            }
+            else if (currentday.DayOfWeek == DayOfWeek.Thursday)
+            {
+                currentday = currentday.AddDays(-7);
+                return DateTime.Parse(currentday.ToString("yyyy-MM-dd") + " 07:30:00");
+            }
+            else
+            {
+                currentday = currentday.AddDays(4 - ((int)currentday.DayOfWeek+7));
+                return DateTime.Parse(currentday.ToString("yyyy-MM-dd") + " 07:30:00");
+            }
+        }
+
+
+        public static List<string> RetrieveLastWeekProcess(string PJKey)
+        {
+            var starttime = RetrieveLastWeek().ToString("yyyy-MM-dd") + " 07:30:00";
+            var endtime = DateTime.Now.ToString("yyyy-MM-dd") + " 07:30:00";
+            return RetrieveProcessWithSequence(PJKey, starttime, endtime);
+        }
+
+        public static Dictionary<string, ProjectMoveHistory> RetrieveLastWeekProcessData(string PJKey,Dictionary<string,List<ProjectMoveHistory>> detailinfo)
+        {
+            var ret = new Dictionary<string, ProjectMoveHistory>();
+
+            var starttime = RetrieveLastWeek().ToString("yyyy-MM-dd") + " 07:30:00";
+            var endtime =  DateTime.Now.ToString("yyyy-MM-dd") + " 07:30:00";
+            var lastweekprocessdata =  RetrieveProcessDataByTime(PJKey, starttime, endtime);
+            foreach (var item in lastweekprocessdata)
+            {
+                if (ret.ContainsKey(item.WorkflowStepName))
+                {
+                    if (item.TxnTypeName == TXNTYPENAME.MoveStd)
+                    {
+                        ret[item.WorkflowStepName].MoveOutQty = ret[item.WorkflowStepName].MoveOutQty + item.MoveOutQty;
+                        ret[item.WorkflowStepName].MoveInQty = ret[item.WorkflowStepName].MoveInQty  + item.MoveOutQty;
+                    }
+                    else if (item.TxnTypeName == TXNTYPENAME.MoveNonStd)
+                    {
+                        ret[item.WorkflowStepName].MoveInQty = ret[item.WorkflowStepName].MoveInQty + item.MoveOutQty;
+                        if (detailinfo != null)
+                        {
+                            var tempcomm = new ProjectMoveHistory();
+                            tempcomm.ContainerName = item.ContainerName;
+                            tempcomm.Comments = item.Comments;
+
+                            if (!detailinfo.ContainsKey(item.WorkflowStepName))
+                            {
+                                var templist = new List<ProjectMoveHistory>();
+                                templist.Add(tempcomm);
+                                detailinfo.Add(item.WorkflowStepName, templist);
+                            }
+                            else
+                            {
+                                detailinfo[item.WorkflowStepName].Add(tempcomm);
+                            }
+                        }//end if
+                    }
+                }
+                else
+                {
+                    var tempmove = new ProjectMoveHistory();
+                    tempmove.MoveOutQty = 0;
+                    tempmove.MoveInQty = 0;
+                    tempmove.WorkflowStepName = item.WorkflowStepName;
+
+                    if (item.TxnTypeName == TXNTYPENAME.MoveStd)
+                    {
+                        tempmove.MoveOutQty = item.MoveOutQty;
+                        tempmove.MoveInQty = item.MoveOutQty;
+                    }
+                    else if (item.TxnTypeName == TXNTYPENAME.MoveNonStd)
+                    {
+                        tempmove.MoveInQty = item.MoveOutQty;
+                        if (detailinfo != null)
+                        {
+                            var tempcomm = new ProjectMoveHistory();
+                            tempcomm.ContainerName = item.ContainerName;
+                            tempcomm.Comments = item.Comments;
+
+                            if (!detailinfo.ContainsKey(item.WorkflowStepName))
+                            {
+                                var templist = new List<ProjectMoveHistory>();
+                                templist.Add(tempcomm);
+                                detailinfo.Add(item.WorkflowStepName, templist);
+                            }
+                            else
+                            {
+                                detailinfo[item.WorkflowStepName].Add(tempcomm);
+                            }
+                        }//end if
+                    }
+                    if (tempmove.MoveInQty != 0)
+                    {
+                        ret.Add(item.WorkflowStepName, tempmove);
+                    }
+                }
+            }
+
+            return ret;
+        }
+
+        public static Dictionary<string, ProjectMoveHistory> RetrieveProcessDataByMfg(string PJKey,string mfg, Dictionary<string, List<ProjectMoveHistory>> detailinfo)
+        {
+            var ret = new Dictionary<string, ProjectMoveHistory>();
+
+            var mfgprocessdata = RetrieveProcessData(PJKey, mfg);
+            foreach (var item in mfgprocessdata)
+            {
+                if (ret.ContainsKey(item.WorkflowStepName))
+                {
+                    if (item.TxnTypeName == TXNTYPENAME.MoveStd)
+                    {
+                        ret[item.WorkflowStepName].MoveOutQty = ret[item.WorkflowStepName].MoveOutQty + item.MoveOutQty;
+                        ret[item.WorkflowStepName].MoveInQty = ret[item.WorkflowStepName].MoveInQty + item.MoveOutQty;
+                    }
+                    else if (item.TxnTypeName == TXNTYPENAME.MoveNonStd)
+                    {
+                        ret[item.WorkflowStepName].MoveInQty = ret[item.WorkflowStepName].MoveInQty + item.MoveOutQty;
+                        if (detailinfo != null)
+                        {
+                            var tempcomm = new ProjectMoveHistory();
+                            tempcomm.ContainerName = item.ContainerName;
+                            tempcomm.Comments = item.Comments;
+
+                            if (!detailinfo.ContainsKey(item.WorkflowStepName))
+                            {
+                                var templist = new List<ProjectMoveHistory>();
+                                templist.Add(tempcomm);
+                                detailinfo.Add(item.WorkflowStepName, templist);
+                            }
+                            else
+                            {
+                                detailinfo[item.WorkflowStepName].Add(tempcomm);
+                            }
+                        }//end if
+                    }
+                }
+                else
+                {
+                    var tempmove = new ProjectMoveHistory();
+                    tempmove.MoveOutQty = 0;
+                    tempmove.MoveInQty = 0;
+                    tempmove.WorkflowStepName = item.WorkflowStepName;
+
+                    if (item.TxnTypeName == TXNTYPENAME.MoveStd)
+                    {
+                        tempmove.MoveOutQty = item.MoveOutQty;
+                        tempmove.MoveInQty = item.MoveOutQty;
+                    }
+                    else if (item.TxnTypeName == TXNTYPENAME.MoveNonStd)
+                    {
+                        tempmove.MoveInQty = item.MoveOutQty;
+                        if (detailinfo != null)
+                        {
+                            var tempcomm = new ProjectMoveHistory();
+                            tempcomm.ContainerName = item.ContainerName;
+                            tempcomm.Comments = item.Comments;
+
+                            if (!detailinfo.ContainsKey(item.WorkflowStepName))
+                            {
+                                var templist = new List<ProjectMoveHistory>();
+                                templist.Add(tempcomm);
+                                detailinfo.Add(item.WorkflowStepName, templist);
+                            }
+                            else
+                            {
+                                detailinfo[item.WorkflowStepName].Add(tempcomm);
+                            }
+                        }//end if
+                    }
+
+                    if (tempmove.MoveInQty != 0)
+                    {
+                        ret.Add(item.WorkflowStepName, tempmove);
+                    }
+                }
+            }
+
             return ret;
         }
 

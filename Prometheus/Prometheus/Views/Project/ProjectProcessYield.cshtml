@@ -1,0 +1,125 @@
+﻿@{
+    ViewBag.Title = "ProjectProcessYield";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="nav navbar-nav navbar-left">
+        <img src="~/Content/images/PJ/Yield.png" style="height:35px; width:35px;margin-right: 15px;">
+    </div>
+    <div class="nav navbar-nav navbar-left">
+        <ol class="breadcrumb" style="width:600px">
+            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
+            @if (ViewBag.pjkey != null)
+            {
+                <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(ViewBag.pjkey)">Project Detail</a></li>
+            }
+
+            @if (ViewBag.pjkey != null)
+            {
+                <li class="active">@ViewBag.pjkey @ViewBag.brnum Process Yield</li>
+            }
+            else
+            {
+                <li class="active">Project Process Yield</li>
+            }
+        </ol>
+    </div>
+</div>
+
+<div class="row">
+    @if (ViewBag.processdatatable != null)
+    {
+            <table id="vcseldatatable" class="display" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Workflow Name</th>
+                        <th>Input</th>
+                        <th>Output</th>
+                        <th>Yield</th>
+                        <th>Detial</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in ViewBag.processdatatable)
+                    {
+                        <tr>
+                            <td>@item.WorkflowStepName</td>
+                            <td>@item.MoveInQty</td>
+                            <td>@item.MoveOutQty</td>
+                            <td>@(((double)item.MoveOutQty / (double)item.MoveInQty * 100.0).ToString("0.00")) %</td>
+                            <td><button class="form-control" type="button" style="border:0px!important;border-top-width:0px!important;border-color:transparent!important;background-color:transparent!important;" onclick="OpenDetailMode()">detail</button></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <script type="text/javascript">
+                $(document).ready(function() {
+                    $('#vcseldatatable').DataTable({
+                        'iDisplayLength': 50,
+                        'aLengthMenu': [[25, 50, 100, -1],
+                                        [25, 50, 100, "All"]],
+                        "aaSorting": [],
+                        "order": []
+                    });
+                            } );
+            </script>
+
+        if (ViewBag.detailinfo != null)
+        {
+            <script type="text/javascript">
+                    function OpenDetailMode()
+                    {
+                        $('#processmodal').modal({ backdrop: 'static' });
+                    }
+            </script>
+
+                <div class="modal" id="processmodal" tabindex="-1" role="dialog" aria-labelledby="processmodalLabel2">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="processmodalLabel2">Process Detail</h4>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-1"></div>
+                                <div class="col-lg-10">
+                                    <table class="table table-hover" style="width:100%!important;">
+                                        <thead>
+                                            <tr>
+                                                <th>Contain Name</th>
+                                                <th>Work Flow</th>
+                                                <th>Comment</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var kv in ViewBag.detailinfo)
+                                            {
+                                                foreach (var com in kv.Value)
+                                                {
+                                                    <tr>
+                                                        <td>@(com.ContainerName)</td>
+                                                        <td>@(kv.Key)</td>
+                                                        <td>@(com.Comments)</td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-lg-1"></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        }
+        else
+        {
+            <script type="text/javascript">
+                    function OpenDetailMode(){}
+            </script>
+        }
+    }
+</div>

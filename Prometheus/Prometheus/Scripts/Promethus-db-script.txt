@@ -740,7 +740,7 @@ CREATE TABLE [dbo].[WaferRecord] (
 	[MoveOutTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
 	[TxnTypeName]   INT       DEFAULT (0) NOT NULL,
 	[ContainerName]	NVARCHAR (200) DEFAULT ('') NOT NULL,
-	[Comments]	NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Comments]	NVARCHAR (MAX) DEFAULT ('') NOT NULL,
 	[Appv_1]   NVARCHAR (200) DEFAULT ('') NOT NULL,
 	[Appv_2]   NVARCHAR (200) DEFAULT ('') NOT NULL,
 	[Appv_3]   NVARCHAR (200) DEFAULT ('') NOT NULL,
@@ -798,6 +798,11 @@ ALTER TABLE  UserRank Add  databackuptm   DATETIME       DEFAULT ('2017-07-18 10
 ALTER TABLE  UserReviewedItems Add  databackuptm   DATETIME       DEFAULT ('2017-07-18 10:00:00') NOT NULL;
 ALTER TABLE  UserTable Add  databackuptm   DATETIME       DEFAULT ('2017-07-18 10:00:00') NOT NULL;
 ALTER TABLE  VCSELUsageTable Add  databackuptm   DATETIME       DEFAULT ('2017-07-18 10:00:00') NOT NULL;
+
+
+ ALTER TABLE [NPITrace].[dbo].[ProjectMoveHistory] DROP CONSTRAINT DF__ProjectMo__Comme__278EDA44
+  ALTER TABLE [NPITrace].[dbo].[ProjectMoveHistory] ALTER COLUMN Comments 	NVARCHAR (MAX) not null
+  ALTER TABLE [NPITrace].[dbo].[ProjectMoveHistory]  ADD DEFAULT '' FOR Comments
 
 
 Create index idx on ErrorComments(ErrorKey);

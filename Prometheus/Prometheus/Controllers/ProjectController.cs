@@ -5294,6 +5294,15 @@ namespace Prometheus.Controllers
             //var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
             //foreach (var pjkey in pjkeylist)
             //{
+            //    try
+            //    {
+                    //ProcessData.LoadMESMoveHistory("EDR", this);
+                //}
+                //catch (Exception ex)
+                //{ }
+            //}
+            //foreach (var pjkey in pjkeylist)
+            //{
             //try
             //{
             //    ProjectTestData.PrePareMESLatestData("EDRLP", this);

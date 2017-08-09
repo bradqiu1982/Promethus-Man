@@ -5812,8 +5812,18 @@ namespace Prometheus.Controllers
                 var ck1 = new Dictionary<string, string>();
                 ck1.Add("PJKey", PJKey);
                 CookieUtility.SetCookie(this, ck1);
-
                 ViewBag.PJKey = PJKey;
+
+                var reportmark = new List<string>();
+                reportmark.Add("Please select report mark");
+                reportmark.Add(WEEKLYREPORTMARK.HighLight);
+                reportmark.Add(WEEKLYREPORTMARK.LowLight);
+                reportmark.Add(WEEKLYREPORTMARK.Notable);
+                var tempcontrol = CreateSelectList1(reportmark, "");
+                tempcontrol[0].Disabled = true;
+                tempcontrol[0].Selected = true;
+                ViewBag.wkrptmarklist = tempcontrol;
+
             }
             return View();
         }
@@ -6135,6 +6145,10 @@ namespace Prometheus.Controllers
                 {
                     ret.Add(SeverHtmlDecode.Decode(this, it.Replace("newlist=", "")).Replace("'", "").Trim());
                 }
+                if (it.Contains("reportmark="))
+                {
+                    ret.Add(it.Replace("reportmark=", "").Trim());
+                }
             }
             return ret;
         }
@@ -6143,7 +6157,7 @@ namespace Prometheus.Controllers
         public JsonResult TodoListMove()
         {
             var ret = MoveOperateParse();
-            if (ret.Count == 3
+            if (ret.Count >= 3
                 && !string.IsNullOrEmpty(ret[0])
                 && !string.IsNullOrEmpty(ret[2]))
             {

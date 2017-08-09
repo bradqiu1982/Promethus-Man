@@ -356,6 +356,13 @@ namespace Prometheus.Models
         public static string PMTASK = "[Project Manage]";
     }
 
+    public class WEEKLYREPORTMARK
+    {
+        public static string HighLight = "highlight";
+        public static string LowLight = "lowlight";
+        public static string Notable = "notable";
+    }
+
     public class RawDMR
     {
         public RawDMR()

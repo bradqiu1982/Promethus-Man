@@ -751,14 +751,39 @@ $(function () {
                         if (me != oldList){
                             delete oldList.$items[item.id];
                             me.$items[item.id] = item;
+                            if (me.$title[0].innerText.indexOf('DONE') != -1) {
+                                var mymoveurl = me.$globalOptions.actions.move;
+                                var myid = item.id;
+                                var myoldlist = oldList.$title[0].innerText;
+                                var mynewlist = me.$title[0].innerText;
 
-                            if (me.$globalOptions.actions.move) {
-                                 $.ajax(me.$globalOptions.actions.move, {
-                                    data: 'id=' + item.id + '&oldlist=' + oldList.$title[0].innerText + '&newlist=' + me.$title[0].innerText,
-                                    method: 'POST',
-                                    cache: false
+                                $('#reportmarkmodal').modal({ backdrop: 'static' });
+                                $('#reportmarkmodal').on('hide.bs.modal', function (e) {
+                                    var reportmark = document.getElementById("wkrptmarklist").value;
+                                    if (reportmark.indexOf('Please') != -1)
+                                    {
+                                        reportmark = '';
+                                    }
+                                    if (mymoveurl)
+                                    {
+                                        $.ajax(mymoveurl, {
+                                            data: 'id=' + myid + '&oldlist=' + myoldlist + '&newlist=' + mynewlist + '&reportmark=' + reportmark,
+                                            method: 'POST',
+                                            cache: false
+                                        });
+                                    }
                                 });
-                                }
+                            }
+                            else
+                            {
+                                if (me.$globalOptions.actions.move) {
+                                     $.ajax(me.$globalOptions.actions.move, {
+                                        data: 'id=' + item.id + '&oldlist=' + oldList.$title[0].innerText + '&newlist=' + me.$title[0].innerText,
+                                        method: 'POST',
+                                        cache: false
+                                    });
+                                    }
+                            }
                         }
 
                         me._triggerEvent('afterItemReorder', [me, oldList, currentIndex, oldIndex, item, $todo]);

@@ -1419,9 +1419,10 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        public ActionResult ProjectSptTask()
+        public ActionResult ProjectSptTask(string ProjectKey)
         {
-            var vm = IssueViewModels.RetrieveSptIssue(this);
+            //null is for qm, not null for parallel project
+            var vm = IssueViewModels.RetrieveSptIssue(this, ProjectKey);
             return View(vm);
         }
 

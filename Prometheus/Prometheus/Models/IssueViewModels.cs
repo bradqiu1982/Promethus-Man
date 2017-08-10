@@ -1205,28 +1205,39 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<IssueViewModels> RetrieveSptIssue(Controller ctrl)
+        public static List<IssueViewModels> RetrieveSptIssue(Controller ctrl,string ProjectKey)
         {
-            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples,APVal2,ErrAbbr,Creator,ModuleSN from Issue where APVal1 <> 'delete' and (Summary like '%<cond1>%' or Summary like '%<cond11>%' or Summary like '%<cond2>%' or Summary like '%<cond22>%') order by Resolution DESC,ReportDate DESC,ProjectKey";
-            sql = sql.Replace("<cond1>", CRITICALERRORTYPE.LYTTASK1.Replace("[","").Replace("]", "")).Replace("<cond2>",CRITICALERRORTYPE.SECONDMATCH1.Replace("[", "").Replace("]", ""))
+            var sql = string.Empty;
+            if (string.IsNullOrEmpty(ProjectKey))
+            {
+                sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples,APVal2,ErrAbbr,Creator,ModuleSN from Issue where APVal1 <> 'delete' and (Summary like '%<cond1>%' or Summary like '%<cond11>%' or Summary like '%<cond2>%' or Summary like '%<cond22>%') order by Resolution DESC,ReportDate DESC,ProjectKey";
+                sql = sql.Replace("<cond1>", CRITICALERRORTYPE.LYTTASK1.Replace("[","").Replace("]", "")).Replace("<cond2>",CRITICALERRORTYPE.SECONDMATCH1.Replace("[", "").Replace("]", ""))
                 .Replace("<cond11>", CRITICALERRORTYPE.LYTTASK.Replace("[", "").Replace("]", "")).Replace("<cond22>", CRITICALERRORTYPE.SECONDMATCH.Replace("[", "").Replace("]", ""));
+
+            }
+            else
+            {
+                sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples,APVal2,ErrAbbr,Creator,ModuleSN from Issue where APVal1 <> 'delete' and (Summary like '%<cond1>%' or Summary like '%<cond11>%' or Summary like '%<cond2>%' or Summary like '%<cond22>%') and ProjectKey = '<ProjectKey>' order by Resolution DESC,ReportDate DESC";
+                sql = sql.Replace("<cond1>", CRITICALERRORTYPE.LYTTASK1.Replace("[", "").Replace("]", "")).Replace("<cond2>", CRITICALERRORTYPE.SECONDMATCH1.Replace("[", "").Replace("]", ""))
+                .Replace("<cond11>", CRITICALERRORTYPE.LYTTASK.Replace("[", "").Replace("]", "")).Replace("<cond22>", CRITICALERRORTYPE.SECONDMATCH.Replace("[", "").Replace("]", "")).Replace("<ProjectKey>", ProjectKey);
+            }
 
             var ret = new List<IssueViewModels>();
 
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
-            if (dbret.Count > 0)
+            foreach (var line in dbret)
             {
-                var tempret = new IssueViewModels(Convert.ToString(dbret[0][0])
-                    , Convert.ToString(dbret[0][1]), Convert.ToString(dbret[0][2])
-                    , Convert.ToString(dbret[0][3]), Convert.ToString(dbret[0][4])
-                    , Convert.ToString(dbret[0][5]), Convert.ToString(dbret[0][6])
-                    , Convert.ToString(dbret[0][7]), Convert.ToString(dbret[0][8])
-                    , Convert.ToString(dbret[0][9]), Convert.ToString(dbret[0][10])
-                    , Convert.ToString(dbret[0][11]), Convert.ToString(dbret[0][12]));
-                tempret.LYT = Convert.ToString(dbret[0][13]);
-                tempret.ErrAbbr = Convert.ToString(dbret[0][14]);
-                tempret.Creator = Convert.ToString(dbret[0][15]);
-                tempret.ModuleSN = Convert.ToString(dbret[0][16]);
+                var tempret = new IssueViewModels(Convert.ToString(line[0])
+                    , Convert.ToString(line[1]), Convert.ToString(line[2])
+                    , Convert.ToString(line[3]), Convert.ToString(line[4])
+                    , Convert.ToString(line[5]), Convert.ToString(line[6])
+                    , Convert.ToString(line[7]), Convert.ToString(line[8])
+                    , Convert.ToString(line[9]), Convert.ToString(line[10])
+                    , Convert.ToString(line[11]), Convert.ToString(line[12]));
+                tempret.LYT = Convert.ToString(line[13]);
+                tempret.ErrAbbr = Convert.ToString(line[14]);
+                tempret.Creator = Convert.ToString(line[15]);
+                tempret.ModuleSN = Convert.ToString(line[16]);
                 tempret.RetrieveComment(ctrl);
                 tempret.RetrieveAttachment(tempret.IssueKey);
                 ret.Add(tempret);

@@ -173,7 +173,17 @@ namespace Prometheus.Models
                     + " and p.WorkflowBaseId is not null and p.WorkflowBaseId <> '0000000000000000' ";
                 sql = sql.Replace("<pncond>", pncond);
                 var dbret = DBUtility.ExeMESSqlWithRes(sql);
-               
+
+                if (dbret.Count == 0)
+                {
+                    sql = "select p.ProductId,s.WorkflowStepID, s.WorkflowStepName,s.WorkflowID,s.Sequence from InsiteDB.insite.WorkflowStep s (nolock) "
+                    + " left join InsiteDB.insite.Product p (nolock) on s.WorkflowID = p.WorkflowID"
+                    + " where (<pncond>) "
+                    + " and p.WorkflowId is not null and p.WorkflowId <> '0000000000000000' ";
+                    sql = sql.Replace("<pncond>", pncond);
+                    dbret = DBUtility.ExeMESSqlWithRes(sql);
+                }
+
                 foreach (var line in dbret)
                 {
                     try

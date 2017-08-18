@@ -636,6 +636,8 @@ namespace Prometheus.Models
 
                 RetrieveCummYield(ret, plist, pvm);
 
+                RetrieveSNYield(ret, plist, pvm);
+
                 if (ret.FirstYields.Count > 0)
                 {
                     ret.XKey = br;

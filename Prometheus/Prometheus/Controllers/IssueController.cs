@@ -3059,6 +3059,18 @@ namespace Prometheus.Controllers
                 {
                     SameAsDBTVM.StoreSameAsIssue(targetdata.IssueKey, tobedata.IssueKey, tobedata.ModuleSN);
                 }
+
+                if (targetdata.CommentList.Count > 0)
+                {
+                    var targetcomment = targetdata.CommentList[0];
+                    if (!targetcomment.Comment.Contains("<p>"))
+                    {
+                        targetcomment.Comment = targetcomment.Comment + "<p>&nbsp;</p>";
+                    }
+                    targetcomment.Comment = targetcomment.Comment + "<div class=\"col-lg-2\">" + "<a href=\"/Issue/UpdateIssue?issuekey=" + key + "\">" + tobedata.ModuleSN + "</a>" + "</div>";
+                    IssueViewModels.UpdateSPComment(targetcomment.IssueKey, targetcomment.CommentType, targetcomment.CommentDate.ToString(), targetcomment.dbComment);
+                }
+                
             }
 
             var pjdata = ProjectTestData.RetrieveProjectTestData(targetissuekey);

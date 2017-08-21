@@ -438,12 +438,27 @@
                                         }
                                     </div>
                                     <div class="col-lg-6 text-left">
-                                        @if (ViewBag.rparetoscript != null)
-                                        {
-                                            @Html.Raw(ViewBag.rparetoscript)
-                                            <div id="rparetochart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-                                        }
+                                        <div class="col-lg-6 text-left">
+                                            @if (ViewBag.fyparetoscript != null)
+                                            {
+                                                @Html.Raw(ViewBag.fyparetoscript)
+                                                <div id="fyparetochart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                                            }
+                                        </div>
                                     </div>
                         </div>
                     </div>
-}
+
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="col-lg-6 text-left">
+                                @if (ViewBag.rparetoscript != null)
+                                {
+                                    @Html.Raw(ViewBag.rparetoscript)
+                                    <div id="rparetochart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                                }
+                            </div>
+                            <div class="col-lg-6 text-left"></div>
+                        </div>
+                    </div>
+                                        }

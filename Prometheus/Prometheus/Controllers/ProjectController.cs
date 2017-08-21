@@ -2019,6 +2019,7 @@ namespace Prometheus.Controllers
 
                 var firstdatalist = new List<KeyValuePair<string, int>>();
                 var retestdatalist = new List<KeyValuePair<string, int>>();
+                var fytestdatalist = new List<KeyValuePair<string, int>>();
 
                 var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
                 var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, sdate.ToString(), edate.ToString(),pvm, HttpContext.Cache);
@@ -2126,6 +2127,39 @@ namespace Prometheus.Controllers
                         .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                 }
 
+                if (yieldvm.LastYields.Count > 0)
+                {
+                    var piedatadict = new Dictionary<string, int>();
+                    var eklist = new List<string>();
+                    foreach (var error in yieldvm.LErrorMap.Keys)
+                    {
+                        eklist.Add(error);
+                    }
+
+                    foreach (var error in eklist)
+                    {
+                        if (string.Compare(error, "PASS", true) != 0)
+                        {
+                            foreach (var test in yieldvm.LastYields)
+                            {
+                                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.LErrorMap);
+
+                                if (piedatadict.ContainsKey(error))
+                                {
+                                    var preval = piedatadict[error];
+                                    piedatadict[error] = preval + val;
+                                }
+                                else
+                                {
+                                    piedatadict.Add(error, val);
+                                }
+                            }
+                        }
+                    }
+
+                    fytestdatalist = piedatadict.ToList();
+                }
+
                 if (firstdatalist.Count > 0)
                 {
                     firsttestparetofun(firstdatalist, ProjectKey);
@@ -2134,6 +2168,11 @@ namespace Prometheus.Controllers
                 if (retestdatalist.Count > 0)
                 {
                     retestparetofun(retestdatalist, ProjectKey);
+                }
+
+                if (fytestdatalist.Count > 0)
+                {
+                    fytparetofun(fytestdatalist, ProjectKey);
                 }
 
                 return View(yieldvm);
@@ -2761,6 +2800,7 @@ namespace Prometheus.Controllers
                 var sdate = edate.AddDays(-1);
                 var firstdatalist = new List<KeyValuePair<string, int>>();
                 var retestdatalist = new List<KeyValuePair<string, int>>();
+                var fytestdatalist = new List<KeyValuePair<string, int>>();
 
                 var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
                 var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, sdate.ToString(), edate.ToString(), pvm, HttpContext.Cache);
@@ -2919,6 +2959,39 @@ namespace Prometheus.Controllers
                         .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                 }
 
+                if (yieldvm.LastYields.Count > 0)
+                {
+                    var piedatadict = new Dictionary<string, int>();
+                    var eklist = new List<string>();
+                    foreach (var error in yieldvm.LErrorMap.Keys)
+                    {
+                        eklist.Add(error);
+                    }
+
+                    foreach (var error in eklist)
+                    {
+                        if (string.Compare(error, "PASS", true) != 0)
+                        {
+                            foreach (var test in yieldvm.LastYields)
+                            {
+                                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.LErrorMap);
+
+                                if (piedatadict.ContainsKey(error))
+                                {
+                                    var preval = piedatadict[error];
+                                    piedatadict[error] = preval + val;
+                                }
+                                else
+                                {
+                                    piedatadict.Add(error, val);
+                                }
+                            }
+                        }
+                    }
+
+                    fytestdatalist = piedatadict.ToList();
+                }
+
                 if (firstdatalist.Count > 0)
                 {
                     firsttestparetofun(firstdatalist, ProjectKey);
@@ -2927,6 +3000,11 @@ namespace Prometheus.Controllers
                 if (retestdatalist.Count > 0)
                 {
                     retestparetofun(retestdatalist, ProjectKey);
+                }
+
+                if (fytestdatalist.Count > 0)
+                {
+                    fytparetofun(fytestdatalist, ProjectKey);
                 }
 
                 return View(yieldvm);
@@ -2955,6 +3033,7 @@ namespace Prometheus.Controllers
 
                 var firstdatalist = new List<KeyValuePair<string, int>>();
                 var retestdatalist = new List<KeyValuePair<string, int>>();
+                var fytestdatalist = new List<KeyValuePair<string, int>>();
 
                 var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
                 var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, sdate.ToString(), edate.ToString(), pvm, HttpContext.Cache);
@@ -3113,6 +3192,39 @@ namespace Prometheus.Controllers
                         .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                 }
 
+                if (yieldvm.LastYields.Count > 0)
+                {
+                    var piedatadict = new Dictionary<string, int>();
+                    var eklist = new List<string>();
+                    foreach (var error in yieldvm.LErrorMap.Keys)
+                    {
+                        eklist.Add(error);
+                    }
+
+                    foreach (var error in eklist)
+                    {
+                        if (string.Compare(error, "PASS", true) != 0)
+                        {
+                            foreach (var test in yieldvm.LastYields)
+                            {
+                                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.LErrorMap);
+
+                                if (piedatadict.ContainsKey(error))
+                                {
+                                    var preval = piedatadict[error];
+                                    piedatadict[error] = preval + val;
+                                }
+                                else
+                                {
+                                    piedatadict.Add(error, val);
+                                }
+                            }
+                        }
+                    }
+
+                    fytestdatalist = piedatadict.ToList();
+                }
+
                 if (firstdatalist.Count > 0)
                 {
                     firsttestparetofun(firstdatalist, ProjectKey);
@@ -3121,6 +3233,11 @@ namespace Prometheus.Controllers
                 if (retestdatalist.Count > 0)
                 {
                     retestparetofun(retestdatalist, ProjectKey);
+                }
+
+                if (fytestdatalist.Count > 0)
+                {
+                    fytparetofun(fytestdatalist, ProjectKey);
                 }
 
                 return View(yieldvm);
@@ -3275,6 +3392,7 @@ namespace Prometheus.Controllers
                 {
                     var firstdatalist = new List<KeyValuePair<string, int>>();
                     var retestdatalist = new List<KeyValuePair<string, int>>();
+                    var fytestdatalist = new List<KeyValuePair<string, int>>();
 
                     var yieldvm = vmlist[0];
 
@@ -3432,6 +3550,38 @@ namespace Prometheus.Controllers
                             .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                     }
 
+                    if (yieldvm.LastYields.Count > 0)
+                    {
+                        var piedatadict = new Dictionary<string, int>();
+                        var eklist = new List<string>();
+                        foreach (var error in yieldvm.LErrorMap.Keys)
+                        {
+                            eklist.Add(error);
+                        }
+
+                        foreach (var error in eklist)
+                        {
+                            if (string.Compare(error, "PASS", true) != 0)
+                            {
+                                foreach (var test in yieldvm.LastYields)
+                                {
+                                    var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.LErrorMap);
+
+                                    if (piedatadict.ContainsKey(error))
+                                    {
+                                        var preval = piedatadict[error];
+                                        piedatadict[error] = preval + val;
+                                    }
+                                    else
+                                    {
+                                        piedatadict.Add(error, val);
+                                    }
+                                }
+                            }
+                        }
+
+                        fytestdatalist = piedatadict.ToList();
+                    }
 
                     if (firstdatalist.Count > 0)
                     {
@@ -3441,6 +3591,11 @@ namespace Prometheus.Controllers
                     if (retestdatalist.Count > 0)
                     {
                         retestparetofun(retestdatalist, ProjectKey);
+                    }
+
+                    if (fytestdatalist.Count > 0)
+                    {
+                        fytparetofun(fytestdatalist, ProjectKey);
                     }
 
                     return View(yieldvm);
@@ -3835,6 +3990,115 @@ namespace Prometheus.Controllers
             }
         }
 
+        private void fytparetofun(List<KeyValuePair<string, int>> retestdatalist, string ProjectKey)
+        {
+            if (retestdatalist.Count > 0)
+            {
+                var peralist = new List<ParetoData>();
+
+                if (retestdatalist.Count > 1)
+                {
+                    retestdatalist.Sort(delegate (KeyValuePair<string, int> pair1, KeyValuePair<string, int> pair2)
+                    {
+                        return pair2.Value.CompareTo(pair1.Value);
+                    });
+                }
+
+                var sum = 0;
+                for (var i = 0; i < retestdatalist.Count; i++)
+                {
+                    sum = sum + retestdatalist[i].Value;
+                }
+
+                var otherpercent = 0.0;
+
+                for (var i = 0; i < retestdatalist.Count; i++)
+                {
+                    if (retestdatalist.Count > 5 && peralist.Count > 0 && peralist[peralist.Count - 1].sumpercent > 0.95)
+                    {
+                        otherpercent = otherpercent + retestdatalist[i].Value / (double)sum;
+                        if (i == (retestdatalist.Count - 1))
+                        {
+                            var tempperato = new ParetoData();
+                            tempperato.key = "Other";
+                            tempperato.count = (int)(otherpercent * sum);
+                            tempperato.percent = otherpercent;
+                            tempperato.sumpercent = 1.0;
+                            peralist.Add(tempperato);
+                        }
+                    }
+                    else
+                    {
+                        var tempperato = new ParetoData();
+                        tempperato.key = retestdatalist[i].Key;
+                        if (i == 0)
+                        {
+                            tempperato.count = retestdatalist[i].Value;
+                            tempperato.percent = tempperato.count / (double)sum;
+                            tempperato.sumpercent = tempperato.percent;
+                            peralist.Add(tempperato);
+                        }
+                        else
+                        {
+                            tempperato.count = retestdatalist[i].Value;
+                            tempperato.percent = tempperato.count / (double)sum;
+                            tempperato.sumpercent = peralist[peralist.Count - 1].sumpercent + tempperato.percent;
+                            peralist.Add(tempperato);
+                        }
+                    }
+                }
+
+                //xaxis
+                var ChartxAxisValues = "";
+
+                foreach (var item in peralist)
+                {
+                    ChartxAxisValues = ChartxAxisValues + "'" + item.key + "',";
+                }
+                ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
+
+
+                //yaxis
+                //var ChartSearies = "{name:'Defect',data:[<fvalue>]}";
+
+                var pcountvalue = "";
+                foreach (var item in peralist)
+                {
+                    pcountvalue = pcountvalue + item.count.ToString() + ",";
+                }
+                pcountvalue = pcountvalue.Substring(0, pcountvalue.Length - 1);
+
+                var ppecentvalue = "";
+                foreach (var item in peralist)
+                {
+                    ppecentvalue = ppecentvalue + (item.sumpercent * 100).ToString("0.0") + ",";
+                }
+                ppecentvalue = ppecentvalue.Substring(0, ppecentvalue.Length - 1);
+
+                var abpecentvalue = "";
+                foreach (var item in peralist)
+                {
+                    abpecentvalue = abpecentvalue + (item.percent * 100).ToString("0.0") + ",";
+                }
+                abpecentvalue = abpecentvalue.Substring(0, abpecentvalue.Length - 1);
+
+                //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
+
+                var reurl = "window.location.href = '/Project/ProjectErrAbbr?ProjectKey=" + ProjectKey + "'" + "+'&ErrAbbr='+this.category";
+
+                var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ParetoChart.xml"));
+                ViewBag.fyparetoscript = tempscript.Replace("#ElementID#", "fyparetochart")
+                    .Replace("#Title#", "Pareto of Final Yield Defect")
+                    .Replace("#XAxisTitle#", "Defect")
+                    .Replace("#ChartxAxisValues#", ChartxAxisValues)
+                    .Replace("#AmountMAX#", sum.ToString())
+                    .Replace("#PCount#", pcountvalue)
+                    .Replace("#ABPercent#", abpecentvalue)
+                    .Replace("#PPercent#", ppecentvalue)
+                    .Replace("#REDIRECTURL#", reurl);
+            }
+        }
+
         public ActionResult ProjectPYieldDetail(string ProjectKey, string StartDate, string EndDate)
         {
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(StartDate) && !string.IsNullOrEmpty(EndDate))
@@ -3844,6 +4108,7 @@ namespace Prometheus.Controllers
 
                 var firstdatalist = new List<KeyValuePair<string, int>>();
                 var retestdatalist = new List<KeyValuePair<string, int>>();
+                var fytestdatalist = new List<KeyValuePair<string, int>>();
 
                 var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
                 var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, StartDate, EndDate, pvm, HttpContext.Cache);
@@ -4002,6 +4267,39 @@ namespace Prometheus.Controllers
                         .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                 }
 
+                if (yieldvm.LastYields.Count > 0)
+                {
+                    var piedatadict = new Dictionary<string, int>();
+                    var eklist = new List<string>();
+                    foreach (var error in yieldvm.LErrorMap.Keys)
+                    {
+                        eklist.Add(error);
+                    }
+
+                    foreach (var error in eklist)
+                    {
+                        if (string.Compare(error, "PASS", true) != 0)
+                        {
+                            foreach (var test in yieldvm.LastYields)
+                            {
+                                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.LErrorMap);
+
+                                if (piedatadict.ContainsKey(error))
+                                {
+                                    var preval = piedatadict[error];
+                                    piedatadict[error] = preval + val;
+                                }
+                                else
+                                {
+                                    piedatadict.Add(error, val);
+                                }
+                            }
+                        }
+                    }
+
+                    fytestdatalist = piedatadict.ToList();
+                }
+
                 if (firstdatalist.Count > 0)
                 {
                     firsttestparetofun(firstdatalist, ProjectKey);
@@ -4010,6 +4308,11 @@ namespace Prometheus.Controllers
                 if (retestdatalist.Count > 0)
                 {
                     retestparetofun(retestdatalist, ProjectKey);
+                }
+
+                if (fytestdatalist.Count > 0)
+                {
+                    fytparetofun(fytestdatalist, ProjectKey);
                 }
 
                 return View(yieldvm);

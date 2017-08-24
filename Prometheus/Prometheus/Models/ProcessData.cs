@@ -567,21 +567,24 @@ namespace Prometheus.Models
                     }
                     namecond = namecond.Substring(0, namecond.Length - 2);
 
-                    sql = "select MoveOutQty,MoveInQty,WorkflowStepName,TxnTypeName,ContainerName,Comments from ProjectMoveHistory where MfgOrderName like '%<MfgName>%' and WorkflowStepName in (<namecond>) order by Sequence ASC";
+                    sql = "select MoveOutQty,MoveInQty,WorkflowStepName,TxnTypeName,ContainerName,Comments from ProjectMoveHistory where MfgOrderName like '%<MfgName>%' and WorkflowStepName in (<namecond>)  order by MoveOutTime desc";
                     sql = sql.Replace("<MfgName>", MfgName).Replace("<namecond>", namecond);
                 }
                 else
                 {
-                    sql = "select MoveOutQty,MoveInQty,WorkflowStepName,TxnTypeName,ContainerName,Comments from ProjectMoveHistory where MfgOrderName like '%<MfgName>%' order by Sequence ASC";
+                    sql = "select MoveOutQty,MoveInQty,WorkflowStepName,TxnTypeName,ContainerName,Comments from ProjectMoveHistory where MfgOrderName like '%<MfgName>%'  order by MoveOutTime desc";
                     sql = sql.Replace("<MfgName>", MfgName);
                 }
 
             }
             else
             {
-                sql = "select MoveOutQty,MoveInQty,WorkflowStepName,TxnTypeName,ContainerName,Comments from ProjectMoveHistory where MfgOrderName like '%<MfgName>%' order by Sequence ASC";
+                sql = "select MoveOutQty,MoveInQty,WorkflowStepName,TxnTypeName,ContainerName,Comments from ProjectMoveHistory where MfgOrderName like '%<MfgName>%'  order by MoveOutTime desc";
                 sql = sql.Replace("<MfgName>", MfgName);
             }
+
+            var filterdict = new Dictionary<string, bool>();
+
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
             {
@@ -593,7 +596,12 @@ namespace Prometheus.Models
                 tempmove.TxnTypeName = Convert.ToInt32(line[3]);
                 tempmove.ContainerName = Convert.ToString(line[4]);
                 tempmove.Comments = Convert.ToString(line[5]);
-                ret.Add(tempmove);
+
+                if (!filterdict.ContainsKey(tempmove.ContainerName + "-" + tempmove.WorkflowStepName))
+                {
+                    filterdict.Add(tempmove.ContainerName + "-" + tempmove.WorkflowStepName, true);
+                    ret.Add(tempmove);
+                }
             }
             return ret;
         }
@@ -681,21 +689,23 @@ namespace Prometheus.Models
                     }
                     namecond = namecond.Substring(0, namecond.Length - 2);
 
-                    sql = "select MoveOutQty,MoveInQty,WorkflowStepName,TxnTypeName,ContainerName,Comments from ProjectMoveHistory where ProjectKey = '<ProjectKey>' and  MoveOutTime >= '<starttime>' and MoveOutTime <= '<endtime>'  and WorkflowStepName in (<namecond>)";
+                    sql = "select MoveOutQty,MoveInQty,WorkflowStepName,TxnTypeName,ContainerName,Comments from ProjectMoveHistory where ProjectKey = '<ProjectKey>' and  MoveOutTime >= '<starttime>' and MoveOutTime <= '<endtime>'  and WorkflowStepName in (<namecond>)  order by MoveOutTime desc";
                     sql = sql.Replace("<ProjectKey>", PJKey).Replace("<starttime>", starttime).Replace("<endtime>", endtime).Replace("<namecond>", namecond);
                 }
                 else
                 {
-                    sql = "select MoveOutQty,MoveInQty,WorkflowStepName,TxnTypeName,ContainerName,Comments from ProjectMoveHistory where  ProjectKey = '<ProjectKey>' and  MoveOutTime >= '<starttime>' and MoveOutTime <= '<endtime>'";
+                    sql = "select MoveOutQty,MoveInQty,WorkflowStepName,TxnTypeName,ContainerName,Comments from ProjectMoveHistory where  ProjectKey = '<ProjectKey>' and  MoveOutTime >= '<starttime>' and MoveOutTime <= '<endtime>'  order by MoveOutTime desc";
                     sql = sql.Replace("<ProjectKey>", PJKey).Replace("<starttime>", starttime).Replace("<endtime>", endtime);
                 }
 
             }
             else
             {
-                sql = "select MoveOutQty,MoveInQty,WorkflowStepName,TxnTypeName,ContainerName,Comments from ProjectMoveHistory where  ProjectKey = '<ProjectKey>' and  MoveOutTime >= '<starttime>' and MoveOutTime <= '<endtime>'";
+                sql = "select MoveOutQty,MoveInQty,WorkflowStepName,TxnTypeName,ContainerName,Comments from ProjectMoveHistory where  ProjectKey = '<ProjectKey>' and  MoveOutTime >= '<starttime>' and MoveOutTime <= '<endtime>' order by MoveOutTime desc";
                 sql = sql.Replace("<ProjectKey>", PJKey).Replace("<starttime>", starttime).Replace("<endtime>", endtime);
             }
+
+            var filterdict = new Dictionary<string, bool>();
 
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
@@ -708,7 +718,12 @@ namespace Prometheus.Models
                 tempmove.TxnTypeName = Convert.ToInt32(line[3]);
                 tempmove.ContainerName = Convert.ToString(line[4]);
                 tempmove.Comments = Convert.ToString(line[5]);
-                ret.Add(tempmove);
+
+                if (!filterdict.ContainsKey(tempmove.ContainerName + "-" + tempmove.WorkflowStepName))
+                {
+                    filterdict.Add(tempmove.ContainerName + "-" + tempmove.WorkflowStepName, true);
+                    ret.Add(tempmove);
+                }
             }
             return ret;
         }

@@ -238,6 +238,7 @@ namespace Prometheus.Models
                     ret.Add(DateTime.Parse(temptimepoint.ToString("yyyy-MM-dd") + " 07:30:00"));
                 }
             }
+
             return ret;
         }
 
@@ -512,7 +513,19 @@ namespace Prometheus.Models
             ret.EndDate = DateTime.Parse(edate);
 
             var startdate = DateTime.Parse(DateTime.Parse(sdate).ToString("yyyy-MM-dd") + " 07:30:00").ToString();
-            var enddate = DateTime.Parse(DateTime.Parse(edate).ToString("yyyy-MM-dd") + " 07:30:00").ToString();
+            var enddate = string.Empty;
+
+            var tend = DateTime.Parse(edate);
+            if (tend > DateTime.Now
+                || string.Compare(tend.ToString("yyyy-MM-dd"), DateTime.Now.ToString("yyyy-MM-dd")) == 0)
+            {
+                tend = DateTime.Now;
+                enddate = tend.ToString();
+            }
+            else
+            {
+                enddate = DateTime.Parse(DateTime.Parse(edate).ToString("yyyy-MM-dd") + " 07:30:00").ToString();
+            }
 
             if (startdate == enddate)
             {
@@ -530,7 +543,7 @@ namespace Prometheus.Models
             var enddatet = DateTime.Parse(enddate);
             foreach (var item in datatfromstart)
             {
-                if (enddatet >= item.TestTimeStamp)
+                if (item.TestTimeStamp <= enddatet)
                 {
                     datawithstartend.Add(item);
                 }

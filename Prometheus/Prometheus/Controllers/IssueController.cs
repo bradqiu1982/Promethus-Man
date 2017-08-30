@@ -1681,7 +1681,7 @@ namespace Prometheus.Controllers
                     //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
                     vm.CloseIssue();
 
-                    if (vm.Summary.Contains(CRITICALERRORTYPE.LYTTASK)|| vm.Summary.Contains(CRITICALERRORTYPE.LYTTASK1))
+                    if (realissue.Summary.Contains(CRITICALERRORTYPE.LYTTASK)|| realissue.Summary.Contains(CRITICALERRORTYPE.LYTTASK1))
                     {
                         if (!issuetag.Contains(CRITICALERRORTYPE.CRITICALERRORTAG))
                         {

@@ -202,6 +202,17 @@ namespace Prometheus.Models
         {
             ModuleSN = "";
             ErrAbbr = "";
+            Summary = "";
+            ProjectKey = "";
+            IssueKey = "";
+            IssueType = "";
+            Summary = "";
+            Priority = "";
+            Assignee = "";
+            Reporter = "";
+            Resolution = "";
+            ParentIssueKey = "";
+            RelativePeoples = "";
         }
 
         public IssueViewModels(string pk,string ik,string it,string sum,string pri,string ddate,string rsdate,string rtdate,string assign,string rt,string resolute,string pik,string rpeople)

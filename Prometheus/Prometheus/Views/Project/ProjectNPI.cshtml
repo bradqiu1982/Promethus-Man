@@ -62,7 +62,7 @@
                     <div class="col-lg-2 text-left">@item.DueDate.ToString("yyyy-MM-dd")</div>
                     <div class="col-lg-2 text-left"></div>
                     <div class="col-lg-1 text-left">
-                        @if (item.AttachList.Count > 0 && ViewBag.authrized)
+                        @if (item.AttachList.Count > 0)
                         {
                             <a href="/Issue/IssueAttach?issuekey=@item.IssueKey" target="_blank">
                                 <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>

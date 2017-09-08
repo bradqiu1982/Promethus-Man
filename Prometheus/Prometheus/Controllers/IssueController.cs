@@ -1282,9 +1282,21 @@ namespace Prometheus.Controllers
             {
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
                 ViewBag.isassignee = false;
+
+                var pj = ProjectViewModels.RetrieveOneProject(ret.ProjectKey);
+                if (pj != null) {
+                    foreach (var item in pj.MemberList)
+                    {
+                        if (string.Compare(updater, item.Name, true) == 0)
+                        {
+                            ViewBag.isassignee = true;
+                        }
+                    }
+                }
+
                 if (string.Compare(updater, ret.Assignee, true) == 0
-                        || string.Compare(updater, ret.Reporter, true) == 0
-                        || string.Compare(updater, ret.Creator, true) == 0)
+                    || string.Compare(updater, ret.Reporter, true) == 0
+                    || string.Compare(updater, ret.Creator, true) == 0)
                 {
                     ViewBag.isassignee = true;
                 }
@@ -1329,9 +1341,22 @@ namespace Prometheus.Controllers
             var issuekey = Request.Form["IssueKey"];
             var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey,this);
 
+            var pjmemauth = false;
+            var pj = ProjectViewModels.RetrieveOneProject(originaldata.ProjectKey);
+            if (pj != null)
+            {
+                foreach (var item in pj.MemberList)
+                {
+                    if (string.Compare(updater, item.Name, true) == 0)
+                    {
+                        pjmemauth = true;
+                    }
+                }
+            }
+
             if (Request.Form["deleteisu"] != null)
             {
-                if (string.Compare(updater, originaldata.Reporter, true) == 0
+                if (pjmemauth || string.Compare(updater, originaldata.Reporter, true) == 0
                     || string.Compare(updater, originaldata.Assignee, true) == 0
                     || string.Compare(updater, originaldata.Creator, true) == 0)
                 {
@@ -1345,7 +1370,7 @@ namespace Prometheus.Controllers
 
             if (Request.Form["linkisu"] != null)
             {
-                if (string.Compare(updater, originaldata.Reporter, true) == 0
+                if (pjmemauth || string.Compare(updater, originaldata.Reporter, true) == 0
                     || string.Compare(updater, originaldata.Assignee, true) == 0)
                 {
                     var errabbr = "";
@@ -1501,7 +1526,7 @@ namespace Prometheus.Controllers
             vm.Priority = Request.Form["prioritylist"].ToString();
             vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
 
-            if (string.Compare(originaldata.Reporter, updater, true) == 0
+            if (pjmemauth || string.Compare(originaldata.Reporter, updater, true) == 0
                 || string.Compare(originaldata.Assignee, updater, true) == 0
                 || string.Compare(originaldata.Creator, updater, true) == 0)
             {
@@ -1661,7 +1686,7 @@ namespace Prometheus.Controllers
 
             //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Updated", originaldata.Summary, originaldata.IssueKey);
 
-            if (string.Compare(originaldata.Assignee, vm.Assignee, true) != 0)
+            if (pjmemauth || string.Compare(originaldata.Assignee, vm.Assignee, true) != 0)
             {
                 vm.UpdateIAssign();
                 //ProjectEvent.AssignIssueEvent(originaldata.ProjectKey, updater, vm.Assignee, originaldata.Summary, originaldata.IssueKey);

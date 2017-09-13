@@ -2414,7 +2414,7 @@ namespace Prometheus.Models
             var tracestrs = filename.Split(new string[] { "_TRACEVIEW_" }, StringSplitOptions.RemoveEmptyEntries);
             if (tracestrs.Length > 1)
             {
-                var dutstrs = tracestrs[1].Split(new string[] { "_DUTORDERED_" }, StringSplitOptions.RemoveEmptyEntries);
+                var dutstrs = tracestrs[1].Split(new string[] { "_DUT" }, StringSplitOptions.RemoveEmptyEntries);
                 var timestr = dutstrs[0].Replace("_", "").Replace(" ", "");
                 return timestr.Substring(0, 4) + "-" + timestr.Substring(4, 2) + "-" + timestr.Substring(6, 2) + " " + timestr.Substring(8, 2) + ":" + timestr.Substring(10, 2) + ":" + timestr.Substring(12, 2);
             }
@@ -2548,6 +2548,45 @@ namespace Prometheus.Models
                     }
                 }//end if
             }//end foreach
+
+            if (ret.Count == 0)
+            {
+                foreach (var srcf in allsrcfiles)
+                {
+                    var filename = Path.GetFileName(srcf).ToUpper();
+
+                    if (filename.Contains(sn.ToUpper())
+                        && filename.Contains(whichtest.ToUpper())
+                        && filename.Contains("_DUT")
+                        && filename.Contains("_TRACEVIEW_"))
+                    {
+                        var traceviewtimestr = RetrieveTimeFromTraceViewName(filename);
+                        if (traceviewtimestr == null)
+                            continue;
+
+                        try
+                        {
+                            var traceviewtime = DateTime.Parse(traceviewtimestr);
+                            var dbtime = DateTime.Parse(dbtimestr);
+                            if (traceviewtime > dbtime.AddSeconds(-5) && traceviewtime < dbtime.AddSeconds(5))
+                            {
+                                logthdinfo("\r\nStart to copy file: " + srcf);
+                                var desfile = imgdir + filename;
+                                FileCopy(ctrl, srcf, desfile, true);
+                                if (FileExist(ctrl, desfile))
+                                {
+                                    logthdinfo("try to add data from file: " + desfile);
+                                    ret.Add(desfile);
+                                }//copied file exist
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            logthdinfo("LoadTraceView2Local Exception: " + ex.Message);
+                        }
+                    }//end if
+                }//end foreach
+            }//end if ret == 0
 
             return ret;
         }

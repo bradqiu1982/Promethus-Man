@@ -2421,7 +2421,7 @@ namespace Prometheus.Models
             return null;
         }
 
-        public static List<TraceViewData> RetrieveTestDataFromTraceView(string filename,string testcase,string datafield)
+        private static List<TraceViewData> RetrieveTestDataFromTraceView_DUTORDERED(string filename, string testcase, string datafield)
         {
             var ret = new List<TraceViewData>();
 
@@ -2497,6 +2497,97 @@ namespace Prometheus.Models
 
             }//end foreach
             return ret;
+        }
+
+        private static List<TraceViewData> RetrieveTestDataFromTraceView_DUTx(string filename, string testcase, string datafield)
+        {
+            var ret = new List<TraceViewData>();
+
+            if (!File.Exists(filename))
+                return ret;
+
+            var allline = System.IO.File.ReadAllLines(filename);
+            var crttemp = 25.0;
+            var crtch = 0;
+
+            var entertestcase = false;
+
+            foreach (var line in allline)
+            {
+                var uline = line.ToUpper();
+
+                if ((string.Compare(testcase, "ALL", true) == 0)
+                    || (uline.Contains(testcase.ToUpper()) && uline.Contains("STARTED")))
+                {
+                    entertestcase = true;
+                    if (uline.Contains("C ---") && uline.Contains("@"))
+                    {
+                        var head = uline.Split(new string[] { "C ---" }, StringSplitOptions.RemoveEmptyEntries);
+                        var tempstrs = head[0].Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries);
+                        if (tempstrs.Length > 1)
+                        {
+                            try
+                            {
+                                crttemp = Convert.ToDouble(tempstrs[1].Trim());
+                            }
+                            catch (Exception ex) { }
+                        }
+                    }
+                }//end if
+
+                if (uline.Contains(testcase.ToUpper()) && uline.Contains("COMPLETED"))
+                {
+                    entertestcase = false;
+                }
+
+                if (string.Compare(testcase, "ALL", true) == 0)
+                {
+                    entertestcase = true;
+                }
+
+                if (entertestcase && line.Contains("--- ") && uline.Contains(" " + datafield.ToUpper() + " "))
+                {
+                    var fields = uline.Split(new string[] { " " + datafield.ToUpper() + " " }, StringSplitOptions.RemoveEmptyEntries);
+                    if (fields.Length > 1)
+                    {
+                        //var chstr = fields[0].Replace("\t", "").Replace(" ", "").Replace("[", "").Replace("]", "").Replace("-", "");
+                        //try
+                        //{ crtch = Convert.ToInt32(chstr); }
+                        //catch (Exception ex) { }
+
+                        var tmpvaluestr = fields[1].Trim();
+                        var tmpvals = tmpvaluestr.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                        try
+                        {
+                            if (!tmpvals[0].Contains("<NM>"))
+                            {
+                                var tempval = Convert.ToDouble(tmpvals[0]);
+                                var temptraceviewdata = new TraceViewData();
+                                temptraceviewdata.Temp = crttemp;
+                                temptraceviewdata.CH = crtch;
+                                temptraceviewdata.Value = tempval;
+                                ret.Add(temptraceviewdata);
+                            }
+                        }
+                        catch (Exception ex) { }
+                    }//end if
+                }//en if
+
+            }//end foreach
+            return ret;
+        }
+
+
+        public static List<TraceViewData> RetrieveTestDataFromTraceView(string filename,string testcase,string datafield)
+        {
+            if (filename.ToUpper().Contains("_DUTORDERED_"))
+            {
+                return RetrieveTestDataFromTraceView_DUTORDERED(filename, testcase, datafield);
+            }
+            else
+            {
+                return RetrieveTestDataFromTraceView_DUTx(filename, testcase, datafield);
+            }
         }
 
         public static List<string> LoadTraceView2Local(string tester, string sn, string whichtest, string dbtimestr, Controller ctrl)

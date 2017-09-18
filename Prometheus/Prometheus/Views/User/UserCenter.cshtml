@@ -4,60 +4,64 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@*<div class="row">
-    <div class="col-lg-12">&nbsp;</div>
+<div class="row uc-header">
+    <h2>@ViewBag.UserName Center</h2>
 </div>
-
-<div class="row">
-    <div class="col-lg-12">&nbsp;</div>
-</div>*@
-
-<div class="row">
-    <div class="col-lg-12">
-        <h2>@ViewBag.UserName Center</h2>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-lg-12">&nbsp;</div>
-</div>
-
-<div class="row" data-toggle="modal" data-target="#myModal">
-    <div class="col-lg-1"></div>
-    <div class="col-lg-2">
-        <div class="row"><a href="/User/Assign2Me?username=@(ViewBag.RealUserID)"><img src="~/Content/images/usercenter/Assign2Me.png" MYTP="HOVER" style="height:158px; width:158px" data-intro = "Tasks you need to do."  data-step="1" ></a></div>
+<div class="row uc-content" data-toggle="modal" data-target="#myModal">
+    <div class="uc-column uc-column-first">
         <div class="row">
-            <div class="col-lg-1"></div>
-            <div class="col-lg-10">
-                <div class="well" style="background-color:white;border-left-color:#006DC0;border-top-color:snow;border-right-color:white;border-bottom-color:white;border-top-left-radius:0px;border-bottom-left-radius:0px">
-                    <div class="row">Pending&nbsp;&nbsp;&nbsp;&nbsp;@(ViewBag.pendinglist.Count)</div>
-                    <div class="row">Working&nbsp;&nbsp;&nbsp;&nbsp;@(ViewBag.workinglist.Count)</div>
-                </div>
+            <a href="/User/Assign2Me?username=@(ViewBag.RealUserID)">
+                <img src="~/Content/images/usercenter/Assign2Me.png" MYTP="HOVER" 
+                     height="158" width="158" data-intro = "Tasks you need to do."  data-step="1" >
+            </a>
+        </div>
+        <div class="row">
+            <div class="uc-column-first-detail">
+                <div>Pending<span class="span-cnt">@(ViewBag.pendinglist.Count)</span></div>
+                <div>Working<span class="span-cnt">@(ViewBag.workinglist.Count)</span></div>
             </div>
-            <div class="col-lg-1"></div>
         </div>
     </div>
-    <div class="col-lg-1"></div>
-    <div class="col-lg-2">
-        <div class="row"><a href="/User/IAssigned?username=@(ViewBag.RealUserID)"><img src="~/Content/images/usercenter/IAssigned.png" MYTP="HOVER" style="height:158px; width:158px" data-intro = "Assigned task to others."  data-step="2" ></a></div>
-        <div class="row">&nbsp;</div>
-        <div class="row"><a href="/User/ILearn"><img src="~/Content/images/usercenter/ILearn.png" MYTP="HOVER" style="height:158px; width:158px" data-intro = "Knowledge need to learn."  data-step="3" ></a></div>
+    <div class="uc-column">
+        <div class="row">
+            <a href="/User/IAssigned?username=@(ViewBag.RealUserID)">
+                <img src="~/Content/images/usercenter/IAssigned.png" MYTP="HOVER" 
+                     height="158" width="158" data-intro = "Assigned task to others."  data-step="2" >
+            </a>
+        </div>
+        <div class="row">
+            <a href="/User/ILearn">
+                <img src="~/Content/images/usercenter/ILearn.png" MYTP="HOVER" 
+                     height="158" width="158" data-intro = "Knowledge need to learn."  data-step="3" >
+            </a>
+        </div>
     </div>
-    <div class="col-lg-1"></div>
-    <div class="col-lg-2">
-        <div class="row"><a href="/Project/ViewAll"><img class="img" src="~/Content/images/usercenter/IProject.png" MYTP="HOVER" style="height:158px; width:158px" data-intro = "Show all projects you have link."  data-step="4"></a></div>
-        <div class="row">&nbsp;</div>
-        <div class="row"><a href="/User/ITag"><img src="~/Content/images/usercenter/ITag.png" MYTP="HOVER" style="height:158px; width:158px" data-intro = "Add tag for projects or technicals."  data-step="5" ></a></div>
-        @*<div class="row"><a href="/User/MyStatus?username=@(ViewBag.RealUserID)"><img src="~/Content/images/usercenter/MyStatus.png" MYTP="HOVER" style="height:158px; width:158px"></a></div>*@
+    <div class="uc-column">
+        <div class="row">
+            <a href="/Project/ViewAll">
+                <img class="img" src="~/Content/images/usercenter/IProject.png" MYTP="HOVER" 
+                     height="158" width="158" data-intro = "Show all projects you have link."  data-step="4">
+            </a>
+        </div>
+        <div class="row">
+            <a href="/User/ITag">
+                <img src="~/Content/images/usercenter/ITag.png" MYTP="HOVER" 
+                     height="158" width="158" data-intro = "Add tag for projects or technicals."  data-step="5" >
+            </a>
+        </div>
     </div>
-    <div class="col-lg-1"></div>
-    <div class="col-lg-2">
-        <div class="row"><a href="/User/IBLOG"><img src="~/Content/images/usercenter/IBlog.png" MYTP="HOVER" style="height:158px; width:158px" data-intro = "Just a blog, you can record some information here."  data-step="6" ></a></div>
-        <div class="row">&nbsp;</div>
-        <div class="row" data-toggle="tooltip" title="IKPI"><a href="/User/IKPI"><img src="~/Content/images/usercenter/IKPI.png" MYTP="HOVER" style="height:158px; width:158px" data-intro = "Show your KPI."  data-step="7" ></a></div>
+    <div class="uc-column">
+        <div class="row">
+            <a href="/User/IBLOG">
+                <img src="~/Content/images/usercenter/IBlog.png" MYTP="HOVER" 
+                     height="158" width="158" data-intro = "Just a blog, you can record some information here."  data-step="6" >
+            </a>
+        </div>
+        <div class="row" data-toggle="tooltip" title="IKPI">
+            <a href="/User/IKPI">
+                <img src="~/Content/images/usercenter/IKPI.png" MYTP="HOVER" 
+                     height="158" width="158" data-intro = "Show your KPI."  data-step="7" >
+            </a>
+        </div>
     </div>
-</div>
-
-<div class="row">
-    <div class="col-lg-12">&nbsp;</div>
 </div>

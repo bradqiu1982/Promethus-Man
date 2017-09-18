@@ -1,0 +1,42 @@
+﻿.login-welcome{
+    text-align: center;
+}
+
+.login-content{
+    margin: auto 2%;
+    height: 320px;
+    background-image: url('/Content/images/FinisarBuilding.jpg');
+    border-radius: 5px;
+    padding: 5% 2% 2% 2%;
+}
+
+.login-form{
+    float: right;
+    width: 25%;
+    margin-top: 2%;
+    margin-right: 2%;
+}
+
+.login-input{
+    margin: 1%;
+    border-style: solid !important;
+    border-color: #006DC0 !important;
+    border-radius: 4px !important;
+}
+
+.login-submit{
+    float: right;
+    margin-right: 4%;
+    background-color: transparent !important;
+    font-family: 'Arial Narrow';
+}
+
+.login-forget-pwd{
+    float: right;
+    margin-right: 4%;
+    background-color: transparent !important;
+    border: none;
+    padding: 0!important;
+    font-family: 'Arial Narrow';
+    cursor: pointer;
+}

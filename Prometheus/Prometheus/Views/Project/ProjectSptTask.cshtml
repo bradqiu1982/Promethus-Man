@@ -25,6 +25,12 @@
     <div class="col-lg-12">&nbsp;</div>
 </div>
 
+<div MYTP="green" style="font-family:'Arial Narrow';font-size:18px"><strong>&nbsp;&nbsp;Critical Tasks</strong></div>
+
+<div class="row">
+    <div class="col-lg-12">&nbsp;</div>
+</div>
+
 <table id="pndatatable" class="display" cellspacing="0">
     <thead>
         <tr>
@@ -93,11 +99,100 @@
 <script type="text/javascript">
                 $(document).ready(function () {
                     $('#pndatatable').DataTable({
-                        'iDisplayLength': 50,
-                        'aLengthMenu': [[20, 50, 100, -1],
-                                        [20, 50, 100, "All"]],
+                        'iDisplayLength': 10,
+                        'aLengthMenu': [[10, 20, 30, -1],
+                                        [10, 20, 30, "All"]],
                         "aaSorting": [],
                         "order": []
                     });
                 })
 </script>
+
+@if (ViewBag.rules.Count > 0)
+{
+    <div class="row">
+        <div class="col-lg-12">&nbsp;</div>
+    </div>
+    <div MYTP="orange" style="font-family:'Arial Narrow';font-size:18px"><strong>&nbsp;&nbsp;Critical Rules</strong></div>
+    <div class="row">
+        <div class="col-lg-12">&nbsp;</div>
+    </div>
+    <table id="ruletable" class="display">
+        <thead>
+            <tr>
+                <th>Project</th>
+                <th>Error Code</th>
+                <th>Test Case</th>
+                <th>Data Field</th>
+                <th>Temperature</th>
+                <th>Channel</th>
+                <th>Low Limit</th>
+                <th>High Limit</th>
+                <th>Algorithm</th>
+                <th>Algorithm Param</th>
+                <th>FA Switch</th>
+                <th>Related People</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in ViewBag.rules)
+            {
+                <tr>
+                    <td>@item.ProjectKey</td>
+                    <td>@item.ErrorCode</td>
+                    <td>@item.TestCaseName</td>
+                    <td>@item.MatchCond</td>
+                    <td>@item.Temperature</td>
+                    <td>@item.Channel</td>
+                    @if (item.WithLimit == 1)
+                    {
+                        <td>@item.LowLimit</td>
+                        <td>@item.HighLimit</td>
+                    }
+                    else
+                    {
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    }
+                    @if (item.WithAlgorithm == 1)
+                    {
+                        <td>@item.Algorithm</td>
+                        <td>@item.AlgorithmParam</td>
+                    }
+                    else
+                    {
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    }
+                    <td>
+                        @if (item.Appv_1 > 0)
+                        {
+                            <button class="form-control" type="button" data-toggle="tooltip" style="border:0px;border-color:transparent!important;background-color:transparent!important;" title="red means no FA will be create after test data fail to match this rule" onclick="OpenFASwitch('PJKey=@(item.ProjectKey)&ErrorCode=@(item.ErrorCode)&TestCase=@(item.TestCaseName)&MatchCond=@(item.MatchCond)')">
+                                <span class="glyphicon glyphicon-filter" aria-hidden="true" style="color:red"></span>
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="form-control" type="button" data-toggle="tooltip" style="border:0px;border-color:transparent!important;background-color:transparent!important;" title="green means FA will be create after test data fail to match this rule" onclick="CloseFASwitch('PJKey=@(item.ProjectKey)&ErrorCode=@(item.ErrorCode)&TestCase=@(item.TestCaseName)&MatchCond=@(item.MatchCond)')">
+                                <span class="glyphicon glyphicon-filter" aria-hidden="true" style="color:green"></span>
+                            </button>
+                        }
+                    </td>
+                    <td>@item.Appv_4.Replace("@FINISAR.COM", "")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <script type="text/javascript">
+                    $(document).ready(function () {
+                        $('#ruletable').DataTable({
+                            'iDisplayLength': 10,
+                            'aLengthMenu': [[10, 20, 30, -1],
+                                            [10, 20, 30, "All"]],
+                            "aaSorting": [],
+                            "order": []
+                        });
+                    })
+    </script>
+}

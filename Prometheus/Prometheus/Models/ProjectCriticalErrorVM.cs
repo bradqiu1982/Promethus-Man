@@ -102,6 +102,11 @@ namespace Prometheus.Models
         public static List<ProjectCriticalErrorVM> RetrievePJCriticalError(string pjkey,string errorcode)
         {
             var ret = new List<ProjectCriticalErrorVM>();
+            if (string.IsNullOrEmpty(pjkey))
+            {
+                return ret;
+            }
+
             var sql = string.Empty;
             if (!string.IsNullOrEmpty(errorcode))
             {

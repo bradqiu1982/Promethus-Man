@@ -1423,6 +1423,7 @@ namespace Prometheus.Controllers
         {
             //null is for qm, not null for parallel project
             var vm = IssueViewModels.RetrieveSptIssue(this, ProjectKey);
+            ViewBag.rules = ProjectCriticalErrorVM.RetrievePJCriticalError(ProjectKey, null);
             return View(vm);
         }
 
@@ -4615,7 +4616,7 @@ namespace Prometheus.Controllers
                 toaddrs.AddRange(towho);
 
                 var reporter = pusher.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
-                EmailUtility.SendEmail(this, "WUXI NPI System_" + reporter, toaddrs, content);
+                EmailUtility.SendEmail(this, "WUXI Engineering System_" + reporter, toaddrs, content);
                 new System.Threading.ManualResetEvent(false).WaitOne(20);
             }
             catch (Exception ex)
@@ -5059,7 +5060,7 @@ namespace Prometheus.Controllers
                         toaddrs.Add(bm.ToUpper());
                     }
 
-                    EmailUtility.SendEmail(this,"WUXI NPI System - VCSEL WAFER YIELD WARNING", toaddrs, content1 + "\r\nWafer SN File: " + validatestr);
+                    EmailUtility.SendEmail(this,"VCSEL WAFER YIELD WARNING - WUXI Engineering System", toaddrs, content1 + "\r\nWafer SN File: " + validatestr);
                     new System.Threading.ManualResetEvent(false).WaitOne(5000);
                 }
         }
@@ -5212,7 +5213,7 @@ namespace Prometheus.Controllers
                         {
                             var tolist = new List<string>();
                             tolist.Add(u);
-                            EmailUtility.SendEmail(this, "WUXI NPI System-Task Notice", tolist, Summary);
+                            EmailUtility.SendEmail(this, "Task Notice - WUXI Engineering System", tolist, Summary);
                         }
                     }//end if
 
@@ -5251,7 +5252,7 @@ namespace Prometheus.Controllers
                         {
                             var tolist = new List<string>();
                             tolist.Add(u);
-                            EmailUtility.SendEmail(this, "WUXI NPI System-Task Notice", tolist, Summary);
+                            EmailUtility.SendEmail(this, "Task Notice - WUXI Engineering System", tolist, Summary);
                         }
                     }//end if
                 }//end foreach
@@ -5287,7 +5288,7 @@ namespace Prometheus.Controllers
 
                         var toaddrs = new List<string>();
                         toaddrs.Add(record.username);
-                        EmailUtility.SendEmail(this,"WUXI NPI System", toaddrs, content);
+                        EmailUtility.SendEmail(this,"WUXI Engineering System", toaddrs, content);
                         new System.Threading.ManualResetEvent(false).WaitOne(500);
                     }
                 }//end foreach
@@ -5323,7 +5324,7 @@ namespace Prometheus.Controllers
                             var toaddrs = new List<string>();
                             toaddrs.Add(item.Reporter);
                             toaddrs.Add(item.Assignee);
-                            EmailUtility.SendEmail(this,"WUXI NPI System", toaddrs, content);
+                            EmailUtility.SendEmail(this,"WUXI Engineering System", toaddrs, content);
                             new System.Threading.ManualResetEvent(false).WaitOne(300);
                     }
                 } catch (Exception ex) { }
@@ -5353,7 +5354,7 @@ namespace Prometheus.Controllers
                             var toaddrs = new List<string>();
                             toaddrs.Add(item.Reporter);
                             toaddrs.Add(item.Assignee);
-                            EmailUtility.SendEmail(this,"WUXI NPI System", toaddrs, content);
+                            EmailUtility.SendEmail(this,"WUXI Engineering System", toaddrs, content);
                             new System.Threading.ManualResetEvent(false).WaitOne(200);
                     }
                 } catch (Exception ex) { }
@@ -5388,7 +5389,7 @@ namespace Prometheus.Controllers
                     var toaddrs = new List<string>();
                     toaddrs.Add(item.Reporter);
                     toaddrs.Add(item.Assignee);
-                    EmailUtility.SendEmail(this,"WUXI NPI System", toaddrs, content);
+                    EmailUtility.SendEmail(this,"WUXI Engineering System", toaddrs, content);
                     new System.Threading.ManualResetEvent(false).WaitOne(200);
                 }
             }
@@ -5422,7 +5423,7 @@ namespace Prometheus.Controllers
                     var toaddrs = new List<string>();
                     //toaddrs.Add(item.Reporter);
                     toaddrs.Add(item.Assignee);
-                    EmailUtility.SendEmail(this, "WUXI NPI System", toaddrs, content);
+                    EmailUtility.SendEmail(this, "WUXI Engineering System", toaddrs, content);
                     new System.Threading.ManualResetEvent(false).WaitOne(200);
                 }
             }
@@ -5883,7 +5884,7 @@ namespace Prometheus.Controllers
             toaddrs.Add(vm.Reporter);
             toaddrs.Add(LYTTASK.Assignee);
 
-            EmailUtility.SendEmail(this, "WUXI NPI System - Project Critical Error Alarm", toaddrs, content);
+            EmailUtility.SendEmail(this, "Project Critical Error Alarm - WUXI Engineering System", toaddrs, content);
 
             IssueViewModels.UpdateLYT(vm.IssueKey);
             new System.Threading.ManualResetEvent(false).WaitOne(500);
@@ -5907,14 +5908,27 @@ namespace Prometheus.Controllers
                     var addrs = Request.Form["RPeopleAddr"].Split(new string[] {";"},StringSplitOptions.RemoveEmptyEntries);
 
                     var LYTTASK = CreateLYTTask(CRITICALERRORTYPE.LYTTASK, comment,vm.ProjectKey,updater,updater,DateTime.Now.AddDays(14),vm.IssueKey);
-                    CreateLYTSubTask(CRITICALERRORTYPE.LYTSUBTASK, "Stop Product Line for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(1));
+                    //CreateLYTSubTask(CRITICALERRORTYPE.LYTSUBTASK, "Stop Product Line for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(1));
                     CreateLYTSubTask(CRITICALERRORTYPE.CONTAINMENTACTION, "Containment Action for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(7));
                     CreateLYTSubTask(CRITICALERRORTYPE.CORRECTIVEACTION, "Corrective Action for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(14));
-                    CreateLYTSubTask(CRITICALERRORTYPE.LYTSUBTASK, "Restart Product Line for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(14));
+                    //CreateLYTSubTask(CRITICALERRORTYPE.LYTSUBTASK, "Restart Product Line for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(14));
 
                     var comment1 = new IssueComments();
-                    comment1.Comment = "ROOTCAUSE: to be edited";
-                    IssueViewModels.StoreIssueComment(LYTTASK.IssueKey, comment1.dbComment, vm.Assignee, COMMENTTYPE.RootCause);
+                    comment1.Comment = "<p>"+comment + "</p><p><a href='/Issue/UpdateIssue?issuekey=" + vm.IssueKey + "'><strong>Trigger Task</strong></a></p>";
+                    if (vm.FailureDetailCommentList.Count > 0)
+                    {
+                        comment1.Comment = comment1.Comment + "<p><h3>Trigger Failure Detail</h3></p><p>"+ vm.FailureDetailCommentList[0].Comment + "</p>";
+                    }
+                    if (vm.RootCauseCommentList.Count > 0)
+                    {
+                        comment1.Comment = comment1.Comment + "<p><h3>Trigger Root Cause</h3></p><p>" + vm.RootCauseCommentList[0].Comment + "</p>";
+                    }
+                    IssueViewModels.StoreIssueComment(LYTTASK.IssueKey, comment1.dbComment, vm.Assignee, COMMENTTYPE.Description);
+
+                    foreach (var attach in vm.AttachList)
+                    {
+                        IssueViewModels.StoreIssueAttachment(LYTTASK.IssueKey, attach);
+                    }
 
                     var originalcomment = new IssueComments();
                     originalcomment.Comment = "<p>A LYT task is create base on this task:</p>" + "<p><a href='/Issue/UpdateIssue?issuekey=" + LYTTASK.IssueKey + "'>LYT TASK</a></p>";
@@ -5977,10 +5991,6 @@ namespace Prometheus.Controllers
             vm.Resolution = Resolute.Pending;
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
             vm.StoreSubIssue();
-
-            var comment1 = new IssueComments();
-            comment1.Comment = sum+ "<p><a href='/Issue/UpdateIssue?issuekey="+ triggleissuekey + "'>Trigger Task</a></p>";
-            IssueViewModels.StoreIssueComment(vm.IssueKey, comment1.dbComment, vm.Assignee, COMMENTTYPE.Description);
 
             return vm;
         }
@@ -6382,7 +6392,7 @@ namespace Prometheus.Controllers
             }
 
             var reporter = vm.Reporter.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
-            EmailUtility.SendEmail(ctrl, "WUXI NPI System_" + reporter, toaddrs, content);
+            EmailUtility.SendEmail(ctrl, "WUXI Engineering System_" + reporter, toaddrs, content);
             new System.Threading.ManualResetEvent(false).WaitOne(30);
         }
 

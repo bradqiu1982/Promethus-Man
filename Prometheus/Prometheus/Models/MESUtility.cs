@@ -475,7 +475,7 @@ namespace Prometheus.Models
             }
 
             var reporter = vm.Reporter.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
-            EmailUtility.SendEmail(ctrl, "WUXI NPI System_" + reporter, toaddrs, content);
+            EmailUtility.SendEmail(ctrl, "WUXI Engineering System_" + reporter, toaddrs, content);
             new System.Threading.ManualResetEvent(false).WaitOne(30);
         }
 

@@ -1143,7 +1143,7 @@ namespace Prometheus.Models
                 toaddrs.Add(vm.Reporter);
 
                 var reporter = vm.Reporter.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
-                EmailUtility.SendEmail(ctrl, "WUXI NPI System_"+reporter, toaddrs, content);
+                EmailUtility.SendEmail(ctrl, "WUXI Engineering System_"+reporter, toaddrs, content);
                 new System.Threading.ManualResetEvent(false).WaitOne(50);
             }
         }
@@ -2371,7 +2371,7 @@ namespace Prometheus.Models
                 var toaddrs = new List<string>();
                 toaddrs.Add(vm.Assignee);
                 toaddrs.Add(vm.Reporter);
-                EmailUtility.SendEmail(ctrl, "WUXI NPI System", toaddrs, content);
+                EmailUtility.SendEmail(ctrl, "WUXI Engineering System", toaddrs, content);
                 new System.Threading.ManualResetEvent(false).WaitOne(200);
             }
         }

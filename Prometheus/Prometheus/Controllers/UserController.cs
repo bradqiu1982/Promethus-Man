@@ -87,7 +87,7 @@ namespace Prometheus.Controllers
 
             var toaddrs = new List<string>();
             toaddrs.Add(username);
-            EmailUtility.SendEmail(this,"WUXI NPI System", toaddrs, validatestr);
+            EmailUtility.SendEmail(this,"WUXI Engineering System", toaddrs, validatestr);
         }
 
         [HttpPost, ActionName("RegisterUser")]
@@ -211,7 +211,7 @@ namespace Prometheus.Controllers
 
             var toaddrs = new List<string>();
             toaddrs.Add(username);
-            EmailUtility.SendEmail(this,"WUXI NPI System", toaddrs, validatestr);
+            EmailUtility.SendEmail(this,"WUXI Engineering System", toaddrs, validatestr);
             return RedirectToAction("ResetNoticeA");
         }
 

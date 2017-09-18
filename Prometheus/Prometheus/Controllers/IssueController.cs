@@ -154,7 +154,7 @@ namespace Prometheus.Controllers
                 }
 
             var reporter = vm.Reporter.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
-            EmailUtility.SendEmail(this,"WUXI NPI System_"+ reporter, toaddrs, content);
+            EmailUtility.SendEmail(this,"WUXI Engineering System_"+ reporter, toaddrs, content);
             new System.Threading.ManualResetEvent(false).WaitOne(300);
         }
 
@@ -182,7 +182,7 @@ namespace Prometheus.Controllers
             }
 
             var report = Reporter.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
-            EmailUtility.SendEmail(this,"WUXI NPI System_"+report, toaddrs, content);
+            EmailUtility.SendEmail(this,"WUXI Engineering System_"+report, toaddrs, content);
             new System.Threading.ManualResetEvent(false).WaitOne(300);
         }
 
@@ -456,7 +456,7 @@ namespace Prometheus.Controllers
             catch (Exception ex) { }
             validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
             var content = commenter + " add a new comment on issue: " + summary + "\r\n\r\n" + commentcontent + "\r\n\r\nISSUE LINK:\r\n\r\n"+ validatestr;
-            EmailUtility.SendEmail(this, "WUXI NPI System_"+commenter, towho, content);
+            EmailUtility.SendEmail(this, "WUXI Engineering System_"+commenter, towho, content);
             new System.Threading.ManualResetEvent(false).WaitOne(50);
         }
 
@@ -1089,7 +1089,7 @@ namespace Prometheus.Controllers
                 toaddrs.Add(vm.Reporter);
 
                 var reporter = vm.Reporter.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
-                EmailUtility.SendEmail(this,"WUXI NPI System_"+reporter, toaddrs, content);
+                EmailUtility.SendEmail(this,"WUXI Engineering System_"+reporter, toaddrs, content);
                 new System.Threading.ManualResetEvent(false).WaitOne(300);
             }
         }
@@ -1120,7 +1120,7 @@ namespace Prometheus.Controllers
                 toaddrs.Add(vm.Reporter);
 
                 var reporter = vm.Reporter.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
-                EmailUtility.SendEmail(this,"WUXI NPI System_"+reporter, toaddrs, content);
+                EmailUtility.SendEmail(this,"WUXI Engineering System_"+reporter, toaddrs, content);
                 new System.Threading.ManualResetEvent(false).WaitOne(300);
             }
         }

@@ -428,6 +428,15 @@ namespace Prometheus.Controllers
                 ViewBag.towholist1 = CreateSelectList(asilist, "");
 
                 ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
+
+                if (ret.Summary.Contains(CRITICALERRORTYPE.LYTTASK) || ret.Summary.Contains(CRITICALERRORTYPE.LYTTASK1))
+                {
+                    var templist = new List<string>();
+                    templist.Add("YES");
+                    templist.Add("NO");
+                    ViewBag.iscriticaltasklist = CreateSelectList(templist, "");
+                }
+
                 return View(ret);
             }
             else
@@ -646,6 +655,15 @@ namespace Prometheus.Controllers
                     {
                         UserKPIVM.AddUserDailyRank(realissue.IssueKey, realissue.Assignee, UserRankType.BASE
                             , "Close CRITICAL ERROR Task: " + realissue.Summary, "/Issue/UpdateIssue?issuekey=" + realissue.IssueKey, 4);
+
+                        var isrealcritical = Request.Form["iscriticaltasklist"];
+                        if (isrealcritical != null)
+                        {
+                            if (string.Compare(isrealcritical, "NO", true) == 0)
+                            {
+                                realissue.UpdateSummary(realissue.Summary.Replace(CRITICALERRORTYPE.LYTTASK,""));
+                            }
+                        }
 
                         if (!issuetag.Contains(CRITICALERRORTYPE.CRITICALERRORTAG))
                         {
@@ -1315,6 +1333,14 @@ namespace Prometheus.Controllers
                 ViewBag.towholist1 = CreateSelectList(asilist, "");
 
                 ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
+
+                if (ret.Summary.Contains(CRITICALERRORTYPE.LYTTASK) || ret.Summary.Contains(CRITICALERRORTYPE.LYTTASK1))
+                {
+                    var templist = new List<string>();
+                    templist.Add("YES");
+                    templist.Add("NO");
+                    ViewBag.iscriticaltasklist = CreateSelectList(templist,"");
+                }
                 return View(ret);
             }
             else
@@ -1708,6 +1734,15 @@ namespace Prometheus.Controllers
 
                     if (realissue.Summary.Contains(CRITICALERRORTYPE.LYTTASK)|| realissue.Summary.Contains(CRITICALERRORTYPE.LYTTASK1))
                     {
+                        var isrealcritical = Request.Form["iscriticaltasklist"];
+                        if (isrealcritical != null)
+                        {
+                            if (string.Compare(isrealcritical, "NO", true) == 0)
+                            {
+                                realissue.UpdateSummary(realissue.Summary.Replace(CRITICALERRORTYPE.LYTTASK, ""));
+                            }
+                        }
+
                         if (!issuetag.Contains(CRITICALERRORTYPE.CRITICALERRORTAG))
                         {
                             issuetag = issuetag + CRITICALERRORTYPE.CRITICALERRORTAG + ";";

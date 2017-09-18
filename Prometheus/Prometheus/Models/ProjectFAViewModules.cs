@@ -67,31 +67,42 @@ namespace Prometheus.Models
                 }
                 else
                 {
-                    var sn = "";
-                    var pjdata = new List<ProjectTestData>();
-                    if (!string.IsNullOrEmpty(d.DataID))
+                    if (!string.IsNullOrEmpty(d.ModuleSN) && !string.IsNullOrEmpty(d.ErrAbbr))
                     {
-                        pjdata = ProjectTestData.RetrieveProjectTestData(d.DataID);
+                        var pjdata = new ProjectTestData();
+                        pjdata.ProjectKey = d.ProjectKey;
+                        pjdata.ModuleSerialNum = d.ModuleSN;
+                        pjdata.ErrAbbr = d.ErrAbbr;
+                        ret.Add(new ProjectFAViewModules(d, pjdata));
                     }
                     else
                     {
-                        pjdata = ProjectTestData.RetrieveProjectTestData(d.IssueKey);
-                    }
+                            var sn = "";
+                        var pjdata = new List<ProjectTestData>();
+                        if (!string.IsNullOrEmpty(d.DataID))
+                        {
+                            pjdata = ProjectTestData.RetrieveProjectTestData(d.DataID);
+                        }
+                        else
+                        {
+                            pjdata = ProjectTestData.RetrieveProjectTestData(d.IssueKey);
+                        }
 
-                    if (pjdata.Count > 0)
-                    {
-                        sn = pjdata[0].ModuleSerialNum;
-                    }
+                        if (pjdata.Count > 0)
+                        {
+                            sn = pjdata[0].ModuleSerialNum;
+                        }
 
-                    if (!string.IsNullOrEmpty(sn) && !fasndict.ContainsKey(sn))
-                    {
-                        fasndict.Add(sn, d.ReportDate.ToString());
-                        ret.Add(new ProjectFAViewModules(d, pjdata[0]));
-                    }
-                    else if (!string.IsNullOrEmpty(sn) && fasndict.ContainsKey(sn))
-                    {
-                        //close automaticlly
-                        IssueViewModels.CloseDupIssueAutomaticlly(d.ProjectKey, sn, fasndict[sn]);
+                        if (!string.IsNullOrEmpty(sn) && !fasndict.ContainsKey(sn))
+                        {
+                            fasndict.Add(sn, d.ReportDate.ToString());
+                            ret.Add(new ProjectFAViewModules(d, pjdata[0]));
+                        }
+                        else if (!string.IsNullOrEmpty(sn) && fasndict.ContainsKey(sn))
+                        {
+                            //close automaticlly
+                            IssueViewModels.CloseDupIssueAutomaticlly(d.ProjectKey, sn, fasndict[sn]);
+                        }
                     }
                 }
             }
@@ -144,11 +155,23 @@ namespace Prometheus.Models
                 }
                 else
                 {
-                    var pjdata = ProjectTestData.RetrieveProjectTestData(d.IssueKey);
-                    if (pjdata.Count > 0)
+                    if (!string.IsNullOrEmpty(d.ModuleSN) && !string.IsNullOrEmpty(d.ErrAbbr))
                     {
-                        ret.Add(new ProjectFAViewModules(d, pjdata[0]));
+                        var pjdata = new ProjectTestData();
+                        pjdata.ProjectKey = d.ProjectKey;
+                        pjdata.ModuleSerialNum = d.ModuleSN;
+                        pjdata.ErrAbbr = d.ErrAbbr;
+                        ret.Add(new ProjectFAViewModules(d, pjdata));
                     }
+                    else
+                    {
+                        var pjdata = ProjectTestData.RetrieveProjectTestData(d.IssueKey);
+                        if (pjdata.Count > 0)
+                        {
+                            ret.Add(new ProjectFAViewModules(d, pjdata[0]));
+                        }
+                    }
+
                 }
             }
 

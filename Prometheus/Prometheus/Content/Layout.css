@@ -3,6 +3,10 @@
     padding-top: 10px !important;
 }
 
+.body-content{
+    margin-top: 1%;
+}
+
 .div-nav{
     background-color: white;
     border-color: #5B9BD5;
@@ -95,6 +99,10 @@
     text-align: center;
 }
 
-.loading-span-i{
+.loading-span-i-0{
     padding-left: 6%;
+}
+
+.loading-span-i-1{
+    padding-left: 8%;
 }

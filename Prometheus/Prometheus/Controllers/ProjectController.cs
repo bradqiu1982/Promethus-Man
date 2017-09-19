@@ -1277,32 +1277,11 @@ namespace Prometheus.Controllers
             projectmodel.ModelIDs = Request.Form["ModelIDs"];
             projectmodel.SumDatasets = Request.Form["SumDatasets"];
 
-            if (!RetrieveProjectDate(projectmodel))
+            if (!RetrieveProjectDate(projectmodel) || !ProjectValidate(projectmodel, true))
             {
-                CreateAllUserLists(projectmodel);
-                CreateUpdateIssueList(projectmodel);
-                CreateMonitorVcselList(projectmodel);
-                CreateProjectTypeList(projectmodel);
-
-                var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist = CreateSelectList(asilist, "");
-
-                return View(projectmodel);
-            }
-                
-
-            if (!ProjectValidate(projectmodel,true))
-            {
-                CreateAllUserLists(projectmodel);
-                CreateUpdateIssueList(projectmodel);
-                CreateMonitorVcselList(projectmodel);
-                CreateProjectTypeList(projectmodel);
-
-                var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist1 = CreateSelectList(asilist, "");
-                ViewBag.towholist2 = CreateSelectList(asilist, "");
-
-                return View(projectmodel);
+                var dict1 = new RouteValueDictionary();
+                dict1.Add("ProjectKey", projectmodel.ProjectKey);
+                return RedirectToAction("ProjectDetail", "Project", dict1);
             }
 
             var waferyieldexceptlist = Request.Form["WaferYieldExceptList"];
@@ -1343,8 +1322,7 @@ namespace Prometheus.Controllers
             var dict = new RouteValueDictionary();
             dict.Add("ProjectKey", projectmodel.ProjectKey);
             return RedirectToAction("ProjectDetail", "Project", dict);
-
-            //return RedirectToAction("ViewAll");
+            
         }
 
         public ActionResult ProjectIssues(string ProjectKey)

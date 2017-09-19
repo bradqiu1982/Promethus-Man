@@ -106,3 +106,61 @@
 .loading-span-i-1{
     padding-left: 8%;
 }
+.breadcrumb{
+    width: 600px;
+}
+
+/* edit project */
+.pro-info{
+    font-family: 'Arial Narrow';
+    font-size: 18px;
+}
+
+.pro-info-eng{
+    font-family: 'Arial Narrow';
+    font-size: 18px;
+    padding-left: 6px;
+}
+
+.pm-width{
+    position: relative;
+    float: left;
+    display: inline-block;
+    width: 13%;
+    padding-left: 3%;
+}
+
+.pm-width-detail{
+    position: relative;
+    float: left;
+    display: inline-block;
+    width: 18%;
+    padding-left: 3%;
+}
+.collapsed-span{
+    color: #2a6496;
+    opacity: 0.8;
+    cursor: pointer;
+    margin-left: 17%;
+    padding: 5px;
+}
+
+.eng-span{
+    margin-right: 1%;
+}
+
+.eng-span-etc{
+    padding: 5px 5%;
+    font-size: 10px;
+}
+
+.pm-textarea-width{
+    min-width: 84% !important;
+    height: 32px !important;
+}
+
+#memberCollapse{
+    background-color: #DEEBF7;
+    border: #DEEBF7 1px solid;
+    border-radius: 6px;
+}

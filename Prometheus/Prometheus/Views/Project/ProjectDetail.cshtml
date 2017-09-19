@@ -7,12 +7,14 @@
 
 <div class="row">
     <div class="nav navbar-nav navbar-left">
-        <img src="~/Content/images/ucicon/IProjectIcons.png" style="height:40px; width:40px">
+        <img src="~/Content/images/ucicon/IProjectIcons.png" height="40" width="40">
     </div>
     <div class="nav navbar-nav navbar-left" data-toggle="modal" data-target="#myModal">
         <ol class="breadcrumb">
-            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll" data-intro = "Back to ALL Project."  data-step="6" >All Projects</a></li>
-
+            <li>
+                <a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll" data-intro = "Back to ALL Project."  
+                   data-step="6" >All Projects</a>
+            </li>
             @if (Model != null)
             {
                 <li class="active">Project @(Model.ProjectKey) Detail</li>
@@ -24,18 +26,22 @@
         </ol>
     </div>
     <div class="nav navbar-nav navbar-right">
-@if (Model != null)
-{
-        <a href="/Project/EditProject?ProjectKey=@Model.ProjectKey"><img  MYTP="HOVER" src="~/Content/images/icon/edit.png" style="height:30px; width:auto" data-intro = "Edit project here."  data-step="1" ></a>
-}
+    @if (Model != null)
+    {
+        <a href="/Project/EditProject?ProjectKey=@Model.ProjectKey">
+            <img  MYTP="HOVER" src="~/Content/images/icon/edit.png" height="30" data-intro = "Edit project here."  
+                 data-step="1" />
+        </a>
+    }
     </div>
 </div>
-
-
 
 @{
     var PMList = new List<Prometheus.Models.ProjectMembers>();
     var ENGList = new List<Prometheus.Models.ProjectMembers>();
+    var PEList = new List<Prometheus.Models.ProjectMembers>();
+    var MEList = new List<Prometheus.Models.ProjectMembers>();
+    var PQEList = new List<Prometheus.Models.ProjectMembers>();
     var projectdata = Model;
 
     if (projectdata != null)
@@ -46,149 +52,150 @@
             {
                 PMList.Add(pm);
             }
-        }
-
-        foreach (var pm in projectdata.MemberList)
-        {
-            if (string.Compare(pm.Role, Prometheus.Models.ProjectViewModels.ENGROLE) == 0)
+            else if (string.Compare(pm.Role, Prometheus.Models.ProjectViewModels.ENGROLE) == 0)
             {
                 ENGList.Add(pm);
+            }
+            else if (string.Compare(pm.Role, Prometheus.Models.ProjectViewModels.PEROLE) == 0)
+            {
+                PEList.Add(pm);
+            }
+            else if (string.Compare(pm.Role, Prometheus.Models.ProjectViewModels.MEROLE) == 0)
+            {
+                MEList.Add(pm);
+            }
+            else if (string.Compare(pm.Role, Prometheus.Models.ProjectViewModels.PQEROLE) == 0)
+            {
+                PQEList.Add(pm);
             }
         }
     }
 }
 
-
 @if (projectdata != null)
 {
     <div class="row" data-intro = "Base information of this project."  data-step="2" >
-        <div MYTP="orange" class="col-lg-2" style="font-family:'Arial Narrow';font-size:18px"><strong>&nbsp;&nbsp;Information</strong></div>
+        <div MYTP="orange" class="col-lg-2">
+            <strong class="pro-info">Information</strong>
+        </div>
         <div class="col-lg-10">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="col-lg-4">
-                            <label class="control-label" for="finishratev">Project Type</label>
-                        </div>
-                        <div class="col-lg-8">
-                            @if (string.IsNullOrEmpty(projectdata.ProjectType))
-                            {
-                                <input id="pjtypeid" name="pjtypeid" class="form-control text-box single-line" value="Parallel" readonly="readonly" />
-                            }
-                            else
-                            {
-                                <input id="pjtypeid" name="pjtypeid" class="form-control text-box single-line" value="@projectdata.ProjectType" readonly="readonly" />
-                            }
-
-                        </div>
+            <div class="row form-group">
+                <div class="col-lg-6">
+                    <label class="control-label col-lg-4" for="finishratev">Project Type</label>
+                    <div>
+                        <input id="pjtypeid" name="pjtypeid" class="form-control text-box single-line" 
+                               value="@(string.IsNullOrEmpty(projectdata.ProjectType)?"Parallel":projectdata.ProjectType)" 
+                               readonly="readonly" />
                     </div>
-
-                    <div class="col-lg-6">
-                        <div class="col-lg-4">
-                            <label class="control-label" for="startdatev">Start Date</label>
-                        </div>
-                        <div class="col-lg-8">
-                            <input id="startdatev" name="startdatev" class="form-control text-box single-line" value="@projectdata.StartDate.ToString("yyyy-MM-dd")" readonly="readonly" />
-                        </div>
+                </div>
+                <div class="col-lg-6">
+                    <label class="control-label col-lg-4" for="startdatev">Start Date</label>
+                    <div class="col-lg-8">
+                        <input id="startdatev" name="startdatev" class="form-control text-box single-line" 
+                               value="@projectdata.StartDate.ToString("yyyy-MM-dd")" readonly="readonly" />
                     </div>
-
                 </div>
             </div>
             @if (string.Compare(projectdata.ProjectType, Prometheus.Models.ProjectTypeInf.QM) != 0)
             {
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="col-lg-4">
-                                <label class="control-label" for="finishratev">Update MES Data</label>
-                            </div>
-                            <div class="col-lg-8">
-                                @if (projectdata.FinishRating > 90)
-                                {
-                                    <input id="finishratev" name="finishratev" class="form-control text-box single-line" value="False" readonly="readonly" />
-                                }
-                                else
-                                {
-                                    <input id="finishratev" name="finishratev" class="form-control text-box single-line" value="True" readonly="readonly" />
-                                }
-
-                            </div>
+                <div class="row form-group">
+                    <div class="col-lg-6">
+                        <label class="control-label col-lg-4" for="finishratev">Update MES Data</label>
+                        <div>
+                            <input id="finishratev" name="finishratev" class="form-control text-box single-line" 
+                                   value="@((projectdata.FinishRating > 90)?"False":"True")" readonly="readonly" />
                         </div>
-                        <div class="col-lg-6"></div>
                     </div>
                 </div>
             }
-
-            <div class="form-group">
-
-                @for (var i = 0; i < 1; i++)
-                {
-                    <div class="row">
-                        <div class="col-lg-6">
-
-                            @if (Model != null && PMList.Count > (i * 2))
-                            {
-                                <div class="col-lg-4">
-                                    <label class="control-label" for="PM@(i * 2 + 1)">PM @(i * 2 + 1)</label>
-                                </div>
-                                <div class="col-lg-8">
-                                    @Html.ActionLink(@PMList[(i * 2)].Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = @PMList[(i * 2)].Name }, null)
-                                </div>
-                            }
-                        </div>
-                        <div class="col-lg-6">
-                            @if (Model != null && PMList.Count > (i * 2 + 1))
-                            {
-                                <div class="col-lg-4">
-                                    <label class="control-label" for="PM@(i * 2 + 2)">PM @(i * 2 + 2)</label>
-                                </div>
-                                <div class="col-lg-8">
-                                    @Html.ActionLink(@PMList[(i * 2 + 1)].Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = @PMList[(i * 2 + 1)].Name }, null)
-                                </div>
-                            }
-                        </div>
-                    </div>
-                }
-
-                <div class="row">
-                    <div class="col-lg-12">&nbsp;</div>
+            <div class="row form-group">
+                <label class="control-label pm-width-detail">Member</label>
+                <div class="collapsed collapsed-span" aria-expanded="false" data-toggle="collapse" data-target="#memberCollapse">
+                    @foreach (var pm in PMList)
+                    {
+                        <span class="eng-span">@(pm.Name.Split(new char[] { '@' })[0])</span>
+                    }
+                    @if ((ENGList.Count + PMList.Count) <= 5)
+                    {
+                        foreach (var eng in ENGList)
+                        {
+                            <span class="eng-span">@(eng.Name.Split(new char[] { '@' })[0])</span>
+                        }
+                    }
+                    else
+                    {
+                        for (var i = 0; i < 5 - PMList.Count; i++)
+                        {
+                            <span class="eng-span">@(ENGList[i].Name.Split(new char[] { '@' })[0])</span>
+                        }
+                    }
+                    <span class="eng-span-etc glyphicon glyphicon-chevron-down"></span>
                 </div>
-
-                @for (var i = 0; i < 3; i++)
+            </div>
+            <div id="memberCollapse" class="collapse">
+                <div class="row form-group">
+                    <label class="control-label pm-width-detail">PM</label>
+                    <div>
+                        @foreach(var pm in PMList)
+                    {
+                            @Html.ActionLink(pm.Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = pm.Name }, new { @class = "eng-span"});
+                    }
+                    </div>
+                </div>
+                @if (ENGList.Count != 0)
                 {
-                    <div class="row">
-                        <div class="col-lg-6">
-                            @if (Model != null && ENGList.Count > (i * 2))
-                            {
-                                <div class="col-lg-4">
-                                    <label class="control-label" for="Engineer@(i * 2 + 1)">Engineer @(i * 2 + 1)</label>
-                                </div>
-                                <div class="col-lg-8">
-                                    @Html.ActionLink(@ENGList[(i * 2)].Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = @ENGList[(i * 2)].Name }, null)
-                                </div>
-                            }
-                        </div>
-                        <div class="col-lg-6">
-                            @if (Model != null && ENGList.Count > (i * 2 + 1))
-                            {
-                                <div class="col-lg-4">
-                                    <label class="control-label" for="Engineer@(i * 2 + 2)">Engineer @(i * 2 + 2)</label>
-                                </div>
-                                <div class="col-lg-8">
-                                    @Html.ActionLink(@ENGList[(i * 2 + 1)].Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = @ENGList[(i * 2 + 1)].Name }, null)
-                                </div>
-                            }
+                    <div class="row form-group">
+                        <label class="control-label pm-width-detail">Engineer</label>
+                        <div>
+                            @foreach (var eng in ENGList)
+                        {
+                        @Html.ActionLink(eng.Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = eng.Name }, new { @class = "eng-span" });
+                        }
                         </div>
                     </div>
                 }
-
+                @if (PEList.Count != 0)
+                {
+                    <div class="row form-group">
+                        <label class="control-label pm-width-detail">PE</label>
+                        <div>
+                            @foreach (var pe in PEList)
+                        {
+                        @Html.ActionLink(pe.Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = pe.Name }, new { @class = "eng-span" });
+                        }
+                        </div>
+                    </div>
+                }
+                @if (MEList.Count != 0)
+                {
+                    <div class="row form-group">
+                        <label class="control-label pm-width-detail">ME</label>
+                        <div>
+                            @foreach (var me in MEList)
+                        {
+                        @Html.ActionLink(me.Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = me.Name }, new { @class = "eng-span" });
+                        }
+                        </div>
+                    </div>
+                }
+                @if (PQEList.Count != 0)
+                {
+                    <div class="row form-group">
+                        <label class="control-label pm-width-detail">PQE</label>
+                        <div>
+                            @foreach (var pqe in PQEList)
+                        {
+                        @Html.ActionLink(pqe.Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = pqe.Name }, new { @class = "eng-span" });
+                        }
+                        </div>
+                    </div>
+                }
             </div>
         </div>
     </div>
+    <hr style="border-color:#006DC0;" />
 
-            <hr style="border-color:#006DC0;" />
-
-            <div class="form-group" data-intro = "Project status."  data-step="3" >
+    <div class="form-group" data-intro = "Project status."  data-step="3" >
                 <div  MYTP="yello"  class="row">
                     @if (!string.IsNullOrEmpty(projectdata.CurrentNPIProc)
                          && !string.IsNullOrEmpty(projectdata.PIP1Date)
@@ -211,7 +218,7 @@
                 </div>
             </div>
 
-            <hr style="border-color:#006DC0;margin-bottom: 40px;" />
+    <hr style="border-color:#006DC0;margin-bottom: 40px;" />
 
     if (string.Compare(projectdata.ProjectType, Prometheus.Models.ProjectTypeInf.QM) != 0)
     {
@@ -437,8 +444,6 @@
         </div>
     }
 
-
-
     if (!string.IsNullOrEmpty(projectdata.Description))
     {
         <hr style="border-color:#006DC0;margin-top: 40px;" />
@@ -458,285 +463,6 @@
         </div>
     </div>
 
-            @*<div class="panel panel-default">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-lg-2">
-                            <span class="glyphicon glyphicon-home" aria-hidden="true"></span> @projectdata.ProjectName
-                        </div>
-                        <div class="col-lg-2">
-                            <a href="/Project/EditProject?ProjectKey=@projectdata.ProjectKey">
-                                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Modify
-                            </a>
-                        </div>
-                        <div class="col-lg-8">
-                        </div>
-                    </div>
-                </div>
-                <div class="panel-body col-lg-12 " style="overflow-x: scroll;">
-                    <div class="form-group">
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <div class="col-lg-4">
-                                    <label class="control-label" for="finishratev">Project Type</label>
-                                </div>
-                                <div class="col-lg-8">
-                                    @if (string.IsNullOrEmpty(projectdata.ProjectType))
-                                    {
-                                        <input id="pjtypeid" name="pjtypeid" class="form-control text-box single-line" value="Parallel" readonly="readonly" />
-                                    }
-                                    else
-                                    {
-                                        <input id="pjtypeid" name="pjtypeid" class="form-control text-box single-line" value="@projectdata.ProjectType" readonly="readonly" />
-                                    }
-
-                                </div>
-                            </div>
-
-                            <div class="col-lg-6">
-                                <div class="col-lg-4">
-                                    <label class="control-label" for="startdatev">StartDate</label>
-                                </div>
-                                <div class="col-lg-8">
-                                    <input id="startdatev" name="startdatev" class="form-control text-box single-line" value="@projectdata.StartDate.ToString("yyyy-MM-dd")" readonly="readonly" />
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    @if (string.Compare(projectdata.ProjectType, Prometheus.Models.ProjectTypeInf.QM) != 0)
-                    {
-                        <div class="form-group">
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <div class="col-lg-4">
-                                        <label class="control-label" for="finishratev">Update MES Data</label>
-                                    </div>
-                                    <div class="col-lg-8">
-                                        @if (projectdata.FinishRating > 90)
-                                        {
-                                            <input id="finishratev" name="finishratev" class="form-control text-box single-line" value="False" readonly="readonly" />
-                                        }
-                                        else
-                                        {
-                                            <input id="finishratev" name="finishratev" class="form-control text-box single-line" value="True" readonly="readonly" />
-                                        }
-
-                                    </div>
-                                </div>
-                                <div class="col-lg-6"></div>
-                            </div>
-                        </div>
-
-                                <hr />
-
-                                <div class="row col-lg-12">
-                                    <div class="col-lg-2 text-left">
-                                        @if (projectdata.FirstYield > 0)
-                                        {
-                                            <a href="/Project/ProjectYieldMain?ProjectKey=@projectdata.ProjectKey">
-                                                <span class="glyphicon glyphicon-stats" aria-hidden="true"></span> FPY @((projectdata.FirstYield * 100.0).ToString("0.00")) %
-                                            </a>
-                                        }
-                                        else
-                                        {
-                                            <a href="/Project/ProjectYieldMain?ProjectKey=@projectdata.ProjectKey">
-                                                <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>Project Yield
-                                            </a>
-                                        }
-                                    </div>
-                                    <div class="col-lg-2">
-                                        @if (projectdata.RetestYield > 0)
-                                        {
-                                            <a href="/Project/ProjectYieldMain?ProjectKey=@projectdata.ProjectKey">
-                                                <span class="glyphicon glyphicon-stats" aria-hidden="true"></span> FY @((projectdata.RetestYield * 100.0).ToString("0.00")) %
-                                            </a>
-                                        }
-                                    </div>
-
-                                    <div class="col-lg-2 text-left">
-                                        <a href="/Project/ProjectFA?ProjectKey=@projectdata.ProjectKey">
-                                            <span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span> Project FA
-                                            @if (projectdata.FinishRating < 90)
-                                            {
-                                                <span class="badge alert-danger">@projectdata.PendingFACount</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge alert-success">@projectdata.PendingFACount</span>
-                                            }
-
-                                        </a>
-                                    </div>
-
-                                    <div class="col-lg-2 text-left">
-                                        <a href="/Project/ProjectIssues?ProjectKey=@projectdata.ProjectKey">
-                                            <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span> Project Tasks <span class="badge alert-danger">@projectdata.PendingTaskCount</span>
-                                        </a>
-                                    </div>
-
-                                    <div class="col-lg-2 text-left">
-                                        <a href="/Project/ProjectRMAStatus?ProjectKey=@projectdata.ProjectKey">
-                                            <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Project RMA <span class="badge alert-danger">@projectdata.PendingRMACount</span>
-                                        </a>
-                                    </div>
-
-                                    <div class="col-lg-2 text-left">
-                                    </div>
-
-                                </div>
-
-                                <hr />
-
-                                <div class="row col-lg-12">
-                                    <div class="col-lg-2 text-left">
-                                        <a href="/BurnIn/BurnInMainPage?ProjectKey=@projectdata.ProjectKey" target="_blank">
-                                            <span class="glyphicon glyphicon-fire" aria-hidden="true"></span> Project Burn-In
-                                        </a>
-                                    </div>
-                                    <div class="col-lg-2 text-left">
-                                        <a href="/Project/ProjectError?ProjectKey=@projectdata.ProjectKey">
-                                            <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span> Debug Tree
-                                        </a>
-                                    </div>
-                                    <div class="col-lg-2 text-left">
-                                        <a href="/Project/ProjectOBA?ProjectKey=@projectdata.ProjectKey">
-                                            <span class="glyphicon glyphicon-record" aria-hidden="true"></span> Project OBA
-                                        </a>
-                                    </div>
-
-                                    <div class="col-lg-2 text-left">
-                                        <a href="/Project/ProjectNPI?ProjectKey=@projectdata.ProjectKey">
-                                            <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Project NPI Process
-                                        </a>
-                                    </div>
-                                    <div class="col-lg-4 text-left">
-
-                                    </div>
-                                </div>
-
-                                <hr />
-
-                                <div class="row col-lg-12">
-                                    @if (!string.IsNullOrEmpty(projectdata.CurrentNPIProc)
-&& !string.IsNullOrEmpty(projectdata.PIP1Date)
-&& !string.IsNullOrEmpty(projectdata.MVTDate))
-                                    {
-                                        <div class="col-lg-1 text-center active"><a href="/Issue/UpdateIssue?issuekey=@projectdata.CurrentNPIProcKey">@projectdata.CurrentNPIProc</a></div>
-                                        <div class="col-lg-2 text-center active">@projectdata.PIP1Date</div>
-                                        <div class="col-lg-2 text-center active">@projectdata.MVTDate</div>
-                                        <div class="col-lg-3 text-center"></div>
-                                    }
-                                    else
-                                    {
-                                        <div class="col-lg-8 text-center"></div>
-                                    }
-                                    <div class="col-lg-3 text-left"></div>
-                                </div>
-
-                                <hr />
-
-                        for (var i = 0; i < 1; i++)
-                        {
-                            <div class="row">
-                                <div class="col-lg-6">
-
-                                    @if (Model != null && PMList.Count > (i * 2))
-                                    {
-                                        <label class="control-label col-lg-2" for="PM@(i * 2 + 1)">PM@(i * 2 + 1)</label>
-                                                <div class="col-lg-10">
-                                                    @Html.ActionLink(@PMList[(i * 2)].Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = @PMList[(i * 2)].Name }, null)
-                                                </div>
-                                    }
-                                </div>
-                                <div class="col-lg-6">
-                                    @if (Model != null && PMList.Count > (i * 2 + 1))
-                                    {
-                                        <label class="control-label col-lg-2" for="PM@(i * 2 + 2)">PM@(i * 2 + 2)</label>
-                                                <div class="col-lg-10">
-                                                    @Html.ActionLink(@PMList[(i * 2 + 1)].Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = @PMList[(i * 2 + 1)].Name }, null)
-                                                </div>
-                                    }
-                                </div>
-                            </div>
-                        }
-
-                        <hr />
-
-                        for (var i = 0; i < 3; i++)
-                        {
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    @if (Model != null && ENGList.Count > (i * 2))
-                                    {
-                                        <label class="control-label col-lg-2" for="Engineer@(i * 2 + 1)">Engineer@(i * 2 + 1)</label>
-                                                <div class="col-lg-10">
-                                                    @Html.ActionLink(@ENGList[(i * 2)].Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = @ENGList[(i * 2)].Name }, null)
-                                                </div>
-                                    }
-                                </div>
-                                <div class="col-lg-6">
-                                    @if (Model != null && ENGList.Count > (i * 2 + 1))
-                                    {
-                                        <label class="control-label col-lg-2" for="Engineer@(i * 2 + 2)">Engineer@(i * 2 + 2)</label>
-                                                <div class="col-lg-10">
-                                                    @Html.ActionLink(@ENGList[(i * 2 + 1)].Name.Split(new char[] { '@' })[0], "UserCenter", "User", new { username = @ENGList[(i * 2 + 1)].Name }, null)
-                                                </div>
-                                    }
-                                </div>
-                            </div>
-                        }
-
-                    }
-                    else
-                    {
-                        <hr />
-
-                                <div class="row col-lg-12">
-                                    <div class="col-lg-2 text-center">
-                                        <a href="/Project/ProjectIssues?ProjectKey=@projectdata.ProjectKey">
-                                            <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span> Project Tasks <span class="badge alert-danger">@projectdata.PendingTaskCount</span>
-                                        </a>
-                                    </div>
-
-                                    <div class="col-lg-2 text-center">
-                                        <a href="/Project/ProjectRMAStatus?ProjectKey=@projectdata.ProjectKey">
-                                            <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> RMA Status<span class="badge alert-danger">@projectdata.PendingRMACount</span>
-                                        </a>
-                                    </div>
-
-                                    <div class="col-lg-2 text-left">
-                                        <a href="/Project/ProjectOBA?ProjectKey=@projectdata.ProjectKey">
-                                            <span class="glyphicon glyphicon-record" aria-hidden="true"></span> Project OBA
-                                        </a>
-                                    </div>
-
-                                    <div class="col-lg-2 text-left">
-                                        <a href="/Project/ProjectQuality?ProjectKey=@projectdata.ProjectKey">
-                                            <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> Quality Issue
-                                        </a>
-                                    </div>
-
-                                    <div class="col-lg-2 text-left">
-                                        <a href="/Project/ProjectReliability?ProjectKey=@projectdata.ProjectKey">
-                                            <span class="glyphicon glyphicon-registration-mark" aria-hidden="true"></span> Reliability Issue
-                                        </a>
-                                    </div>
-
-                                    <div class="col-lg-2 text-center"></div>
-                                </div>
-                    }
-
-                    <hr />
-
-                    <div class="row">
-                        <div class="col-lg-12">
-                            @Html.Raw(projectdata.Description)
-                        </div>
-                    </div>
-                </div>
-            </div>*@
-            }
+}
 
 

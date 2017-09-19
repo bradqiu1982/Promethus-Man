@@ -91,6 +91,9 @@ namespace Prometheus.Models
     {
         public static string PMROLE = "PM";
         public static string ENGROLE = "ENG";
+        public static string PEROLE = "PE";
+        public static string MEROLE = "ME";
+        public static string PQEROLE = "PQE";
 
         public ProjectViewModels()
         {
@@ -98,6 +101,9 @@ namespace Prometheus.Models
             ProjectType = "";
             PMListStr = string.Empty;
             EngListStr = string.Empty;
+            PeListStr = string.Empty;
+            MeListStr = string.Empty;
+            PqeListStr = string.Empty;
         }
 
         public ProjectViewModels(string prokey, string proname, string startdate, double finshrate, string sdescription,string monitorvcsel,string vcselwarning,string pjtype)
@@ -123,10 +129,16 @@ namespace Prometheus.Models
             WaferYieldExceptList = "";
             PMListStr = string.Empty;
             EngListStr = string.Empty;
+            PeListStr = string.Empty;
+            MeListStr = string.Empty;
+            PqeListStr = string.Empty;
         }
 
         public string PMListStr { set; get; }
         public string EngListStr { set; get; }
+        public string PeListStr { set; get; }
+        public string MeListStr { set; get; }
+        public string PqeListStr { set; get; }
 
         public string WaferYieldExceptList { set; get; }
 

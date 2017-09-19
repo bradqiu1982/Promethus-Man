@@ -412,6 +412,9 @@ namespace Prometheus.Controllers
         {
             var pmlist = new List<ProjectMembers>();
             var eglist = new List<ProjectMembers>();
+            var pelist = new List<ProjectMembers>();
+            var melist = new List<ProjectMembers>();
+            var pqelist = new List<ProjectMembers>();
 
             foreach (var pm in vm.MemberList)
             {
@@ -431,48 +434,32 @@ namespace Prometheus.Controllers
                 }
             }
 
+            foreach (var pe in vm.MemberList)
+            {
+                if (string.Compare(pe.Role, Prometheus.Models.ProjectViewModels.PEROLE) == 0)
+                {
+                    pelist.Add(pe);
+                    vm.PeListStr = vm.PeListStr + ";" + pe.Name;
+                }
+            }
 
-            //var asilist = UserViewModels.RetrieveAllUser();
-            //if (pmlist.Count > 0)
-            //    ViewBag.PM1 = CreateSelectList(asilist, pmlist[0].Name);
-            //else
-            //    ViewBag.PM1 = CreateSelectList(asilist,"");
+            foreach (var me in vm.MemberList)
+            {
+                if (string.Compare(me.Role, Prometheus.Models.ProjectViewModels.MEROLE) == 0)
+                {
+                    melist.Add(me);
+                    vm.MeListStr = vm.MeListStr + ";" + me.Name;
+                }
+            }
 
-            //if (pmlist.Count > 1)
-            //    ViewBag.PM2 = CreateSelectList(asilist, pmlist[1].Name);
-            //else
-            //    ViewBag.PM2 = CreateSelectList(asilist, "");
-
-            //if (eglist.Count > 0)
-            //    ViewBag.Engineer1 = CreateSelectList(asilist, eglist[0].Name);
-            //else
-            //    ViewBag.Engineer1 = CreateSelectList(asilist, "");
-
-            //if (eglist.Count > 1)
-            //    ViewBag.Engineer2 = CreateSelectList(asilist, eglist[1].Name);
-            //else
-            //    ViewBag.Engineer2 = CreateSelectList(asilist, "");
-
-            //if (eglist.Count > 2)
-            //    ViewBag.Engineer3 = CreateSelectList(asilist, eglist[2].Name);
-            //else
-            //    ViewBag.Engineer3 = CreateSelectList(asilist, "");
-
-            //if (eglist.Count > 3)
-            //    ViewBag.Engineer4 = CreateSelectList(asilist, eglist[3].Name);
-            //else
-            //    ViewBag.Engineer4 = CreateSelectList(asilist, "");
-
-            //if (eglist.Count > 4)
-            //    ViewBag.Engineer5 = CreateSelectList(asilist, eglist[4].Name);
-            //else
-            //    ViewBag.Engineer5 = CreateSelectList(asilist, "");
-
-            //if (eglist.Count > 5)
-            //    ViewBag.Engineer6 = CreateSelectList(asilist, eglist[5].Name);
-            //else
-            //    ViewBag.Engineer6 = CreateSelectList(asilist, "");
-
+            foreach (var pqe in vm.MemberList)
+            {
+                if (string.Compare(pqe.Role, Prometheus.Models.ProjectViewModels.PQEROLE) == 0)
+                {
+                    pqelist.Add(pqe);
+                    vm.PqeListStr = vm.PqeListStr + ";" + pqe.Name;
+                }
+            }
         }
 
         public ActionResult CreateProject()
@@ -781,6 +768,24 @@ namespace Prometheus.Controllers
                 lpm.Add(new ProjectMembers(projectmodel.ProjectKey, p, ProjectViewModels.ENGROLE));
             }
 
+            pns = Request.Form["PEAddr"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var p in pns)
+            {
+                lpm.Add(new ProjectMembers(projectmodel.ProjectKey, p, ProjectViewModels.PEROLE));
+            }
+
+            pns = Request.Form["MEAddr"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var p in pns)
+            {
+                lpm.Add(new ProjectMembers(projectmodel.ProjectKey, p, ProjectViewModels.MEROLE));
+            }
+
+            pns = Request.Form["PQEAddr"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var p in pns)
+            {
+                lpm.Add(new ProjectMembers(projectmodel.ProjectKey, p, ProjectViewModels.PQEROLE));
+            }
+
             projectmodel.MemberList = lpm;
         }
 
@@ -1043,8 +1048,7 @@ namespace Prometheus.Controllers
                     var vm = ProjectViewModels.RetrieveOneProject(realkey);
 
                     var asilist = UserViewModels.RetrieveAllUser();
-                    ViewBag.towholist1 = CreateSelectList(asilist, "");
-                    ViewBag.towholist2 = CreateSelectList(asilist, "");
+                    ViewBag.towholist = CreateSelectList(asilist, "");
 
                     CreateAllUserLists(vm);
                     CreateUpdateIssueList(vm);
@@ -1211,8 +1215,7 @@ namespace Prometheus.Controllers
                 CreateProjectTypeList(projectmodel);
 
                 var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist1 = CreateSelectList(asilist, "");
-                ViewBag.towholist2 = CreateSelectList(asilist, "");
+                ViewBag.towholist = CreateSelectList(asilist, "");
 
                 return View(projectmodel);
             }

@@ -23,7 +23,7 @@ namespace Prometheus.Models
         {
             var ret = new List<ProjectFAViewModules>();
             var issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Working,50,ctrl);
-            var issuedict2 = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Pending, 500,ctrl);
+            var issuedict2 = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Pending, 300,ctrl);
             issuedict.AddRange(issuedict2);
 
             var bisndict = new Dictionary<string, string>();
@@ -121,7 +121,7 @@ namespace Prometheus.Models
         {
             var ret = new List<ProjectFAViewModules>();
 
-            var issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Done, 2000,ctrl);
+            var issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Done, 500,ctrl);
             foreach (var d in issuedict)
             {
                     if (d.CommentList.Count == 2)

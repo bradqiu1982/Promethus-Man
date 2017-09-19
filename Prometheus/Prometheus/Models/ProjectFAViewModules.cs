@@ -31,7 +31,7 @@ namespace Prometheus.Models
 
             foreach (var d in issuedict)
             {
-                if (d.Summary.Contains(CRITICALERRORTYPE.SECONDMATCH1) && d.Summary.Contains(CRITICALERRORTYPE.SECONDMATCH))
+                if (d.Summary.Contains(CRITICALERRORTYPE.SECONDMATCH1) || d.Summary.Contains(CRITICALERRORTYPE.SECONDMATCH))
                 {
                     continue;
                 }
@@ -148,7 +148,7 @@ namespace Prometheus.Models
                         }
                     }
 
-                    if (d.Summary.Contains(CRITICALERRORTYPE.SECONDMATCH1) && d.Summary.Contains(CRITICALERRORTYPE.SECONDMATCH))
+                    if (d.Summary.Contains(CRITICALERRORTYPE.SECONDMATCH1) || d.Summary.Contains(CRITICALERRORTYPE.SECONDMATCH))
                     {
                         continue;
                     }

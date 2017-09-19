@@ -1381,7 +1381,7 @@ namespace Prometheus.Models
             }
 
             //var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples,APVal2,ModuleSN,DataID from Issue where  APVal1 <> 'delete' and  ParentIssueKey = '' and ProjectKey = '<ProjectKey>' and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType>' order by ReportDate DESC";
-            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples,APVal2,ModuleSN,DataID from Issue where  APVal1 <> 'delete' and  ParentIssueKey = '' and ProjectKey = '<ProjectKey>' and Resolution in <cond> and IssueType <> '<IssueType>' order by ReportDate DESC";
+            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples,APVal2,ModuleSN,DataID,ErrAbbr from Issue where  APVal1 <> 'delete' and  ParentIssueKey = '' and ProjectKey = '<ProjectKey>' and Resolution in <cond> and IssueType <> '<IssueType>' order by ReportDate DESC";
             sql = sql.Replace("<ProjectKey>", pjkey).Replace("<cond>", cond).Replace("<topnum>", Convert.ToString(topnum))
                     .Replace("<IssueType>", ISSUETP.NPIPROC);
 
@@ -1398,6 +1398,7 @@ namespace Prometheus.Models
                 ret.LYT = Convert.ToString(line[13]);
                 ret.ModuleSN = Convert.ToString(line[14]);
                 ret.DataID = Convert.ToString(line[15]);
+                ret.ErrAbbr = Convert.ToString(line[16]);
 
                 //var tempclist = new List<IssueComments>();
                 //sql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
@@ -1424,7 +1425,107 @@ namespace Prometheus.Models
             return retdict;
         }
 
-        public static List<IssueViewModels> RRetrieveFABySN(string pjkey,string SN,string whichtest)
+        public static List<IssueViewModels> RRetrieveFAByErrAbbr(string pjkey, string errabbr, int topnum, Controller ctrl)
+        {
+            var retdict = new List<IssueViewModels>();
+
+            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,"
+                +"DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,"
+                +"RelativePeoples,APVal2,ModuleSN,DataID,ErrAbbr from Issue "
+                + " where  APVal1 <> 'delete' and  ParentIssueKey = '' and ProjectKey = '<ProjectKey>' and ErrAbbr = '<ErrAbbr>' order by ReportDate DESC";
+            sql = sql.Replace("<ProjectKey>", pjkey).Replace("<topnum>", Convert.ToString(topnum)).Replace("<ErrAbbr>", errabbr);
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var ret = new IssueViewModels(Convert.ToString(line[0])
+                    , Convert.ToString(line[1]), Convert.ToString(line[2])
+                    , Convert.ToString(line[3]), Convert.ToString(line[4])
+                    , Convert.ToString(line[5]), Convert.ToString(line[6])
+                    , Convert.ToString(line[7]), Convert.ToString(line[8])
+                    , Convert.ToString(line[9]), Convert.ToString(line[10])
+                    , Convert.ToString(line[11]), Convert.ToString(line[12]));
+                ret.LYT = Convert.ToString(line[13]);
+                ret.ModuleSN = Convert.ToString(line[14]);
+                ret.DataID = Convert.ToString(line[15]);
+                ret.ErrAbbr = Convert.ToString(line[16]);
+
+                //var tempclist = new List<IssueComments>();
+                //sql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
+                //sql = sql.Replace("<IssueKey>", ret.IssueKey);
+                //var cret = DBUtility.ExeLocalSqlWithRes(sql,null);
+                //foreach (var r in cret)
+                //{
+                //    var tempcomment = new IssueComments();
+                //    tempcomment.IssueKey = Convert.ToString(r[0]);
+                //    tempcomment.dbComment = Convert.ToString(r[1]);
+                //    tempcomment.Reporter = Convert.ToString(r[2]);
+                //    tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
+                //    tempcomment.CommentType = Convert.ToString(r[4]);
+                //    tempclist.Add(tempcomment);
+                //}
+                //ret.CommentList = tempclist;
+                //ret.SubIssues = RetrieveSubIssue(ret.IssueKey);
+
+                ret.RetrieveComment(ctrl);
+                ret.RetrieveAttachment(ret.IssueKey);
+                retdict.Add(ret);
+            }
+
+            return retdict;
+        }
+
+        public static List<IssueViewModels> RRetrieveFABySN(string pjkey, string sn, Controller ctrl)
+        {
+            var retdict = new List<IssueViewModels>();
+
+            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,"
+                + "DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,"
+                + "RelativePeoples,APVal2,ModuleSN,DataID,ErrAbbr from Issue "
+                + " where  APVal1 <> 'delete' and  ParentIssueKey = '' and ProjectKey = '<ProjectKey>' and ModuleSN = '<ModuleSN>' order by ReportDate DESC";
+            sql = sql.Replace("<ProjectKey>", pjkey).Replace("<ModuleSN>", sn);
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var ret = new IssueViewModels(Convert.ToString(line[0])
+                    , Convert.ToString(line[1]), Convert.ToString(line[2])
+                    , Convert.ToString(line[3]), Convert.ToString(line[4])
+                    , Convert.ToString(line[5]), Convert.ToString(line[6])
+                    , Convert.ToString(line[7]), Convert.ToString(line[8])
+                    , Convert.ToString(line[9]), Convert.ToString(line[10])
+                    , Convert.ToString(line[11]), Convert.ToString(line[12]));
+                ret.LYT = Convert.ToString(line[13]);
+                ret.ModuleSN = Convert.ToString(line[14]);
+                ret.DataID = Convert.ToString(line[15]);
+                ret.ErrAbbr = Convert.ToString(line[16]);
+
+                //var tempclist = new List<IssueComments>();
+                //sql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
+                //sql = sql.Replace("<IssueKey>", ret.IssueKey);
+                //var cret = DBUtility.ExeLocalSqlWithRes(sql,null);
+                //foreach (var r in cret)
+                //{
+                //    var tempcomment = new IssueComments();
+                //    tempcomment.IssueKey = Convert.ToString(r[0]);
+                //    tempcomment.dbComment = Convert.ToString(r[1]);
+                //    tempcomment.Reporter = Convert.ToString(r[2]);
+                //    tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
+                //    tempcomment.CommentType = Convert.ToString(r[4]);
+                //    tempclist.Add(tempcomment);
+                //}
+                //ret.CommentList = tempclist;
+                //ret.SubIssues = RetrieveSubIssue(ret.IssueKey);
+
+                ret.RetrieveComment(ctrl);
+                ret.RetrieveAttachment(ret.IssueKey);
+                retdict.Add(ret);
+            }
+
+            return retdict;
+        }
+
+        private static List<IssueViewModels> RRetrieveFABySN(string pjkey,string SN,string whichtest)
         {
             var retdict = new List<IssueViewModels>();
 
@@ -1453,7 +1554,7 @@ namespace Prometheus.Models
             return retdict;
         }
 
-        public static List<IssueViewModels> RRetrieveDupFABySN(string pjkey, string SN,string datestr)
+        private static List<IssueViewModels> RRetrieveDupFABySN(string pjkey, string SN,string datestr)
         {
             var retdict = new List<IssueViewModels>();
 
@@ -1511,7 +1612,7 @@ namespace Prometheus.Models
         }
 
 
-        public static List<IssueViewModels> RRetrieveBIFABySN(string pjkey, string SN)
+        private static List<IssueViewModels> RRetrieveBIFABySN(string pjkey, string SN)
         {
             var retdict = new List<IssueViewModels>();
 

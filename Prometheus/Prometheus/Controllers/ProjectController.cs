@@ -9,7 +9,7 @@ using System.Text;
 using System.Net.Mail;
 using System.IO;
 using System.Threading;
-
+using System.Web.Caching;
 
 namespace Prometheus.Controllers
 {
@@ -17,7 +17,7 @@ namespace Prometheus.Controllers
     {
         private static void logthdinfo(string info)
         {
-            //var filename = "d:\\log\\sqlexception-" + DateTime.Now.ToString("yyyy-MM-dd");
+            //var filename = "d:\\log\\spendtime-" + DateTime.Now.ToString("yyyy-MM-dd");
             //if (System.IO.File.Exists(filename))
             //{
             //    var content = System.IO.File.ReadAllText(filename);
@@ -32,7 +32,20 @@ namespace Prometheus.Controllers
 
         private void UserAuth(string username)
         {
-            var userdict = UserMatrixVM.RetrieveUserMatrixAuth();
+            var userdict = new Dictionary<string, string>();
+
+            var mycache = HttpContext.Cache;
+            var tempuserdict = mycache.Get("usermatrixvm");
+            if (tempuserdict == null)
+            {
+                userdict = UserMatrixVM.RetrieveUserMatrixAuth();
+                mycache.Insert("usermatrixvm", userdict, null, DateTime.Now.AddHours(2), Cache.NoSlidingExpiration);
+            }
+            else
+            {
+                userdict = (Dictionary<string, string>)tempuserdict;
+            }
+
             if (userdict.ContainsKey(username.ToUpper()))
             {
                 ViewBag.IsOutSide = false;
@@ -84,6 +97,11 @@ namespace Prometheus.Controllers
         // GET: Project
         public ActionResult ViewAll()
         {
+            //var now = DateTime.Now;
+            //var msec1 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
+
+            var mycache = HttpContext.Cache;
+
             var ckdict = CookieUtility.UnpackCookie(this);
             if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
             {
@@ -98,33 +116,43 @@ namespace Prometheus.Controllers
                 return RedirectToAction("LoginUser", "User");
             }
 
+            //now = DateTime.Now;
+            //var msec2 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
+            //logthdinfo("cookie  " + (msec2 - msec1).ToString());
 
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
             UserAuth(updater);
-            
-            //var now = DateTime.Now;
-            //var msec1 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
-            
-            var allprojlist = ProjectViewModels.RetrieveAllProject();
-            
-            var userpj = UserViewModels.RetrieveUserProjectKeyDict(updater);
+
             var projlist = new List<ProjectViewModels>();
-            foreach (var pjk in allprojlist)
+            var cachepjlist = mycache.Get(updater + "_pjlist");
+            if (cachepjlist == null)
             {
-                if (userpj.ContainsKey(pjk.ProjectKey) || (ViewBag.IsSuper != null && ViewBag.IsSuper))
+                var allprojlist = ProjectViewModels.RetrieveAllProject();
+                var userpj = UserViewModels.RetrieveUserProjectKeyDict(updater);
+                foreach (var pjk in allprojlist)
                 {
-                    projlist.Add(pjk);
+                    if (userpj.ContainsKey(pjk.ProjectKey) || (ViewBag.IsSuper != null && ViewBag.IsSuper))
+                    {
+                        projlist.Add(pjk);
+                    }
+                }//end foreach
+
+                if (projlist.Count == 0)
+                {
+                    return RedirectToAction("LoadProjects", "Project");
                 }
+
+                mycache.Insert(updater + "_pjlist", projlist, null, DateTime.Now.AddHours(2), Cache.NoSlidingExpiration);
+            }
+            else
+            {
+                projlist.AddRange((List<ProjectViewModels>)cachepjlist);
             }
 
             if (projlist.Count == 0)
             {
                 return RedirectToAction("LoadProjects", "Project");
             }
-
-            //now = DateTime.Now;
-            //var msec2 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
-            //logthdinfo("RetrieveAllProject  " + (msec2 - msec1).ToString());
 
             var filterlist = new List<SelectListItem>();
             var filteritem = new SelectListItem();
@@ -155,46 +183,82 @@ namespace Prometheus.Controllers
 
                 //now = DateTime.Now;
                 //msec1 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
-
-                var yvm = ProjectYieldViewModule.GetYieldByDateRange(item.ProjectKey, startdate.ToString(), enddate, item,HttpContext.Cache);
-
-                if (yvm.FirstYields.Count > 0)
+                var firstyield = mycache.Get(item.ProjectKey + "_FPY");
+                if (firstyield == null)
                 {
-                    item.FirstYield = yvm.FirstYield;
-                    item.RetestYield = yvm.LastYield;
+                    var yvm = ProjectYieldViewModule.GetYieldByDateRange(item.ProjectKey, startdate.ToString(), enddate, item,HttpContext.Cache);
+
+                    if (yvm.FirstYields.Count > 0)
+                    {
+                        item.FirstYield = yvm.FirstYield;
+                        item.RetestYield = yvm.LastYield;
+                    }
+                    else
+                    {
+                        item.FirstYield = -1.0;
+                        item.RetestYield = -1.0;
+                    }
+                    mycache.Insert(item.ProjectKey + "_FPY", item.FirstYield, null, DateTime.Now.AddHours(2), Cache.NoSlidingExpiration);
+                    mycache.Insert(item.ProjectKey + "_FY", item.RetestYield, null, DateTime.Now.AddHours(2), Cache.NoSlidingExpiration);
                 }
                 else
                 {
-                    item.FirstYield = -1.0;
-                    item.RetestYield = -1.0;
+                    item.FirstYield = Convert.ToDouble(mycache.Get(item.ProjectKey + "_FPY"));
+                    item.RetestYield = Convert.ToDouble(mycache.Get(item.ProjectKey + "_FY"));
                 }
 
-                //now = DateTime.Now;
-                //msec2 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
-                //logthdinfo(item.ProjectKey+ " GetYieldByDateRange " + (msec2 - msec1).ToString());
 
                 NPIInfo(item);
 
-                var taskdone = IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Done);
-                var tasktotal = taskdone + IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Pending)
-                    + IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Working);
-                item.PendingTaskCount = taskdone.ToString() + "/" + tasktotal.ToString();
+                var taskcount = mycache.Get(item.ProjectKey + "_taskct");
+                if (taskcount == null)
+                {
+                    var taskdone = IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Done);
+                    var tasktotal = taskdone + IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Pending)
+                        + IssueViewModels.RetrieveTaskCountByProjectKey(item.ProjectKey, Resolute.Working);
+                    item.PendingTaskCount = taskdone.ToString() + "/" + tasktotal.ToString();
+                    mycache.Insert(item.ProjectKey + "_taskct", item.PendingTaskCount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                }
+                else
+                {
+                    item.PendingTaskCount = Convert.ToString(taskcount);
+                }
 
-                var fadone = ProjectFAViewModules.RetrieveFADataCount(item.ProjectKey, false);
-                var fatotal = fadone + ProjectFAViewModules.RetrieveFADataCount(item.ProjectKey);
-                item.PendingFACount = fadone.ToString()+"/"+ fatotal.ToString();
 
-                var rmadone = IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Done);
-                var rmatotal = rmadone + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Pending) 
-                    + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Working);
-                item.PendingRMACount = rmadone.ToString()+ "/" + rmatotal.ToString();
+                var facount = mycache.Get(item.ProjectKey + "_fact");
+                if (facount == null)
+                {
+                    var fadone = ProjectFAViewModules.RetrieveFADataCount(item.ProjectKey, false);
+                    var fatotal = fadone + ProjectFAViewModules.RetrieveFADataCount(item.ProjectKey);
+                    item.PendingFACount = fadone.ToString()+"/"+ fatotal.ToString();
+                    mycache.Insert(item.ProjectKey + "_fact", item.PendingFACount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                }
+                else
+                {
+                    item.PendingFACount = Convert.ToString(facount);
+                }
+
+
+                var rmacount = mycache.Get(item.ProjectKey + "_rmact");
+                if (rmacount == null)
+                {
+                    var rmadone = IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Done);
+                    var rmatotal = rmadone + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Pending) 
+                        + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Working);
+                    item.PendingRMACount = rmadone.ToString()+ "/" + rmatotal.ToString();
+                    mycache.Insert(item.ProjectKey + "_rmact", item.PendingRMACount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                }
+                else
+                {
+                    item.PendingRMACount = Convert.ToString(rmacount);
+                }
+
             }
 
             filterlist[0].Disabled = true;
             filterlist[0].Selected = true;
             ViewBag.pjfilterlist = filterlist;
             SortPJ(projlist);
-
 
             ViewBag.pjtpdict = new Dictionary<string, bool>();
             ViewBag.pjtypelist = new List<string>();
@@ -205,13 +269,7 @@ namespace Prometheus.Controllers
             {
                 ViewBag.pjtypelist.Add(pjt);
             }
-            //ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.Parallel);
-            //ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.Tunable);
-            //ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.OSA);
-            //ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.LineCard);
-            //ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.QM);
-            //ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.Others);
-
+            
             foreach (var item in projlist)
             {
                 var tpstr = "";
@@ -236,7 +294,19 @@ namespace Prometheus.Controllers
 
         private void NPIInfo(ProjectViewModels item)
         {
-                var ivmlist = IssueViewModels.RetrieveNPIPROCIssue(item.ProjectKey,this);
+            var ivmlist = new List<IssueViewModels>();
+
+            var mycache = HttpContext.Cache;
+            var templist = mycache.Get(item.ProjectKey+"_npilist");
+            if (templist == null)
+            {
+                ivmlist = IssueViewModels.RetrieveNPIPROCIssue(item.ProjectKey,this);
+                mycache.Insert(item.ProjectKey + "_npilist", ivmlist, null, DateTime.Now.AddHours(2), Cache.NoSlidingExpiration);
+            }
+            else
+            {
+                ivmlist.AddRange((List<IssueViewModels>)templist);
+            }
                 foreach (var iv in ivmlist)
                 {
                     if (iv.Summary.Contains("PIP1"))
@@ -6172,6 +6242,9 @@ namespace Prometheus.Controllers
             {
                 UserViewModels.UpdateUserProject(updater, newkey);
             }
+
+            var mycache = HttpContext.Cache;
+            mycache.Remove(updater + "_pjlist");
 
             return RedirectToAction("ViewAll", "Project");
         }

@@ -1231,7 +1231,6 @@ namespace Prometheus.Models
                 sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples,APVal2,ErrAbbr,Creator,ModuleSN from Issue where APVal1 <> 'delete' and (Summary like '%<cond1>%' or Summary like '%<cond11>%' or Summary like '%<cond2>%' or Summary like '%<cond22>%') and  ParentIssueKey = '' order by Resolution DESC,ReportDate DESC,ProjectKey";
                 sql = sql.Replace("<cond1>", CRITICALERRORTYPE.LYTTASK1.Replace("[","").Replace("]", "")).Replace("<cond2>",CRITICALERRORTYPE.SECONDMATCH1.Replace("[", "").Replace("]", ""))
                 .Replace("<cond11>", CRITICALERRORTYPE.LYTTASK.Replace("[", "").Replace("]", "")).Replace("<cond22>", CRITICALERRORTYPE.SECONDMATCH.Replace("[", "").Replace("]", ""));
-
             }
             else
             {
@@ -3111,6 +3110,13 @@ namespace Prometheus.Models
                 tobedata.UpdateIssue();
                 tobedata.CloseIssue();
             }
+        }
+
+        public static void UpdateIssueAssigneeAndResolution(string issuekey, string assignee, string resolution)
+        {
+            var sql = "update Issue set Assignee = '<Assignee>', Resolution = <Resolution> where IssueKey = '<IssueKey>'";
+            sql = sql.Replace("<IssueKey>", issuekey).Replace("<Assignee>", assignee).Replace("<Resolution>", resolution);
+            DBUtility.ExeLocalSqlNoRes(sql);
         }
     }
 }

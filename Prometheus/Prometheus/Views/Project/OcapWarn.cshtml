@@ -1,4 +1,4 @@
-﻿@model Prometheus.Models.IssueViewModels
+﻿@model IEnumerable < Prometheus.Models.IssueViewModels>
 
 @{
     ViewBag.Title = "OcapAlarm";
@@ -10,8 +10,8 @@
         <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
         @if (Model != null)
         {
-            <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ProjectKey)">Project Detail</a></li>
-            <li><a data-toggle="tooltip" title="Goto Special Task" href="/Project/ProjectSptTask?ProjectKey=@(Model.ProjectKey)">Special Task</a></li>
+            <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ElementAt(0).ProjectKey)">Project Detail</a></li>
+            <li><a data-toggle="tooltip" title="Goto Special Task" href="/Project/ProjectSptTask?ProjectKey=@(Model.ElementAt(0).ProjectKey)">Special Task</a></li>
         }
         <li class="active">OCAP Alarm</li>
     </ol>
@@ -19,14 +19,14 @@
 
 @if (Model != null)
 {
-    <h3>Summary: @Model.Summary</h3>
+    <h3>Summary</h3>
     <hr />
     using (Html.BeginForm("OcapWarn", "Project", FormMethod.Post, new { enctype = "multipart/form-data" }))
     {
         @Html.AntiForgeryToken()
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         <div class="row col-lg-12">
-            <input type="hidden" id="IssueKey" name="IssueKey" value="@(Model.IssueKey)" />
+            <input type="hidden" id="IssueKeys" name="IssueKeys" value="@(ViewBag.IssueKeys)" />
             <div class="form-group">
                 <label>Related People Email<font color="red">*</font></label>
             </div>
@@ -85,12 +85,12 @@
                             <label class="control-label">To Who</label>
                         </div>
                         <div class="col-lg-9">
-                            @Html.DropDownList("towholist1", null, new { @id = "towholist1", @class = "form-control", @onchange = "chooseapusher1()" })
+                            @Html.DropDownList("towholist", null, new { @id = "towholist", @class = "form-control", @onchange = "chooseapusher1()" })
                         </div>
                         <script type="text/javascript">
                             function chooseapusher1()
                             {
-                                document.getElementById("towhoinput1").value = document.getElementById("towhoinput1").value + ';' + document.getElementById("towholist1").value;
+                                document.getElementById("towhoinput1").value = document.getElementById("towhoinput1").value + ';' + document.getElementById("towholist").value;
                             }
                         </script>
                     </div>

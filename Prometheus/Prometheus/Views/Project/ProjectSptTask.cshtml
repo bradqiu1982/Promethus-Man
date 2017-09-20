@@ -45,7 +45,13 @@
             @foreach (var item in Model)
             {
                 <tr>
-                    <td>@item.ProjectKey</td>
+                    <td>
+                    @if (item.Resolution != Prometheus.Models.Resolute.Pending
+                            && item.Resolution != Prometheus.Models.Resolute.Working
+                                && item.Resolution != Prometheus.Models.Resolute.Reopen)
+                    {
+                        <input type="checkbox" class="checkbox-issuekey" data-data="@item.IssueKey" name="issuekey" />
+                    }&nbsp;@item.ProjectKey</td>
                     <td>@item.ModuleSN</td>
                     <td>Components damage</td>
                     <td>
@@ -88,6 +94,11 @@
         </tbody>
     </table>
 </div>
+<hr />
+<div class="row">
+    <input type="checkbox" id="checkAll" name="checkAll" class="col-md-offset-1 col-md-1" />
+    <button type="button" id="batch_ocap" name="batch_ocap" class="col-md-2 btn btn-success">OCAP</button>
+</div>
 <script type="text/javascript">
     $(document).ready(function () {
         $('#pndatatable').DataTable({
@@ -105,8 +116,40 @@
             pqeFlag = "TRUE";
             if (pqeFlag === "TRUE") {
                 var issuekey = $(this).attr("data-key");
-                var myurl = "/Project/OcapWarn?IssueKey=" + issuekey;
+                var myurl = "/Project/OcapWarn?IssueKeys=" + issuekey;
                 window.open(myurl, '_blank');
+            }
+        }
+        return false;
+    });
+
+    $("body").on("click", "#checkAll", function () {
+        if ($(this).prop("checked")) {
+            $('.checkbox-issuekey').prop("checked", true);
+        }
+        else {
+            $('.checkbox-issuekey').prop("checked", false);
+        }
+    })
+
+    $("body").on("click", "#batch_ocap", function () {
+        var rst = confirm("Warning: only PQE can trigger OCAP Alarm.");
+        if (rst) {
+            var pqeFlag = $("#pqe_flag").val();
+            pqeFlag = "TRUE";
+            if (pqeFlag === "TRUE") {
+                var issueKeys = "";
+                $(".checkbox-issuekey:checked").each(function () {
+                    issueKeys += $(this).attr("data-data") + ";";
+                });
+                if (issueKeys === "") {
+                    alert("Please at least choose one task!");
+                    return false;
+                }
+                else {
+                    var myurl = "/Project/OcapWarn?IssueKeys=" + window.btoa(issueKeys);
+                    window.open(myurl, '_blank');
+                }
             }
         }
         return false;

@@ -6647,7 +6647,7 @@ namespace Prometheus.Controllers
             return res;
         }
 
-        public ActionResult OcapWarn(string IssueKey)
+        public ActionResult OcapWarn(string IssueKeys)
         {
             var ckdict = CookieUtility.UnpackCookie(this);
             if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
@@ -6659,38 +6659,49 @@ namespace Prometheus.Controllers
                 var ck = new Dictionary<string, string>();
                 ck.Add("logonredirectctrl", "Project");
                 ck.Add("logonredirectact", "OcapWarn");
-                ck.Add("issuekey", IssueKey);
+                ck.Add("issuekeys", IssueKeys);
                 CookieUtility.SetCookie(this, ck);
                 return RedirectToAction("LoginUser", "User");
             }
 
-            var key = "";
-            if (!string.IsNullOrEmpty(IssueKey))
+            var keys = "";
+            if (!string.IsNullOrEmpty(IssueKeys))
             {
                 var ck = new Dictionary<string, string>();
-                ck.Add("issuekey", IssueKey);
+                ck.Add("issuekeys", IssueKeys);
                 ck.Add("currentaction", "OcapWarn");
                 CookieUtility.SetCookie(this, ck);
-                key = IssueKey;
+                keys = IssueKeys;
             }
-            else if (ckdict.ContainsKey("issuekey") && !string.IsNullOrEmpty(ckdict["issuekey"]))
+            else if (ckdict.ContainsKey("issuekeys") && !string.IsNullOrEmpty(ckdict["issuekeys"]))
             {
-                key = ckdict["issuekey"];
+                keys = ckdict["issuekeys"];
                 var ck = new Dictionary<string, string>();
                 ck.Add("currentaction", "OcapWarn");
                 CookieUtility.SetCookie(this, ck);
             }
 
-            if (string.IsNullOrEmpty(key))
+            if (string.IsNullOrEmpty(keys))
             {
-                return View();
+                return RedirectToAction("ViewAll", "Project");
             }
 
             var asilist = UserViewModels.RetrieveAllUser();
-            ViewBag.towholist1 = CreateSelectList(asilist, "");
+            ViewBag.towholist = CreateSelectList(asilist, "");
 
-            var ret = IssueViewModels.RetrieveIssueByIssueKey(key, this);
-            if (ret != null)
+            var issuekeybits = Convert.FromBase64String(keys);
+            var issuekeystr = System.Text.Encoding.UTF8.GetString(issuekeybits);
+            var issueKeyList = issuekeystr.Split(new string[] { ",", ";"}, StringSplitOptions.RemoveEmptyEntries);
+            var vmList = new List<IssueViewModels>();
+            foreach (var key in issueKeyList)
+            {
+                var vm = IssueViewModels.RetrieveIssueByIssueKey(key, this);
+                if (vm != null)
+                {
+                    vmList.Add(vm);
+                }  
+            }
+            if(vmList.Count > 0)
             {
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
                 //for test
@@ -6700,12 +6711,13 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(defaultlytteam))
                 {
                     ViewBag.defaultlytteam = defaultlytteam;
+                    ViewBag.IssueKeys = IssueKeys;
                 }
-                return View(ret);
+                return View(vmList);
             }
             else
             {
-                return View();
+                return RedirectToAction("ViewAll", "Project");
             }
         }
 
@@ -6713,66 +6725,112 @@ namespace Prometheus.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult OcapWarnPost()
         {
-            var issuekey = Request.Form["IssueKey"];
-            var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey, this);
-            if (vm != null)
+            var issuekeybits = Convert.FromBase64String(Request.Form["IssueKeys"]);
+            var issuekeystr = System.Text.Encoding.UTF8.GetString(issuekeybits);
+
+            if ( ! String.IsNullOrEmpty(issuekeystr))
             {
+                var issuekeys = issuekeystr.Split(new string[] { ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
                 var ckdict = CookieUtility.UnpackCookie(this);
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
                 //for test
                 updater = "YAN.SHI@FINISAR.COM";
-                if (Request.Form["sendisu"] != null)
+                var vms = new List<IssueViewModels>();
+                var comment = Request.Form["commentcontent"];
+                var addrs = Request.Form["RPeopleAddr"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+                var addrlist = new List<string>();
+                addrlist.AddRange(addrs);
+                foreach (var issuekey in issuekeys)
                 {
-                    var comment = Request.Form["commentcontent"];
-                    var addrs = Request.Form["RPeopleAddr"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
-
-                    CreateLYTSubTask(CRITICALERRORTYPE.CONTAINMENTACTION, "Containment Action for " + comment, vm.ProjectKey, issuekey, updater, updater, DateTime.Now.AddDays(7));
-                    CreateLYTSubTask(CRITICALERRORTYPE.CORRECTIVEACTION, "Corrective Action for " + comment, vm.ProjectKey, issuekey, updater, updater, DateTime.Now.AddDays(14));
-
-                    var addrlist = new List<string>();
-                    addrlist.AddRange(addrs);
-                    SendOCAPEvent(vm, comment, addrlist);
-                    
-                    IssueViewModels.UpdateIssueAssigneeAndResolution(issuekey, updater, Resolute.Reopen);
-
+                    var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey.ToString(), this);
+                    if (vm != null)
+                    {
+                        vms.Add(vm);
+                        //OcapSingletonOperate(vm, updater, comment);
+                    }
+                }
+                SendOCAPEvent(vms, comment, addrlist);
+                if (vms.Count == 0)
+                {
+                    return RedirectToAction("ViewAll", "Project");
+                }
+                else if (vms.Count == 1)
+                {
                     var dict = new RouteValueDictionary();
-                    dict.Add("issuekey", issuekey);
+                    dict.Add("issuekey", vms.ElementAt(0).IssueKey);
                     return RedirectToAction("UpdateIssue", "Issue", dict);
                 }
                 else
                 {
                     var dict = new RouteValueDictionary();
-                    dict.Add("ProjectKey", vm.ProjectKey);
+                    dict.Add("ProjectKey", vms.ElementAt(0).ProjectKey);
                     return RedirectToAction("ProjectSptTask", "Project", dict);
                 }
             }
-            return RedirectToAction("ProjectSptTask", "Project");
+
+            return RedirectToAction("ViewAll", "Project");
         }
 
-        private void SendOCAPEvent(IssueViewModels vm, string comment, List<string> addrlist)
+        private void OcapSingletonOperate(IssueViewModels vm, string updater, string comment)
         {
-            var routevalue = new RouteValueDictionary();
-            routevalue.Add("issuekey", vm.IssueKey);
-            //send validate email
-            string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
-            string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+            CreateLYTSubTask(CRITICALERRORTYPE.CONTAINMENTACTION, "Containment Action for " + comment, vm.ProjectKey, vm.IssueKey, updater, updater, DateTime.Now.AddDays(7));
+            CreateLYTSubTask(CRITICALERRORTYPE.CORRECTIVEACTION, "Corrective Action for " + comment, vm.ProjectKey, vm.IssueKey, updater, updater, DateTime.Now.AddDays(14));
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment, vm.Assignee, COMMENTTYPE.Description);
+            IssueViewModels.UpdateIssueAssigneeAndResolution(vm.IssueKey, updater, Resolute.Reopen);
+        }
 
-            var netcomputername = "";
-            try { netcomputername = System.Net.Dns.GetHostName(); }
-            catch (Exception ex) { }
-            validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
+        private void SendOCAPEvent(List<IssueViewModels> vms, string comment, List<string> addrlist)
+        {
+            var toaddrs = new Dictionary<string, bool>();
+            var body = new List<List<string>>();
+            var tmpList = new List<string>();
+            tmpList.Add("Project");
+            tmpList.Add("ModuleSN");
+            tmpList.Add("RootCause");
+            tmpList.Add("Failure Description");
+            tmpList.Add("Task Link");
+            body.Add(tmpList);
+            foreach (var vm in vms) {
+                var routevalue = new RouteValueDictionary();
+                routevalue.Add("issuekey", vm.IssueKey);
+                //send validate email
+                string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
 
-            var content = "Hi All,\r\n\r\nThis is a Critical Error Alarm information. Please pay your attention to it. Thanks!";
-            content = content + "\r\n\r\n[" + vm.Summary + "]  is created base on analyse of task: ";
-            content = content + "\r\n\r\n" + vm.Summary;
-            content = content + "\r\n\r\nCritical Error TASK LINK: " + validatestr;
+                var netcomputername = "";
+                try {
+                    netcomputername = System.Net.Dns.GetHostName();
+                }
+                catch (Exception ex)
+                { }
+                validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
+                
+                tmpList = new List<string>();
+                tmpList.Add(vm.ProjectKey);
+                tmpList.Add(vm.ModuleSN);
+                tmpList.Add(vm.ModuleSN);
+                tmpList.Add(vm.Summary.Replace(CRITICALERRORTYPE.SECONDMATCH, ""));
+                tmpList.Add("<a href=" + validatestr + ">Detail</a>");
+                body.Add(tmpList);
+                //if ( ! toaddrs.ContainsKey(vm.Assignee))
+                //{
+                //    toaddrs.Add(vm.Assignee, true);
+                //}
+                //if( !toaddrs.ContainsKey(vm.Reporter))
+                //{
+                //    toaddrs.Add(vm.Reporter, true);
+                //}
+            }
 
-            var toaddrs = new List<string>();
-            toaddrs.AddRange(addrlist);
-            toaddrs.Add(vm.Assignee);
-            toaddrs.Add(vm.Reporter);
+            var towho = new List<string>();
+            towho.AddRange(toaddrs.Keys);
+            towho.AddRange(addrlist);
 
-            EmailUtility.SendEmail(this, "Project Critical Error Alarm - WUXI Engineering System", toaddrs, content);
+            var greeting = "Hi All";
+            var description = "Below is Parallel Critical OCAP Alarm base on WUXI ENGINEERING SYSTEM for " + DateTime.Now.ToString("MM/dd/yyyy"); 
+            var content = EmailUtility.CreateTableHtml(greeting, description, comment, body);
+
+            EmailUtility.SendEmail(this, "Parallel Test Critical Failure Alarm Report -- " + DateTime.Now.ToString("MM/dd/yyyy"), towho, content, true);
             
             new System.Threading.ManualResetEvent(false).WaitOne(500);
         }

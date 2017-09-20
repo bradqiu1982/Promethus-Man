@@ -833,7 +833,7 @@ namespace Prometheus.Controllers
         public ActionResult AddShareTag()
         {
             var tagstr = string.Empty;
-            var tags = ShareDocVM.RetrieveShareTags();
+            var tags = ShareDocVM.RetrieveShareTags(this);
 
             foreach (var tag in tags)
             {
@@ -855,7 +855,7 @@ namespace Prometheus.Controllers
             taglist.AddRange(tags);
             ShareDocVM.StoreShareTags(taglist);
 
-            var tags1 = ShareDocVM.RetrieveShareTags();
+            var tags1 = ShareDocVM.RetrieveShareTags(this);
             var tagstr1 = string.Empty;
             foreach (var tag in tags1)
             {
@@ -922,7 +922,7 @@ namespace Prometheus.Controllers
 
         private void createtaglist()
         {
-            var tags = ShareDocVM.RetrieveShareTags();
+            var tags = ShareDocVM.RetrieveShareTags(this);
             tags.Sort();
             var newtags = new List<string>();
             newtags.Add("Technical Tag");

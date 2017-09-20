@@ -213,6 +213,7 @@ namespace Prometheus.Models
             Resolution = "";
             ParentIssueKey = "";
             RelativePeoples = "";
+            SharedTag = "";
         }
 
         public IssueViewModels(string pk,string ik,string it,string sum,string pri,string ddate,string rsdate,string rtdate,string assign,string rt,string resolute,string pik,string rpeople)
@@ -235,6 +236,8 @@ namespace Prometheus.Models
         public string ProjectKey{ set;get; }
 
         public string IssueKey { set; get; }
+
+        public string SharedTag { set; get; }
 
         public string IssueType { set; get; }
         public string Summary { set; get; }
@@ -1258,6 +1261,7 @@ namespace Prometheus.Models
                 tempret.ModuleSN = Convert.ToString(line[16]);
                 tempret.RetrieveComment(ctrl);
                 tempret.RetrieveAttachment(tempret.IssueKey);
+                tempret.SharedTag = ShareDocVM.RetrieveSharedDocTag(tempret.IssueKey);
                 ret.Add(tempret);
             }
 

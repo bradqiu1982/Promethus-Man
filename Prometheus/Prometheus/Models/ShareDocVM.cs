@@ -105,6 +105,19 @@ namespace Prometheus.Models
             return docid;
         }
 
+        public static string RetrieveSharedDocTag(string dockey)
+        {
+            var ret = new List<string>();
+            var sql = "select DOCTag from ShareDoc where DOCKey = '<DOCKey>'";
+            sql = sql.Replace("<DOCKey>", dockey);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                return Convert.ToString(line[0]).Replace(CRITICALERRORTYPE.CRITICALERRORTAG+";","");
+            }
+            return string.Empty;
+        }
+
         public static string RetrieveBackLink(string Dockey)
         {
             var sql = "select BackLink from ShareDoc where DOCKey=N'<DOCKey>'";
@@ -888,13 +901,32 @@ namespace Prometheus.Models
             }
         }
 
-        public static List<string> RetrieveShareTags()
+        public static List<string> RetrieveShareTags(Controller ctrl)
         {
             var ret = new List<string>();
-            var sql = "select DOCTag from ShareTags order by DOCTag ASC";
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
-            foreach (var line in dbret)
-            { ret.Add(Convert.ToString(line[0])); }
+            var sharetags = CfgUtility.GetSysConfig(ctrl)["SHARETAG"].Split(new string[] { ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var item in sharetags)
+            {
+                ret.Add(item.Trim());
+            }
+            ret.Sort();
+            return ret;
+
+            //var sql = "select DOCTag from ShareTags order by DOCTag ASC";
+            //var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
+            //foreach (var line in dbret)
+            //{ ret.Add(Convert.ToString(line[0])); }
+        }
+
+        public static List<string> RetrieveCriticalTags(Controller ctrl)
+        {
+            var ret = new List<string>();
+            var sharetags = CfgUtility.GetSysConfig(ctrl)["CRITICALFAILURERT"].Split(new string[] { ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var item in sharetags)
+            {
+                ret.Add(item.Trim());
+            }
+            ret.Sort();
             return ret;
         }
 

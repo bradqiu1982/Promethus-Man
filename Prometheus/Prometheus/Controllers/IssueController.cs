@@ -107,7 +107,7 @@ namespace Prometheus.Controllers
                 vm.Reporter = ckdict["logonuser"].Split(new char[] { '|' })[0];
                 CreateAllLists(vm);
 
-                ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
+                ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
 
                 var asilist = UserViewModels.RetrieveAllUser();
                 ViewBag.towholist = CreateSelectList(asilist, "");
@@ -346,7 +346,7 @@ namespace Prometheus.Controllers
 
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);
-                ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
+                ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
                 return View();
             }
 
@@ -422,21 +422,24 @@ namespace Prometheus.Controllers
                     ViewBag.birootcauselist = CreateBIRootIssue(ret.ProjectKey, sn);
                 }
 
-
-                var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist = CreateSelectList(asilist, "");
-                ViewBag.towholist1 = CreateSelectList(asilist, "");
-
-                ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
-
                 if (ret.Summary.Contains(CRITICALERRORTYPE.LYTTASK) || ret.Summary.Contains(CRITICALERRORTYPE.LYTTASK1))
                 {
                     var templist = new List<string>();
                     templist.Add("YES");
                     templist.Add("NO");
                     ViewBag.iscriticaltasklist = CreateSelectList(templist, "");
+
+                    ViewBag.tobechoosetags = ShareDocVM.RetrieveCriticalTags(this);
+                }
+                else
+                {
+                    ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
                 }
 
+                var asilist = UserViewModels.RetrieveAllUser();
+                ViewBag.towholist = CreateSelectList(asilist, "");
+                ViewBag.towholist1 = CreateSelectList(asilist, "");
+                
                 return View(ret);
             }
             else
@@ -447,7 +450,7 @@ namespace Prometheus.Controllers
 
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);
-                ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
+                ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
                 return View();
             }
         }
@@ -665,10 +668,10 @@ namespace Prometheus.Controllers
                             }
                         }
 
-                        if (!issuetag.Contains(CRITICALERRORTYPE.CRITICALERRORTAG))
-                        {
-                            issuetag = issuetag + CRITICALERRORTYPE.CRITICALERRORTAG + ";";
-                        }
+                        //if (!issuetag.Contains(CRITICALERRORTYPE.CRITICALERRORTAG))
+                        //{
+                        //    issuetag = issuetag + CRITICALERRORTYPE.CRITICALERRORTAG + ";";
+                        //}
                     }
                     else
                     {
@@ -803,7 +806,7 @@ namespace Prometheus.Controllers
             vm.ParentIssueKey = parentkey;
             vm.ProjectKey = projectkey;
             CreateAllLists(vm);
-            ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
+            ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
 
             var asilist = UserViewModels.RetrieveAllUser();
             ViewBag.towholist = CreateSelectList(asilist, "");
@@ -1068,7 +1071,7 @@ namespace Prometheus.Controllers
                 vm.Reporter = ckdict["logonuser"].Split(new char[] { '|' })[0];
                 CreateAllLists(vm);
 
-                ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
+                ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
                 return View(vm);
             }
             else
@@ -1290,7 +1293,7 @@ namespace Prometheus.Controllers
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);
 
-                ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
+                ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
                 return View();
             }
 
@@ -1332,15 +1335,19 @@ namespace Prometheus.Controllers
                 ViewBag.towholist = CreateSelectList(asilist, "");
                 ViewBag.towholist1 = CreateSelectList(asilist, "");
 
-                ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
-
                 if (ret.Summary.Contains(CRITICALERRORTYPE.LYTTASK) || ret.Summary.Contains(CRITICALERRORTYPE.LYTTASK1))
                 {
                     var templist = new List<string>();
                     templist.Add("YES");
                     templist.Add("NO");
                     ViewBag.iscriticaltasklist = CreateSelectList(templist,"");
+                    ViewBag.tobechoosetags = ShareDocVM.RetrieveCriticalTags(this);
                 }
+                else
+                {
+                    ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
+                }
+
                 return View(ret);
             }
             else
@@ -1352,7 +1359,7 @@ namespace Prometheus.Controllers
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);
 
-                ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
+                ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
                 return View();
             }
         }
@@ -1743,10 +1750,10 @@ namespace Prometheus.Controllers
                             }
                         }
 
-                        if (!issuetag.Contains(CRITICALERRORTYPE.CRITICALERRORTAG))
-                        {
-                            issuetag = issuetag + CRITICALERRORTYPE.CRITICALERRORTAG + ";";
-                        }
+                        //if (!issuetag.Contains(CRITICALERRORTYPE.CRITICALERRORTAG))
+                        //{
+                        //    issuetag = issuetag + CRITICALERRORTYPE.CRITICALERRORTAG + ";";
+                        //}
 
                         UserKPIVM.AddUserDailyRank(realissue.IssueKey, realissue.Assignee, UserRankType.BASE
                             , "Close CRITICAL ERROR Task: " + realissue.Summary, "/Issue/UpdateIssue?issuekey=" + realissue.IssueKey, 4);
@@ -1875,7 +1882,7 @@ namespace Prometheus.Controllers
                 }
                 //ret.Reporter = updater;
 
-                ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
+                ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
                 CreateAllLists(ret);
                 var asilist = UserViewModels.RetrieveAllUser();
                 ViewBag.towholist = CreateSelectList(asilist, "");
@@ -2304,7 +2311,7 @@ namespace Prometheus.Controllers
                     ViewBag.isassignee = true;
                 }
 
-                ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
+                ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
                 CreateAllLists(ret);
 
                 var asilist = UserViewModels.RetrieveAllUser();
@@ -2530,7 +2537,7 @@ namespace Prometheus.Controllers
                 }
                 //ret.Reporter = updater;
 
-                ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
+                ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
                 CreateAllLists(ret);
                 var asilist = UserViewModels.RetrieveAllUser();
                 ViewBag.towholist = CreateSelectList(asilist, "");
@@ -2745,7 +2752,7 @@ namespace Prometheus.Controllers
             //{
             //    ViewBag.isassignee = true;
             //}
-            //ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
+            //ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
             //return View(newdata);
 
             var dict1 = new RouteValueDictionary();
@@ -2809,7 +2816,7 @@ namespace Prometheus.Controllers
                 //ret.Reporter = updater;
 
                 CreateAllLists(ret);
-                ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags();
+                ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
 
                 return View(ret);
             }

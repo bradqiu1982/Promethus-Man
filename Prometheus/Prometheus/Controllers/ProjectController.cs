@@ -1379,35 +1379,74 @@ namespace Prometheus.Controllers
                         }
                     }
 
-                    var yvm = ProjectYieldViewModule.GetYieldByDateRange(vm.ProjectKey, startdate.ToString(), enddate, vm, HttpContext.Cache);
-                    if (yvm.FirstYields.Count > 0)
+                    var mycache = HttpContext.Cache;
+                    var firstyield = mycache.Get(vm.ProjectKey + "_FPY");
+                    if (firstyield == null)
                     {
-                        vm.FirstYield = yvm.FirstYield;
-                        vm.RetestYield = yvm.LastYield;
+                        var yvm = ProjectYieldViewModule.GetYieldByDateRange(vm.ProjectKey, startdate.ToString(), enddate, vm, HttpContext.Cache);
+                        if (yvm.FirstYields.Count > 0)
+                        {
+                            vm.FirstYield = yvm.FirstYield;
+                            vm.RetestYield = yvm.LastYield;
+                        }
+                        else
+                        {
+                            vm.FirstYield = -1.0;
+                            vm.RetestYield = -1.0;
+                        }
+                        mycache.Insert(vm.ProjectKey + "_FPY", vm.FirstYield, null, DateTime.Now.AddHours(2), Cache.NoSlidingExpiration);
+                        mycache.Insert(vm.ProjectKey + "_FY", vm.RetestYield, null, DateTime.Now.AddHours(2), Cache.NoSlidingExpiration);
                     }
                     else
                     {
-                        vm.FirstYield = -1.0;
-                        vm.RetestYield = -1.0;
+                        vm.FirstYield = Convert.ToDouble(mycache.Get(vm.ProjectKey + "_FPY"));
+                        vm.RetestYield = Convert.ToDouble(mycache.Get(vm.ProjectKey + "_FY"));
                     }
+
 
                     NPIInfo(vm);
 
-                    var taskdone = IssueViewModels.RetrieveTaskCountByProjectKey(vm.ProjectKey, Resolute.Done);
-                    var tasktotal = taskdone + IssueViewModels.RetrieveTaskCountByProjectKey(vm.ProjectKey, Resolute.Pending)
-                        + IssueViewModels.RetrieveTaskCountByProjectKey(vm.ProjectKey, Resolute.Working);
+                    var taskcount = mycache.Get(vm.ProjectKey + "_taskct");
+                    if (taskcount == null)
+                    {
+                        var taskdone = IssueViewModels.RetrieveTaskCountByProjectKey(vm.ProjectKey, Resolute.Done);
+                        var tasktotal = taskdone + IssueViewModels.RetrieveTaskCountByProjectKey(vm.ProjectKey, Resolute.Pending)
+                            + IssueViewModels.RetrieveTaskCountByProjectKey(vm.ProjectKey, Resolute.Working);
+                        vm.PendingTaskCount = taskdone.ToString() + "/" + tasktotal.ToString();
+                        mycache.Insert(vm.ProjectKey + "_taskct", vm.PendingTaskCount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                    }
+                    else
+                    {
+                        vm.PendingTaskCount = Convert.ToString(taskcount);
+                    }
 
-                    vm.PendingTaskCount = taskdone.ToString() + "/" + tasktotal.ToString();
+                    var facount = mycache.Get(vm.ProjectKey + "_fact");
+                    if (facount == null)
+                    {
+                        var fadone = ProjectFAViewModules.RetrieveFADataCount(vm.ProjectKey, false);
+                        var fatotal = fadone + ProjectFAViewModules.RetrieveFADataCount(vm.ProjectKey);
+                        vm.PendingFACount = fadone.ToString() + "/" + fatotal.ToString();
+                        mycache.Insert(vm.ProjectKey + "_fact", vm.PendingFACount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                    }
+                    else
+                    {
+                        vm.PendingFACount = Convert.ToString(facount);
+                    }
 
-                    var fadone = ProjectFAViewModules.RetrieveFADataCount(vm.ProjectKey, false);
-                    var fatotal = fadone + ProjectFAViewModules.RetrieveFADataCount(vm.ProjectKey);
-                    vm.PendingFACount = fadone.ToString() + "/" + fatotal.ToString();
+                    var rmacount = mycache.Get(vm.ProjectKey + "_rmact");
+                    if (rmacount == null)
+                    {
+                        var rmadone = IssueViewModels.RetrieveRMACountByProjectKey(vm.ProjectKey, Resolute.Done);
+                        var rmatotal = rmadone + IssueViewModels.RetrieveRMACountByProjectKey(vm.ProjectKey, Resolute.Pending)
+                            + IssueViewModels.RetrieveRMACountByProjectKey(vm.ProjectKey, Resolute.Working);
+                        vm.PendingRMACount = rmadone.ToString() + "/" + rmatotal.ToString();
+                        mycache.Insert(vm.ProjectKey + "_rmact", vm.PendingRMACount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                    }
+                    else
+                    {
+                        vm.PendingRMACount = Convert.ToString(rmacount);
+                    }
 
-                    var rmadone = IssueViewModels.RetrieveRMACountByProjectKey(vm.ProjectKey, Resolute.Done);
-                    var rmatotal = rmadone + IssueViewModels.RetrieveRMACountByProjectKey(vm.ProjectKey, Resolute.Pending)
-                        + IssueViewModels.RetrieveRMACountByProjectKey(vm.ProjectKey, Resolute.Working);
-
-                    vm.PendingRMACount = rmadone.ToString() + "/" + rmatotal.ToString();
                 }
 
                 return View(vm);

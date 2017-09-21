@@ -923,6 +923,20 @@ namespace Prometheus.Controllers
         private void createtaglist()
         {
             var tags = ShareDocVM.RetrieveShareTags(this);
+            var ctags = ShareDocVM.RetrieveCriticalTags(this);
+            var tagdict = new Dictionary<string, bool>();
+            foreach (var item in tags)
+            {
+                tagdict.Add(item, true);
+            }
+            foreach (var item in ctags)
+            {
+                if (!tagdict.ContainsKey(item))
+                {
+                    tags.Add(item);
+                }
+            }
+
             tags.Sort();
             var newtags = new List<string>();
             newtags.Add("Technical Tag");

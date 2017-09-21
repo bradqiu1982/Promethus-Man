@@ -176,10 +176,10 @@ namespace Prometheus.Controllers
             var toaddrs = new List<string>();
             toaddrs.Add(Reporter);
             toaddrs.Add(Assignee);
-            if (vm.RelativePeopleList.Count > 0)
-            {
-                toaddrs.AddRange(vm.RelativePeopleList);
-            }
+            //if (vm.RelativePeopleList.Count > 0)
+            //{
+            //    toaddrs.AddRange(vm.RelativePeopleList);
+            //}
 
             var report = Reporter.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
             EmailUtility.SendEmail(this,"WUXI Engineering System_"+report, toaddrs, content);
@@ -504,6 +504,72 @@ namespace Prometheus.Controllers
             return ret;
         }
 
+        private List<string> PJPQE(IssueViewModels vm)
+        {
+            var pj = ProjectViewModels.RetrieveOneProject(vm.ProjectKey);
+            var ret = new List<string>();
+            foreach (var item in pj.MemberList)
+            {
+                if (string.Compare(item.Role, ProjectViewModels.PQEROLE, true) == 0)
+                {
+                    ret.Add(item.Name);
+                }
+            }
+            return ret;
+        }
+
+        private void SendPDMSEvent(IssueViewModels vm, string comment,string rootcause)
+        {
+            var netcomputername = "";
+            try
+            {
+                netcomputername = System.Net.Dns.GetHostName();
+            }
+            catch (Exception ex)
+            { }
+
+            var body = new List<List<string>>();
+            var tmpList = new List<string>();
+            tmpList.Add("Project");
+            tmpList.Add("ModuleSN");
+            tmpList.Add("RootCause");
+            tmpList.Add("Failure Description");
+            tmpList.Add("Task Link");
+            body.Add(tmpList);
+
+                var routevalue = new RouteValueDictionary();
+                routevalue.Add("issuekey", vm.IssueKey);
+                //send validate email
+                string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+                validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
+
+                tmpList = new List<string>();
+                tmpList.Add(vm.ProjectKey);
+                tmpList.Add(vm.ModuleSN);
+                tmpList.Add(rootcause);
+                tmpList.Add(vm.Summary.Replace(CRITICALERRORTYPE.SECONDMATCH, ""));
+                tmpList.Add("<a href=" + validatestr + ">Detail</a>");
+                body.Add(tmpList);
+
+            var towho = new List<string>();
+            towho.Add(vm.Assignee);
+            towho.Add(vm.Reporter);
+            towho.AddRange(PJPQE(vm));
+            if (vm.RelativePeopleList.Count > 0)
+            {
+                towho.AddRange(vm.RelativePeopleList);
+            }
+
+            var greeting = "Hi All";
+            var description = "Below is Parallel Test Critical Alarm base on WUXI ENGINEERING SYSTEM (Human Reviewed) --" + DateTime.Now.ToString("MM/dd/yyyy");
+            var content = EmailUtility.CreateTableHtml(greeting, description, comment, body);
+
+            EmailUtility.SendEmail(this, "Parallel Test Critical Failure Alarm Report -- " + DateTime.Now.ToString("MM/dd/yyyy"), towho, content, true);
+
+            new System.Threading.ManualResetEvent(false).WaitOne(500);
+        }
+
         [HttpPost, ActionName("UpdateIssue")]
         [ValidateAntiForgeryToken]
         public ActionResult UpdateIssuePost()
@@ -664,7 +730,16 @@ namespace Prometheus.Controllers
                         {
                             if (string.Compare(isrealcritical, "NO", true) == 0)
                             {
-                                realissue.UpdateSummary(realissue.Summary.Replace(CRITICALERRORTYPE.LYTTASK,""));
+                                realissue.UpdateSummary(realissue.Summary.Replace(CRITICALERRORTYPE.LYTTASK, ""));
+                            }
+                            else
+                            {
+                                var tmpcmt = updater.ToUpper().Replace("@FINISAR.COM", "") + " has confirmed this is a real critical failure.";
+                                if (!string.IsNullOrEmpty(issuetag))
+                                {
+                                    tmpcmt = tmpcmt + "it's rootcause is "+issuetag.Replace(";"," ");
+                                }
+                                SendPDMSEvent(realissue,tmpcmt,issuetag);
                             }
                         }
 
@@ -1747,6 +1822,15 @@ namespace Prometheus.Controllers
                             if (string.Compare(isrealcritical, "NO", true) == 0)
                             {
                                 realissue.UpdateSummary(realissue.Summary.Replace(CRITICALERRORTYPE.LYTTASK, ""));
+                            }
+                            else
+                            {
+                                var tmpcmt = updater.ToUpper().Replace("@FINISAR.COM", "") + " has confirmed this is a real critical failure.";
+                                if (!string.IsNullOrEmpty(issuetag))
+                                {
+                                    tmpcmt = tmpcmt + "it's rootcause is " + issuetag.Replace(";", " ");
+                                }
+                                SendPDMSEvent(realissue, tmpcmt, issuetag);
                             }
                         }
 

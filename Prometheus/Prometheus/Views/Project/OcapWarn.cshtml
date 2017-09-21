@@ -90,7 +90,7 @@
         <div class="row col-lg-12 ocap-content">
             <div class="row form-group">
                 <label class="coap-label control-label">OCAP Num<font color="red">*</font></label>
-                <input type="text" class="form-control ocap-alarm-input col-md-6" id="ocap_id" name="ocap_id" 
+                <input type="text" class="form-control ocap-alarm-input col-md-6" id="ocap_id" name="ocap_id"  style="margin-left:-1%"
                     data-val="true" data-val-required="This field is required." 
                         data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$"/>
                 <span class="field-validation-valid text-danger" data-valmsg-for="ocap_id" data-valmsg-replace="true"></span>
@@ -98,13 +98,22 @@
         </div>
         <div class="row col-lg-12 ocap-content">
             <div class="row form-group">
-                <label class="coap-label control-label">Attachments<font color="red">*</font></label>
+                @*<label class="coap-label control-label">Attachments<font color="red">*</font></label>
                 <input type="file" class="ocap-alarm-attach col-md-6" name="files" id="file1" 
-                    data-val="true" data-val-required="This field is required." />
-                @*<span class="btn-file" id="choosefile">
-                    <span class="ocap-attach-update">OCAP Files Upload</span>
-                </span>*@
-                <span class="field-validation-valid text-danger" data-valmsg-for="file1" data-valmsg-replace="true"></span>
+                    data-val="true" data-val-required="This field is required." />*@
+                <div class="col-lg-2" style="padding-left:0px">
+                    <span class="btn btn-default btn-file" id="choosefile" style="width:10em!important;border-radius:0.5em;">
+                        Upload OCAP File<input type="file" name="files" id="file1" runat="server" onchange="ShowFileNames(this)" />
+                    </span>
+                </div>
+                <div class="col-lg-10">
+                    <label class="control-label" id="showfilename" name="showfilename" style="text-align:left"></label>
+                </div>
+                <script type="text/javascript">
+                    function ShowFileNames(oFile) {
+                        $('#showfilename').text(oFile.value);
+                    }
+                </script>
             </div>
         </div>
         <div class="row col-lg-12 ocap-content">

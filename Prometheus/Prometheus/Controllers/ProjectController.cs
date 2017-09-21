@@ -6742,6 +6742,7 @@ namespace Prometheus.Controllers
                 var ocapNum = Request.Form["ocap_id"];
                 var comment = updater.ToUpper().Replace("@FINISAR.COM", "") + " start OCAP Num [ " + ocapNum + " ] at " + DateTime.Now.ToString("MM/dd/yyyy") + ". ";
                 comment += "</p><p>Comment: " + Request.Form["commentcontent"];
+                var comment1 = comment.Replace("</p><p>", "");
                 var files_ret = ReceiveAttachFiles();
                 var fileurl = "";
                 if(files_ret.Count > 0)
@@ -6755,7 +6756,7 @@ namespace Prometheus.Controllers
                     if (vm != null)
                     {
                         vms.Add(vm);
-                        OcapSingletonOperate(vm, updater, comment, fileurl);
+                        OcapSingletonOperate(vm, updater, comment1, fileurl);
                     }
                 }
                 var addrs = Request.Form["RPeopleAddr"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);

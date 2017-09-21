@@ -45,13 +45,14 @@
             @foreach (var item in Model)
             {
                 <tr>
-                    <td>
+                    <td>@item.ProjectKey</td>
+                    @*<td>
                     @if (item.Resolution != Prometheus.Models.Resolute.Pending
                             && item.Resolution != Prometheus.Models.Resolute.Working
                                 && item.Resolution != Prometheus.Models.Resolute.Reopen)
                     {
                         <input type="checkbox" class="checkbox-issuekey" data-data="@item.IssueKey" name="issuekey" />
-                    }&nbsp;@item.ProjectKey</td>
+                    }&nbsp;@item.ProjectKey</td>*@
                     <td>@item.ModuleSN</td>
                     <td>@item.SharedTag</td>
                     <td>
@@ -94,13 +95,14 @@
         </tbody>
     </table>
 </div>
-<hr />
+
+@*<hr />
 <div class="row">
     <div class="col-md-1 text-center">
         <input type="checkbox" id="checkAll" name="checkAll">
     </div>
     <button type="button" id="batch_ocap" name="batch_ocap" class="col-md-2 btn btn-success">OCAP</button>
-</div>
+</div>*@
 <script type="text/javascript">
     $(document).ready(function () {
         $('#pndatatable').DataTable({

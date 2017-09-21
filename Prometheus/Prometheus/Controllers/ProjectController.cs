@@ -6739,20 +6739,29 @@ namespace Prometheus.Controllers
                 ////for test
                 //updater = "YAN.SHI@FINISAR.COM";
                 var vms = new List<IssueViewModels>();
-                var comment = Request.Form["commentcontent"];
-                var addrs = Request.Form["RPeopleAddr"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
-                var addrlist = new List<string>();
-                addrlist.AddRange(addrs);
+                var ocapNum = Request.Form["ocap_id"];
+                var comment = updater.ToUpper().Replace("@FINISAR.COM", "") + " start OCAP Num: " + ocapNum + " at " + DateTime.Now.ToString("MM/dd/yyyy") + ".";
+                comment += "Comment: " + Request.Form["commentcontent"];
+                var files_ret = ReceiveAttachFiles();
+                var fileurl = "";
+                if(files_ret.Count > 0)
+                {
+                    fileurl = files_ret[0];
+                }
+
                 foreach (var issuekey in issuekeys)
                 {
                     var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey.ToString(), this);
                     if (vm != null)
                     {
                         vms.Add(vm);
-                        OcapSingletonOperate(vm, updater, comment);
+                        //OcapSingletonOperate(vm, updater, comment, fileurl);
                     }
                 }
-                SendOCAPEvent(vms, comment, addrlist);
+                var addrs = Request.Form["RPeopleAddr"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+                var addrlist = new List<string>();
+                addrlist.AddRange(addrs);
+                //SendOCAPEvent(vms, comment, addrlist);
                 if (vms.Count == 0)
                 {
                     return RedirectToAction("ViewAll", "Project");
@@ -6774,7 +6783,7 @@ namespace Prometheus.Controllers
             return RedirectToAction("ViewAll", "Project");
         }
 
-        private void OcapSingletonOperate(IssueViewModels vm, string updater, string comment)
+        private void OcapSingletonOperate(IssueViewModels vm, string updater, string comment, string fileurl)
         {
             CreateLYTSubTask(CRITICALERRORTYPE.CONTAINMENTACTION, "Containment Action for " + comment, vm.ProjectKey, vm.IssueKey, updater, updater, DateTime.Now.AddDays(7));
             CreateLYTSubTask(CRITICALERRORTYPE.CORRECTIVEACTION, "Corrective Action for " + comment, vm.ProjectKey, vm.IssueKey, updater, updater, DateTime.Now.AddDays(14));
@@ -6783,6 +6792,10 @@ namespace Prometheus.Controllers
             comment1.Comment = comment;
             IssueViewModels.StoreIssueComment(vm.IssueKey, comment1.dbComment, vm.Assignee, COMMENTTYPE.Description);
             IssueViewModels.UpdateIssueAssigneeAndResolution(vm.IssueKey, updater, Resolute.Reopen);
+            if (! String.IsNullOrEmpty(fileurl))
+            {
+                IssueViewModels.StoreIssueAttachment(vm.IssueKey, fileurl);
+            }
         }
 
         private void SendOCAPEvent(List<IssueViewModels> vms, string comment, List<string> addrlist)

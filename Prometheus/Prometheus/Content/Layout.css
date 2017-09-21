@@ -185,8 +185,20 @@
 .ocap-alarm-textarea{
     min-width: 100%;
     min-height:60px;
+    margin-left: -1%;
 }
 
+.ocap-alarm-input{
+    margin-left: 2%;
+}
+
+.ocap-alarm-attach{
+    margin-left: 1%;
+}
+
+.ocap-content{
+    margin-left: -2%;
+}
  .collapse-summary{
     background-color: #DEEBF7;
     padding: 5px;

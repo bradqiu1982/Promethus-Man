@@ -39,13 +39,19 @@ namespace Prometheus.Models
             }
         }
 
-        public static bool SendEmail(Controller ctrl,string title, List<string> tolist, string content, bool isHtml = false)
+        public static bool SendEmail(Controller ctrl,string title, List<string> tolist, string content, bool isHtml = false,string attachpath = null)
         {
             try
             {
                 var syscfgdict = CfgUtility.GetSysConfig(ctrl);
 
                 var message = new MailMessage();
+                if (!string.IsNullOrEmpty(attachpath))
+                {
+                    var attach = new Attachment(attachpath);
+                    message.Attachments.Add(attach);
+                }
+
                 message.IsBodyHtml = isHtml;
                 message.From = new MailAddress(syscfgdict["APPEMAILADRESS"]);
                 foreach (var item in tolist)

@@ -6713,9 +6713,9 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(defaultlytteam))
                 {
                     ViewBag.defaultlytteam = defaultlytteam;
-                    ViewBag.IssueKeys = IssueKeys;
-                    ViewBag.SummaryList = summaryList;
                 }
+                ViewBag.IssueKeys = IssueKeys;
+                ViewBag.SummaryList = summaryList;
                 return View(vmList);
             }
             else
@@ -6760,13 +6760,13 @@ namespace Prometheus.Controllers
                 else if (vms.Count == 1)
                 {
                     var dict = new RouteValueDictionary();
-                    dict.Add("issuekey", vms.ElementAt(0).IssueKey);
+                    dict.Add("issuekey", vms[0].IssueKey);
                     return RedirectToAction("UpdateIssue", "Issue", dict);
                 }
                 else
                 {
                     var dict = new RouteValueDictionary();
-                    dict.Add("ProjectKey", vms.ElementAt(0).ProjectKey);
+                    dict.Add("ProjectKey", vms[0].ProjectKey);
                     return RedirectToAction("ProjectSptTask", "Project", dict);
                 }
             }
@@ -6778,12 +6778,22 @@ namespace Prometheus.Controllers
         {
             CreateLYTSubTask(CRITICALERRORTYPE.CONTAINMENTACTION, "Containment Action for " + comment, vm.ProjectKey, vm.IssueKey, updater, updater, DateTime.Now.AddDays(7));
             CreateLYTSubTask(CRITICALERRORTYPE.CORRECTIVEACTION, "Corrective Action for " + comment, vm.ProjectKey, vm.IssueKey, updater, updater, DateTime.Now.AddDays(14));
-            IssueViewModels.StoreIssueComment(vm.IssueKey, comment, vm.Assignee, COMMENTTYPE.Description);
+
+            var comment1 = new IssueComments();
+            comment1.Comment = comment;
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment1.dbComment, vm.Assignee, COMMENTTYPE.Description);
             IssueViewModels.UpdateIssueAssigneeAndResolution(vm.IssueKey, updater, Resolute.Reopen);
         }
 
         private void SendOCAPEvent(List<IssueViewModels> vms, string comment, List<string> addrlist)
         {
+            var netcomputername = "";
+            try {
+                netcomputername = System.Net.Dns.GetHostName();
+            }
+            catch (Exception ex)
+            { }
+
             var toaddrs = new Dictionary<string, bool>();
             var body = new List<List<string>>();
             var tmpList = new List<string>();
@@ -6799,19 +6809,12 @@ namespace Prometheus.Controllers
                 //send validate email
                 string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
                 string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
-
-                var netcomputername = "";
-                try {
-                    netcomputername = System.Net.Dns.GetHostName();
-                }
-                catch (Exception ex)
-                { }
                 validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
                 
                 tmpList = new List<string>();
                 tmpList.Add(vm.ProjectKey);
                 tmpList.Add(vm.ModuleSN);
-                tmpList.Add(vm.ModuleSN);
+                tmpList.Add(vm.SharedTag);
                 tmpList.Add(vm.Summary.Replace(CRITICALERRORTYPE.SECONDMATCH, ""));
                 tmpList.Add("<a href=" + validatestr + ">Detail</a>");
                 body.Add(tmpList);

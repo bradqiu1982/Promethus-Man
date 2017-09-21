@@ -3118,7 +3118,7 @@ namespace Prometheus.Models
 
         public static void UpdateIssueAssigneeAndResolution(string issuekey, string assignee, string resolution)
         {
-            var sql = "update Issue set Assignee = '<Assignee>', Resolution = <Resolution> where IssueKey = '<IssueKey>'";
+            var sql = "update Issue set Assignee = '<Assignee>', Resolution = '<Resolution>' where IssueKey = '<IssueKey>'";
             sql = sql.Replace("<IssueKey>", issuekey).Replace("<Assignee>", assignee).Replace("<Resolution>", resolution);
             DBUtility.ExeLocalSqlNoRes(sql);
         }

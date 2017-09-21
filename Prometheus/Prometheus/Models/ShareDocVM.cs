@@ -79,9 +79,16 @@ namespace Prometheus.Models
             return docid;
         }
 
+        private static void UpdateTag(string tag, string DOCKey)
+        {
+            var sql = "Update ShareDoc set DOCTag = '<DOCTag>' where DOCKey = N'<DOCKey>'";
+            sql = sql.Replace("<DOCTag>", tag).Replace("<DOCKey>", DOCKey);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
         public static string ShareDoc(string DOCPJK, string DOCType, string DOCKey, string DOCTag, string DOCCreator, string DOCDate,string BackLink)
         {
-            var sql = "select APVal1 from ShareDoc where DOCPJK='<DOCPJK>' and DOCKey=N'<DOCKey>'";
+            var sql = "select APVal1,DOCTag from ShareDoc where DOCPJK='<DOCPJK>' and DOCKey=N'<DOCKey>'";
             sql = sql.Replace("<DOCPJK>", DOCPJK).Replace("<DOCKey>", DOCKey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             if (dbret.Count > 0)
@@ -91,6 +98,8 @@ namespace Prometheus.Models
                 {
                     docid1 = UpdateDocID(DOCPJK,DOCKey);
                 }
+                var newtag = DOCTag +  Convert.ToString(dbret[0][1]);
+                UpdateTag(newtag, DOCKey);
                 return docid1;
             }
 

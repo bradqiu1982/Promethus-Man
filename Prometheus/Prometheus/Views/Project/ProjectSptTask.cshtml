@@ -53,7 +53,7 @@
                         <input type="checkbox" class="checkbox-issuekey" data-data="@item.IssueKey" name="issuekey" />
                     }&nbsp;@item.ProjectKey</td>
                     <td>@item.ModuleSN</td>
-                    <td>Components damage</td>
+                    <td>@item.SharedTag</td>
                     <td>
                         <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace(Prometheus.Models.CRITICALERRORTYPE.SECONDMATCH, "")</a>
                     </td>
@@ -118,6 +118,9 @@
                 var myurl = "/Project/OcapWarn?IssueKeys=" + window.btoa(issuekey);
                 window.open(myurl, '_blank');
             }
+            else {
+                alert("You are not PQE!");
+            }
         }
         return false;
     });
@@ -148,6 +151,9 @@
                     var myurl = "/Project/OcapWarn?IssueKeys=" + window.btoa(issueKeys);
                     window.open(myurl, '_blank');
                 }
+            }
+            else {
+                alert("You are not PQE!");
             }
         }
         return false;

@@ -6693,25 +6693,28 @@ namespace Prometheus.Controllers
             var issuekeystr = System.Text.Encoding.UTF8.GetString(issuekeybits);
             var issueKeyList = issuekeystr.Split(new string[] { ",", ";"}, StringSplitOptions.RemoveEmptyEntries);
             var vmList = new List<IssueViewModels>();
+            var summaryList = new List<String>();
             foreach (var key in issueKeyList)
             {
                 var vm = IssueViewModels.RetrieveIssueByIssueKey(key, this);
                 if (vm != null)
                 {
                     vmList.Add(vm);
+                    summaryList.Add(vm.Summary);
                 }  
             }
             if(vmList.Count > 0)
             {
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
-                //for test
-                updater = "YAN.SHI@FINISAR.COM";
-                var defaultlytteam = UserGroupVM.RetreiveUserGroup(updater, UserGroupType.WorkGroup);
-                //var defaultlytteam = UserGroupVM.RetreiveUserGroup(updater, UserGroupType.LYTGroup);
+                ////for test
+                //updater = "YAN.SHI@FINISAR.COM";
+                //var defaultlytteam = UserGroupVM.RetreiveUserGroup(updater, UserGroupType.WorkGroup);
+                var defaultlytteam = UserGroupVM.RetreiveUserGroup(updater, UserGroupType.LYTGroup);
                 if (!string.IsNullOrEmpty(defaultlytteam))
                 {
                     ViewBag.defaultlytteam = defaultlytteam;
                     ViewBag.IssueKeys = IssueKeys;
+                    ViewBag.SummaryList = summaryList;
                 }
                 return View(vmList);
             }
@@ -6733,8 +6736,8 @@ namespace Prometheus.Controllers
                 var issuekeys = issuekeystr.Split(new string[] { ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
                 var ckdict = CookieUtility.UnpackCookie(this);
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
-                //for test
-                updater = "YAN.SHI@FINISAR.COM";
+                ////for test
+                //updater = "YAN.SHI@FINISAR.COM";
                 var vms = new List<IssueViewModels>();
                 var comment = Request.Form["commentcontent"];
                 var addrs = Request.Form["RPeopleAddr"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
@@ -6746,7 +6749,7 @@ namespace Prometheus.Controllers
                     if (vm != null)
                     {
                         vms.Add(vm);
-                        //OcapSingletonOperate(vm, updater, comment);
+                        OcapSingletonOperate(vm, updater, comment);
                     }
                 }
                 SendOCAPEvent(vms, comment, addrlist);
@@ -6812,14 +6815,14 @@ namespace Prometheus.Controllers
                 tmpList.Add(vm.Summary.Replace(CRITICALERRORTYPE.SECONDMATCH, ""));
                 tmpList.Add("<a href=" + validatestr + ">Detail</a>");
                 body.Add(tmpList);
-                //if ( ! toaddrs.ContainsKey(vm.Assignee))
-                //{
-                //    toaddrs.Add(vm.Assignee, true);
-                //}
-                //if( !toaddrs.ContainsKey(vm.Reporter))
-                //{
-                //    toaddrs.Add(vm.Reporter, true);
-                //}
+                if (!toaddrs.ContainsKey(vm.Assignee))
+                {
+                    toaddrs.Add(vm.Assignee, true);
+                }
+                if (!toaddrs.ContainsKey(vm.Reporter))
+                {
+                    toaddrs.Add(vm.Reporter, true);
+                }
             }
 
             var towho = new List<string>();

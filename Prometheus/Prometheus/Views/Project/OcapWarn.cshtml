@@ -5,6 +5,23 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<script type="text/javascript">
+    function chooserelatedpeople()
+    {
+        document.getElementById("towhoinput1").value = document.getElementById("RPeopleAddr").value;
+        $('#relatedmodal').modal({ backdrop: 'static' });
+    }
+    function fillreleatepeople()
+    {
+        $('#relatedmodal').modal('hide');
+        document.getElementById("RPeopleAddr").value = document.getElementById("towhoinput1").value;
+        document.getElementById("RPeopleAddr").focus();
+    }
+    $("body").on("click", "#cancelisu", function () {
+        window.location.href = "/Project/ProjectSptTask?ProjectKey=" + $("#projectkey").val();
+    })
+</script>
+
 <div class="row">
     <ol class="breadcrumb">
         <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
@@ -16,10 +33,20 @@
         <li class="active">OCAP Alarm</li>
     </ol>
 </div>
-
+<input type="hidden" id="projectkey" name="projectkey" value="@(Model.ElementAt(0).ProjectKey)"/>
 @if (Model != null)
 {
-    <h3>Summary</h3>
+    <div class="collapsed collapse-summary" aria-expanded="false" data-toggle="collapse" data-target="#summaryCollapse">
+        <span>Summary</span>
+    </div>
+    <div id="summaryCollapse" class="collapse">
+        @foreach(var summary in ViewBag.SummaryList)
+        {
+            <div class="summary-span">
+                <span>@summary.Replace(Prometheus.Models.CRITICALERRORTYPE.SECONDMATCH, "")</span>
+            </div>
+        }
+    </div>
     <hr />
     using (Html.BeginForm("OcapWarn", "Project", FormMethod.Post, new { enctype = "multipart/form-data" }))
     {
@@ -36,19 +63,6 @@
                 </div>
                 <span class="field-validation-valid text-danger" data-valmsg-for="RPeopleAddr" data-valmsg-replace="true"></span>
             </div>
-            <script type="text/javascript">
-                function chooserelatedpeople()
-                {
-                    document.getElementById("towhoinput1").value = document.getElementById("RPeopleAddr").value;
-                    $('#relatedmodal').modal({ backdrop: 'static' });
-                }
-                function fillreleatepeople()
-                {
-                    $('#relatedmodal').modal('hide');
-                    document.getElementById("RPeopleAddr").value = document.getElementById("towhoinput1").value;
-                    document.getElementById("RPeopleAddr").focus();
-                }
-            </script>
         </div>
         <hr />
         <div class="row col-lg-12">
@@ -69,7 +83,7 @@
                     <input type="submit" value="Send" id="sendisu" name="sendisu" class="btn btn-default" />
                 </div>
                 <div class="col-lg-3">
-                    <input type="submit" value="Cancel" id="cancelisu" name="cancelisu" class="btn btn-default" />
+                    <input type="button" value="Cancel" id="cancelisu" name="cancelisu" class="btn btn-default" />
                 </div>
             </div>
         </div>

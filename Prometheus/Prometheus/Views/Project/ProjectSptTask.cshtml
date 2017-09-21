@@ -173,6 +173,7 @@
             <thead>
                 <tr>
                     <th>Project</th>
+                    <th>Setting Reason</th>
                     <th>Error Code</th>
                     <th>Test Case</th>
                     <th>Data Field</th>
@@ -183,6 +184,7 @@
                     <th>Algorithm</th>
                     <th>Algorithm Param</th>
                     <th>FA Switch</th>
+                    
                     <th>Related People</th>
                 </tr>
             </thead>
@@ -191,6 +193,7 @@
                 {
                     <tr>
                         <td>@item.ProjectKey</td>
+                        <td>@item.SettingReason</td>
                         <td>@item.ErrorCode</td>
                         <td>@item.TestCaseName</td>
                         <td>@item.MatchCond</td>
@@ -214,6 +217,7 @@
                                 </button>
                             }
                         </td>
+                        
                         <td>@item.Appv_4.Replace("@FINISAR.COM", "")</td>
                     </tr>
                 }

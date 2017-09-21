@@ -735,10 +735,6 @@ namespace Prometheus.Controllers
                             else
                             {
                                 var tmpcmt = updater.ToUpper().Replace("@FINISAR.COM", "") + " has confirmed this is a real critical failure.";
-                                if (!string.IsNullOrEmpty(issuetag))
-                                {
-                                    tmpcmt = tmpcmt + "it's rootcause is "+issuetag.Replace(";"," ");
-                                }
                                 SendPDMSEvent(realissue,tmpcmt,issuetag);
                             }
                         }
@@ -1826,10 +1822,6 @@ namespace Prometheus.Controllers
                             else
                             {
                                 var tmpcmt = updater.ToUpper().Replace("@FINISAR.COM", "") + " has confirmed this is a real critical failure.";
-                                if (!string.IsNullOrEmpty(issuetag))
-                                {
-                                    tmpcmt = tmpcmt + "it's rootcause is " + issuetag.Replace(";", " ");
-                                }
                                 SendPDMSEvent(realissue, tmpcmt, issuetag);
                             }
                         }

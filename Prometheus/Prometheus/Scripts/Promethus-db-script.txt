@@ -684,7 +684,8 @@ CREATE TABLE [dbo].[ProjectCriticalError] (
 	[Appv_2]   FLOAT DEFAULT (-99999.0) NOT NULL,
 	[Appv_3]   NVARCHAR (200) DEFAULT ('') NOT NULL,
 	[Appv_4]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
-	[Appv_5]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+	[Appv_5]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[SettingReason]   NVARCHAR (MAX) DEFAULT ('') NOT NULL
 );
 
 CREATE TABLE [dbo].[WaferRecord] (
@@ -748,6 +749,8 @@ CREATE TABLE [dbo].[WaferRecord] (
 	[databackuptm]   DATETIME       DEFAULT ('2017-08-02 10:00:00') NOT NULL
    );
 
+ALTER TABLE  [DebugDB].[dbo].[ProjectCriticalError] Add SettingReason NVARCHAR (MAX)    DEFAULT ('') NOT NULL;
+ALTER TABLE  [NPITrace].[dbo].[ProjectCriticalError] Add SettingReason NVARCHAR (MAX)    DEFAULT ('') NOT NULL;
 
 ALTER TABLE  AlignmentPower Add  databackuptm   DATETIME       DEFAULT ('2017-07-18 10:00:00') NOT NULL;
 ALTER TABLE  BIError Add  databackuptm   DATETIME       DEFAULT ('2017-07-18 10:00:00') NOT NULL;

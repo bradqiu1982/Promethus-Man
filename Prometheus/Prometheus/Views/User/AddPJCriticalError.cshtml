@@ -147,6 +147,29 @@
             </div>
         </div>
 
+        <div class="form-group">
+            <div class="row" style="margin-bottom:5px">
+                <div class="col-lg-2" style="font-family:'Arial Narrow';font-size:18px"><strong>&nbsp;&nbsp;Rule Setting Reason</strong></div>
+                <div class="col-lg-10"></div>
+            </div>
+            <div class="row">
+                @if (ViewBag.tobechoosetags != null)
+                {
+                    for (var idx = 0; idx < ViewBag.tobechoosetags.Count; idx++)
+                    {
+                        <div class="col-lg-4">
+                            <div class="col-lg-3">
+                                <input type="checkbox" id="issuetagcheck@(idx)" name="issuetagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
+                            </div>
+                            <div class="col-lg-9">
+                                <label class="control-label">@(ViewBag.tobechoosetags[idx])</label>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+
         <div class="modal" id="relatedmodal" tabindex="-1" role="dialog" aria-labelledby="relatedmodalLabel">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -226,6 +249,7 @@
                         <thead>
                             <tr>
                                 <th>Project</th>
+                                <th>Setting Reason</th>
                                 <th>Error Code</th>
                                 <th>Test Case</th>
                                 <th>Data Field</th>
@@ -236,6 +260,7 @@
                                 <th>Algorithm</th>
                                 <th>Algorithm Param</th>
                                 <th>FA Switch</th>
+                                
                                 <th>Related People</th>
                                 <th>&nbsp;</th>
                             </tr>
@@ -245,6 +270,7 @@
                             {
                                 <tr>
                                     <td>@item.ProjectKey</td>
+                                    <td>@item.SettingReason</td>
                                     <td>@item.ErrorCode</td>
                                     <td>@item.TestCaseName</td>
                                     <td>@item.MatchCond</td>
@@ -284,6 +310,7 @@
                                             </button>
                                         }
                                     </td>
+                                    
                                     <td>@item.Appv_4.Replace("@FINISAR.COM","")</td>
                                     <td><img src="~/Content/images/icon/delete2.png" MYTP="HOVER" style="height:30px; width:18px" onclick="DeletePJCriticalError('PJKey=@(item.ProjectKey)&ErrorCode=@(item.ErrorCode)&TestCase=@(item.TestCaseName)&MatchCond=@(item.MatchCond)')"></td>
                                 </tr>

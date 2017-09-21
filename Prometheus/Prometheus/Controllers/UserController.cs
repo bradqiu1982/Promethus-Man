@@ -1976,6 +1976,8 @@ namespace Prometheus.Controllers
             var asilist = UserViewModels.RetrieveAllUser();
             ViewBag.towholist1 = CreateSelectList(asilist, "");
 
+            ViewBag.tobechoosetags = ShareDocVM.RetrieveCriticalTags(this);
+
             return View(vm);
         }
 
@@ -2014,6 +2016,17 @@ namespace Prometheus.Controllers
                 vm.Temperature = Request.Form["templist"];
                 vm.Channel = Request.Form["channellist"];
                 vm.Appv_4 = Request.Form["RPeopleAddr"];
+
+                var issuetag = string.Empty;
+                for (var i = 0; i < 60; i++)
+                {
+                    if (Request.Form["issuetagcheck" + i] != null)
+                    {
+                        issuetag = issuetag + Request.Form["issuetagcheck" + i] + ";";
+                    }
+                }
+                vm.SettingReason = issuetag;
+
                 vm.StorePJCriticalError();
             }
             catch (Exception ex) { }

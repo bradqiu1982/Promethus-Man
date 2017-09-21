@@ -199,7 +199,14 @@
 .ocap-content{
     margin-left: -2%;
 }
- .collapse-summary{
+
+.coap-label{
+    float: left;
+    width: 10%;
+    display: inline-block;
+}
+
+.collapse-summary{
     background-color: #DEEBF7;
     padding: 5px;
     color: #006DC0;
@@ -208,7 +215,7 @@
     margin-left: 1%;
     border-radius: 4px;
     cursor: pointer;
- }
+}
 
 #summaryCollapse{
     margin-top: 2%;

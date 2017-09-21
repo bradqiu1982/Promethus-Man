@@ -6740,8 +6740,8 @@ namespace Prometheus.Controllers
                 //updater = "YAN.SHI@FINISAR.COM";
                 var vms = new List<IssueViewModels>();
                 var ocapNum = Request.Form["ocap_id"];
-                var comment = updater.ToUpper().Replace("@FINISAR.COM", "") + " start OCAP Num: " + ocapNum + " at " + DateTime.Now.ToString("MM/dd/yyyy") + ".";
-                comment += "Comment: " + Request.Form["commentcontent"];
+                var comment = updater.ToUpper().Replace("@FINISAR.COM", "") + " start OCAP Num [ " + ocapNum + " ] at " + DateTime.Now.ToString("MM/dd/yyyy") + ". ";
+                comment += "</p><p>Comment: " + Request.Form["commentcontent"];
                 var files_ret = ReceiveAttachFiles();
                 var fileurl = "";
                 if(files_ret.Count > 0)
@@ -6755,13 +6755,13 @@ namespace Prometheus.Controllers
                     if (vm != null)
                     {
                         vms.Add(vm);
-                        //OcapSingletonOperate(vm, updater, comment, fileurl);
+                        OcapSingletonOperate(vm, updater, comment, fileurl);
                     }
                 }
                 var addrs = Request.Form["RPeopleAddr"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
                 var addrlist = new List<string>();
                 addrlist.AddRange(addrs);
-                //SendOCAPEvent(vms, comment, addrlist);
+                SendOCAPEvent(vms, comment, addrlist, fileurl);
                 if (vms.Count == 0)
                 {
                     return RedirectToAction("ViewAll", "Project");
@@ -6798,7 +6798,7 @@ namespace Prometheus.Controllers
             }
         }
 
-        private void SendOCAPEvent(List<IssueViewModels> vms, string comment, List<string> addrlist)
+        private void SendOCAPEvent(List<IssueViewModels> vms, string comment, List<string> addrlist, string fileUrl)
         {
             var netcomputername = "";
             try {
@@ -6845,11 +6845,14 @@ namespace Prometheus.Controllers
             towho.AddRange(toaddrs.Keys);
             towho.AddRange(addrlist);
 
-            var greeting = "Hi All";
-            var description = "Below is Parallel Critical OCAP Alarm base on WUXI ENGINEERING SYSTEM for " + DateTime.Now.ToString("MM/dd/yyyy"); 
+            var greeting = "Dear All";
+            var description = "Attachment is Wuxi OCAP file from PQE by WUXI ENGINEERING SYSTEM -- " + DateTime.Now.ToString("MM/dd/yyyy") + ". ";
+            description = description + "Please kindly view it";
             var content = EmailUtility.CreateTableHtml(greeting, description, comment, body);
 
-            EmailUtility.SendEmail(this, "Parallel Test Critical Failure Alarm Report -- " + DateTime.Now.ToString("MM/dd/yyyy"), towho, content, true);
+            fileUrl = fileUrl.Replace("/userfiles", Server.MapPath("~/userfiles")).Replace("/", "\\");
+
+            EmailUtility.SendEmail(this, "Wuxi OCAP Task -- " + DateTime.Now.ToString("MM/dd/yyyy"), towho, content, true, fileUrl);
             
             new System.Threading.ManualResetEvent(false).WaitOne(500);
         }

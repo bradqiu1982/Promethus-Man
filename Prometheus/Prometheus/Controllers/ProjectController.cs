@@ -166,7 +166,7 @@ namespace Prometheus.Controllers
             {
                 for (int i = 7; i > 0; i--)
                 {
-                    if (DateTime.Now.AddDays(0-i).DayOfWeek == DayOfWeek.Thursday)
+                    if (DateTime.Now.AddDays(0 - i).DayOfWeek == DayOfWeek.Thursday)
                     {
                         startdate = DateTime.Now.AddDays(0 - i);
                         break;
@@ -186,7 +186,7 @@ namespace Prometheus.Controllers
                 var firstyield = mycache.Get(item.ProjectKey + "_FPY");
                 if (firstyield == null)
                 {
-                    var yvm = ProjectYieldViewModule.GetYieldByDateRange(item.ProjectKey, startdate.ToString(), enddate, item,HttpContext.Cache);
+                    var yvm = ProjectYieldViewModule.GetYieldByDateRange(item.ProjectKey, startdate.ToString(), enddate, item, HttpContext.Cache);
 
                     if (yvm.FirstYields.Count > 0)
                     {
@@ -230,7 +230,7 @@ namespace Prometheus.Controllers
                 {
                     var fadone = ProjectFAViewModules.RetrieveFADataCount(item.ProjectKey, false);
                     var fatotal = fadone + ProjectFAViewModules.RetrieveFADataCount(item.ProjectKey);
-                    item.PendingFACount = fadone.ToString()+"/"+ fatotal.ToString();
+                    item.PendingFACount = fadone.ToString() + "/" + fatotal.ToString();
                     mycache.Insert(item.ProjectKey + "_fact", item.PendingFACount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
                 }
                 else
@@ -243,9 +243,9 @@ namespace Prometheus.Controllers
                 if (rmacount == null)
                 {
                     var rmadone = IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Done);
-                    var rmatotal = rmadone + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Pending) 
+                    var rmatotal = rmadone + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Pending)
                         + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Working);
-                    item.PendingRMACount = rmadone.ToString()+ "/" + rmatotal.ToString();
+                    item.PendingRMACount = rmadone.ToString() + "/" + rmatotal.ToString();
                     mycache.Insert(item.ProjectKey + "_rmact", item.PendingRMACount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
                 }
                 else
@@ -269,7 +269,7 @@ namespace Prometheus.Controllers
             {
                 ViewBag.pjtypelist.Add(pjt);
             }
-            
+
             foreach (var item in projlist)
             {
                 var tpstr = "";
@@ -297,53 +297,53 @@ namespace Prometheus.Controllers
             var ivmlist = new List<IssueViewModels>();
 
             var mycache = HttpContext.Cache;
-            var templist = mycache.Get(item.ProjectKey+"_npilist");
+            var templist = mycache.Get(item.ProjectKey + "_npilist");
             if (templist == null)
             {
-                ivmlist = IssueViewModels.RetrieveNPIPROCIssue(item.ProjectKey,this);
+                ivmlist = IssueViewModels.RetrieveNPIPROCIssue(item.ProjectKey, this);
                 mycache.Insert(item.ProjectKey + "_npilist", ivmlist, null, DateTime.Now.AddHours(2), Cache.NoSlidingExpiration);
             }
             else
             {
                 ivmlist.AddRange((List<IssueViewModels>)templist);
             }
-                foreach (var iv in ivmlist)
+            foreach (var iv in ivmlist)
+            {
+                if (iv.Summary.Contains("PIP1"))
+                {
+                    item.PIP1Date = iv.DueDate.ToString("yyyy-MM-dd");
+                }
+
+                if (iv.Summary.Contains("MVT"))
+                {
+                    item.MVTDate = iv.DueDate.ToString("yyyy-MM-dd");
+                }
+
+                if (iv.Resolution == Resolute.Working)
                 {
                     if (iv.Summary.Contains("PIP1"))
                     {
-                        item.PIP1Date = iv.DueDate.ToString("yyyy-MM-dd");
+                        item.CurrentNPIProc = "PIP1";
                     }
-
+                    if (iv.Summary.Contains("EVT"))
+                    {
+                        item.CurrentNPIProc = "EVT";
+                    }
+                    if (iv.Summary.Contains("DVT"))
+                    {
+                        item.CurrentNPIProc = "DVT";
+                    }
                     if (iv.Summary.Contains("MVT"))
                     {
-                        item.MVTDate = iv.DueDate.ToString("yyyy-MM-dd");
+                        item.CurrentNPIProc = "MVT";
                     }
-
-                    if (iv.Resolution == Resolute.Working)
+                    if (iv.Summary.Contains("MP"))
                     {
-                        if (iv.Summary.Contains("PIP1"))
-                        {
-                            item.CurrentNPIProc = "PIP1";
-                        }
-                        if (iv.Summary.Contains("EVT"))
-                        {
-                            item.CurrentNPIProc = "EVT";
-                        }
-                        if (iv.Summary.Contains("DVT"))
-                        {
-                            item.CurrentNPIProc = "DVT";
-                        }
-                        if (iv.Summary.Contains("MVT"))
-                        {
-                            item.CurrentNPIProc = "MVT";
-                        }
-                        if (iv.Summary.Contains("MP"))
-                        {
-                            item.CurrentNPIProc = "MP";
-                        }
-                        item.CurrentNPIProcKey = iv.IssueKey;
+                        item.CurrentNPIProc = "MP";
                     }
+                    item.CurrentNPIProcKey = iv.IssueKey;
                 }
+            }
         }
 
         private void SortPJ(List<ProjectViewModels> projlist)
@@ -354,7 +354,7 @@ namespace Prometheus.Controllers
                 {
                     return -1;
                 }
-                else if(pair1.FirstYield <= 0 && pair2.FirstYield > 0)
+                else if (pair1.FirstYield <= 0 && pair2.FirstYield > 0)
                 {
                     return 1;
                 }
@@ -436,7 +436,7 @@ namespace Prometheus.Controllers
                 pitem = new SelectListItem();
                 pitem.Text = p;
                 pitem.Value = p;
-                if (!string.IsNullOrEmpty(defVal) && string.Compare(defVal, p,true) == 0)
+                if (!string.IsNullOrEmpty(defVal) && string.Compare(defVal, p, true) == 0)
                 {
                     pitem.Selected = true;
                     selected = true;
@@ -491,7 +491,7 @@ namespace Prometheus.Controllers
                 if (string.Compare(pm.Role, Prometheus.Models.ProjectViewModels.PMROLE) == 0)
                 {
                     pmlist.Add(pm);
-                    vm.PMListStr =  vm.PMListStr+ ";" + pm.Name;
+                    vm.PMListStr = vm.PMListStr + ";" + pm.Name;
                 }
             }
 
@@ -500,7 +500,7 @@ namespace Prometheus.Controllers
                 if (string.Compare(eg.Role, Prometheus.Models.ProjectViewModels.ENGROLE) == 0)
                 {
                     eglist.Add(eg);
-                    vm.EngListStr = vm.EngListStr+ ";" + eg.Name ;
+                    vm.EngListStr = vm.EngListStr + ";" + eg.Name;
                 }
             }
 
@@ -552,7 +552,7 @@ namespace Prometheus.Controllers
                 var ck = new Dictionary<string, string>();
                 ck.Add("logonredirectctrl", "Project");
                 ck.Add("logonredirectact", "CreateProject");
-                CookieUtility.SetCookie(this,ck);
+                CookieUtility.SetCookie(this, ck);
                 return RedirectToAction("LoginUser", "User");
             }
         }
@@ -592,13 +592,13 @@ namespace Prometheus.Controllers
         }
 
 
-        private bool ProjectValidate(ProjectViewModels projectmodel,bool updateproject = false)
+        private bool ProjectValidate(ProjectViewModels projectmodel, bool updateproject = false)
         {
             var createerror = "<h3><font color=\"red\">Fail to create/modify project: <ErrorMsg></font></h3>";
             if (string.IsNullOrEmpty(projectmodel.ProjectName.Trim())
                 || string.IsNullOrEmpty(projectmodel.ProjectKey.Trim()))
             {
-                ViewBag.CreateError = createerror.Replace("<ErrorMsg>","Project Name is empty");
+                ViewBag.CreateError = createerror.Replace("<ErrorMsg>", "Project Name is empty");
                 return false;
             }
 
@@ -617,7 +617,7 @@ namespace Prometheus.Controllers
                 return false;
             }
 
-            if(!updateproject)
+            if (!updateproject)
             {
                 if (projectmodel.CheckExistProject())
                 {
@@ -651,7 +651,7 @@ namespace Prometheus.Controllers
                 return false;
             }
 
-            if(eglist.Count == 0)
+            if (eglist.Count == 0)
             {
                 ViewBag.CreateError = createerror.Replace("<ErrorMsg>", "At least one Engineer should be choosed");
                 return false;
@@ -704,7 +704,7 @@ namespace Prometheus.Controllers
 
                         if (tableseg && line.Contains("="))
                         {
-                            ret.Add(new ProjectMesTable("",line.Split(new char[] { '=' })[0].Trim(), line.Split(new char[] { '=' })[1].Trim().Replace("\"", "")));
+                            ret.Add(new ProjectMesTable("", line.Split(new char[] { '=' })[0].Trim(), line.Split(new char[] { '=' })[1].Trim().Replace("\"", "")));
                         }
                     }
                 }
@@ -763,14 +763,14 @@ namespace Prometheus.Controllers
             }
         }
 
-        private List<string> RetrieveProjectInfo(string key,int count)
+        private List<string> RetrieveProjectInfo(string key, int count)
         {
             var ret = new List<string>();
             try
             {
-                for (var i = 1; i < count+1; i++)
+                for (var i = 1; i < count + 1; i++)
                 {
-                    if (!string.IsNullOrEmpty(Request.Form[key + i].ToString()) 
+                    if (!string.IsNullOrEmpty(Request.Form[key + i].ToString())
                         && string.Compare(Request.Form[key + i].ToString(), "NONE") != 0)
                     {
                         ret.Add(Request.Form[key + i].ToString());
@@ -826,7 +826,7 @@ namespace Prometheus.Controllers
         {
 
             var lpm = new List<ProjectMembers>();
-            var pns = Request.Form["PMAddr"].Split(new string[] { ";"},StringSplitOptions.RemoveEmptyEntries);
+            var pns = Request.Form["PMAddr"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var p in pns)
             {
                 lpm.Add(new ProjectMembers(projectmodel.ProjectKey, p, ProjectViewModels.PMROLE));
@@ -868,7 +868,7 @@ namespace Prometheus.Controllers
             }
             else
             {
-                projectmodel.Description = SeverHtmlDecode.Decode(this,temphtml);
+                projectmodel.Description = SeverHtmlDecode.Decode(this, temphtml);
             }
         }
 
@@ -883,7 +883,7 @@ namespace Prometheus.Controllers
                 }
                 catch (Exception ex)
                 {
-                    ViewBag.CreateError = "<h3><font color=\"red\">Fail to create/modify project: " + RMSpectialCh(ex.ToString())+"</font></h3>";
+                    ViewBag.CreateError = "<h3><font color=\"red\">Fail to create/modify project: " + RMSpectialCh(ex.ToString()) + "</font></h3>";
                     return false;
                 }
             }
@@ -975,7 +975,7 @@ namespace Prometheus.Controllers
             projectmodel.StoreProject();
 
             var bondingprocess = Request.Form["ChoosedProcess"];
-            if (!string.IsNullOrEmpty(bondingprocess) 
+            if (!string.IsNullOrEmpty(bondingprocess)
                 && !bondingprocess.ToUpper().Contains("PLEASE"))
             {
                 ProjectViewModels.StoreProjectProcessBonding(projectmodel.ProjectKey, bondingprocess);
@@ -985,11 +985,11 @@ namespace Prometheus.Controllers
             IssueViewModels.CreateNPIProcTasks(projectmodel.ProjectName, projectmodel.ProjectKey, projectmodel.MemberList[0].Name);
 
             var ckdict = CookieUtility.UnpackCookie(this);
-            var who = (ckdict["logonuser"]).Split(new string[]{ "||"},StringSplitOptions.None)[0];
+            var who = (ckdict["logonuser"]).Split(new string[] { "||" }, StringSplitOptions.None)[0];
             //ProjectEvent.CreateProjectEvent(who, projectmodel.ProjectKey, projectmodel.ProjectName);
 
             MESUtility.StartProjectBonding(projectmodel);
-            BIDataUtility.StartProjectBonding(this,projectmodel);
+            BIDataUtility.StartProjectBonding(this, projectmodel);
             ATEUtility.StartProjectBonding(projectmodel);
 
 
@@ -1026,7 +1026,7 @@ namespace Prometheus.Controllers
                 pslist[0].Selected = true;
             }
 
-            ViewBag.updateissuelist =pslist;
+            ViewBag.updateissuelist = pslist;
         }
 
         private void CreateMonitorVcselList(ProjectViewModels vm)
@@ -1045,8 +1045,8 @@ namespace Prometheus.Controllers
 
             if (vm != null)
             {
-                if (string.IsNullOrEmpty(vm.MonitorVcsel) 
-                    || string.Compare(vm.MonitorVcsel,"True",true) == 0)
+                if (string.IsNullOrEmpty(vm.MonitorVcsel)
+                    || string.Compare(vm.MonitorVcsel, "True", true) == 0)
                 {
                     pslist[0].Selected = true;
                 }
@@ -1135,7 +1135,7 @@ namespace Prometheus.Controllers
                     }
 
                     var projectprocesslist = ProcessData.GetCurrentProjectWorkflowSteps(realkey);
-                    if(projectprocesslist.Count > 0)
+                    if (projectprocesslist.Count > 0)
                     {
                         ViewBag.ProcessList = CreateSelectList(projectprocesslist, "");
                     }
@@ -1155,7 +1155,7 @@ namespace Prometheus.Controllers
             }
             else
             {
-                return RedirectToAction("CreateProject","Project");
+                return RedirectToAction("CreateProject", "Project");
             }
         }
 
@@ -1168,7 +1168,7 @@ namespace Prometheus.Controllers
                 {
                     pndict.Add(pn.Pn, true);
                 }
-                    
+
             }
 
             bool changed = false;
@@ -1301,20 +1301,20 @@ namespace Prometheus.Controllers
             {
                 projectmodel.TabList = oldpjdata.TabList;
             }
-            
-                        
+
+
             var ckdict = CookieUtility.UnpackCookie(this);
             var who = (ckdict["logonuser"]).Split(new string[] { "||" }, StringSplitOptions.None)[0];
             //ProjectEvent.UpdateProjectEvent(who, projectmodel.ProjectKey, projectmodel.ProjectName);
 
-            if(databondingchange)
+            if (databondingchange)
             {
                 MESUtility.StartProjectBonding(projectmodel);
             }
 
             if (pnbondingchg)
             {
-                BIDataUtility.StartProjectBonding(this,projectmodel);
+                BIDataUtility.StartProjectBonding(this, projectmodel);
             }
 
             ProjectTestData.PrePareATELatestData(projectmodel.ProjectKey);
@@ -1322,12 +1322,12 @@ namespace Prometheus.Controllers
             var dict = new RouteValueDictionary();
             dict.Add("ProjectKey", projectmodel.ProjectKey);
             return RedirectToAction("ProjectDetail", "Project", dict);
-            
+
         }
 
         public ActionResult ProjectIssues(string ProjectKey)
         {
-            if(ProjectKey != null)
+            if (ProjectKey != null)
             {
                 var list1 = IssueViewModels.RetrieveTaskByProjectKey(ProjectKey, Resolute.Pending);
                 var list2 = IssueViewModels.RetrieveTaskByProjectKey(ProjectKey, Resolute.Working);
@@ -1460,7 +1460,7 @@ namespace Prometheus.Controllers
             {
                 ViewBag.projectkey = ProjectKey;
 
-                var vm  = ProjectFAViewModules.RetrievePendingFAData(ProjectKey,this);
+                var vm = ProjectFAViewModules.RetrievePendingFAData(ProjectKey, this);
 
                 var piedatadict = new Dictionary<string, int>();
                 foreach (var item in vm)
@@ -1482,7 +1482,7 @@ namespace Prometheus.Controllers
                     var namevaluepair = "";
                     foreach (var k in keys)
                     {
-                        namevaluepair = namevaluepair+"{ name:'"+k+"',y:"+ piedatadict[k].ToString()+ "},";
+                        namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
                     }
 
                     namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
@@ -1511,9 +1511,31 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectSptTask(string ProjectKey)
         {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
             //null is for qm, not null for parallel project
             var vm = IssueViewModels.RetrieveSptIssue(this, ProjectKey);
             ViewBag.rules = ProjectCriticalErrorVM.RetrievePJCriticalError(ProjectKey, null);
+
+            var ProjectInfo = ProjectViewModels.RetrieveOneProject(ProjectKey);
+            var pqeFlag = false;
+            if (ProjectInfo.MemberList.Count > 0)
+            {
+                foreach (var pqe in ProjectInfo.MemberList)
+                {
+                    if (string.Compare(pqe.Role, Prometheus.Models.ProjectViewModels.PQEROLE) == 0)
+                    {
+                        if (string.Compare(updater, pqe.Name, true) == 0)
+                        {
+                            pqeFlag = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            ViewBag.pqeFlag = pqeFlag;
             return View(vm);
         }
 
@@ -1521,7 +1543,7 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(ProjectKey))
             {
-                var vm = ProjectErrorViewModels.RetrieveErrorByPJKey(ProjectKey,this);
+                var vm = ProjectErrorViewModels.RetrieveErrorByPJKey(ProjectKey, this);
                 var piedatadict = new Dictionary<string, int>();
                 foreach (var item in vm)
                 {
@@ -1553,14 +1575,14 @@ namespace Prometheus.Controllers
             }
             return View();
         }
-        
+
         public ActionResult ProjectErrAbbr(string ProjectKey, string ErrAbbr)
         {
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(ErrAbbr))
             {
                 ViewBag.projectkey = ProjectKey;
 
-                var vm = ProjectFAViewModules.RetrieveFADataWithErrAbbr(ProjectKey, ErrAbbr,this);
+                var vm = ProjectFAViewModules.RetrieveFADataWithErrAbbr(ProjectKey, ErrAbbr, this);
 
                 var pendingitems = new List<ProjectFAViewModules>();
                 var tempitems = new List<ProjectFAViewModules>();
@@ -1635,7 +1657,7 @@ namespace Prometheus.Controllers
 
                 return View(pendingitems);
             }
-            return RedirectToAction("ViewAll","Project");
+            return RedirectToAction("ViewAll", "Project");
         }
 
         public ActionResult SNIssue(string ProjectKey, string SN)
@@ -1644,7 +1666,7 @@ namespace Prometheus.Controllers
             {
                 ViewBag.projectkey = ProjectKey;
 
-                var vm = ProjectFAViewModules.RetrieveFADataWithSN(ProjectKey, SN,this);
+                var vm = ProjectFAViewModules.RetrieveFADataWithSN(ProjectKey, SN, this);
 
                 var asilist = UserViewModels.RetrieveAllUser();
                 ViewBag.AllUserList = CreateSelectList1(asilist, "");
@@ -1665,7 +1687,7 @@ namespace Prometheus.Controllers
             var projectkey = Request.Form["HProjectKey"];
             ViewBag.projectkey = projectkey;
 
-            var vm = ProjectFAViewModules.RetrieveDoneFAData(projectkey,this);
+            var vm = ProjectFAViewModules.RetrieveDoneFAData(projectkey, this);
 
             var piedatadict = new Dictionary<string, int>();
             foreach (var item in vm)
@@ -1714,7 +1736,7 @@ namespace Prometheus.Controllers
         {
             if (ProjectKey != null)
             {
-                var vmlist = IssueViewModels.RetrieveNPIPROCIssue(ProjectKey,this);
+                var vmlist = IssueViewModels.RetrieveNPIPROCIssue(ProjectKey, this);
                 var pj = ProjectViewModels.RetrieveOneProject(ProjectKey);
 
                 var ckdict = CookieUtility.UnpackCookie(this);
@@ -1739,72 +1761,11 @@ namespace Prometheus.Controllers
             return View();
         }
 
-
-        /*public static void ProjectWeeklyTrend(Controller ctrl, string ProjectKey)
-        {
-                var vmlist = ProjectYieldViewModule.GetYieldByWeeks(ProjectKey);
-                if (vmlist.Count > 0)
-                {
-                    var ChartxAxisValues = "";
-                    var ChartSearies = "";
-
-                    var ftimelist = new List<string>();
-                    var fvalues = new List<double>();
-                    var cvalues = new List<double>();
-
-                    foreach (var item in vmlist)
-                    {
-                        ftimelist.Add(item.EndDate.ToString("yyyy-MM-dd"));
-                        fvalues.Add(item.FirstYield * 100.0);
-                        cvalues.Add(item.LastYield * 100.0);
-                    }
-
-                    //xaxis
-                    foreach (var item in ftimelist)
-                    {
-                        ChartxAxisValues = ChartxAxisValues + "'" + item + "',";
-                    }
-                    ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
-
-
-                    //yaxis
-                    ChartSearies = "{name:'First Yield',data:[<fvalue>]},{name:'Retest Yield',data:[<cvalue>]}";
-
-                    var tempvalue = "";
-                    foreach (var item in fvalues)
-                    {
-                        tempvalue = tempvalue + item.ToString("0.00") + ",";
-                    }
-                    tempvalue = tempvalue.Substring(0, tempvalue.Length - 1);
-                    ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
-
-                    tempvalue = "";
-                    foreach (var item in cvalues)
-                    {
-                        tempvalue = tempvalue + item.ToString("0.00") + ",";
-                    }
-                    tempvalue = tempvalue.Substring(0, tempvalue.Length - 1);
-                    ChartSearies = ChartSearies.Replace("<cvalue>", tempvalue);
-
-                    //rederect url
-                    var reurl = "window.location.href = '/Project/ProjectWYieldDetail?ProjectKey="+ProjectKey+"'"+ "+'&EndDate='+this.category";
-
-                    var tempscript = System.IO.File.ReadAllText(ctrl.Server.MapPath("~/Scripts/ColumnChart.xml"));
-                    ctrl.ViewBag.chartscript = tempscript.Replace("#ElementID#", "weeklyyield")
-                        .Replace("#ChartType#", "column")
-                        .Replace("#Title#", "Weekly Yield Trend")
-                        .Replace("#ChartxAxisValues#", ChartxAxisValues)
-                        .Replace("#yAxisTitle#", "Yield Percent")
-                        .Replace("#ChartSearies#", ChartSearies)
-                        .Replace("#REDIRECTURL#", reurl);
-                }
-        }*/
-
-        public static void ProjectWeeklyTrend(Controller ctrl, string ProjectKey,int weeks)
+        public static void ProjectWeeklyTrend(Controller ctrl, string ProjectKey, int weeks)
         {
             ctrl.ViewBag.Weeks = weeks.ToString();
 
-            var vmlist = ProjectYieldViewModule.GetYieldByWeeks(ProjectKey, ctrl.HttpContext.Cache,weeks);
+            var vmlist = ProjectYieldViewModule.GetYieldByWeeks(ProjectKey, ctrl.HttpContext.Cache, weeks);
             if (vmlist.Count > 0)
             {
                 var ChartxAxisValues = "";
@@ -1890,7 +1851,7 @@ namespace Prometheus.Controllers
 
                 for (var idx = 0; idx < rtyieldlist.Count; idx++)
                 {
-                    FINALTOOLTIP = FINALTOOLTIP+ "'<!doctype html><table>"
+                    FINALTOOLTIP = FINALTOOLTIP + "'<!doctype html><table>"
                         + "<tr><td><b>FPY</b></td><td>" + fyieldlist[idx].ToString("0.00") + "&#37;</td></tr>"
                         + "<tr><td><b>FY</b></td><td>" + ryieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
 
@@ -1899,7 +1860,7 @@ namespace Prometheus.Controllers
                         FINALTOOLTIP = FINALTOOLTIP + "<tr><td><b>" + d.WhichTest + "</b></td><td>Input:</td><td>" + d.InputCount.ToString() + "</td><td>Output:</td><td>" + d.OutputCount.ToString() + "</td></tr>";
                     }
 
-                    FINALTOOLTIP =  FINALTOOLTIP + "</table>'";
+                    FINALTOOLTIP = FINALTOOLTIP + "</table>'";
                     FINALTOOLTIP = FINALTOOLTIP + ",";
                 }
                 FINALTOOLTIP = FINALTOOLTIP.Substring(0, FINALTOOLTIP.Length - 1);
@@ -1907,7 +1868,7 @@ namespace Prometheus.Controllers
 
                 for (var idx = 0; idx < rtyieldlist.Count; idx++)
                 {
-                    REALTIMETOOLTIP = REALTIMETOOLTIP+ "'<!doctype html><table>"
+                    REALTIMETOOLTIP = REALTIMETOOLTIP + "'<!doctype html><table>"
                         + "<tr><td><b>Realtime Yield</b></td><td>" + rtyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
                     foreach (var d in vmlist[idx].RealTimeYields)
                     {
@@ -1933,7 +1894,7 @@ namespace Prometheus.Controllers
                 SNTOOLTIP = SNTOOLTIP.Substring(0, SNTOOLTIP.Length - 1);
 
                 //rederect url
-                var reurl = "window.location.href = '/Project/ProjectWYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category"+ "+'&Weeks='+'"+weeks.ToString()+"'";
+                var reurl = "window.location.href = '/Project/ProjectWYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category" + "+'&Weeks='+'" + weeks.ToString() + "'";
 
                 var tempscript = System.IO.File.ReadAllText(ctrl.Server.MapPath("~/Scripts/SuperYield.xml"));
                 ctrl.ViewBag.chartscript = tempscript.Replace("#ElementID#", "weeklyyield")
@@ -1954,7 +1915,7 @@ namespace Prometheus.Controllers
             }
         }
 
-        public ActionResult ProjectYield(string ProjectKey,int Weeks)
+        public ActionResult ProjectYield(string ProjectKey, int Weeks)
         {
             if (ProjectKey != null)
             {
@@ -1967,20 +1928,18 @@ namespace Prometheus.Controllers
             return View();
         }
 
-
-
         public ActionResult ProjectYieldMain(string ProjectKey)
         {
-            var sarray = new string []{ "8", "16", "24", "32", "40", "48", "56" };
+            var sarray = new string[] { "8", "16", "24", "32", "40", "48", "56" };
             var slist = new List<string>();
             slist.Add("Weekly Yield Trend");
             slist.AddRange(sarray);
-            var weeklylist = CreateSelectList1(slist,"");
+            var weeklylist = CreateSelectList1(slist, "");
             weeklylist[0].Selected = true;
             weeklylist[0].Disabled = true;
             ViewBag.weeklylist = weeklylist;
 
-            sarray = new string[] { "1", "2", "3", "4", "5", "6", "12","18","24" };
+            sarray = new string[] { "1", "2", "3", "4", "5", "6", "12", "18", "24" };
             slist = new List<string>();
             slist.Add("Monthly Yield Trend");
             slist.AddRange(sarray);
@@ -1989,7 +1948,7 @@ namespace Prometheus.Controllers
             monthlylist[0].Disabled = true;
             ViewBag.monthlylist = monthlylist;
 
-            sarray = new string[] { YIELDTYPE.BR, YIELDTYPE.JO};
+            sarray = new string[] { YIELDTYPE.BR, YIELDTYPE.JO };
             slist = new List<string>();
             slist.AddRange(sarray);
             ViewBag.yieldtypelist = CreateSelectList1(slist, "");
@@ -1997,7 +1956,7 @@ namespace Prometheus.Controllers
             if (ProjectKey != null)
             {
                 ViewBag.pjkey = ProjectKey;
-                ProjectWeeklyTrend(this, ProjectKey,4);
+                ProjectWeeklyTrend(this, ProjectKey, 4);
 
                 var allprocname = new List<string>();
                 var bondingedprocess = ProjectViewModels.RetriveProjectProcessBonding(ProjectKey);
@@ -2013,16 +1972,16 @@ namespace Prometheus.Controllers
                 var detailinfo = new Dictionary<string, List<ProjectMoveHistory>>();
                 var procdata = ProcessData.RetrieveLastWeekProcessData(ProjectKey, detailinfo);
                 var processdatatable = new List<ProjectMoveHistory>();
-                foreach(var proc in allprocname)
+                foreach (var proc in allprocname)
                 {
                     if (procdata.ContainsKey(proc))
                     {
                         processdatatable.Add(procdata[proc]);
                     }
                 }
-                if(detailinfo.Count > 0)
+                if (detailinfo.Count > 0)
                     ViewBag.detailinfo = detailinfo;
-                if(processdatatable.Count > 0)
+                if (processdatatable.Count > 0)
                     ViewBag.processdatatable = processdatatable;
 
                 var jolist = new List<string>();
@@ -2088,7 +2047,7 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        public ActionResult ProjectWYieldDetail(string ProjectKey, string EndDate,string Weeks)
+        public ActionResult ProjectWYieldDetail(string ProjectKey, string EndDate, string Weeks)
         {
             ViewBag.Weeks = Weeks;
 
@@ -2100,7 +2059,7 @@ namespace Prometheus.Controllers
                 {
                     for (int i = 6; i > 0; i--)
                     {
-                        sdate = edate.AddDays(0-i);
+                        sdate = edate.AddDays(0 - i);
                         if (sdate.DayOfWeek == DayOfWeek.Thursday)
                         {
                             break;
@@ -2113,7 +2072,7 @@ namespace Prometheus.Controllers
                 var fytestdatalist = new List<KeyValuePair<string, int>>();
 
                 var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
-                var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, sdate.ToString(), edate.ToString(),pvm, HttpContext.Cache);
+                var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, sdate.ToString(), edate.ToString(), pvm, HttpContext.Cache);
 
                 if (yieldvm.FirstYields.Count > 0)
                 {
@@ -2153,7 +2112,7 @@ namespace Prometheus.Controllers
                     var namevaluepair = "";
                     foreach (var k in keys)
                     {
-                        if(piedatadict[k] > 0)
+                        if (piedatadict[k] > 0)
                             namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
                     }
 
@@ -2161,7 +2120,7 @@ namespace Prometheus.Controllers
 
                     var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
                     ViewBag.fchartscript = tempscript.Replace("#ElementID#", "ffailurepie")
-                        .Replace("#Title#","First Failure")
+                        .Replace("#Title#", "First Failure")
                         .Replace("#SERIESNAME#", "FFailure")
                         .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                 }
@@ -2179,7 +2138,7 @@ namespace Prometheus.Controllers
                     foreach (var error in eklist)
                     {
                         if (string.Compare(error, "PASS", true) != 0)
-                        { 
+                        {
                             foreach (var test in yieldvm.SNYields)
                             {
                                 var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.SNErrorMap);
@@ -2292,9 +2251,9 @@ namespace Prometheus.Controllers
         {
             if (ProjectKey != null)
             {
-                var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Pending,ISSUETP.RMA,this);
-                var list2 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Working,ISSUETP.RMA, this);
-                var list3 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Done,ISSUETP.RMA, this);
+                var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Pending, ISSUETP.RMA, this);
+                var list2 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Working, ISSUETP.RMA, this);
+                var list3 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Done, ISSUETP.RMA, this);
                 list1.AddRange(list2);
                 list1.AddRange(list3);
                 return View(list1);
@@ -2403,7 +2362,6 @@ namespace Prometheus.Controllers
             }
             return View();
         }
-
 
         public ActionResult ProjectOBA(string ProjectKey)
         {
@@ -2580,7 +2538,7 @@ namespace Prometheus.Controllers
 
         }*/
 
-        public ActionResult ProjectMonthlyYield(string ProjectKey,int Months)
+        public ActionResult ProjectMonthlyYield(string ProjectKey, int Months)
         {
             if (ProjectKey != null)
             {
@@ -2871,7 +2829,7 @@ namespace Prometheus.Controllers
                     SNTOOLTIP = SNTOOLTIP.Substring(0, SNTOOLTIP.Length - 1);
 
                     //rederect url
-                    var reurl = "window.location.href = '/Project/ProjectDYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category+'&VStartDate='+'" + StartDate+ "'+'&VEndDate='+'"+EndDate2+"'";
+                    var reurl = "window.location.href = '/Project/ProjectDYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category+'&VStartDate='+'" + StartDate + "'+'&VEndDate='+'" + EndDate2 + "'";
 
                     var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/SuperYield.xml"));
                     ViewBag.chartscript = tempscript.Replace("#ElementID#", "dailyyield")
@@ -2896,7 +2854,7 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        public ActionResult ProjectDYieldDetail(string ProjectKey, string EndDate,string VStartDate,string VEndDate)
+        public ActionResult ProjectDYieldDetail(string ProjectKey, string EndDate, string VStartDate, string VEndDate)
         {
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(EndDate))
             {
@@ -3137,7 +3095,7 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        public ActionResult ProjectMYieldDetail(string ProjectKey, string EndDate,int Months)
+        public ActionResult ProjectMYieldDetail(string ProjectKey, string EndDate, int Months)
         {
             ViewBag.Months = Months.ToString();
 
@@ -3387,10 +3345,10 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        private void ProjectBRTypeYield(string ProjectKey, string BRNUM,string BRType)
+        private void ProjectBRTypeYield(string ProjectKey, string BRNUM, string BRType)
         {
             var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
-            var vmlist = ProjectYieldViewModule.GetYieldByBRNum(ProjectKey, BRNUM, pvm, HttpContext.Cache,BRType);
+            var vmlist = ProjectYieldViewModule.GetYieldByBRNum(ProjectKey, BRNUM, pvm, HttpContext.Cache, BRType);
 
             if (vmlist.Count > 0)
             {
@@ -3473,12 +3431,12 @@ namespace Prometheus.Controllers
                 FINALTOOLTIP = FINALTOOLTIP.Substring(0, FINALTOOLTIP.Length - 1);
 
                 //rederect url
-                var tempurl = "/Project/ProjectBRYieldDetail?ProjectKey=" + ProjectKey+ "'+'&CurrentBR='+this.category+'" + "&WholeBRNUM=" + BRNUM + "&BRType=" + BRType;
+                var tempurl = "/Project/ProjectBRYieldDetail?ProjectKey=" + ProjectKey + "'+'&CurrentBR='+this.category+'" + "&WholeBRNUM=" + BRNUM + "&BRType=" + BRType;
                 var reurl = "window.location.href = '" + tempurl + "'";
 
                 var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/BaseYield.xml"));
                 ViewBag.chartscript = tempscript.Replace("#ElementID#", "bryield")
-                    .Replace("#Title#", BRNUM+" "+BRType + " Yield")
+                    .Replace("#Title#", BRNUM + " " + BRType + " Yield")
                     .Replace("#ChartxAxisValues#", ChartxAxisValues)
                     .Replace("#XAxisTitle#", BRType)
                     .Replace("#AmountMAX#", maxamout.ToString())
@@ -3491,7 +3449,7 @@ namespace Prometheus.Controllers
 
         }
 
-        
+
 
         public ActionResult ProjectBRYield(string ProjectKey, string BRNUM)
         {
@@ -3518,7 +3476,7 @@ namespace Prometheus.Controllers
 
             return View();
         }
-        public ActionResult ProjectBRYieldDetail(string ProjectKey,string CurrentBR,string WholeBRNUM,string BRType)
+        public ActionResult ProjectBRYieldDetail(string ProjectKey, string CurrentBR, string WholeBRNUM, string BRType)
         {
             if (!string.IsNullOrEmpty(ProjectKey)
                 && !string.IsNullOrEmpty(CurrentBR)
@@ -3805,7 +3763,7 @@ namespace Prometheus.Controllers
                         var tempfamount = 0;
                         foreach (var d in item.FirstYields)
                         {
-                            if (d.InputCount > tempfamount){ tempfamount = d.InputCount;}
+                            if (d.InputCount > tempfamount) { tempfamount = d.InputCount; }
                             if (d.InputCount > maxamout) { maxamout = d.InputCount; }
                         }
                         famountlist.Add(tempfamount);
@@ -3932,7 +3890,7 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        private void firsttestparetofun(List<KeyValuePair<string, int>> firstdatalist,string ProjectKey)
+        private void firsttestparetofun(List<KeyValuePair<string, int>> firstdatalist, string ProjectKey)
         {
             if (firstdatalist.Count > 0)
             {
@@ -4041,7 +3999,7 @@ namespace Prometheus.Controllers
             }
         }
 
-        private void retestparetofun(List<KeyValuePair<string, int>> retestdatalist,string ProjectKey)
+        private void retestparetofun(List<KeyValuePair<string, int>> retestdatalist, string ProjectKey)
         {
             if (retestdatalist.Count > 0)
             {
@@ -4531,10 +4489,10 @@ namespace Prometheus.Controllers
                 ck.Add("currentaction", "UpdateProjectError");
                 CookieUtility.SetCookie(this, ck);
             }
-            
+
             if (!string.IsNullOrEmpty(key))
             {
-                var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key,this);
+                var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key, this);
                 var AllPJMember = ProjectViewModels.RetrieveOneProject(vm[0].ProjectKey).AllPJMember;
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
                 if (AllPJMember.ToUpper().Contains(updater.ToUpper()))
@@ -4551,18 +4509,18 @@ namespace Prometheus.Controllers
 
                 return View(vm[0]);
             }
-            
+
             return View();
         }
 
         public ActionResult DeleteErrorComment(string ErrorKey, string CommentType, string Date)
         {
-            if (!string.IsNullOrEmpty(ErrorKey) && !string.IsNullOrEmpty(CommentType) && !string.IsNullOrEmpty(Date) )
+            if (!string.IsNullOrEmpty(ErrorKey) && !string.IsNullOrEmpty(CommentType) && !string.IsNullOrEmpty(Date))
             {
                 ProjectErrorViewModels.DeleteErrorComment(ErrorKey, CommentType, Date);
                 var dict = new RouteValueDictionary();
                 dict.Add("ErrorKey", ErrorKey);
-                return RedirectToAction("UpdateProjectError", "Project",dict);
+                return RedirectToAction("UpdateProjectError", "Project", dict);
             }
             return RedirectToAction("ViewAll", "Project");
         }
@@ -4581,9 +4539,9 @@ namespace Prometheus.Controllers
         }
 
 
-        public ActionResult UpdateProjectError2(string ProjectKey,string ErrorCode)
+        public ActionResult UpdateProjectError2(string ProjectKey, string ErrorCode)
         {
-            var tempvm = ProjectErrorViewModels.RetrieveErrorByPJKey(ProjectKey, ErrorCode,this);
+            var tempvm = ProjectErrorViewModels.RetrieveErrorByPJKey(ProjectKey, ErrorCode, this);
             var ErrorKey = "";
             if (tempvm.Count > 0)
             {
@@ -4624,7 +4582,7 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(key))
             {
-                var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key,this);
+                var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key, this);
                 var AllPJMember = ProjectViewModels.RetrieveOneProject(vm[0].ProjectKey).AllPJMember;
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
                 if (AllPJMember.ToUpper().Contains(updater.ToUpper()))
@@ -4638,7 +4596,7 @@ namespace Prometheus.Controllers
 
                 var asilist1 = UserViewModels.RetrieveAllUser();
                 ViewBag.towholist = CreateSelectList(asilist1, "");
-                return View("UpdateProjectError",vm[0]);
+                return View("UpdateProjectError", vm[0]);
             }
 
             var asilist = UserViewModels.RetrieveAllUser();
@@ -4685,7 +4643,7 @@ namespace Prometheus.Controllers
             return ret;
         }
 
-        private void SendDBGCommentEvent(string what, string urlstr, List<string> towho, string pusher,string commentcontent)
+        private void SendDBGCommentEvent(string what, string urlstr, List<string> towho, string pusher, string commentcontent)
         {
             try
             {
@@ -4730,7 +4688,7 @@ namespace Prometheus.Controllers
                     {
                         ret.Add(name.ToUpper());
                     }
-                    else if(name.Contains("."))
+                    else if (name.Contains("."))
                     {
                         ret.Add(name.ToUpper() + "@FINISAR.COM");
                     }
@@ -4756,7 +4714,7 @@ namespace Prometheus.Controllers
             var vm = new ProjectErrorViewModels();
             vm.ErrorKey = Request.Form["ErrorKey"];
             vm.ShortDesc = Request.Form["ShortDesc"];
-            vm.Reporter = ckdict["logonuser"].Split(new char[] { '|' })[0];            
+            vm.Reporter = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
             vm.UpdateShortDesc();
 
@@ -4764,8 +4722,8 @@ namespace Prometheus.Controllers
             var temphtml = Request.Form["editor1"];
             if (!string.IsNullOrEmpty(temphtml))
             {
-                vm.Description = SeverHtmlDecode.Decode(this,temphtml);
-                ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey,vm.dbDescription,PJERRORCOMMENTTYPE.Description,vm.Reporter, currenttime);
+                vm.Description = SeverHtmlDecode.Decode(this, temphtml);
+                ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, vm.dbDescription, PJERRORCOMMENTTYPE.Description, vm.Reporter, currenttime);
 
                 var updatevm = ProjectErrorViewModels.RetrieveErrorByErrorKey(vm.ErrorKey, this);
                 var pjmems = ProjectViewModels.RetrieveOneProject(updatevm[0].ProjectKey).MemberList;
@@ -4778,7 +4736,7 @@ namespace Prometheus.Controllers
                 if (atlist.Count > 0) towho.AddRange(atlist);
 
                 var commentcontent = System.Text.RegularExpressions.Regex.Replace(vm.Description.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
-                SendDBGCommentEvent("A mew comment", "/Project/UpdateProjectError?ErrorKey=" + vm.ErrorKey, towho, updater,commentcontent);
+                SendDBGCommentEvent("A mew comment", "/Project/UpdateProjectError?ErrorKey=" + vm.ErrorKey, towho, updater, commentcontent);
             }
 
             var urls = ReceiveAttachFiles();
@@ -4806,7 +4764,7 @@ namespace Prometheus.Controllers
                     var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
                     var dockey = tempkeys[tempkeys.Length - 1];
                     UserKPIVM.AddUserAttachDailyRank(vm.ErrorKey, updater, UserRankType.ADDITIONAL
-                        , "Add attachment to " + vm.ProjectKey + " " + vm.OrignalCode, "/Project/UpdateProjectError?ErrorKey=" + vm.ErrorKey, 2,dockey,this);
+                        , "Add attachment to " + vm.ProjectKey + " " + vm.OrignalCode, "/Project/UpdateProjectError?ErrorKey=" + vm.ErrorKey, 2, dockey, this);
                 }
             }
 
@@ -4860,19 +4818,19 @@ namespace Prometheus.Controllers
 
             if (analyseinputed)
             {
-                    if (string.IsNullOrEmpty(failurestr))
-                    {
-                        var com1 = new ErrorComments();
-                        com1.Comment = "<p>To Be Edit</p>";
-                        ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.FailureDetail, vm.Reporter, currenttime);
-                    }
+                if (string.IsNullOrEmpty(failurestr))
+                {
+                    var com1 = new ErrorComments();
+                    com1.Comment = "<p>To Be Edit</p>";
+                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.FailureDetail, vm.Reporter, currenttime);
+                }
 
-                    if (string.IsNullOrEmpty(resulutstr))
-                    {
-                        var com1 = new ErrorComments();
-                        com1.Comment = "<p>To Be Edit</p>";
-                        ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.Result, vm.Reporter, currenttime);
-                    }
+                if (string.IsNullOrEmpty(resulutstr))
+                {
+                    var com1 = new ErrorComments();
+                    com1.Comment = "<p>To Be Edit</p>";
+                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.Result, vm.Reporter, currenttime);
+                }
 
                 if (string.IsNullOrEmpty(rootcausestr))
                 {
@@ -4896,24 +4854,24 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(ErrorKey))
             {
-                var tempvm = ProjectErrorViewModels.RetrieveErrorByErrorKey(ErrorKey,this);
+                var tempvm = ProjectErrorViewModels.RetrieveErrorByErrorKey(ErrorKey, this);
                 return View(tempvm[0]);
             }
             return RedirectToAction("ViewAll", "Project");
         }
 
-        public ActionResult DeleteErrorAttachment(string errorkey,string filename)
+        public ActionResult DeleteErrorAttachment(string errorkey, string filename)
         {
             if (!string.IsNullOrEmpty(errorkey) && !string.IsNullOrEmpty(filename))
             {
-                var tempvm = ProjectErrorViewModels.RetrieveErrorByErrorKey(errorkey,this);
+                var tempvm = ProjectErrorViewModels.RetrieveErrorByErrorKey(errorkey, this);
                 var AllPJMember = ProjectViewModels.RetrieveOneProject(tempvm[0].ProjectKey).AllPJMember;
                 var ckdict = CookieUtility.UnpackCookie(this);
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
                 if (AllPJMember.ToUpper().Contains(updater.ToUpper()))
                 {
-                    ProjectErrorViewModels.DeleteAttachment(errorkey,filename);
+                    ProjectErrorViewModels.DeleteAttachment(errorkey, filename);
                 }
 
                 var dict = new RouteValueDictionary();
@@ -4972,7 +4930,7 @@ namespace Prometheus.Controllers
                 var content = "";
                 foreach (var item in emailed)
                 {
-                        content = content + item.Key + "<>" + item.Value.ToString("0.00000") + "\r\n";
+                    content = content + item.Key + "<>" + item.Value.ToString("0.00000") + "\r\n";
                 }
                 System.IO.File.WriteAllText(wholefilename, content);
             }
@@ -4983,183 +4941,183 @@ namespace Prometheus.Controllers
 
         private void RealCheckVcselYieldByWafer(List<string> pjkeylist)
         {
-                var emailed = VcselEmailCheck();
-                //var content = "<!DOCTYPE html><table>";
-                var content1 = string.Empty;
-                var logcontent = string.Empty;
-                bool hascontent = false;
+            var emailed = VcselEmailCheck();
+            //var content = "<!DOCTYPE html><table>";
+            var content1 = string.Empty;
+            var logcontent = string.Empty;
+            bool hascontent = false;
 
-                //var tempcontent2 = "<tr>" + "<th>Project</th>" + "<th>Wafer</th>" + "<th>Corrective Yield</th>" + "<th>Input</th>" + "<th>Output</th>" + "</tr>";
-                //content = content + tempcontent2;
+            //var tempcontent2 = "<tr>" + "<th>Project</th>" + "<th>Wafer</th>" + "<th>Corrective Yield</th>" + "<th>Input</th>" + "<th>Output</th>" + "</tr>";
+            //content = content + tempcontent2;
 
-                var waferexceptlist = ProjectViewModels.RetrieveProjectAllExcept(ProjectExceptType.WAFERYIELDEXCEPT);
-                var exceptdict = new Dictionary<string, bool>();
+            var waferexceptlist = ProjectViewModels.RetrieveProjectAllExcept(ProjectExceptType.WAFERYIELDEXCEPT);
+            var exceptdict = new Dictionary<string, bool>();
 
-                foreach(var e in waferexceptlist)
+            foreach (var e in waferexceptlist)
+            {
+                var waferexcepts = e.Except.Split(new string[] { ";", ",", " " }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var w in waferexcepts)
                 {
-                    var waferexcepts = e.Except.Split(new string[] { ";", ",", " " }, StringSplitOptions.RemoveEmptyEntries);
-                    foreach (var w in waferexcepts)
+                    if (!exceptdict.ContainsKey(w))
                     {
-                        if (!exceptdict.ContainsKey(w))
-                        {
-                            exceptdict.Add(w, true);
-                        }
+                        exceptdict.Add(w, true);
                     }
                 }
+            }
 
-                foreach (var item in pjkeylist)
+            foreach (var item in pjkeylist)
+            {
+                var pjval = ProjectViewModels.RetrieveOneProject(item);
+                if (string.Compare(pjval.MonitorVcsel, "False", true) == 0)
                 {
-                    var pjval = ProjectViewModels.RetrieveOneProject(item);
-                    if (string.Compare(pjval.MonitorVcsel,"False",true) == 0)
+                    continue;
+                }
+                var warningyield = Convert.ToDouble(pjval.VcselWarningYield) * 0.01;
+
+                var waferlist = BITestData.RetrieveAllWafer(item);
+
+                foreach (var w in waferlist)
+                {
+                    if (exceptdict.ContainsKey(w))
                     {
                         continue;
                     }
-                    var warningyield = Convert.ToDouble(pjval.VcselWarningYield) * 0.01;
 
-                var waferlist = BITestData.RetrieveAllWafer(item);
-                    
-                foreach (var w in waferlist)
-                {
-                        if (exceptdict.ContainsKey(w))
+
+                    var yield = ProjectBIYieldViewModule.GetYieldByWafer(item, w);
+                    if (yield.CorrectLastYield > 0.1 && yield.CorrectLastYield < warningyield)
+                    {
+
+                        var alldict = new Dictionary<string, bool>();
+                        var errdict = new Dictionary<string, bool>();
+                        var cordict = new Dictionary<string, bool>();
+
+                        foreach (var yitem in yield.LastYields)
                         {
-                            continue;
-                        }
-                        
-
-                        var yield = ProjectBIYieldViewModule.GetYieldByWafer(item, w);
-                        if (yield.CorrectLastYield > 0.1 && yield.CorrectLastYield < warningyield)
-                        {
-
-                            var alldict = new Dictionary<string, bool>();
-                            var errdict = new Dictionary<string, bool>();
-                            var cordict = new Dictionary<string, bool>();
-
-                            foreach (var yitem in yield.LastYields)
+                            foreach (var snitem in yitem.AllSNDict)
                             {
-                                foreach (var snitem in yitem.AllSNDict)
+                                if (!alldict.ContainsKey(snitem.Key))
                                 {
-                                    if (!alldict.ContainsKey(snitem.Key))
-                                    {
-                                        alldict.Add(snitem.Key, true);
-                                    }
-                                }
-
-                                foreach (var snitem in yitem.ErrSNDict)
-                                {
-                                    if (!errdict.ContainsKey(snitem.Key))
-                                    {
-                                        errdict.Add(snitem.Key, true);
-                                    }
-                                }
-
-                                foreach (var snitem in yitem.CorSNDict)
-                                {
-                                    if (!cordict.ContainsKey(snitem.Key))
-                                    {
-                                        cordict.Add(snitem.Key, true);
-                                    }
+                                    alldict.Add(snitem.Key, true);
                                 }
                             }
+
+                            foreach (var snitem in yitem.ErrSNDict)
+                            {
+                                if (!errdict.ContainsKey(snitem.Key))
+                                {
+                                    errdict.Add(snitem.Key, true);
+                                }
+                            }
+
+                            foreach (var snitem in yitem.CorSNDict)
+                            {
+                                if (!cordict.ContainsKey(snitem.Key))
+                                {
+                                    cordict.Add(snitem.Key, true);
+                                }
+                            }
+                        }
 
                         if (alldict.Count < 80)
                         {
                             continue;
                         }
 
-                            hascontent = true;
-                            var tempcontent1 = "Warning: the corrective yield of " + item + " wafer " + w + " is " + (yield.CorrectLastYield * 100.0).ToString("0.00") + "% \r\n\r\n"
-                                + " Total Input: "+ alldict.Count.ToString() + " ,Failed Modules: " + errdict.Count.ToString()+" ,Reviewed Modules: " + cordict.Count.ToString() + " \r\n\r\n";
+                        hascontent = true;
+                        var tempcontent1 = "Warning: the corrective yield of " + item + " wafer " + w + " is " + (yield.CorrectLastYield * 100.0).ToString("0.00") + "% \r\n\r\n"
+                            + " Total Input: " + alldict.Count.ToString() + " ,Failed Modules: " + errdict.Count.ToString() + " ,Reviewed Modules: " + cordict.Count.ToString() + " \r\n\r\n";
 
-                            if (errdict.Count == cordict.Count)
-                            {
-                                tempcontent1 = "[Reviewed ] " + tempcontent1;
-                            }
-
-                            if (!emailed.ContainsKey(item + "-" + w))
-                            {
-                                tempcontent1 = "[new ] " + tempcontent1;
-                                emailed.Add(item + "-" + w, yield.CorrectLastYield);
-                            }
-                            else
-                            {
-                                var lasttimeyield = Convert.ToDouble(emailed[item + "-" + w].ToString("0.0"));
-                                var currentyield = Convert.ToDouble(yield.CorrectLastYield.ToString("0.0"));
-                                if (currentyield > lasttimeyield)
-                                {
-                                    tempcontent1 = "[^] " + tempcontent1;
-                                }
-                                else if (currentyield < lasttimeyield)
-                                {
-                                    tempcontent1 = "[v] " + tempcontent1;
-                                }
-                                emailed[item + "-" + w] = yield.CorrectLastYield;
-                            }
-                                //tempcontent2 = "<tr>"+ "<td>"+item+"</td>" + "<td>"+w+"</td>" + "<td>"+ (yield.CorrectLastYield * 100.0).ToString("0.00") + "%</td>" + "<td>"+ alldict.Count.ToString() + "</td>" + "<td>"+ ((int)(alldict.Count* yield.CorrectLastYield)).ToString() + "</td>" + "</tr>";
-                                //content = content + tempcontent2;
-
-                            content1 = content1 + tempcontent1;
-
-                            logcontent = logcontent + tempcontent1;
-                            logcontent = logcontent + "All SN:\r\n";
-                            foreach (var sn in alldict)
-                            {
-                                logcontent = logcontent + sn.Key+"\r\n";
-                            }
-                            logcontent = logcontent + "Error SN:\r\n";
-                            foreach (var sn in errdict)
-                            {
-                                logcontent = logcontent + sn.Key + "\r\n";
-                            }
-
+                        if (errdict.Count == cordict.Count)
+                        {
+                            tempcontent1 = "[Reviewed ] " + tempcontent1;
                         }
-                    }//end foreach
+
+                        if (!emailed.ContainsKey(item + "-" + w))
+                        {
+                            tempcontent1 = "[new ] " + tempcontent1;
+                            emailed.Add(item + "-" + w, yield.CorrectLastYield);
+                        }
+                        else
+                        {
+                            var lasttimeyield = Convert.ToDouble(emailed[item + "-" + w].ToString("0.0"));
+                            var currentyield = Convert.ToDouble(yield.CorrectLastYield.ToString("0.0"));
+                            if (currentyield > lasttimeyield)
+                            {
+                                tempcontent1 = "[^] " + tempcontent1;
+                            }
+                            else if (currentyield < lasttimeyield)
+                            {
+                                tempcontent1 = "[v] " + tempcontent1;
+                            }
+                            emailed[item + "-" + w] = yield.CorrectLastYield;
+                        }
+                        //tempcontent2 = "<tr>"+ "<td>"+item+"</td>" + "<td>"+w+"</td>" + "<td>"+ (yield.CorrectLastYield * 100.0).ToString("0.00") + "%</td>" + "<td>"+ alldict.Count.ToString() + "</td>" + "<td>"+ ((int)(alldict.Count* yield.CorrectLastYield)).ToString() + "</td>" + "</tr>";
+                        //content = content + tempcontent2;
+
+                        content1 = content1 + tempcontent1;
+
+                        logcontent = logcontent + tempcontent1;
+                        logcontent = logcontent + "All SN:\r\n";
+                        foreach (var sn in alldict)
+                        {
+                            logcontent = logcontent + sn.Key + "\r\n";
+                        }
+                        logcontent = logcontent + "Error SN:\r\n";
+                        foreach (var sn in errdict)
+                        {
+                            logcontent = logcontent + sn.Key + "\r\n";
+                        }
+
+                    }
                 }//end foreach
+            }//end foreach
 
 
-                VcselEmailStore(emailed);
+            VcselEmailStore(emailed);
 
-                //content = content + "</table>";
+            //content = content + "</table>";
 
-                if (hascontent)
+            if (hascontent)
+            {
+                var fn = "VCSEL_WAFER_SN" + DateTime.Now.ToString("yyyy-MM-dd") + ".txt";
+                var logvcsel = Server.MapPath("~/userfiles") + "\\" + fn;
+                System.IO.File.WriteAllText(logvcsel, logcontent);
+
+                var netcomputername = "";
+                try
                 {
-                    var fn = "VCSEL_WAFER_SN" + DateTime.Now.ToString("yyyy-MM-dd") + ".txt";
-                    var logvcsel = Server.MapPath("~/userfiles") + "\\" + fn;
-                    System.IO.File.WriteAllText(logvcsel, logcontent);
-
-                    var netcomputername = "";
-                    try
-                    {
-                        netcomputername = System.Net.Dns.GetHostName();
-                    }
-                    catch (Exception ex) { }
-
-
-                    var url = "/userfiles/" + fn;
-                    var routevalue = new RouteValueDictionary();
-                    routevalue.Add("issuekey", "ABC");
-                    string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
-                    string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
-                    validatestr = validatestr.Split(new string[] { "/Issue" }, StringSplitOptions.None)[0]+ url;
-                    validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
-
-                    var toaddrs = new List<string>();
-                    var syscfgdict = CfgUtility.GetSysConfig(this);
-                    var bimembs = syscfgdict["BITEAM"].Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
-                    foreach (var bm in bimembs)
-                    {
-                        toaddrs.Add(bm.ToUpper());
-                    }
-
-                    EmailUtility.SendEmail(this,"VCSEL WAFER YIELD WARNING - WUXI Engineering System", toaddrs, content1 + "\r\nWafer SN File: " + validatestr);
-                    new System.Threading.ManualResetEvent(false).WaitOne(5000);
+                    netcomputername = System.Net.Dns.GetHostName();
                 }
+                catch (Exception ex) { }
+
+
+                var url = "/userfiles/" + fn;
+                var routevalue = new RouteValueDictionary();
+                routevalue.Add("issuekey", "ABC");
+                string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+                validatestr = validatestr.Split(new string[] { "/Issue" }, StringSplitOptions.None)[0] + url;
+                validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
+
+                var toaddrs = new List<string>();
+                var syscfgdict = CfgUtility.GetSysConfig(this);
+                var bimembs = syscfgdict["BITEAM"].Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var bm in bimembs)
+                {
+                    toaddrs.Add(bm.ToUpper());
+                }
+
+                EmailUtility.SendEmail(this, "VCSEL WAFER YIELD WARNING - WUXI Engineering System", toaddrs, content1 + "\r\nWafer SN File: " + validatestr);
+                new System.Threading.ManualResetEvent(false).WaitOne(5000);
+            }
         }
 
         private void CheckVecselYieldByWafer(List<string> pjkeylist)
         {
             var filename = "log" + DateTime.Now.ToString("yyyy-MM-dd");
             var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
-            
+
             if (!System.IO.File.Exists(wholefilename))
             {
                 RealCheckVcselYieldByWafer(pjkeylist);
@@ -5186,13 +5144,13 @@ namespace Prometheus.Controllers
             var netcomputername = "";
             try { netcomputername = System.Net.Dns.GetHostName(); }
             catch (Exception ex) { }
-            return  validatestr.Replace("//localhost", "//" + netcomputername);
+            return validatestr.Replace("//localhost", "//" + netcomputername);
         }
 
         private string SendIAssignPendingIssue(string username)
         {
             var wissues = IssueViewModels.RetrieveIssueByCreator(username, Resolute.Working, this);
-            var pissues = IssueViewModels.RetrieveIssueByCreator(username,Resolute.Pending, this);
+            var pissues = IssueViewModels.RetrieveIssueByCreator(username, Resolute.Pending, this);
 
             var ret = string.Empty;
             foreach (var i in wissues)
@@ -5200,7 +5158,7 @@ namespace Prometheus.Controllers
                 if (i.DueDate > DateTime.Now)
                     continue;
 
-                ret = ret + "WORKING    Expire-Days: " + (DateTime.Now - i.DueDate).Days.ToString()+"    "+ i.Summary + "   " + i.Assignee +" Due Date: " + i.DueDate.ToString() + ":\r\n";
+                ret = ret + "WORKING    Expire-Days: " + (DateTime.Now - i.DueDate).Days.ToString() + "    " + i.Summary + "   " + i.Assignee + " Due Date: " + i.DueDate.ToString() + ":\r\n";
                 ret = ret + IssueURL(i.IssueKey) + "\r\n\r\n";
             }
 
@@ -5370,7 +5328,7 @@ namespace Prometheus.Controllers
                         string validatestr = this.Url.Action("UserBookedReport", "PJReport", routevalue, scheme);
 
                         var netcomputername = "";
-                        try{ netcomputername = System.Net.Dns.GetHostName();}
+                        try { netcomputername = System.Net.Dns.GetHostName(); }
                         catch (Exception ex) { }
                         validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
@@ -5378,7 +5336,7 @@ namespace Prometheus.Controllers
 
                         var toaddrs = new List<string>();
                         toaddrs.Add(record.username);
-                        EmailUtility.SendEmail(this,"WUXI Engineering System", toaddrs, content);
+                        EmailUtility.SendEmail(this, "WUXI Engineering System", toaddrs, content);
                         new System.Threading.ManualResetEvent(false).WaitOne(500);
                     }
                 }//end foreach
@@ -5391,63 +5349,67 @@ namespace Prometheus.Controllers
             var pjlist = ProjectViewModels.RetrieveAllProjectKey();
             foreach (var pjkey in pjlist)
             {
-                try {
-                        var fvissues = IssueViewModels.Retrieve_Alert_RMAByProjectKey(pjkey, true);
+                try
+                {
+                    var fvissues = IssueViewModels.Retrieve_Alert_RMAByProjectKey(pjkey, true);
 
-                        foreach (var item in fvissues)
-                        { item.UpdateAlertEmailDate();}
-                            
-                        foreach (var item in fvissues)
-                        {
-                            var routevalue = new RouteValueDictionary();
-                            routevalue.Add("issuekey", item.IssueKey);
-                            //send validate email
-                            string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
-                            string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
-                            var netcomputername = "";
-                            try { netcomputername = System.Net.Dns.GetHostName(); }
-                            catch (Exception ex) { }
-                            validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
+                    foreach (var item in fvissues)
+                    { item.UpdateAlertEmailDate(); }
 
-                        var content = "RMA FA of "+item.ModuleSN+" must finished today :\r\n " + validatestr;
+                    foreach (var item in fvissues)
+                    {
+                        var routevalue = new RouteValueDictionary();
+                        routevalue.Add("issuekey", item.IssueKey);
+                        //send validate email
+                        string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                        string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+                        var netcomputername = "";
+                        try { netcomputername = System.Net.Dns.GetHostName(); }
+                        catch (Exception ex) { }
+                        validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
-                            var toaddrs = new List<string>();
-                            toaddrs.Add(item.Reporter);
-                            toaddrs.Add(item.Assignee);
-                            EmailUtility.SendEmail(this,"WUXI Engineering System", toaddrs, content);
-                            new System.Threading.ManualResetEvent(false).WaitOne(300);
+                        var content = "RMA FA of " + item.ModuleSN + " must finished today :\r\n " + validatestr;
+
+                        var toaddrs = new List<string>();
+                        toaddrs.Add(item.Reporter);
+                        toaddrs.Add(item.Assignee);
+                        EmailUtility.SendEmail(this, "WUXI Engineering System", toaddrs, content);
+                        new System.Threading.ManualResetEvent(false).WaitOne(300);
                     }
-                } catch (Exception ex) { }
+                }
+                catch (Exception ex) { }
 
 
-                try {
-                        var faissues = IssueViewModels.Retrieve_Alert_RMAByProjectKey(pjkey, false);
+                try
+                {
+                    var faissues = IssueViewModels.Retrieve_Alert_RMAByProjectKey(pjkey, false);
 
-                        foreach (var item in faissues)
-                        { item.UpdateAlertEmailDate(); }
+                    foreach (var item in faissues)
+                    { item.UpdateAlertEmailDate(); }
 
-                        foreach (var item in faissues)
-                        {
-                            var routevalue = new RouteValueDictionary();
-                            routevalue.Add("issuekey", item.IssueKey);
-                            //send validate email
-                            string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
-                            string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+                    foreach (var item in faissues)
+                    {
+                        var routevalue = new RouteValueDictionary();
+                        routevalue.Add("issuekey", item.IssueKey);
+                        //send validate email
+                        string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                        string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
 
-                            var netcomputername = "";
-                            try { netcomputername = System.Net.Dns.GetHostName(); }
-                            catch (Exception ex) { }
-                            validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
+                        var netcomputername = "";
+                        try { netcomputername = System.Net.Dns.GetHostName(); }
+                        catch (Exception ex) { }
+                        validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
                         var content = "RMA report of " + item.ModuleSN + " must finished today :\r\n " + validatestr;
 
-                            var toaddrs = new List<string>();
-                            toaddrs.Add(item.Reporter);
-                            toaddrs.Add(item.Assignee);
-                            EmailUtility.SendEmail(this,"WUXI Engineering System", toaddrs, content);
-                            new System.Threading.ManualResetEvent(false).WaitOne(200);
+                        var toaddrs = new List<string>();
+                        toaddrs.Add(item.Reporter);
+                        toaddrs.Add(item.Assignee);
+                        EmailUtility.SendEmail(this, "WUXI Engineering System", toaddrs, content);
+                        new System.Threading.ManualResetEvent(false).WaitOne(200);
                     }
-                } catch (Exception ex) { }
+                }
+                catch (Exception ex) { }
 
             }//end foreach
         }
@@ -5479,7 +5441,7 @@ namespace Prometheus.Controllers
                     var toaddrs = new List<string>();
                     toaddrs.Add(item.Reporter);
                     toaddrs.Add(item.Assignee);
-                    EmailUtility.SendEmail(this,"WUXI Engineering System", toaddrs, content);
+                    EmailUtility.SendEmail(this, "WUXI Engineering System", toaddrs, content);
                     new System.Threading.ManualResetEvent(false).WaitOne(200);
                 }
             }
@@ -5575,7 +5537,7 @@ namespace Prometheus.Controllers
             {
                 try
                 {
-                    ProjectTestData.PrePareMESLatestData(pjkey,this);
+                    ProjectTestData.PrePareMESLatestData(pjkey, this);
                 }
                 catch (Exception ex)
                 { }
@@ -5669,7 +5631,7 @@ namespace Prometheus.Controllers
                 var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
 
                 var content = System.IO.File.ReadAllText(wholefilename);
-                content = content+ "heart beat end @ "+DateTime.Now.ToString()+"\r\n";
+                content = content + "heart beat end @ " + DateTime.Now.ToString() + "\r\n";
                 System.IO.File.WriteAllText(wholefilename, content);
             }
             catch (Exception ex)
@@ -5696,7 +5658,7 @@ namespace Prometheus.Controllers
         private void UpdateJO()
         {
             var sns = ProjectTestData.RetrieveAllSNWithNoJO();
-            logjoinfo("get sn count from local: "+sns.Count.ToString());
+            logjoinfo("get sn count from local: " + sns.Count.ToString());
 
             var dict = new Dictionary<string, string>();
 
@@ -5735,7 +5697,7 @@ namespace Prometheus.Controllers
         private void AssignPJ2User()
         {
             var allpjkey = ProjectViewModels.RetrieveAllProject();
-            foreach(var pjkey in allpjkey)
+            foreach (var pjkey in allpjkey)
             {
                 var pjmembers = ProjectViewModels.RetrieveProjectMembers(pjkey.ProjectKey);
                 foreach (var member in pjmembers)
@@ -5778,10 +5740,10 @@ namespace Prometheus.Controllers
             //{
             //    try
             //    {
-                    //ProcessData.LoadMESMoveHistory("EDR", this);
-                //}
-                //catch (Exception ex)
-                //{ }
+            //ProcessData.LoadMESMoveHistory("EDR", this);
+            //}
+            //catch (Exception ex)
+            //{ }
             //}
             //foreach (var pjkey in pjkeylist)
             //{
@@ -5810,13 +5772,13 @@ namespace Prometheus.Controllers
         public ActionResult HeartBeat3()
         {
 
-                try
-                {
+            try
+            {
                 //ExternalDataCollector.RefreshOBAFromDMR(this);
                 //ExternalDataCollector.RefreshNeoMAPData(this);
-                }
-                catch (Exception ex)
-                { }
+            }
+            catch (Exception ex)
+            { }
 
             return View("HeartBeat");
         }
@@ -5835,7 +5797,7 @@ namespace Prometheus.Controllers
         public ActionResult TestPNDesc(string PNs)
         {
             var vm = new List<List<string>>();
-            
+
             var title = new List<string>();
             title.Add("Part Num");
             vm.Add(title);
@@ -5874,7 +5836,7 @@ namespace Prometheus.Controllers
             {
                 try
                 {
-                    BITestData.RetrieveWaferDataFromMes(this,pjkey);
+                    BITestData.RetrieveWaferDataFromMes(this, pjkey);
                     var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
                     RealCheckVcselYieldByWafer(pjkeylist);
                 }
@@ -5944,7 +5906,7 @@ namespace Prometheus.Controllers
         }
 
 
-        private void SendLYTEvent(IssueViewModels LYTTASK,IssueViewModels vm, string comment,List<string> addrlist)
+        private void SendLYTEvent(IssueViewModels LYTTASK, IssueViewModels vm, string comment, List<string> addrlist)
         {
             var routevalue = new RouteValueDictionary();
             routevalue.Add("issuekey", vm.IssueKey);
@@ -5967,7 +5929,7 @@ namespace Prometheus.Controllers
             content = content + "\r\n\r\n" + vm.Summary;
             content = content + "\r\n\r\nCritical Error TASK LINK: " + validatestr2;
             content = content + "\r\n\r\nTRIGGER TASK LINK: " + validatestr;
-            
+
             var toaddrs = new List<string>();
             toaddrs.AddRange(addrlist);
             toaddrs.Add(vm.Assignee);
@@ -5995,19 +5957,19 @@ namespace Prometheus.Controllers
                     && Request.Form["sendisu"] != null)
                 {
                     var comment = Request.Form["commentcontent"];
-                    var addrs = Request.Form["RPeopleAddr"].Split(new string[] {";"},StringSplitOptions.RemoveEmptyEntries);
+                    var addrs = Request.Form["RPeopleAddr"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
 
-                    var LYTTASK = CreateLYTTask(CRITICALERRORTYPE.LYTTASK, comment,vm.ProjectKey,updater,updater,DateTime.Now.AddDays(14),vm.IssueKey);
+                    var LYTTASK = CreateLYTTask(CRITICALERRORTYPE.LYTTASK, comment, vm.ProjectKey, updater, updater, DateTime.Now.AddDays(14), vm.IssueKey);
                     //CreateLYTSubTask(CRITICALERRORTYPE.LYTSUBTASK, "Stop Product Line for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(1));
                     CreateLYTSubTask(CRITICALERRORTYPE.CONTAINMENTACTION, "Containment Action for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(7));
                     CreateLYTSubTask(CRITICALERRORTYPE.CORRECTIVEACTION, "Corrective Action for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(14));
                     //CreateLYTSubTask(CRITICALERRORTYPE.LYTSUBTASK, "Restart Product Line for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(14));
 
                     var comment1 = new IssueComments();
-                    comment1.Comment = "<p>"+comment + "</p><p><a href='/Issue/UpdateIssue?issuekey=" + vm.IssueKey + "'><strong>Trigger Task</strong></a></p>";
+                    comment1.Comment = "<p>" + comment + "</p><p><a href='/Issue/UpdateIssue?issuekey=" + vm.IssueKey + "'><strong>Trigger Task</strong></a></p>";
                     if (vm.FailureDetailCommentList.Count > 0)
                     {
-                        comment1.Comment = comment1.Comment + "<p><h3>Trigger Failure Detail</h3></p><p>"+ vm.FailureDetailCommentList[0].Comment + "</p>";
+                        comment1.Comment = comment1.Comment + "<p><h3>Trigger Failure Detail</h3></p><p>" + vm.FailureDetailCommentList[0].Comment + "</p>";
                     }
                     if (vm.RootCauseCommentList.Count > 0)
                     {
@@ -6066,7 +6028,7 @@ namespace Prometheus.Controllers
             IssueViewModels.StoreIssueComment(vm.IssueKey, comment1.dbComment, vm.Assignee, COMMENTTYPE.Description);
         }
 
-        private static IssueViewModels CreateLYTTask(string presum, string sum, string pjkey, string analyser, string reporter, DateTime duedate,string triggleissuekey)
+        private static IssueViewModels CreateLYTTask(string presum, string sum, string pjkey, string analyser, string reporter, DateTime duedate, string triggleissuekey)
         {
             var vm = new IssueViewModels();
             vm.ProjectKey = pjkey;
@@ -6120,7 +6082,7 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
                 var tempcommment = new ErrorComments();
-                tempcommment.Comment = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
+                tempcommment.Comment = SeverHtmlDecode.Decode(this, Request.Form["editor1"]);
                 ProjectErrorViewModels.UpdateSPComment(errorkey, commenttype, commentdate, tempcommment.dbComment);
             }
             else
@@ -6135,7 +6097,7 @@ namespace Prometheus.Controllers
             return RedirectToAction("UpdateProjectError", "Project", dict);
         }
 
-        public ActionResult IPushDebug(string ErrorKey, string ToWho,string Reason)
+        public ActionResult IPushDebug(string ErrorKey, string ToWho, string Reason)
         {
             var ckdict = CookieUtility.UnpackCookie(this);
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
@@ -6160,11 +6122,11 @@ namespace Prometheus.Controllers
                 tempreason = tempreason.Replace("WITHCOMMENT:", "");
                 var dbstr = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(tempreason));
                 var commenttype = PJERRORCOMMENTTYPE.Description;
-                ProjectErrorViewModels.StoreErrorComment(ErrorKey, dbstr, commenttype, updater,DateTime.Now.ToString());
+                ProjectErrorViewModels.StoreErrorComment(ErrorKey, dbstr, commenttype, updater, DateTime.Now.ToString());
                 tempreason = tempreason.Replace("<p>", "").Replace("</p>", "\r\n");
             }
 
-            var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(ErrorKey,this);
+            var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(ErrorKey, this);
             ShareDocVM.ShareDoc(debugtree[0].ProjectKey, ShareDocType.DEBUG, debugtree[0].ErrorKey, debugtree[0].OrignalCode, updater, DateTime.Now.ToString(), "/Project/UpdateProjectError?ErrorKey=" + debugtree[0].ErrorKey);
 
             var whoes = ToWho.Split(new string[] { ";", ",", " " }, StringSplitOptions.RemoveEmptyEntries);
@@ -6174,7 +6136,7 @@ namespace Prometheus.Controllers
             }
 
             ShareDocVM.SendPushDocEvent("a debug about " + debugtree[0].ProjectKey + "-" + debugtree[0].ErrorKey
-                , "/Project/UpdateProjectError?ErrorKey="+ debugtree[0].ErrorKey, updater, updater, this, tempreason);
+                , "/Project/UpdateProjectError?ErrorKey=" + debugtree[0].ErrorKey, updater, updater, this, tempreason);
 
             var dict1 = new RouteValueDictionary();
             dict1.Add("ErrorKey", ErrorKey);
@@ -6240,8 +6202,8 @@ namespace Prometheus.Controllers
             var pjcount = allprojlist.Count;
 
             var choosedpj = new List<string>();
-            var choosedpjdict = new Dictionary<string,bool>();
-            for (var idx=0; idx < pjcount;idx++)
+            var choosedpjdict = new Dictionary<string, bool>();
+            for (var idx = 0; idx < pjcount; idx++)
             {
                 if (Request.Form["projectkey" + idx] != null)
                 {
@@ -6325,9 +6287,9 @@ namespace Prometheus.Controllers
         [HttpGet]
         public JsonResult InitPJMGTask(string PJKey)
         {
-            var vm = IssueViewModels.RetrievePMTask(PJKey,Resolute.Pending,this);
-            var list1 = IssueViewModels.RetrievePMTask(PJKey, Resolute.Working,this);
-            var list2 = IssueViewModels.RetrievePMTask(PJKey, Resolute.Done,this);
+            var vm = IssueViewModels.RetrievePMTask(PJKey, Resolute.Pending, this);
+            var list1 = IssueViewModels.RetrievePMTask(PJKey, Resolute.Working, this);
+            var list2 = IssueViewModels.RetrievePMTask(PJKey, Resolute.Done, this);
             vm.AddRange(list1);
             vm.AddRange(list2);
 
@@ -6340,9 +6302,10 @@ namespace Prometheus.Controllers
                 if (string.Compare(item.Resolution, Resolute.Pending, true) == 0)
                 {
                     pendinglist.Add(
-                        new {
+                        new
+                        {
                             id = item.IssueKey,
-                            title = item.Summary.Replace(CRITICALERRORTYPE.PMTASK,"").Trim()+ "  <a href='/Issue/UpdateIssue?issuekey="+item.IssueKey + "' target='_blank'>Detail</a>",
+                            title = item.Summary.Replace(CRITICALERRORTYPE.PMTASK, "").Trim() + "  <a href='/Issue/UpdateIssue?issuekey=" + item.IssueKey + "' target='_blank'>Detail</a>",
                             description = item.CommentList.Count > 0 ? item.CommentList[0].Comment : string.Empty,
                             dueDate = item.DueDate.ToString("yyyy-MM-dd")
                         });
@@ -6352,7 +6315,8 @@ namespace Prometheus.Controllers
                     || string.Compare(item.Resolution, Resolute.Reopen, true) == 0)
                 {
                     donginglist.Add(
-                        new {
+                        new
+                        {
                             id = item.IssueKey,
                             title = item.Summary.Replace(CRITICALERRORTYPE.PMTASK, "").Trim() + "  <a href='/Issue/UpdateIssue?issuekey=" + item.IssueKey + "' target='_blank'>Detail</a>",
                             description = item.CommentList.Count > 0 ? item.CommentList[0].Comment : string.Empty,
@@ -6364,7 +6328,8 @@ namespace Prometheus.Controllers
                     || string.Compare(item.Resolution, Resolute.Done, true) == 0)
                 {
                     donelist.Add(
-                        new {
+                        new
+                        {
                             id = item.IssueKey,
                             title = item.Summary.Replace(CRITICALERRORTYPE.PMTASK, "").Trim() + "  <a href='/Issue/UpdateIssue?issuekey=" + item.IssueKey + "' target='_blank'>Detail</a>",
                             description = item.CommentList.Count > 0 ? item.CommentList[0].Comment : string.Empty,
@@ -6375,7 +6340,8 @@ namespace Prometheus.Controllers
 
             var mylists = new List<object>();
             mylists.Add(
-                new {
+                new
+                {
                     id = "mytobelist",
                     title = "TODO",
                     defaultStyle = "lobilist-warning",
@@ -6422,12 +6388,12 @@ namespace Prometheus.Controllers
             {
                 if (it.Contains("id="))
                 {
-                    ret.IssueKey = it.Replace("id=","").Trim();
+                    ret.IssueKey = it.Replace("id=", "").Trim();
                 }
 
                 if (it.Contains("title="))
                 {
-                    ret.Summary = SeverHtmlDecode.Decode(this, it.Replace("title=", "")).Replace("'","").Replace("+", " ").Trim();
+                    ret.Summary = SeverHtmlDecode.Decode(this, it.Replace("title=", "")).Replace("'", "").Replace("+", " ").Trim();
                 }
 
                 if (it.Contains("description="))
@@ -6446,7 +6412,7 @@ namespace Prometheus.Controllers
                 {
                     try
                     {
-                        ret.DueDate = DateTime.Parse( SeverHtmlDecode.Decode(this, it.Replace("dueDate=", "")).Replace("'", "").Trim() + " 10:00:00");
+                        ret.DueDate = DateTime.Parse(SeverHtmlDecode.Decode(this, it.Replace("dueDate=", "")).Replace("'", "").Trim() + " 10:00:00");
                     }
                     catch (Exception ex) { ret.Summary = string.Empty; }
                 }
@@ -6566,7 +6532,7 @@ namespace Prometheus.Controllers
                 return res1;
             }
 
-            var realissue = IssueViewModels.RetrieveIssueByIssueKey(vm.IssueKey,this);
+            var realissue = IssueViewModels.RetrieveIssueByIssueKey(vm.IssueKey, this);
             if (realissue != null)
             {
                 if (!string.IsNullOrEmpty(vm.Description))
@@ -6593,7 +6559,7 @@ namespace Prometheus.Controllers
                     realissue.UpdateIssue();
                 }
             }
-            
+
             var res = new JsonResult();
             res.Data = new { success = true };
             return res;
@@ -6681,5 +6647,193 @@ namespace Prometheus.Controllers
             return res;
         }
 
+        public ActionResult OcapWarn(string IssueKeys)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "Project");
+                ck.Add("logonredirectact", "OcapWarn");
+                ck.Add("issuekeys", IssueKeys);
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var keys = "";
+            if (!string.IsNullOrEmpty(IssueKeys))
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("issuekeys", IssueKeys);
+                ck.Add("currentaction", "OcapWarn");
+                CookieUtility.SetCookie(this, ck);
+                keys = IssueKeys;
+            }
+            else if (ckdict.ContainsKey("issuekeys") && !string.IsNullOrEmpty(ckdict["issuekeys"]))
+            {
+                keys = ckdict["issuekeys"];
+                var ck = new Dictionary<string, string>();
+                ck.Add("currentaction", "OcapWarn");
+                CookieUtility.SetCookie(this, ck);
+            }
+
+            if (string.IsNullOrEmpty(keys))
+            {
+                return RedirectToAction("ViewAll", "Project");
+            }
+
+            var asilist = UserViewModels.RetrieveAllUser();
+            ViewBag.towholist = CreateSelectList(asilist, "");
+
+            var issuekeybits = Convert.FromBase64String(keys);
+            var issuekeystr = System.Text.Encoding.UTF8.GetString(issuekeybits);
+            var issueKeyList = issuekeystr.Split(new string[] { ",", ";"}, StringSplitOptions.RemoveEmptyEntries);
+            var vmList = new List<IssueViewModels>();
+            foreach (var key in issueKeyList)
+            {
+                var vm = IssueViewModels.RetrieveIssueByIssueKey(key, this);
+                if (vm != null)
+                {
+                    vmList.Add(vm);
+                }  
+            }
+            if(vmList.Count > 0)
+            {
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                //for test
+                updater = "YAN.SHI@FINISAR.COM";
+                var defaultlytteam = UserGroupVM.RetreiveUserGroup(updater, UserGroupType.WorkGroup);
+                //var defaultlytteam = UserGroupVM.RetreiveUserGroup(updater, UserGroupType.LYTGroup);
+                if (!string.IsNullOrEmpty(defaultlytteam))
+                {
+                    ViewBag.defaultlytteam = defaultlytteam;
+                    ViewBag.IssueKeys = IssueKeys;
+                }
+                return View(vmList);
+            }
+            else
+            {
+                return RedirectToAction("ViewAll", "Project");
+            }
+        }
+
+        [HttpPost, ActionName("OcapWarn")]
+        [ValidateAntiForgeryToken]
+        public ActionResult OcapWarnPost()
+        {
+            var issuekeybits = Convert.FromBase64String(Request.Form["IssueKeys"]);
+            var issuekeystr = System.Text.Encoding.UTF8.GetString(issuekeybits);
+
+            if ( ! String.IsNullOrEmpty(issuekeystr))
+            {
+                var issuekeys = issuekeystr.Split(new string[] { ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
+                var ckdict = CookieUtility.UnpackCookie(this);
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                //for test
+                updater = "YAN.SHI@FINISAR.COM";
+                var vms = new List<IssueViewModels>();
+                var comment = Request.Form["commentcontent"];
+                var addrs = Request.Form["RPeopleAddr"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+                var addrlist = new List<string>();
+                addrlist.AddRange(addrs);
+                foreach (var issuekey in issuekeys)
+                {
+                    var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey.ToString(), this);
+                    if (vm != null)
+                    {
+                        vms.Add(vm);
+                        //OcapSingletonOperate(vm, updater, comment);
+                    }
+                }
+                SendOCAPEvent(vms, comment, addrlist);
+                if (vms.Count == 0)
+                {
+                    return RedirectToAction("ViewAll", "Project");
+                }
+                else if (vms.Count == 1)
+                {
+                    var dict = new RouteValueDictionary();
+                    dict.Add("issuekey", vms.ElementAt(0).IssueKey);
+                    return RedirectToAction("UpdateIssue", "Issue", dict);
+                }
+                else
+                {
+                    var dict = new RouteValueDictionary();
+                    dict.Add("ProjectKey", vms.ElementAt(0).ProjectKey);
+                    return RedirectToAction("ProjectSptTask", "Project", dict);
+                }
+            }
+
+            return RedirectToAction("ViewAll", "Project");
+        }
+
+        private void OcapSingletonOperate(IssueViewModels vm, string updater, string comment)
+        {
+            CreateLYTSubTask(CRITICALERRORTYPE.CONTAINMENTACTION, "Containment Action for " + comment, vm.ProjectKey, vm.IssueKey, updater, updater, DateTime.Now.AddDays(7));
+            CreateLYTSubTask(CRITICALERRORTYPE.CORRECTIVEACTION, "Corrective Action for " + comment, vm.ProjectKey, vm.IssueKey, updater, updater, DateTime.Now.AddDays(14));
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment, vm.Assignee, COMMENTTYPE.Description);
+            IssueViewModels.UpdateIssueAssigneeAndResolution(vm.IssueKey, updater, Resolute.Reopen);
+        }
+
+        private void SendOCAPEvent(List<IssueViewModels> vms, string comment, List<string> addrlist)
+        {
+            var toaddrs = new Dictionary<string, bool>();
+            var body = new List<List<string>>();
+            var tmpList = new List<string>();
+            tmpList.Add("Project");
+            tmpList.Add("ModuleSN");
+            tmpList.Add("RootCause");
+            tmpList.Add("Failure Description");
+            tmpList.Add("Task Link");
+            body.Add(tmpList);
+            foreach (var vm in vms) {
+                var routevalue = new RouteValueDictionary();
+                routevalue.Add("issuekey", vm.IssueKey);
+                //send validate email
+                string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+
+                var netcomputername = "";
+                try {
+                    netcomputername = System.Net.Dns.GetHostName();
+                }
+                catch (Exception ex)
+                { }
+                validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
+                
+                tmpList = new List<string>();
+                tmpList.Add(vm.ProjectKey);
+                tmpList.Add(vm.ModuleSN);
+                tmpList.Add(vm.ModuleSN);
+                tmpList.Add(vm.Summary.Replace(CRITICALERRORTYPE.SECONDMATCH, ""));
+                tmpList.Add("<a href=" + validatestr + ">Detail</a>");
+                body.Add(tmpList);
+                //if ( ! toaddrs.ContainsKey(vm.Assignee))
+                //{
+                //    toaddrs.Add(vm.Assignee, true);
+                //}
+                //if( !toaddrs.ContainsKey(vm.Reporter))
+                //{
+                //    toaddrs.Add(vm.Reporter, true);
+                //}
+            }
+
+            var towho = new List<string>();
+            towho.AddRange(toaddrs.Keys);
+            towho.AddRange(addrlist);
+
+            var greeting = "Hi All";
+            var description = "Below is Parallel Critical OCAP Alarm base on WUXI ENGINEERING SYSTEM for " + DateTime.Now.ToString("MM/dd/yyyy"); 
+            var content = EmailUtility.CreateTableHtml(greeting, description, comment, body);
+
+            EmailUtility.SendEmail(this, "Parallel Test Critical Failure Alarm Report -- " + DateTime.Now.ToString("MM/dd/yyyy"), towho, content, true);
+            
+            new System.Threading.ManualResetEvent(false).WaitOne(500);
+        }
     }
+    
 }

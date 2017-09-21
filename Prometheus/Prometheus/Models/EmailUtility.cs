@@ -39,13 +39,14 @@ namespace Prometheus.Models
             }
         }
 
-        public static bool SendEmail(Controller ctrl,string title, List<string> tolist, string content)
+        public static bool SendEmail(Controller ctrl,string title, List<string> tolist, string content, bool isHtml = false)
         {
             try
             {
                 var syscfgdict = CfgUtility.GetSysConfig(ctrl);
 
                 var message = new MailMessage();
+                message.IsBodyHtml = isHtml;
                 message.From = new MailAddress(syscfgdict["APPEMAILADRESS"]);
                 foreach (var item in tolist)
                 {
@@ -164,6 +165,49 @@ namespace Prometheus.Models
                 return false;
             }
             return true;
+        }
+        
+        public static string CreateTableHtml(string greetig, string description, string comment, List<List<string>> table) 
+        {
+            var idx =0;
+            var content = "<!DOCTYPE html>";
+            content += "<html>";
+            content += "<head>";
+            content += "<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />";
+            content += "<title></title>";
+            content += "</head>";
+            content += "<body>";
+            content += "<div><p>" + greetig + ",</p></div>";
+            content += "<div><p>"+ description +".</p></div>";
+            content += "<div><p>Comment:" + comment + "</p>";
+            content += "<div><br>";
+            content += "<table border='1' cellpadding='0' cellspacing='0' width='100%'>";
+            content += "<thead style='background-color: #006DC0; color: #fff;'>";
+            foreach(var th in table[0])
+            {
+                content += "<th>" + th + "</th>";
+            }
+            content += "</thead>";
+            foreach(var tr in table)
+            {
+                if(idx > 0)
+                {
+                    content += "<tr>";
+                    foreach (var td in tr)
+                    {
+                        content += "<td>" + td + "</td>";
+                    }
+                    content += "</tr>";
+                }
+                idx++;
+            }
+            content += "</table>";
+            content += "</div><br><br>";
+            content += "<div><p style='font-size: 12px; font-style: italic;'>This is a system generated message, please do not reply to this email.</p></div>";
+            content += "</body>";
+            content += "</html>";
+
+            return content;
         }
     }
 }

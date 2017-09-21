@@ -164,3 +164,25 @@
     border: #DEEBF7 1px solid;
     border-radius: 6px;
 }
+
+.critical-task-ocap{
+    font-size: 16px;
+    color: red;
+    cursor: pointer;
+}
+
+.critical-task-rules-btn{
+    border: 0px;
+    border-color: transparent!important;
+    background-color: transparent!important;
+}
+
+.cirtical-info{
+    margin-top: 1%;
+    margin-bottom: 2%;
+}
+
+.ocap-alarm-textarea{
+    min-width: 100%;
+    min-height:60px;
+}

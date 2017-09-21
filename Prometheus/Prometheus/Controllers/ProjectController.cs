@@ -6739,20 +6739,29 @@ namespace Prometheus.Controllers
                 ////for test
                 //updater = "YAN.SHI@FINISAR.COM";
                 var vms = new List<IssueViewModels>();
-                var comment = Request.Form["commentcontent"];
-                var addrs = Request.Form["RPeopleAddr"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
-                var addrlist = new List<string>();
-                addrlist.AddRange(addrs);
+                var ocapNum = Request.Form["ocap_id"];
+                var comment = updater.ToUpper().Replace("@FINISAR.COM", "") + " start OCAP Num [ " + ocapNum + " ] at " + DateTime.Now.ToString("MM/dd/yyyy") + ". ";
+                comment += "</p><p>Comment: " + Request.Form["commentcontent"];
+                var files_ret = ReceiveAttachFiles();
+                var fileurl = "";
+                if(files_ret.Count > 0)
+                {
+                    fileurl = files_ret[0];
+                }
+
                 foreach (var issuekey in issuekeys)
                 {
                     var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey.ToString(), this);
                     if (vm != null)
                     {
                         vms.Add(vm);
-                        OcapSingletonOperate(vm, updater, comment);
+                        OcapSingletonOperate(vm, updater, comment, fileurl);
                     }
                 }
-                SendOCAPEvent(vms, comment, addrlist);
+                var addrs = Request.Form["RPeopleAddr"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+                var addrlist = new List<string>();
+                addrlist.AddRange(addrs);
+                SendOCAPEvent(vms, comment, addrlist, fileurl);
                 if (vms.Count == 0)
                 {
                     return RedirectToAction("ViewAll", "Project");
@@ -6774,7 +6783,7 @@ namespace Prometheus.Controllers
             return RedirectToAction("ViewAll", "Project");
         }
 
-        private void OcapSingletonOperate(IssueViewModels vm, string updater, string comment)
+        private void OcapSingletonOperate(IssueViewModels vm, string updater, string comment, string fileurl)
         {
             CreateLYTSubTask(CRITICALERRORTYPE.CONTAINMENTACTION, "Containment Action for " + comment, vm.ProjectKey, vm.IssueKey, updater, updater, DateTime.Now.AddDays(7));
             CreateLYTSubTask(CRITICALERRORTYPE.CORRECTIVEACTION, "Corrective Action for " + comment, vm.ProjectKey, vm.IssueKey, updater, updater, DateTime.Now.AddDays(14));
@@ -6783,9 +6792,13 @@ namespace Prometheus.Controllers
             comment1.Comment = comment;
             IssueViewModels.StoreIssueComment(vm.IssueKey, comment1.dbComment, vm.Assignee, COMMENTTYPE.Description);
             IssueViewModels.UpdateIssueAssigneeAndResolution(vm.IssueKey, updater, Resolute.Reopen);
+            if (! String.IsNullOrEmpty(fileurl))
+            {
+                IssueViewModels.StoreIssueAttachment(vm.IssueKey, fileurl);
+            }
         }
 
-        private void SendOCAPEvent(List<IssueViewModels> vms, string comment, List<string> addrlist)
+        private void SendOCAPEvent(List<IssueViewModels> vms, string comment, List<string> addrlist, string fileUrl)
         {
             var netcomputername = "";
             try {
@@ -6832,11 +6845,14 @@ namespace Prometheus.Controllers
             towho.AddRange(toaddrs.Keys);
             towho.AddRange(addrlist);
 
-            var greeting = "Hi All";
-            var description = "Below is Parallel Critical OCAP Alarm base on WUXI ENGINEERING SYSTEM for " + DateTime.Now.ToString("MM/dd/yyyy"); 
+            var greeting = "Dear All";
+            var description = "Attachment is Wuxi OCAP file from PQE by WUXI ENGINEERING SYSTEM -- " + DateTime.Now.ToString("MM/dd/yyyy") + ". ";
+            description = description + "Please kindly view it";
             var content = EmailUtility.CreateTableHtml(greeting, description, comment, body);
 
-            EmailUtility.SendEmail(this, "Parallel Test Critical Failure Alarm Report -- " + DateTime.Now.ToString("MM/dd/yyyy"), towho, content, true);
+            fileUrl = fileUrl.Replace("/userfiles", Server.MapPath("~/userfiles")).Replace("/", "\\");
+
+            EmailUtility.SendEmail(this, "Wuxi OCAP Task -- " + DateTime.Now.ToString("MM/dd/yyyy"), towho, content, true, fileUrl);
             
             new System.Threading.ManualResetEvent(false).WaitOne(500);
         }

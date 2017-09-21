@@ -185,7 +185,7 @@ namespace Prometheus.Models
             content += "<body>";
             content += "<div><p>" + greetig + ",</p></div>";
             content += "<div><p>"+ description +".</p></div>";
-            content += "<div><p>Comment:" + comment + "</p>";
+            content += "<div><p>" + comment + "</p>";
             content += "<div><br>";
             content += "<table border='1' cellpadding='0' cellspacing='0' width='100%'>";
             content += "<thead style='background-color: #006DC0; color: #fff;'>";

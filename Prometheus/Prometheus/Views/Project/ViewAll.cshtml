@@ -10,23 +10,25 @@
 <div class="row">
     <div class="col-lg-7" data-toggle="modal" data-target="#myModal">
         <div class="nav navbar-nav navbar-left">
-            <img src="~/Content/images/ucicon/IProjectIcons.png" style="height:45px; width:45px">
+            <img src="~/Content/images/ucicon/IProjectIcons.png" style="height:40px; width:40px">
         </div>
         <div class="nav navbar-nav navbar-left">
-            <ol class="breadcrumb" style="font-size:18px;width:600px">
+            <ol class="breadcrumb">
                 <li><a href="/Project/ViewAll">All Projects</a></li>
             </ol>
         </div>
     </div>
-    <div class="col-lg-3" data-intro = "Search specify product here."  data-step="1" >@Html.DropDownList("pjfilterlist", null, new { @id = "pjfilterlist", @class = "form-control", @style = "font-family:'Arial Narrow';border-color:#006DC0;", @onchange = "ShowProjectDetail()" })</div>
+    <div class="col-lg-3" data-intro = "Search specify product here." data-step="1" >
+        @Html.DropDownList("pjfilterlist", null, new { @id = "pjfilterlist", @class = "form-control", @style = "font-family:'Arial Narrow';border-color:#006DC0;", @onchange = "ShowProjectDetail()" })
+    </div>
     <div class="col-lg-1">
         @if ((ViewBag.IsSuper != null && ViewBag.IsSuper)
                 || (ViewBag.IsManage != null && ViewBag.IsManage))
         {
-            <button class="btn btn-default" type="button" style="background-color:#006DC0;color:white;" onclick="LoadProject()" data-intro="Add or delete product here." data-step="2">Load Projects</button>
+            <button class="btn btn-default" type="button" 
+                    onclick="LoadProject()" data-intro="Add or delete product here." data-step="2">Load Projects</button>
         }
     </div>
-    <div class="col-lg-1"></div>
     <script type="text/javascript">
             function ShowProjectDetail() {
                 if (document.getElementById("pjfilterlist").value && document.getElementById("pjfilterlist").value != 'NONE') {
@@ -41,27 +43,20 @@
     </script>
 </div>
 
-@*<div class="row">
-    <div class="col-lg-12">&nbsp;</div>
-</div>*@
-
-
-@*<div class="panel-group" id="accordion"  style="border-left-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-color:transparent !important;border:none;">*@
 <div class="panel-group" data-intro="Your project(s) list here." data-step="3">
     @foreach (var pjtype in ViewBag.pjtypelist)
     {
         if (ViewBag.pjtpdict.ContainsKey(pjtype))
         {
             <div class="panel panel-default" id="panel@(idx)" style="border:none !important;margin-bottom:8px;">
-                <div class="panel-heading" style="background-color:#006DC0;border-left-color:transparent !important;border-right-color:transparent !important;">
+                <div class="panel-heading collapsed va-pro-info" data-toggle="collapse" data-target="#collapse@(idx)">
                     <h4 class="panel-title">
-                        <a data-toggle="collapse" data-target="#collapse@(idx)" href="#collapse@(idx)" class="collapsed"><font color="white">@pjtype</font></a>
+                        <font color="white">@pjtype</font>
                     </h4>
                 </div>
 
-                <div id="collapse@(idx)" class="panel-collapse collapse" style="border:none !important;">
+                <div id="collapse@(idx)" class="panel-collapse collapse">
                     <div class="panel-body">
-
                     @foreach (var item in Model)
                     {
                         if (string.Compare(item.ProjectType, pjtype, true) != 0)
@@ -69,7 +64,6 @@
                         <div class="row" MYTP="HOVER" style="margin-top:8px;margin-bottom:8px;">
                             <div class="col-lg-12">
                                 <div class="col-lg-2">
-
                                     <div class="well" style="margin-bottom:8px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px;padding-top:4px;padding-bottom:4px">
                                         <div class="row text-left">
                                         @if (!ViewBag.IsOutSide)
@@ -127,17 +121,15 @@
                                 @if (string.Compare(item.ProjectType, Prometheus.Models.ProjectTypeInf.QM) != 0)
                                 {
                                 <div class="col-lg-2">
-                                    <div class="col-lg-7" data-toggle="tooltip" title="Yield">
-
+                                    <div class="col-lg-7" data-toggle="modal" data-target="#myModal">
                                         <div class="row">
                                             <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                         </div>
-                                        <div class="row">
+                                        <div class="row" data-toggle="tooltip" title="Yield">
                                             <a href="/Project/ProjectYieldMain?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/Yield.png" MYTP="HOVER" style="height:80px; width:80px"></a>
                                         </div>
                                     </div>
                                     <div class="col-lg-5">
-
                                         <div class="row">
                                             <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                         </div>
@@ -167,7 +159,7 @@
                                 <div class="col-lg-2">
                                     @if (!ViewBag.IsOutSide)
                                     {
-                                        <div class="col-lg-7">
+                                        <div class="col-lg-7" data-toggle="modal" data-target="#myModal">
 
                                             <div class="row">
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
@@ -195,12 +187,12 @@
                                     }
                                 </div>
                                 <div class="col-lg-2">
-                                    <div class="col-lg-7" data-toggle="tooltip" title="Task">
+                                    <div class="col-lg-7" data-toggle="modal" data-target="#myModal">
 
                                         <div class="row">
                                             <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                         </div>
-                                        <div class="row">
+                                        <div class="row" data-toggle="tooltip" title="Task">
                                             <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/Task.png" MYTP="HOVER" style="height:80px; width:80px"></a>
                                         </div>
                                     </div>
@@ -213,7 +205,7 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
-                                    <div class="col-lg-7">
+                                    <div class="col-lg-7" data-toggle="modal" data-target="#myModal">
 
                                         <div class="row">
                                             <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
@@ -232,12 +224,11 @@
                                 <div class="col-lg-2">
                                     @if (!ViewBag.IsOutSide)
                                     {
-                                        <div class="col-lg-7" data-toggle="tooltip" title="Debug Tree">
-
+                                        <div class="col-lg-7" data-toggle="modal" data-target="#myModal">
                                             <div class="row">
                                                 <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                             </div>
-                                            <div class="row">
+                                            <div class="row" data-toggle="tooltip" title="Debug Tree">
                                                 <a href="/Project/ProjectError?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/DebugTreeicon.png" MYTP="HOVER" style="height:80px; width:80px"></a>
                                             </div>
                                         </div>
@@ -249,12 +240,12 @@
                                 else
                                 {
                                 <div class="col-lg-2">
-                                    <div class="col-lg-7" data-toggle="tooltip" title="Task">
+                                    <div class="col-lg-7" data-toggle="modal" data-target="#myModal">
 
                                         <div class="row">
                                             <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                         </div>
-                                        <div class="row">
+                                        <div class="row" data-toggle="tooltip" title="Task">
                                             <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/Task.png" MYTP="HOVER" style="height:80px; width:80px"></a>
                                         </div>
                                     </div>
@@ -267,12 +258,11 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
-                                    <div class="col-lg-7" data-toggle="tooltip" title="Reliability">
-
+                                    <div class="col-lg-7" data-toggle="modal" data-target="#myModal">
                                         <div class="row">
                                             <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                         </div>
-                                        <div class="row">
+                                        <div class="row" data-toggle="tooltip" title="Reliability">
                                             <a href="/Project/ProjectReliability?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/REL.png" MYTP="HOVER" style="height:80px; width:80px"></a>
                                         </div>
                                     </div>
@@ -284,12 +274,12 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
-                                    <div class="col-lg-7" data-toggle="tooltip" title="OBA">
+                                    <div class="col-lg-7" data-toggle="modal" data-target="#myModal">
 
                                         <div class="row">
                                             <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                         </div>
-                                        <div class="row">
+                                        <div class="row" data-toggle="tooltip" title="OBA">
                                             <a href="/Project/ProjectOBA?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/OBA.png" MYTP="HOVER" style="height:80px; width:80px"></a>
                                         </div>
                                     </div>
@@ -299,25 +289,6 @@
                                             <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-lg-2">
-                                    @*<div class="col-lg-7" data-toggle="tooltip" title="Quality">
-
-                                            <div class="row">
-                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
-                                            </div>
-                                            <div class="row">
-                                                <a href="/Project/ProjectQuality?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/quailty.png" MYTP="HOVER" style="height:80px; width:80px"></a>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-5">
-
-                                            <div class="row">
-                                                <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
-                                            </div>
-                                        </div>*@
-                                </div>
-                                <div class="col-lg-2">
                                 </div>
                                 }
 

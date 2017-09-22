@@ -43,7 +43,7 @@
 }
 
 .uc-content{
-    margin: 5% 5%;
+    margin: 2% 5%;
 }
 
 .uc-column{
@@ -107,7 +107,7 @@
     padding-left: 8%;
 }
 .breadcrumb{
-    width: 600px;
+    /*width: 800px;*/
 }
 
 /* edit project */
@@ -236,4 +236,16 @@
     float: right;
     padding: 1% 3%;
     font-size: 15px;
+}
+
+.va-load-pro{
+    background-color: #006DC0;
+    color: white;
+}
+
+.va-pro-info{
+    background-color: #006DC0 !important;
+    border-left-color: transparent !important;
+    border-right-color: transparent !important; 
+    cursor: pointer;
 }

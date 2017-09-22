@@ -7,15 +7,15 @@
 <div class="row uc-header">
     <h2>@ViewBag.UserName Center</h2>
 </div>
-<div class="row uc-content" data-toggle="modal" data-target="#myModal">
+<div class="row uc-content">
     <div class="uc-column uc-column-first">
-        <div class="row">
+        <div data-toggle="modal" data-target="#myModal">
             <a href="/User/Assign2Me?username=@(ViewBag.RealUserID)">
                 <img src="~/Content/images/usercenter/Assign2Me.png" MYTP="HOVER" 
                      height="158" width="158" data-intro = "Tasks you need to do."  data-step="1" >
             </a>
         </div>
-        <div class="row">
+        <div>
             <div class="uc-column-first-detail">
                 <div>Pending<span class="span-cnt">@(ViewBag.pendinglist.Count)</span></div>
                 <div>Working<span class="span-cnt">@(ViewBag.workinglist.Count)</span></div>
@@ -23,13 +23,13 @@
         </div>
     </div>
     <div class="uc-column">
-        <div class="row">
+        <div data-toggle="modal" data-target="#myModal">
             <a href="/User/IAssigned?username=@(ViewBag.RealUserID)">
                 <img src="~/Content/images/usercenter/IAssigned.png" MYTP="HOVER" 
                      height="158" width="158" data-intro = "Assigned task to others."  data-step="2" >
             </a>
         </div>
-        <div class="row">
+        <div data-toggle="modal" data-target="#myModal">
             <a href="/User/ILearn">
                 <img src="~/Content/images/usercenter/ILearn.png" MYTP="HOVER" 
                      height="158" width="158" data-intro = "Knowledge need to learn."  data-step="3" >
@@ -37,13 +37,13 @@
         </div>
     </div>
     <div class="uc-column">
-        <div class="row">
+        <div data-toggle="modal" data-target="#myModal">
             <a href="/Project/ViewAll">
                 <img class="img" src="~/Content/images/usercenter/IProject.png" MYTP="HOVER" 
                      height="158" width="158" data-intro = "Show all projects you have link."  data-step="4">
             </a>
         </div>
-        <div class="row">
+        <div data-toggle="modal" data-target="#myModal">
             <a href="/User/ITag">
                 <img src="~/Content/images/usercenter/ITag.png" MYTP="HOVER" 
                      height="158" width="158" data-intro = "Add tag for projects or technicals."  data-step="5" >
@@ -51,14 +51,14 @@
         </div>
     </div>
     <div class="uc-column">
-        <div class="row">
+        <div data-toggle="modal" data-target="#myModal">
             <a href="/User/IBLOG">
                 <img src="~/Content/images/usercenter/IBlog.png" MYTP="HOVER" 
                      height="158" width="158" data-intro = "Just a blog, you can record some information here."  data-step="6" >
             </a>
         </div>
-        <div class="row" data-toggle="tooltip" title="IKPI">
-            <a href="/User/IKPI">
+        <div data-toggle="tooltip" title="IKPI">
+            <a href="/User/IKPI" data-toggle="modal" data-target="#myModal">
                 <img src="~/Content/images/usercenter/IKPI.png" MYTP="HOVER" 
                      height="158" width="158" data-intro = "Show your KPI."  data-step="7" >
             </a>

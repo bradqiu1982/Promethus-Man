@@ -987,6 +987,38 @@ else
             <div class="col-lg-12">&nbsp;</div>
         </div>
 
+        if (Model.FailureDetailCommentList.Count != 0)
+        {
+            if (Model.FailureDetailCommentList[0].Comment.ToUpper().Contains("TO BE EDIT") && Model.FailureDetailCommentList[0].Comment.Length < 20)
+            {
+                <input id="failuredetaillist" name="failuredetaillist" value="FALSE" type="hidden" />
+            }
+            else
+            {
+                <input id="failuredetaillist" name="failuredetaillist" value="TRUE" type="hidden" />
+            }
+        }
+        else
+        {
+            <input id="failuredetaillist" name="failuredetaillist" value="FALSE" type="hidden" />
+    }
+
+    if (Model.RootCauseCommentList.Count != 0)
+    {
+        if (Model.RootCauseCommentList[0].Comment.ToUpper().Contains("TO BE EDIT") && Model.RootCauseCommentList[0].Comment.Length < 20)
+        {
+            <input id="rootcauselist" name="rootcauselist" value="FALSE" type="hidden" />
+        }
+        else
+        {
+            <input id="rootcauselist" name="rootcauselist" value="TRUE" type="hidden" />
+        }
+    }
+    else
+    {
+            <input id="rootcauselist" name="rootcauselist" value="FALSE" type="hidden" />
+    }
+
         <div class="row">
             <div class="form-group">
                 <div class="row col-lg-12">
@@ -1006,21 +1038,49 @@ else
                     <div class="col-lg-6"></div>
                 </div>
             </div>
-            <script type="text/javascript">
+
+
+                <script type="text/javascript">
                 $('body').on('click', '#updateisu', function () {
                     if (document.getElementById("resolutionlist").value === "Fixed"
                                             || document.getElementById("resolutionlist").value === "Done")
                     {
-                        var failuredetail = CKEDITOR.instances.failureeditor.getData();
-                        var rootcasue = CKEDITOR.instances.rootcauseeditor.getData();
-                        if (failuredetail.length < 5 || rootcasue.length < 5)
+                        if ($("#failuredetaillist").val() === "FALSE")
                         {
-                            window.alert('To close this task,failure detail and rootcause need to be input');
-                            return false;
+                            if (!CKEDITOR.instances.failureeditor)
+                            {
+                                window.alert('To close this task,failure detail and rootcause need to be input');
+                                return false;
+                            }
+
+                            var failuredetail = CKEDITOR.instances.failureeditor.getData();
+                            if (failuredetail.length < 5 ) {
+                                window.alert('To close this task,failure detail and rootcause need to be input');
+                                return false;
+                            }
+                        }
+
+                        if ($("#rootcauselist").val() === "FALSE")
+                        {
+                            if (!CKEDITOR.instances.rootcauseeditor) {
+                                window.alert('To close this task,failure detail and rootcause need to be input');
+                                return false;
+                            }
+
+                            var rootcasue = CKEDITOR.instances.rootcauseeditor.getData();
+                            if (rootcasue.length < 5)
+                            {
+                                window.alert('To close this task,failure detail and rootcause need to be input');
+                                return false;
+                            }
                         }
                     }
+
                     $("#issueform").submit();
                 });
+                </script>
+
+            <script type="text/javascript">
 
                 function PushTask(oBT) {
                     document.getElementById("pushtowho").value = oBT.value;
@@ -1055,7 +1115,7 @@ else
 
                     window.location.href = myurl;
                 }
-            </script>
+                </script>
         </div>
 
     if (ViewBag.isassignee != null

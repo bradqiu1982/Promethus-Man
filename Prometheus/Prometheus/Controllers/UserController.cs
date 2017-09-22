@@ -1926,6 +1926,7 @@ namespace Prometheus.Controllers
 
             selectlist = new List<string>();
             selectlist.Add("Please select error code");
+            selectlist.Add("ALL");
             selectlist.AddRange(errorlist);
             selectcontrol = CreateSelectList(selectlist, "");
             selectcontrol[0].Disabled = true;

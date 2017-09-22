@@ -161,10 +161,7 @@ else
                             }
 
                         </div>
-                        @if (ViewBag.isassignee != null
-    && ViewBag.isassignee
-    && Model.FailureDetailCommentList.Count > 0
-    && Model.RootCauseCommentList.Count > 0)
+                        @if (ViewBag.isassignee != null && ViewBag.isassignee)
                         {
                             <script type="text/javascript">
                                 function chooseissuetag() {
@@ -994,7 +991,7 @@ else
             <div class="form-group">
                 <div class="row col-lg-12">
                     <div class="col-lg-2">
-                        <input style="background-color:#006DC0;color:white;" type="submit" value="Submit" id="updateisu" name="updateisu" class="btn btn-default" />
+                        <input style="background-color:#006DC0;color:white;" type="button" value="Submit" id="updateisu" name="updateisu" class="btn btn-default" />
                     </div>
                     <div class="col-lg-2">
                         @if (ViewBag.isassignee != null && ViewBag.isassignee)
@@ -1010,6 +1007,21 @@ else
                 </div>
             </div>
             <script type="text/javascript">
+                $('body').on('click', '#updateisu', function () {
+                    if (document.getElementById("resolutionlist").value === "Fixed"
+                                            || document.getElementById("resolutionlist").value === "Done")
+                    {
+                        var failuredetail = CKEDITOR.instances.failureeditor.getData();
+                        var rootcasue = CKEDITOR.instances.rootcauseeditor.getData();
+                        if (failuredetail.length < 5 || rootcasue.length < 5)
+                        {
+                            window.alert('To close this task,failure detail and rootcause need to be input');
+                            return false;
+                        }
+                    }
+                    $("#issueform").submit();
+                });
+
                 function PushTask(oBT) {
                     document.getElementById("pushtowho").value = oBT.value;
 

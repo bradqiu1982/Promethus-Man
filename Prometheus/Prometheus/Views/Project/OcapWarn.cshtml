@@ -26,9 +26,12 @@
         var types = ['png', 'jpeg', 'jpg', 'bmp', 'svg'];
         if (file) {
             var filearray = file.split(".");
-            var filetype = filearray[1];
+            var filetype = filearray[filearray.length-1];
             if ($.inArray(filetype.toLowerCase(), types) !== -1) {
                 alert("Image file is not allowed, Please updload OCAP file!");
+            }
+            else {
+                $('#showfilename').text(file);
             }
         }
     })
@@ -103,7 +106,7 @@
                     data-val="true" data-val-required="This field is required." />*@
                 <div class="col-lg-2" style="padding-left:0px">
                     <span class="btn btn-default btn-file" id="choosefile" style="width:10em!important;border-radius:0.5em;">
-                        Upload OCAP File<input type="file" name="files" id="file1" runat="server" onchange="ShowFileNames(this)" />
+                        Upload OCAP File<input type="file" name="files" id="file1" runat="server"/>
                     </span>
                 </div>
                 <div class="col-lg-10">

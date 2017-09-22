@@ -922,7 +922,11 @@ SELECT  [HistoryMainlineId]  FROM [InsiteDB].[insite].[HistoryMainline] (nolock)
   select ProductId,WorkflowStepId,MoveOutQty,MoveInQty,MfgOrderId,WorkflowStepName,GenerateTime,TxnTypeName,ContainerName,Comments
 	 from PDMSMaster.dbo.HistStepMoveSummary (nolock) where MoveOutTime > '2017-08-03 10:00:00' and ProductId in ('00062c80000fb541','00062c800012b648','00062c80000daad1','00062c80000ebd0c','00062c80000f8211','00062c80000ce252') and MFGOrderId is not null
 
-
+update [NPITrace].[dbo].[ProjectCriticalError] set SettingReason = 'EOS/ESD;Cable crack;Components missing;' where ProjectKey= '25GSFPWIRE' and ErrorCode = '-22664'
+update [NPITrace].[dbo].[ProjectCriticalError] set SettingReason = 'VCSEL;Lens detachment;' where ProjectKey= '25GSFPWIRE' and ErrorCode = 'LoPwr'
+update [NPITrace].[dbo].[ProjectCriticalError] set SettingReason = 'EOS/ESD;Cable crack;PCBA open/short;Components missing;' where ProjectKey= '25GSFPWIRE' and ErrorCode = 'InpCur'
+update [NPITrace].[dbo].[ProjectCriticalError] set SettingReason = 'EOS/ESD;Cable crack;Lens detachment;' where ProjectKey= '25GSFPWIRE' and ErrorCode = '-10808'
+update [NPITrace].[dbo].[ProjectCriticalError] set SettingReason = 'VCSEL;Lens detachment;Cable crack;' where ProjectKey= '25GSFPWIRE' and ErrorCode = 'RLoP'
 
 
 

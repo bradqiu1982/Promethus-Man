@@ -540,7 +540,8 @@ namespace Prometheus.Models
 
             foreach (var item in pjcriticalerrorlist)
             {
-                if (string.Compare(item.ErrorCode, pjdata.ErrAbbr, true) == 0)
+                if (string.Compare(item.ErrorCode, pjdata.ErrAbbr, true) == 0 
+                    || string.Compare(item.ErrorCode,"ALL",true) == 0)
                 {
                     if (item.Appv_1 > 0)//FA SWITCH CLOSED
                     {

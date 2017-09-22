@@ -6793,7 +6793,7 @@ namespace Prometheus.Controllers
 
             var comment1 = new IssueComments();
             comment1.Comment = comment;
-            IssueViewModels.StoreIssueComment(vm.IssueKey, comment1.dbComment, vm.Assignee, COMMENTTYPE.Description);
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment1.dbComment, updater, COMMENTTYPE.Description);
             IssueViewModels.UpdateIssueAssigneeAndResolution(vm.IssueKey, updater, Resolute.Reopen);
             if (! String.IsNullOrEmpty(fileurl))
             {

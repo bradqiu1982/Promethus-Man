@@ -5846,6 +5846,7 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
+            MESUtility.DebugCriticalFunction("4803af8000860127", "25GSFPWIRE", this);
             //try
             //{
             //    var ckeylist = new List<string>();

@@ -1977,7 +1977,7 @@ namespace Prometheus.Controllers
             var asilist = UserViewModels.RetrieveAllUser();
             ViewBag.towholist1 = CreateSelectList(asilist, "");
 
-            ViewBag.tobechoosetags = ShareDocVM.RetrieveCriticalTags(this);
+            ViewBag.tobechoosetags = ShareDocVM.RetrieveCriticalSymptom(this);
 
             return View(vm);
         }

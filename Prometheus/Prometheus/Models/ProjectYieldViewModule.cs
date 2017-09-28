@@ -507,6 +507,16 @@ namespace Prometheus.Models
 
         public static ProjectYieldViewModule GetYieldByDateRange(string pjkey, string sdate, string edate, ProjectViewModels pvm,Cache mycache)
         {
+            if (mycache != null)
+            {
+                var ckey = pjkey + "_" + DateTime.Parse(sdate).ToString("yyyy-MM-dd hh:mm:ss") + "_" + DateTime.Parse(edate).ToString("yyyy-MM-dd hh:mm:ss") + "_CUST";
+                var vm = mycache.Get(ckey);
+                if (vm != null)
+                {
+                    return (ProjectYieldViewModule)vm;
+                }
+            }
+
             var ret = new ProjectYieldViewModule();
             ret.ProjectKey = pjkey;
             ret.StartDate = DateTime.Parse(sdate);
@@ -621,6 +631,16 @@ namespace Prometheus.Models
             validatedict4snyield.Clear();
             GC.Collect();
             GC.WaitForPendingFinalizers();
+
+            if (mycache != null)
+            {
+                var ckey = pjkey + "_" + DateTime.Parse(sdate).ToString("yyyy-MM-dd hh:mm:ss") + "_" + DateTime.Parse(edate).ToString("yyyy-MM-dd hh:mm:ss") + "_CUST";
+                var vm = mycache.Get(ckey);
+                if (vm == null)
+                {
+                    mycache.Insert(ckey, ret, null, DateTime.Now.AddHours(2), Cache.NoSlidingExpiration);
+                }
+            }
 
             return ret;
         }

@@ -5768,6 +5768,10 @@ namespace Prometheus.Controllers
                     }
                 }
 
+                foreach (var pjkey in pjkeylist)
+                {
+                    ProjectYieldViewModule.GetYieldByWeeks(pjkey, mycache, 4);
+                }
                 _viewallprivate();
             }
             catch (Exception ex)
@@ -5846,7 +5850,12 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
-            MESUtility.DebugCriticalFunction("4803af8000860127", "25GSFPWIRE", this);
+            //var allpjkey = ProjectViewModels.RetrieveAllProject();
+            //foreach (var pjkey in allpjkey)
+            //{
+            //    ProjectYieldViewModule.GetYieldByWeeks(pjkey.ProjectKey, HttpContext.Cache, 4);
+            //}
+            //MESUtility.DebugCriticalFunction("4803af8000860127", "25GSFPWIRE", this);
             //try
             //{
             //    var ckeylist = new List<string>();

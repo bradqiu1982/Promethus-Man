@@ -939,6 +939,18 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static List<string> RetrieveCriticalSymptom(Controller ctrl)
+        {
+            var ret = new List<string>();
+            var sharetags = CfgUtility.GetSysConfig(ctrl)["CRITICALFAILURESYMPTOM"].Split(new string[] { ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var item in sharetags)
+            {
+                ret.Add(item.Trim());
+            }
+            ret.Sort();
+            return ret;
+        }
+
         public static void MatchAllPostDocForUser(string username,Controller ctrl)
         {
             var allpostdoc = RetrieveAllSharedDocs(ctrl);

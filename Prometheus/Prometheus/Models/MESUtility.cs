@@ -625,6 +625,20 @@ namespace Prometheus.Models
             }
         }
 
+
+        public static void DebugCriticalFunction(string dataid, string projectkey, Controller ctrl)
+        {
+            var pjdata = ProjectTestData.RetrieveProjectTestData(dataid);
+            var pjcriticalerrorlist = ProjectCriticalErrorVM.RetrievePJCriticalError(projectkey, null);
+
+
+                if (!CheckPJCriticalError(pjdata[0], pjcriticalerrorlist, ctrl))
+                {
+                    CreateFA(pjdata[0], "BRAD.QIU@FINISAR.COM", ctrl);
+                }
+
+        }
+
         public static void StartProjectBonding(ProjectViewModels vm)
         {
             try

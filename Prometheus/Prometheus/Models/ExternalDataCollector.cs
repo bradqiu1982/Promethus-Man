@@ -2595,62 +2595,25 @@ namespace Prometheus.Models
         public static List<string> LoadTraceView2Local(string tester, string sn, string whichtest, string dbtimestr, Controller ctrl)
         {
             var ret = new List<string>();
-
-            var syscfgdict = CfgUtility.GetSysConfig(ctrl);
-            var traceviewscrfolder = syscfgdict["TRACEVIEWFOLDER"]+"\\"+tester;
-            var allsrcfiles = DirectoryEnumerateFiles(ctrl, traceviewscrfolder);
-
-            string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\TraceView\\";
-            if (!DirectoryExists(ctrl, imgdir))
+            try
             {
-                Directory.CreateDirectory(imgdir);
-            }
+                var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+                var traceviewscrfolder = syscfgdict["TRACEVIEWFOLDER"]+"\\"+tester;
+                var allsrcfiles = DirectoryEnumerateFiles(ctrl, traceviewscrfolder);
 
-            foreach (var srcf in allsrcfiles)
-            {
-                var filename = Path.GetFileName(srcf).ToUpper();
-
-                if (filename.Contains(sn.ToUpper())
-                    && filename.Contains(whichtest.ToUpper())
-                    && filename.Contains("_DUTORDERED_")
-                    && filename.Contains("_TRACEVIEW_"))
+                string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\TraceView\\";
+                if (!DirectoryExists(ctrl, imgdir))
                 {
-                    var traceviewtimestr = RetrieveTimeFromTraceViewName(filename);
-                    if (traceviewtimestr == null)
-                        continue;
+                    Directory.CreateDirectory(imgdir);
+                }
 
-                    try
-                    {
-                        var traceviewtime = DateTime.Parse(traceviewtimestr);
-                        var dbtime = DateTime.Parse(dbtimestr);
-                        if (traceviewtime > dbtime.AddSeconds(-5) && traceviewtime < dbtime.AddSeconds(5))
-                        {
-                            logthdinfo("\r\nStart to copy file: " + srcf);
-                            var desfile = imgdir + filename;
-                            FileCopy(ctrl, srcf, desfile, true);
-                            if (FileExist(ctrl, desfile))
-                            {
-                                logthdinfo("try to add data from file: " + desfile);
-                                ret.Add(desfile);
-                            }//copied file exist
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        logthdinfo("LoadTraceView2Local Exception: " + ex.Message);
-                    }
-                }//end if
-            }//end foreach
-
-            if (ret.Count == 0)
-            {
                 foreach (var srcf in allsrcfiles)
                 {
                     var filename = Path.GetFileName(srcf).ToUpper();
 
                     if (filename.Contains(sn.ToUpper())
                         && filename.Contains(whichtest.ToUpper())
-                        && filename.Contains("_DUT")
+                        && filename.Contains("_DUTORDERED_")
                         && filename.Contains("_TRACEVIEW_"))
                     {
                         var traceviewtimestr = RetrieveTimeFromTraceViewName(filename);
@@ -2679,7 +2642,48 @@ namespace Prometheus.Models
                         }
                     }//end if
                 }//end foreach
-            }//end if ret == 0
+
+                if (ret.Count == 0)
+                {
+                    foreach (var srcf in allsrcfiles)
+                    {
+                        var filename = Path.GetFileName(srcf).ToUpper();
+
+                        if (filename.Contains(sn.ToUpper())
+                            && filename.Contains(whichtest.ToUpper())
+                            && filename.Contains("_DUT")
+                            && filename.Contains("_TRACEVIEW_"))
+                        {
+                            var traceviewtimestr = RetrieveTimeFromTraceViewName(filename);
+                            if (traceviewtimestr == null)
+                                continue;
+
+                            try
+                            {
+                                var traceviewtime = DateTime.Parse(traceviewtimestr);
+                                var dbtime = DateTime.Parse(dbtimestr);
+                                if (traceviewtime > dbtime.AddSeconds(-5) && traceviewtime < dbtime.AddSeconds(5))
+                                {
+                                    logthdinfo("\r\nStart to copy file: " + srcf);
+                                    var desfile = imgdir + filename;
+                                    FileCopy(ctrl, srcf, desfile, true);
+                                    if (FileExist(ctrl, desfile))
+                                    {
+                                        logthdinfo("try to add data from file: " + desfile);
+                                        ret.Add(desfile);
+                                    }//copied file exist
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                logthdinfo("LoadTraceView2Local Exception: " + ex.Message);
+                            }
+                        }//end if
+                    }//end foreach
+                }//end if ret == 0
+            }
+            catch (Exception e) { }
+
 
             return ret;
         }

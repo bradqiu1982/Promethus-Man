@@ -1,7 +1,7 @@
 ﻿PROJECTTYPE:::Parallel;Tunable;Telecom;LineCard;OSA;QM;Others
 SHAREFOLDERUSER:::brad.qiu
 SHAREFOLDERDOMIN:::china
-SHAREFOLDERPWD:::wangle@5323
+SHAREFOLDERPWD:::wangle@12345
 APPEMAILADRESS:::WXNPI.Trace@finisar.com
 APPEMAILPWD:::abc@12345
 EMAILSERVER:::wmail.finisar.com
@@ -28,6 +28,7 @@ OUTSIDEPEOPLEAUTH:::TRUE
 MOVEHISTORYZEROTIME:::2017-07-10 07:30:00
 SHARETAG:::BER;EF;Epoxy;FLEX;IC;IC Setting;Lens;LOL;Los;LYT;OBA;ORT;PCB(A);Process;REL;RMA;SBR;Sensitivity;TX Power;VCSEL;CRITICALERROR
 CRITICALFAILURERT:::VCSEL;Lens detachment;EOS/ESD;Components damage;Components missing;PCBA open/short;Cable crack;LYT;Others
+CRITICALFAILURESYMPTOM:::LOL;LowPwr;High Power Consumption;High BitError;Low RSSI;Low RX Amptitude;RSSI Uniformity
 
 
 OBA--PARA-10G OE:::Nevin.Niu

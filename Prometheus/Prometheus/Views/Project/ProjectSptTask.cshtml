@@ -56,7 +56,16 @@
                     <td>@item.ModuleSN</td>
                     <td>@item.SharedTag</td>
                     <td>
-                        <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace(Prometheus.Models.CRITICALERRORTYPE.SECONDMATCH, "")</a>
+                        @if (item.Summary.Contains(Prometheus.Models.CRITICALERRORTYPE.OCAP))
+                        {
+                            <img src="~/Content/images/ocap_warn.png" class="summary-img" />                        
+                            <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey" class="summary-a">@item.Summary.Replace(Prometheus.Models.CRITICALERRORTYPE.SECONDMATCH, "").Replace(Prometheus.Models.CRITICALERRORTYPE.OCAP, "")</a>
+                        }
+                        else
+                        {
+                            <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace(Prometheus.Models.CRITICALERRORTYPE.SECONDMATCH, "").Replace(Prometheus.Models.CRITICALERRORTYPE.OCAP, "")</a>
+                        }
+
                     </td>
                     <td>
                         @if (!string.IsNullOrEmpty(item.ErrAbbr))

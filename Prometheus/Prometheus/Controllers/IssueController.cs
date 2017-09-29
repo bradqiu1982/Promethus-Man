@@ -730,7 +730,7 @@ namespace Prometheus.Controllers
                         {
                             if (string.Compare(isrealcritical, "NO", true) == 0)
                             {
-                                realissue.UpdateSummary(realissue.Summary.Replace(CRITICALERRORTYPE.LYTTASK, ""));
+                                realissue.UpdateSummary(CRITICALERRORTYPE.NOTREALCRITICALISSUE + realissue.Summary.Replace(CRITICALERRORTYPE.LYTTASK, ""));
                             }
                             else
                             {
@@ -1804,10 +1804,6 @@ namespace Prometheus.Controllers
                 {
                     var realissue = IssueViewModels.RetrieveIssueByIssueKey(vm.IssueKey,this);
 
-                    //UserKPIVM.AddUserDailyRank(realissue.IssueKey, realissue.Assignee, UserRankType.BASE
-                    //    , "Close FA Task: " + realissue.Summary, "/Issue/UpdateIssue?issuekey=" + realissue.IssueKey, 1);
-
-                    //ProjectEvent.OperateIssueEvent(originaldata.ProjectKey, updater, "Closed", originaldata.Summary, originaldata.IssueKey);
                     vm.CloseIssue();
 
                     if (realissue.Summary.Contains(CRITICALERRORTYPE.LYTTASK)|| realissue.Summary.Contains(CRITICALERRORTYPE.LYTTASK1))
@@ -1817,7 +1813,7 @@ namespace Prometheus.Controllers
                         {
                             if (string.Compare(isrealcritical, "NO", true) == 0)
                             {
-                                realissue.UpdateSummary(realissue.Summary.Replace(CRITICALERRORTYPE.LYTTASK, ""));
+                                realissue.UpdateSummary(CRITICALERRORTYPE.NOTREALCRITICALISSUE + realissue.Summary.Replace(CRITICALERRORTYPE.LYTTASK, ""));
                             }
                             else
                             {
@@ -1825,12 +1821,6 @@ namespace Prometheus.Controllers
                                 SendPDMSEvent(realissue, tmpcmt, issuetag);
                             }
                         }
-
-                        //if (!issuetag.Contains(CRITICALERRORTYPE.CRITICALERRORTAG))
-                        //{
-                        //    issuetag = issuetag + CRITICALERRORTYPE.CRITICALERRORTAG + ";";
-                        //}
-
                         UserKPIVM.AddUserDailyRank(realissue.IssueKey, realissue.Assignee, UserRankType.BASE
                             , "Close CRITICAL ERROR Task: " + realissue.Summary, "/Issue/UpdateIssue?issuekey=" + realissue.IssueKey, 4);
                     }

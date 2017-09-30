@@ -354,6 +354,8 @@ namespace Prometheus.Models
         public static string SECONDMATCH = "[Critical Failure Alarm]";
         public static string CRITICALERRORTAG = "CRITICALERROR";
         public static string PMTASK = "[Project Manage]";
+        public static string OCAP = "[OCAP]";
+        public static string NOTREALCRITICALISSUE = "[Not Real Critical Issue]";
     }
 
     public class WEEKLYREPORTMARK

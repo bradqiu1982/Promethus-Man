@@ -3116,10 +3116,10 @@ namespace Prometheus.Models
             }
         }
 
-        public static void UpdateIssueAssigneeAndResolution(string issuekey, string assignee, string resolution)
+        public static void UpdateIssueAssigneeAndResolution(string issuekey, string assignee, string resolution, string summary)
         {
-            var sql = "update Issue set Assignee = '<Assignee>', Resolution = '<Resolution>' where IssueKey = '<IssueKey>'";
-            sql = sql.Replace("<IssueKey>", issuekey).Replace("<Assignee>", assignee).Replace("<Resolution>", resolution);
+            var sql = "update Issue set Summary = '<Summary>', Assignee = '<Assignee>', Resolution = '<Resolution>' where IssueKey = '<IssueKey>'";
+            sql = sql.Replace("<IssueKey>", issuekey).Replace("<Assignee>", assignee).Replace("<Resolution>", resolution).Replace("<Summary>", summary);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
     }

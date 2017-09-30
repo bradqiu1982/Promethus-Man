@@ -35,13 +35,23 @@
                 <div class="col-lg-6">
                     <label class="control-label col-lg-2" for="ProjectName">Project</label>
                     <div class="col-lg-10">
-                        @Html.DropDownList("projectlist", null, new { @id = "ProjectKey", @class = "form-control" })
+                        <select id="ProjectKey" class="form-control" name="ProjectKey">
+                            @foreach (var op in ViewBag.projectlist)
+                            {
+                                <option value="@op.Value" @((op.Value == ViewBag.pj) ? "selected" : "")>@op.Value</option>
+                            }
+                        </select>
                     </div>
                 </div>
                 <div class="col-lg-6">
                     <label class="control-label col-lg-2" for="IssueType">TaskType</label>
                     <div class="col-lg-10">
-                        @Html.DropDownList("issuetypelist", null, new { @id = "IssueType", @class = "form-control" })
+                        <select id="IssueType" class="form-control" name="IssueType">
+                            @foreach (var op in ViewBag.issuetypelist)
+                            {
+                                <option value="@op.Value" @((op.Value == ViewBag.tp) ? "selected" : "")>@op.Value</option>
+                            }
+                        </select>
                     </div>
                 </div>
             </div>
@@ -50,13 +60,23 @@
                 <div class="col-lg-6">
                     <label class="control-label col-lg-2" for="Assignee">Assignee</label>
                     <div class="col-lg-10">
-                        @Html.DropDownList("assigneelist", null, new { @id = "Assignee", @class = "form-control" })
+                        <select id="Assignee" class="form-control" name="Assignee">
+                            @foreach (var op in ViewBag.assigneelist)
+                            {
+                                <option value="@op.Value" @((op.Value == ViewBag.asn) ? "selected" : "")>@op.Value</option>
+                            }
+                        </select>
                     </div>
                 </div>
                 <div class="col-lg-6">
                     <label class="control-label col-lg-2" for="IssueType">Status</label>
                     <div class="col-lg-10">
-                        @Html.DropDownList("resolutionlist", null, new { @id = "Resolution", @class = "form-control" })
+                        <select id="Resolution" class="form-control" name="Resolution">
+                            @foreach (var op in ViewBag.resolutionlist)
+                            {
+                                <option value="@op.Value" @((op.Value == ViewBag.rs) ? "selected" : "")>@op.Value</option>
+                            }
+                        </select>
                     </div>
                 </div>
             </div>
@@ -65,13 +85,13 @@
                 <div class="col-lg-6">
                     <label class="control-label col-lg-2" for="StartDate">StartDate</label>
                     <div class="col-lg-10">
-                        <input class="form-control text-box single-line" id="StartDate" name="StartDate" type="text" value="" />
+                        <input class="form-control text-box single-line" id="StartDate" name="StartDate" type="text" value="@ViewBag.sd" />
                     </div>
                 </div>
                 <div class="col-lg-6">
                     <label class="control-label col-lg-2" for="EndDate">EndDate</label>
                     <div class="col-lg-10">
-                        <input class="form-control text-box single-line" id="EndDate" name="EndDate" type="text" value="" />
+                        <input class="form-control text-box single-line" id="EndDate" name="EndDate" type="text" value="@ViewBag.ed" />
                     </div>
                 </div>
             </div>
@@ -96,7 +116,10 @@
                 <div class="col-lg-12">
                     <label class="control-label col-lg-1" for="Summary">Summary</label>
                     <div class="col-lg-11">
-                        <input class="form-control text-box single-line" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 180." data-val-length-max="180" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="Summary" name="Summary" type="text" value="" />
+                        <input class="form-control text-box single-line" data-val="true"
+                               data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 180."
+                               data-val-length-max="180" data-val-length-min="2" data-val-regex="The field should not contain \'"
+                               data-val-regex-pattern="^(?!.*&#39;).*$" id="Summary" name="Summary" type="text" value="@ViewBag.desp" />
                         <span class="field-validation-valid text-danger" data-valmsg-for="Summary" data-valmsg-replace="true"></span>
                     </div>
                 </div>
@@ -157,32 +180,32 @@
                     } );
     </script>
 
-            @*foreach (var item in Model)
-                {
+    @*foreach (var item in Model)
+        {
 
-                        <div class="panel panel-default">
-                            <div class="panel-heading" style="min-height:40px;max-height:40px;">
-                                <div class="col-lg-3 text-left">
-                                    <a href="/Project/ProjectDetail?ProjectKey=@item.ProjectKey">
-                                        <span class="glyphicon glyphicon-home" aria-hidden="true"></span> @item.ProjectKey
-                                    </a>
-                                </div>
-                                <div class="col-lg-10"></div>
-                            </div>
-                            <div class="panel-body">
-                                <div class="row">
-                                    <div class="col-lg-6 text-left">Summary</div>
-                                    <div class="col-lg-2 text-left">Asignee</div>
-                                    <div class="col-lg-2 text-left">Status</div>
-                                    <div class="col-lg-2 text-left">DueDate</div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-lg-6 text-left"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></div>
-                                    <div class="col-lg-2 text-left"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
-                                    <div class="col-lg-2 text-left">@item.Resolution</div>
-                                    <div class="col-lg-2 text-left">@item.DueDate.ToString("yyyy-MM-dd")</div>
-                                </div>
-                            </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading" style="min-height:40px;max-height:40px;">
+                        <div class="col-lg-3 text-left">
+                            <a href="/Project/ProjectDetail?ProjectKey=@item.ProjectKey">
+                                <span class="glyphicon glyphicon-home" aria-hidden="true"></span> @item.ProjectKey
+                            </a>
                         </div>
-                    }*@
-            }
+                        <div class="col-lg-10"></div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-lg-6 text-left">Summary</div>
+                            <div class="col-lg-2 text-left">Asignee</div>
+                            <div class="col-lg-2 text-left">Status</div>
+                            <div class="col-lg-2 text-left">DueDate</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6 text-left"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></div>
+                            <div class="col-lg-2 text-left"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
+                            <div class="col-lg-2 text-left">@item.Resolution</div>
+                            <div class="col-lg-2 text-left">@item.DueDate.ToString("yyyy-MM-dd")</div>
+                        </div>
+                    </div>
+                </div>
+            }*@
+}

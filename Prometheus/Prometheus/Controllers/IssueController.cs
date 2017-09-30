@@ -1047,6 +1047,17 @@ namespace Prometheus.Controllers
 
         }
 
+        private void CreateSearchParams(string pj, string tp, string rs, string asn, string sd, string ed, string desp)
+        {
+            ViewBag.pj = pj;
+            ViewBag.tp = tp;
+            ViewBag.rs = rs;
+            ViewBag.asn = asn;
+            ViewBag.sd = sd;
+            ViewBag.ed = ed;
+            ViewBag.desp = desp;
+        }
+
         public ActionResult SearchIssue()
         {
             CreateAllSearchLists();
@@ -1065,24 +1076,24 @@ namespace Prometheus.Controllers
             var ed = "";
             var desp = "";
 
-            if (string.Compare(Request.Form["projectlist"].ToString(), "NONE") != 0)
+            if (string.Compare(Request.Form["ProjectKey"].ToString(), "NONE") != 0)
             {
-                pj = Request.Form["projectlist"].ToString();
+                pj = Request.Form["ProjectKey"].ToString();
             }
 
-            if (string.Compare(Request.Form["issuetypelist"].ToString(), "NONE") != 0)
+            if (string.Compare(Request.Form["IssueType"].ToString(), "NONE") != 0)
             {
-                tp = Request.Form["issuetypelist"].ToString();
+                tp = Request.Form["IssueType"].ToString();
             }
 
-            if (string.Compare(Request.Form["resolutionlist"].ToString(), "NONE") != 0)
+            if (string.Compare(Request.Form["Resolution"].ToString(), "NONE") != 0)
             {
-                rs = Request.Form["resolutionlist"].ToString();
+                rs = Request.Form["Resolution"].ToString();
             }
 
-            if (string.Compare(Request.Form["assigneelist"].ToString(), "NONE") != 0)
+            if (string.Compare(Request.Form["Assignee"].ToString(), "NONE") != 0)
             {
-                asn = Request.Form["assigneelist"].ToString();
+                asn = Request.Form["Assignee"].ToString();
             }
 
             if (!string.IsNullOrEmpty(Request.Form["StartDate"]))
@@ -1114,9 +1125,24 @@ namespace Prometheus.Controllers
             }
 
             var vmlist = IssueViewModels.SearchIssue(pj, tp, rs, asn, sd, ed, desp, 100);
-
+            CreateSearchParams(pj, tp, rs, asn, sd, ed, desp);
             CreateAllSearchLists();
             return View(vmlist);
+        }
+
+        public ActionResult SearachIssue2(string pj, string desp)
+        {
+
+            var tp = "";
+            var rs = "";
+            var asn = "";
+            var sd = "";
+            var ed = "";
+            
+            var vmlist = IssueViewModels.SearchIssue(pj, tp, rs, asn, sd, ed, desp, 100);
+            CreateSearchParams(pj, tp, rs, asn, sd, ed, desp);
+            CreateAllSearchLists();
+            return View("SearchIssue", vmlist);
         }
 
         public ActionResult IssueAttach(string issuekey)

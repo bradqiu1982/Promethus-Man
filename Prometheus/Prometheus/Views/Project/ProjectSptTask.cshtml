@@ -23,6 +23,8 @@
 
 <div class="row cirtical-info" MYTP="green">
     <strong class="pro-info-eng">Critical Tasks</strong>
+    <a style="font-size: 10px; font-style:italic; margin-left: 5px;" 
+       href="/Issue/SearachIssue2/?pj=@(Model.ElementAt(0).ProjectKey)&desp=@(Prometheus.Models.CRITICALERRORTYPE.NOTREALCRITICALISSUE.Replace("[", "").Replace("]", ""))">( Not Real Critical Issue )</a>
 </div>
 <div class="row">
     <input type="hidden" id="pqe_flag" name="pqe_flag" value="@ViewBag.pqeFlag.ToString().ToUpper()" />

@@ -53,7 +53,7 @@ OBA--PARA-OE28LP:::Bright.Zhang
 OBA--PARA-QSFP FDR transceiver:::Doris.Kong
 OBA--PARA-QSFP GEN4:::Doris.Kong
 OBA--PARA-QSFP SR4 Gen4:::Doris.Kong
-OBA--PARA-QSFP28G-PSM4:::Nevin.Niu
+OBA--PARA-QSFP28G-PSM4:::Hao.Xu
 OBA--PARA-QSFP28G-SR4:::Bright.Zhang
 OBA--PARA-QSFP-GEN2:::Doris.Kong
 OBA--PARA-QSFP-GEN3:::Doris.Kong

@@ -4,7 +4,8 @@ SHAREFOLDERDOMIN:::china
 SHAREFOLDERPWD:::wangle@12345
 APPEMAILADRESS:::WXNPI.Trace@finisar.com
 APPEMAILPWD:::abc@12345
-EMAILSERVER:::wmail.finisar.com
+#EMAILSERVER:::wmail.finisar.com
+EMAILSERVER:::outlook.office.com/owa/
 RMASHAREFOLDER:::\\wux-fs\PUBLIC\Quality\10.Quality case summary\Customer Quality Case Summary\RMA & Complaint New
 RMACLOSEATTACHES:::\\wux-fs\PUBLIC\Quality\10.Quality case summary\Customer Quality Case Summary\RMA Close Data\RMA
 #NeoMAPDataFolder:::\\wux-file01\Public\Wuxi Parallel NPI\NeoMAP Data

@@ -37,9 +37,20 @@ else
     </div>
 </div>
 
-<div class="row">
-    <div class="col-lg-12">&nbsp;</div>
-</div>
+@if (ViewBag.isassignee != null && ViewBag.isassignee)
+{
+    <div class="row">
+        <div class="col-lg-12">&nbsp;</div>
+    </div>
+}
+else
+{
+    <div class="alert alert-success" role="alert" style="padding:4px!important">
+        You are in review mode now.  If you want edit current page, please click  <a MYTP="HOVER" id="editablebt" name="editablebt" onclick="changepagemode()">
+            <span class="glyphicon glyphicon-edit" title="Edit Mode" data-toggle="tooltip"></span>
+        </a>
+    </div>
+}
 
 <div class="row">
     <div class="col-lg-3">

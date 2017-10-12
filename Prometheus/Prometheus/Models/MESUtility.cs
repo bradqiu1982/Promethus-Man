@@ -534,6 +534,50 @@ namespace Prometheus.Models
             return null;
         }
 
+        private static void Create2ndCheckTask2(ProjectTestData pjdata,string asignee, KeyValuePair<string,string> rule, Controller ctrl, List<string> traceviewfilelist)
+        {
+            try
+            {
+                var now = DateTime.Now;
+                var vm = new IssueViewModels();
+                vm.ProjectKey = pjdata.ProjectKey;
+                vm.IssueKey = IssueViewModels.GetUniqKey();
+                vm.IssueType = ISSUETP.Bug;
+                vm.Summary = CRITICALERRORTYPE.SECONDMATCH + " " + pjdata.ModuleSerialNum + " failed for " + pjdata.ErrAbbr + " @ " + pjdata.WhichTest;
+                vm.ModuleSN = pjdata.ModuleSerialNum;
+                vm.ErrAbbr = pjdata.ErrAbbr;
+                vm.Priority = ISSUEPR.Major;
+                vm.DueDate = now.AddDays(7);
+                vm.ReportDate = DateTime.Now;
+                vm.Assignee = asignee;
+                vm.Reporter = asignee;
+                vm.Creator = asignee;
+                vm.Resolution = Resolute.Pending;
+                vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+                vm.RelativePeoples = "";
+                vm.StoreIssue();
+
+                var comment1 = new IssueComments();
+                comment1.Comment = "<p>" + pjdata.ModuleSerialNum + " failed for " + pjdata.ErrAbbr + " @ " + pjdata.WhichTest + "</p>";
+                comment1.Comment = comment1.Comment + "<p> match default rule: test -- " +rule.Key + " failure code -- " + rule.Value + "</p>";
+
+                IssueViewModels.StoreIssueComment(vm.IssueKey, comment1.dbComment, vm.Assignee, COMMENTTYPE.Description);
+
+                foreach (var trace in traceviewfilelist)
+                {
+                    var traces = trace.Split(new string[] { "userfiles\\" }, StringSplitOptions.RemoveEmptyEntries);
+                    if (traces.Length == 2)
+                    {
+                        var url = "/userfiles/" + traces[1].Replace("\\", "/");
+                        IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
+                    }
+                }//end foreach
+
+                SendTaskEvent(vm, comment1.Comment, ctrl);
+            }
+            catch (Exception ex) { }
+        }
+
         private static bool CheckPJCriticalError(ProjectTestData pjdata, List<ProjectCriticalErrorVM> pjcriticalerrorlist, Controller ctrl)
         {
             var ret = false;
@@ -598,11 +642,42 @@ namespace Prometheus.Models
             return ret;
         }
 
+        private static bool CheckDefaultCriticalError(ProjectTestData pjdata,string firstengineer, List<KeyValuePair<string, string>> defrulelist,Controller ctrl)
+        {
+            foreach (var defrule in defrulelist)
+            {
+                if (pjdata.WhichTest.ToUpper().Contains(defrule.Key.ToUpper())
+                    && pjdata.ErrAbbr.ToUpper().Contains(defrule.Value.ToUpper()))
+                {
+                    var traceviewlist = ExternalDataCollector.LoadTraceView2Local(pjdata.TestStation, pjdata.ModuleSerialNum, pjdata.WhichTest, pjdata.TestTimeStamp.ToString(), ctrl);
+                    Create2ndCheckTask2(pjdata, firstengineer, defrule, ctrl, traceviewlist);
+                    return true;
+                }
+            }//end foreach
+
+            return false;
+        }
 
         private static void CreateSystemIssues(List<ProjectTestData> failurelist, Controller ctrl)
         {
             if (failurelist.Count > 0)
             {
+                //get default critical rule
+                var defrulelist = new List<KeyValuePair<string, string>>();
+                var defaultrules = string.Empty;
+                CfgUtility.GetSysConfig(ctrl).TryGetValue("CRITICALDEFAULTRULE",out defaultrules);
+                if (!string.IsNullOrEmpty(defaultrules))
+                {
+                    var splitstrs = defaultrules.Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var item in splitstrs)
+                    {
+                        var kv = item.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                        var tempdef = new KeyValuePair<string,string>(kv[0], kv[1]);
+                        defrulelist.Add(tempdef);
+                    }
+                }
+
+                //get first engineer
                 var pj = ProjectViewModels.RetrieveOneProject(failurelist[0].ProjectKey);
                 var firstengineer = "";
                 foreach (var m in pj.MemberList)
@@ -613,10 +688,17 @@ namespace Prometheus.Models
                         break;
                     }
                 }
+                //get user critical rule
                 var pjcriticalerrorlist = ProjectCriticalErrorVM.RetrievePJCriticalError(failurelist[0].ProjectKey, null);
-
                 foreach (var item in failurelist)
                 {
+                    //default critical rule
+                    if (defrulelist.Count > 0)
+                    {
+                        var ret = CheckDefaultCriticalError(item, firstengineer, defrulelist, ctrl);
+                        if (ret)  continue;
+                    }//end if
+
                     if (!CheckPJCriticalError(item,pjcriticalerrorlist,ctrl))
                     {
                         CreateFA(item, firstengineer,ctrl);

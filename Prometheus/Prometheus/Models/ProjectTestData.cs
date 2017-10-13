@@ -147,7 +147,7 @@ namespace Prometheus.Models
             }
         }
 
-        public static void PrePareATELatestData(string projectkey)
+        public static void PrePareATELatestData(string projectkey,Controller ctrl)
         {
             if (UpdatePJLockUsing(projectkey))
                 return;
@@ -165,12 +165,12 @@ namespace Prometheus.Models
                         //vlast = vlast.AddMinutes(18);
                         //if (vlast < DateTime.Now)
                         //{
-                            ATEUtility.UpdateProjectData(vm, lastupdatetime);
+                            ATEUtility.UpdateProjectData(vm, lastupdatetime,ctrl);
                         //}
                     }
                     else
                     {
-                        ATEUtility.UpdateProjectData(vm, vm.StartDate.ToString());
+                        ATEUtility.UpdateProjectData(vm, vm.StartDate.ToString(),ctrl);
                     }
                 }
 

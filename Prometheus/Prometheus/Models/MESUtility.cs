@@ -950,7 +950,7 @@ namespace Prometheus.Models
                         //use latest failure cover previous failure
                         foreach (var item in failurelist)
                         {
-                            IssueViewModels.CloseIssueAutomaticllyWithFailedSN(item.ProjectKey, item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss"));
+                            IssueViewModels.CloseIssueAutomaticllyWithFailedSN(item.ProjectKey, item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss"),ctrl);
                         }
 
                         CreateSystemIssues(failurelist,ctrl);
@@ -961,7 +961,7 @@ namespace Prometheus.Models
                         //use pass sn cover previous failure
                         foreach (var item in passlist)
                     {
-                        IssueViewModels.CloseIssueAutomaticlly(item.ProjectKey,item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss"));
+                        IssueViewModels.CloseIssueAutomaticlly(item.ProjectKey,item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss"),ctrl);
                     }
                 }
                 

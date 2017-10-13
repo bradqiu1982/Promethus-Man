@@ -1428,7 +1428,7 @@ namespace Prometheus.Controllers
                 BIDataUtility.StartProjectBonding(this, projectmodel);
             }
 
-            ProjectTestData.PrePareATELatestData(projectmodel.ProjectKey);
+            ProjectTestData.PrePareATELatestData(projectmodel.ProjectKey,this);
 
             var dict = new RouteValueDictionary();
             dict.Add("ProjectKey", projectmodel.ProjectKey);
@@ -5658,7 +5658,7 @@ namespace Prometheus.Controllers
             {
                 try
                 {
-                    ProjectTestData.PrePareATELatestData(pjkey);
+                    ProjectTestData.PrePareATELatestData(pjkey,this);
                 }
                 catch (Exception ex)
                 { }

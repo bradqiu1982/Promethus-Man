@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 
 namespace Prometheus.Models
 {
@@ -248,7 +249,7 @@ namespace Prometheus.Models
         }
 
 
-        public static void UpdateProjectData(ProjectViewModels vm, string starttime)
+        public static void UpdateProjectData(ProjectViewModels vm, string starttime,Controller ctrl)
         {
             try
             {
@@ -399,7 +400,7 @@ namespace Prometheus.Models
                         //use latest failure cover previous failure
                         foreach (var item in failurelist)
                         {
-                            IssueViewModels.CloseIssueAutomaticllyWithFailedSN(item.ProjectKey, item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss"));
+                            IssueViewModels.CloseIssueAutomaticllyWithFailedSN(item.ProjectKey, item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss"),ctrl);
                         }
 
                         CreateSystemIssues(failurelist);
@@ -410,7 +411,7 @@ namespace Prometheus.Models
                         //use pass sn cover previous failure
                         foreach (var item in passlist)
                         {
-                            IssueViewModels.CloseIssueAutomaticlly(item.ProjectKey, item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss"));
+                            IssueViewModels.CloseIssueAutomaticlly(item.ProjectKey, item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss"),ctrl);
                         }
                     }
 

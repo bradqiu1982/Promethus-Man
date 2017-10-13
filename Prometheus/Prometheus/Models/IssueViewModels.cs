@@ -1528,7 +1528,7 @@ namespace Prometheus.Models
             return retdict;
         }
 
-        private static List<IssueViewModels> RRetrieveFABySN(string pjkey,string SN,string whichtest)
+        private static List<IssueViewModels> RRetrieveFABySN(string pjkey,string SN,string whichtest,Controller ctrl)
         {
             var retdict = new List<IssueViewModels>();
 
@@ -1551,6 +1551,7 @@ namespace Prometheus.Models
                     , Convert.ToString(line[11]), Convert.ToString(line[12]));
                 ret.ModuleSN = Convert.ToString(line[13]);
 
+                ret.RetrieveComment(ctrl);
                 retdict.Add(ret);
             }
 
@@ -3037,27 +3038,33 @@ namespace Prometheus.Models
         }
 
 
-        public static void CloseIssueAutomaticlly(string pjkey, string SN, string whichtest, string tester, string datestr)
+        public static void CloseIssueAutomaticlly(string pjkey, string SN, string whichtest, string tester, string datestr,Controller ctrl)
         {
-            var issues = IssueViewModels.RRetrieveFABySN(pjkey, SN, whichtest);
+            var issues = IssueViewModels.RRetrieveFABySN(pjkey, SN, whichtest,ctrl);
             foreach (var tobedata in issues)
             {
-                tobedata.Resolution = Resolute.AutoClose;
-                tobedata.Description = "Module " + SN + " passed " + whichtest + " test @" + tester + " @" + datestr;
-                tobedata.UpdateIssue();
-                tobedata.CloseIssue();
+                if (tobedata.CommentList.Count < 2)
+                {
+                    tobedata.Resolution = Resolute.AutoClose;
+                    tobedata.Description = "Module " + SN + " passed " + whichtest + " test @" + tester + " @" + datestr;
+                    tobedata.UpdateIssue();
+                    tobedata.CloseIssue();
+                }
             }
         }
 
-        public static void CloseIssueAutomaticllyWithFailedSN(string pjkey, string SN, string whichtest, string tester, string datestr)
+        public static void CloseIssueAutomaticllyWithFailedSN(string pjkey, string SN, string whichtest, string tester, string datestr, Controller ctrl)
         {
-            var issues = IssueViewModels.RRetrieveFABySN(pjkey, SN, whichtest);
+            var issues = IssueViewModels.RRetrieveFABySN(pjkey, SN, whichtest,ctrl);
             foreach (var tobedata in issues)
             {
-                tobedata.Resolution = Resolute.AutoClose;
-                tobedata.Description = "Module " + SN + " faild for " + whichtest + " test @" + tester + " @" + datestr+" again";
-                tobedata.UpdateIssue();
-                tobedata.CloseIssue();
+                if (tobedata.CommentList.Count < 2)
+                {
+                    tobedata.Resolution = Resolute.AutoClose;
+                    tobedata.Description = "Module " + SN + " faild for " + whichtest + " test @" + tester + " @" + datestr+" again";
+                    tobedata.UpdateIssue();
+                    tobedata.CloseIssue();
+                }
             }
         }
 

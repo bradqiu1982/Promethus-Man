@@ -5855,7 +5855,7 @@ namespace Prometheus.Controllers
             //{
             //    ProjectYieldViewModule.GetYieldByWeeks(pjkey.ProjectKey, HttpContext.Cache, 4);
             //}
-            //MESUtility.DebugCriticalFunction("4803af8000860127", "25GSFPWIRE", this);
+            MESUtility.DebugCriticalFunction("4803ad800037d81c", "QSFPSR4GEN4", this);
             //try
             //{
             //    var ckeylist = new List<string>();

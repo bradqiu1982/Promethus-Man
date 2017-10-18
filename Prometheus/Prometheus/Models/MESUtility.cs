@@ -148,7 +148,7 @@ namespace Prometheus.Models
             traceviewfilelist.AddRange(traceviewlist);
             foreach (var filename in traceviewlist)
             {
-                var tempret = ExternalDataCollector.RetrieveTestDataFromTraceView(filename, pjerror.TestCaseName, pjerror.MatchCond);
+                var tempret = ExternalDataCollector.RetrieveTestDataFromTraceView(filename, pjerror.TestCaseName.Trim(), pjerror.MatchCond.Trim());
                 if (tempret.Count > 0)
                 {
                     ret.AddRange(tempret);
@@ -716,7 +716,7 @@ namespace Prometheus.Models
 
                 if (!CheckPJCriticalError(pjdata[0], pjcriticalerrorlist, ctrl))
                 {
-                    CreateFA(pjdata[0], "BRAD.QIU@FINISAR.COM", ctrl);
+                    //CreateFA(pjdata[0], "BRAD.QIU@FINISAR.COM", ctrl);
                 }
 
         }

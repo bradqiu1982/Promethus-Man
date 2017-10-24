@@ -9,10 +9,10 @@
 @if (Model != null)
 {
     <div class="row">
-        <div class="col-lg-1 text-right">
+        <div class="col-xs-1 text-right">
             <img src="~/Content/images/PJ/Task.png" style="height:45px; width:45px">
         </div>
-        <div class="col-lg-11">
+        <div class="col-xs-11">
             <ol class="breadcrumb" style="font-size:18px">
                 <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
                 <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ProjectKey)">Project Detail</a></li>
@@ -24,7 +24,7 @@
     </div>
 
     <div class="row">
-        <div class="col-lg-12">&nbsp;</div>
+        <div class="col-xs-12">&nbsp;</div>
     </div>
 
     foreach (Prometheus.Models.IssueComments item in Model.RootCauseCommentList)
@@ -45,10 +45,10 @@
 else
 {
     <div class="row">
-        <div class="col-lg-1 text-right">
+        <div class="col-xs-1 text-right">
             <img src="~/Content/images/PJ/Task.png" style="height:45px; width:45px">
         </div>
-        <div class="col-lg-11">
+        <div class="col-xs-11">
             <ol class="breadcrumb" style="font-size:18px">
                 <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
                 <li class="active">Root Cause Investigation</li>
@@ -57,7 +57,7 @@ else
     </div>
 
     <div class="row">
-        <div class="col-lg-12">&nbsp;</div>
+        <div class="col-xs-12">&nbsp;</div>
     </div>
 }
 

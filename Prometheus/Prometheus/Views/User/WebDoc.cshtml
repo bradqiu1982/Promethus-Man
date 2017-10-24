@@ -20,7 +20,7 @@
 </div>
 
 <div class="row">
-    <div class="col-lg-12">&nbsp;</div>
+    <div class="col-xs-12">&nbsp;</div>
 </div>
 
 <script src="../../ckeditor/ckeditor.js"></script>
@@ -33,9 +33,9 @@
         <div class="form-horizontal">
             <div class="form-group">
                 <div class="row">
-                    <div class="col-lg-12">
-                        <div class="col-lg-1"></div>
-                        <div class="col-lg-11">
+                    <div class="col-xs-12">
+                        <div class="col-xs-1"></div>
+                        <div class="col-xs-11">
                             <h3><a href="@Model.Content" target="_blank">@Model.Title</a></h3>
                         </div>
                     </div>
@@ -51,9 +51,9 @@
                 <div class="panel panel-default">
                     <div class="panel-heading" style="background-color:whitesmoke;">
                         <div class="row">
-                            <div class="col-lg-12">
-                                <div class="col-lg-11"><h3 class="panel-title">@Model.Title</h3></div>
-                                <div class="col-lg-1">
+                            <div class="col-xs-12">
+                                <div class="col-xs-11"><h3 class="panel-title">@Model.Title</h3></div>
+                                <div class="col-xs-1">
                                     @if (ViewBag.Owner != null && ViewBag.Owner)
                                     {
                                         <a href="/User/ModifyBlogDoc?DocKey=@Model.DocKey">
@@ -85,7 +85,7 @@
         <div class="row">
             <div class="row" MYTP="blue" style="margin-left:3px"><a data-toggle="collapse" href="#commentswell" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';"><font color="black">@(Model.CommentList.Count) Comments</font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:20px; width:12px"></a></div>
             <div class="row">
-                <div class="col-lg-12">&nbsp;</div>
+                <div class="col-xs-12">&nbsp;</div>
             </div>
             <div class="row" style="margin-left:10px">
                 <div class="collapse in" id="commentswell">
@@ -94,19 +94,19 @@
                         <div class="well" MYTP="HOVER" style="margin-bottom:2px;padding-bottom:2px;margin-top:2px;padding-top:2px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px;border-top-width:0px">
                             <div class="row" MYTP="HOVER" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
                                 <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
-                                    <div class="col-lg-6">
-                                        <div class="col-lg-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")</div>
-                                        <div class="col-lg-2">
+                                    <div class="col-xs-6">
+                                        <div class="col-xs-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")</div>
+                                        <div class="col-xs-2">
                                             <a href="/User/UpdateWebDocComment?ErrorKey=@(item.ErrorKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())&Creator=@(Model.UserName)">
                                                 <img src="~/Content/images/icon/edit.png" MYTP="HOVER" style="height:34px; width:24px">
                                             </a>
                                         </div>
                                     </div>
-                                    <div class="col-lg-6"></div>
+                                    <div class="col-xs-6"></div>
                                 </div>
                                 <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
-                                    <div class="col-lg-1"></div>
-                                    <div class="col-lg-11">@Html.Raw(item.Comment)</div>
+                                    <div class="col-xs-1"></div>
+                                    <div class="col-xs-11">@Html.Raw(item.Comment)</div>
                                 </div>
                             </div>
                             <script type="text/javascript">
@@ -119,7 +119,7 @@
                         </div>
 
                             <div class="row">
-                                <div class="col-lg-12">&nbsp;</div>
+                                <div class="col-xs-12">&nbsp;</div>
                             </div>
                     }
                 </div>
@@ -130,7 +130,7 @@
     }
 
     <div class="row">
-        <div class="col-lg-12">&nbsp;</div>
+        <div class="col-xs-12">&nbsp;</div>
     </div>
 
     using (Html.BeginForm("WebDoc", "User", FormMethod.Post, new { enctype = "multipart/form-data" }))
@@ -140,22 +140,22 @@
 
         <div class="row">
 
-            <div class="col-lg-12">
+            <div class="col-xs-12">
                 <div MYTP="red" class="row" style="margin-left:3px"><a data-toggle="collapse" href="#CommentInput" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';"><font color="black">Comment Input</font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:20px; width:12px"></a></div>
                 <div class="row">
-                    <div class="col-lg-12">&nbsp;</div>
+                    <div class="col-xs-12">&nbsp;</div>
                 </div>
                 <div class="row" style="margin-left:10px">
                     <div class="collapse" id="CommentInput">
                         <div class="form-horizontal">
                             @*<div class="form-group">
-                                    <div class="col-lg-12">
+                                    <div class="col-xs-12">
                                         <label class="control-label">Comment</label>
                                     </div>
                                 </div>*@
 
                             <div class="form-group">
-                                <div class="col-lg-12">
+                                <div class="col-xs-12">
                                     <textarea name="docinputeditor" id="docinputeditor" rows="30" cols="80"></textarea>
                                     <script>
                                         CKEDITOR.replace('docinputeditor', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
@@ -166,17 +166,17 @@
                             <div class="form-group">
 
                                 <div class="row">
-                                    <div class="col-lg-12">
-                                        <div class="col-lg-4">
+                                    <div class="col-xs-12">
+                                        <div class="col-xs-4">
                                             <span class="btn btn-default btn-file" id="choosefile6">
                                                 Editor Attachment <input type="file" name="file6" id="file6" runat="server" onchange="ShowFileNames6(this)" />
                                             </span>
                                         </div>
-                                        <div class="col-lg-1"></div>
-                                        <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                                        <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                                        <div class="col-lg-3"></div>
-                                        <div class="col-lg-2 text-right"></div>
+                                        <div class="col-xs-1"></div>
+                                        <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                                        <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                                        <div class="col-xs-3"></div>
+                                        <div class="col-xs-2 text-right"></div>
                                     </div>
                                     <script type="text/javascript">
                                         function ShowFileNames6(oFile) {
@@ -229,19 +229,19 @@
         </div>
 
         <div class="row">
-            <div class="col-lg-12">&nbsp;</div>
+            <div class="col-xs-12">&nbsp;</div>
         </div>
 
             <div class="row">
-                <div class="col-lg-2">
+                <div class="col-xs-2">
                     <input type="submit" value="Submit" class="btn btn-submit" />
                 </div>
-                <div class="col-lg-2">
+                <div class="col-xs-2">
                     <button class="btn btn-info"  value="DOCKey=@(Model.DocKey)&DOCCreator=@(Model.UserName)" onclick="LikeThisDoc(this)">
                     <span class="glyphicon glyphicon-heart" aria-hidden="true"></span> ILike</button>
                 </div>
-                <div class="col-lg-6"></div>
-                <div class="col-lg-2"></div>
+                <div class="col-xs-6"></div>
+                <div class="col-xs-2"></div>
                 <script type="text/javascript">
                     function LikeThisDoc(oBT) {
                         window.location.href = '/User/ILike?' + oBT.value;

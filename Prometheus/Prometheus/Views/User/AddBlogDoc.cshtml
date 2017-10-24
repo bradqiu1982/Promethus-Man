@@ -29,16 +29,16 @@
 
         <div class="form-group">
             <div class="row" data-intro="Select Blog Category." data-step="1">
-                <div class="col-lg-3" MYTP="orange" style="font-family:'Arial Narrow';font-size:18px"><strong>&nbsp;&nbsp;Blog Category*</strong></div>
-                <div class="col-lg-9">
+                <div class="col-xs-3" MYTP="orange" style="font-family:'Arial Narrow';font-size:18px"><strong>&nbsp;&nbsp;Blog Category*</strong></div>
+                <div class="col-xs-9">
                     <div class="row">
-                        <div class="col-lg-6">
-                            <label class="control-label col-lg-2" for="Tag">Category</label>
-                            <div class="col-lg-10">
+                        <div class="col-xs-6">
+                            <label class="control-label col-xs-2" for="Tag">Category</label>
+                            <div class="col-xs-10">
                                 <input class="form-control text-box single-line" data-toggle="tooltip" title="Tag1;Tag2;Tag3" id="Tag" name="Tag" type="text" onclick="PopTag()" />
                             </div>
                         </div>
-                        <div class="col-lg-6"></div>
+                        <div class="col-xs-6"></div>
                         <script type="text/javascript">
                             function PopTag() {
                                 $('#attachtag').modal({ backdrop: 'static' });
@@ -54,11 +54,11 @@
 
         <div class="form-group">
             <div class="row" data-intro="Share DOC by document." data-step="2">
-                <div class="col-lg-3" MYTP="orange" style="font-family:'Arial Narrow';font-size:18px"><strong>&nbsp;&nbsp;Share DOC by document*</strong></div>
-                <div class="col-lg-9">
+                <div class="col-xs-3" MYTP="orange" style="font-family:'Arial Narrow';font-size:18px"><strong>&nbsp;&nbsp;Share DOC by document*</strong></div>
+                <div class="col-xs-9">
                     <div class="row">
-                        <div class="col-lg-6">
-                            <div class="col-lg-11">
+                        <div class="col-xs-6">
+                            <div class="col-xs-11">
                                 <label class="control-label" id="showfile3" name="showfile3">Select a document</label>
                                 <div class="nav navbar-nav navbar-right">
                                     <span class="btn btn-default btn-file " id="choosefile3">
@@ -66,7 +66,7 @@
                                     </span>
                                 </div>
                             </div>
-                            <div class="col-lg-1">
+                            <div class="col-xs-1">
                                 <input class="form-control text-box single-line" value="" id="attachmentupload" name="attachmentupload" type="hidden" />
                             </div>
                         </div>
@@ -77,7 +77,7 @@
                             }
                         </script>
 
-                        <div class="col-lg-6"><input type="submit" value="Submit" class="btn btn-primary" /></div>
+                        <div class="col-xs-6"><input type="submit" value="Submit" class="btn btn-primary" /></div>
                     </div>
                 </div>
             </div>
@@ -88,18 +88,18 @@
         <div class="form-group">
             <div class="row" data-intro="Share DOC by Editor." data-step="3">
 
-                <div class="col-lg-3" MYTP="orange" style="font-family:'Arial Narrow';font-size:18px"><strong>&nbsp;&nbsp;Share DOC by Editor*</strong></div>
-                <div class="col-lg-9"></div>
+                <div class="col-xs-3" MYTP="orange" style="font-family:'Arial Narrow';font-size:18px"><strong>&nbsp;&nbsp;Share DOC by Editor*</strong></div>
+                <div class="col-xs-9"></div>
                 <div class="row">
-                    <div class="col-lg-12" style="margin-left: 40px;margin-right: 40px;">
+                    <div class="col-xs-12" style="margin-left: 40px;margin-right: 40px;">
                         <div class="form-group"></div>
                         <div class="form-group">
-                                <label class="control-label col-lg-1 text-left">Title</label>
+                                <label class="control-label col-xs-1 text-left">Title</label>
                                 <input class="form-control text-box single-line" id="DocTitle" name="DocTitle" type="text" />
                         </div>
 
                         <div class="form-group">
-                            <div class="col-lg-12">
+                            <div class="col-xs-12">
                                 <textarea name="docinputeditor" id="docinputeditor" rows="30" cols="80"></textarea>
                                 <script>
                                     CKEDITOR.replace('docinputeditor', { htmlEncodeOutput: true, filebrowserUploadUrl: '/userfiles/Upload.ashx', skin: 'moono-lisa' });
@@ -110,16 +110,16 @@
                         <div class="form-group">
 
                             <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="col-lg-4">
+                                <div class="col-xs-12">
+                                    <div class="col-xs-4">
                                         <span class="btn btn-success btn-file" id="choosefile6">
                                             Editor Attachment <input type="file" name="file6" id="file6" runat="server" onchange="ShowFileNames6(this)" />
                                         </span>
                                     </div>
-                                    <div class="col-lg-1"></div>
-                                    <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                                    <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                                    <div class="col-lg-5"></div>
+                                    <div class="col-xs-1"></div>
+                                    <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                                    <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                                    <div class="col-xs-5"></div>
                                 </div>
                                 <script type="text/javascript">
                                     function ShowFileNames6(oFile) {
@@ -155,10 +155,10 @@
         <hr />
         <div class="form-group">
             <div class="row">
-                <div class="col-lg-3">
+                <div class="col-xs-3">
                     <input type="submit" value="Submit" class="btn btn-primary" data-intro="Submit here." data-step="4" />
                 </div>
-                <div class="col-lg-9"></div>
+                <div class="col-xs-9"></div>
             </div>
         </div>
     </div>
@@ -176,11 +176,11 @@
                 {
                     for (var idx = 0; idx < ViewBag.tobechoosetags.Count; idx++)
                     {
-                                    <div class="col-lg-4">
-                                        <div class="col-lg-3">
+                                    <div class="col-xs-4">
+                                        <div class="col-xs-3">
                                             <input type="checkbox" id="attachtagcheck@(idx)" name="attachtagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
                                         </div>
-                                        <div class="col-lg-9">
+                                        <div class="col-xs-9">
                                             <label class="control-label">@(ViewBag.tobechoosetags[idx])</label>
                                         </div>
                                     </div>

@@ -22,14 +22,14 @@
 <script src="~/Scripts/exporting.js"></script>
 
 
-<ul class="nav nav-pills nav-stacked col-lg-2" data-intro = "Select tab to see detail."  data-step="1">
+<ul class="nav nav-pills nav-stacked col-xs-2" data-intro = "Select tab to see detail."  data-step="1">
     <li class="active"><a href="#tab_a" data-toggle="pill">I Learn</a></li>
     <li><a href="#tab_b" data-toggle="pill">Weekly Report</a></li>
     <li><a href="#tab_c" data-toggle="pill">Training</a></li>
     <li><a href="#tab_d" data-toggle="pill">I Share</a></li>
 </ul>
 
-<div class="tab-content col-lg-10" data-intro = "Show detail of tab"  data-step="2">
+<div class="tab-content col-xs-10" data-intro = "Show detail of tab"  data-step="2">
     <div class="tab-pane active" id="tab_a">
         
     @using (Html.BeginForm("ILearnOperate", "User", FormMethod.Post, new { enctype = "multipart/form-data" }))
@@ -97,15 +97,15 @@
         <hr/>
 
         <div class="row">
-            <div class="col-lg-1 text-center">
+            <div class="col-xs-1 text-center">
 
                     <input type="checkbox" id="checkall" name="checkall" onclick="ChooseAll(this)" />
 
             </div>
-            <div class="col-lg-2 text-center">
+            <div class="col-xs-2 text-center">
                 <input type="submit" value="Remove" id="removeilearn" name="removeilearn" class="btn btn-danger" />
             </div>
-            <div class="col-lg-9 text-center"></div>
+            <div class="col-xs-9 text-center"></div>
         </div>
 
         <script type="text/javascript">
@@ -405,21 +405,21 @@
                 <h4 class="modal-title" id="attachtagLabel">Push Doc</h4>
             </div>
             <div class="row"></div>
-            <div class="row col-lg-12">
-                <div class="col-lg-3">
+            <div class="row col-xs-12">
+                <div class="col-xs-3">
                     <label class="control-label">To Who</label>
                 </div>
-                <div class="col-lg-9">
+                <div class="col-xs-9">
                     @Html.DropDownList("towholist", null, new { @id = "towholist", @class = "form-control" })
                 </div>
             </div>
             <hr/>
-            <div class="row col-lg-12">
-                <div class="col-lg-3">
+            <div class="row col-xs-12">
+                <div class="col-xs-3">
                     <label class="control-label"></label>
                 </div>
-                <div class="col-lg-9" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
-                    <textarea  class="form-control col-lg-12" name="towhoinput" id="towhoinput" style="height:100px;min-width:300px;"></textarea>
+                <div class="col-xs-9" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
+                    <textarea  class="form-control col-xs-12" name="towhoinput" id="towhoinput" style="height:100px;min-width:300px;"></textarea>
                 </div>
             </div>
             <div class="row"></div>

@@ -18,10 +18,10 @@ else
 }
 
 <div class="row">
-    <div class="col-lg-1 text-right">
+    <div class="col-xs-1 text-right">
         <img src="~/Content/images/PJ/quailty.png" style="height:45px; width:45px">
     </div>
-    <div class="col-lg-11">
+    <div class="col-xs-11">
         <ol class="breadcrumb" style="font-size:18px">
             <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
             @if (Model != null)
@@ -40,7 +40,7 @@ else
 @if (ViewBag.isassignee != null && ViewBag.isassignee)
 {
     <div class="row">
-        <div class="col-lg-12">&nbsp;</div>
+        <div class="col-xs-12">&nbsp;</div>
     </div>
 }
 else
@@ -55,13 +55,13 @@ else
 
 
 <div class="row">
-    <div class="col-lg-3">
+    <div class="col-xs-3">
 
     </div>
-    <div class="col-lg-1">
+    <div class="col-xs-1">
 
     </div>
-    <div class="col-lg-3">
+    <div class="col-xs-3">
         @if (Model != null && string.IsNullOrEmpty(Model.ParentIssueKey))
         {
             using (Html.BeginForm("PrepareSubIssue", "Issue", FormMethod.Post, new { enctype = "multipart/form-data"}))
@@ -92,7 +92,7 @@ else
         }
 
     </div>
-    <div class="col-lg-3">
+    <div class="col-xs-3">
         @if (Model != null && string.IsNullOrEmpty(Model.ParentIssueKey))
         {
             using (Html.BeginForm("PrepareSubIssue", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
@@ -123,7 +123,7 @@ else
         }
 
     </div>
-    <div class="col-lg-2">
+    <div class="col-xs-2">
         @if (Model != null)
         {
             <input class="form-control text-box single-line" value="@(Model.IssueKey)" id="HIssueKeyForDelete" name="HIssueKeyForDelete" type="hidden" />
@@ -142,15 +142,15 @@ else
     <div class="form-group">
         <div class="form-horizontal">
             <div class="form-group">
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="projectlist">Project<font color="red">*</font></label>
-                    <div class="col-lg-10">
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-2" for="projectlist">Project<font color="red">*</font></label>
+                    <div class="col-xs-10">
                         @Html.DropDownList("projectlist", null, new { @id = "projectlist", @class = "form-control", @readonly = "readonly" })
                     </div>
                 </div>
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="FailureMode">Failure Mode</label>
-                    <div class="col-lg-10">
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-2" for="FailureMode">Failure Mode</label>
+                    <div class="col-xs-10">
                         @if (Model != null && !string.IsNullOrEmpty(Model.RMAFailureCode))
                         {
                             <input class="form-control text-box single-line" value="@Model.RMAFailureCode" readonly="readonly" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="FailureMode" name="FailureMode" type="text" />
@@ -165,9 +165,9 @@ else
             </div>
 
             <div class="form-group">
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="assigneelist">Assignee</label>
-                    <div class="col-lg-10">
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-2" for="assigneelist">Assignee</label>
+                    <div class="col-xs-10">
                         @if (ViewBag.isassignee != null && ViewBag.isassignee)
                         {
                             @Html.DropDownList("assigneelist", null, new { @id = "assigneelist", @class = "form-control" })
@@ -179,9 +179,9 @@ else
                     </div>
                 </div>
 
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="prioritylist">Priority</label>
-                    <div class="col-lg-10">
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-2" for="prioritylist">Priority</label>
+                    <div class="col-xs-10">
                         @Html.DropDownList("prioritylist", null, new { @id = "prioritylist", @class = "form-control" })
                     </div>
                 </div>
@@ -189,9 +189,9 @@ else
             </div>
 
             <div class="form-group">
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="ProductType">Product Type</label>
-                    <div class="col-lg-10">
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-2" for="ProductType">Product Type</label>
+                    <div class="col-xs-10">
                         @if (Model != null && !string.IsNullOrEmpty(Model.ProductType))
                         {
                             <input class="form-control text-box single-line" value="@Model.ProductType" readonly="readonly" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="ProductType" name="ProductType" type="text" />
@@ -203,9 +203,9 @@ else
                         <span class="field-validation-valid text-danger" data-valmsg-for="ProductType" data-valmsg-replace="true"></span>
                     </div>
                 </div>
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="dispositionlist">Product Disposal</label>
-                    <div class="col-lg-10">
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-2" for="dispositionlist">Product Disposal</label>
+                    <div class="col-xs-10">
                         @Html.DropDownList("dispositionlist", null, new { @id = "dispositionlist", @class = "form-control" })
                     </div>
                 </div>
@@ -213,9 +213,9 @@ else
             </div>
 
             <div class="form-group">
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="AffectRange">Affect Range</label>
-                    <div class="col-lg-10">
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-2" for="AffectRange">Affect Range</label>
+                    <div class="col-xs-10">
                         @if (Model != null && !string.IsNullOrEmpty(Model.AffectRange))
                         {
                             <input class="form-control text-box single-line"  value="@Model.AffectRange" readonly="readonly" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="AffectRange" name="AffectRange" type="text" />
@@ -228,9 +228,9 @@ else
                     </div>
                 </div>
 
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="resolutionlist">Status<font color="red">*</font></label>
-                    <div class="col-lg-10">
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-2" for="resolutionlist">Status<font color="red">*</font></label>
+                    <div class="col-xs-10">
                         @if (ViewBag.isassignee != null && ViewBag.isassignee)
                         {
                             @Html.DropDownList("resolutionlist", null, new { @id = "resolutionlist", @class = "form-control" })
@@ -246,9 +246,9 @@ else
 
             <div class="form-group">
 
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="DueDate">DueDate<font color="red">*</font></label>
-                    <div class="col-lg-10">
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-2" for="DueDate">DueDate<font color="red">*</font></label>
+                    <div class="col-xs-10">
                         @if (Model != null && string.Compare(Model.DueDate.ToString("yyyy-MM-dd"), "0001-01-01") != 0)
                         {
                             <input class="form-control text-box single-line" value="@Model.DueDate.ToString("yyyy-MM-dd")" data-val="true" data-val-required="The DueDate field is required." id="DueDate" name="DueDate" type="text" />
@@ -261,9 +261,9 @@ else
                     </div>
                 </div>
 
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2">Creator</label>
-                    <div class="col-lg-10">
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-2">Creator</label>
+                    <div class="col-xs-10">
                         @if (Model != null && !string.IsNullOrEmpty(Model.Reporter))
                         {
                             <input class="form-control text-box single-line" value="@Model.Reporter" readonly="readonly" type="text" />
@@ -287,9 +287,9 @@ else
             </div>
 
             <div class="form-group">
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-2" for="Summary">Summary</label>
-                    <div class="col-lg-10">
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-2" for="Summary">Summary</label>
+                    <div class="col-xs-10">
                         @if (Model != null && !string.IsNullOrEmpty(Model.Summary))
                         {
                             <input class="form-control text-box single-line" value="@Model.Summary" readonly="readonly" type="text" />
@@ -300,19 +300,19 @@ else
                         }
                     </div>
                 </div>
-                <div class="col-lg-6"></div>
+                <div class="col-xs-6"></div>
             </div>
 
             @if (ViewBag.isassignee != null && ViewBag.isassignee)
             {
                 <hr />
-                <div class="col-lg-12">
+                <div class="col-xs-12">
                     <div class="form-group">
                         <label>Related People Email</label>
                     </div>
 
                     <div class="form-group">
-                        <div class="col-lg-12" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
+                        <div class="col-xs-12" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
                             @if (Model != null && !string.IsNullOrEmpty(Model.RelativePeoples))
                             {
                                 <textarea class="form-control" name="RPeopleAddr" id="RPeopleAddr" style="min-width: 100%;min-height:60px;overflow-y: scroll;overflow-x: scroll;" data-val="true" data-val-length="The field must be a string with a minimum length of 6 and a maximum length of 800." data-val-length-max="800" data-val-length-min="6" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$">@Model.RelativePeoples</textarea>
@@ -330,17 +330,17 @@ else
             <hr />
 
             <div class="form-group">
-                <div class="col-lg-12">
-                    <div class="col-lg-4">
+                <div class="col-xs-12">
+                    <div class="col-xs-4">
                         <span class="btn btn-default btn-file" id="choosefile3">
                             Attachment <input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
                         </span>
                     </div>
-                    <div class="col-lg-8">
-                        <div class="col-lg-11">
+                    <div class="col-xs-8">
+                        <div class="col-xs-11">
                             <label class="control-label" id="showfile3" name="showfile3"></label>
                         </div>
-                        <div class="col-lg-1">
+                        <div class="col-xs-1">
                             <input class="form-control text-box single-line" value="" id="attachmentupload" name="attachmentupload" type="hidden" />
                         </div>
                     </div>
@@ -369,27 +369,27 @@ else
             @if (Model.ContainmentActions.Count > 0)
             {
                 <div class="form-group">
-                    <div class="col-lg-12">
+                    <div class="col-xs-12">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h3 class="panel-title">Containment Actions</h3>
                             </div>
                             <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
                                 <div class="row">
-                                    <div class="col-lg-4">Summary</div>
-                                    <div class="col-lg-2">Status</div>
-                                    <div class="col-lg-2">Asignee</div>
-                                    <div class="col-lg-2">DueDate</div>
-                                    <div class="col-lg-2"></div>
+                                    <div class="col-xs-4">Summary</div>
+                                    <div class="col-xs-2">Status</div>
+                                    <div class="col-xs-2">Asignee</div>
+                                    <div class="col-xs-2">DueDate</div>
+                                    <div class="col-xs-2"></div>
                                 </div>
                                 @foreach (var item in Model.ContainmentActions)
                                 {
                                     <div class="row">
-                                        <div class="col-lg-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace("[Containment]", "")</a></div>
-                                        <div class="col-lg-2">@item.Resolution</div>
-                                        <div class="col-lg-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
-                                        <div class="col-lg-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
-                                        <div class="col-lg-2"></div>
+                                        <div class="col-xs-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace("[Containment]", "")</a></div>
+                                        <div class="col-xs-2">@item.Resolution</div>
+                                        <div class="col-xs-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
+                                        <div class="col-xs-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
+                                        <div class="col-xs-2"></div>
                                     </div>
                                 }
                             </div>
@@ -402,27 +402,27 @@ else
             @if (Model.CorrectiveActions.Count > 0)
             {
                 <div class="form-group">
-                    <div class="col-lg-12">
+                    <div class="col-xs-12">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h3 class="panel-title">Corrective Actions</h3>
                             </div>
                             <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
                                 <div class="row">
-                                    <div class="col-lg-4">Summary</div>
-                                    <div class="col-lg-2">Status</div>
-                                    <div class="col-lg-2">Asignee</div>
-                                    <div class="col-lg-2">DueDate</div>
-                                    <div class="col-lg-2"></div>
+                                    <div class="col-xs-4">Summary</div>
+                                    <div class="col-xs-2">Status</div>
+                                    <div class="col-xs-2">Asignee</div>
+                                    <div class="col-xs-2">DueDate</div>
+                                    <div class="col-xs-2"></div>
                                 </div>
                                 @foreach (var item in Model.CorrectiveActions)
                                 {
                                     <div class="row">
-                                        <div class="col-lg-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace("[Corrective]", "")</a></div>
-                                        <div class="col-lg-2">@item.Resolution</div>
-                                        <div class="col-lg-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
-                                        <div class="col-lg-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
-                                        <div class="col-lg-2"></div>
+                                        <div class="col-xs-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace("[Corrective]", "")</a></div>
+                                        <div class="col-xs-2">@item.Resolution</div>
+                                        <div class="col-xs-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
+                                        <div class="col-xs-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
+                                        <div class="col-xs-2"></div>
                                     </div>
                                 }
                             </div>
@@ -437,7 +437,7 @@ else
             {
                 <hr />
                 <div class="row">
-                    <div class="col-lg-12">
+                    <div class="col-xs-12">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h3 class="panel-title">Attachments</h3>
@@ -461,8 +461,8 @@ else
                                     if (item.Contains("<a href"))
                                     {
                                         <div class="row">
-                                            <div class="col-lg-6">@Html.Raw(item)</div>
-                                            <div class="col-lg-1">
+                                            <div class="col-xs-6">@Html.Raw(item)</div>
+                                            <div class="col-xs-1">
                                                 @if (ViewBag.isassignee != null && ViewBag.isassignee)
                                                 {
                                                     <button class="form-control" value="@realfn" type="button"  onclick="DeleteAttachment(this)">
@@ -470,7 +470,7 @@ else
                                                     </button>
                                                 }
                                             </div>
-                                            <div class="col-lg-5"></div>
+                                            <div class="col-xs-5"></div>
 
                                         </div>
                                     }
@@ -479,12 +479,12 @@ else
                                         var fns = item.Split(new char[] { '/' });
                                         var fn = fns[fns.Length - 1];
                                         <div class="row">
-                                            <div class="col-lg-6">
+                                            <div class="col-xs-6">
                                                 <a href="@item" target="_blank">
                                                     <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>@fn
                                                 </a>
                                             </div>
-                                            <div class="col-lg-1">
+                                            <div class="col-xs-1">
                                                 @if (ViewBag.isassignee != null && ViewBag.isassignee)
                                                 {
                                                     <button class="form-control" value="@realfn" type="button"  onclick="DeleteAttachment(this)">
@@ -492,7 +492,7 @@ else
                                                     </button>
                                                 }
                                             </div>
-                                            <div class="col-lg-5"></div>
+                                            <div class="col-xs-5"></div>
 
                                         </div>
                                     }
@@ -520,7 +520,7 @@ else
                 <hr />
 
                 <div class="form-group">
-                    <div class="col-lg-12">
+                    <div class="col-xs-12">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h3 class="panel-title">Analysis</h3>
@@ -528,12 +528,12 @@ else
                             <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
                                 @foreach (var item in Model.AnalysisCommentList)
                                 {
-                                    <div class="row col-lg-12">
+                                    <div class="row col-xs-12">
                                         @Html.Raw(item.Comment)
                                     </div>
-                                    <div class="row col-lg-12">
-                                        <div class="col-lg-6"></div>
-                                        <div class="col-lg-1">
+                                    <div class="row col-xs-12">
+                                        <div class="col-xs-6"></div>
+                                        <div class="col-xs-1">
                                             @if (ViewBag.isassignee != null && ViewBag.isassignee)
                                             {
                                                 <button class="form-control" type="button" value="IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="ModifyIssueComment(this)">
@@ -541,13 +541,13 @@ else
                                                 </button>
                                             }
                                         </div>
-                                        <div class="col-lg-2">
+                                        <div class="col-xs-2">
                                             Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>
                                         </div>
-                                        <div class="col-lg-2">
+                                        <div class="col-xs-2">
                                             @item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")
                                         </div>
-                                        <div class="col-lg-1">
+                                        <div class="col-xs-1">
                                             @if (ViewBag.isassignee != null && ViewBag.isassignee)
                                             {
                                                 <button class="form-control" type="button" value="IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="DeleteSPIssueComment(this)">
@@ -570,7 +570,7 @@ else
                 <hr />
 
                 <div class="form-group">
-                    <div class="col-lg-12">
+                    <div class="col-xs-12">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h3 class="panel-title">Root Cause</h3>
@@ -578,12 +578,12 @@ else
                             <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
                                 @foreach (var item in Model.RootCauseCommentList)
                                 {
-                                    <div class="row col-lg-12">
+                                    <div class="row col-xs-12">
                                         @Html.Raw(item.Comment)
                                     </div>
-                                    <div class="row col-lg-12">
-                                        <div class="col-lg-6"></div>
-                                        <div class="col-lg-1">
+                                    <div class="row col-xs-12">
+                                        <div class="col-xs-6"></div>
+                                        <div class="col-xs-1">
                                             @if (ViewBag.isassignee != null && ViewBag.isassignee)
                                             {
                                                 <button class="form-control" type="button" value="IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="ModifyIssueComment(this)">
@@ -591,13 +591,13 @@ else
                                                 </button>
                                             }
                                         </div>
-                                        <div class="col-lg-2">
+                                        <div class="col-xs-2">
                                             Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>
                                         </div>
-                                        <div class="col-lg-2">
+                                        <div class="col-xs-2">
                                             @item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")
                                         </div>
-                                        <div class="col-lg-1">
+                                        <div class="col-xs-1">
                                             @if (ViewBag.isassignee != null && ViewBag.isassignee)
                                             {
                                                 <button class="form-control" type="button" value="IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="DeleteSPIssueComment(this)">
@@ -620,13 +620,13 @@ else
             {
                 <hr />
                 <div class="form-group">
-                    <div class="col-lg-12">
+                    <div class="col-xs-12">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <div class="row">
-                                    <div class="col-lg-2"><h3 class="panel-title">Comment</h3></div>
-                                    <div class="col-lg-7"></div>
-                                    <div class="col-lg-1">
+                                    <div class="col-xs-2"><h3 class="panel-title">Comment</h3></div>
+                                    <div class="col-xs-7"></div>
+                                    <div class="col-xs-1">
                                         @if (ViewBag.isassignee != null && ViewBag.isassignee)
                                         {
                                             <button class="form-control" type="button" value="IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="ModifyIssueComment(this)">
@@ -634,8 +634,8 @@ else
                                             </button>
                                         }
                                     </div>
-                                    <div class="col-lg-1"></div>
-                                    <div class="col-lg-1">
+                                    <div class="col-xs-1"></div>
+                                    <div class="col-xs-1">
                                         @if (ViewBag.isassignee != null && ViewBag.isassignee)
                                         {
                                             <button class="form-control" type="button" value="IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="DeleteSPIssueComment(this)">
@@ -677,7 +677,7 @@ else
     if (ViewBag.isassignee != null && ViewBag.isassignee)
     {
         <hr />
-                <div class="col-lg-12">
+                <div class="col-xs-12">
                     <div class="form-group">
                         Analysis
                     </div>
@@ -693,16 +693,16 @@ else
 
                     <div class="form-group">
                         <div class="row">
-                            <div class="col-lg-12">
-                                <div class="col-lg-4">
+                            <div class="col-xs-12">
+                                <div class="col-xs-4">
                                     <span class="btn btn-default btn-file" id="choosefile6">
                                         Editor Attachment <input type="file" name="file6" id="file6" runat="server" onchange="ShowFileNames6(this)" />
                                     </span>
                                 </div>
-                                <div class="col-lg-1"></div>
-                                <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                                <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                                <div class="col-lg-5"></div>
+                                <div class="col-xs-1"></div>
+                                <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                                <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                                <div class="col-xs-5"></div>
                             </div>
                             <script type="text/javascript">
                                             function ShowFileNames6(oFile) {
@@ -736,7 +736,7 @@ else
                 </div>
 
                 <hr />
-                <div class="col-lg-12">
+                <div class="col-xs-12">
                     <div class="form-group">
                         Root Cause
                     </div>
@@ -752,16 +752,16 @@ else
 
                     <div class="form-group">
                         <div class="row">
-                            <div class="col-lg-12">
-                                <div class="col-lg-4">
+                            <div class="col-xs-12">
+                                <div class="col-xs-4">
                                     <span class="btn btn-default btn-file" id="choosefile7">
                                         Editor Attachment <input type="file" name="file7" id="file7" runat="server" onchange="ShowFileNames7(this)" />
                                     </span>
                                 </div>
-                                <div class="col-lg-1"></div>
-                                <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                                <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                                <div class="col-lg-5"></div>
+                                <div class="col-xs-1"></div>
+                                <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                                <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                                <div class="col-xs-5"></div>
                             </div>
                             <script type="text/javascript">
                                             function ShowFileNames7(oFile) {
@@ -796,7 +796,7 @@ else
     }
 
     <hr />
-    <div class="col-lg-12">
+    <div class="col-xs-12">
         <div class="form-group">
             Comment
         </div>
@@ -819,16 +819,16 @@ else
 
         <div class="form-group">
             <div class="row">
-                <div class="col-lg-12">
-                    <div class="col-lg-4">
+                <div class="col-xs-12">
+                    <div class="col-xs-4">
                         <span class="btn btn-default btn-file" id="choosefile9">
                             Editor Attachment <input type="file" name="file9" id="file9" runat="server" onchange="ShowFileNames9(this)" />
                         </span>
                     </div>
-                    <div class="col-lg-1"></div>
-                    <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                    <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                    <div class="col-lg-5"></div>
+                    <div class="col-xs-1"></div>
+                    <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                    <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                    <div class="col-xs-5"></div>
                 </div>
                 <script type="text/javascript">
                                             function ShowFileNames9(oFile) {
@@ -883,7 +883,7 @@ else
     </div>
 
     <div class="form-group">
-        <div class="col-lg-6">
+        <div class="col-xs-6">
             @if (Model != null && !string.IsNullOrEmpty(Model.IssueKey))
             {
                 <input class="form-control text-box single-line" value="@(Model.IssueKey)" id="IssueKey" name="IssueKey" type="hidden" />
@@ -893,21 +893,21 @@ else
                 <input class="form-control text-box single-line" id="IssueKey" name="IssueKey" type="hidden" value="" />
             }
         </div>
-        <div class="col-lg-6"></div>
+        <div class="col-xs-6"></div>
     </div>
 
-    <div class="row col-lg-12">
+    <div class="row col-xs-12">
         <div class="form-group">
-            <div class="col-lg-3">
+            <div class="col-xs-3">
                 <input type="submit" value="Submit" id="updaterma" name="updaterma" class="btn btn-default" />
             </div>
-            <div class="col-lg-3">
+            <div class="col-xs-3">
                 @if (ViewBag.isassignee != null && ViewBag.isassignee)
                 {
                     <input type="submit" value="Delete" id="deleterma" name="deleterma" class="btn btn-default" />
                 }
             </div>
-            <div class="col-lg-6"></div>
+            <div class="col-xs-6"></div>
         </div>
     </div>
 
@@ -924,11 +924,11 @@ else
                 {
                     for (var idx = 0; idx < ViewBag.tobechoosetags.Count; idx++)
                     {
-                        <div class="col-lg-4">
-                            <div class="col-lg-3">
+                        <div class="col-xs-4">
+                            <div class="col-xs-3">
                                 <input type="checkbox" id="attachtagcheck@(idx)" name="attachtagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
                             </div>
-                            <div class="col-lg-9">
+                            <div class="col-xs-9">
                                 <label class="control-label">@(ViewBag.tobechoosetags[idx])</label>
                             </div>
                         </div>

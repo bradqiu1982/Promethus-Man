@@ -8,10 +8,10 @@
 }
 
 <div class="row">
-    <div class="col-lg-12">
-        <div class="col-lg-3"><h2>Update Debug Tree</h2></div>
-        <div class="col-lg-1"><h2><a data-toggle="tooltip" title="Goto Debug Tree" href="/BurnIn/BIError?ProjectKey="><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2></div>
-        <div class="col-lg-8"></div>
+    <div class="col-xs-12">
+        <div class="col-xs-3"><h2>Update Debug Tree</h2></div>
+        <div class="col-xs-1"><h2><a data-toggle="tooltip" title="Goto Debug Tree" href="/BurnIn/BIError?ProjectKey="><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2></div>
+        <div class="col-xs-8"></div>
     </div>
 
 </div>
@@ -24,28 +24,28 @@
     using (Html.BeginForm("UpdateBIError", "BurnIn", FormMethod.Post, new { enctype = "multipart/form-data" }))
     {
         @Html.AntiForgeryToken()
-        <div class="row col-lg-12">
+        <div class="row col-xs-12">
             <div class="form-group">
                 <div class="form-horizontal">
                     <div class="form-group">
-                        <div class="col-lg-6">
-                            <label class="control-label col-lg-2" for="ProjectKey">Project Key</label>
-                            <div class="col-lg-10">
+                        <div class="col-xs-6">
+                            <label class="control-label col-xs-2" for="ProjectKey">Project Key</label>
+                            <div class="col-xs-10">
                                 <input class="form-control text-box single-line" id="ProjectKey" name="ProjectKey" type="text" value="@Model.ProjectKey" readonly="readonly" />
                             </div>
                         </div>
-                        <div class="col-lg-6">
-                            <label class="control-label col-lg-2" for="ErrorCode">Error Code</label>
-                            <div class="col-lg-10">
+                        <div class="col-xs-6">
+                            <label class="control-label col-xs-2" for="ErrorCode">Error Code</label>
+                            <div class="col-xs-10">
                                 <input class="form-control text-box single-line" id="ErrorCode" name="ErrorCode" type="text" value="@Model.OrignalCode" readonly="readonly" />
                             </div>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <div class="col-lg-6">
-                            <label class="control-label col-lg-2" for="ShortDesc">Short Desc</label>
-                            <div class="col-lg-10">
+                        <div class="col-xs-6">
+                            <label class="control-label col-xs-2" for="ShortDesc">Short Desc</label>
+                            <div class="col-xs-10">
                                 @if (ViewBag.assigee != null && ViewBag.assigee)
                                 {
                                     <input class="form-control text-box single-line" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 25." data-val-length-max="25" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="ShortDesc" name="ShortDesc" type="text" value="@Model.ShortDesc" />
@@ -57,30 +57,30 @@
                                 }
                             </div>
                         </div>
-                        <div class="col-lg-6">
-                            <label class="control-label col-lg-2" for="ErrorCount">Error Count</label>
-                            <div class="col-lg-10">
+                        <div class="col-xs-6">
+                            <label class="control-label col-xs-2" for="ErrorCount">Error Count</label>
+                            <div class="col-xs-10">
                                 <input class="form-control text-box single-line" data-val="true" id="ErrorCount" name="ErrorCount" type="text" value="@Model.ErrorCount" readonly="readonly" />
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
-                        <div class="col-lg-6"><input class="form-control text-box single-line" value="@(Model.ErrorKey)" id="ErrorKey" name="ErrorKey" type="hidden" /></div>
-                        <div class="col-lg-6"></div>
+                        <div class="col-xs-6"><input class="form-control text-box single-line" value="@(Model.ErrorKey)" id="ErrorKey" name="ErrorKey" type="hidden" /></div>
+                        <div class="col-xs-6"></div>
                     </div>
                     <hr />
                     <div class="form-group">
-                        <div class="col-lg-12">
-                            <div class="col-lg-4">
+                        <div class="col-xs-12">
+                            <div class="col-xs-4">
                                 <span class="btn btn-default btn-file" id="choosefile3">
                                     Attachment <input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
                                 </span>
                             </div>
-                            <div class="col-lg-8">
-                                <div class="col-lg-11">
+                            <div class="col-xs-8">
+                                <div class="col-xs-11">
                                     <label class="control-label" id="showfile3" name="showfile3"></label>
                                 </div>
-                                <div class="col-lg-1">
+                                <div class="col-xs-1">
                                     <input class="form-control text-box single-line" value="" id="attachmentupload" name="attachmentupload" type="hidden" />
                                 </div>
                             </div>
@@ -100,7 +100,7 @@
         {
             <hr />
             <div class="row">
-                <div class="col-lg-12">
+                <div class="col-xs-12">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h3 class="panel-title">Attachments</h3>
@@ -113,12 +113,12 @@
                                 realfn = tempfns[tempfns.Length - 1].Trim();
 
                                 <div class="row">
-                                    <div class="col-lg-6">
+                                    <div class="col-xs-6">
                                         <a href="@item" target="_blank">
                                             <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>@realfn
                                         </a>
                                     </div>
-                                    <div class="col-lg-1">
+                                    <div class="col-xs-1">
                                         @if (ViewBag.assigee != null && ViewBag.assigee)
                                         {
                                             <button class="form-control" value="@realfn" type="button" onclick="DeleteAttachment(this)">
@@ -126,7 +126,7 @@
                                             </button>
                                         }
                                     </div>
-                                    <div class="col-lg-5"></div>
+                                    <div class="col-xs-5"></div>
                                 </div>
                             }
                         </div>
@@ -153,7 +153,7 @@
 
             <hr />
             <div class="form-group">
-                <div class="col-lg-12">
+                <div class="col-xs-12">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h3 class="panel-title">Analyse @idx</h3>
@@ -166,7 +166,7 @@
                                     continue;
                                 }
 
-                                <div class="row col-lg-12">
+                                <div class="row col-xs-12">
                                     @if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.RootCause) == 0)
                                     {
                                         <h3>@item.CommentType Investigation</h3>
@@ -176,12 +176,12 @@
                                         <h3>@item.CommentType</h3>
                                     }
                                 </div>
-                                            <div class="row col-lg-12">
+                                            <div class="row col-xs-12">
                                                 @Html.Raw(item.Comment)
                                             </div>
-                                            <div class="row col-lg-12">
-                                                <div class="col-lg-6"></div>
-                                                <div class="col-lg-1">
+                                            <div class="row col-xs-12">
+                                                <div class="col-xs-6"></div>
+                                                <div class="col-xs-1">
                                                     @if (ViewBag.assigee != null && ViewBag.assigee)
                                                     {
                                                         <button class="form-control" type="button" value="ErrorKey=@(item.ErrorKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="UpdateErrorComment(this)">
@@ -189,13 +189,13 @@
                                                         </button>
                                                     }
                                                 </div>
-                                                <div class="col-lg-2">
+                                                <div class="col-xs-2">
                                                     Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>
                                                 </div>
-                                                <div class="col-lg-2">
+                                                <div class="col-xs-2">
                                                     @item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")
                                                 </div>
-                                                <div class="row col-lg-1">
+                                                <div class="row col-xs-1">
                                                     @if (ViewBag.assigee != null && ViewBag.assigee)
                                                     {
                                                         <button class="form-control" type="button" value="ErrorKey=@(item.ErrorKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="DeleteComment(this)">
@@ -231,16 +231,16 @@
         {
             <hr />
             <div class="form-group">
-                <div class="col-lg-12">
+                <div class="col-xs-12">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="col-lg-1">
+                                <div class="col-xs-12">
+                                    <div class="col-xs-1">
                                         <h3 class="panel-title">Comment</h3>
                                     </div>
-                                    <div class="col-lg-8"></div>
-                                    <div class="col-lg-1">
+                                    <div class="col-xs-8"></div>
+                                    <div class="col-xs-1">
                                         @if (ViewBag.assigee != null && ViewBag.assigee)
                                         {
                                             <button class="form-control" type="button" value="ErrorKey=@(item.ErrorKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="UpdateErrorComment(this)">
@@ -248,8 +248,8 @@
                                             </button>
                                         }
                                     </div>
-                                    <div class="col-lg-1"></div>
-                                    <div class="col-lg-1">
+                                    <div class="col-xs-1"></div>
+                                    <div class="col-xs-1">
                                         @if (ViewBag.assigee != null && ViewBag.assigee)
                                         {
                                             <button class="form-control" type="button" value="ErrorKey=@(item.ErrorKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())" onclick="DeleteComment(this)">
@@ -276,7 +276,7 @@
         {
             <hr />
 
-            <div class="col-lg-12">
+            <div class="col-xs-12">
                 <div class="form-group">
                     Failure Detail
                 </div>
@@ -292,16 +292,16 @@
 
                 <div class="form-group">
                     <div class="row">
-                        <div class="col-lg-12">
-                            <div class="col-lg-4">
+                        <div class="col-xs-12">
+                            <div class="col-xs-4">
                                 <span class="btn btn-default btn-file" id="choosefile6">
                                     Editor Attachment <input type="file" name="file6" id="file6" runat="server" onchange="ShowFileNames6(this)" />
                                 </span>
                             </div>
-                            <div class="col-lg-1"></div>
-                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                            <div class="col-lg-5"></div>
+                            <div class="col-xs-1"></div>
+                            <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                            <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                            <div class="col-xs-5"></div>
                         </div>
                         <script type="text/javascript">
                                             function ShowFileNames6(oFile) {
@@ -333,17 +333,17 @@
                 </div>
 
                 @*<div class="form-group">
-                    <div class="col-lg-12">
-                        <div class="col-lg-4">
+                    <div class="col-xs-12">
+                        <div class="col-xs-4">
                             <span class="btn btn-default btn-file" id="choosefile1">
                                 Failure Detail Attachement <input type="file" name="files1" id="file1" runat="server" onchange="ShowFileNames1(this)" />
                             </span>
                         </div>
-                        <div class="col-lg-8">
-                            <div class="col-lg-11">
+                        <div class="col-xs-8">
+                            <div class="col-xs-11">
                                 <label class="control-label" id="showfile1" name="showfile1"></label>
                             </div>
-                            <div class="col-lg-1">
+                            <div class="col-xs-1">
                                 <input class="form-control text-box single-line" value="" id="detailattach" name="detailattach" type="hidden" />
                             </div>
                         </div>
@@ -362,7 +362,7 @@
 
             <hr />
 
-            <div class="col-lg-12">
+            <div class="col-xs-12">
                 <div class="form-group">
                     Root Cause Investigation
                 </div>
@@ -378,16 +378,16 @@
 
                 <div class="form-group">
                     <div class="row">
-                        <div class="col-lg-12">
-                            <div class="col-lg-4">
+                        <div class="col-xs-12">
+                            <div class="col-xs-4">
                                 <span class="btn btn-default btn-file" id="choosefile7">
                                     Editor Attachment <input type="file" name="file7" id="file7" runat="server" onchange="ShowFileNames7(this)" />
                                 </span>
                             </div>
-                            <div class="col-lg-1"></div>
-                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                            <div class="col-lg-5"></div>
+                            <div class="col-xs-1"></div>
+                            <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                            <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                            <div class="col-xs-5"></div>
                         </div>
                         <script type="text/javascript">
                                             function ShowFileNames7(oFile) {
@@ -419,17 +419,17 @@
                 </div>
 
                 @*<div class="form-group">
-                    <div class="col-lg-12">
-                        <div class="col-lg-4">
+                    <div class="col-xs-12">
+                        <div class="col-xs-4">
                             <span class="btn btn-default btn-file" id="choosefile2">
                                 Root Cause Attachement <input type="file" name="files2" id="file2" runat="server" onchange="ShowFileNames2(this)" />
                             </span>
                         </div>
-                        <div class="col-lg-8">
-                            <div class="col-lg-11">
+                        <div class="col-xs-8">
+                            <div class="col-xs-11">
                                 <label class="control-label" id="showfile2" name="showfile2"></label>
                             </div>
-                            <div class="col-lg-1">
+                            <div class="col-xs-1">
                                 <input class="form-control text-box single-line" value="" id="rootattach" name="rootattach" type="hidden" />
                             </div>
                         </div>
@@ -448,7 +448,7 @@
 
             <hr />
 
-            <div class="col-lg-12">
+            <div class="col-xs-12">
                 <div class="form-group">
                     Result
                 </div>
@@ -464,16 +464,16 @@
 
                 <div class="form-group">
                     <div class="row">
-                        <div class="col-lg-12">
-                            <div class="col-lg-4">
+                        <div class="col-xs-12">
+                            <div class="col-xs-4">
                                 <span class="btn btn-default btn-file" id="choosefile8">
                                     Editor Attachment <input type="file" name="file8" id="file8" runat="server" onchange="ShowFileNames8(this)" />
                                 </span>
                             </div>
-                            <div class="col-lg-1"></div>
-                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                            <div class="col-lg-5"></div>
+                            <div class="col-xs-1"></div>
+                            <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                            <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                            <div class="col-xs-5"></div>
                         </div>
                         <script type="text/javascript">
                                             function ShowFileNames8(oFile) {
@@ -505,17 +505,17 @@
                 </div>
 
                 @*<div class="form-group">
-                    <div class="col-lg-12">
-                        <div class="col-lg-4">
+                    <div class="col-xs-12">
+                        <div class="col-xs-4">
                             <span class="btn btn-default btn-file" id="choosefile4">
                                 Result Attachement <input type="file" name="files4" id="file4" runat="server" onchange="ShowFileNames4(this)" />
                             </span>
                         </div>
-                        <div class="col-lg-8">
-                            <div class="col-lg-11">
+                        <div class="col-xs-8">
+                            <div class="col-xs-11">
                                 <label class="control-label" id="showfile4" name="showfile4"></label>
                             </div>
-                            <div class="col-lg-1">
+                            <div class="col-xs-1">
                                 <input class="form-control text-box single-line" value="" id="resultattach" name="resultattach" type="hidden" />
                             </div>
                         </div>
@@ -533,7 +533,7 @@
         }
 
         <hr />
-        <div class="col-lg-12">
+        <div class="col-xs-12">
             <div class="form-group">
                 Comment
             </div>
@@ -549,16 +549,16 @@
 
             <div class="form-group">
                 <div class="row">
-                    <div class="col-lg-12">
-                        <div class="col-lg-4">
+                    <div class="col-xs-12">
+                        <div class="col-xs-4">
                             <span class="btn btn-default btn-file" id="choosefile9">
                                 Editor Attachment <input type="file" name="file9" id="file9" runat="server" onchange="ShowFileNames9(this)" />
                             </span>
                         </div>
-                        <div class="col-lg-1"></div>
-                        <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                        <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                        <div class="col-lg-5"></div>
+                        <div class="col-xs-1"></div>
+                        <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                        <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                        <div class="col-xs-5"></div>
                     </div>
                     <script type="text/javascript">
                                             function ShowFileNames9(oFile) {
@@ -613,7 +613,7 @@
 
         <hr />
 
-        <div class="col-lg-12">
+        <div class="col-xs-12">
             <div class="form-group">
                 <input type="submit" value="Submit" class="btn btn-default" />
             </div>

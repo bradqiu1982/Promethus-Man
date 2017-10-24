@@ -42,29 +42,29 @@
 
         <div class="row" MYTP="orange" style="font-size:18px"><strong>&nbsp;&nbsp;&nbsp;Information</strong></div>
         <div class="row">
-            <div class="col-lg-1"></div>
-            <div class="col-lg-11">
+            <div class="col-xs-1"></div>
+            <div class="col-xs-11">
                 <div class="form-horizontal">
                     <div class="form-group">
-                        <div class="col-lg-6">
-                            <div class="col-lg-3"><label class="control-label" for="ProjectKey">Project Key</label></div>
-                            <div class="col-lg-9">
+                        <div class="col-xs-6">
+                            <div class="col-xs-3"><label class="control-label" for="ProjectKey">Project Key</label></div>
+                            <div class="col-xs-9">
                                 <input class="form-control text-box single-line" id="ProjectKey" name="ProjectKey" type="text" value="@Model.ProjectKey" readonly="readonly" />
                             </div>
                         </div>
-                        <div class="col-lg-6">
-                            <div class="col-lg-3"><label class="control-label" for="ErrorCode">Error Code</label></div>
+                        <div class="col-xs-6">
+                            <div class="col-xs-3"><label class="control-label" for="ErrorCode">Error Code</label></div>
 
-                            <div class="col-lg-9">
+                            <div class="col-xs-9">
                                 <input class="form-control text-box single-line" id="ErrorCode" name="ErrorCode" type="text" value="@Model.OrignalCode" readonly="readonly" />
                             </div>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <div class="col-lg-6">
-                            <div class="col-lg-3"><label class="control-label" for="ShortDesc">Short Desc</label></div>
-                            <div class="col-lg-9">
+                        <div class="col-xs-6">
+                            <div class="col-xs-3"><label class="control-label" for="ShortDesc">Short Desc</label></div>
+                            <div class="col-xs-9">
                                 @if (ViewBag.assigee != null && ViewBag.assigee)
                                 {
                                     <input class="form-control text-box single-line" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 25." data-val-length-max="25" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="ShortDesc" name="ShortDesc" type="text" value="@Model.ShortDesc" />
@@ -76,17 +76,17 @@
                                 }
                             </div>
                         </div>
-                        <div class="col-lg-6">
-                            <div class="col-lg-3"><label class="control-label" for="ErrorCount">Error Count</label></div>
+                        <div class="col-xs-6">
+                            <div class="col-xs-3"><label class="control-label" for="ErrorCount">Error Count</label></div>
 
-                            <div class="col-lg-9">
+                            <div class="col-xs-9">
                                 <input class="form-control text-box single-line" id="ErrorCount" name="ErrorCount" type="text" value="@Model.ErrorCount" readonly="readonly" />
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
-                        <div class="col-lg-6"><input class="form-control text-box single-line" value="@(Model.ErrorKey)" id="ErrorKey" name="ErrorKey" type="hidden" /></div>
-                        <div class="col-lg-6"></div>
+                        <div class="col-xs-6"><input class="form-control text-box single-line" value="@(Model.ErrorKey)" id="ErrorKey" name="ErrorKey" type="hidden" /></div>
+                        <div class="col-xs-6"></div>
                     </div>
 
 
@@ -127,9 +127,9 @@
 
                             @if (closed)
                             {
-                                <div class="col-lg-4" style="background-color:#0F4FA8;">
+                                <div class="col-xs-4" style="background-color:#0F4FA8;">
                                     <div class="panel-title">
-                                        <div class="col-lg-12">
+                                        <div class="col-xs-12">
                                             <a data-toggle="collapse" data-target="#collapse@(idx)" href="#collapse@(idx)" class="collapsed"><font color="white">Analyse @idx @Html.Raw(analyzetitle)</font></a>
                                         </div>
                                     </div>
@@ -137,9 +137,9 @@
                             }
                             else
                             {
-                                <div MYTP="realred" class="col-lg-4" style="background-color:#0F4FA8;">
+                                <div MYTP="realred" class="col-xs-4" style="background-color:#0F4FA8;">
                                     <div class="panel-title">
-                                        <div class="col-lg-12">
+                                        <div class="col-xs-12">
                                             <a data-toggle="collapse" data-target="#collapse@(idx)" href="#collapse@(idx)" class="collapsed"><font color="white">Analyse @idx @Html.Raw(analyzetitle)</font></a>
                                         </div>
                                     </div>
@@ -147,9 +147,9 @@
                             }
 
 
-                            <div class="col-lg-8">
-                                <div class="col-lg-10"></div>
-                                <div class="col-lg-2">
+                            <div class="col-xs-8">
+                                <div class="col-xs-10"></div>
+                                <div class="col-xs-2">
                                     @if (ViewBag.assigee != null && ViewBag.assigee)
                                     {
                                         <img src="~/Content/images/icon/delete2.png" MYTP="HOVER" style="height:24px; width:14px" onclick="DeleteAnalyse('ErrorKey=@(paircoment[0].ErrorKey)&Date=@(paircoment[0].CommentDate.ToString())')">
@@ -200,12 +200,12 @@
                                     }
 
                                     <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
-                                        <div class="row col-lg-12">
+                                        <div class="row col-xs-12">
                                             @Html.Raw(item.Comment)
                                         </div>
-                                        <div class="row col-lg-12">
-                                            <div class="col-lg-5"></div>
-                                            <div class="col-lg-1">
+                                        <div class="row col-xs-12">
+                                            <div class="col-xs-5"></div>
+                                            <div class="col-xs-1">
                                                 @if (ViewBag.assigee != null && ViewBag.assigee)
                                                 {
                                                     if (string.Compare(item.CommentType, Prometheus.Models.PJERRORCOMMENTTYPE.Result) == 0)
@@ -222,15 +222,15 @@
                                                     }
                                                 }
                                             </div>
-                                            <div class="col-lg-1">
+                                            <div class="col-xs-1">
                                             </div>
-                                            <div class="col-lg-2">
+                                            <div class="col-xs-2">
                                                 Reporter: <a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>
                                             </div>
-                                            <div class="col-lg-2">
+                                            <div class="col-xs-2">
                                                 @item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")
                                             </div>
-                                            <div class="row col-lg-1">
+                                            <div class="row col-xs-1">
                                                 @if (ViewBag.assigee != null && ViewBag.assigee)
                                                 {
                                                     <a href="/Project/UpdateErrorComment?ErrorKey=@(item.ErrorKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
@@ -279,20 +279,20 @@
         <hr style="border-color:#006DC0;" />
         <div  class="row">
             <div MYTP="green" class="row" style="margin-left:3px">
-                <div class="col-lg-2">
+                <div class="col-xs-2">
                     <a data-toggle="collapse" href="#attachwell" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';font-size:18px"><font color="black"><strong>@(Model.AttachList.Count) Attachements</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:auto"></a>
                 </div>
-                <div class="col-lg-10">
-                    <div class="col-lg-3">
+                <div class="col-xs-10">
+                    <div class="col-xs-3">
                         <span class="btn btn-default btn-file" id="choosefile3" style="padding:0px;background-color:transparent !important;border-color:transparent !important;">
                             <img src="~/Content/images/icon/Upload.png" MYTP="HOVER" style="height:25px; width:auto"><input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
                         </span>
                     </div>
-                    <div class="col-lg-9">
-                        <div class="col-lg-11">
+                    <div class="col-xs-9">
+                        <div class="col-xs-11">
                             <label class="control-label" id="showfile3" name="showfile3"></label>
                         </div>
-                        <div class="col-lg-1">
+                        <div class="col-xs-1">
                             <input class="form-control text-box single-line" value="" id="attachmentupload" name="attachmentupload" type="hidden" />
                         </div>
                     </div>
@@ -306,12 +306,12 @@
             </div>
 
             <div class="row">
-                <div class="col-lg-12">&nbsp;</div>
+                <div class="col-xs-12">&nbsp;</div>
             </div>
 
             <div class="row" style="margin-left:10px">
-                <div class="col-lg-1"></div>
-                <div class="col-lg-11">
+                <div class="col-xs-1"></div>
+                <div class="col-xs-11">
                     <div class="collapse" id="attachwell">
                         @foreach (var item in Model.AttachList)
                         {
@@ -321,18 +321,18 @@
 
                             <div class="well" style="background-color:white;border-left-color:#006DC0;border-top-color:white;border-right-color:white;border-bottom-color:white;border-top-left-radius:0px;border-bottom-left-radius:0px">
                                 <div class="row">
-                                    <div class="col-lg-6">
+                                    <div class="col-xs-6">
                                         <a href="@item" target="_blank">
                                             <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>@realfn
                                         </a>
                                     </div>
-                                    <div class="col-lg-1">
+                                    <div class="col-xs-1">
                                         @if (ViewBag.assigee != null && ViewBag.assigee)
                                         {
                                             <img src="~/Content/images/icon/delete2.png" MYTP="HOVER" style="height:30px; width:18px" onclick="DeleteAttachment('@realfn')">
                                         }
                                     </div>
-                                    <div class="col-lg-5"></div>
+                                    <div class="col-xs-5"></div>
                                 </div>
                             </div>
                         }
@@ -359,39 +359,39 @@
             <div class="row">
                 <div MYTP="blue" class="row" style="margin-left:3px"><a data-toggle="collapse" href="#commentswell" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';"><font color="black"><strong>&nbsp;&nbsp;@(Model.GeneralCommentList.Count) Comments</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:auto"></a></div>
                 <div class="row">
-                    <div class="col-lg-12">&nbsp;</div>
+                    <div class="col-xs-12">&nbsp;</div>
                 </div>
                 <div class="row" style="margin-left:10px">
                     <div class="collapse" id="commentswell">
                         <div class="row">
-                            <div class="col-lg-1"></div>
-                            <div class="col-lg-10">
+                            <div class="col-xs-1"></div>
+                            <div class="col-xs-10">
                                 @foreach (var item in Model.GeneralCommentList)
                                 {
                                     <div class="well" MYTP="HOVER" style="margin-bottom:2px;padding-bottom:2px;margin-top:2px;padding-top:2px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px">
                                         <div class="row" MYTP="HOVER" style="margin-bottom:2px;padding-bottom:2px;margin-top:2px;padding-top:2px;">
                                             <div class="row">
-                                                <div class="col-lg-6">
-                                                    <div class="col-lg-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")</div>
-                                                    <div class="col-lg-2">
+                                                <div class="col-xs-6">
+                                                    <div class="col-xs-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")</div>
+                                                    <div class="col-xs-2">
                                                         <a href="/Project/UpdateErrorComment?ErrorKey=@(item.ErrorKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
                                                             <img src="~/Content/images/icon/edit.png" MYTP="HOVER" style="height:34px; width:24px">
                                                         </a>
                                                     </div>
                                                 </div>
-                                                <div class="col-lg-6"></div>
+                                                <div class="col-xs-6"></div>
                                             </div>
 
                                             <div class="row">
-                                                <div class="col-lg-1"></div>
-                                                <div class="col-lg-11">@Html.Raw(item.Comment)</div>
+                                                <div class="col-xs-1"></div>
+                                                <div class="col-xs-11">@Html.Raw(item.Comment)</div>
                                             </div>
                                         </div>
 
                                     </div>
                                 }
                             </div>
-                            <div class="col-lg-1"></div>
+                            <div class="col-xs-1"></div>
                         </div>
 
 
@@ -407,24 +407,24 @@
             <div class="row">
                 <div  MYTP="red" class="row" style="margin-left:3px"><a data-toggle="collapse" href="#AnalyseInput" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';"><font color="black"><strong>&nbsp;&nbsp;Analyse Input</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:auto"></a></div>
                 <div class="row">
-                    <div class="col-lg-12">&nbsp;</div>
+                    <div class="col-xs-12">&nbsp;</div>
                 </div>
                 <div class="row" style="margin-left:10px">
                     <div class="collapse" id="AnalyseInput">
                         <div class="row">
-                            <div class="col-lg-1"></div>
-                            <div class="col-lg-10">
+                            <div class="col-xs-1"></div>
+                            <div class="col-xs-10">
                                 <div class="row">
                                     <div class="form-group">
-                                        <div class="col-lg-12">
-                                            <div class="col-lg-2">
+                                        <div class="col-xs-12">
+                                            <div class="col-xs-2">
                                                 <label class="control-label" for="analysetitle">Analyse Title</label>
                                             </div>
-                                            <div class="col-lg-4">
+                                            <div class="col-xs-4">
                                                 <input class="form-control text-box single-line" id="analysetitle" name="analysetitle" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 200." data-val-length-max="200" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" type="text" value="" />
                                                 <span class="field-validation-valid text-danger" data-valmsg-for="analysetitle" data-valmsg-replace="true"></span>
                                             </div>
-                                            <div class="col-lg-6">
+                                            <div class="col-xs-6">
                                             </div>
                                         </div>
 
@@ -432,7 +432,7 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-lg-12">&nbsp;</div>
+                                    <div class="col-xs-12">&nbsp;</div>
                                 </div>
 
                                 <div class="row">
@@ -451,16 +451,16 @@
 
                                     <div class="form-group">
                                         <div class="row">
-                                            <div class="col-lg-12">
-                                                <div class="col-lg-4">
+                                            <div class="col-xs-12">
+                                                <div class="col-xs-4">
                                                     <span class="btn btn-default btn-file" id="choosefile6">
                                                         Editor Attachment <input type="file" name="file6" id="file6" runat="server" onchange="ShowFileNames6(this)" />
                                                     </span>
                                                 </div>
-                                                <div class="col-lg-1"></div>
-                                                <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                                                <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                                                <div class="col-lg-5"></div>
+                                                <div class="col-xs-1"></div>
+                                                <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                                                <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                                                <div class="col-xs-5"></div>
                                             </div>
                                             <script type="text/javascript">
                                         function ShowFileNames6(oFile) {
@@ -492,7 +492,7 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-lg-12">&nbsp;</div>
+                                    <div class="col-xs-12">&nbsp;</div>
                                 </div>
 
                                 <div class="row">
@@ -511,16 +511,16 @@
 
                                     <div class="form-group">
                                         <div class="row">
-                                            <div class="col-lg-12">
-                                                <div class="col-lg-4">
+                                            <div class="col-xs-12">
+                                                <div class="col-xs-4">
                                                     <span class="btn btn-default btn-file" id="choosefile7">
                                                         Editor Attachment <input type="file" name="file7" id="file7" runat="server" onchange="ShowFileNames7(this)" />
                                                     </span>
                                                 </div>
-                                                <div class="col-lg-1"></div>
-                                                <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                                                <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                                                <div class="col-lg-5"></div>
+                                                <div class="col-xs-1"></div>
+                                                <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                                                <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                                                <div class="col-xs-5"></div>
                                             </div>
                                             <script type="text/javascript">
                                         function ShowFileNames7(oFile) {
@@ -552,7 +552,7 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-lg-12">&nbsp;</div>
+                                    <div class="col-xs-12">&nbsp;</div>
                                 </div>
 
                                 <div class="row">
@@ -570,16 +570,16 @@
                                     </div>
                                     <div class="form-group">
                                         <div class="row">
-                                            <div class="col-lg-12">
-                                                <div class="col-lg-4">
+                                            <div class="col-xs-12">
+                                                <div class="col-xs-4">
                                                     <span class="btn btn-default btn-file" id="choosefile8">
                                                         Editor Attachment <input type="file" name="file8" id="file8" runat="server" onchange="ShowFileNames8(this)" />
                                                     </span>
                                                 </div>
-                                                <div class="col-lg-1"></div>
-                                                <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                                                <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                                                <div class="col-lg-5"></div>
+                                                <div class="col-xs-1"></div>
+                                                <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                                                <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                                                <div class="col-xs-5"></div>
                                             </div>
                                             <script type="text/javascript">
                                         function ShowFileNames8(oFile) {
@@ -609,7 +609,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-1"></div>
+                            <div class="col-xs-1"></div>
                         </div>
 
                     </div>
@@ -621,14 +621,14 @@
         <div class="row">
             <div MYTP="red" class="row" style="margin-left:3px"><a data-toggle="collapse" href="#CommentInput" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';"><font color="black"><strong>&nbsp;&nbsp;General Comment Input</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:auto"></a></div>
             <div class="row">
-                <div class="col-lg-12">&nbsp;</div>
+                <div class="col-xs-12">&nbsp;</div>
             </div>
             <div class="row" style="margin-left:10px">
                 <div class="collapse" id="CommentInput">
                     <div class="row">
                         <div class="row">
-                            <div class="col-lg-1"></div>
-                            <div class="col-lg-10">
+                            <div class="col-xs-1"></div>
+                            <div class="col-xs-10">
                                 <div class="form-group">
                                     <div>
                                         <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
@@ -639,16 +639,16 @@
                                 </div>
                                 <div class="form-group">
                                     <div class="row">
-                                        <div class="col-lg-12">
-                                            <div class="col-lg-4">
+                                        <div class="col-xs-12">
+                                            <div class="col-xs-4">
                                                 <span class="btn btn-default btn-file" id="choosefile9">
                                                     Editor Attachment <input type="file" name="file9" id="file9" runat="server" onchange="ShowFileNames9(this)" />
                                                 </span>
                                             </div>
-                                            <div class="col-lg-1"></div>
-                                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                                            <div class="col-lg-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                                            <div class="col-lg-5"></div>
+                                            <div class="col-xs-1"></div>
+                                            <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                                            <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                                            <div class="col-xs-5"></div>
                                         </div>
                                         <script type="text/javascript">
                                         function ShowFileNames9(oFile) {
@@ -678,7 +678,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-1"></div>
+                            <div class="col-xs-1"></div>
                         </div>
 
                     </div>
@@ -690,14 +690,14 @@
         <hr style="border-color:#006DC0;" />
         <div class="row">
             <div class="form-group">
-                <div class="col-lg-12">
-                    <div class="col-lg-2">
+                <div class="col-xs-12">
+                    <div class="col-xs-2">
                         <input type="submit" value="Submit" class="btn btn-primary" />
                     </div>
-                    <div class="col-lg-2">
+                    <div class="col-xs-2">
                         <button class="btn btn-success" type="button" value="ErrorKey=@(Model.ErrorKey)&ToWho=" onclick="PushTask(this)">Push</button>
                     </div>
-                    <div class="col-lg-8"><input class="form-control text-box single-line" value="" id="pushtowho" name="pushtowho" type="hidden" /></div>
+                    <div class="col-xs-8"><input class="form-control text-box single-line" value="" id="pushtowho" name="pushtowho" type="hidden" /></div>
                 </div>
             </div>
             <script type="text/javascript">
@@ -738,11 +738,11 @@
                         <h4 class="modal-title" id="towhoLabel">Push Debug Tree</h4>
                     </div>
                     <div class="row"></div>
-                    <div class="row col-lg-12">
-                        <div class="col-lg-3">
+                    <div class="row col-xs-12">
+                        <div class="col-xs-3">
                             <label class="control-label">To Who</label>
                         </div>
-                        <div class="col-lg-9">
+                        <div class="col-xs-9">
                             @if (ViewBag.towholist != null)
                             {
                                 @Html.DropDownList("towholist", null, new { @id = "towholist", @class = "form-control", @onchange = "chooseapusher()" })
@@ -755,21 +755,21 @@
                         </script>
                     </div>
                     <hr />
-                    <div class="row col-lg-12">
-                        <div class="col-lg-3">
+                    <div class="row col-xs-12">
+                        <div class="col-xs-3">
                             <label class="control-label">To who Input</label>
                         </div>
-                        <div class="col-lg-9" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
-                            <textarea class="form-control col-lg-12" name="towhoinput" id="towhoinput" style="height:100px;min-width:300px;"></textarea>
+                        <div class="col-xs-9" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
+                            <textarea class="form-control col-xs-12" name="towhoinput" id="towhoinput" style="height:100px;min-width:300px;"></textarea>
                         </div>
                     </div>
                     <hr />
-                    <div class="row col-lg-12">
-                        <div class="col-lg-3">
+                    <div class="row col-xs-12">
+                        <div class="col-xs-3">
                             <label class="control-label">Push Comment<font color="red">*</font></label>
                         </div>
-                        <div class="col-lg-9" data-toggle="tooltip" data-placement="center" title="Your Comment">
-                            <textarea class="form-control col-lg-12" name="issuereason" id="issuereason" style="height:100px;min-width:300px;"></textarea>
+                        <div class="col-xs-9" data-toggle="tooltip" data-placement="center" title="Your Comment">
+                            <textarea class="form-control col-xs-12" name="issuereason" id="issuereason" style="height:100px;min-width:300px;"></textarea>
                         </div>
                     </div>
                     <div class="row"></div>

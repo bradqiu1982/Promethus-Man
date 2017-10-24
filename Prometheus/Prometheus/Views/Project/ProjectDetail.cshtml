@@ -75,22 +75,22 @@
 @if (projectdata != null)
 {
     <div class="row" data-intro="Base information of this project." data-step="2">
-        <div MYTP="orange" class="col-lg-2">
+        <div MYTP="orange" class="col-xs-2">
             <strong class="pro-info">Information</strong>
         </div>
-        <div class="col-lg-10">
+        <div class="col-xs-10">
             <div class="row form-group">
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-4" for="finishratev">Project Type</label>
-                    <div>
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-4" for="finishratev">Project Type</label>
+                    <div class="col-xs-8">
                         <input id="pjtypeid" name="pjtypeid" class="form-control text-box single-line"
                                value="@(string.IsNullOrEmpty(projectdata.ProjectType)?"Parallel":projectdata.ProjectType)"
                                readonly="readonly" />
                     </div>
                 </div>
-                <div class="col-lg-6">
-                    <label class="control-label col-lg-4" for="startdatev">Start Date</label>
-                    <div class="col-lg-8">
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-4" for="startdatev">Start Date</label>
+                    <div class="col-xs-8">
                         <input id="startdatev" name="startdatev" class="form-control text-box single-line"
                                value="@projectdata.StartDate.ToString("yyyy-MM-dd")" readonly="readonly" />
                     </div>
@@ -99,9 +99,9 @@
             @if (string.Compare(projectdata.ProjectType, Prometheus.Models.ProjectTypeInf.QM) != 0)
             {
                 <div class="row form-group">
-                    <div class="col-lg-6">
-                        <label class="control-label col-lg-4" for="finishratev">Update MES Data</label>
-                        <div>
+                    <div class="col-xs-6">
+                        <label class="control-label col-xs-4" for="finishratev">Update MES Data</label>
+                        <div class="col-xs-8">
                             <input id="finishratev" name="finishratev" class="form-control text-box single-line"
                                    value="@((projectdata.FinishRating > 90)?"False":"True")" readonly="readonly" />
                         </div>
@@ -202,19 +202,19 @@
                              && !string.IsNullOrEmpty(projectdata.MVTDate))
             {
 
-                <div class="col-lg-2 text-left" style="font-family:'Arial Narrow';font-size:18px"><strong>Status</strong></div>
-                        <div class="col-lg-1 text-left active"><a href="/Issue/UpdateIssue?issuekey=@projectdata.CurrentNPIProcKey">@projectdata.CurrentNPIProc</a></div>
-                        <div class="col-lg-2 text-left active">@projectdata.PIP1Date</div>
-                        <div class="col-lg-2 text-left active">@projectdata.MVTDate</div>
-                        <div class="col-lg-1 text-left"></div>
+                <div class="col-xs-2 text-left" style="font-family:'Arial Narrow';font-size:18px"><strong>Status</strong></div>
+                        <div class="col-xs-1 text-left active"><a href="/Issue/UpdateIssue?issuekey=@projectdata.CurrentNPIProcKey">@projectdata.CurrentNPIProc</a></div>
+                        <div class="col-xs-2 text-left active">@projectdata.PIP1Date</div>
+                        <div class="col-xs-2 text-left active">@projectdata.MVTDate</div>
+                        <div class="col-xs-1 text-left"></div>
             }
             else
             {
-                <div class="col-lg-1 text-left" style="font-family:'Arial Narrow';font-size:18px"><label class="control-label"><strong>Status</strong></label></div>
-                        <div class="col-lg-1 text-left"></div>
-                        <div class="col-lg-7 text-left"></div>
+                <div class="col-xs-1 text-left" style="font-family:'Arial Narrow';font-size:18px"><label class="control-label"><strong>Status</strong></label></div>
+                        <div class="col-xs-1 text-left"></div>
+                        <div class="col-xs-7 text-left"></div>
             }
-            <div class="col-lg-3 text-left"></div>
+            <div class="col-xs-3 text-left"></div>
         </div>
     </div>
 
@@ -225,19 +225,19 @@
         <div class="form-group" data-intro="detail informaton show here." data-step="4">
             <div class="form-group">
                 <div class="row">
-                    <div class="col-lg-12">
+                    <div class="col-xs-12">
                         @if (!ViewBag.IsOutSide)
                     {
-                            <div class="col-lg-1">
+                            <div class="col-xs-1">
                             </div>
-                            <div class="col-lg-2">
-                                <div class="col-lg-3"></div>
-                                <div class="col-lg-6" data-toggle="modal" data-target="#myModal">
+                            <div class="col-xs-2">
+                                <div class="col-xs-3"></div>
+                                <div class="col-xs-6" data-toggle="modal" data-target="#myModal">
                                     <div class="row" data-toggle="tooltip" title="Yield">
                                         <a href="/Project/ProjectYieldMain?ProjectKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/Yield.png" style="height:75px; width:75px"></a>
                                     </div>
                                 </div>
-                                <div class="col-lg-3">
+                                <div class="col-xs-3">
                                     @if (projectdata.FirstYield > 0)
                                     {
                                         <div class="row"><span class="badge" style="color:white;background-color:red">FPY @((projectdata.FirstYield * 100.0).ToString("0.0")) %</span></div>
@@ -245,7 +245,7 @@
                                     else
                                     {
                                         <div class="row">
-                                            <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            <div class="col-xs-12" style="font-size:14px;">&nbsp;</div>
                                         </div>
                                     }
                                     @if (projectdata.RetestYield > 0)
@@ -255,20 +255,20 @@
                                     else
                                     {
                                         <div class="row">
-                                            <div class="col-lg-12" style="font-size:14px;">&nbsp;</div>
+                                            <div class="col-xs-12" style="font-size:14px;">&nbsp;</div>
                                         </div>
                                     }
 
                                 </div>
                             </div>
-                            <div class="col-lg-2">
-                                <div class="col-lg-3"></div>
-                                <div class="col-lg-6" data-toggle="modal" data-target="#myModal">
+                            <div class="col-xs-2">
+                                <div class="col-xs-3"></div>
+                                <div class="col-xs-6" data-toggle="modal" data-target="#myModal">
                                     <div class="row">
                                         <a href="/Project/ProjectFA?ProjectKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/FA.png" style="height:75px; width:75px"></a>
                                     </div>
                                 </div>
-                                <div class="col-lg-3">
+                                <div class="col-xs-3">
                                     <div class="row">
                                         @if (projectdata.FinishRating < 90)
                                         {
@@ -282,39 +282,39 @@
                                 </div>
 
                             </div>
-                            <div class="col-lg-2">
-                                <div class="col-lg-3"></div>
-                                <div class="col-lg-6" data-toggle="modal" data-target="#myModal">
+                            <div class="col-xs-2">
+                                <div class="col-xs-3"></div>
+                                <div class="col-xs-6" data-toggle="modal" data-target="#myModal">
                                     <div class="row" data-toggle="tooltip" title="Task">
                                         <a href="/Project/ProjectIssues?ProjectKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/Task.png" style="height:75px; width:75px"></a>
                                     </div>
                                 </div>
-                                <div class="col-lg-3">
+                                <div class="col-xs-3">
                                     <div class="row"><span class="badge" style="color:white;background-color:red">@projectdata.PendingTaskCount</span></div>
                                 </div>
                             </div>
-                            <div class="col-lg-2">
-                                <div class="col-lg-3"></div>
-                                <div class="col-lg-6" data-toggle="modal" data-target="#myModal">
+                            <div class="col-xs-2">
+                                <div class="col-xs-3"></div>
+                                <div class="col-xs-6" data-toggle="modal" data-target="#myModal">
                                     <div class="row">
                                         <a href="/Project/ProjectRMAStatus?ProjectKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/RMA.png" style="height:75px; width:75px"></a>
                                     </div>
                                 </div>
-                                <div class="col-lg-3">
+                                <div class="col-xs-3">
                                     <div class="row"><span class="badge" style="color:white;background-color:red">@projectdata.PendingRMACount</span></div>
                                 </div>
                             </div>
-                            <div class="col-lg-2">
-                                <div class="col-lg-3"></div>
-                                <div class="col-lg-6" data-toggle="modal" data-target="#myModal">
+                            <div class="col-xs-2">
+                                <div class="col-xs-3"></div>
+                                <div class="col-xs-6" data-toggle="modal" data-target="#myModal">
                                     <div class="row" data-toggle="tooltip" title="Debug Tree">
                                         <a href="/Project/ProjectError?ProjectKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/DebugTreeicon.png" style="height:75px; width:75px"></a>
                                     </div>
                                 </div>
-                                <div class="col-lg-3"></div>
+                                <div class="col-xs-3"></div>
                             </div>
 
-                            <div class="col-lg-1">
+                            <div class="col-xs-1">
                             </div>
                         }
                     </div>
@@ -322,63 +322,63 @@
             </div>
             <div class="form-group">
                 <div class="row">
-                    <div class="col-lg-12">
+                    <div class="col-xs-12">
                         @if (!ViewBag.IsOutSide)
                         {
-                            <div class="col-lg-1">
+                            <div class="col-xs-1">
                             </div>
-                            <div class="col-lg-2">
-                                <div class="col-lg-3"></div>
-                                <div class="col-lg-6" data-toggle="modal" data-target="#myModal">
+                            <div class="col-xs-2">
+                                <div class="col-xs-3"></div>
+                                <div class="col-xs-6" data-toggle="modal" data-target="#myModal">
                                     <div class="row" data-toggle="tooltip" title="Special Task">
                                         <a href="/Project/ProjectSptTask?ProjectKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/Spt.png" style="height:75px; width:75px"></a>
                                     </div>
                                 </div>
-                                <div class="col-lg-3">
+                                <div class="col-xs-3">
                                 </div>
                             </div>
-                            <div class="col-lg-2">
-                                <div class="col-lg-3"></div>
-                                <div class="col-lg-6" data-toggle="modal" data-target="#myModal">
+                            <div class="col-xs-2">
+                                <div class="col-xs-3"></div>
+                                <div class="col-xs-6" data-toggle="modal" data-target="#myModal">
                                     <div class="row" data-toggle="tooltip" title="NPI Process">
                                         <a href="/Project/ProjectNPI?ProjectKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/NPIProcess.png" style="height:75px; width:75px"></a>
                                     </div>
                                 </div>
-                                <div class="col-lg-3"></div>
+                                <div class="col-xs-3"></div>
                             </div>
-                            <div class="col-lg-2">
-                                <div class="col-lg-3"></div>
-                                <div class="col-lg-6" data-toggle="modal" data-target="#myModal">
+                            <div class="col-xs-2">
+                                <div class="col-xs-3"></div>
+                                <div class="col-xs-6" data-toggle="modal" data-target="#myModal">
                                     <div class="row" data-toggle="tooltip" title="Burn In">
                                         <a href="/BurnIn/BurnInMainPage?ProjectKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/BI.png" style="height:75px; width:75px"></a>
                                     </div>
                                 </div>
-                                <div class="col-lg-3">
+                                <div class="col-xs-3">
                                 </div>
                             </div>
-                            <div class="col-lg-2">
-                                <div class="col-lg-3"></div>
-                                <div class="col-lg-6" data-toggle="modal" data-target="#myModal">
+                            <div class="col-xs-2">
+                                <div class="col-xs-3"></div>
+                                <div class="col-xs-6" data-toggle="modal" data-target="#myModal">
                                     <div class="row" data-toggle="tooltip" title="Reliability">
                                         <a href="/Project/ProjectReliability?ProjectKey=RELIABILITY"><img src="~/Content/images/PJ/REL.png" style="height:75px; width:75px"></a>
                                     </div>
                                 </div>
-                                <div class="col-lg-3">
+                                <div class="col-xs-3">
                                 </div>
                             </div>
 
 
-                            <div class="col-lg-2">
-                                <div class="col-lg-3"></div>
-                                <div class="col-lg-6" data-toggle="modal" data-target="#myModal">
+                            <div class="col-xs-2">
+                                <div class="col-xs-3"></div>
+                                <div class="col-xs-6" data-toggle="modal" data-target="#myModal">
                                     <div class="row" data-toggle="tooltip" title="Project Manage">
                                         <a href="/Project/ProjectDash?PJKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/PM.png" style="height:75px; width:75px"></a>
                                     </div>
                                 </div>
-                                <div class="col-lg-3"></div>
+                                <div class="col-xs-3"></div>
                             </div>
 
-                            <div class="col-lg-1">
+                            <div class="col-xs-1">
                             </div>
                         }
 
@@ -391,53 +391,53 @@
     {
         <div class="form-group" data-intro="Edit project here." data-step="4">
             <div class="row">
-                <div class="col-lg-12">
-                    <div class="col-lg-1">
+                <div class="col-xs-12">
+                    <div class="col-xs-1">
                     </div>
-                    <div class="col-lg-2">
-                        <div class="col-lg-3"></div>
-                        <div class="col-lg-6" data-toggle="modal" data-target="#myModal">
+                    <div class="col-xs-2">
+                        <div class="col-xs-3"></div>
+                        <div class="col-xs-6" data-toggle="modal" data-target="#myModal">
                             <div class="row" data-toggle="tooltip" title="Task">
                                 <a href="/Project/ProjectIssues?ProjectKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/Task.png" style="height:75px; width:auto"></a>
                             </div>
                         </div>
-                        <div class="col-lg-3">
+                        <div class="col-xs-3">
                             <div class="row"><span class="badge" style="color:white;background-color:red">@projectdata.PendingTaskCount</span></div>
                         </div>
                     </div>
-                    <div class="col-lg-2">
-                        <div class="col-lg-3"></div>
-                        <div class="col-lg-6" data-toggle="modal" data-target="#myModal">
+                    <div class="col-xs-2">
+                        <div class="col-xs-3"></div>
+                        <div class="col-xs-6" data-toggle="modal" data-target="#myModal">
                             <div class="row" data-toggle="tooltip" title="Special Task">
                                 <a href="/Project/ProjectSptTask"><img src="~/Content/images/PJ/Spt.png" style="height:75px; width:75px"></a>
                             </div>
                         </div>
-                        <div class="col-lg-3">
+                        <div class="col-xs-3">
                         </div>
                     </div>
-                    <div class="col-lg-2">
-                        <div class="col-lg-3"></div>
-                        <div class="col-lg-6" data-toggle="modal" data-target="#myModal">
+                    <div class="col-xs-2">
+                        <div class="col-xs-3"></div>
+                        <div class="col-xs-6" data-toggle="modal" data-target="#myModal">
                             <div class="row" data-toggle="tooltip" title="OBA">
                                 <a href="/Project/ProjectOBA?ProjectKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/OBA.png" style="height:75px; width:auto"></a>
                             </div>
                         </div>
-                        <div class="col-lg-3"></div>
+                        <div class="col-xs-3"></div>
                     </div>
-                    <div class="col-lg-2">
-                        <div class="col-lg-3"></div>
-                        <div class="col-lg-6" data-toggle="modal" data-target="#myModal">
+                    <div class="col-xs-2">
+                        <div class="col-xs-3"></div>
+                        <div class="col-xs-6" data-toggle="modal" data-target="#myModal">
                             <div class="row" data-toggle="tooltip" title="Reliability">
                                 <a href="/Project/ProjectReliability?ProjectKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/REL.png" style="height:75px; width:auto"></a>
                             </div>
                         </div>
-                        <div class="col-lg-3"></div>
+                        <div class="col-xs-3"></div>
                     </div>
 
-                    <div class="col-lg-2">
+                    <div class="col-xs-2">
                     </div>
 
-                    <div class="col-lg-1">
+                    <div class="col-xs-1">
                     </div>
                 </div>
             </div>
@@ -453,12 +453,12 @@
         <div class="row">
             @if (!string.IsNullOrEmpty(projectdata.Description))
             {
-                <div MYTP="blue" class="col-lg-2 text-left" style="font-family:'Arial Narrow';font-size:18px"><strong>Description</strong></div>
-                <div class="col-lg-10 text-left">@Html.Raw(projectdata.Description)</div>
+                <div MYTP="blue" class="col-xs-2 text-left" style="font-family:'Arial Narrow';font-size:18px"><strong>Description</strong></div>
+                <div class="col-xs-10 text-left">@Html.Raw(projectdata.Description)</div>
             }
             else
             {
-                <div class="col-lg-12 text-center"></div>
+                <div class="col-xs-12 text-center"></div>
             }
         </div>
     </div>

@@ -387,8 +387,8 @@ namespace Prometheus.Models
         public static Dictionary<string,bool> RetrieveAllDataID(string projectkey)
         {
             var ret = new Dictionary<string, bool>();
-            var sql = "select DataID from ProjectTestData where ProjectKey = '<ProjectKey>'";
-            sql = sql.Replace("<ProjectKey>", projectkey);
+            var sql = "select DataID from ProjectTestData where ProjectKey = '<ProjectKey>' where TestTimeStamp > '<TestTimeStamp>'";
+            sql = sql.Replace("<ProjectKey>", projectkey).Replace("<TestTimeStamp>",DateTime.Now.AddMonths(-3).ToString("yyyy-MM-dd hh:mm:ss"));
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var item in dbret)
             {

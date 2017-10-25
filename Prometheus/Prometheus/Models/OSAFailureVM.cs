@@ -84,6 +84,7 @@ namespace Prometheus.Models
 
                     if (!ret.ContainsKey(tempvm.ParameterName+"_"+tempvm.WhichTest))
                     {
+                        ret.Add((tempvm.ParameterName + "_" + tempvm.WhichTest).ToUpper(), tempvm);
                     }
                 }
                 catch (Exception ex) { }

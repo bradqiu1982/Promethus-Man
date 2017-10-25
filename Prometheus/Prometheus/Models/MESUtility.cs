@@ -1,6 +1,7 @@
 ﻿using Prometheus.Controllers;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web;
@@ -103,6 +104,18 @@ namespace Prometheus.Models
                 
             }
             return ret;
+        }
+
+        private static string RetrieveOSASql(ProjectViewModels projectmodel)
+        {
+            string pncond = PNCondition(projectmodel.PNList);
+            if (string.IsNullOrEmpty(pncond))
+                return string.Empty;
+
+            var joinstr = " LEFT JOIN Insite.Container b WITH (NOLOCK) ON b.containername = a.ModuleSerialNum LEFT JOIN Insite.MfgOrder d WITH(NOLOCK) ON d.MfgOrderId = b.MfgOrderId ";
+            var sql = "select a.dc_OSAMultiValueTestHistoryId,a.ModuleSerialNum, a.WhichTest, a.ModuleType,a.TestResult, a.TestTimeStamp, a.TestStation,a.ModulePartNum ,d.MfgOrderName from "
+                + " insite.dc_OSAMultiValueTest a (nolock) " + joinstr + " where a.ModulePartNum in  (<PNCOND>)  <TIMECOND>  order by  moduleserialnum,testtimestamp DESC";
+            return sql.Replace("<PNCOND>", pncond);
         }
 
         private static void CreateFA(ProjectTestData item,string firstengineer,Controller ctrl)
@@ -834,6 +847,249 @@ namespace Prometheus.Models
             
         }
 
+
+        private static void logthdinfo(string info)
+        {
+            try
+            {
+                var filename = "d:\\log\\osamapfilenocontain-" + DateTime.Now.ToString("yyyy-MM-dd");
+                if (File.Exists(filename))
+                {
+                    var content = System.IO.File.ReadAllText(filename);
+                    content = content + "\r\n" + DateTime.Now.ToString() + " : " + info;
+                    System.IO.File.WriteAllText(filename, content);
+                }
+                else
+                {
+                    System.IO.File.WriteAllText(filename, DateTime.Now.ToString() + " : " + info);
+                }
+            }
+            catch (Exception ex)
+            { }
+
+        }
+
+        private static string RetrieveOSAFailure(Dictionary<string, List<KeyValuePair<string, double>>> datafield,ProjectTestData pjdata, Dictionary<string, OSAFailureVM> mapfile)
+        {
+            try
+            {
+                if (datafield.ContainsKey(pjdata.DataID))
+                {
+                    var keyvaluelist = datafield[pjdata.DataID];
+                    foreach(var kv in keyvaluelist)
+                    { 
+                        var combinekey = (kv.Key + "_" + pjdata.WhichTest).ToUpper();
+                        if (mapfile.ContainsKey(combinekey))
+                        {
+                            var osafailurevm = mapfile[combinekey];
+                            if (kv.Value >= osafailurevm.LowLimit && kv.Value <= osafailurevm.HighLimit)
+                            {
+                                //do nothing
+                            }
+                            else
+                            {
+                                return osafailurevm.FailureMode;
+                            }
+                        }
+                        else
+                        {
+                            logthdinfo(combinekey);
+                        }
+                    }//end foreach
+                }
+                return "OTHERS";
+            }
+            catch (Exception ex)
+            {
+                return "OTHERS";
+            }
+        }
+
+        public static void StartOSAProjectBonding(ProjectViewModels vm)
+        {
+            try
+            {
+                if (ProjectTestData.UpdatePJLockUsing(vm.ProjectKey))
+                    return;
+
+                var osafailuremapdata = OSAFailureVM.RetrieveAllOSAFailureVM(vm.ProjectKey);
+
+                if (osafailuremapdata.Count > 0
+                    && vm.PNList.Count > 0)
+                {
+
+                    var sql = RetrieveOSASql(vm);
+                    if (string.IsNullOrEmpty(sql))
+                    {
+                        ProjectTestData.ResetUpdatePJLock(vm.ProjectKey);
+                        return;
+                    }
+                   
+                    sql = sql.Replace("<TIMECOND>", "and TestTimeStamp > '" + vm.StartDate.ToString("yyyy-MM-dd hh:mm:ss") + "' and TestTimeStamp < '" + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + "'");
+
+                    var newdatalist = new List<ProjectTestData>();
+                    var dbret = DBUtility.ExeMESSqlWithRes(sql);
+                    foreach (var item in dbret)
+                    {
+                        try
+                        {
+                            var tempdata = new ProjectTestData(vm.ProjectKey, Convert.ToString(item[0]), Convert.ToString(item[1])
+                                    ,Convert.ToString(item[2]), Convert.ToString(item[3]), Convert.ToString(item[4])
+                                    , Convert.ToString(item[5]), Convert.ToString(item[6]), Convert.ToString(item[7]));
+                            tempdata.JO = Convert.ToString(item[8]);
+                            newdatalist.Add(tempdata);
+                        }
+                        catch (Exception ex)
+                        { }
+                    }//end foreach
+
+                    if (newdatalist.Count > 0)
+                    {
+                        var datafield = new Dictionary<string,List<KeyValuePair<string, double>>>();
+
+                        var dataidcond = "('";
+                        foreach (var dt in newdatalist)
+                        {
+                            if (string.Compare(dt.ErrAbbr, "0", true) == 0)
+                            {
+                                dataidcond = dataidcond + dt.DataID + "','";
+                            }
+                        }
+                        if (dataidcond.Length > 2)
+                            dataidcond = dataidcond.Substring(0, dataidcond.Length - 2) + ")";
+                        else
+                            dataidcond = string.Empty;
+
+                        if (!string.IsNullOrEmpty(dataidcond))
+                        {
+                            sql = "  select ParentHistoryID,DataColumn,DataValue1 from insite.DCE_OSAMultiValueTest_Main(nolock) where ParentHistoryID in <ParentHistoryID> order by ParentHistoryID";
+                            sql = sql.Replace("<ParentHistoryID>", dataidcond);
+                            dbret = DBUtility.ExeMESSqlWithRes(sql);
+                            foreach (var item in dbret)
+                            {
+                                try
+                                {
+                                    var dataid = Convert.ToString(item[0]);
+                                    var key = Convert.ToString(item[1]);
+                                    var value = Convert.ToDouble(item[2]);
+
+                                    if (datafield.ContainsKey(dataid))
+                                    {
+                                        datafield[dataid].Add(new KeyValuePair<string, double>(key, value));
+                                    }
+                                    else
+                                    {
+                                        var templist = new List<KeyValuePair<string, double>>();
+                                        templist.Add( new KeyValuePair<string, double>(key,value));
+                                        datafield.Add(dataid,templist);
+                                    }
+
+                                }
+                                catch (Exception ex)
+                                { }
+
+                            }//end foreach
+                        }//end if
+
+                        foreach (var dt in newdatalist)
+                        {
+                            if (string.Compare(dt.ErrAbbr, "0", true) == 0)
+                            {
+                                if (datafield.Count > 0)
+                                {
+                                    dt.ErrAbbr = RetrieveOSAFailure(datafield, dt, osafailuremapdata);
+                                }
+                                else
+                                {
+                                    dt.ErrAbbr = "OTHERS";
+                                }
+                            }
+                            else
+                            {
+                                dt.ErrAbbr = "PASS";
+                            }
+
+                            //dt.StoreProjectTestData();
+                        }
+                        
+
+                    }
+
+                }
+
+                ProjectTestData.ResetUpdatePJLock(vm.ProjectKey);
+            }
+            catch (Exception ex)
+            {
+                ProjectTestData.ResetUpdatePJLock(vm.ProjectKey);
+            }
+
+        }
+
+
+        //public static void StartOSAProjectBonding(ProjectViewModels vm)
+        //{
+        //    try
+        //    {
+        //        if (ProjectTestData.UpdatePJLockUsing(vm.ProjectKey))
+        //            return;
+
+        //        var osafailuremapdata = OSAFailureVM.RetrieveAllOSAFailureVM(vm.ProjectKey);
+
+        //        if (osafailuremapdata.Count > 0
+        //            && vm.PNList.Count > 0)
+        //        {
+
+        //            var sql = RetrieveOSASql(vm);
+        //            if (string.IsNullOrEmpty(sql))
+        //            {
+        //                ProjectTestData.ResetUpdatePJLock(vm.ProjectKey);
+        //                return;
+        //            }
+
+        //            //bool bondinged = false;
+        //            //if (ProjectTestData.RetrieveLatestTimeOfLocalProject(vm.ProjectKey) != null)
+        //            //{
+        //            //    bondinged = true;
+        //            //}
+
+        //            ////var bondingeddatadict = new Dictionary<string, bool>();
+        //            ////if (bondinged)
+        //            ////{
+        //            ////    bondingeddatadict = ProjectTestData.RetrieveAllDataID(vm.ProjectKey);
+        //            ////}
+
+        //            sql = sql.Replace("<TIMECOND>", "and TestTimeStamp > '" + vm.StartDate.ToString("yyyy-MM-dd hh:mm:ss") + "' and TestTimeStamp < '" + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + "'");
+        //            var dbret = DBUtility.ExeMESSqlWithRes(sql);
+        //            foreach (var item in dbret)
+        //            {
+        //                try
+        //                {
+        //                    var newdataid = Convert.ToString(item[0]);
+        //                    //if (bondingeddatadict.Count > 0 && bondingeddatadict.ContainsKey(newdataid))
+        //                    //    continue;
+
+        //                    var tempdata = new ProjectTestData(vm.ProjectKey, Convert.ToString(item[0]), Convert.ToString(item[1])
+        //                            , Convert.ToString(item[2]), Convert.ToString(item[3]), Convert.ToString(item[4])
+        //                            , Convert.ToString(item[5]), Convert.ToString(item[6]), Convert.ToString(item[7]));
+        //                    tempdata.JO = Convert.ToString(item[8]);
+
+        //                }
+        //                catch (Exception ex)
+        //                { }
+        //            }
+
+        //        }
+
+        //        ProjectTestData.ResetUpdatePJLock(vm.ProjectKey);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        ProjectTestData.ResetUpdatePJLock(vm.ProjectKey);
+        //    }
+
+
+        //}
 
         public static void UpdateProjectData(ProjectViewModels vm,string starttime,string endtime, Controller ctrl)
         {

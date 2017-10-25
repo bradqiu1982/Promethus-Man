@@ -653,8 +653,7 @@ namespace Prometheus.Controllers
                 CreateProjectTypeList(vm);
 
                 var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist1 = CreateSelectList(asilist, "");
-                ViewBag.towholist2 = CreateSelectList(asilist, "");
+                ViewBag.towholist = CreateSelectList(asilist, "");
 
                 return View();
             }
@@ -896,7 +895,6 @@ namespace Prometheus.Controllers
             }
         }
 
-
         private void RetrievePorjectKey(ProjectViewModels projectmodel)
         {
             if (!string.IsNullOrEmpty(projectmodel.ProjectName))
@@ -907,31 +905,6 @@ namespace Prometheus.Controllers
             else
                 projectmodel.ProjectKey = "";
         }
-
-        //private void RetrieveProjectMember(ProjectViewModels projectmodel)
-        //{
-        //    var pns = RetrieveProjectInfo("PM", 2);
-        //    var lpm = new List<ProjectMembers>();
-
-        //    if (pns.Count > 0)
-        //    {
-        //        foreach (var p in pns)
-        //        {
-        //            lpm.Add(new ProjectMembers(projectmodel.ProjectKey, p, ProjectViewModels.PMROLE));
-        //        }
-        //    }
-
-        //    pns = RetrieveProjectInfo("Engineer", 6);
-        //    if (pns.Count > 0)
-        //    {
-        //        foreach (var p in pns)
-        //        {
-        //            lpm.Add(new ProjectMembers(projectmodel.ProjectKey, p, ProjectViewModels.ENGROLE));
-        //        }
-        //    }
-
-        //    projectmodel.MemberList = lpm;
-        //}
 
         private void RetrieveProjectMember2(ProjectViewModels projectmodel)
         {
@@ -1007,35 +980,13 @@ namespace Prometheus.Controllers
 
         private void RetrievePNs(ProjectViewModels projectmodel)
         {
-            //var pns = RetrieveProjectInfo("PN", 9);
-            //if (pns.Count > 0)
-            //{
-            //    var lpn = new List<ProjectPn>();
-            //    foreach (var p in pns)
-            //    {
-            //        lpn.Add(new ProjectPn(projectmodel.ProjectKey, p));
-            //    }
-            //    projectmodel.PNList = lpn;
-            //}
             projectmodel.PNs = Request.Form["PNs"];
         }
 
         private void RetrieveStation(ProjectViewModels projectmodel)
         {
-            //var stats = RetrieveProjectInfo("Station", 9);
-            //if (stats.Count > 0)
-            //{
-            //    var lstat = new List<ProjectStation>();
-            //    foreach (var s in stats)
-            //    {
-            //        lstat.Add(new ProjectStation(projectmodel.ProjectKey, s));
-            //    }
-            //    projectmodel.StationList = lstat;
-            //}
             projectmodel.Stations = Request.Form["Stations"];
         }
-
-
 
         [HttpPost, ActionName("CreateProject")]
         [ValidateAntiForgeryToken]
@@ -1057,14 +1008,16 @@ namespace Prometheus.Controllers
             RetrievePNs(projectmodel);
             RetrieveStation(projectmodel);
 
+            //Store OSA failured code map
+            StoreOSAFailuredCodeMap(projectmodel);
+
             projectmodel.ModelIDs = Request.Form["ModelIDs"];
             projectmodel.SumDatasets = Request.Form["SumDatasets"];
 
             if (!RetrieveProjectDate(projectmodel))
             {
                 var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist1 = CreateSelectList(asilist, "");
-                ViewBag.towholist2 = CreateSelectList(asilist, "");
+                ViewBag.towholist = CreateSelectList(asilist, "");
 
                 CreateAllUserLists(projectmodel);
                 CreateProjectTypeList(projectmodel);
@@ -1075,8 +1028,7 @@ namespace Prometheus.Controllers
             if (!ProjectValidate(projectmodel))
             {
                 var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist1 = CreateSelectList(asilist, "");
-                ViewBag.towholist2 = CreateSelectList(asilist, "");
+                ViewBag.towholist = CreateSelectList(asilist, "");
 
                 CreateAllUserLists(projectmodel);
                 CreateProjectTypeList(projectmodel);
@@ -1102,8 +1054,7 @@ namespace Prometheus.Controllers
             MESUtility.StartProjectBonding(projectmodel);
             BIDataUtility.StartProjectBonding(this, projectmodel);
             ATEUtility.StartProjectBonding(projectmodel);
-
-
+            
             return RedirectToAction("ViewAll");
         }
 
@@ -5969,10 +5920,7 @@ namespace Prometheus.Controllers
         {
             var vm = new List<List<string>>();
 
-            var title = new List<string>();
-            title.Add("Part Num");
-            vm.Add(title);
-
+            var partnums = new List<string>();
             if (!string.IsNullOrEmpty(PNs))
             {
                 var ps = PNs.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
@@ -5988,15 +5936,19 @@ namespace Prometheus.Controllers
 
                 if (pndeslist.Count > 0)
                 {
-                    var partnums = MESUtility.RetrieveAllPN(pndeslist);
-                    foreach (var pt in partnums)
-                    {
-                        var templine = new List<string>();
-                        templine.Add(pt);
-                        vm.Add(templine);
-                    }
+                    partnums = MESUtility.RetrieveAllPN(pndeslist);
                 }
             }
+            var title = new List<string>();
+
+            var colSize = 8;
+            for(var i = 1; i <= colSize; i++)
+            {
+                title.Add("Part Num " + i);
+            }
+            ViewBag.colSize = colSize;
+            ViewBag.tHead = title;
+            ViewBag.pnList = partnums;
 
             return View(vm);
         }
@@ -6330,13 +6282,6 @@ namespace Prometheus.Controllers
             {
                 ViewBag.pjtypelist.Add(pjt);
             }
-
-            //ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.Parallel);
-            //ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.Tunable);
-            //ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.OSA);
-            //ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.LineCard);
-            //ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.QM);
-            //ViewBag.pjtypelist.Add(Prometheus.Models.ProjectTypeInf.Others);
 
             foreach (var item in allprojlist)
             {
@@ -6879,9 +6824,6 @@ namespace Prometheus.Controllers
             if(vmList.Count > 0)
             {
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
-                ////for test
-                //updater = "YAN.SHI@FINISAR.COM";
-                //var defaultlytteam = UserGroupVM.RetreiveUserGroup(updater, UserGroupType.WorkGroup);
                 var defaultlytteam = UserGroupVM.RetreiveUserGroup(updater, UserGroupType.LYTGroup);
                 if (!string.IsNullOrEmpty(defaultlytteam))
                 {
@@ -6957,6 +6899,86 @@ namespace Prometheus.Controllers
             return RedirectToAction("ViewAll", "Project");
         }
 
+        private bool StoreOSAFailuredCodeMap(ProjectViewModels projectmodel)
+        {
+            try
+            {
+                string fl = "osafile";
+                if (Request.Files[fl] != null)
+                {
+                    string fn = System.IO.Path.GetFileName(Request.Files[fl].FileName);
+                    string datestring = DateTime.Now.ToString("yyyyMMdd");
+                    string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+
+                    if (!Directory.Exists(imgdir))
+                    {
+                        Directory.CreateDirectory(imgdir);
+                    }
+
+                    fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
+                    Request.Files[fl].SaveAs(imgdir + fn);
+                    var ret = RetriveOSATables(imgdir + fn);
+                    if (ret.Count > 0)
+                    {
+                        foreach (var tb in ret)
+                        {
+                            tb.ProjectKey = projectmodel.ProjectKey;
+                        }
+
+                        projectmodel.OSATabList = ret;
+                        return true;
+                    }
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        private List<OSAFailureVM> RetriveOSATables(string filename)
+        {
+            var ret = new List<OSAFailureVM>();
+            try
+            {
+                if (System.IO.File.Exists(filename))
+                {
+                    string[] lines = System.IO.File.ReadAllLines(filename);
+                    bool tableseg = false;
+                    foreach (var line in lines)
+                    {
+                        if (line.Contains(";"))
+                        {
+                            continue;
+                        }
+
+                        if (line.ToUpper().Contains("[MESTABLENAME]"))
+                        {
+                            tableseg = true;
+                            continue;
+                        }
+
+                        if (tableseg && line.Contains("[") && line.Contains("]"))
+                        {
+                            tableseg = false;
+                        }
+
+                        //if (tableseg && line.Contains("="))
+                        //{
+                        //    ret.Add(new OSAFailureVM("", line.Split(new char[] { '=' })[0].Trim(), line.Split(new char[] { '=' })[1].Trim().Replace("\"", "")));
+                        //}
+                    }
+                }
+
+                return ret;
+            }
+            catch (Exception ex)
+            {
+                ret.Clear();
+                return ret;
+            }
+        }
         private void OcapSingletonOperate(IssueViewModels vm, string updater, string comment, string fileurl)
         {
             CreateLYTSubTask(CRITICALERRORTYPE.CONTAINMENTACTION, "Containment Action for " + comment, vm.ProjectKey, vm.IssueKey, updater, updater, DateTime.Now.AddDays(7));

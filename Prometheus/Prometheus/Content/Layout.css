@@ -126,8 +126,8 @@
     position: relative;
     float: left;
     display: inline-block;
-    width: 13%;
-    padding-left: 3%;
+    width: 13.5%;
+    padding-left: 4%;
 }
 
 .pm-width-detail{
@@ -135,7 +135,7 @@
     float: left;
     display: inline-block;
     width: 18%;
-    padding-left: 3%;
+    padding-left: 4%;
 }
 .collapsed-span{
     color: #2a6496;

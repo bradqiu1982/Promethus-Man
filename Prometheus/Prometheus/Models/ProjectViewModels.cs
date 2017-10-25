@@ -452,6 +452,17 @@ namespace Prometheus.Models
                 ltab.AddRange(value);
             }
         }
+        private List<OSAFailureVM> osatab = new List<OSAFailureVM>();
+        public List<OSAFailureVM> OSATabList
+        {
+            get
+            { return osatab; }
+            set
+            {
+                osatab.Clear();
+                osatab.AddRange(value);
+            }
+        }
 
         private List<ProjectMembers> lmeb = new List<ProjectMembers>();
         public List<ProjectMembers> MemberList

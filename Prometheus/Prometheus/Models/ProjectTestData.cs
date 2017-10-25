@@ -182,6 +182,37 @@ namespace Prometheus.Models
             }
         }
 
+        public static void PrePareOSALatestData(string projectkey, Controller ctrl)
+        {
+            if (UpdatePJLockUsing(projectkey))
+                return;
+
+            try
+            {
+                var vm = ProjectViewModels.RetrieveOneProject(projectkey);
+                var OSATabList = OSAFailureVM.RetrieveAllOSAFailureVM(projectkey);
+                if (OSATabList.Count > 0
+                    && vm.PNList.Count > 0)
+                {
+                    string lastupdatetime = ProjectTestData.RetrieveLatestTimeOfLocalProject(projectkey);
+                    if (!string.IsNullOrEmpty(lastupdatetime))
+                    {
+                        MESUtility.UpdateOSAProjectData(vm, lastupdatetime, ctrl);
+                    }
+                    else
+                    {
+                        MESUtility.UpdateOSAProjectData(vm, vm.StartDate.ToString(), ctrl);
+                    }
+                }
+
+                ResetUpdatePJLock(projectkey);
+            }
+            catch (Exception ex)
+            {
+                ResetUpdatePJLock(projectkey);
+            }
+        }
+
         public static string RetrieveLatestTimeOfLocalProject(string projectkey)
         {
             var sql = "select top 1 TestTimeStamp from ProjectTestData where ProjectKey = '<ProjectKey>' order by TestTimeStamp DESC";

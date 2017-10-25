@@ -612,6 +612,23 @@ namespace Prometheus.Models
             }
         }
 
+        public static void StoreOSAStation(string pjkey,List<string> stationlist)
+        {
+            if (stationlist.Count > 0)
+            {
+                var sql = "delete from ProjectStation where ProjectKey = '<ProjectKey>'";
+                sql = sql.Replace("<ProjectKey>", pjkey);
+                DBUtility.ExeLocalSqlNoRes(sql);
+            }
+
+            foreach (var item in stationlist)
+            {
+                var sql = "insert into ProjectStation(ProjectKey,Station,databackuptm) values('<ProjectKey>','<Station>','<databackuptm>')";
+                sql = sql.Replace("<ProjectKey>", pjkey).Replace("<Station>", item).Replace("<databackuptm>", DateTime.Now.ToString());
+                DBUtility.ExeLocalSqlNoRes(sql);
+            }
+        }
+
         private void StoreProjectSumDataSet()
         {
             if (SumDatasetList.Count > 0)

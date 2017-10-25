@@ -981,6 +981,10 @@ namespace Prometheus.Controllers
         private void RetrievePNs(ProjectViewModels projectmodel)
         {
             projectmodel.PNs = Request.Form["PNs"];
+            if (!string.IsNullOrEmpty(Request.Form["OSAPNs"]))
+            {
+                projectmodel.PNs = Request.Form["OSAPNs"];
+            }
         }
 
         private void RetrieveStation(ProjectViewModels projectmodel)
@@ -1008,8 +1012,7 @@ namespace Prometheus.Controllers
             RetrievePNs(projectmodel);
             RetrieveStation(projectmodel);
 
-            //Store OSA failured code map
-            StoreOSAFailuredCodeMap(projectmodel);
+
 
             projectmodel.ModelIDs = Request.Form["ModelIDs"];
             projectmodel.SumDatasets = Request.Form["SumDatasets"];
@@ -1037,6 +1040,9 @@ namespace Prometheus.Controllers
 
             projectmodel.StoreProject();
 
+            //Store OSA failured code map
+            StoreOSAFailuredCodeMap(projectmodel);
+
             var bondingprocess = Request.Form["ChoosedProcess"];
             if (!string.IsNullOrEmpty(bondingprocess)
                 && !bondingprocess.ToUpper().Contains("PLEASE"))
@@ -1051,9 +1057,19 @@ namespace Prometheus.Controllers
             var who = (ckdict["logonuser"]).Split(new string[] { "||" }, StringSplitOptions.None)[0];
             //ProjectEvent.CreateProjectEvent(who, projectmodel.ProjectKey, projectmodel.ProjectName);
 
-            MESUtility.StartProjectBonding(projectmodel);
+            if (projectmodel.OSATabList.Count > 0)
+            {
+                MESUtility.StartOSAProjectBonding(projectmodel);
+            }
+            else
+            {
+                MESUtility.StartProjectBonding(projectmodel);
+            }
+
             BIDataUtility.StartProjectBonding(this, projectmodel);
             ATEUtility.StartProjectBonding(projectmodel);
+
+
             
             return RedirectToAction("ViewAll");
         }
@@ -6917,16 +6933,28 @@ namespace Prometheus.Controllers
 
                     fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
                     Request.Files[fl].SaveAs(imgdir + fn);
-                    var ret = RetriveOSATables(imgdir + fn);
+                    var ret = RetriveOSATables(projectmodel.ProjectKey,imgdir + fn);
+
+                    //store test station
+                    var stationlist = new List<string>();
+                    var stationdict = new Dictionary<string, bool>();
+                    foreach (var item in ret)
+                    {
+                        if (!stationdict.ContainsKey(item.WhichTest))
+                        {
+                            stationdict.Add(item.WhichTest,true);
+                            stationlist.Add(item.WhichTest);
+                        }
+                    }
+                    if (stationlist.Count > 0)
+                    {
+                        ProjectViewModels.StoreOSAStation(projectmodel.ProjectKey,stationlist);
+                    }
+
                     if (ret.Count > 0)
                     {
-                        foreach (var tb in ret)
-                        {
-                            tb.ProjectKey = projectmodel.ProjectKey;
-                        }
-
                         projectmodel.OSATabList = ret;
-                        return true;
+                        return OSAFailureVM.UpdateOSAFailureVM(ret);
                     }
                 }
                 return false;
@@ -6937,38 +6965,53 @@ namespace Prometheus.Controllers
             }
         }
 
-        private List<OSAFailureVM> RetriveOSATables(string filename)
+        private List<OSAFailureVM> RetriveOSATables(string pjkey,string filename)
         {
             var ret = new List<OSAFailureVM>();
             try
             {
                 if (System.IO.File.Exists(filename))
                 {
-                    string[] lines = System.IO.File.ReadAllLines(filename);
-                    bool tableseg = false;
-                    foreach (var line in lines)
+                    var idx = 0;
+                    var data = ExcelReader.RetrieveDataFromExcel(filename, null);
+                    foreach (var line in data)
                     {
-                        if (line.Contains(";"))
+                        if (idx == 0)
                         {
+                            idx++;
                             continue;
                         }
 
-                        if (line.ToUpper().Contains("[MESTABLENAME]"))
+                        var lowlimit = -99999.0;
+                        if (!string.IsNullOrEmpty(line[4]))
                         {
-                            tableseg = true;
-                            continue;
+                            try
+                            {
+                                lowlimit = Convert.ToDouble(line[4]);
+                            }
+                            catch (Exception ex)
+                            {
+                                continue;
+                            }
                         }
 
-                        if (tableseg && line.Contains("[") && line.Contains("]"))
+                        var highlimit = 99999.0;
+                        if (!string.IsNullOrEmpty(line[5]))
                         {
-                            tableseg = false;
+                            try
+                            {
+                                highlimit = Convert.ToDouble(line[5]);
+                            }
+                            catch (Exception ex)
+                            {
+                                continue;
+                            }
                         }
 
-                        //if (tableseg && line.Contains("="))
-                        //{
-                        //    ret.Add(new OSAFailureVM("", line.Split(new char[] { '=' })[0].Trim(), line.Split(new char[] { '=' })[1].Trim().Replace("\"", "")));
-                        //}
+                        var tempvm = new OSAFailureVM(pjkey, line[1], line[2], line[3], lowlimit, highlimit, line[6], line[7]);
+                        ret.Add(tempvm);
                     }
+                    
                 }
 
                 return ret;

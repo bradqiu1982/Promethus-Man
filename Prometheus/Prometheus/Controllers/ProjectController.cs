@@ -1590,6 +1590,32 @@ namespace Prometheus.Controllers
         public ActionResult ProjectSptTask(string ProjectKey)
         {
             var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "Project");
+                ck.Add("logonredirectact", "ProjectSptTask");
+                ck.Add("sptpjkey", ProjectKey);
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            if (string.IsNullOrEmpty(ProjectKey))
+            {
+                if (ckdict.ContainsKey("sptpjkey"))
+                {
+                    ProjectKey = ckdict["sptpjkey"];
+                }
+                else
+                {
+                    return RedirectToAction("ViewAll", "Project");
+                }
+            }
+
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
             //null is for qm, not null for parallel project

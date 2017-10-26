@@ -5843,12 +5843,14 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
+            //ProjectTestData.PrePareOSALatestData("25GWIRELESSTOSAG", this);
+            
             //var allpjkey = ProjectViewModels.RetrieveAllProject();
             //foreach (var pjkey in allpjkey)
             //{
             //    ProjectYieldViewModule.GetYieldByWeeks(pjkey.ProjectKey, HttpContext.Cache, 4);
             //}
-            MESUtility.DebugCriticalFunction("4803ad800037d81c", "QSFPSR4GEN4", this);
+            //MESUtility.DebugCriticalFunction("4803ad800037d81c", "QSFPSR4GEN4", this);
             //try
             //{
             //    var ckeylist = new List<string>();

@@ -848,26 +848,26 @@ namespace Prometheus.Models
         }
 
 
-        private static void logthdinfo(string info)
-        {
-            try
-            {
-                var filename = "d:\\log\\osamapfilenocontain-" + DateTime.Now.ToString("yyyy-MM-dd");
-                if (File.Exists(filename))
-                {
-                    var content = System.IO.File.ReadAllText(filename);
-                    content = content + "\r\n" + DateTime.Now.ToString() + " : " + info;
-                    System.IO.File.WriteAllText(filename, content);
-                }
-                else
-                {
-                    System.IO.File.WriteAllText(filename, DateTime.Now.ToString() + " : " + info);
-                }
-            }
-            catch (Exception ex)
-            { }
+        //private static void logthdinfo(string info)
+        //{
+        //    try
+        //    {
+        //        var filename = "d:\\log\\osamapfilenocontain-" + DateTime.Now.ToString("yyyy-MM-dd");
+        //        if (File.Exists(filename))
+        //        {
+        //            var content = System.IO.File.ReadAllText(filename);
+        //            content = content + "\r\n" + DateTime.Now.ToString() + " : " + info;
+        //            System.IO.File.WriteAllText(filename, content);
+        //        }
+        //        else
+        //        {
+        //            System.IO.File.WriteAllText(filename, DateTime.Now.ToString() + " : " + info);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    { }
 
-        }
+        //}
 
         private static string RetrieveOSAFailure(Dictionary<string, List<KeyValuePair<string, double>>> datafield,ProjectTestData pjdata, Dictionary<string, OSAFailureVM> mapfile)
         {
@@ -955,6 +955,12 @@ namespace Prometheus.Models
                                 if (datafield.Count > 0)
                                 {
                                     dt.ErrAbbr = RetrieveOSAFailure(datafield, dt, osafailuremapdata).Split(new string[] { "::" },StringSplitOptions.RemoveEmptyEntries)[0];
+
+                                    var ekey = ProjectErrorViewModels.GetUniqKey();
+                                    var pjerror = new ProjectErrorViewModels(vm.ProjectKey, ekey, dt.ErrAbbr, "", 1);
+                                    pjerror.Reporter = "System";
+                                    pjerror.Description = "";
+                                    pjerror.AddandUpdateProjectError();
                                 }
                                 else
                                 {
@@ -1143,9 +1149,15 @@ namespace Prometheus.Models
                                                 sndict.Add(dt.ModuleSerialNum, true);
                                                 if (vm.FinishRating < 90 && DateTime.Parse(starttime) != vm.StartDate)
                                                 {
-                                                    CreateOSAFA(vm, dt, datafield[dt.DataID], priority, failedparam, firstengineer);
+                                                    CreateOSAFA(vm, dt, datafield[dt.DataID], priority, failedparam, firstengineer,ctrl);
                                                 }
                                             }
+
+                                            var ekey = ProjectErrorViewModels.GetUniqKey();
+                                            var pjerror = new ProjectErrorViewModels(vm.ProjectKey, ekey, dt.ErrAbbr, "", 1);
+                                            pjerror.Reporter = "System";
+                                            pjerror.Description = "";
+                                            pjerror.AddandUpdateProjectError();
                                         }
                                         else
                                         {
@@ -1223,18 +1235,19 @@ namespace Prometheus.Models
             vm.StoreIssue();
         }
 
-        private static void CreateOSACriticalFA(ProjectTestData item, List<KeyValuePair<string, double>> RawData, string FailedParam, string firstengineer)
+        private static void CreateOSACriticalFA(ProjectTestData item, List<KeyValuePair<string, double>> RawData, string FailedParam, string firstengineer,Controller ctrl)
         {
             var vm = new IssueViewModels();
             vm.ProjectKey = item.ProjectKey;
-            vm.IssueKey = item.DataID;
+            vm.IssueKey = IssueViewModels.GetUniqKey();
             vm.IssueType = ISSUETP.Bug;
-            vm.Summary = "Module " + item.ModuleSerialNum + " failed for " + item.ErrAbbr + " @ " + item.WhichTest;
-            vm.Priority = ISSUEPR.Major;
+            vm.Summary = CRITICALERRORTYPE.SECONDMATCH + " " + item.ModuleSerialNum + " failed for " + item.ErrAbbr + " @ " + item.WhichTest;
+            vm.Priority = ISSUEPR.Critical;
             vm.DueDate = DateTime.Now.AddDays(7);
-            vm.ReportDate = item.TestTimeStamp;
+            vm.ReportDate = DateTime.Now;
             vm.Assignee = firstengineer;
-            vm.Reporter = "System";
+            vm.Reporter = firstengineer;
+            vm.Creator = firstengineer;
             vm.Resolution = Resolute.Pending;
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
             vm.CommentType = COMMENTTYPE.Description;
@@ -1257,9 +1270,11 @@ namespace Prometheus.Models
             }
             vm.Description = vm.Description + "</tbody></table>";
             vm.StoreIssue();
+
+            SendTaskEvent(vm, vm.Summary, ctrl);
         }
 
-        private static void CreateOSAFA(ProjectViewModels vm, ProjectTestData pjdata, List<KeyValuePair<string, double>> RawData, string ErrorPriority, string FailedParam,string firstengineer)
+        private static void CreateOSAFA(ProjectViewModels vm, ProjectTestData pjdata, List<KeyValuePair<string, double>> RawData, string ErrorPriority, string FailedParam,string firstengineer,Controller ctrl)
         {
             if (string.Compare(ErrorPriority, OSAFAILUREPRIORITY.NORMAL) == 0)
             {
@@ -1267,7 +1282,7 @@ namespace Prometheus.Models
             }
             else
             {
-                CreateOSACriticalFA(pjdata, RawData, FailedParam, firstengineer);
+                CreateOSACriticalFA(pjdata, RawData, FailedParam, firstengineer,ctrl);
             }
         }
 

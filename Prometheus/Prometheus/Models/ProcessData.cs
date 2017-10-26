@@ -431,6 +431,8 @@ namespace Prometheus.Models
                 var MfgOrdidDict = new Dictionary<string, bool>();
                 var movelist = new List<ProjectMoveHistory>();
 
+                var FailedSN = "'";
+
                 var dbret = DBUtility.ExeMESReportMasterSqlWithRes(sql);
                 foreach (var line in dbret)
                 {
@@ -444,16 +446,20 @@ namespace Prometheus.Models
                         tempmove.MoveInQty = Convert.ToInt32(line[3]);
                         tempmove.MfgOrderId = ConvertString(line[4]);
                         tempmove.MoveOutTime = Convert.ToDateTime(line[5]);
+                        tempmove.ContainerName = ConvertString(line[7]);
 
                         var TxnTypeName = ConvertString(line[6]);
                         if (TxnTypeName.ToUpper().Contains("MOVESTD"))
                         { tempmove.TxnTypeName = TXNTYPENAME.MoveStd; }
                         else if (TxnTypeName.ToUpper().Contains("MOVENONSTD"))
-                        { tempmove.TxnTypeName = TXNTYPENAME.MoveNonStd; }
+                        {
+                            tempmove.TxnTypeName = TXNTYPENAME.MoveNonStd;
+                            FailedSN = FailedSN + tempmove.ContainerName + "','";
+                        }
                         else
                         { tempmove.TxnTypeName = TXNTYPENAME.Other; }
 
-                        tempmove.ContainerName = ConvertString(line[7]);
+                        
                         tempmove.Comments = ConvertString(line[8]);
                         if (stepnamedict.ContainsKey(tempmove.WorkflowStepID))
                         {
@@ -474,6 +480,43 @@ namespace Prometheus.Models
                     }
                     catch (Exception ex) { }
                 }//end foreach
+
+                if (movelist.Count > 0)
+                {
+                    var snfailuredict = new Dictionary<string, string>();
+
+                    var holdtime = movelist[0].MoveOutTime.AddDays(-7).ToString();
+                    if (FailedSN.Length > 5)
+                    {
+                        FailedSN = FailedSN.Substring(0, FailedSN.Length - 2);
+
+                        sql = "SELECT [Containername],[DefectReason] FROM [PDMS].[dbo].[HoldHistContainer] (nolock) where HoldTime > '<HoldTime>' and Containername in (<FailedSN>)";
+                        sql = sql.Replace("<HoldTime>",holdtime).Replace("<FailedSN>", FailedSN);
+                        dbret = DBUtility.ExeMESReportMasterSqlWithRes(sql);
+                        foreach (var line in dbret)
+                        {
+                            try
+                            {
+                                if (!snfailuredict.ContainsKey(Convert.ToString(line[0])))
+                                {
+                                    snfailuredict.Add(Convert.ToString(line[0]), Convert.ToString(line[1]));
+                                }
+                            }
+                            catch (Exception ex) { }
+                        }//end foreach
+
+                        foreach (var item in movelist)
+                        {
+                            if (item.TxnTypeName == TXNTYPENAME.MoveNonStd)
+                            {
+                                if (snfailuredict.ContainsKey(item.ContainerName))
+                                {
+                                    item.Comments = snfailuredict[item.ContainerName];
+                                }
+                            }
+                        }//end foreach
+                    }//end if
+                }//end if
 
                 var orgdict = new Dictionary<string, string>();
                 if (MfgOrdidDict.Count > 0)

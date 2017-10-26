@@ -800,7 +800,8 @@ namespace Prometheus.Models
             var conn = new SqlConnection();
             try
             {
-                conn.ConnectionString = @"Server=wux-prod02\mes_report;uid=Active_NPI;pwd=Active@123;Database=PDMSMaster;Connection Timeout=30;";
+                conn.ConnectionString = @"Server=wux-prod02\mes_report;uid=Active_NPI;pwd=Active@123;Connection Timeout=30;";
+                //conn.ConnectionString = @"Server=wux-prod02\mes_report;uid=Active_NPI;pwd=Active@123;Database=PDMSMaster;Connection Timeout=30;";
                 //conn.ConnectionString = "Data Source=cn-csrpt;Initial Catalog=SummaryDB;Integrated Security=True;Connection Timeout=30;";
                 conn.Open();
                 return conn;

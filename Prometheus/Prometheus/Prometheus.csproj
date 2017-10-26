@@ -223,6 +223,7 @@
     <Compile Include="App_Start\MYStaticFileHandler.cs" />
     <Compile Include="Models\NeoMAPVM.cs" />
     <Compile Include="Models\NormalDistributeAlg.cs" />
+    <Compile Include="Models\OSAFailureVM.cs" />
     <Compile Include="Models\ParetoData.cs" />
     <Compile Include="Models\PJReportViewModels.cs" />
     <Compile Include="Models\ProcessData.cs" />
@@ -591,6 +592,7 @@
     <Content Include="Content\images\icon\LowYield.png" />
     <Content Include="Content\images\icon\Upload.png" />
     <Content Include="Content\images\Loading.gif" />
+    <Content Include="Content\images\ocap_warn.png" />
     <Content Include="Content\images\PJ\BI.png" />
     <Content Include="Content\images\PJ\DebugTreeicon.png" />
     <Content Include="Content\images\PJ\FA.png" />
@@ -626,6 +628,8 @@
     <Content Include="Content\images\usercenter\IProject.png" />
     <Content Include="Content\images\usercenter\ITag.png" />
     <Content Include="Content\images\usercenter\MyStatus.png" />
+    <Content Include="Content\Layout.css" />
+    <Content Include="Content\Login.css" />
     <Content Include="Scripts\jquery.flexdatalist.min.css" />
     <Content Include="Content\themes\base\accordion.css" />
     <Content Include="Content\themes\base\all.css" />
@@ -841,7 +845,9 @@
     <Content Include="Scripts\NormalDistribution.xml" />
     <Content Include="Scripts\NormalDistribution1.xml" />
     <Content Include="Scripts\NormalDistributionCombine.xml" />
-    <Content Include="Scripts\ParetoChart.xml" />
+    <Content Include="Scripts\ParetoChart.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Scripts\PieChart.xml" />
     <Content Include="Scripts\placeholders.min.js" />
     <Content Include="Scripts\Promethus-db-script.txt" />
@@ -1015,6 +1021,7 @@
     <Content Include="Scripts\lobilist\lib\lobibox\sounds\sound6.ogg" />
     <Content Include="Views\Project\ProjectDash.cshtml" />
     <Content Include="Views\Project\ProjectProcessYield.cshtml" />
+    <Content Include="Views\Project\OcapWarn.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1078,16 +1085,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
-          <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>64289</DevelopmentServerPort>
-          <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:8081/</IISUrl>
-          <NTLMAuthentication>False</NTLMAuthentication>
-          <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>
-          </CustomServerUrl>
-          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+          <SaveServerSettingsInUserFile>True</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>
     </VisualStudio>

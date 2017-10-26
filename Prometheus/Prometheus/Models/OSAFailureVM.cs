@@ -30,14 +30,21 @@ namespace Prometheus.Models
             ProjectKey = pjkey;
             ParameterName = param;
             WhichTest = whichtest;
-            ErrorPriority = priority;
+            if (string.Compare(priority.ToUpper(), OSAFAILUREPRIORITY.CRITICAL) == 0)
+            {
+                ErrorPriority = OSAFAILUREPRIORITY.CRITICAL;
+            }
+            else
+            {
+                ErrorPriority = OSAFAILUREPRIORITY.NORMAL;
+            }
             LowLimit = low;
             HighLimit = high;
             FailureCode = failcode;
             FailureMode = failmode;
         }
 
-        public bool UpdateOSAFailureVM(List<OSAFailureVM> osafailurelist)
+        public static bool UpdateOSAFailureVM(List<OSAFailureVM> osafailurelist)
         {
             if (osafailurelist.Count > 0)
             {
@@ -45,14 +52,15 @@ namespace Prometheus.Models
                 sql = sql.Replace("<ProjectKey>", osafailurelist[0].ProjectKey);
                 DBUtility.ExeLocalSqlNoRes(sql);
 
+                var currenttime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
-                sql = "insert into OSAFailureVM(ProjectKey,ParameterName,WhichTest,ErrorPriority,LowLimit,HighLimit,FailureCode,FailureMode) values";
-                var val = "('<ProjectKey>','<ParameterName>','<WhichTest>','<ErrorPriority>',<LowLimit>,<HighLimit>,'<FailureCode>','<FailureMode>'),";
+                sql = "insert into OSAFailureVM(ProjectKey,ParameterName,WhichTest,ErrorPriority,LowLimit,HighLimit,FailureCode,FailureMode,databackuptm) values";
+                var val = "('<ProjectKey>','<ParameterName>','<WhichTest>','<ErrorPriority>',<LowLimit>,<HighLimit>,'<FailureCode>','<FailureMode>','<databackuptm>'),";
                 foreach(var item in osafailurelist)
                 {
                     sql = sql + val.Replace("<ProjectKey>", item.ProjectKey).Replace("<ParameterName>", item.ParameterName).Replace("<WhichTest>", item.WhichTest)
                         .Replace("<ErrorPriority>", item.ErrorPriority).Replace("<LowLimit>", item.LowLimit.ToString("0.000")).Replace("<HighLimit>", item.HighLimit.ToString("0.000"))
-                        .Replace("<FailureCode>", FailureCode).Replace("<FailureMode>", FailureMode);
+                        .Replace("<FailureCode>", item.FailureCode).Replace("<FailureMode>", item.FailureMode).Replace("<databackuptm>", currenttime);
                 }
                 sql = sql.Substring(0, sql.Length - 1);
                 return DBUtility.ExeLocalSqlNoRes(sql);

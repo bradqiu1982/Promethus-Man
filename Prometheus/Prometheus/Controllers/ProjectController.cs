@@ -981,6 +981,10 @@ namespace Prometheus.Controllers
         private void RetrievePNs(ProjectViewModels projectmodel)
         {
             projectmodel.PNs = Request.Form["PNs"];
+            if (!string.IsNullOrEmpty(Request.Form["OSAPNs"]))
+            {
+                projectmodel.PNs = Request.Form["OSAPNs"];
+            }
         }
 
         private void RetrieveStation(ProjectViewModels projectmodel)
@@ -1008,8 +1012,7 @@ namespace Prometheus.Controllers
             RetrievePNs(projectmodel);
             RetrieveStation(projectmodel);
 
-            //Store OSA failured code map
-            StoreOSAFailuredCodeMap(projectmodel);
+
 
             projectmodel.ModelIDs = Request.Form["ModelIDs"];
             projectmodel.SumDatasets = Request.Form["SumDatasets"];
@@ -1037,6 +1040,9 @@ namespace Prometheus.Controllers
 
             projectmodel.StoreProject();
 
+            //Store OSA failured code map
+            StoreOSAFailuredCodeMap(projectmodel);
+
             var bondingprocess = Request.Form["ChoosedProcess"];
             if (!string.IsNullOrEmpty(bondingprocess)
                 && !bondingprocess.ToUpper().Contains("PLEASE"))
@@ -1051,9 +1057,19 @@ namespace Prometheus.Controllers
             var who = (ckdict["logonuser"]).Split(new string[] { "||" }, StringSplitOptions.None)[0];
             //ProjectEvent.CreateProjectEvent(who, projectmodel.ProjectKey, projectmodel.ProjectName);
 
-            MESUtility.StartProjectBonding(projectmodel);
+            if (projectmodel.OSATabList.Count > 0)
+            {
+                MESUtility.StartOSAProjectBonding(projectmodel);
+            }
+            else
+            {
+                MESUtility.StartProjectBonding(projectmodel);
+            }
+
             BIDataUtility.StartProjectBonding(this, projectmodel);
             ATEUtility.StartProjectBonding(projectmodel);
+
+
             
             return RedirectToAction("ViewAll");
         }
@@ -1359,24 +1375,35 @@ namespace Prometheus.Controllers
             var bondingprocess = Request.Form["ChoosedProcess"];
             ProjectViewModels.StoreProjectProcessBonding(projectmodel.ProjectKey, bondingprocess);
 
-            if (projectmodel.TabList.Count == 0)
+            //Store OSA failured code map
+            StoreOSAFailuredCodeMap(projectmodel);
+
+            if (projectmodel.OSATabList.Count > 0)
             {
-                projectmodel.TabList = oldpjdata.TabList;
+                //do nothing
+                //ProjectTestData.PrePareOSALatestData(projectmodel.ProjectKey, this);
             }
-
-
-            var ckdict = CookieUtility.UnpackCookie(this);
-            var who = (ckdict["logonuser"]).Split(new string[] { "||" }, StringSplitOptions.None)[0];
-            //ProjectEvent.UpdateProjectEvent(who, projectmodel.ProjectKey, projectmodel.ProjectName);
-
-            if (databondingchange)
+            else
             {
-                MESUtility.StartProjectBonding(projectmodel);
-            }
+                if (projectmodel.TabList.Count == 0)
+                {
+                    projectmodel.TabList = oldpjdata.TabList;
+                }
 
-            if (pnbondingchg)
-            {
-                BIDataUtility.StartProjectBonding(this, projectmodel);
+
+                //var ckdict = CookieUtility.UnpackCookie(this);
+                //var who = (ckdict["logonuser"]).Split(new string[] { "||" }, StringSplitOptions.None)[0];
+                //ProjectEvent.UpdateProjectEvent(who, projectmodel.ProjectKey, projectmodel.ProjectName);
+
+                if (databondingchange)
+                {
+                    MESUtility.StartProjectBonding(projectmodel);
+                }
+
+                if (pnbondingchg)
+                {
+                    BIDataUtility.StartProjectBonding(this, projectmodel);
+                }
             }
 
             ProjectTestData.PrePareATELatestData(projectmodel.ProjectKey,this);
@@ -1574,6 +1601,32 @@ namespace Prometheus.Controllers
         public ActionResult ProjectSptTask(string ProjectKey)
         {
             var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "Project");
+                ck.Add("logonredirectact", "ProjectSptTask");
+                ck.Add("sptpjkey", ProjectKey);
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            if (string.IsNullOrEmpty(ProjectKey))
+            {
+                if (ckdict.ContainsKey("sptpjkey"))
+                {
+                    ProjectKey = ckdict["sptpjkey"];
+                }
+                else
+                {
+                    return RedirectToAction("ViewAll", "Project");
+                }
+            }
+
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
             //null is for qm, not null for parallel project
@@ -5609,6 +5662,16 @@ namespace Prometheus.Controllers
             {
                 try
                 {
+                    ProjectTestData.PrePareOSALatestData(pjkey, this);
+                }
+                catch (Exception ex)
+                { }
+            }
+
+            foreach (var pjkey in pjkeylist)
+            {
+                try
+                {
                     ProjectTestData.PrePareATELatestData(pjkey,this);
                 }
                 catch (Exception ex)
@@ -5801,12 +5864,14 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
+            //ProjectTestData.PrePareOSALatestData("25GWIRELESSTOSAG", this);
+            
             //var allpjkey = ProjectViewModels.RetrieveAllProject();
             //foreach (var pjkey in allpjkey)
             //{
             //    ProjectYieldViewModule.GetYieldByWeeks(pjkey.ProjectKey, HttpContext.Cache, 4);
             //}
-            MESUtility.DebugCriticalFunction("4803ad800037d81c", "QSFPSR4GEN4", this);
+            //MESUtility.DebugCriticalFunction("4803ad800037d81c", "QSFPSR4GEN4", this);
             //try
             //{
             //    var ckeylist = new List<string>();
@@ -6082,7 +6147,7 @@ namespace Prometheus.Controllers
                     var comment = Request.Form["commentcontent"];
                     var addrs = Request.Form["RPeopleAddr"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
 
-                    var LYTTASK = CreateLYTTask(CRITICALERRORTYPE.LYTTASK, comment, vm.ProjectKey, updater, updater, DateTime.Now.AddDays(14), vm);
+                    var LYTTASK = CreateLYTTask(CRITICALERRORTYPE.LYTTASK, comment, vm.ProjectKey, updater, updater, DateTime.Now.AddDays(14), vm, Request.Form["RPeopleAddr"]);
                     //CreateLYTSubTask(CRITICALERRORTYPE.LYTSUBTASK, "Stop Product Line for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(1));
                     CreateLYTSubTask(CRITICALERRORTYPE.CONTAINMENTACTION, "Containment Action for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(7));
                     CreateLYTSubTask(CRITICALERRORTYPE.CORRECTIVEACTION, "Corrective Action for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(14));
@@ -6151,7 +6216,7 @@ namespace Prometheus.Controllers
             IssueViewModels.StoreIssueComment(vm.IssueKey, comment1.dbComment, vm.Assignee, COMMENTTYPE.Description);
         }
 
-        private static IssueViewModels CreateLYTTask(string presum, string sum, string pjkey, string analyser, string reporter, DateTime duedate, IssueViewModels trigglevm)
+        private static IssueViewModels CreateLYTTask(string presum, string sum, string pjkey, string analyser, string reporter, DateTime duedate, IssueViewModels trigglevm,string relatedaddrs)
         {
             var vm = new IssueViewModels();
             vm.ProjectKey = pjkey;
@@ -6167,6 +6232,7 @@ namespace Prometheus.Controllers
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
             vm.ModuleSN = trigglevm.ModuleSN;
             vm.ErrAbbr = trigglevm.ErrAbbr;
+            vm.RelativePeoples = relatedaddrs;
             vm.StoreSubIssue();
 
             return vm;
@@ -6917,16 +6983,28 @@ namespace Prometheus.Controllers
 
                     fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
                     Request.Files[fl].SaveAs(imgdir + fn);
-                    var ret = RetriveOSATables(imgdir + fn);
+                    var ret = RetriveOSATables(projectmodel.ProjectKey,imgdir + fn);
+
+                    //store test station
+                    var stationlist = new List<string>();
+                    var stationdict = new Dictionary<string, bool>();
+                    foreach (var item in ret)
+                    {
+                        if (!stationdict.ContainsKey(item.WhichTest))
+                        {
+                            stationdict.Add(item.WhichTest,true);
+                            stationlist.Add(item.WhichTest);
+                        }
+                    }
+                    if (stationlist.Count > 0)
+                    {
+                        ProjectViewModels.StoreOSAStation(projectmodel.ProjectKey,stationlist);
+                    }
+
                     if (ret.Count > 0)
                     {
-                        foreach (var tb in ret)
-                        {
-                            tb.ProjectKey = projectmodel.ProjectKey;
-                        }
-
                         projectmodel.OSATabList = ret;
-                        return true;
+                        return OSAFailureVM.UpdateOSAFailureVM(ret);
                     }
                 }
                 return false;
@@ -6937,38 +7015,53 @@ namespace Prometheus.Controllers
             }
         }
 
-        private List<OSAFailureVM> RetriveOSATables(string filename)
+        private List<OSAFailureVM> RetriveOSATables(string pjkey,string filename)
         {
             var ret = new List<OSAFailureVM>();
             try
             {
                 if (System.IO.File.Exists(filename))
                 {
-                    string[] lines = System.IO.File.ReadAllLines(filename);
-                    bool tableseg = false;
-                    foreach (var line in lines)
+                    var idx = 0;
+                    var data = ExcelReader.RetrieveDataFromExcel(filename, null);
+                    foreach (var line in data)
                     {
-                        if (line.Contains(";"))
+                        if (idx == 0)
                         {
+                            idx++;
                             continue;
                         }
 
-                        if (line.ToUpper().Contains("[MESTABLENAME]"))
+                        var lowlimit = -99999.0;
+                        if (!string.IsNullOrEmpty(line[4]))
                         {
-                            tableseg = true;
-                            continue;
+                            try
+                            {
+                                lowlimit = Convert.ToDouble(line[4]);
+                            }
+                            catch (Exception ex)
+                            {
+                                continue;
+                            }
                         }
 
-                        if (tableseg && line.Contains("[") && line.Contains("]"))
+                        var highlimit = 99999.0;
+                        if (!string.IsNullOrEmpty(line[5]))
                         {
-                            tableseg = false;
+                            try
+                            {
+                                highlimit = Convert.ToDouble(line[5]);
+                            }
+                            catch (Exception ex)
+                            {
+                                continue;
+                            }
                         }
 
-                        //if (tableseg && line.Contains("="))
-                        //{
-                        //    ret.Add(new OSAFailureVM("", line.Split(new char[] { '=' })[0].Trim(), line.Split(new char[] { '=' })[1].Trim().Replace("\"", "")));
-                        //}
+                        var tempvm = new OSAFailureVM(pjkey, line[1], line[2], line[3], lowlimit, highlimit, line[6], line[7]);
+                        ret.Add(tempvm);
                     }
+                    
                 }
 
                 return ret;

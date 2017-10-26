@@ -749,6 +749,21 @@ CREATE TABLE [dbo].[WaferRecord] (
 	[databackuptm]   DATETIME       DEFAULT ('2017-08-02 10:00:00') NOT NULL
    );
 
+   CREATE TABLE [dbo].[OSAFailureVM] (
+    [ProjectKey]        NVARCHAR (50)  NOT NULL,
+    [ParameterName]       NVARCHAR (200)  NOT NULL,
+    [WhichTest]        NVARCHAR (200) NOT NULL,
+    [ErrorPriority]        NVARCHAR (64) NOT NULL,
+    [LowLimit] FLOAT            DEFAULT ((-99999.0)) NOT NULL,
+	[HighLimit] FLOAT            DEFAULT ((99999.0)) NOT NULL,
+    [FailureCode]        NVARCHAR (200) NOT NULL,
+	[FailureMode]        NVARCHAR (200) NOT NULL,
+    [APVal1]        NVARCHAR (200) DEFAULT ('') NOT NULL,
+    [APVal2]        NVARCHAR (200) DEFAULT ('') NOT NULL,
+    [APVal3]        DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[databackuptm]   DATETIME       DEFAULT ('2017-08-02 10:00:00') NOT NULL
+	);
+
 ALTER TABLE  [DebugDB].[dbo].[ProjectCriticalError] Add SettingReason NVARCHAR (MAX)    DEFAULT ('') NOT NULL;
 ALTER TABLE  [NPITrace].[dbo].[ProjectCriticalError] Add SettingReason NVARCHAR (MAX)    DEFAULT ('') NOT NULL;
 

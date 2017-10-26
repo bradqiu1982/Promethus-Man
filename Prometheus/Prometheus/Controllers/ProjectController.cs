@@ -1375,24 +1375,35 @@ namespace Prometheus.Controllers
             var bondingprocess = Request.Form["ChoosedProcess"];
             ProjectViewModels.StoreProjectProcessBonding(projectmodel.ProjectKey, bondingprocess);
 
-            if (projectmodel.TabList.Count == 0)
+            //Store OSA failured code map
+            StoreOSAFailuredCodeMap(projectmodel);
+
+            if (projectmodel.OSATabList.Count > 0)
             {
-                projectmodel.TabList = oldpjdata.TabList;
+                //do nothing
+                //ProjectTestData.PrePareOSALatestData(projectmodel.ProjectKey, this);
             }
-
-
-            var ckdict = CookieUtility.UnpackCookie(this);
-            var who = (ckdict["logonuser"]).Split(new string[] { "||" }, StringSplitOptions.None)[0];
-            //ProjectEvent.UpdateProjectEvent(who, projectmodel.ProjectKey, projectmodel.ProjectName);
-
-            if (databondingchange)
+            else
             {
-                MESUtility.StartProjectBonding(projectmodel);
-            }
+                if (projectmodel.TabList.Count == 0)
+                {
+                    projectmodel.TabList = oldpjdata.TabList;
+                }
 
-            if (pnbondingchg)
-            {
-                BIDataUtility.StartProjectBonding(this, projectmodel);
+
+                //var ckdict = CookieUtility.UnpackCookie(this);
+                //var who = (ckdict["logonuser"]).Split(new string[] { "||" }, StringSplitOptions.None)[0];
+                //ProjectEvent.UpdateProjectEvent(who, projectmodel.ProjectKey, projectmodel.ProjectName);
+
+                if (databondingchange)
+                {
+                    MESUtility.StartProjectBonding(projectmodel);
+                }
+
+                if (pnbondingchg)
+                {
+                    BIDataUtility.StartProjectBonding(this, projectmodel);
+                }
             }
 
             ProjectTestData.PrePareATELatestData(projectmodel.ProjectKey,this);
@@ -5642,6 +5653,16 @@ namespace Prometheus.Controllers
                 try
                 {
                     ProjectTestData.PrePareMESLatestData(pjkey, this);
+                }
+                catch (Exception ex)
+                { }
+            }
+
+            foreach (var pjkey in pjkeylist)
+            {
+                try
+                {
+                    ProjectTestData.PrePareOSALatestData(pjkey, this);
                 }
                 catch (Exception ex)
                 { }

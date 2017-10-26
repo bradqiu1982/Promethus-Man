@@ -222,6 +222,12 @@ namespace Prometheus.Controllers
 
         private ActionResult NormalLogin(string username,string dbpwd,string inputpwd)
         {
+            ////for test log4net
+            //var dic = new Dictionary<string, string>();
+            //dic.Add("user_name", username);
+            //dic.Add("log_type", "Post");
+            //LogHelper.WriteLog("Test", Log4NetLevel.Info, dic);
+
             if (string.Compare(dbpwd, inputpwd) != 0)
             {
                 var loginerror = "<h3><font color=\"red\">Fail to login: password not correct</font></h3>";

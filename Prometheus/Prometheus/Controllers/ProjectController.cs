@@ -6147,7 +6147,7 @@ namespace Prometheus.Controllers
                     var comment = Request.Form["commentcontent"];
                     var addrs = Request.Form["RPeopleAddr"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
 
-                    var LYTTASK = CreateLYTTask(CRITICALERRORTYPE.LYTTASK, comment, vm.ProjectKey, updater, updater, DateTime.Now.AddDays(14), vm);
+                    var LYTTASK = CreateLYTTask(CRITICALERRORTYPE.LYTTASK, comment, vm.ProjectKey, updater, updater, DateTime.Now.AddDays(14), vm, Request.Form["RPeopleAddr"]);
                     //CreateLYTSubTask(CRITICALERRORTYPE.LYTSUBTASK, "Stop Product Line for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(1));
                     CreateLYTSubTask(CRITICALERRORTYPE.CONTAINMENTACTION, "Containment Action for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(7));
                     CreateLYTSubTask(CRITICALERRORTYPE.CORRECTIVEACTION, "Corrective Action for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(14));
@@ -6216,7 +6216,7 @@ namespace Prometheus.Controllers
             IssueViewModels.StoreIssueComment(vm.IssueKey, comment1.dbComment, vm.Assignee, COMMENTTYPE.Description);
         }
 
-        private static IssueViewModels CreateLYTTask(string presum, string sum, string pjkey, string analyser, string reporter, DateTime duedate, IssueViewModels trigglevm)
+        private static IssueViewModels CreateLYTTask(string presum, string sum, string pjkey, string analyser, string reporter, DateTime duedate, IssueViewModels trigglevm,string relatedaddrs)
         {
             var vm = new IssueViewModels();
             vm.ProjectKey = pjkey;
@@ -6232,6 +6232,7 @@ namespace Prometheus.Controllers
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
             vm.ModuleSN = trigglevm.ModuleSN;
             vm.ErrAbbr = trigglevm.ErrAbbr;
+            vm.RelativePeoples = relatedaddrs;
             vm.StoreSubIssue();
 
             return vm;

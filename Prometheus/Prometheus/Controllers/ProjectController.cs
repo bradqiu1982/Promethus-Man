@@ -1708,7 +1708,7 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        public ActionResult ProjectErrAbbr(string ProjectKey, string ErrAbbr)
+        public ActionResult ProjectErrAbbr(string ProjectKey, string ErrAbbr, string StartDate = null, string EndDate = null)
         {
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(ErrAbbr))
             {
@@ -1759,6 +1759,20 @@ namespace Prometheus.Controllers
                     }
                     else
                     {
+                        if (!string.IsNullOrEmpty(StartDate) && !string.IsNullOrEmpty(EndDate))
+                        {
+                            try
+                            {
+                                var startdate = DateTime.Parse(StartDate).AddHours(-12);
+                                var enddate = DateTime.Parse(EndDate).AddHours(12);
+                                if (item.IssueData.ReportDate > enddate || item.IssueData.ReportDate < startdate)
+                                {
+                                    continue;
+                                }
+                            }
+                            catch (Exception ex) { }
+                        }//end if
+
                         pendingitems.Add(item);
                     }
                 }
@@ -2361,17 +2375,17 @@ namespace Prometheus.Controllers
 
                 if (firstdatalist.Count > 0)
                 {
-                    firsttestparetofun(firstdatalist, ProjectKey);
+                    firsttestparetofun(firstdatalist, ProjectKey, sdate.ToString(), edate.ToString());
                 }
 
                 if (retestdatalist.Count > 0)
                 {
-                    retestparetofun(retestdatalist, ProjectKey);
+                    retestparetofun(retestdatalist, ProjectKey, sdate.ToString(), edate.ToString());
                 }
 
                 if (fytestdatalist.Count > 0)
                 {
-                    fytparetofun(fytestdatalist, ProjectKey);
+                    fytparetofun(fytestdatalist, ProjectKey, sdate.ToString(), edate.ToString());
                 }
 
                 return View(yieldvm);
@@ -3209,17 +3223,17 @@ namespace Prometheus.Controllers
 
                 if (firstdatalist.Count > 0)
                 {
-                    firsttestparetofun(firstdatalist, ProjectKey);
+                    firsttestparetofun(firstdatalist, ProjectKey, sdate.ToString(), edate.ToString());
                 }
 
                 if (retestdatalist.Count > 0)
                 {
-                    retestparetofun(retestdatalist, ProjectKey);
+                    retestparetofun(retestdatalist, ProjectKey, sdate.ToString(), edate.ToString());
                 }
 
                 if (fytestdatalist.Count > 0)
                 {
-                    fytparetofun(fytestdatalist, ProjectKey);
+                    fytparetofun(fytestdatalist, ProjectKey, sdate.ToString(), edate.ToString());
                 }
 
                 return View(yieldvm);
@@ -3459,17 +3473,17 @@ namespace Prometheus.Controllers
 
                 if (firstdatalist.Count > 0)
                 {
-                    firsttestparetofun(firstdatalist, ProjectKey);
+                    firsttestparetofun(firstdatalist, ProjectKey, sdate.ToString(), edate.ToString());
                 }
 
                 if (retestdatalist.Count > 0)
                 {
-                    retestparetofun(retestdatalist, ProjectKey);
+                    retestparetofun(retestdatalist, ProjectKey, sdate.ToString(), edate.ToString());
                 }
 
                 if (fytestdatalist.Count > 0)
                 {
-                    fytparetofun(fytestdatalist, ProjectKey);
+                    fytparetofun(fytestdatalist, ProjectKey, sdate.ToString(), edate.ToString());
                 }
 
                 return View(yieldvm);
@@ -3835,17 +3849,17 @@ namespace Prometheus.Controllers
 
                     if (firstdatalist.Count > 0)
                     {
-                        firsttestparetofun(firstdatalist, ProjectKey);
+                        firsttestparetofun(firstdatalist, ProjectKey,null,null);
                     }
 
                     if (retestdatalist.Count > 0)
                     {
-                        retestparetofun(retestdatalist, ProjectKey);
+                        retestparetofun(retestdatalist, ProjectKey, null, null);
                     }
 
                     if (fytestdatalist.Count > 0)
                     {
-                        fytparetofun(fytestdatalist, ProjectKey);
+                        fytparetofun(fytestdatalist, ProjectKey, null, null);
                     }
 
                     return View(yieldvm);
@@ -4022,7 +4036,7 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        private void firsttestparetofun(List<KeyValuePair<string, int>> firstdatalist, string ProjectKey)
+        private void firsttestparetofun(List<KeyValuePair<string, int>> firstdatalist, string ProjectKey, string StartDate, string EndDate)
         {
             if (firstdatalist.Count > 0)
             {
@@ -4117,6 +4131,10 @@ namespace Prometheus.Controllers
                 //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
 
                 var reurl = "window.location.href = '/Project/ProjectErrAbbr?ProjectKey=" + ProjectKey + "'" + "+'&ErrAbbr='+this.category";
+                if (!string.IsNullOrEmpty(StartDate) && !string.IsNullOrEmpty(EndDate))
+                {
+                    reurl = reurl + "+'&StartDate='+'"+ StartDate + "'+'&EndDate='+'"+ EndDate + "'";
+                }
 
                 var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ParetoChart.xml"));
                 ViewBag.fparetoscript = tempscript.Replace("#ElementID#", "fparetochart")
@@ -4131,7 +4149,7 @@ namespace Prometheus.Controllers
             }
         }
 
-        private void retestparetofun(List<KeyValuePair<string, int>> retestdatalist, string ProjectKey)
+        private void retestparetofun(List<KeyValuePair<string, int>> retestdatalist, string ProjectKey, string StartDate, string EndDate)
         {
             if (retestdatalist.Count > 0)
             {
@@ -4226,6 +4244,10 @@ namespace Prometheus.Controllers
                 //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
 
                 var reurl = "window.location.href = '/Project/ProjectErrAbbr?ProjectKey=" + ProjectKey + "'" + "+'&ErrAbbr='+this.category";
+                if (!string.IsNullOrEmpty(StartDate) && !string.IsNullOrEmpty(EndDate))
+                {
+                    reurl = reurl + "+'&StartDate='+'" + StartDate + "'+'&EndDate='+'" + EndDate + "'";
+                }
 
                 var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ParetoChart.xml"));
                 ViewBag.rparetoscript = tempscript.Replace("#ElementID#", "rparetochart")
@@ -4240,7 +4262,7 @@ namespace Prometheus.Controllers
             }
         }
 
-        private void fytparetofun(List<KeyValuePair<string, int>> retestdatalist, string ProjectKey)
+        private void fytparetofun(List<KeyValuePair<string, int>> retestdatalist, string ProjectKey,string StartDate,string EndDate)
         {
             if (retestdatalist.Count > 0)
             {
@@ -4335,6 +4357,10 @@ namespace Prometheus.Controllers
                 //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
 
                 var reurl = "window.location.href = '/Project/ProjectErrAbbr?ProjectKey=" + ProjectKey + "'" + "+'&ErrAbbr='+this.category";
+                if (!string.IsNullOrEmpty(StartDate) && !string.IsNullOrEmpty(EndDate))
+                {
+                    reurl = reurl + "+'&StartDate='+'" + StartDate + "'+'&EndDate='+'" + EndDate + "'";
+                }
 
                 var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ParetoChart.xml"));
                 ViewBag.fyparetoscript = tempscript.Replace("#ElementID#", "fyparetochart")
@@ -4570,17 +4596,17 @@ namespace Prometheus.Controllers
 
                 if (firstdatalist.Count > 0)
                 {
-                    firsttestparetofun(firstdatalist, ProjectKey);
+                    firsttestparetofun(firstdatalist, ProjectKey,StartDate,EndDate);
                 }
 
                 if (retestdatalist.Count > 0)
                 {
-                    retestparetofun(retestdatalist, ProjectKey);
+                    retestparetofun(retestdatalist, ProjectKey, StartDate, EndDate);
                 }
 
                 if (fytestdatalist.Count > 0)
                 {
-                    fytparetofun(fytestdatalist, ProjectKey);
+                    fytparetofun(fytestdatalist, ProjectKey, StartDate, EndDate);
                 }
 
                 return View(yieldvm);

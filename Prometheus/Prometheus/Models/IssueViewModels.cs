@@ -1453,25 +1453,8 @@ namespace Prometheus.Models
                 ret.DataID = Convert.ToString(line[15]);
                 ret.ErrAbbr = Convert.ToString(line[16]);
 
-                //var tempclist = new List<IssueComments>();
-                //sql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
-                //sql = sql.Replace("<IssueKey>", ret.IssueKey);
-                //var cret = DBUtility.ExeLocalSqlWithRes(sql,null);
-                //foreach (var r in cret)
-                //{
-                //    var tempcomment = new IssueComments();
-                //    tempcomment.IssueKey = Convert.ToString(r[0]);
-                //    tempcomment.dbComment = Convert.ToString(r[1]);
-                //    tempcomment.Reporter = Convert.ToString(r[2]);
-                //    tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
-                //    tempcomment.CommentType = Convert.ToString(r[4]);
-                //    tempclist.Add(tempcomment);
-                //}
-                //ret.CommentList = tempclist;
-                //ret.SubIssues = RetrieveSubIssue(ret.IssueKey);
-
                 ret.RetrieveComment(ctrl);
-                ret.RetrieveAttachment(ret.IssueKey);
+                //ret.RetrieveAttachment(ret.IssueKey);
                 retdict.Add(ret);
             }
 

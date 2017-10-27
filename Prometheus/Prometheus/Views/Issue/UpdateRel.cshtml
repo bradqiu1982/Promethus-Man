@@ -1069,26 +1069,28 @@ else
                             <hr />
                             <div class="row"></div>
                             @if (ViewBag.tobechoosetags != null)
-                {
-                    for (var idx = 0; idx < ViewBag.tobechoosetags.Count; idx++)
-                    {
-                        <div class="col-xs-4">
-                            <div class="col-xs-3">
-                                @if (string.Compare(ViewBag.tobechoosetags[idx], "Rel", true) == 0)
-                                        {
-                                        <input type="checkbox" id="attachtagcheck@(idx)" checked="checked" name="attachtagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
-                                        }
-                                        else
-                                        {
-                                        <input type="checkbox" id="attachtagcheck@(idx)" name="attachtagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
-                                        }
-                            </div>
-                            <div class="col-xs-9">
-                                <label class="control-label">@(ViewBag.tobechoosetags[idx])</label>
-                            </div>
-                        </div>
+                            {
+                                <div class="row">
+                                    @for (var idx = 0; idx < ViewBag.tobechoosetags.Count; idx++)
+                                    {
+                                    <div class="col-xs-4">
+                                        <div class="col-xs-3">
+                                            @if (string.Compare(ViewBag.tobechoosetags[idx], "Rel", true) == 0)
+                                            {
+                                                <input type="checkbox" id="attachtagcheck@(idx)" checked="checked" name="attachtagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" id="attachtagcheck@(idx)" name="attachtagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
+                                            }
+                                        </div>
+                                        <div class="col-xs-9">
+                                            <label class="control-label">@(ViewBag.tobechoosetags[idx])</label>
+                                        </div>
+                                    </div>
+                                    }
+                                </div>
                             }
-                        }
                             <div class="row"></div>
                             <hr />
                             <div class="row"></div>
@@ -1110,26 +1112,28 @@ else
                             <hr />
                             <div class="row"></div>
                             @if (ViewBag.tobechoosetags != null)
-                {
-                    for (var idx = 0; idx < ViewBag.tobechoosetags.Count; idx++)
-                    {
-                        <div class="col-xs-4">
-                            <div class="col-xs-3">
-                                @if (string.Compare(ViewBag.tobechoosetags[idx], "Rel", true) == 0)
-                                        {
-                                        <input type="checkbox" id="issuetagcheck@(idx)" checked="checked" name="issuetagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
-                                        }
-                                        else
-                                        {
-                                        <input type="checkbox" id="issuetagcheck@(idx)" name="issuetagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
-                                        }
-                            </div>
-                            <div class="col-xs-9">
-                                <label class="control-label">@(ViewBag.tobechoosetags[idx])</label>
-                            </div>
-                        </div>
+                            {
+                                <div class="row">
+                                    @for (var idx = 0; idx < ViewBag.tobechoosetags.Count; idx++)
+                                    {
+                                    <div class="col-xs-4">
+                                        <div class="col-xs-3">
+                                            @if (string.Compare(ViewBag.tobechoosetags[idx], "Rel", true) == 0)
+                                            {
+                                                <input type="checkbox" id="issuetagcheck@(idx)" checked="checked" name="issuetagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" id="issuetagcheck@(idx)" name="issuetagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
+                                            }
+                                        </div>
+                                        <div class="col-xs-9">
+                                            <label class="control-label">@(ViewBag.tobechoosetags[idx])</label>
+                                        </div>
+                                    </div>
+                                    }
+                                </div>
                             }
-                        }
                             <div class="row"></div>
                             <hr />
                             <div class="row"></div>

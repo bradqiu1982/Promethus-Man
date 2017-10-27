@@ -330,20 +330,20 @@ namespace Prometheus.Models
 
         public void AddandUpdateProjectError()
         {
-            var sql = "select  ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount from ProjectError where ProjectKey = '<ProjectKey>' and OrignalCode = '<OrignalCode>'";
+            var sql = "select  ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount from ProjectError where ProjectKey = '<ProjectKey>' and OrignalCode = N'<OrignalCode>'";
             sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<OrignalCode>", OrignalCode);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
 
             if (dbret.Count > 0)
             {
-                sql = "update ProjectError set ErrorCount = <ErrorCount>  where ProjectKey = '<ProjectKey>' and OrignalCode = '<OrignalCode>'";
+                sql = "update ProjectError set ErrorCount = <ErrorCount>  where ProjectKey = '<ProjectKey>' and OrignalCode = N'<OrignalCode>'";
                 sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<OrignalCode>", OrignalCode)
                         .Replace("<ErrorCount>", Convert.ToString(Convert.ToUInt32(dbret[0][4])+1));
                 DBUtility.ExeLocalSqlNoRes(sql);
             }
             else
             {
-                sql = "insert into ProjectError(ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount,databackuptm) values('<ProjectKey>','<ErrorKey>','<OrignalCode>','<ShortDesc>',1,'<databackuptm>')";
+                sql = "insert into ProjectError(ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount,databackuptm) values('<ProjectKey>','<ErrorKey>',N'<OrignalCode>',N'<ShortDesc>',1,'<databackuptm>')";
                 sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ErrorKey>", ErrorKey)
                     .Replace("<OrignalCode>", OrignalCode).Replace("<ShortDesc>", ShortDesc).Replace("<databackuptm>", DateTime.Now.ToString());
                 DBUtility.ExeLocalSqlNoRes(sql);

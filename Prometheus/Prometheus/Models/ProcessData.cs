@@ -391,6 +391,13 @@ namespace Prometheus.Models
 
         public static void LoadMESMoveHistory(string PJKey,Controller ctrl)
         {
+            bool isosapj = false;
+            var osafailuremap = OSAFailureVM.RetrieveAllOSAFailureVM(PJKey);
+            if (osafailuremap.Count > 0)
+            {
+                isosapj = true;
+            }
+
             var allpids = RetrieveAllProductIDs(PJKey);
             var allworkflow = RetriveWorkflowByName(PJKey, new List<string>());
             if (allpids.Count > 0)
@@ -512,6 +519,14 @@ namespace Prometheus.Models
                                 if (snfailuredict.ContainsKey(item.ContainerName))
                                 {
                                     item.Comments = snfailuredict[item.ContainerName];
+                                    if (isosapj)
+                                    {
+                                        var ekey = ProjectErrorViewModels.GetUniqKey();
+                                        var pjerror = new ProjectErrorViewModels(PJKey, ekey,item.Comments, "", 1);
+                                        pjerror.Reporter = "System";
+                                        pjerror.Description = "";
+                                        pjerror.AddandUpdateProjectError();
+                                    }
                                 }
                             }
                         }//end foreach

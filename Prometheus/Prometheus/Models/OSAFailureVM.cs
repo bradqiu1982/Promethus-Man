@@ -55,7 +55,7 @@ namespace Prometheus.Models
                 var currenttime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
                 sql = "insert into OSAFailureVM(ProjectKey,ParameterName,WhichTest,ErrorPriority,LowLimit,HighLimit,FailureCode,FailureMode,databackuptm) values";
-                var val = "('<ProjectKey>','<ParameterName>','<WhichTest>','<ErrorPriority>',<LowLimit>,<HighLimit>,'<FailureCode>','<FailureMode>','<databackuptm>'),";
+                var val = "('<ProjectKey>',N'<ParameterName>',N'<WhichTest>','<ErrorPriority>',<LowLimit>,<HighLimit>,N'<FailureCode>',N'<FailureMode>','<databackuptm>'),";
                 foreach(var item in osafailurelist)
                 {
                     sql = sql + val.Replace("<ProjectKey>", item.ProjectKey).Replace("<ParameterName>", item.ParameterName).Replace("<WhichTest>", item.WhichTest)

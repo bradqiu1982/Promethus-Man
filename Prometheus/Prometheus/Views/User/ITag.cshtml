@@ -76,26 +76,25 @@
             <div class="row">
                 <div class="col-xs-12">&nbsp;</div>
             </div>
-
-
-        for (var idx = 0; idx < ViewBag.usertaglist.Count; idx++)
-        {
-                <div class="col-xs-3">
-                    <div class="col-xs-2">
-                        <input type="checkbox" style="border:1px double #006DC0;" checked="checked" id="check@(idx)" name="check@(idx)" value="@(ViewBag.usertaglist[idx])"/>
+            <div class="row">
+                @for (var idx = 0; idx < ViewBag.usertaglist.Count; idx++)
+                {
+                    <div class="col-xs-3">
+                        <div class="col-xs-2">
+                            <input type="checkbox" style="border:1px double #006DC0;" checked="checked" id="check@(idx)" name="check@(idx)" value="@(ViewBag.usertaglist[idx])" />
+                        </div>
+                        <div class="col-xs-10" style="text-align:left;">
+                            <label class="control-label" style="font-family:'Arial Narrow';">@(ViewBag.usertaglist[idx])</label>
+                        </div>
                     </div>
-                    <div class="col-xs-10" style="text-align:left;">
-                        <label class="control-label"  style="font-family:'Arial Narrow';">@(ViewBag.usertaglist[idx])</label>
-                    </div>
-                </div>
-        }
-
-        <div class="row">
-            <div class="col-xs-12">&nbsp;</div>
-        </div>
-        <div class="row">
-            <div class="col-xs-12">&nbsp;</div>
-        </div>
+                }
+            </div>
+            <div class="row">
+                <div class="col-xs-12">&nbsp;</div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">&nbsp;</div>
+            </div>
 
             <div class="row">
                 <div class="col-xs-9"></div>

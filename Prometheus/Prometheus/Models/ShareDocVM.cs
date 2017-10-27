@@ -434,7 +434,15 @@ namespace Prometheus.Models
         private static List<ShareDocVM> RetrieveMyLearnBlog(string UserName, Controller ctrl)
         {
             var ret = new List<ShareDocVM>();
-            var sql = "select DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,DOCFavorTimes,APVal1,BackLink from ShareDoc where DOCTag like '%TRAINING%' ORDER BY DOCDate DESC";
+            var sql = "(select DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,'' as DOCPusher, '' as DOCFavor, APVal1,BackLink"+ 
+                        " from ShareDoc where DOCTag like '%TRAINING%')"+
+                        " UNION ALL"+
+                        " (select a.DOCPJK, a.DOCType, a.DOCKey, a.DOCTag, a.DOCCreator, a.DOCDate, a.DOCPusher, a.DOCFavor, b.APVal1, a.BackLink"+
+                        " from UserLearn a left"+
+                        " join ShareDoc b ON a.DOCKey = b.DOCKey"+
+                        " where a.UserName = '<UserName>' and a.DOCType = '<DOCType>' and a.DOCTag not like '%TRAINING%')" +
+                        " ORDER by DOCDate Desc; ";
+            sql = sql.Replace("<UserName>", UserName).Replace("<DOCType>", ShareDocType.BLOG);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
             {
@@ -446,11 +454,11 @@ namespace Prometheus.Models
                 tempvm.DOCTag = Convert.ToString(line[3]);
                 tempvm.DOCCreator = Convert.ToString(line[4]);
                 tempvm.DOCDate = DateTime.Parse(Convert.ToString(line[5]));
-                tempvm.DOCPusher = "";
-                tempvm.DOCFavor = "";
-                tempvm.DOCFavorTimes = Convert.ToInt32(line[6]);
-                tempvm.DocID = Convert.ToString(line[7]);
-                tempvm.BACKLink = Convert.ToString(line[8]);
+                tempvm.DOCPusher = Convert.ToString(line[6]);
+                tempvm.DOCFavor = Convert.ToString(line[7]);
+                tempvm.DOCFavorTimes = RetrieveBlogFavorTimes(tempvm.DOCKey, tempvm.DOCCreator) ;
+                tempvm.DocID = Convert.ToString(line[8]);
+                tempvm.BACKLink = Convert.ToString(line[9]);
 
                 var blog = UserBlogVM.RetrieveBlogDoc(tempvm.DOCKey,ctrl);
                 if (string.IsNullOrEmpty(blog.DocKey))

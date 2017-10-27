@@ -1763,8 +1763,8 @@ namespace Prometheus.Controllers
                         {
                             try
                             {
-                                var startdate = DateTime.Parse(StartDate).AddHours(-2);
-                                var enddate = DateTime.Parse(EndDate).AddHours(2);
+                                var startdate = DateTime.Parse(StartDate).AddHours(-12);
+                                var enddate = DateTime.Parse(EndDate).AddHours(12);
                                 if (item.IssueData.ReportDate > enddate || item.IssueData.ReportDate < startdate)
                                 {
                                     continue;

@@ -655,6 +655,11 @@ namespace Prometheus.Controllers
                 var asilist = UserViewModels.RetrieveAllUser();
                 ViewBag.towholist = CreateSelectList(asilist, "");
 
+                var cfgpjlist = CfgUtility.GetStandardPJList(this);
+                var suggestpjlist = new List<string>();
+                suggestpjlist.AddRange(cfgpjlist.Values);
+                ViewBag.ProjectStandardList = Newtonsoft.Json.JsonConvert.SerializeObject(suggestpjlist.ToArray());
+
                 return View();
             }
             else
@@ -721,11 +726,11 @@ namespace Prometheus.Controllers
             //    }
             //}
 
-            if (string.IsNullOrEmpty(projectmodel.Description.Trim()))
-            {
-                ViewBag.CreateError = createerror.Replace("<ErrorMsg>", "Project description is empty");
-                return false;
-            }
+            //if (string.IsNullOrEmpty(projectmodel.Description.Trim()))
+            //{
+            //    ViewBag.CreateError = createerror.Replace("<ErrorMsg>", "Project description is empty");
+            //    return false;
+            //}
 
             if (!updateproject)
             {
@@ -1024,6 +1029,12 @@ namespace Prometheus.Controllers
 
                 CreateAllUserLists(projectmodel);
                 CreateProjectTypeList(projectmodel);
+
+                var cfgpjlist = CfgUtility.GetStandardPJList(this);
+                var suggestpjlist = new List<string>();
+                suggestpjlist.AddRange(cfgpjlist.Values);
+                ViewBag.ProjectStandardList = Newtonsoft.Json.JsonConvert.SerializeObject(suggestpjlist.ToArray());
+
                 return View(projectmodel);
             }
 
@@ -1035,6 +1046,12 @@ namespace Prometheus.Controllers
 
                 CreateAllUserLists(projectmodel);
                 CreateProjectTypeList(projectmodel);
+
+                var cfgpjlist = CfgUtility.GetStandardPJList(this);
+                var suggestpjlist = new List<string>();
+                suggestpjlist.AddRange(cfgpjlist.Values);
+                ViewBag.ProjectStandardList = Newtonsoft.Json.JsonConvert.SerializeObject(suggestpjlist.ToArray());
+
                 return View(projectmodel);
             }
 

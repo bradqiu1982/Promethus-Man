@@ -691,6 +691,10 @@ CREATE TABLE [dbo].[ProjectCriticalError] (
 	[SettingReason]   NVARCHAR (MAX) DEFAULT ('') NOT NULL
 );
 
+ALTER TABLE  [DebugDB].[dbo].[ProjectCriticalError] Add RuleID NVARCHAR (200) DEFAULT ('') NOT NULL;
+ALTER TABLE  [NPITrace].[dbo].[ProjectCriticalError] Add RuleID NVARCHAR (200) DEFAULT ('') NOT NULL;
+
+
 CREATE TABLE [dbo].[WaferRecord] (
 	[Wafer]   NVARCHAR (100) DEFAULT ('') NOT NULL,
 	[WaferBinYield]   NVARCHAR (128) DEFAULT ('') NOT NULL,

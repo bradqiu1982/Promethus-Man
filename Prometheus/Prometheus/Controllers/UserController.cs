@@ -2040,21 +2040,27 @@ namespace Prometheus.Controllers
             return RedirectToAction("AddPJCriticalError", "User");
         }
 
-        public ActionResult DeletePJCriticalError(string PJKey, string ErrorCode,string TestCase,string MatchCond)
+        //public ActionResult DeletePJCriticalError(string PJKey, string ErrorCode,string TestCase,string MatchCond)
+        //{
+        //    ProjectCriticalErrorVM.RemovePJCriticalError(PJKey, ErrorCode,TestCase,MatchCond);
+        //    return RedirectToAction("AddPJCriticalError", "User");
+        //}
+
+        public ActionResult DeletePJCriticalError(string RuleID)
         {
-            ProjectCriticalErrorVM.RemovePJCriticalError(PJKey, ErrorCode,TestCase,MatchCond);
+            ProjectCriticalErrorVM.RemovePJCriticalError(RuleID);
             return RedirectToAction("AddPJCriticalError", "User");
         }
 
-        public ActionResult Open2ndCheckFASwitch(string PJKey, string ErrorCode, string TestCase, string MatchCond)
+        public ActionResult Open2ndCheckFASwitch(string RuleID)
         {
-            ProjectCriticalErrorVM.Open2ndCheckFASwitch(PJKey, ErrorCode, TestCase, MatchCond);
+            ProjectCriticalErrorVM.Open2ndCheckFASwitch(RuleID);
             return RedirectToAction("AddPJCriticalError", "User");
         }
 
-        public ActionResult Close2ndCheckFASwitch(string PJKey, string ErrorCode, string TestCase, string MatchCond)
+        public ActionResult Close2ndCheckFASwitch(string RuleID)
         {
-            ProjectCriticalErrorVM.Close2ndCheckFASwitch(PJKey, ErrorCode, TestCase, MatchCond);
+            ProjectCriticalErrorVM.Close2ndCheckFASwitch(RuleID);
             return RedirectToAction("AddPJCriticalError", "User");
         }
 

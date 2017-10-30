@@ -67,37 +67,59 @@ namespace Prometheus.Models
         public string Appv_4 { set; get; }
         public DateTime Appv_5 { set; get; }
         public string SettingReason { set; get; }
+        public string RuleID { set; get; }
 
         public void StorePJCriticalError()
         {
-            var sql = "insert into ProjectCriticalError(ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel,Appv_4,databackuptm,SettingReason) "
-                + " values('<ProjectKey>','<ErrorCode>','<TestCaseName>','<MatchCond>',<WithLimit>,<LowLimit>,<HighLimit>,<WithAlgorithm>,'<Algorithm>','<AlgorithmParam>','<Creater>','<Temperature>','<Channel>','<Appv_4>','<databackuptm>','<SettingReason>')";
+            if (RuleExist(ProjectKey,ErrorCode,TestCaseName,MatchCond,LowLimit,HighLimit,Algorithm, AlgorithmParam))
+            {
+                return;
+            }
+
+            var sql = "insert into ProjectCriticalError(ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel,Appv_4,databackuptm,SettingReason,RuleID) "
+                + " values('<ProjectKey>','<ErrorCode>','<TestCaseName>','<MatchCond>',<WithLimit>,<LowLimit>,<HighLimit>,<WithAlgorithm>,'<Algorithm>','<AlgorithmParam>','<Creater>','<Temperature>','<Channel>','<Appv_4>','<databackuptm>','<SettingReason>','<RuleID>')";
 
             sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ErrorCode>", ErrorCode).Replace("<MatchCond>", MatchCond).Replace("<TestCaseName>", TestCaseName)
                 .Replace("<WithLimit>", WithLimit.ToString()).Replace("<LowLimit>", LowLimit.ToString()).Replace("<HighLimit>", HighLimit.ToString())
                 .Replace("<WithAlgorithm>", WithAlgorithm.ToString()).Replace("<Algorithm>", Algorithm).Replace("<AlgorithmParam>", AlgorithmParam)
-                .Replace("<Creater>", Creater).Replace("<Temperature>", Temperature).Replace("<Channel>", Channel).Replace("<Appv_4>", Appv_4).Replace("<databackuptm>", DateTime.Now.ToString()).Replace("<SettingReason>", SettingReason);
+                .Replace("<Creater>", Creater).Replace("<Temperature>", Temperature).Replace("<Channel>", Channel).Replace("<Appv_4>", Appv_4)
+                .Replace("<databackuptm>", DateTime.Now.ToString()).Replace("<SettingReason>", SettingReason).Replace("<RuleID>",IssueViewModels.GetUniqKey());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
-        public static void RemovePJCriticalError(string pjkey, string errorcode,string testcase,string matchcond)
+        private static bool RuleExist(string pjkey, string errorcode, string testcasename, string matchcond, double lowlimit, double highlimit, string Algorithm, string algorithmparam)
         {
-            var sql = "delete from ProjectCriticalError where ProjectKey='<ProjectKey>' and ErrorCode='<ErrorCode>' and TestCaseName='<TestCaseName>' and MatchCond='<MatchCond>'";
-            sql = sql.Replace("<ProjectKey>", pjkey).Replace("<ErrorCode>", errorcode).Replace("<TestCaseName>", testcase).Replace("<MatchCond>", matchcond);
+            var sql = "select RuleID from ProjectCriticalError where ProjectKey = '<ProjectKey>' and ErrorCode = '<ErrorCode>' and TestCaseName = '<TestCaseName>' and MatchCond = '<MatchCond>' and LowLimit = <LowLimit> and HighLimit = <HighLimit> and Algorithm = '<Algorithm>' and AlgorithmParam = '<AlgorithmParam>'";
+            sql = sql.Replace("<ProjectKey>", pjkey).Replace("<ErrorCode>", errorcode).Replace("<TestCaseName>", testcasename)
+                .Replace("<MatchCond>", matchcond).Replace("<LowLimit>", lowlimit.ToString()).Replace("<HighLimit>", highlimit.ToString())
+                .Replace("<Algorithm>", Algorithm).Replace("<AlgorithmParam>", algorithmparam);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
+            if (dbret.Count > 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static void RemovePJCriticalError(string RuleID)
+        {
+            var sql = "delete from ProjectCriticalError where RuleID='<RuleID>'";
+            sql = sql.Replace("<RuleID>", RuleID);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
-        public static void Open2ndCheckFASwitch(string pjkey, string errorcode, string testcase, string matchcond)
+        public static void Open2ndCheckFASwitch(string RuleID)
         {
-            var sql = "update ProjectCriticalError set Appv_1 = -99999 where ProjectKey='<ProjectKey>' and ErrorCode='<ErrorCode>' and TestCaseName='<TestCaseName>' and MatchCond='<MatchCond>'";
-            sql = sql.Replace("<ProjectKey>", pjkey).Replace("<ErrorCode>", errorcode).Replace("<TestCaseName>", testcase).Replace("<MatchCond>", matchcond);
+            var sql = "update ProjectCriticalError set Appv_1 = -99999 where RuleID='<RuleID>'";
+            sql = sql.Replace("<RuleID>", RuleID);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
-        public static void Close2ndCheckFASwitch(string pjkey, string errorcode, string testcase, string matchcond)
+        public static void Close2ndCheckFASwitch(string RuleID)
         {
-            var sql = "update ProjectCriticalError set Appv_1 = 1  where ProjectKey='<ProjectKey>' and ErrorCode='<ErrorCode>' and TestCaseName='<TestCaseName>' and MatchCond='<MatchCond>'";
-            sql = sql.Replace("<ProjectKey>", pjkey).Replace("<ErrorCode>", errorcode).Replace("<TestCaseName>", testcase).Replace("<MatchCond>", matchcond);
+            var sql = "update ProjectCriticalError set Appv_1 = 1  where RuleID='<RuleID>'";
+            sql = sql.Replace("<RuleID>", RuleID);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
@@ -112,12 +134,12 @@ namespace Prometheus.Models
             var sql = string.Empty;
             if (!string.IsNullOrEmpty(errorcode))
             {
-                sql = "select ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel,Appv_5,Appv_4,Appv_3,Appv_1,SettingReason from ProjectCriticalError where ProjectKey='<ProjectKey>' and ErrorCode='<ErrorCode>'";
+                sql = "select ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel,Appv_5,Appv_4,Appv_3,Appv_1,SettingReason,RuleID from ProjectCriticalError where ProjectKey='<ProjectKey>' and ErrorCode='<ErrorCode>'";
                 sql = sql.Replace("<ProjectKey>", pjkey).Replace("<ErrorCode>", errorcode);
             }
             else
             {
-                sql = "select ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel,Appv_5,Appv_4,Appv_3,Appv_1,SettingReason from ProjectCriticalError where ProjectKey='<ProjectKey>'";
+                sql = "select ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel,Appv_5,Appv_4,Appv_3,Appv_1,SettingReason,RuleID from ProjectCriticalError where ProjectKey='<ProjectKey>'";
                 sql = sql.Replace("<ProjectKey>", pjkey);
             }
 
@@ -143,16 +165,35 @@ namespace Prometheus.Models
                 tempvm.Appv_3 = Convert.ToString(line[15]);
                 tempvm.Appv_1 = Convert.ToDouble(line[16]);
                 tempvm.SettingReason = Convert.ToString(line[17]);
+                tempvm.RuleID = Convert.ToString(line[18]);
+
+                if (string.IsNullOrEmpty(tempvm.RuleID))
+                {
+                    tempvm.RuleID = IssueViewModels.GetUniqKey();
+                    UpdateRuleID(tempvm.RuleID, tempvm.ProjectKey, tempvm.ErrorCode
+                        , tempvm.TestCaseName, tempvm.MatchCond, tempvm.LowLimit
+                        , tempvm.HighLimit, tempvm.Algorithm, tempvm.AlgorithmParam);
+                }
+
                 ret.Add(tempvm);
             }
             return ret;
         }
 
+
+        private static void UpdateRuleID(string ruleid,string pjkey, string errorcode, string testcasename, string matchcond, double lowlimit, double highlimit,string Algorithm, string algorithmparam)
+        {
+            var sql = "update ProjectCriticalError set RuleID = '<RuleID>' where ProjectKey = '<ProjectKey>' and ErrorCode = '<ErrorCode>' and TestCaseName = '<TestCaseName>' and MatchCond = '<MatchCond>' and LowLimit = <LowLimit> and HighLimit = <HighLimit> and Algorithm = '<Algorithm>' and AlgorithmParam = '<AlgorithmParam>'";
+            sql = sql.Replace("<RuleID>",ruleid).Replace("<ProjectKey>",pjkey).Replace("<ErrorCode>", errorcode).Replace("<TestCaseName>", testcasename)
+                .Replace("<MatchCond>", matchcond).Replace("<LowLimit>",lowlimit.ToString()).Replace("<HighLimit>", highlimit.ToString())
+                .Replace("<Algorithm>", Algorithm).Replace("<AlgorithmParam>", algorithmparam);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
         public void UpdateMatchDateandTaskKey()
         {
-            var sql = "update ProjectCriticalError set Appv_5 = '<MatchDate>',Appv_3 = '<issuekey>' where ProjectKey='<ProjectKey>' and ErrorCode='<ErrorCode>' and TestCaseName='<TestCaseName>' and MatchCond='<MatchCond>'";
-            sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ErrorCode>", ErrorCode).Replace("<TestCaseName>", TestCaseName)
-                .Replace("<MatchCond>", MatchCond).Replace("<MatchDate>",Appv_5.ToString("yyyy-MM-dd hh:mm:ss")).Replace("<issuekey>", Appv_3);
+            var sql = "update ProjectCriticalError set Appv_5 = '<MatchDate>',Appv_3 = '<issuekey>' where RuleID='<RuleID>'";
+            sql = sql.Replace("<RuleID>", RuleID).Replace("<MatchDate>",Appv_5.ToString("yyyy-MM-dd hh:mm:ss")).Replace("<issuekey>", Appv_3);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
     }

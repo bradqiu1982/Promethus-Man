@@ -521,11 +521,14 @@ namespace Prometheus.Models
                                     item.Comments = snfailuredict[item.ContainerName];
                                     if (isosapj)
                                     {
-                                        var ekey = ProjectErrorViewModels.GetUniqKey();
-                                        var pjerror = new ProjectErrorViewModels(PJKey, ekey,item.Comments, "", 1);
-                                        pjerror.Reporter = "System";
-                                        pjerror.Description = "";
-                                        pjerror.AddandUpdateProjectError();
+                                        if (!string.IsNullOrEmpty(item.Comments.Trim()) && !item.Comments.Trim().ToUpper().Contains("OTHER"))
+                                        {
+                                            var ekey = ProjectErrorViewModels.GetUniqKey();
+                                            var pjerror = new ProjectErrorViewModels(PJKey, ekey,item.Comments.Trim(), "", 1);
+                                            pjerror.Reporter = "System";
+                                            pjerror.Description = "";
+                                            pjerror.AddandUpdateProjectError();
+                                        }
                                     }
                                 }
                             }

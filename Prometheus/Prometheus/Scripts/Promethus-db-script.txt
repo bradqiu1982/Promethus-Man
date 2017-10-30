@@ -216,6 +216,9 @@ CREATE TABLE [dbo].[ProjectError] (
     [ErrorCount]  INT           NOT NULL
 );
 
+ALTER TABLE  [DebugDB].[dbo].[ProjectError] Add SolvedCount INT    DEFAULT (0) NOT NULL;
+ALTER TABLE  [NPITrace].[dbo].[ProjectError] Add SolvedCount INT    DEFAULT (0) NOT NULL;
+
 CREATE TABLE [dbo].[Project] (
     [ProjectKey]  NVARCHAR (50)  NOT NULL,
     [ProjectName] NVARCHAR (200) NOT NULL,

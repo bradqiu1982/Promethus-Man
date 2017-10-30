@@ -1829,8 +1829,8 @@ namespace Prometheus.Controllers
                 if (vm.IssueClosed())
                 {
                     var realissue = IssueViewModels.RetrieveIssueByIssueKey(vm.IssueKey,this);
-
-                    vm.CloseIssue();
+                    realissue.CloseIssue();
+                    ProjectErrorViewModels.UpdateSovledIssueCount(realissue.ProjectKey, realissue.ErrAbbr);
 
                     if (realissue.Summary.Contains(CRITICALERRORTYPE.LYTTASK)|| realissue.Summary.Contains(CRITICALERRORTYPE.LYTTASK1))
                     {

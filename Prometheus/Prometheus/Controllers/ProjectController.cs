@@ -7188,6 +7188,29 @@ namespace Prometheus.Controllers
             
             new System.Threading.ManualResetEvent(false).WaitOne(500);
         }
+
+
+        private void SumOnePJSolvedIssu(string pjkey)
+        {
+            var allerrorkey = ProjectErrorViewModels.RetrieveErrorByPJKey(pjkey, this);
+            foreach (var err in allerrorkey)
+            {
+                var solvecount = IssueViewModels.RetrieveSolveIssueCount(pjkey,err.OrignalCode);
+                ProjectErrorViewModels.UpdateSolvedIssueCount(pjkey,err.OrignalCode,solvecount);
+            }
+        }
+
+        public ActionResult SumSolvedIssue()
+        {
+            var pjlist = ProjectViewModels.RetrieveAllProjectKey();
+            foreach (var pj in pjlist)
+            {
+                SumOnePJSolvedIssu(pj);
+            }
+
+            return View("HeartBeat");
+        }
+
     }
     
 }

@@ -63,6 +63,7 @@
                 <th>Error Code</th>
                 <th>Short Desc</th>
                 <th>Count</th>
+                <th>Solved</th>
                 <th>Attachement</th>
                 <th>FA</th>
             </tr>
@@ -76,6 +77,7 @@
                     </td>
                     <td>@item.ShortDesc</td>
                     <td>@item.ErrorCount</td>
+                    <td>@item.SolvedCount</td>
                     @if (item.AttachList.Count > 0)
                     {
                         <td><a href="/Project/ErrorAttach?ErrorKey=@item.ErrorKey" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></a></td>

@@ -83,17 +83,25 @@ namespace Prometheus.Models
     public class ProjectErrorViewModels
     {
         public ProjectErrorViewModels()
-        { }
+        {
+            ProjectKey = "";
+            ErrorKey = "";
+            OrignalCode = "";
+            ShortDesc = "";
+            ErrorCount = 0;
+            SolvedCount = 0;
+        }
 
         public static string BURNIN = "BURNIN";
 
-        public ProjectErrorViewModels(string pjkey,string ekey,string ocode,string sdesc,int count)
+        public ProjectErrorViewModels(string pjkey,string ekey,string ocode,string sdesc,int count,int solvedcount = 0)
         {
             ProjectKey = pjkey;
             ErrorKey = ekey;
             OrignalCode = ocode;
             ShortDesc = sdesc;
             ErrorCount = count;
+            SolvedCount = solvedcount;
         }
 
         public string ProjectKey { set; get; }
@@ -107,6 +115,8 @@ namespace Prometheus.Models
         public string Reporter { set; get; }
 
         public int ErrorCount { set; get; }
+
+        public int SolvedCount { set; get; }
 
         private string sDescription = "";
         public string Description
@@ -330,7 +340,7 @@ namespace Prometheus.Models
 
         public void AddandUpdateProjectError()
         {
-            var sql = "select  ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount from ProjectError where ProjectKey = '<ProjectKey>' and OrignalCode = N'<OrignalCode>'";
+            var sql = "select  ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount,SolvedCount from ProjectError where ProjectKey = '<ProjectKey>' and OrignalCode = N'<OrignalCode>'";
             sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<OrignalCode>", OrignalCode);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
 
@@ -381,13 +391,13 @@ namespace Prometheus.Models
         public static List<ProjectErrorViewModels> RetrieveErrorByPJKey(string projectkey, Controller ctrl)
         {
             var ret = new List<ProjectErrorViewModels>();
-            var sql = "select  ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount from ProjectError where ProjectKey = '<ProjectKey>' order by ErrorCount DESC";
+            var sql = "select  ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount,SolvedCount from ProjectError where ProjectKey = '<ProjectKey>' order by ErrorCount DESC";
             sql = sql.Replace("<ProjectKey>", projectkey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
 
             foreach (var line in dbret)
             {
-                var temperror = new ProjectErrorViewModels(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToString(line[2]), Convert.ToString(line[3]),Convert.ToInt32(line[4]));
+                var temperror = new ProjectErrorViewModels(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToString(line[2]), Convert.ToString(line[3]),Convert.ToInt32(line[4]),Convert.ToInt32(line[5]));
                 temperror.CommentList = RetrieveErrorComments(temperror.ErrorKey,ctrl);
                 temperror.RetrieveAttachment(temperror.ErrorKey);
                 ret.Add(temperror);
@@ -414,13 +424,13 @@ namespace Prometheus.Models
         public static List<ProjectErrorViewModels> RetrieveErrorByPJKey(string projectkey,string errorcode, Controller ctrl)
         {
             var ret = new List<ProjectErrorViewModels>();
-            var sql = "select  ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount from ProjectError where ProjectKey = '<ProjectKey>' and OrignalCode = '<OrignalCode>'";
+            var sql = "select  ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount,SolvedCount from ProjectError where ProjectKey = '<ProjectKey>' and OrignalCode = '<OrignalCode>'";
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<OrignalCode>", errorcode);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
 
             foreach (var line in dbret)
             {
-                var temperror = new ProjectErrorViewModels(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToString(line[2]), Convert.ToString(line[3]), Convert.ToInt32(line[4]));
+                var temperror = new ProjectErrorViewModels(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToString(line[2]), Convert.ToString(line[3]), Convert.ToInt32(line[4]),Convert.ToInt32(line[5]));
                 temperror.CommentList = RetrieveErrorComments(temperror.ErrorKey,ctrl);
                 temperror.RetrieveAttachment(temperror.ErrorKey);
                 ret.Add(temperror);
@@ -431,13 +441,13 @@ namespace Prometheus.Models
         public static List<ProjectErrorViewModels> RetrieveErrorByErrorKey(string ekey, Controller ctrl)
         {
             var ret = new List<ProjectErrorViewModels>();
-            var sql = "select  ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount from ProjectError where ErrorKey = '<ErrorKey>'";
+            var sql = "select  ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount,SolvedCount from ProjectError where ErrorKey = '<ErrorKey>'";
             sql = sql.Replace("<ErrorKey>", ekey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
 
             foreach (var line in dbret)
             {
-                var temperror = new ProjectErrorViewModels(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToString(line[2]), Convert.ToString(line[3]), Convert.ToInt32(line[4]));
+                var temperror = new ProjectErrorViewModels(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToString(line[2]), Convert.ToString(line[3]), Convert.ToInt32(line[4]),Convert.ToInt32(line[5]));
                 temperror.CommentList = RetrieveErrorComments(temperror.ErrorKey,ctrl);
                 temperror.RetrieveAttachment(temperror.ErrorKey);
                 ret.Add(temperror);
@@ -625,6 +635,27 @@ namespace Prometheus.Models
                 DBUtility.ExeLocalSqlNoRes(csql);
             }//end if
         }
+
+        public static void UpdateSolvedIssueCount(string pjkey, string errabbr, int count)
+        {
+            var sql = "update ProjectError set SolvedCount = <SolvedCount> where ProjectKey = '<ProjectKey>' and OrignalCode = N'<OrignalCode>'";
+            sql = sql.Replace("<ProjectKey>", pjkey).Replace("<OrignalCode>", errabbr).Replace("<SolvedCount>", count.ToString());
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        public static void UpdateSovledIssueCount(string pjkey, string errabbr)
+        {
+            var sql = "select SolvedCount from ProjectError where  ProjectKey = '<ProjectKey>' and OrignalCode = N'<OrignalCode>'";
+            sql = sql.Replace("<ProjectKey>", pjkey).Replace("<OrignalCode>", errabbr);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
+            if (dbret.Count > 0)
+            {
+                var newcount = Convert.ToInt32(dbret[0][0]) + 1;
+                UpdateSolvedIssueCount(pjkey, errabbr, newcount);
+            }
+        }
+
+
 
     }
 }

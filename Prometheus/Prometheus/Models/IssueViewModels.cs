@@ -3112,5 +3112,25 @@ namespace Prometheus.Models
             sql = sql.Replace("<IssueKey>", issuekey).Replace("<Assignee>", assignee).Replace("<Resolution>", resolution).Replace("<Summary>", summary);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
+
+
+        public static int RetrieveSolveIssueCount(string pjkey, string errAbbr)
+        {
+            var ret = 0;
+            var cond = "('" + Resolute.Fixed + "','" + Resolute.Done + "','" + Resolute.NotFix + "','" + Resolute.NotReproduce + "','" + Resolute.Unresolved + "')";
+            var sql = "select Count(*) from Issue where APVal1 <> 'delete' and ProjectKey = '<ProjectKey>' and Resolution in <cond> and ErrAbbr = '<ErrAbbr>'";
+            sql = sql.Replace("<ProjectKey>", pjkey).Replace("<ErrAbbr>", errAbbr).Replace("<cond>", cond);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
+            if(dbret.Count > 0)
+            {
+                try
+                {
+                    return Convert.ToInt32(dbret[0][0]);
+                }
+                catch (Exception ex) { return 0; }
+            }
+
+            return ret;
+        }
     }
 }

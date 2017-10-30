@@ -71,7 +71,7 @@ namespace Prometheus.Models
 
         public void StorePJCriticalError()
         {
-            if (RuleExist(ProjectKey,ErrorCode,TestCaseName,MatchCond,LowLimit,HighLimit,Algorithm, AlgorithmParam))
+            if (RuleExist(ProjectKey,ErrorCode.Trim(),TestCaseName.Trim(),MatchCond.Trim(),LowLimit,HighLimit,Algorithm.Trim(), AlgorithmParam.Trim()))
             {
                 return;
             }
@@ -79,11 +79,11 @@ namespace Prometheus.Models
             var sql = "insert into ProjectCriticalError(ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel,Appv_4,databackuptm,SettingReason,RuleID) "
                 + " values('<ProjectKey>','<ErrorCode>','<TestCaseName>','<MatchCond>',<WithLimit>,<LowLimit>,<HighLimit>,<WithAlgorithm>,'<Algorithm>','<AlgorithmParam>','<Creater>','<Temperature>','<Channel>','<Appv_4>','<databackuptm>','<SettingReason>','<RuleID>')";
 
-            sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ErrorCode>", ErrorCode).Replace("<MatchCond>", MatchCond).Replace("<TestCaseName>", TestCaseName)
+            sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ErrorCode>", ErrorCode.Trim()).Replace("<MatchCond>", MatchCond.Trim()).Replace("<TestCaseName>", TestCaseName.Trim())
                 .Replace("<WithLimit>", WithLimit.ToString()).Replace("<LowLimit>", LowLimit.ToString()).Replace("<HighLimit>", HighLimit.ToString())
-                .Replace("<WithAlgorithm>", WithAlgorithm.ToString()).Replace("<Algorithm>", Algorithm).Replace("<AlgorithmParam>", AlgorithmParam)
+                .Replace("<WithAlgorithm>", WithAlgorithm.ToString()).Replace("<Algorithm>", Algorithm.Trim()).Replace("<AlgorithmParam>", AlgorithmParam.Trim())
                 .Replace("<Creater>", Creater).Replace("<Temperature>", Temperature).Replace("<Channel>", Channel).Replace("<Appv_4>", Appv_4)
-                .Replace("<databackuptm>", DateTime.Now.ToString()).Replace("<SettingReason>", SettingReason).Replace("<RuleID>",IssueViewModels.GetUniqKey());
+                .Replace("<databackuptm>", DateTime.Now.ToString()).Replace("<SettingReason>", SettingReason.Trim()).Replace("<RuleID>",IssueViewModels.GetUniqKey());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 

@@ -95,7 +95,7 @@
                             <div class="row" MYTP="HOVER" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
                                 <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
                                     <div class="col-xs-6">
-                                        <div class="col-xs-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd hh:mm:ss")</div>
+                                        <div class="col-xs-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd HH:mm:ss")</div>
                                         <div class="col-xs-2">
                                             <a href="/User/UpdateWebDocComment?ErrorKey=@(item.ErrorKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())&Creator=@(Model.UserName)">
                                                 <img src="~/Content/images/icon/edit.png" MYTP="HOVER" style="height:34px; width:24px">

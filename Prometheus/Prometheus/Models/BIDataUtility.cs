@@ -712,7 +712,7 @@ namespace Prometheus.Models
                     var pntemptime = BITestData.RetrieveLatestTimeOfLocalBIByPN(pn);
                     if (pntemptime == null)
                     {
-                        pntemptime = vm.StartDate.ToString("yyyy-MM-dd hh:mm:ss");
+                        pntemptime = vm.StartDate.ToString("yyyy-MM-dd HH:mm:ss");
                     }
 
                     var sql = "select SN,TestName,BITable,Failure,TestTimeStamp,Station,PN,Wafer,JO from BITestResult where PN='<PN>' and TestTimeStamp > '<TestTimeStamp>' order by TestTimeStamp Desc,SN";
@@ -807,7 +807,7 @@ namespace Prometheus.Models
                             return;
                         }
 
-                            sql = sql.Replace("<PNCOND>",pncond).Replace("<TIMECOND>", vm.StartDate.ToString("yyyy-MM-dd hh:mm:ss"));
+                            sql = sql.Replace("<PNCOND>",pncond).Replace("<TIMECOND>", vm.StartDate.ToString("yyyy-MM-dd HH:mm:ss"));
 
                             var tempdataiddict = new Dictionary<string, BITestData>();
                             var dbret = DBUtility.ExePRLSqlWithRes(ctrl,sql);
@@ -895,7 +895,7 @@ namespace Prometheus.Models
                     var pntemptime = BITestData.RetrieveLatestTimeOfLocalBIByPN(pn);
                     if (pntemptime == null)
                     {
-                        pntemptime = vm.StartDate.ToString("yyyy-MM-dd hh:mm:ss");
+                        pntemptime = vm.StartDate.ToString("yyyy-MM-dd HH:mm:ss");
                     }
 
                     var sql = "select SN,TestName,BITable,Failure,TestTimeStamp,Station,PN,Wafer,JO from BITestResult where PN='<PN>' and TestTimeStamp > '<TestTimeStamp>' order by TestTimeStamp Desc,SN";
@@ -993,7 +993,7 @@ namespace Prometheus.Models
                             var starttime = BITestData.RetrieveLatestTimeOfLocalBI(vm.ProjectKey);
                             if (string.IsNullOrEmpty(starttime))
                             {
-                                starttime = vm.StartDate.ToString("yyyy-MM-dd hh:mm:ss");
+                                starttime = vm.StartDate.ToString("yyyy-MM-dd HH:mm:ss");
                             }
 
                             var sql = "select ModuleSerialNum,Step,ModuleType,ErrAbbr,TestTimeStamp,TestStation,ModulePartNum,wafer,waferpn from  "+vt+"(nolock) where wafer <> 'NULL' and waferpn  <> 'NULL' and ErrAbbr  <> 'NULL' and ModulePartNum in <PNCOND> and TestTimeStamp > '<TIMECOND>' order by TestTimeStamp Desc,ModuleSerialNum";
@@ -1293,7 +1293,7 @@ namespace Prometheus.Models
                     vm.Reporter = "System";
                     vm.Resolution = Resolute.Pending;
                     vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
-                    vm.Description = "Module " + item.ModuleSerialNum + " failed for " + item.ErrAbbr + " @Burn-In Step " + item.WhichTest + " on tester " + item.TestStation + " " + item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss");
+                    vm.Description = "Module " + item.ModuleSerialNum + " failed for " + item.ErrAbbr + " @Burn-In Step " + item.WhichTest + " on tester " + item.TestStation + " " + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss");
                     vm.CommentType = COMMENTTYPE.Description;
                     vm.ModuleSN = item.ModuleSerialNum;
                     vm.ErrAbbr = item.ErrAbbr;
@@ -1316,7 +1316,7 @@ namespace Prometheus.Models
             {
                 try
                 {
-                    return DateTime.Parse(Convert.ToString(dbret[0][0])).ToString("yyyy-MM-dd hh:mm:ss");
+                    return DateTime.Parse(Convert.ToString(dbret[0][0])).ToString("yyyy-MM-dd HH:mm:ss");
                 }
                 catch (Exception ex)
                 {
@@ -1720,7 +1720,7 @@ namespace Prometheus.Models
             {
                 try
                 {
-                    return DateTime.Parse(Convert.ToString(dbret[0][0])).ToString("yyyy-MM-dd hh:mm:ss");
+                    return DateTime.Parse(Convert.ToString(dbret[0][0])).ToString("yyyy-MM-dd HH:mm:ss");
                 }
                 catch (Exception ex)
                 {
@@ -1911,7 +1911,7 @@ namespace Prometheus.Models
             {
                 try
                 {
-                    return DateTime.Parse(Convert.ToString(dbret[0][0])).ToString("yyyy-MM-dd hh:mm:ss");
+                    return DateTime.Parse(Convert.ToString(dbret[0][0])).ToString("yyyy-MM-dd HH:mm:ss");
                 }
                 catch (Exception ex)
                 {

@@ -193,7 +193,7 @@ namespace Prometheus.Models
         public void UpdateMatchDateandTaskKey()
         {
             var sql = "update ProjectCriticalError set Appv_5 = '<MatchDate>',Appv_3 = '<issuekey>' where RuleID='<RuleID>'";
-            sql = sql.Replace("<RuleID>", RuleID).Replace("<MatchDate>",Appv_5.ToString("yyyy-MM-dd hh:mm:ss")).Replace("<issuekey>", Appv_3);
+            sql = sql.Replace("<RuleID>", RuleID).Replace("<MatchDate>",Appv_5.ToString("yyyy-MM-dd HH:mm:ss")).Replace("<issuekey>", Appv_3);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
     }

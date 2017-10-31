@@ -400,7 +400,7 @@ namespace Prometheus.Models
                         //use latest failure cover previous failure
                         foreach (var item in failurelist)
                         {
-                            IssueViewModels.CloseIssueAutomaticllyWithFailedSN(item.ProjectKey, item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss"),ctrl);
+                            IssueViewModels.CloseIssueAutomaticllyWithFailedSN(item.ProjectKey, item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"),ctrl);
                         }
 
                         CreateSystemIssues(failurelist);
@@ -411,7 +411,7 @@ namespace Prometheus.Models
                         //use pass sn cover previous failure
                         foreach (var item in passlist)
                         {
-                            IssueViewModels.CloseIssueAutomaticlly(item.ProjectKey, item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss"),ctrl);
+                            IssueViewModels.CloseIssueAutomaticlly(item.ProjectKey, item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"),ctrl);
                         }
                     }
 
@@ -507,7 +507,7 @@ namespace Prometheus.Models
                         vm.Reporter = "System";
                         vm.Resolution = Resolute.Pending;
                         vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
-                        vm.Description = "Module " + item.ModuleSerialNum + " failed for " + item.ErrAbbr + " @ " + item.WhichTest + " on tester " + item.TestStation + " " + item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss")+ DataFieldStr(item.DataID);
+                        vm.Description = "Module " + item.ModuleSerialNum + " failed for " + item.ErrAbbr + " @ " + item.WhichTest + " on tester " + item.TestStation + " " + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss")+ DataFieldStr(item.DataID);
                         vm.CommentType = COMMENTTYPE.Description;
                         vm.ModuleSN = item.ModuleSerialNum;
                         vm.ErrAbbr = item.ErrAbbr;

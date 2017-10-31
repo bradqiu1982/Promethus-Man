@@ -212,7 +212,7 @@ namespace Prometheus.Models
             sql = "insert into WaferRecord(Wafer,WaferBinYield,WaferBinCount,SumCount,databackuptm) "
                 +" values('<Wafer>','<WaferBinYield>','<WaferBinCount>','<SumCount>','<databackuptm>')";
             sql = sql.Replace("<Wafer>", Wafer).Replace("<WaferBinYield>", WaferBinYield).Replace("<WaferBinCount>", WaferBinCount)
-                .Replace("<SumCount>", SumCount).Replace("<databackuptm>", databackuptm.ToString("yyyy-MM-dd hh:mm:ss"));
+                .Replace("<SumCount>", SumCount).Replace("<databackuptm>", databackuptm.ToString("yyyy-MM-dd HH:mm:ss"));
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
@@ -2195,7 +2195,7 @@ namespace Prometheus.Models
         private static List<RawDMR> RetrieveDMRFromITDB(string OBAUpdateTime, Dictionary<string, IssueViewModels> DMRDict, Controller ctrl)
         {
             var ret = new List<RawDMR>();
-            var onemonthago = DateTime.Parse(OBAUpdateTime).AddMonths(-1).ToString("yyyy-MM-dd hh:mm:ss");
+            var onemonthago = DateTime.Parse(OBAUpdateTime).AddMonths(-1).ToString("yyyy-MM-dd HH:mm:ss");
 
             var sql = "select DMR_ID,Created_at,Prod_Line,Defect_Qty,Inspected_Qty,Actual_Problem,Justification,Remark,File_URL from dbo.DMR_Detail_List_View where Created_at > '<CreateTime>'";
             sql = sql.Replace("<CreateTime>", onemonthago);

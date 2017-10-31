@@ -297,8 +297,8 @@ namespace Prometheus.Controllers
         {
             var edate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd") + " 07:30:00");
             var sdate = edate.AddDays(-30);
-            var pendingissues = IssueViewModels.RetrieveIssueForIncreaseSummary(ProjectKey,sdate.ToString("yyyy-MM-dd hh:mm:ss"));
-            var solvedissues = IssueViewModels.RetrieveIssueForSolveSummary(ProjectKey, sdate.ToString("yyyy-MM-dd hh:mm:ss"));
+            var pendingissues = IssueViewModels.RetrieveIssueForIncreaseSummary(ProjectKey,sdate.ToString("yyyy-MM-dd HH:mm:ss"));
+            var solvedissues = IssueViewModels.RetrieveIssueForSolveSummary(ProjectKey, sdate.ToString("yyyy-MM-dd HH:mm:ss"));
             
             var datelist = new List<string>();
             var pendinglist = new List<int>();
@@ -398,7 +398,7 @@ namespace Prometheus.Controllers
 
             var edate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd") + " 07:30:00");
             var sdate = edate.AddDays(-30);
-            var pendingissues = IssueViewModels.RetrieveIssueForIncreaseSummary(ProjectKey, sdate.ToString("yyyy-MM-dd hh:mm:ss"));
+            var pendingissues = IssueViewModels.RetrieveIssueForIncreaseSummary(ProjectKey, sdate.ToString("yyyy-MM-dd HH:mm:ss"));
 
             var datelist = new List<string>();
             var dictlist = new List<Dictionary<string, int>>();

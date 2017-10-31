@@ -3473,7 +3473,7 @@ namespace Prometheus.Controllers
                 line = "\""+item.FinisarRMA.Replace("\"","")+"\","+ "\""+item.ModuleSN.Replace("\"", "") + "\"," + "\"" + item.Resolution.Replace("\"", "") + "\","
                     + "\"" + item.ECustomer.Replace("\"", "") + "\"," + "\"" + item.FVCode.Replace("\"", "") + "\","+ "\""+item.RMAFailureCode.Replace("\"", "") + "\"," 
                     + "\""+ rootcause.Trim() + "\"," + "\""+item.Assignee.Replace("\"", "")+ "\"," + "\"" + item.Reporter.Replace("\"", "") + "\"," 
-                    + "\""+item.ReportDate.ToString("yyyy-MM-dd hh:mm:ss") + "\"," 
+                    + "\""+item.ReportDate.ToString("yyyy-MM-dd HH:mm:ss") + "\"," 
                     + "\"" + item.CReport.Replace("\"", "") + "\","+ "\""+ internalreport + "\"," + "\""+ customerreport + "\","
                     + "\"" + containmentaction.Replace("\"", "") + "\"," + "\"" + correctiveaction.Replace("\"", "") + "\"," + "\"" + attach.Replace("\"", "") + "\",";
 
@@ -3600,7 +3600,7 @@ namespace Prometheus.Controllers
                 line = string.Empty;
                 line = "\"" + item.FinisarRMA.Replace("\"", "") + "\"," + "\"" + item.ProjectKey.Replace("\"", "") + "\"," + "\"" + item.ModuleSN.Replace("\"", "") + "\"," + "\"" + item.Resolution.Replace("\"", "") + "\","
                     + "\"" + item.ECustomer.Replace("\"", "") + "\"," + "\"" + item.FVCode.Replace("\"", "") + "\"," + "\"" + item.RMAFailureCode.Replace("\"", "") + "\"," + "\"" + rootcause.Trim() + "\","
-                    + "\"" + item.Assignee.Replace("\"", "") + "\"," + "\"" + item.Reporter.Replace("\"", "") + "\"," + "\"" + item.ReportDate.ToString("yyyy-MM-dd hh:mm:ss") + "\"," + "\"" + item.CReport.Replace("\"", "") + "\","
+                    + "\"" + item.Assignee.Replace("\"", "") + "\"," + "\"" + item.Reporter.Replace("\"", "") + "\"," + "\"" + item.ReportDate.ToString("yyyy-MM-dd HH:mm:ss") + "\"," + "\"" + item.CReport.Replace("\"", "") + "\","
                     + "\"" + internalreport + "\"," + "\"" + customerreport + "\","
                     + "\"" + containmentaction.Replace("\"", "") + "\"," + "\"" + correctiveaction.Replace("\"", "") + "\"," + "\"" + attach.Replace("\"", "") + "\",";
 

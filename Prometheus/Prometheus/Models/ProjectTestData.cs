@@ -130,12 +130,12 @@ namespace Prometheus.Models
                         //vlast = vlast.AddMinutes(18);
                         //if (vlast < DateTime.Now)
                         //{
-                            MESUtility.UpdateProjectData(vm, lastupdatetime, DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),ctrl);
+                            MESUtility.UpdateProjectData(vm, lastupdatetime, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),ctrl);
                         //}
                     }
                     else
                     {
-                        MESUtility.UpdateProjectData(vm, vm.StartDate.ToString("yyyy-MM-dd hh:mm:ss"), DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),ctrl);
+                        MESUtility.UpdateProjectData(vm, vm.StartDate.ToString("yyyy-MM-dd HH:mm:ss"), DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),ctrl);
                     }
                 }
 
@@ -419,7 +419,7 @@ namespace Prometheus.Models
         {
             var ret = new Dictionary<string, bool>();
             var sql = "select DataID from ProjectTestData where ProjectKey = '<ProjectKey>' and TestTimeStamp > '<TestTimeStamp>'";
-            sql = sql.Replace("<ProjectKey>", projectkey).Replace("<TestTimeStamp>",DateTime.Now.AddMonths(-3).ToString("yyyy-MM-dd hh:mm:ss"));
+            sql = sql.Replace("<ProjectKey>", projectkey).Replace("<TestTimeStamp>",DateTime.Now.AddMonths(-3).ToString("yyyy-MM-dd HH:mm:ss"));
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var item in dbret)
             {
@@ -435,7 +435,7 @@ namespace Prometheus.Models
         {
             var ret = new Dictionary<string, bool>();
             //var sql = "select ModuleSerialNum,WhichTest from ProjectTestData where ProjectKey = '<ProjectKey>' and TestTimeStamp < '<ENDDATE>'";
-            var sql = "select ModuleSerialNum,WhichTest from ProjectTestData where ProjectKey = '<ProjectKey>' and TestTimeStamp < '<ENDDATE>' and TestTimeStamp > '" + DateTime.Parse(edate).AddMonths(-12).ToString("yyyy-MM-dd hh:mm:ss") + "' order by TestTimeStamp DESC";
+            var sql = "select ModuleSerialNum,WhichTest from ProjectTestData where ProjectKey = '<ProjectKey>' and TestTimeStamp < '<ENDDATE>' and TestTimeStamp > '" + DateTime.Parse(edate).AddMonths(-12).ToString("yyyy-MM-dd HH:mm:ss") + "' order by TestTimeStamp DESC";
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<ENDDATE>", edate);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, mycache);
             foreach (var item in dbret)

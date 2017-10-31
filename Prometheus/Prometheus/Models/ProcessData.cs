@@ -220,7 +220,7 @@ namespace Prometheus.Models
                         + " values('<ProjectKey>','<ProductId>','<WorkflowStepID>','<WorkflowStepName>','<WorkflowID>',<Sequence>,'<databackuptm>')";
                     csql = csql.Replace("<ProjectKey>",flow.ProjectKey).Replace("<ProductId>",flow.ProductId).Replace("<WorkflowStepID>",flow.WorkflowStepID)
                         .Replace("<WorkflowStepName>",flow.WorkflowStepName).Replace("<WorkflowID>",flow.WorkflowID).Replace("<Sequence>",flow.Sequence.ToString())
-                        .Replace("<databackuptm>",DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"));
+                        .Replace("<databackuptm>",DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
                     DBUtility.ExeLocalSqlNoRes(csql);
                 }
             }//end if
@@ -296,7 +296,7 @@ namespace Prometheus.Models
             {
                 try
                 {
-                    return Convert.ToDateTime(dbret[0][0]).ToString("yyyy-MM-dd hh:mm:ss");
+                    return Convert.ToDateTime(dbret[0][0]).ToString("yyyy-MM-dd HH:mm:ss");
                 }
                 catch (Exception ex) { return movezerotime; }
             }
@@ -719,7 +719,7 @@ namespace Prometheus.Models
         {
             var ret = new List<string>();
             var sql = "select distinct MfgOrderName from ProjectMoveHistory where MoveOutTime > '<starttime>' and ProjectKey= '<ProjectKey>'  order by MfgOrderName";
-            sql = sql.Replace("<starttime>", DateTime.Now.AddMonths(-6).ToString("yyyy-MM-dd hh:mm:ss")).Replace("<ProjectKey>", PJKey);
+            sql = sql.Replace("<starttime>", DateTime.Now.AddMonths(-6).ToString("yyyy-MM-dd HH:mm:ss")).Replace("<ProjectKey>", PJKey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
             {

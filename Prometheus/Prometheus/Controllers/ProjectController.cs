@@ -6776,7 +6776,7 @@ namespace Prometheus.Controllers
                     {
                         realissue.CommentList[0].Comment = vm.Description;
                         IssueViewModels.UpdateSPComment(realissue.IssueKey, realissue.CommentList[0].CommentType
-                            , realissue.CommentList[0].CommentDate.ToString("yyyy-MM-dd hh:mm:ss"), realissue.CommentList[0].dbComment);
+                            , realissue.CommentList[0].CommentDate.ToString("yyyy-MM-dd HH:mm:ss"), realissue.CommentList[0].dbComment);
                     }
                 }
 

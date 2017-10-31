@@ -225,7 +225,7 @@ namespace Prometheus.Models
                 }
             }
 
-            plist = BITestData.RetrieveProjectTestData(pjkey, startdate, DateTime.Parse(enddate).AddYears(5).ToString("yyyy-MM-dd hh:mm:ss"), false);
+            plist = BITestData.RetrieveProjectTestData(pjkey, startdate, DateTime.Parse(enddate).AddYears(5).ToString("yyyy-MM-dd HH:mm:ss"), false);
             var filteredPjData2 = new List<BITestData>();
             foreach (var item in plist)
             {

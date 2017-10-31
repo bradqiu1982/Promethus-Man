@@ -3086,7 +3086,7 @@ namespace Prometheus.Models
                     if (item.TestTimeStamp > tobedata.ReportDate)
                     {
                         tobedata.Resolution = Resolute.AutoClose;
-                        tobedata.Description = "Module " + item.ModuleSerialNum + " passed " + item.WhichTest + " test @" + item.TestStation + " @" + item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss");
+                        tobedata.Description = "Module " + item.ModuleSerialNum + " passed " + item.WhichTest + " test @" + item.TestStation + " @" + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss");
                         tobedata.UpdateIssue();
                         tobedata.CloseIssue();
                     }

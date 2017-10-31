@@ -531,7 +531,7 @@ namespace Prometheus.Models
         {
             if (mycache != null)
             {
-                var ckey = pjkey + "_" + DateTime.Parse(sdate).ToString("yyyy-MM-dd hh:mm:ss") + "_" + DateTime.Parse(edate).ToString("yyyy-MM-dd hh:mm:ss") + "_CUST";
+                var ckey = pjkey + "_" + DateTime.Parse(sdate).ToString("yyyy-MM-dd HH:mm:ss") + "_" + DateTime.Parse(edate).ToString("yyyy-MM-dd HH:mm:ss") + "_CUST";
                 var vm = mycache.Get(ckey);
                 if (vm != null)
                 {
@@ -564,7 +564,7 @@ namespace Prometheus.Models
                 return ret;
             }
 
-            var datatfromstart = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, DateTime.Parse(enddate).AddYears(5).ToString("yyyy-MM-dd hh:mm:ss"), false,null);
+            var datatfromstart = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, DateTime.Parse(enddate).AddYears(5).ToString("yyyy-MM-dd HH:mm:ss"), false,null);
             if (datatfromstart.Count == 0)
             {
                 return ret;
@@ -656,7 +656,7 @@ namespace Prometheus.Models
 
             if (mycache != null)
             {
-                var ckey = pjkey + "_" + DateTime.Parse(sdate).ToString("yyyy-MM-dd hh:mm:ss") + "_" + DateTime.Parse(edate).ToString("yyyy-MM-dd hh:mm:ss") + "_CUST";
+                var ckey = pjkey + "_" + DateTime.Parse(sdate).ToString("yyyy-MM-dd HH:mm:ss") + "_" + DateTime.Parse(edate).ToString("yyyy-MM-dd HH:mm:ss") + "_CUST";
                 var vm = mycache.Get(ckey);
                 if (vm == null)
                 {

@@ -132,7 +132,7 @@ namespace Prometheus.Models
             vm.Reporter = "System";
             vm.Resolution = Resolute.Pending;
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
-            vm.Description = "Module " + item.ModuleSerialNum + " failed for " + item.ErrAbbr + " @ " + item.WhichTest +" on tester "+item.TestStation + " "+item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss");
+            vm.Description = "Module " + item.ModuleSerialNum + " failed for " + item.ErrAbbr + " @ " + item.WhichTest +" on tester "+item.TestStation + " "+item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss");
             vm.CommentType = COMMENTTYPE.Description;
             vm.ModuleSN = item.ModuleSerialNum;
             vm.ErrAbbr = item.ErrAbbr;
@@ -771,7 +771,7 @@ namespace Prometheus.Models
                         }
 
                         var sndict = new Dictionary<string, bool>();
-                        var sql = s.Value.Replace("<TIMECOND>", "and TestTimeStamp > '" + vm.StartDate.ToString("yyyy-MM-dd hh:mm:ss") + "' and TestTimeStamp < '" + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + "'");
+                        var sql = s.Value.Replace("<TIMECOND>", "and TestTimeStamp > '" + vm.StartDate.ToString("yyyy-MM-dd HH:mm:ss") + "' and TestTimeStamp < '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "'");
                         var dbret = DBUtility.ExeMESSqlWithRes(sql);
                         foreach (var item in dbret)
                         {
@@ -1105,11 +1105,11 @@ namespace Prometheus.Models
                             {
                                 if (string.Compare(dt.ErrAbbr, "0", true) == 0)
                                 {
-                                    IssueViewModels.CloseIssueAutomaticllyWithFailedSN(dt.ProjectKey, dt.ModuleSerialNum, dt.WhichTest, dt.TestStation, dt.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss"), ctrl);
+                                    IssueViewModels.CloseIssueAutomaticllyWithFailedSN(dt.ProjectKey, dt.ModuleSerialNum, dt.WhichTest, dt.TestStation, dt.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), ctrl);
                                 }
                                 else
                                 {
-                                    IssueViewModels.CloseIssueAutomaticlly(dt.ProjectKey, dt.ModuleSerialNum, dt.WhichTest, dt.TestStation, dt.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss"), ctrl);
+                                    IssueViewModels.CloseIssueAutomaticlly(dt.ProjectKey, dt.ModuleSerialNum, dt.WhichTest, dt.TestStation, dt.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), ctrl);
                                 }
                             }
                         }
@@ -1218,7 +1218,7 @@ namespace Prometheus.Models
             vm.ErrAbbr = item.ErrAbbr;
             vm.DataID = item.DataID;
 
-            vm.Description ="<p>" + "Module " + item.ModuleSerialNum + " failed for " + item.ErrAbbr + " @ " + item.WhichTest + " on tester " + item.TestStation + " " + item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss")+"</p>";
+            vm.Description ="<p>" + "Module " + item.ModuleSerialNum + " failed for " + item.ErrAbbr + " @ " + item.WhichTest + " on tester " + item.TestStation + " " + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss")+"</p>";
             vm.Description = vm.Description + "<table class='table table-hover'><thead><tr><th>Parameter</th><th>value</th></tr></thead><tbody>";
             foreach (var kv in RawData)
             {
@@ -1255,7 +1255,7 @@ namespace Prometheus.Models
             vm.ErrAbbr = item.ErrAbbr;
             vm.DataID = item.DataID;
 
-            vm.Description = "<p>" + "Module " + item.ModuleSerialNum + " failed for " + item.ErrAbbr + " @ " + item.WhichTest + " on tester " + item.TestStation + " " + item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss") + "</p>";
+            vm.Description = "<p>" + "Module " + item.ModuleSerialNum + " failed for " + item.ErrAbbr + " @ " + item.WhichTest + " on tester " + item.TestStation + " " + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss") + "</p>";
             vm.Description = vm.Description + "<table class='table table-hover'><thead><tr><th>Parameter</th><th>value</th></tr></thead><tbody>";
             foreach (var kv in RawData)
             {
@@ -1401,7 +1401,7 @@ namespace Prometheus.Models
                         //use latest failure cover previous failure
                         foreach (var item in failurelist)
                         {
-                            IssueViewModels.CloseIssueAutomaticllyWithFailedSN(item.ProjectKey, item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss"),ctrl);
+                            IssueViewModels.CloseIssueAutomaticllyWithFailedSN(item.ProjectKey, item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"),ctrl);
                         }
 
                         CreateSystemIssues(failurelist,ctrl);
@@ -1412,7 +1412,7 @@ namespace Prometheus.Models
                         //use pass sn cover previous failure
                         foreach (var item in passlist)
                     {
-                        IssueViewModels.CloseIssueAutomaticlly(item.ProjectKey,item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd hh:mm:ss"),ctrl);
+                        IssueViewModels.CloseIssueAutomaticlly(item.ProjectKey,item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"),ctrl);
                     }
                 }
                 

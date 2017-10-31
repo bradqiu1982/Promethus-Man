@@ -642,7 +642,7 @@
                                         <div class="col-xs-12">
                                             <div class="col-xs-4">
                                                 <span class="btn btn-default btn-file" id="choosefile9">
-                                                    Editor Attachment <input type="file" name="file9" id="file9" runat="server" onchange="ShowFileNames9(this)" />
+                                                    Editor Attachment <input class="btn-available" type="file" name="file9" id="file9" runat="server" onchange="ShowFileNames9(this)" />
                                                 </span>
                                             </div>
                                             <div class="col-xs-1"></div>
@@ -651,7 +651,8 @@
                                             <div class="col-xs-5"></div>
                                         </div>
                                         <script type="text/javascript">
-                                        function ShowFileNames9(oFile) {
+                                            function ShowFileNames9(oFile) {
+                                                npieditmode();
                                             ajaxFileUpload9();
                                         }
                                         function ajaxFileUpload9() {
@@ -692,16 +693,17 @@
             <div class="form-group">
                 <div class="col-xs-12">
                     <div class="col-xs-2">
-                        <input type="submit" value="Submit" class="btn btn-primary" />
+                        <input type="submit" value="Submit" class="btn btn-primary btn-available" />
                     </div>
                     <div class="col-xs-2">
-                        <button class="btn btn-success" type="button" value="ErrorKey=@(Model.ErrorKey)&ToWho=" onclick="PushTask(this)">Push</button>
+                        <button class="btn btn-success btn-available" type="button" value="ErrorKey=@(Model.ErrorKey)&ToWho=" onclick="PushTask(this)">Push</button>
                     </div>
                     <div class="col-xs-8"><input class="form-control text-box single-line" value="" id="pushtowho" name="pushtowho" type="hidden" /></div>
                 </div>
             </div>
             <script type="text/javascript">
                 function PushTask(oBT) {
+                    npieditmode();
                     document.getElementById("pushtowho").value = oBT.value;
                     if (CKEDITOR.instances.editor1.getData()) {
                         document.getElementById("issuereason").value = 'WITHCOMMENT:' + CKEDITOR.instances.editor1.getData();

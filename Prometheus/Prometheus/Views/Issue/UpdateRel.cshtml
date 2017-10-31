@@ -941,13 +941,14 @@ else
                                     <div class="col-xs-12">
                                         <div class="col-xs-4">
                                             <span class="btn btn-default btn-file" id="choosefile9">
-                                                Editor Attachment <input type="file" name="file9" id="file9" runat="server" onchange="ShowFileNames9(this)" />
+                                                Editor Attachment <input class="btn-available" type="file" name="file9" id="file9" runat="server" onchange="ShowFileNames9(this)" />
                                             </span>
                                         </div>
                                         <div class="col-xs-8"></div>
                                     </div>
                                     <script type="text/javascript">
-                                            function ShowFileNames9(oFile) {
+                                        function ShowFileNames9(oFile) {
+                                            npieditmode();
                                                 ajaxFileUpload9();
                                             }
                                             function ajaxFileUpload9() {
@@ -990,7 +991,7 @@ else
         <div class="form-group">
             <div class="row col-xs-12">
                 <div class="col-xs-2">
-                    <input style="background-color:#006DC0;color:white;" type="submit" value="Submit" id="updaterma" name="updaterma" class="btn btn-default" />
+                    <input style="background-color:#006DC0;color:white;" type="submit" value="Submit" id="updaterma" name="updaterma" class="btn btn-default btn-available" />
                 </div>
                 <div class="col-xs-2">
                     @if (ViewBag.isassignee != null && ViewBag.isassignee)
@@ -999,7 +1000,7 @@ else
                     }
                 </div>
                 <div class="col-xs-2">
-                    <button class="btn btn-success" type="button" value="IssueKey=@(Model.IssueKey)&ToWho=" onclick="PushTask(this)">Push</button>
+                    <button class="btn btn-success  btn-available" type="button" value="IssueKey=@(Model.IssueKey)&ToWho=" onclick="PushTask(this)">Push</button>
                     <input class="form-control text-box single-line" value="" id="pushtowho" name="pushtowho" type="hidden" />
                 </div>
                 <div class="col-xs-6"></div>
@@ -1008,6 +1009,7 @@ else
         <script type="text/javascript">
                             function PushTask(oBT)
                             {
+                                npieditmode();
                                 document.getElementById("pushtowho").value = oBT.value;
                                 if (document.getElementById("RPeopleAddr").value)
                                 {

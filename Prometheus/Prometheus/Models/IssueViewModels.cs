@@ -1042,34 +1042,6 @@ namespace Prometheus.Models
             }
         }
 
-        //public static void RepairAttachUrl()
-        //{
-        //    //IssueComments(IssueKey, Comment, Reporter, CommentDate, CommentType)
-        //    var sql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where CommentType = '<CommentType2>'";
-        //    sql = sql.Replace("<CommentType2>", COMMENTTYPE.CustomReport);
-        //    var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
-        //    foreach (var r in dbret)
-        //    {
-        //        var tempcomment = new IssueComments();
-        //        tempcomment.IssueKey = Convert.ToString(r[0]);
-        //        tempcomment.dbComment = Convert.ToString(r[1]);
-        //        tempcomment.Reporter = Convert.ToString(r[2]);
-        //        tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
-        //        tempcomment.CommentType = Convert.ToString(r[4]);
-
-        //        if (tempcomment.Comment.Contains("<p><a href=\"")
-        //            && tempcomment.Comment.Contains("\" target"))
-        //        {
-        //            var attachtype = ISSUEATTACHTYPE.CustomRMA;
-        //            var splitstr = tempcomment.Comment.Split(new string[] { "<a href=\"" }, StringSplitOptions.RemoveEmptyEntries);
-
-        //            var url = splitstr[1].Split(new string[] { "\" target" }, StringSplitOptions.RemoveEmptyEntries)[0];
-        //            var csql = "insert into IssueAttachment (IssueKey,Attachment,UpdateTime,APVal1) values('<IssueKey>',N'<Attachment>','<UpdateTime>','<attachtype>')";
-        //            csql = csql.Replace("<IssueKey>", tempcomment.IssueKey).Replace("<Attachment>", url).Replace("<UpdateTime>", tempcomment.CommentDate.ToString()).Replace("<attachtype>", attachtype);
-        //            DBUtility.ExeLocalSqlNoRes(csql);
-        //        }
-        //    }
-        //}
 
         public void UpdateIssue()
         {
@@ -1403,21 +1375,6 @@ namespace Prometheus.Models
                 ret.DataID = Convert.ToString(line[15]);
                 ret.ErrAbbr = Convert.ToString(line[16]);
 
-                //var tempclist = new List<IssueComments>();
-                //sql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
-                //sql = sql.Replace("<IssueKey>", ret.IssueKey);
-                //var cret = DBUtility.ExeLocalSqlWithRes(sql,null);
-                //foreach (var r in cret)
-                //{
-                //    var tempcomment = new IssueComments();
-                //    tempcomment.IssueKey = Convert.ToString(r[0]);
-                //    tempcomment.dbComment = Convert.ToString(r[1]);
-                //    tempcomment.Reporter = Convert.ToString(r[2]);
-                //    tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
-                //    tempcomment.CommentType = Convert.ToString(r[4]);
-                //    tempclist.Add(tempcomment);
-                //}
-                //ret.CommentList = tempclist;
                 //ret.SubIssues = RetrieveSubIssue(ret.IssueKey);
 
                 //ret.RetrieveComment(ctrl);
@@ -1486,21 +1443,6 @@ namespace Prometheus.Models
                 ret.DataID = Convert.ToString(line[15]);
                 ret.ErrAbbr = Convert.ToString(line[16]);
 
-                //var tempclist = new List<IssueComments>();
-                //sql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
-                //sql = sql.Replace("<IssueKey>", ret.IssueKey);
-                //var cret = DBUtility.ExeLocalSqlWithRes(sql,null);
-                //foreach (var r in cret)
-                //{
-                //    var tempcomment = new IssueComments();
-                //    tempcomment.IssueKey = Convert.ToString(r[0]);
-                //    tempcomment.dbComment = Convert.ToString(r[1]);
-                //    tempcomment.Reporter = Convert.ToString(r[2]);
-                //    tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
-                //    tempcomment.CommentType = Convert.ToString(r[4]);
-                //    tempclist.Add(tempcomment);
-                //}
-                //ret.CommentList = tempclist;
                 //ret.SubIssues = RetrieveSubIssue(ret.IssueKey);
 
                 ret.RetrieveComment(ctrl);
@@ -1859,7 +1801,7 @@ namespace Prometheus.Models
         private void RetrieveComment(Controller ctrl)
         {
                 var tempclist = new List<IssueComments>();
-                var csql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' order by CommentDate ASC";
+                var csql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' and Removed <> 'TRUE' order by CommentDate ASC";
                 csql = csql.Replace("<IssueKey>", IssueKey);
                 var cdbret = DBUtility.ExeLocalSqlWithRes(csql,null);
                 foreach (var r in cdbret)
@@ -1951,7 +1893,8 @@ namespace Prometheus.Models
 
         public static void DeleteSPComment(string issuekey,string commenttype,string date)
         {
-            var csql = "delete from IssueComments where IssueKey = '<IssueKey>' and CommentDate = '<CommentDate>' and CommentType = '<CommentType>'";
+            //var csql = "delete from IssueComments where IssueKey = '<IssueKey>' and CommentDate = '<CommentDate>' and CommentType = '<CommentType>'";
+            var csql = "update IssueComments set Removed = 'TRUE' where IssueKey = '<IssueKey>' and CommentDate = '<CommentDate>' and CommentType = '<CommentType>'";
             csql = csql.Replace("<IssueKey>", issuekey).Replace("<CommentDate>", date).Replace("<CommentType>", commenttype);
             DBUtility.ExeLocalSqlNoRes(csql);
         }
@@ -1959,7 +1902,7 @@ namespace Prometheus.Models
         public static IssueComments RetrieveSPComment(string issuekey, string commenttype, string date)
         {
             var tempcomment = new IssueComments();
-            var csql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' and CommentDate = '<CommentDate>' and CommentType = '<CommentType>'";
+            var csql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' and CommentDate = '<CommentDate>' and CommentType = '<CommentType>' and Removed <> 'TRUE'";
             csql = csql.Replace("<IssueKey>", issuekey).Replace("<CommentDate>", date).Replace("<CommentType>", commenttype);
             var cdbret = DBUtility.ExeLocalSqlWithRes(csql, null);
             foreach (var r in cdbret)
@@ -1975,7 +1918,7 @@ namespace Prometheus.Models
 
         public static void UpdateSPComment(string issuekey, string commenttype, string date,string dbcomment)
         {
-            var csql = "update IssueComments set Comment = '<Comment>'  where IssueKey = '<IssueKey>' and CommentDate = '<CommentDate>' and CommentType = '<CommentType>'";
+            var csql = "update IssueComments set Comment = '<Comment>'  where IssueKey = '<IssueKey>' and CommentDate = '<CommentDate>' and CommentType = '<CommentType>' and Removed <> 'TRUE'";
             csql = csql.Replace("<IssueKey>", issuekey).Replace("<CommentDate>", date).Replace("<CommentType>", commenttype).Replace("<Comment>", dbcomment);
             DBUtility.ExeLocalSqlNoRes(csql);
         }
@@ -2735,20 +2678,6 @@ namespace Prometheus.Models
                 DBUtility.ExeLocalSqlNoRes(csql);
             }//end if
         }
-
-        //public static void DeleteAttachComment(string issuekey, string cond)
-        //{
-        //    var csql = "select Comment from IssueComments where IssueKey = '<IssueKey>' and Comment = '<cond>'";
-        //    csql = csql.Replace("<IssueKey>", issuekey).Replace("<cond>", cond);
-        //    var cdbret = DBUtility.ExeLocalSqlWithRes(csql,null);
-        //    if (cdbret.Count > 0 && cdbret.Count < 3)
-        //    {
-        //        csql = "delete from IssueComments where IssueKey = '<IssueKey>' and Comment = '<cond>'";
-        //        csql = csql.Replace("<IssueKey>", issuekey).Replace("<cond>", cond);
-        //        DBUtility.ExeLocalSqlNoRes(csql);
-        //    }//end if
-        //}
-
 
         public static void StoreBIRootCause(string pjkey, string sn,string rootcause)
         {

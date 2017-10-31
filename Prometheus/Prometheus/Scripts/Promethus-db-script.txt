@@ -279,6 +279,8 @@ CREATE TABLE [dbo].[IssueComments] (
     [CommentType] NVARCHAR (100)  DEFAULT ('Description') NOT NULL
 );
 
+ALTER TABLE  [DebugDB].[dbo].[IssueComments] Add Removed NVARCHAR (200) DEFAULT ('') NOT NULL;
+ALTER TABLE  [NPITrace].[dbo].[IssueComments] Add Removed NVARCHAR (200) DEFAULT ('') NOT NULL;
 
 CREATE TABLE [dbo].[IssueAttribute] (
     [IssueKey] NVARCHAR (100) NOT NULL,

@@ -1881,7 +1881,17 @@ namespace Prometheus.Controllers
         {
             var grouptype = Request.Form["grouptypelist"].ToString();
             var groupmember = Request.Form["RPeopleAddr"];
-            UserGroupVM.AddGroup(grouptype, groupmember);
+            var hiddengid = Request.Form["HiddenGroupID"];
+
+            if (string.IsNullOrEmpty(hiddengid))
+            {
+                UserGroupVM.AddGroup(grouptype, groupmember);
+            }
+            else
+            {
+                UserGroupVM.EditGroup(hiddengid, groupmember);
+            }
+
             return RedirectToAction("IGroup", "User");
         }
 
@@ -2303,6 +2313,35 @@ namespace Prometheus.Controllers
             ViewBag.monthlylist = monthlylist;
 
             return View(vm);
+        }
+
+        public JsonResult RetrieveOneUserGroup()
+        {
+            try
+            {
+                string gid = Request.Form["gid"];
+                if (!string.IsNullOrEmpty(gid))
+                {
+                    var tempvm = UserGroupVM.RetrieveOneUserGroup(gid);
+                    if (!string.IsNullOrEmpty(tempvm.GroupID))
+                    {
+                        var ret1 = new JsonResult();
+                        ret1.Data = new {
+                            success = true,
+                            gid = tempvm.GroupID,
+                            tag = tempvm.GroupTag,
+                            memb = tempvm.GroupMember
+                        };
+                        return ret1;
+                    }
+                }
+            }
+            catch (Exception ex) { }
+
+            var ret = new JsonResult();
+            ret.Data = new { success = false };
+            return ret;
+            
         }
 
     }

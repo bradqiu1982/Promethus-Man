@@ -76,6 +76,12 @@
         <div class="row">
             <div class="col-xs-12">&nbsp;</div>
         </div>
+        
+        <div class="row">
+            <div class="col-xs-12">
+                <input id="HiddenGroupID" name="HiddenGroupID" type="hidden">
+            </div>
+        </div>
 
         <div class="row">
             <div class="form-group">
@@ -113,6 +119,7 @@
                     <tr>
                         <th>Group Type</th>
                         <th>Group Member</th>
+                        <th><img src="~/Content/images/icon/edit2.png" MYTP="HOVER" style="height:30px; width:18px"></th>
                         <th><img src="~/Content/images/icon/delete2.png" MYTP="HOVER" style="height:30px; width:18px"></th>
                     </tr>
                 </thead>
@@ -122,6 +129,7 @@
                         <tr>
                             <td>@(g.GroupTag)</td>
                             <td>@(g.GroupMember.Replace("@FINISAR.COM",""))</td>
+                            <td><img src="~/Content/images/icon/edit2.png" MYTP="HOVER" style="height:30px; width:18px" onclick="EditGroup('@(g.GroupID)')"></td>
                             <td><img src="~/Content/images/icon/delete2.png" MYTP="HOVER" style="height:30px; width:18px" onclick="DeleteGroup('@(g.GroupID)')"></td>
                         </tr>
                     }
@@ -140,7 +148,8 @@
                             "aoColumns": [
                             { sWidth: '10%' },
                             { sWidth: '80%' },
-                            { sWidth: '10%' }]
+                            { sWidth: '5%' },
+                            { sWidth: '5%' }]
                         });
                     });
 
@@ -150,6 +159,25 @@
                         {
                             window.location.href = '/User/DeleteGroup?GroupID='+obt;
                         }
+                    }
+
+                    function EditGroup(obt)
+                    {
+                        $.post('/User/RetrieveOneUserGroup',
+                            { gid: obt},
+                            function (output) {
+                                if (output.success)
+                                {
+                                    $('#grouptypelist').val(output.tag);
+                                    $('#RPeopleAddr').val(output.memb);
+                                    $('#HiddenGroupID').val(output.gid);
+                                    return false;
+                                }
+                                else
+                                {
+                                    return false;
+                                }
+                            });
                     }
             </script>
         }

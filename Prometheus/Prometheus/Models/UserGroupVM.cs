@@ -14,6 +14,13 @@ namespace Prometheus.Models
 
     public class UserGroupVM
     {
+        public UserGroupVM()
+        {
+            GroupID = "";
+            GroupTag = "";
+            GroupMember = "";
+        }
+
         public string GroupID { set; get; }
         public string GroupTag { set; get; }
         public string GroupMember { set; get; }
@@ -25,12 +32,34 @@ namespace Prometheus.Models
                 .Replace("<GroupMember>", groupmember.ToUpper()).Replace("<TimeStamp>", DateTime.Now.ToString()).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
         }
-        
+
         public static void DeleteGroup(string groupid)
         {
             var sql = "delete from UserGroupVM where GroupID = '<GroupID>'";
             sql = sql.Replace("<GroupID>", groupid);
             DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        public static void EditGroup(string groupid, string groupmember)
+        {
+            var sql = "update UserGroupVM set GroupMember = '<GroupMember>' where GroupID = '<GroupID>'";
+            sql = sql.Replace("<GroupID>", groupid).Replace("<GroupMember>",groupmember);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        public static UserGroupVM RetrieveOneUserGroup(string groupid)
+        {
+            var ret = new UserGroupVM();
+            var sql = "select GroupID,GroupTag,GroupMember from UserGroupVM where GroupID = '<GroupID>'";
+            sql = sql.Replace("<GroupID>", groupid);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            if (dbret.Count > 0)
+            {
+                ret.GroupID = Convert.ToString(dbret[0][0]);
+                ret.GroupTag = Convert.ToString(dbret[0][1]);
+                ret.GroupMember = Convert.ToString(dbret[0][2]);
+            }
+            return ret;
         }
 
         public static List<UserGroupVM> RetreiveAllGroup()
@@ -48,7 +77,7 @@ namespace Prometheus.Models
             }
             return ret;
         }
-
+        
         public static string RetreiveUserGroup(string username,string grouptag)
         {
             var ret = string.Empty;

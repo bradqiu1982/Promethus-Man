@@ -87,6 +87,20 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
+        public void UpdatePJCriticalError(string ruleid)
+        {
+            var sql = "update ProjectCriticalError set ProjectKey = '<ProjectKey>',ErrorCode = '<ErrorCode>',TestCaseName = '<TestCaseName>',MatchCond = '<MatchCond>',WithLimit = <WithLimit>,LowLimit = <LowLimit>,HighLimit = <HighLimit>"
+                + ",WithAlgorithm = <WithAlgorithm>,Algorithm = '<Algorithm>',AlgorithmParam = '<AlgorithmParam>',Temperature = '<Temperature>',Channel = '<Channel>',Appv_4 = '<Appv_4>',SettingReason = '<SettingReason>' where RuleID = '<RuleID>'";
+
+            sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ErrorCode>", ErrorCode.Trim()).Replace("<MatchCond>", MatchCond.Trim()).Replace("<TestCaseName>", TestCaseName.Trim())
+                .Replace("<WithLimit>", WithLimit.ToString()).Replace("<LowLimit>", LowLimit.ToString()).Replace("<HighLimit>", HighLimit.ToString())
+                .Replace("<WithAlgorithm>", WithAlgorithm.ToString()).Replace("<Algorithm>", Algorithm.Trim()).Replace("<AlgorithmParam>", AlgorithmParam.Trim())
+                .Replace("<Creater>", Creater).Replace("<Temperature>", Temperature).Replace("<Channel>", Channel).Replace("<Appv_4>", Appv_4)
+                .Replace("<SettingReason>", SettingReason.Trim()).Replace("<RuleID>", ruleid);
+
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
         private static bool RuleExist(string pjkey, string errorcode, string testcasename, string matchcond, double lowlimit, double highlimit, string Algorithm, string algorithmparam)
         {
             var sql = "select RuleID from ProjectCriticalError where ProjectKey = '<ProjectKey>' and ErrorCode = '<ErrorCode>' and TestCaseName = '<TestCaseName>' and MatchCond = '<MatchCond>' and LowLimit = <LowLimit> and HighLimit = <HighLimit> and Algorithm = '<Algorithm>' and AlgorithmParam = '<AlgorithmParam>'";
@@ -180,6 +194,38 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static ProjectCriticalErrorVM RetrieveOneRule(string rid)
+        {
+            var tempvm = new ProjectCriticalErrorVM();
+            var sql = "select ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel,Appv_5,Appv_4,Appv_3,Appv_1,SettingReason,RuleID from ProjectCriticalError where RuleID='<RuleID>'";
+            sql = sql.Replace("<RuleID>", rid);
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                tempvm.ProjectKey = Convert.ToString(line[0]);
+                tempvm.ErrorCode = Convert.ToString(line[1]);
+                tempvm.TestCaseName = Convert.ToString(line[2]);
+                tempvm.MatchCond = Convert.ToString(line[3]);
+                tempvm.WithLimit = Convert.ToInt32(line[4]);
+                tempvm.LowLimit = Convert.ToDouble(line[5]);
+                tempvm.HighLimit = Convert.ToDouble(line[6]);
+                tempvm.WithAlgorithm = Convert.ToInt32(line[7]);
+                tempvm.Algorithm = Convert.ToString(line[8]);
+                tempvm.AlgorithmParam = Convert.ToString(line[9]);
+                tempvm.Creater = Convert.ToString(line[10]);
+                tempvm.Temperature = Convert.ToString(line[11]);
+                tempvm.Channel = Convert.ToString(line[12]);
+                tempvm.Appv_5 = Convert.ToDateTime(line[13]);
+                tempvm.Appv_4 = Convert.ToString(line[14]);
+                tempvm.Appv_3 = Convert.ToString(line[15]);
+                tempvm.Appv_1 = Convert.ToDouble(line[16]);
+                tempvm.SettingReason = Convert.ToString(line[17]);
+                tempvm.RuleID = Convert.ToString(line[18]);
+            }
+
+            return tempvm;
+        }
 
         private static void UpdateRuleID(string ruleid,string pjkey, string errorcode, string testcasename, string matchcond, double lowlimit, double highlimit,string Algorithm, string algorithmparam)
         {

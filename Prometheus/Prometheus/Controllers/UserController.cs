@@ -1955,7 +1955,8 @@ namespace Prometheus.Controllers
             selectlist.Add(TestTemperatureType.Nomal);
             selectlist.Add(TestTemperatureType.High);
             selectcontrol = CreateSelectList(selectlist, "");
-            selectcontrol[0].Disabled = true;
+            //selectcontrol[0].Disabled = true;
+            selectcontrol[0].Value = "";
             selectcontrol[0].Selected = true;
             ViewBag.templist = selectcontrol;
 
@@ -1966,7 +1967,8 @@ namespace Prometheus.Controllers
                 selectlist.Add(idx.ToString());
             }
             selectcontrol = CreateSelectList(selectlist, "");
-            selectcontrol[0].Disabled = true;
+            //selectcontrol[0].Disabled = true;
+            selectcontrol[0].Value = "";
             selectcontrol[0].Selected = true;
             ViewBag.channellist = selectcontrol;
 
@@ -1976,7 +1978,8 @@ namespace Prometheus.Controllers
             selectlist.Add(PJCriticalAlgorithm.UNIFORMITY);
             selectlist.Add(PJCriticalAlgorithm.STDDEV);
             selectcontrol = CreateSelectList(selectlist, "");
-            selectcontrol[0].Disabled = true;
+            //selectcontrol[0].Disabled = true;
+            selectcontrol[0].Value = "";
             selectcontrol[0].Selected = true;
             ViewBag.algorithmlist = selectcontrol;
 
@@ -2044,7 +2047,15 @@ namespace Prometheus.Controllers
                 }
                 vm.SettingReason = issuetag;
 
-                vm.StorePJCriticalError();
+                var hiddenrid = Request.Form["HiddenRuleID"];
+                if (string.IsNullOrEmpty(hiddenrid))
+                {
+                    vm.StorePJCriticalError();
+                }
+                else
+                {
+                    vm.UpdatePJCriticalError(hiddenrid);
+                }
             }
             catch (Exception ex) { }
             return RedirectToAction("AddPJCriticalError", "User");
@@ -2343,6 +2354,31 @@ namespace Prometheus.Controllers
             return ret;
             
         }
+
+        public JsonResult RetrieveOneRule()
+        {
+            try
+            {
+                string rid = Request.Form["rid"];
+                if (!string.IsNullOrEmpty(rid))
+                {
+                    var tempvm = ProjectCriticalErrorVM.RetrieveOneRule(rid);
+                    if (!string.IsNullOrEmpty(tempvm.RuleID))
+                    {
+                        var ret1 = new JsonResult();
+                        ret1.Data = tempvm;
+                        return ret1;
+                    }
+                }
+            }
+            catch (Exception ex) { }
+
+            var ret = new JsonResult();
+            ret.Data = new { success = false };
+            return ret;
+
+        }
+
 
     }
 }

@@ -159,7 +159,7 @@
                     {
                         <div class="col-xs-4">
                             <div class="col-xs-3">
-                                <input type="checkbox" id="issuetagcheck@(idx)" name="issuetagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
+                                <input class="reasontags" type="checkbox" id="issuetagcheck@(idx)" name="issuetagcheck@(idx)" value="@(ViewBag.tobechoosetags[idx])" />
                             </div>
                             <div class="col-xs-9">
                                 <label class="control-label">@(ViewBag.tobechoosetags[idx])</label>
@@ -204,6 +204,12 @@
                         <button type="button" class="btn btn-success" onclick="fillreleatepeople()">OK</button>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12">
+                <input id="HiddenRuleID" name="HiddenRuleID" type="hidden">
             </div>
         </div>
 
@@ -263,6 +269,7 @@
                                 
                                 <th>Related People</th>
                                 <th>&nbsp;</th>
+                                <th>&nbsp;</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -312,6 +319,7 @@
                                     </td>
                                     
                                     <td>@item.Appv_4.Replace("@FINISAR.COM","")</td>
+                                    <td><img src="~/Content/images/icon/edit2.png" MYTP="HOVER" style="height:30px; width:18px" onclick="EditPJCriticalError('@(item.RuleID)')"></td>
                                     <td><img src="~/Content/images/icon/delete2.png" MYTP="HOVER" style="height:30px; width:18px" onclick="DeletePJCriticalError('RuleID=@(item.RuleID)')"></td>
                                 </tr>
                             }
@@ -325,6 +333,62 @@
                                 window.location.href = '/User/DeletePJCriticalError?' + obt;
                             }
                         }
+
+                        function EditPJCriticalError(obt)
+                        {
+                            $.post('/User/RetrieveOneRule',
+                            { rid: obt },
+                            function (output) {
+                                if (output.RuleID) {
+
+                                    $('#withlimit').prop("checked", false);
+                                    $('#lowlimit').val("");
+                                    $('#highlimit').val("");
+
+                                    $('#withalgorithm').prop("checked", false);
+                                    $('#algorithmlist').val("");
+                                    $('#algorithmparam').val("");
+                                    $('.reasontags').prop("checked", false);
+
+
+                                    $('#pjlist').val(output.ProjectKey);
+                                    $('#errorlist').val(output.ErrorCode);
+                                    $('#testcase').val(output.TestCaseName);
+                                    $('#matchcond').val(output.MatchCond);
+                                    $('#templist').val(output.Temperature);
+                                    $('#channellist').val(output.Channel);
+
+                                    if (output.WithLimit && output.WithLimit == 1)
+                                    {
+                                        $('#withlimit').prop("checked", true);
+                                        $('#lowlimit').val(output.LowLimit);
+                                        $('#highlimit').val(output.HighLimit);
+                                    }
+
+                                    if (output.WithAlgorithm && output.WithAlgorithm == 1)
+                                    {
+                                        $('#withalgorithm').prop("checked", true);
+                                        $('#algorithmlist').val(output.Algorithm);
+                                        $('#algorithmparam').val(output.AlgorithmParam);
+                                    }
+
+                                    $('#RPeopleAddr').val(output.Appv_4);
+
+                                    $('.reasontags').each(function () {
+                                        if (output.SettingReason.indexOf($(this).val()) != -1) {
+                                            $(this).prop("checked", true);
+                                        }
+                                    });
+
+                                    $('#HiddenRuleID').val(output.RuleID);
+                                    return false;
+                                }
+                                else {
+                                    return false;
+                                }
+                            });
+                        }
+
                         function OpenFASwitch(obt)
                         {
                             window.location.href = '/User/Open2ndCheckFASwitch?' + obt;

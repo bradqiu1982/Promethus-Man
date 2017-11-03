@@ -138,13 +138,41 @@ namespace Prometheus.Models
             }//end foreach
             return ret;
         }
+
+        public static Dictionary<string, string> GetNPIMachine(Controller ctrl)
+        {
+            var lines = System.IO.File.ReadAllLines(ctrl.Server.MapPath("~/Scripts/npidepartmentmachine.cfg"));
+            var ret = new Dictionary<string, string>();
+            foreach (var line in lines)
+            {
+                if (line.Contains("##"))
+                {
+                    continue;
+                }
+
+                if (line.Contains(":::"))
+                {
+                    var kvpair = line.Split(new string[] { ":::" }, StringSplitOptions.RemoveEmptyEntries);
+                    if (!ret.ContainsKey(kvpair[0].Trim()))
+                    {
+                        ret.Add(kvpair[0].Trim().ToUpper(), kvpair[1].Trim());
+                    }
+                }//end if
+            }//end foreach
+            return ret;
+        }
+
     }
 
     public class SeverHtmlDecode
-    {
-        public static string Decode(Controller ctrl, string src)
         {
-            return ctrl.Server.HtmlDecode(src).Replace("border=\"0\"", "border=\"2\"");
+            public static string Decode(Controller ctrl, string src)
+            {
+                return ctrl.Server.HtmlDecode(src).Replace("border=\"0\"", "border=\"2\"");
+            }
         }
-    }
+
 }
+
+
+

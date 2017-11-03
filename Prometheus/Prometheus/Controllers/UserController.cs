@@ -13,6 +13,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
 using System.Threading;
 using System.IO;
+using System.Security.Cryptography;
 
 namespace Prometheus.Controllers
 {
@@ -379,9 +380,82 @@ namespace Prometheus.Controllers
             ViewBag.monthlist = slist;
         }
 
-
-        public ActionResult UserCenter(string username,string month)
+        public static string DetermineCompName(string IP)
         {
+            try
+            {
+                IPAddress myIP = IPAddress.Parse(IP);
+                IPHostEntry GetIPHost = Dns.GetHostEntry(myIP);
+                List<string> compName = GetIPHost.HostName.ToString().Split('.').ToList();
+                return compName.First();
+            }
+            catch (Exception ex)
+            { return string.Empty; }
+        }
+
+        static string GetMd5Hash(MD5 md5Hash, string input)
+        {
+
+            byte[] data = md5Hash.ComputeHash(System.Text.Encoding.UTF8.GetBytes(input));
+            StringBuilder sBuilder = new StringBuilder();
+            for (int i = 0; i < data.Length; i++)
+            {
+                sBuilder.Append(data[i].ToString("x2"));
+            }
+            return sBuilder.ToString();
+        }
+
+        public ActionResult UserCenter(string username,string month,string smartkey=null)
+        {
+            if (smartkey != null)
+            {
+                var smartkey1 = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(smartkey));
+                if (smartkey1.Contains("::"))
+                {
+                    var splitstr = smartkey1.Split(new string[] { "::" }, StringSplitOptions.RemoveEmptyEntries);
+                    var hash1 = splitstr[0];
+                    var timestamp = splitstr[1];
+                    MD5 md5Hash = MD5.Create();
+                    var hash2 = GetMd5Hash(md5Hash, timestamp + "_joke");
+                    if (hash1.Contains(hash2))
+                    {
+                        var now = DateTime.Now;
+                        try
+                        {
+                            var time1 = DateTime.Parse(timestamp);
+                            if (time1 > now.AddSeconds(-10))
+                            {
+                                //time is ok
+                            }
+                            else
+                            {
+                                return Redirect("http://wuxinpi.china.ads.finisar.com:8081/");
+                            }
+                        }
+                        catch (Exception ex) { return Redirect("http://wuxinpi.china.ads.finisar.com:8081/");}
+
+                    }
+                    else
+                    {
+                        return Redirect("http://wuxinpi.china.ads.finisar.com:8081/");
+                    }
+                }
+                else
+                {
+                    return Redirect("http://wuxinpi.china.ads.finisar.com:8081/");
+                }
+            }
+            else if (Request.Cookies["activenpi"] == null && smartkey == null)
+            {
+                string IP = Request.UserHostName;
+                string compName = DetermineCompName(IP).ToUpper();
+                var machinedict = CfgUtility.GetNPIMachine(this);
+                if (!string.IsNullOrEmpty(compName) && !machinedict.ContainsKey(compName))
+                {
+                    return Redirect("http://wuxinpi.china.ads.finisar.com:8081/");
+                }
+            }
+
             var ckdict = CookieUtility.UnpackCookie(this);
             if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
             {

@@ -1575,7 +1575,10 @@ namespace Prometheus.Controllers
                                     ProjectErrorViewModels.StoreErrorAttachment(perrlist[0].ErrorKey, item);
                                 }
 
-                                SameAsDBTVM.StoreLinkDBTIssue(perrlist[0].ErrorKey, linktime, originaldata.IssueKey, originaldata.IssueKey, testdata[0].ModuleSerialNum);
+                                if (testdata.Count > 0)
+                                {
+                                    SameAsDBTVM.StoreLinkDBTIssue(perrlist[0].ErrorKey, linktime, originaldata.IssueKey, originaldata.IssueKey, testdata[0].ModuleSerialNum);
+                                }
 
                                 UserKPIVM.AddUserDailyRank(originaldata.IssueKey, updater, UserRankType.SPECIAL, "Link To "+originaldata.ProjectKey+" Debug Tree "+ errabbr
                                     , "/Issue/UpdateIssue?issuekey=" + originaldata.IssueKey, 6);
@@ -1633,7 +1636,10 @@ namespace Prometheus.Controllers
                                     ProjectErrorViewModels.StoreErrorAttachment(perrlist[0].ErrorKey, item);
                                 }
 
-                                SameAsDBTVM.StoreLinkDBTIssue(perrlist[0].ErrorKey, linktime, originaldata.IssueKey, originaldata.IssueKey, testdata[0].ModuleSerialNum);
+                                if (testdata.Count > 0)
+                                {
+                                    SameAsDBTVM.StoreLinkDBTIssue(perrlist[0].ErrorKey, linktime, originaldata.IssueKey, originaldata.IssueKey, testdata[0].ModuleSerialNum);
+                                }
 
                                 UserKPIVM.AddUserDailyRank(originaldata.IssueKey, updater, UserRankType.SPECIAL, "Link To Burn-In Debug Tree " + errabbr
                                     , "/Issue/UpdateIssue?issuekey=" + originaldata.IssueKey, 6);

@@ -500,7 +500,7 @@ namespace Prometheus.Models
                 var now = DateTime.Now;
                 var vm = new IssueViewModels();
                 vm.ProjectKey = item.ProjectKey;
-                vm.IssueKey = IssueViewModels.GetUniqKey();
+                vm.IssueKey = pjdata.DataID;
                 vm.IssueType = ISSUETP.Bug;
                 vm.Summary = CRITICALERRORTYPE.SECONDMATCH + " " + pjdata.ModuleSerialNum + " failed for " + pjdata.ErrAbbr + " @ " + pjdata.WhichTest;
                 vm.ModuleSN = pjdata.ModuleSerialNum;
@@ -554,7 +554,7 @@ namespace Prometheus.Models
                 var now = DateTime.Now;
                 var vm = new IssueViewModels();
                 vm.ProjectKey = pjdata.ProjectKey;
-                vm.IssueKey = IssueViewModels.GetUniqKey();
+                vm.IssueKey = pjdata.DataID;
                 vm.IssueType = ISSUETP.Bug;
                 vm.Summary = CRITICALERRORTYPE.SECONDMATCH + " " + pjdata.ModuleSerialNum + " failed for " + pjdata.ErrAbbr + " @ " + pjdata.WhichTest;
                 vm.ModuleSN = pjdata.ModuleSerialNum;
@@ -1239,7 +1239,7 @@ namespace Prometheus.Models
         {
             var vm = new IssueViewModels();
             vm.ProjectKey = item.ProjectKey;
-            vm.IssueKey = IssueViewModels.GetUniqKey();
+            vm.IssueKey = item.DataID;
             vm.IssueType = ISSUETP.Bug;
             vm.Summary = CRITICALERRORTYPE.SECONDMATCH + " " + item.ModuleSerialNum + " failed for " + item.ErrAbbr + " @ " + item.WhichTest;
             vm.Priority = ISSUEPR.Critical;

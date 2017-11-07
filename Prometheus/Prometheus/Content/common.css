@@ -1,0 +1,116 @@
+﻿input, select, textarea{
+    max-width: 100%;
+}
+/* Common styles for all types */
+.bs-callout {
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #eee;
+  border-left-width: 5px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.bs-callout h4 {
+  margin-top: 0;
+  margin-bottom: 5px;
+}
+.bs-callout p:last-child {
+  margin-bottom: 0;
+}
+.bs-callout code {
+  border-radius: 3px;
+}
+
+/* Tighten up space between multiple callouts */
+.bs-callout + .bs-callout {
+  margin-top: -5px;
+}
+
+/* Variations */
+.bs-callout-danger {
+  border-left-color: #ce4844;
+}
+.bs-callout-danger h4 {
+  color: #ce4844;
+}
+.bs-callout-warning {
+  border-left-color: #aa6708;
+}
+.bs-callout-warning h4 {
+  color: #aa6708;
+}
+.bs-callout-info {
+  border-left-color: #1b809e;
+}
+.bs-callout-info h4 {
+  color: #1b809e;
+}
+
+/*for weekly report*/
+.fypareto{
+    border: #000 1px solid;
+    display: inline-block;
+    margin-left: 1%;
+    height: 200px;
+    width: 48%;
+}
+.wyield{
+    border: #000 1px solid;
+    display: inline-block;
+    margin-left: 1%;
+    height: 200px;
+    width: 48%;
+}
+
+.cursor-pointer{
+    cursor: pointer;
+}
+
+.chevron-down{
+    float: right;
+    padding: 2px 5px;
+}
+
+.table{
+    margin-bottom: 0;
+}
+#histaskcontent > tbody > tr{
+    cursor: pointer;
+}
+.well{
+    padding: 5px;
+    margin-bottom: 0;
+}
+.wr-operation{
+    margin: 2% auto 5% auto;
+    text-align: center;
+}
+.op-btn{
+    width: 200px;
+    margin-left: 2%;
+}
+.yield-summary{
+    display: inline-block;
+    width: 100%;
+}
+.summary{
+    padding: 5px;
+    font-weight: bold;
+}
+.span-pro{
+    margin: 5px;
+    padding: 5px 10px;
+    font-size: 18px;
+}
+.data-summary{
+    font-size: 12px;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.item-summary{
+    font-size: 12px;
+    margin-left: 0;
+    margin-right: 0;
+    border-radius: 0;
+}

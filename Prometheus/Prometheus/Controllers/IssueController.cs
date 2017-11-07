@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -580,7 +581,11 @@ namespace Prometheus.Controllers
             var issuekey = Request.Form["IssueKey"];
             var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey,this);
 
-           if (Request.Form["deleteisu"] != null)
+            //write log
+            LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
+                Request.Url.ToString(), "Issue", "Update", issuekey, "", Log4NetLevel.Info, "");
+
+            if (Request.Form["deleteisu"] != null)
             {
                 if (string.Compare(updater, originaldata.Reporter, true) == 0
                     || string.Compare(updater, originaldata.Assignee, true) == 0
@@ -797,7 +802,6 @@ namespace Prometheus.Controllers
                     IssueViewModels.StoreBIRootCause(originaldata.ProjectKey, sn, biret);
                 }
             }
-
 
             var dict1 = new RouteValueDictionary();
             dict1.Add("issuekey", originaldata.IssueKey);
@@ -1471,6 +1475,10 @@ namespace Prometheus.Controllers
             var issuekey = Request.Form["IssueKey"];
             var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey,this);
 
+            //write log
+            LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
+                Request.Url.ToString(), "Bug", "Update", issuekey, "", Log4NetLevel.Info, "");
+
             var pjmemauth = false;
             var pj = ProjectViewModels.RetrieveOneProject(originaldata.ProjectKey);
             if (pj != null)
@@ -1880,7 +1888,6 @@ namespace Prometheus.Controllers
                 }
             }
 
-
             var dict1 = new RouteValueDictionary();
             dict1.Add("issuekey", originaldata.IssueKey);
             return RedirectToAction("UpdateBug", "Issue", dict1);
@@ -2040,6 +2047,10 @@ namespace Prometheus.Controllers
             var issuekey = Request.Form["IssueKey"];
 
             var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey,this);
+
+            //write log
+            LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
+                Request.Url.ToString(), "RMA", "Update", issuekey, "", Log4NetLevel.Info, "");
 
             if (Request.Form["deleterma"] != null)
             {
@@ -2338,7 +2349,6 @@ namespace Prometheus.Controllers
                 }
             }
 
-
             var dict1 = new RouteValueDictionary();
             dict1.Add("issuekey", originaldata.IssueKey);
             return RedirectToAction("UpdateRMA", "Issue", dict1);
@@ -2435,6 +2445,10 @@ namespace Prometheus.Controllers
 
             var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey,this);
 
+            //write log
+            LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
+                Request.Url.ToString(), "REL", "Update", issuekey, "", Log4NetLevel.Info, "");
+
             if (Request.Form["deleterma"] != null)
             {
                 if (string.Compare(updater, originaldata.Reporter, true) == 0
@@ -2447,10 +2461,7 @@ namespace Prometheus.Controllers
                     return RedirectToAction("ProjectDetail", "Project", dict1);
                 }
             }
-
-
-
-
+            
             var originalassignee = originaldata.Assignee;
             var originaldataresolution = originaldata.Resolution;
             if (string.Compare(originaldata.Reporter, updater, true) == 0
@@ -2656,6 +2667,10 @@ namespace Prometheus.Controllers
             var issuekey = Request.Form["IssueKey"];
 
             var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey,this);
+
+            //write log
+            LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
+                Request.Url.ToString(), "OBA", "Update", issuekey, "", Log4NetLevel.Info, "");
 
             if (Request.Form["deleterma"] != null)
             {
@@ -2929,6 +2944,10 @@ namespace Prometheus.Controllers
             var issuekey = Request.Form["IssueKey"];
 
             var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey,this);
+
+            //write log
+            LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
+                Request.Url.ToString(), "Quality", "Update", issuekey, "", Log4NetLevel.Info, "");
 
             if (Request.Form["deleterma"] != null)
             {
@@ -3997,6 +4016,19 @@ namespace Prometheus.Controllers
                 return RedirectToAction("ProjectIssues", "Project", dict);
             }
 
+        }
+
+        public static string DetermineCompName(string IP)
+        {
+            try
+            {
+                IPAddress myIP = IPAddress.Parse(IP);
+                IPHostEntry GetIPHost = Dns.GetHostEntry(myIP);
+                List<string> compName = GetIPHost.HostName.ToString().Split('.').ToList();
+                return compName.First();
+            }
+            catch (Exception ex)
+            { return string.Empty; }
         }
     }
 }

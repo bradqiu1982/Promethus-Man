@@ -13,6 +13,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
 using System.Threading;
 using System.IO;
+using System.Globalization;
 
 namespace Prometheus.Controllers
 {
@@ -222,11 +223,6 @@ namespace Prometheus.Controllers
 
         private ActionResult NormalLogin(string username,string dbpwd,string inputpwd)
         {
-            ////for test log4net
-            //var dic = new Dictionary<string, string>();
-            //dic.Add("user_name", username);
-            //dic.Add("log_type", "Post");
-            //LogHelper.WriteLog("Test", Log4NetLevel.Info, dic);
 
             if (string.Compare(dbpwd, inputpwd) != 0)
             {
@@ -788,9 +784,9 @@ namespace Prometheus.Controllers
 
                 var edate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd") + " 07:30:00");
                 var sdate = edate.AddMonths(0 - tempmonth);
-                var pendingissues = IssueViewModels.RetrieveIssuePendingByUser(username, sdate.ToString("yyyy-MM-dd HH:mm:ss"));
-                var workingissues = IssueViewModels.RetrieveIssueWorkingByUser(username, sdate.ToString("yyyy-MM-dd HH:mm:ss"));
-                var solvedissues = IssueViewModels.RetrieveIssueDoneByUser(username, sdate.ToString("yyyy-MM-dd HH:mm:ss"), this);
+                var pendingissues = IssueViewModels.RetrieveIssuePendingByUser(username, sdate.ToString("yyyy-MM-dd hh:mm:ss"));
+                var workingissues = IssueViewModels.RetrieveIssueWorkingByUser(username, sdate.ToString("yyyy-MM-dd hh:mm:ss"));
+                var solvedissues = IssueViewModels.RetrieveIssueDoneByUser(username, sdate.ToString("yyyy-MM-dd hh:mm:ss"), this);
                 workingissues.AddRange(solvedissues);
                 workingissues.AddRange(pendingissues);
 
@@ -2305,5 +2301,217 @@ namespace Prometheus.Controllers
             return View(vm);
         }
 
+        public ActionResult WeeklyReport(string username)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "ILearn");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            ViewBag.UserName = updater.Split(new char[] { '@' })[0];
+            ViewBag.RealUserID = updater;
+            //user's project list
+            var projectlist = UserViewModels.RetrieveUserProjectKeyDict(username);
+            var dayofweek = Convert.ToInt32(DateTime.Now.DayOfWeek);
+            var sDate = DateTime.Now.AddDays((4 - dayofweek) - 7).ToString("yyyy-MM-dd 07:30:00");
+            var eDate = DateTime.Now.ToString("yyyy-MM-dd 07:30:00");
+            var ProjectKeyList = new List<string>();
+            var historyTaskList = new Dictionary<string, Dictionary<string, TaskData>>();
+            var taskList = new Dictionary<string, Dictionary<string, TaskData>>();
+            var historyCriList = new Dictionary<string, Dictionary<string, TaskData>>();
+            var criticalList = new Dictionary<string, Dictionary<string, TaskData>>();
+            var historyRMAList = new Dictionary<string, Dictionary<string, TaskData>>();
+            var RMAList = new Dictionary<string, Dictionary<string, TaskData>>();
+            var SummaryList = new Dictionary<string, Dictionary<string, List<WeeklyReportVM>>>();
+            foreach (var project in projectlist)
+            {
+                ProjectKeyList.Add(project.Key);
+
+                getProjectYield(project.Key, sDate, eDate);
+
+                //weekly yield pareto
+
+                //weekly yield trend
+               
+                //task
+                historyTaskList.Add(project.Key, getProjectTask(updater, project.Key, 0, sDate, eDate, ISSUESUBTYPE.Task));
+                taskList.Add(project.Key, getProjectTask(updater, project.Key, 1, sDate, eDate, ISSUESUBTYPE.Task));
+
+                //critical failure task
+                historyCriList.Add(project.Key, getProjectTask(updater, project.Key, 0, sDate, eDate, ISSUESUBTYPE.CrititalFailureTask, false));
+                criticalList.Add(project.Key, getProjectTask(updater, project.Key, 1, sDate, eDate, ISSUESUBTYPE.CrititalFailureTask, false));
+                //rma
+                historyRMAList.Add(project.Key, getProjectTask(updater, project.Key, 0, sDate, eDate, ISSUESUBTYPE.RMA));
+                RMAList.Add(project.Key, getProjectTask(updater, project.Key, 1, sDate, eDate, ISSUESUBTYPE.RMA));
+
+                //debug tree
+
+                //others
+
+                //get current week summary
+                SummaryList.Add(project.Key, getCurWeekSummary(project.Key, sDate, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")));
+            }
+            ViewBag.pKeys = ProjectKeyList;
+            ViewBag.historyTaskList = historyTaskList;
+            ViewBag.taskList = taskList;
+            ViewBag.historyCriList = historyCriList;
+            ViewBag.criticalList = criticalList;
+            ViewBag.historyRMAList = historyRMAList;
+            ViewBag.RMAList = RMAList;
+            ViewBag.SummaryList = SummaryList;
+
+            return View();
+        }
+
+        private void getProjectYield(string projectkey, string sDate, string eDate)
+        {
+            var pvm = ProjectViewModels.RetrieveOneProject(projectkey);
+            var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(projectkey, sDate, eDate, pvm, HttpContext.Cache);
+            var firstdatalist = new List<KeyValuePair<string, int>>();
+            var fpy = 1.0;
+            var fy = 1.0;
+            if (yieldvm.FirstYields.Count > 0)
+            {
+                //fpy
+                foreach (var val in yieldvm.FirstYields)
+                {
+                    fpy *= (Convert.ToDouble(val.OutputCount) / val.InputCount);
+                }
+            }
+            else
+            {
+                fpy = 0;
+            }
+            var tops = new List<double>();
+            if (yieldvm.LastYields.Count > 0)
+            {
+                //fy
+                foreach (var val in yieldvm.LastYields)
+                {
+                    tops.Add(Convert.ToDouble(val.OutputCount) / val.InputCount);
+                    fy *= (Convert.ToDouble(val.OutputCount) / val.InputCount);
+                }
+            }
+            else
+            {
+                fy = 0;
+            }
+
+            if (yieldvm.RealTimeYields.Count > 0)
+            {
+
+            }
+            //top
+            tops.Sort();
+
+        }
+
+        private Dictionary<string, TaskData> getProjectTask(string username, string projectkey, int period, string sDate, string eDate, int iType, bool wSubTask = true)
+        {
+            return IssueViewModels.getProjectTask(username, projectkey, period, sDate, eDate, iType, wSubTask);
+        }
+
+        private Dictionary<string, List<WeeklyReportVM>> getCurWeekSummary(string pKey, string sDate, string eDate)
+        {
+            return WeeklyReportVM.GetIssueSummary(pKey, sDate, eDate);
+        }
+
+        public ActionResult WeeklyReportList(string username)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "WeeklyReportList");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            ViewBag.UserName = updater.Split(new char[] { '@' })[0];
+            ViewBag.RealUserID = updater;
+
+            var usergroup = UserGroupVM.RetreiveUserGroup(updater, UserGroupType.ReportGroup);
+            var userlist = usergroup.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
+            ViewBag.userreportlist = WeeklyReportVM.GetUserLatestTime("'" + string.Join("','", userlist) + "'");
+
+            return View();
+        }
+
+        [HttpPost]
+        public JsonResult GetSummary()
+        {
+            var sType = Request.Form["sType"];
+            var iKey = Request.Form["iKey"];
+            var summaryList = WeeklyReportVM.GetSummary(sType, iKey);
+            var ret = new JsonResult();
+            ret.Data = new { success = true, data = summaryList };
+            return ret;
+        }
+
+        [HttpPost]
+        public JsonResult SaveWeeklyReport()
+        {
+            var ret = new JsonResult();
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            { 
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                var pKey = Request.Form["pKey"];
+                var sType = Convert.ToInt32(Request.Form["sType"]);
+                var iKey = Request.Form["iKey"];
+                var Mark = Request.Form["Mark"];
+                var data = (List<List<string>>)Newtonsoft.Json.JsonConvert.DeserializeObject(Request.Form["data"], (new List<List<string>>()).GetType());
+                var reports = new List<WeeklyReportVM>();
+               
+                if (data.Count > 0)
+                {
+                    DateTimeFormatInfo dfi = DateTimeFormatInfo.CurrentInfo;
+                    var year = DateTime.Now.Year;
+                    var week = dfi.Calendar.GetWeekOfYear(DateTime.Now, dfi.CalendarWeekRule, DayOfWeek.Thursday);
+                    foreach (var item in data)
+                    {
+                        reports.Add(new WeeklyReportVM(
+                            "",
+                            pKey,
+                            updater,
+                            item[0],
+                            item[2],
+                            sType.ToString(),
+                            year.ToString(),
+                            week.ToString(),
+                            item[1],
+                            SummaryStatus.Valid.ToString(),
+                            DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                            DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                        ));
+                    }
+                    WeeklyReportVM.SaveWeeklyReport(reports);
+                }
+
+                ret.Data = new { success = true };
+                return ret;
+            }
+            else
+            {
+                ret.Data = new { success = false };
+                return ret;
+            }
+        }
     }
 }

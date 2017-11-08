@@ -3233,15 +3233,15 @@ namespace Prometheus.Models
         }
     }
 
-    public class IssueType
+    public class IssueTypeVM
     {
-        public IssueType()
+        public IssueTypeVM()
         {
             IssueKey = "";
             IssueSubType = "";
             IssueSsubType = "";
         }
-        public IssueType(string iKey, string iSubType, string iSsubType)
+        public IssueTypeVM(string iKey, string iSubType, string iSsubType)
         {
             IssueKey = iKey;
             IssueSubType = iSubType;
@@ -3251,7 +3251,7 @@ namespace Prometheus.Models
         public string IssueSubType { set; get; }
         public string IssueSsubType { set; get; }
 
-        public void SaveIssueType(List<IssueType> iTypeList)
+        public void SaveIssueType(List<IssueTypeVM> iTypeList)
         {
             var ikeylist = "(";
             var items = "";

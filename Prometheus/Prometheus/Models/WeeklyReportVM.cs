@@ -124,7 +124,8 @@ namespace Prometheus.Models
             var items = "";
             foreach(var rep in report)
             {
-                var sqltmp = "update WeeklyReport set Status = '<DelStatus>'" +
+                //var sqltmp = "update WeeklyReport set Status = '<DelStatus>'" +
+                var sqltmp = "delete from WeeklyReport " +
                         "where ProjectKey = '<ProjectKey>' " +
                         "and IssueKey = '<IssueKey>' " +
                         "and Year = '<Year>' and Week = '<Week>' "+

@@ -73,18 +73,29 @@
                         <div class="wyield" id="wyield_@idx"></div>
                     </div>
                     <div class="yield-summary">
-                        <div class="col-xs-1 summary">Summary:</div>
-                        <div class="col-xs-11">
-                            @{
-                                var ysummary = "";
-                                if (summarylist != null && summarylist.ContainsKey("@@" + Prometheus.Models.SummaryType.Yield))
+                        <div class="col-xs-12 summary">Summary:</div>
+                        @{
+                            var ysummary = "";
+                            if (summarylist != null && summarylist.ContainsKey("@@" + Prometheus.Models.SummaryType.Yield))
+                            {
+                                foreach (var item in summarylist["@@" + Prometheus.Models.SummaryType.Yield])
                                 {
-                                    foreach (var item in summarylist["@@" + Prometheus.Models.SummaryType.Yield])
+                                    if (item.UserName.ToUpper() != ViewBag.RealUserID.ToUpper())
+                                    {
+                                        <div class="row well item-summary">
+                                            <span class="col-xs-5">@item.Summary</span>
+                                            <span class="col-xs-3">@item.UserName</span>
+                                            <span class="col-xs-4">@item.UpdateTime</span>
+                                        </div>
+                                    }
+                                    else
                                     {
                                         ysummary += item.Summary;
                                     }
                                 }
                             }
+                        }
+                        <div class="col-xs-12">
                             <textarea class="form-control" style="height: 35px;" id="yield_summary_@idx" 
                                 name="yield_summary">@ysummary</textarea>
                         </div>

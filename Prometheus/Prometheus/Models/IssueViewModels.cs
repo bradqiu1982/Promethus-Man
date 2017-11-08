@@ -3171,7 +3171,7 @@ namespace Prometheus.Models
             {
                 //history
                 cond = "('" + Resolute.Fixed + "','" + Resolute.NotFix + "','" + Resolute.Done + "')";
-                sql += "and Issue.Resolution in <cond>" +
+                sql += "and Issue.Resolution in <cond> and (Log.Date is null or Log.Date < '<sDate>') " +
                       "order by Log.Date Desc, Issue.ReportDate Desc; ";
             }
             else

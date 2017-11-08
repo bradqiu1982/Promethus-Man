@@ -23,7 +23,7 @@ namespace Prometheus.Models
     public class ISSUESUBTYPE
     {    
         //0: Other 1: Task 2: Critital Failure Task 3: Non Critical Failure Task 
-        //4: OBA 5: RMA 6: Bug 7: REL 8: NPI 
+        //4: OBA 5: RMA 6: Bug 7: REL 8: NPI
         public static int Other = 0;
         public static int Task = 1;
         public static int CrititalFailureTask = 2;
@@ -3150,6 +3150,15 @@ namespace Prometheus.Models
 
         public static Dictionary<string, TaskData> getProjectTask(string uName, string pKey, int tPeriod, string sDate, string eDate, int iType, bool wSubTask = true)
         {
+            //var issuetypes = "";
+            //if (iType == ISSUESUBTYPE.CrititalFailureTask)
+            //{
+            //    issuetypes = "('" + ISSUESUBTYPE.CrititalFailureTask + "', '"+ISSUESUBTYPE.OCAP+"')";
+            //}
+            //else
+            //{
+            //    issuetypes = "('" + iType + "')";
+            //}
             var sql = "select Issue.Summary as Description, Issue.IssueKey, Issue.IssueType, " +
                             "Issue.Resolution, Issue.ReportDate as StartDate, "+
                             "Issue.DueDate, Log.Date as UpdateTme, ia.Attachment, it.IssueSubType " +
@@ -3221,6 +3230,49 @@ namespace Prometheus.Models
         private static DateTime convertDate(string date)
         {
             return string.IsNullOrEmpty(date) ? new DateTime(1, 1, 1, 0, 0, 0) : Convert.ToDateTime(date);
+        }
+    }
+
+    public class IssueType
+    {
+        public IssueType()
+        {
+            IssueKey = "";
+            IssueSubType = "";
+            IssueSsubType = "";
+        }
+        public IssueType(string iKey, string iSubType, string iSsubType)
+        {
+            IssueKey = iKey;
+            IssueSubType = iSubType;
+            IssueSsubType = iSsubType;
+        }
+        public string IssueKey { set; get; }
+        public string IssueSubType { set; get; }
+        public string IssueSsubType { set; get; }
+
+        public void SaveIssueType(List<IssueType> iTypeList)
+        {
+            var ikeylist = "(";
+            var items = "";
+            foreach (var iType in iTypeList)
+            {
+                ikeylist += "'" + iType.IssueKey + "',";
+
+                items += "('" + iType.IssueKey + "',"
+                        + "'" + iType.IssueSubType + "',"
+                        + "'" + iType.IssueSsubType + "'),";
+            }
+            ikeylist = ikeylist.Substring(0, ikeylist.Length - 1) + ")";
+            var sqltmp = "delete from IssueType where IssueKey in <IssueKey> ";
+            sqltmp = sqltmp.Replace("<IssueKey>", ikeylist);
+            DBUtility.ExeLocalSqlNoRes(sqltmp);
+
+            items = items.Substring(0, items.Length - 1);
+            var sql = "insert into IssueType (IssueKey, IssueSubType, IssueSsubType) values <Items>; ";
+            sql = sql.Replace("<Items>", items);
+
+            DBUtility.ExeLocalSqlNoRes(sql);
         }
     }
 }

@@ -952,9 +952,6 @@ update [NPITrace].[dbo].[ProjectCriticalError] set SettingReason = 'VCSEL;Lens d
 
 
 /* Add for weekly report */
-USE [DebugDB]
-GO
-
 /****** Object:  Table [dbo].[Log]    Script Date: 11/1/2017 4:45:39 PM ******/
 SET ANSI_NULLS ON
 GO
@@ -995,9 +992,6 @@ ALTER TABLE [dbo].[Log] ADD  CONSTRAINT [DF_Log_LogLevel]  DEFAULT ('') FOR [Log
 GO
 
 ALTER TABLE [dbo].[Log] ADD  CONSTRAINT [DF_Log_Message]  DEFAULT ('') FOR [Message]
-GO
-
-USE [DebugDB]
 GO
 
 /****** Object:  Table [dbo].[WeeklyReport]    Script Date: 11/1/2017 4:37:46 PM ******/
@@ -1048,11 +1042,29 @@ GO
 EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'0: Delete 1: Valid' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'WeeklyReport', @level2type=N'COLUMN',@level2name=N'Status'
 GO
 
+/****** Object:  Table [dbo].[IssueType]    Script Date: 11/8/2017 2:21:31 PM ******/
+SET ANSI_NULLS ON
+GO
 
+SET QUOTED_IDENTIFIER ON
+GO
 
+CREATE TABLE [dbo].[IssueType](
+	[IssueKey] [nvarchar](50) NOT NULL,
+	[IssueSubType] [tinyint] NOT NULL,
+	[IssueSsubType] [tinyint] NOT NULL
+) ON [PRIMARY]
 
+GO
 
+ALTER TABLE [dbo].[IssueType] ADD  CONSTRAINT [DF_IssueType_IssueSubType]  DEFAULT ((0)) FOR [IssueSubType]
+GO
 
+ALTER TABLE [dbo].[IssueType] ADD  CONSTRAINT [DF_IssueType_IssueSsubType]  DEFAULT ((0)) FOR [IssueSsubType]
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'0: Other 1: Task 2: Critital Failure Task 3: Non Critical Failure Task 4: OBA 5: RMA 6: Bug 7: REL 8: NPI ' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'IssueType', @level2type=N'COLUMN',@level2name=N'IssueSubType'
+GO
 
 
 

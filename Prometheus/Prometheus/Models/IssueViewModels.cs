@@ -20,6 +20,20 @@ namespace Prometheus.Models
         public static string Document = "Document";
         public static string Rel = "Rel";
     }
+    public class ISSUESUBTYPE
+    {    
+        //0: Other 1: Task 2: Critital Failure Task 3: Non Critical Failure Task 
+        //4: OBA 5: RMA 6: Bug 7: REL 8: NPI 
+        public static int Other = 0;
+        public static int Task = 1;
+        public static int CrititalFailureTask = 2;
+        public static int NonCrititalFailureTask = 3;
+        public static int OBA = 4;
+        public static int RMA = 5;
+        public static int Bug = 6;
+        public static int REL = 7;
+        public static int NPIProcess = 8;
+    }
 
     public class ISSUEATTACHTYPE
     {
@@ -3060,6 +3074,82 @@ namespace Prometheus.Models
             }
 
             return ret;
+        }
+
+
+        public static Dictionary<string, TaskData> getProjectTask(string uName, string pKey, int tPeriod, string sDate, string eDate, int iType, bool wSubTask = true)
+        {
+            var sql = "select Issue.Summary as Description, Issue.IssueKey, Issue.IssueType, " +
+                            "Issue.Resolution, Issue.ReportDate as StartDate, "+
+                            "Issue.DueDate, Log.Date as UpdateTme, ia.Attachment, it.IssueSubType " +
+                      "from Issue " +
+                          "left join Log on Issue.IssueKey = Log.IssueKey " +
+                          "left join IssueAttachment as ia on ia.IssueKey = Issue.IssueKey " +
+                          "left join IssueType as it on it.IssueKey = Issue.IssueKey " +
+                      "where Reporter <> 'System' " +
+                          "and Issue.ProjectKey = '<ProjectKey>' " +
+                          "and Issue.APVal1 <> 'delete' " +
+                          "and Issue.Assignee = '<UserName>' " +
+                          "and it.IssueSubType = '<IssueType>' ";
+            if( !wSubTask)
+            {
+                sql += "and Issue.ParentIssueKey = '' ";
+            }
+            var cond = "";
+            if (tPeriod == 0)
+            {
+                //history
+                cond = "('" + Resolute.Fixed + "','" + Resolute.NotFix + "','" + Resolute.Done + "')";
+                sql += "and Issue.Resolution in <cond> and (Log.Date is null or Log.Date < '<sDate>') " +
+                      "order by Log.Date Desc, Issue.ReportDate Desc; ";
+            }
+            else
+            {
+                cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "','" + Resolute.Working + "')";
+                sql += "and (Issue.Resolution in <cond> or (Log.Date Between '<sDate>' And '<eDate>')) " +
+                      "order by Log.Date Desc, Issue.ReportDate Desc; ";
+            }
+                         
+            sql = sql.Replace("<UserName>", uName).Replace("<cond>", cond).Replace("<IssueType>", iType.ToString()).Replace("<ProjectKey>", pKey).Replace("<sDate>", sDate).Replace("<eDate>", eDate);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            var ret = new Dictionary<string, TaskData>();
+            foreach (var line in dbret)
+            {
+                if (ret.ContainsKey(Convert.ToString(line[1])))
+                {
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[7])))
+                    {
+                        ret[Convert.ToString(line[1])].Attachment.Add(Convert.ToString(line[7]));
+                    }
+                }
+                else
+                {
+                    var attach = new List<string>();
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[7])))
+                    {
+                        attach.Add(Convert.ToString(line[7]));
+                    }
+                    var tmp = new TaskData(
+                        Convert.ToString(line[1]),
+                        Convert.ToString(line[0]),
+                        Convert.ToString(line[2]),
+                        Convert.ToString(line[8]),
+                        Convert.ToString(line[3]),
+                        convertDate(Convert.ToString(line[4])),
+                        convertDate(Convert.ToString(line[5])),
+                        convertDate(Convert.ToString(line[6])),
+                        attach
+                    );
+                    ret.Add(Convert.ToString(line[1]), tmp);
+                }
+            }
+
+            return ret;
+        }
+
+        private static DateTime convertDate(string date)
+        {
+            return string.IsNullOrEmpty(date) ? new DateTime(1, 1, 1, 0, 0, 0) : Convert.ToDateTime(date);
         }
     }
 }

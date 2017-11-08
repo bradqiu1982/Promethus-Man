@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -579,6 +580,10 @@ namespace Prometheus.Controllers
 
             var issuekey = Request.Form["IssueKey"];
             var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey,this);
+
+            //write log
+            LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
+                Request.Url.ToString(), "Issue", "Update", issuekey, "", Log4NetLevel.Info, "");
 
            if (Request.Form["deleteisu"] != null)
             {
@@ -1471,6 +1476,10 @@ namespace Prometheus.Controllers
             var issuekey = Request.Form["IssueKey"];
             var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey,this);
 
+            //write log
+            LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
+                Request.Url.ToString(), "Bug", "Update", issuekey, "", Log4NetLevel.Info, "");
+
             var pjmemauth = false;
             var pj = ProjectViewModels.RetrieveOneProject(originaldata.ProjectKey);
             if (pj != null)
@@ -2047,6 +2056,10 @@ namespace Prometheus.Controllers
 
             var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey,this);
 
+            //write log
+            LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
+                Request.Url.ToString(), "RMA", "Update", issuekey, "", Log4NetLevel.Info, "");
+
             if (Request.Form["deleterma"] != null)
             {
                 if (string.Compare(updater, originaldata.Reporter, true) == 0
@@ -2441,6 +2454,10 @@ namespace Prometheus.Controllers
 
             var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey,this);
 
+            //write log
+            LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
+                Request.Url.ToString(), "REL", "Update", issuekey, "", Log4NetLevel.Info, "");
+
             if (Request.Form["deleterma"] != null)
             {
                 if (string.Compare(updater, originaldata.Reporter, true) == 0
@@ -2662,6 +2679,10 @@ namespace Prometheus.Controllers
             var issuekey = Request.Form["IssueKey"];
 
             var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey,this);
+
+            //write log
+            LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
+                Request.Url.ToString(), "OBA", "Update", issuekey, "", Log4NetLevel.Info, "");
 
             if (Request.Form["deleterma"] != null)
             {
@@ -2935,6 +2956,10 @@ namespace Prometheus.Controllers
             var issuekey = Request.Form["IssueKey"];
 
             var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey,this);
+
+            //write log
+            LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
+                Request.Url.ToString(), "Quality", "Update", issuekey, "", Log4NetLevel.Info, "");
 
             if (Request.Form["deleterma"] != null)
             {
@@ -4003,6 +4028,19 @@ namespace Prometheus.Controllers
                 return RedirectToAction("ProjectIssues", "Project", dict);
             }
 
+        }
+
+        public static string DetermineCompName(string IP)
+        {
+            try
+            {
+                IPAddress myIP = IPAddress.Parse(IP);
+                IPHostEntry GetIPHost = Dns.GetHostEntry(myIP);
+                List<string> compName = GetIPHost.HostName.ToString().Split('.').ToList();
+                return compName.First();
+            }
+            catch (Exception ex)
+            { return string.Empty; }
         }
     }
 }

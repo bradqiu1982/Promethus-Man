@@ -953,28 +953,102 @@ update [NPITrace].[dbo].[ProjectCriticalError] set SettingReason = 'EOS/ESD;Cabl
 update [NPITrace].[dbo].[ProjectCriticalError] set SettingReason = 'VCSEL;Lens detachment;Cable crack;' where ProjectKey= '25GSFPWIRE' and ErrorCode = 'RLoP'
 
 
+/* Add for weekly report */
+USE [DebugDB]
+GO
 
+/****** Object:  Table [dbo].[Log]    Script Date: 11/1/2017 4:45:39 PM ******/
+SET ANSI_NULLS ON
+GO
 
+SET QUOTED_IDENTIFIER ON
+GO
 
+CREATE TABLE [dbo].[Log](
+    [ID] [int] IDENTITY(1,1) NOT NULL,
+    [UserName] [nvarchar](50) NOT NULL,
+    [ProjectKey] [nvarchar](50) NOT NULL,
+    [Machine] [nvarchar](50) NOT NULL,
+    [Url] [nvarchar](200) NOT NULL,
+    [OperateModule] [nvarchar](50) NOT NULL,
+    [Operate] [nvarchar](200) NOT NULL,
+    [IssueKey] [nvarchar](50) NOT NULL,
+    [LogType] [nvarchar](50) NOT NULL,
+    [LogLevel] [nvarchar](50) NOT NULL,
+    [Message] [nvarchar](200) NOT NULL,
+    [Date] [datetime] NOT NULL,
+    [APVal1] [nvarchar](max) NOT NULL,
+    [APVal2] [nvarchar](max) NOT NULL,
+    [APVal3] [nvarchar](max) NOT NULL
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 
+GO
 
+ALTER TABLE [dbo].[Log] ADD  CONSTRAINT [DF_Log_ProjectKey]  DEFAULT ('') FOR [ProjectKey]
+GO
 
+ALTER TABLE [dbo].[Log] ADD  CONSTRAINT [DF_Log_IssueKey]  DEFAULT ('') FOR [IssueKey]
+GO
 
+ALTER TABLE [dbo].[Log] ADD  CONSTRAINT [DF_Log_LogType]  DEFAULT ('') FOR [LogType]
+GO
 
+ALTER TABLE [dbo].[Log] ADD  CONSTRAINT [DF_Log_LogLevel]  DEFAULT ('') FOR [LogLevel]
+GO
 
+ALTER TABLE [dbo].[Log] ADD  CONSTRAINT [DF_Log_Message]  DEFAULT ('') FOR [Message]
+GO
 
+USE [DebugDB]
+GO
 
+/****** Object:  Table [dbo].[WeeklyReport]    Script Date: 11/1/2017 4:37:46 PM ******/
+SET ANSI_NULLS ON
+GO
 
+SET QUOTED_IDENTIFIER ON
+GO
 
+CREATE TABLE [dbo].[WeeklyReport](
+    [ID] [int] IDENTITY(1,1) NOT NULL,
+    [UserName] [nvarchar](200) NOT NULL,
+    [ProjectKey] [nvarchar](50) NOT NULL,
+    [IssueKey] [nvarchar](50) NOT NULL,
+    [Summary] [nvarchar](200) NOT NULL,
+    [Type] [tinyint] NOT NULL,
+    [Year] [int] NOT NULL,
+    [Week] [int] NOT NULL,
+    [Mark] [tinyint] NOT NULL,
+    [Status] [tinyint] NOT NULL,
+    [CreateTime] [datetime] NOT NULL,
+    [UpdateTime] [datetime] NOT NULL
+) ON [PRIMARY]
 
+GO
 
+ALTER TABLE [dbo].[WeeklyReport] ADD  CONSTRAINT [DF_WeeklyReport_IssueKey]  DEFAULT ('') FOR [IssueKey]
+GO
 
+ALTER TABLE [dbo].[WeeklyReport] ADD  CONSTRAINT [DF_WeeklyReport_Summary]  DEFAULT ('') FOR [Summary]
+GO
 
+ALTER TABLE [dbo].[WeeklyReport] ADD  CONSTRAINT [DF_WeeklyReport_Type]  DEFAULT ((0)) FOR [Type]
+GO
 
+ALTER TABLE [dbo].[WeeklyReport] ADD  CONSTRAINT [DF_WeeklyReport_Mark]  DEFAULT ((0)) FOR [Mark]
+GO
 
+ALTER TABLE [dbo].[WeeklyReport] ADD  CONSTRAINT [DF_WeeklyReport_Status]  DEFAULT ((1)) FOR [Status]
+GO
 
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'0: Others Summary 1: Yield Summary 2: Task 3: Critical Failure 4: RMA' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'WeeklyReport', @level2type=N'COLUMN',@level2name=N'Type'
+GO
 
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'0: Normal 1: High 2: Low' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'WeeklyReport', @level2type=N'COLUMN',@level2name=N'Mark'
+GO
 
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'0: Delete 1: Valid' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'WeeklyReport', @level2type=N'COLUMN',@level2name=N'Status'
+GO
 
 
 

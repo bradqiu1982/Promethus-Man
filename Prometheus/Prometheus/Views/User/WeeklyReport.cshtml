@@ -1,0 +1,555 @@
+﻿
+@{
+    ViewBag.Title = "WeeklyReport";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var idx = 0;
+    var m = 0;
+    var colors = new String[]{ "success", "primary", "warning", "info", "danger" };
+}
+
+<div class="row">
+    <div class="nav navbar-nav navbar-left">
+        <img src="~/Content/images/ucicon/ILearnIcons.png" style="height:40px; width:40px">
+    </div>
+    <div class="nav navbar-nav navbar-left">
+        <ol class="breadcrumb">
+            <li><a href="/User/UserCenter?username=@(ViewBag.RealUserID)">Weekly Report</a></li>
+            <li class="active">@ViewBag.UserName</li>
+        </ol>
+    </div>
+</div>
+
+<script src="~/Scripts/highcharts.js"></script>
+<script src="~/Scripts/exporting.js"></script>
+<script src="~/Scripts/weeklyreport.js"></script>
+
+
+<ul class="nav nav-pills nav-stacked col-xs-2" data-intro="Select tab to see detail." data-step="1">
+    <li><a href="#tab_a" data-toggle="pill">I Learn</a></li>
+    <li class="active"><a href="/User/WeeklyReportList">Weekly Report</a></li>
+    <li><a href="#tab_c" data-toggle="pill">Training</a></li>
+    <li><a href="#tab_d" data-toggle="pill">I Share</a></li>
+</ul>
+<div class="tab-content col-xs-10" data-intro="Show detail of tab" data-step="2">
+    <div class="pro-info">
+        @foreach (var pKey in ViewBag.pKeys)
+        {
+            var summarylist = (ViewBag.SummaryList.ContainsKey(pKey) && ViewBag.SummaryList[pKey].Count > 0) ? ViewBag.SummaryList[pKey] : null;
+            <div class="project-name">
+                <span class="label label-@(colors[idx % 5]) span-pro">@pKey</span>
+            </div>
+            <section id="Yield-@idx">
+                <div class="bs-callout bs-callout-danger" data-toggle="collapse" data-target="#content_yield_@idx" aria-expanded="@(idx == 0 ? "true" : "false")">
+                    <h4>Yield</h4>
+                </div>
+                <div class="content collapse @(idx == 0 ? "in" : "")" id="content_yield_@idx">
+                    <div id="data-yield_@idx">
+                        <table class="table table-bordered table-condensed">
+                            <thead>
+                                <tr>
+                                    <th>FPY</th>
+                                    <th>FY</th>
+                                    <th colspan="2">Top 1</th>
+                                    <th colspan="2">Top 2</th>
+                                    <th colspan="2">Top 3</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>98%</td>
+                                    <td>98%</td>
+                                    <td>PRE-ALIGN</td>
+                                    <td>99%</td>
+                                    <td>Label</td>
+                                    <td>98%</td>
+                                    <td>Initial</td>
+                                    <td>97%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="chart_@idx">
+                        <div class="fypareto" id="fypareto_@idx"></div>
+                        <div class="wyield" id="wyield_@idx"></div>
+                    </div>
+                    <div class="yield-summary">
+                        <div class="col-xs-12 summary">Summary:</div>
+                        @{
+                            var ysummary = "";
+                            if (summarylist != null && summarylist.ContainsKey("@@" + Prometheus.Models.SummaryType.Yield))
+                            {
+                                foreach (var item in summarylist["@@" + Prometheus.Models.SummaryType.Yield])
+                                {
+                                    if (item.UserName.ToUpper() != ViewBag.RealUserID.ToUpper())
+                                    {
+                                        <div class="row well item-summary">
+                                            <span class="col-xs-5">@item.Summary</span>
+                                            <span class="col-xs-3">@item.UserName</span>
+                                            <span class="col-xs-4">@item.UpdateTime</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        ysummary += item.Summary;
+                                    }
+                                }
+                            }
+                        }
+                        <div class="col-xs-12">
+                            <textarea class="form-control" style="height: 35px;" id="yield_summary_@idx" 
+                                name="yield_summary">@ysummary</textarea>
+                        </div>
+                    </div>
+                    <div class="wr-operation">
+                        <input type="button" class="btn btn-success op-btn btn-save" data-data-key="@pKey" data-data-module="@Prometheus.Models.SummaryType.Yield" name="btn_save" value="Save" />
+                        <input type="button" class="btn btn-warning op-btn btn-cancel" name="btn_cancel" value="Cancel" />
+                    </div>
+                </div>
+            </section>
+            <section id="Task-@idx">
+                <div class="bs-callout bs-callout-info" data-toggle="collapse" data-target="#content_task_@idx" aria-expanded="false">
+                    <h4>Task</h4>
+                </div>
+                <div id="content_task_@idx" class="content collapse">
+                    <div id="his_task_@idx">
+                        <div class="panel panel-default">
+                            <div class="panel-heading cursor-pointer" data-toggle="collapse" data-target="#content_his_task_@idx" aria-expanded="false">
+                                <span class="panel-title">History</span>
+                                <span class="glyphicon glyphicon-chevron-down chevron-down"></span>
+                            </div>
+                            <div class="panel-body collapse" id="content_his_task_@idx">
+                                <table class="table table-hover table-condensed task-content" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Description</th>
+                                            <th>Status</th>
+                                            <th>Start Date</th>
+                                            <th>Due Date</th>
+                                            <th>Update Date</th>
+                                            <th>Attachment</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (ViewBag.historyTaskList.ContainsKey(pKey) && ViewBag.historyTaskList[pKey].Count > 0)
+                                        {
+                                            m = 0;
+                                            foreach (var history in ViewBag.historyTaskList[pKey])
+                                            {
+                                                <tr class="cursor-pointer" data-toggle="collapse" data-data="his-task-@idx-@m" data-target="#his-task-@idx-@m" 
+                                                        data-ikey="@history.Value.IssueKey" data-itype="@history.Value.IssueSubType" aria-expanded="false">
+                                                    <td>@(m + 1)</td>
+                                                    <td><a href="/Issue/UpdateIssue?issuekey=@history.Key" target="_blank">@history.Value.Description</a></td>
+                                                    <td>@history.Value.Status</td>
+                                                    <td>@history.Value.StartDate.ToString("MM/dd")</td>
+                                                    <td>@history.Value.DueDate.ToString("MM/dd")</td>
+                                                    <td>@(history.Value.UpdateTime.ToString("yyyy/MM/dd HH:mm:ss") == "0001/01/01 00:00:00" ? "" : history.Value.UpdateTime.ToString("MM/dd HH:mm"))</td>
+                                                    <td>
+                                                        @if (history.Value.Attachment.Count > 0)
+                                                        {
+                                                            <a href="/Issue/IssueAttach?issuekey=@history.Key" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></a>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                                m++;
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    @if (ViewBag.taskList.ContainsKey(pKey) && ViewBag.taskList[pKey].Count > 0)
+                    {
+                        m = 0;
+                        <div id="cur_task_@idx">
+                            <table class="table table-condensed" cellpadding="0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Description</th>
+                                        <th>Status</th>
+                                        <th>Start Date</th>
+                                        <th>Due Date</th>
+                                        <th>Update Date</th>
+                                        <th>Attachment</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var task in ViewBag.taskList[pKey])
+                                    {
+                                        <tr data-data="cur-task-@idx-@m">
+                                            <td>@(m + 1)</td>
+                                            <td><a href="/Issue/UpdateIssue?issuekey=@task.Key" target="_blank">@task.Value.Description</a></td>
+                                            <td>@task.Value.Status</td>
+                                            <td>@task.Value.StartDate.ToString("MM/dd")</td>
+                                            <td>@task.Value.DueDate.ToString("MM/dd")</td>
+                                            <td>@(task.Value.UpdateTime.ToString("yyyy/MM/dd HH:mm:ss") == "0001/01/01 00:00:00" ? "" : task.Value.UpdateTime.ToString("MM/dd HH:mm"))</td>
+                                            <td>
+                                                @if (task.Value.Attachment.Count > 0)
+                                                {
+                                                    <a href="/Issue/IssueAttach?issuekey=@task.Key" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></a>
+                                                }
+                                            </td>
+                                        </tr>
+                                        <tr class="even" data-ikey="@task.Key">
+                                            <td colspan="7">
+                                                <div class="col-xs-12 summary">Summary:</div>
+                                                @{
+                                                    var tsummary = "";
+                                                    if (summarylist != null && summarylist.ContainsKey(task.Key + "@@" + Prometheus.Models.SummaryType.Task))
+                                                    {
+                                                        foreach (var item in summarylist[task.Key + "@@" + Prometheus.Models.SummaryType.Task])
+                                                        {
+                                                            if(item.UserName.ToUpper() != ViewBag.RealUserID.ToUpper()) {
+                                                                <div class="row well item-summary">
+                                                                    <span class="col-xs-5">@item.Summary</span>
+                                                                    <span class="col-xs-3">@item.UserName</span>
+                                                                    <span class="col-xs-4">@item.UpdateTime</span>
+                                                                </div>
+                                                            }
+                                                            else
+                                                            {
+                                                                tsummary += item.Summary;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                <div class="col-xs-8">
+                                                    <textarea class="form-control" style="height: 35px;" id="cur_task_summary_@(idx)_@m" 
+                                                              name="cur_task_summary">@tsummary</textarea>
+                                                </div>
+                                                <div class="col-xs-4">
+                                                    <select class="form-control col-md-1">
+                                                        <option selected value="0">Normal</option>
+                                                        <option value="1">High</option>
+                                                        <option value="2">Low</option>
+                                                    </select>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        m++;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="wr-operation">
+                            <input type="button" class="btn btn-success op-btn btn-save" data-data-key="@pKey" data-data-module="@Prometheus.Models.SummaryType.Task" name="btn_save" value="Save" />
+                            <input type="button" class="btn btn-warning op-btn btn-cancel" name="btn_cancel" value="Cancel" />
+                        </div>
+                    }
+                </div>
+            </section>
+            <section id="Critical-Failure-Task-@idx">
+                <div class="bs-callout bs-callout-warning" data-toggle="collapse" data-target="#content_cri_task_@idx" aria-expanded="false">
+                    <h4>Critical Failure Task</h4>
+                </div>
+                <div id="content_cri_task_@idx" class="content collapse">
+                    <div id="his_critical_task_@idx">
+                        <div class="panel panel-default">
+                            <div class="panel-heading cursor-pointer" data-toggle="collapse" data-target="#content_his_cri_task_@idx" aria-expanded="false">
+                                <span class="panel-title">History</span>
+                                <span class="glyphicon glyphicon-chevron-down chevron-down"></span>
+                            </div>
+                            <div class="panel-body collapse" id="content_his_cri_task_@idx">
+                                <table class="table table-hover table-condensed task-content" id="hiscritaskcontent" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Description</th>
+                                            <th>Status</th>
+                                            <th>Start Date</th>
+                                            <th>Due Date</th>
+                                            <th>Update Date</th>
+                                            <th>Attachment</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (ViewBag.historyCriList.ContainsKey(pKey) && ViewBag.historyCriList[pKey].Count > 0)
+                                        {
+                                            m = 0;
+                                            foreach (var history in ViewBag.historyCriList[pKey])
+                                            {
+                                                <tr class="cursor-pointer" data-toggle="collapse" data-data="his-cri-task-@idx-@m" data-target="#his-cri-task-@idx-@m" 
+                                                        data-ikey="@history.Value.IssueKey" data-itype="@history.Value.IssueSubType" aria-expanded="false">
+                                                    <td>@(m + 1)</td>
+                                                    <td><a href="/Issue/UpdateIssue?issuekey=@history.Key" target="_blank">@history.Value.Description</a></td>
+                                                    <td>@history.Value.Status</td>
+                                                    <td>@history.Value.StartDate.ToString("MM/dd")</td>
+                                                    <td>@history.Value.DueDate.ToString("MM/dd")</td>
+                                                    <td>@(history.Value.UpdateTime.ToString("yyyy/MM/dd HH:mm:ss") == "0001/01/01 00:00:00" ? "" : history.Value.UpdateTime.ToString("MM/dd HH:mm"))</td>
+                                                    <td>
+                                                        @if (history.Value.Attachment.Count > 0)
+                                                        {
+                                                            <a href="/Issue/IssueAttach?issuekey=@history.Key" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></a>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                                m++;
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    @if (ViewBag.criticalList.ContainsKey(pKey) && ViewBag.criticalList[pKey].Count > 0)
+                    {
+                        m = 0;
+                        <div id="cur_critical_task_@idx">
+                            <table class="table table-condensed" cellpadding="0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Description</th>
+                                        <th>Status</th>
+                                        <th>Start Date</th>
+                                        <th>Due Date</th>
+                                        <th>Update Date</th>
+                                        <th>Attachment</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var task in ViewBag.criticalList[pKey])
+                                    {
+                                        <tr data-data="cur-cri-task-@idx-@m">
+                                            <td>@(m + 1)</td>
+                                            <td><a href="/Issue/UpdateIssue?issuekey=@task.Key" target="_blank">@task.Value.Description</a></td>
+                                            <td>@task.Value.Status</td>
+                                            <td>@task.Value.StartDate.ToString("MM/dd")</td>
+                                            <td>@task.Value.DueDate.ToString("MM/dd")</td>
+                                            <td>@(task.Value.UpdateTime.ToString("yyyy/MM/dd HH:mm:ss") == "0001/01/01 00:00:00" ? "" : task.Value.UpdateTime.ToString("MM/dd HH:mm"))</td>
+                                            <td>
+                                                @if (task.Value.Attachment.Count > 0)
+                                                {
+                                                    <a href="/Issue/IssueAttach?issuekey=@task.Key" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></a>
+                                                }
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="7">
+                                                <div class="col-xs-12 summary">Summary:</div>
+                                                @{
+                                                    var csummary = "";
+                                                    if (summarylist != null && summarylist.ContainsKey(task.Key + "@@" + Prometheus.Models.SummaryType.CriticalFailure))
+                                                    {
+                                                        foreach (var item in summarylist[task.Key + "@@" + Prometheus.Models.SummaryType.CriticalFailure])
+                                                        {
+                                                            if (item.UserName.ToUpper() != ViewBag.RealUserID.ToUpper())
+                                                            {
+                                                                <div class="row well item-summary">
+                                                                    <span class="col-xs-5">@item.Summary</span>
+                                                                    <span class="col-xs-3">@item.UserName</span>
+                                                                    <span class="col-xs-4">@item.UpdateTime</span>
+                                                                </div>
+                                                            }
+                                                            else
+                                                            {
+                                                                csummary += item.Summary;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                <div class="col-xs-8">
+                                                    <textarea class="form-control" style="height: 35px;" id="cur_cri_task_summary_@(idx)_@m" 
+                                                              name="cur_cri_task_summary">@csummary</textarea>
+                                                </div>
+                                                <div class="col-xs-4">
+                                                    <select class="form-control col-md-1">
+                                                        <option selected value="0">Normal</option>
+                                                        <option value="1">High</option>
+                                                        <option value="2">Low</option>
+                                                    </select>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        m++;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="wr-operation">
+                            <input type="button" class="btn btn-success op-btn btn-save" data-data-key="@pKey" data-data-module="@Prometheus.Models.SummaryType.CriticalFailure" name="btn_save" value="Save" />
+                            <input type="button" class="btn btn-warning op-btn btn-cancel" name="btn_cancel" value="Cancel" />
+                        </div>
+                    }
+                </div>
+            </section>
+            <section id="RMA-@idx">
+                <div class="bs-callout bs-callout-danger" data-toggle="collapse" data-target="#content_rma_task_@idx" aria-expanded="false">
+                    <h4>RMA</h4>
+                </div>
+                <div id="content_rma_task_@idx" class="content collapse">
+                    <div id="his_rma_task_@idx">
+                        <div class="panel panel-default">
+                            <div class="panel-heading cursor-pointer" data-toggle="collapse" data-target="#content_his_rma_task_@idx" aria-expanded="false">
+                                <span class="panel-title">History</span>
+                                <span class="glyphicon glyphicon-chevron-down chevron-down"></span>
+                            </div>
+                            <div class="panel-body collapse" id="content_his_rma_task_@idx">
+                                <table class="table table-hover table-condensed task-content" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Description</th>
+                                            <th>Status</th>
+                                            <th>Start Date</th>
+                                            <th>Due Date</th>
+                                            <th>Update Date</th>
+                                            <th>Attachment</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (ViewBag.historyRMAList.ContainsKey(pKey) && ViewBag.historyRMAList[pKey].Count > 0)
+                                        {
+                                            m = 0;
+                                            foreach (var history in ViewBag.historyRMAList[pKey])
+                                            {
+                                                <tr class="cursor-pointer" data-toggle="collapse" data-data="his-rma-task-@idx-@m" data-target="#his-rma-task-@idx-@m" 
+                                                        data-ikey="@history.Value.IssueKey" data-itype="@history.Value.IssueSubType" aria-expanded="false">
+                                                    <td>@(m + 1)</td>
+                                                    <td><a href="/Issue/UpdateIssue?issuekey=@history.Key" target="_blank">@history.Value.Description</a></td>
+                                                    <td>@history.Value.Status</td>
+                                                    <td>@history.Value.StartDate.ToString("MM/dd")</td>
+                                                    <td>@history.Value.DueDate.ToString("MM/dd")</td>
+                                                    <td>@(history.Value.UpdateTime.ToString("yyyy/MM/dd HH:mm:ss") == "0001/01/01 00:00:00" ? "" : history.Value.UpdateTime.ToString("MM/dd HH:mm"))</td>
+                                                    <td>
+                                                        @if (history.Value.Attachment.Count > 0)
+                                                        {
+                                                            <a href="/Issue/IssueAttach?issuekey=@history.Key" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></a>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                                m++;
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    @if (ViewBag.RMAList.ContainsKey(pKey) && ViewBag.RMAList[pKey].Count > 0)
+                    {
+                        m = 0;
+                        <div id="cur_rma_task_@idx">
+                            <table class="table table-condensed" cellpadding="0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Description</th>
+                                        <th>Status</th>
+                                        <th>Start Date</th>
+                                        <th>Due Date</th>
+                                        <th>Update Date</th>
+                                        <th>Attachment</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var task in ViewBag.RMAList[pKey])
+                                    {
+                                        <tr data-data="cur-rma-task-@idx-@m">
+                                            <td>@(m + 1)</td>
+                                            <td><a href="/Issue/UpdateIssue?issuekey=@task.Key" target="_blank">@task.Value.Description</a></td>
+                                            <td>@task.Value.Status</td>
+                                            <td>@task.Value.StartDate.ToString("MM/dd")</td>
+                                            <td>@task.Value.DueDate.ToString("MM/dd")</td>
+                                            <td>@(task.Value.UpdateTime.ToString("yyyy/MM/dd HH:mm:ss") == "0001/01/01 00:00:00" ? "" : task.Value.UpdateTime.ToString("MM/dd HH:mm"))</td>
+                                            <td>
+                                                @if (task.Value.Attachment.Count > 0)
+                                                {
+                                                    <a href="/Issue/IssueAttach?issuekey=@task.Key" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></a>
+                                                }
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="7">
+                                                <div class="col-xs-12 summary">Summary:</div>
+                                                @{
+                                                    var rsummary = "";
+                                                    if (summarylist != null && summarylist.ContainsKey(task.Key + "@@" + Prometheus.Models.SummaryType.RMA))
+                                                    {
+                                                        foreach (var item in summarylist[task.Key + "@@" + Prometheus.Models.SummaryType.RMA])
+                                                        {
+                                                            if (item.UserName.ToUpper() != ViewBag.RealUserID.ToUpper())
+                                                            {
+                                                                <div class="row well item-summary">
+                                                                    <span class="col-xs-5">@item.Summary</span>
+                                                                    <span class="col-xs-3">@item.UserName</span>
+                                                                    <span class="col-xs-4">@item.UpdateTime</span>
+                                                                </div>
+                                                            }
+                                                            else
+                                                            {
+                                                                rsummary += item.Summary;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                <div class="col-xs-8">
+                                                    <textarea class="form-control" style="height: 35px;" id="cur_rma_task_summary_@(idx)_@m" 
+                                                              name="cur_rma_task_summary">@rsummary</textarea>
+                                                </div>
+                                                <div class="col-xs-4">
+                                                    <select class="form-control col-md-1">
+                                                        <option selected value="0">Normal</option>
+                                                        <option value="1">High</option>
+                                                        <option value="2">Low</option>
+                                                    </select>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        m++;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="wr-operation">
+                            <input type="button" class="btn btn-success op-btn btn-save" data-data-key="@pKey" data-data-module="@Prometheus.Models.SummaryType.RMA" name="btn_save" value="Save" />
+                            <input type="button" class="btn btn-warning op-btn btn-cancel" name="btn_cancel" value="Cancel" />
+                        </div>
+                    }
+                </div>
+            </section>
+            <section id="DebugTree-@idx">
+                <div class="bs-callout bs-callout-info" data-toggle="collapse" data-target="#content_dtree_@idx" aria-expanded="false">
+                    <h4>Debug Tree</h4>
+                </div>
+                <div id="content_dtree_@idx" class="collapse">
+                    <table></table>
+                </div>
+            </section>
+            <section id="Others-@idx">
+                <div class="bs-callout bs-callout-warning" data-toggle="collapse" data-target="#content_others_@idx" aria-expanded="false">
+                    <h4>Other</h4>
+                </div>
+                <div id="content_others_@idx" class="collapse">
+                </div>
+            </section>
+            idx++;
+        }
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        WeeklyReport.init();
+    })
+    $(document).ready(function () {
+        $('.task-content').DataTable({
+            'iDisplayLength': 5,
+            'aLengthMenu': [[5, 25, 50, 100, -1],
+                            [5, 25, 50, 100, "All"]],
+            "bAutoWidth": false,
+            "aaSorting": [],
+            "order": [],
+            "aoColumns": [
+            { sWidth: '5%' },
+            { sWidth: '45%' },
+            { sWidth: '10%' },
+            { sWidth: '10%' },
+            { sWidth: '10%' },
+            { sWidth: '10%' },
+            { sWidth: '10%' }]
+        });
+    })
+</script>

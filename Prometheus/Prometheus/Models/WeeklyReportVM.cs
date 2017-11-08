@@ -31,6 +31,21 @@ namespace Prometheus.Models
 
     public class WeeklyReportVM
     {
+        public WeeklyReportVM()
+        {
+            ID = "";
+            ProjectKey = "";
+            UserName = "";
+            IssueKey = "";
+            Summary = "";
+            Type = "";
+            Year = "";
+            Week = "";
+            Mark = "";
+            Status = "";
+            CreateTime = "";
+            UpdateTime = "";
+        }
         public WeeklyReportVM(string id, string pkey, string username, string ikey, string summary, string type,
             string year, string week, string mark, string status, string createtime, string updatetime)
         {
@@ -207,6 +222,18 @@ namespace Prometheus.Models
 
     public class TaskData
     {
+        public TaskData()
+        {
+            IssueKey = "";
+            Description = "";
+            IssueType = "";
+            IssueSubType = "";
+            Status = "";
+            StartDate = DateTime.Now;
+            DueDate = DateTime.Now;
+            UpdateTime = DateTime.Now;
+            Attachment = new List<string>();
+        }
         public TaskData(string iKey, string des, string type, string subtype, string status, DateTime sDate, DateTime dDate, DateTime uUpdate, List<string> attach)
         {
             IssueKey = iKey;

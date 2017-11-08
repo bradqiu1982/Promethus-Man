@@ -84,7 +84,7 @@
                                     {
                                         <div class="row well item-summary">
                                             <span class="col-xs-5">@item.Summary</span>
-                                            <span class="col-xs-3">@item.UserName</span>
+                                            <span class="col-xs-3">@item.UserName.Split(new char[] { '@' })[0]</span>
                                             <span class="col-xs-4">@item.UpdateTime</span>
                                         </div>
                                     }
@@ -204,7 +204,7 @@
                                                             if(item.UserName.ToUpper() != ViewBag.RealUserID.ToUpper()) {
                                                                 <div class="row well item-summary">
                                                                     <span class="col-xs-5">@item.Summary</span>
-                                                                    <span class="col-xs-3">@item.UserName</span>
+                                                                    <span class="col-xs-3">@item.UserName.Split(new char[] { '@' })[0]</span>
                                                                     <span class="col-xs-4">@item.UpdateTime</span>
                                                                 </div>
                                                             }
@@ -339,7 +339,7 @@
                                                             {
                                                                 <div class="row well item-summary">
                                                                     <span class="col-xs-5">@item.Summary</span>
-                                                                    <span class="col-xs-3">@item.UserName</span>
+                                                                    <span class="col-xs-3">@item.UserName.Split(new char[] { '@' })[0]</span>
                                                                     <span class="col-xs-4">@item.UpdateTime</span>
                                                                 </div>
                                                             }
@@ -474,7 +474,7 @@
                                                             {
                                                                 <div class="row well item-summary">
                                                                     <span class="col-xs-5">@item.Summary</span>
-                                                                    <span class="col-xs-3">@item.UserName</span>
+                                                                    <span class="col-xs-3">@item.UserName.Split(new char[] { '@' })[0]</span>
                                                                     <span class="col-xs-4">@item.UpdateTime</span>
                                                                 </div>
                                                             }

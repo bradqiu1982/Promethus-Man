@@ -3152,4 +3152,47 @@ namespace Prometheus.Models
             return string.IsNullOrEmpty(date) ? new DateTime(1, 1, 1, 0, 0, 0) : Convert.ToDateTime(date);
         }
     }
+
+    public class IssueTypeVM
+    {
+        public IssueTypeVM()
+        {
+            IssueKey = "";
+            IssueSubType = "";
+            IssueSsubType = "";
+        }
+        public IssueTypeVM(string iKey, string iSubType, string iSsubType)
+        {
+            IssueKey = iKey;
+            IssueSubType = iSubType;
+            IssueSsubType = iSsubType;
+        }
+        public string IssueKey { set; get; }
+        public string IssueSubType { set; get; }
+        public string IssueSsubType { set; get; }
+
+        public void SaveIssueType(List<IssueTypeVM> iTypeList)
+        {
+            var ikeylist = "(";
+            var items = "";
+            foreach (var iType in iTypeList)
+            {
+                ikeylist += "'" + iType.IssueKey + "',";
+
+                items += "('" + iType.IssueKey + "',"
+                        + "'" + iType.IssueSubType + "',"
+                        + "'" + iType.IssueSsubType + "'),";
+            }
+            ikeylist = ikeylist.Substring(0, ikeylist.Length - 1) + ")";
+            var sqltmp = "delete from IssueType where IssueKey in <IssueKey> ";
+            sqltmp = sqltmp.Replace("<IssueKey>", ikeylist);
+            DBUtility.ExeLocalSqlNoRes(sqltmp);
+
+            items = items.Substring(0, items.Length - 1);
+            var sql = "insert into IssueType (IssueKey, IssueSubType, IssueSsubType) values <Items>; ";
+            sql = sql.Replace("<Items>", items);
+
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+    }
 }

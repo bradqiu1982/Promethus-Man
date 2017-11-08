@@ -954,9 +954,6 @@ update [NPITrace].[dbo].[ProjectCriticalError] set SettingReason = 'VCSEL;Lens d
 
 
 /* Add for weekly report */
-USE [DebugDB]
-GO
-
 /****** Object:  Table [dbo].[Log]    Script Date: 11/1/2017 4:45:39 PM ******/
 SET ANSI_NULLS ON
 GO
@@ -997,9 +994,6 @@ ALTER TABLE [dbo].[Log] ADD  CONSTRAINT [DF_Log_LogLevel]  DEFAULT ('') FOR [Log
 GO
 
 ALTER TABLE [dbo].[Log] ADD  CONSTRAINT [DF_Log_Message]  DEFAULT ('') FOR [Message]
-GO
-
-USE [DebugDB]
 GO
 
 /****** Object:  Table [dbo].[WeeklyReport]    Script Date: 11/1/2017 4:37:46 PM ******/

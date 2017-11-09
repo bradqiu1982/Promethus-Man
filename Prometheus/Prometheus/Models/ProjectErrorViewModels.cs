@@ -90,6 +90,7 @@ namespace Prometheus.Models
             ShortDesc = "";
             ErrorCount = 0;
             SolvedCount = 0;
+            AutoClosed = 0;
         }
 
         public static string BURNIN = "BURNIN";
@@ -102,6 +103,7 @@ namespace Prometheus.Models
             ShortDesc = sdesc;
             ErrorCount = count;
             SolvedCount = solvedcount;
+            AutoClosed = 0;
         }
 
         public string ProjectKey { set; get; }
@@ -117,6 +119,8 @@ namespace Prometheus.Models
         public int ErrorCount { set; get; }
 
         public int SolvedCount { set; get; }
+
+        public int AutoClosed { set; get; }
 
         private string sDescription = "";
         public string Description
@@ -360,6 +364,21 @@ namespace Prometheus.Models
             }
         }
 
+        public static void UpdateProjectAutoCloseCount(int count,string pjkey,string errorcode)
+        {
+            var sql = "select AutoClosed from ProjectError where ProjectKey = '<ProjectKey>' and OrignalCode = N'<OrignalCode>'";
+            sql = sql.Replace("<ProjectKey>", pjkey).Replace("<OrignalCode>", errorcode);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+
+            if (dbret.Count > 0)
+            {
+                sql = "update ProjectError set AutoClosed = <AutoClosed>  where ProjectKey = '<ProjectKey>' and OrignalCode = N'<OrignalCode>'";
+                sql = sql.Replace("<ProjectKey>", pjkey).Replace("<OrignalCode>", errorcode)
+                        .Replace("<AutoClosed>", Convert.ToString(Convert.ToUInt32(dbret[0][0]) + count));
+                DBUtility.ExeLocalSqlNoRes(sql);
+            }
+        }
+
         public void UpdateShortDesc()
         {
             var sql = "update ProjectError set ShortDesc = '<ShortDesc>'  where ErrorKey = '<ErrorKey>'";
@@ -391,13 +410,15 @@ namespace Prometheus.Models
         public static List<ProjectErrorViewModels> RetrieveErrorByPJKey(string projectkey, Controller ctrl)
         {
             var ret = new List<ProjectErrorViewModels>();
-            var sql = "select  ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount,SolvedCount from ProjectError where ProjectKey = '<ProjectKey>' order by ErrorCount DESC";
+            var sql = "select  ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount,SolvedCount,AutoClosed from ProjectError where ProjectKey = '<ProjectKey>' order by ErrorCount DESC";
             sql = sql.Replace("<ProjectKey>", projectkey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
 
             foreach (var line in dbret)
             {
                 var temperror = new ProjectErrorViewModels(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToString(line[2]), Convert.ToString(line[3]),Convert.ToInt32(line[4]),Convert.ToInt32(line[5]));
+                temperror.AutoClosed = Convert.ToInt32(line[6]);
+
                 temperror.CommentList = RetrieveErrorComments(temperror.ErrorKey,ctrl);
                 temperror.RetrieveAttachment(temperror.ErrorKey);
                 ret.Add(temperror);
@@ -424,13 +445,15 @@ namespace Prometheus.Models
         public static List<ProjectErrorViewModels> RetrieveErrorByPJKey(string projectkey,string errorcode, Controller ctrl)
         {
             var ret = new List<ProjectErrorViewModels>();
-            var sql = "select  ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount,SolvedCount from ProjectError where ProjectKey = '<ProjectKey>' and OrignalCode = '<OrignalCode>'";
+            var sql = "select  ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount,SolvedCount,AutoClosed from ProjectError where ProjectKey = '<ProjectKey>' and OrignalCode = '<OrignalCode>'";
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<OrignalCode>", errorcode);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
 
             foreach (var line in dbret)
             {
                 var temperror = new ProjectErrorViewModels(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToString(line[2]), Convert.ToString(line[3]), Convert.ToInt32(line[4]),Convert.ToInt32(line[5]));
+                temperror.AutoClosed = Convert.ToInt32(line[6]);
+
                 temperror.CommentList = RetrieveErrorComments(temperror.ErrorKey,ctrl);
                 temperror.RetrieveAttachment(temperror.ErrorKey);
                 ret.Add(temperror);
@@ -441,13 +464,15 @@ namespace Prometheus.Models
         public static List<ProjectErrorViewModels> RetrieveErrorByErrorKey(string ekey, Controller ctrl)
         {
             var ret = new List<ProjectErrorViewModels>();
-            var sql = "select  ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount,SolvedCount from ProjectError where ErrorKey = '<ErrorKey>'";
+            var sql = "select  ProjectKey,ErrorKey,OrignalCode,ShortDesc,ErrorCount,SolvedCount,AutoClosed from ProjectError where ErrorKey = '<ErrorKey>'";
             sql = sql.Replace("<ErrorKey>", ekey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
 
             foreach (var line in dbret)
             {
                 var temperror = new ProjectErrorViewModels(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToString(line[2]), Convert.ToString(line[3]), Convert.ToInt32(line[4]),Convert.ToInt32(line[5]));
+                temperror.AutoClosed = Convert.ToInt32(line[6]);
+
                 temperror.CommentList = RetrieveErrorComments(temperror.ErrorKey,ctrl);
                 temperror.RetrieveAttachment(temperror.ErrorKey);
                 ret.Add(temperror);

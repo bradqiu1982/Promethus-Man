@@ -2991,6 +2991,10 @@ namespace Prometheus.Models
                     tobedata.Description = "Module " + SN + " passed " + whichtest + " test @" + tester + " @" + datestr;
                     tobedata.UpdateIssue();
                     tobedata.CloseIssue();
+                    if (!string.IsNullOrEmpty(tobedata.ErrAbbr))
+                    {
+                        ProjectErrorViewModels.UpdateProjectAutoCloseCount(1, tobedata.ProjectKey, tobedata.ErrAbbr);
+                    }
                 }
             }
         }
@@ -3006,6 +3010,10 @@ namespace Prometheus.Models
                     tobedata.Description = "Module " + SN + " faild for " + whichtest + " test @" + tester + " @" + datestr+" again";
                     tobedata.UpdateIssue();
                     tobedata.CloseIssue();
+                    if (!string.IsNullOrEmpty(tobedata.ErrAbbr))
+                    {
+                        ProjectErrorViewModels.UpdateProjectAutoCloseCount(1, tobedata.ProjectKey, tobedata.ErrAbbr);
+                    }
                 }
             }
         }
@@ -3019,6 +3027,10 @@ namespace Prometheus.Models
                 tobedata.Description = "Module " + SN + " is closed automaticlly for duplication reason " + " @" + DateTime.Now.ToString();
                 tobedata.UpdateIssue();
                 tobedata.CloseIssue();
+                if (!string.IsNullOrEmpty(tobedata.ErrAbbr))
+                {
+                    ProjectErrorViewModels.UpdateProjectAutoCloseCount(1, tobedata.ProjectKey, tobedata.ErrAbbr);
+                }
             }
         }
 
@@ -3048,6 +3060,10 @@ namespace Prometheus.Models
                         tobedata.Description = "Module " + item.ModuleSerialNum + " passed " + item.WhichTest + " test @" + item.TestStation + " @" + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss");
                         tobedata.UpdateIssue();
                         tobedata.CloseIssue();
+                        if (!string.IsNullOrEmpty(tobedata.ErrAbbr))
+                        {
+                            ProjectErrorViewModels.UpdateProjectAutoCloseCount(1, tobedata.ProjectKey, tobedata.ErrAbbr);
+                        }
                     }
                 }
             }
@@ -3062,6 +3078,10 @@ namespace Prometheus.Models
                 tobedata.Description = "Module " + SN + "  is closed automaticlly for duplication reason " + " @" + DateTime.Now.ToString();
                 tobedata.UpdateIssue();
                 tobedata.CloseIssue();
+                if (!string.IsNullOrEmpty(tobedata.ErrAbbr))
+                {
+                    ProjectErrorViewModels.UpdateProjectAutoCloseCount(1, tobedata.ProjectKey, tobedata.ErrAbbr);
+                }
             }
         }
 
@@ -3092,6 +3112,24 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static int RetrieveAutoCloseIssueCount(string pjkey, string errAbbr)
+        {
+            var ret = 0;
+            var cond = "('" + Resolute.AutoClose + "')";
+            var sql = "select Count(*) from Issue where APVal1 <> 'delete' and ProjectKey = '<ProjectKey>' and Resolution in <cond> and ErrAbbr = '<ErrAbbr>'";
+            sql = sql.Replace("<ProjectKey>", pjkey).Replace("<ErrAbbr>", errAbbr).Replace("<cond>", cond);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            if (dbret.Count > 0)
+            {
+                try
+                {
+                    return Convert.ToInt32(dbret[0][0]);
+                }
+                catch (Exception ex) { return 0; }
+            }
+
+            return ret;
+        }
 
         public static Dictionary<string, TaskData> getProjectTask(string uName, string pKey, int tPeriod, string sDate, string eDate, int iType, bool wSubTask = true)
         {

@@ -62,7 +62,7 @@
             <tr style="color:white;">
                 <th>Error Code</th>
                 <th>Short Desc</th>
-                <th>Count</th>
+                <th>Count (AutoClose)</th>
                 <th>Solved</th>
                 <th>Attachement</th>
                 <th>FA</th>
@@ -76,7 +76,7 @@
                         <a href="/Project/UpdateProjectError?ErrorKey=@item.ErrorKey">@item.OrignalCode</a>@if (item.CommentList.Count > 0){<span class="badge alert-success">C</span>}
                     </td>
                     <td>@item.ShortDesc</td>
-                    <td>@item.ErrorCount</td>
+                    <td>@(item.ErrorCount) (@item.AutoClosed)</td>
                     <td>@item.SolvedCount</td>
                     @if (item.AttachList.Count > 0)
                     {

@@ -7218,6 +7218,27 @@ namespace Prometheus.Controllers
         //    return View("HeartBeat");
         //}
 
+        private void SumOnePJAutoIssu(string pjkey)
+        {
+            var allerrorkey = ProjectErrorViewModels.RetrieveErrorByPJKey(pjkey, this);
+            foreach (var err in allerrorkey)
+            {
+                var solvecount = IssueViewModels.RetrieveAutoCloseIssueCount(pjkey, err.OrignalCode);
+                ProjectErrorViewModels.UpdateProjectAutoCloseCount(solvecount,pjkey, err.OrignalCode);
+            }
+        }
+
+        public ActionResult SumAutoCloseIssue()
+        {
+            var pjlist = ProjectViewModels.RetrieveAllProjectKey();
+            foreach (var pj in pjlist)
+            {
+                SumOnePJAutoIssu(pj);
+            }
+
+            return View("HeartBeat");
+        }
+
     }
-    
+
 }

@@ -72,8 +72,24 @@
                 data: JSON.stringify(data)
             }, function (output) {
                 if (output.success) {
-                    $content.collapse('hide');
-                    $content.parent('section').next('section').children('.content').collapse('show');
+                    if (sType == 0) {
+                        if ($content.parent('section').next().next().length > 0) {
+                            $content.collapse('hide');
+                            $content.parent('section').next().next().children('.content').collapse('show');
+                        }
+                        else {
+                            window.location.reload();
+                        }
+                    }
+                    else {
+                        if ($content.parent('section').next('section').length > 0) {
+                            $content.collapse('hide');
+                            $content.parent('section').next('section').children('.content').collapse('show');
+                        }
+                        else {
+                            window.location.reload();
+                        }
+                    }
                 }
                 else {
                     alert("Failed to save!");

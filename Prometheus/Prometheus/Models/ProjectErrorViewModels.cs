@@ -358,6 +358,9 @@ namespace Prometheus.Models
                     .Replace("<OrignalCode>", OrignalCode).Replace("<ShortDesc>", ShortDesc).Replace("<databackuptm>", DateTime.Now.ToString());
                 DBUtility.ExeLocalSqlNoRes(sql);
             }
+
+            //write log
+            LogVM.WriteLog("", ProjectKey, "", "", OrignalCode, ShortDesc, ErrorKey, 2, Log4NetLevel.Info, "");
         }
 
         public void UpdateShortDesc()
@@ -654,8 +657,38 @@ namespace Prometheus.Models
                 UpdateSolvedIssueCount(pjkey, errabbr, newcount);
             }
         }
+        
+        public static List<ProjectErrorViewModels> RetrieveWeeklyErrorByPJKey(string projectkey, string sDate, string eDate, Controller ctrl)
+        {
+            var ret = new List<ProjectErrorViewModels>();
+            var sql = "select ProjectKey, IssueKey as ErrorKey, "
+                        + "OperateModule as OrignalCode, Operate as ShortDesc, "
+                        + "count(*) as Count "
+                        + "from Log "
+                        + "where LogType = '<LogType>' and ProjectKey = '<ProjectKey>' "
+                        + "and Date between '<sDate>' and '<eDate>' "
+                        + "group by IssueKey, ProjectKey, OperateModule, Operate "
+                        + "order by Count DESC; ";
+            sql = sql.Replace("<LogType>", LogType.DebugTree.ToString())
+                    .Replace("<ProjectKey>", projectkey)
+                    .Replace("<sDate>", sDate)
+                    .Replace("<eDate>", eDate);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
 
-
+            foreach (var line in dbret)
+            {
+                var temperror = new ProjectErrorViewModels(
+                    Convert.ToString(line[0]), 
+                    Convert.ToString(line[1]), 
+                    Convert.ToString(line[2]), 
+                    Convert.ToString(line[3]), 
+                    Convert.ToInt32(line[4]), 0);
+                temperror.CommentList = RetrieveErrorComments(temperror.ErrorKey, ctrl);
+                temperror.RetrieveAttachment(temperror.ErrorKey);
+                ret.Add(temperror);
+            }
+            return ret;
+        }
 
     }
 }

@@ -78,13 +78,13 @@ namespace Prometheus.Models
         public string OperateModule { set; get; }
         public string Operate { set; get; }
         public string IssueKey { set; get; }
-        public string LogType { set; get; }
+        public int LogType { set; get; }
         public string LogLevel { set; get; }
         public string Message { set; get; }
         public string Date { set; get; }
 
         public static void WriteLog(string uName, string pKey, string machine, string url, 
-                string oModule, string op, string iKey, string lType, Log4NetLevel lLevel, string msg)
+                string oModule, string op, string iKey, int lType, Log4NetLevel lLevel, string msg)
         {
             var dic = new Dictionary<string, string>();
             dic.Add("uname", uName);
@@ -94,8 +94,16 @@ namespace Prometheus.Models
             dic.Add("module", oModule);
             dic.Add("operate", op);
             dic.Add("ikey", iKey);
-            dic.Add("ltype", lType);
+            dic.Add("ltype", lType.ToString());
             LogHelper.WriteLog(msg, lLevel, dic);
         }
     }
+
+    public class LogType
+    {
+        public static int Default = 0;
+        public static int Task = 1;
+        public static int DebugTree = 2;
+    }
+
 }

@@ -426,6 +426,29 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static Dictionary<string,string> RetrieveShortDescDict(string projectkey)
+        {
+            var ret = new Dictionary<string, string>();
+            var dupdict = new Dictionary<string, bool>();
+
+            var sql = "select  OrignalCode,ShortDesc from ProjectError where ProjectKey = '<ProjectKey>' order by ErrorCount DESC";
+            sql = sql.Replace("<ProjectKey>", projectkey);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+
+            foreach (var line in dbret)
+            {
+                if (!string.IsNullOrEmpty(Convert.ToString(line[1])) 
+                    && !ret.ContainsKey(Convert.ToString(line[0]))
+                    && !dupdict.ContainsKey(Convert.ToString(line[1]).ToUpper()))
+                {
+                    dupdict.Add(Convert.ToString(line[1]).ToUpper(), true);
+                    ret.Add(Convert.ToString(line[0]), Convert.ToString(line[1]));
+                }
+            }
+
+            return ret;
+        }
+
         public static string RetrieveRealError(string projectkey, string errorcode, Controller ctrl)
         {
             var vm = RetrieveErrorByPJKey(projectkey, errorcode,ctrl);

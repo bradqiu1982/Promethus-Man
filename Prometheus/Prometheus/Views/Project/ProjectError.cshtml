@@ -40,13 +40,16 @@
 @if (ViewBag.chartscript != null)
 {
     @Html.Raw(ViewBag.chartscript)
-
+    @Html.Raw(ViewBag.realchartscript)
     <div class="row">
-        <div class="col-xs-2"></div>
-        <div class="col-xs-8">
+        <div class="col-xs-1"></div>
+        <div class="col-xs-5">
             <div id="failurepie" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
         </div>
-        <div class="col-xs-2"></div>
+        <div class="col-xs-5">
+            <div id="realchartscript" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+        </div>
+        <div class="col-xs-1"></div>
     </div>
 }
 

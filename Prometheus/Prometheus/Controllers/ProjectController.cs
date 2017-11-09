@@ -6192,8 +6192,8 @@ namespace Prometheus.Controllers
 
                     var LYTTASK = CreateLYTTask(CRITICALERRORTYPE.LYTTASK, comment, vm.ProjectKey, updater, updater, DateTime.Now.AddDays(14), vm, Request.Form["RPeopleAddr"]);
                     //CreateLYTSubTask(CRITICALERRORTYPE.LYTSUBTASK, "Stop Product Line for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(1));
-                    CreateLYTSubTask(CRITICALERRORTYPE.CONTAINMENTACTION, "Containment Action for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(7));
-                    CreateLYTSubTask(CRITICALERRORTYPE.CORRECTIVEACTION, "Corrective Action for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(14));
+                    CreateLYTSubTask(CRITICALERRORTYPE.CONTAINMENTACTION, "Containment Action for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(7),ISSUESUBTYPE.CONTAINMENT.ToString());
+                    CreateLYTSubTask(CRITICALERRORTYPE.CORRECTIVEACTION, "Corrective Action for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(14),ISSUESUBTYPE.CORRECTIVE.ToString());
                     //CreateLYTSubTask(CRITICALERRORTYPE.LYTSUBTASK, "Restart Product Line for " + comment, vm.ProjectKey, LYTTASK.IssueKey, updater, updater, DateTime.Now.AddDays(14));
 
                     var comment1 = new IssueComments();
@@ -6237,7 +6237,7 @@ namespace Prometheus.Controllers
             return RedirectToAction("ViewAll", "Project");
         }
 
-        private static void CreateLYTSubTask(string presum, string sum, string pjkey, string parentkey, string analyser, string reporter, DateTime duedate)
+        private static void CreateLYTSubTask(string presum, string sum, string pjkey, string parentkey, string analyser, string reporter, DateTime duedate,string moretag)
         {
             var vm = new IssueViewModels();
             vm.ProjectKey = pjkey;
@@ -6253,6 +6253,8 @@ namespace Prometheus.Controllers
             vm.Resolution = Resolute.Pending;
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
             vm.StoreSubIssue();
+
+            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.Task.ToString(),moretag);
 
             var comment1 = new IssueComments();
             comment1.Comment = vm.Summary;
@@ -6277,6 +6279,8 @@ namespace Prometheus.Controllers
             vm.ErrAbbr = trigglevm.ErrAbbr;
             vm.RelativePeoples = relatedaddrs;
             vm.StoreSubIssue();
+
+            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.CrititalFailureTask.ToString(), ISSUESUBTYPE.CrititalFailureTask.ToString());
 
             return vm;
         }
@@ -6699,6 +6703,7 @@ namespace Prometheus.Controllers
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
             vm.Description = desc;
             vm.StoreIssue();
+            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.Task.ToString(),ISSUESUBTYPE.PMTask.ToString());
             SendTaskEvent(vm, desc, this);
             return vm;
         }
@@ -7117,13 +7122,15 @@ namespace Prometheus.Controllers
         }
         private void OcapSingletonOperate(IssueViewModels vm, string updater, string comment, string fileurl)
         {
-            CreateLYTSubTask(CRITICALERRORTYPE.CONTAINMENTACTION, "Containment Action for " + comment, vm.ProjectKey, vm.IssueKey, updater, updater, DateTime.Now.AddDays(7));
-            CreateLYTSubTask(CRITICALERRORTYPE.CORRECTIVEACTION, "Corrective Action for " + comment, vm.ProjectKey, vm.IssueKey, updater, updater, DateTime.Now.AddDays(14));
+            CreateLYTSubTask(CRITICALERRORTYPE.CONTAINMENTACTION, "Containment Action for " + comment, vm.ProjectKey, vm.IssueKey, updater, updater, DateTime.Now.AddDays(7), ISSUESUBTYPE.CONTAINMENT.ToString());
+            CreateLYTSubTask(CRITICALERRORTYPE.CORRECTIVEACTION, "Corrective Action for " + comment, vm.ProjectKey, vm.IssueKey, updater, updater, DateTime.Now.AddDays(14), ISSUESUBTYPE.CORRECTIVE.ToString());
 
             var comment1 = new IssueComments();
             comment1.Comment = comment;
             IssueViewModels.StoreIssueComment(vm.IssueKey, comment1.dbComment, updater, COMMENTTYPE.Description);
             IssueViewModels.UpdateIssueAssigneeAndResolution(vm.IssueKey, updater, Resolute.Reopen, CRITICALERRORTYPE.OCAP + vm.Summary);
+            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.CrititalFailureTask.ToString(),ISSUESUBTYPE.OCAP.ToString());
+
             if (! String.IsNullOrEmpty(fileurl))
             {
                 IssueViewModels.StoreIssueAttachment(vm.IssueKey, fileurl);

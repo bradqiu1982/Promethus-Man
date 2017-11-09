@@ -33,6 +33,13 @@ namespace Prometheus.Models
         public static int Bug = 6;
         public static int REL = 7;
         public static int NPIProcess = 8;
+
+        public static int PMTask = 9;
+        public static int FAILVERIFY = 10;
+        public static int CONTAINMENT = 11;
+        public static int CORRECTIVE = 12;
+        public static int CORRECTIVEVERIFY = 13;
+        public static int OCAP = 14;
     }
 
     public class ISSUEATTACHTYPE
@@ -2762,6 +2769,8 @@ namespace Prometheus.Models
             vm.Description = desc;
             vm.CommentType = COMMENTTYPE.Description;
             vm.StoreSubIssue();
+
+            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.NPIProcess.ToString());
         }
 
         private static void CreatePIP1Issues(string projectname, string pjkey, string firstengineer)
@@ -2783,6 +2792,7 @@ namespace Prometheus.Models
             vm.Description = "Assign resources and initiate project";
             vm.CommentType = COMMENTTYPE.Description;
             vm.StoreIssue();
+            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.NPIProcess.ToString());
         }
 
         private static void CreateEVTIssues(string projectname, string pjkey, string firstengineer)
@@ -2804,6 +2814,7 @@ namespace Prometheus.Models
             vm.Description = "Build prototypes and prove feasibility";
             vm.CommentType = COMMENTTYPE.Description;
             vm.StoreIssue();
+            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.NPIProcess.ToString());
 
             //var sum = "Complete Firmware Architecture Review";
             //var desc = "Complete Firmware Architecture Review";
@@ -2854,6 +2865,7 @@ namespace Prometheus.Models
             vm.Description = "Finalize Product Design and Verify suitability for production";
             vm.CommentType = COMMENTTYPE.Description;
             vm.StoreIssue();
+            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.NPIProcess.ToString());
 
             //var sum = "DVT Presentation Completed and ECO Approved";
             //var desc = "DVT Presentation Completed and ECO Approved";
@@ -2904,6 +2916,8 @@ namespace Prometheus.Models
             vm.CommentType = COMMENTTYPE.Description;
             vm.StoreIssue();
 
+            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.NPIProcess.ToString());
+            
             //var sum = "MVT Presentation Completed and ECO Approved";
             //var desc = "MVT Presentation Completed and ECO Approved";
             //CreateNPISubIssue(projectname, pjkey, parentkey, firstengineer, sum, desc, 9);
@@ -2952,6 +2966,8 @@ namespace Prometheus.Models
             vm.Description = "Mass Produce";
             vm.CommentType = COMMENTTYPE.Description;
             vm.StoreIssue();
+
+            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.NPIProcess.ToString());
         }
 
         public static void CreateNPIProcTasks(string projectname,string pjkey,string firstengineer)
@@ -3194,5 +3210,13 @@ namespace Prometheus.Models
 
             DBUtility.ExeLocalSqlNoRes(sql);
         }
+
+        public static void SaveIssueType(string issuekey, string subtype, string moretag = "0")
+        {
+            var templist = new List<IssueTypeVM>();
+            templist.Add(new IssueTypeVM(issuekey, subtype, moretag));
+            new IssueTypeVM().SaveIssueType(templist);
+        }
+
     }
 }

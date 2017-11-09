@@ -1300,6 +1300,7 @@ namespace Prometheus.Models
                     vm.DataID = item.DataID;
                     //ProjectEvent.CreateIssueEvent(vm.ProjectKey, "System", vm.Assignee, vm.Summary, vm.IssueKey);
                     vm.StoreIssue();
+                    IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.Bug.ToString());
                 }
             }
         }

@@ -140,6 +140,8 @@ namespace Prometheus.Models
             //ProjectEvent.CreateIssueEvent(vm.ProjectKey, "System", vm.Assignee, vm.Summary, vm.IssueKey);
             vm.StoreIssue();
 
+            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.Bug.ToString());
+
             var traceviewlist = ExternalDataCollector.LoadTraceView2Local(item.TestStation, item.ModuleSerialNum, item.WhichTest, item.TestTimeStamp.ToString(), ctrl);
             foreach (var trace in traceviewlist)
             {
@@ -516,6 +518,8 @@ namespace Prometheus.Models
                 vm.RelativePeoples = item.Appv_4;
                 vm.StoreIssue();
 
+                IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.CrititalFailureTask.ToString(), ISSUESUBTYPE.CrititalFailureTask.ToString());
+
                 var comment1 = new IssueComments();
                 comment1.Comment = "<p>"+ pjdata.ModuleSerialNum + " failed for " + pjdata.ErrAbbr + " @ " + pjdata.WhichTest + "</p>";
                 comment1.Comment = comment1.Comment+"<p> match rule: test case -- " +item.TestCaseName+" datefield -- "+item.MatchCond+ "</p>";
@@ -569,6 +573,8 @@ namespace Prometheus.Models
                 vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
                 vm.RelativePeoples = "";
                 vm.StoreIssue();
+
+                IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.CrititalFailureTask.ToString(),ISSUESUBTYPE.CrititalFailureTask.ToString());
 
                 var comment1 = new IssueComments();
                 comment1.Comment = "<p>" + pjdata.ModuleSerialNum + " failed for " + pjdata.ErrAbbr + " @ " + pjdata.WhichTest + "</p>";
@@ -671,7 +677,7 @@ namespace Prometheus.Models
             return false;
         }
 
-        private static void CreateSystemIssues(List<ProjectTestData> failurelist, Controller ctrl)
+        private static void CreateSystemIssues(List<ProjectTestData> failurelist, Controller ctrl,bool normalFAEnable = true)
         {
             if (failurelist.Count > 0)
             {
@@ -703,6 +709,7 @@ namespace Prometheus.Models
                 }
                 //get user critical rule
                 var pjcriticalerrorlist = ProjectCriticalErrorVM.RetrievePJCriticalError(failurelist[0].ProjectKey, null);
+
                 foreach (var item in failurelist)
                 {
                     //default critical rule
@@ -714,7 +721,10 @@ namespace Prometheus.Models
 
                     if (!CheckPJCriticalError(item,pjcriticalerrorlist,ctrl))
                     {
-                        CreateFA(item, firstengineer,ctrl);
+                        if (normalFAEnable)
+                        {
+                            CreateFA(item, firstengineer,ctrl);
+                        }
                     }
                 }
             }
@@ -1233,6 +1243,8 @@ namespace Prometheus.Models
             }
             vm.Description = vm.Description + "</tbody></table>";
             vm.StoreIssue();
+
+            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.Bug.ToString());
         }
 
         private static void CreateOSACriticalFA(ProjectTestData item, List<KeyValuePair<string, double>> RawData, string FailedParam, string firstengineer,Controller ctrl)
@@ -1270,6 +1282,8 @@ namespace Prometheus.Models
             }
             vm.Description = vm.Description + "</tbody></table>";
             vm.StoreIssue();
+
+            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.CrititalFailureTask.ToString(), ISSUESUBTYPE.CrititalFailureTask.ToString());
 
             SendTaskEvent(vm, vm.Summary, ctrl);
         }
@@ -1396,16 +1410,20 @@ namespace Prometheus.Models
                     }
                 }
 
-                if (vm.FinishRating < 90 && DateTime.Parse(starttime) != vm.StartDate)
-                {
+                    if (vm.FinishRating < 90 && DateTime.Parse(starttime) != vm.StartDate)
+                    {
                         //use latest failure cover previous failure
                         foreach (var item in failurelist)
                         {
-                            IssueViewModels.CloseIssueAutomaticllyWithFailedSN(item.ProjectKey, item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"),ctrl);
+                            IssueViewModels.CloseIssueAutomaticllyWithFailedSN(item.ProjectKey, item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), ctrl);
                         }
 
-                        CreateSystemIssues(failurelist,ctrl);
-                }
+                        CreateSystemIssues(failurelist, ctrl);
+                    }
+                    else
+                    {
+                        CreateSystemIssues(failurelist, ctrl,false);
+                    }
 
                 if (vm.FinishRating < 90 && DateTime.Parse(starttime) != vm.StartDate)
                 {

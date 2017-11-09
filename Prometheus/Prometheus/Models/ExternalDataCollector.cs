@@ -884,7 +884,7 @@ namespace Prometheus.Models
             }//analyser in usermatrisx
         }
 
-        private static void CreateRMASubIssue(string presum, string sum, string pjkey, string parentkey, string analyser, string reporter, DateTime duedate)
+        private static void CreateRMASubIssue(string presum, string sum, string pjkey, string parentkey, string analyser, string reporter, DateTime duedate,string moretag)
         {
             var vm = new IssueViewModels();
             vm.ProjectKey = pjkey;
@@ -900,6 +900,8 @@ namespace Prometheus.Models
             vm.Resolution = Resolute.Pending;
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
             vm.StoreSubIssue();
+
+            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.Task.ToString(),moretag);
         }
 
         private static void CreateRMAIssue(RMARAWData rawdata,Controller ctrl)
@@ -979,11 +981,12 @@ namespace Prometheus.Models
             vm.CommentType = COMMENTTYPE.Description;
 
             vm.StoreIssue();
+            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.RMA.ToString());
 
             UserViewModels.RegisterUserAuto(vm.Assignee);
 
-            CreateRMASubIssue(RMASubIssueType.CONTAINMENTACTION, "Cotainment Action for RMA " + vm.FinisarRMA, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(18));
-            CreateRMASubIssue(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for RMA " + vm.FinisarRMA, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(48));
+            CreateRMASubIssue(RMASubIssueType.CONTAINMENTACTION, "Cotainment Action for RMA " + vm.FinisarRMA, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(18),ISSUESUBTYPE.CONTAINMENT.ToString());
+            CreateRMASubIssue(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for RMA " + vm.FinisarRMA, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(48),ISSUESUBTYPE.CORRECTIVE.ToString());
             SendRMAEvent(vm, "created",ctrl, true);
         }
 
@@ -1897,10 +1900,12 @@ namespace Prometheus.Models
 
             vm.StoreIssue();
 
-            CreateRelSubIssue(RELSubIssueType.FAILVERIFYACTION, "Failure Verify for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(2));
-            CreateRelSubIssue(RELSubIssueType.CONTAINMENTACTION, "Cotainment Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(30));
-            CreateRelSubIssue(RELSubIssueType.CORRECTIVEACTION, "Corrective/PreVentive Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(60));
-            CreateRelSubIssue(RELSubIssueType.VERIFYCORRECTIVEACTION, "Verify Corrective/PreVentive Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, reporter, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(75));
+            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.REL.ToString());
+
+            CreateRelSubIssue(RELSubIssueType.FAILVERIFYACTION, "Failure Verify for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(2),ISSUESUBTYPE.FAILVERIFY.ToString());
+            CreateRelSubIssue(RELSubIssueType.CONTAINMENTACTION, "Cotainment Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(30),ISSUESUBTYPE.CONTAINMENT.ToString());
+            CreateRelSubIssue(RELSubIssueType.CORRECTIVEACTION, "Corrective/PreVentive Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(60),ISSUESUBTYPE.CORRECTIVE.ToString());
+            CreateRelSubIssue(RELSubIssueType.VERIFYCORRECTIVEACTION, "Verify Corrective/PreVentive Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, reporter, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(75),ISSUESUBTYPE.CORRECTIVEVERIFY.ToString());
 
             var comment = new IssueComments();
             comment.Comment = "ROOTCAUSE: to be edited";
@@ -1913,7 +1918,7 @@ namespace Prometheus.Models
 
         }
 
-        private static void CreateRelSubIssue(string presum, string sum, string pjkey, string parentkey, string analyser, string reporter, DateTime duedate)
+        private static void CreateRelSubIssue(string presum, string sum, string pjkey, string parentkey, string analyser, string reporter, DateTime duedate,string moretag)
         {
             var vm = new IssueViewModels();
             vm.ProjectKey = pjkey;
@@ -1929,6 +1934,8 @@ namespace Prometheus.Models
             vm.Resolution = Resolute.Pending;
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
             vm.StoreSubIssue();
+
+            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.Task.ToString(),moretag);
         }
 
         private static Dictionary<string, Dictionary<string, bool>> RetrieveRelAttach()
@@ -2338,12 +2345,13 @@ namespace Prometheus.Models
             vm.MaterialDisposition = "";
 
             vm.StoreIssue();
+            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.OBA.ToString());
 
             UserViewModels.RegisterUserAuto(vm.Assignee);
             SendOBAEvent(vm, "created",ctrl, true);
 
-            CreateRMASubIssue(RMASubIssueType.CONTAINMENTACTION, "Cotainment Action for OBA " + vm.FinisarDMR, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(14));
-            CreateRMASubIssue(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for OBA " + vm.FinisarDMR, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(28));
+            CreateRMASubIssue(RMASubIssueType.CONTAINMENTACTION, "Cotainment Action for OBA " + vm.FinisarDMR, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(14),ISSUESUBTYPE.CONTAINMENT.ToString());
+            CreateRMASubIssue(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for OBA " + vm.FinisarDMR, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(28),ISSUESUBTYPE.CORRECTIVE.ToString());
 
             var comment = new IssueComments();
             comment.Comment = "ROOTCAUSE: to be edited";

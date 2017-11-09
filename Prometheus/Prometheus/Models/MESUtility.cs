@@ -140,6 +140,8 @@ namespace Prometheus.Models
             //ProjectEvent.CreateIssueEvent(vm.ProjectKey, "System", vm.Assignee, vm.Summary, vm.IssueKey);
             vm.StoreIssue();
 
+            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.Bug.ToString());
+
             var traceviewlist = ExternalDataCollector.LoadTraceView2Local(item.TestStation, item.ModuleSerialNum, item.WhichTest, item.TestTimeStamp.ToString(), ctrl);
             foreach (var trace in traceviewlist)
             {
@@ -516,6 +518,8 @@ namespace Prometheus.Models
                 vm.RelativePeoples = item.Appv_4;
                 vm.StoreIssue();
 
+                IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.CrititalFailureTask.ToString(), ISSUESUBTYPE.CrititalFailureTask.ToString());
+
                 var comment1 = new IssueComments();
                 comment1.Comment = "<p>"+ pjdata.ModuleSerialNum + " failed for " + pjdata.ErrAbbr + " @ " + pjdata.WhichTest + "</p>";
                 comment1.Comment = comment1.Comment+"<p> match rule: test case -- " +item.TestCaseName+" datefield -- "+item.MatchCond+ "</p>";
@@ -569,6 +573,8 @@ namespace Prometheus.Models
                 vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
                 vm.RelativePeoples = "";
                 vm.StoreIssue();
+
+                IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.CrititalFailureTask.ToString(),ISSUESUBTYPE.CrititalFailureTask.ToString());
 
                 var comment1 = new IssueComments();
                 comment1.Comment = "<p>" + pjdata.ModuleSerialNum + " failed for " + pjdata.ErrAbbr + " @ " + pjdata.WhichTest + "</p>";
@@ -1233,6 +1239,8 @@ namespace Prometheus.Models
             }
             vm.Description = vm.Description + "</tbody></table>";
             vm.StoreIssue();
+
+            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.Bug.ToString());
         }
 
         private static void CreateOSACriticalFA(ProjectTestData item, List<KeyValuePair<string, double>> RawData, string FailedParam, string firstengineer,Controller ctrl)
@@ -1270,6 +1278,8 @@ namespace Prometheus.Models
             }
             vm.Description = vm.Description + "</tbody></table>";
             vm.StoreIssue();
+
+            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.CrititalFailureTask.ToString(), ISSUESUBTYPE.CrititalFailureTask.ToString());
 
             SendTaskEvent(vm, vm.Summary, ctrl);
         }

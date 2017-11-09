@@ -1072,6 +1072,9 @@ namespace Prometheus.Controllers
                             vm.CommentType = COMMENTTYPE.Description;
 
                             vm.StoreIssue();
+
+                            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.RMA.ToString());
+
                             UserViewModels.RegisterUserAuto(vm.Assignee);
                             SendRMAEvent(vm, "created",true);
                         }
@@ -1199,6 +1202,8 @@ namespace Prometheus.Controllers
 
                             vm.StoreIssue();
 
+                            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.OBA.ToString());
+
                             UserViewModels.RegisterUserAuto(vm.Assignee);
 
                             SendOBAEvent(vm, "created", true);
@@ -1321,6 +1326,8 @@ namespace Prometheus.Controllers
 
                             vm.StoreIssue();
 
+                            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.Other.ToString());
+
                             UserViewModels.RegisterUserAuto(vm.Assignee);
 
                             SendQualityEvent(vm, "created", true);
@@ -1434,6 +1441,8 @@ namespace Prometheus.Controllers
                             vm.CommentType = COMMENTTYPE.Description;
 
                             vm.StoreIssue();
+
+                            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.REL.ToString());
 
                             SendQualityEvent(vm, "created", true);
                         }

@@ -218,6 +218,22 @@ namespace Prometheus.Controllers
 
             vm.StoreIssue();
 
+            if (vm.IssueType.Contains(ISSUETP.Task))
+            {
+                IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.Task.ToString());
+            }
+            else if (vm.IssueType.Contains(ISSUETP.Bug))
+            {
+                IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.Bug.ToString());
+            }
+            else if (vm.IssueType.Contains(ISSUETP.NPIPROC))
+            {
+                IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.NPIProcess.ToString());
+            }
+            else
+            {
+                IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.Other.ToString());
+            }
 
             if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
             {
@@ -736,6 +752,7 @@ namespace Prometheus.Controllers
                             if (string.Compare(isrealcritical, "NO", true) == 0)
                             {
                                 realissue.UpdateSummary(CRITICALERRORTYPE.NOTREALCRITICALISSUE + realissue.Summary.Replace(CRITICALERRORTYPE.LYTTASK, ""));
+                                IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.NonCrititalFailureTask.ToString(), ISSUESUBTYPE.NonCrititalFailureTask.ToString());
                             }
                             else
                             {
@@ -937,6 +954,23 @@ namespace Prometheus.Controllers
                 vm.Description = "";
 
             vm.StoreSubIssue();
+
+            if (vm.IssueType.Contains(ISSUETP.Task))
+            {
+                IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.Task.ToString());
+            }
+            else if (vm.IssueType.Contains(ISSUETP.Bug))
+            {
+                IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.Bug.ToString());
+            }
+            else if (vm.IssueType.Contains(ISSUETP.NPIPROC))
+            {
+                IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.NPIProcess.ToString());
+            }
+            else
+            {
+                IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.Other.ToString());
+            }
 
             SendTaskEvent(vm, "asigned to you", vm.Reporter, vm.Assignee);
 
@@ -1293,6 +1327,8 @@ namespace Prometheus.Controllers
             }
 
             vm.StoreIssue();
+
+            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.RMA.ToString());
 
             if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
             {
@@ -1855,6 +1891,7 @@ namespace Prometheus.Controllers
                             if (string.Compare(isrealcritical, "NO", true) == 0)
                             {
                                 realissue.UpdateSummary(CRITICALERRORTYPE.NOTREALCRITICALISSUE + realissue.Summary.Replace(CRITICALERRORTYPE.LYTTASK, ""));
+                                IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.NonCrititalFailureTask.ToString(), ISSUESUBTYPE.NonCrititalFailureTask.ToString());
                             }
                             else
                             {
@@ -1901,7 +1938,7 @@ namespace Prometheus.Controllers
             return RedirectToAction("UpdateBug", "Issue", dict1);
         }
 
-        private static void CreateRMASubIssue(string presum, string sum, string pjkey, string parentkey, string analyser, string reporter, DateTime duedate)
+        private static void CreateRMASubIssue(string presum, string sum, string pjkey, string parentkey, string analyser, string reporter, DateTime duedate,string moretag)
         {
             var vm = new IssueViewModels();
             vm.ProjectKey = pjkey;
@@ -1917,6 +1954,8 @@ namespace Prometheus.Controllers
             vm.Resolution = Resolute.Pending;
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
             vm.StoreSubIssue();
+
+            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.Task.ToString(),moretag);
         }
 
         public ActionResult UpdateRMA(string issuekey)
@@ -1970,13 +2009,13 @@ namespace Prometheus.Controllers
 
                 if (ret.ContainmentActions.Count == 0)
                 {
-                    CreateRMASubIssue(RMASubIssueType.CONTAINMENTACTION, "Cotainment Action for RMA " + ret.FinisarRMA, ret.ProjectKey, ret.IssueKey, ret.Assignee, ret.Reporter, ret.DueDate.AddDays(18));
+                    CreateRMASubIssue(RMASubIssueType.CONTAINMENTACTION, "Cotainment Action for RMA " + ret.FinisarRMA, ret.ProjectKey, ret.IssueKey, ret.Assignee, ret.Reporter, ret.DueDate.AddDays(18),ISSUESUBTYPE.CONTAINMENT.ToString());
                     ret = IssueViewModels.RetrieveIssueByIssueKey(key, this);
                 }
 
                 if (ret.CorrectiveActions.Count == 0)
                 {
-                    CreateRMASubIssue(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for RMA " + ret.FinisarRMA, ret.ProjectKey, ret.IssueKey, ret.Assignee, ret.Reporter, ret.DueDate.AddDays(48));
+                    CreateRMASubIssue(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for RMA " + ret.FinisarRMA, ret.ProjectKey, ret.IssueKey, ret.Assignee, ret.Reporter, ret.DueDate.AddDays(48),ISSUESUBTYPE.CORRECTIVE.ToString());
                     ret = IssueViewModels.RetrieveIssueByIssueKey(key, this);
                 }
 

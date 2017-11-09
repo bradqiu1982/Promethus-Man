@@ -599,7 +599,7 @@ namespace Prometheus.Controllers
 
             //write log
             LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
-                Request.Url.ToString(), "Issue", "Update", issuekey, "", Log4NetLevel.Info, "");
+                Request.Url.ToString(), "Issue", "Update", issuekey, LogType.Task, Log4NetLevel.Info, "");
 
            if (Request.Form["deleteisu"] != null)
             {
@@ -1514,7 +1514,7 @@ namespace Prometheus.Controllers
 
             //write log
             LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
-                Request.Url.ToString(), "Bug", "Update", issuekey, "", Log4NetLevel.Info, "");
+                Request.Url.ToString(), "Bug", "Update", issuekey, LogType.Task, Log4NetLevel.Info, "");
 
             var pjmemauth = false;
             var pj = ProjectViewModels.RetrieveOneProject(originaldata.ProjectKey);
@@ -2097,7 +2097,7 @@ namespace Prometheus.Controllers
 
             //write log
             LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
-                Request.Url.ToString(), "RMA", "Update", issuekey, "", Log4NetLevel.Info, "");
+                Request.Url.ToString(), "RMA", "Update", issuekey, LogType.Task, Log4NetLevel.Info, "");
 
             if (Request.Form["deleterma"] != null)
             {
@@ -2495,7 +2495,7 @@ namespace Prometheus.Controllers
 
             //write log
             LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
-                Request.Url.ToString(), "REL", "Update", issuekey, "", Log4NetLevel.Info, "");
+                Request.Url.ToString(), "REL", "Update", issuekey, LogType.Task, Log4NetLevel.Info, "");
 
             if (Request.Form["deleterma"] != null)
             {
@@ -2721,7 +2721,7 @@ namespace Prometheus.Controllers
 
             //write log
             LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
-                Request.Url.ToString(), "OBA", "Update", issuekey, "", Log4NetLevel.Info, "");
+                Request.Url.ToString(), "OBA", "Update", issuekey, LogType.Task, Log4NetLevel.Info, "");
 
             if (Request.Form["deleterma"] != null)
             {
@@ -2998,7 +2998,7 @@ namespace Prometheus.Controllers
 
             //write log
             LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
-                Request.Url.ToString(), "Quality", "Update", issuekey, "", Log4NetLevel.Info, "");
+                Request.Url.ToString(), "Quality", "Update", issuekey, LogType.Task, Log4NetLevel.Info, "");
 
             if (Request.Form["deleterma"] != null)
             {

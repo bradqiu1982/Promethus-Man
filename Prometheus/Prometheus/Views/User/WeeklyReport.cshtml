@@ -515,14 +515,77 @@
                     <h4>Debug Tree</h4>
                 </div>
                 <div id="content_dtree_@idx" class="collapse">
-                    <table></table>
+                    <table class="table table-condensed" cellpadding="0">
+                        <thead>
+                            <tr>
+                                <th>Error Code</th>
+                                <th>Short Desc</th>
+                                <th>Increase Count</th>
+                                <th>Attachement</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.DebugTreeList.ContainsKey(pKey) && ViewBag.DebugTreeList[pKey].Count > 0)
+                            {
+                                foreach(var val in ViewBag.DebugTreeList[pKey])
+                                {
+                                    <tr>
+                                        <td>
+                                            <a href="/Project/UpdateProjectError?ErrorKey=@val.ErrorKey" target="_blank">@val.OrignalCode</a>
+                                            @if (val.CommentList.Count > 0)
+                                            {
+                                                <span class="badge alert-success">C</span>
+                                            }
+                                        </td>
+                                        <td>@val.ShortDesc</td>
+                                        <td>@val.ErrorCount</td>
+                                        <td>
+                                            @if (val.AttachList.Count > 0)
+                                            {
+                                                <a href="/Project/ErrorAttach?ErrorKey=@val.ErrorKey" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></a>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </section>
             <section id="Others-@idx">
                 <div class="bs-callout bs-callout-warning" data-toggle="collapse" data-target="#content_others_@idx" aria-expanded="false">
                     <h4>Other</h4>
                 </div>
-                <div id="content_others_@idx" class="collapse">
+                <div id="content_others_@idx" class="content collapse">
+                    @{
+                        var osummary = "";
+                        if (summarylist != null && summarylist.ContainsKey("@@" + Prometheus.Models.SummaryType.Others))
+                        {
+                            foreach (var item in summarylist["@@" + Prometheus.Models.SummaryType.Others])
+                            {
+                                if (item.UserName.ToUpper() != ViewBag.RealUserID.ToUpper())
+                                {
+                                    <div class="row well item-summary">
+                                        <span class="col-xs-5">@item.Summary</span>
+                                        <span class="col-xs-3">@item.UserName.Split(new char[] { '@' })[0]</span>
+                                        <span class="col-xs-4">@item.UpdateTime</span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    osummary += item.Summary;
+                                }
+                            }
+                        }
+                    }
+                    <div class="col-xs-12">
+                        <textarea class="form-control" style="height: 70px;" id="other_summary_@idx"
+                                name="cur_rma_task_summary">@osummary</textarea>
+                    </div>
+                    <div class="wr-operation">
+                        <input type="button" class="btn btn-success op-btn btn-save" data-data-key="@pKey" data-data-module="@Prometheus.Models.SummaryType.Others" name="btn_save" value="Save" />
+                        <input type="button" class="btn btn-warning op-btn btn-cancel" name="btn_cancel" value="Cancel" />
+                    </div>
                 </div>
             </section>
             idx++;

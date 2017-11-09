@@ -2486,6 +2486,7 @@ namespace Prometheus.Controllers
             var historyRMAList = new Dictionary<string, Dictionary<string, TaskData>>();
             var RMAList = new Dictionary<string, Dictionary<string, TaskData>>();
             var SummaryList = new Dictionary<string, Dictionary<string, List<WeeklyReportVM>>>();
+            var DebugTreeList = new Dictionary<string, List<ProjectErrorViewModels>>();
             foreach (var project in projectlist)
             {
                 ProjectKeyList.Add(project.Key);
@@ -2503,14 +2504,13 @@ namespace Prometheus.Controllers
                 //critical failure task
                 historyCriList.Add(project.Key, getProjectTask(updater, project.Key, 0, sDate, eDate, ISSUESUBTYPE.CrititalFailureTask, false));
                 criticalList.Add(project.Key, getProjectTask(updater, project.Key, 1, sDate, eDate, ISSUESUBTYPE.CrititalFailureTask, false));
+                
                 //rma
                 historyRMAList.Add(project.Key, getProjectTask(updater, project.Key, 0, sDate, eDate, ISSUESUBTYPE.RMA));
                 RMAList.Add(project.Key, getProjectTask(updater, project.Key, 1, sDate, eDate, ISSUESUBTYPE.RMA));
 
                 //debug tree
-
-                //others
-
+                DebugTreeList.Add(project.Key, ProjectErrorViewModels.RetrieveWeeklyErrorByPJKey(project.Key, sDate, eDate, this));
                 //get current week summary
                 SummaryList.Add(project.Key, getCurWeekSummary(project.Key, sDate, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")));
             }
@@ -2522,6 +2522,7 @@ namespace Prometheus.Controllers
             ViewBag.historyRMAList = historyRMAList;
             ViewBag.RMAList = RMAList;
             ViewBag.SummaryList = SummaryList;
+            ViewBag.DebugTreeList = DebugTreeList;
 
             return View();
         }

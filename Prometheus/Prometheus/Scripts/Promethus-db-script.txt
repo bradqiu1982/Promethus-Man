@@ -1094,16 +1094,17 @@ else 0
 end
 ) as IssueSubType,
 (case 
-when (IssueType = 'Task' and Summary like '%Containment%') then '11'
-when (IssueType = 'Task' and Summary like '%Project Manage%') then '9'
-when (IssueType = 'Task' and Summary like '%Corrective%') then 12
-when (IssueType = 'Task' and Summary like '%CONTAINMENTACTION%') then 11
-when (IssueType = 'Task' and Summary like '%FAILVERIFYACTION%') then 10 
-when (IssueType = 'Task' and Summary like '%VERIFYCORRECTIVEACTION\') then 13
-when (IssueType = 'Bug' and Summary like '%Containment%') then 11
-when (IssueType = 'Bug' and Summary like '%Corrective%') then 12
-when (IssueType = 'RMA' and Summary like '%Containment%') then 11
-when (IssueType = 'RMA' and Summary like '%Containment%') then 11
+when (Summary like '%Containment%') then '11'
+when (Summary like '%Project Manage%') then '9'
+when (Summary like '%Corrective%') then 12
+when (Summary like '%CONTAINMENTACTION%') then 11
+when (Summary like '%FAILVERIFYACTION%') then 10 
+when (Summary like '%VERIFYCORRECTIVEACTION%') then 13
+when (Summary like '%Containment%') then 11
+when (Summary like '%Corrective%') then 12
+when (Summary like '%Containment%') then 11
+when (Summary like '%Corrective%') then 12
+when (Summary like '%OCAP%' and Summary like '%Critical Failure Alarm%') then 14
 else 0
 end
 ) as IssueSsubType from Issue ;

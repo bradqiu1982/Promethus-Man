@@ -2478,8 +2478,6 @@ namespace Prometheus.Controllers
             var dayofweek = Convert.ToInt32(DateTime.Now.DayOfWeek);
             var sDate = DateTime.Now.AddDays((4 - dayofweek) - 7).ToString("yyyy-MM-dd 07:30:00");
             var eDate = DateTime.Now.ToString("yyyy-MM-dd 07:30:00");
-            //var sDate = "2017-08-03 07:30:00";
-            //var eDate = "2017-08-10 07:30:00";
             var ProjectKeyList = new List<string>();
             var YieldDataList = new Dictionary<string, WeeklyYieldData>();
             var historyTaskList = new Dictionary<string, Dictionary<string, TaskData>>();
@@ -2490,31 +2488,49 @@ namespace Prometheus.Controllers
             var RMAList = new Dictionary<string, Dictionary<string, TaskData>>();
             var SummaryList = new Dictionary<string, Dictionary<string, List<WeeklyReportVM>>>();
             var DebugTreeList = new Dictionary<string, List<ProjectErrorViewModels>>();
+            var setting = WeeklyReportSetting.GetWeeklyReportSetting(username);
+
             foreach (var project in projectlist)
             {
                 ProjectKeyList.Add(project.Key);
                 
                 //yield
-                YieldDataList.Add(project.Key, getProjectYield(project.Key, sDate, eDate));
+                if(setting.Yield == 1)
+                {
+                    YieldDataList.Add(project.Key, getProjectYield(project.Key, sDate, eDate));
+                }
 
                 //task
-                historyTaskList.Add(project.Key, getProjectTask(updater, project.Key, 0, sDate, eDate, ISSUESUBTYPE.Task));
-                taskList.Add(project.Key, getProjectTask(updater, project.Key, 1, sDate, eDate, ISSUESUBTYPE.Task));
+                if (setting.Task == 1)
+                {
+                    historyTaskList.Add(project.Key, getProjectTask(updater, project.Key, 0, sDate, eDate, ISSUESUBTYPE.Task));
+                    taskList.Add(project.Key, getProjectTask(updater, project.Key, 1, sDate, eDate, ISSUESUBTYPE.Task));
+                }
 
                 //critical failure task
-                historyCriList.Add(project.Key, getProjectTask(updater, project.Key, 0, sDate, eDate, ISSUESUBTYPE.CrititalFailureTask, false));
-                criticalList.Add(project.Key, getProjectTask(updater, project.Key, 1, sDate, eDate, ISSUESUBTYPE.CrititalFailureTask, false));
-                
+                if (setting.CriticalFailure == 1)
+                {
+                    historyCriList.Add(project.Key, getProjectTask(updater, project.Key, 0, sDate, eDate, ISSUESUBTYPE.CrititalFailureTask, false));
+                    criticalList.Add(project.Key, getProjectTask(updater, project.Key, 1, sDate, eDate, ISSUESUBTYPE.CrititalFailureTask, false));
+                }
+
                 //rma
-                historyRMAList.Add(project.Key, getProjectTask(updater, project.Key, 0, sDate, eDate, ISSUESUBTYPE.RMA));
-                RMAList.Add(project.Key, getProjectTask(updater, project.Key, 1, sDate, eDate, ISSUESUBTYPE.RMA));
+                if (setting.RMA == 1)
+                {
+                    historyRMAList.Add(project.Key, getProjectTask(updater, project.Key, 0, sDate, eDate, ISSUESUBTYPE.RMA));
+                    RMAList.Add(project.Key, getProjectTask(updater, project.Key, 1, sDate, eDate, ISSUESUBTYPE.RMA));
+                }
 
                 //debug tree
-                DebugTreeList.Add(project.Key, ProjectErrorViewModels.RetrieveWeeklyErrorByPJKey(project.Key, sDate, eDate, this));
-                
+                if (setting.DebugTree == 1)
+                {
+                    DebugTreeList.Add(project.Key, ProjectErrorViewModels.RetrieveWeeklyErrorByPJKey(project.Key, sDate, eDate, this));
+                }
+
                 //get current week summary
                 SummaryList.Add(project.Key, getCurWeekSummary(project.Key, sDate, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")));
             }
+            ViewBag.setting = setting;
             ViewBag.pKeys = ProjectKeyList;
             ViewBag.YieldDataList = YieldDataList;
             ViewBag.historyTaskList = historyTaskList;
@@ -2971,5 +2987,43 @@ namespace Prometheus.Controllers
             }
         }
 
+        [HttpPost]
+        public JsonResult SaveWeeklyReportSetting()
+        {
+
+            var ret = new JsonResult();
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                var yield = Request.Form["m_yield"];
+                var task = Request.Form["m_task"];
+                var criticalfailure = Request.Form["m_criticalfailure"];
+                var rma = Request.Form["m_rma"];
+                var debugtree = Request.Form["m_debugtree"];
+                var others = Request.Form["m_others"];
+                
+                var setting = new WeeklyReportSetting(
+                    "",
+                    updater,
+                    Convert.ToInt32(yield),
+                    Convert.ToInt32(task),
+                    Convert.ToInt32(criticalfailure),
+                    Convert.ToInt32(rma),
+                    Convert.ToInt32(debugtree),
+                    Convert.ToInt32(others),
+                    DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                );
+                WeeklyReportSetting.SaveWeeklyReportSetting(setting);
+                ret.Data = new { success = true };
+                return ret;
+            }
+            else
+            {
+                ret.Data = new { success = false };
+                return ret;
+            }
+        }
     }
 }

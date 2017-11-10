@@ -13,6 +13,7 @@ namespace Prometheus.Models
         public static int Task = 2;
         public static int CriticalFailure = 3;
         public static int RMA = 4;
+        public static int DebugTree = 5;
     }
 
     public class MarkType
@@ -278,5 +279,116 @@ namespace Prometheus.Models
 
         public string Trend { set; get; }
 
+    }
+
+    public class WeeklyReportSetting
+    {
+        public WeeklyReportSetting()
+        {
+            ID = "";
+            UserName = "";
+            Yield = 1;
+            Task = 1;
+            CriticalFailure = 1;
+            RMA = 1;
+            DebugTree = 1;
+            Others = 1;
+            CreateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            UpdateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        }
+
+        public WeeklyReportSetting(string id, string username, int yield, int task, int critask, int rma, int dtree, int others, string ctime, string utime)
+        {
+            ID = id;
+            UserName = username;
+            Yield = yield;
+            Task = task;
+            CriticalFailure = critask;
+            RMA = rma;
+            DebugTree = dtree;
+            Others = others;
+            CreateTime = ctime;
+            UpdateTime = utime;
+        }
+
+        public string ID { set; get; }
+        public string UserName { set; get; }
+        public int Yield { set; get; }
+        public int Task { set; get; }
+        public int CriticalFailure { set; get; }
+        public int RMA { set; get; }
+        public int DebugTree { set; get; }
+        public int Others { set; get; }
+        public string CreateTime { set; get; }
+        public string UpdateTime { set; get; }
+
+        public static WeeklyReportSetting GetWeeklyReportSetting(string username)
+        {
+            var sql = "select ID, UserName, Yield, Task, CriticalFailure, RMA, "
+                    + "DebugTree, Others, CreateTime, UpdateTime "
+                    + "from WeeklyReportSetting "
+                    + "where UserName = '<UserName>' ";
+            sql = sql.Replace("<UserName>", username);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            var ret = new WeeklyReportSetting();
+            foreach (var line in dbret)
+            {
+                ret.ID = Convert.ToString(line[0]);
+                ret.UserName = Convert.ToString(line[1]);
+                ret.Yield = Convert.ToInt32(line[2]);
+                ret.Task = Convert.ToInt32(line[3]);
+                ret.CriticalFailure = Convert.ToInt32(line[4]);
+                ret.RMA = Convert.ToInt32(line[5]);
+                ret.DebugTree = Convert.ToInt32(line[6]);
+                ret.Others = Convert.ToInt32(line[7]);
+                ret.CreateTime = Convert.ToString(line[8]);
+                ret.UpdateTime = Convert.ToString(line[9]);
+            }
+
+            return ret;
+        }
+
+        public static void SaveWeeklyReportSetting(WeeklyReportSetting setting)
+        {
+            var sql = "select ID from WeeklyReportSetting where UserName = '<UserName>'";
+            sql = sql.Replace("<UserName>", setting.UserName);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            if(dbret.Count > 0)
+            {
+                var updatesql = "update WeeklyReportSetting set Yield = '<Yield>', "
+                            + "Task = '<Task>', CriticalFailure = '<CriticalFailure>', "
+                            + "RMA = '<RMA>', DebugTree = '<DebugTree>', "
+                            + "Others = '<Others>', UpdateTime = '<UpdateTime>' "
+                            + "where UserName = '<UserName>'; ";
+                updatesql = updatesql.Replace("<UserName>", setting.UserName)
+                        .Replace("<Yield>", setting.Yield.ToString())
+                        .Replace("<Task>", setting.Task.ToString())
+                        .Replace("<CriticalFailure>", setting.CriticalFailure.ToString())
+                        .Replace("<RMA>", setting.RMA.ToString())
+                        .Replace("<DebugTree>", setting.DebugTree.ToString())
+                        .Replace("<Others>", setting.Others.ToString())
+                        .Replace("<UpdateTime>", setting.UpdateTime);
+                DBUtility.ExeLocalSqlNoRes(updatesql);
+            }
+            else
+            {
+                var insertsql = "insert into WeeklyReportSetting "
+                            + "(UserName, Yield, Task, CriticalFailure, RMA, "
+                            + "DebugTree, Others, CreateTime, UpdateTime) values "
+                            + "('<UserName>', '<Yield>', '<Task>', '<CriticalFailure>', "
+                            + "'<RMA>', '<DebugTree>', '<Others>', '<CreateTime>', '<UpdateTime>'); ";
+                insertsql = insertsql.Replace("<UserName>", setting.UserName)
+                        .Replace("<Yield>", setting.Yield.ToString())
+                        .Replace("<Task>", setting.Task.ToString())
+                        .Replace("<CriticalFailure>", setting.CriticalFailure.ToString())
+                        .Replace("<RMA>", setting.RMA.ToString())
+                        .Replace("<DebugTree>", setting.DebugTree.ToString())
+                        .Replace("<Others>", setting.Others.ToString())
+                        .Replace("<CreateTime>", setting.CreateTime)
+                        .Replace("<UpdateTime>", setting.UpdateTime);
+
+                DBUtility.ExeLocalSqlNoRes(insertsql);
+            }
+        }
     }
 }

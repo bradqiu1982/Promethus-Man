@@ -1,5 +1,7 @@
 ﻿var WeeklyReport = function () {
     var show = function () {
+        $('section').eq(0).children(1).attr('aria-expanded', 'true');
+        $('section').eq(0).children(2).addClass('in');
         $('body').on('click', '.task-content tbody tr', function () {
             var ikey = $(this).attr('data-ikey');
             var itype = $(this).attr('data-itype');
@@ -13,6 +15,7 @@
                     sType: itype,
                     iKey: ikey
                 }, function (output) {
+                    console.log(output);
                     if (output.success && output.data.length > 0) {
                         var summary = "";
                         for (var i = 0; i < output.data.length; i++) {
@@ -100,6 +103,31 @@
 
         $('body').on('click', '.btn-cancel', function () {
             $(this).parent('.wr-operation').parent('.content').find('textarea').val('');
+        })
+
+        $('body').on('click', '#save_setting', function () {
+            var m_yield = ($('#modal_yield').prop("checked"))?1:0;
+            var m_task = ($('#modal_task').prop("checked"))?1:0;
+            var m_criticalfailure = ($('#modal_criticalfailure').prop("checked"))?1:0;
+            var m_rma = ($('#modal_rma').prop("checked"))?1:0;
+            var m_debugtree = ($('#modal_debugtree').prop("checked"))?1:0;
+            var m_others = ($('#modal_others').prop("checked")) ? 1 : 0;
+            $.post('/User/SaveWeeklyReportSetting',
+            {
+                m_yield: m_yield,
+                m_task: m_task,
+                m_criticalfailure: m_criticalfailure,
+                m_rma: m_rma,
+                m_debugtree: m_debugtree,
+                m_others: m_others
+            }, function (output) {
+                if (output.success) {
+                    window.location.reload();
+                }
+                else {
+                    alert("Failed to update!");
+                }
+            })
         })
     }
 

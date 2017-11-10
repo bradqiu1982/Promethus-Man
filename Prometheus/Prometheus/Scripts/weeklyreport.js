@@ -15,7 +15,6 @@
                     sType: itype,
                     iKey: ikey
                 }, function (output) {
-                    console.log(output);
                     if (output.success && output.data.length > 0) {
                         var summary = "";
                         for (var i = 0; i < output.data.length; i++) {

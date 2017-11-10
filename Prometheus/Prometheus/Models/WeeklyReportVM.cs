@@ -256,4 +256,27 @@ namespace Prometheus.Models
         public DateTime UpdateTime { set; get; }
         public List<string> Attachment { set; get; }
     }
+
+    public class WeeklyYieldData
+    {
+        public WeeklyYieldData()
+        {
+            Data = new List<string>();
+            Pareto = "";
+            Trend = "";
+        }
+
+        public WeeklyYieldData(List<string> data, string pareto, string trend)
+        {
+            Data = data;
+            Pareto = pareto;
+            Trend = trend;
+        }
+        public List<string> Data { set; get; }
+
+        public string Pareto { set; get; }
+
+        public string Trend { set; get; }
+
+    }
 }

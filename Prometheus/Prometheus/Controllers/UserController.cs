@@ -2478,7 +2478,10 @@ namespace Prometheus.Controllers
             var dayofweek = Convert.ToInt32(DateTime.Now.DayOfWeek);
             var sDate = DateTime.Now.AddDays((4 - dayofweek) - 7).ToString("yyyy-MM-dd 07:30:00");
             var eDate = DateTime.Now.ToString("yyyy-MM-dd 07:30:00");
+            //var sDate = "2017-08-03 07:30:00";
+            //var eDate = "2017-08-10 07:30:00";
             var ProjectKeyList = new List<string>();
+            var YieldDataList = new Dictionary<string, WeeklyYieldData>();
             var historyTaskList = new Dictionary<string, Dictionary<string, TaskData>>();
             var taskList = new Dictionary<string, Dictionary<string, TaskData>>();
             var historyCriList = new Dictionary<string, Dictionary<string, TaskData>>();
@@ -2490,13 +2493,10 @@ namespace Prometheus.Controllers
             foreach (var project in projectlist)
             {
                 ProjectKeyList.Add(project.Key);
+                
+                //yield
+                YieldDataList.Add(project.Key, getProjectYield(project.Key, sDate, eDate));
 
-                getProjectYield(project.Key, sDate, eDate);
-
-                //weekly yield pareto
-
-                //weekly yield trend
-               
                 //task
                 historyTaskList.Add(project.Key, getProjectTask(updater, project.Key, 0, sDate, eDate, ISSUESUBTYPE.Task));
                 taskList.Add(project.Key, getProjectTask(updater, project.Key, 1, sDate, eDate, ISSUESUBTYPE.Task));
@@ -2511,10 +2511,12 @@ namespace Prometheus.Controllers
 
                 //debug tree
                 DebugTreeList.Add(project.Key, ProjectErrorViewModels.RetrieveWeeklyErrorByPJKey(project.Key, sDate, eDate, this));
+                
                 //get current week summary
                 SummaryList.Add(project.Key, getCurWeekSummary(project.Key, sDate, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")));
             }
             ViewBag.pKeys = ProjectKeyList;
+            ViewBag.YieldDataList = YieldDataList;
             ViewBag.historyTaskList = historyTaskList;
             ViewBag.taskList = taskList;
             ViewBag.historyCriList = historyCriList;
@@ -2527,47 +2529,348 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        private void getProjectYield(string projectkey, string sDate, string eDate)
+        private WeeklyYieldData getProjectYield(string projectkey, string sDate, string eDate)
         {
+            var datalist = new List<string>();
             var pvm = ProjectViewModels.RetrieveOneProject(projectkey);
             var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(projectkey, sDate, eDate, pvm, HttpContext.Cache);
             var firstdatalist = new List<KeyValuePair<string, int>>();
-            var fpy = 1.0;
-            var fy = 1.0;
-            if (yieldvm.FirstYields.Count > 0)
-            {
-                //fpy
-                foreach (var val in yieldvm.FirstYields)
-                {
-                    fpy *= (Convert.ToDouble(val.OutputCount) / val.InputCount);
-                }
-            }
-            else
-            {
-                fpy = 0;
-            }
-            var tops = new List<double>();
+            var fpy = yieldvm.FirstYield * 100;
+            var fy = yieldvm.LastYield * 100;
+
+            //pareto
+            var pareto = "";
+            var tops = new Dictionary<string, int>();
             if (yieldvm.LastYields.Count > 0)
             {
-                //fy
-                foreach (var val in yieldvm.LastYields)
+                var piedatadict = new Dictionary<string, int>();
+                var eklist = new List<string>();
+                foreach (var error in yieldvm.LErrorMap.Keys)
                 {
-                    tops.Add(Convert.ToDouble(val.OutputCount) / val.InputCount);
-                    fy *= (Convert.ToDouble(val.OutputCount) / val.InputCount);
+                    eklist.Add(error);
                 }
+
+                foreach (var error in eklist)
+                {
+                    if (string.Compare(error, "PASS", true) != 0)
+                    {
+                        foreach (var test in yieldvm.LastYields)
+                        {
+                            var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.LErrorMap);
+
+                            if (piedatadict.ContainsKey(error))
+                            {
+                                var preval = piedatadict[error];
+                                piedatadict[error] = preval + val;
+                            }
+                            else
+                            {
+                                piedatadict.Add(error, val);
+                            }
+                        }
+                    }
+                }
+
+                tops = piedatadict.OrderByDescending(o => o.Value).ToDictionary(p => p.Key, o => o.Value);
+
+                var fytestdatalist = piedatadict.ToList();
+
+
+                if (fytestdatalist.Count > 0)
+                {
+                    pareto = fytparetofun(fytestdatalist, projectkey, sDate, eDate);
+                }
+            }
+            //weekly yield trend
+            var trend = ProjectWeeklyTrend(this, projectkey, 4);
+
+
+            datalist.Add(fpy.ToString("0.00") + "%");
+            datalist.Add(fy.ToString("0.00") + "%");
+            var idx = 0;
+            var total = tops.Sum(x => x.Value);
+            foreach (var top in tops)
+            {
+                if(idx < 3)
+                {
+                    datalist.Add(top.Key);
+                    datalist.Add((Convert.ToDouble(top.Value)/ total * 100).ToString("0.00")+"%");
+                }
+                else
+                {
+                    break;
+                }
+                idx++;
+            }
+            if(tops.Count < 3)
+            {
+                for(var i = 0; i < 3 - tops.Count; i++)
+                {
+                    datalist.Add("");
+                    datalist.Add("");
+                }
+            }
+
+            return new WeeklyYieldData(
+                datalist,
+                pareto,
+                trend
+            );
+        }
+
+        private string fytparetofun(List<KeyValuePair<string, int>> retestdatalist, string ProjectKey, string StartDate, string EndDate)
+        {
+            if (retestdatalist.Count > 0)
+            {
+                var peralist = new List<ParetoData>();
+
+                if (retestdatalist.Count > 1)
+                {
+                    retestdatalist.Sort(delegate (KeyValuePair<string, int> pair1, KeyValuePair<string, int> pair2)
+                    {
+                        return pair2.Value.CompareTo(pair1.Value);
+                    });
+                }
+
+                var sum = 0;
+                for (var i = 0; i < retestdatalist.Count; i++)
+                {
+                    sum = sum + retestdatalist[i].Value;
+                }
+
+                var otherpercent = 0.0;
+
+                for (var i = 0; i < retestdatalist.Count; i++)
+                {
+                    if (retestdatalist.Count > 5 && peralist.Count > 0 && peralist[peralist.Count - 1].sumpercent > 0.95)
+                    {
+                        otherpercent = otherpercent + retestdatalist[i].Value / (double)sum;
+                        if (i == (retestdatalist.Count - 1))
+                        {
+                            var tempperato = new ParetoData();
+                            tempperato.key = "Other";
+                            tempperato.count = (int)(otherpercent * sum);
+                            tempperato.percent = otherpercent;
+                            tempperato.sumpercent = 1.0;
+                            peralist.Add(tempperato);
+                        }
+                    }
+                    else
+                    {
+                        var tempperato = new ParetoData();
+                        tempperato.key = retestdatalist[i].Key;
+                        if (i == 0)
+                        {
+                            tempperato.count = retestdatalist[i].Value;
+                            tempperato.percent = tempperato.count / (double)sum;
+                            tempperato.sumpercent = tempperato.percent;
+                            peralist.Add(tempperato);
+                        }
+                        else
+                        {
+                            tempperato.count = retestdatalist[i].Value;
+                            tempperato.percent = tempperato.count / (double)sum;
+                            tempperato.sumpercent = peralist[peralist.Count - 1].sumpercent + tempperato.percent;
+                            peralist.Add(tempperato);
+                        }
+                    }
+                }
+                
+                var ChartxAxisValues = "";
+
+                foreach (var item in peralist)
+                {
+                    ChartxAxisValues = ChartxAxisValues + "'" + item.key + "',";
+                }
+                ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
+
+                var pcountvalue = "";
+                foreach (var item in peralist)
+                {
+                    pcountvalue = pcountvalue + item.count.ToString() + ",";
+                }
+                pcountvalue = pcountvalue.Substring(0, pcountvalue.Length - 1);
+
+                var ppecentvalue = "";
+                foreach (var item in peralist)
+                {
+                    ppecentvalue = ppecentvalue + (item.sumpercent * 100).ToString("0.0") + ",";
+                }
+                ppecentvalue = ppecentvalue.Substring(0, ppecentvalue.Length - 1);
+
+                var abpecentvalue = "";
+                foreach (var item in peralist)
+                {
+                    abpecentvalue = abpecentvalue + (item.percent * 100).ToString("0.0") + ",";
+                }
+                abpecentvalue = abpecentvalue.Substring(0, abpecentvalue.Length - 1);
+                
+                var reurl = "window.open('/Project/ProjectErrAbbr?ProjectKey=" + ProjectKey + "'" + "+'&ErrAbbr='+this.category)";
+                if (!string.IsNullOrEmpty(StartDate) && !string.IsNullOrEmpty(EndDate))
+                {
+                    reurl = reurl + "+'&StartDate='+'" + StartDate + "'+'&EndDate='+'" + EndDate + "'";
+                }
+
+                var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ParetoChart.xml"));
+                return tempscript.Replace("#Title#", "Pareto of Final Yield Defect")
+                    .Replace("#XAxisTitle#", "Defect")
+                    .Replace("#ChartxAxisValues#", ChartxAxisValues)
+                    .Replace("#AmountMAX#", sum.ToString())
+                    .Replace("#PCount#", pcountvalue)
+                    .Replace("#ABPercent#", abpecentvalue)
+                    .Replace("#PPercent#", ppecentvalue)
+                    .Replace("#REDIRECTURL#", reurl);
             }
             else
             {
-                fy = 0;
+                return "";
             }
+        }
 
-            if (yieldvm.RealTimeYields.Count > 0)
+        private string ProjectWeeklyTrend(Controller ctrl, string ProjectKey, int weeks)
+        {
+            var vmlist = ProjectYieldViewModule.GetYieldByWeeks(ProjectKey, ctrl.HttpContext.Cache, weeks);
+            if (vmlist.Count > 0)
             {
+                var ChartxAxisValues = "";
+                var ftimelist = new List<string>();
+                var famountlist = new List<int>();
+                var fyieldlist = new List<double>();
+                var ryieldlist = new List<double>();
+                var rtyieldlist = new List<double>();
+                var snyieldlist = new List<double>();
+                var maxamout = 0;
 
+                foreach (var item in vmlist)
+                {
+                    ftimelist.Add(item.EndDate.ToString("yyyy-MM-dd"));
+
+                    fyieldlist.Add(item.FirstYield * 100.0);
+                    ryieldlist.Add(item.LastYield * 100.0);
+                    rtyieldlist.Add(item.RealTimeYield * 100.0);
+                    snyieldlist.Add(item.SNYield * 100);
+
+                    var tempfamount = 0;
+                    foreach (var d in item.FirstYields)
+                    {
+                        if (d.InputCount > tempfamount) { tempfamount = d.InputCount; }
+                        if (d.InputCount > maxamout) { maxamout = d.InputCount; }
+                    }
+                    famountlist.Add(tempfamount);
+                }
+
+                //xaxis
+                foreach (var item in ftimelist)
+                {
+                    ChartxAxisValues = ChartxAxisValues + "'" + item + "',";
+                }
+                ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
+                
+                var famout = "";
+                foreach (var item in famountlist)
+                {
+                    famout = famout + item.ToString() + ",";
+                }
+                famout = famout.Substring(0, famout.Length - 1);
+
+                var ftempvalue = "";
+                foreach (var item in fyieldlist)
+                {
+                    ftempvalue = ftempvalue + item.ToString("0.00") + ",";
+                }
+                ftempvalue = ftempvalue.Substring(0, ftempvalue.Length - 1);
+
+                var rttempvalue = "";
+                foreach (var item in rtyieldlist)
+                {
+                    rttempvalue = rttempvalue + item.ToString("0.00") + ",";
+                }
+                rttempvalue = rttempvalue.Substring(0, rttempvalue.Length - 1);
+
+                var sntempvalue = "";
+                foreach (var item in snyieldlist)
+                {
+                    sntempvalue = sntempvalue + item.ToString("0.00") + ",";
+                }
+                sntempvalue = sntempvalue.Substring(0, sntempvalue.Length - 1);
+
+                var rtempvalue = "";
+                foreach (var item in ryieldlist)
+                {
+                    rtempvalue = rtempvalue + item.ToString("0.00") + ",";
+                }
+                rtempvalue = rtempvalue.Substring(0, rtempvalue.Length - 1);
+
+                var FINALTOOLTIP = "";
+                var REALTIMETOOLTIP = "";
+
+
+                for (var idx = 0; idx < rtyieldlist.Count; idx++)
+                {
+                    FINALTOOLTIP = FINALTOOLTIP + "'<!doctype html><table>"
+                        + "<tr><td><b>FPY</b></td><td>" + fyieldlist[idx].ToString("0.00") + "&#37;</td></tr>"
+                        + "<tr><td><b>FY</b></td><td>" + ryieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
+
+                    foreach (var d in vmlist[idx].LastYields)
+                    {
+                        FINALTOOLTIP = FINALTOOLTIP + "<tr><td><b>" + d.WhichTest + "</b></td><td>Input:</td><td>" + d.InputCount.ToString() + "</td><td>Output:</td><td>" + d.OutputCount.ToString() + "</td></tr>";
+                    }
+
+                    FINALTOOLTIP = FINALTOOLTIP + "</table>'";
+                    FINALTOOLTIP = FINALTOOLTIP + ",";
+                }
+                FINALTOOLTIP = FINALTOOLTIP.Substring(0, FINALTOOLTIP.Length - 1);
+
+
+                for (var idx = 0; idx < rtyieldlist.Count; idx++)
+                {
+                    REALTIMETOOLTIP = REALTIMETOOLTIP + "'<!doctype html><table>"
+                        + "<tr><td><b>Realtime Yield</b></td><td>" + rtyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
+                    foreach (var d in vmlist[idx].RealTimeYields)
+                    {
+                        REALTIMETOOLTIP = REALTIMETOOLTIP + "<tr><td><b>" + d.WhichTest + "</b></td><td>Input:</td><td>" + d.InputCount.ToString() + "</td><td>Output:</td><td>" + d.OutputCount.ToString() + "</td></tr>";
+                    }
+                    REALTIMETOOLTIP = REALTIMETOOLTIP + "</table>'";
+                    REALTIMETOOLTIP = REALTIMETOOLTIP + ",";
+                }
+                REALTIMETOOLTIP = REALTIMETOOLTIP.Substring(0, REALTIMETOOLTIP.Length - 1);
+
+                var SNTOOLTIP = "";
+                for (var idx = 0; idx < snyieldlist.Count; idx++)
+                {
+                    SNTOOLTIP = SNTOOLTIP + "'<!doctype html><table>"
+                        + "<tr><td><b>SN Trace Yield</b></td><td>" + snyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
+                    foreach (var d in vmlist[idx].SNYields)
+                    {
+                        SNTOOLTIP = SNTOOLTIP + "<tr><td><b>" + d.WhichTest + "</b></td><td>Input:</td><td>" + d.InputCount.ToString() + "</td><td>Output:</td><td>" + d.OutputCount.ToString() + "</td></tr>";
+                    }
+                    SNTOOLTIP = SNTOOLTIP + "</table>'";
+                    SNTOOLTIP = SNTOOLTIP + ",";
+                }
+                SNTOOLTIP = SNTOOLTIP.Substring(0, SNTOOLTIP.Length - 1);
+
+                //rederect url
+                var reurl = "window.open('/Project/ProjectWYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category" + "+'&Weeks='+'" + weeks.ToString() + "');";
+
+                var tempscript = System.IO.File.ReadAllText(ctrl.Server.MapPath("~/Scripts/SuperYield.xml"));
+                return tempscript.Replace("#Title#", "Weekly Yield Trend")
+                    .Replace("#ChartxAxisValues#", ChartxAxisValues)
+                    .Replace("#XAxisTitle#", "Date")
+                    .Replace("#AmountMAX#", maxamout.ToString())
+                    .Replace("#FirstAmount#", famout)
+                    .Replace("#FirstYield#", ftempvalue)
+                    .Replace("#RetestYield#", rtempvalue)
+                    .Replace("#RealTimeYield#", rttempvalue)
+                    .Replace("#SNYield#", sntempvalue)
+                    .Replace("#FINALTOOLTIP#", FINALTOOLTIP)
+                    .Replace("#REALTIMETOOLTIP#", REALTIMETOOLTIP)
+                    .Replace("#SNTOOLTIP#", SNTOOLTIP)
+                    .Replace("#REDIRECTURL#", reurl);
             }
-            //top
-            tops.Sort();
-
+            else
+            {
+                return "";
+            }
         }
 
         private Dictionary<string, TaskData> getProjectTask(string username, string projectkey, int period, string sDate, string eDate, int iType, bool wSubTask = true)

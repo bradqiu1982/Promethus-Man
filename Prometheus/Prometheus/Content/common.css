@@ -28,19 +28,19 @@
 
 /* Variations */
 .bs-callout-danger {
-  border-left-color: #ce4844;
+  /*border-left-color: #ce4844;*/
 }
 .bs-callout-danger h4 {
   color: #ce4844;
 }
 .bs-callout-warning {
-  border-left-color: #aa6708;
+  /*border-left-color: #aa6708;*/
 }
 .bs-callout-warning h4 {
   color: #aa6708;
 }
 .bs-callout-info {
-  border-left-color: #1b809e;
+  /*border-left-color: #1b809e;*/
 }
 .bs-callout-info h4 {
   color: #1b809e;
@@ -48,17 +48,17 @@
 
 /*for weekly report*/
 .fypareto{
-    border: #000 1px solid;
+    /*border: #000 1px solid;*/
     display: inline-block;
     margin-left: 1%;
-    height: 200px;
+    height: 300px;
     width: 48%;
 }
 .wyield{
-    border: #000 1px solid;
+    /*border: #000 1px solid;*/
     display: inline-block;
     margin-left: 1%;
-    height: 200px;
+    height: 300px;
     width: 48%;
 }
 
@@ -112,4 +112,17 @@
     font-size: 12px;
     margin: 0 15px 2px 15px;
     border-radius: 0;
+}
+
+.summary-hightlight{
+    border-left-width: 5px;
+    border-left-color: #d9534f;
+}
+.summary-lowlight{
+    border-left-width: 5px;
+    border-left-color: #5cb85c;
+}
+.summary-normal{
+    border-left-width: 5px;
+    border-left-color: #eee;
 }

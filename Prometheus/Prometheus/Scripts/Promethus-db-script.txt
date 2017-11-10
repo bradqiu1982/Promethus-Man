@@ -1070,3 +1070,37 @@ GO
 
 EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'0: Other 1: Task 2: Critital Failure Task 3: Non Critical Failure Task 4: OBA 5: RMA 6: Bug 7: REL 8: NPI ' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'IssueType', @level2type=N'COLUMN',@level2name=N'IssueSubType'
 GO
+
+
+/*Init IssueType Data*/
+
+insert into issueType (IssueKey, IssueSubType, IssueSsubType) 
+select IssueKey, 
+(case  
+when (IssueType = 'Task' and Summary not like '%Critical Failure Alarm%' and Summary not like '%Not Real Critical Issue%') then '1'
+when (IssueType = 'Task' and Summary like '%Critical Failure Alarm%') then '2'
+when (IssueType = 'Bug' and Summary like '%Critical Failure Alarm%') then '2'
+when (IssueType = 'Bug' and Summary like '%2nd Match%') then '2'
+when (IssueType = 'Bug' and Summary like '%Not Real Critical Issue%') then '3'
+when IssueType = 'Bug' then '6'
+when IssueType = 'RMA' then '5'
+when IssueType = 'OBA' then '4'
+when IssueType = 'Rel' then '7'
+when IssueType = 'NPI PROCESS' then '8'
+else 0
+end
+) as IssueSubType,
+(case 
+when (IssueType = 'Task' and Summary like '%Containment%') then '11'
+when (IssueType = 'Task' and Summary like '%Project Manage%') then '9'
+when (IssueType = 'Task' and Summary like '%Corrective%') then 12
+when (IssueType = 'Task' and Summary like '%CONTAINMENTACTION%') then 11
+when (IssueType = 'Task' and Summary like '%FAILVERIFYACTION%') then 10 
+when (IssueType = 'Task' and Summary like '%VERIFYCORRECTIVEACTION\') then 13
+when (IssueType = 'Bug' and Summary like '%Containment%') then 11
+when (IssueType = 'Bug' and Summary like '%Corrective%') then 12
+when (IssueType = 'RMA' and Summary like '%Containment%') then 11
+when (IssueType = 'RMA' and Summary like '%Containment%') then 11
+else 0
+end
+) as IssueSsubType from Issue ;

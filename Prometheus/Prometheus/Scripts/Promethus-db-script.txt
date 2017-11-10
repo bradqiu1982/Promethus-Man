@@ -1108,3 +1108,61 @@ when (Summary like '%OCAP%' and Summary like '%Critical Failure Alarm%') then 14
 else 0
 end
 ) as IssueSsubType from Issue ;
+
+/****** Object:  Table [dbo].[WeeklyReportSetting]    Script Date: 11/10/2017 2:51:56 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[WeeklyReportSetting](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[UserName] [nvarchar](50) NOT NULL,
+	[Yield] [tinyint] NOT NULL,
+	[Task] [tinyint] NOT NULL,
+	[CriticalFailure] [tinyint] NOT NULL,
+	[RMA] [tinyint] NOT NULL,
+	[DebugTree] [tinyint] NOT NULL,
+	[Others] [tinyint] NOT NULL,
+	[CreateTime] [datetime] NOT NULL,
+	[UpdateTime] [datetime] NOT NULL
+) ON [PRIMARY]
+
+GO
+
+ALTER TABLE [dbo].[WeeklyReportSetting] ADD  CONSTRAINT [DF_WeeklyReportSetting_Yield]  DEFAULT ((1)) FOR [Yield]
+GO
+
+ALTER TABLE [dbo].[WeeklyReportSetting] ADD  CONSTRAINT [DF_WeeklyReportSetting_Task]  DEFAULT ((1)) FOR [Task]
+GO
+
+ALTER TABLE [dbo].[WeeklyReportSetting] ADD  CONSTRAINT [DF_WeeklyReportSetting_CriticalFailure]  DEFAULT ((1)) FOR [CriticalFailure]
+GO
+
+ALTER TABLE [dbo].[WeeklyReportSetting] ADD  CONSTRAINT [DF_WeeklyReportSetting_RMA]  DEFAULT ((1)) FOR [RMA]
+GO
+
+ALTER TABLE [dbo].[WeeklyReportSetting] ADD  CONSTRAINT [DF_WeeklyReportSetting_DebugTree]  DEFAULT ((1)) FOR [DebugTree]
+GO
+
+ALTER TABLE [dbo].[WeeklyReportSetting] ADD  CONSTRAINT [DF_WeeklyReportSetting_Others]  DEFAULT ((1)) FOR [Others]
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'1 valid' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'WeeklyReportSetting', @level2type=N'COLUMN',@level2name=N'Yield'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'1 valid' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'WeeklyReportSetting', @level2type=N'COLUMN',@level2name=N'Task'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'1: valid' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'WeeklyReportSetting', @level2type=N'COLUMN',@level2name=N'CriticalFailure'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'1: valid' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'WeeklyReportSetting', @level2type=N'COLUMN',@level2name=N'RMA'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'1: valid' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'WeeklyReportSetting', @level2type=N'COLUMN',@level2name=N'DebugTree'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'1: valid' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'WeeklyReportSetting', @level2type=N'COLUMN',@level2name=N'Others'
+GO

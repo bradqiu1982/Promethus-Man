@@ -1676,6 +1676,9 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(ProjectKey))
             {
                 var vm = ProjectErrorViewModels.RetrieveErrorByPJKey(ProjectKey, this);
+                var descdict = ProjectErrorViewModels.RetrieveShortDescDict(ProjectKey);
+
+
                 var piedatadict = new Dictionary<string, int>();
                 foreach (var item in vm)
                 {
@@ -1691,14 +1694,43 @@ namespace Prometheus.Controllers
                     var namevaluepair = "";
                     foreach (var k in keys)
                     {
-                        namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                        var pkey = descdict.ContainsKey(k) ? descdict[k] : k;
+                        namevaluepair = namevaluepair + "{ name:'" + pkey + "',y:" + piedatadict[k].ToString() + "},";
                     }
 
                     namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
 
                     var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
                     ViewBag.chartscript = tempscript.Replace("#ElementID#", "failurepie")
-                        .Replace("#Title#", ProjectKey + " Realtime Failure")
+                        .Replace("#Title#", ProjectKey + " Total Failure")
+                        .Replace("#SERIESNAME#", "Failure")
+                        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
+                }
+
+                piedatadict = new Dictionary<string, int>();
+                foreach (var item in vm)
+                {
+                    if (!piedatadict.ContainsKey(item.OrignalCode))
+                    {
+                        piedatadict.Add(item.OrignalCode, item.ErrorCount-item.AutoClosed);
+                    }
+                }
+
+                keys = piedatadict.Keys;
+                if (keys.Count > 0)
+                {
+                    var namevaluepair = "";
+                    foreach (var k in keys)
+                    {
+                        var pkey = descdict.ContainsKey(k) ? descdict[k] : k;
+                        namevaluepair = namevaluepair + "{ name:'" + pkey + "',y:" + piedatadict[k].ToString() + "},";
+                    }
+
+                    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                    ViewBag.realchartscript = tempscript.Replace("#ElementID#", "realchartscript")
+                        .Replace("#Title#", ProjectKey + " After Retest Failure")
                         .Replace("#SERIESNAME#", "Failure")
                         .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                 }
@@ -7218,6 +7250,27 @@ namespace Prometheus.Controllers
         //    return View("HeartBeat");
         //}
 
+        private void SumOnePJAutoIssu(string pjkey)
+        {
+            var allerrorkey = ProjectErrorViewModels.RetrieveErrorByPJKey(pjkey, this);
+            foreach (var err in allerrorkey)
+            {
+                var solvecount = IssueViewModels.RetrieveAutoCloseIssueCount(pjkey, err.OrignalCode);
+                ProjectErrorViewModels.UpdateProjectAutoCloseCount(solvecount,pjkey, err.OrignalCode);
+            }
+        }
+
+        public ActionResult SumAutoCloseIssue()
+        {
+            var pjlist = ProjectViewModels.RetrieveAllProjectKey();
+            foreach (var pj in pjlist)
+            {
+                SumOnePJAutoIssu(pj);
+            }
+
+            return View("HeartBeat");
+        }
+
     }
-    
+
 }

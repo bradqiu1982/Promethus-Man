@@ -123,6 +123,145 @@
                     </div>
                 </section>
             }
+            if(ViewBag.setting.ICare == 1)
+            {
+                <section id="ICare-@idx">
+                    <div class="bs-callout bs-callout-info" data-toggle="collapse" data-target="#content_icare_@idx" aria-expanded="false">
+                        <h4>ICare</h4>
+                    </div>
+                    <div id="content_icare_@idx" class="content collapse">
+                        <div id="his_icare_@idx">
+                            <div class="panel panel-default">
+                                <div class="panel-heading cursor-pointer" data-toggle="collapse" data-target="#content_his_icare_@idx" aria-expanded="false">
+                                    <span class="panel-title">History</span>
+                                    <span class="glyphicon glyphicon-chevron-down chevron-down"></span>
+                                </div>
+                                <div class="panel-body collapse" id="content_his_icare_@idx">
+                                    <table class="table table-hover table-condensed task-content" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Description</th>
+                                                <th>Status</th>
+                                                <th>Start Date</th>
+                                                <th>Due Date</th>
+                                                <th>Update Date</th>
+                                                <th>Attachment</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (ViewBag.historyIcareList.ContainsKey(pKey) && ViewBag.historyIcareList[pKey].Count > 0)
+                                            {
+                                                m = 0;
+                                                foreach (var history in ViewBag.historyIcareList[pKey])
+                                                {
+                                                    <tr class="cursor-pointer" data-toggle="collapse" data-data="his-icare-@idx-@m" data-target="#his-icare-@idx-@m" 
+                                                            data-ikey="@history.Value.IssueKey" data-itype="@history.Value.IssueSubType" aria-expanded="false">
+                                                        <td>@(m + 1)</td>
+                                                        <td><a href="/Issue/UpdateIssue?issuekey=@history.Key" target="_blank">@history.Value.Description</a></td>
+                                                        <td>@history.Value.Status</td>
+                                                        <td>@history.Value.StartDate.ToString("MM/dd")</td>
+                                                        <td>@history.Value.DueDate.ToString("MM/dd")</td>
+                                                        <td>@(history.Value.UpdateTime.ToString("yyyy/MM/dd HH:mm:ss") == "0001/01/01 00:00:00" ? "" : history.Value.UpdateTime.ToString("MM/dd HH:mm"))</td>
+                                                        <td>
+                                                            @if (history.Value.Attachment.Count > 0)
+                                                            {
+                                                                <a href="/Issue/IssueAttach?issuekey=@history.Key" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></a>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                    m++;
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        @if (ViewBag.icareList.ContainsKey(pKey) && ViewBag.icareList[pKey].Count > 0)
+                        {
+                            m = 0;
+                            <div id="cur_icare_@idx">
+                                <table class="table table-condensed" cellpadding="0">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Description</th>
+                                            <th>Status</th>
+                                            <th>Start Date</th>
+                                            <th>Due Date</th>
+                                            <th>Update Date</th>
+                                            <th>Attachment</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var task in ViewBag.icareList[pKey])
+                                        {
+                                            <tr data-data="cur-icare-@idx-@m">
+                                                <td>@(m + 1)</td>
+                                                <td><a href="/Issue/UpdateIssue?issuekey=@task.Key" target="_blank">@task.Value.Description</a></td>
+                                                <td>@task.Value.Status</td>
+                                                <td>@task.Value.StartDate.ToString("MM/dd")</td>
+                                                <td>@task.Value.DueDate.ToString("MM/dd")</td>
+                                                <td>@(task.Value.UpdateTime.ToString("yyyy/MM/dd HH:mm:ss") == "0001/01/01 00:00:00" ? "" : task.Value.UpdateTime.ToString("MM/dd HH:mm"))</td>
+                                                <td>
+                                                    @if (task.Value.Attachment.Count > 0)
+                                                    {
+                                                        <a href="/Issue/IssueAttach?issuekey=@task.Key" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></a>
+                                                    }
+                                                </td>
+                                            </tr>
+                                            <tr class="even" data-ikey="@task.Key">
+                                                <td colspan="7">
+                                                    <div class="col-xs-12 summary">Summary:</div>
+                                                    @{
+                                                        var isummary = "";
+                                                        var imark = "0";
+                                                        if (summarylist != null && summarylist.ContainsKey(task.Key))
+                                                        {
+                                                            foreach (var item in summarylist[task.Key])
+                                                            {
+                                                                if(item.UserName.ToUpper() != ViewBag.RealUserID.ToUpper()) {
+                                                                    <div class="row well item-summary @((item.Mark == "1")?"summary-hightlight":((item.Mark == "2")?"summary-lowlight":"summary-normal"))">
+                                                                        <span class="col-xs-5">@item.Summary</span>
+                                                                        <span class="col-xs-3">@item.UserName.Split(new char[] { '@' })[0]</span>
+                                                                        <span class="col-xs-4">@item.UpdateTime</span>
+                                                                    </div>
+                                                                }
+                                                                else
+                                                                {
+                                                                    imark = item.Mark;
+                                                                    isummary += item.Summary;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    <div class="col-xs-8">
+                                                        <textarea class="form-control" style="height: 35px;" id="cur_icare_summary_@(idx)_@m" 
+                                                                  name="cur_icare_summary">@isummary</textarea>
+                                                    </div>
+                                                    <div class="col-xs-4">
+                                                        <select class="form-control col-md-1">
+                                                            <option value="0" @(imark == "0" ? "selected" : "")>Normal</option>
+                                                            <option value="1" @(imark == "1" ? "selected" : "")>High</option>
+                                                            <option value="2" @(imark == "2" ? "selected" : "")>Low</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            m++;
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="wr-operation">
+                                <input type="button" class="btn btn-success op-btn btn-save" data-data-key="@pKey" data-data-module="@Prometheus.Models.SummaryType.ICare" name="btn_save" value="Save" />
+                                <input type="button" class="btn btn-warning op-btn btn-cancel" name="btn_cancel" value="Cancel" />
+                            </div>
+                        }
+                    </div>
+                </section>
+            }
             if(ViewBag.setting.Task == 1)
             {
                 <section id="Task-@idx">
@@ -217,9 +356,9 @@
                                                     @{
                                                         var tsummary = "";
                                                         var tmark = "0";
-                                                        if (summarylist != null && summarylist.ContainsKey(task.Key + "@@" + Prometheus.Models.SummaryType.Task))
+                                                        if (summarylist != null && summarylist.ContainsKey(task.Key))
                                                         {
-                                                            foreach (var item in summarylist[task.Key + "@@" + Prometheus.Models.SummaryType.Task])
+                                                            foreach (var item in summarylist[task.Key])
                                                             {
                                                                 if(item.UserName.ToUpper() != ViewBag.RealUserID.ToUpper()) {
                                                                     <div class="row well item-summary @((item.Mark == "1")?"summary-hightlight":((item.Mark == "2")?"summary-lowlight":"summary-normal"))">
@@ -356,9 +495,9 @@
                                                     @{
                                                         var csummary = "";
                                                         var cmark = "0";
-                                                        if (summarylist != null && summarylist.ContainsKey(task.Key + "@@" + Prometheus.Models.SummaryType.CriticalFailure))
+                                                        if (summarylist != null && summarylist.ContainsKey(task.Key))
                                                         {
-                                                            foreach (var item in summarylist[task.Key + "@@" + Prometheus.Models.SummaryType.CriticalFailure])
+                                                            foreach (var item in summarylist[task.Key])
                                                             {
                                                                 if (item.UserName.ToUpper() != ViewBag.RealUserID.ToUpper())
                                                                 {
@@ -496,9 +635,9 @@
                                                     @{
                                                         var rsummary = "";
                                                         var rmark = "0";
-                                                        if (summarylist != null && summarylist.ContainsKey(task.Key + "@@" + Prometheus.Models.SummaryType.RMA))
+                                                        if (summarylist != null && summarylist.ContainsKey(task.Key))
                                                         {
-                                                            foreach (var item in summarylist[task.Key + "@@" + Prometheus.Models.SummaryType.RMA])
+                                                            foreach (var item in summarylist[task.Key])
                                                             {
                                                                 if (item.UserName.ToUpper() != ViewBag.RealUserID.ToUpper())
                                                                 {
@@ -645,15 +784,19 @@
                         <span>Yield</span>
                     </div>
                     <div class="col-xs-4">
+                        <input type="checkbox" id="modal_icare" @(ViewBag.setting.ICare == 1 ? "checked" : "") />
+                        <span>ICare</span>
+                    </div>
+                    <div class="col-xs-4">
                         <input type="checkbox" id="modal_task" @(ViewBag.setting.Task == 1 ? "checked":"") />
                         <span>Task</span>
                     </div>
-                    <div class="col-xs-4">
-                        <input type="checkbox" id="modal_criticalfailure" @(ViewBag.setting.CriticalFailure == 1 ? "checked":"") />
-                        <span>Critical Failure Task</span>
-                    </div>
                 </div>
                 <div class="row">
+                    <div class="col-xs-4">
+                        <input type="checkbox" id="modal_criticalfailure" @(ViewBag.setting.CriticalFailure == 1 ? "checked" : "") />
+                        <span>Critical Failure Task</span>
+                    </div>
                     <div class="col-xs-4">
                         <input type="checkbox" id="modal_rma" @(ViewBag.setting.RMA == 1 ? "checked":"") />
                         <span>RMA</span>
@@ -662,8 +805,10 @@
                         <input type="checkbox" id="modal_debugtree" @(ViewBag.setting.DebugTree == 1 ? "checked":"") />
                         <span>DebugTree</span>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-xs-4">
-                        <input type="checkbox" id="modal_others" @(ViewBag.setting.Others == 1 ? "checked":"") />
+                        <input type="checkbox" id="modal_others" @(ViewBag.setting.Others == 1 ? "checked" : "") />
                         <span>Others</span>
                     </div>
                 </div>

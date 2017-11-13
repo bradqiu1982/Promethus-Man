@@ -1108,7 +1108,8 @@ else 0
 end
 ) as IssueSsubType from Issue ;
 
-/****** Object:  Table [dbo].[WeeklyReportSetting]    Script Date: 11/10/2017 2:51:56 PM ******/
+
+/****** Object:  Table [dbo].[WeeklyReportSetting]    Script Date: 11/13/2017 11:25:36 AM ******/
 SET ANSI_NULLS ON
 GO
 
@@ -1119,6 +1120,7 @@ CREATE TABLE [dbo].[WeeklyReportSetting](
 	[ID] [int] IDENTITY(1,1) NOT NULL,
 	[UserName] [nvarchar](50) NOT NULL,
 	[Yield] [tinyint] NOT NULL,
+	[ICare] [tinyint] NOT NULL,
 	[Task] [tinyint] NOT NULL,
 	[CriticalFailure] [tinyint] NOT NULL,
 	[RMA] [tinyint] NOT NULL,
@@ -1131,6 +1133,9 @@ CREATE TABLE [dbo].[WeeklyReportSetting](
 GO
 
 ALTER TABLE [dbo].[WeeklyReportSetting] ADD  CONSTRAINT [DF_WeeklyReportSetting_Yield]  DEFAULT ((1)) FOR [Yield]
+GO
+
+ALTER TABLE [dbo].[WeeklyReportSetting] ADD  CONSTRAINT [DF_WeeklyReportSetting_ICare]  DEFAULT ((1)) FOR [ICare]
 GO
 
 ALTER TABLE [dbo].[WeeklyReportSetting] ADD  CONSTRAINT [DF_WeeklyReportSetting_Task]  DEFAULT ((1)) FOR [Task]
@@ -1164,4 +1169,33 @@ EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'1: valid' , @l
 GO
 
 EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'1: valid' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'WeeklyReportSetting', @level2type=N'COLUMN',@level2name=N'Others'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'1: valid' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'WeeklyReportSetting', @level2type=N'COLUMN',@level2name=N'ICare'
+GO
+
+
+
+/****** Object:  Table [dbo].[IssueIcare]    Script Date: 11/13/2017 9:15:58 AM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[IssueIcare](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[ProjectKey] [nvarchar](50) NOT NULL,
+	[IssueKey] [nvarchar](50) NOT NULL,
+	[Icare] [tinyint] NOT NULL,
+	[CreateTime] [datetime] NOT NULL,
+	[UpdateTime] [datetime] NOT NULL
+) ON [PRIMARY]
+
+GO
+
+ALTER TABLE [dbo].[IssueIcare] ADD  CONSTRAINT [DF_IssueIcare_Icare]  DEFAULT ((1)) FOR [Icare]
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'1: Icare 0: cancel' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'IssueIcare', @level2type=N'COLUMN',@level2name=N'Icare'
 GO

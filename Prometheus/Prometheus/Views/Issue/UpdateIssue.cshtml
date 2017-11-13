@@ -753,7 +753,10 @@ else
                         <button style="background-color:#00B050;color:white;" class="btn btn-default btn-available" type="button" value="IssueKey=@(Model.IssueKey)&ToWho=" onclick="PushTask(this)">Push</button>
                         <input class="form-control text-box single-line" value="" id="pushtowho" name="pushtowho" type="hidden" />
                     </div>
-                    <div class="col-xs-6"></div>
+                    <div class="col-xs-2">
+                        @Html.Partial("~/Views/Shared/_Icare.cshtml")
+                    </div>
+                    <div class="col-xs-4"></div>
                     <script type="text/javascript">
                         function PushTask(oBT)
                         {

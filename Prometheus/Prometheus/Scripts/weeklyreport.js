@@ -105,7 +105,8 @@
         })
 
         $('body').on('click', '#save_setting', function () {
-            var m_yield = ($('#modal_yield').prop("checked"))?1:0;
+            var m_yield = ($('#modal_yield').prop("checked")) ? 1 : 0;
+            var m_icare = ($('#modal_icare').prop("checked")) ? 1 : 0;
             var m_task = ($('#modal_task').prop("checked"))?1:0;
             var m_criticalfailure = ($('#modal_criticalfailure').prop("checked"))?1:0;
             var m_rma = ($('#modal_rma').prop("checked"))?1:0;
@@ -114,6 +115,7 @@
             $.post('/User/SaveWeeklyReportSetting',
             {
                 m_yield: m_yield,
+                m_icare: m_icare,
                 m_task: m_task,
                 m_criticalfailure: m_criticalfailure,
                 m_rma: m_rma,

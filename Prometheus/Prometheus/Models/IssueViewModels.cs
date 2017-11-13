@@ -3135,9 +3135,9 @@ namespace Prometheus.Models
         {
             var sql = "select Issue.Summary as Description, Issue.IssueKey, Issue.IssueType, " +
                             "Issue.Resolution, Issue.ReportDate as StartDate, "+
-                            "Issue.DueDate, Log.Date as UpdateTme, ia.Attachment, it.IssueSubType " +
+                            "Issue.DueDate, Log_tmp.Date as UpdateTme, ia.Attachment, it.IssueSubType " +
                       "from Issue " +
-                          "left join Log on Issue.IssueKey = Log.IssueKey " +
+                          "left join (select ProjectKey, IssueKey, Max(Log.Date) as Date from Log where LogType = '<LogType>' group by ProjectKey, IssueKey) as Log_tmp on Issue.IssueKey = Log_tmp.IssueKey " +
                           "left join IssueAttachment as ia on ia.IssueKey = Issue.IssueKey " +
                           "left join IssueType as it on it.IssueKey = Issue.IssueKey " +
                       "where Reporter <> 'System' " +
@@ -3154,17 +3154,96 @@ namespace Prometheus.Models
             {
                 //history
                 cond = "('" + Resolute.Fixed + "','" + Resolute.NotFix + "','" + Resolute.Done + "')";
-                sql += "and Issue.Resolution in <cond> and (Log.Date is null or Log.Date < '<sDate>') " +
-                      "order by Log.Date Desc, Issue.ReportDate Desc; ";
+                sql += "and Issue.Resolution in <cond> and (Log_tmp.Date is null or Log_tmp.Date < '<sDate>') " +
+                      "order by Log_tmp.Date Desc, Issue.ReportDate Desc; ";
             }
             else
             {
                 cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "','" + Resolute.Working + "')";
-                sql += "and (Issue.Resolution in <cond> or (Log.Date Between '<sDate>' And '<eDate>')) " +
-                      "order by Log.Date Desc, Issue.ReportDate Desc; ";
+                sql += "and (Issue.Resolution in <cond> or (Log_tmp.Date Between '<sDate>' And '<eDate>')) " +
+                      "order by Log_tmp.Date Desc, Issue.ReportDate Desc; ";
             }
                          
-            sql = sql.Replace("<UserName>", uName).Replace("<cond>", cond).Replace("<IssueType>", iType.ToString()).Replace("<ProjectKey>", pKey).Replace("<sDate>", sDate).Replace("<eDate>", eDate);
+            sql = sql.Replace("<LogType>", LogType.Task.ToString())
+                .Replace("<UserName>", uName)
+                .Replace("<cond>", cond)
+                .Replace("<IssueType>", iType.ToString())
+                .Replace("<ProjectKey>", pKey)
+                .Replace("<sDate>", sDate)
+                .Replace("<eDate>", eDate);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            var ret = new Dictionary<string, TaskData>();
+            foreach (var line in dbret)
+            {
+                if (ret.ContainsKey(Convert.ToString(line[1])))
+                {
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[7])))
+                    {
+                        ret[Convert.ToString(line[1])].Attachment.Add(Convert.ToString(line[7]));
+                    }
+                }
+                else
+                {
+                    var attach = new List<string>();
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[7])))
+                    {
+                        attach.Add(Convert.ToString(line[7]));
+                    }
+                    var tmp = new TaskData(
+                        Convert.ToString(line[1]),
+                        Convert.ToString(line[0]),
+                        Convert.ToString(line[2]),
+                        Convert.ToString(line[8]),
+                        Convert.ToString(line[3]),
+                        convertDate(Convert.ToString(line[4])),
+                        convertDate(Convert.ToString(line[5])),
+                        convertDate(Convert.ToString(line[6])),
+                        attach
+                    );
+                    ret.Add(Convert.ToString(line[1]), tmp);
+                }
+            }
+
+            return ret;
+        }
+
+        public static Dictionary<string, TaskData> getIcareTask(string uName, string pKey, int tPeriod, string sDate, string eDate)
+        {
+            var sql = "select Issue.Summary as Description, Issue.IssueKey, Issue.IssueType, " +
+                            "Issue.Resolution, Issue.ReportDate as StartDate, " +
+                            "Issue.DueDate, Log_tmp.Date as UpdateTme, ia.Attachment, it.IssueSubType " +
+                      "from IssueIcare as ii " +
+                          "inner join Issue on ii.IssueKey = Issue.IssueKey " +
+                          "left join (select ProjectKey, IssueKey, Max(Log.Date) as Date from Log where LogType = '<LogType>' group by ProjectKey, IssueKey) as Log_tmp on Issue.IssueKey = Log_tmp.IssueKey " +
+                          "left join IssueAttachment as ia on ia.IssueKey = Issue.IssueKey " +
+                          "left join IssueType as it on it.IssueKey = Issue.IssueKey " +
+                      "where ii.Icare = '<Icare>'" +
+                          "and Reporter <> 'System' " +
+                          "and Issue.ProjectKey = '<ProjectKey>' " +
+                          "and Issue.APVal1 <> 'delete' " +
+                          "and Issue.Assignee = '<UserName>' ";
+            var cond = "";
+            if (tPeriod == 0)
+            {
+                //history
+                cond = "('" + Resolute.Fixed + "','" + Resolute.NotFix + "','" + Resolute.Done + "')";
+                sql += "and Issue.Resolution in <cond> and (Log_tmp.Date is null or Log_tmp.Date < '<sDate>') " +
+                      "order by Log_tmp.Date Desc, Issue.ReportDate Desc; ";
+            }
+            else
+            {
+                cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "','" + Resolute.Working + "')";
+                sql += "and (Issue.Resolution in <cond> or (Log_tmp.Date Between '<sDate>' and '<eDate>')) " +
+                      "order by Log_tmp.Date Desc, Issue.ReportDate Desc; ";
+            }
+
+            sql = sql.Replace("<LogType>", LogType.Task.ToString())
+                .Replace("<Icare>", IssueIcareStatus.Icare.ToString())
+                .Replace("<UserName>", uName)
+                .Replace("<cond>", cond)
+                .Replace("<ProjectKey>", pKey)
+                .Replace("<sDate>", sDate)
+                .Replace("<eDate>", eDate);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             var ret = new Dictionary<string, TaskData>();
             foreach (var line in dbret)

@@ -2480,6 +2480,8 @@ namespace Prometheus.Controllers
             var eDate = DateTime.Now.ToString("yyyy-MM-dd 07:30:00");
             var ProjectKeyList = new List<string>();
             var YieldDataList = new Dictionary<string, WeeklyYieldData>();
+            var historyIcareList = new Dictionary<string, Dictionary<string, TaskData>>();
+            var icareList = new Dictionary<string, Dictionary<string, TaskData>>();
             var historyTaskList = new Dictionary<string, Dictionary<string, TaskData>>();
             var taskList = new Dictionary<string, Dictionary<string, TaskData>>();
             var historyCriList = new Dictionary<string, Dictionary<string, TaskData>>();
@@ -2498,6 +2500,13 @@ namespace Prometheus.Controllers
                 if(setting.Yield == 1)
                 {
                     YieldDataList.Add(project.Key, getProjectYield(project.Key, sDate, eDate));
+                }
+
+                //i care
+                if(setting.ICare == 1)
+                {
+                    historyIcareList.Add(project.Key, getIcareTask(updater, project.Key, 0, sDate, eDate));
+                    icareList.Add(project.Key, getIcareTask(updater, project.Key, 1, sDate, eDate));
                 }
 
                 //task
@@ -2533,6 +2542,8 @@ namespace Prometheus.Controllers
             ViewBag.setting = setting;
             ViewBag.pKeys = ProjectKeyList;
             ViewBag.YieldDataList = YieldDataList;
+            ViewBag.historyIcareList = historyIcareList;
+            ViewBag.icareList = icareList;
             ViewBag.historyTaskList = historyTaskList;
             ViewBag.taskList = taskList;
             ViewBag.historyCriList = historyCriList;
@@ -2894,6 +2905,11 @@ namespace Prometheus.Controllers
             return IssueViewModels.getProjectTask(username, projectkey, period, sDate, eDate, iType, wSubTask);
         }
 
+        private Dictionary<string, TaskData> getIcareTask(string username, string projectkey, int period, string sDate, string eDate)
+        {
+            return IssueViewModels.getIcareTask(username, projectkey, period, sDate, eDate);
+        }
+
         private Dictionary<string, List<WeeklyReportVM>> getCurWeekSummary(string pKey, string sDate, string eDate)
         {
             return WeeklyReportVM.GetIssueSummary(pKey, sDate, eDate);
@@ -2997,6 +3013,7 @@ namespace Prometheus.Controllers
             {
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
                 var yield = Request.Form["m_yield"];
+                var icare = Request.Form["m_icare"];
                 var task = Request.Form["m_task"];
                 var criticalfailure = Request.Form["m_criticalfailure"];
                 var rma = Request.Form["m_rma"];
@@ -3007,6 +3024,7 @@ namespace Prometheus.Controllers
                     "",
                     updater,
                     Convert.ToInt32(yield),
+                    Convert.ToInt32(icare),
                     Convert.ToInt32(task),
                     Convert.ToInt32(criticalfailure),
                     Convert.ToInt32(rma),

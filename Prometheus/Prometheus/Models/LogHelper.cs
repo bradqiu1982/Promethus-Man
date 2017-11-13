@@ -104,6 +104,8 @@ namespace Prometheus.Models
         public static int Default = 0;
         public static int Task = 1;
         public static int DebugTree = 2;
+        public static int ICare = 3;
+        public static int CancelICare = 4;
     }
 
 }

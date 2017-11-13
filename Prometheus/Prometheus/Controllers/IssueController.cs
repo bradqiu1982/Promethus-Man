@@ -4081,5 +4081,80 @@ namespace Prometheus.Controllers
             catch (Exception ex)
             { return string.Empty; }
         }
+
+        [HttpPost]
+        public JsonResult GetICare()
+        {
+            var ret = new JsonResult();
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                var pkey = Request.Form["pkey"];
+                var ikey = Request.Form["ikey"];
+
+                var data = IssueIcareVM.GetIssueIcare(pkey, ikey);
+                if(data.Icare == 1)
+                {
+                    ret.Data = new { success = true };
+                    return ret;
+                }
+            }
+
+            ret.Data = new { success = false };
+            return ret;
+        }
+
+        [HttpPost]
+        public JsonResult CancelICare()
+        {
+            var ret = new JsonResult();
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                var pkey = Request.Form["pkey"];
+                var ikey = Request.Form["ikey"];
+
+                IssueIcareVM.CancelICare(pkey, ikey);
+
+                LogVM.WriteLog(updater.ToUpper(), pkey, DetermineCompName(Request.UserHostName),
+                        Request.Url.ToString(), "Issue", "Cancel ICare", ikey, LogType.CancelICare, Log4NetLevel.Info, "");
+
+                ret.Data = new { success = true };
+                return ret;
+            }
+            else
+            {
+                ret.Data = new { success = false };
+                return ret;
+            }
+        }
+
+        [HttpPost]
+        public JsonResult ICare()
+        {
+            var ret = new JsonResult();
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                var pkey = Request.Form["pkey"];
+                var ikey = Request.Form["ikey"];
+
+                IssueIcareVM.ICare(pkey, ikey);
+
+                LogVM.WriteLog(updater.ToUpper(), pkey, DetermineCompName(Request.UserHostName),
+                        Request.Url.ToString(), "Issue", "ICare", ikey, LogType.ICare, Log4NetLevel.Info, "");
+
+                ret.Data = new { success = true };
+                return ret;
+            }
+            else
+            {
+                ret.Data = new { success = false };
+                return ret;
+            }
+        }
     }
 }

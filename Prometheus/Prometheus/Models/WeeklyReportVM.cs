@@ -14,6 +14,7 @@ namespace Prometheus.Models
         public static int CriticalFailure = 3;
         public static int RMA = 4;
         public static int DebugTree = 5;
+        public static int ICare = 6;
     }
 
     public class MarkType
@@ -204,20 +205,25 @@ namespace Prometheus.Models
                     Convert.ToDateTime(Convert.ToString(line[10])).ToString("yyyy/MM/dd HH:mm"),
                     Convert.ToDateTime(Convert.ToString(line[11])).ToString("yyyy/MM/dd HH:mm")
                 );
-                if (ret.ContainsKey(Convert.ToString(line[3]) + "@@" + Convert.ToString(line[5])))
+                var key_tmp = Convert.ToString(line[3]);
+                if (Convert.ToInt32(line[5]) == SummaryType.Others
+                    || Convert.ToInt32(line[5]) == SummaryType.Yield
+                        || Convert.ToInt32(line[5]) == SummaryType.DebugTree)
                 {
-                    ret[Convert.ToString(line[3]) + "@@" + Convert.ToString(line[5])].Add(tmp);
+                    key_tmp += "@@" + Convert.ToString(line[5]);
+                }
+                if (ret.ContainsKey(key_tmp))
+                {
+                    ret[key_tmp].Add(tmp);
                 }
                 else
                 {
                     var tmplist = new List<WeeklyReportVM>();
                     tmplist.Add(tmp);
-                    ret.Add(Convert.ToString(line[3]) + "@@" + Convert.ToString(line[5]), tmplist);
-
+                    ret.Add(key_tmp, tmplist);
                 }
             }
             return ret;
-
         }
     }
 
@@ -288,6 +294,7 @@ namespace Prometheus.Models
             ID = "";
             UserName = "";
             Yield = 1;
+            ICare = 1;
             Task = 1;
             CriticalFailure = 1;
             RMA = 1;
@@ -297,11 +304,12 @@ namespace Prometheus.Models
             UpdateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         }
 
-        public WeeklyReportSetting(string id, string username, int yield, int task, int critask, int rma, int dtree, int others, string ctime, string utime)
+        public WeeklyReportSetting(string id, string username, int yield, int icare, int task, int critask, int rma, int dtree, int others, string ctime, string utime)
         {
             ID = id;
             UserName = username;
             Yield = yield;
+            ICare = icare;
             Task = task;
             CriticalFailure = critask;
             RMA = rma;
@@ -314,6 +322,7 @@ namespace Prometheus.Models
         public string ID { set; get; }
         public string UserName { set; get; }
         public int Yield { set; get; }
+        public int ICare { set; get; }
         public int Task { set; get; }
         public int CriticalFailure { set; get; }
         public int RMA { set; get; }
@@ -324,7 +333,7 @@ namespace Prometheus.Models
 
         public static WeeklyReportSetting GetWeeklyReportSetting(string username)
         {
-            var sql = "select ID, UserName, Yield, Task, CriticalFailure, RMA, "
+            var sql = "select ID, UserName, Yield, ICare, Task, CriticalFailure, RMA, "
                     + "DebugTree, Others, CreateTime, UpdateTime "
                     + "from WeeklyReportSetting "
                     + "where UserName = '<UserName>' ";
@@ -336,13 +345,14 @@ namespace Prometheus.Models
                 ret.ID = Convert.ToString(line[0]);
                 ret.UserName = Convert.ToString(line[1]);
                 ret.Yield = Convert.ToInt32(line[2]);
-                ret.Task = Convert.ToInt32(line[3]);
-                ret.CriticalFailure = Convert.ToInt32(line[4]);
-                ret.RMA = Convert.ToInt32(line[5]);
-                ret.DebugTree = Convert.ToInt32(line[6]);
-                ret.Others = Convert.ToInt32(line[7]);
-                ret.CreateTime = Convert.ToString(line[8]);
-                ret.UpdateTime = Convert.ToString(line[9]);
+                ret.ICare = Convert.ToInt32(line[3]);
+                ret.Task = Convert.ToInt32(line[4]);
+                ret.CriticalFailure = Convert.ToInt32(line[5]);
+                ret.RMA = Convert.ToInt32(line[6]);
+                ret.DebugTree = Convert.ToInt32(line[7]);
+                ret.Others = Convert.ToInt32(line[8]);
+                ret.CreateTime = Convert.ToString(line[9]);
+                ret.UpdateTime = Convert.ToString(line[10]);
             }
 
             return ret;
@@ -356,12 +366,13 @@ namespace Prometheus.Models
             if(dbret.Count > 0)
             {
                 var updatesql = "update WeeklyReportSetting set Yield = '<Yield>', "
-                            + "Task = '<Task>', CriticalFailure = '<CriticalFailure>', "
+                            + "ICare = '<ICare>', Task = '<Task>', CriticalFailure = '<CriticalFailure>', "
                             + "RMA = '<RMA>', DebugTree = '<DebugTree>', "
                             + "Others = '<Others>', UpdateTime = '<UpdateTime>' "
                             + "where UserName = '<UserName>'; ";
                 updatesql = updatesql.Replace("<UserName>", setting.UserName)
                         .Replace("<Yield>", setting.Yield.ToString())
+                        .Replace("<ICare>", setting.ICare.ToString())
                         .Replace("<Task>", setting.Task.ToString())
                         .Replace("<CriticalFailure>", setting.CriticalFailure.ToString())
                         .Replace("<RMA>", setting.RMA.ToString())
@@ -373,12 +384,13 @@ namespace Prometheus.Models
             else
             {
                 var insertsql = "insert into WeeklyReportSetting "
-                            + "(UserName, Yield, Task, CriticalFailure, RMA, "
+                            + "(UserName, Yield, ICare, Task, CriticalFailure, RMA, "
                             + "DebugTree, Others, CreateTime, UpdateTime) values "
-                            + "('<UserName>', '<Yield>', '<Task>', '<CriticalFailure>', "
+                            + "('<UserName>', '<Yield>', '<ICare>', '<Task>', '<CriticalFailure>', "
                             + "'<RMA>', '<DebugTree>', '<Others>', '<CreateTime>', '<UpdateTime>'); ";
                 insertsql = insertsql.Replace("<UserName>", setting.UserName)
                         .Replace("<Yield>", setting.Yield.ToString())
+                        .Replace("<ICare>", setting.ICare.ToString())
                         .Replace("<Task>", setting.Task.ToString())
                         .Replace("<CriticalFailure>", setting.CriticalFailure.ToString())
                         .Replace("<RMA>", setting.RMA.ToString())

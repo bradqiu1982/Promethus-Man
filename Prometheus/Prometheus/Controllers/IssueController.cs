@@ -601,7 +601,25 @@ namespace Prometheus.Controllers
             LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
                 Request.Url.ToString(), "Issue", "Update", issuekey, LogType.Task, Log4NetLevel.Info, "");
 
-           if (Request.Form["deleteisu"] != null)
+            if (string.Compare(updater, originaldata.Assignee, true) == 0
+            || string.Compare(updater, originaldata.Reporter, true) == 0
+            || string.Compare(updater, originaldata.Creator, true) == 0)
+            { }
+            else
+            {
+                if (!string.IsNullOrEmpty(Request.Form["editor1"]))
+                {
+                    var issuecomment = new IssueComments();
+                    issuecomment.Comment = SeverHtmlDecode.Decode(this, Request.Form["editor1"]);
+                    IssueViewModels.StoreIssueComment(originaldata.IssueKey, issuecomment.dbComment, updater, COMMENTTYPE.Description);
+                }
+
+                var dict2 = new RouteValueDictionary();
+                dict2.Add("issuekey", originaldata.IssueKey);
+                return RedirectToAction("UpdateIssue", "Issue", dict2);
+            }
+
+            if (Request.Form["deleteisu"] != null)
             {
                 if (string.Compare(updater, originaldata.Reporter, true) == 0
                     || string.Compare(updater, originaldata.Assignee, true) == 0
@@ -1529,6 +1547,24 @@ namespace Prometheus.Controllers
                 }
             }
 
+            if (pjmemauth || string.Compare(updater, originaldata.Assignee, true) == 0
+                || string.Compare(updater, originaldata.Reporter, true) == 0
+                || string.Compare(updater, originaldata.Creator, true) == 0)
+            { }
+            else
+            {
+                    if ( !string.IsNullOrEmpty(Request.Form["editor1"]))
+                    {
+                        var issuecomment = new IssueComments();
+                        issuecomment.Comment = SeverHtmlDecode.Decode(this, Request.Form["editor1"]);
+                        IssueViewModels.StoreIssueComment(originaldata.IssueKey, issuecomment.dbComment, updater, COMMENTTYPE.Description);
+                    }
+
+                    var dict2 = new RouteValueDictionary();
+                    dict2.Add("issuekey", originaldata.IssueKey);
+                    return RedirectToAction("UpdateIssue", "Issue", dict2);
+            }
+
             if (Request.Form["deleteisu"] != null)
             {
                 if (pjmemauth || string.Compare(updater, originaldata.Reporter, true) == 0
@@ -2099,6 +2135,24 @@ namespace Prometheus.Controllers
             LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
                 Request.Url.ToString(), "RMA", "Update", issuekey, LogType.Task, Log4NetLevel.Info, "");
 
+            if (string.Compare(updater, originaldata.Assignee, true) == 0
+                || string.Compare(updater, originaldata.Reporter, true) == 0
+                || string.Compare(updater, originaldata.Creator, true) == 0)
+            { }
+            else
+            {
+                if (!string.IsNullOrEmpty(Request.Form["editor1"]))
+                {
+                    var issuecomment = new IssueComments();
+                    issuecomment.Comment = SeverHtmlDecode.Decode(this, Request.Form["editor1"]);
+                    IssueViewModels.StoreIssueComment(originaldata.IssueKey, issuecomment.dbComment, updater, COMMENTTYPE.Description);
+                }
+
+                var dict2 = new RouteValueDictionary();
+                dict2.Add("issuekey", originaldata.IssueKey);
+                return RedirectToAction("UpdateIssue", "Issue", dict2);
+            }
+
             if (Request.Form["deleterma"] != null)
             {
                 if (string.Compare(updater, originaldata.Reporter, true) == 0
@@ -2497,6 +2551,24 @@ namespace Prometheus.Controllers
             LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
                 Request.Url.ToString(), "REL", "Update", issuekey, LogType.Task, Log4NetLevel.Info, "");
 
+            if (string.Compare(updater, originaldata.Assignee, true) == 0
+                || string.Compare(updater, originaldata.Reporter, true) == 0
+                || string.Compare(updater, originaldata.Creator, true) == 0)
+            { }
+            else
+            {
+                if (!string.IsNullOrEmpty(Request.Form["editor1"]))
+                {
+                    var issuecomment = new IssueComments();
+                    issuecomment.Comment = SeverHtmlDecode.Decode(this, Request.Form["editor1"]);
+                    IssueViewModels.StoreIssueComment(originaldata.IssueKey, issuecomment.dbComment, updater, COMMENTTYPE.Description);
+                }
+
+                var dict2 = new RouteValueDictionary();
+                dict2.Add("issuekey", originaldata.IssueKey);
+                return RedirectToAction("UpdateIssue", "Issue", dict2);
+            }
+
             if (Request.Form["deleterma"] != null)
             {
                 if (string.Compare(updater, originaldata.Reporter, true) == 0
@@ -2722,6 +2794,24 @@ namespace Prometheus.Controllers
             //write log
             LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
                 Request.Url.ToString(), "OBA", "Update", issuekey, LogType.Task, Log4NetLevel.Info, "");
+
+            if (string.Compare(updater, originaldata.Assignee, true) == 0
+                || string.Compare(updater, originaldata.Reporter, true) == 0
+                || string.Compare(updater, originaldata.Creator, true) == 0)
+            { }
+            else
+            {
+                    if (!string.IsNullOrEmpty(Request.Form["editor1"]))
+                    {
+                        var issuecomment = new IssueComments();
+                        issuecomment.Comment = SeverHtmlDecode.Decode(this, Request.Form["editor1"]);
+                        IssueViewModels.StoreIssueComment(originaldata.IssueKey, issuecomment.dbComment, updater, COMMENTTYPE.Description);
+                    }
+
+                    var dict2 = new RouteValueDictionary();
+                    dict2.Add("issuekey", originaldata.IssueKey);
+                    return RedirectToAction("UpdateIssue", "Issue", dict2);
+            }
 
             if (Request.Form["deleterma"] != null)
             {

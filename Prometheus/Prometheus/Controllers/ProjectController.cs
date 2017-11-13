@@ -5417,6 +5417,72 @@ namespace Prometheus.Controllers
             return ret;
         }
 
+        public ActionResult Test()
+        {
+            SendWeeklyReportNotice();
+
+            return View("");
+        }
+
+        private void SendWeeklyReportNotice()
+        {
+            var currenttime = DateTime.Now;
+            if (currenttime.DayOfWeek == DayOfWeek.Thursday && DateTime.Now.Hour > 11)
+            {
+                var filename = "log_weelyreport_" + DateTime.Now.ToString("yyyyMMdd");
+                var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
+                if (!System.IO.File.Exists(wholefilename))
+                {
+                    var hello = "hello";
+                    System.IO.File.WriteAllText(wholefilename, hello);
+
+                    var updater = "WINDY.JU@FINISAR.COM";
+                    var usergroup = UserGroupVM.RetreiveUserGroup(updater, UserGroupType.WorkGroup);
+                    var userlist = usergroup.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
+                    var greeting = "Hi, <UserName>";
+                    var description = "Today is " + DateTime.Now.ToString("MM/dd/yyyy") + ", ThursDay, Please fill out your weekly report in WUXI ENGINEERING SYSTEM. ";
+
+                    var url = getActionUrl("User", "WeeklyReportList");
+                    var content = EmailUtility.CreateTableHtml(greeting, description, url, null);
+                    //userlist = new string[] { "Yan.Shi@FINISAR.COM" };
+                    foreach (var user in userlist)
+                    {
+                        var towholist = new List<string>();
+                        towholist.Add(user);
+                        var towho = user.Split(new char[] { '@' })[0];
+                        content = content.Replace("<UserName>", towho);
+                        EmailUtility.SendEmail(this, "Weekly Report Alarm -- " + DateTime.Now.ToString("MM/dd/yyyy"), towholist, content, true);
+                    }
+                }
+            }
+        }
+
+        private string getActionUrl(string module, string act, Dictionary<string, string> param = null)
+        {
+            var routevalue = new RouteValueDictionary();
+            if(param != null)
+            {
+                foreach (var item in param)
+                {
+                    routevalue.Add(item.Key, item.Value);
+                }
+            }
+            //send validate email
+            string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+            string validatestr = this.Url.Action(act, module, routevalue, scheme);
+
+            var netcomputername = "";
+            try {
+                netcomputername = System.Net.Dns.GetHostName();
+            }
+            catch (Exception ex)
+            {
+            }
+            validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
+
+            return validatestr;
+        }
+
         private void SendTaskNotice()
         {
             var filename = "log" + DateTime.Now.ToString("yyyy-MM-dd");
@@ -5696,6 +5762,7 @@ namespace Prometheus.Controllers
             {
                 SendTaskNotice();
                 //SendBookedReportNotice();
+                SendWeeklyReportNotice();
             }
             catch (Exception ex)
             { }

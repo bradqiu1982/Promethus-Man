@@ -185,30 +185,37 @@ namespace Prometheus.Models
             content += "<body>";
             content += "<div><p>" + greetig + ",</p></div>";
             content += "<div><p>"+ description +".</p></div>";
-            content += "<div><p>" + comment + "</p>";
-            content += "<div><br>";
-            content += "<table border='1' cellpadding='0' cellspacing='0' width='100%'>";
-            content += "<thead style='background-color: #006DC0; color: #fff;'>";
-            foreach(var th in table[0])
+            if (!string.IsNullOrEmpty(comment))
             {
-                content += "<th>" + th + "</th>";
+                content += "<div><p>" + comment + "</p>";
             }
-            content += "</thead>";
-            foreach(var tr in table)
+            if(table != null)
             {
-                if(idx > 0)
+                content += "<div><br>";
+                content += "<table border='1' cellpadding='0' cellspacing='0' width='100%'>";
+                content += "<thead style='background-color: #006DC0; color: #fff;'>";
+                foreach (var th in table[0])
                 {
-                    content += "<tr>";
-                    foreach (var td in tr)
-                    {
-                        content += "<td>" + td + "</td>";
-                    }
-                    content += "</tr>";
+                    content += "<th>" + th + "</th>";
                 }
-                idx++;
+                content += "</thead>";
+                foreach (var tr in table)
+                {
+                    if (idx > 0)
+                    {
+                        content += "<tr>";
+                        foreach (var td in tr)
+                        {
+                            content += "<td>" + td + "</td>";
+                        }
+                        content += "</tr>";
+                    }
+                    idx++;
+                }
+                content += "</table>";
+                content += "</div>";
             }
-            content += "</table>";
-            content += "</div><br><br>";
+            content += "<br><br>";
             content += "<div><p style='font-size: 12px; font-style: italic;'>This is a system generated message, please do not reply to this email.</p></div>";
             content += "</body>";
             content += "</html>";

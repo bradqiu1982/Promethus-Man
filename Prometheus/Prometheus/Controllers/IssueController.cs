@@ -1547,14 +1547,12 @@ namespace Prometheus.Controllers
                 }
             }
 
-            if (string.Compare(updater, originaldata.Assignee, true) == 0
+            if (pjmemauth || string.Compare(updater, originaldata.Assignee, true) == 0
                 || string.Compare(updater, originaldata.Reporter, true) == 0
                 || string.Compare(updater, originaldata.Creator, true) == 0)
             { }
             else
             {
-                if (!pjmemauth)
-                {
                     if ( !string.IsNullOrEmpty(Request.Form["editor1"]))
                     {
                         var issuecomment = new IssueComments();
@@ -1565,7 +1563,6 @@ namespace Prometheus.Controllers
                     var dict2 = new RouteValueDictionary();
                     dict2.Add("issuekey", originaldata.IssueKey);
                     return RedirectToAction("UpdateIssue", "Issue", dict2);
-                }
             }
 
             if (Request.Form["deleteisu"] != null)

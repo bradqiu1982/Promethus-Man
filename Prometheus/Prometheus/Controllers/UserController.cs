@@ -2505,8 +2505,8 @@ namespace Prometheus.Controllers
                 //i care
                 if(setting.ICare == 1)
                 {
-                    historyIcareList.Add(project.Key, getIcareTask(updater, project.Key, 0, sDate, eDate));
-                    var icarelist_tmp = getIcareTask(updater, project.Key, 1, sDate, eDate);
+                    historyIcareList.Add(project.Key, getIcareTask(username, project.Key, 0, sDate, eDate));
+                    var icarelist_tmp = getIcareTask(username, project.Key, 1, sDate, eDate);
                     task_total += icarelist_tmp.Count;
                     icareList.Add(project.Key, icarelist_tmp);
                 }
@@ -2514,8 +2514,8 @@ namespace Prometheus.Controllers
                 //task
                 if (setting.Task == 1)
                 {
-                    historyTaskList.Add(project.Key, getProjectTask(updater, project.Key, 0, sDate, eDate, ISSUESUBTYPE.Task));
-                    var taskList_tmp = getProjectTask(updater, project.Key, 1, sDate, eDate, ISSUESUBTYPE.Task);
+                    historyTaskList.Add(project.Key, getProjectTask(username, project.Key, 0, sDate, eDate, ISSUESUBTYPE.Task));
+                    var taskList_tmp = getProjectTask(username, project.Key, 1, sDate, eDate, ISSUESUBTYPE.Task);
                     task_total += taskList_tmp.Count;
                     taskList.Add(project.Key, taskList_tmp);
                 }
@@ -2523,8 +2523,8 @@ namespace Prometheus.Controllers
                 //critical failure task
                 if (setting.CriticalFailure == 1)
                 {
-                    historyCriList.Add(project.Key, getProjectTask(updater, project.Key, 0, sDate, eDate, ISSUESUBTYPE.CrititalFailureTask, false));
-                    var criList_tmp = getProjectTask(updater, project.Key, 1, sDate, eDate, ISSUESUBTYPE.CrititalFailureTask, false);
+                    historyCriList.Add(project.Key, getProjectTask(username, project.Key, 0, sDate, eDate, ISSUESUBTYPE.CrititalFailureTask, false));
+                    var criList_tmp = getProjectTask(username, project.Key, 1, sDate, eDate, ISSUESUBTYPE.CrititalFailureTask, false);
                     task_total += criList_tmp.Count;
                     criticalList.Add(project.Key, criList_tmp);
                 }
@@ -2532,8 +2532,8 @@ namespace Prometheus.Controllers
                 //rma
                 if (setting.RMA == 1)
                 {
-                    historyRMAList.Add(project.Key, getProjectTask(updater, project.Key, 0, sDate, eDate, ISSUESUBTYPE.RMA));
-                    var rmaList_tmp = getProjectTask(updater, project.Key, 1, sDate, eDate, ISSUESUBTYPE.RMA);
+                    historyRMAList.Add(project.Key, getProjectTask(username, project.Key, 0, sDate, eDate, ISSUESUBTYPE.RMA));
+                    var rmaList_tmp = getProjectTask(username, project.Key, 1, sDate, eDate, ISSUESUBTYPE.RMA);
                     task_total += rmaList_tmp.Count;
                     RMAList.Add(project.Key, rmaList_tmp);
                 }

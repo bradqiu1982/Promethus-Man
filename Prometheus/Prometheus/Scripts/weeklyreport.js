@@ -9,11 +9,16 @@
             appendsummary($(this), itype, ikey);
         })
         $('body').on('click', '.project-name', function () {
-            $('.project-info').addClass("hidden");
-            $(this).next().removeClass("hidden");
-            $(this).next().children('section').eq(0).children(1).attr('aria-expanded', 'true');
-            $(this).next().children('section').eq(0).children(2).addClass('in');
-            $(this).next().children('section').eq(0).children(2).removeAttr('style');
+            if ($(this).next().hasClass("hidden")) {
+                $('.project-info').addClass("hidden");
+                $(this).next().removeClass("hidden");
+                $(this).next().children('section').eq(0).children(1).attr('aria-expanded', 'true');
+                $(this).next().children('section').eq(0).children(2).addClass('in');
+                $(this).next().children('section').eq(0).children(2).removeAttr('style');
+            }
+            else {
+                $(this).next().addClass("hidden");
+            }
         })
         var appendsummary = function (object, itype, ikey) {
             var data_target = object.attr('data-target').substr(1);

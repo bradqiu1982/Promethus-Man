@@ -8,6 +8,7 @@
             var itype = $(this).attr('data-itype');
             appendsummary($(this), itype, ikey);
         })
+
         $('body').on('click', '.project-name', function () {
             if ($(this).next().hasClass("hidden")) {
                 $('.project-info').addClass("hidden");
@@ -20,6 +21,7 @@
                 $(this).next().addClass("hidden");
             }
         })
+
         var appendsummary = function (object, itype, ikey) {
             var data_target = object.attr('data-target').substr(1);
             if ($('#' + data_target).length === 0) {

@@ -11,7 +11,7 @@
     </div>
     <div class="nav navbar-nav navbar-left">
         <ol class="breadcrumb">
-            <li><a href="/User/UserCenter">User Center</a></li>
+            <li><a href="/User/UserCenter?username=@(ViewBag.RealUserID)">@ViewBag.UserName Center</a></li>
             <li class="active">Weekly Report</li>
         </ol>
     </div>
@@ -23,10 +23,10 @@
 
 
 <ul class="nav nav-pills nav-stacked col-xs-2" data-intro="Select tab to see detail." data-step="1">
-    <li><a href="#tab_a" data-toggle="pill">I Learn</a></li>
+    <li><a href="/User/ILearn">I Learn</a></li>
     <li class="active"><a href="/User/WeeklyReportList">Weekly Report</a></li>
-    <li><a href="#tab_c" data-toggle="pill">Training</a></li>
-    <li><a href="#tab_d" data-toggle="pill">I Share</a></li>
+    <li><a href="/User/ILearn">Training</a></li>
+    <li><a href="/User/ILearn">I Share</a></li>
 </ul>
 <div class="tab-content col-xs-10" data-intro="Show detail of tab" data-step="2">
     <div class="wr-list">

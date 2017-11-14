@@ -1,11 +1,18 @@
 ﻿var WeeklyReport = function () {
     var show = function () {
+        $('.project-name').eq(0).next().removeClass("hidden");
         $('section').eq(0).children(1).attr('aria-expanded', 'true');
         $('section').eq(0).children(2).addClass('in');
         $('body').on('click', '.task-content tbody tr', function () {
             var ikey = $(this).attr('data-ikey');
             var itype = $(this).attr('data-itype');
             appendsummary($(this), itype, ikey);
+        })
+        $('body').on('click', '.project-name', function () {
+            $('.project-info').addClass("hidden");
+            $(this).next().removeClass("hidden");
+            $(this).next().children('section').eq(0).children(1).attr('aria-expanded', 'true');
+            $(this).next().children('section').eq(0).children(2).addClass('in');
         })
         var appendsummary = function (object, itype, ikey) {
             var data_target = object.attr('data-target').substr(1);

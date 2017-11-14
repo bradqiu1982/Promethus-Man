@@ -45,6 +45,9 @@
 .bs-callout-info h4 {
   color: #1b809e;
 }
+.bs-callout-green{
+    border-left-color: #5cb85c
+}
 
 /*for weekly report*/
 .fypareto{
@@ -131,4 +134,8 @@
     text-align: right;
     margin-right: 5px;
     cursor: pointer;
+}
+
+.project-name{
+    margin-bottom: 10px;
 }

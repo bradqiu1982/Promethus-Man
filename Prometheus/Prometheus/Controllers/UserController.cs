@@ -2478,7 +2478,7 @@ namespace Prometheus.Controllers
             var dayofweek = Convert.ToInt32(DateTime.Now.DayOfWeek);
             var sDate = DateTime.Now.AddDays((4 - dayofweek) - 7).ToString("yyyy-MM-dd 07:30:00");
             var eDate = DateTime.Now.ToString("yyyy-MM-dd 07:30:00");
-            var ProjectKeyList = new List<string>();
+            var ProjectKeyList = new Dictionary<string, int>();
             var YieldDataList = new Dictionary<string, WeeklyYieldData>();
             var historyIcareList = new Dictionary<string, Dictionary<string, TaskData>>();
             var icareList = new Dictionary<string, Dictionary<string, TaskData>>();
@@ -2494,7 +2494,7 @@ namespace Prometheus.Controllers
 
             foreach (var project in projectlist)
             {
-                ProjectKeyList.Add(project.Key);
+                var task_total = 0;
                 
                 //yield
                 if(setting.Yield == 1)
@@ -2506,28 +2506,36 @@ namespace Prometheus.Controllers
                 if(setting.ICare == 1)
                 {
                     historyIcareList.Add(project.Key, getIcareTask(updater, project.Key, 0, sDate, eDate));
-                    icareList.Add(project.Key, getIcareTask(updater, project.Key, 1, sDate, eDate));
+                    var icarelist_tmp = getIcareTask(updater, project.Key, 1, sDate, eDate);
+                    task_total += icarelist_tmp.Count;
+                    icareList.Add(project.Key, icarelist_tmp);
                 }
 
                 //task
                 if (setting.Task == 1)
                 {
                     historyTaskList.Add(project.Key, getProjectTask(updater, project.Key, 0, sDate, eDate, ISSUESUBTYPE.Task));
-                    taskList.Add(project.Key, getProjectTask(updater, project.Key, 1, sDate, eDate, ISSUESUBTYPE.Task));
+                    var taskList_tmp = getProjectTask(updater, project.Key, 1, sDate, eDate, ISSUESUBTYPE.Task);
+                    task_total += taskList_tmp.Count;
+                    taskList.Add(project.Key, taskList_tmp);
                 }
 
                 //critical failure task
                 if (setting.CriticalFailure == 1)
                 {
                     historyCriList.Add(project.Key, getProjectTask(updater, project.Key, 0, sDate, eDate, ISSUESUBTYPE.CrititalFailureTask, false));
-                    criticalList.Add(project.Key, getProjectTask(updater, project.Key, 1, sDate, eDate, ISSUESUBTYPE.CrititalFailureTask, false));
+                    var criList_tmp = getProjectTask(updater, project.Key, 1, sDate, eDate, ISSUESUBTYPE.CrititalFailureTask, false);
+                    task_total += criList_tmp.Count;
+                    criticalList.Add(project.Key, criList_tmp);
                 }
 
                 //rma
                 if (setting.RMA == 1)
                 {
                     historyRMAList.Add(project.Key, getProjectTask(updater, project.Key, 0, sDate, eDate, ISSUESUBTYPE.RMA));
-                    RMAList.Add(project.Key, getProjectTask(updater, project.Key, 1, sDate, eDate, ISSUESUBTYPE.RMA));
+                    var rmaList_tmp = getProjectTask(updater, project.Key, 1, sDate, eDate, ISSUESUBTYPE.RMA);
+                    task_total += rmaList_tmp.Count;
+                    RMAList.Add(project.Key, rmaList_tmp);
                 }
 
                 //debug tree
@@ -2538,9 +2546,12 @@ namespace Prometheus.Controllers
 
                 //get current week summary
                 SummaryList.Add(project.Key, getCurWeekSummary(project.Key, sDate, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")));
+
+                ProjectKeyList.Add(project.Key, task_total);
             }
+
             ViewBag.setting = setting;
-            ViewBag.pKeys = ProjectKeyList;
+            ViewBag.pKeys = ProjectKeyList.OrderByDescending(o => o.Value).ToDictionary(p => p.Key, o => o.Value).Keys.ToList();
             ViewBag.YieldDataList = YieldDataList;
             ViewBag.historyIcareList = historyIcareList;
             ViewBag.icareList = icareList;

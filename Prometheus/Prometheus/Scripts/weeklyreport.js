@@ -13,6 +13,7 @@
             $(this).next().removeClass("hidden");
             $(this).next().children('section').eq(0).children(1).attr('aria-expanded', 'true');
             $(this).next().children('section').eq(0).children(2).addClass('in');
+            $(this).next().children('section').eq(0).children(2).removeAttr('style');
         })
         var appendsummary = function (object, itype, ikey) {
             var data_target = object.attr('data-target').substr(1);

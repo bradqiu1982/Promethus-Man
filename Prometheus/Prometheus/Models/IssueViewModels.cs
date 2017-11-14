@@ -1413,8 +1413,8 @@ namespace Prometheus.Models
             var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,"
                 +"DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,"
                 +"RelativePeoples,APVal2,ModuleSN,DataID,ErrAbbr from Issue "
-                + " where  APVal1 <> 'delete' and  ParentIssueKey = '' and ProjectKey = '<ProjectKey>' and ErrAbbr = '<ErrAbbr>' order by ReportDate DESC";
-            sql = sql.Replace("<ProjectKey>", pjkey).Replace("<topnum>", Convert.ToString(topnum)).Replace("<ErrAbbr>", errabbr);
+                + " where  APVal1 <> 'delete' and  ParentIssueKey = '' and ProjectKey = '<ProjectKey>' and ErrAbbr = '<ErrAbbr>' and Resolution <> '<AutoClose>' order by ReportDate DESC";
+            sql = sql.Replace("<ProjectKey>", pjkey).Replace("<topnum>", Convert.ToString(topnum)).Replace("<ErrAbbr>", errabbr).Replace("<AutoClose>",Resolute.AutoClose);
 
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)

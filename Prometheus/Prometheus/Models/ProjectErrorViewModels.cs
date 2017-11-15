@@ -354,6 +354,8 @@ namespace Prometheus.Models
                 sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<OrignalCode>", OrignalCode)
                         .Replace("<ErrorCount>", Convert.ToString(Convert.ToUInt32(dbret[0][4])+1));
                 DBUtility.ExeLocalSqlNoRes(sql);
+                //write log
+                LogVM.WriteLog("", ProjectKey, "", "", OrignalCode, Convert.ToString(dbret[0][3]), Convert.ToString(dbret[0][1]), LogType.DebugTree, Log4NetLevel.Info, "");
             }
             else
             {
@@ -361,10 +363,10 @@ namespace Prometheus.Models
                 sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ErrorKey>", ErrorKey)
                     .Replace("<OrignalCode>", OrignalCode).Replace("<ShortDesc>", ShortDesc).Replace("<databackuptm>", DateTime.Now.ToString());
                 DBUtility.ExeLocalSqlNoRes(sql);
+                //write log
+                LogVM.WriteLog("", ProjectKey, "", "", OrignalCode, ShortDesc, ErrorKey, LogType.DebugTree, Log4NetLevel.Info, "");
             }
 
-            //write log
-            LogVM.WriteLog("", ProjectKey, "", "", OrignalCode, ShortDesc, ErrorKey, 2, Log4NetLevel.Info, "");
         }
 
         public static void UpdateProjectAutoCloseCount(int count,string pjkey,string errorcode)

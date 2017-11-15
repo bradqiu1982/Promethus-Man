@@ -1,8 +1,8 @@
 ﻿var WeeklyReport = function () {
     var show = function () {
-        $('.project-name').eq(0).next().removeClass("hidden");
-        $('section').eq(0).children(1).attr('aria-expanded', 'true');
-        $('section').eq(0).children(2).addClass('in');
+        //$('.project-name').eq(0).next().removeClass("hidden");
+        //$('section').eq(0).children(1).attr('aria-expanded', 'true');
+        //$('section').eq(0).children(2).addClass('in');
         $('body').on('click', '.task-content tbody tr', function () {
             var ikey = $(this).attr('data-ikey');
             var itype = $(this).attr('data-itype');
@@ -13,9 +13,9 @@
             if ($(this).next().hasClass("hidden")) {
                 $('.project-info').addClass("hidden");
                 $(this).next().removeClass("hidden");
-                $(this).next().children('section').eq(0).children(1).attr('aria-expanded', 'true');
-                $(this).next().children('section').eq(0).children(2).addClass('in');
-                $(this).next().children('section').eq(0).children(2).removeAttr('style');
+                //$(this).next().children('section').eq(0).children(1).attr('aria-expanded', 'true');
+                //$(this).next().children('section').eq(0).children(2).addClass('in');
+                //$(this).next().children('section').eq(0).children(2).removeAttr('style');
             }
             else {
                 $(this).next().addClass("hidden");

@@ -40,6 +40,7 @@
     <div class="pro-info">
         @foreach (var pKey in ViewBag.pKeys)
         {
+            var yield_flg = false;
             var icare_flg = false;
             var icare_cnt = 0;
             var task_flg = false;
@@ -48,6 +49,10 @@
             var cri_cnt = 0;
             var rma_flg = false;
             var rma_cnt = 0;
+            if(ViewBag.setting.Yield == 1)
+            {
+                yield_flg = ! string.IsNullOrEmpty(ViewBag.YieldDataList[pKey].Pareto);
+            }
             if (ViewBag.setting.ICare == 1)
             {
                 icare_flg = ViewBag.icareList.ContainsKey(pKey) && ViewBag.icareList[pKey].Count > 0;
@@ -83,7 +88,7 @@
                 @if (ViewBag.setting.Yield == 1)
                 {
                     <section id="Yield-@idx">
-                        <div class="bs-callout bs-callout-danger" data-toggle="collapse" data-target="#content_yield_@idx" aria-expanded="false">
+                        <div class="bs-callout bs-callout-danger @(yield_flg?"bs-callout-green":"")" data-toggle="collapse" data-target="#content_yield_@idx" aria-expanded="false">
                             <h4>Yield</h4>
                         </div>
                         <div class="content collapse" id="content_yield_@idx">
@@ -179,9 +184,9 @@
                                                     <th>#</th>
                                                     <th>Description</th>
                                                     <th>Status</th>
-                                                    <th>Start Date</th>
-                                                    <th>Due Date</th>
-                                                    <th>Update Date</th>
+                                                    <th>Start</th>
+                                                    <th>Due</th>
+                                                    <th>Update</th>
                                                     <th>Attachment</th>
                                                 </tr>
                                             </thead>
@@ -224,9 +229,9 @@
                                                 <th>#</th>
                                                 <th>Description</th>
                                                 <th>Status</th>
-                                                <th>Start Date</th>
-                                                <th>Due Date</th>
-                                                <th>Update Date</th>
+                                                <th>Start</th>
+                                                <th>Due</th>
+                                                <th>Update</th>
                                                 <th>Attachment</th>
                                             </tr>
                                         </thead>
@@ -319,9 +324,9 @@
                                                     <th>#</th>
                                                     <th>Description</th>
                                                     <th>Status</th>
-                                                    <th>Start Date</th>
-                                                    <th>Due Date</th>
-                                                    <th>Update Date</th>
+                                                    <th>Start</th>
+                                                    <th>Due</th>
+                                                    <th>Update</th>
                                                     <th>Attachment</th>
                                                 </tr>
                                             </thead>
@@ -364,9 +369,9 @@
                                                 <th>#</th>
                                                 <th>Description</th>
                                                 <th>Status</th>
-                                                <th>Start Date</th>
-                                                <th>Due Date</th>
-                                                <th>Update Date</th>
+                                                <th>Start</th>
+                                                <th>Due</th>
+                                                <th>Update</th>
                                                 <th>Attachment</th>
                                             </tr>
                                         </thead>
@@ -459,9 +464,9 @@
                                                     <th>#</th>
                                                     <th>Description</th>
                                                     <th>Status</th>
-                                                    <th>Start Date</th>
-                                                    <th>Due Date</th>
-                                                    <th>Update Date</th>
+                                                    <th>Start</th>
+                                                    <th>Due</th>
+                                                    <th>Update</th>
                                                     <th>Attachment</th>
                                                 </tr>
                                             </thead>
@@ -504,9 +509,9 @@
                                                 <th>#</th>
                                                 <th>Description</th>
                                                 <th>Status</th>
-                                                <th>Start Date</th>
-                                                <th>Due Date</th>
-                                                <th>Update Date</th>
+                                                <th>Start</th>
+                                                <th>Due</th>
+                                                <th>Update</th>
                                                 <th>Attachment</th>
                                             </tr>
                                         </thead>
@@ -578,6 +583,52 @@
                                                             }
                         </div>
                     </section>
+                                                            }
+                @if (ViewBag.setting.DebugTree == 1)
+                {
+                    var dt_flg = ViewBag.DebugTreeList.ContainsKey(pKey) && ViewBag.DebugTreeList[pKey].Count > 0;
+                    <section id="DebugTree-@idx">
+                        <div class="bs-callout bs-callout-info @(dt_flg?"bs-callout-green":"")" data-toggle="collapse" data-target="#content_dtree_@idx" aria-expanded="false">
+                            <h4>Debug Tree</h4>
+                        </div>
+                        <div id="content_dtree_@idx" class="collapse">
+                            <table class="table table-condensed" cellpadding="0">
+                                <thead>
+                                    <tr>
+                                        <th>Error Code</th>
+                                        <th>Short Desc</th>
+                                        <th>Increase Count</th>
+                                        <th>Attachement</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (ViewBag.DebugTreeList.ContainsKey(pKey) && ViewBag.DebugTreeList[pKey].Count > 0)
+                                    {
+                                        foreach (var val in ViewBag.DebugTreeList[pKey])
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <a href="/Project/UpdateProjectError?ErrorKey=@val.ErrorKey" target="_blank">@val.OrignalCode</a>
+                                                    @if (val.CommentList.Count > 0)
+                                                    {
+                                                        <span class="badge alert-success">C</span>
+                                                    }
+                                                </td>
+                                                <td>@val.ShortDesc</td>
+                                                <td>@val.ErrorCount</td>
+                                                <td>
+                                                    @if (val.AttachList.Count > 0)
+                                                    {
+                                                        <a href="/Project/ErrorAttach?ErrorKey=@val.ErrorKey" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></a>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
                 }
                 @if (ViewBag.setting.RMA == 1)
                 {
@@ -599,9 +650,9 @@
                                                     <th>#</th>
                                                     <th>Description</th>
                                                     <th>Status</th>
-                                                    <th>Start Date</th>
-                                                    <th>Due Date</th>
-                                                    <th>Update Date</th>
+                                                    <th>Start</th>
+                                                    <th>Due</th>
+                                                    <th>Updates</th>
                                                     <th>Attachment</th>
                                                 </tr>
                                             </thead>
@@ -644,9 +695,9 @@
                                                 <th>#</th>
                                                 <th>Description</th>
                                                 <th>Status</th>
-                                                <th>Start Date</th>
-                                                <th>Due Date</th>
-                                                <th>Update Date</th>
+                                                <th>Start</th>
+                                                <th>Due</th>
+                                                <th>Update</th>
                                                 <th>Attachment</th>
                                             </tr>
                                         </thead>
@@ -716,52 +767,6 @@
                                     <input type="button" class="btn btn-warning op-btn btn-cancel" name="btn_cancel" value="Cancel" />
                                 </div>
                              }
-                        </div>
-                    </section>
-                }
-                @if (ViewBag.setting.DebugTree == 1)
-                {
-                    var dt_flg = ViewBag.DebugTreeList.ContainsKey(pKey) && ViewBag.DebugTreeList[pKey].Count > 0;
-                    <section id="DebugTree-@idx">
-                        <div class="bs-callout bs-callout-info @(dt_flg?"bs-callout-green":"")" data-toggle="collapse" data-target="#content_dtree_@idx" aria-expanded="false">
-                            <h4>Debug Tree</h4>
-                        </div>
-                        <div id="content_dtree_@idx" class="collapse">
-                            <table class="table table-condensed" cellpadding="0">
-                                <thead>
-                                    <tr>
-                                        <th>Error Code</th>
-                                        <th>Short Desc</th>
-                                        <th>Increase Count</th>
-                                        <th>Attachement</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if (ViewBag.DebugTreeList.ContainsKey(pKey) && ViewBag.DebugTreeList[pKey].Count > 0)
-                                    {
-                                        foreach (var val in ViewBag.DebugTreeList[pKey])
-                                        {
-                                            <tr>
-                                                <td>
-                                                    <a href="/Project/UpdateProjectError?ErrorKey=@val.ErrorKey" target="_blank">@val.OrignalCode</a>
-                                                    @if (val.CommentList.Count > 0)
-                                                    {
-                                                        <span class="badge alert-success">C</span>
-                                                    }
-                                                </td>
-                                                <td>@val.ShortDesc</td>
-                                                <td>@val.ErrorCount</td>
-                                                <td>
-                                                    @if (val.AttachList.Count > 0)
-                                                    {
-                                                        <a href="/Project/ErrorAttach?ErrorKey=@val.ErrorKey" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></a>
-                                                    }
-                                                </td>
-                                            </tr>
-                                        }
-                                    }
-                                </tbody>
-                            </table>
                         </div>
                     </section>
                 }

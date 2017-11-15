@@ -2781,7 +2781,7 @@ namespace Prometheus.Controllers
 
                 foreach (var item in vmlist)
                 {
-                    ftimelist.Add(item.EndDate.ToString("yyyy-MM-dd"));
+                    ftimelist.Add(item.EndDate.ToString("MM/dd"));
 
                     fyieldlist.Add(item.FirstYield * 100.0);
                     ryieldlist.Add(item.LastYield * 100.0);

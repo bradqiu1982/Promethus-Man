@@ -1664,6 +1664,8 @@ namespace Prometheus.Controllers
                                 UserKPIVM.AddUserDailyRank(originaldata.IssueKey, updater, UserRankType.SPECIAL, "Link To "+originaldata.ProjectKey+" Debug Tree "+ errabbr
                                     , "/Issue/UpdateIssue?issuekey=" + originaldata.IssueKey, 6);
 
+                                //write log
+                                LogVM.WriteLog("", originaldata.ProjectKey, "", "", perrlist[0].OrignalCode, perrlist[0].ShortDesc, perrlist[0].ErrorKey, LogType.DebugTree, Log4NetLevel.Info, "");
                                 var dict = new RouteValueDictionary();
                                 dict.Add("ErrorKey", perrlist[0].ErrorKey);
                                 return RedirectToAction("UpdateProjectError", "Project", dict);

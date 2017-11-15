@@ -1205,3 +1205,7 @@ GO
 select issue.issueType, issueType.IssueSubType, issueType.IssueSsubType, issue.Summary from IssueType
 left join Issue on IssueType.IssueKey = issue.IssueKey
  where issueType.IssueSubType = '' or issueType.IssueSubType is null;
+
+ /*delete wrong data in log(debug tree)*/
+
+ delete from log where LogType = '2';

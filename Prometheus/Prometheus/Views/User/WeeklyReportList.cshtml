@@ -42,7 +42,7 @@
                 @foreach (var user in ViewBag.userreportlist)
                 {
                     <tr>
-                        <td><a href="/User/WeeklyReport?username=@user.Key">@user.Key.Split(new char[] { '@' })[0]</a></td>
+                        <td data-toggle="modal" data-target="#myModal"><a href="/User/WeeklyReport?username=@user.Key">@user.Key.Split(new char[] { '@' })[0]</a></td>
                         <td>@(string.IsNullOrEmpty(user.Value) ?"--":(user.Value))</td>
                     </tr>
                 }

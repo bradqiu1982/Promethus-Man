@@ -17,10 +17,11 @@
         <ol class="breadcrumb">
             <li><a href="/User/UserCenter?username=@(ViewBag.RealUserID)">@ViewBag.UserName Center</a></li>
             <li><a href="/User/WeeklyReportList">Weekly Report</a></li>
-            <li class="active">@ViewBag.UserName</li>
+            <li class="active">@ViewBag.cUserName</li>
         </ol>
     </div>
 </div>
+<input type="hidden" id="current_user" name="current_user" value="@ViewBag.cUserID" />
 
 <script src="~/Scripts/highcharts.js"></script>
 <script src="~/Scripts/exporting.js"></script>

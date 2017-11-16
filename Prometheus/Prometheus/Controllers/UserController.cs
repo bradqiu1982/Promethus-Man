@@ -2473,6 +2473,8 @@ namespace Prometheus.Controllers
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
             ViewBag.UserName = updater.Split(new char[] { '@' })[0];
             ViewBag.RealUserID = updater;
+            ViewBag.cUserName = username.Split(new char[] { '@' })[0];
+            ViewBag.cUserID = username;
             //user's project list
             var projectlist = UserViewModels.RetrieveUserProjectKeyDict(username);
             var dayofweek = Convert.ToInt32(DateTime.Now.DayOfWeek);
@@ -3024,6 +3026,7 @@ namespace Prometheus.Controllers
             if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
             {
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                var cur_user = Request.Form["cur_user"];
                 var yield = Request.Form["m_yield"];
                 var icare = Request.Form["m_icare"];
                 var task = Request.Form["m_task"];
@@ -3034,7 +3037,7 @@ namespace Prometheus.Controllers
                 
                 var setting = new WeeklyReportSetting(
                     "",
-                    updater,
+                    cur_user,
                     Convert.ToInt32(yield),
                     Convert.ToInt32(icare),
                     Convert.ToInt32(task),

@@ -133,6 +133,7 @@
         })
 
         $('body').on('click', '#save_setting', function () {
+            var cur_user = $('#current_user').val();
             var m_yield = ($('#modal_yield').prop("checked")) ? 1 : 0;
             var m_icare = ($('#modal_icare').prop("checked")) ? 1 : 0;
             var m_task = ($('#modal_task').prop("checked"))?1:0;
@@ -142,6 +143,7 @@
             var m_others = ($('#modal_others').prop("checked")) ? 1 : 0;
             $.post('/User/SaveWeeklyReportSetting',
             {
+                cur_user: cur_user,
                 m_yield: m_yield,
                 m_icare: m_icare,
                 m_task: m_task,

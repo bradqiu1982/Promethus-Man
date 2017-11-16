@@ -5417,13 +5417,6 @@ namespace Prometheus.Controllers
             return ret;
         }
 
-        public ActionResult Test()
-        {
-            SendWeeklyReportNotice();
-
-            return View("");
-        }
-
         private void SendWeeklyReportNotice()
         {
             var currenttime = DateTime.Now;

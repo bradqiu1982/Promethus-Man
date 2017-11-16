@@ -3,29 +3,16 @@
         //$('.project-name').eq(0).next().removeClass("hidden");
         //$('section').eq(0).children(1).attr('aria-expanded', 'true');
         //$('section').eq(0).children(2).addClass('in');
-        $('body').on('click', '.task-content tbody tr', function () {
+        $('body').on('click', '.icare-content tbody tr', function () {
             var ikey = $(this).attr('data-ikey');
             var itype = $(this).attr('data-itype');
             appendsummary($(this), itype, ikey);
         })
 
-        $('body').on('click', '.project-name', function () {
-            if ($(this).next().hasClass("hidden")) {
-                $('.project-info').addClass("hidden");
-                $(this).next().removeClass("hidden");
-                //$(this).next().children('section').eq(0).children(1).attr('aria-expanded', 'true');
-                //$(this).next().children('section').eq(0).children(2).addClass('in');
-                //$(this).next().children('section').eq(0).children(2).removeAttr('style');
-            }
-            else {
-                $(this).next().addClass("hidden");
-            }
-        })
-
         var appendsummary = function (object, itype, ikey) {
             var data_target = object.attr('data-target').substr(1);
             if ($('#' + data_target).length === 0) {
-                $.post('/User/GetSummary', 
+                $.post('/User/GetSummary',
                 {
                     sType: itype,
                     iKey: ikey
@@ -55,11 +42,24 @@
             }
         }
 
+        $('body').on('click', '.project-name', function () {
+            if ($(this).next().hasClass("hidden")) {
+                $('.project-info').addClass("hidden");
+                $(this).next().removeClass("hidden");
+                //$(this).next().children('section').eq(0).children(1).attr('aria-expanded', 'true');
+                //$(this).next().children('section').eq(0).children(2).addClass('in');
+                //$(this).next().children('section').eq(0).children(2).removeAttr('style');
+            }
+            else {
+                $(this).next().addClass("hidden");
+            }
+        })
+
         $('body').on('click', '.btn-save', function () {
             var pKey = $(this).attr('data-data-key');
             var sType = $(this).attr('data-data-module');
             var data = new Array();
-            if (sType != 0 && sType != 1) {
+            if (sType == 6) {
                 var $content = $(this).parent('.wr-operation').prev().find('.even');
                 $($content).each(function () {
                     var arrtmp = new Array();
@@ -69,6 +69,20 @@
                     if (sumstr != '') {
                         arrtmp.push(ikey, mark, sumstr);
                         data.push(arrtmp)
+                    }
+                })
+            }
+            else if (sType != 0 && sType != 1) {
+                var $content = $(this).parent('.wr-operation').prev().find('.tr-data');
+                $($content).each(function () {
+                    var arrtmp = new Array();
+                    var ikey = $(this).attr('data-ikey');
+                    var sumstr = '';
+                    var mark = $(this).find('select').val();
+                    var omark = $(this).find('select').prev().val();
+                    if (mark != omark) {
+                        arrtmp.push(ikey, mark, sumstr);
+                        data.push(arrtmp);
                     }
                 })
             }

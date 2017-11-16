@@ -46,7 +46,7 @@
   color: #1b809e;
 }
 .bs-callout-green{
-    border-left-color: #5cb85c
+    border-left-color: #5cb85c;
 }
 
 /*for weekly report*/
@@ -151,4 +151,16 @@
 
 .split-line{
     color: #fff;
+}
+
+.tr-highlight{
+    border-left-width: 6px;
+    border-left-style: solid;
+    border-left-color: #c9302c;
+}
+
+.tr-lowlight{
+    border-left-width: 6px;
+    border-left-style: solid;
+    border-left-color: #5cb85c;
 }

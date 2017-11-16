@@ -178,7 +178,7 @@
                                         <span class="glyphicon glyphicon-chevron-down chevron-down"></span>
                                     </div>
                                     <div class="panel-body collapse" id="content_his_icare_@idx">
-                                        <table class="table table-hover table-condensed task-content" cellspacing="0">
+                                        <table class="table table-hover table-condensed icare-content" cellspacing="0">
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
@@ -364,6 +364,16 @@
                                 m = 0;
                                 <div id="cur_task_@idx">
                                     <table class="table table-condensed" cellpadding="0">
+                                        <colgroup>
+                                            <col style="width: 5%;">
+                                            <col style="width: 45%;">
+                                            <col style="width: 10%;">
+                                            <col style="width: 6%;">
+                                            <col style="width: 6%;">
+                                            <col style="width: 6%;">
+                                            <col style="width: 10%;">
+                                            <col style="width: 12%;">
+                                        </colgroup>
                                         <thead>
                                             <tr>
                                                 <th>#</th>
@@ -373,12 +383,18 @@
                                                 <th>Due</th>
                                                 <th>Update</th>
                                                 <th>Attachment</th>
+                                                <th>Mark</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach (var task in ViewBag.taskList[pKey])
                                             {
-                                                <tr data-data="cur-task-@idx-@m">
+                                                var tmark = "0";
+                                                if (summarylist != null && summarylist.ContainsKey(task.Key))
+                                                {
+                                                    tmark = summarylist[task.Key][0].Mark;
+                                                }
+                                                <tr data-data="cur-task-@idx-@m" class="tr-data @(tmark == "1" ? "tr-highlight" : (tmark == "2" ? "tr-lowlight" : ""))" data-ikey="@task.Key">
                                                     <td>@(m + 1)</td>
                                                     <td><a href="/Issue/UpdateIssue?issuekey=@task.Key" target="_blank">@task.Value.Description</a></td>
                                                     <td>@task.Value.Status</td>
@@ -391,44 +407,13 @@
                                                             <a href="/Issue/IssueAttach?issuekey=@task.Key" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></a>
                                                         }
                                                     </td>
-                                                </tr>
-                                                <tr class="even" data-ikey="@task.Key">
-                                                    <td colspan="7">
-                                                        <div class="col-xs-12 summary">Summary:</div>
-                                                        @{
-                                                            var tsummary = "";
-                                                            var tmark = "0";
-                                                            if (summarylist != null && summarylist.ContainsKey(task.Key))
-                                                            {
-                                                                foreach (var item in summarylist[task.Key])
-                                                                {
-                                                                    if (item.UserName.ToUpper() != ViewBag.RealUserID.ToUpper())
-                                                                    {
-                                                                        <div class="row well item-summary @((item.Mark == "1")?"summary-hightlight":((item.Mark == "2")?"summary-lowlight":"summary-normal"))">
-                                                                            <span class="col-xs-5">@item.Summary</span>
-                                                                            <span class="col-xs-3">@item.UserName.Split(new char[] { '@' })[0]</span>
-                                                                            <span class="col-xs-4">@item.UpdateTime</span>
-                                                                        </div>
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        tmark = item.Mark;
-                                                                        tsummary += item.Summary;
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                        <div class="col-xs-8">
-                                                            <textarea class="form-control" style="height: 35px;" id="cur_task_summary_@(idx)_@m"
-                                                                      name="cur_task_summary">@tsummary</textarea>
-                                                        </div>
-                                                        <div class="col-xs-4">
-                                                            <select class="form-control col-md-1">
-                                                                <option value="0" @(tmark == "0" ? "selected" : "")>Normal</option>
-                                                                <option value="1" @(tmark == "1" ? "selected" : "")>High</option>
-                                                                <option value="2" @(tmark == "2" ? "selected" : "")>Low</option>
-                                                            </select>
-                                                        </div>
+                                                    <td>
+                                                        <input type="hidden" value="@tmark"/>
+                                                        <select class="form-control col-md-1">
+                                                            <option value="0" @(tmark == "0" ? "selected" : "")>Normal</option>
+                                                            <option value="1" @(tmark == "1" ? "selected" : "")>High</option>
+                                                            <option value="2" @(tmark == "2" ? "selected" : "")>Low</option>
+                                                        </select>
                                                     </td>
                                                 </tr>
                                                 m++;
@@ -504,6 +489,16 @@
                                 m = 0;
                                 <div id="cur_critical_task_@idx">
                                     <table class="table table-condensed" cellpadding="0">
+                                        <colgroup>
+                                            <col style="width: 5%;">
+                                            <col style="width: 45%;">
+                                            <col style="width: 10%;">
+                                            <col style="width: 6%;">
+                                            <col style="width: 6%;">
+                                            <col style="width: 6%;">
+                                            <col style="width: 10%;">
+                                            <col style="width: 12%;">
+                                        </colgroup>
                                         <thead>
                                             <tr>
                                                 <th>#</th>
@@ -513,12 +508,18 @@
                                                 <th>Due</th>
                                                 <th>Update</th>
                                                 <th>Attachment</th>
+                                                <th>Mark</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach (var task in ViewBag.criticalList[pKey])
                                             {
-                                                <tr data-data="cur-cri-task-@idx-@m">
+                                                var cmark = "0";
+                                                if (summarylist != null && summarylist.ContainsKey(task.Key))
+                                                {
+                                                    cmark = summarylist[task.Key][0].Mark;
+                                                }
+                                                <tr data-data="cur-cri-task-@idx-@m" class="tr-data @(cmark == "1" ? "tr-highlight" : (cmark == "2" ? "tr-lowlight" : ""))" data-ikey="@task.Key">
                                                     <td>@(m + 1)</td>
                                                     <td><a href="/Issue/UpdateIssue?issuekey=@task.Key" target="_blank">@task.Value.Description</a></td>
                                                     <td>@task.Value.Status</td>
@@ -531,48 +532,17 @@
                                                             <a href="/Issue/IssueAttach?issuekey=@task.Key" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></a>
                                                         }
                                                     </td>
+                                                    <td>
+                                                        <input type="hidden" value="@cmark" />
+                                                        <select class="form-control col-md-1">
+                                                            <option value="0" @(cmark == "0" ? "selected" : "")>Normal</option>
+                                                            <option value="1" @(cmark == "1" ? "selected" : "")>High</option>
+                                                            <option value="2" @(cmark == "2" ? "selected" : "")>Low</option>
+                                                        </select>
+                                                    </td>
                                                 </tr>
-                                                <tr class="even" data-ikey="@task.Key">
-                                                    <td colspan="7">
-                                                        <div class="col-xs-12 summary">Summary:</div>
-                                                        @{
-                                                            var csummary = "";
-                                                            var cmark = "0";
-                                                            if (summarylist != null && summarylist.ContainsKey(task.Key))
-                                                            {
-                                                                foreach (var item in summarylist[task.Key])
-                                                                {
-                                                                    if (item.UserName.ToUpper() != ViewBag.RealUserID.ToUpper())
-                                                                    {
-                                                                        <div class="row well item-summary @((item.Mark == "1")?"summary-hightlight":((item.Mark == "2")?"summary-lowlight":"summary-normal"))">
-                                                                            <span class="col-xs-5">@item.Summary</span>
-                                                                            <span class="col-xs-3">@item.UserName.Split(new char[] { '@' })[0]</span>
-                                                                            <span class="col-xs-4">@item.UpdateTime</span>
-                                                                        </div>
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        cmark = item.Mark;
-                                                                        csummary += item.Summary;
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                        <div class="col-xs-8">
-                                                            <textarea class="form-control" style="height: 35px;" id="cur_cri_task_summary_@(idx)_@m"
-                                                                      name="cur_cri_task_summary">@csummary</textarea>
-                                                            </div>
-                                                            <div class="col-xs-4">
-                                                                <select class="form-control col-md-1">
-                                                                    <option value="0" @(cmark == "0" ? "selected" : "")>Normal</option>
-                                                                    <option value="1" @(cmark == "1" ? "selected" : "")>High</option>
-                                                                    <option value="2" @(cmark == "2" ? "selected" : "")>Low</option>
-                                                                </select>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                                m++;
-                                                            }
+                                                m++;
+                                            }
                                         </tbody>
                                     </table>
                                 </div>
@@ -580,10 +550,10 @@
                                     <input type="button" class="btn btn-success op-btn btn-save" data-data-key="@pKey" data-data-module="@Prometheus.Models.SummaryType.CriticalFailure" name="btn_save" value="Save" />
                                     <input type="button" class="btn btn-warning op-btn btn-cancel" name="btn_cancel" value="Cancel" />
                                 </div>
-                                                            }
+                             }
                         </div>
                     </section>
-                                                            }
+                }
                 @if (ViewBag.setting.DebugTree == 1)
                 {
                     var dt_flg = ViewBag.DebugTreeList.ContainsKey(pKey) && ViewBag.DebugTreeList[pKey].Count > 0;
@@ -690,6 +660,16 @@
                                 m = 0;
                                 <div id="cur_rma_task_@idx">
                                     <table class="table table-condensed" cellpadding="0">
+                                        <colgroup>
+                                            <col style="width: 5%;">
+                                            <col style="width: 45%;">
+                                            <col style="width: 10%;">
+                                            <col style="width: 6%;">
+                                            <col style="width: 6%;">
+                                            <col style="width: 6%;">
+                                            <col style="width: 10%;">
+                                            <col style="width: 12%;">
+                                        </colgroup>
                                         <thead>
                                             <tr>
                                                 <th>#</th>
@@ -699,12 +679,18 @@
                                                 <th>Due</th>
                                                 <th>Update</th>
                                                 <th>Attachment</th>
+                                                <th>Mark</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach (var task in ViewBag.RMAList[pKey])
                                             {
-                                                <tr data-data="cur-rma-task-@idx-@m">
+                                                var rmark = "0";
+                                                if (summarylist != null && summarylist.ContainsKey(task.Key))
+                                                {
+                                                    rmark = summarylist[task.Key][0].Mark;
+                                                }
+                                                <tr data-data="cur-rma-task-@idx-@m" class="tr-data @(rmark == "1" ? "tr-hightlight" : (rmark == "2" ? "tr-lowlight" : ""))" data-ikey="@task.Key">
                                                     <td>@(m + 1)</td>
                                                     <td><a href="/Issue/UpdateIssue?issuekey=@task.Key" target="_blank">@task.Value.Description</a></td>
                                                     <td>@task.Value.Status</td>
@@ -717,44 +703,13 @@
                                                             <a href="/Issue/IssueAttach?issuekey=@task.Key" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></a>
                                                         }
                                                     </td>
-                                                </tr>
-                                                <tr class="even" data-ikey="@task.Key">
-                                                    <td colspan="7">
-                                                        <div class="col-xs-12 summary">Summary:</div>
-                                                        @{
-                                                            var rsummary = "";
-                                                            var rmark = "0";
-                                                            if (summarylist != null && summarylist.ContainsKey(task.Key))
-                                                            {
-                                                                foreach (var item in summarylist[task.Key])
-                                                                {
-                                                                    if (item.UserName.ToUpper() != ViewBag.RealUserID.ToUpper())
-                                                                    {
-                                                                        <div class="row well item-summary @((item.Mark == "1")?"summary-hightlight":((item.Mark == "2")?"summary-lowlight":"summary-normal"))">
-                                                                            <span class="col-xs-5">@item.Summary</span>
-                                                                            <span class="col-xs-3">@item.UserName.Split(new char[] { '@' })[0]</span>
-                                                                            <span class="col-xs-4">@item.UpdateTime</span>
-                                                                        </div>
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        rmark = item.Mark;
-                                                                        rsummary += item.Summary;
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                        <div class="col-xs-8">
-                                                            <textarea class="form-control" style="height: 35px;" id="cur_rma_task_summary_@(idx)_@m"
-                                                                      name="cur_rma_task_summary">@rsummary</textarea>
-                                                        </div>
-                                                        <div class="col-xs-4">
-                                                            <select class="form-control col-md-1">
-                                                                <option value="0" @(rmark == "0" ? "selected" : "")>Normal</option>
-                                                                <option value="1" @(rmark == "1" ? "selected" : "")>High</option>
-                                                                <option value="2" @(rmark == "2" ? "selected" : "")>Low</option>
-                                                            </select>
-                                                        </div>
+                                                    <td>
+                                                        <input type="hidden" value="@rmark" />
+                                                        <select class="form-control col-md-1">
+                                                            <option value="0" @(rmark == "0" ? "selected" : "")>Normal</option>
+                                                            <option value="1" @(rmark == "1" ? "selected" : "")>High</option>
+                                                            <option value="2" @(rmark == "2" ? "selected" : "")>Low</option>
+                                                        </select>
                                                     </td>
                                                 </tr>
                                                 m++;

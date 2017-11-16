@@ -5443,8 +5443,8 @@ namespace Prometheus.Controllers
                         var towholist = new List<string>();
                         towholist.Add(user);
                         var towho = user.Split(new char[] { '@' })[0];
-                        content = content.Replace("<UserName>", towho);
-                        EmailUtility.SendEmail(this, "Weekly Report Alarm -- " + DateTime.Now.ToString("MM/dd/yyyy"), towholist, content, true);
+                        var con = content.Replace("<UserName>", towho);
+                        EmailUtility.SendEmail(this, "Weekly Report Alarm -- " + DateTime.Now.ToString("MM/dd/yyyy"), towholist, con, true);
                     }
                 }
             }

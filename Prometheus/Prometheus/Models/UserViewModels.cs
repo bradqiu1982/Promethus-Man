@@ -174,7 +174,8 @@ namespace Prometheus.Models
                 var pjs = us.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var pj in pjs)
                 {
-                    if (!dict.ContainsKey(pj))
+                    var onepj = ProjectViewModels.RetrieveOneProject(pj);
+                    if (onepj!=null && !dict.ContainsKey(pj))
                     {
                         dict.Add(pj, true);
                     }

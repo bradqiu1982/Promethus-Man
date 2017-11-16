@@ -3220,8 +3220,7 @@ namespace Prometheus.Models
                       "where ii.Icare = '<Icare>'" +
                           "and Reporter <> 'System' " +
                           "and Issue.ProjectKey = '<ProjectKey>' " +
-                          "and Issue.APVal1 <> 'delete' " +
-                          "and Issue.Assignee = '<UserName>' ";
+                          "and Issue.APVal1 <> 'delete' ";
             var cond = "";
             if (tPeriod == 0)
             {

@@ -1529,7 +1529,6 @@ namespace Prometheus.Controllers
 
             var issuekey = Request.Form["IssueKey"];
             var originaldata = IssueViewModels.RetrieveIssueByIssueKey(issuekey,this);
-
             //write log
             LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
                 Request.Url.ToString(), "Bug", "Update", issuekey, LogType.Task, Log4NetLevel.Info, "");
@@ -1665,7 +1664,8 @@ namespace Prometheus.Controllers
                                     , "/Issue/UpdateIssue?issuekey=" + originaldata.IssueKey, 6);
 
                                 //write log
-                                LogVM.WriteLog("", originaldata.ProjectKey, "", "", perrlist[0].OrignalCode, perrlist[0].ShortDesc, perrlist[0].ErrorKey, LogType.DebugTree, Log4NetLevel.Info, "");
+                                LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
+                                        Request.Url.ToString(), perrlist[0].OrignalCode, perrlist[0].ShortDesc, perrlist[0].ErrorKey, LogType.DebugTree, Log4NetLevel.Info, "");
                                 var dict = new RouteValueDictionary();
                                 dict.Add("ErrorKey", perrlist[0].ErrorKey);
                                 return RedirectToAction("UpdateProjectError", "Project", dict);

@@ -48,6 +48,9 @@
 .bs-callout-green{
     border-left-color: #5cb85c;
 }
+.bs-callout-yellow{
+    border-left-color: #aa6708;
+}
 
 /*for weekly report*/
 .fypareto{

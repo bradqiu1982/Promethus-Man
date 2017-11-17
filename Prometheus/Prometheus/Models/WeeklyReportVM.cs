@@ -239,9 +239,10 @@ namespace Prometheus.Models
             StartDate = DateTime.Now;
             DueDate = DateTime.Now;
             UpdateTime = DateTime.Now;
+            ParentIssueKey = string.Empty;
             Attachment = new List<string>();
         }
-        public TaskData(string iKey, string des, string type, string subtype, string status, DateTime sDate, DateTime dDate, DateTime uUpdate, List<string> attach)
+        public TaskData(string iKey, string des, string type, string subtype, string status, DateTime sDate, DateTime dDate, DateTime uUpdate, string pIKey, List<string> attach)
         {
             IssueKey = iKey;
             Description = des;
@@ -251,6 +252,7 @@ namespace Prometheus.Models
             StartDate = sDate;
             DueDate = dDate;
             UpdateTime = uUpdate;
+            ParentIssueKey = pIKey;
             Attachment = attach;
         }
         public string IssueKey { set; get; }
@@ -261,6 +263,7 @@ namespace Prometheus.Models
         public DateTime StartDate { set; get; }
         public DateTime DueDate { set; get; }
         public DateTime UpdateTime { set; get; }
+        public string ParentIssueKey { set; get; }
         public List<string> Attachment { set; get; }
     }
 
@@ -402,5 +405,24 @@ namespace Prometheus.Models
                 DBUtility.ExeLocalSqlNoRes(insertsql);
             }
         }
+    }
+
+    public class TaskDataWithUpdateFlg
+    {
+        public TaskDataWithUpdateFlg()
+        {
+            IsUpdate = false;
+            TaskList = new Dictionary<string, TaskData>();
+        }
+
+        public TaskDataWithUpdateFlg(bool isupdate, Dictionary<string, TaskData> tasklist)
+        {
+            IsUpdate = isupdate;
+            TaskList = tasklist;
+        }
+        
+        public bool IsUpdate { set; get; }
+
+        public Dictionary<string, TaskData> TaskList { set; get; }
     }
 }

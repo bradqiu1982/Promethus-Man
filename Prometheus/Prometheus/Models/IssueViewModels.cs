@@ -3131,11 +3131,11 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static Dictionary<string, TaskData> getProjectTask(string uName, string pKey, int tPeriod, string sDate, string eDate, int iType, bool wSubTask = true)
+        public static TaskDataWithUpdateFlg getProjectTask(string uName, string pKey, int tPeriod, string sDate, string eDate, int iType, bool wSubTask = true)
         {
             var sql = "select Issue.Summary as Description, Issue.IssueKey, Issue.IssueType, " +
                             "Issue.Resolution, Issue.ReportDate as StartDate, "+
-                            "Issue.DueDate, Log_tmp.Date as UpdateTme, ia.Attachment, it.IssueSubType " +
+                            "Issue.DueDate, Log_tmp.Date as UpdateTme, ia.Attachment, it.IssueSubType, Issue.ParentIssueKey " +
                       "from Issue " +
                           "left join (select ProjectKey, IssueKey, Max(Log.Date) as Date from Log where LogType = '<LogType>' group by ProjectKey, IssueKey) as Log_tmp on Issue.IssueKey = Log_tmp.IssueKey " +
                           "left join IssueAttachment as ia on ia.IssueKey = Issue.IssueKey " +
@@ -3172,14 +3172,21 @@ namespace Prometheus.Models
                 .Replace("<sDate>", sDate)
                 .Replace("<eDate>", eDate);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
-            var ret = new Dictionary<string, TaskData>();
+            var data = new Dictionary<string, TaskData>();
+            var subtasks = new Dictionary<string, TaskData>();
+            var isupdate = false;
             foreach (var line in dbret)
             {
-                if (ret.ContainsKey(Convert.ToString(line[1])))
+
+                if (!string.IsNullOrEmpty(Convert.ToString(line[6])))
+                {
+                    isupdate = true;
+                }
+                if (data.ContainsKey(Convert.ToString(line[1])))
                 {
                     if (!string.IsNullOrEmpty(Convert.ToString(line[7])))
                     {
-                        ret[Convert.ToString(line[1])].Attachment.Add(Convert.ToString(line[7]));
+                        data[Convert.ToString(line[1])].Attachment.Add(Convert.ToString(line[7]));
                     }
                 }
                 else
@@ -3198,20 +3205,48 @@ namespace Prometheus.Models
                         convertDate(Convert.ToString(line[4])),
                         convertDate(Convert.ToString(line[5])),
                         convertDate(Convert.ToString(line[6])),
+                        Convert.ToString(line[9]),
                         attach
                     );
-                    ret.Add(Convert.ToString(line[1]), tmp);
+                    data.Add(Convert.ToString(line[1]), tmp);
+                    if (wSubTask && Convert.ToString(line[9]) != "")
+                    {
+                        subtasks.Add(Convert.ToString(line[1]), tmp);
+                    }
+                }
+            }
+            if(subtasks != null)
+            {
+                foreach (var subtask in subtasks)
+                {
+                    var parentissue = isIssueExist(subtask.Value.ParentIssueKey, uName);
+                    if (parentissue)
+                    {
+                        data.Remove(subtask.Key);
+                    }
                 }
             }
 
-            return ret;
+            return new TaskDataWithUpdateFlg(isupdate, data);
         }
 
-        public static Dictionary<string, TaskData> getIcareTask(string uName, string pKey, int tPeriod, string sDate, string eDate)
+        public static bool isIssueExist(string issuekey, string username)
+        {
+            var sql = "select Summary, IssueKey, IssueType, ParentIssueKey "
+                    + "from Issue "
+                    + "where IssueKey = '<IssueKey>' and Assignee = '<UserName>'";
+            sql = sql.Replace("<IssueKey>", issuekey)
+                    .Replace("<UserName>", username);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+
+            return dbret.Count > 0;
+        }
+
+        public static TaskDataWithUpdateFlg getIcareTask(string uName, string pKey, int tPeriod, string sDate, string eDate)
         {
             var sql = "select Issue.Summary as Description, Issue.IssueKey, Issue.IssueType, " +
                             "Issue.Resolution, Issue.ReportDate as StartDate, " +
-                            "Issue.DueDate, Log_tmp.Date as UpdateTme, ia.Attachment, it.IssueSubType " +
+                            "Issue.DueDate, Log_tmp.Date as UpdateTme, ia.Attachment, it.IssueSubType, Issue.ParentIssueKey " +
                       "from IssueIcare as ii " +
                           "inner join Issue on ii.IssueKey = Issue.IssueKey " +
                           "left join (select ProjectKey, IssueKey, Max(Log.Date) as Date from Log where LogType = '<LogType>' group by ProjectKey, IssueKey) as Log_tmp on Issue.IssueKey = Log_tmp.IssueKey " +
@@ -3244,14 +3279,19 @@ namespace Prometheus.Models
                 .Replace("<sDate>", sDate)
                 .Replace("<eDate>", eDate);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
-            var ret = new Dictionary<string, TaskData>();
+            var data = new Dictionary<string, TaskData>();
+            var isupdate = false;
             foreach (var line in dbret)
             {
-                if (ret.ContainsKey(Convert.ToString(line[1])))
+                if (!string.IsNullOrEmpty(Convert.ToString(line[6])))
+                {
+                    isupdate = true;
+                }
+                if (data.ContainsKey(Convert.ToString(line[1])))
                 {
                     if (!string.IsNullOrEmpty(Convert.ToString(line[7])))
                     {
-                        ret[Convert.ToString(line[1])].Attachment.Add(Convert.ToString(line[7]));
+                        data[Convert.ToString(line[1])].Attachment.Add(Convert.ToString(line[7]));
                     }
                 }
                 else
@@ -3270,13 +3310,14 @@ namespace Prometheus.Models
                         convertDate(Convert.ToString(line[4])),
                         convertDate(Convert.ToString(line[5])),
                         convertDate(Convert.ToString(line[6])),
+                        Convert.ToString(line[9]),
                         attach
                     );
-                    ret.Add(Convert.ToString(line[1]), tmp);
+                    data.Add(Convert.ToString(line[1]), tmp);
                 }
             }
 
-            return ret;
+            return new TaskDataWithUpdateFlg(isupdate, data);
         }
 
         private static DateTime convertDate(string date)

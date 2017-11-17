@@ -2483,14 +2483,14 @@ namespace Prometheus.Controllers
             var cDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             var ProjectKeyList = new Dictionary<string, int>();
             var YieldDataList = new Dictionary<string, WeeklyYieldData>();
-            var historyIcareList = new Dictionary<string, Dictionary<string, TaskData>>();
-            var icareList = new Dictionary<string, Dictionary<string, TaskData>>();
-            var historyTaskList = new Dictionary<string, Dictionary<string, TaskData>>();
-            var taskList = new Dictionary<string, Dictionary<string, TaskData>>();
-            var historyCriList = new Dictionary<string, Dictionary<string, TaskData>>();
-            var criticalList = new Dictionary<string, Dictionary<string, TaskData>>();
-            var historyRMAList = new Dictionary<string, Dictionary<string, TaskData>>();
-            var RMAList = new Dictionary<string, Dictionary<string, TaskData>>();
+            var historyIcareList = new Dictionary<string, TaskDataWithUpdateFlg>();
+            var icareList = new Dictionary<string, TaskDataWithUpdateFlg>();
+            var historyTaskList = new Dictionary<string, TaskDataWithUpdateFlg>();
+            var taskList = new Dictionary<string, TaskDataWithUpdateFlg>();
+            var historyCriList = new Dictionary<string, TaskDataWithUpdateFlg>();
+            var criticalList = new Dictionary<string, TaskDataWithUpdateFlg>();
+            var historyRMAList = new Dictionary<string, TaskDataWithUpdateFlg>();
+            var RMAList = new Dictionary<string, TaskDataWithUpdateFlg>();
             var SummaryList = new Dictionary<string, Dictionary<string, List<WeeklyReportVM>>>();
             var DebugTreeList = new Dictionary<string, List<ProjectErrorViewModels>>();
             var setting = WeeklyReportSetting.GetWeeklyReportSetting(username);
@@ -2510,7 +2510,7 @@ namespace Prometheus.Controllers
                 {
                     historyIcareList.Add(project.Key, getIcareTask(username, project.Key, 0, sDate, cDate));
                     var icarelist_tmp = getIcareTask(username, project.Key, 1, sDate, cDate);
-                    task_total += icarelist_tmp.Count;
+                    task_total += icarelist_tmp.IsUpdate ? icarelist_tmp.TaskList.Count : 0;
                     icareList.Add(project.Key, icarelist_tmp);
                 }
 
@@ -2519,7 +2519,7 @@ namespace Prometheus.Controllers
                 {
                     historyTaskList.Add(project.Key, getProjectTask(username, project.Key, 0, sDate, cDate, ISSUESUBTYPE.Task));
                     var taskList_tmp = getProjectTask(username, project.Key, 1, sDate, cDate, ISSUESUBTYPE.Task);
-                    task_total += taskList_tmp.Count;
+                    task_total += taskList_tmp.IsUpdate ? taskList_tmp.TaskList.Count : 0;
                     taskList.Add(project.Key, taskList_tmp);
                 }
 
@@ -2528,7 +2528,7 @@ namespace Prometheus.Controllers
                 {
                     historyCriList.Add(project.Key, getProjectTask(username, project.Key, 0, sDate, cDate, ISSUESUBTYPE.CrititalFailureTask, false));
                     var criList_tmp = getProjectTask(username, project.Key, 1, sDate, cDate, ISSUESUBTYPE.CrititalFailureTask, false);
-                    task_total += criList_tmp.Count;
+                    task_total += criList_tmp.IsUpdate ? criList_tmp.TaskList.Count : 0;
                     criticalList.Add(project.Key, criList_tmp);
                 }
 
@@ -2537,7 +2537,7 @@ namespace Prometheus.Controllers
                 {
                     historyRMAList.Add(project.Key, getProjectTask(username, project.Key, 0, sDate, cDate, ISSUESUBTYPE.RMA));
                     var rmaList_tmp = getProjectTask(username, project.Key, 1, sDate, cDate, ISSUESUBTYPE.RMA);
-                    task_total += rmaList_tmp.Count;
+                    task_total += rmaList_tmp.IsUpdate ? rmaList_tmp.TaskList.Count : 0;
                     RMAList.Add(project.Key, rmaList_tmp);
                 }
 
@@ -2914,12 +2914,12 @@ namespace Prometheus.Controllers
             }
         }
 
-        private Dictionary<string, TaskData> getProjectTask(string username, string projectkey, int period, string sDate, string eDate, int iType, bool wSubTask = true)
+        private TaskDataWithUpdateFlg getProjectTask(string username, string projectkey, int period, string sDate, string eDate, int iType, bool wSubTask = true)
         {
             return IssueViewModels.getProjectTask(username, projectkey, period, sDate, eDate, iType, wSubTask);
         }
 
-        private Dictionary<string, TaskData> getIcareTask(string username, string projectkey, int period, string sDate, string eDate)
+        private TaskDataWithUpdateFlg getIcareTask(string username, string projectkey, int period, string sDate, string eDate)
         {
             return IssueViewModels.getIcareTask(username, projectkey, period, sDate, eDate);
         }

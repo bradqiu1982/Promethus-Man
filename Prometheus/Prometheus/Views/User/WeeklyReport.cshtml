@@ -44,35 +44,43 @@
             var yield_flg = false;
             var icare_flg = false;
             var icare_cnt = 0;
+            var icare_update = false;
             var task_flg = false;
             var task_cnt = 0;
+            var task_update = false;
             var cri_flg = false;
             var cri_cnt = 0;
+            var cri_update = false;
             var rma_flg = false;
             var rma_cnt = 0;
-            if(ViewBag.setting.Yield == 1)
+            var rma_update = false;
+            if (ViewBag.setting.Yield == 1)
             {
                 yield_flg = ! string.IsNullOrEmpty(ViewBag.YieldDataList[pKey].Pareto);
             }
             if (ViewBag.setting.ICare == 1)
             {
-                icare_flg = ViewBag.icareList.ContainsKey(pKey) && ViewBag.icareList[pKey].Count > 0;
-                icare_cnt = icare_flg ? ViewBag.icareList[pKey].Count : 0;
+                icare_flg = ViewBag.icareList.ContainsKey(pKey) && ViewBag.icareList[pKey].TaskList.Count > 0;
+                icare_update = ViewBag.icareList[pKey].IsUpdate;
+                icare_cnt = icare_flg && icare_update ? ViewBag.icareList[pKey].TaskList.Count : 0;
             }
             if (ViewBag.setting.Task == 1)
             {
-                task_flg = ViewBag.taskList.ContainsKey(pKey) && ViewBag.taskList[pKey].Count > 0;
-                task_cnt = task_flg ? ViewBag.taskList[pKey].Count : 0;
+                task_flg = ViewBag.taskList.ContainsKey(pKey) && ViewBag.taskList[pKey].TaskList.Count > 0;
+                task_update = ViewBag.taskList[pKey].IsUpdate;
+                task_cnt = task_flg && task_update ? ViewBag.taskList[pKey].TaskList.Count : 0;
             }
             if (ViewBag.setting.CriticalFailure == 1)
             {
-                cri_flg = ViewBag.criticalList.ContainsKey(pKey) && ViewBag.criticalList[pKey].Count > 0;
-                cri_cnt = cri_flg ? ViewBag.criticalList[pKey].Count : 0;
+                cri_flg = ViewBag.criticalList.ContainsKey(pKey) && ViewBag.criticalList[pKey].TaskList.Count > 0;
+                cri_update = ViewBag.criticalList[pKey].IsUpdate;
+                cri_cnt = cri_flg && cri_update ? ViewBag.criticalList[pKey].TaskList.Count : 0;
             }
             if (ViewBag.setting.RMA == 1)
             {
-                rma_flg = ViewBag.RMAList.ContainsKey(pKey) && ViewBag.RMAList[pKey].Count > 0;
-                rma_cnt = rma_flg ? ViewBag.RMAList[pKey].Count : 0;
+                rma_flg = ViewBag.RMAList.ContainsKey(pKey) && ViewBag.RMAList[pKey].TaskList.Count > 0;
+                rma_update = ViewBag.RMAList[pKey].IsUpdate;
+                rma_cnt = rma_flg && rma_update ? ViewBag.RMAList[pKey].TaskList.Count : 0;
             }
             var split_line = "<span class='split-line'> / </span>";
             var pro_title = (icare_cnt != 0 ? ("  ICare: " + icare_cnt + split_line) : "")
@@ -168,7 +176,8 @@
                 @if (ViewBag.setting.ICare == 1)
                 {
                     <section id="ICare-@idx">
-                        <div class="bs-callout bs-callout-info @(icare_flg?"bs-callout-green":"")" data-toggle="collapse" data-target="#content_icare_@idx" aria-expanded="false">
+                        <div class="bs-callout bs-callout-info @((icare_flg && icare_update)?"bs-callout-green":((icare_flg && !icare_update) ? "bs-callout-yellow" :""))"
+                                data-toggle="collapse" data-target="#content_icare_@idx" aria-expanded="false">
                             <h4>ICare</h4>
                         </div>
                         <div id="content_icare_@idx" class="content collapse">
@@ -192,10 +201,10 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @if (ViewBag.historyIcareList.ContainsKey(pKey) && ViewBag.historyIcareList[pKey].Count > 0)
+                                                @if (ViewBag.historyIcareList.ContainsKey(pKey) && ViewBag.historyIcareList[pKey].TaskList.Count > 0)
                                                 {
                                                     m = 0;
-                                                    foreach (var history in ViewBag.historyIcareList[pKey])
+                                                    foreach (var history in ViewBag.historyIcareList[pKey].TaskList)
                                                     {
                                                         <tr class="cursor-pointer" data-toggle="collapse" data-data="his-icare-@idx-@m" data-target="#his-icare-@idx-@m"
                                                             data-ikey="@history.Value.IssueKey" data-itype="@history.Value.IssueSubType" aria-expanded="false">
@@ -237,7 +246,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach (var task in ViewBag.icareList[pKey])
+                                            @foreach (var task in ViewBag.icareList[pKey].TaskList)
                                             {
                                                 <tr data-data="cur-icare-@idx-@m">
                                                     <td>@(m + 1)</td>
@@ -308,7 +317,8 @@
                 @if (ViewBag.setting.Task == 1)
                 {
                     <section id="Task-@idx">
-                        <div class="bs-callout bs-callout-info @(task_flg ? "bs-callout-green" :"")" data-toggle="collapse" data-target="#content_task_@idx" aria-expanded="false">
+                        <div class="bs-callout bs-callout-info @((task_flg && task_update)?"bs-callout-green":((task_flg && !task_update) ? "bs-callout-yellow" :""))" 
+                                data-toggle="collapse" data-target="#content_task_@idx" aria-expanded="false">
                             <h4>Task</h4>
                         </div>
                         <div id="content_task_@idx" class="content collapse">
@@ -332,10 +342,10 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @if (ViewBag.historyTaskList.ContainsKey(pKey) && ViewBag.historyTaskList[pKey].Count > 0)
+                                                @if (ViewBag.historyTaskList.ContainsKey(pKey) && ViewBag.historyTaskList[pKey].TaskList.Count > 0)
                                                 {
                                                     m = 0;
-                                                    foreach (var history in ViewBag.historyTaskList[pKey])
+                                                    foreach (var history in ViewBag.historyTaskList[pKey].TaskList)
                                                     {
                                                         <tr class="cursor-pointer" data-toggle="collapse" data-data="his-task-@idx-@m" data-target="#his-task-@idx-@m"
                                                             data-ikey="@history.Value.IssueKey" data-itype="@history.Value.IssueSubType" aria-expanded="false">
@@ -388,7 +398,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach (var task in ViewBag.taskList[pKey])
+                                            @foreach (var task in ViewBag.taskList[pKey].TaskList)
                                             {
                                                 var tmark = "0";
                                                 if (summarylist != null && summarylist.ContainsKey(task.Key))
@@ -433,7 +443,8 @@
                 @if (ViewBag.setting.CriticalFailure == 1)
                 {
                     <section id="Critical-Failure-Task-@idx">
-                        <div class="bs-callout bs-callout-warning @(cri_flg ? "bs-callout-green" : "")" data-toggle="collapse" data-target="#content_cri_task_@idx" aria-expanded="false">
+                        <div class="bs-callout bs-callout-warning @((cri_flg && cri_update)?"bs-callout-green":((cri_flg && !cri_update) ? "bs-callout-yellow" :""))"
+                                data-toggle="collapse" data-target="#content_cri_task_@idx" aria-expanded="false">
                             <h4>Critical Failure Task</h4>
                         </div>
                         <div id="content_cri_task_@idx" class="content collapse">
@@ -457,10 +468,10 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @if (ViewBag.historyCriList.ContainsKey(pKey) && ViewBag.historyCriList[pKey].Count > 0)
+                                                @if (ViewBag.historyCriList.ContainsKey(pKey) && ViewBag.historyCriList[pKey].TaskList.Count > 0)
                                                 {
                                                     m = 0;
-                                                    foreach (var history in ViewBag.historyCriList[pKey])
+                                                    foreach (var history in ViewBag.historyCriList[pKey].TaskList)
                                                     {
                                                         <tr class="cursor-pointer" data-toggle="collapse" data-data="his-cri-task-@idx-@m" data-target="#his-cri-task-@idx-@m"
                                                             data-ikey="@history.Value.IssueKey" data-itype="@history.Value.IssueSubType" aria-expanded="false">
@@ -513,7 +524,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach (var task in ViewBag.criticalList[pKey])
+                                            @foreach (var task in ViewBag.criticalList[pKey].TaskList)
                                             {
                                                 var cmark = "0";
                                                 if (summarylist != null && summarylist.ContainsKey(task.Key))
@@ -604,7 +615,8 @@
                 @if (ViewBag.setting.RMA == 1)
                 {
                     <section id="RMA-@idx">
-                        <div class="bs-callout bs-callout-danger @(rma_flg ? "bs-callout-green" :"")" data-toggle="collapse" data-target="#content_rma_task_@idx" aria-expanded="false">
+                        <div class="bs-callout bs-callout-danger@((rma_flg && rma_update)?"bs-callout-green":((rma_flg && !rma_update) ? "bs-callout-yellow" :""))"
+                                data-toggle="collapse" data-target="#content_rma_task_@idx" aria-expanded="false">
                             <h4>RMA</h4>
                         </div>
                         <div id="content_rma_task_@idx" class="content collapse">
@@ -628,10 +640,10 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @if (ViewBag.historyRMAList.ContainsKey(pKey) && ViewBag.historyRMAList[pKey].Count > 0)
+                                                @if (ViewBag.historyRMAList.ContainsKey(pKey) && ViewBag.historyRMAList[pKey].TaskList.Count > 0)
                                                 {
                                                     m = 0;
-                                                    foreach (var history in ViewBag.historyRMAList[pKey])
+                                                    foreach (var history in ViewBag.historyRMAList[pKey].TaskList)
                                                     {
                                                         <tr class="cursor-pointer" data-toggle="collapse" data-data="his-rma-task-@idx-@m" data-target="#his-rma-task-@idx-@m"
                                                             data-ikey="@history.Value.IssueKey" data-itype="@history.Value.IssueSubType" aria-expanded="false">
@@ -684,7 +696,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach (var task in ViewBag.RMAList[pKey])
+                                            @foreach (var task in ViewBag.RMAList[pKey].TaskList)
                                             {
                                                 var rmark = "0";
                                                 if (summarylist != null && summarylist.ContainsKey(task.Key))

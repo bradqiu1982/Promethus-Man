@@ -3324,6 +3324,37 @@ namespace Prometheus.Models
         {
             return string.IsNullOrEmpty(date) ? new DateTime(1, 1, 1, 0, 0, 0) : Convert.ToDateTime(date);
         }
+        
+        public static int RetrieveSptCountIssue(string pKey, int type, int status)
+        {
+            var sql = "select count(*) from issue as i "
+                    + "left join IssueType as it on i.IssueKey = it.IssueKey "
+                    + "where i.ProjectKey = '<ProjectKey>'"
+                    + "and it.IssueSubType = '<IssueSubType>'";
+            var cond = "";
+            if(type == ISSUESUBTYPE.CrititalFailureTask)
+            {
+                if (status == 0)
+                {
+                    //closed
+                    cond = "('" + Resolute.Fixed + "','" + Resolute.NotFix + "','" + Resolute.Done + "')";
+                }
+                else
+                {
+                    //open
+                    cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "','" + Resolute.Working + "')";
+                }
+                sql += "and i.Resolution in <cond> ";
+            }
+
+            sql = sql.Replace("<ProjectKey>", pKey)
+                .Replace("<IssueSubType>", type.ToString())
+                .Replace("<cond>", cond);
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+
+            return Convert.ToInt32(dbret[0][0]);
+        }
     }
 
     public class IssueTypeVM
@@ -3376,4 +3407,5 @@ namespace Prometheus.Models
         }
 
     }
+
 }

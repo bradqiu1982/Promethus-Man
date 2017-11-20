@@ -509,6 +509,7 @@ namespace Prometheus.Models
         public string PendingTaskCount { set; get; }
         public string PendingFACount { set; get; }
         public string PendingRMACount { set; get; }
+        public string PendingSptCount { set; get; }
 
         private void StoreProjectBaseInfo()
         {

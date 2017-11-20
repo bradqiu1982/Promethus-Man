@@ -189,20 +189,34 @@ namespace Prometheus.Controllers
                 }
 
 
-                var rmacount = mycache.Get(item.ProjectKey + "_rmact_CUST");
-                if (rmacount == null)
+                //var rmacount = mycache.Get(item.ProjectKey + "_rmact_CUST");
+                //if (rmacount == null)
+                //{
+                //    var rmadone = IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Done);
+                //    var rmatotal = rmadone + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Pending)
+                //        + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Working);
+                //    item.PendingRMACount = rmadone.ToString() + "/" + rmatotal.ToString();
+                //    mycache.Insert(item.ProjectKey + "_rmact_CUST", item.PendingRMACount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                //}
+                //else
+                //{
+                //    item.PendingRMACount = Convert.ToString(rmacount);
+                //}
+
+                var sptcount = mycache.Get(item.ProjectKey + "_sptct_CUST");
+                if (sptcount == null)
                 {
-                    var rmadone = IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Done);
-                    var rmatotal = rmadone + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Pending)
-                        + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Working);
-                    item.PendingRMACount = rmadone.ToString() + "/" + rmatotal.ToString();
-                    mycache.Insert(item.ProjectKey + "_rmact_CUST", item.PendingRMACount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+
+                    var sptopen = IssueViewModels.RetrieveSptCountIssue(item.ProjectKey, ISSUESUBTYPE.CrititalFailureTask, 1);
+                    var sptdone = IssueViewModels.RetrieveSptCountIssue(item.ProjectKey, ISSUESUBTYPE.CrititalFailureTask, 0);
+                    var nonspt = IssueViewModels.RetrieveSptCountIssue(item.ProjectKey, ISSUESUBTYPE.NonCrititalFailureTask, 0);
+                    item.PendingSptCount = (sptdone + nonspt).ToString() + "/" + (sptopen + sptdone + nonspt).ToString();
+                    mycache.Insert(item.ProjectKey + "_sptct_CUST", item.PendingSptCount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
                 }
                 else
                 {
-                    item.PendingRMACount = Convert.ToString(rmacount);
+                    item.PendingSptCount = Convert.ToString(sptcount);
                 }
-
             }
 
         }
@@ -349,19 +363,33 @@ namespace Prometheus.Controllers
                     item.PendingFACount = Convert.ToString(facount);
                 }
 
+                //var rmacount = mycache.Get(item.ProjectKey + "_rmact_CUST");
+                //if (rmacount == null)
+                //{
+                //    var rmadone = IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Done);
+                //    var rmatotal = rmadone + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Pending)
+                //        + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Working);
+                //    item.PendingRMACount = rmadone.ToString() + "/" + rmatotal.ToString();
+                //    mycache.Insert(item.ProjectKey + "_rmact_CUST", item.PendingRMACount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                //}
+                //else
+                //{
+                //    item.PendingRMACount = Convert.ToString(rmacount);
+                //}
 
-                var rmacount = mycache.Get(item.ProjectKey + "_rmact_CUST");
-                if (rmacount == null)
+                var sptcount = mycache.Get(item.ProjectKey + "_sptct_CUST");
+                if(sptcount == null)
                 {
-                    var rmadone = IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Done);
-                    var rmatotal = rmadone + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Pending)
-                        + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Working);
-                    item.PendingRMACount = rmadone.ToString() + "/" + rmatotal.ToString();
-                    mycache.Insert(item.ProjectKey + "_rmact_CUST", item.PendingRMACount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+
+                    var sptopen = IssueViewModels.RetrieveSptCountIssue(item.ProjectKey, ISSUESUBTYPE.CrititalFailureTask, 1);
+                    var sptdone = IssueViewModels.RetrieveSptCountIssue(item.ProjectKey, ISSUESUBTYPE.CrititalFailureTask, 0);
+                    var nonspt = IssueViewModels.RetrieveSptCountIssue(item.ProjectKey, ISSUESUBTYPE.NonCrititalFailureTask, 0);
+                    item.PendingSptCount = (sptdone + nonspt).ToString() + "/" + (sptopen + sptdone + nonspt).ToString();
+                    mycache.Insert(item.ProjectKey + "_sptct_CUST", item.PendingSptCount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
                 }
                 else
                 {
-                    item.PendingRMACount = Convert.ToString(rmacount);
+                    item.PendingSptCount = Convert.ToString(sptcount);
                 }
 
             }
@@ -506,13 +534,13 @@ namespace Prometheus.Controllers
                     return 1;
                 }
 
-                if (Convert.ToInt32(pair1.PendingRMACount.Split(new string[] { "/" }, StringSplitOptions.None)[1])
-                > Convert.ToInt32(pair2.PendingRMACount.Split(new string[] { "/" }, StringSplitOptions.None)[1]))
+                if (Convert.ToInt32(pair1.PendingSptCount.Split(new string[] { "/" }, StringSplitOptions.None)[1])
+                > Convert.ToInt32(pair2.PendingSptCount.Split(new string[] { "/" }, StringSplitOptions.None)[1]))
                 {
                     return -1;
                 }
-                else if (Convert.ToInt32(pair1.PendingRMACount.Split(new string[] { "/" }, StringSplitOptions.None)[1])
-                < Convert.ToInt32(pair2.PendingRMACount.Split(new string[] { "/" }, StringSplitOptions.None)[1]))
+                else if (Convert.ToInt32(pair1.PendingSptCount.Split(new string[] { "/" }, StringSplitOptions.None)[1])
+                < Convert.ToInt32(pair2.PendingSptCount.Split(new string[] { "/" }, StringSplitOptions.None)[1]))
                 {
                     return 1;
                 }

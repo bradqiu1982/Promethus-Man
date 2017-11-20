@@ -615,7 +615,7 @@
                 @if (ViewBag.setting.RMA == 1)
                 {
                     <section id="RMA-@idx">
-                        <div class="bs-callout bs-callout-danger@((rma_flg && rma_update)?"bs-callout-green":((rma_flg && !rma_update) ? "bs-callout-yellow" :""))"
+                        <div class="bs-callout bs-callout-danger @((rma_flg && rma_update)?"bs-callout-green":((rma_flg && !rma_update) ? "bs-callout-yellow" :""))"
                                 data-toggle="collapse" data-target="#content_rma_task_@idx" aria-expanded="false">
                             <h4>RMA</h4>
                         </div>

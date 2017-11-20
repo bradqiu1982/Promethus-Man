@@ -54,6 +54,7 @@
             var rma_flg = false;
             var rma_cnt = 0;
             var rma_update = false;
+            var dt_flg = false;
             if (ViewBag.setting.Yield == 1)
             {
                 yield_flg = ! string.IsNullOrEmpty(ViewBag.YieldDataList[pKey].Pareto);
@@ -82,10 +83,15 @@
                 rma_update = ViewBag.RMAList[pKey].IsUpdate;
                 rma_cnt = rma_flg && rma_update ? ViewBag.RMAList[pKey].TaskList.Count : 0;
             }
+            if(ViewBag.setting.DebugTree == 1)
+            {
+                dt_flg = ViewBag.DebugTreeList.ContainsKey(pKey) && ViewBag.DebugTreeList[pKey].Count > 0;
+            }
             var split_line = "<span class='split-line'> / </span>";
             var pro_title = (icare_cnt != 0 ? ("  ICare: " + icare_cnt + split_line) : "")
                                 + (task_cnt != 0 ? (" Task: " + task_cnt + split_line) : "")
                                 + (cri_cnt != 0 ? (" CriticalFailure: " + cri_cnt + split_line) : "")
+                                + (dt_flg ? (" DebugTree " + split_line) : "")
                                 + (rma_cnt != 0 ? (" RMA: " + rma_cnt + split_line) : "");
             pro_title = !string.IsNullOrEmpty(pro_title) ? pro_title.Substring(0, pro_title.Length - split_line.Length) : "";
             var summarylist = (ViewBag.SummaryList.ContainsKey(pKey) && ViewBag.SummaryList[pKey].Count > 0) ? ViewBag.SummaryList[pKey] : null;
@@ -568,7 +574,6 @@
                 }
                 @if (ViewBag.setting.DebugTree == 1)
                 {
-                    var dt_flg = ViewBag.DebugTreeList.ContainsKey(pKey) && ViewBag.DebugTreeList[pKey].Count > 0;
                     <section id="DebugTree-@idx">
                         <div class="bs-callout bs-callout-info @(dt_flg?"bs-callout-green":"")" data-toggle="collapse" data-target="#content_dtree_@idx" aria-expanded="false">
                             <h4>Debug Tree</h4>

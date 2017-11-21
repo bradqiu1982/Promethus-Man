@@ -36,13 +36,13 @@ namespace Prometheus
             {
                 if (!IsDebug())
                 {
-                    using (Process myprocess = new Process())
-                    {
-                        myprocess.StartInfo.FileName = Path.Combine(System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath, @"Scripts\HeartBeat.exe").Replace("\\", "/");
-                        //System.Windows.MessageBox.Show(myprocess.StartInfo.FileName);
-                        //myprocess.StartInfo.CreateNoWindow = true;
-                        myprocess.Start();
-                    }
+                    //using (Process myprocess = new Process())
+                    //{
+                    //    myprocess.StartInfo.FileName = Path.Combine(System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath, @"Scripts\HeartBeat.exe").Replace("\\", "/");
+                    //    //System.Windows.MessageBox.Show(myprocess.StartInfo.FileName);
+                    //    //myprocess.StartInfo.CreateNoWindow = true;
+                    //    myprocess.Start();
+                    //}
                 }
             }
             catch (Exception ex)

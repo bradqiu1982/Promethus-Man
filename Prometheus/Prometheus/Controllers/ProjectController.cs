@@ -2154,7 +2154,7 @@ namespace Prometheus.Controllers
             monthlylist[0].Disabled = true;
             ViewBag.monthlylist = monthlylist;
 
-            sarray = new string[] { YIELDTYPE.BR, YIELDTYPE.JO };
+            sarray = new string[] { YIELDTYPE.BR, YIELDTYPE.JO, YIELDTYPE.PN };
             slist = new List<string>();
             slist.AddRange(sarray);
             ViewBag.yieldtypelist = CreateSelectList1(slist, "");
@@ -3655,8 +3655,6 @@ namespace Prometheus.Controllers
 
         }
 
-
-
         public ActionResult ProjectBRYield(string ProjectKey, string BRNUM)
         {
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(BRNUM))
@@ -3669,6 +3667,17 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        public ActionResult ProjectPNYield(string ProjectKey, string BRNUM)
+        {
+            if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(BRNUM))
+            {
+                ViewBag.pjkey = ProjectKey;
+                ProjectBRTypeYield(ProjectKey, BRNUM, YIELDTYPE.PN);
+                return View();
+            }
+
+            return View();
+        }
 
 
         public ActionResult ProjectJOYield(string ProjectKey, string BRNUM)

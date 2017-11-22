@@ -15,6 +15,7 @@ using System.Threading;
 using System.IO;
 using System.Security.Cryptography;
 using System.Globalization;
+using System.Web.Caching;
 
 namespace Prometheus.Controllers
 {
@@ -2572,91 +2573,104 @@ namespace Prometheus.Controllers
 
         private WeeklyYieldData getProjectYield(string projectkey, string sDate, string eDate)
         {
-            var datalist = new List<string>();
-            var pvm = ProjectViewModels.RetrieveOneProject(projectkey);
-            var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(projectkey, sDate, eDate, pvm, HttpContext.Cache);
-            var firstdatalist = new List<KeyValuePair<string, int>>();
-            var fpy = yieldvm.FirstYield * 100;
-            var fy = yieldvm.LastYield * 100;
-
-            //pareto
-            var pareto = "";
-            var tops = new Dictionary<string, int>();
-            if (yieldvm.LastYields.Count > 0)
+            var eDateStr = Convert.ToDateTime(eDate).ToString("yyyyMMddHHmmss");
+            var mycache = HttpContext.Cache;
+            var data = mycache.Get(projectkey + "_" + eDateStr + "_WR_Yield_CUST");
+            if(data != null)
             {
-                var piedatadict = new Dictionary<string, int>();
-                var eklist = new List<string>();
-                foreach (var error in yieldvm.LErrorMap.Keys)
-                {
-                    eklist.Add(error);
-                }
+                return (WeeklyYieldData)data;
+            }
+            else
+            {
+                var datalist = new List<string>();
+                var pvm = ProjectViewModels.RetrieveOneProject(projectkey);
+                var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(projectkey, sDate, eDate, pvm, HttpContext.Cache);
+                var firstdatalist = new List<KeyValuePair<string, int>>();
+                var fpy = yieldvm.FirstYield * 100;
+                var fy = yieldvm.LastYield * 100;
 
-                foreach (var error in eklist)
+                //pareto
+                var pareto = "";
+                var tops = new Dictionary<string, int>();
+                if (yieldvm.LastYields.Count > 0)
                 {
-                    if (string.Compare(error, "PASS", true) != 0)
+                    var piedatadict = new Dictionary<string, int>();
+                    var eklist = new List<string>();
+                    foreach (var error in yieldvm.LErrorMap.Keys)
                     {
-                        foreach (var test in yieldvm.LastYields)
-                        {
-                            var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.LErrorMap);
+                        eklist.Add(error);
+                    }
 
-                            if (piedatadict.ContainsKey(error))
+                    foreach (var error in eklist)
+                    {
+                        if (string.Compare(error, "PASS", true) != 0)
+                        {
+                            foreach (var test in yieldvm.LastYields)
                             {
-                                var preval = piedatadict[error];
-                                piedatadict[error] = preval + val;
-                            }
-                            else
-                            {
-                                piedatadict.Add(error, val);
+                                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.LErrorMap);
+
+                                if (piedatadict.ContainsKey(error))
+                                {
+                                    var preval = piedatadict[error];
+                                    piedatadict[error] = preval + val;
+                                }
+                                else
+                                {
+                                    piedatadict.Add(error, val);
+                                }
                             }
                         }
                     }
+
+                    tops = piedatadict.OrderByDescending(o => o.Value).ToDictionary(p => p.Key, o => o.Value);
+
+                    var fytestdatalist = piedatadict.ToList();
+
+
+                    if (fytestdatalist.Count > 0)
+                    {
+                        pareto = fytparetofun(fytestdatalist, projectkey, sDate, eDate);
+                    }
                 }
-
-                tops = piedatadict.OrderByDescending(o => o.Value).ToDictionary(p => p.Key, o => o.Value);
-
-                var fytestdatalist = piedatadict.ToList();
+                //weekly yield trend
+                var trend = ProjectWeeklyTrend(this, projectkey, 4);
 
 
-                if (fytestdatalist.Count > 0)
+                datalist.Add(fpy.ToString("0.00") + "%");
+                datalist.Add(fy.ToString("0.00") + "%");
+                var idx = 0;
+                var total = tops.Sum(x => x.Value);
+                foreach (var top in tops)
                 {
-                    pareto = fytparetofun(fytestdatalist, projectkey, sDate, eDate);
+                    if (idx < 3)
+                    {
+                        datalist.Add(top.Key);
+                        datalist.Add((Convert.ToDouble(top.Value) / total * 100).ToString("0.00") + "%");
+                    }
+                    else
+                    {
+                        break;
+                    }
+                    idx++;
                 }
+                if (tops.Count < 3)
+                {
+                    for (var i = 0; i < 3 - tops.Count; i++)
+                    {
+                        datalist.Add("");
+                        datalist.Add("");
+                    }
+                }
+
+                var newdata = new WeeklyYieldData(
+                    datalist,
+                    pareto,
+                    trend
+                );
+                mycache.Insert(projectkey + "_" + eDateStr + "_WR_Yield_CUST", newdata, null, DateTime.Now.AddHours(12), Cache.NoSlidingExpiration);
+
+                return newdata;
             }
-            //weekly yield trend
-            var trend = ProjectWeeklyTrend(this, projectkey, 4);
-
-
-            datalist.Add(fpy.ToString("0.00") + "%");
-            datalist.Add(fy.ToString("0.00") + "%");
-            var idx = 0;
-            var total = tops.Sum(x => x.Value);
-            foreach (var top in tops)
-            {
-                if(idx < 3)
-                {
-                    datalist.Add(top.Key);
-                    datalist.Add((Convert.ToDouble(top.Value)/ total * 100).ToString("0.00")+"%");
-                }
-                else
-                {
-                    break;
-                }
-                idx++;
-            }
-            if(tops.Count < 3)
-            {
-                for(var i = 0; i < 3 - tops.Count; i++)
-                {
-                    datalist.Add("");
-                    datalist.Add("");
-                }
-            }
-
-            return new WeeklyYieldData(
-                datalist,
-                pareto,
-                trend
-            );
         }
 
         private string fytparetofun(List<KeyValuePair<string, int>> retestdatalist, string ProjectKey, string StartDate, string EndDate)
@@ -2916,12 +2930,42 @@ namespace Prometheus.Controllers
 
         private TaskDataWithUpdateFlg getProjectTask(string username, string projectkey, int period, string sDate, string eDate, int iType, bool wSubTask = true)
         {
-            return IssueViewModels.getProjectTask(username, projectkey, period, sDate, eDate, iType, wSubTask);
+            if(period == 0)
+            {
+                var sDateStr = Convert.ToDateTime(sDate).ToString("yyyyMMdd");
+                var mycache = HttpContext.Cache;
+                var taskList = mycache.Get(username + "_" + projectkey + "_" + sDateStr + "_" + iType + "_TASK_CUST");
+                if (taskList == null)
+                {
+                    taskList = IssueViewModels.getProjectTask(username, projectkey, period, sDate, eDate, iType, wSubTask);
+                    mycache.Insert(username + "_" + projectkey + "_" + sDateStr + "_" + iType + "_TASK_CUST", taskList, null, DateTime.Now.AddHours(12), Cache.NoSlidingExpiration);
+                }
+                return (TaskDataWithUpdateFlg)taskList;
+            }
+            else
+            {
+                return IssueViewModels.getProjectTask(username, projectkey, period, sDate, eDate, iType, wSubTask);
+            }
         }
 
         private TaskDataWithUpdateFlg getIcareTask(string username, string projectkey, int period, string sDate, string eDate)
         {
-            return IssueViewModels.getIcareTask(username, projectkey, period, sDate, eDate);
+            if (period == 0)
+            {
+                var sDateStr = Convert.ToDateTime(sDate).ToString("yyyyMMdd");
+                var mycache = HttpContext.Cache;
+                var icareList = mycache.Get(username + "_" + projectkey + "_" + sDateStr + "_Icare_TASK_CUST");
+                if(icareList == null)
+                {
+                    icareList = IssueViewModels.getIcareTask(username, projectkey, period, sDate, eDate);
+                    mycache.Insert(username + "_" + projectkey + "_" + sDateStr + "_Icare_TASK_CUST", icareList, null, DateTime.Now.AddHours(12), Cache.NoSlidingExpiration);
+                }
+                return (TaskDataWithUpdateFlg)icareList;
+            }
+            else
+            {
+                return IssueViewModels.getIcareTask(username, projectkey, period, sDate, eDate);
+            }
         }
 
         private Dictionary<string, List<WeeklyReportVM>> getCurWeekSummary(string pKey, string sDate, string eDate)

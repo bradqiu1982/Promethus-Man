@@ -103,23 +103,7 @@
                 data: JSON.stringify(data)
             }, function (output) {
                 if (output.success) {
-                    if ($content.parent('section').next('section').length > 0) {
-                        $content.collapse('hide');
-                        $content.parent('section').next('section').children('.content').collapse('show');
-                    }
-                    else {
-                        var $pro_info = $content.parent('section').parent('.project-info');
-                        var $next_pro_info = $pro_info.next().next();
-                        if ($next_pro_info.find('section').length > 0) {
-                            $content.collapse('hide');
-                            $pro_info.addClass('hidden');
-                            $next_pro_info.removeClass("hidden");
-                            $next_pro_info.find('section').eq(0).children('.content').collapse('show');
-                        }
-                        else {
-                            window.location.reload();
-                        }
-                    }
+                    alert("Save successfully!");
                 }
                 else {
                     alert("Failed to save!");

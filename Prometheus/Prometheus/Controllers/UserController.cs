@@ -1115,6 +1115,8 @@ namespace Prometheus.Controllers
             }
             ShareDocVM.SetUserBookTag(updater, usertag);
 
+            ClearILearnCache(updater);
+
             return RedirectToAction("ITag", "User");
         }
 
@@ -1138,6 +1140,8 @@ namespace Prometheus.Controllers
 
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
+            ClearILearnCache(updater);
+
             if (Request.Form["matchpostfile"] != null)
             {
                 ShareDocVM.MatchAllPostDocForUser(updater,this);
@@ -1153,6 +1157,7 @@ namespace Prometheus.Controllers
                 }
             }
             ShareDocVM.SetUserBookTag(updater,tags);
+
 
             return RedirectToAction("ITag","User");
         }
@@ -1184,7 +1189,19 @@ namespace Prometheus.Controllers
             var iweeklytable = new List<ShareDocVM>();
             var itrainingtable = new List<ShareDocVM>();
 
-            var allileanrn =  ShareDocVM.RetrieveMyLearn(updater,this);
+            var mycache = HttpContext.Cache;
+            var allileanrntmp = mycache.Get(updater.ToUpper() + "_ILearn_CUST");
+            var allileanrn = new List<ShareDocVM>();
+            if (allileanrntmp == null)
+            {
+                allileanrn = ShareDocVM.RetrieveMyLearn(updater, this);
+                mycache.Insert(updater.ToUpper() + "_ILearn_CUST", allileanrn, null, DateTime.Now.AddDays(1), Cache.NoSlidingExpiration);
+            }
+            else
+            {
+                allileanrn = (List<ShareDocVM>)allileanrntmp;
+            }
+
             foreach (var item in allileanrn)
             {
                 if (item.DOCTag.ToUpper().Contains(SPECIALBLOGType.WEEKLYREPORT)
@@ -1285,6 +1302,8 @@ namespace Prometheus.Controllers
                 ShareDocVM.RemoveMyLearn(key, updater);
             }
 
+            ClearILearnCache(updater);
+
             return RedirectToAction("ILearn", "User");
         }
 
@@ -1310,14 +1329,31 @@ namespace Prometheus.Controllers
                 && !string.IsNullOrEmpty(DOCCreator))
             {
                 ShareDocVM.LikeDoc(DOCKey, DOCCreator, updater,this);
+                ClearILearnCache(updater);
             }
             return RedirectToAction("ILearn", "User");
         }
 
         public ActionResult RemoveBlogDoc(string DOCKey)
         {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "ILearn");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
             UserBlogVM.RemoveBlogDoc(DOCKey);
             ShareDocVM.RemoveDoc(DOCKey);
+            ClearILearnCache(string.Empty);
             return RedirectToAction("IBLOG", "User");
         }
 
@@ -1336,11 +1372,13 @@ namespace Prometheus.Controllers
                 CookieUtility.SetCookie(this, ck);
                 return RedirectToAction("LoginUser", "User");
             }
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
             if (!string.IsNullOrEmpty(DOCPJK)
                 && !string.IsNullOrEmpty(DOCKey))
             {
                 ShareDocVM.RemoveDoc(DOCKey);
+                ClearILearnCache(string.Empty);
             }
 
             return RedirectToAction("ILearn", "User");
@@ -1367,6 +1405,7 @@ namespace Prometheus.Controllers
             foreach (var w in whoes)
             {
                 ShareDocVM.IPushDoc(DOCPJK, DOCKey, w.Trim().ToUpper(),updater,this);
+                ClearILearnCache(w.Trim());
             }
 
             ShareDocVM.SendPushDocEvent("a new document about " + DOCKey, "/User/WebDoc?DocKey=" + HttpUtility.UrlEncode(DOCKey) + "&Creator=" + updater.ToUpper(), updater, updater, this);
@@ -1428,11 +1467,13 @@ namespace Prometheus.Controllers
             var whoes = ToWho.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var w in whoes)
             {
+                ClearILearnCache(w.Trim());
                 ShareDocVM.PushDoc(w.Trim().ToUpper(), "ALL", ShareDocType.BLOG, DOCKey, vm.Tag, vm.UserName, DateTime.Now.ToString(), "",docid,vm.DocURL);
                 ShareDocVM.SendPushDocEvent("a new document about " + vm.Tag, vm.DocURL, ToWho, updater.ToUpper(), this, tempreason);
             }
 
             ShareDocVM.SendPushDocEvent("a new document about " + vm.Tag, vm.DocURL, updater.ToUpper(), updater.ToUpper(), this, tempreason);
+
 
             return RedirectToAction("IBLOG", "User");
         }
@@ -1565,6 +1606,8 @@ namespace Prometheus.Controllers
                 tag = "Default;".ToUpper();
             }
 
+            ClearILearnCache(string.Empty);
+
             UserBlogVM.StoreUserTag(updater, tag);
 
             var urls = ReceiveRMAFiles();
@@ -1625,6 +1668,8 @@ namespace Prometheus.Controllers
                 DefaultActionForBlogDoc(currentblog, updater);
             }
 
+            ClearILearnCache(string.Empty);
+
             return RedirectToAction("IBLOG", "User");
         }
 
@@ -1674,6 +1719,9 @@ namespace Prometheus.Controllers
             var dict = new RouteValueDictionary();
             dict.Add("DocKey", vm.DocKey);
             dict.Add("Creator", vm.UserName);
+
+            ClearILearnCache(string.Empty);
+
             return RedirectToAction("WebDoc", "User", dict);
         }
 
@@ -1824,6 +1872,9 @@ namespace Prometheus.Controllers
             var dict = new RouteValueDictionary();
             dict.Add("DocKey", dockey);
             dict.Add("Creator", doccreator);
+
+            ClearILearnCache(string.Empty);
+
             return RedirectToAction("WebDoc", "User", dict);
 
             //var vm = UserBlogVM.RetrieveBlogDoc(dockey);
@@ -1878,6 +1929,7 @@ namespace Prometheus.Controllers
             var dict = new RouteValueDictionary();
             dict.Add("DocKey", errorkey);
             dict.Add("Creator", creator);
+            ClearILearnCache(creator);
             return RedirectToAction("WebDoc", "User", dict);
         }
 
@@ -2571,6 +2623,22 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        //[HttpPost]
+        //public JsonResult GetHistoryTask(string pKey, string uName, int tType)
+        //{
+        //    var dayofweek = Convert.ToInt32(DateTime.Now.DayOfWeek);
+        //    var sDate = DateTime.Now.AddDays((4 - dayofweek) - 7).ToString("yyyy-MM-dd 07:30:00");
+        //    var eDate = DateTime.Now.ToString("yyyy-MM-dd 07:30:00");
+        //    var cDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        //    var data = getProjectTask(uName, pKey, 1, sDate, cDate, tType);
+
+        //    var ret = new JsonResult();
+
+        //    ret.Data = new { success = true, data = data };
+
+        //    return ret;
+        //}
+
         private WeeklyYieldData getProjectYield(string projectkey, string sDate, string eDate)
         {
             var eDateStr = Convert.ToDateTime(eDate).ToString("yyyyMMddHHmmss");
@@ -3100,6 +3168,27 @@ namespace Prometheus.Controllers
             {
                 ret.Data = new { success = false };
                 return ret;
+            }
+        }
+
+        private void ClearILearnCache(string updater)
+        {
+            var key = "_ILearn_CUST";
+            var mycache = HttpContext.Cache;
+            if (string.IsNullOrEmpty(updater))
+            {
+                var allcache = mycache.GetEnumerator();
+                while (allcache.MoveNext())
+                {
+                    if (allcache.Key.ToString().IndexOf(key) != -1)
+                    {
+                        mycache.Remove(allcache.Key.ToString());
+                    }
+                }
+            }
+            else
+            {
+                mycache.Remove(updater.ToUpper() + key);
             }
         }
     }

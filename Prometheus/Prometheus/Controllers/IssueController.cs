@@ -4185,7 +4185,7 @@ namespace Prometheus.Controllers
                 var pkey = Request.Form["pkey"];
                 var ikey = Request.Form["ikey"];
 
-                var data = IssueIcareVM.GetIssueIcare(pkey, ikey);
+                var data = IssueIcareVM.GetIssueIcare(pkey, ikey, updater);
                 if(data.Icare == 1)
                 {
                     ret.Data = new { success = true };
@@ -4208,7 +4208,7 @@ namespace Prometheus.Controllers
                 var pkey = Request.Form["pkey"];
                 var ikey = Request.Form["ikey"];
 
-                IssueIcareVM.CancelICare(pkey, ikey);
+                IssueIcareVM.CancelICare(pkey, ikey, updater);
 
                 LogVM.WriteLog(updater.ToUpper(), pkey, DetermineCompName(Request.UserHostName),
                         Request.Url.ToString(), "Issue", "Cancel ICare", ikey, LogType.CancelICare, Log4NetLevel.Info, "");
@@ -4234,7 +4234,7 @@ namespace Prometheus.Controllers
                 var pkey = Request.Form["pkey"];
                 var ikey = Request.Form["ikey"];
 
-                IssueIcareVM.ICare(pkey, ikey);
+                IssueIcareVM.ICare(pkey, ikey, updater);
 
                 LogVM.WriteLog(updater.ToUpper(), pkey, DetermineCompName(Request.UserHostName),
                         Request.Url.ToString(), "Issue", "ICare", ikey, LogType.ICare, Log4NetLevel.Info, "");

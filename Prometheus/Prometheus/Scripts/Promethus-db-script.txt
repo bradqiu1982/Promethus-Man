@@ -1209,3 +1209,7 @@ left join Issue on IssueType.IssueKey = issue.IssueKey
  /*delete wrong data in log(debug tree)*/
 
  delete from log where LogType = '2';
+
+ //add column in issueicare
+
+ alter table IssueIcare add UserName nvarchar(50) DEFAULT ('') NOT NULL;

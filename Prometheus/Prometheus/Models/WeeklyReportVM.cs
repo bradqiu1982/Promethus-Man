@@ -141,12 +141,12 @@ namespace Prometheus.Models
             var items = "";
             foreach(var rep in report)
             {
-                //var sqltmp = "update WeeklyReport set Status = '<DelStatus>'" +
-                var sqltmp = "delete from WeeklyReport " +
+                var sqltmp = "update WeeklyReport set Status = '<DelStatus>' " +
+                //var sqltmp = "delete from WeeklyReport " +
                         "where ProjectKey = '<ProjectKey>' " +
                         "and IssueKey = '<IssueKey>' " +
-                        "and Year = '<Year>' and Week = '<Week>' "+
-                        "and Type = '<Type>' and UserName = '<UserName>' "+
+                        "and Year = '<Year>' and Week = '<Week>' " +
+                        "and Type = '<Type>' and UserName = '<UserName>' " +
                         "and Status = '<Status>';";
                 sqltmp = sqltmp.Replace("<DelStatus>", SummaryStatus.Delete.ToString())
                         .Replace("<ProjectKey>", rep.ProjectKey)
@@ -180,8 +180,9 @@ namespace Prometheus.Models
             var sql = "select ID, UserName, ProjectKey, IssueKey, Summary, Type, Year, Week, " +
                 "Mark, Status, CreateTime, UpdateTime " +
                 "from WeeklyReport " +
-                "where ProjectKey = '<ProjectKey>' and UpdateTime "+
-                "between '<sDate>' and '<eDate>' and Status = '<Status>' " +
+                "where ProjectKey = '<ProjectKey>' " +
+                "and (Summary <> '' or Summary is not null)" +
+                "and UpdateTime between '<sDate>' and '<eDate>' and Status = '<Status>' " +
                 "order by UpdateTime Desc; ";
             sql = sql.Replace("<ProjectKey>", pKey)
                     .Replace("<sDate>", sDate)

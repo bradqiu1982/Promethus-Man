@@ -1213,3 +1213,12 @@ left join Issue on IssueType.IssueKey = issue.IssueKey
  //add column in issueicare
 
  alter table IssueIcare add UserName nvarchar(50) DEFAULT ('') NOT NULL;
+
+ //modify weekly report summary datatype
+ 
+ALTER TABLE [dbo].[WeeklyReport] drop  CONSTRAINT [DF_WeeklyReport_Summary]  
+GO
+ALTER TABLE WeeklyReport ALTER COLUMN Summary nvarchar(Max)
+
+ALTER TABLE [dbo].[WeeklyReport] add  CONSTRAINT [DF_WeeklyReport_Summary]  DEFAULT ('') FOR [Summary]
+GO

@@ -64,7 +64,7 @@
                 $($content).each(function () {
                     var arrtmp = new Array();
                     var ikey = $(this).attr('data-ikey');
-                    var sumstr = $(this).find('textarea').val();
+                    var sumstr = $(this).find('textarea').val().replace(/'/g, ' ');
                     var mark = $(this).find('select').val();
                     if (sumstr != '') {
                         arrtmp.push(ikey, mark, sumstr);
@@ -88,7 +88,7 @@
             }
             else {
                 var arrtmp = new Array();
-                var sumstr = $(this).parent('.wr-operation').prev().find('textarea').val();
+                var sumstr = $(this).parent('.wr-operation').prev().find('textarea').val().replace(/'/g, ' ');
                 if (sumstr == '') {
                     return false;
                 }

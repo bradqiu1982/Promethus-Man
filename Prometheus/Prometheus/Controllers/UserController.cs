@@ -2528,6 +2528,11 @@ namespace Prometheus.Controllers
             ViewBag.RealUserID = updater;
             ViewBag.cUserName = username.Split(new char[] { '@' })[0];
             ViewBag.cUserID = username;
+            //user list in current group
+            var usergroup = UserGroupVM.RetreiveUserGroup(updater, UserGroupType.ReportGroup);
+            var userlist = usergroup.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
+            ViewBag.userreportlist = WeeklyReportVM.GetUserLatestTime("'" + string.Join("','", userlist) + "'");
+
             //user's project list
             var projectlist = UserViewModels.RetrieveUserProjectKeyDict(username);
             var dayofweek = Convert.ToInt32(DateTime.Now.DayOfWeek);

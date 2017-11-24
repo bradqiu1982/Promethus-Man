@@ -35,8 +35,18 @@
     <li><a href="/User/ILearn">I Share</a></li>
 </ul>
 <div class="tab-content col-xs-10" data-intro="Show detail of tab" data-step="2">
-    <div class="wr-setting">
-        <span class="glyphicon glyphicon-cog" title="Setting" data-toggle="modal" data-target="#modal_wr_setting"></span>
+    <div class="wr-op-setting">
+        <div class="reportlist col-xs-4">
+            <select class="userreportlist form-control" id="userreportlist" name="userreportlist">
+                @foreach (var user in ViewBag.userreportlist)
+                {
+                    <option value="@user.Key" @(string.Compare(user.Key, ViewBag.cUserID.ToUpper()) == 0 ? "selected":"")>@user.Key.Split(new char[] { '@' })[0]</option>
+                }
+            </select>
+        </div>
+        <div class="wr-setting">
+            <span class="glyphicon glyphicon-cog" title="Setting" data-toggle="modal" data-target="#modal_wr_setting"></span>
+        </div>
     </div>
     <div class="pro-info">
         @foreach (var pKey in ViewBag.pKeys)

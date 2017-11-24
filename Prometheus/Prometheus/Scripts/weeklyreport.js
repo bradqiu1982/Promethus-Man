@@ -144,6 +144,10 @@
                 }
             })
         })
+
+        $('body').on('change', '#userreportlist', function () {
+            window.location.href = '/User/WeeklyReport?username='+$.trim($(this).val());
+        })
     }
 
 

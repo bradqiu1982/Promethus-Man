@@ -2531,7 +2531,7 @@ namespace Prometheus.Controllers
             //user's project list
             var projectlist = UserViewModels.RetrieveUserProjectKeyDict(username);
             var dayofweek = Convert.ToInt32(DateTime.Now.DayOfWeek);
-            var sDate = DateTime.Now.AddDays((4 - dayofweek) - 7).ToString("yyyy-MM-dd 07:30:00");
+            var sDate = DateTime.Now.AddDays((dayofweek > 4) ? (4 - dayofweek) : ((4 - dayofweek) - 7)).ToString("yyyy-MM-dd 07:30:00");
             var eDate = DateTime.Now.ToString("yyyy-MM-dd 07:30:00");
             var cDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             var ProjectKeyList = new Dictionary<string, int>();
@@ -3115,6 +3115,14 @@ namespace Prometheus.Controllers
                             DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                             DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
                         ));
+
+                        //save to issue comment
+                        if (!string.IsNullOrEmpty(item[2]))
+                        {
+                            var issuecomment = new IssueComments();
+                            issuecomment.Comment = SeverHtmlDecode.Decode(this, item[2]);
+                            IssueViewModels.StoreUniqueIssueComment(item[0], issuecomment.dbComment, updater, COMMENTTYPE.WeeklyReportSummary);
+                        }
                     }
                     WeeklyReportVM.SaveWeeklyReport(reports);
                 }

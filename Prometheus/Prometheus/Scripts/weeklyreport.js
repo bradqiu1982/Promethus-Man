@@ -27,7 +27,7 @@
                                         '</div>';
                         }
                         var appendStr = '<tr>' +
-                            '<td colspan="7">' +
+                            '<td colspan="8">' +
                                 '<div class="collapse in" id="' + data_target + '">' +
                                     '<div class="row well data-summary">' +
                                         '<label>Summary:</label>' +

@@ -195,10 +195,21 @@
                                     </div>
                                     <div class="panel-body collapse" id="content_his_icare_@idx">
                                         <table class="table table-hover table-condensed icare-content" cellspacing="0">
+                                            <colgroup>
+                                                <col style="width: 5%;">
+                                                <col style="width: 45%;">
+                                                <col style="width: 12%;">
+                                                <col style="width: 10%;">
+                                                <col style="width: 6%;">
+                                                <col style="width: 6%;">
+                                                <col style="width: 10%;">
+                                                <col style="width: 6%;">
+                                            </colgroup>
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
                                                     <th>Description</th>
+                                                    <th>Assignee</th>
                                                     <th>Status</th>
                                                     <th>Start</th>
                                                     <th>Due</th>
@@ -216,6 +227,7 @@
                                                             data-ikey="@history.Value.IssueKey" data-itype="@history.Value.IssueSubType" aria-expanded="false">
                                                             <td>@(m + 1)</td>
                                                             <td><a href="/Issue/UpdateIssue?issuekey=@history.Key" target="_blank">@history.Value.Description</a></td>
+                                                            <td>@history.Value.Assignee.Split(new char[] { '@' })[0]</td>
                                                             <td>@history.Value.Status</td>
                                                             <td>@history.Value.StartDate.ToString("MM/dd")</td>
                                                             <td>@history.Value.DueDate.ToString("MM/dd")</td>
@@ -240,10 +252,21 @@
                                 m = 0;
                                 <div id="cur_icare_@idx">
                                     <table class="table table-condensed" cellpadding="0">
+                                        <colgroup>
+                                            <col style="width: 5%;">
+                                            <col style="width: 45%;">
+                                            <col style="width: 12%;">
+                                            <col style="width: 10%;">
+                                            <col style="width: 6%;">
+                                            <col style="width: 6%;">
+                                            <col style="width: 10%;">
+                                            <col style="width: 6%;">
+                                        </colgroup>
                                         <thead>
                                             <tr>
                                                 <th>#</th>
                                                 <th>Description</th>
+                                                <th>Assignee</th>
                                                 <th>Status</th>
                                                 <th>Start</th>
                                                 <th>Due</th>
@@ -257,6 +280,7 @@
                                                 <tr data-data="cur-icare-@idx-@m">
                                                     <td>@(m + 1)</td>
                                                     <td><a href="/Issue/UpdateIssue?issuekey=@task.Key" target="_blank">@task.Value.Description</a></td>
+                                                    <td>@task.Value.Assignee.Split(new char[] { '@' })[0]</td>
                                                     <td>@task.Value.Status</td>
                                                     <td>@task.Value.StartDate.ToString("MM/dd")</td>
                                                     <td>@task.Value.DueDate.ToString("MM/dd")</td>
@@ -269,7 +293,7 @@
                                                     </td>
                                                 </tr>
                                                 <tr class="even" data-ikey="@task.Key">
-                                                    <td colspan="7">
+                                                    <td colspan="8">
                                                         <div class="col-xs-12 summary">Summary:</div>
                                                         @{
                                                             var isummary = "";

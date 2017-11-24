@@ -877,21 +877,21 @@
         WeeklyReport.init();
     })
     $(document).ready(function () {
-        $('.task-content, .icare-content').DataTable({
+        $('.icare-content').DataTable({
+            'iDisplayLength': 5,
+            'aLengthMenu': [[5, 25, 50, 100, -1],
+            [5, 25, 50, 100, "All"]],
+            "bAutoWidth": false,
+            "aaSorting": [],
+            "order": []
+        });
+        $('.task-content').DataTable({
             'iDisplayLength': 5,
             'aLengthMenu': [[5, 25, 50, 100, -1],
                             [5, 25, 50, 100, "All"]],
             "bAutoWidth": false,
             "aaSorting": [],
-            "order": [],
-            "aoColumns": [
-            { sWidth: '5%' },
-            { sWidth: '45%' },
-            { sWidth: '10%' },
-            { sWidth: '10%' },
-            { sWidth: '10%' },
-            { sWidth: '10%' },
-            { sWidth: '10%' }]
+            "order": []
         });
     })
 </script>

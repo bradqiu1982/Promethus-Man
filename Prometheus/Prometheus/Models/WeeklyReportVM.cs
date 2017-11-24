@@ -141,7 +141,7 @@ namespace Prometheus.Models
             var items = "";
             foreach(var rep in report)
             {
-                var s_sql = "select Summary from WeeklyReport " +
+                var s_sql = "select Summary, Mark from WeeklyReport " +
                         "where ProjectKey = N'<ProjectKey>' " +
                         "and IssueKey = N'<IssueKey>' " +
                         "and Year = '<Year>' and Week = '<Week>' " +
@@ -155,7 +155,8 @@ namespace Prometheus.Models
                         .Replace("<UserName>", rep.UserName)
                         .Replace("<Status>", SummaryStatus.Valid.ToString());
                 var exist_data = DBUtility.ExeLocalSqlWithRes(s_sql, null);
-                if (exist_data.Count == 1 && string.Compare(exist_data[0][0].ToString(), rep.Summary) == 0)
+                if (exist_data.Count == 1 && string.Compare(exist_data[0][0].ToString(), rep.Summary) == 0
+                    && string.Compare(exist_data[0][1].ToString(), rep.Mark) == 0)
                 {
 
                 }
@@ -193,11 +194,14 @@ namespace Prometheus.Models
                 }
                 
             }
-            items = items.Substring(0, items.Length - 1);
-            var sql = "insert into WeeklyReport (UserName, ProjectKey, IssueKey, Summary, [Type], [Year], [Week], [Mark], [Status], [CreateTime], [UpdateTime]) values <Items>; ";
-            sql = sql.Replace("<Items>", items);
+            if ( ! string.IsNullOrEmpty(items))
+            {
+                items = items.Substring(0, items.Length - 1);
+                var sql = "insert into WeeklyReport (UserName, ProjectKey, IssueKey, Summary, [Type], [Year], [Week], [Mark], [Status], [CreateTime], [UpdateTime]) values <Items>; ";
+                sql = sql.Replace("<Items>", items);
 
-            DBUtility.ExeLocalSqlNoRes(sql);
+                DBUtility.ExeLocalSqlNoRes(sql);
+            }
         }
 
         public static Dictionary<string, List<WeeklyReportVM>> GetIssueSummary(string pKey, string sDate, string eDate)

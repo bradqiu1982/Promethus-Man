@@ -111,7 +111,9 @@ namespace Prometheus.Models
             var sql = "select ID, UserName, ProjectKey, IssueKey, Summary, Type, Year, Week, "+
                 "Mark, Status, CreateTime, UpdateTime "+
                 "from WeeklyReport "+
-                "where IssueKey = N'<IssueKey>' and Type = '<SummaryType>' and Status = '<Status>'"+
+                "where IssueKey = N'<IssueKey>' and Type = '<SummaryType>' "+ 
+                "and Status = '<Status>' " +
+                "and (Summary <> '' or Summary <> null)" +
                 "order by UpdateTime Desc; ";
             sql = sql.Replace("<IssueKey>", iKey).Replace("<SummaryType>", sType).Replace("<Status>", SummaryStatus.Valid.ToString());
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
@@ -210,7 +212,6 @@ namespace Prometheus.Models
                 "Mark, Status, CreateTime, UpdateTime " +
                 "from WeeklyReport " +
                 "where ProjectKey = N'<ProjectKey>' " +
-                "and (Summary <> '' or Summary <> null) " +
                 "and UpdateTime between '<sDate>' and '<eDate>' and Status = '<Status>' " +
                 "order by UpdateTime Desc; ";
             sql = sql.Replace("<ProjectKey>", pKey)

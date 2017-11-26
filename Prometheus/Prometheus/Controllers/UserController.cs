@@ -3122,7 +3122,7 @@ namespace Prometheus.Controllers
                         ));
 
                         //save to issue comment
-                        if (!string.IsNullOrEmpty(item[2]))
+                        if (!string.IsNullOrEmpty(item[2]) && !string.IsNullOrEmpty(item[0]))
                         {
                             var issuecomment = new IssueComments();
                             issuecomment.Comment = SeverHtmlDecode.Decode(this, item[2]);

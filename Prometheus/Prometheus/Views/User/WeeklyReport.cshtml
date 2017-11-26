@@ -312,7 +312,7 @@
                                                             {
                                                                 foreach (var item in summarylist[task.Key])
                                                                 {
-                                                                    if (item.UserName.ToUpper() != ViewBag.RealUserID.ToUpper())
+                                                                    if (item.UserName.ToUpper() != ViewBag.RealUserID.ToUpper() && ! string.IsNullOrEmpty(item.Summary))
                                                                     {
                                                                         <div class="row well item-summary @((item.Mark == "1")?"summary-hightlight":((item.Mark == "2")?"summary-lowlight":"summary-normal"))">
                                                                             <span class="col-xs-5">@item.Summary</span>

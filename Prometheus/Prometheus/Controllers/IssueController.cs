@@ -612,7 +612,7 @@ namespace Prometheus.Controllers
             else
             {
                 var ismanage = CheckHasManagePermit(updater);
-                if (ismanage)
+                if (ismanage && Request.Form["DueDate"] != null)
                 {
                     //modify duedate
                     var nDuedate = DateTime.Parse(Request.Form["DueDate"]);
@@ -648,7 +648,7 @@ namespace Prometheus.Controllers
             vm.Reporter = updater;
             vm.IssueType = Request.Form["issuetypelist"].ToString();
             vm.Priority = Request.Form["prioritylist"].ToString();
-            vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
+            vm.DueDate = (Request.Form["DueDate"] != null) ? DateTime.Parse(Request.Form["DueDate"]) : originaldata.DueDate;
 
             if (string.Compare(originaldata.Reporter, updater, true) == 0
                 || string.Compare(originaldata.Assignee, updater, true) == 0
@@ -1567,7 +1567,7 @@ namespace Prometheus.Controllers
             else
             {
                 var ismanage = CheckHasManagePermit(updater);
-                if (ismanage)
+                if (ismanage && Request.Form["DueDate"] != null)
                 {
                     //modify duedate
                     var nDuedate = DateTime.Parse(Request.Form["DueDate"]);
@@ -1763,7 +1763,7 @@ namespace Prometheus.Controllers
             vm.Reporter = updater;
             vm.IssueType = Request.Form["issuetypelist"].ToString();
             vm.Priority = Request.Form["prioritylist"].ToString();
-            vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
+            vm.DueDate = (Request.Form["DueDate"] != null) ? DateTime.Parse(Request.Form["DueDate"]) : originaldata.DueDate;
 
             if (pjmemauth || string.Compare(originaldata.Reporter, updater, true) == 0
                 || string.Compare(originaldata.Assignee, updater, true) == 0
@@ -2169,7 +2169,7 @@ namespace Prometheus.Controllers
             else
             {
                 var ismanage = CheckHasManagePermit(updater);
-                if (ismanage)
+                if (ismanage && Request.Form["DueDate"] != null)
                 {
                     //modify duedate
                     var nDuedate = DateTime.Parse(Request.Form["DueDate"]);
@@ -2231,7 +2231,7 @@ namespace Prometheus.Controllers
             }
 
             vm.Priority = Request.Form["prioritylist"].ToString();
-            vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
+            vm.DueDate = (Request.Form["DueDate"] != null) ? DateTime.Parse(Request.Form["DueDate"]) : originaldata.DueDate;
             vm.ReportDate = DateTime.Now;
             vm.Reporter = updater;
             if (string.Compare(originaldata.Reporter, updater, true) == 0
@@ -2596,7 +2596,7 @@ namespace Prometheus.Controllers
             else
             {
                 var ismanage = CheckHasManagePermit(updater);
-                if (ismanage)
+                if (ismanage && Request.Form["DueDate"] != null)
                 {
                     //modify duedate
                     var nDuedate = DateTime.Parse(Request.Form["DueDate"]);
@@ -2640,7 +2640,7 @@ namespace Prometheus.Controllers
                 originaldata.RelativePeoples = Request.Form["RPeopleAddr"];
                 originaldata.FVCode = Request.Form["FVCode"];
                 originaldata.Priority = Request.Form["prioritylist"].ToString();
-                originaldata.DueDate = DateTime.Parse(Request.Form["DueDate"]);
+                originaldata.DueDate = (Request.Form["DueDate"] != null) ? DateTime.Parse(Request.Form["DueDate"]) : originaldata.DueDate;
             }
 
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
@@ -2851,7 +2851,7 @@ namespace Prometheus.Controllers
             else
             {
                 var ismanage = CheckHasManagePermit(updater);
-                if (ismanage)
+                if (ismanage && Request.Form["DueDate"] != null)
                 {
                     //modify duedate
                     var nDuedate = DateTime.Parse(Request.Form["DueDate"]);
@@ -2908,7 +2908,7 @@ namespace Prometheus.Controllers
             vm.Summary = originaldata.Summary;
 
             vm.Priority = Request.Form["prioritylist"].ToString();
-            vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
+            vm.DueDate = (Request.Form["DueDate"] != null) ? DateTime.Parse(Request.Form["DueDate"]) : originaldata.DueDate;
             vm.ReportDate = DateTime.Now;
             vm.Reporter = updater;
 
@@ -3190,7 +3190,7 @@ namespace Prometheus.Controllers
             vm.Summary = originaldata.Summary;
 
             vm.Priority = Request.Form["prioritylist"].ToString();
-            vm.DueDate = DateTime.Parse(Request.Form["DueDate"]);
+            vm.DueDate = (Request.Form["DueDate"] != null) ? DateTime.Parse(Request.Form["DueDate"]) : originaldata.DueDate;
             vm.ReportDate = DateTime.Now;
             vm.Reporter = updater;
 

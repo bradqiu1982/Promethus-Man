@@ -2537,6 +2537,7 @@ namespace Prometheus.Controllers
             var projectlist = UserViewModels.RetrieveUserProjectKeyDict(username);
             var dayofweek = Convert.ToInt32(DateTime.Now.DayOfWeek);
             var sDate = DateTime.Now.AddDays((dayofweek > 4) ? (4 - dayofweek) : ((4 - dayofweek) - 7)).ToString("yyyy-MM-dd 07:30:00");
+            var stDate = DateTime.Now.AddDays((dayofweek > 4) ? (4 - dayofweek) : ((4 - dayofweek) - 7)).AddDays(1).ToString("yyyy-MM-dd 07:30:00");
             var eDate = DateTime.Now.ToString("yyyy-MM-dd 07:30:00");
             var cDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             var ProjectKeyList = new Dictionary<string, int>();
@@ -2566,8 +2567,8 @@ namespace Prometheus.Controllers
                 //i care
                 if(setting.ICare == 1)
                 {
-                    historyIcareList.Add(project.Key, getIcareTask(username, project.Key, 0, sDate, cDate));
-                    var icarelist_tmp = getIcareTask(username, project.Key, 1, sDate, cDate);
+                    historyIcareList.Add(project.Key, getIcareTask(username, project.Key, 0, stDate, cDate));
+                    var icarelist_tmp = getIcareTask(username, project.Key, 1, stDate, cDate);
                     task_total += icarelist_tmp.IsUpdate ? icarelist_tmp.TaskList.Count : 0;
                     icareList.Add(project.Key, icarelist_tmp);
                 }
@@ -2575,8 +2576,8 @@ namespace Prometheus.Controllers
                 //task
                 if (setting.Task == 1)
                 {
-                    historyTaskList.Add(project.Key, getProjectTask(username, project.Key, 0, sDate, cDate, ISSUESUBTYPE.Task));
-                    var taskList_tmp = getProjectTask(username, project.Key, 1, sDate, cDate, ISSUESUBTYPE.Task);
+                    historyTaskList.Add(project.Key, getProjectTask(username, project.Key, 0, stDate, cDate, ISSUESUBTYPE.Task));
+                    var taskList_tmp = getProjectTask(username, project.Key, 1, stDate, cDate, ISSUESUBTYPE.Task);
                     task_total += taskList_tmp.IsUpdate ? taskList_tmp.TaskList.Count : 0;
                     taskList.Add(project.Key, taskList_tmp);
                 }
@@ -2584,8 +2585,8 @@ namespace Prometheus.Controllers
                 //critical failure task
                 if (setting.CriticalFailure == 1)
                 {
-                    historyCriList.Add(project.Key, getProjectTask(username, project.Key, 0, sDate, cDate, ISSUESUBTYPE.CrititalFailureTask, false));
-                    var criList_tmp = getProjectTask(username, project.Key, 1, sDate, cDate, ISSUESUBTYPE.CrititalFailureTask, false);
+                    historyCriList.Add(project.Key, getProjectTask(username, project.Key, 0, stDate, cDate, ISSUESUBTYPE.CrititalFailureTask, false));
+                    var criList_tmp = getProjectTask(username, project.Key, 1, stDate, cDate, ISSUESUBTYPE.CrititalFailureTask, false);
                     task_total += criList_tmp.IsUpdate ? criList_tmp.TaskList.Count : 0;
                     criticalList.Add(project.Key, criList_tmp);
                 }
@@ -2602,11 +2603,11 @@ namespace Prometheus.Controllers
                 //debug tree
                 if (setting.DebugTree == 1)
                 {
-                    DebugTreeList.Add(project.Key, ProjectErrorViewModels.RetrieveWeeklyErrorByPJKey(project.Key, sDate, cDate, this));
+                    DebugTreeList.Add(project.Key, ProjectErrorViewModels.RetrieveWeeklyErrorByPJKey(project.Key, stDate, cDate, this));
                 }
 
                 //get current week summary
-                SummaryList.Add(project.Key, getCurWeekSummary(project.Key, sDate, cDate));
+                SummaryList.Add(project.Key, getCurWeekSummary(project.Key, stDate, cDate));
 
                 ProjectKeyList.Add(project.Key, task_total);
             }
@@ -3103,7 +3104,7 @@ namespace Prometheus.Controllers
                 {
                     DateTimeFormatInfo dfi = DateTimeFormatInfo.CurrentInfo;
                     var year = DateTime.Now.Year;
-                    var week = dfi.Calendar.GetWeekOfYear(DateTime.Now, dfi.CalendarWeekRule, DayOfWeek.Thursday);
+                    var week = dfi.Calendar.GetWeekOfYear(DateTime.Now, dfi.CalendarWeekRule, DayOfWeek.Friday);
                     foreach (var item in data)
                     {
                         reports.Add(new WeeklyReportVM(

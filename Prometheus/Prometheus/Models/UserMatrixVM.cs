@@ -51,6 +51,25 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static Dictionary<string, string> RetrieveUserMatrixAuthByuName(string uName)
+        {
+            var ret = new Dictionary<string, string>();
+            var sql = "select UserName,Auth,Depart from UserMatrix "
+                    + "where UserName = N'<UserName>'";
+            sql = sql.Replace("<UserName>", uName);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var username = Convert.ToString(line[0]);
+                var auth = Convert.ToString(line[1]);
+                if (!ret.ContainsKey(username))
+                {
+                    ret.Add(username, auth);
+                }
+            }
+            return ret;
+        }
+
         public static Dictionary<string, string> RetrieveUserMatrixDepart()
         {
             var ret = new Dictionary<string, string>();

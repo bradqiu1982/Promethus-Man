@@ -97,6 +97,19 @@ namespace Prometheus.Models
             dic.Add("ltype", lType.ToString());
             LogHelper.WriteLog(msg, lLevel, dic);
         }
+
+        public static int GetChangeDueDateLogCnt(string iKey, int lType)
+        {
+            string sql = "select count(*) from Log "
+                        + "where IssueKey = '<IssueKey>' "
+                        + "and LogType = '<LogType>' ";
+            sql = sql.Replace("<IssueKey>", iKey)
+                    .Replace("<LogType>", lType.ToString());
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+
+            return Convert.ToInt32(dbret[0][0]);
+        }
     }
 
     public class LogType
@@ -106,6 +119,12 @@ namespace Prometheus.Models
         public static int DebugTree = 2;
         public static int ICare = 3;
         public static int CancelICare = 4;
+        public static int ModifyDueDate = 5;
+    }
+
+    public class ModifyDueDateConstant
+    {
+        public static int EditCnt = 3;
     }
 
 }

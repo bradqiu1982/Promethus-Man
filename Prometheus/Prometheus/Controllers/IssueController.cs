@@ -408,12 +408,16 @@ namespace Prometheus.Controllers
 
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
                 ViewBag.isassignee = false;
+                var hasEditPermit = false;
                 if (string.Compare(updater, ret.Assignee, true) == 0
                         || string.Compare(updater, ret.Reporter,true) == 0
                         || string.Compare(updater, ret.Creator, true) == 0)
                 {
                     ViewBag.isassignee = true;
+                    hasEditPermit = true;
                 }
+
+                ViewBag.hasEditDueDate = CheckModifyDueDatePermit(key, updater, hasEditPermit);
 
                 ViewBag.authrized = true;
                 if (string.Compare(ret.IssueType, ISSUETP.NPIPROC) == 0)
@@ -607,6 +611,13 @@ namespace Prometheus.Controllers
             { }
             else
             {
+                var ismanage = CheckHasManagePermit(updater);
+                if (ismanage)
+                {
+                    //modify duedate
+                    var nDuedate = DateTime.Parse(Request.Form["DueDate"]);
+                    IssueViewModels.UpdateIssueDueDate(originaldata.IssueKey, nDuedate);
+                }
                 if (!string.IsNullOrEmpty(Request.Form["editor1"]))
                 {
                     var issuecomment = new IssueComments();
@@ -838,6 +849,7 @@ namespace Prometheus.Controllers
                 }
             }
 
+            LogModifyDueDate(originaldata, updater, vm.DueDate.ToString("yyyy-MM-dd HH:mm:ss"));
 
             var dict1 = new RouteValueDictionary();
             dict1.Add("issuekey", originaldata.IssueKey);
@@ -1459,6 +1471,7 @@ namespace Prometheus.Controllers
             {
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
                 ViewBag.isassignee = false;
+                var hasEditPermit = false;
 
                 var pj = ProjectViewModels.RetrieveOneProject(ret.ProjectKey);
                 if (pj != null) {
@@ -1476,8 +1489,9 @@ namespace Prometheus.Controllers
                     || string.Compare(updater, ret.Creator, true) == 0)
                 {
                     ViewBag.isassignee = true;
+                    hasEditPermit = true;
                 }
-
+                ViewBag.hasEditDueDate = CheckModifyDueDatePermit(key, updater, hasEditPermit);
                 //ret.Reporter = updater;
                 CreateAllLists(ret);
 
@@ -1552,16 +1566,22 @@ namespace Prometheus.Controllers
             { }
             else
             {
-                    if ( !string.IsNullOrEmpty(Request.Form["editor1"]))
-                    {
-                        var issuecomment = new IssueComments();
-                        issuecomment.Comment = SeverHtmlDecode.Decode(this, Request.Form["editor1"]);
-                        IssueViewModels.StoreIssueComment(originaldata.IssueKey, issuecomment.dbComment, updater, COMMENTTYPE.Description);
-                    }
-
-                    var dict2 = new RouteValueDictionary();
-                    dict2.Add("issuekey", originaldata.IssueKey);
-                    return RedirectToAction("UpdateIssue", "Issue", dict2);
+                var ismanage = CheckHasManagePermit(updater);
+                if (ismanage)
+                {
+                    //modify duedate
+                    var nDuedate = DateTime.Parse(Request.Form["DueDate"]);
+                    IssueViewModels.UpdateIssueDueDate(originaldata.IssueKey, nDuedate);
+                }
+                if (!string.IsNullOrEmpty(Request.Form["editor1"]))
+                {
+                    var issuecomment = new IssueComments();
+                    issuecomment.Comment = SeverHtmlDecode.Decode(this, Request.Form["editor1"]);
+                    IssueViewModels.StoreIssueComment(originaldata.IssueKey, issuecomment.dbComment, updater, COMMENTTYPE.Description);
+                }
+                var dict2 = new RouteValueDictionary();
+                dict2.Add("issuekey", originaldata.IssueKey);
+                return RedirectToAction("UpdateIssue", "Issue", dict2);
             }
 
             if (Request.Form["deleteisu"] != null)
@@ -1970,6 +1990,8 @@ namespace Prometheus.Controllers
                 }
             }
 
+            //log update duedate count
+            LogModifyDueDate(originaldata, updater, vm.DueDate.ToString("yyyy-MM-dd HH:mm:ss"));
 
             var dict1 = new RouteValueDictionary();
             dict1.Add("issuekey", originaldata.IssueKey);
@@ -2058,12 +2080,15 @@ namespace Prometheus.Controllers
                 }
 
                 ViewBag.isassignee = false;
+                var hasEditPermit = false;
                 if (string.Compare(updater, ret.Assignee, true) == 0 
                     || string.Compare(updater,ret.Reporter,true) == 0
                     || string.Compare(updater, ret.Creator, true) == 0)
                 {
                     ViewBag.isassignee = true;
+                    hasEditPermit = true;
                 }
+                ViewBag.hasEditDueDate = CheckModifyDueDatePermit(key, updater, hasEditPermit);
                 //ret.Reporter = updater;
 
                 ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
@@ -2143,6 +2168,13 @@ namespace Prometheus.Controllers
             { }
             else
             {
+                var ismanage = CheckHasManagePermit(updater);
+                if (ismanage)
+                {
+                    //modify duedate
+                    var nDuedate = DateTime.Parse(Request.Form["DueDate"]);
+                    IssueViewModels.UpdateIssueDueDate(originaldata.IssueKey, nDuedate);
+                }
                 if (!string.IsNullOrEmpty(Request.Form["editor1"]))
                 {
                     var issuecomment = new IssueComments();
@@ -2452,6 +2484,7 @@ namespace Prometheus.Controllers
                 }
             }
 
+            LogModifyDueDate(originaldata, updater, vm.DueDate.ToString("yyyy-MM-dd HH:ii:ss"));
 
             var dict1 = new RouteValueDictionary();
             dict1.Add("issuekey", originaldata.IssueKey);
@@ -2510,12 +2543,15 @@ namespace Prometheus.Controllers
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
                 ViewBag.isassignee = false;
+                var hasEditPermit = false;
                 if (string.Compare(updater, ret.Assignee, true) == 0
                     || string.Compare(updater, ret.Reporter, true) == 0
                     || string.Compare(updater, ret.Creator, true) == 0)
                 {
                     ViewBag.isassignee = true;
+                    hasEditPermit = true;
                 }
+                ViewBag.hasEditDueDate = CheckModifyDueDatePermit(key, updater, hasEditPermit);
 
                 ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
                 CreateAllLists(ret);
@@ -2559,13 +2595,19 @@ namespace Prometheus.Controllers
             { }
             else
             {
+                var ismanage = CheckHasManagePermit(updater);
+                if (ismanage)
+                {
+                    //modify duedate
+                    var nDuedate = DateTime.Parse(Request.Form["DueDate"]);
+                    IssueViewModels.UpdateIssueDueDate(originaldata.IssueKey, nDuedate);
+                }
                 if (!string.IsNullOrEmpty(Request.Form["editor1"]))
                 {
                     var issuecomment = new IssueComments();
                     issuecomment.Comment = SeverHtmlDecode.Decode(this, Request.Form["editor1"]);
                     IssueViewModels.StoreIssueComment(originaldata.IssueKey, issuecomment.dbComment, updater, COMMENTTYPE.Description);
                 }
-
                 var dict2 = new RouteValueDictionary();
                 dict2.Add("issuekey", originaldata.IssueKey);
                 return RedirectToAction("UpdateIssue", "Issue", dict2);
@@ -2701,6 +2743,8 @@ namespace Prometheus.Controllers
                 }
             }
 
+            LogModifyDueDate(originaldata, updater, DateTime.Parse(Request.Form["DueDate"]).ToString("yyyy-MM-dd HH:mm:ss"));
+
             var dict = new RouteValueDictionary();
             dict.Add("issuekey", originaldata.IssueKey);
             return RedirectToAction("UpdateRel", "Issue", dict);
@@ -2757,12 +2801,15 @@ namespace Prometheus.Controllers
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
                 ViewBag.isassignee = false;
+                var hasEditPermit = false;
                 if (string.Compare(updater, ret.Assignee, true) == 0
                     || string.Compare(updater, ret.Reporter, true) == 0
                     || string.Compare(updater, ret.Creator, true) == 0)
                 {
                     ViewBag.isassignee = true;
+                    hasEditPermit = true;
                 }
+                ViewBag.hasEditDueDate = CheckModifyDueDatePermit(key, updater, hasEditPermit);
                 //ret.Reporter = updater;
 
                 ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
@@ -2803,16 +2850,23 @@ namespace Prometheus.Controllers
             { }
             else
             {
-                    if (!string.IsNullOrEmpty(Request.Form["editor1"]))
-                    {
-                        var issuecomment = new IssueComments();
-                        issuecomment.Comment = SeverHtmlDecode.Decode(this, Request.Form["editor1"]);
-                        IssueViewModels.StoreIssueComment(originaldata.IssueKey, issuecomment.dbComment, updater, COMMENTTYPE.Description);
-                    }
+                var ismanage = CheckHasManagePermit(updater);
+                if (ismanage)
+                {
+                    //modify duedate
+                    var nDuedate = DateTime.Parse(Request.Form["DueDate"]);
+                    IssueViewModels.UpdateIssueDueDate(originaldata.IssueKey, nDuedate);
+                }
+                if (!string.IsNullOrEmpty(Request.Form["editor1"]))
+                {
+                    var issuecomment = new IssueComments();
+                    issuecomment.Comment = SeverHtmlDecode.Decode(this, Request.Form["editor1"]);
+                    IssueViewModels.StoreIssueComment(originaldata.IssueKey, issuecomment.dbComment, updater, COMMENTTYPE.Description);
+                }
 
-                    var dict2 = new RouteValueDictionary();
-                    dict2.Add("issuekey", originaldata.IssueKey);
-                    return RedirectToAction("UpdateIssue", "Issue", dict2);
+                var dict2 = new RouteValueDictionary();
+                dict2.Add("issuekey", originaldata.IssueKey);
+                return RedirectToAction("UpdateIssue", "Issue", dict2);
             }
 
             if (Request.Form["deleterma"] != null)
@@ -3005,6 +3059,7 @@ namespace Prometheus.Controllers
             //ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
             //return View(newdata);
 
+            LogModifyDueDate(originaldata, updater, vm.DueDate.ToString("yyyy-MM-dd HH:mm:ss"));
             var dict1 = new RouteValueDictionary();
             dict1.Add("issuekey", originaldata.IssueKey);
             return RedirectToAction("UpdateOBA", "Issue", dict1);
@@ -3057,12 +3112,15 @@ namespace Prometheus.Controllers
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
                 ViewBag.isassignee = false;
+                var hasEditPermit = false;
                 if (string.Compare(updater, ret.Assignee, true) == 0
                     || string.Compare(updater, ret.Reporter, true) == 0
                     || string.Compare(updater, ret.Creator, true) == 0)
                 {
                     ViewBag.isassignee = true;
+                    hasEditPermit = true;
                 }
+                ViewBag.hasEditDueDate = CheckModifyDueDatePermit(key, updater, hasEditPermit);
                 //ret.Reporter = updater;
 
                 CreateAllLists(ret);
@@ -3272,6 +3330,8 @@ namespace Prometheus.Controllers
             //}
 
             //return View(newdata);
+
+            LogModifyDueDate(originaldata, updater, vm.DueDate.ToString("yyyy-MM-dd HH:mm:ss"));
 
             var dict1 = new RouteValueDictionary();
             dict1.Add("issuekey", originaldata.IssueKey);
@@ -4247,6 +4307,63 @@ namespace Prometheus.Controllers
                 ret.Data = new { success = false };
                 return ret;
             }
+        }
+
+        private bool CheckModifyDueDatePermit(string iKey, string uName, bool isAssigee)
+        {
+            var userdict = UserMatrixVM.RetrieveUserMatrixAuthByuName(uName);
+            var editcnt = LogVM.GetChangeDueDateLogCnt(iKey, LogType.ModifyDueDate);
+            if (userdict.Count > 0 && editcnt >= ModifyDueDateConstant.EditCnt
+                && string.Compare(userdict[uName.ToUpper()].ToUpper(), USERAUTH.MANAGE.ToUpper()) == 0)
+            {
+                return true;
+            }
+            else
+            {
+                if (isAssigee)
+                {
+                    if (editcnt >= ModifyDueDateConstant.EditCnt)
+                    {
+                        return false;
+                    }
+
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+        private bool CheckHasManagePermit(string uName)
+        {
+            var userdict = UserMatrixVM.RetrieveUserMatrixAuthByuName(uName);
+            var ismanage = false;
+            if (userdict.Count > 0 && string.Compare(userdict[uName.ToUpper()].ToUpper(), USERAUTH.MANAGE.ToUpper()) == 0)
+            {
+                ismanage = true;
+            }
+
+            return ismanage;
+        }
+
+        private void LogModifyDueDate(IssueViewModels originaldata, string uName, string nDueDate)
+        {
+            var ismanage = CheckHasManagePermit(uName);
+            if (string.Compare(nDueDate, originaldata.DueDate.ToString("yyyy-MM-dd HH:mm:ss")) != 0
+                && !ismanage && (string.Compare(uName, originaldata.Assignee, true) == 0
+                       || string.Compare(uName, originaldata.Reporter, true) == 0
+                       || string.Compare(uName, originaldata.Creator, true) == 0))
+            {
+                var editcnt = LogVM.GetChangeDueDateLogCnt(originaldata.IssueKey, LogType.ModifyDueDate);
+                if (editcnt <= ModifyDueDateConstant.EditCnt)
+                {
+                    LogVM.WriteLog(uName, originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
+                        Request.Url.ToString(), "Issue", "ChangeDueDate", originaldata.IssueKey, LogType.ModifyDueDate, Log4NetLevel.Info, "");
+                }
+            }
+
         }
     }
 }

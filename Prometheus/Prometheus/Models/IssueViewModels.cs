@@ -1106,6 +1106,13 @@ namespace Prometheus.Models
             }
         }
 
+        public static void UpdateIssueDueDate(string iKey, DateTime nDuedate)
+        {
+            var sql = "update Issue set DueDate = '<DueDate>'where IssueKey = '<IssueKey>'";
+            sql = sql.Replace("<IssueKey>", iKey)
+                    .Replace("<DueDate>", nDuedate.ToString("yyyy-MM-dd"));
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
 
         public void UpdateIssue()
         {

@@ -2570,7 +2570,7 @@ namespace Prometheus.Controllers
                 {
                     historyIcareList.Add(project.Key, getIcareTask(username, project.Key, 0, stDate, cDate));
                     var icarelist_tmp = getIcareTask(username, project.Key, 1, stDate, cDate);
-                    task_total += icarelist_tmp.IsUpdate ? icarelist_tmp.TaskList.Count : 0;
+                    task_total += icarelist_tmp.TaskList.Count;
                     icareList.Add(project.Key, icarelist_tmp);
                     //debug tree
                     icareDebugTree.Add(project.Key, ProjectErrorICareVM.GetProjectErrorICareList(username, project.Key, stDate, cDate, this));
@@ -2581,7 +2581,7 @@ namespace Prometheus.Controllers
                 {
                     historyTaskList.Add(project.Key, getProjectTask(username, project.Key, 0, stDate, cDate, ISSUESUBTYPE.Task));
                     var taskList_tmp = getProjectTask(username, project.Key, 1, stDate, cDate, ISSUESUBTYPE.Task);
-                    task_total += taskList_tmp.IsUpdate ? taskList_tmp.TaskList.Count : 0;
+                    task_total += taskList_tmp.TaskList.Count;
                     taskList.Add(project.Key, taskList_tmp);
                 }
 
@@ -2590,7 +2590,7 @@ namespace Prometheus.Controllers
                 {
                     historyCriList.Add(project.Key, getProjectTask(username, project.Key, 0, stDate, cDate, ISSUESUBTYPE.CrititalFailureTask, false));
                     var criList_tmp = getProjectTask(username, project.Key, 1, stDate, cDate, ISSUESUBTYPE.CrititalFailureTask, false);
-                    task_total += criList_tmp.IsUpdate ? criList_tmp.TaskList.Count : 0;
+                    task_total += criList_tmp.TaskList.Count;
                     criticalList.Add(project.Key, criList_tmp);
                 }
 
@@ -2599,7 +2599,7 @@ namespace Prometheus.Controllers
                 {
                     historyRMAList.Add(project.Key, getProjectTask(username, project.Key, 0, sDate, cDate, ISSUESUBTYPE.RMA));
                     var rmaList_tmp = getProjectTask(username, project.Key, 1, sDate, cDate, ISSUESUBTYPE.RMA);
-                    task_total += rmaList_tmp.IsUpdate ? rmaList_tmp.TaskList.Count : 0;
+                    task_total += rmaList_tmp.TaskList.Count;
                     RMAList.Add(project.Key, rmaList_tmp);
                 }
 

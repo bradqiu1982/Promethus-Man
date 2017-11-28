@@ -3228,7 +3228,9 @@ namespace Prometheus.Models
             foreach (var line in dbret)
             {
 
-                if (!string.IsNullOrEmpty(Convert.ToString(line[6])))
+                if ( ! string.IsNullOrEmpty(Convert.ToString(line[6]))
+                    && DateTime.Compare(Convert.ToDateTime(line[6]), Convert.ToDateTime(sDate)) > 0 
+                        && DateTime.Compare(Convert.ToDateTime(line[6]), Convert.ToDateTime(eDate)) < 0)
                 {
                     isupdate = true;
                 }

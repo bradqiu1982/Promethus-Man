@@ -54,6 +54,7 @@
             var yield_flg = false;
             var icare_flg = false;
             var icare_cnt = 0;
+            var icare_dt_flg = false;
             var icare_update = false;
             var task_flg = false;
             var task_cnt = 0;
@@ -71,8 +72,9 @@
             }
             if (ViewBag.setting.ICare == 1)
             {
+                icare_dt_flg = ViewBag.icareDebugTree.ContainsKey(pKey) && ViewBag.icareDebugTree[pKey].Count > 0;
                 icare_flg = ViewBag.icareList.ContainsKey(pKey) && ViewBag.icareList[pKey].TaskList.Count > 0;
-                icare_update = ViewBag.icareList[pKey].IsUpdate;
+                icare_update = ViewBag.icareList[pKey].IsUpdate || icare_dt_flg;
                 icare_cnt = icare_flg && icare_update ? ViewBag.icareList[pKey].TaskList.Count : 0;
             }
             if (ViewBag.setting.Task == 1)
@@ -192,7 +194,7 @@
                 @if (ViewBag.setting.ICare == 1)
                 {
                     <section id="ICare-@idx">
-                        <div class="bs-callout bs-callout-info @((icare_flg && icare_update)?"bs-callout-green":((icare_flg && !icare_update) ? "bs-callout-yellow" :""))"
+                        <div class="bs-callout bs-callout-info @(((icare_flg || icare_dt_flg) && icare_update)?"bs-callout-green":((icare_flg && !icare_update) ? "bs-callout-yellow" :""))"
                                 data-toggle="collapse" data-target="#content_icare_@idx" aria-expanded="false">
                             <h4>ICare</h4>
                         </div>
@@ -312,18 +314,21 @@
                                                             {
                                                                 foreach (var item in summarylist[task.Key])
                                                                 {
-                                                                    if (item.UserName.ToUpper() != ViewBag.RealUserID.ToUpper() && ! string.IsNullOrEmpty(item.Summary))
+                                                                    if (!string.IsNullOrEmpty(item.Summary))
                                                                     {
-                                                                        <div class="row well item-summary @((item.Mark == "1")?"summary-hightlight":((item.Mark == "2")?"summary-lowlight":"summary-normal"))">
-                                                                            <span class="col-xs-5">@item.Summary</span>
-                                                                            <span class="col-xs-3">@item.UserName.Split(new char[] { '@' })[0]</span>
-                                                                            <span class="col-xs-4">@item.UpdateTime</span>
-                                                                        </div>
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        imark = item.Mark;
-                                                                        isummary += item.Summary;
+                                                                        if (item.UserName.ToUpper() != ViewBag.RealUserID.ToUpper())
+                                                                        {
+                                                                            <div class="row well item-summary @((item.Mark == "1") ? "summary-hightlight" : ((item.Mark == "2") ? "summary-lowlight" : "summary-normal"))">
+                                                                                <span class="col-xs-5">@item.Summary</span>
+                                                                                <span class="col-xs-3">@item.UserName.Split(new char[] { '@' })[0]</span>
+                                                                                <span class="col-xs-4">@item.UpdateTime</span>
+                                                                            </div>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            imark = item.Mark;
+                                                                            isummary += item.Summary;
+                                                                        }
                                                                     }
                                                                 }
                                                             }
@@ -341,8 +346,8 @@
                                                         </div>
                                                     </td>
                                                 </tr>
-                                                m++;
-                                            }
+                                                                m++;
+                                                            }
                                         </tbody>
                                     </table>
                                 </div>
@@ -350,7 +355,45 @@
                                     <input type="button" class="btn btn-success op-btn btn-save" data-data-key="@pKey" data-data-module="@Prometheus.Models.SummaryType.ICare" name="btn_save" value="Save" />
                                     <input type="button" class="btn btn-warning op-btn btn-cancel" name="btn_cancel" value="Cancel" />
                                 </div>
-                                                            }
+                            }
+                            @if (icare_dt_flg)
+                            {
+                                <div class="icare-dt">
+                                    <span class="label label-danger">Debug Tree</span>
+                                </div>
+                                <table class="table table-condensed" cellpadding="0">
+                                        <thead>
+                                            <tr>
+                                                <th>Error Code</th>
+                                                <th>Short Desc</th>
+                                                <th>Increase Count</th>
+                                                <th>Attachement</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var val in ViewBag.icareDebugTree[pKey])
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <a href="/Project/UpdateProjectError?ErrorKey=@val.ErrorKey" target="_blank">@val.OrignalCode</a>
+                                                        @if (val.CommentList.Count > 0)
+                                                        {
+                                                            <span class="badge alert-success">C</span>
+                                                        }
+                                                    </td>
+                                                    <td>@val.ShortDesc</td>
+                                                    <td>@val.ErrorCount</td>
+                                                    <td>
+                                                        @if (val.AttachList.Count > 0)
+                                                        {
+                                                            <a href="/Project/ErrorAttach?ErrorKey=@val.ErrorKey" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></a>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                             }
                         </div>
                     </section>
                 }
@@ -613,19 +656,19 @@
                             <h4>Debug Tree</h4>
                         </div>
                         <div id="content_dtree_@idx" class="collapse">
-                            <table class="table table-condensed" cellpadding="0">
-                                <thead>
-                                    <tr>
-                                        <th>Error Code</th>
-                                        <th>Short Desc</th>
-                                        <th>Increase Count</th>
-                                        <th>Attachement</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if (ViewBag.DebugTreeList.ContainsKey(pKey) && ViewBag.DebugTreeList[pKey].Count > 0)
-                                    {
-                                        foreach (var val in ViewBag.DebugTreeList[pKey])
+                            @if (ViewBag.DebugTreeList.ContainsKey(pKey) && ViewBag.DebugTreeList[pKey].Count > 0)
+                            {
+                                <table class="table table-condensed" cellpadding="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Error Code</th>
+                                            <th>Short Desc</th>
+                                            <th>Increase Count</th>
+                                            <th>Attachement</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var val in ViewBag.DebugTreeList[pKey])
                                         {
                                             <tr>
                                                 <td>
@@ -645,9 +688,9 @@
                                                 </td>
                                             </tr>
                                         }
-                                    }
-                                </tbody>
-                            </table>
+                                    </tbody>
+                                </table>
+                            }
                         </div>
                     </section>
                 }

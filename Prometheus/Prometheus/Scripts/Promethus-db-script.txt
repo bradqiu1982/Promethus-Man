@@ -1225,3 +1225,28 @@ GO
 
 /* fix weekly report data */
 update weeklyreport set week = '47';
+
+/* for project error i care */
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[ProjectErrorICare](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[ProjectKey] [nvarchar](50) NOT NULL,
+	[ErrorKey] [nvarchar](50) NOT NULL,
+	[UserName] [nvarchar](50) NOT NULL,
+	[ICare] [tinyint] NOT NULL,
+	[CreateTime] [datetime] NOT NULL,
+	[UpdateTime] [datetime] NOT NULL
+) ON [PRIMARY]
+
+GO
+
+ALTER TABLE [dbo].[ProjectErrorICare] ADD  CONSTRAINT [DF_ProjectErrorICare_ICare]  DEFAULT ((1)) FOR [ICare]
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'0: Invalid 1: valid' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'ProjectErrorICare', @level2type=N'COLUMN',@level2name=N'ICare'
+GO

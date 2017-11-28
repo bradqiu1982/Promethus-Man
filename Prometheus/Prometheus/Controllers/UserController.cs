@@ -2544,6 +2544,7 @@ namespace Prometheus.Controllers
             var YieldDataList = new Dictionary<string, WeeklyYieldData>();
             var historyIcareList = new Dictionary<string, TaskDataWithUpdateFlg>();
             var icareList = new Dictionary<string, TaskDataWithUpdateFlg>();
+            var icareDebugTree = new Dictionary<string, List<ProjectErrorViewModels>>();
             var historyTaskList = new Dictionary<string, TaskDataWithUpdateFlg>();
             var taskList = new Dictionary<string, TaskDataWithUpdateFlg>();
             var historyCriList = new Dictionary<string, TaskDataWithUpdateFlg>();
@@ -2571,6 +2572,8 @@ namespace Prometheus.Controllers
                     var icarelist_tmp = getIcareTask(username, project.Key, 1, stDate, cDate);
                     task_total += icarelist_tmp.IsUpdate ? icarelist_tmp.TaskList.Count : 0;
                     icareList.Add(project.Key, icarelist_tmp);
+                    //debug tree
+                    icareDebugTree.Add(project.Key, ProjectErrorICareVM.GetProjectErrorICareList(username, project.Key, stDate, cDate, this));
                 }
 
                 //task
@@ -2617,6 +2620,7 @@ namespace Prometheus.Controllers
             ViewBag.YieldDataList = YieldDataList;
             ViewBag.historyIcareList = historyIcareList;
             ViewBag.icareList = icareList;
+            ViewBag.icareDebugTree = icareDebugTree;
             ViewBag.historyTaskList = historyTaskList;
             ViewBag.taskList = taskList;
             ViewBag.historyCriList = historyCriList;

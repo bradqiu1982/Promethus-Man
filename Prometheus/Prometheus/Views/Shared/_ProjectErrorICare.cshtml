@@ -1,0 +1,50 @@
+﻿
+<button type="button" class="btn btn-warning" id="i_care" name="i_care" data-ekey="@(Model.ErrorKey)" data-pkey="@(Model.ProjectKey)">ICare</button>
+<script>
+    $(function () {
+        var ekey = '@Model.ErrorKey';
+        var pkey = '@Model.ProjectKey';
+        $.post('/Project/GetICare',
+        {
+            pkey: pkey,
+            ekey: ekey
+        }, function(output){
+            if(output.success){
+                $('#i_care').html('Cancel ICare');
+                $('#i_care').attr('id', 'cancel_icare')
+            }
+        });
+    })
+    $('body').on('click', '#cancel_icare', function(){
+        var ekey = $(this).attr('data-ekey');
+        var pkey = $(this).attr('data-pkey');
+        $.post('/Project/CancelICare',
+        {
+            pkey: pkey,
+            ekey: ekey
+        }, function (output) {
+            if (output.success) {
+                window.location.reload();
+            }
+            else {
+                alert("Failed to cancel ICare!");
+            }
+        })
+    })
+    $('body').on('click', '#i_care', function () {
+        var ekey = $(this).attr('data-ekey');
+        var pkey = $(this).attr('data-pkey');
+        $.post('/Project/ICare',
+        {
+            pkey: pkey,
+            ekey: ekey
+        }, function (output) {
+            if (output.success) {
+                window.location.reload();
+            }
+            else {
+                alert("Failed to ICare!");
+            }
+        })
+    })
+</script>

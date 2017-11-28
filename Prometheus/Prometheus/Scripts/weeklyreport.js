@@ -146,6 +146,7 @@
         })
 
         $('body').on('change', '#userreportlist', function () {
+            $('#myModal').modal('show');
             window.location.href = '/User/WeeklyReport?username='+$.trim($(this).val());
         })
     }

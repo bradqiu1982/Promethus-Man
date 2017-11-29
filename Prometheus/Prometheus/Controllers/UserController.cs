@@ -15,6 +15,7 @@ using System.Threading;
 using System.IO;
 using System.Security.Cryptography;
 using System.Globalization;
+using System.Web.Caching;
 
 namespace Prometheus.Controllers
 {
@@ -1114,6 +1115,8 @@ namespace Prometheus.Controllers
             }
             ShareDocVM.SetUserBookTag(updater, usertag);
 
+            ClearILearnCache(updater);
+
             return RedirectToAction("ITag", "User");
         }
 
@@ -1137,6 +1140,8 @@ namespace Prometheus.Controllers
 
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
+            ClearILearnCache(updater);
+
             if (Request.Form["matchpostfile"] != null)
             {
                 ShareDocVM.MatchAllPostDocForUser(updater,this);
@@ -1152,6 +1157,7 @@ namespace Prometheus.Controllers
                 }
             }
             ShareDocVM.SetUserBookTag(updater,tags);
+
 
             return RedirectToAction("ITag","User");
         }
@@ -1183,7 +1189,19 @@ namespace Prometheus.Controllers
             var iweeklytable = new List<ShareDocVM>();
             var itrainingtable = new List<ShareDocVM>();
 
-            var allileanrn =  ShareDocVM.RetrieveMyLearn(updater,this);
+            var mycache = HttpContext.Cache;
+            var allileanrntmp = mycache.Get(updater.ToUpper() + "_ILearn_CUST");
+            var allileanrn = new List<ShareDocVM>();
+            if (allileanrntmp == null)
+            {
+                allileanrn = ShareDocVM.RetrieveMyLearn(updater, this);
+                mycache.Insert(updater.ToUpper() + "_ILearn_CUST", allileanrn, null, DateTime.Now.AddDays(1), Cache.NoSlidingExpiration);
+            }
+            else
+            {
+                allileanrn = (List<ShareDocVM>)allileanrntmp;
+            }
+
             foreach (var item in allileanrn)
             {
                 if (item.DOCTag.ToUpper().Contains(SPECIALBLOGType.WEEKLYREPORT)
@@ -1284,6 +1302,8 @@ namespace Prometheus.Controllers
                 ShareDocVM.RemoveMyLearn(key, updater);
             }
 
+            ClearILearnCache(updater);
+
             return RedirectToAction("ILearn", "User");
         }
 
@@ -1309,14 +1329,31 @@ namespace Prometheus.Controllers
                 && !string.IsNullOrEmpty(DOCCreator))
             {
                 ShareDocVM.LikeDoc(DOCKey, DOCCreator, updater,this);
+                ClearILearnCache(updater);
             }
             return RedirectToAction("ILearn", "User");
         }
 
         public ActionResult RemoveBlogDoc(string DOCKey)
         {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "ILearn");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
             UserBlogVM.RemoveBlogDoc(DOCKey);
             ShareDocVM.RemoveDoc(DOCKey);
+            ClearILearnCache(string.Empty);
             return RedirectToAction("IBLOG", "User");
         }
 
@@ -1335,11 +1372,13 @@ namespace Prometheus.Controllers
                 CookieUtility.SetCookie(this, ck);
                 return RedirectToAction("LoginUser", "User");
             }
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
             if (!string.IsNullOrEmpty(DOCPJK)
                 && !string.IsNullOrEmpty(DOCKey))
             {
                 ShareDocVM.RemoveDoc(DOCKey);
+                ClearILearnCache(string.Empty);
             }
 
             return RedirectToAction("ILearn", "User");
@@ -1366,6 +1405,7 @@ namespace Prometheus.Controllers
             foreach (var w in whoes)
             {
                 ShareDocVM.IPushDoc(DOCPJK, DOCKey, w.Trim().ToUpper(),updater,this);
+                ClearILearnCache(w.Trim());
             }
 
             ShareDocVM.SendPushDocEvent("a new document about " + DOCKey, "/User/WebDoc?DocKey=" + HttpUtility.UrlEncode(DOCKey) + "&Creator=" + updater.ToUpper(), updater, updater, this);
@@ -1427,11 +1467,13 @@ namespace Prometheus.Controllers
             var whoes = ToWho.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var w in whoes)
             {
+                ClearILearnCache(w.Trim());
                 ShareDocVM.PushDoc(w.Trim().ToUpper(), "ALL", ShareDocType.BLOG, DOCKey, vm.Tag, vm.UserName, DateTime.Now.ToString(), "",docid,vm.DocURL);
                 ShareDocVM.SendPushDocEvent("a new document about " + vm.Tag, vm.DocURL, ToWho, updater.ToUpper(), this, tempreason);
             }
 
             ShareDocVM.SendPushDocEvent("a new document about " + vm.Tag, vm.DocURL, updater.ToUpper(), updater.ToUpper(), this, tempreason);
+
 
             return RedirectToAction("IBLOG", "User");
         }
@@ -1564,6 +1606,8 @@ namespace Prometheus.Controllers
                 tag = "Default;".ToUpper();
             }
 
+            ClearILearnCache(string.Empty);
+
             UserBlogVM.StoreUserTag(updater, tag);
 
             var urls = ReceiveRMAFiles();
@@ -1624,6 +1668,8 @@ namespace Prometheus.Controllers
                 DefaultActionForBlogDoc(currentblog, updater);
             }
 
+            ClearILearnCache(string.Empty);
+
             return RedirectToAction("IBLOG", "User");
         }
 
@@ -1673,6 +1719,9 @@ namespace Prometheus.Controllers
             var dict = new RouteValueDictionary();
             dict.Add("DocKey", vm.DocKey);
             dict.Add("Creator", vm.UserName);
+
+            ClearILearnCache(string.Empty);
+
             return RedirectToAction("WebDoc", "User", dict);
         }
 
@@ -1823,6 +1872,9 @@ namespace Prometheus.Controllers
             var dict = new RouteValueDictionary();
             dict.Add("DocKey", dockey);
             dict.Add("Creator", doccreator);
+
+            ClearILearnCache(string.Empty);
+
             return RedirectToAction("WebDoc", "User", dict);
 
             //var vm = UserBlogVM.RetrieveBlogDoc(dockey);
@@ -1877,6 +1929,7 @@ namespace Prometheus.Controllers
             var dict = new RouteValueDictionary();
             dict.Add("DocKey", errorkey);
             dict.Add("Creator", creator);
+            ClearILearnCache(creator);
             return RedirectToAction("WebDoc", "User", dict);
         }
 
@@ -2475,16 +2528,23 @@ namespace Prometheus.Controllers
             ViewBag.RealUserID = updater;
             ViewBag.cUserName = username.Split(new char[] { '@' })[0];
             ViewBag.cUserID = username;
+            //user list in current group
+            var usergroup = UserGroupVM.RetreiveUserGroup(updater, UserGroupType.ReportGroup);
+            var userlist = usergroup.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
+            ViewBag.userreportlist = WeeklyReportVM.GetUserLatestTime("'" + string.Join("','", userlist) + "'");
+
             //user's project list
             var projectlist = UserViewModels.RetrieveUserProjectKeyDict(username);
             var dayofweek = Convert.ToInt32(DateTime.Now.DayOfWeek);
-            var sDate = DateTime.Now.AddDays((4 - dayofweek) - 7).ToString("yyyy-MM-dd 07:30:00");
+            var sDate = DateTime.Now.AddDays((dayofweek > 4) ? (4 - dayofweek) : ((4 - dayofweek) - 7)).ToString("yyyy-MM-dd 07:30:00");
+            var stDate = DateTime.Now.AddDays((dayofweek > 4) ? (4 - dayofweek) : ((4 - dayofweek) - 7)).AddDays(1).ToString("yyyy-MM-dd 07:30:00");
             var eDate = DateTime.Now.ToString("yyyy-MM-dd 07:30:00");
             var cDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             var ProjectKeyList = new Dictionary<string, int>();
             var YieldDataList = new Dictionary<string, WeeklyYieldData>();
             var historyIcareList = new Dictionary<string, TaskDataWithUpdateFlg>();
             var icareList = new Dictionary<string, TaskDataWithUpdateFlg>();
+            var icareDebugTree = new Dictionary<string, List<ProjectErrorViewModels>>();
             var historyTaskList = new Dictionary<string, TaskDataWithUpdateFlg>();
             var taskList = new Dictionary<string, TaskDataWithUpdateFlg>();
             var historyCriList = new Dictionary<string, TaskDataWithUpdateFlg>();
@@ -2508,27 +2568,29 @@ namespace Prometheus.Controllers
                 //i care
                 if(setting.ICare == 1)
                 {
-                    historyIcareList.Add(project.Key, getIcareTask(username, project.Key, 0, sDate, cDate));
-                    var icarelist_tmp = getIcareTask(username, project.Key, 1, sDate, cDate);
-                    task_total += icarelist_tmp.IsUpdate ? icarelist_tmp.TaskList.Count : 0;
+                    historyIcareList.Add(project.Key, getIcareTask(username, project.Key, 0, stDate, cDate));
+                    var icarelist_tmp = getIcareTask(username, project.Key, 1, stDate, cDate);
+                    task_total += icarelist_tmp.TaskList.Count;
                     icareList.Add(project.Key, icarelist_tmp);
+                    //debug tree
+                    icareDebugTree.Add(project.Key, ProjectErrorICareVM.GetProjectErrorICareList(username, project.Key, stDate, cDate, this));
                 }
 
                 //task
                 if (setting.Task == 1)
                 {
-                    historyTaskList.Add(project.Key, getProjectTask(username, project.Key, 0, sDate, cDate, ISSUESUBTYPE.Task));
-                    var taskList_tmp = getProjectTask(username, project.Key, 1, sDate, cDate, ISSUESUBTYPE.Task);
-                    task_total += taskList_tmp.IsUpdate ? taskList_tmp.TaskList.Count : 0;
+                    historyTaskList.Add(project.Key, getProjectTask(username, project.Key, 0, stDate, cDate, ISSUESUBTYPE.Task));
+                    var taskList_tmp = getProjectTask(username, project.Key, 1, stDate, cDate, ISSUESUBTYPE.Task);
+                    task_total += taskList_tmp.TaskList.Count;
                     taskList.Add(project.Key, taskList_tmp);
                 }
 
                 //critical failure task
                 if (setting.CriticalFailure == 1)
                 {
-                    historyCriList.Add(project.Key, getProjectTask(username, project.Key, 0, sDate, cDate, ISSUESUBTYPE.CrititalFailureTask, false));
-                    var criList_tmp = getProjectTask(username, project.Key, 1, sDate, cDate, ISSUESUBTYPE.CrititalFailureTask, false);
-                    task_total += criList_tmp.IsUpdate ? criList_tmp.TaskList.Count : 0;
+                    historyCriList.Add(project.Key, getProjectTask(username, project.Key, 0, stDate, cDate, ISSUESUBTYPE.CrititalFailureTask, false));
+                    var criList_tmp = getProjectTask(username, project.Key, 1, stDate, cDate, ISSUESUBTYPE.CrititalFailureTask, false);
+                    task_total += criList_tmp.TaskList.Count;
                     criticalList.Add(project.Key, criList_tmp);
                 }
 
@@ -2537,18 +2599,18 @@ namespace Prometheus.Controllers
                 {
                     historyRMAList.Add(project.Key, getProjectTask(username, project.Key, 0, sDate, cDate, ISSUESUBTYPE.RMA));
                     var rmaList_tmp = getProjectTask(username, project.Key, 1, sDate, cDate, ISSUESUBTYPE.RMA);
-                    task_total += rmaList_tmp.IsUpdate ? rmaList_tmp.TaskList.Count : 0;
+                    task_total += rmaList_tmp.TaskList.Count;
                     RMAList.Add(project.Key, rmaList_tmp);
                 }
 
                 //debug tree
                 if (setting.DebugTree == 1)
                 {
-                    DebugTreeList.Add(project.Key, ProjectErrorViewModels.RetrieveWeeklyErrorByPJKey(project.Key, sDate, cDate, this));
+                    DebugTreeList.Add(project.Key, ProjectErrorViewModels.RetrieveWeeklyErrorByPJKey(project.Key, stDate, cDate, this));
                 }
 
                 //get current week summary
-                SummaryList.Add(project.Key, getCurWeekSummary(project.Key, sDate, cDate));
+                SummaryList.Add(project.Key, getCurWeekSummary(project.Key, stDate, cDate));
 
                 ProjectKeyList.Add(project.Key, task_total);
             }
@@ -2558,6 +2620,7 @@ namespace Prometheus.Controllers
             ViewBag.YieldDataList = YieldDataList;
             ViewBag.historyIcareList = historyIcareList;
             ViewBag.icareList = icareList;
+            ViewBag.icareDebugTree = icareDebugTree;
             ViewBag.historyTaskList = historyTaskList;
             ViewBag.taskList = taskList;
             ViewBag.historyCriList = historyCriList;
@@ -2570,93 +2633,122 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        //[HttpPost]
+        //public JsonResult GetHistoryTask(string pKey, string uName, int tType)
+        //{
+        //    var dayofweek = Convert.ToInt32(DateTime.Now.DayOfWeek);
+        //    var sDate = DateTime.Now.AddDays((4 - dayofweek) - 7).ToString("yyyy-MM-dd 07:30:00");
+        //    var eDate = DateTime.Now.ToString("yyyy-MM-dd 07:30:00");
+        //    var cDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        //    var data = getProjectTask(uName, pKey, 1, sDate, cDate, tType);
+
+        //    var ret = new JsonResult();
+
+        //    ret.Data = new { success = true, data = data };
+
+        //    return ret;
+        //}
+
         private WeeklyYieldData getProjectYield(string projectkey, string sDate, string eDate)
         {
-            var datalist = new List<string>();
-            var pvm = ProjectViewModels.RetrieveOneProject(projectkey);
-            var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(projectkey, sDate, eDate, pvm, HttpContext.Cache);
-            var firstdatalist = new List<KeyValuePair<string, int>>();
-            var fpy = yieldvm.FirstYield * 100;
-            var fy = yieldvm.LastYield * 100;
-
-            //pareto
-            var pareto = "";
-            var tops = new Dictionary<string, int>();
-            if (yieldvm.LastYields.Count > 0)
+            var eDateStr = Convert.ToDateTime(eDate).ToString("yyyyMMddHHmmss");
+            var mycache = HttpContext.Cache;
+            var data = mycache.Get(projectkey + "_" + eDateStr + "_WR_Yield_CUST");
+            if(data != null)
             {
-                var piedatadict = new Dictionary<string, int>();
-                var eklist = new List<string>();
-                foreach (var error in yieldvm.LErrorMap.Keys)
-                {
-                    eklist.Add(error);
-                }
+                return (WeeklyYieldData)data;
+            }
+            else
+            {
+                var datalist = new List<string>();
+                var pvm = ProjectViewModels.RetrieveOneProject(projectkey);
+                var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(projectkey, sDate, eDate, pvm, HttpContext.Cache);
+                var firstdatalist = new List<KeyValuePair<string, int>>();
+                var fpy = yieldvm.FirstYield * 100;
+                var fy = yieldvm.LastYield * 100;
 
-                foreach (var error in eklist)
+                //pareto
+                var pareto = "";
+                var tops = new Dictionary<string, int>();
+                if (yieldvm.LastYields.Count > 0)
                 {
-                    if (string.Compare(error, "PASS", true) != 0)
+                    var piedatadict = new Dictionary<string, int>();
+                    var eklist = new List<string>();
+                    foreach (var error in yieldvm.LErrorMap.Keys)
                     {
-                        foreach (var test in yieldvm.LastYields)
-                        {
-                            var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.LErrorMap);
+                        eklist.Add(error);
+                    }
 
-                            if (piedatadict.ContainsKey(error))
+                    foreach (var error in eklist)
+                    {
+                        if (string.Compare(error, "PASS", true) != 0)
+                        {
+                            foreach (var test in yieldvm.LastYields)
                             {
-                                var preval = piedatadict[error];
-                                piedatadict[error] = preval + val;
-                            }
-                            else
-                            {
-                                piedatadict.Add(error, val);
+                                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.LErrorMap);
+
+                                if (piedatadict.ContainsKey(error))
+                                {
+                                    var preval = piedatadict[error];
+                                    piedatadict[error] = preval + val;
+                                }
+                                else
+                                {
+                                    piedatadict.Add(error, val);
+                                }
                             }
                         }
                     }
+
+                    tops = piedatadict.OrderByDescending(o => o.Value).ToDictionary(p => p.Key, o => o.Value);
+
+                    var fytestdatalist = piedatadict.ToList();
+
+
+                    if (fytestdatalist.Count > 0)
+                    {
+                        pareto = fytparetofun(fytestdatalist, projectkey, sDate, eDate);
+                    }
                 }
-
-                tops = piedatadict.OrderByDescending(o => o.Value).ToDictionary(p => p.Key, o => o.Value);
-
-                var fytestdatalist = piedatadict.ToList();
+                //weekly yield trend
+                var trend = ProjectWeeklyTrend(this, projectkey, 4);
 
 
-                if (fytestdatalist.Count > 0)
+                datalist.Add(fpy.ToString("0.00") + "%");
+                datalist.Add(fy.ToString("0.00") + "%");
+                var idx = 0;
+                var total = tops.Sum(x => x.Value);
+                foreach (var top in tops)
                 {
-                    pareto = fytparetofun(fytestdatalist, projectkey, sDate, eDate);
+                    if (idx < 3)
+                    {
+                        datalist.Add(top.Key);
+                        datalist.Add((Convert.ToDouble(top.Value) / total * 100).ToString("0.00") + "%");
+                    }
+                    else
+                    {
+                        break;
+                    }
+                    idx++;
                 }
+                if (tops.Count < 3)
+                {
+                    for (var i = 0; i < 3 - tops.Count; i++)
+                    {
+                        datalist.Add("");
+                        datalist.Add("");
+                    }
+                }
+
+                var newdata = new WeeklyYieldData(
+                    datalist,
+                    pareto,
+                    trend
+                );
+                mycache.Insert(projectkey + "_" + eDateStr + "_WR_Yield_CUST", newdata, null, DateTime.Now.AddHours(12), Cache.NoSlidingExpiration);
+
+                return newdata;
             }
-            //weekly yield trend
-            var trend = ProjectWeeklyTrend(this, projectkey, 4);
-
-
-            datalist.Add(fpy.ToString("0.00") + "%");
-            datalist.Add(fy.ToString("0.00") + "%");
-            var idx = 0;
-            var total = tops.Sum(x => x.Value);
-            foreach (var top in tops)
-            {
-                if(idx < 3)
-                {
-                    datalist.Add(top.Key);
-                    datalist.Add((Convert.ToDouble(top.Value)/ total * 100).ToString("0.00")+"%");
-                }
-                else
-                {
-                    break;
-                }
-                idx++;
-            }
-            if(tops.Count < 3)
-            {
-                for(var i = 0; i < 3 - tops.Count; i++)
-                {
-                    datalist.Add("");
-                    datalist.Add("");
-                }
-            }
-
-            return new WeeklyYieldData(
-                datalist,
-                pareto,
-                trend
-            );
         }
 
         private string fytparetofun(List<KeyValuePair<string, int>> retestdatalist, string ProjectKey, string StartDate, string EndDate)
@@ -2916,12 +3008,42 @@ namespace Prometheus.Controllers
 
         private TaskDataWithUpdateFlg getProjectTask(string username, string projectkey, int period, string sDate, string eDate, int iType, bool wSubTask = true)
         {
-            return IssueViewModels.getProjectTask(username, projectkey, period, sDate, eDate, iType, wSubTask);
+            if(period == 0)
+            {
+                var sDateStr = Convert.ToDateTime(sDate).ToString("yyyyMMdd");
+                var mycache = HttpContext.Cache;
+                var taskList = mycache.Get(username + "_" + projectkey + "_" + sDateStr + "_" + iType + "_TASK_CUST");
+                if (taskList == null)
+                {
+                    taskList = IssueViewModels.getProjectTask(username, projectkey, period, sDate, eDate, iType, wSubTask);
+                    mycache.Insert(username + "_" + projectkey + "_" + sDateStr + "_" + iType + "_TASK_CUST", taskList, null, DateTime.Now.AddHours(12), Cache.NoSlidingExpiration);
+                }
+                return (TaskDataWithUpdateFlg)taskList;
+            }
+            else
+            {
+                return IssueViewModels.getProjectTask(username, projectkey, period, sDate, eDate, iType, wSubTask);
+            }
         }
 
         private TaskDataWithUpdateFlg getIcareTask(string username, string projectkey, int period, string sDate, string eDate)
         {
-            return IssueViewModels.getIcareTask(username, projectkey, period, sDate, eDate);
+            if (period == 0)
+            {
+                var sDateStr = Convert.ToDateTime(sDate).ToString("yyyyMMdd");
+                var mycache = HttpContext.Cache;
+                var icareList = mycache.Get(username + "_" + projectkey + "_" + sDateStr + "_Icare_TASK_CUST");
+                if(icareList == null)
+                {
+                    icareList = IssueViewModels.getIcareTask(username, projectkey, period, sDate, eDate);
+                    mycache.Insert(username + "_" + projectkey + "_" + sDateStr + "_Icare_TASK_CUST", icareList, null, DateTime.Now.AddHours(12), Cache.NoSlidingExpiration);
+                }
+                return (TaskDataWithUpdateFlg)icareList;
+            }
+            else
+            {
+                return IssueViewModels.getIcareTask(username, projectkey, period, sDate, eDate);
+            }
         }
 
         private Dictionary<string, List<WeeklyReportVM>> getCurWeekSummary(string pKey, string sDate, string eDate)
@@ -2986,7 +3108,7 @@ namespace Prometheus.Controllers
                 {
                     DateTimeFormatInfo dfi = DateTimeFormatInfo.CurrentInfo;
                     var year = DateTime.Now.Year;
-                    var week = dfi.Calendar.GetWeekOfYear(DateTime.Now, dfi.CalendarWeekRule, DayOfWeek.Thursday);
+                    var week = dfi.Calendar.GetWeekOfYear(DateTime.Now, dfi.CalendarWeekRule, DayOfWeek.Friday);
                     foreach (var item in data)
                     {
                         reports.Add(new WeeklyReportVM(
@@ -3003,6 +3125,14 @@ namespace Prometheus.Controllers
                             DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                             DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
                         ));
+
+                        //save to issue comment
+                        if (!string.IsNullOrEmpty(item[2]) && !string.IsNullOrEmpty(item[0]))
+                        {
+                            var issuecomment = new IssueComments();
+                            issuecomment.Comment = SeverHtmlDecode.Decode(this, item[2]);
+                            IssueViewModels.StoreUniqueIssueComment(item[0], issuecomment.dbComment, updater, COMMENTTYPE.WeeklyReportSummary);
+                        }
                     }
                     WeeklyReportVM.SaveWeeklyReport(reports);
                 }
@@ -3056,6 +3186,27 @@ namespace Prometheus.Controllers
             {
                 ret.Data = new { success = false };
                 return ret;
+            }
+        }
+
+        private void ClearILearnCache(string updater)
+        {
+            var key = "_ILearn_CUST";
+            var mycache = HttpContext.Cache;
+            if (string.IsNullOrEmpty(updater))
+            {
+                var allcache = mycache.GetEnumerator();
+                while (allcache.MoveNext())
+                {
+                    if (allcache.Key.ToString().IndexOf(key) != -1)
+                    {
+                        mycache.Remove(allcache.Key.ToString());
+                    }
+                }
+            }
+            else
+            {
+                mycache.Remove(updater.ToUpper() + key);
             }
         }
     }

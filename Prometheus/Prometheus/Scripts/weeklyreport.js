@@ -27,7 +27,7 @@
                                         '</div>';
                         }
                         var appendStr = '<tr>' +
-                            '<td colspan="7">' +
+                            '<td colspan="8">' +
                                 '<div class="collapse in" id="' + data_target + '">' +
                                     '<div class="row well data-summary">' +
                                         '<label>Summary:</label>' +
@@ -64,7 +64,7 @@
                 $($content).each(function () {
                     var arrtmp = new Array();
                     var ikey = $(this).attr('data-ikey');
-                    var sumstr = $(this).find('textarea').val();
+                    var sumstr = $(this).find('textarea').val().replace(/'/g, ' ');
                     var mark = $(this).find('select').val();
                     if (sumstr != '') {
                         arrtmp.push(ikey, mark, sumstr);
@@ -88,7 +88,7 @@
             }
             else {
                 var arrtmp = new Array();
-                var sumstr = $(this).parent('.wr-operation').prev().find('textarea').val();
+                var sumstr = $(this).parent('.wr-operation').prev().find('textarea').val().replace(/'/g, ' ');
                 if (sumstr == '') {
                     return false;
                 }
@@ -103,23 +103,7 @@
                 data: JSON.stringify(data)
             }, function (output) {
                 if (output.success) {
-                    if ($content.parent('section').next('section').length > 0) {
-                        $content.collapse('hide');
-                        $content.parent('section').next('section').children('.content').collapse('show');
-                    }
-                    else {
-                        var $pro_info = $content.parent('section').parent('.project-info');
-                        var $next_pro_info = $pro_info.next().next();
-                        if ($next_pro_info.find('section').length > 0) {
-                            $content.collapse('hide');
-                            $pro_info.addClass('hidden');
-                            $next_pro_info.removeClass("hidden");
-                            $next_pro_info.find('section').eq(0).children('.content').collapse('show');
-                        }
-                        else {
-                            window.location.reload();
-                        }
-                    }
+                    alert("Save successfully!");
                 }
                 else {
                     alert("Failed to save!");
@@ -159,6 +143,11 @@
                     alert("Failed to update!");
                 }
             })
+        })
+
+        $('body').on('change', '#userreportlist', function () {
+            $('#myModal').modal('show');
+            window.location.href = '/User/WeeklyReport?username='+$.trim($(this).val());
         })
     }
 

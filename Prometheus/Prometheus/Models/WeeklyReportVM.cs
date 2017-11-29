@@ -111,7 +111,9 @@ namespace Prometheus.Models
             var sql = "select ID, UserName, ProjectKey, IssueKey, Summary, Type, Year, Week, "+
                 "Mark, Status, CreateTime, UpdateTime "+
                 "from WeeklyReport "+
-                "where IssueKey = '<IssueKey>' and Type = '<SummaryType>' and Status = '<Status>'"+
+                "where IssueKey = N'<IssueKey>' and Type = '<SummaryType>' "+ 
+                "and Status = '<Status>' " +
+                "and (Summary <> '' or Summary <> null)" +
                 "order by UpdateTime Desc; ";
             sql = sql.Replace("<IssueKey>", iKey).Replace("<SummaryType>", sType).Replace("<Status>", SummaryStatus.Valid.ToString());
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
@@ -141,38 +143,67 @@ namespace Prometheus.Models
             var items = "";
             foreach(var rep in report)
             {
-                //var sqltmp = "update WeeklyReport set Status = '<DelStatus>'" +
-                var sqltmp = "delete from WeeklyReport " +
-                        "where ProjectKey = '<ProjectKey>' " +
-                        "and IssueKey = '<IssueKey>' " +
-                        "and Year = '<Year>' and Week = '<Week>' "+
-                        "and Type = '<Type>' and UserName = '<UserName>' "+
+                var s_sql = "select Summary, Mark from WeeklyReport " +
+                        "where ProjectKey = N'<ProjectKey>' " +
+                        "and IssueKey = N'<IssueKey>' " +
+                        "and Year = '<Year>' and Week = '<Week>' " +
+                        "and Type = '<Type>' and UserName = N'<UserName>' " +
                         "and Status = '<Status>';";
-                sqltmp = sqltmp.Replace("<DelStatus>", SummaryStatus.Delete.ToString())
-                        .Replace("<ProjectKey>", rep.ProjectKey)
+                s_sql = s_sql.Replace("<ProjectKey>", rep.ProjectKey)
                         .Replace("<IssueKey>", rep.IssueKey)
-                        .Replace("<Year>", rep.Year).Replace("<Week>", rep.Week)
+                        .Replace("<Year>", rep.Year)
+                        .Replace("<Week>", rep.Week)
                         .Replace("<Type>", rep.Type)
                         .Replace("<UserName>", rep.UserName)
                         .Replace("<Status>", SummaryStatus.Valid.ToString());
-                DBUtility.ExeLocalSqlNoRes(sqltmp);
-                items += "('" + rep.UserName + "'," 
-                        + "'" + rep.ProjectKey + "'," 
-                        + "'" + rep.IssueKey + "',"
-                        + "'" + rep.Summary + "',"
-                        + "'" + rep.Type + "',"
-                        + "'" + rep.Year + "',"
-                        + "'" + rep.Week + "',"
-                        + "'" + rep.Mark + "',"
-                        + "'" + rep.Status + "',"
-                        + "'" + rep.CreateTime + "',"
-                        + "'" + rep.UpdateTime + "'),";
-            }
-            items = items.Substring(0, items.Length - 1);
-            var sql = "insert into WeeklyReport (UserName, ProjectKey, IssueKey, Summary, [Type], [Year], [Week], [Mark], [Status], [CreateTime], [UpdateTime]) values <Items>; ";
-            sql = sql.Replace("<Items>", items);
+                var exist_data = DBUtility.ExeLocalSqlWithRes(s_sql, null);
+                if (exist_data.Count == 1 && string.Compare(exist_data[0][0].ToString(), rep.Summary) == 0
+                    && string.Compare(exist_data[0][1].ToString(), rep.Mark) == 0)
+                {
 
-            DBUtility.ExeLocalSqlNoRes(sql);
+                }
+                else
+                {
+                    if(exist_data.Count > 0)
+                    {
+                        var sqltmp = "update WeeklyReport set Status = '<DelStatus>' " +
+                            //var sqltmp = "delete from WeeklyReport " +
+                            "where ProjectKey = N'<ProjectKey>' " +
+                            "and IssueKey = N'<IssueKey>' " +
+                            "and Year = '<Year>' and Week = '<Week>' " +
+                            "and Type = '<Type>' and UserName = N'<UserName>' " +
+                            "and Status = '<Status>';";
+                        sqltmp = sqltmp.Replace("<DelStatus>", SummaryStatus.Delete.ToString())
+                                .Replace("<ProjectKey>", rep.ProjectKey)
+                                .Replace("<IssueKey>", rep.IssueKey)
+                                .Replace("<Year>", rep.Year).Replace("<Week>", rep.Week)
+                                .Replace("<Type>", rep.Type)
+                                .Replace("<UserName>", rep.UserName)
+                                .Replace("<Status>", SummaryStatus.Valid.ToString());
+                        DBUtility.ExeLocalSqlNoRes(sqltmp);
+                    }
+                    items += "(N'" + rep.UserName + "',"
+                            + "N'" + rep.ProjectKey + "',"
+                            + "N'" + rep.IssueKey + "',"
+                            + "N'" + rep.Summary + "',"
+                            + "'" + rep.Type + "',"
+                            + "'" + rep.Year + "',"
+                            + "'" + rep.Week + "',"
+                            + "'" + rep.Mark + "',"
+                            + "'" + rep.Status + "',"
+                            + "'" + rep.CreateTime + "',"
+                            + "'" + rep.UpdateTime + "'),";
+                }
+                
+            }
+            if ( ! string.IsNullOrEmpty(items))
+            {
+                items = items.Substring(0, items.Length - 1);
+                var sql = "insert into WeeklyReport (UserName, ProjectKey, IssueKey, Summary, [Type], [Year], [Week], [Mark], [Status], [CreateTime], [UpdateTime]) values <Items>; ";
+                sql = sql.Replace("<Items>", items);
+
+                DBUtility.ExeLocalSqlNoRes(sql);
+            }
         }
 
         public static Dictionary<string, List<WeeklyReportVM>> GetIssueSummary(string pKey, string sDate, string eDate)
@@ -180,8 +211,8 @@ namespace Prometheus.Models
             var sql = "select ID, UserName, ProjectKey, IssueKey, Summary, Type, Year, Week, " +
                 "Mark, Status, CreateTime, UpdateTime " +
                 "from WeeklyReport " +
-                "where ProjectKey = '<ProjectKey>' and UpdateTime "+
-                "between '<sDate>' and '<eDate>' and Status = '<Status>' " +
+                "where ProjectKey = N'<ProjectKey>' " +
+                "and UpdateTime between '<sDate>' and '<eDate>' and Status = '<Status>' " +
                 "order by UpdateTime Desc; ";
             sql = sql.Replace("<ProjectKey>", pKey)
                     .Replace("<sDate>", sDate)
@@ -240,9 +271,10 @@ namespace Prometheus.Models
             DueDate = DateTime.Now;
             UpdateTime = DateTime.Now;
             ParentIssueKey = string.Empty;
+            Assignee = string.Empty;
             Attachment = new List<string>();
         }
-        public TaskData(string iKey, string des, string type, string subtype, string status, DateTime sDate, DateTime dDate, DateTime uUpdate, string pIKey, List<string> attach)
+        public TaskData(string iKey, string des, string type, string subtype, string status, DateTime sDate, DateTime dDate, DateTime uUpdate, string pIKey, string assignee, List<string> attach)
         {
             IssueKey = iKey;
             Description = des;
@@ -253,6 +285,7 @@ namespace Prometheus.Models
             DueDate = dDate;
             UpdateTime = uUpdate;
             ParentIssueKey = pIKey;
+            Assignee = assignee;
             Attachment = attach;
         }
         public string IssueKey { set; get; }
@@ -264,6 +297,7 @@ namespace Prometheus.Models
         public DateTime DueDate { set; get; }
         public DateTime UpdateTime { set; get; }
         public string ParentIssueKey { set; get; }
+        public string Assignee { set; get; }
         public List<string> Attachment { set; get; }
     }
 
@@ -372,7 +406,7 @@ namespace Prometheus.Models
                             + "ICare = '<ICare>', Task = '<Task>', CriticalFailure = '<CriticalFailure>', "
                             + "RMA = '<RMA>', DebugTree = '<DebugTree>', "
                             + "Others = '<Others>', UpdateTime = '<UpdateTime>' "
-                            + "where UserName = '<UserName>'; ";
+                            + "where UserName = N'<UserName>'; ";
                 updatesql = updatesql.Replace("<UserName>", setting.UserName)
                         .Replace("<Yield>", setting.Yield.ToString())
                         .Replace("<ICare>", setting.ICare.ToString())
@@ -389,7 +423,7 @@ namespace Prometheus.Models
                 var insertsql = "insert into WeeklyReportSetting "
                             + "(UserName, Yield, ICare, Task, CriticalFailure, RMA, "
                             + "DebugTree, Others, CreateTime, UpdateTime) values "
-                            + "('<UserName>', '<Yield>', '<ICare>', '<Task>', '<CriticalFailure>', "
+                            + "(N'<UserName>', '<Yield>', '<ICare>', '<Task>', '<CriticalFailure>', "
                             + "'<RMA>', '<DebugTree>', '<Others>', '<CreateTime>', '<UpdateTime>'); ";
                 insertsql = insertsql.Replace("<UserName>", setting.UserName)
                         .Replace("<Yield>", setting.Yield.ToString())

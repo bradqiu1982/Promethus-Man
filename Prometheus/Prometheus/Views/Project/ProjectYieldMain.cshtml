@@ -172,13 +172,8 @@
 
             function showbryield()
             {
-                if (document.getElementById("yieldtypelist").value == "BR" && document.getElementById("BRNUM").value)
-                {
-                    window.location.href = "/Project/ProjectBRYield?ProjectKey=@ViewBag.pjkey" + "&BRNUM=" + document.getElementById("BRNUM").value;
-                }
-                if (document.getElementById("yieldtypelist").value == "JO" && document.getElementById("BRNUM").value)
-                {
-                    window.location.href = "/Project/ProjectJOYield?ProjectKey=@ViewBag.pjkey" + "&BRNUM=" + document.getElementById("BRNUM").value;
+                if (document.getElementById("BRNUM").value){
+                    window.location.href = "/Project/Project" + $.trim(document.getElementById("yieldtypelist").value) +"Yield?ProjectKey=@ViewBag.pjkey" + "&BRNUM=" + document.getElementById("BRNUM").value;
                 }
             }
         </script>

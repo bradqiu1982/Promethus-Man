@@ -10,6 +10,7 @@ namespace Prometheus.Models
     {
         public static string BR = "BR";
         public static string JO = "JO";
+        public static string PN = "PN";
     }
 
     public class TestDataErrorSum
@@ -523,8 +524,6 @@ namespace Prometheus.Models
                     }
                 }
             }
-
-
         }
 
         public static ProjectYieldViewModule GetYieldByDateRange(string pjkey, string sdate, string edate, ProjectViewModels pvm,Cache mycache)

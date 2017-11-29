@@ -88,7 +88,7 @@
     margin-bottom: 0;
 }
 .wr-operation{
-    margin: 2% auto 5% auto;
+    margin: 2% auto 2% auto;
     text-align: center;
 }
 .op-btn{
@@ -166,4 +166,13 @@
     border-left-width: 6px;
     border-left-style: solid;
     border-left-color: #5cb85c;
+}
+
+.wr-op-setting{
+    margin-bottom: 2%;
+    margin-left: -15px;
+}
+
+.icare-dt{
+    margin-bottom: 5px;
 }

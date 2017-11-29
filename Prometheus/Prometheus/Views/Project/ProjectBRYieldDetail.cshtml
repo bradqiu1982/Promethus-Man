@@ -15,28 +15,8 @@
             @if (Model != null)
             {
                 <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ProjectKey)">Project Detail</a></li>
-            }
-
-            @if (Model != null)
-            {
                 <li><a data-toggle="tooltip" title="Goto Yield Main Page" href="/Project/ProjectYieldMain?ProjectKey=@(Model.ProjectKey)">Yield Main</a></li>
-            }
-
-            @if (Model != null)
-            {
-                if (string.Compare(@ViewBag.BRType, Prometheus.Models.YIELDTYPE.BR) == 0)
-                {
-                    <li><a data-toggle="tooltip" title="Goto Yield Page" href="/Project/ProjectBRYield?ProjectKey=@(Model.ProjectKey+ "&BRNUM="+ ViewBag.BRNUM)">BR Yield</a></li>
-                }
-                else
-                {
-                    <li><a data-toggle="tooltip" title="Goto Yield Page" href="/Project/ProjectJOYield?ProjectKey=@(Model.ProjectKey+ "&BRNUM="+ ViewBag.BRNUM)">JO Yield</a></li>
-                }
-
-            }
-
-            @if (Model != null)
-            {
+                <li><a data-toggle="tooltip" title="Goto Yield Page" href="/Project/Project@(ViewBag.BRType)Yield?ProjectKey=@(Model.ProjectKey+ "&BRNUM="+ ViewBag.BRNUM)">@(ViewBag.BRType) Yield</a></li>
                 <li class="active">@Model.ProjectKey @ViewBag.BRType Yield Detail</li>
             }
             else

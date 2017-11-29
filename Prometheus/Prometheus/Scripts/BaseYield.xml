@@ -42,13 +42,13 @@ $(function () {
             series:{
               allowPointSelect:true,
               point: {
-                        events:{
-                          click:function(e)
-                          {
-                            #REDIRECTURL#
-                          }
-                        }
-                        }
+                  events:{
+                    click:function(e)
+                    {
+                      #REDIRECTURL#
+                    }
+                  }
+               }
             }
         },
 				tooltip: {

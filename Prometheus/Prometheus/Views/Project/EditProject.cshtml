@@ -59,7 +59,7 @@
         <div class="col-xs-10">
             <div class="row form-group">
                 <div class="col-xs-6">
-                    <label class="control-label col-xs-3" for="ProjectName">Project</label>
+                    <label class="control-label col-xs-3" for="ProjectName">Project<font color="red">*</font></label>
                     <div class="col-xs-8">
                         @if (Model != null && !string.IsNullOrEmpty(Model.ProjectName))
                         {
@@ -68,7 +68,7 @@
                     </div>
                 </div>
                 <div class="col-xs-6">
-                    <label class="control-label col-xs-4" for="StartDate">StartDate</label>
+                    <label class="control-label col-xs-4" for="StartDate">StartDate<font color="red">*</font></label>
                     <div class="col-xs-8">
                         @if (Model != null && !string.IsNullOrEmpty(Model.StartDate.ToString()))
                         {
@@ -92,7 +92,7 @@
                 </div>
             </div>
             <div class="row form-group">
-                <label class="control-label pm-width">PM</label>
+                <label class="control-label pm-width">PM<font color="red">*</font></label>
                 <div class="col-xs-10">
                     <div data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
                         <textarea class="form-control pm-textarea-width" name="PMAddr" id="PMAddr" 
@@ -106,7 +106,7 @@
             </div>
             <div class="row form-group">
                 <div class="col-xs-6">
-                    <label class="control-label col-xs-3">Engineer</label>
+                    <label class="control-label col-xs-3">Engineer<font color="red">*</font></label>
                     <div class="col-xs-8">
                         <div data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
                             @if (Model != null && !string.IsNullOrEmpty(Model.EngListStr))
@@ -181,7 +181,7 @@
         <div  MYTP="red"  class="row" style="margin-left:3px">
             <div class="col-xs-12">
                 <a data-toggle="collapse" href="#commentinput" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
-                    <font color="black"><strong>&nbsp;&nbsp;Description</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
+                    <font color="black"><strong>&nbsp;&nbsp;Description<font color="red">*</font></strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
                 </a>
             </div>
         </div>

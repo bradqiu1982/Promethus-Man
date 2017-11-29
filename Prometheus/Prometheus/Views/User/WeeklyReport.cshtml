@@ -35,8 +35,18 @@
     <li><a href="/User/ILearn">I Share</a></li>
 </ul>
 <div class="tab-content col-xs-10" data-intro="Show detail of tab" data-step="2">
-    <div class="wr-setting">
-        <span class="glyphicon glyphicon-cog" title="Setting" data-toggle="modal" data-target="#modal_wr_setting"></span>
+    <div class="wr-op-setting">
+        <div class="reportlist col-xs-4">
+            <select class="userreportlist form-control" id="userreportlist" name="userreportlist">
+                @foreach (var user in ViewBag.userreportlist)
+                {
+                    <option value="@user.Key" @(string.Compare(user.Key, ViewBag.cUserID.ToUpper()) == 0 ? "selected":"")>@user.Key.Split(new char[] { '@' })[0]</option>
+                }
+            </select>
+        </div>
+        <div class="wr-setting">
+            <span class="glyphicon glyphicon-cog" title="Setting" data-toggle="modal" data-target="#modal_wr_setting"></span>
+        </div>
     </div>
     <div class="pro-info">
         @foreach (var pKey in ViewBag.pKeys)
@@ -44,6 +54,7 @@
             var yield_flg = false;
             var icare_flg = false;
             var icare_cnt = 0;
+            var icare_dt_flg = false;
             var icare_update = false;
             var task_flg = false;
             var task_cnt = 0;
@@ -61,8 +72,9 @@
             }
             if (ViewBag.setting.ICare == 1)
             {
+                icare_dt_flg = ViewBag.icareDebugTree.ContainsKey(pKey) && ViewBag.icareDebugTree[pKey].Count > 0;
                 icare_flg = ViewBag.icareList.ContainsKey(pKey) && ViewBag.icareList[pKey].TaskList.Count > 0;
-                icare_update = ViewBag.icareList[pKey].IsUpdate;
+                icare_update = ViewBag.icareList[pKey].IsUpdate || icare_dt_flg;
                 icare_cnt = icare_flg && icare_update ? ViewBag.icareList[pKey].TaskList.Count : 0;
             }
             if (ViewBag.setting.Task == 1)
@@ -182,7 +194,7 @@
                 @if (ViewBag.setting.ICare == 1)
                 {
                     <section id="ICare-@idx">
-                        <div class="bs-callout bs-callout-info @((icare_flg && icare_update)?"bs-callout-green":((icare_flg && !icare_update) ? "bs-callout-yellow" :""))"
+                        <div class="bs-callout bs-callout-info @(((icare_flg || icare_dt_flg) && icare_update)?"bs-callout-green":((icare_flg && !icare_update) ? "bs-callout-yellow" :""))"
                                 data-toggle="collapse" data-target="#content_icare_@idx" aria-expanded="false">
                             <h4>ICare</h4>
                         </div>
@@ -195,10 +207,21 @@
                                     </div>
                                     <div class="panel-body collapse" id="content_his_icare_@idx">
                                         <table class="table table-hover table-condensed icare-content" cellspacing="0">
+                                            <colgroup>
+                                                <col style="width: 5%;">
+                                                <col style="width: 45%;">
+                                                <col style="width: 12%;">
+                                                <col style="width: 10%;">
+                                                <col style="width: 6%;">
+                                                <col style="width: 6%;">
+                                                <col style="width: 10%;">
+                                                <col style="width: 6%;">
+                                            </colgroup>
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
                                                     <th>Description</th>
+                                                    <th>Assignee</th>
                                                     <th>Status</th>
                                                     <th>Start</th>
                                                     <th>Due</th>
@@ -216,6 +239,7 @@
                                                             data-ikey="@history.Value.IssueKey" data-itype="@history.Value.IssueSubType" aria-expanded="false">
                                                             <td>@(m + 1)</td>
                                                             <td><a href="/Issue/UpdateIssue?issuekey=@history.Key" target="_blank">@history.Value.Description</a></td>
+                                                            <td>@history.Value.Assignee.Split(new char[] { '@' })[0]</td>
                                                             <td>@history.Value.Status</td>
                                                             <td>@history.Value.StartDate.ToString("MM/dd")</td>
                                                             <td>@history.Value.DueDate.ToString("MM/dd")</td>
@@ -240,10 +264,21 @@
                                 m = 0;
                                 <div id="cur_icare_@idx">
                                     <table class="table table-condensed" cellpadding="0">
+                                        <colgroup>
+                                            <col style="width: 5%;">
+                                            <col style="width: 45%;">
+                                            <col style="width: 12%;">
+                                            <col style="width: 10%;">
+                                            <col style="width: 6%;">
+                                            <col style="width: 6%;">
+                                            <col style="width: 10%;">
+                                            <col style="width: 6%;">
+                                        </colgroup>
                                         <thead>
                                             <tr>
                                                 <th>#</th>
                                                 <th>Description</th>
+                                                <th>Assignee</th>
                                                 <th>Status</th>
                                                 <th>Start</th>
                                                 <th>Due</th>
@@ -257,6 +292,7 @@
                                                 <tr data-data="cur-icare-@idx-@m">
                                                     <td>@(m + 1)</td>
                                                     <td><a href="/Issue/UpdateIssue?issuekey=@task.Key" target="_blank">@task.Value.Description</a></td>
+                                                    <td>@task.Value.Assignee.Split(new char[] { '@' })[0]</td>
                                                     <td>@task.Value.Status</td>
                                                     <td>@task.Value.StartDate.ToString("MM/dd")</td>
                                                     <td>@task.Value.DueDate.ToString("MM/dd")</td>
@@ -269,7 +305,7 @@
                                                     </td>
                                                 </tr>
                                                 <tr class="even" data-ikey="@task.Key">
-                                                    <td colspan="7">
+                                                    <td colspan="8">
                                                         <div class="col-xs-12 summary">Summary:</div>
                                                         @{
                                                             var isummary = "";
@@ -278,18 +314,21 @@
                                                             {
                                                                 foreach (var item in summarylist[task.Key])
                                                                 {
-                                                                    if (item.UserName.ToUpper() != ViewBag.RealUserID.ToUpper())
+                                                                    if (!string.IsNullOrEmpty(item.Summary))
                                                                     {
-                                                                        <div class="row well item-summary @((item.Mark == "1")?"summary-hightlight":((item.Mark == "2")?"summary-lowlight":"summary-normal"))">
-                                                                            <span class="col-xs-5">@item.Summary</span>
-                                                                            <span class="col-xs-3">@item.UserName.Split(new char[] { '@' })[0]</span>
-                                                                            <span class="col-xs-4">@item.UpdateTime</span>
-                                                                        </div>
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        imark = item.Mark;
-                                                                        isummary += item.Summary;
+                                                                        if (item.UserName.ToUpper() != ViewBag.RealUserID.ToUpper())
+                                                                        {
+                                                                            <div class="row well item-summary @((item.Mark == "1") ? "summary-hightlight" : ((item.Mark == "2") ? "summary-lowlight" : "summary-normal"))">
+                                                                                <span class="col-xs-5">@item.Summary</span>
+                                                                                <span class="col-xs-3">@item.UserName.Split(new char[] { '@' })[0]</span>
+                                                                                <span class="col-xs-4">@item.UpdateTime</span>
+                                                                            </div>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            imark = item.Mark;
+                                                                            isummary += item.Summary;
+                                                                        }
                                                                     }
                                                                 }
                                                             }
@@ -301,14 +340,14 @@
                                                         <div class="col-xs-4">
                                                             <select class="form-control">
                                                                 <option value="0" @(imark == "0" ? "selected" : "")>Normal</option>
-                                                                <option value="1" @(imark == "1" ? "selected" : "")>High</option>
-                                                                <option value="2" @(imark == "2" ? "selected" : "")>Low</option>
+                                                                <option value="1" @(imark == "1" ? "selected" : "")>Highlight</option>
+                                                                <option value="2" @(imark == "2" ? "selected" : "")>Lowlight</option>
                                                             </select>
                                                         </div>
                                                     </td>
                                                 </tr>
-                                                m++;
-                                            }
+                                                                m++;
+                                                            }
                                         </tbody>
                                     </table>
                                 </div>
@@ -316,7 +355,45 @@
                                     <input type="button" class="btn btn-success op-btn btn-save" data-data-key="@pKey" data-data-module="@Prometheus.Models.SummaryType.ICare" name="btn_save" value="Save" />
                                     <input type="button" class="btn btn-warning op-btn btn-cancel" name="btn_cancel" value="Cancel" />
                                 </div>
-                                                            }
+                            }
+                            @if (icare_dt_flg)
+                            {
+                                <div class="icare-dt">
+                                    <span class="label label-danger">Debug Tree</span>
+                                </div>
+                                <table class="table table-condensed" cellpadding="0">
+                                        <thead>
+                                            <tr>
+                                                <th>Error Code</th>
+                                                <th>Short Desc</th>
+                                                <th>Increase Count</th>
+                                                <th>Attachement</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var val in ViewBag.icareDebugTree[pKey])
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <a href="/Project/UpdateProjectError?ErrorKey=@val.ErrorKey" target="_blank">@val.OrignalCode</a>
+                                                        @if (val.CommentList.Count > 0)
+                                                        {
+                                                            <span class="badge alert-success">C</span>
+                                                        }
+                                                    </td>
+                                                    <td>@val.ShortDesc</td>
+                                                    <td>@val.ErrorCount</td>
+                                                    <td>
+                                                        @if (val.AttachList.Count > 0)
+                                                        {
+                                                            <a href="/Project/ErrorAttach?ErrorKey=@val.ErrorKey" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></a>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                             }
                         </div>
                     </section>
                 }
@@ -428,8 +505,8 @@
                                                         <input type="hidden" value="@tmark"/>
                                                         <select class="form-control">
                                                             <option value="0" @(tmark == "0" ? "selected" : "")>Normal</option>
-                                                            <option value="1" @(tmark == "1" ? "selected" : "")>High</option>
-                                                            <option value="2" @(tmark == "2" ? "selected" : "")>Low</option>
+                                                            <option value="1" @(tmark == "1" ? "selected" : "")>Highlight</option>
+                                                            <option value="2" @(tmark == "2" ? "selected" : "")>Lowlight</option>
                                                         </select>
                                                     </td>
                                                 </tr>
@@ -554,8 +631,8 @@
                                                         <input type="hidden" value="@cmark" />
                                                         <select class="form-control">
                                                             <option value="0" @(cmark == "0" ? "selected" : "")>Normal</option>
-                                                            <option value="1" @(cmark == "1" ? "selected" : "")>High</option>
-                                                            <option value="2" @(cmark == "2" ? "selected" : "")>Low</option>
+                                                            <option value="1" @(cmark == "1" ? "selected" : "")>Highlight</option>
+                                                            <option value="2" @(cmark == "2" ? "selected" : "")>Lowlight</option>
                                                         </select>
                                                     </td>
                                                 </tr>
@@ -579,19 +656,19 @@
                             <h4>Debug Tree</h4>
                         </div>
                         <div id="content_dtree_@idx" class="collapse">
-                            <table class="table table-condensed" cellpadding="0">
-                                <thead>
-                                    <tr>
-                                        <th>Error Code</th>
-                                        <th>Short Desc</th>
-                                        <th>Increase Count</th>
-                                        <th>Attachement</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if (ViewBag.DebugTreeList.ContainsKey(pKey) && ViewBag.DebugTreeList[pKey].Count > 0)
-                                    {
-                                        foreach (var val in ViewBag.DebugTreeList[pKey])
+                            @if (ViewBag.DebugTreeList.ContainsKey(pKey) && ViewBag.DebugTreeList[pKey].Count > 0)
+                            {
+                                <table class="table table-condensed" cellpadding="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Error Code</th>
+                                            <th>Short Desc</th>
+                                            <th>Increase Count</th>
+                                            <th>Attachement</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var val in ViewBag.DebugTreeList[pKey])
                                         {
                                             <tr>
                                                 <td>
@@ -611,9 +688,9 @@
                                                 </td>
                                             </tr>
                                         }
-                                    }
-                                </tbody>
-                            </table>
+                                    </tbody>
+                                </table>
+                            }
                         </div>
                     </section>
                 }
@@ -725,8 +802,8 @@
                                                         <input type="hidden" value="@rmark" />
                                                         <select class="form-control">
                                                             <option value="0" @(rmark == "0" ? "selected" : "")>Normal</option>
-                                                            <option value="1" @(rmark == "1" ? "selected" : "")>High</option>
-                                                            <option value="2" @(rmark == "2" ? "selected" : "")>Low</option>
+                                                            <option value="1" @(rmark == "1" ? "selected" : "")>Highlight</option>
+                                                            <option value="2" @(rmark == "2" ? "selected" : "")>Lowlight</option>
                                                         </select>
                                                     </td>
                                                 </tr>
@@ -843,21 +920,21 @@
         WeeklyReport.init();
     })
     $(document).ready(function () {
-        $('.task-content, .icare-content').DataTable({
+        $('.icare-content').DataTable({
+            'iDisplayLength': 5,
+            'aLengthMenu': [[5, 25, 50, 100, -1],
+            [5, 25, 50, 100, "All"]],
+            "bAutoWidth": false,
+            "aaSorting": [],
+            "order": []
+        });
+        $('.task-content').DataTable({
             'iDisplayLength': 5,
             'aLengthMenu': [[5, 25, 50, 100, -1],
                             [5, 25, 50, 100, "All"]],
             "bAutoWidth": false,
             "aaSorting": [],
-            "order": [],
-            "aoColumns": [
-            { sWidth: '5%' },
-            { sWidth: '45%' },
-            { sWidth: '10%' },
-            { sWidth: '10%' },
-            { sWidth: '10%' },
-            { sWidth: '10%' },
-            { sWidth: '10%' }]
+            "order": []
         });
     })
 </script>

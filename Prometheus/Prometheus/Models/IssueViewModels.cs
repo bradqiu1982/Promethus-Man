@@ -153,6 +153,7 @@ namespace Prometheus.Models
         public static string FailureDetail = "FailureDetail";
         public static string Result = "Result";
         public static string Analysis = "Analysis";
+        public static string WeeklyReportSummary = "WeeklyReportSummary";
     }
 
     public class IssueComments
@@ -343,7 +344,8 @@ namespace Prometheus.Models
                 foreach (var item in cemlist)
                 {
                     if (string.Compare(item.CommentType,COMMENTTYPE.Description) == 0
-                        ||string.IsNullOrEmpty(item.CommentType))
+                        || string.Compare(item.CommentType, COMMENTTYPE.WeeklyReportSummary) == 0
+                        || string.IsNullOrEmpty(item.CommentType))
                     {
                         generalcommentlist.Add(item);
                     }
@@ -1017,6 +1019,47 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
+        public static void StoreUniqueIssueComment(string isk, string desc, string rept, string cmtype)
+        {
+
+            var dayofweek = Convert.ToInt32(DateTime.Now.DayOfWeek);
+            var sDate = DateTime.Now.AddDays((dayofweek > 4) ? (4 - dayofweek) : ((4 - dayofweek) - 7)).ToString("yyyy-MM-dd 07:30:00");
+            var eDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            var sql = "select Comment from IssueComments "
+                    + "where IssueKey = N'<IssueKey>' "
+                    + "and Reporter = N'<Reporter>' "
+                    + "and CommentType = N'<CommentType>' "
+                    + "and Removed <> 'TRUE' "
+                    + "and CommentDate between '<sDate>' and '<eDate>'";
+            sql = sql.Replace("<IssueKey>", isk)
+                    .Replace("<Reporter>", rept)
+                    .Replace("<CommentType>", cmtype)
+                    .Replace("<sDate>", sDate)
+                    .Replace("<eDate>", eDate);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            if(dbret.Count == 1 && string.Compare(dbret[0][0].ToString(), desc) == 0)
+            {
+                    
+            }
+            else
+            {
+                if (dbret.Count > 0)
+                {
+                    var upsql = "update IssueComments set Removed = 'TRUE' "
+                        + "where IssueKey = N'<IssueKey>' "
+                        + "and Reporter = N'<Reporter>' "
+                        + "and CommentType = N'<CommentType>' "
+                        + "and CommentDate between '<sDate>' and '<eDate>'";
+                    upsql = upsql.Replace("<IssueKey>", isk)
+                            .Replace("<Reporter>", rept)
+                            .Replace("<CommentType>", cmtype)
+                            .Replace("<sDate>", sDate)
+                            .Replace("<eDate>", eDate);
+                    DBUtility.ExeLocalSqlNoRes(upsql);
+                }
+                StoreIssueComment(isk, desc, rept, cmtype);
+            }
+        }
         
 
         public static void StoreIssueAttachment(string issuekey,string attachmenturl,string attachtype = "Normal")
@@ -1063,6 +1106,13 @@ namespace Prometheus.Models
             }
         }
 
+        public static void UpdateIssueDueDate(string iKey, DateTime nDuedate)
+        {
+            var sql = "update Issue set DueDate = '<DueDate>'where IssueKey = '<IssueKey>'";
+            sql = sql.Replace("<IssueKey>", iKey)
+                    .Replace("<DueDate>", nDuedate.ToString("yyyy-MM-dd"));
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
 
         public void UpdateIssue()
         {
@@ -3135,7 +3185,7 @@ namespace Prometheus.Models
         {
             var sql = "select Issue.Summary as Description, Issue.IssueKey, Issue.IssueType, " +
                             "Issue.Resolution, Issue.ReportDate as StartDate, "+
-                            "Issue.DueDate, Log_tmp.Date as UpdateTme, ia.Attachment, it.IssueSubType, Issue.ParentIssueKey " +
+                            "Issue.DueDate, Log_tmp.Date as UpdateTme, ia.Attachment, it.IssueSubType, Issue.ParentIssueKey, Issue.Assignee " +
                       "from Issue " +
                           "left join (select ProjectKey, IssueKey, Max(Log.Date) as Date from Log where LogType = '<LogType>' group by ProjectKey, IssueKey) as Log_tmp on Issue.IssueKey = Log_tmp.IssueKey " +
                           "left join IssueAttachment as ia on ia.IssueKey = Issue.IssueKey " +
@@ -3178,7 +3228,9 @@ namespace Prometheus.Models
             foreach (var line in dbret)
             {
 
-                if (!string.IsNullOrEmpty(Convert.ToString(line[6])))
+                if ( ! string.IsNullOrEmpty(Convert.ToString(line[6]))
+                    && DateTime.Compare(Convert.ToDateTime(line[6]), Convert.ToDateTime(sDate)) > 0 
+                        && DateTime.Compare(Convert.ToDateTime(line[6]), Convert.ToDateTime(eDate)) < 0)
                 {
                     isupdate = true;
                 }
@@ -3206,6 +3258,7 @@ namespace Prometheus.Models
                         convertDate(Convert.ToString(line[5])),
                         convertDate(Convert.ToString(line[6])),
                         Convert.ToString(line[9]),
+                        Convert.ToString(line[10]),
                         attach
                     );
                     data.Add(Convert.ToString(line[1]), tmp);
@@ -3246,7 +3299,7 @@ namespace Prometheus.Models
         {
             var sql = "select Issue.Summary as Description, Issue.IssueKey, Issue.IssueType, " +
                             "Issue.Resolution, Issue.ReportDate as StartDate, " +
-                            "Issue.DueDate, Log_tmp.Date as UpdateTme, ia.Attachment, it.IssueSubType, Issue.ParentIssueKey " +
+                            "Issue.DueDate, Log_tmp.Date as UpdateTme, ia.Attachment, it.IssueSubType, Issue.ParentIssueKey, Issue.Assignee " +
                       "from IssueIcare as ii " +
                           "inner join Issue on ii.IssueKey = Issue.IssueKey " +
                           "left join (select ProjectKey, IssueKey, Max(Log.Date) as Date from Log where LogType = '<LogType>' group by ProjectKey, IssueKey) as Log_tmp on Issue.IssueKey = Log_tmp.IssueKey " +
@@ -3255,6 +3308,7 @@ namespace Prometheus.Models
                       "where ii.Icare = '<Icare>'" +
                           "and Reporter <> 'System' " +
                           "and Issue.ProjectKey = '<ProjectKey>' " +
+                          "and ii.UserName = '<UserName>' " +
                           "and Issue.APVal1 <> 'delete' ";
             var cond = "";
             if (tPeriod == 0)
@@ -3311,6 +3365,7 @@ namespace Prometheus.Models
                         convertDate(Convert.ToString(line[5])),
                         convertDate(Convert.ToString(line[6])),
                         Convert.ToString(line[9]),
+                        Convert.ToString(line[10]),
                         attach
                     );
                     data.Add(Convert.ToString(line[1]), tmp);

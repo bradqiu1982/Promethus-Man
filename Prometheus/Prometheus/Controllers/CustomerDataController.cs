@@ -277,6 +277,188 @@ namespace Prometheus.Controllers
             return sb.ToString().ToUpper();
         }
 
+        public ActionResult CommitFAData()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "CustomerData");
+                ck.Add("logonredirectact", "CommitFAData");
+                ck.Add("currentaction", "CommitFAData");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            return View();
+        }
+
+        [HttpPost, ActionName("CommitFAData")]
+        [ValidateAntiForgeryToken]
+        public ActionResult CommitFADataPost()
+        {
+            var wholefn = "";
+            try
+            {
+                if (!string.IsNullOrEmpty(Request.Form["RMAFileName"]))
+                {
+                    var customereportfile = Request.Form["RMAFileName"];
+                    var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_").Replace("#", "").Replace("'", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                    foreach (string fl in Request.Files)
+                    {
+                        if (fl != null && Request.Files[fl].ContentLength > 0)
+                        {
+                            string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ", "_").Replace("#", "").Replace("'", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                            string datestring = DateTime.Now.ToString("yyyyMMdd");
+                            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+
+                            if (!Directory.Exists(imgdir))
+                            {
+                                Directory.CreateDirectory(imgdir);
+                            }
+
+                            fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
+                            Request.Files[fl].SaveAs(imgdir + fn);
+
+                            if (fn.Contains(originalname))
+                            {
+                                wholefn = imgdir + fn;
+                                break;
+                            }
+                        }//end if
+                    }//end foreach
+
+                    if (!string.IsNullOrEmpty(wholefn))
+                    {
+                        var data = RetrieveDataFromExcelWithAuth(this, wholefn);
+                        ProjectViewModels currentpj = null;
+                        for (int idx = 1; idx < data.Count; idx++)
+                        {
+                            var pjname = data[idx][0];
+                            var sn = data[idx][1];
+                            var fcode = data[idx][2];
+                            var whichtest = data[idx][3];
+                            var tester = data[idx][4];
+                            var testtime = data[idx][5];
+
+                            if (string.IsNullOrEmpty(pjname) || string.IsNullOrEmpty(sn) || string.IsNullOrEmpty(fcode))
+                                continue;
+
+                            var pjkey = RMSpectialCh(pjname);
+                            var pj = ProjectViewModels.RetrieveOneProject(pjkey);
+
+                            if (pj == null)
+                                continue;
+
+                            if (currentpj == null)
+                                currentpj = pj;
+
+                            var realdate = false;
+                            if (!string.IsNullOrEmpty(testtime))
+                            {
+                                try
+                                {
+                                    var tempdate = DateTime.Parse(testtime);
+                                    realdate = true;
+                                }
+                                catch (Exception ex) { }
+                            }
+
+                            var firstengineer = "";
+                            foreach (var m in pj.MemberList)
+                            {
+                                if (string.Compare(m.Role, ProjectViewModels.ENGROLE) == 0)
+                                {
+                                    firstengineer = m.Name;
+                                    break;
+                                }
+                            }
+
+                            if (!string.IsNullOrEmpty(tester) && !string.IsNullOrEmpty(whichtest) && realdate)
+                            {
+                                var TestTimeStamp = DateTime.Parse(testtime);
+
+                                var vm = new IssueViewModels();
+                                vm.ProjectKey = pjkey;
+                                vm.IssueKey = IssueViewModels.GetUniqKey();
+                                vm.IssueType = ISSUETP.Bug;
+                                vm.Summary = "Module " + sn + " failed for " + fcode + " @ " + whichtest;
+                                vm.Priority = ISSUEPR.Major;
+                                vm.DueDate = DateTime.Now.AddDays(7);
+                                vm.ReportDate = TestTimeStamp;
+                                vm.Assignee = firstengineer;
+                                vm.Reporter = "System";
+                                vm.Resolution = Resolute.Pending;
+                                vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+                                vm.Description = "Module " + sn + " failed for " + fcode + " @ " + whichtest + " on tester " + tester + " " + TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss");
+                                vm.CommentType = COMMENTTYPE.Description;
+                                vm.ModuleSN = sn;
+                                vm.ErrAbbr = fcode;
+                                vm.DataID = "";
+                                vm.StoreIssue();
+
+                                IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.Bug.ToString());
+
+                                var traceviewlist = ExternalDataCollector.LoadTraceView2Local(tester, sn, whichtest, TestTimeStamp.ToString(), this);
+                                foreach (var trace in traceviewlist)
+                                {
+                                    var traces = trace.Split(new string[] { "userfiles\\" }, StringSplitOptions.RemoveEmptyEntries);
+                                    if (traces.Length == 2)
+                                    {
+                                        var url = "/userfiles/" + traces[1].Replace("\\", "/");
+                                        IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
+                                    }
+                                }//end foreach
+                            }
+                            else
+                            {
+                                var vm = new IssueViewModels();
+                                vm.ProjectKey = pjkey;
+                                vm.IssueKey = IssueViewModels.GetUniqKey();
+                                vm.IssueType = ISSUETP.Bug;
+                                vm.Summary = "Module " + sn + " failed for " + fcode;
+                                vm.Priority = ISSUEPR.Major;
+                                vm.DueDate = DateTime.Now.AddDays(7);
+                                vm.ReportDate = DateTime.Now;
+                                vm.Assignee = firstengineer;
+                                vm.Reporter = "System";
+                                vm.Resolution = Resolute.Pending;
+                                vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+                                vm.Description = "Module " + sn + " failed for " + fcode;
+                                vm.CommentType = COMMENTTYPE.Description;
+                                vm.ModuleSN = sn;
+                                vm.ErrAbbr = fcode;
+                                vm.DataID = "";
+                                vm.StoreIssue();
+                                IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.Bug.ToString());
+                            }
+                        }//end for
+
+                        if (currentpj != null && !string.IsNullOrEmpty(currentpj.ProjectKey))
+                        {
+                            var dict = new RouteValueDictionary();
+                            dict.Add("ProjectKey", currentpj.ProjectKey);
+                            return RedirectToAction("ProjectFA", "Project", dict);
+                        }
+                    }//end if
+
+                }//end if
+            }
+            catch (Exception ex) { }
+
+            return RedirectToAction("ViewAll", "Project");
+        }
+
+
+
         [HttpPost, ActionName("CommitRMAData")]
         [ValidateAntiForgeryToken]
         public ActionResult CommitRMADataPost()
@@ -423,6 +605,9 @@ namespace Prometheus.Controllers
 
             return View();
         }
+
+
+
 
         [HttpPost, ActionName("CommitOBAData")]
         [ValidateAntiForgeryToken]

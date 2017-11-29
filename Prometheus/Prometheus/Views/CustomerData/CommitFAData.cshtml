@@ -1,0 +1,57 @@
+﻿
+@{
+    ViewBag.Title = "CommitFAData";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="col-xs-4"><h2>CommitFAData</h2></div>
+        <div class="col-xs-2"></div>
+        <div class="col-xs-3 text-center"><a href="~/Scripts/project_list.xlsx" target="_blank">Project List File</a></div>
+        <div class="col-xs-3 text-center"><a href="~/Scripts/Standard FA Data.xlsx" target="_blank">Sample Data File</a></div>
+    </div>
+</div>
+
+@using (Html.BeginForm("CommitFAData", "CustomerData", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="form-group">
+
+                <div class="col-xs-4">
+                    <span class="btn btn-default btn-file" id="choosefile1">
+                        FA Data File <input type="file" name="files1" id="file1" runat="server" onchange="ShowFileNames1(this)" />
+                    </span>
+                </div>
+                <div class="col-xs-8">
+                    <div class="col-xs-11">
+                        <label class="control-label" id="showfile1" name="showfile1"></label>
+                    </div>
+                    <div class="col-xs-1">
+                        <input class="form-control text-box single-line" value="" id="RMAFileName" name="RMAFileName" type="hidden" />
+                    </div>
+                </div>
+            </div>
+
+            <script type="text/javascript">
+                    function ShowFileNames1(oFile) {
+                        $('#showfile1').text(oFile.value);
+                        document.getElementById("RMAFileName").value = oFile.value;
+                    }
+            </script>
+        </div>
+    </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <div class="col-xs-3"><input type="submit" value="Submit" class="btn btn-default" /></div>
+                    <div class="col-xs-9"></div>
+                </div>
+            </div>
+        </div>
+}
+
+

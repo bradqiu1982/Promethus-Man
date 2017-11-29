@@ -329,6 +329,66 @@ namespace Prometheus.Models
         public string AppV_AG { set; get; }
     }
 
+    public class IQERAWData
+    {
+        public IQERAWData()
+        {
+            AppV_A = string.Empty;
+            AppV_B = string.Empty;
+            AppV_C = string.Empty;
+            AppV_D = string.Empty;
+            AppV_E = string.Empty;
+            AppV_F = string.Empty;
+            AppV_G = string.Empty;
+            AppV_H = string.Empty;
+            AppV_I = string.Empty;
+            AppV_J = string.Empty;
+            AppV_K = string.Empty;
+            AppV_L = string.Empty;
+            AppV_M = string.Empty;
+            AppV_N = string.Empty;
+            AppV_O = string.Empty;
+            AppV_P = string.Empty;
+            AppV_Q = string.Empty;
+            AppV_R = string.Empty;
+            AppV_S = string.Empty;
+            AppV_T = string.Empty;
+            AppV_U = string.Empty;
+            AppV_V = string.Empty;
+            AppV_W = string.Empty;
+            AppV_X = string.Empty;
+            AppV_Y = string.Empty;
+            AppV_Z = string.Empty;
+        }
+
+        public string AppV_A { set; get; }
+        public string AppV_B { set; get; }
+        public string AppV_C { set; get; }
+        public string AppV_D { set; get; }
+        public string AppV_E { set; get; }
+        public string AppV_F { set; get; }
+        public string AppV_G { set; get; }
+        public string AppV_H { set; get; }
+        public string AppV_I { set; get; }
+        public string AppV_J { set; get; }
+        public string AppV_K { set; get; }
+        public string AppV_L { set; get; }
+        public string AppV_M { set; get; }
+        public string AppV_N { set; get; }
+        public string AppV_O { set; get; }
+        public string AppV_P { set; get; }
+        public string AppV_Q { set; get; }
+        public string AppV_R { set; get; }
+        public string AppV_S { set; get; }
+        public string AppV_T { set; get; }
+        public string AppV_U { set; get; }
+        public string AppV_V { set; get; }
+        public string AppV_W { set; get; }
+        public string AppV_X { set; get; }
+        public string AppV_Y { set; get; }
+        public string AppV_Z { set; get; }
+    }
+
     public class RELSubIssueType
     {
         public static string CONTAINMENTACTION = "[CONTAINMENTACTION]";
@@ -1192,6 +1252,416 @@ namespace Prometheus.Models
 
         #endregion
 
+        #region IQC
+        public static void RefreshIQEData(Controller ctrl)
+        {
+            var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+
+            var rmasrcfolder = syscfgdict["IQESHAREFOLDER"];
+            var rmasrcfiles = DirectoryEnumerateFiles(ctrl, rmasrcfolder);
+
+            string datestring = DateTime.Now.ToString("yyyyMMdd");
+            string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+            if (!DirectoryExists(ctrl, imgdir))
+            {
+                Directory.CreateDirectory(imgdir);
+            }
+
+            foreach (var srcf in rmasrcfiles)
+            {
+                var filename = Path.GetFileName(srcf);
+
+                    try
+                    {
+                        logthdinfo("\r\nStart to copy file: " + srcf);
+
+                        var desfile = imgdir + filename;
+                        FileCopy(ctrl, srcf, desfile, true);
+                        if (FileExist(ctrl, desfile))
+                        {
+                            logthdinfo("try to get data from file: " + desfile);
+                            var data = RetrieveDataFromExcelWithAuth(ctrl, desfile);
+                            logthdinfo("get data count: " + data.Count.ToString());
+
+                            SolveIQEData(data, rmasrcfolder, ctrl);
+                        }//copied file exist
+                    }
+                    catch (Exception ex)
+                    {
+                        logthdinfo("SolveIQEData Exception: " + ex.Message);
+                    }
+
+            }//end foreach
+        }
+
+        private static void SolveIQEData(List<List<string>> data,string attfolder, Controller ctrl)
+        {
+            if (data.Count == 0)
+                return;
+            if (!data[0][0].ToUpper().Contains("ID"))
+                return;
+        
+            var allrmaissue = IssueViewModels.RetrieveAllIssueTypeIssue("NONE", "NONE", ISSUETP.IQE, ctrl); //IQC issues
+            var rmaissuedict = new Dictionary<string, bool>();
+            foreach (var issue in allrmaissue)
+            {
+                var uniquekey = issue.ModuleSN;
+                if (!rmaissuedict.ContainsKey(uniquekey))
+                {
+                    rmaissuedict.Add(uniquekey, true);
+                }
+            }//end foreach
+
+            var allbacupdata = ExternalDataCollector.RetrieveAllIQEData();
+            var allbackupdict = new Dictionary<string, string>();
+            foreach (var bdata in allbacupdata)
+            {
+                var uniquekey =bdata.AppV_A;
+                if (!allbackupdict.ContainsKey(uniquekey))
+                {
+                    allbackupdict.Add(uniquekey, bdata.AppV_A);
+                }
+            }
+
+
+            var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+            var IQEPJKEY = RMSpectialCh(syscfgdict["IQEDEFAULTPJ"]);
+
+            var rmaattaches = RetrieveIQEAttach(); //all IQE attach
+            var solvedrmanum = new Dictionary<string, bool>();
+
+            var idx = 0;
+            foreach (var line in data)
+            {
+                if (idx != 0)
+                {
+                    try
+                    {
+                        var rawdata = OfferIQERAWDataValue(line); //split rma record with sn
+                        if (rawdata == null)
+                            continue;
+
+                        UpdateIQEData(rawdata, allbackupdict);
+
+                        Try2CreateIQE(IQEPJKEY, rawdata, rmaissuedict, ctrl);
+
+                        var uniquekey = rawdata.AppV_A;
+                        if (solvedrmanum.ContainsKey(uniquekey))
+                        {
+                            continue;
+                        }
+
+                        StoreIQEAttachs(attfolder+"\\"+rawdata.AppV_A, uniquekey, rmaattaches, ctrl); //retrieve IQE attach and store them
+                        solvedrmanum.Add(uniquekey, true);
+
+                    }
+                    catch (Exception ex) { }
+                }//end if
+                idx = idx + 1;
+            }//foreach
+        }
+
+        private static void StoreIQEAttachs(string attfolder, string combinekey, Dictionary<string, Dictionary<string, bool>> rmaattaches, Controller ctrl)
+        {
+
+            if (DirectoryExists(ctrl, attfolder))
+            {
+                var imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\IQEATTCH\\" + combinekey + "\\";
+
+                if (!DirectoryExists(ctrl, imgdir))
+                    Directory.CreateDirectory(imgdir);
+
+
+                var rmaattachfiles = DirectoryEnumerateFiles(ctrl, attfolder);
+                foreach (var attach in rmaattachfiles)
+                {
+                    var filename = Path.GetFileName(attach).Replace(" ", "_").Replace("#", "").Replace("'", "")
+                            .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                    if (!rmaattaches.ContainsKey(combinekey))
+                    {
+                        //download file and store
+
+                        var desfile = imgdir + filename;
+                        FileCopy(ctrl, attach, desfile, true);
+                        if (FileExist(ctrl, desfile))
+                        {
+                            var url = "/userfiles/docs/IQEATTCH/" + combinekey + "/" + filename;
+                            StoreIQEAttach(combinekey, url);
+                        }
+                    }//not contain rmanum
+                    else
+                    {
+                        var attachdict = rmaattaches[combinekey];
+                        if (!attachdict.ContainsKey(filename))
+                        {
+                            var desfile = imgdir + filename;
+                            FileCopy(ctrl, attach, desfile, true);
+                            if (FileExist(ctrl, desfile))
+                            {
+                                var url = "/userfiles/docs/IQEATTCH/" + combinekey + "/" + filename;
+                                StoreIQEAttach(combinekey, url);
+                            }
+                        }//not contain attach
+                    }
+                }//foreach
+            }//if folder exist
+        }
+
+        private static void StoreIQEAttach(string combinekey, string attach)
+        {
+            var sql = "insert into IQEMapData(AppV_A,AppV_B,AppV_C,AppV_D,databackuptm) values(N'<AppV_A>',N'<AppV_B>',N'<AppV_C>',N'<AppV_D>','<databackuptm>')";
+            sql = sql.Replace("<AppV_A>", combinekey).Replace("<AppV_B>", "").Replace("<AppV_C>", attach).Replace("<AppV_D>", RMAMAPDATATYPE.ATTACH).Replace("<databackuptm>", DateTime.Now.ToString());
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        private static void Try2CreateIQE(string IQEPJKEY, IQERAWData rawdata
+                , Dictionary<string, bool> rmaissuedict, Controller ctrl)
+        {
+            if (string.IsNullOrEmpty(rawdata.AppV_M) || string.IsNullOrEmpty(rawdata.AppV_N))
+                return;
+
+            if (string.Compare(rawdata.AppV_I.ToUpper(), Resolute.Working.ToUpper()) == 0)
+            {
+                var analyser = rawdata.AppV_M.ToUpper();
+                if (!rawdata.AppV_M.Contains("@"))
+                    analyser = (rawdata.AppV_M.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
+
+                var reporter = rawdata.AppV_N.ToUpper();
+                if (!rawdata.AppV_N.Contains("@"))
+                    reporter = (rawdata.AppV_N.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
+
+                UserViewModels.RegisterUserAuto(analyser);
+                UserViewModels.RegisterUserAuto(reporter);
+
+                var uniquekey = rawdata.AppV_A;
+                if (!rmaissuedict.ContainsKey(uniquekey))
+                {
+                    CreateIQEIssue(IQEPJKEY, analyser, reporter, rawdata, ctrl);
+                }//check if IQE issue exist
+            }//check raw data status
+        }
+
+        private static void CreateIQEIssue(string IQEPJKEY, string analyser, string reporter, IQERAWData rawdata, Controller ctrl)
+        {
+            var vm = new IssueViewModels();
+            vm.ProjectKey = IQEPJKEY;
+            vm.IssueKey = IssueViewModels.GetUniqKey();
+            vm.IssueType = ISSUETP.IQE;
+
+            vm.RelativePeoples = "";
+            vm.Priority = ISSUEPR.Major;
+            vm.Resolution = Resolute.Pending;
+            vm.FVCode = "";
+            vm.ReportDate = DateTime.Parse(rawdata.AppV_C);
+
+            vm.ModuleSN = rawdata.AppV_A;
+
+            //vm.CaseID = rawdata.AppV_A.ToString();
+            //vm.ProductType = rawdata.AppV_H;
+            //vm.LineCategory = rawdata.AppV_G;
+            //vm.QualType = rawdata.AppV_E;
+            //vm.TestType = rawdata.AppV_I;
+            //vm.FailureInterval = rawdata.AppV_J;
+            //vm.TestFailure = rawdata.AppV_P;
+            //vm.Location = rawdata.AppV_U;
+            //vm.RequestID = rawdata.AppV_F;
+            //vm.ModuleSN = rawdata.AppV_K;
+            //vm.FailQTY = rawdata.AppV_L;
+            //vm.TotalQTY = rawdata.AppV_M;
+
+            vm.Assignee = analyser;
+            vm.Reporter = reporter;
+
+            vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+            vm.DueDate = DateTime.Parse(rawdata.AppV_O).AddDays(23);
+
+            vm.Summary = "IQE " + vm.CaseID + ": " + vm.ModuleSN + " failed for " + vm.TestType + " test with failure " + vm.TestFailure;
+            vm.Description = vm.Summary;
+            vm.CommentType = COMMENTTYPE.Description;
+
+            vm.StoreIssue();
+
+            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.IQE.ToString());
+
+            CreateRMASubIssue(RMASubIssueType.CONTAINMENTACTION, "Cotainment Action for ", vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(18), ISSUESUBTYPE.CONTAINMENT.ToString());
+            CreateRMASubIssue(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for ", vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(48), ISSUESUBTYPE.CORRECTIVE.ToString());
+
+            var comment = new IssueComments();
+            comment.Comment = "ROOTCAUSE: to be edited";
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, analyser, COMMENTTYPE.RootCause);
+
+            if (!IsDebug())
+            {
+                SendRMAEvent(vm, "created", ctrl, true);
+            }
+
+        }
+
+
+        private static void UpdateIQEData(IQERAWData rmadata, Dictionary<string, string> allbackupdict)
+        {
+            var sql = "";
+            var relid = allbackupdict.ContainsKey(rmadata.AppV_A)? rmadata.AppV_A:"";
+            if (!string.IsNullOrEmpty(relid))
+            {
+                sql = "update IQEBackupData set AppV_B = N'<AppV_B>',AppV_C = N'<AppV_C>',AppV_D = N'<AppV_D>'"
+                    + ",AppV_E = N'<AppV_E>',AppV_F = N'<AppV_F>',AppV_G = N'<AppV_G>',AppV_H = N'<AppV_H>',AppV_I = N'<AppV_I>'"
+                    + ",AppV_J = N'<AppV_J>',AppV_K = N'<AppV_K>',AppV_L = N'<AppV_L>',AppV_M = N'<AppV_M>',AppV_N = N'<AppV_N>'"
+                    + ",AppV_O = N'<AppV_O>',AppV_P = '<AppV_P>',AppV_Q = '<AppV_Q>',AppV_R = '<AppV_R>',AppV_S = '<AppV_S>'"
+                    + ",AppV_T = '<AppV_T>',AppV_U = N'<AppV_U>',AppV_V = '<AppV_V>',AppV_W = '<AppV_W>',AppV_X = N'<AppV_X>'"
+                    + ",AppV_Y = N'<AppV_Y>',AppV_Z = N'<AppV_Z>'"
+                    + "where AppV_A=<AppV_A>";
+                sql = sql.Replace("<AppV_A>", relid);
+            }
+            else
+            {
+                sql = "insert into IQEBackupData(AppV_A,AppV_B,AppV_C,AppV_D,AppV_E,AppV_F"
+                    + ",AppV_G,AppV_H,AppV_I,AppV_J,AppV_K,AppV_L,AppV_M,AppV_N,AppV_O"
+                    + ",AppV_P,AppV_Q,AppV_R,AppV_S,AppV_T,AppV_U,AppV_V,AppV_W,AppV_X"
+                    + ",AppV_Y,AppV_Z,AppV_AA,AppV_AB,AppV_AC,AppV_AD,AppV_AE,AppV_AF,AppV_AG,databackuptm)"
+                    + " values(<AppV_A>,N'<AppV_B>',N'<AppV_C>',N'<AppV_D>',N'<AppV_E>',N'<AppV_F>'"
+                    + ",N'<AppV_G>',N'<AppV_H>',N'<AppV_I>',N'<AppV_J>',N'<AppV_K>',N'<AppV_L>',N'<AppV_M>',N'<AppV_N>',N'<AppV_O>'"
+                    + ",'<AppV_P>','<AppV_Q>','<AppV_R>','<AppV_S>','<AppV_T>',N'<AppV_U>','<AppV_V>','<AppV_W>',N'<AppV_X>'"
+                    + ",N'<AppV_Y>',N'<AppV_Z>',N'<AppV_AA>',N'<AppV_AB>','<AppV_AC>',N'<AppV_AD>',N'<AppV_AE>',N'<AppV_AF>',N'<AppV_AG>','<databackuptm>')";
+                sql = sql.Replace("<AppV_A>", rmadata.AppV_A);
+
+                var uniquekey = rmadata.AppV_A;
+                if (!allbackupdict.ContainsKey(uniquekey))
+                {
+                    allbackupdict.Add(uniquekey, rmadata.AppV_A);
+                }
+            }
+
+            sql = sql.Replace("<AppV_B>", rmadata.AppV_B).Replace("<AppV_C>", rmadata.AppV_C)
+                .Replace("<AppV_D>", rmadata.AppV_D).Replace("<AppV_E>", rmadata.AppV_E).Replace("<AppV_F>", rmadata.AppV_F)
+                .Replace("<AppV_G>", rmadata.AppV_G).Replace("<AppV_H>", rmadata.AppV_H).Replace("<AppV_I>", rmadata.AppV_I)
+                .Replace("<AppV_J>", rmadata.AppV_J).Replace("<AppV_K>", rmadata.AppV_K).Replace("<AppV_L>", rmadata.AppV_L)
+                .Replace("<AppV_M>", rmadata.AppV_M).Replace("<AppV_N>", rmadata.AppV_N).Replace("<AppV_O>", rmadata.AppV_O)
+                .Replace("<AppV_P>", rmadata.AppV_P).Replace("<AppV_Q>", rmadata.AppV_Q).Replace("<AppV_R>", rmadata.AppV_R)
+                .Replace("<AppV_S>", rmadata.AppV_S).Replace("<AppV_T>", rmadata.AppV_T).Replace("<AppV_U>", rmadata.AppV_U)
+                .Replace("<AppV_V>", rmadata.AppV_V).Replace("<AppV_W>", rmadata.AppV_W).Replace("<AppV_X>", rmadata.AppV_X)
+                .Replace("<AppV_Y>", rmadata.AppV_Y).Replace("<AppV_Z>", rmadata.AppV_Z).Replace("<databackuptm>", DateTime.Now.ToString());
+
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        private static IQERAWData OfferIQERAWDataValue(List<string> line)
+        {
+            if (string.IsNullOrEmpty(line[0]))
+                return null;
+
+            var tempdata = new IQERAWData();
+            tempdata.AppV_A = line[0];
+            tempdata.AppV_B = line[1];
+            tempdata.AppV_C = line[2];
+            tempdata.AppV_D = line[3];
+            tempdata.AppV_E = line[4];
+            tempdata.AppV_F = line[5];
+            tempdata.AppV_G = line[6];
+            tempdata.AppV_H = line[7];
+            tempdata.AppV_I = line[8];
+            tempdata.AppV_J = line[9];
+            tempdata.AppV_K = line[10];
+            tempdata.AppV_L = line[11];
+            tempdata.AppV_M = line[12];
+            tempdata.AppV_N = line[13];
+            tempdata.AppV_O = line[14];
+            tempdata.AppV_P = line[15];
+            tempdata.AppV_Q = line[16];
+            tempdata.AppV_R = line[17];
+            tempdata.AppV_S = line[18];
+            tempdata.AppV_T = line[19];
+            tempdata.AppV_U = line[20];
+            tempdata.AppV_V = line[21];
+            tempdata.AppV_W = line[22];
+            tempdata.AppV_X = line[23];
+            tempdata.AppV_Y = line[24];
+            tempdata.AppV_Z = line[25];
+            return tempdata;
+        }
+
+        private static Dictionary<string, Dictionary<string, bool>> RetrieveIQEAttach()
+        {
+            var ret = new Dictionary<string, Dictionary<string, bool>>();
+            var sql = "select AppV_A,AppV_B,AppV_C from IQEMapData where AppV_D = '<AppV_D>'";
+            sql = sql.Replace("<AppV_D>", RMAMAPDATATYPE.ATTACH);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var combinekey = Convert.ToString(line[0]);
+                var attachs = Convert.ToString(line[2]).Split(new string[] { "\\", "/" }, StringSplitOptions.RemoveEmptyEntries);
+                var attach = attachs[attachs.Length - 1];
+
+                if (ret.ContainsKey(combinekey))
+                {
+                    if (!ret[combinekey].ContainsKey(attach))
+                    {
+                        ret[combinekey].Add(attach, true);
+                    }
+                }
+                else
+                {
+                    var val = new Dictionary<string, bool>();
+                    val.Add(attach, true);
+                    ret.Add(combinekey, val);
+                }
+            }
+
+            return ret;
+        }
+
+        public static List<IQERAWData> RetrieveAllIQEData()
+        {
+            var ret = new List<IQERAWData>();
+
+            var sql = "select AppV_A,AppV_B,AppV_C,AppV_D,AppV_E,AppV_F"
+                    + ",AppV_G,AppV_H,AppV_I,AppV_J,AppV_K,AppV_L,AppV_M,AppV_N,AppV_O"
+                    + ",AppV_P,AppV_Q,AppV_R,AppV_S,AppV_T,AppV_U,AppV_V,AppV_W,AppV_X"
+                    + ",AppV_Y,AppV_Z from IQEBackupData";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                try
+                {
+                    var tempdata = new IQERAWData();
+                    tempdata.AppV_A = Convert.ToString(line[0]);
+                    tempdata.AppV_B = Convert.ToString(line[1]);
+                    tempdata.AppV_C = Convert.ToString(line[2]);
+                    tempdata.AppV_D = Convert.ToString(line[3]);
+                    tempdata.AppV_E = Convert.ToString(line[4]);
+                    tempdata.AppV_F = Convert.ToString(line[5]);
+                    tempdata.AppV_G = Convert.ToString(line[6]);
+                    tempdata.AppV_H = Convert.ToString(line[7]);
+                    tempdata.AppV_I = Convert.ToString(line[8]);
+                    tempdata.AppV_J = Convert.ToString(line[9]);
+                    tempdata.AppV_K = Convert.ToString(line[10]);
+                    tempdata.AppV_L = Convert.ToString(line[11]);
+                    tempdata.AppV_M = Convert.ToString(line[12]);
+                    tempdata.AppV_N = Convert.ToString(line[13]);
+                    tempdata.AppV_O = Convert.ToString(line[14]);
+                    tempdata.AppV_P = Convert.ToString(line[15]);
+                    tempdata.AppV_Q = Convert.ToString(line[16]);
+                    tempdata.AppV_R = Convert.ToString(line[17]);
+                    tempdata.AppV_S = Convert.ToString(line[18]);
+                    tempdata.AppV_T = Convert.ToString(line[19]);
+                    tempdata.AppV_U = Convert.ToString(line[20]);
+                    tempdata.AppV_V = Convert.ToString(line[21]);
+                    tempdata.AppV_W = Convert.ToString(line[22]);
+                    tempdata.AppV_X = Convert.ToString(line[23]);
+                    tempdata.AppV_Y = Convert.ToString(line[24]);
+                    tempdata.AppV_Z = Convert.ToString(line[25]);
+                    ret.Add(tempdata);
+                }
+                catch (Exception ex) { }
+
+            }
+
+            return ret;
+        }
+
+        #endregion
+
         #region NEOMAP
         public static Dictionary<string, string> NeoMapDBColName2RealName()
         {
@@ -1838,7 +2308,7 @@ namespace Prometheus.Models
                     analyser = (rawdata.AppV_N.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
 
                 var reporter = rawdata.AppV_O.ToUpper();
-                if (!rawdata.AppV_N.Contains("@"))
+                if (!rawdata.AppV_O.Contains("@"))
                     reporter = (rawdata.AppV_O.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
                 UserViewModels.RegisterUserAuto(analyser);
                 UserViewModels.RegisterUserAuto(reporter);

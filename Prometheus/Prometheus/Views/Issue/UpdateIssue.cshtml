@@ -128,7 +128,7 @@ else
                         <div class="col-xs-10">
                             @if (Model != null && !string.IsNullOrEmpty(Model.Summary))
                             {
-                                <input class="form-control text-box single-line" value="@Model.Summary" readonly="readonly" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 180." data-val-length-max="180" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="Summary" name="Summary" type="text" />
+                                <input class="form-control text-box single-line" value="@Model.Summary" readonly="readonly" data-val="true" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="Summary" name="Summary" type="text" />
                             }
                             else
                             {

@@ -586,7 +586,7 @@ namespace Prometheus.Controllers
             var description = "Below is Parallel Test Critical Alarm base on WUXI ENGINEERING SYSTEM (Human Reviewed) --" + DateTime.Now.ToString("MM/dd/yyyy");
             var content = EmailUtility.CreateTableHtml(greeting, description, comment, body);
 
-            EmailUtility.SendEmail(this, "Parallel Test Critical Failure Alarm Report -- " + DateTime.Now.ToString("MM/dd/yyyy"), towho, content, true);
+            EmailUtility.SendEmail(this, "Critical Failure Alarm -- "+vm.ProjectKey+"-" + DateTime.Now.ToString("MM/dd/yyyy"), towho, content, true);
 
             new System.Threading.ManualResetEvent(false).WaitOne(500);
         }

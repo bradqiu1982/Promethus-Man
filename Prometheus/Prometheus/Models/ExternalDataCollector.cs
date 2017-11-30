@@ -1351,7 +1351,7 @@ namespace Prometheus.Models
                             continue;
                         }
 
-                        StoreIQEAttachs(attfolder+"\\"+rawdata.AppV_A, uniquekey, rmaattaches, ctrl); //retrieve IQE attach and store them
+                        StoreIQEAttachs(attfolder+ "\\attachment\\" + rawdata.AppV_A, uniquekey, rmaattaches, ctrl); //retrieve IQE attach and store them
                         solvedrmanum.Add(uniquekey, true);
 
                     }

@@ -11,7 +11,7 @@ RMACLOSEATTACHES:::\\wux-fs\PUBLIC\Quality\10.Quality case summary\Customer Qual
 #NeoMAPDataFolder:::\\wux-file01\Public\Wuxi Parallel NPI\NeoMAP Data
 NeoMAPDataFolder:::\\wux-fs\public\Quality\20.Report of IQA\IQC对外分享文件\MESA VCSEL Tracking\NeoMAPwaferData
 RELSHAREFOLDER:::\\Cn-file01\public\Quality\Reliability\Failure Analysis\FA-AutoTracking\SummaryTable
-IQESHAREFOLDER:::\\wux-fs\public\Quality\20.Report of IQA\IQC内部记录\新项目\IQE job follow up items\New Data
+IQESHAREFOLDER:::\\wux-fs\public\Quality\20.Report of IQA\IQC内部记录\新项目\IQE job follow up items\New data
 BIAUTOTABLES:::dbo.v_BICFP2Output;dbo.v_BICFP4Output;dbo.v_BICXPOutput;dbo.v_BIEDROutput;dbo.v_BIFDROutput;dbo.v_BIOEOutput;dbo.v_BIQSFP28GOutput;dbo.v_BIQSFPGen3Output;dbo.v_BIQWireOutput;dbo.v_BITopazOutput;
 BIZEROTIME:::2017-05-01 07:30:00
 TXPOWERTABLES:::ersetup;ertempcomp;

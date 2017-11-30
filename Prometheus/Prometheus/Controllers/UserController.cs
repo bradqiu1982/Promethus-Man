@@ -3132,6 +3132,8 @@ namespace Prometheus.Controllers
                             var issuecomment = new IssueComments();
                             issuecomment.Comment = SeverHtmlDecode.Decode(this, item[2]);
                             IssueViewModels.StoreUniqueIssueComment(item[0], issuecomment.dbComment, updater, COMMENTTYPE.WeeklyReportSummary);
+                            LogVM.WriteLog(updater.ToUpper(), pKey, DetermineCompName(Request.UserHostName), 
+                                    Request.Url.ToString(), "Issue", "AddComment", item[0], LogType.Task, Log4NetLevel.Info, "");
                         }
                     }
                     WeeklyReportVM.SaveWeeklyReport(reports);

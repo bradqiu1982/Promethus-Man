@@ -6,13 +6,13 @@
         $('body').on('click', '.icare-content tbody tr', function () {
             var ikey = $(this).attr('data-ikey');
             var itype = $(this).attr('data-itype');
-            appendsummary($(this), itype, ikey, 7);
+            appendsummary($(this), itype, ikey, 8);
         })
         
         $('body').on('click', '.critical-content tbody tr', function () {
             var ikey = $(this).attr('data-ikey');
             var itype = $(this).attr('data-itype');
-            appendsummary($(this), itype, ikey, 8);
+            appendsummary($(this), itype, ikey, 7);
         })
 
         var appendsummary = function (object, itype, ikey, cols) {

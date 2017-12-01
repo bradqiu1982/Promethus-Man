@@ -66,6 +66,9 @@
             var rma_cnt = 0;
             var rma_update = false;
             var dt_flg = false;
+            var others_flg = false;
+            var others_update = false;
+            var summarylist = (ViewBag.SummaryList.ContainsKey(pKey) && ViewBag.SummaryList[pKey].Count > 0) ? ViewBag.SummaryList[pKey] : null;
             if (ViewBag.setting.Yield == 1)
             {
                 yield_flg = ! string.IsNullOrEmpty(ViewBag.YieldDataList[pKey].Pareto);
@@ -99,6 +102,11 @@
             {
                 dt_flg = ViewBag.DebugTreeList.ContainsKey(pKey) && ViewBag.DebugTreeList[pKey].Count > 0;
             }
+            if(ViewBag.setting.Others == 1)
+            {
+                others_flg = summarylist != null && summarylist.ContainsKey("@@" + Prometheus.Models.SummaryType.Others);
+                others_update = (others_flg) ? summarylist["@@" + Prometheus.Models.SummaryType.Others].Count > 0 : false;
+            }
             var split_line = "<span class='split-line'> / </span>";
             var pro_title = (icare_cnt != 0 ? ("  ICare: " + icare_cnt + split_line) : "")
                                 + (task_cnt != 0 ? (" Task: " + task_cnt + split_line) : "")
@@ -106,7 +114,6 @@
                                 + (dt_flg ? (" DebugTree " + split_line) : "")
                                 + (rma_cnt != 0 ? (" RMA: " + rma_cnt + split_line) : "");
             pro_title = !string.IsNullOrEmpty(pro_title) ? pro_title.Substring(0, pro_title.Length - split_line.Length) : "";
-            var summarylist = (ViewBag.SummaryList.ContainsKey(pKey) && ViewBag.SummaryList[pKey].Count > 0) ? ViewBag.SummaryList[pKey] : null;
             <div class="project-name cursor-pointer" style="background-color: @(colors[0])">
                 <span class="span-pro">@(pKey)</span>
                 <span class="sub-title">@Html.Raw(pro_title)</span>
@@ -318,7 +325,7 @@
                                                                     {
                                                                         if (item.UserName.ToUpper() != ViewBag.RealUserID.ToUpper())
                                                                         {
-                                                                            <div class="row well item-summary @((item.Mark == "1") ? "summary-hightlight" : ((item.Mark == "2") ? "summary-lowlight" : "summary-normal"))">
+                                                                            <div class="row well item-summary @((item.Mark == "1") ? "summary-highlight" : ((item.Mark == "2") ? "summary-lowlight" : "summary-normal"))">
                                                                                 <span class="col-xs-5">@item.Summary</span>
                                                                                 <span class="col-xs-3">@item.UserName.Split(new char[] { '@' })[0]</span>
                                                                                 <span class="col-xs-4">@item.UpdateTime</span>
@@ -346,8 +353,8 @@
                                                         </div>
                                                     </td>
                                                 </tr>
-                                                                m++;
-                                                            }
+                                                m++;
+                                            }
                                         </tbody>
                                     </table>
                                 </div>
@@ -588,11 +595,10 @@
                                             <col style="width: 5%;">
                                             <col style="width: 45%;">
                                             <col style="width: 10%;">
-                                            <col style="width: 6%;">
-                                            <col style="width: 6%;">
-                                            <col style="width: 6%;">
                                             <col style="width: 10%;">
-                                            <col style="width: 12%;">
+                                            <col style="width: 10%;">
+                                            <col style="width: 10%;">
+                                            <col style="width: 10%;">
                                         </colgroup>
                                         <thead>
                                             <tr>
@@ -603,18 +609,12 @@
                                                 <th>Due</th>
                                                 <th>Update</th>
                                                 <th>Attachment</th>
-                                                <th>Mark</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach (var task in ViewBag.criticalList[pKey].TaskList)
                                             {
-                                                var cmark = "0";
-                                                if (summarylist != null && summarylist.ContainsKey(task.Key))
-                                                {
-                                                    cmark = summarylist[task.Key][0].Mark;
-                                                }
-                                                <tr data-data="cur-cri-task-@idx-@m" class="tr-data @(cmark == "1" ? "tr-highlight" : (cmark == "2" ? "tr-lowlight" : ""))" data-ikey="@task.Key">
+                                                <tr data-data="cur-cri-task-@idx-@m" class="tr-data" data-ikey="@task.Key">
                                                     <td>@(m + 1)</td>
                                                     <td><a href="/Issue/UpdateIssue?issuekey=@task.Key" target="_blank">@task.Value.Description</a></td>
                                                     <td>@task.Value.Status</td>
@@ -627,13 +627,47 @@
                                                             <a href="/Issue/IssueAttach?issuekey=@task.Key" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></a>
                                                         }
                                                     </td>
-                                                    <td>
-                                                        <input type="hidden" value="@cmark" />
-                                                        <select class="form-control">
-                                                            <option value="0" @(cmark == "0" ? "selected" : "")>Normal</option>
-                                                            <option value="1" @(cmark == "1" ? "selected" : "")>Highlight</option>
-                                                            <option value="2" @(cmark == "2" ? "selected" : "")>Lowlight</option>
-                                                        </select>
+                                                </tr>
+                                                <tr class="even" data-ikey="@task.Key">
+                                                    <td colspan="8">
+                                                        <div class="col-xs-12 summary">Summary:</div>
+                                                        @{
+                                                            var csummary = "";
+                                                            var cmark = "0";
+                                                            if (summarylist != null && summarylist.ContainsKey(task.Key))
+                                                            {
+                                                                foreach (var item in summarylist[task.Key])
+                                                                {
+                                                                    if (!string.IsNullOrEmpty(item.Summary))
+                                                                    {
+                                                                        if (item.UserName.ToUpper() != ViewBag.RealUserID.ToUpper())
+                                                                        {
+                                                                            <div class="row well item-summary @((item.Mark == "1") ? "summary-highlight" : ((item.Mark == "2") ? "summary-lowlight" : "summary-normal"))">
+                                                                                <span class="col-xs-5">@item.Summary</span>
+                                                                                <span class="col-xs-3">@item.UserName.Split(new char[] { '@' })[0]</span>
+                                                                                <span class="col-xs-4">@item.UpdateTime</span>
+                                                                            </div>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            cmark = item.Mark;
+                                                                            csummary += item.Summary;
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                        <div class="col-xs-8">
+                                                            <textarea class="form-control" style="height: 35px;" id="cur_icare_summary_@(idx)_@m"
+                                                                      name="cur_icare_summary">@csummary</textarea>
+                                                        </div>
+                                                        <div class="col-xs-4">
+                                                            <select class="form-control">
+                                                                <option value="0" @(cmark == "0" ? "selected" : "")>Normal</option>
+                                                                <option value="1" @(cmark == "1" ? "selected" : "")>Highlight</option>
+                                                                <option value="2" @(cmark == "2" ? "selected" : "")>Lowlight</option>
+                                                            </select>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                                 m++;
@@ -785,7 +819,7 @@
                                                 {
                                                     rmark = summarylist[task.Key][0].Mark;
                                                 }
-                                                <tr data-data="cur-rma-task-@idx-@m" class="tr-data @(rmark == "1" ? "tr-hightlight" : (rmark == "2" ? "tr-lowlight" : ""))" data-ikey="@task.Key">
+                                                <tr data-data="cur-rma-task-@idx-@m" class="tr-data @(rmark == "1" ? "tr-highlight" : (rmark == "2" ? "tr-lowlight" : ""))" data-ikey="@task.Key">
                                                     <td>@(m + 1)</td>
                                                     <td><a href="/Issue/UpdateIssue?issuekey=@task.Key" target="_blank">@task.Value.Description</a></td>
                                                     <td>@task.Value.Status</td>
@@ -823,13 +857,13 @@
                 @if (ViewBag.setting.Others == 1)
                 {
                     <section id="Others-@idx">
-                        <div class="bs-callout bs-callout-warning" data-toggle="collapse" data-target="#content_others_@idx" aria-expanded="false">
+                        <div class="bs-callout bs-callout-warning @(others_update ? "bs-callout-green" : "")" data-toggle="collapse" data-target="#content_others_@idx" aria-expanded="false">
                             <h4>Others</h4>
                         </div>
                         <div id="content_others_@idx" class="content collapse">
                             @{
                                 var osummary = "";
-                                if (summarylist != null && summarylist.ContainsKey("@@" + Prometheus.Models.SummaryType.Others))
+                                if (others_update)
                                 {
                                     foreach (var item in summarylist["@@" + Prometheus.Models.SummaryType.Others])
                                     {

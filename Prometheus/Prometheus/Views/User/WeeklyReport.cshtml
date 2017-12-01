@@ -78,25 +78,25 @@
                 icare_dt_flg = ViewBag.icareDebugTree.ContainsKey(pKey) && ViewBag.icareDebugTree[pKey].Count > 0;
                 icare_flg = ViewBag.icareList.ContainsKey(pKey) && ViewBag.icareList[pKey].TaskList.Count > 0;
                 icare_update = ViewBag.icareList[pKey].IsUpdate || icare_dt_flg;
-                icare_cnt = icare_flg && icare_update ? ViewBag.icareList[pKey].TaskList.Count : 0;
+                icare_cnt = icare_flg ? ViewBag.icareList[pKey].TaskList.Count : 0;
             }
             if (ViewBag.setting.Task == 1)
             {
                 task_flg = ViewBag.taskList.ContainsKey(pKey) && ViewBag.taskList[pKey].TaskList.Count > 0;
                 task_update = ViewBag.taskList[pKey].IsUpdate;
-                task_cnt = task_flg && task_update ? ViewBag.taskList[pKey].TaskList.Count : 0;
+                task_cnt = task_flg ? ViewBag.taskList[pKey].TaskList.Count : 0;
             }
             if (ViewBag.setting.CriticalFailure == 1)
             {
                 cri_flg = ViewBag.criticalList.ContainsKey(pKey) && ViewBag.criticalList[pKey].TaskList.Count > 0;
                 cri_update = ViewBag.criticalList[pKey].IsUpdate;
-                cri_cnt = cri_flg && cri_update ? ViewBag.criticalList[pKey].TaskList.Count : 0;
+                cri_cnt = cri_flg ? ViewBag.criticalList[pKey].TaskList.Count : 0;
             }
             if (ViewBag.setting.RMA == 1)
             {
                 rma_flg = ViewBag.RMAList.ContainsKey(pKey) && ViewBag.RMAList[pKey].TaskList.Count > 0;
                 rma_update = ViewBag.RMAList[pKey].IsUpdate;
-                rma_cnt = rma_flg && rma_update ? ViewBag.RMAList[pKey].TaskList.Count : 0;
+                rma_cnt = rma_flg ? ViewBag.RMAList[pKey].TaskList.Count : 0;
             }
             if(ViewBag.setting.DebugTree == 1)
             {
@@ -545,7 +545,7 @@
                                         <span class="glyphicon glyphicon-chevron-down chevron-down"></span>
                                     </div>
                                     <div class="panel-body collapse" id="content_his_cri_task_@idx">
-                                        <table class="table table-hover table-condensed task-content" id="hiscritaskcontent" cellspacing="0">
+                                        <table class="table table-hover table-condensed critical-content" id="hiscritaskcontent" cellspacing="0">
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
@@ -629,7 +629,7 @@
                                                     </td>
                                                 </tr>
                                                 <tr class="even" data-ikey="@task.Key">
-                                                    <td colspan="8">
+                                                    <td colspan="7">
                                                         <div class="col-xs-12 summary">Summary:</div>
                                                         @{
                                                             var csummary = "";
@@ -954,18 +954,10 @@
         WeeklyReport.init();
     })
     $(document).ready(function () {
-        $('.icare-content').DataTable({
+        $('.icare-content, .task-content, .critical-content').DataTable({
             'iDisplayLength': 5,
             'aLengthMenu': [[5, 25, 50, 100, -1],
             [5, 25, 50, 100, "All"]],
-            "bAutoWidth": false,
-            "aaSorting": [],
-            "order": []
-        });
-        $('.task-content').DataTable({
-            'iDisplayLength': 5,
-            'aLengthMenu': [[5, 25, 50, 100, -1],
-                            [5, 25, 50, 100, "All"]],
             "bAutoWidth": false,
             "aaSorting": [],
             "order": []

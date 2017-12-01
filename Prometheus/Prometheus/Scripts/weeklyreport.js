@@ -6,10 +6,16 @@
         $('body').on('click', '.icare-content tbody tr', function () {
             var ikey = $(this).attr('data-ikey');
             var itype = $(this).attr('data-itype');
-            appendsummary($(this), itype, ikey);
+            appendsummary($(this), itype, ikey, 8);
+        })
+        
+        $('body').on('click', '.critical-content tbody tr', function () {
+            var ikey = $(this).attr('data-ikey');
+            var itype = $(this).attr('data-itype');
+            appendsummary($(this), itype, ikey, 7);
         })
 
-        var appendsummary = function (object, itype, ikey) {
+        var appendsummary = function (object, itype, ikey, cols) {
             var data_target = object.attr('data-target').substr(1);
             if ($('#' + data_target).length === 0) {
                 $.post('/User/GetSummary',
@@ -27,7 +33,7 @@
                                         '</div>';
                         }
                         var appendStr = '<tr>' +
-                            '<td colspan="8">' +
+                            '<td colspan="'+cols+'">' +
                                 '<div class="collapse in" id="' + data_target + '">' +
                                     '<div class="row well data-summary">' +
                                         '<label>Summary:</label>' +

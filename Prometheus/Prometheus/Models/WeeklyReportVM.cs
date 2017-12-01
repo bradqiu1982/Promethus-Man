@@ -124,8 +124,8 @@ namespace Prometheus.Models
             {
                 ret.Add(new WeeklyReportVM(
                     Convert.ToString(line[0]),
-                    Convert.ToString(line[1]),
                     Convert.ToString(line[2]),
+                    Convert.ToString(line[1]),
                     Convert.ToString(line[3]),
                     Convert.ToString(line[4]),
                     Convert.ToString(line[5]),

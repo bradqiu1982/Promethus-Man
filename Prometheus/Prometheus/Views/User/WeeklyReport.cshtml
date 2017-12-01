@@ -78,25 +78,25 @@
                 icare_dt_flg = ViewBag.icareDebugTree.ContainsKey(pKey) && ViewBag.icareDebugTree[pKey].Count > 0;
                 icare_flg = ViewBag.icareList.ContainsKey(pKey) && ViewBag.icareList[pKey].TaskList.Count > 0;
                 icare_update = ViewBag.icareList[pKey].IsUpdate || icare_dt_flg;
-                icare_cnt = icare_flg && icare_update ? ViewBag.icareList[pKey].TaskList.Count : 0;
+                icare_cnt = icare_flg ? ViewBag.icareList[pKey].TaskList.Count : 0;
             }
             if (ViewBag.setting.Task == 1)
             {
                 task_flg = ViewBag.taskList.ContainsKey(pKey) && ViewBag.taskList[pKey].TaskList.Count > 0;
                 task_update = ViewBag.taskList[pKey].IsUpdate;
-                task_cnt = task_flg && task_update ? ViewBag.taskList[pKey].TaskList.Count : 0;
+                task_cnt = task_flg ? ViewBag.taskList[pKey].TaskList.Count : 0;
             }
             if (ViewBag.setting.CriticalFailure == 1)
             {
                 cri_flg = ViewBag.criticalList.ContainsKey(pKey) && ViewBag.criticalList[pKey].TaskList.Count > 0;
                 cri_update = ViewBag.criticalList[pKey].IsUpdate;
-                cri_cnt = cri_flg && cri_update ? ViewBag.criticalList[pKey].TaskList.Count : 0;
+                cri_cnt = cri_flg ? ViewBag.criticalList[pKey].TaskList.Count : 0;
             }
             if (ViewBag.setting.RMA == 1)
             {
                 rma_flg = ViewBag.RMAList.ContainsKey(pKey) && ViewBag.RMAList[pKey].TaskList.Count > 0;
                 rma_update = ViewBag.RMAList[pKey].IsUpdate;
-                rma_cnt = rma_flg && rma_update ? ViewBag.RMAList[pKey].TaskList.Count : 0;
+                rma_cnt = rma_flg ? ViewBag.RMAList[pKey].TaskList.Count : 0;
             }
             if(ViewBag.setting.DebugTree == 1)
             {

@@ -545,7 +545,7 @@
                                         <span class="glyphicon glyphicon-chevron-down chevron-down"></span>
                                     </div>
                                     <div class="panel-body collapse" id="content_his_cri_task_@idx">
-                                        <table class="table table-hover table-condensed task-content" id="hiscritaskcontent" cellspacing="0">
+                                        <table class="table table-hover table-condensed critical-content" id="hiscritaskcontent" cellspacing="0">
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
@@ -629,7 +629,7 @@
                                                     </td>
                                                 </tr>
                                                 <tr class="even" data-ikey="@task.Key">
-                                                    <td colspan="8">
+                                                    <td colspan="7">
                                                         <div class="col-xs-12 summary">Summary:</div>
                                                         @{
                                                             var csummary = "";
@@ -954,18 +954,10 @@
         WeeklyReport.init();
     })
     $(document).ready(function () {
-        $('.icare-content').DataTable({
+        $('.icare-content, .task-content, .critical-content').DataTable({
             'iDisplayLength': 5,
             'aLengthMenu': [[5, 25, 50, 100, -1],
             [5, 25, 50, 100, "All"]],
-            "bAutoWidth": false,
-            "aaSorting": [],
-            "order": []
-        });
-        $('.task-content').DataTable({
-            'iDisplayLength': 5,
-            'aLengthMenu': [[5, 25, 50, 100, -1],
-                            [5, 25, 50, 100, "All"]],
             "bAutoWidth": false,
             "aaSorting": [],
             "order": []

@@ -54,8 +54,8 @@ namespace Prometheus.Models
                 if (IsDebug())
                 {
                     //conn.ConnectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=" + Path.Combine(HttpRuntime.AppDomainAppPath, "App_Data\\Prometheus.mdf") + ";Integrated Security=True;";
-                    conn.ConnectionString = "Server=WUX-D80008792;User ID=dbg;Password=dbgpwd;Database=DebugDB;Connection Timeout=120;";
-                    //conn.ConnectionString = "Server=wuxinpi;User ID=NPI;Password=NPI@NPI;Database=NPITrace;Connection Timeout=120;";
+                    //conn.ConnectionString = "Server=WUX-D80008792;User ID=dbg;Password=dbgpwd;Database=DebugDB;Connection Timeout=120;";
+                    conn.ConnectionString = "Server=wuxinpi;User ID=NPI;Password=NPI@NPI;Database=NPITrace;Connection Timeout=120;";
                 }
                 else
                 {
@@ -125,7 +125,12 @@ namespace Prometheus.Models
             }
         }
 
-        public static List<List<object>> ExeSqlWithRes(SqlConnection conn, string sql)
+        /* parameters: 
+         * if you want to defense SQL injection,
+         * you can prepare @param in sql,
+         * and give @param-values in parameters.
+         */
+        public static List<List<object>> ExeSqlWithRes(SqlConnection conn, string sql, Dictionary<string, string> parameters = null)
         {
 
             var ret = new List<List<object>>();
@@ -140,6 +145,13 @@ namespace Prometheus.Models
                 command = conn.CreateCommand();
                 command.CommandText = sql;
                 command.CommandTimeout = 180;
+                if (parameters != null)
+                {
+                    foreach (var param in parameters)
+                    {
+                        command.Parameters.AddWithValue(param.Key, param.Value);
+                    }
+                }
                 sqlreader = command.ExecuteReader();
                 if (sqlreader.HasRows)
                 {
@@ -219,8 +231,12 @@ namespace Prometheus.Models
                 logthdinfo("close conn exception: " + ex.Message + "\r\n");
             }
         }
-
-        public static bool ExeLocalSqlNoRes(string sql)
+        /* parameters: 
+        * if you want to defense SQL injection,
+        * you can prepare @param in sql,
+        * and give @param-values in parameters.
+        */
+        public static bool ExeLocalSqlNoRes(string sql, Dictionary<string, string> parameters = null)
         {
             //var now = DateTime.Now;
             //var msec1 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
@@ -234,6 +250,13 @@ namespace Prometheus.Models
             {
                 command = conn.CreateCommand();
                 command.CommandText = sql;
+                if(parameters != null)
+                {
+                    foreach(var param in parameters)
+                    {
+                        command.Parameters.AddWithValue(param.Key, param.Value);
+                    }
+                }
                 command.ExecuteNonQuery();
                 CloseConnector(conn);
 
@@ -328,8 +351,12 @@ namespace Prometheus.Models
                 return null;
             }
         }
-
-        public static List<List<object>> ExeLocalSqlWithRes( string sql,Cache mycache)
+        /* parameters: 
+         * if you want to defense SQL injection,
+         * you can prepare @param in sql,
+         * and give @param-values in parameters.
+         */
+        public static List<List<object>> ExeLocalSqlWithRes( string sql,Cache mycache, Dictionary<string, string> parameters = null)
         {
             //var now = DateTime.Now;
             //var msec1 = now.Hour * 60 * 60 * 1000 + now.Minute * 60 * 1000 + now.Second * 1000 + now.Millisecond;
@@ -354,6 +381,13 @@ namespace Prometheus.Models
             {
                 command = conn.CreateCommand();
                 command.CommandText = sql;
+                if (parameters != null)
+                {
+                    foreach (var param in parameters)
+                    {
+                        command.Parameters.AddWithValue(param.Key, param.Value);
+                    }
+                }
                 sqlreader = command.ExecuteReader();
                 if (sqlreader.HasRows)
                 {
@@ -486,8 +520,12 @@ namespace Prometheus.Models
                 return false;
             }
         }
-
-        public static List<List<object>> ExeMESSqlWithRes(string sql)
+        /* parameters: 
+         * if you want to defense SQL injection,
+         * you can prepare @param in sql,
+         * and give @param-values in parameters.
+         */
+        public static List<List<object>> ExeMESSqlWithRes(string sql, Dictionary<string, string> parameters = null)
         {
             var ret = new List<List<object>>();
             var conn = GetMESConnector();
@@ -499,6 +537,13 @@ namespace Prometheus.Models
                 var command = conn.CreateCommand();
                 command.CommandTimeout = 180;
                 command.CommandText = sql;
+                if (parameters != null)
+                {
+                    foreach (var param in parameters)
+                    {
+                        command.Parameters.AddWithValue(param.Key, param.Value);
+                    }
+                }
                 var sqlreader = command.ExecuteReader();
                 if (sqlreader.HasRows)
                 {
@@ -592,8 +637,12 @@ namespace Prometheus.Models
                 }
 
         }
-
-        public static List<List<object>> ExePRLSqlWithRes(Controller ctrl, string sql)
+        /* parameters: 
+         * if you want to defense SQL injection,
+         * you can prepare @param in sql,
+         * and give @param-values in parameters.
+         */
+        public static List<List<object>> ExePRLSqlWithRes(Controller ctrl, string sql, Dictionary<string, string> parameters = null)
         {
             //var syscfgdict = CfgUtility.GetSysConfig(ctrl);
 
@@ -607,6 +656,13 @@ namespace Prometheus.Models
                     var command = conn.CreateCommand();
                     command.CommandTimeout = 60;
                     command.CommandText = sql;
+                    if (parameters != null)
+                    {
+                        foreach (var param in parameters)
+                        {
+                            command.Parameters.AddWithValue(param.Key, param.Value);
+                        }
+                    }
                     var sqlreader = command.ExecuteReader();
                     if (sqlreader.HasRows)
                     {
@@ -668,8 +724,12 @@ namespace Prometheus.Models
                 return null;
             }
         }
-
-        public static List<List<object>> ExeMESBackupSqlWithRes(Controller ctrl, string sql)
+        /* parameters: 
+         * if you want to defense SQL injection,
+         * you can prepare @param in sql,
+         * and give @param-values in parameters.
+         */
+        public static List<List<object>> ExeMESBackupSqlWithRes(Controller ctrl, string sql, Dictionary<string, string> parameters = null)
         {
             //var syscfgdict = CfgUtility.GetSysConfig(ctrl);
 
@@ -683,6 +743,13 @@ namespace Prometheus.Models
                 var command = conn.CreateCommand();
                 command.CommandTimeout = 180;
                 command.CommandText = sql;
+                if (parameters != null)
+                {
+                    foreach (var param in parameters)
+                    {
+                        command.Parameters.AddWithValue(param.Key, param.Value);
+                    }
+                }
                 var sqlreader = command.ExecuteReader();
                 if (sqlreader.HasRows)
                 {
@@ -744,7 +811,12 @@ namespace Prometheus.Models
             }
         }
 
-        public static List<List<object>> ExeMESReportSqlWithRes(Controller ctrl, string sql)
+        /* parameters: 
+         * if you want to defense SQL injection,
+         * you can prepare @param in sql,
+         * and give @param-values in parameters.
+         */
+        public static List<List<object>> ExeMESReportSqlWithRes(Controller ctrl, string sql, Dictionary<string, string> parameters = null)
         {
             //var syscfgdict = CfgUtility.GetSysConfig(ctrl);
 
@@ -758,6 +830,13 @@ namespace Prometheus.Models
                 var command = conn.CreateCommand();
                 command.CommandTimeout = 60;
                 command.CommandText = sql;
+                if (parameters != null)
+                {
+                    foreach (var param in parameters)
+                    {
+                        command.Parameters.AddWithValue(param.Key, param.Value);
+                    }
+                }
                 var sqlreader = command.ExecuteReader();
                 if (sqlreader.HasRows)
                 {
@@ -820,7 +899,12 @@ namespace Prometheus.Models
             }
         }
 
-        public static List<List<object>> ExeMESReportMasterSqlWithRes(string sql)
+        /* parameters: 
+         * if you want to defense SQL injection,
+         * you can prepare @param in sql,
+         * and give @param-values in parameters.
+         */
+        public static List<List<object>> ExeMESReportMasterSqlWithRes(string sql, Dictionary<string, string> parameters = null)
         {
             //var syscfgdict = CfgUtility.GetSysConfig(ctrl);
 
@@ -834,6 +918,13 @@ namespace Prometheus.Models
                 var command = conn.CreateCommand();
                 command.CommandTimeout = 180;
                 command.CommandText = sql;
+                if (parameters != null)
+                {
+                    foreach (var param in parameters)
+                    {
+                        command.Parameters.AddWithValue(param.Key, param.Value);
+                    }
+                }
                 var sqlreader = command.ExecuteReader();
                 if (sqlreader.HasRows)
                 {
@@ -894,8 +985,12 @@ namespace Prometheus.Models
                 return null;
             }
         }
-
-        public static List<List<object>> ExeAutoSqlWithRes(string sql)
+        /* parameters: 
+         * if you want to defense SQL injection,
+         * you can prepare @param in sql,
+         * and give @param-values in parameters.
+         */
+        public static List<List<object>> ExeAutoSqlWithRes(string sql, Dictionary<string, string> parameters = null)
         {
             //var syscfgdict = CfgUtility.GetSysConfig(ctrl);
 
@@ -909,6 +1004,13 @@ namespace Prometheus.Models
                 var command = conn.CreateCommand();
                 command.CommandTimeout = 120;
                 command.CommandText = sql;
+                if (parameters != null)
+                {
+                    foreach (var param in parameters)
+                    {
+                        command.Parameters.AddWithValue(param.Key, param.Value);
+                    }
+                }
                 var sqlreader = command.ExecuteReader();
                 if (sqlreader.HasRows)
                 {
@@ -969,8 +1071,12 @@ namespace Prometheus.Models
                 return null;
             }
         }
-
-        public static List<List<object>> ExeFAISqlWithRes(string sql)
+        /* parameters: 
+         * if you want to defense SQL injection,
+         * you can prepare @param in sql,
+         * and give @param-values in parameters.
+         */
+        public static List<List<object>> ExeFAISqlWithRes(string sql, Dictionary<string, string> parameters = null)
         {
             //var syscfgdict = CfgUtility.GetSysConfig(ctrl);
 
@@ -984,6 +1090,13 @@ namespace Prometheus.Models
                 var command = conn.CreateCommand();
                 command.CommandTimeout = 60;
                 command.CommandText = sql;
+                if (parameters != null)
+                {
+                    foreach (var param in parameters)
+                    {
+                        command.Parameters.AddWithValue(param.Key, param.Value);
+                    }
+                }
                 var sqlreader = command.ExecuteReader();
                 if (sqlreader.HasRows)
                 {

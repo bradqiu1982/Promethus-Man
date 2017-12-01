@@ -281,13 +281,14 @@ namespace Prometheus.Controllers
                     }
                 }
             }
-
+            LogVM.WriteLog(updater.ToUpper(), vm.ProjectKey, DetermineCompName(Request.UserHostName),
+                    Request.Url.ToString(), "Issue", "CreateIssue", vm.IssueKey, LogType.Task, Log4NetLevel.Info, "");
 
             //ProjectEvent.CreateIssueEvent(vm.ProjectKey, vm.Reporter, vm.Assignee, vm.Summary, vm.IssueKey);
 
             //if (vm.RelativePeopleList.Count > 0)
             //{
-                SendTaskEvent(vm, "Created");
+            SendTaskEvent(vm, "Created");
             //}
 
             var dict = new RouteValueDictionary();
@@ -1063,6 +1064,8 @@ namespace Prometheus.Controllers
             }
 
             //ProjectEvent.CreateIssueEvent(vm.ProjectKey, vm.Reporter, vm.Assignee, vm.Summary, vm.IssueKey);
+            LogVM.WriteLog(updater.ToUpper(), vm.ProjectKey, DetermineCompName(Request.UserHostName),
+                    Request.Url.ToString(), "Issue", "CreateSubIssue", vm.IssueKey, LogType.Task, Log4NetLevel.Info, "");
 
             var dict = new RouteValueDictionary();
             dict.Add("issuekey", vm.ParentIssueKey);
@@ -1419,6 +1422,8 @@ namespace Prometheus.Controllers
 
             //ProjectEvent.CreateIssueEvent(vm.ProjectKey, vm.Reporter, vm.Assignee, vm.Summary, vm.IssueKey);
             SendRMAEvent(vm, "created",true);
+            LogVM.WriteLog(updater.ToUpper(), vm.ProjectKey, DetermineCompName(Request.UserHostName),
+                    Request.Url.ToString(), "Issue", "CreateRMA", vm.IssueKey, LogType.Task, Log4NetLevel.Info, "");
 
             var dict = new RouteValueDictionary();
             dict.Add("issuekey", vm.IssueKey);

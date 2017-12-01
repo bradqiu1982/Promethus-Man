@@ -59,7 +59,7 @@
             var pKey = $(this).attr('data-data-key');
             var sType = $(this).attr('data-data-module');
             var data = new Array();
-            if (sType == 6) {
+            if (sType == 6 || sType == 3) {
                 var $content = $(this).parent('.wr-operation').prev().find('.even');
                 $($content).each(function () {
                     var arrtmp = new Array();

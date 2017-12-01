@@ -80,13 +80,15 @@ namespace Prometheus.Models
         public static Dictionary<string, string> GetUserLatestTime(String username)
         {
             var ret = new Dictionary<string, string>();
-            var sql = "SELECT MAX(wr.UpdateTime) as UpdateTime, ut.UserName " +
+            var sql = "SELECT MAX(Log.Date) as UpdateTime, ut.UserName " +
                     "FROM UserTable as ut " +
-                    "Left Join WeeklyReport as wr ON ut.UserName = wr.UserName " +
-                    "WHERE ut.UserName in (<username>) " +
+                    "Left Join Log ON ut.UserName = Log.UserName " +
+                    "WHERE ut.UserName in (<UserName>) " +
+                    "and Log.LogType = '<LogType>' " +
                     "Group by ut.UserName " +
                     "ORDER BY UpdateTime DESC";
-            sql = sql.Replace("<username>", username.ToUpper());
+            sql = sql.Replace("<UserName>", username.ToUpper())
+                    .Replace("<LogType>", LogType.Task.ToString());
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             var UserName = "";
             var UpdateTime = "";

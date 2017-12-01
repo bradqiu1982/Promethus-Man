@@ -67,7 +67,14 @@ namespace Prometheus.Controllers
             ViewBag.resolutionlist = slist;
 
             var asilist = UserViewModels.RetrieveAllUser();
-            slist = CreateSelectList(asilist, vm.Assignee);
+            if (string.IsNullOrEmpty(vm.Assignee))
+            {
+                slist = CreateSelectList(asilist, vm.Reporter);
+            }
+            else
+            {
+                slist = CreateSelectList(asilist, vm.Assignee);
+            }
             ViewBag.assigneelist = slist;
 
             var rpilist = UserViewModels.RetrieveAllUser();

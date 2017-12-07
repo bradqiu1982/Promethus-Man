@@ -96,7 +96,7 @@
                         <div class="col-xs-6">
                             <label class="control-label col-xs-2" for="Assignee">Assignee</label>
                             <div class="col-xs-10">
-                                <select id="Assignee" name="Assignee" class="form-control">
+                                <select id="Assignee" name="assigneelist" class="form-control">
                                     @foreach (var item in ViewBag.assigneelist)
                                     {
                                         <option value="@item.Value" @(string.Compare(Model.Reporter, item.Value) == 0 ? "selected" : "")>@item.Text.ToUpper()</option>

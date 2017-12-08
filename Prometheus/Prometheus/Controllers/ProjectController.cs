@@ -5769,6 +5769,24 @@ namespace Prometheus.Controllers
             catch (Exception ex) { }
         }
 
+        private void heartbeatlog(string msg)
+        {
+            try
+            {
+                var filename = "log" + DateTime.Now.ToString("yyyy-MM-dd");
+                var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
+
+                var content = "";
+                if (System.IO.File.Exists(wholefilename))
+                {
+                    content = System.IO.File.ReadAllText(wholefilename);
+                }
+                content = content + msg + " @ " + DateTime.Now.ToString() + "\r\n";
+                System.IO.File.WriteAllText(wholefilename, content);
+            }
+            catch (Exception ex)
+            { }
+        }
 
         public ActionResult HeartBeat()
         {
@@ -5798,18 +5816,7 @@ namespace Prometheus.Controllers
             catch (Exception ex)
             { }
 
-
-            try
-            {
-                var filename = "log" + DateTime.Now.ToString("yyyy-MM-dd");
-                var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
-
-                var content = System.IO.File.ReadAllText(wholefilename);
-                content = content + "heart beat start @ " + starttime + "\r\n";
-                System.IO.File.WriteAllText(wholefilename, content);
-            }
-            catch (Exception ex)
-            { }
+            heartbeatlog("heart beat start");
 
             try
             {
@@ -5820,6 +5827,7 @@ namespace Prometheus.Controllers
             catch (Exception ex) { }
 
 
+            heartbeatlog("ProjectTestData.PrePareMESLatestData");
 
             foreach (var pjkey in pjkeylist)
             {
@@ -5831,6 +5839,8 @@ namespace Prometheus.Controllers
                 { }
             }
 
+            heartbeatlog("ProjectTestData.PrePareOSALatestData");
+
             foreach (var pjkey in pjkeylist)
             {
                 try
@@ -5840,6 +5850,8 @@ namespace Prometheus.Controllers
                 catch (Exception ex)
                 { }
             }
+
+            heartbeatlog("ProjectTestData.PrePareATELatestData");
 
             foreach (var pjkey in pjkeylist)
             {
@@ -5851,11 +5863,15 @@ namespace Prometheus.Controllers
                 { }
             }
 
+            heartbeatlog("ProjectTestData.RefreshRMAData");
+
             try
             {
                 ExternalDataCollector.RefreshRMAData(this);
             }
             catch (Exception ex) { }
+
+            heartbeatlog("ProjectTestData.RefreshRELData");
 
             try
             {
@@ -5863,17 +5879,23 @@ namespace Prometheus.Controllers
             }
             catch (Exception ex) { }
 
+            heartbeatlog("ProjectTestData.RefreshOBAFromDMR");
+
             try
             {
                 ExternalDataCollector.RefreshOBAFromDMR(this);
             }
             catch (Exception ex) { }
 
+            heartbeatlog("LoadBITestDateFromAuto");
+
             try
             {
                 BIDataUtility.LoadBITestDateFromAuto(this);
             }
             catch (Exception ex) { }
+
+            heartbeatlog("BITestData.PrePareLatestData");
 
             foreach (var pjkey in pjkeylist)
             {
@@ -5885,6 +5907,8 @@ namespace Prometheus.Controllers
                 { }
             }
 
+            heartbeatlog("ProcessData.LoadMesWorkflow");
+
             foreach (var pjkey in pjkeylist)
             {
                 try
@@ -5894,6 +5918,8 @@ namespace Prometheus.Controllers
                 catch (Exception ex)
                 { }
             }
+
+            heartbeatlog("ProcessData.LoadMESMoveHistory");
 
             foreach (var pjkey in pjkeylist)
             {
@@ -5905,11 +5931,15 @@ namespace Prometheus.Controllers
                 { }
             }
 
+            heartbeatlog("BIDataUtility.LoadModuleTXOFromMESBackup");
+
             try
             {
                 BIDataUtility.LoadModuleTXOFromMESBackup(this);
             }
             catch (Exception ex) { }
+
+            heartbeatlog("BIDataUtility.LoadProcessTXOFromAuto");
 
             try
             {
@@ -5917,23 +5947,15 @@ namespace Prometheus.Controllers
             }
             catch (Exception ex) { }
 
+            heartbeatlog("RefreshNeoMAPData");
+
             try
             {
                 ExternalDataCollector.RefreshNeoMAPData(this);
             }
             catch (Exception ex) { }
 
-            try
-            {
-                var filename = "log" + DateTime.Now.ToString("yyyy-MM-dd");
-                var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
-
-                var content = System.IO.File.ReadAllText(wholefilename);
-                content = content + "heart beat end @ " + DateTime.Now.ToString() + "\r\n";
-                System.IO.File.WriteAllText(wholefilename, content);
-            }
-            catch (Exception ex)
-            { }
+            heartbeatlog("refresh cache");
 
             try
             {
@@ -5963,6 +5985,8 @@ namespace Prometheus.Controllers
             }
             catch (Exception ex)
             { }
+
+            heartbeatlog("Heart beat end");
 
             return View();
         }

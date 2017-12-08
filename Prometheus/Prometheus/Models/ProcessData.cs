@@ -397,22 +397,8 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static void LoadMESMoveHistory(string PJKey,Controller ctrl)
+        private static void _loadMESMoveHistory(string PJKey, Controller ctrl,List<string> allpids, List<ProjectWorkflow> allworkflow,string latesttime, bool isosapj)
         {
-            bool isosapj = false;
-            var osafailuremap = OSAFailureVM.RetrieveAllOSAFailureVM(PJKey);
-            if (osafailuremap.Count > 0)
-            {
-                isosapj = true;
-            }
-
-            var allpids = RetrieveAllProductIDs(PJKey);
-            var allworkflow = RetriveWorkflowByName(PJKey, new List<string>());
-            if (allpids.Count > 0)
-            {
-                var syscfg = CfgUtility.GetSysConfig(ctrl);
-                var movezerotime = syscfg["MOVEHISTORYZEROTIME"];
-                var latesttime = RetriveProjectMoveHistoryLatetime(PJKey, movezerotime);
 
                 var stepnamedict = new Dictionary<string, string>();
                 foreach (var item in allworkflow)
@@ -440,8 +426,8 @@ namespace Prometheus.Models
                 pidcond = pidcond.Substring(0, pidcond.Length - 2);
 
                 var sql = "select ProductId,WorkflowStepId,MoveOutQty,MoveInQty,MfgOrderId,MoveOutTime,TxnTypeName,ContainerName,Comments,WorkflowStepName "
-                    + " from PDMSMaster.dbo.HistStepMoveSummary (nolock) where MoveOutTime > '<MoveOutTime>' and ProductId in (<pidcond>)  and MFGOrderId is not null";
-                sql = sql.Replace("<pidcond>", pidcond).Replace("<MoveOutTime>", latesttime);
+                    + " from PDMSMaster.dbo.HistStepMoveSummary (nolock) where MoveOutTime > '<MoveOutTime>' and MoveOutTime < '<LIMITTime>' and ProductId in (<pidcond>)  and MFGOrderId is not null";
+                sql = sql.Replace("<pidcond>", pidcond).Replace("<MoveOutTime>", latesttime).Replace("<LIMITTime>", DateTime.Parse(latesttime).AddDays(3).ToString("yyyy-MM-dd HH:mm:ss"));
 
                 var MfgOrdidDict = new Dictionary<string, bool>();
                 var movelist = new List<ProjectMoveHistory>();
@@ -562,6 +548,35 @@ namespace Prometheus.Models
                 }
 
                 StoreMoveHistory(movelist);
+        }
+
+        public static void LoadMESMoveHistory(string PJKey,Controller ctrl)
+        {
+            var syscfg = CfgUtility.GetSysConfig(ctrl);
+            var movezerotime = syscfg["MOVEHISTORYZEROTIME"];
+            var latesttime = RetriveProjectMoveHistoryLatetime(PJKey, movezerotime);
+
+            bool isosapj = false;
+            var osafailuremap = OSAFailureVM.RetrieveAllOSAFailureVM(PJKey);
+            if (osafailuremap.Count > 0)
+            {
+                isosapj = true;
+            }
+
+            var allpids = RetrieveAllProductIDs(PJKey);
+            var allworkflow = RetriveWorkflowByName(PJKey, new List<string>());
+            if (allpids.Count > 0)
+            {
+                var temppidlistlist = new List<List<string>>();
+                for (int i = 0; i < allpids.Count; i += 5)
+                {
+                    temppidlistlist.Add(allpids.GetRange(i, Math.Min(5, allpids.Count - i)));
+                }
+
+                foreach (var templist in temppidlistlist)
+                {
+                    _loadMESMoveHistory(PJKey, ctrl, templist, allworkflow, latesttime, isosapj);
+                }
             }//end if
         }
 

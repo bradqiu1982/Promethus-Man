@@ -144,7 +144,7 @@ namespace Prometheus.Models
             {
                 command = conn.CreateCommand();
                 command.CommandText = sql;
-                command.CommandTimeout = 180;
+                command.CommandTimeout = 120;
                 if (parameters != null)
                 {
                     foreach (var param in parameters)
@@ -536,7 +536,90 @@ namespace Prometheus.Models
                     return ret;
 
                 var command = conn.CreateCommand();
-                command.CommandTimeout = 180;
+                command.CommandTimeout = 120;
+                command.CommandText = sql;
+                if (parameters != null)
+                {
+                    foreach (var param in parameters)
+                    {
+                        command.Parameters.AddWithValue(param.Key, param.Value);
+                    }
+                }
+                var sqlreader = command.ExecuteReader();
+                if (sqlreader.HasRows)
+                {
+
+                    while (sqlreader.Read())
+                    {
+                        var newline = new List<object>();
+                        for (var i = 0; i < sqlreader.FieldCount; i++)
+                        {
+                            newline.Add(sqlreader.GetValue(i));
+                        }
+                        ret.Add(newline);
+                    }
+                }
+
+                sqlreader.Close();
+                CloseConnector(conn);
+                return ret;
+            }
+            catch (SqlException ex)
+            {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                //System.Windows.MessageBox.Show(ex.ToString());
+                CloseConnector(conn);
+                ret.Clear();
+                return ret;
+            }
+            catch (Exception ex)
+            {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                //System.Windows.MessageBox.Show(ex.ToString());
+                CloseConnector(conn);
+                ret.Clear();
+                return ret;
+            }
+        }
+
+        private static SqlConnection GetRealMESConnector()
+        {
+            var conn = new SqlConnection();
+            try
+            {
+                conn.ConnectionString = "Server=CN-CSSQL;uid=SHG_Read;pwd=shgread;Database=InsiteDB;Connection Timeout=30;";
+                //conn.ConnectionString = "Server=wux-csods;uid=NPI_FA;pwd=msW2TH95Pd;Database=InsiteDB;Connection Timeout=30;";
+                conn.Open();
+                return conn;
+            }
+            catch (SqlException ex)
+            {
+                //System.Windows.MessageBox.Show(ex.ToString());
+                return null;
+            }
+            catch (Exception ex)
+            {
+                //System.Windows.MessageBox.Show(ex.ToString());
+                return null;
+            }
+        }
+
+        /* parameters: 
+         * if you want to defense SQL injection,
+         * you can prepare @param in sql,
+         * and give @param-values in parameters.
+         */
+        public static List<List<object>> ExeRealMESSqlWithRes(string sql, Dictionary<string, string> parameters = null)
+        {
+            var ret = new List<List<object>>();
+            var conn = GetRealMESConnector();
+            try
+            {
+                if (conn == null)
+                    return ret;
+
+                var command = conn.CreateCommand();
+                command.CommandTimeout = 120;
                 command.CommandText = sql;
                 if (parameters != null)
                 {
@@ -742,7 +825,7 @@ namespace Prometheus.Models
                     return ret;
 
                 var command = conn.CreateCommand();
-                command.CommandTimeout = 180;
+                command.CommandTimeout = 120;
                 command.CommandText = sql;
                 if (parameters != null)
                 {
@@ -917,7 +1000,7 @@ namespace Prometheus.Models
                     return ret;
 
                 var command = conn.CreateCommand();
-                command.CommandTimeout = 180;
+                command.CommandTimeout = 120;
                 command.CommandText = sql;
                 if (parameters != null)
                 {

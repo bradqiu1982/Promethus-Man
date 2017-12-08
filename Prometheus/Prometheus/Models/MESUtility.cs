@@ -1049,7 +1049,7 @@ namespace Prometheus.Models
             {
                 var sql = "  select ParentHistoryID,DataColumn,DataValue1 from insite.DCE_OSAMultiValueTest_Main(nolock) where ParentHistoryID in <ParentHistoryID> order by ParentHistoryID";
                 sql = sql.Replace("<ParentHistoryID>", dataidcond);
-                var dbret = DBUtility.ExeMESSqlWithRes(sql);
+                var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
                 foreach (var item in dbret)
                 {
                     try

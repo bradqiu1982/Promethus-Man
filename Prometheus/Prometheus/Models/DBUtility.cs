@@ -1263,6 +1263,8 @@ namespace Prometheus.Models
             }
             catch (Exception ex)
             {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+
                 //System.Windows.MessageBox.Show(ex.Message);
 
                 try

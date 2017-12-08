@@ -5982,44 +5982,44 @@ namespace Prometheus.Controllers
             }
         }
 
-        private void UpdateJO()
-        {
-            var sns = ProjectTestData.RetrieveAllSNWithNoJO();
-            logjoinfo("get sn count from local: " + sns.Count.ToString());
+        //private void UpdateJO()
+        //{
+        //    var sns = ProjectTestData.RetrieveAllSNWithNoJO();
+        //    logjoinfo("get sn count from local: " + sns.Count.ToString());
 
-            var dict = new Dictionary<string, string>();
+        //    var dict = new Dictionary<string, string>();
 
-            int i = 0;
-            foreach (var sn in sns)
-            {
-                var jo = ProjectTestData.RetrieveJOFromMESSN(sn);
-                if (!string.IsNullOrEmpty(jo))
-                {
-                    dict.Add(sn, jo);
-                    i = i + 1;
-                }
+        //    int i = 0;
+        //    foreach (var sn in sns)
+        //    {
+        //        var jo = ProjectTestData.RetrieveJOFromMESSN(sn);
+        //        if (!string.IsNullOrEmpty(jo))
+        //        {
+        //            dict.Add(sn, jo);
+        //            i = i + 1;
+        //        }
 
-                if (i % 10000 == 0)
-                {
-                    logjoinfo("read jo count: " + i.ToString());
+        //        if (i % 10000 == 0)
+        //        {
+        //            logjoinfo("read jo count: " + i.ToString());
 
-                    foreach (var kv in dict)
-                    {
-                        ProjectTestData.UpdateJO(kv.Key, kv.Value);
-                    }
+        //            foreach (var kv in dict)
+        //            {
+        //                ProjectTestData.UpdateJO(kv.Key, kv.Value);
+        //            }
 
-                    dict.Clear();
-                    logjoinfo("write jo ");
-                }
-            }
+        //            dict.Clear();
+        //            logjoinfo("write jo ");
+        //        }
+        //    }
 
-            logjoinfo("write last jo ");
-            foreach (var kv in dict)
-            {
-                ProjectTestData.UpdateJO(kv.Key, kv.Value);
-            }
-            logjoinfo("finish last jo ");
-        }
+        //    logjoinfo("write last jo ");
+        //    foreach (var kv in dict)
+        //    {
+        //        ProjectTestData.UpdateJO(kv.Key, kv.Value);
+        //    }
+        //    logjoinfo("finish last jo ");
+        //}
 
         private void AssignPJ2User()
         {

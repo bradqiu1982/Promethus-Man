@@ -776,6 +776,13 @@ CREATE TABLE [dbo].[WaferRecord] (
 	[databackuptm]   DATETIME       DEFAULT ('2017-08-02 10:00:00') NOT NULL
 	);
 
+	CREATE TABLE [dbo].[PNDescCache] (
+    [pnkey]        NVARCHAR (MAX) DEFAULT ('')   NOT NULL,
+    [pn]       NVARCHAR (MAX) DEFAULT ('')   NOT NULL,
+    [updatetime]        DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+	);
+
+
 ALTER TABLE  [DebugDB].[dbo].[ProjectCriticalError] Add SettingReason NVARCHAR (MAX)    DEFAULT ('') NOT NULL;
 ALTER TABLE  [NPITrace].[dbo].[ProjectCriticalError] Add SettingReason NVARCHAR (MAX)    DEFAULT ('') NOT NULL;
 

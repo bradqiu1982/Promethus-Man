@@ -60,8 +60,37 @@ namespace Prometheus.Models
             }
             else
             {
-                var ret = "select DISTINCT p.ProductName from insite.Product c (nolock) left join insite.ProductBase p on c.ProductBaseId = p.ProductBaseId where " + cond;
-                return ret;
+                //var ret = "select DISTINCT p.ProductName from insite.Product c (nolock) left join insite.ProductBase p on c.ProductBaseId = p.ProductBaseId where " + cond;
+                //return ret;
+                var pnkey = "name_" + cond.Replace("c.Description like", "").Replace("or", ",").Replace("'", "").Replace("%", "").Replace(" ", "");
+                var pnlist = PNDescCache.RetrievePNs(pnkey);
+                if (pnlist.Count > 0)
+                {
+                    var ret = "'";
+                    foreach (var item in pnlist)
+                    {
+                        ret = ret + item + "','";
+                    }
+                    ret = ret.Substring(0, ret.Length - 2);
+                    return ret;
+                }
+
+                var sql = "select DISTINCT p.ProductName from insite.Product c (nolock) left join insite.ProductBase p on c.ProductBaseId = p.ProductBaseId where " + cond;
+                var dbret = DBUtility.ExeMESSqlWithRes(sql);
+                if (dbret.Count == 0)
+                {
+                    return string.Empty;
+                }
+
+                var ret1 = "'";
+                foreach (var line in dbret)
+                {
+                    var pn = Convert.ToString(line[0]);
+                    ret1 = ret1 + pn + "','";
+                    PNDescCache.StorePN(pnkey, pn);
+                }
+                ret1 = ret1.Substring(0, ret1.Length - 2);
+                return ret1;
             }
         }
 
@@ -1067,7 +1096,8 @@ namespace Prometheus.Models
                     {
                         return;
                     }
-                    sql = sql.Replace("<TIMECOND>", "and TestTimeStamp > '" + starttime + "' and TestTimeStamp < '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "'");
+                    //sql = sql.Replace("<TIMECOND>", "and TestTimeStamp > '" + starttime + "' and TestTimeStamp < '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "'");
+                    sql = sql.Replace("<TIMECOND>", "and TestTimeStamp > '" + starttime + "' and TestTimeStamp < '" + DateTime.Parse(starttime).AddDays(3).ToString("yyyy-MM-dd HH:mm:ss") + "'");
 
                     var bondingeddatadict = ProjectTestData.RetrieveAllDataID(vm.ProjectKey);
 
@@ -1341,7 +1371,8 @@ namespace Prometheus.Models
                     }
 
                     var sndict = new Dictionary<string, bool>();
-                    var sql = s.Value.Replace("<TIMECOND>", "and TestTimeStamp > '" + starttime + "' and TestTimeStamp < '"+ endtime + "'");
+                    //var sql = s.Value.Replace("<TIMECOND>", "and TestTimeStamp > '" + starttime + "' and TestTimeStamp < '"+ endtime + "'");
+                      var sql = s.Value.Replace("<TIMECOND>", "and TestTimeStamp > '" + starttime + "' and TestTimeStamp < '" + DateTime.Parse(starttime).AddDays(3).ToString("yyyy-MM-dd HH:mm:ss") + "'");
                     var dbret = DBUtility.ExeMESSqlWithRes(sql);
                     foreach (var item in dbret)
                     {

@@ -499,18 +499,18 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
-        public static string RetrieveJOFromMESSN(string SN)
-        {
-            var sql = "SELECT MO.MfgOrderName FROM Insite.MfgOrder MO WITH (NOLOCK) LEFT JOIN Insite.Container C WITH (NOLOCK) ON MO.MfgOrderId = C.MfgOrderId WHERE  c.containername = '<SN>'";
-            sql = sql.Replace("<SN>", SN);
-            var dbret = DBUtility.ExeMESSqlWithRes(sql);
-            var ret = string.Empty;
-            if (dbret.Count > 0)
-            {
-                ret = Convert.ToString(dbret[0][0]);
-            }
-            return ret;
-        }
+        //public static string RetrieveJOFromMESSN(string SN)
+        //{
+        //    var sql = "SELECT MO.MfgOrderName FROM Insite.MfgOrder MO WITH (NOLOCK) LEFT JOIN Insite.Container C WITH (NOLOCK) ON MO.MfgOrderId = C.MfgOrderId WHERE  c.containername = '<SN>'";
+        //    sql = sql.Replace("<SN>", SN);
+        //    var dbret = DBUtility.ExeMESSqlWithRes(sql);
+        //    var ret = string.Empty;
+        //    if (dbret.Count > 0)
+        //    {
+        //        ret = Convert.ToString(dbret[0][0]);
+        //    }
+        //    return ret;
+        //}
 
         public static List<string> Last300FailedModuleForUser(string UserName)
         {

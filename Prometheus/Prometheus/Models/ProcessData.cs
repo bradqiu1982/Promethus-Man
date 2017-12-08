@@ -373,6 +373,13 @@ namespace Prometheus.Models
             var pncond = PNCondition(pvm.PNList);
             if (!string.IsNullOrEmpty(pncond))
             {
+                var pnkey = "id_" + pncond.Replace("p.Description like", "").Replace("or", ",").Replace("'", "").Replace("%", "").Replace(" ", "").Replace(" ", "");
+                var pnlist = PNDescCache.RetrievePNs(pnkey);
+                if (pnlist.Count > 0)
+                {
+                    return pnlist;
+                }
+
                 var sql = "select distinct p.ProductId from InsiteDB.insite.Product p (nolock) where (<pncond>) ";
                 sql = sql.Replace("<pncond>", pncond);
                 var dbret = DBUtility.ExeMESSqlWithRes(sql);
@@ -382,6 +389,7 @@ namespace Prometheus.Models
                     if (!string.IsNullOrEmpty(pid))
                     {
                         ret.Add(pid);
+                        PNDescCache.StorePN(pnkey, pid);
                     }
                 }//end foreach
             }//end if

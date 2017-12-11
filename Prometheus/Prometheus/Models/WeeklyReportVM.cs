@@ -142,23 +142,23 @@ namespace Prometheus.Models
 
         public static void SaveWeeklyReport(List<WeeklyReportVM> report)
         {
-            var items = "";
             foreach(var rep in report)
             {
                 var s_sql = "select Summary, Mark from WeeklyReport " +
-                        "where ProjectKey = N'<ProjectKey>' " +
-                        "and IssueKey = N'<IssueKey>' " +
-                        "and Year = '<Year>' and Week = '<Week>' " +
-                        "and Type = '<Type>' and UserName = N'<UserName>' " +
-                        "and Status = '<Status>';";
-                s_sql = s_sql.Replace("<ProjectKey>", rep.ProjectKey)
-                        .Replace("<IssueKey>", rep.IssueKey)
-                        .Replace("<Year>", rep.Year)
-                        .Replace("<Week>", rep.Week)
-                        .Replace("<Type>", rep.Type)
-                        .Replace("<UserName>", rep.UserName)
-                        .Replace("<Status>", SummaryStatus.Valid.ToString());
-                var exist_data = DBUtility.ExeLocalSqlWithRes(s_sql, null);
+                        "where ProjectKey = @ProjectKey " +
+                        "and IssueKey = @IssueKey " +
+                        "and Year = @Year and Week = @Week " +
+                        "and Type = @Type and UserName = @UserName " +
+                        "and Status = @Status;";
+                var param = new Dictionary<string, string>();
+                    param.Add("@ProjectKey", rep.ProjectKey);
+                    param.Add("@IssueKey", rep.IssueKey);
+                    param.Add("@Year", rep.Year);
+                    param.Add("@Week", rep.Week);
+                    param.Add("@Type", rep.Type);
+                    param.Add("@UserName", rep.UserName);
+                    param.Add("@Status", SummaryStatus.Valid.ToString());
+                var exist_data = DBUtility.ExeLocalSqlWithRes(s_sql, null, param);
                 if (exist_data.Count == 1 && string.Compare(exist_data[0][0].ToString(), rep.Summary) == 0
                     && string.Compare(exist_data[0][1].ToString(), rep.Mark) == 0)
                 {
@@ -168,43 +168,43 @@ namespace Prometheus.Models
                 {
                     if(exist_data.Count > 0)
                     {
-                        var sqltmp = "update WeeklyReport set Status = '<DelStatus>' " +
-                            //var sqltmp = "delete from WeeklyReport " +
-                            "where ProjectKey = N'<ProjectKey>' " +
-                            "and IssueKey = N'<IssueKey>' " +
-                            "and Year = '<Year>' and Week = '<Week>' " +
-                            "and Type = '<Type>' and UserName = N'<UserName>' " +
-                            "and Status = '<Status>';";
-                        sqltmp = sqltmp.Replace("<DelStatus>", SummaryStatus.Delete.ToString())
-                                .Replace("<ProjectKey>", rep.ProjectKey)
-                                .Replace("<IssueKey>", rep.IssueKey)
-                                .Replace("<Year>", rep.Year).Replace("<Week>", rep.Week)
-                                .Replace("<Type>", rep.Type)
-                                .Replace("<UserName>", rep.UserName)
-                                .Replace("<Status>", SummaryStatus.Valid.ToString());
-                        DBUtility.ExeLocalSqlNoRes(sqltmp);
+                        var sqltmp = "update WeeklyReport set Status = @DelStatus " +
+                            "where ProjectKey = @ProjectKey " +
+                            "and IssueKey = @IssueKey " +
+                            "and Year = @Year and Week = @Week " +
+                            "and Type = @Type and UserName = @UserName " +
+                            "and Status = @Status;";
+                        var param1 = new Dictionary<string, string>();
+                            param1.Add("@DelStatus", SummaryStatus.Delete.ToString());
+                            param1.Add("@ProjectKey", rep.ProjectKey);
+                            param1.Add("@IssueKey", rep.IssueKey);
+                            param1.Add("@Year", rep.Year);
+                            param1.Add("@Week", rep.Week);
+                            param1.Add("@Type", rep.Type);
+                            param1.Add("@UserName", rep.UserName);
+                            param1.Add("@Status", SummaryStatus.Valid.ToString());
+                        DBUtility.ExeLocalSqlNoRes(sqltmp, param1);
                     }
-                    items += "(N'" + rep.UserName + "',"
-                            + "N'" + rep.ProjectKey + "',"
-                            + "N'" + rep.IssueKey + "',"
-                            + "N'" + rep.Summary + "',"
-                            + "'" + rep.Type + "',"
-                            + "'" + rep.Year + "',"
-                            + "'" + rep.Week + "',"
-                            + "'" + rep.Mark + "',"
-                            + "'" + rep.Status + "',"
-                            + "'" + rep.CreateTime + "',"
-                            + "'" + rep.UpdateTime + "'),";
-                }
-                
-            }
-            if ( ! string.IsNullOrEmpty(items))
-            {
-                items = items.Substring(0, items.Length - 1);
-                var sql = "insert into WeeklyReport (UserName, ProjectKey, IssueKey, Summary, [Type], [Year], [Week], [Mark], [Status], [CreateTime], [UpdateTime]) values <Items>; ";
-                sql = sql.Replace("<Items>", items);
+                    var sql = @"insert into WeeklyReport (UserName, ProjectKey, IssueKey, 
+                                Summary, [Type], [Year], [Week], [Mark], [Status], 
+                                [CreateTime], [UpdateTime]) values (@UserName, @ProjectKey,
+                                @IssueKey, @Summary, @Type, @Year, @Week, @Mark,
+                                @Status, @CreateTime, @UpdateTime); ";
+                    var param2 = new Dictionary<string, string>();
+                        param2.Add("@UserName", rep.UserName);
+                        param2.Add("@ProjectKey", rep.ProjectKey);
+                        param2.Add("@IssueKey", rep.IssueKey);
+                        param2.Add("@Summary", rep.Summary);
+                        param2.Add("@Type", rep.Type);
+                        param2.Add("@Year", rep.Year);
+                        param2.Add("@Week", rep.Week);
+                        param2.Add("@Mark", rep.Mark);
+                        param2.Add("@Status", rep.Status);
+                        param2.Add("@CreateTime", rep.CreateTime);
+                        param2.Add("@UpdateTime", rep.UpdateTime);
 
-                DBUtility.ExeLocalSqlNoRes(sql);
+                    DBUtility.ExeLocalSqlNoRes(sql, param2);
+                }
             }
         }
 
@@ -274,9 +274,10 @@ namespace Prometheus.Models
             UpdateTime = DateTime.Now;
             ParentIssueKey = string.Empty;
             Assignee = string.Empty;
+            Rule = string.Empty;
             Attachment = new List<string>();
         }
-        public TaskData(string iKey, string des, string type, string subtype, string status, DateTime sDate, DateTime dDate, DateTime uUpdate, string pIKey, string assignee, List<string> attach)
+        public TaskData(string iKey, string des, string type, string subtype, string status, DateTime sDate, DateTime dDate, DateTime uUpdate, string pIKey, string assignee, string rule, List<string> attach)
         {
             IssueKey = iKey;
             Description = des;
@@ -288,6 +289,7 @@ namespace Prometheus.Models
             UpdateTime = uUpdate;
             ParentIssueKey = pIKey;
             Assignee = assignee;
+            Rule = rule;
             Attachment = attach;
         }
         public string IssueKey { set; get; }
@@ -300,6 +302,7 @@ namespace Prometheus.Models
         public DateTime UpdateTime { set; get; }
         public string ParentIssueKey { set; get; }
         public string Assignee { set; get; }
+        public string Rule { set; get; }
         public List<string> Attachment { set; get; }
     }
 

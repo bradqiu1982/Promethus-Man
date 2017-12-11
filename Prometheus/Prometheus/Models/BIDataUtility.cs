@@ -1818,8 +1818,8 @@ namespace Prometheus.Models
 
                 var sql = "select  c.moduleserialnum,m.TxPower_dBm,c.TestTimeStamp,m.OvenTemp_C,m.ChannelNumber,c.AssemblyPartNum from insitedb.insite.dc_<dctab> c(nolock) "
                     + " left join insitedb.insite.dce_<dctab>_main m(nolock) on  c.dc_<dctab>HistoryId=m.parenthistoryid "
-                    + " where m.TxPower_dBm is not null and c.moduleserialnum is not null and c.TestTimeStamp > '<TestTimeStamp>' and c.TestTimeStamp < '<LimitTime>'";
-                sql = sql.Replace("<dctab>", bt).Replace("<TestTimeStamp>", txplatesttime).Replace("<LimitTime>", DateTime.Parse(txplatesttime).AddDays(3).ToString("yyyy-MM-dd HH:mm:ss"));
+                    + " where m.TxPower_dBm is not null and c.moduleserialnum is not null and c.TestTimeStamp > '<TestTimeStamp>'";
+                sql = sql.Replace("<dctab>", bt).Replace("<TestTimeStamp>", txplatesttime);
 
                 var dbret = DBUtility.ExeMESBackupSqlWithRes(ctrl, sql);
                 if (dbret.Count == 0)
@@ -1966,8 +1966,8 @@ namespace Prometheus.Models
                     +" ,[Final_Power_On_Align_CH2nd],[Final_Power_On_Align_CH3rd],[Final_Power_On_Align_CH4th]"
                     +" ,[Tx1_Power_For_Second],[Tx2_Power_For_Second],[Tx3_Power_For_Second],[Tx4_Power_For_Second]"
                     +"  from[Parallel].[dbo].[Parallel_LensAligner]"
-                    + "  where Data_Time > '<TestTimeStamp>' and Data_Time < '<LimitTime>' and Process_Mode = 'Lens Alignment' and Tx_Power_Name_For_Second = 'Check PostUV TxPower (dBm)'";
-            sql = sql.Replace("<TestTimeStamp>", prolatesttime).Replace("<LimitTime>", DateTime.Parse(prolatesttime).AddDays(3).ToString("yyyy-MM-dd HH:mm:ss"));
+                    + "  where Data_Time > '<TestTimeStamp>' and Process_Mode = 'Lens Alignment' and Tx_Power_Name_For_Second = 'Check PostUV TxPower (dBm)'";
+            sql = sql.Replace("<TestTimeStamp>", prolatesttime);
 
             var dbret = DBUtility.ExeAutoSqlWithRes(sql);
             if (dbret.Count == 0)

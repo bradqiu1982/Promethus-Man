@@ -426,8 +426,8 @@ namespace Prometheus.Models
                 pidcond = pidcond.Substring(0, pidcond.Length - 2);
 
                 var sql = "select ProductId,WorkflowStepId,MoveOutQty,MoveInQty,MfgOrderId,MoveOutTime,TxnTypeName,ContainerName,Comments,WorkflowStepName "
-                    + " from PDMSMaster.dbo.HistStepMoveSummary (nolock) where MoveOutTime > '<MoveOutTime>' and MoveOutTime < '<LIMITTime>' and ProductId in (<pidcond>)  and MFGOrderId is not null";
-                sql = sql.Replace("<pidcond>", pidcond).Replace("<MoveOutTime>", latesttime).Replace("<LIMITTime>", DateTime.Parse(latesttime).AddDays(3).ToString("yyyy-MM-dd HH:mm:ss"));
+                    + " from PDMSMaster.dbo.HistStepMoveSummary (nolock) where MoveOutTime > '<MoveOutTime>' and ProductId in (<pidcond>)  and MFGOrderId is not null";
+                sql = sql.Replace("<pidcond>", pidcond).Replace("<MoveOutTime>", latesttime);
 
                 var MfgOrdidDict = new Dictionary<string, bool>();
                 var movelist = new List<ProjectMoveHistory>();

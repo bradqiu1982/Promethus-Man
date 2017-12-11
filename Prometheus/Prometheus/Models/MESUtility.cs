@@ -1096,8 +1096,8 @@ namespace Prometheus.Models
                     {
                         return;
                     }
-                    //sql = sql.Replace("<TIMECOND>", "and TestTimeStamp > '" + starttime + "' and TestTimeStamp < '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "'");
-                    sql = sql.Replace("<TIMECOND>", "and TestTimeStamp > '" + starttime + "' and TestTimeStamp < '" + DateTime.Parse(starttime).AddDays(3).ToString("yyyy-MM-dd HH:mm:ss") + "'");
+                    sql = sql.Replace("<TIMECOND>", "and TestTimeStamp > '" + starttime + "' and TestTimeStamp < '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "'");
+                    //sql = sql.Replace("<TIMECOND>", "and TestTimeStamp > '" + starttime + "' and TestTimeStamp < '" + DateTime.Parse(starttime).AddDays(3).ToString("yyyy-MM-dd HH:mm:ss") + "'");
 
                     var bondingeddatadict = ProjectTestData.RetrieveAllDataID(vm.ProjectKey);
 
@@ -1371,8 +1371,8 @@ namespace Prometheus.Models
                     }
 
                     var sndict = new Dictionary<string, bool>();
-                    //var sql = s.Value.Replace("<TIMECOND>", "and TestTimeStamp > '" + starttime + "' and TestTimeStamp < '"+ endtime + "'");
-                      var sql = s.Value.Replace("<TIMECOND>", "and TestTimeStamp > '" + starttime + "' and TestTimeStamp < '" + DateTime.Parse(starttime).AddDays(3).ToString("yyyy-MM-dd HH:mm:ss") + "'");
+                    var sql = s.Value.Replace("<TIMECOND>", "and TestTimeStamp > '" + starttime + "' and TestTimeStamp < '"+ endtime + "'");
+                    //var sql = s.Value.Replace("<TIMECOND>", "and TestTimeStamp > '" + starttime + "' and TestTimeStamp < '" + DateTime.Parse(starttime).AddDays(3).ToString("yyyy-MM-dd HH:mm:ss") + "'");
                     var dbret = DBUtility.ExeMESSqlWithRes(sql);
                     foreach (var item in dbret)
                     {

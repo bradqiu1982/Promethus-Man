@@ -3192,12 +3192,16 @@ namespace Prometheus.Models
         public static TaskDataWithUpdateFlg getProjectTask(string uName, string pKey, int tPeriod, string sDate, string eDate, int iType, bool wSubTask = true)
         {
             var sql = "select Issue.Summary as Description, Issue.IssueKey, Issue.IssueType, " +
-                            "Issue.Resolution, Issue.ReportDate as StartDate, "+
-                            "Issue.DueDate, Log_tmp.Date as UpdateTme, ia.Attachment, it.IssueSubType, Issue.ParentIssueKey, Issue.Assignee " +
+                            "Issue.Resolution, Issue.ReportDate as StartDate, " +
+                            "Issue.DueDate, Log_tmp.Date as UpdateTme, ia.Attachment, " +
+                            "it.IssueSubType, Issue.ParentIssueKey, Issue.Assignee, " +
+                            "Issue.ErrAbbr, pce.TestCaseName, pce.MatchCond, pce.WithLimit, pce.LowLimit, pce.HighLimit, " +
+                            "pce.WithAlgorithm, pce.Algorithm, pce.AlgorithmParam " +
                       "from Issue " +
                           "left join (select ProjectKey, IssueKey, Max(Log.Date) as Date from Log where LogType = '<LogType>' group by ProjectKey, IssueKey) as Log_tmp on Issue.IssueKey = Log_tmp.IssueKey " +
                           "left join IssueAttachment as ia on ia.IssueKey = Issue.IssueKey " +
                           "left join IssueType as it on it.IssueKey = Issue.IssueKey " +
+                          "left join ProjectCriticalError as pce on Issue.ErrAbbr = pce.ErrorCode " +
                       "where Reporter <> 'System' " +
                           "and Issue.ProjectKey = '<ProjectKey>' " +
                           "and Issue.APVal1 <> 'delete' " +
@@ -3256,6 +3260,22 @@ namespace Prometheus.Models
                     {
                         attach.Add(Convert.ToString(line[7]));
                     }
+                    var rule = string.Empty;
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[11])))
+                    {
+                        if (!string.IsNullOrEmpty(Convert.ToString(line[12])))
+                        {
+                            rule = "MatchRule: TestCase -- " + Convert.ToString(line[12]) + " -- " + Convert.ToString(line[13]);
+                        }
+                        if (!string.IsNullOrEmpty(Convert.ToString(line[14])) && Convert.ToInt32(line[14]) == 1)
+                        {
+                            rule += "\r\nWithLimit: LowLimit -- " + Convert.ToString(line[15]) + "; HighLimit -- " + Convert.ToString(line[16]);
+                        }
+                        if (!string.IsNullOrEmpty(Convert.ToString(line[17])) && Convert.ToInt32(line[17]) == 1)
+                        {
+                            rule += "\r\nWithAlgorithm: Algorithm -- " + Convert.ToString(line[18]) + "; AlgorithmParam -- " + Convert.ToString(line[19]);
+                        }
+                    }
                     var tmp = new TaskData(
                         Convert.ToString(line[1]),
                         Convert.ToString(line[0]),
@@ -3267,6 +3287,7 @@ namespace Prometheus.Models
                         convertDate(Convert.ToString(line[6])),
                         Convert.ToString(line[9]),
                         Convert.ToString(line[10]),
+                        rule,
                         attach
                     );
                     data.Add(Convert.ToString(line[1]), tmp);
@@ -3307,12 +3328,16 @@ namespace Prometheus.Models
         {
             var sql = "select Issue.Summary as Description, Issue.IssueKey, Issue.IssueType, " +
                             "Issue.Resolution, Issue.ReportDate as StartDate, " +
-                            "Issue.DueDate, Log_tmp.Date as UpdateTme, ia.Attachment, it.IssueSubType, Issue.ParentIssueKey, Issue.Assignee " +
+                            "Issue.DueDate, Log_tmp.Date as UpdateTme, ia.Attachment, "+ 
+                            "it.IssueSubType, Issue.ParentIssueKey, Issue.Assignee, " +
+                            "Issue.ErrAbbr, pce.TestCaseName, pce.MatchCond, pce.WithLimit, pce.LowLimit, pce.HighLimit, " +
+                            "pce.WithAlgorithm, pce.Algorithm, pce.AlgorithmParam " +
                       "from IssueIcare as ii " +
                           "inner join Issue on ii.IssueKey = Issue.IssueKey " +
                           "left join (select ProjectKey, IssueKey, Max(Log.Date) as Date from Log where LogType = '<LogType>' group by ProjectKey, IssueKey) as Log_tmp on Issue.IssueKey = Log_tmp.IssueKey " +
                           "left join IssueAttachment as ia on ia.IssueKey = Issue.IssueKey " +
                           "left join IssueType as it on it.IssueKey = Issue.IssueKey " +
+                          "left join ProjectCriticalError as pce on Issue.ErrAbbr = pce.ErrorCode " +
                       "where ii.Icare = '<Icare>'" +
                           "and Reporter <> 'System' " +
                           "and Issue.ProjectKey = '<ProjectKey>' " +
@@ -3363,6 +3388,22 @@ namespace Prometheus.Models
                     {
                         attach.Add(Convert.ToString(line[7]));
                     }
+                    var rule = string.Empty;
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[11])))
+                    {
+                        if (!string.IsNullOrEmpty(Convert.ToString(line[12])))
+                        {
+                            rule = "MatchRule: TestCase -- " + Convert.ToString(line[12]) + " -- " + Convert.ToString(line[13]);
+                        }
+                        if(!string.IsNullOrEmpty(Convert.ToString(line[14])) && Convert.ToInt32(line[14]) == 1)
+                        {
+                            rule += "\r\nWithLimit: LowLimit -- " + Convert.ToString(line[15]) + "; HighLimit -- " + Convert.ToString(line[16]);  
+                        }
+                        if(!string.IsNullOrEmpty(Convert.ToString(line[17])) && Convert.ToInt32(line[17]) == 1)
+                        {
+                            rule += "\r\nWithAlgorithm: Algorithm -- " + Convert.ToString(line[18]) + "; AlgorithmParam -- " + Convert.ToString(line[19]);
+                        }
+                    }
                     var tmp = new TaskData(
                         Convert.ToString(line[1]),
                         Convert.ToString(line[0]),
@@ -3374,6 +3415,7 @@ namespace Prometheus.Models
                         convertDate(Convert.ToString(line[6])),
                         Convert.ToString(line[9]),
                         Convert.ToString(line[10]),
+                        rule,
                         attach
                     );
                     data.Add(Convert.ToString(line[1]), tmp);

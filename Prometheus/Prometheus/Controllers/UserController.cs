@@ -3090,6 +3090,7 @@ namespace Prometheus.Controllers
         }
 
         [HttpPost]
+        [ValidateInput(false)]
         public JsonResult SaveWeeklyReport()
         {
             var ret = new JsonResult();

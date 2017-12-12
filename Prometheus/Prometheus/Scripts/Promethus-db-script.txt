@@ -1,3 +1,16 @@
+DECLARE @Subject  nvarchar(255);
+SET @Subject = N'\\Wux-d80008792\d\newbak\DominoTrace'+ REPLACE(REPLACE(REPLACE(CONVERT(varchar,GETDATE(), 20),'-',''),':',''),' ','') +N'.bak';
+BACKUP DATABASE [DominoTrace]  TO DISK =  @Subject;
+
+DECLARE @Subject  nvarchar(255);
+SET @Subject = N'\\Wux-d80008792\d\newbak\NebulaTrace'+ REPLACE(REPLACE(REPLACE(CONVERT(varchar,GETDATE(), 20),'-',''),':',''),' ','') +N'.bak';
+BACKUP DATABASE [NebulaTrace]  TO DISK =  @Subject;
+
+DECLARE @Subject  nvarchar(255);
+SET @Subject = N'\\Wux-d80008792\D\newbak\NPITrace'+ REPLACE(REPLACE(REPLACE(CONVERT(varchar,GETDATE(), 20),'-',''),':',''),' ','') +N'.bak';
+BACKUP DATABASE [NPITrace]  TO DISK =  @Subject;
+
+
 CREATE TABLE [dbo].[UserMatrix] (
     [UserName]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
     [Auth]     NVARCHAR (MAX) DEFAULT ('') NOT NULL,

@@ -3083,7 +3083,7 @@ namespace Prometheus.Controllers
         {
             var sType = Request.Form["sType"];
             var iKey = Request.Form["iKey"];
-            var summaryList = WeeklyReportVM.GetSummary(sType, iKey);
+            var summaryList = WeeklyReportVM.GetSummary(iKey);
             var ret = new JsonResult();
             ret.Data = new { success = true, data = summaryList };
             return ret;

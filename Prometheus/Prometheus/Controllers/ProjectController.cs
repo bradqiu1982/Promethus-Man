@@ -6061,6 +6061,8 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
+            ExternalDataCollector.RefreshIQEData(this);
+
             //ProjectTestData.PrePareOSALatestData("25GWIRELESSTOSAG", this);
 
             //var allpjkey = ProjectViewModels.RetrieveAllProject();
@@ -6309,7 +6311,7 @@ namespace Prometheus.Controllers
             validatestr2 = validatestr2.Replace("//localhost", "//" + netcomputername);
 
 
-            var content = "Hi All,\r\n\r\nThis is a Critical Error Alarm information. Please pay your attention to it. Thanks!";
+            var content = "Hi All,\r\n\r\nThis is a "+vm.ProjectKey+" Critical Error Alarm information. Please pay your attention to it. Thanks!";
             content = content + "\r\n\r\n[" + LYTTASK.Summary + "]  is created base on analyse of task: ";
             content = content + "\r\n\r\n" + vm.Summary;
             content = content + "\r\n\r\nCritical Error TASK LINK: " + validatestr2;
@@ -6321,7 +6323,7 @@ namespace Prometheus.Controllers
             toaddrs.Add(vm.Reporter);
             toaddrs.Add(LYTTASK.Assignee);
 
-            EmailUtility.SendEmail(this, "Project Critical Error Alarm - WUXI Engineering System", toaddrs, content);
+            EmailUtility.SendEmail(this, "Project "+vm.ProjectKey+" Critical Error Alarm - WUXI Engineering System", toaddrs, content);
 
             IssueViewModels.UpdateLYT(vm.IssueKey);
             new System.Threading.ManualResetEvent(false).WaitOne(500);

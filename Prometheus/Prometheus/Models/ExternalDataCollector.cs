@@ -348,17 +348,6 @@ namespace Prometheus.Models
             AppV_M = string.Empty;
             AppV_N = string.Empty;
             AppV_O = string.Empty;
-            AppV_P = string.Empty;
-            AppV_Q = string.Empty;
-            AppV_R = string.Empty;
-            AppV_S = string.Empty;
-            AppV_T = string.Empty;
-            AppV_U = string.Empty;
-            AppV_V = string.Empty;
-            AppV_W = string.Empty;
-            AppV_X = string.Empty;
-            AppV_Y = string.Empty;
-            AppV_Z = string.Empty;
         }
 
         public string AppV_A { set; get; }
@@ -376,17 +365,6 @@ namespace Prometheus.Models
         public string AppV_M { set; get; }
         public string AppV_N { set; get; }
         public string AppV_O { set; get; }
-        public string AppV_P { set; get; }
-        public string AppV_Q { set; get; }
-        public string AppV_R { set; get; }
-        public string AppV_S { set; get; }
-        public string AppV_T { set; get; }
-        public string AppV_U { set; get; }
-        public string AppV_V { set; get; }
-        public string AppV_W { set; get; }
-        public string AppV_X { set; get; }
-        public string AppV_Y { set; get; }
-        public string AppV_Z { set; get; }
     }
 
     public class RELSubIssueType
@@ -1328,7 +1306,7 @@ namespace Prometheus.Models
             var IQEPJKEY = RMSpectialCh(syscfgdict["IQEDEFAULTPJ"]);
 
             var rmaattaches = RetrieveIQEAttach(); //all IQE attach
-            var solvedrmanum = new Dictionary<string, bool>();
+            var solvediqedatanum = new Dictionary<string, bool>();
 
             var idx = 0;
             foreach (var line in data)
@@ -1346,13 +1324,13 @@ namespace Prometheus.Models
                         Try2CreateIQE(IQEPJKEY, rawdata, rmaissuedict, ctrl);
 
                         var uniquekey = rawdata.AppV_A;
-                        if (solvedrmanum.ContainsKey(uniquekey))
+                        if (solvediqedatanum.ContainsKey(uniquekey))
                         {
                             continue;
                         }
 
                         StoreIQEAttachs(attfolder+ "\\attachment\\" + rawdata.AppV_A, uniquekey, rmaattaches, ctrl); //retrieve IQE attach and store them
-                        solvedrmanum.Add(uniquekey, true);
+                        solvediqedatanum.Add(uniquekey, true);
 
                     }
                     catch (Exception ex) { }
@@ -1421,13 +1399,13 @@ namespace Prometheus.Models
             if (string.IsNullOrEmpty(rawdata.AppV_M) || string.IsNullOrEmpty(rawdata.AppV_N))
                 return;
 
-            if (string.Compare(rawdata.AppV_I.ToUpper(), Resolute.Working.ToUpper()) == 0)
+            if (string.Compare(rawdata.AppV_J.ToUpper(), Resolute.Working.ToUpper()) == 0)
             {
-                var analyser = rawdata.AppV_M.ToUpper();
+                var analyser = rawdata.AppV_M.ToUpper().Split(new string[] { "/" },StringSplitOptions.RemoveEmptyEntries)[0];
                 if (!rawdata.AppV_M.Contains("@"))
                     analyser = (rawdata.AppV_M.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
 
-                var reporter = rawdata.AppV_N.ToUpper();
+                var reporter = rawdata.AppV_N.ToUpper().Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries)[0];
                 if (!rawdata.AppV_N.Contains("@"))
                     reporter = (rawdata.AppV_N.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
 
@@ -1438,6 +1416,7 @@ namespace Prometheus.Models
                 if (!rmaissuedict.ContainsKey(uniquekey))
                 {
                     CreateIQEIssue(IQEPJKEY, analyser, reporter, rawdata, ctrl);
+                    rmaissuedict.Add(rawdata.AppV_A, true);
                 }//check if IQE issue exist
             }//check raw data status
         }
@@ -1452,40 +1431,29 @@ namespace Prometheus.Models
             vm.RelativePeoples = "";
             vm.Priority = ISSUEPR.Major;
             vm.Resolution = Resolute.Pending;
-            vm.FVCode = "";
-            vm.ReportDate = DateTime.Parse(rawdata.AppV_C);
-
+            vm.ReportDate = DateTime.Now;
             vm.ModuleSN = rawdata.AppV_A;
-
-            //vm.CaseID = rawdata.AppV_A.ToString();
-            //vm.ProductType = rawdata.AppV_H;
-            //vm.LineCategory = rawdata.AppV_G;
-            //vm.QualType = rawdata.AppV_E;
-            //vm.TestType = rawdata.AppV_I;
-            //vm.FailureInterval = rawdata.AppV_J;
-            //vm.TestFailure = rawdata.AppV_P;
-            //vm.Location = rawdata.AppV_U;
-            //vm.RequestID = rawdata.AppV_F;
-            //vm.ModuleSN = rawdata.AppV_K;
-            //vm.FailQTY = rawdata.AppV_L;
-            //vm.TotalQTY = rawdata.AppV_M;
 
             vm.Assignee = analyser;
             vm.Reporter = reporter;
 
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
-            vm.DueDate = DateTime.Parse(rawdata.AppV_O).AddDays(23);
+            vm.DueDate = DateTime.Now.AddDays(14);
 
-            vm.Summary = "IQE " + vm.CaseID + ": " + vm.ModuleSN + " failed for " + vm.TestType + " test with failure " + vm.TestFailure;
-            vm.Description = vm.Summary;
+            var shortissue = ((rawdata.AppV_I.Length > 50) ? rawdata.AppV_I.Substring(0, 50) : rawdata.AppV_I);
+
+            vm.Summary = rawdata.AppV_B + "," + rawdata.AppV_G + "(" + rawdata.AppV_F+","+rawdata.AppV_H + ")" + "," + shortissue;
+            vm.Description = rawdata.AppV_B + "," + rawdata.AppV_G + "(" + rawdata.AppV_F + "," + rawdata.AppV_H + ")" + "," + rawdata.AppV_I;
             vm.CommentType = COMMENTTYPE.Description;
 
             vm.StoreIssue();
 
             IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.IQE.ToString());
 
-            CreateRMASubIssue(RMASubIssueType.CONTAINMENTACTION, "Cotainment Action for ", vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(18), ISSUESUBTYPE.CONTAINMENT.ToString());
-            CreateRMASubIssue(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for ", vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(48), ISSUESUBTYPE.CORRECTIVE.ToString());
+            CreateRMASubIssue(RMASubIssueType.CONTAINMENTACTION, "Cotainment Action for "+ shortissue
+                , vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(18), ISSUESUBTYPE.CONTAINMENT.ToString());
+            CreateRMASubIssue(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for "+ shortissue
+                , vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(48), ISSUESUBTYPE.CORRECTIVE.ToString());
 
             var comment = new IssueComments();
             comment.Comment = "ROOTCAUSE: to be edited";
@@ -1508,22 +1476,18 @@ namespace Prometheus.Models
                 sql = "update IQEBackupData set AppV_B = N'<AppV_B>',AppV_C = N'<AppV_C>',AppV_D = N'<AppV_D>'"
                     + ",AppV_E = N'<AppV_E>',AppV_F = N'<AppV_F>',AppV_G = N'<AppV_G>',AppV_H = N'<AppV_H>',AppV_I = N'<AppV_I>'"
                     + ",AppV_J = N'<AppV_J>',AppV_K = N'<AppV_K>',AppV_L = N'<AppV_L>',AppV_M = N'<AppV_M>',AppV_N = N'<AppV_N>'"
-                    + ",AppV_O = N'<AppV_O>',AppV_P = '<AppV_P>',AppV_Q = '<AppV_Q>',AppV_R = '<AppV_R>',AppV_S = '<AppV_S>'"
-                    + ",AppV_T = '<AppV_T>',AppV_U = N'<AppV_U>',AppV_V = '<AppV_V>',AppV_W = '<AppV_W>',AppV_X = N'<AppV_X>'"
-                    + ",AppV_Y = N'<AppV_Y>',AppV_Z = N'<AppV_Z>'"
-                    + "where AppV_A=<AppV_A>";
+                    + ",AppV_O = '<AppV_O>'"
+                    + "  where AppV_A=N'<AppV_A>'";
                 sql = sql.Replace("<AppV_A>", relid);
             }
             else
             {
                 sql = "insert into IQEBackupData(AppV_A,AppV_B,AppV_C,AppV_D,AppV_E,AppV_F"
                     + ",AppV_G,AppV_H,AppV_I,AppV_J,AppV_K,AppV_L,AppV_M,AppV_N,AppV_O"
-                    + ",AppV_P,AppV_Q,AppV_R,AppV_S,AppV_T,AppV_U,AppV_V,AppV_W,AppV_X"
-                    + ",AppV_Y,AppV_Z,AppV_AA,AppV_AB,AppV_AC,AppV_AD,AppV_AE,AppV_AF,AppV_AG,databackuptm)"
-                    + " values(<AppV_A>,N'<AppV_B>',N'<AppV_C>',N'<AppV_D>',N'<AppV_E>',N'<AppV_F>'"
-                    + ",N'<AppV_G>',N'<AppV_H>',N'<AppV_I>',N'<AppV_J>',N'<AppV_K>',N'<AppV_L>',N'<AppV_M>',N'<AppV_N>',N'<AppV_O>'"
-                    + ",'<AppV_P>','<AppV_Q>','<AppV_R>','<AppV_S>','<AppV_T>',N'<AppV_U>','<AppV_V>','<AppV_W>',N'<AppV_X>'"
-                    + ",N'<AppV_Y>',N'<AppV_Z>',N'<AppV_AA>',N'<AppV_AB>','<AppV_AC>',N'<AppV_AD>',N'<AppV_AE>',N'<AppV_AF>',N'<AppV_AG>','<databackuptm>')";
+                    + ",databackuptm)"
+                    + " values(N'<AppV_A>',N'<AppV_B>',N'<AppV_C>',N'<AppV_D>',N'<AppV_E>',N'<AppV_F>'"
+                    + ",N'<AppV_G>',N'<AppV_H>',N'<AppV_I>',N'<AppV_J>',N'<AppV_K>',N'<AppV_L>',N'<AppV_M>',N'<AppV_N>','<AppV_O>'"
+                    + ",'<databackuptm>')";
                 sql = sql.Replace("<AppV_A>", rmadata.AppV_A);
 
                 var uniquekey = rmadata.AppV_A;
@@ -1537,11 +1501,8 @@ namespace Prometheus.Models
                 .Replace("<AppV_D>", rmadata.AppV_D).Replace("<AppV_E>", rmadata.AppV_E).Replace("<AppV_F>", rmadata.AppV_F)
                 .Replace("<AppV_G>", rmadata.AppV_G).Replace("<AppV_H>", rmadata.AppV_H).Replace("<AppV_I>", rmadata.AppV_I)
                 .Replace("<AppV_J>", rmadata.AppV_J).Replace("<AppV_K>", rmadata.AppV_K).Replace("<AppV_L>", rmadata.AppV_L)
-                .Replace("<AppV_M>", rmadata.AppV_M).Replace("<AppV_N>", rmadata.AppV_N).Replace("<AppV_O>", rmadata.AppV_O)
-                .Replace("<AppV_P>", rmadata.AppV_P).Replace("<AppV_Q>", rmadata.AppV_Q).Replace("<AppV_R>", rmadata.AppV_R)
-                .Replace("<AppV_S>", rmadata.AppV_S).Replace("<AppV_T>", rmadata.AppV_T).Replace("<AppV_U>", rmadata.AppV_U)
-                .Replace("<AppV_V>", rmadata.AppV_V).Replace("<AppV_W>", rmadata.AppV_W).Replace("<AppV_X>", rmadata.AppV_X)
-                .Replace("<AppV_Y>", rmadata.AppV_Y).Replace("<AppV_Z>", rmadata.AppV_Z).Replace("<databackuptm>", DateTime.Now.ToString());
+                .Replace("<AppV_M>", rmadata.AppV_M).Replace("<AppV_N>", rmadata.AppV_N).Replace("<AppV_O>",ConvertToDateStr(rmadata.AppV_O))
+                .Replace("<databackuptm>", DateTime.Now.ToString());
 
             DBUtility.ExeLocalSqlNoRes(sql);
         }
@@ -1567,17 +1528,7 @@ namespace Prometheus.Models
             tempdata.AppV_M = line[12];
             tempdata.AppV_N = line[13];
             tempdata.AppV_O = line[14];
-            tempdata.AppV_P = line[15];
-            tempdata.AppV_Q = line[16];
-            tempdata.AppV_R = line[17];
-            tempdata.AppV_S = line[18];
-            tempdata.AppV_T = line[19];
-            tempdata.AppV_U = line[20];
-            tempdata.AppV_V = line[21];
-            tempdata.AppV_W = line[22];
-            tempdata.AppV_X = line[23];
-            tempdata.AppV_Y = line[24];
-            tempdata.AppV_Z = line[25];
+
             return tempdata;
         }
 
@@ -1617,8 +1568,7 @@ namespace Prometheus.Models
 
             var sql = "select AppV_A,AppV_B,AppV_C,AppV_D,AppV_E,AppV_F"
                     + ",AppV_G,AppV_H,AppV_I,AppV_J,AppV_K,AppV_L,AppV_M,AppV_N,AppV_O"
-                    + ",AppV_P,AppV_Q,AppV_R,AppV_S,AppV_T,AppV_U,AppV_V,AppV_W,AppV_X"
-                    + ",AppV_Y,AppV_Z from IQEBackupData";
+                    + " from IQEBackupData order by AppV_O DESC";
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
             {
@@ -1639,18 +1589,7 @@ namespace Prometheus.Models
                     tempdata.AppV_L = Convert.ToString(line[11]);
                     tempdata.AppV_M = Convert.ToString(line[12]);
                     tempdata.AppV_N = Convert.ToString(line[13]);
-                    tempdata.AppV_O = Convert.ToString(line[14]);
-                    tempdata.AppV_P = Convert.ToString(line[15]);
-                    tempdata.AppV_Q = Convert.ToString(line[16]);
-                    tempdata.AppV_R = Convert.ToString(line[17]);
-                    tempdata.AppV_S = Convert.ToString(line[18]);
-                    tempdata.AppV_T = Convert.ToString(line[19]);
-                    tempdata.AppV_U = Convert.ToString(line[20]);
-                    tempdata.AppV_V = Convert.ToString(line[21]);
-                    tempdata.AppV_W = Convert.ToString(line[22]);
-                    tempdata.AppV_X = Convert.ToString(line[23]);
-                    tempdata.AppV_Y = Convert.ToString(line[24]);
-                    tempdata.AppV_Z = Convert.ToString(line[25]);
+                    tempdata.AppV_O = Convert.ToDateTime(line[14]).ToString("yyyy-MM-dd HH:mm:ss");
                     ret.Add(tempdata);
                 }
                 catch (Exception ex) { }

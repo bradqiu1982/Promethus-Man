@@ -1,0 +1,98 @@
+﻿@model IEnumerable<Prometheus.Models.IQERAWData>
+
+@{
+    ViewBag.Title = "ReviewIQEBackupData";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<div class="row">
+    <div class="col-xs-8">
+        <ol class="breadcrumb" style="font-size:18px">
+            <li class="active">Review IQE Data</li>
+        </ol>
+    </div>
+    <div class="col-xs-4">
+        <button class="form-control" data-toggle="tooltip" title="Export All IQE Data" onclick="ShareAllIQE()" type="button"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span>ALL</button>
+    </div>
+    <script type="text/javascript">
+        function ShareAllIQE() {
+            var myurl = '/CustomerData/ExportAllIQEData';
+                window.open(myurl, '_blank');
+        }
+    </script>
+</div>
+
+<div class="row">
+    <div class="col-xs-12">&nbsp;</div>
+</div>
+
+
+
+<style type="text/css">
+    th, td {
+        white-space: nowrap;
+    }
+</style>
+
+<hr />
+
+<table id="pndatatable" class="display" width="100%" cellspacing="0">
+    <thead>
+        <tr>
+            <th style="font-size:12px">ID</th>
+            <th style="font-size:12px">Product line</th>
+            <th style="font-size:12px">IQC missing?(Y/N)</th>
+            <th style="font-size:12px">Category</th>
+            <th style="font-size:12px">Horizontal spread(Y/N)</th>
+            <th style="font-size:12px">PN</th>
+            <th style="font-size:12px">Description</th>
+            <th style="font-size:12px">Supplier</th>
+            <th style="font-size:12px">Issue</th>
+            <th style="font-size:12px">Status</th>
+            <th style="font-size:12px">RCCA</th>
+            <th style="font-size:12px">Evidence</th>
+            <th style="font-size:12px">Owner</th>
+            <th style="font-size:12px">IQE</th>
+            <th style="font-size:12px">Due Data</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var line in Model)
+        {
+            <tr>
+                <th style="font-size:12px">@line.AppV_A</th>
+                <th style="font-size:12px">@line.AppV_B</th>
+                <th style="font-size:12px">@line.AppV_C</th>
+                <th style="font-size:12px">@line.AppV_D</th>
+                <th style="font-size:12px">@line.AppV_E</th>
+                <th style="font-size:12px">@line.AppV_F</th>
+                <th style="font-size:12px">@line.AppV_G</th>
+                <th style="font-size:12px">@line.AppV_H</th>
+                <th style="font-size:12px">@line.AppV_I</th>
+                <th style="font-size:12px">@line.AppV_J</th>
+                <th style="font-size:9px;" data-toggle="tooltip" title="@line.AppV_K">@line.AppV_K</th>
+                <th style="font-size:12px">@line.AppV_L</th>
+                <th style="font-size:12px">@line.AppV_M</th>
+                <th style="font-size:12px">@line.AppV_N</th>
+                <th style="font-size:12px">@line.AppV_O</th>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script type="text/javascript">
+        $(document).ready(function() {
+            $('#pndatatable').DataTable({
+                'scrollX': true,
+                'iDisplayLength': 50,
+                'aLengthMenu': [[25, 50, 100, -1],
+                                [25, 50, 100, "All"]],
+                "bAutoWidth": false,
+                "aaSorting": [],
+                "order": []
+            });
+                    } );
+</script>

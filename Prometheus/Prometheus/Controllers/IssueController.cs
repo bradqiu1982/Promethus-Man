@@ -3754,7 +3754,7 @@ namespace Prometheus.Controllers
                 {
                     wholefile = wholefile + l + "\r\n";
                 }
-                System.IO.File.WriteAllText(filename, wholefile);
+                System.IO.File.WriteAllText(filename, wholefile,System.Text.Encoding.UTF8);
 
                 return File(filename, "application/vnd.ms-excel", fn);
             }
@@ -3879,7 +3879,7 @@ namespace Prometheus.Controllers
             {
                 wholefile = wholefile + l + "\r\n";
             }
-            System.IO.File.WriteAllText(filename, wholefile);
+            System.IO.File.WriteAllText(filename, wholefile, System.Text.Encoding.UTF8);
 
             return File(filename, "application/vnd.ms-excel", fn);
         }
@@ -4096,7 +4096,7 @@ namespace Prometheus.Controllers
             {
                 wholefile = wholefile + l + "\r\n";
             }
-            System.IO.File.WriteAllText(filename, wholefile);
+            System.IO.File.WriteAllText(filename, wholefile, System.Text.Encoding.UTF8);
 
             return File(filename, "application/vnd.ms-excel", fn);
         }
@@ -4202,7 +4202,7 @@ namespace Prometheus.Controllers
             {
                 wholefile = wholefile + l + "\r\n";
             }
-            System.IO.File.WriteAllText(filename, wholefile);
+            System.IO.File.WriteAllText(filename, wholefile, System.Text.Encoding.UTF8);
 
             return File(filename, "application/vnd.ms-excel", fn);
 

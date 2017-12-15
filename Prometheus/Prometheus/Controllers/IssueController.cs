@@ -47,7 +47,7 @@ namespace Prometheus.Controllers
             ViewBag.projectlist = slist;
 
             var typelist = new List<string>();
-            string[] tlist = { ISSUETP.Task, ISSUETP.Bug, ISSUETP.RMA, ISSUETP.OBA, ISSUETP.NPIPROC };
+            string[] tlist = { ISSUETP.Task, ISSUETP.Bug, ISSUETP.RMA, ISSUETP.OBA, ISSUETP.NPIPROC,ISSUETP.IQE };
 
             typelist.AddRange(tlist);
             slist = CreateSelectList(typelist, vm.IssueType);

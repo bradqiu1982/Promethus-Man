@@ -26,18 +26,18 @@
                     if (output.success && output.data.length > 0) {
                         var summary = "";
                         for (var i = 0; i < output.data.length; i++) {
-                            summary += '<div data-id="' + output.data[i].ID + '">' +
-                                            '<span class="col-xs-5">' + output.data[i].Summary + '</span>' +
-                                            '<span class="col-xs-3">' + output.data[i].UserName.split('@')[0] + '</span>' +
-                                            '<span class="col-xs-4">' + output.data[i].UpdateTime + '</span>' +
-                                        '</div>';
+                            summary += '<tr data-id="' + output.data[i].ID + '" style="background-color: transparent;">' +
+                                            '<td class="col-xs-5">' + output.data[i].Summary + '</td>' +
+                                            '<td class="col-xs-3">' + output.data[i].UserName.split('@')[0] + '</td>' +
+                                            '<td class="col-xs-4">' + output.data[i].UpdateTime + '</td>' +
+                                        '</tr>';
                         }
                         var appendStr = '<tr>' +
                             '<td colspan="'+cols+'">' +
                                 '<div class="collapse in" id="' + data_target + '">' +
                                     '<div class="row well data-summary">' +
                                         '<label>Summary:</label>' +
-                                        summary +
+                                        '<table>' + summary + '</table>' +
                                     '</div>' +
                                 '</div>' +
                             '</td>' +

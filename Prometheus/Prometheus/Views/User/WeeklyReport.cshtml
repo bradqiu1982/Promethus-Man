@@ -319,17 +319,18 @@
                                                             var imark = "0";
                                                             if (summarylist != null && summarylist.ContainsKey(task.Key))
                                                             {
-                                                                foreach (var item in summarylist[task.Key])
+                                                                <table>
+                                                                @foreach (var item in summarylist[task.Key])
                                                                 {
                                                                     if (!string.IsNullOrEmpty(item.Summary))
                                                                     {
                                                                         if (item.UserName.ToUpper() != ViewBag.RealUserID.ToUpper())
                                                                         {
-                                                                            <div class="row well item-summary @((item.Mark == "1") ? "summary-highlight" : ((item.Mark == "2") ? "summary-lowlight" : "summary-normal"))">
-                                                                                <span class="col-xs-5">@item.Summary</span>
-                                                                                <span class="col-xs-3">@item.UserName.Split(new char[] { '@' })[0]</span>
-                                                                                <span class="col-xs-4">@item.UpdateTime</span>
-                                                                            </div>
+                                                                            <tr class="row well item-summary @((item.Mark == "1") ? "summary-highlight" : ((item.Mark == "2") ? "summary-lowlight" : "summary-normal"))">
+                                                                                <td class="col-xs-5">@item.Summary</td>
+                                                                                <td class="col-xs-3">@item.UserName.Split(new char[] { '@' })[0]</td>
+                                                                                <td class="col-xs-4">@item.UpdateTime</td>
+                                                                            </tr>
                                                                         }
                                                                         else
                                                                         {
@@ -338,6 +339,7 @@
                                                                         }
                                                                     }
                                                                 }
+                                                                </table>
                                                             }
                                                         }
                                                         <div class="col-xs-8">
@@ -636,17 +638,18 @@
                                                             var cmark = "0";
                                                             if (summarylist != null && summarylist.ContainsKey(task.Key))
                                                             {
-                                                                foreach (var item in summarylist[task.Key])
+                                                                <table>
+                                                                @foreach (var item in summarylist[task.Key])
                                                                 {
                                                                     if (!string.IsNullOrEmpty(item.Summary))
                                                                     {
                                                                         if (item.UserName.ToUpper() != ViewBag.RealUserID.ToUpper())
                                                                         {
-                                                                            <div class="row well item-summary @((item.Mark == "1") ? "summary-highlight" : ((item.Mark == "2") ? "summary-lowlight" : "summary-normal"))">
-                                                                                <span class="col-xs-5">@item.Summary</span>
-                                                                                <span class="col-xs-3">@item.UserName.Split(new char[] { '@' })[0]</span>
-                                                                                <span class="col-xs-4">@item.UpdateTime</span>
-                                                                            </div>
+                                                                            <tr class="row well item-summary @((item.Mark == "1") ? "summary-highlight" : ((item.Mark == "2") ? "summary-lowlight" : "summary-normal"))">
+                                                                                <td class="col-xs-5">@item.Summary</td>
+                                                                                <td class="col-xs-3">@item.UserName.Split(new char[] { '@' })[0]</td>
+                                                                                <td class="col-xs-4">@item.UpdateTime</td>
+                                                                            </tr>
                                                                         }
                                                                         else
                                                                         {
@@ -655,6 +658,7 @@
                                                                         }
                                                                     }
                                                                 }
+                                                                </table>
                                                             }
                                                         }
                                                         <div class="col-xs-8">

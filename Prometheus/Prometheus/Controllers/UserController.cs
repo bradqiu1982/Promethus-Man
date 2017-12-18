@@ -2536,9 +2536,9 @@ namespace Prometheus.Controllers
             //user's project list
             var projectlist = UserViewModels.RetrieveUserProjectKeyDict(username);
             var dayofweek = Convert.ToInt32(DateTime.Now.DayOfWeek);
-            var sDate = DateTime.Now.AddDays((dayofweek > 4) ? (4 - dayofweek) : ((4 - dayofweek) - 7)).ToString("yyyy-MM-dd 07:30:00");
-            var stDate = DateTime.Now.AddDays((dayofweek > 4) ? (4 - dayofweek) : ((4 - dayofweek) - 7)).AddDays(1).ToString("yyyy-MM-dd 07:30:00");
-            var eDate = DateTime.Now.ToString("yyyy-MM-dd 07:30:00");
+            var sDate = DateTime.Now.AddDays((4 - dayofweek) - 7).ToString("yyyy-MM-dd 07:30:00");
+            var stDate = DateTime.Now.AddDays((4 - dayofweek) - 7).AddDays(1).ToString("yyyy-MM-dd 07:30:00");
+            var eDate = DateTime.Now.AddDays((dayofweek > 4) ? (4 - dayofweek) : 0).ToString("yyyy-MM-dd 07:30:00");
             var cDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             var ProjectKeyList = new Dictionary<string, int>();
             var YieldDataList = new Dictionary<string, WeeklyYieldData>();
@@ -2597,8 +2597,8 @@ namespace Prometheus.Controllers
                 //rma
                 if (setting.RMA == 1)
                 {
-                    historyRMAList.Add(project.Key, getProjectTask(username, project.Key, 0, sDate, cDate, ISSUESUBTYPE.RMA));
-                    var rmaList_tmp = getProjectTask(username, project.Key, 1, sDate, cDate, ISSUESUBTYPE.RMA);
+                    historyRMAList.Add(project.Key, getProjectTask(username, project.Key, 0, stDate, cDate, ISSUESUBTYPE.RMA));
+                    var rmaList_tmp = getProjectTask(username, project.Key, 1, stDate, cDate, ISSUESUBTYPE.RMA);
                     task_total += rmaList_tmp.TaskList.Count;
                     RMAList.Add(project.Key, rmaList_tmp);
                 }

@@ -348,6 +348,8 @@ namespace Prometheus.Models
             AppV_M = string.Empty;
             AppV_N = string.Empty;
             AppV_O = string.Empty;
+            AppV_P = string.Empty;
+            Attachs = new List<string>();
         }
 
         public string AppV_A { set; get; }
@@ -365,6 +367,9 @@ namespace Prometheus.Models
         public string AppV_M { set; get; }
         public string AppV_N { set; get; }
         public string AppV_O { set; get; }
+        public string AppV_P { set; get; }
+
+        public List<string> Attachs { set; get; }
     }
 
     public class RELSubIssueType
@@ -1305,7 +1310,7 @@ namespace Prometheus.Models
             var syscfgdict = CfgUtility.GetSysConfig(ctrl);
             var IQEPJKEY = RMSpectialCh(syscfgdict["IQEDEFAULTPJ"]);
 
-            var rmaattaches = RetrieveIQEAttach(); //all IQE attach
+            var rmaattaches = RetrieveAllIQEAttach(); //all IQE attach
             var solvediqedatanum = new Dictionary<string, bool>();
 
             var idx = 0;
@@ -1319,17 +1324,19 @@ namespace Prometheus.Models
                         if (rawdata == null)
                             continue;
 
-                        UpdateIQEData(rawdata, allbackupdict);
-
-                        Try2CreateIQE(IQEPJKEY, rawdata, rmaissuedict, ctrl);
-
                         var uniquekey = rawdata.AppV_A;
                         if (solvediqedatanum.ContainsKey(uniquekey))
                         {
                             continue;
                         }
 
-                        StoreIQEAttachs(attfolder+ "\\attachment\\" + rawdata.AppV_A, uniquekey, rmaattaches, ctrl); //retrieve IQE attach and store them
+                        UpdateIQEData(rawdata, allbackupdict);
+
+                        var attaches = StoreIQEAttachs(attfolder+ "\\attachment\\" + rawdata.AppV_A, uniquekey, rmaattaches, ctrl); //retrieve IQE attach and store them
+
+                        Try2CreateIQE(IQEPJKEY, rawdata, rmaissuedict, ctrl,attaches);
+
+
                         solvediqedatanum.Add(uniquekey, true);
 
                     }
@@ -1339,9 +1346,9 @@ namespace Prometheus.Models
             }//foreach
         }
 
-        private static void StoreIQEAttachs(string attfolder, string combinekey, Dictionary<string, Dictionary<string, bool>> rmaattaches, Controller ctrl)
+        private static string StoreIQEAttachs(string attfolder, string combinekey, Dictionary<string, Dictionary<string, bool>> rmaattaches, Controller ctrl)
         {
-
+            var ret = "";
             if (DirectoryExists(ctrl, attfolder))
             {
                 var imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\IQEATTCH\\" + combinekey + "\\";
@@ -1366,6 +1373,7 @@ namespace Prometheus.Models
                         {
                             var url = "/userfiles/docs/IQEATTCH/" + combinekey + "/" + filename;
                             StoreIQEAttach(combinekey, url);
+                            ret = ret + url + ";";
                         }
                     }//not contain rmanum
                     else
@@ -1379,11 +1387,13 @@ namespace Prometheus.Models
                             {
                                 var url = "/userfiles/docs/IQEATTCH/" + combinekey + "/" + filename;
                                 StoreIQEAttach(combinekey, url);
+                                ret = ret + url + ";";
                             }
                         }//not contain attach
                     }
                 }//foreach
             }//if folder exist
+            return ret;
         }
 
         private static void StoreIQEAttach(string combinekey, string attach)
@@ -1393,8 +1403,21 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
+        public static List<string> RetrieveIQEAttach(string combinekey)
+        {
+            var ret = new List<string>();
+            var sql = "select AppV_C from IQEMapData where AppV_A = '<AppV_A>'";
+            sql = sql.Replace("<AppV_A>", combinekey);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                ret.Add(Conver2Str(line[0]));
+            }
+            return ret;
+        }
+
         private static void Try2CreateIQE(string IQEPJKEY, IQERAWData rawdata
-                , Dictionary<string, bool> rmaissuedict, Controller ctrl)
+                , Dictionary<string, bool> rmaissuedict, Controller ctrl,string attaches)
         {
             if (string.IsNullOrEmpty(rawdata.AppV_M) || string.IsNullOrEmpty(rawdata.AppV_N))
                 return;
@@ -1415,13 +1438,13 @@ namespace Prometheus.Models
                 var uniquekey = rawdata.AppV_A;
                 if (!rmaissuedict.ContainsKey(uniquekey))
                 {
-                    CreateIQEIssue(IQEPJKEY, analyser, reporter, rawdata, ctrl);
+                    CreateIQEIssue(IQEPJKEY, analyser, reporter, rawdata, ctrl, attaches);
                     rmaissuedict.Add(rawdata.AppV_A, true);
                 }//check if IQE issue exist
             }//check raw data status
         }
 
-        private static void CreateIQEIssue(string IQEPJKEY, string analyser, string reporter, IQERAWData rawdata, Controller ctrl)
+        private static void CreateIQEIssue(string IQEPJKEY, string analyser, string reporter, IQERAWData rawdata, Controller ctrl,string attaches)
         {
             var vm = new IssueViewModels();
             vm.ProjectKey = IQEPJKEY;
@@ -1443,10 +1466,23 @@ namespace Prometheus.Models
             var shortissue = ((rawdata.AppV_I.Length > 50) ? rawdata.AppV_I.Substring(0, 50) : rawdata.AppV_I);
 
             vm.Summary = rawdata.AppV_B + "," + rawdata.AppV_G + "(" + rawdata.AppV_F+","+rawdata.AppV_H + ")" + "," + shortissue;
+
             vm.Description = rawdata.AppV_B + "," + rawdata.AppV_G + "(" + rawdata.AppV_F + "," + rawdata.AppV_H + ")" + "," + rawdata.AppV_I;
+            if (!string.IsNullOrEmpty(attaches))
+            {
+                var attachlist = attaches.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var attach in attachlist)
+                {
+                    var splitstrs = attach.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+                    var filename = splitstrs[splitstrs.Length - 1];
+                    vm.Description = vm.Description+"<p><a href='" + attach + "' target = '_blank'>" + filename + "</a></p>";
+                }
+            }
+            
             vm.CommentType = COMMENTTYPE.Description;
 
             vm.StoreIssue();
+            UpdateIQETaskKey(rawdata.AppV_A, vm.IssueKey);
 
             IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.IQE.ToString());
 
@@ -1466,6 +1502,12 @@ namespace Prometheus.Models
 
         }
 
+        private static void UpdateIQETaskKey(string combinekey,string issuekey)
+        {
+            var sql = "update IQEBackupData set AppV_P = N'<AppV_P>' where AppV_A=N'<AppV_A>'";
+            sql = sql.Replace("<AppV_A>", combinekey).Replace("<AppV_P>",issuekey);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
 
         private static void UpdateIQEData(IQERAWData rmadata, Dictionary<string, string> allbackupdict)
         {
@@ -1532,7 +1574,7 @@ namespace Prometheus.Models
             return tempdata;
         }
 
-        private static Dictionary<string, Dictionary<string, bool>> RetrieveIQEAttach()
+        private static Dictionary<string, Dictionary<string, bool>> RetrieveAllIQEAttach()
         {
             var ret = new Dictionary<string, Dictionary<string, bool>>();
             var sql = "select AppV_A,AppV_B,AppV_C from IQEMapData where AppV_D = '<AppV_D>'";
@@ -1567,7 +1609,7 @@ namespace Prometheus.Models
             var ret = new List<IQERAWData>();
 
             var sql = "select AppV_A,AppV_B,AppV_C,AppV_D,AppV_E,AppV_F"
-                    + ",AppV_G,AppV_H,AppV_I,AppV_J,AppV_K,AppV_L,AppV_M,AppV_N,AppV_O"
+                    + ",AppV_G,AppV_H,AppV_I,AppV_J,AppV_K,AppV_L,AppV_M,AppV_N,AppV_O,AppV_P"
                     + " from IQEBackupData order by AppV_O DESC";
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
@@ -1590,6 +1632,8 @@ namespace Prometheus.Models
                     tempdata.AppV_M = Convert.ToString(line[12]);
                     tempdata.AppV_N = Convert.ToString(line[13]);
                     tempdata.AppV_O = Convert.ToDateTime(line[14]).ToString("yyyy-MM-dd HH:mm:ss");
+                    tempdata.AppV_P = Convert.ToString(line[15]);
+                    tempdata.Attachs.AddRange(RetrieveIQEAttach(tempdata.AppV_A));
                     ret.Add(tempdata);
                 }
                 catch (Exception ex) { }

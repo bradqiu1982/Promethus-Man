@@ -6122,6 +6122,7 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
+            //ExternalDataCollector.RefreshIQEData(this);
 
             //ProjectTestData.PrePareOSALatestData("25GWIRELESSTOSAG", this);
 

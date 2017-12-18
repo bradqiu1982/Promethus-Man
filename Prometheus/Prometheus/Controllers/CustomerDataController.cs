@@ -1796,6 +1796,12 @@ namespace Prometheus.Controllers
             return View(vm);
         }
 
+        public ActionResult IQEAttachments(string attachkey)
+        {
+            var list = ExternalDataCollector.RetrieveIQEAttach(attachkey);
+            return View("CustomerAttach", list);
+        }
+
         public ActionResult ReviewRelBackupData()
         {
             var vm = ExternalDataCollector.RetrieveAllRELData();

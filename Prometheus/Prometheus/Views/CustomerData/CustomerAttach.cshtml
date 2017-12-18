@@ -1,0 +1,67 @@
+﻿@model IEnumerable<string>
+
+@{
+    ViewBag.Title = "CustomerAttach";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="row">
+    <div class="col-xs-8">
+        <ol class="breadcrumb" style="font-size:18px">
+            <li class="active">Customer Attachment</li>
+        </ol>
+    </div>
+    <div class="col-xs-4">
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12">&nbsp;</div>
+</div>
+
+
+
+<style type="text/css">
+    th, td {
+        white-space: nowrap;
+    }
+</style>
+
+@if (Model.Count() > 0)
+{
+    <table id="pndatatable" class="display" width="100%" cellspacing="0">
+        <thead>
+            <tr>
+                <th style="font-size:12px">File Name</th>
+                <th style="font-size:12px">Link</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var line in Model)
+            {
+                var splitstrs = line.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+                var filename = splitstrs[splitstrs.Length - 1];
+                <tr>
+                    <th style="font-size:12px">@filename</th>
+                    <th style="font-size:12px"><a href="@line" target="_blank">Link</a></th>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#pndatatable').DataTable({
+                'scrollX': true,
+                'iDisplayLength': 50,
+                'aLengthMenu': [[25, 50, 100, -1],
+                                [25, 50, 100, "All"]],
+                "bAutoWidth": false,
+                "aaSorting": [],
+                "order": []
+            });
+                    } );
+    </script>
+}

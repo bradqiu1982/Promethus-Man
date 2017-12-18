@@ -47,7 +47,7 @@ namespace Prometheus.Controllers
             ViewBag.projectlist = slist;
 
             var typelist = new List<string>();
-            string[] tlist = { ISSUETP.Task, ISSUETP.Bug, ISSUETP.RMA, ISSUETP.OBA, ISSUETP.NPIPROC };
+            string[] tlist = { ISSUETP.Task, ISSUETP.Bug, ISSUETP.RMA, ISSUETP.OBA, ISSUETP.NPIPROC,ISSUETP.IQE };
 
             typelist.AddRange(tlist);
             slist = CreateSelectList(typelist, vm.IssueType);
@@ -3754,7 +3754,7 @@ namespace Prometheus.Controllers
                 {
                     wholefile = wholefile + l + "\r\n";
                 }
-                System.IO.File.WriteAllText(filename, wholefile);
+                System.IO.File.WriteAllText(filename, wholefile,System.Text.Encoding.UTF8);
 
                 return File(filename, "application/vnd.ms-excel", fn);
             }
@@ -3879,7 +3879,7 @@ namespace Prometheus.Controllers
             {
                 wholefile = wholefile + l + "\r\n";
             }
-            System.IO.File.WriteAllText(filename, wholefile);
+            System.IO.File.WriteAllText(filename, wholefile, System.Text.Encoding.UTF8);
 
             return File(filename, "application/vnd.ms-excel", fn);
         }
@@ -4096,7 +4096,7 @@ namespace Prometheus.Controllers
             {
                 wholefile = wholefile + l + "\r\n";
             }
-            System.IO.File.WriteAllText(filename, wholefile);
+            System.IO.File.WriteAllText(filename, wholefile, System.Text.Encoding.UTF8);
 
             return File(filename, "application/vnd.ms-excel", fn);
         }
@@ -4202,7 +4202,7 @@ namespace Prometheus.Controllers
             {
                 wholefile = wholefile + l + "\r\n";
             }
-            System.IO.File.WriteAllText(filename, wholefile);
+            System.IO.File.WriteAllText(filename, wholefile, System.Text.Encoding.UTF8);
 
             return File(filename, "application/vnd.ms-excel", fn);
 

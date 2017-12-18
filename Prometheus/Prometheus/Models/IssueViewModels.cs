@@ -19,7 +19,7 @@ namespace Prometheus.Models
         public static string Improvement = "Improvement";
         public static string Document = "Document";
         public static string Rel = "Rel";
-        public static string IQE = "IQE";
+        public static string IQE = "IQC";
     }
 
     public class ISSUESUBTYPE

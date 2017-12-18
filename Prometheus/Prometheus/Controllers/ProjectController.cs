@@ -2623,6 +2623,59 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        public ActionResult ProjectIQC(string ProjectKey)
+        {
+            if (ProjectKey != null)
+            {
+                //var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Pending, ISSUETP.OBA, this);
+                //var list2 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Working, ISSUETP.OBA, this);
+                //var list3 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Done, ISSUETP.OBA, this);
+                //list1.AddRange(list2);
+                //list1.AddRange(list3);
+
+                var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, "NONE", "NONE", ISSUETP.IQE, this);
+
+                //var piedatadict = new Dictionary<string, int>();
+                //foreach (var item in list1)
+                //{
+                //    var rmafailurecode = item.RMAFailureCode.ToLower().Trim();
+                //    if (!string.IsNullOrEmpty(rmafailurecode))
+                //    {
+                //        if (piedatadict.ContainsKey(rmafailurecode))
+                //        {
+                //            var preval = piedatadict[rmafailurecode];
+                //            piedatadict[rmafailurecode] = preval + 1;
+                //        }
+                //        else
+                //        {
+                //            piedatadict.Add(rmafailurecode, 1);
+                //        }
+                //    }
+                //}
+
+                //var keys = piedatadict.Keys;
+                //if (keys.Count > 0)
+                //{
+                //    var namevaluepair = "";
+                //    foreach (var k in keys)
+                //    {
+                //        namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                //    }
+
+                //    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                //    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                //    ViewBag.chartscript = tempscript.Replace("#ElementID#", "failurepie")
+                //        .Replace("#Title#", ProjectKey + " RMA Realtime Failure")
+                //        .Replace("#SERIESNAME#", "Failure")
+                //        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
+                //}
+
+                return View(list1);
+            }
+            return View();
+        }
+
         public ActionResult ProjectQuality(string ProjectKey)
         {
             if (ProjectKey != null)
@@ -5863,7 +5916,7 @@ namespace Prometheus.Controllers
                 { }
             }
 
-            heartbeatlog("ProjectTestData.RefreshRMAData");
+            heartbeatlog("ExternalDataCollector.RefreshRMAData");
 
             try
             {
@@ -5871,7 +5924,7 @@ namespace Prometheus.Controllers
             }
             catch (Exception ex) { }
 
-            heartbeatlog("ProjectTestData.RefreshRELData");
+            heartbeatlog("ExternalDataCollector.RefreshRELData");
 
             try
             {
@@ -5879,8 +5932,16 @@ namespace Prometheus.Controllers
             }
             catch (Exception ex) { }
 
-            heartbeatlog("ProjectTestData.RefreshOBAFromDMR");
+            heartbeatlog("ExternalDataCollector.RefreshIQEData");
 
+            try
+            {
+                ExternalDataCollector.RefreshIQEData(this);
+            }
+            catch (Exception ex) { }
+
+            heartbeatlog("ExternalDataCollector.RefreshOBAFromDMR");
+          
             try
             {
                 ExternalDataCollector.RefreshOBAFromDMR(this);
@@ -6061,6 +6122,7 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
+
             //ProjectTestData.PrePareOSALatestData("25GWIRELESSTOSAG", this);
 
             //var allpjkey = ProjectViewModels.RetrieveAllProject();
@@ -6309,7 +6371,7 @@ namespace Prometheus.Controllers
             validatestr2 = validatestr2.Replace("//localhost", "//" + netcomputername);
 
 
-            var content = "Hi All,\r\n\r\nThis is a Critical Error Alarm information. Please pay your attention to it. Thanks!";
+            var content = "Hi All,\r\n\r\nThis is a "+vm.ProjectKey+" Critical Error Alarm information. Please pay your attention to it. Thanks!";
             content = content + "\r\n\r\n[" + LYTTASK.Summary + "]  is created base on analyse of task: ";
             content = content + "\r\n\r\n" + vm.Summary;
             content = content + "\r\n\r\nCritical Error TASK LINK: " + validatestr2;
@@ -6321,7 +6383,7 @@ namespace Prometheus.Controllers
             toaddrs.Add(vm.Reporter);
             toaddrs.Add(LYTTASK.Assignee);
 
-            EmailUtility.SendEmail(this, "Project Critical Error Alarm - WUXI Engineering System", toaddrs, content);
+            EmailUtility.SendEmail(this, "Project "+vm.ProjectKey+" Critical Error Alarm - WUXI Engineering System", toaddrs, content);
 
             IssueViewModels.UpdateLYT(vm.IssueKey);
             new System.Threading.ManualResetEvent(false).WaitOne(500);

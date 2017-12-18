@@ -1,0 +1,164 @@
+﻿@model IEnumerable<Prometheus.Models.IssueViewModels>
+
+@{
+    ViewBag.Title = "ProjectIQC";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-xs-1 text-right">
+        <img src="~/Content/images/PJ/IQC.png" style="height:45px; width:45px">
+    </div>
+    <div class="col-xs-11">
+        <ol class="breadcrumb" style="font-size:18px">
+            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
+            @if (Model != null && Model.Count() > 0)
+            {
+                <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ElementAt(0).ProjectKey)">Project Detail</a></li>
+            }
+            <li class="active">IQC Task</li>
+        </ol>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12">&nbsp;</div>
+</div>
+
+@if (Model != null)
+{
+    <script src="~/Scripts/highcharts.js"></script>
+    <script src="~/Scripts/exporting.js"></script>
+
+    if (ViewBag.chartscript != null)
+    {
+        @Html.Raw(ViewBag.chartscript)
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Failure</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="col-xs-12">
+                            <div id="failurepie" style="min-width: 310px; height: 300px; margin: 0 auto"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+
+    <table id="firsttable" name="firsttable" class="display" cellspacing="0">
+        <thead>
+            <tr style="color:white;">
+                <th width="12%">IQC#</th>
+                <th width="8%">RootCause</th>
+                <th width="8%">Containment Action</th>
+                <th width="8%">Corrective Action</th>
+                <th width="8%">Owner</th>
+                <th width="8%">IQE</th>
+                <th width="8%">Report Date</th>
+                <th width="8%">Attachment</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+                {
+                    var rmatitle = item.Summary.Trim();
+
+                <tr>
+                    <td width="12%">
+                        <div class="row">
+                            <div class="col-xs-1"></div>
+                            <div class="col-xs-11">
+                                <img src="~/Content/images/icon/LowYield.png" data-toggle="tooltip" title="Critical Error Alarm" MYTP="HOVER" style="height:16px;width:16px" onclick="LowYieldWarning('@item.IssueKey')">
+                            </div>
+                        </div>
+                    </td>
+                    <td colspan="6" width="80%">
+                        <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">
+                            <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
+                            @rmatitle.Substring(0, rmatitle.Length > 125 ? 125 : rmatitle.Length)
+                        </a>
+                    </td>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
+                    <td width="8%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus2(item.Resolution))</td>
+                </tr>
+                <tr>
+                    <td width="12%">
+                        @if (!string.IsNullOrEmpty(item.LYT))
+                        {
+                            <span class="badge alert-danger">LYT</span>
+                        }
+                        @item.ModuleSN
+                    </td>
+
+                    @if (item.RootCauseCommentList.Count > 0)
+                    {
+                        <td width="8%"><a href="/Issue/ShowRootCause?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></td>
+                    }
+                    else
+                    {
+                        <td width="8%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
+                    }
+
+                    @if (item.ContainmentActions.Count > 0)
+                    {
+                        <td width="8%"><a href="/Issue/ShowContainmentAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.ContainmentActionStatus())</a></td>
+                    }
+                    else
+                    {
+                        <td width="8%">N/A</td>
+                    }
+
+                    @if (item.CorrectiveActions.Count > 0)
+                    {
+                        <td width="8%"><a href="/Issue/ShowCorrectiveAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.CorrectiveActionStatus())</a></td>
+                    }
+                    else
+                    {
+                        <td width="8%">N/A</td>
+                    }
+
+                    <td width="8%"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
+                    <td width="8%"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
+                    <td width="8%">@item.ReportDate.ToString("yy-MM-dd")</td>
+                    <td width="8%">
+                        @if (item.AttachList.Count > 0)
+                    {
+                        <a href="/Issue/IssueAttach?issuekey=@item.IssueKey" target="_blank">
+                            <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>
+                        </a>
+                    }
+                </td>
+            </tr>
+
+            }
+        </tbody>
+    </table>
+    <script type="text/javascript">
+            $(document).ready(function () {
+                $('#firsttable').DataTable({
+                    'iDisplayLength': 20,
+                    'aLengthMenu': [[20, 50, 100, -1],
+                                    [20, 50, 100, "All"]],
+                    "aaSorting": [],
+                    "order": []
+                });
+            });
+
+            function LowYieldWarning(oBT) {
+                if (confirm("Warning: only FA assignee can trigger Critical Error Alarm.")) {
+                    var myurl = "/Project/LowYieldWarn?IssueKey=" + oBT;
+                    window.open(myurl, '_blank');
+                }
+            }
+    </script>
+}

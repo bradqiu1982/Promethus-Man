@@ -1178,9 +1178,7 @@ namespace Prometheus.Models
                 string scheme = ctrl.Url.RequestContext.HttpContext.Request.Url.Scheme;
                 string validatestr = ctrl.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
 
-                var netcomputername = "";
-                try { netcomputername = System.Net.Dns.GetHostName(); }
-                catch (Exception ex) { }
+                var netcomputername = EmailUtility.RetrieveCurrentMachineName();
                 validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
                 var content = vm.Summary + " is " + operate + " by " + vm.Reporter + " :\r\n " + validatestr;
@@ -2824,9 +2822,7 @@ namespace Prometheus.Models
                 string scheme = ctrl.Url.RequestContext.HttpContext.Request.Url.Scheme;
                 string validatestr = ctrl.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
 
-                var netcomputername = "";
-                try { netcomputername = System.Net.Dns.GetHostName(); }
-                catch (Exception ex) { }
+                var netcomputername = EmailUtility.RetrieveCurrentMachineName();
                 validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
                 var content = vm.Summary + " is " + operate + " by " + vm.Reporter + " :\r\n " + validatestr;

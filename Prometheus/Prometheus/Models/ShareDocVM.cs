@@ -166,9 +166,7 @@ namespace Prometheus.Models
                 routevalue.Add("issuekey", "ABC");
                 string scheme = ctrl.Url.RequestContext.HttpContext.Request.Url.Scheme;
                 string validatestr = ctrl.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
-                var netcomputername = "";
-                try { netcomputername = System.Net.Dns.GetHostName(); }
-                catch (Exception ex) { }
+                var netcomputername = EmailUtility.RetrieveCurrentMachineName();
                 validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
 
@@ -199,9 +197,7 @@ namespace Prometheus.Models
                 routevalue.Add("issuekey", "ABC");
                 string scheme = ctrl.Url.RequestContext.HttpContext.Request.Url.Scheme;
                 string validatestr = ctrl.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
-                var netcomputername = "";
-                try { netcomputername = System.Net.Dns.GetHostName(); }
-                catch (Exception ex) { }
+                var netcomputername = EmailUtility.RetrieveCurrentMachineName();
                 validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
 

@@ -83,9 +83,7 @@ namespace Prometheus.Controllers
             string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
             string validatestr = this.Url.Action("ActiveUser", "User", routevalue, scheme);
 
-            var netcomputername = "";
-            try { netcomputername = System.Net.Dns.GetHostName(); }
-            catch (Exception ex) { }
+            var netcomputername = EmailUtility.RetrieveCurrentMachineName();
             validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
             var toaddrs = new List<string>();
@@ -207,9 +205,7 @@ namespace Prometheus.Controllers
             //send validate email
             string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
             string validatestr = this.Url.Action("ResetUser", "User", routevalue, scheme);
-            var netcomputername = "";
-            try { netcomputername = System.Net.Dns.GetHostName(); }
-            catch (Exception ex) { }
+            var netcomputername = EmailUtility.RetrieveCurrentMachineName();
             validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
             var toaddrs = new List<string>();

@@ -451,74 +451,60 @@ else
                                 <h3 class="panel-title">Attachments</h3>
                             </div>
                             <div class="panel-body">
-                                @foreach (var item in Model.AttachList)
-                                {
-                                    var realfn = "";
-                                    if (item.Contains("<a href"))
+                                <table style="margin-left: 2%; width: 80%">
+                                    <thead>
+                                        <colgroup>
+                                            <col style="width: 60%;">
+                                            <col style="width: 30%;">
+                                            <col style="width: 10%;">
+                                        </colgroup>
+                                    </thead>
+                                    @foreach (var item in Model.AttachList)
                                     {
-                                        var tempfn = item.Split(new string[] { "<a href=", "target=" }, StringSplitOptions.None)[1].Replace("\"", "").Trim();
-                                        var tempfns = tempfn.Split(new string[] { "/" }, StringSplitOptions.None);
-                                        realfn = tempfns[tempfns.Length - 1];
-                                    }
-                                    else
-                                    {
-                                        var tempfns = item.Split(new string[] { "/" }, StringSplitOptions.None);
-                                        realfn = tempfns[tempfns.Length - 1].Trim();
-                                    }
-
-                                    if (item.Contains("<a href"))
-                                    {
-                                        <div class="row">
-                                            <div class="col-xs-6">@Html.Raw(item)</div>
-                                            <div class="col-xs-1">
-                                                @if (ViewBag.isassignee != null && ViewBag.isassignee)
-                                                {
-                                                    <button class="form-control" value="@realfn" type="button"  onclick="DeleteAttachment(this)">
-                                                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                                                    </button>
-                                                }
-                                            </div>
-                                            <div class="col-xs-5"></div>
-
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        var fns = item.Split(new char[] { '/' });
-                                        var fn = fns[fns.Length - 1];
-                                        <div class="row">
-                                            <div class="col-xs-6">
-                                                <a href="@item" target="_blank">
-                                                    <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>@fn
+                                        var realfn = "";
+                                        var tempfn = "";
+                                        if (item.Contains("<a href"))
+                                        {
+                                            tempfn = item.Split(new string[] { "<a href=", "target=" }, StringSplitOptions.None)[1].Replace("\"", "").Trim();
+                                            var tempfns = tempfn.Split(new string[] { "/" }, StringSplitOptions.None);
+                                            realfn = tempfns[tempfns.Length - 1];
+                                        }
+                                        else
+                                        {
+                                            tempfn = item;
+                                            var tempfns = item.Split(new string[] { "/" }, StringSplitOptions.None);
+                                            realfn = tempfns[tempfns.Length - 1].Trim();
+                                        }
+                                        var filedate = Prometheus.Models.IssueViewModels.GetFileDate(realfn);
+                                        <tr>
+                                            <td>
+                                                <a href="@tempfn" target="_blank">
+                                                    <span class="glyphicon glyphicon-paperclip" aria-hidden="true" style="width: 20px;"></span>
+                                                    <span>@realfn</span>
                                                 </a>
-                                            </div>
-                                            <div class="col-xs-1">
+                                            </td>
+                                            <td>@filedate</td>
+                                            <td>
                                                 @if (ViewBag.isassignee != null && ViewBag.isassignee)
                                                 {
-                                                    <button class="form-control" value="@realfn" type="button"  onclick="DeleteAttachment(this)">
-                                                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                                                    </button>
+                                                    <img src="~/Content/images/icon/delete2.png" MYTP="HOVER" data-toggle="tooltip" title="Delete" style="height:30px; width:18px" onclick="DeleteAttachment('@realfn')">
                                                 }
-                                            </div>
-                                            <div class="col-xs-5"></div>
-
-                                        </div>
+                                            </td>
+                                        </tr>
                                     }
-                                }
+                                </table>
+                                <script type="text/javascript">
+                                    function DeleteAttachment(oBT) {
+                                        if (confirm("Do you real want to delete this attachment?")) {
+                                            window.location.href = '/Issue/DeleteAttachment?issuekey=' + document.getElementById("HIssueKeyForDelete").value + '&filename=' + oBT.value
+                                        }
+                                        else {
+                                            window.location.href = '/Issue/UpdateIssue?issuekey=' + document.getElementById("HIssueKeyForDelete").value
+                                        }
+                                    }
+                                </script>
                             </div>
                         </div>
-                        <script type="text/javascript">
-                            function DeleteAttachment(oBT) {
-                                if (confirm("Do you real want to delete this attachment?"))
-                                {
-                                    window.location.href = '/Issue/DeleteAttachment?issuekey=' + document.getElementById("HIssueKeyForDelete").value + '&filename=' + oBT.value
-                                }
-                                else
-                                {
-                                    window.location.href = '/Issue/UpdateIssue?issuekey=' + document.getElementById("HIssueKeyForDelete").value
-                                }
-                            }
-                        </script>
                     </div>
                 </div>
             }

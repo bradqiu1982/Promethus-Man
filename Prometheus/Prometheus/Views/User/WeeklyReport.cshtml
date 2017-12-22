@@ -296,7 +296,13 @@
                                         <tbody>
                                             @foreach (var task in ViewBag.icareList[pKey].TaskList)
                                             {
-                                                <tr data-data="cur-icare-@idx-@m">
+                                                var itr_class = "";
+                                                if (summarylist != null && summarylist.ContainsKey(task.Key))
+                                                {
+                                                    itr_class = (summarylist[task.Key][0].Mark == "1") ? "summary-highlight"
+                                                                : ((summarylist[task.Key][0].Mark == "2") ? "summary-lowlight" : "");
+                                                }
+                                                <tr data-data="cur-icare-@idx-@m" class="@itr_class">
                                                     <td>@(m + 1)</td>
                                                     <td><a href="/Issue/UpdateIssue?issuekey=@task.Key" target="_blank" title="@task.Value.Rule" data-toggle="title">@task.Value.Description</a></td>
                                                     <td>@task.Value.Assignee.Split(new char[] { '@' })[0]</td>
@@ -319,7 +325,7 @@
                                                             var imark = "0";
                                                             if (summarylist != null && summarylist.ContainsKey(task.Key))
                                                             {
-                                                                <table>
+                                                                <table style="width: 100%;">
                                                                 @foreach (var item in summarylist[task.Key])
                                                                 {
                                                                     if (!string.IsNullOrEmpty(item.Summary))
@@ -327,9 +333,9 @@
                                                                         if (item.UserName.ToUpper() != ViewBag.RealUserID.ToUpper())
                                                                         {
                                                                             <tr class="row well item-summary @((item.Mark == "1") ? "summary-highlight" : ((item.Mark == "2") ? "summary-lowlight" : "summary-normal"))">
-                                                                                <td class="col-xs-5">@item.Summary</td>
-                                                                                <td class="col-xs-3">@item.UserName.Split(new char[] { '@' })[0]</td>
-                                                                                <td class="col-xs-4">@item.UpdateTime</td>
+                                                                                <td class="col-xs-8">@item.Summary</td>
+                                                                                <td class="col-xs-2">@item.UserName.Split(new char[] { '@' })[0]</td>
+                                                                                <td class="col-xs-2">@item.UpdateTime</td>
                                                                             </tr>
                                                                         }
                                                                         else
@@ -616,7 +622,13 @@
                                         <tbody>
                                             @foreach (var task in ViewBag.criticalList[pKey].TaskList)
                                             {
-                                                <tr data-data="cur-cri-task-@idx-@m" class="tr-data" data-ikey="@task.Key">
+                                                var tr_class = "";
+                                                if (summarylist != null && summarylist.ContainsKey(task.Key))
+                                                {
+                                                    tr_class = (summarylist[task.Key][0].Mark == "1") ? "summary-highlight"
+                                                                : ((summarylist[task.Key][0].Mark == "2") ? "summary-lowlight" : "");
+                                                }
+                                                <tr data-data="cur-cri-task-@idx-@m" class="tr-data @tr_class" data-ikey="@task.Key">
                                                     <td>@(m + 1)</td>
                                                     <td><a href="/Issue/UpdateIssue?issuekey=@task.Key" target="_blank" title="@task.Value.Rule" data-toggle="title">@task.Value.Description</a></td>
                                                     <td>@task.Value.Status</td>
@@ -638,26 +650,26 @@
                                                             var cmark = "0";
                                                             if (summarylist != null && summarylist.ContainsKey(task.Key))
                                                             {
-                                                                <table>
-                                                                @foreach (var item in summarylist[task.Key])
-                                                                {
-                                                                    if (!string.IsNullOrEmpty(item.Summary))
+                                                                <table style="width: 100%;">
+                                                                    @foreach (var item in summarylist[task.Key])
                                                                     {
-                                                                        if (item.UserName.ToUpper() != ViewBag.RealUserID.ToUpper())
+                                                                        if (!string.IsNullOrEmpty(item.Summary))
                                                                         {
-                                                                            <tr class="row well item-summary @((item.Mark == "1") ? "summary-highlight" : ((item.Mark == "2") ? "summary-lowlight" : "summary-normal"))">
-                                                                                <td class="col-xs-5">@item.Summary</td>
-                                                                                <td class="col-xs-3">@item.UserName.Split(new char[] { '@' })[0]</td>
-                                                                                <td class="col-xs-4">@item.UpdateTime</td>
-                                                                            </tr>
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            cmark = item.Mark;
-                                                                            csummary += item.Summary;
+                                                                            if (item.UserName.ToUpper() != ViewBag.RealUserID.ToUpper())
+                                                                            {
+                                                                                <tr class="row well item-summary @((item.Mark == "1") ? "summary-highlight" : ((item.Mark == "2") ? "summary-lowlight" : "summary-normal"))">
+                                                                                    <td class="col-xs-8">@item.Summary</td>
+                                                                                    <td class="col-xs-2">@item.UserName.Split(new char[] { '@' })[0]</td>
+                                                                                    <td class="col-xs-2">@item.UpdateTime</td>
+                                                                                </tr>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                cmark = item.Mark;
+                                                                                csummary += item.Summary;
+                                                                            }
                                                                         }
                                                                     }
-                                                                }
                                                                 </table>
                                                             }
                                                         }

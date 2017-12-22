@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
 
@@ -158,6 +159,7 @@ namespace Prometheus.Models
         public static string Result = "Result";
         public static string Analysis = "Analysis";
         public static string WeeklyReportSummary = "WeeklyReportSummary";
+        public static string AddAttachment = "AddAttachment";
     }
 
     public class IssueComments
@@ -349,6 +351,7 @@ namespace Prometheus.Models
                 {
                     if (string.Compare(item.CommentType,COMMENTTYPE.Description) == 0
                         || string.Compare(item.CommentType, COMMENTTYPE.WeeklyReportSummary) == 0
+                        || string.Compare(item.CommentType, COMMENTTYPE.AddAttachment) == 0
                         || string.IsNullOrEmpty(item.CommentType))
                     {
                         generalcommentlist.Add(item);
@@ -3459,6 +3462,42 @@ namespace Prometheus.Models
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
 
             return Convert.ToInt32(dbret[0][0]);
+        }
+        
+        public static string GetFileDate(string filename)
+        {
+            string pat = @"\d{8}_\d{6}";
+            Regex r = new Regex(pat, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            Match m = r.Match(filename);
+            var filedate = "";
+            if (m.Success)
+            {
+                try
+                {
+                    filedate = DateTime.ParseExact(m.Value.ToString(), "yyyyMMdd_HHmmss", null).ToString("yyyy/MM/dd HH:mm");
+                }
+                catch (Exception e)
+                {
+
+                }
+            }
+            else
+            {
+                string pat1 = @"\d{14}";
+                Regex r1 = new Regex(pat1, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                Match m1 = r1.Match(filename);
+                if (m1.Success)
+                {
+                    try
+                    {
+                        filedate = DateTime.ParseExact(m1.Value.ToString(), "yyyyMMddHHmmss", null).ToString("yyyy/MM/dd HH:mm");
+                    }
+                    catch (Exception ex)
+                    {
+                    }
+                }
+            }
+            return filedate;
         }
     }
 

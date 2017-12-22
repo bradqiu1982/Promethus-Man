@@ -452,59 +452,53 @@ else
 
         <div class="row" style="margin-left:10px">
             <div class="collapse in" id="attachwell">
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-xs-12">
-                            @if (Model != null && Model.AttachList.Count > 0)
+                <div class="row form-group">
+                    @if (Model != null && Model.AttachList.Count > 0)
+                    {
+                        <table style="margin-left: 2%; width: 80%;">
+                            <thead>
+                                <colgroup>
+                                    <col style="width: 60%;">
+                                    <col style="width: 30%;">
+                                    <col style="width: 10%;">
+                                </colgroup>
+                            </thead>
+                            @foreach (var item in Model.AttachList)
+                            {
+                                var realfn = "";
+                                var tempfn = "";
+                                if (item.Contains("<a href"))
                                 {
-                                    foreach (var item in Model.AttachList)
-                                    {
-                                        var realfn = "";
-                                        if (item.Contains("<a href"))
-                                        {
-                                            var tempfn = item.Split(new string[] { "<a href=", "target=" }, StringSplitOptions.None)[1].Replace("\"", "").Trim();
-                                            var tempfns = tempfn.Split(new string[] { "/" }, StringSplitOptions.None);
-                                            realfn = tempfns[tempfns.Length - 1];
-                                        }
-                                        else
-                                        {
-                                            var tempfns = item.Split(new string[] { "/" }, StringSplitOptions.None);
-                                            realfn = tempfns[tempfns.Length - 1].Trim();
-                                        }
-
-                                        if (item.Contains("<a href"))
-                                        {
-                                <div class="row">
-                                    @Html.Raw(item);
-                                </div>
-                                        }
-                                        else
-                                        {
-                                            var fns = item.Split(new char[] { '/' });
-                                            var fn = fns[fns.Length - 1];
-
-                                <div class="row">
-                                    <div class="col-xs-1"></div>
-                                    <div class="col-xs-6">
-                                        <a href="@item" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>@fn</a>
-                                    </div>
-                                    <div class="col-xs-1" data-toggle="tooltip" title="Delete">
-                                        @if (ViewBag.isassignee != null && ViewBag.isassignee)
-                                                    {
-                                                    <img src="~/Content/images/icon/delete2.png" MYTP="HOVER" style="height:30px; width:18px" onclick="DeleteAttachment('@realfn')">
-                                                    }
-                                    </div>
-                                    <div class="col-xs-4"></div>
-                                </div>
-                                        }
-                                    }
-
+                                    tempfn = item.Split(new string[] { "<a href=", "target=" }, StringSplitOptions.None)[1].Replace("\"", "").Trim();
+                                    var tempfns = tempfn.Split(new string[] { "/" }, StringSplitOptions.None);
+                                    realfn = tempfns[tempfns.Length - 1];
                                 }
-
-                        </div>
-                    </div>
+                                else
+                                {
+                                    tempfn = item;
+                                    var tempfns = item.Split(new string[] { "/" }, StringSplitOptions.None);
+                                    realfn = tempfns[tempfns.Length - 1].Trim();
+                                }
+                                var filedate = Prometheus.Models.IssueViewModels.GetFileDate(realfn);
+                                <tr>
+                                    <td>
+                                        <a href="@tempfn" target="_blank">
+                                            <span class="glyphicon glyphicon-paperclip" aria-hidden="true" style="width: 20px;"></span>
+                                            <span>@realfn</span>
+                                        </a>
+                                    </td>
+                                    <td>@filedate</td>
+                                    <td>
+                                        @if (!item.Contains("<a href") && ViewBag.isassignee != null && ViewBag.isassignee)
+                                        {
+                                            <img src="~/Content/images/icon/delete2.png" MYTP="HOVER" data-toggle="tooltip" title="Delete" style="height:30px; width:18px" onclick="DeleteAttachment('@realfn')">
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                            </table>
+                    }
                 </div>
-
             </div>
         </div>
     </div>
@@ -559,60 +553,53 @@ else
 
             <div class="row" style="margin-left:10px">
                 <div class="collapse in" id="internalattachwell">
-                    <div class="form-group">
-                        <div class="row">
-                            <div class="col-xs-12">
-                                @if (Model != null && Model.InternalAttachList.Count > 0)
+                    <div class="row form-group">
+                        @if (Model != null && Model.InternalAttachList.Count > 0)
+                        {
+                            <table style="margin-left: 2%; width: 80%;">
+                                <thead>
+                                    <colgroup>
+                                        <col style="width: 60%;">
+                                        <col style="width: 30%;">
+                                        <col style="width: 10%;">
+                                    </colgroup>
+                                </thead>
+                                @foreach (var item in Model.InternalAttachList)
                                 {
-                                    foreach (var item in Model.InternalAttachList)
+                                    var realfn = "";
+                                    var tempfn = "";
+                                    if (item.Contains("<a href"))
                                     {
-                                        var realfn = "";
-                                        if (item.Contains("<a href"))
-                                        {
-                                            var tempfn = item.Split(new string[] { "<a href=", "target=" }, StringSplitOptions.None)[1].Replace("\"", "").Trim();
-                                            var tempfns = tempfn.Split(new string[] { "/" }, StringSplitOptions.None);
-                                            realfn = tempfns[tempfns.Length - 1];
-                                        }
-                                        else
-                                        {
-                                            var tempfns = item.Split(new string[] { "/" }, StringSplitOptions.None);
-                                            realfn = tempfns[tempfns.Length - 1].Trim();
-                                        }
-
-                                        if (item.Contains("<a href"))
-                                        {
-                                            <div class="row">
-                                                @Html.Raw(item);
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            var fns = item.Split(new char[] { '/' });
-                                            var fn = fns[fns.Length - 1];
-
-                                            <div class="row">
-                                                <div class="col-xs-1"></div>
-                                                <div class="col-xs-6">
-                                                    <a href="@item" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>@fn</a>
-                                                </div>
-                                                <div class="col-xs-1" data-toggle="tooltip" title="Delete">
-                                                    @if (ViewBag.isassignee != null && ViewBag.isassignee)
-                                                    {
-                                                        <img src="~/Content/images/icon/delete2.png" MYTP="HOVER" style="height:30px; width:18px" onclick="DeleteAttachment('@realfn')">
-                                                    }
-                                                </div>
-                                                <div class="col-xs-4"></div>
-                                            </div>
-                                        }
+                                        tempfn = item.Split(new string[] { "<a href=", "target=" }, StringSplitOptions.None)[1].Replace("\"", "").Trim();
+                                        var tempfns = tempfn.Split(new string[] { "/" }, StringSplitOptions.None);
+                                        realfn = tempfns[tempfns.Length - 1];
                                     }
-
-
+                                    else
+                                    {
+                                        tempfn = item;
+                                        var tempfns = item.Split(new string[] { "/" }, StringSplitOptions.None);
+                                        realfn = tempfns[tempfns.Length - 1].Trim();
+                                    }
+                                    var filedate = Prometheus.Models.IssueViewModels.GetFileDate(realfn);
+                                    <tr>
+                                        <td>
+                                            <a href="@tempfn" target="_blank">
+                                                <span class="glyphicon glyphicon-paperclip" aria-hidden="true" style="width: 20px;"></span>
+                                                <span>@realfn</span>
+                                            </a>
+                                        </td>
+                                        <td>@filedate</td>
+                                        <td>
+                                            @if (!item.Contains("<a href") && ViewBag.isassignee != null && ViewBag.isassignee)
+                                            {
+                                                <img src="~/Content/images/icon/delete2.png" MYTP="HOVER" data-toggle="tooltip" title="Delete" style="height:30px; width:18px" onclick="DeleteAttachment('@realfn')">
+                                            }
+                                        </td>
+                                    </tr>
                                 }
-
-                            </div>
-                        </div>
+                            </table>
+                        }
                     </div>
-
                 </div>
             </div>
         </div>

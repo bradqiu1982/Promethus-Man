@@ -121,12 +121,14 @@
 }
 
 .summary-highlight {
-    border-left-width: 5px;
-    border-left-color: #5cb85c;
+    border-left-style: solid !important;
+    border-left-width: 5px !important;
+    border-left-color: #5cb85c !important;
 }
 .summary-lowlight {
-    border-left-width: 5px;
-    border-left-color: #d9534f;
+    border-left-style: solid !important;
+    border-left-width: 5px !important;
+    border-left-color: #d9534f !important;
 }
 .summary-normal{
     border-left-width: 5px;

@@ -81,6 +81,7 @@
                     <td>Assignee</td>
                     <td>Failure Desc</td>
                     <td>Date</td>
+                    <td>ClosedDate</td>
                     <td><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></td>
                     <td>LYT</td>
                 </tr>
@@ -133,6 +134,9 @@
                         </td>
                         <td>
                             @item.IssueData.ReportDate.ToString("MM/dd")
+                        </td>
+                        <td>
+                            @item.IssueData.ResolvedDate.ToString("MM/dd HH:mm")
                         </td>
                         <td>
                             @if (item.IssueData.AttachList.Count > 0)

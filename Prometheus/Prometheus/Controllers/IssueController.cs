@@ -247,6 +247,7 @@ namespace Prometheus.Controllers
             {
                 var urls = ReceiveRMAFiles();
                 var internalreportfile = Request.Form["attachmentupload"];
+                var originalfilename = Path.GetFileName(internalreportfile);
                 var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
                     .Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
@@ -264,6 +265,7 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(url))
                 {
                     IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
+                    StoreAttachComment(this, vm.IssueKey, originalfilename, url, updater);
 
                     var attachtag = string.Empty;
                     for (var i = 0; i < 200; i++)
@@ -743,6 +745,7 @@ namespace Prometheus.Controllers
             {
                 var urls = ReceiveRMAFiles();
                 var internalreportfile = Request.Form["attachmentupload"];
+                var originalfilename = Path.GetFileName(internalreportfile);
                 var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
                     .Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
@@ -760,6 +763,7 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(url))
                 {
                     IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
+                    StoreAttachComment(this, vm.IssueKey, originalfilename, url, updater);
 
                     var attachtag = string.Empty;
                     for (var i = 0; i < 200; i++)
@@ -1042,6 +1046,7 @@ namespace Prometheus.Controllers
             {
                 var urls = ReceiveRMAFiles();
                 var internalreportfile = Request.Form["attachmentupload"];
+                var originalfilename = Path.GetFileName(internalreportfile);
                 var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
                     .Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
@@ -1060,6 +1065,7 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(url))
                 {
                     IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
+                    StoreAttachComment(this, vm.IssueKey, originalfilename, url, updater);
 
                     var attachtag = string.Empty;
                     for (var i = 0; i < 200; i++)
@@ -1400,6 +1406,7 @@ namespace Prometheus.Controllers
             {
                 var urls = ReceiveRMAFiles();
                 var internalreportfile = Request.Form["attachmentupload"];
+                var originalfilename = Path.GetFileName(internalreportfile);
                 var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
                     .Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
@@ -1417,6 +1424,7 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(url))
                 {
                     IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
+                    StoreAttachComment(this, vm.IssueKey, originalfilename, url, updater);
 
                     var attachtag = string.Empty;
                     for (var i = 0; i < 200; i++)
@@ -1912,6 +1920,7 @@ namespace Prometheus.Controllers
             {
                 var urls = ReceiveRMAFiles();
                 var internalreportfile = Request.Form["attachmentupload"];
+                var originalfilename = Path.GetFileName(internalreportfile);
                 var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
                     .Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
@@ -1929,6 +1938,7 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(url))
                 {
                     IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
+                    StoreAttachComment(this, vm.IssueKey, originalfilename, url, updater);
 
                     var attachtag = string.Empty;
                     for (var i = 0; i < 200; i++)
@@ -2350,6 +2360,7 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
             {
                 var attachementfile = Request.Form["attachmentupload"];
+                var originalfilename1 = Path.GetFileName(attachementfile);
                 var originalname1 = Path.GetFileNameWithoutExtension(attachementfile)
                     .Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
@@ -2367,7 +2378,7 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(url))
                 {
                     IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
-
+                    StoreAttachComment(this, vm.IssueKey, originalfilename1, url, updater);
 
                     if (!string.IsNullOrEmpty(attachtag))
                     {
@@ -2392,6 +2403,7 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(Request.Form["customreportupload"]))
             {
                 var customereportfile = Request.Form["customreportupload"];
+                var originalfilename = Path.GetFileName(customereportfile);
                 var originalname = Path.GetFileNameWithoutExtension(customereportfile)
                     .Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
@@ -2411,6 +2423,8 @@ namespace Prometheus.Controllers
                     var linkstr = url;
 
                     IssueViewModels.StoreIssueAttachment(vm.IssueKey, linkstr, ISSUEATTACHTYPE.CustomRMA);
+                    StoreAttachComment(this, vm.IssueKey, originalfilename, linkstr, updater);
+
                     if (!string.IsNullOrEmpty(customertag))
                     {
                         var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
@@ -2433,6 +2447,7 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(Request.Form["internalreportupload"]))
             {
                 var internalreportfile = Request.Form["internalreportupload"];
+                var originalfilename = Path.GetFileName(internalreportfile);
                 var originalname = Path.GetFileNameWithoutExtension(internalreportfile)
                     .Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
@@ -2452,6 +2467,8 @@ namespace Prometheus.Controllers
                     var linkstr = url;
 
                     IssueViewModels.StoreIssueAttachment(vm.IssueKey, linkstr, ISSUEATTACHTYPE.InternalRMA);
+                    StoreAttachComment(this, vm.IssueKey, originalfilename, linkstr, updater);
+
                     if (!string.IsNullOrEmpty(internaltag))
                     {
                         var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
@@ -2703,6 +2720,7 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
             {
                 var attachementfile = Request.Form["attachmentupload"];
+                var originalfilename1 = Path.GetFileName(attachementfile);
                 var originalname1 = Path.GetFileNameWithoutExtension(attachementfile)
                     .Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
@@ -2720,6 +2738,8 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(url))
                 {
                     IssueViewModels.StoreIssueAttachment(originaldata.IssueKey, url);
+                    StoreAttachComment(this, originaldata.IssueKey, originalfilename1, url, updater);
+
                     if (!string.IsNullOrEmpty(attachtag))
                     {
                         var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
@@ -2993,6 +3013,7 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
             {
                 var attachementfile = Request.Form["attachmentupload"];
+                var originalfilename1 = Path.GetFileName(attachementfile);
                 var originalname1 = Path.GetFileNameWithoutExtension(attachementfile)
                     .Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
@@ -3010,6 +3031,8 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(url))
                 {
                     IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
+                    StoreAttachComment(this, vm.IssueKey, originalfilename1, url, updater);
+
                     if (!string.IsNullOrEmpty(attachtag))
                     {
                         var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
@@ -3264,6 +3287,7 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
             {
                 var attachementfile = Request.Form["attachmentupload"];
+                var originalfilename1 = Path.GetFileName(attachementfile);
                 var originalname1 = Path.GetFileNameWithoutExtension(attachementfile)
                     .Replace(" ", "_").Replace("#", "").Replace("'", "")
                     .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
@@ -3281,6 +3305,7 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(url))
                 {
                     IssueViewModels.StoreIssueAttachment(vm.IssueKey, url);
+                    StoreAttachComment(this, vm.IssueKey, originalfilename1, url, updater);
 
                     var attachtag = string.Empty;
                     for (var i = 0; i < 200; i++)
@@ -4392,6 +4417,15 @@ namespace Prometheus.Controllers
                 }
             }
 
+        }
+
+        private void StoreAttachComment(Controller ctrl, string iKey, string filename, string url, string updater)
+        {
+            var username = updater.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
+            var comment = username.ToUpper() + " upload attachment: <a href='"+url+"'>" + filename + "</a> at " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            var issuecomment = new IssueComments();
+            issuecomment.Comment = SeverHtmlDecode.Decode(ctrl, comment);
+            IssueViewModels.StoreIssueComment(iKey, issuecomment.dbComment, updater, COMMENTTYPE.AddAttachment);
         }
     }
 }

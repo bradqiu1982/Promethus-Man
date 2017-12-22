@@ -27,9 +27,9 @@
                         var summary = "";
                         for (var i = 0; i < output.data.length; i++) {
                             summary += '<tr data-id="' + output.data[i].ID + '" style="background-color: transparent;">' +
-                                            '<td class="col-xs-5">' + output.data[i].Summary + '</td>' +
-                                            '<td class="col-xs-3">' + output.data[i].UserName.split('@')[0] + '</td>' +
-                                            '<td class="col-xs-4">' + output.data[i].UpdateTime + '</td>' +
+                                            '<td class="col-xs-8">' + output.data[i].Summary + '</td>' +
+                                            '<td class="col-xs-2">' + output.data[i].UserName.split('@')[0] + '</td>' +
+                                            '<td class="col-xs-2">' + output.data[i].UpdateTime + '</td>' +
                                         '</tr>';
                         }
                         var appendStr = '<tr>' +
@@ -37,7 +37,7 @@
                                 '<div class="collapse in" id="' + data_target + '">' +
                                     '<div class="row well data-summary">' +
                                         '<label>Summary:</label>' +
-                                        '<table>' + summary + '</table>' +
+                                        '<table style="width: 100%">' + summary + '</table>' +
                                     '</div>' +
                                 '</div>' +
                             '</td>' +
@@ -75,6 +75,8 @@
                     if (sumstr != '') {
                         arrtmp.push(ikey, mark, sumstr);
                         data.push(arrtmp)
+                        var tr_class = (mark == 1) ? "summary-highlight" : ((mark == 2) ? "summary-lowlight" : "");
+                        $(this).prev().removeClass().addClass(tr_class);
                     }
                 })
             }
@@ -89,6 +91,9 @@
                     if (mark != omark) {
                         arrtmp.push(ikey, mark, sumstr);
                         data.push(arrtmp);
+                        $(this).find('select').prev().val(mark);
+                        var tr_class = (mark == 1) ? "tr-highlight" : ((mark == 2) ? "tr-lowlight" : "");
+                        $(this).removeClass().addClass('tr-data').addClass(tr_class);
                     }
                 })
             }

@@ -56,6 +56,7 @@
             <th style="font-size:12px">Owner</th>
             <th style="font-size:12px">IQE</th>
             <th style="font-size:12px">Due Data</th>
+            <th style="font-size:12px"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></th>
         </tr>
     </thead>
 
@@ -63,7 +64,15 @@
         @foreach (var line in Model)
         {
             <tr>
-                <th style="font-size:12px">@line.AppV_A</th>
+                @if (string.IsNullOrEmpty(line.AppV_P))
+                {
+                    <th style="font-size:12px">@line.AppV_A</th>
+                }
+                else
+                {
+                    <th style="font-size:12px"><a href="/Issue/UpdateIssue?issuekey=@(line.AppV_P)" target="_blank">@line.AppV_A</a></th>
+                }
+
                 <th style="font-size:12px">@line.AppV_B</th>
                 <th style="font-size:12px">@line.AppV_C</th>
                 <th style="font-size:12px">@line.AppV_D</th>
@@ -78,6 +87,14 @@
                 <th style="font-size:12px">@line.AppV_M</th>
                 <th style="font-size:12px">@line.AppV_N</th>
                 <th style="font-size:12px">@line.AppV_O</th>
+                @if (line.Attachs.Count > 0)
+                {
+                    <th style="font-size:12px"><a href="/CustomerData/IQEAttachments?attachkey=@(line.AppV_A)" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></a></th>
+                }
+                else
+                {
+                    <th style="font-size:12px"></th>
+                }
             </tr>
         }
     </tbody>

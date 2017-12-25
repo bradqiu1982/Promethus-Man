@@ -4932,9 +4932,7 @@ namespace Prometheus.Controllers
                 routevalue.Add("issuekey", "ABC");
                 string scheme = Url.RequestContext.HttpContext.Request.Url.Scheme;
                 string validatestr = Url.Action("UpdateIssue", "Issue", routevalue, scheme);
-                var netcomputername = "";
-                try { netcomputername = System.Net.Dns.GetHostName(); }
-                catch (Exception ex) { }
+                var netcomputername = EmailUtility.RetrieveCurrentMachineName();
                 validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
 
@@ -5365,12 +5363,7 @@ namespace Prometheus.Controllers
                 var logvcsel = Server.MapPath("~/userfiles") + "\\" + fn;
                 System.IO.File.WriteAllText(logvcsel, logcontent);
 
-                var netcomputername = "";
-                try
-                {
-                    netcomputername = System.Net.Dns.GetHostName();
-                }
-                catch (Exception ex) { }
+                var netcomputername = EmailUtility.RetrieveCurrentMachineName();
 
 
                 var url = "/userfiles/" + fn;
@@ -5422,9 +5415,7 @@ namespace Prometheus.Controllers
             routevalue.Add("issuekey", IssueKey);
             string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
             string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
-            var netcomputername = "";
-            try { netcomputername = System.Net.Dns.GetHostName(); }
-            catch (Exception ex) { }
+            var netcomputername = EmailUtility.RetrieveCurrentMachineName();
             return validatestr.Replace("//localhost", "//" + netcomputername);
         }
 
@@ -5555,13 +5546,7 @@ namespace Prometheus.Controllers
             string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
             string validatestr = this.Url.Action(act, module, routevalue, scheme);
 
-            var netcomputername = "";
-            try {
-                netcomputername = System.Net.Dns.GetHostName();
-            }
-            catch (Exception ex)
-            {
-            }
+            var netcomputername = EmailUtility.RetrieveCurrentMachineName();
             validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
             return validatestr;
@@ -5667,9 +5652,7 @@ namespace Prometheus.Controllers
                         string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
                         string validatestr = this.Url.Action("UserBookedReport", "PJReport", routevalue, scheme);
 
-                        var netcomputername = "";
-                        try { netcomputername = System.Net.Dns.GetHostName(); }
-                        catch (Exception ex) { }
+                        var netcomputername = EmailUtility.RetrieveCurrentMachineName();
                         validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
                         var content = "Click below link to review the Report which you booked :\r\n " + validatestr;
@@ -5703,9 +5686,7 @@ namespace Prometheus.Controllers
                         //send validate email
                         string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
                         string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
-                        var netcomputername = "";
-                        try { netcomputername = System.Net.Dns.GetHostName(); }
-                        catch (Exception ex) { }
+                        var netcomputername = EmailUtility.RetrieveCurrentMachineName();
                         validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
                         var content = "RMA FA of " + item.ModuleSN + " must finished today :\r\n " + validatestr;
@@ -5735,9 +5716,7 @@ namespace Prometheus.Controllers
                         string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
                         string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
 
-                        var netcomputername = "";
-                        try { netcomputername = System.Net.Dns.GetHostName(); }
-                        catch (Exception ex) { }
+                        var netcomputername = EmailUtility.RetrieveCurrentMachineName();
                         validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
                         var content = "RMA report of " + item.ModuleSN + " must finished today :\r\n " + validatestr;
@@ -5771,9 +5750,7 @@ namespace Prometheus.Controllers
                     string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
                     string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
 
-                    var netcomputername = "";
-                    try { netcomputername = System.Net.Dns.GetHostName(); }
-                    catch (Exception ex) { }
+                    var netcomputername = EmailUtility.RetrieveCurrentMachineName();
                     validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
                     var content = "OBA " + item.FinisarDMR + " analyse  must finished tomorrow :\r\n " + validatestr;
@@ -5805,9 +5782,7 @@ namespace Prometheus.Controllers
                     string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
                     string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
 
-                    var netcomputername = "";
-                    try { netcomputername = System.Net.Dns.GetHostName(); }
-                    catch (Exception ex) { }
+                    var netcomputername = EmailUtility.RetrieveCurrentMachineName();
                     validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
                     var content = "Warning: Assigned to you task - " + item.Summary + " is close to its Due Date :\r\n " + validatestr;
@@ -6122,6 +6097,7 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
+            //ExternalDataCollector.RefreshIQEData(this);
 
             //ProjectTestData.PrePareOSALatestData("25GWIRELESSTOSAG", this);
 
@@ -6364,9 +6340,7 @@ namespace Prometheus.Controllers
             routevalue["issuekey"] = LYTTASK.IssueKey;
             string validatestr2 = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
 
-            var netcomputername = "";
-            try { netcomputername = System.Net.Dns.GetHostName(); }
-            catch (Exception ex) { }
+            var netcomputername = EmailUtility.RetrieveCurrentMachineName();
             validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
             validatestr2 = validatestr2.Replace("//localhost", "//" + netcomputername);
 
@@ -6881,9 +6855,7 @@ namespace Prometheus.Controllers
             string scheme = ctrl.Url.RequestContext.HttpContext.Request.Url.Scheme;
             string validatestr = ctrl.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
 
-            var netcomputername = "";
-            try { netcomputername = System.Net.Dns.GetHostName(); }
-            catch (Exception ex) { }
+            var netcomputername = EmailUtility.RetrieveCurrentMachineName();
             validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
             var content = vm.Summary + " is created :\r\n " + validatestr;
@@ -7355,12 +7327,7 @@ namespace Prometheus.Controllers
 
         private void SendOCAPEvent(List<IssueViewModels> vms, string comment, List<string> addrlist, string fileUrl)
         {
-            var netcomputername = "";
-            try {
-                netcomputername = System.Net.Dns.GetHostName();
-            }
-            catch (Exception ex)
-            { }
+            var netcomputername = EmailUtility.RetrieveCurrentMachineName();
 
             var toaddrs = new Dictionary<string, bool>();
             var body = new List<List<string>>();

@@ -147,9 +147,7 @@ namespace Prometheus.Controllers
             string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
             string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
 
-            var netcomputername = "";
-            try { netcomputername = System.Net.Dns.GetHostName(); }
-            catch (Exception ex) { }
+            var netcomputername = EmailUtility.RetrieveCurrentMachineName();
             validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
             var content = vm.Summary + " is " + operate + " by " + vm.Reporter + " :\r\n " + validatestr;
@@ -175,9 +173,7 @@ namespace Prometheus.Controllers
             string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
             string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
 
-            var netcomputername = "";
-            try { netcomputername = System.Net.Dns.GetHostName(); }
-            catch (Exception ex) { }
+            var netcomputername = EmailUtility.RetrieveCurrentMachineName();
             validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
             var content = vm.Summary + " is " + operate + " by " + vm.Reporter + " :\r\n " + validatestr;
@@ -495,9 +491,7 @@ namespace Prometheus.Controllers
             string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
             string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
 
-            var netcomputername = "";
-            try { netcomputername = System.Net.Dns.GetHostName(); }
-            catch (Exception ex) { }
+            var netcomputername = EmailUtility.RetrieveCurrentMachineName();
             validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
             var content = commenter + " add a new comment on issue: " + summary + "\r\n\r\n" + commentcontent + "\r\n\r\nISSUE LINK:\r\n\r\n" + validatestr;
             EmailUtility.SendEmail(this, "WUXI Engineering System_" + commenter, towho, content);
@@ -584,13 +578,7 @@ namespace Prometheus.Controllers
 
         private void SendPDMSEvent(IssueViewModels vm, string comment, string rootcause)
         {
-            var netcomputername = "";
-            try
-            {
-                netcomputername = System.Net.Dns.GetHostName();
-            }
-            catch (Exception ex)
-            { }
+            var netcomputername = EmailUtility.RetrieveCurrentMachineName();
 
             var body = new List<List<string>>();
             var tmpList = new List<string>();
@@ -1305,9 +1293,7 @@ namespace Prometheus.Controllers
                 string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
                 string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
 
-                var netcomputername = "";
-                try { netcomputername = System.Net.Dns.GetHostName(); }
-                catch (Exception ex) { }
+                var netcomputername = EmailUtility.RetrieveCurrentMachineName();
                 validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
                 var content = vm.Summary + " is " + operate + " by " + vm.Reporter + " :\r\n " + validatestr;
@@ -1336,9 +1322,7 @@ namespace Prometheus.Controllers
                 string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
                 string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
 
-                var netcomputername = "";
-                try { netcomputername = System.Net.Dns.GetHostName(); }
-                catch (Exception ex) { }
+                var netcomputername = EmailUtility.RetrieveCurrentMachineName();
                 validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
                 var content = vm.Summary + " is " + operate + " by " + vm.Reporter + " :\r\n " + validatestr;
@@ -3694,9 +3678,7 @@ namespace Prometheus.Controllers
                 string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
                 validatestr = validatestr.Split(new string[] { "/Issue" }, StringSplitOptions.None)[0];
 
-                var netcomputername = "";
-                try { netcomputername = System.Net.Dns.GetHostName(); }
-                catch (Exception ex) { }
+                var netcomputername = EmailUtility.RetrieveCurrentMachineName();
                 validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
                 var attach = "";
@@ -3822,9 +3804,7 @@ namespace Prometheus.Controllers
                 string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
                 validatestr = validatestr.Split(new string[] { "/Issue" }, StringSplitOptions.None)[0];
 
-                var netcomputername = "";
-                try { netcomputername = System.Net.Dns.GetHostName(); }
-                catch (Exception ex) { }
+                var netcomputername = EmailUtility.RetrieveCurrentMachineName();
                 validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
                 var attach = "";
@@ -4048,9 +4028,7 @@ namespace Prometheus.Controllers
                 string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
                 validatestr = validatestr.Split(new string[] { "/Issue" }, StringSplitOptions.None)[0];
 
-                var netcomputername = "";
-                try { netcomputername = System.Net.Dns.GetHostName(); }
-                catch (Exception ex) { }
+                var netcomputername = EmailUtility.RetrieveCurrentMachineName();
                 validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
 
@@ -4156,9 +4134,7 @@ namespace Prometheus.Controllers
                 string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
                 validatestr = validatestr.Split(new string[] { "/Issue" }, StringSplitOptions.None)[0];
 
-                var netcomputername = "";
-                try { netcomputername = System.Net.Dns.GetHostName(); }
-                catch (Exception ex) { }
+                var netcomputername = EmailUtility.RetrieveCurrentMachineName();
                 validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
 

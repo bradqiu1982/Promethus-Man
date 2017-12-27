@@ -4,7 +4,6 @@ using System;
 using System.Web;
 using System.IO;
 using Prometheus.Models;
-using System.Web.Mvc;
 
 public class Upload : IHttpHandler {
 

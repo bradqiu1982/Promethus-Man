@@ -4,6 +4,7 @@ using System;
 using System.Web;
 using System.IO;
 using Prometheus.Models;
+using System.Web.Mvc;
 
 public class Upload : IHttpHandler {
 
@@ -13,6 +14,8 @@ public class Upload : IHttpHandler {
             HttpPostedFile uploads = context.Request.Files["upload"];
 
             string CKEditorFuncNum = context.Request["CKEditorFuncNum"];
+
+            string type = context.Request["responseType"];
 
             string fn = System.IO.Path.GetFileName(uploads.FileName);
             string url = "";
@@ -48,7 +51,7 @@ public class Upload : IHttpHandler {
                 fn = Path.GetFileNameWithoutExtension(fn)+"-"+DateTime.Now.ToString("yyyyMMddHHmmss")+Path.GetExtension(fn);
                 fn = fn.Replace(" ", "_").Replace("#", "").Replace("'", "")
                             .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-                
+
                 uploads.SaveAs(imgdir + fn);
                 url = "/userfiles/docs/" +datestring+"/"+ fn;
 
@@ -61,7 +64,18 @@ public class Upload : IHttpHandler {
                     IssueViewModels.StoreIssueAttachment(dict["issuekey"], url);
                 }
             }
-            context.Response.Write("<script>window.parent.CKEDITOR.tools.callFunction(" + CKEditorFuncNum + ", \"" + url + "\""+");</script>");
+            if (string.Compare(type, "json") != 0)
+            {
+                context.Response.Write("<script>window.parent.CKEDITOR.tools.callFunction(" + CKEditorFuncNum + ", \"" + url + "\"" + ");</script>");
+            }
+            else
+            {
+                context.Response.ContentType = "application/json";
+                context.Response.Charset = "utf-8";
+                string txt = "{\"fileName\":\""+fn+"\",\"uploaded\":1,\"url\":\""+url+"\"}";
+
+                context.Response.Write(txt);
+            }
             HttpContext.Current.ApplicationInstance.CompleteRequest();
         }
         catch (Exception ex)

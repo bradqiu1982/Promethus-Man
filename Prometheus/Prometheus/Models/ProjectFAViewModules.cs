@@ -38,17 +38,27 @@ namespace Prometheus.Models
 
                 if (!string.IsNullOrEmpty(d.ModuleSN) && !string.IsNullOrEmpty(d.ErrAbbr))
                 {
-                    var pjdata = new ProjectTestData();
-                    pjdata.ProjectKey = d.ProjectKey;
-                    pjdata.ModuleSerialNum = d.ModuleSN;
-                    pjdata.ErrAbbr = d.ErrAbbr;
-                    ret.Add(new ProjectFAViewModules(d, pjdata));
+                    var testStation = "";
+
+                    var pjdata = ProjectTestData.RetrieveProjectTestData(d.IssueKey);
+                    
+                    if (pjdata.Count > 0)
+                    {
+                        testStation = pjdata[0].TestStation;
+                    }
+                    var pd = new ProjectTestData();
+                    pd.ModuleSerialNum = d.ModuleSN;
+                    pd.ErrAbbr = d.ErrAbbr;
+                    pd.ProjectKey = d.ProjectKey;
+                    pd.TestStation = testStation;
+                    ret.Add(new ProjectFAViewModules(d, pd));
                 }
                 else
                 {
                     if (d.Summary.Contains("@Burn-In Step"))
                     {
                         var sn = "";
+                        var testStation = "";
 
                         var pjdata = new List<ProjectTestData>();
                         if (!string.IsNullOrEmpty(d.DataID))
@@ -63,6 +73,7 @@ namespace Prometheus.Models
                         if (pjdata.Count > 0)
                         {
                             sn = pjdata[0].ModuleSerialNum;
+                            testStation = pjdata[0].TestStation;
                         }
 
                         if (!string.IsNullOrEmpty(sn) && !bisndict.ContainsKey(sn))
@@ -72,6 +83,7 @@ namespace Prometheus.Models
                             pd.ModuleSerialNum = sn;
                             pd.ErrAbbr = pjdata[0].ErrAbbr;
                             pd.ProjectKey = d.ProjectKey;
+                            pd.TestStation = testStation;
                             ret.Add(new ProjectFAViewModules(d, pd));
                         }
                         else if (!string.IsNullOrEmpty(sn) && bisndict.ContainsKey(sn))
@@ -155,11 +167,19 @@ namespace Prometheus.Models
 
                     if (!string.IsNullOrEmpty(d.ModuleSN) && !string.IsNullOrEmpty(d.ErrAbbr))
                     {
-                        var pjdata = new ProjectTestData();
-                        pjdata.ProjectKey = d.ProjectKey;
-                        pjdata.ModuleSerialNum = d.ModuleSN;
-                        pjdata.ErrAbbr = d.ErrAbbr;
-                        ret.Add(new ProjectFAViewModules(d, pjdata));
+                        var testStation = "";
+                        var pjdata = ProjectTestData.RetrieveProjectTestData(d.IssueKey);
+                        if (pjdata.Count > 0)
+                        {
+                            testStation = pjdata[0].TestStation;
+                        }
+
+                        var pd = new ProjectTestData();
+                            pd.ModuleSerialNum = d.ModuleSN;
+                            pd.ErrAbbr = d.ErrAbbr;
+                            pd.ProjectKey = d.ProjectKey;
+                            pd.TestStation = testStation;
+                        ret.Add(new ProjectFAViewModules(d, pd));
                     }
                     else
                     {
@@ -172,6 +192,7 @@ namespace Prometheus.Models
                                 pd.ModuleSerialNum = pjdata[0].ModuleSerialNum;
                                 pd.ErrAbbr = pjdata[0].ErrAbbr;
                                 pd.ProjectKey = d.ProjectKey;
+                                pd.TestStation = pjdata[0].TestStation;
                                 ret.Add(new ProjectFAViewModules(d, pd));
                             }
                         }
@@ -209,10 +230,18 @@ namespace Prometheus.Models
             var vm = IssueViewModels.RRetrieveFAByErrAbbr(ProjectKey, ErrAbbr, 500, ctrl);
             foreach (var item in vm)
             {
+                var testStation = "";
+                var pjdata = ProjectTestData.RetrieveProjectTestData(item.IssueKey);
+                if (pjdata.Count > 0)
+                {
+                    testStation = pjdata[0].TestStation;
+                }
+
                 var pd = new ProjectTestData();
                 pd.ModuleSerialNum = item.ModuleSN;
                 pd.ErrAbbr = item.ErrAbbr;
                 pd.ProjectKey = item.ProjectKey;
+                pd.TestStation = testStation;
                 ret.Add(new ProjectFAViewModules(item, pd));
             }
             return ret;
@@ -242,10 +271,18 @@ namespace Prometheus.Models
             var vm = IssueViewModels.RRetrieveFABySN(ProjectKey, sn, ctrl);
             foreach (var item in vm)
             {
+                var testStation = "";
+                var pjdata = ProjectTestData.RetrieveProjectTestData(item.IssueKey);
+                if (pjdata.Count > 0)
+                {
+                    testStation = pjdata[0].TestStation;
+                }
+
                 var pd = new ProjectTestData();
                 pd.ModuleSerialNum = item.ModuleSN;
                 pd.ErrAbbr = item.ErrAbbr;
                 pd.ProjectKey = item.ProjectKey;
+                pd.TestStation = testStation;
                 ret.Add(new ProjectFAViewModules(item, pd));
             }
             return ret;

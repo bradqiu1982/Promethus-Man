@@ -88,6 +88,7 @@
                     <td>FA Status</td>
                     <td>Assignee</td>
                     <td>Failure Desc</td>
+                    <td>Tester</td>
                     <td>Date</td>
                     <td><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></td>
                     <td>LYT</td>
@@ -139,6 +140,9 @@
                         </td>
                         <td>
                             <a href="/Issue/UpdateIssue?issuekey=@item.IssueData.IssueKey">@item.IssueData.Summary</a>
+                        </td>
+                        <td>
+                            @item.TestData.TestStation
                         </td>
                         <td>
                             @item.IssueData.ReportDate.ToString("MM/dd")

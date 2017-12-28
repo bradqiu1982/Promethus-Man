@@ -1,0 +1,58 @@
+﻿
+@{
+    ViewBag.Title = "ProjectErrorMind";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link href="~/Content/common.css" rel="stylesheet" type="text/css" />
+<link href="~/Content/jsmind.css" rel="stylesheet" type="text/css" />
+<script src="~/Scripts/jsmind/jsmind.js" type="text/javascript"></script>
+
+<div class="row">
+    <div class="nav navbar-nav navbar-left">
+        <ol class="breadcrumb">
+            <li><a href="#">Debug Tree</a></li>
+            <li class="active"><a href="#">@ViewBag.OriginalCode</a></li>
+        </ol>
+    </div>
+</div>
+<input type="hidden" id="original_code" name="original_code" value="@ViewBag.OriginalCode" />
+<div class="jsmind_container" id="jsmind_container"></div>
+
+<script type="text/javascript">
+    $(function () {
+        var _jm = null;
+        var options = {
+            container: 'jsmind_container',
+            theme: 'greensea',
+            editable: true,
+            mode: 'side',
+            view: {
+                hmargin: 10,
+                vmargin: 10,
+                line_width: 2,
+                line_color: '#555'
+            },
+            layout: {
+                hspace: 20,
+                vspace: 10,
+                pspace: 0
+            }
+        }
+        var original_code = $('#original_code').val();
+        $.post('/Project/ProjectErrorData',
+        {
+            OriginalCode: original_code
+        }, function (output) {
+            if (output.success) {
+                var mind = {
+                    "format": "node_array",
+                    "data": output.jm_data
+                };
+                _jm = jsMind.show(options, mind);
+            }
+        });
+
+    })
+
+</script>
+

@@ -7510,6 +7510,32 @@ namespace Prometheus.Controllers
             }
         }
 
+        public ActionResult ProjectErrorMind(string OrignalCode)
+        {
+            //var data = ProjectErrorViewModels.GetProjectErrorByOrignalCode(OrignalCode, this);
+
+            //ViewBag.jm_data = data;
+            ViewBag.OriginalCode = OrignalCode;
+
+            return View();
+        }
+
+        [HttpPost]
+        public JsonResult ProjectErrorData()
+        {
+            var OriginalCode = Request.Form["OriginalCode"];
+            var data = ProjectErrorViewModels.GetProjectErrorByOrignalCode(OriginalCode, this);
+
+            var res = new JsonResult();
+            res.Data = new
+            {
+                success = true,
+                jm_data = data
+            };
+
+            return res;
+
+        }
     }
 
 }

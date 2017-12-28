@@ -69,6 +69,7 @@
                 <th>Solved</th>
                 <th>Attachement</th>
                 <th>FA</th>
+                <th><span class="glyphicon glyphicon-globe"></span></th>
             </tr>
         </thead>
         <tbody>
@@ -90,6 +91,11 @@
                         <td>&nbsp;</td>
                     }
                     <td><a href="/Project/ProjectErrAbbr?ProjectKey=@item.ProjectKey&ErrAbbr=@item.OrignalCode"><span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span></a></td>
+                    <td>
+                        <a href="/Project/ProjectErrorMind?OrignalCode=@item.OrignalCode">
+                            <span class="glyphicon glyphicon-globe"></span>
+                        </a>
+                    </td>
                 </tr>
             }
         </tbody>

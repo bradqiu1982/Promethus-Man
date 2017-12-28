@@ -752,9 +752,9 @@ namespace Prometheus.Models
         public static List<JsMindVM> GetProjectErrorByOrignalCode(string original_code, Controller ctrl)
         {
             var sql = @"select pe.ProjectKey, ec.ErrorKey, ec.Comment, ec.Reporter, 
-                ec.CommentDate, ec.CommentType, ec.APVal2 from ErrorComments as ec 
+                ec.CommentDate, ec.CommentType, ec.APVal2, ec.AnalyzeID from ErrorComments as ec 
                 inner join ProjectError as pe on ec.ErrorKey = pe.ErrorKey 
-                where pe.OrignalCode = @OrignalCode;";
+                where pe.OrignalCode = @OrignalCode and ec.APVal1 <> 'delete';";
             var param = new Dictionary<string, string>();
             param.Add("@OrignalCode", original_code);
 
@@ -776,7 +776,8 @@ namespace Prometheus.Models
                 var tmpcom = RepairBase64Image4IE(tmpCommentList, ctrl);
 
                 var projectkey = Convert.ToString(r[0]);
-                var analysiskey = DateTime.Parse(Convert.ToString(r[4])).ToString("yyyyMMddHHmmss") ;
+                var analysisid = Convert.ToString(r[7]);
+                var analysiskey = string.IsNullOrEmpty(analysisid) ? DateTime.Parse(Convert.ToString(r[4])).ToString("yyyyMMddHHmmss") : analysisid;
                 if (proErrList.ContainsKey(projectkey))
                 {
                     if (proErrList[projectkey].ContainsKey(analysiskey))

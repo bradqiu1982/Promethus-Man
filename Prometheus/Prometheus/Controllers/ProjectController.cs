@@ -6574,7 +6574,27 @@ namespace Prometheus.Controllers
         public ActionResult LoadProjects()
         {
             var ckdict = CookieUtility.UnpackCookie(this);
+            if (!ckdict.ContainsKey("logonuser"))
+            {
+                return RedirectToAction("LoginUser", "User");
+            }
+
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            UserAuth(updater);
+
+            if (!ViewBag.IsSuper && !ViewBag.IsManage){
+                ViewBag.NoAuthrization = true;
+            }
+            else {
+                ViewBag.NoAuthrization = false;
+            }
+
+            var userpjdict = UserViewModels.RetrieveUserProjectKeyDict(updater);
+            if (userpjdict.Count == 0)
+            {
+                ViewBag.NoAuthrization = false;
+            }
+
             var allprojlist = ProjectViewModels.RetrieveAllProject();
 
             ViewBag.pjtpdict = new Dictionary<string, bool>();

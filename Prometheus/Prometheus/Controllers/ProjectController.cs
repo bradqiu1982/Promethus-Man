@@ -5047,11 +5047,13 @@ namespace Prometheus.Controllers
                 }
             }
 
+            var aid = IssueViewModels.GetUniqKey();
+
             if (!string.IsNullOrEmpty(Request.Form["analysetitle"]))
             {
                 var com = new ErrorComments();
                 com.Comment = Request.Form["analysetitle"];
-                ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.AnalyzeTitle, vm.Reporter, currenttime);
+                ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.AnalyzeTitle, vm.Reporter, currenttime,aid);
             }
 
             bool analyseinputed = false;
@@ -5066,7 +5068,7 @@ namespace Prometheus.Controllers
                 failurestr = com.Comment;
                 if (!string.IsNullOrEmpty(com.Comment))
                 {
-                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.FailureDetail, vm.Reporter, currenttime);
+                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.FailureDetail, vm.Reporter, currenttime,aid);
                     analyseinputed = true;
                 }
             }
@@ -5078,7 +5080,7 @@ namespace Prometheus.Controllers
                 resulutstr = com.Comment;
                 if (!string.IsNullOrEmpty(com.Comment))
                 {
-                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.Result, vm.Reporter, currenttime);
+                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.Result, vm.Reporter, currenttime,aid);
                     analyseinputed = true;
                 }
             }
@@ -5090,7 +5092,7 @@ namespace Prometheus.Controllers
                 rootcausestr = com.Comment;
                 if (!string.IsNullOrEmpty(com.Comment))
                 {
-                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.RootCause, vm.Reporter, currenttime);
+                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.RootCause, vm.Reporter, currenttime,aid);
                     analyseinputed = true;
                 }
             }
@@ -5101,21 +5103,21 @@ namespace Prometheus.Controllers
                 {
                     var com1 = new ErrorComments();
                     com1.Comment = "<p>To Be Edit</p>";
-                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.FailureDetail, vm.Reporter, currenttime);
+                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.FailureDetail, vm.Reporter, currenttime,aid);
                 }
 
                 if (string.IsNullOrEmpty(resulutstr))
                 {
                     var com1 = new ErrorComments();
                     com1.Comment = "<p>To Be Edit</p>";
-                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.Result, vm.Reporter, currenttime);
+                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.Result, vm.Reporter, currenttime,aid);
                 }
 
                 if (string.IsNullOrEmpty(rootcausestr))
                 {
                     var com1 = new ErrorComments();
                     com1.Comment = "<p>To Be Edit</p>";
-                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.RootCause, vm.Reporter, currenttime);
+                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.RootCause, vm.Reporter, currenttime,aid);
                 }
                 else
                 {
@@ -6095,8 +6097,33 @@ namespace Prometheus.Controllers
 
         }
 
+
+        private void UpdateAnalyzeID()
+        {
+            var allpj = ProjectViewModels.RetrieveAllProjectKey();
+            allpj.Add("BURNIN");
+
+            foreach (var pj in allpj)
+            {
+                var allerrorvm = ProjectErrorViewModels.RetrieveErrorByPJKey(pj, this);
+                foreach (var errorvm in allerrorvm)
+                {
+                    foreach (var errorcommentpair in errorvm.PairComments)
+                    {
+                        var aid = IssueViewModels.GetUniqKey();
+                        foreach (var ecom in errorcommentpair)
+                        {
+                            ProjectErrorViewModels.UpdateErrorCommentAID(ecom.ErrorKey, ecom.CommentType, ecom.CommentDate.ToString("yyyy-MM-dd HH:mm:ss"), aid);
+                        }
+                    }
+                }
+            }
+        }
+
         public ActionResult HeartBeat2()
         {
+            UpdateAnalyzeID();
+
             //ExternalDataCollector.RefreshIQEData(this);
 
             //ProjectTestData.PrePareOSALatestData("25GWIRELESSTOSAG", this);
@@ -6574,7 +6601,27 @@ namespace Prometheus.Controllers
         public ActionResult LoadProjects()
         {
             var ckdict = CookieUtility.UnpackCookie(this);
+            if (!ckdict.ContainsKey("logonuser"))
+            {
+                return RedirectToAction("LoginUser", "User");
+            }
+
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            UserAuth(updater);
+
+            if (!ViewBag.IsSuper && !ViewBag.IsManage){
+                ViewBag.NoAuthrization = true;
+            }
+            else {
+                ViewBag.NoAuthrization = false;
+            }
+
+            var userpjdict = UserViewModels.RetrieveUserProjectKeyDict(updater);
+            if (userpjdict.Count == 0)
+            {
+                ViewBag.NoAuthrization = false;
+            }
+
             var allprojlist = ProjectViewModels.RetrieveAllProject();
 
             ViewBag.pjtpdict = new Dictionary<string, bool>();

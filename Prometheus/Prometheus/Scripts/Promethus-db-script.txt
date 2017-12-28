@@ -373,6 +373,10 @@ CREATE TABLE [dbo].[ErrorComments] (
     [APVal3]      DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
 );
 
+
+ALTER TABLE  [NPITrace].[dbo].[ErrorComments] Add AnalyzeID NVARCHAR (200) DEFAULT ('') NOT NULL;
+ALTER TABLE  [DebugDB].[dbo].[ErrorComments] Add AnalyzeID NVARCHAR (200) DEFAULT ('') NOT NULL;
+
 CREATE TABLE [dbo].[BookReportRecord] (
     [username]       NVARCHAR (100) NOT NULL,
     [projects]       NVARCHAR (MAX) NOT NULL,

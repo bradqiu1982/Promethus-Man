@@ -1163,7 +1163,9 @@ namespace Prometheus.Controllers
                 ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, vm.dbDescription, PJERRORCOMMENTTYPE.Description, vm.Reporter, currenttime);
             }
 
+
             var urls = ReceiveAttachFiles();
+            var aid = IssueViewModels.GetUniqKey();
 
             var detailcontenturl = string.Empty;
             var detailcontentreffile = string.Empty;
@@ -1240,7 +1242,7 @@ namespace Prometheus.Controllers
                         com.Comment = com.Comment + "<p><a href='" + detailcontenturl + "' target='_blank'>Reference File: " + detailcontentreffile + " " + "</a></p>";
                     }
 
-                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.FailureDetail, vm.Reporter, currenttime);
+                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.FailureDetail, vm.Reporter, currenttime,aid);
                     failuredetail = com.Comment;
                 }
             }
@@ -1256,7 +1258,7 @@ namespace Prometheus.Controllers
                         com.Comment = com.Comment + "<p><a href='" + resultcontenturl + "' target='_blank'>Reference File: " + resultcontentreffile + " " + "</a></p>";
                     }
 
-                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.Result, vm.Reporter, currenttime);
+                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.Result, vm.Reporter, currenttime,aid);
                     result = com.Comment;
                 }
             }
@@ -1272,7 +1274,7 @@ namespace Prometheus.Controllers
                         com.Comment = com.Comment + "<p><a href='" + rootcontenturl + "' target='_blank'>Reference File: " + rootcontentreffile + " " + "</a></p>";
                     }
 
-                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.RootCause, vm.Reporter, currenttime);
+                    ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.RootCause, vm.Reporter, currenttime,aid);
 
                     UserKPIVM.AddUserDailyRank(vm.ErrorKey, updater, UserRankType.ADDITIONAL
                         , "Add analyse to " + vm.ProjectKey + " " + vm.OrignalCode, "/BurnIn/UpdateBIError?ErrorKey=" + vm.ErrorKey, 6);
@@ -1285,7 +1287,7 @@ namespace Prometheus.Controllers
                         {
                             com1.Comment = com1.Comment + "<p><a href='" + detailcontenturl + "' target='_blank'>Reference File: " + detailcontentreffile + " " + "</a></p>";
                         }
-                        ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.FailureDetail, vm.Reporter, currenttime);
+                        ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.FailureDetail, vm.Reporter, currenttime,aid);
                     }
 
                     if (string.IsNullOrEmpty(result))
@@ -1296,7 +1298,7 @@ namespace Prometheus.Controllers
                         {
                             com1.Comment = com1.Comment + "<p><a href='" + resultcontenturl + "' target='_blank'>Reference File: " + resultcontentreffile + " " + "</a></p>";
                         }
-                        ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.Result, vm.Reporter, currenttime);
+                        ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, com1.dbComment, PJERRORCOMMENTTYPE.Result, vm.Reporter, currenttime,aid);
                     }
                 }
             }

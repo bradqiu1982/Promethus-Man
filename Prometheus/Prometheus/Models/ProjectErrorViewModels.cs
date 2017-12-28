@@ -400,11 +400,11 @@ namespace Prometheus.Models
         //    }
         //}
 
-        public static void StoreErrorComment(string ErrorKey, string dbComment,string CommentType, string Reporter, string CommentDate)
+        public static void StoreErrorComment(string ErrorKey, string dbComment,string CommentType, string Reporter, string CommentDate,string aid = "")
         {
-            var sql = "insert into ErrorComments(ErrorKey,Comment,Reporter,CommentDate,CommentType,databackuptm) values('<ErrorKey>','<Comment>','<Reporter>','<CommentDate>','<CommentType>','<databackuptm>')";
+            var sql = "insert into ErrorComments(ErrorKey,Comment,Reporter,CommentDate,CommentType,databackuptm,AnalyzeID) values('<ErrorKey>','<Comment>','<Reporter>','<CommentDate>','<CommentType>','<databackuptm>','<AnalyzeID>')";
             sql = sql.Replace("<ErrorKey>", ErrorKey).Replace("<Comment>", dbComment)
-                .Replace("<Reporter>", Reporter).Replace("<CommentDate>", CommentDate).Replace("<CommentType>", CommentType).Replace("<databackuptm>", DateTime.Now.ToString());
+                .Replace("<Reporter>", Reporter).Replace("<CommentDate>", CommentDate).Replace("<CommentType>", CommentType).Replace("<databackuptm>", DateTime.Now.ToString()).Replace("<AnalyzeID>", aid);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
@@ -641,6 +641,13 @@ namespace Prometheus.Models
         {
             var csql = "update ErrorComments set Comment = '<Comment>'  where ErrorKey='<ErrorKey>' and CommentType='<CommentType>' and CommentDate='<CommentDate>'";
             csql = csql.Replace("<ErrorKey>", ErrorKey).Replace("<CommentType>", CommentType).Replace("<CommentDate>", Date).Replace("<Comment>", dbcomment);
+            DBUtility.ExeLocalSqlNoRes(csql);
+        }
+
+        public static void UpdateErrorCommentAID(string ErrorKey, string CommentType, string Date, string aid)
+        {
+            var csql = "update ErrorComments set AnalyzeID = '<AnalyzeID>'  where ErrorKey='<ErrorKey>' and CommentType='<CommentType>' and CommentDate='<CommentDate>'";
+            csql = csql.Replace("<ErrorKey>", ErrorKey).Replace("<CommentType>", CommentType).Replace("<CommentDate>", Date).Replace("<AnalyzeID>", aid);
             DBUtility.ExeLocalSqlNoRes(csql);
         }
 

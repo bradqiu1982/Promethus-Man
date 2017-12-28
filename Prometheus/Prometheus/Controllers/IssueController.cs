@@ -1659,12 +1659,13 @@ namespace Prometheus.Controllers
                             if (perrlist.Count > 0)
                             {
                                 var linktime = DateTime.Now.ToString();
+                                var aid = IssueViewModels.GetUniqKey();
 
                                 if (!string.IsNullOrEmpty(Request.Form["analysetitle"]))
                                 {
                                     var com = new ErrorComments();
                                     com.Comment = Request.Form["analysetitle"];
-                                    ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.AnalyzeTitle, updater, linktime);
+                                    ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.AnalyzeTitle, updater, linktime,aid);
                                 }
 
                                 foreach (var item in originaldata.FailureDetailCommentList)
@@ -1682,25 +1683,25 @@ namespace Prometheus.Controllers
                                         newcomment.Comment = item.Comment;
                                     }
 
-                                    ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, newcomment.dbComment, PJERRORCOMMENTTYPE.FailureDetail, updater, linktime);
+                                    ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, newcomment.dbComment, PJERRORCOMMENTTYPE.FailureDetail, updater, linktime,aid);
                                 }
 
                                 foreach (var item in originaldata.RootCauseCommentList)
                                 {
-                                    ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, item.dbComment, PJERRORCOMMENTTYPE.RootCause, updater, linktime);
+                                    ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, item.dbComment, PJERRORCOMMENTTYPE.RootCause, updater, linktime,aid);
                                 }
                                 if (originaldata.ResultCommentList.Count > 0)
                                 {
                                     foreach (var item in originaldata.ResultCommentList)
                                     {
-                                        ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, item.dbComment, PJERRORCOMMENTTYPE.Result, updater, linktime);
+                                        ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, item.dbComment, PJERRORCOMMENTTYPE.Result, updater, linktime,aid);
                                     }
                                 }
                                 else
                                 {
                                     var newcomment = new IssueComments();
                                     newcomment.Comment = "<p>To Be Edit</p>";
-                                    ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, newcomment.dbComment, PJERRORCOMMENTTYPE.Result, updater, linktime);
+                                    ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, newcomment.dbComment, PJERRORCOMMENTTYPE.Result, updater, linktime,aid);
                                 }
 
                                 foreach (var item in originaldata.AttachList)
@@ -1731,6 +1732,15 @@ namespace Prometheus.Controllers
                             if (perrlist.Count > 0)
                             {
                                 var linktime = DateTime.Now.ToString();
+                                var aid = IssueViewModels.GetUniqKey();
+
+                                if (!string.IsNullOrEmpty(Request.Form["analysetitle"]))
+                                {
+                                    var com = new ErrorComments();
+                                    com.Comment = Request.Form["analysetitle"];
+                                    ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, com.dbComment, PJERRORCOMMENTTYPE.AnalyzeTitle, updater, linktime,aid);
+                                }
+
                                 foreach (var item in originaldata.FailureDetailCommentList)
                                 {
                                     var newcomment = new IssueComments();
@@ -1745,26 +1755,26 @@ namespace Prometheus.Controllers
                                         newcomment.Comment = item.Comment;
                                     }
 
-                                    ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, newcomment.dbComment, PJERRORCOMMENTTYPE.FailureDetail, updater, linktime);
+                                    ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, newcomment.dbComment, PJERRORCOMMENTTYPE.FailureDetail, updater, linktime,aid);
                                 }
 
                                 foreach (var item in originaldata.RootCauseCommentList)
                                 {
-                                    ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, item.dbComment, PJERRORCOMMENTTYPE.RootCause, updater, linktime);
+                                    ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, item.dbComment, PJERRORCOMMENTTYPE.RootCause, updater, linktime,aid);
                                 }
 
                                 if (originaldata.ResultCommentList.Count > 0)
                                 {
                                     foreach (var item in originaldata.ResultCommentList)
                                     {
-                                        ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, item.dbComment, PJERRORCOMMENTTYPE.Result, updater, linktime);
+                                        ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, item.dbComment, PJERRORCOMMENTTYPE.Result, updater, linktime,aid);
                                     }
                                 }
                                 else
                                 {
                                     var newcomment = new IssueComments();
                                     newcomment.Comment = "<p>To Be Edit</p>";
-                                    ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, newcomment.dbComment, PJERRORCOMMENTTYPE.Result, updater, linktime);
+                                    ProjectErrorViewModels.StoreErrorComment(perrlist[0].ErrorKey, newcomment.dbComment, PJERRORCOMMENTTYPE.Result, updater, linktime,aid);
                                 }
 
                                 foreach (var item in originaldata.AttachList)

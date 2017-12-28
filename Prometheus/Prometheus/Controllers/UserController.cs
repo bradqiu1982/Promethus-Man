@@ -2531,6 +2531,22 @@ namespace Prometheus.Controllers
 
             //user's project list
             var projectlist = UserViewModels.RetrieveUserProjectKeyDict(username);
+
+            //task project
+            var taskprojectlist = UserViewModels.GetUserProjects(username);
+
+            if(taskprojectlist.Count > 0)
+            {
+                foreach(var pro in taskprojectlist)
+                {
+                    if (!projectlist.ContainsKey(pro.Key))
+                    {
+                        projectlist.Add(pro.Key, pro.Value);
+                    }
+                }
+            }
+
+
             var dayofweek = Convert.ToInt32(DateTime.Now.DayOfWeek);
             var sDate = DateTime.Now.AddDays((4 - dayofweek) - 7).ToString("yyyy-MM-dd 07:30:00");
             var stDate = DateTime.Now.AddDays((4 - dayofweek) - 7).AddDays(1).ToString("yyyy-MM-dd 07:30:00");

@@ -82,9 +82,8 @@ namespace Prometheus.Models
             var ret = new Dictionary<string, string>();
             var sql = "SELECT MAX(Log.Date) as UpdateTime, ut.UserName " +
                     "FROM UserTable as ut " +
-                    "Left Join Log ON ut.UserName = Log.UserName " +
+                    "Left Join Log ON (ut.UserName = Log.UserName and Log.LogType = '<LogType>') " +
                     "WHERE ut.UserName in (<UserName>) " +
-                    "and Log.LogType = '<LogType>' " +
                     "Group by ut.UserName " +
                     "ORDER BY UpdateTime DESC";
             sql = sql.Replace("<UserName>", username.ToUpper())

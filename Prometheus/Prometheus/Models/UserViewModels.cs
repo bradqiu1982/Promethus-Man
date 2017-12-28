@@ -242,6 +242,24 @@ namespace Prometheus.Models
             }
         }
 
+        public static Dictionary<string, bool> GetUserProjects(string uName)
+        {
+            var sql = "select distinct ProjectKey from issue where Assignee = @Username";
+            var param = new Dictionary<string, string>();
+            param.Add("@Username", uName);
+
+            var data = DBUtility.ExeLocalSqlWithRes(sql, null, param);
+            var res = new Dictionary<string, bool>();
+            if(data.Count > 0)
+            {
+                foreach(var item in data)
+                {
+                    res.Add(Convert.ToString(item[0]), true);
+                }
+            }
+            return res;
+        }
+
 
     }
 

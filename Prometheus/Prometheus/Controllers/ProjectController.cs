@@ -7587,20 +7587,49 @@ namespace Prometheus.Controllers
             var id = Request.Form["id"];
             var commentlist = ProjectErrorViewModels.RetrieveErrorCommentsByAnalyzeID(id, this);
             
-            var retlist = new List<object>();
+            var failuredetail = new object();
+            var rootcause = new object();
+            var result = new object();
+            var analysistitle = new object();
             foreach (var item in commentlist)
             {
-                retlist.Add(new
+                var commenttmp = new
                 {
-                    key = item.CommentType,
                     time = item.CommentDate.ToString("yyyy-MM-dd HH:mm:ss"),
                     reporter = item.Reporter.ToUpper().Replace("@FINISAR.COM", ""),
                     content = item.Comment
-                });
+                };
+                if (string.Compare(item.CommentType, PJERRORCOMMENTTYPE.AnalyzeTitle) == 0)
+                {
+                    analysistitle = commenttmp;
+                    continue;
+                }
+                if(string.Compare(item.CommentType, PJERRORCOMMENTTYPE.FailureDetail) == 0)
+                {
+                    failuredetail = commenttmp;
+                    continue;
+                }
+                if (string.Compare(item.CommentType, PJERRORCOMMENTTYPE.RootCause) == 0)
+                {
+                    rootcause = commenttmp;
+                    continue;
+                }
+                if (string.Compare(item.CommentType, PJERRORCOMMENTTYPE.Result) == 0)
+                {
+                    result = commenttmp;
+                    continue;
+                }
             }
 
             var ret = new JsonResult();
-            ret.Data = retlist;
+            ret.Data = new
+            {
+                title = analysistitle,
+                failuredetail = failuredetail,
+                rootcause = rootcause,
+                result = result
+            };
+
             return ret;
         }
 

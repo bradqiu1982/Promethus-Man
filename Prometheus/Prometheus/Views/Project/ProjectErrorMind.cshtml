@@ -32,14 +32,13 @@
                 <div class="row form-group">
                     <label class="col-xs-2">Analysis Title</label>
                     <div class="col-xs-8" id="display-title">
-                        <input type="text" class="form-control" style="width: 60%; display: inline-block;"
-                               id="span-title" name="span-title" value="Analysis Title" />
+                        <input type="text" class="form-control" style="width: 80%; display: inline-block;" id="span-title" name="span-title" readonly/>
                         <input type="button" class="btn btn-success" 
                                id="btn-edit" name="btn-edit" value="Edit" />
                     </div>
                     <div class="col-xs-8 hidden" id="edit-title">
-                        <input type="text" class="form-control" style="width: 60%; display: inline-block;"
-                               id="analysis-name" name="analysis-name" value="Analysis Title" />
+                        <input type="text" class="form-control" style="width: 80%; display: inline-block;"
+                               id="analysis-name" name="analysis-name" />
                         <input type="button" class="btn btn-success" 
                                id="btn-save" name="btn-save" value="Save" />
                     </div>
@@ -51,7 +50,7 @@
                     <div class="panel-body">
                         <div class="row" id="des-info">FailureDetail</div>
                         <div class="row">
-                            <div class="col-xs-2 col-xs-offset-6">
+                            <div class="col-xs-4 col-xs-offset-5">
                                 Reporter: <span id="des-reporter"></span>
                             </div>
                             <div class="col-xs-3">
@@ -67,7 +66,7 @@
                     <div class="panel-body">
                         <div class="row" id="rc-info">RootCause</div>
                         <div class="row">
-                            <div class="col-xs-2 col-xs-offset-6">
+                            <div class="col-xs-4 col-xs-offset-5">
                                 Reporter: <span id="rc-reporter"></span>
                             </div>
                             <div class="col-xs-3">
@@ -83,7 +82,7 @@
                     <div class="panel-body">
                         <div class="row" id="res-info">Result</div>
                         <div class="row">
-                            <div class="col-xs-2 col-xs-offset-6">
+                            <div class="col-xs-4 col-xs-offset-5">
                                 Reporter: <span id="res-reporter"></span>
                             </div>
                             <div class="col-xs-3">
@@ -135,27 +134,26 @@
 
     $('body').on('click', 'jmnode', function () {
         var analysis_id = $(this).attr('nodeid');
-        alert(analysis_id);
-        //$.post('/',
-        //{
-        //    id: analysis_id
-        //}, function (output) {
-        //    if (output.success) {
-        //        $('#analysis-id').val(output.analysisid);
-        //        $('#span-title').val(output.analysis_title);
-        //        $('#analysis_name').val(output.analysis_title);
-        //        $('#des-info').html(output.failuredetail.comment);
-        //        $('#des-reporter').html(output.failuredetail.reporter);
-        //        $('#des-datetime').html(output.failuredetail.commentdate);
-        //        $('#rc-info').html(output.rootcause.comment);
-        //        $('#rc-reporter').html(output.rootcause.reporter);
-        //        $('#rc-datetime').html(output.rootcause.commentdate);
-        //        $('#res-info').html(output.result.comment);
-        //        $('#res-reporter').html(output.result.reporter);
-        //        $('#res-datetime').html(output.result.commentdate);
-                $('#analysis-modal').modal('show');
-        //    }
-        //})
+        $('#display-title').removeClass('hidden');
+        $('#edit-title').addClass('hidden');
+        $.post('/Project/RetrieveErrorCommentsByAnalyzeID',
+        {
+            id: analysis_id
+        }, function (output) {
+            $('#analysis-id').val(analysis_id);
+            $('#span-title').val(output.title.content);
+            $('#analysis-name').val(output.title.content);
+            $('#des-info').html(output.failuredetail.content);
+            $('#des-reporter').html(output.failuredetail.reporter);
+            $('#des-datetime').html(output.failuredetail.time);
+            $('#rc-info').html(output.rootcause.content);
+            $('#rc-reporter').html(output.rootcause.reporter);
+            $('#rc-datetime').html(output.rootcause.time);
+            $('#res-info').html(output.result.content);
+            $('#res-reporter').html(output.result.reporter);
+            $('#res-datetime').html(output.result.time);
+            $('#analysis-modal').modal('show');
+        })
     })
 
     $('body').on('click', '#btn-edit', function () {
@@ -166,15 +164,17 @@
     $('body').on('click', '#btn-save', function () {
         var id = $('#analysis-id').val();
         var name = $('#analysis-name').val();
-        //$.post('/', {
-        //    id: id,
-        //    name: name
-        //}, function (output) {
-        //    if (output.success) {
+        $.post('/Project/UpdateErrorCommentTitle', {
+            id: id,
+            name: name
+        }, function (output) {
+            if (output.success) {
                 $('#span-title').val(name);
                 $('jmnode[nodeid=' + id + ']').html(name);
-        //    }
-        //})
+                $('#display-title').removeClass('hidden');
+                $('#edit-title').addClass('hidden');
+            }
+        })
     })
 </script>
 

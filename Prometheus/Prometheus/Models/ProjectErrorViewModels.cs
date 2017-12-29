@@ -807,6 +807,10 @@ namespace Prometheus.Models
                 var idx = 1;
                 foreach(var analysis in pro.Value)
                 {
+                    if (analysis.Value.Count < 3)
+                    {
+                        continue;
+                    }
                     var topic = string.Empty;
                     foreach(var item in analysis.Value)
                     {

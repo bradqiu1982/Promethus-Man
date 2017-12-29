@@ -39,7 +39,7 @@ namespace Prometheus.Models
             }
         }
 
-        public static bool SendEmail(Controller ctrl,string title, List<string> tolist, string content, bool isHtml = false,string attachpath = null)
+        public static bool SendEmail(Controller ctrl,string title, List<string> tolist, string content, bool isHtml = true,string attachpath = null)
         {
             try
             {
@@ -77,7 +77,7 @@ namespace Prometheus.Models
                 }
 
                 message.Subject = title;
-                message.Body = content;
+                message.Body = content.Replace("\r\n", "<br>").Replace("\r", "<br>");
 
                 SmtpClient client = new SmtpClient();
                 client.Host = syscfgdict["EMAILSERVER"];

@@ -7581,6 +7581,41 @@ namespace Prometheus.Controllers
             return res;
 
         }
+
+        public JsonResult RetrieveErrorCommentsByAnalyzeID()
+        {
+            var id = Request.Form["id"];
+            var commentlist = ProjectErrorViewModels.RetrieveErrorCommentsByAnalyzeID(id, this);
+            
+            var retlist = new List<object>();
+            foreach (var item in commentlist)
+            {
+                retlist.Add(new
+                {
+                    key = item.CommentType,
+                    time = item.CommentDate.ToString("yyyy-MM-dd HH:mm:ss"),
+                    reporter = item.Reporter.ToUpper().Replace("@FINISAR.COM", ""),
+                    content = item.Comment
+                });
+            }
+
+            var ret = new JsonResult();
+            ret.Data = retlist;
+            return ret;
+        }
+
+        public JsonResult UpdateErrorCommentTitle()
+        {
+            var id = Request.Form ["id"];
+            var name = Request.Form["name"];
+
+            ProjectErrorViewModels.UpdateAnalyzeTitle(id,name);
+
+            var ret = new JsonResult();
+            ret.Data = new { success = true };
+            return ret;
+        }
+
     }
 
 }

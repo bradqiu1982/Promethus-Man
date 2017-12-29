@@ -751,10 +751,11 @@ namespace Prometheus.Models
 
         public static List<JsMindVM> GetProjectErrorByOrignalCode(string original_code, Controller ctrl)
         {
+
             var sql = @"select pe.ProjectKey, ec.ErrorKey, ec.Comment, ec.Reporter, 
                 ec.CommentDate, ec.CommentType, ec.APVal2, ec.AnalyzeID from ErrorComments as ec 
                 inner join ProjectError as pe on ec.ErrorKey = pe.ErrorKey 
-                where pe.OrignalCode = @OrignalCode and ec.APVal1 <> 'delete';";
+                where pe.OrignalCode = @OrignalCode and ec.APVal1 <> 'delete' and ec.AnalyzeID <> '';";
             var param = new Dictionary<string, string>();
             param.Add("@OrignalCode", original_code);
 
@@ -776,8 +777,8 @@ namespace Prometheus.Models
                 var tmpcom = RepairBase64Image4IE(tmpCommentList, ctrl);
 
                 var projectkey = Convert.ToString(r[0]);
-                var analysisid = Convert.ToString(r[7]);
-                var analysiskey = string.IsNullOrEmpty(analysisid) ? DateTime.Parse(Convert.ToString(r[4])).ToString("yyyyMMddHHmmss") : analysisid;
+                var analysiskey = Convert.ToString(r[7]);
+
                 if (proErrList.ContainsKey(projectkey))
                 {
                     if (proErrList[projectkey].ContainsKey(analysiskey))
@@ -831,5 +832,58 @@ namespace Prometheus.Models
 
             return res;
         }
+
+        public static List<ErrorComments> RetrieveErrorCommentsByAnalyzeID(string AnalyzeID, Controller ctrl)
+        {
+            var ret = new List<ErrorComments>();
+            var sql = "select ErrorKey,Comment,Reporter,CommentDate,CommentType,APVal2 from ErrorComments where AnalyzeID = '<AnalyzeID>' and APVal1 <> 'delete' order by CommentDate ASC";
+            sql = sql.Replace("<AnalyzeID>", AnalyzeID);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+
+            foreach (var r in dbret)
+            {
+                var tempcomment = new ErrorComments();
+                tempcomment.ErrorKey = Convert.ToString(r[0]);
+                tempcomment.dbComment = Convert.ToString(r[1]);
+                tempcomment.Reporter = Convert.ToString(r[2]);
+                tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[3]));
+                tempcomment.CommentType = Convert.ToString(r[4]);
+                tempcomment.ResultClosed = Convert.ToString(r[5]);
+                ret.Add(tempcomment);
+            }
+
+            return RepairBase64Image4IE(ret, ctrl);
+        }
+
+        public static void UpdateAnalyzeTitle(string AnalyzeID, string title)
+        {
+            var errorcom = new ErrorComments();
+            errorcom.Comment = title;
+
+            var sql = "select ErrorKey,Comment,Reporter,CommentDate,CommentType,APVal2 from ErrorComments where AnalyzeID = '<AnalyzeID>' and CommentType = '<CommentType>' and APVal1 <> 'delete' order by CommentDate ASC";
+            sql = sql.Replace("<AnalyzeID>", AnalyzeID).Replace("<CommentType>",PJERRORCOMMENTTYPE.AnalyzeTitle);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
+            if (dbret.Count > 0)
+            {
+                sql = "update ErrorComments set Comment = '<Comment>' where AnalyzeID = '<AnalyzeID>' and CommentType = '<CommentType>' and APVal1 <> 'delete' ";
+                sql = sql.Replace("<AnalyzeID>", AnalyzeID).Replace("<CommentType>", PJERRORCOMMENTTYPE.AnalyzeTitle).Replace("<Comment>", errorcom.dbComment);
+                DBUtility.ExeLocalSqlNoRes(sql);
+            }
+            else
+            {
+                sql = "select ErrorKey,Reporter,CommentDate from ErrorComments where AnalyzeID = '<AnalyzeID>' and CommentType = '<CommentType>' and APVal1 <> 'delete' order by CommentDate ASC";
+                sql = sql.Replace("<AnalyzeID>", AnalyzeID).Replace("<CommentType>", PJERRORCOMMENTTYPE.RootCause);
+                dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+                if (dbret.Count > 0)
+                {
+                    var ErrorKey = Convert.ToString(dbret[0][0]);
+                    var Reporter = Convert.ToString(dbret[0][1]);
+                    var CommentDate = Convert.ToDateTime(dbret[0][2]).ToString("yyyy-MM-dd HH:mm:ss");
+                    StoreErrorComment(ErrorKey, errorcom.dbComment, PJERRORCOMMENTTYPE.AnalyzeTitle, Reporter, CommentDate, AnalyzeID);
+                }//HAS ROOTCAUSE
+            }
+        }
+
+
     }
 }

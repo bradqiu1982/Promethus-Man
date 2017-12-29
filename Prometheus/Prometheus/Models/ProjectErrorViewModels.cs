@@ -815,11 +815,11 @@ namespace Prometheus.Models
             }
 
             var res = new List<JsMindVM>();
-            var root = new JsMindVM(original_code, true, original_code, string.Empty, MINDCOLOR.RootColor);
+            var root = new JsMindVM("1", true, original_code, string.Empty, MINDCOLOR.RootColor);
             res.Add(root);
             foreach(var pro in proErrList)
             {
-                res.Add(new JsMindVM(pro.Key, false, pro.Key, original_code, MINDCOLOR.ProColor));
+                res.Add(new JsMindVM(pro.Key, false, pro.Key, "1", MINDCOLOR.ProColor));
                 var idx = 1;
                 foreach(var analysis in pro.Value)
                 {

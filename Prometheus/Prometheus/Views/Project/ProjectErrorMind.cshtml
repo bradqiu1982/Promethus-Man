@@ -31,12 +31,12 @@
                 <input type="hidden" id="analysis-id"/>
                 <div class="row form-group">
                     <label class="col-xs-2">Analysis Title</label>
-                    <div class="col-xs-8" id="display-title">
+                    <div class="col-xs-8 hidden" id="display-title">
                         <input type="text" class="form-control" style="width: 80%; display: inline-block;" id="span-title" name="span-title" readonly/>
                         <input type="button" class="btn btn-success" 
                                id="btn-edit" name="btn-edit" value="Edit" />
                     </div>
-                    <div class="col-xs-8 hidden" id="edit-title">
+                    <div class="col-xs-8" id="edit-title">
                         <input type="text" class="form-control" style="width: 80%; display: inline-block;"
                                id="analysis-name" name="analysis-name" />
                         <input type="button" class="btn btn-success" 
@@ -97,8 +97,8 @@
 </div>
 
 <script type="text/javascript">
+    var _jm = null;
     $(function () {
-        var _jm = null;
         var options = {
             container: 'jsmind_container',
             theme: 'greensea',
@@ -133,9 +133,14 @@
     })
 
     $('body').on('click', 'jmnode', function () {
-        var analysis_id = $(this).attr('nodeid');
-        $('#display-title').removeClass('hidden');
-        $('#edit-title').addClass('hidden');
+        var select_node = _jm.get_selected_node();
+        if (select_node.children.length > 0) {
+            return false;
+        }
+        var analysis_id = select_node.id;
+
+        $('#display-title').addClass('hidden');
+        $('#edit-title').removeClass('hidden');
         $.post('/Project/RetrieveErrorCommentsByAnalyzeID',
         {
             id: analysis_id

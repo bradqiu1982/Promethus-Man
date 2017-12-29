@@ -2405,7 +2405,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<IssueViewModels> Retrieve_Alert_TaskByProjectKey()
+        public static List<IssueViewModels> Retrieve_Alert_TaskByProjectKey(string tasktype)
         {
 
             var cond = "('" + Resolute.Pending + "','" + Resolute.Working + "','" + Resolute.Reopen + "')";
@@ -2416,7 +2416,7 @@ namespace Prometheus.Models
             var endtime = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd") + " 23:59:59").AddDays(2).ToString();
 
             var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples,ModuleSN,AlertEmailUpdateDate from Issue where APVal1 <> 'delete' and Resolution in <cond> and  ParentIssueKey = '' and IssueType = '<IssueType>' and DueDate >= '<stattime>' and DueDate <= '<endtime>' ";
-            sql = sql.Replace("<cond>", cond).Replace("<IssueType>", ISSUETP.Task).Replace("<stattime>", stattime).Replace("<endtime>", endtime);
+            sql = sql.Replace("<cond>", cond).Replace("<IssueType>", tasktype).Replace("<stattime>", stattime).Replace("<endtime>", endtime);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)

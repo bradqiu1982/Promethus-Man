@@ -5767,11 +5767,11 @@ namespace Prometheus.Controllers
             catch (Exception ex) { }
         }
 
-        private void SendTaskAlertEmail()
+        private void SendTaskAlertEmail(string tasktype)
         {
             try
             {
-                var faissues = IssueViewModels.Retrieve_Alert_TaskByProjectKey();
+                var faissues = IssueViewModels.Retrieve_Alert_TaskByProjectKey(tasktype);
 
                 foreach (var item in faissues)
                 { item.UpdateAlertEmailDate(); }
@@ -5787,10 +5787,10 @@ namespace Prometheus.Controllers
                     var netcomputername = EmailUtility.RetrieveCurrentMachineName();
                     validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
-                    var content = "Warning: Assigned to you task - " + item.Summary + " is close to its Due Date :\r\n " + validatestr;
+                    var content = "Warning: your task - " + item.Summary + " is close to its Due Date :\r\n " + validatestr;
 
                     var toaddrs = new List<string>();
-                    //toaddrs.Add(item.Reporter);
+                    toaddrs.Add(item.Reporter);
                     toaddrs.Add(item.Assignee);
                     EmailUtility.SendEmail(this, "WUXI Engineering System", toaddrs, content);
                     new System.Threading.ManualResetEvent(false).WaitOne(200);
@@ -5850,7 +5850,8 @@ namespace Prometheus.Controllers
 
             try
             {
-                SendTaskAlertEmail();
+                SendTaskAlertEmail(ISSUETP.Task);
+                SendTaskAlertEmail(ISSUETP.IQE);
                 SendRMAAlertEmail();
                 SendOBAAlertEmail();
             }

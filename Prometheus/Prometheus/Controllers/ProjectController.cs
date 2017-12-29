@@ -7557,11 +7557,9 @@ namespace Prometheus.Controllers
             }
         }
 
-        public ActionResult ProjectErrorMind(string OrignalCode)
+        public ActionResult ProjectErrorMind(string ProjectKey, string OrignalCode)
         {
-            //var data = ProjectErrorViewModels.GetProjectErrorByOrignalCode(OrignalCode, this);
-
-            //ViewBag.jm_data = data;
+            ViewBag.ProjectKey = ProjectKey;
             ViewBag.OriginalCode = OrignalCode;
 
             return View();

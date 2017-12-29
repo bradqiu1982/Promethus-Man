@@ -1,7 +1,7 @@
 ﻿
 @{
     ViewBag.Title = "ProjectErrorMind";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
 }
 <link href="~/Content/common.css" rel="stylesheet" type="text/css" />
 <link href="~/Content/jsmind.css" rel="stylesheet" type="text/css" />
@@ -10,13 +10,92 @@
 <div class="row">
     <div class="nav navbar-nav navbar-left">
         <ol class="breadcrumb">
-            <li><a href="#">Debug Tree</a></li>
-            <li class="active"><a href="#">@ViewBag.OriginalCode</a></li>
+            <li><a href="/Project/ProjectError?ProjectKey=@ViewBag.ProjectKey">Debug Tree</a></li>
+            <li class="active">@ViewBag.OriginalCode</li>
         </ol>
     </div>
 </div>
 <input type="hidden" id="original_code" name="original_code" value="@ViewBag.OriginalCode" />
 <div class="jsmind_container" id="jsmind_container"></div>
+
+<div class="modal fade" id="analysis-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"> 
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title" id="myLargeModalLabel">Analysis Detail</h4>
+            </div> 
+            <div class="modal-body">
+                <input type="hidden" id="analysis-id"/>
+                <div class="row form-group">
+                    <label class="col-xs-2">Analysis Title</label>
+                    <div class="col-xs-8" id="display-title">
+                        <input type="text" class="form-control" style="width: 60%; display: inline-block;"
+                               id="span-title" name="span-title" value="Analysis Title" />
+                        <input type="button" class="btn btn-success" 
+                               id="btn-edit" name="btn-edit" value="Edit" />
+                    </div>
+                    <div class="col-xs-8 hidden" id="edit-title">
+                        <input type="text" class="form-control" style="width: 60%; display: inline-block;"
+                               id="analysis-name" name="analysis-name" value="Analysis Title" />
+                        <input type="button" class="btn btn-success" 
+                               id="btn-save" name="btn-save" value="Save" />
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">FailureDetail</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row" id="des-info">FailureDetail</div>
+                        <div class="row">
+                            <div class="col-xs-2 col-xs-offset-6">
+                                Reporter: <span id="des-reporter"></span>
+                            </div>
+                            <div class="col-xs-3">
+                                <span id="des-datetime">@DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">RootCause</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row" id="rc-info">RootCause</div>
+                        <div class="row">
+                            <div class="col-xs-2 col-xs-offset-6">
+                                Reporter: <span id="rc-reporter"></span>
+                            </div>
+                            <div class="col-xs-3">
+                                <span id="rc-datetime">@DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Result</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row" id="res-info">Result</div>
+                        <div class="row">
+                            <div class="col-xs-2 col-xs-offset-6">
+                                Reporter: <span id="res-reporter"></span>
+                            </div>
+                            <div class="col-xs-3">
+                                <span id="res-datetime">@DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script type="text/javascript">
     $(function () {
@@ -54,5 +133,48 @@
 
     })
 
+    $('body').on('click', 'jmnode', function () {
+        var analysis_id = $(this).attr('nodeid');
+        alert(analysis_id);
+        //$.post('/',
+        //{
+        //    id: analysis_id
+        //}, function (output) {
+        //    if (output.success) {
+        //        $('#analysis-id').val(output.analysisid);
+        //        $('#span-title').val(output.analysis_title);
+        //        $('#analysis_name').val(output.analysis_title);
+        //        $('#des-info').html(output.failuredetail.comment);
+        //        $('#des-reporter').html(output.failuredetail.reporter);
+        //        $('#des-datetime').html(output.failuredetail.commentdate);
+        //        $('#rc-info').html(output.rootcause.comment);
+        //        $('#rc-reporter').html(output.rootcause.reporter);
+        //        $('#rc-datetime').html(output.rootcause.commentdate);
+        //        $('#res-info').html(output.result.comment);
+        //        $('#res-reporter').html(output.result.reporter);
+        //        $('#res-datetime').html(output.result.commentdate);
+                $('#analysis-modal').modal('show');
+        //    }
+        //})
+    })
+
+    $('body').on('click', '#btn-edit', function () {
+        $('#display-title').addClass('hidden');
+        $('#edit-title').removeClass('hidden');
+    })
+
+    $('body').on('click', '#btn-save', function () {
+        var id = $('#analysis-id').val();
+        var name = $('#analysis-name').val();
+        //$.post('/', {
+        //    id: id,
+        //    name: name
+        //}, function (output) {
+        //    if (output.success) {
+                $('#span-title').val(name);
+                $('jmnode[nodeid=' + id + ']').html(name);
+        //    }
+        //})
+    })
 </script>
 

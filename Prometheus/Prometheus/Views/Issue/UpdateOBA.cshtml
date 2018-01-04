@@ -904,11 +904,11 @@ else
                                 </div>
                             }
                         </div>
-                        <div class="col-xs-2" data-intro = "You can push this bug to others."  data-step="@(step_idx++)">
+                        <div class="col-xs-2" data-intro = "You can push this task to others."  data-step="@(step_idx++)">
                             <button style="background-color:#00B050;color:white;" class="btn btn-default  btn-available" type="button" value="IssueKey=@(Model.IssueKey)&ToWho=" onclick="PushTask(this)">Push</button>
                             <input class="form-control text-box single-line" value="" id="pushtowho" name="pushtowho" type="hidden" />
                         </div>
-                        <div class="col-xs-2" data-intro = "If you are interest in this bug, you can click this."  data-step="@(step_idx++)">
+                        <div class="col-xs-2" data-intro = "If you are interest in this task, you can click this."  data-step="@(step_idx++)">
                             @Html.Partial("~/Views/Shared/_Icare.cshtml")
                         </div>
                         <div class="col-xs-4"></div>

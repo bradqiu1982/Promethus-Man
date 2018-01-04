@@ -3,6 +3,7 @@
 @{
     ViewBag.Title = "Update Task";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var step_idx = 1;
 }
 
 @if (ViewBag.isassignee != null && ViewBag.isassignee)
@@ -101,7 +102,7 @@ else
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-    <div class="row">
+    <div class="row" data-intro = "Edit information of your issue."  data-step="@(step_idx++)">
         <div class="col-xs-2" MYTP="orange" style="font-family:'Arial Narrow';font-size:18px"><strong>&nbsp;&nbsp;Information</strong></div>
         <div class="col-xs-10">
             <div class="form-group">
@@ -255,7 +256,7 @@ else
         <div class="col-xs-12">&nbsp;</div>
     </div>
 
-    <div class="row">
+    <div class="row" data-intro = "Edit releated people of your issue."  data-step="@(step_idx++)">
         <div class="col-xs-2" style="font-family:'Arial Narrow';font-size:18px"><strong>&nbsp;&nbsp;Related People</strong></div>
         <div class="col-xs-10">
             <div class="row">
@@ -290,14 +291,14 @@ else
 
     <hr style="border-color:#006DC0;" />
 
-        <div class="row">
+        <div class="row" data-intro = "Upload or download attachments of your issue."  data-step="@(step_idx++)">
             <div MYTP="green" class="row" style="margin-left:3px">
                 <div class="col-xs-2">
                     <a data-toggle="collapse" href="#attachwell" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
                         <font color="black"><strong>&nbsp;&nbsp;@(Model.AttachList.Count) Attachements</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
                     </a>
                 </div>
-                <div class="col-xs-10">
+                <div class="col-xs-10" data-intro = "Upload attachment of your issue."  data-step="@(step_idx++)">
                     <div class="col-xs-3">
                         <span class="btn btn-default btn-file" id="choosefile3" style="padding:0px;background-color:transparent !important;border-color:transparent !important;">
                             <img src="~/Content/images/icon/Upload.png" MYTP="HOVER" style="height:20px; width:34px"> <input type="file" name="files3" id="file3" runat="server" onchange="ShowFileNames3(this)" />
@@ -330,7 +331,7 @@ else
                 <div class="col-xs-12">&nbsp;</div>
             </div>
 
-            <div class="row" style="margin-left:10px">
+            <div class="row" style="margin-left:10px" data-intro = "View attachments of your issue."  data-step="@(step_idx++)">
                 <div class="collapse in" id="attachwell">
                     <div class="row form-group">
                         @if (Model != null && Model.AttachList.Count > 0)
@@ -397,7 +398,7 @@ else
 
     if (Model != null && Model.GeneralActions.Count > 0)
     {
-        <div class="row">
+        <div class="row" data-intro = "Sub tasks of your issue."  data-step="@(step_idx++)">
             <div  MYTP="yello"  class="row" style="margin-left:3px">
                 <div class="col-xs-12">
                     <a data-toggle="collapse" href="#subtasks" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
@@ -446,7 +447,7 @@ else
 
     if (Model != null && Model.ContainmentActions.Count > 0)
                 {
-        <div class="row">
+        <div class="row" data-intro = "Show containment actions."  data-step="@(step_idx++)>
             <div MYTP="yello" class="row" style="margin-left:3px">
                 <div class="col-xs-12">
                     <a data-toggle="collapse" href="#containmenttasks" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
@@ -495,7 +496,7 @@ else
 
     if (Model.RootCauseCommentList.Count > 0)
                 {
-        <div class="row">
+        <div class="row" data-intro = "Show root cause comments." data-step="@(step_idx++)">
             <div MYTP="blue" class="row" style="margin-left:3px">
                 <div class="col-xs-12">
                     <a data-toggle="collapse" href="#rootcausecom" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
@@ -524,11 +525,6 @@ else
                                                             <img src="~/Content/images/icon/edit2.png" MYTP="HOVER" style="height:34px; width:24px">
                                                         </a>
                                                     </div>
-                                                    <div class="col-xs-1">
-                                                        <a href="/Issue/DeleteSPIssueComment?IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
-                                                            <img src="~/Content/images/icon/delete2.png" MYTP="HOVER" style="height:34px; width:24px">
-                                                        </a>
-                                                    </div>
                                                 </div>
                                                 <div class="col-xs-6"></div>
                                             </div>
@@ -554,7 +550,7 @@ else
 
     if (Model != null && Model.CorrectiveActions.Count > 0)
                 {
-        <div class="row">
+        <div class="row" data-intro = "Show corrective actions."  data-step="@(step_idx++)">
             <div MYTP="yello" class="row" style="margin-left:3px">
                 <div class="col-xs-12">
                     <a data-toggle="collapse" href="#correctivetasks" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
@@ -604,7 +600,7 @@ else
 
     if (Model.GeneralCommentList.Count > 0)
     {
-        <div class="row">
+        <div class="row" data-intro = "Show general comments." data-step="@(step_idx++)">
             <div MYTP="blue" class="row" style="margin-left:3px">
                 <div class="col-xs-12">
                     <a data-toggle="collapse" href="#generalcomment" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
@@ -660,7 +656,7 @@ else
         <hr style="border-color:#006DC0;" />
     }
 
-    <div class="row">
+    <div class="row" data-intro = "Please input comment." data-step="@(step_idx++)">
         <div  MYTP="red"  class="row" style="margin-left:3px">
             <div class="col-xs-12">
                 <a data-toggle="collapse" href="#commentinput" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
@@ -742,20 +738,22 @@ else
         <div class="row">
             <div class="form-group">
                 <div class="row col-xs-12">
-                    <div class="col-xs-2">
+                    <div class="col-xs-2" data-intro = "Submit your changes."  data-step="@(step_idx++)">
                         <input style="background-color: #006DC0;color:white;"  type="submit" value="Submit" id="updateisu" name="updateisu" class="btn btn-default btn-available" />
                     </div>
                     <div class="col-xs-2">
                         @if (ViewBag.isassignee != null && ViewBag.isassignee)
                         {
+                            <div data-intro = "Delete your issue."  data-step="@(step_idx++)">
                             @*<input style="background-color:#CC0000;color:white;" type="submit" value="Delete" id="deleteisu" name="deleteisu" class="btn btn-default" />*@
+                            </div>
                         }
                     </div>
-                    <div class="col-xs-2">
+                    <div class="col-xs-2" data-intro = "You can push this issue to others."  data-step="@(step_idx++)">
                         <button style="background-color:#00B050;color:white;" class="btn btn-default btn-available" type="button" value="IssueKey=@(Model.IssueKey)&ToWho=" onclick="PushTask(this)">Push</button>
                         <input class="form-control text-box single-line" value="" id="pushtowho" name="pushtowho" type="hidden" />
                     </div>
-                    <div class="col-xs-2">
+                    <div class="col-xs-2" data-intro = "If you are interest in this issue, you can click this."  data-step="@(step_idx++)">
                         @Html.Partial("~/Views/Shared/_Icare.cshtml")
                     </div>
                     <div class="col-xs-4"></div>

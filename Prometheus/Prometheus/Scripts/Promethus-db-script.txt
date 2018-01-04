@@ -751,6 +751,8 @@ CREATE TABLE [dbo].[ProjectCriticalError] (
 ALTER TABLE  [DebugDB].[dbo].[ProjectCriticalError] Add RuleID NVARCHAR (200) DEFAULT ('') NOT NULL;
 ALTER TABLE  [NPITrace].[dbo].[ProjectCriticalError] Add RuleID NVARCHAR (200) DEFAULT ('') NOT NULL;
 
+ALTER TABLE  [NPITrace].[dbo].[ProjectCriticalError] Add WithWildMatch INT DEFAULT (0) NOT NULL;
+ALTER TABLE  [NPITrace].[dbo].[ProjectCriticalError] Add WildMatchParam  NVARCHAR (MAX) DEFAULT ('') NOT NULL;
 
 CREATE TABLE [dbo].[WaferRecord] (
 	[Wafer]   NVARCHAR (100) DEFAULT ('') NOT NULL,

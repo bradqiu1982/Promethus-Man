@@ -192,7 +192,7 @@ namespace Prometheus.Models
             traceviewfilelist.AddRange(traceviewlist);
             foreach (var filename in traceviewlist)
             {
-                var tempret = ExternalDataCollector.RetrieveTestDataFromTraceView(filename, pjerror.TestCaseName.Trim(), pjerror.MatchCond.Trim());
+                var tempret = ExternalDataCollector.RetrieveTestDataFromTraceView( pjerror, filename, pjerror.TestCaseName.Trim(), pjerror.MatchCond.Trim());
                 if (tempret.Count > 0)
                 {
                     ret.AddRange(tempret);
@@ -236,15 +236,15 @@ namespace Prometheus.Models
             {
                 if (item.Temp > 45)
                 {
-                    hightemplist.Add(item.Value);
+                    hightemplist.Add(item.dValue);
                 }
                 else if (item.Temp < 15)
                 {
-                    lowtemplist.Add(item.Value);
+                    lowtemplist.Add(item.dValue);
                 }
                 else
                 {
-                    normaltemplist.Add(item.Value);
+                    normaltemplist.Add(item.dValue);
                 }
             }
 
@@ -284,15 +284,15 @@ namespace Prometheus.Models
             {
                 if (item.Temp > 45)
                 {
-                    hightemplist.Add(item.Value);
+                    hightemplist.Add(item.dValue);
                 }
                 else if (item.Temp < 15)
                 {
-                    lowtemplist.Add(item.Value);
+                    lowtemplist.Add(item.dValue);
                 }
                 else
                 {
-                    normaltemplist.Add(item.Value);
+                    normaltemplist.Add(item.dValue);
                 }
             }
 
@@ -331,15 +331,15 @@ namespace Prometheus.Models
             {
                 if (item.Temp > 45)
                 {
-                    hightemplist.Add(item.Value);
+                    hightemplist.Add(item.dValue);
                 }
                 else if (item.Temp < 15)
                 {
-                    lowtemplist.Add(item.Value);
+                    lowtemplist.Add(item.dValue);
                 }
                 else
                 {
-                    normaltemplist.Add(item.Value);
+                    normaltemplist.Add(item.dValue);
                 }
             }
 
@@ -442,9 +442,37 @@ namespace Prometheus.Models
             {
                 foreach (var item in tempfiltereddata)
                 {
-                    if (item.Value > pjerror.LowLimit && item.Value < pjerror.HighLimit)
+                    if (item.dValue > pjerror.LowLimit && item.dValue < pjerror.HighLimit)
                     {
                         return true;
+                    }
+                }
+            }
+
+            if (pjerror.WithWildMatch == 1)
+            {
+                foreach (var item in tempfiltereddata)
+                {
+                    if (pjerror.WildMatchParam.Contains("##"))
+                    {
+                        try
+                        {
+                            var lowhigh = pjerror.WildMatchParam.Split(new string[] { "##" }, StringSplitOptions.RemoveEmptyEntries);
+                            var low = Convert.ToDouble(lowhigh[0]);
+                            var high = Convert.ToDouble(lowhigh[1]);
+                            if (item.dValue > low && item.dValue < high)
+                            {
+                                return true;
+                            }
+                        }
+                        catch(Exception E) { }
+                    }
+                    else
+                    {
+                        if (string.Compare(item.Value.ToUpper().Trim(),pjerror.WildMatchParam.ToUpper().Trim()) != 0)
+                        {
+                            return true;
+                        }
                     }
                 }
             }
@@ -490,6 +518,7 @@ namespace Prometheus.Models
                     catch (Exception ex) { }
                 }
             }
+
 
             return false;
         }
@@ -554,10 +583,17 @@ namespace Prometheus.Models
                 {
                     comment1.Comment = comment1.Comment + "<p> with limit: low limit -- " + item.LowLimit.ToString() + " high limit -- " + item.HighLimit.ToString() + "</p>";
                 }
+
                 if (item.WithAlgorithm == 1)
                 {
                     comment1.Comment = comment1.Comment + "<p> with algorithm: argorithm -- " + item.Algorithm + " param -- " + item.AlgorithmParam + "</p>";
                 }
+
+                if (item.WithWildMatch == 1)
+                {
+                    comment1.Comment = comment1.Comment + "<p> with wild match, param -- " + item.WildMatchParam + "</p>";
+                }
+
                 IssueViewModels.StoreIssueComment(vm.IssueKey, comment1.dbComment, vm.Assignee, COMMENTTYPE.Description);
 
                 foreach (var trace in traceviewfilelist)

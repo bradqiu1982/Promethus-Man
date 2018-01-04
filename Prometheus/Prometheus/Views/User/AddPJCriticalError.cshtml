@@ -121,6 +121,30 @@
 
         <div class="form-group">
             <div class="row">
+                <div class="col-xs-12">
+                    <div class="col-xs-1">
+                        <div class="col-xs-6">
+                        </div>
+                        <div class="col-xs-6">
+                            <input type="checkbox" id="withwildmatch" name="withwildmatch" value="withwildmatch" />
+                        </div>
+                    </div>
+                    <div class="col-xs-2">
+                        <label class="control-label" style="font-family:'Arial Narrow'">Wild Match</label>
+                    </div>
+                    <div class="col-xs-3">
+                        <input id="wildmatchparam" name="wildmatchparam" data-toggle="tooltip" title="match parameter can be a string or lowlimit##highlimit" placeholder="wild match params" class="form-control text-box single-line" type="text" />
+                    </div>
+                    <div class="col-xs-3">
+                    </div>
+                    <div class="col-xs-3">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
                 <div class="col-xs-2" style="font-family:'Arial Narrow';font-size:18px"><strong>&nbsp;&nbsp;Related People</strong></div>
                 <div class="col-xs-10">
                     <div class="row">
@@ -238,8 +262,11 @@
                             && document.getElementById("highlimit").value.indexOf("limit") == -1)
                             || (document.getElementById("withalgorithm").checked
                             && document.getElementById("algorithmlist").value.indexOf("Please") == -1
-                            && document.getElementById("algorithmlist").value.indexOf("algorithm") == -1))) {
-                            $('#igroupform').submit();
+                            && document.getElementById("algorithmlist").value.indexOf("algorithm") == -1)
+                            || (document.getElementById("withwildmatch").checked
+                            && document.getElementById("wildmatchparam").value
+                            && document.getElementById("wildmatchparam").value.indexOf("wild match") == -1))) {
+                              $('#igroupform').submit();
                             return false;
                         }
                     }
@@ -265,6 +292,7 @@
                                 <th>High Limit</th>
                                 <th>Algorithm</th>
                                 <th>Algorithm Param</th>
+                                <th>Wild Match Param</th>
                                 <th>FA Switch</th>
                                 
                                 <th>Related People</th>
@@ -301,6 +329,14 @@
                                     else
                                     {
                                         <td>&nbsp;</td>
+                                        <td>&nbsp;</td>
+                                    }
+                                    @if (item.WithWildMatch == 1)
+                                    {
+                                        <td>@item.WildMatchParam</td>
+                                    }
+                                    else
+                                    {
                                         <td>&nbsp;</td>
                                     }
                                     <td>
@@ -370,6 +406,12 @@
                                         $('#withalgorithm').prop("checked", true);
                                         $('#algorithmlist').val(output.Algorithm);
                                         $('#algorithmparam').val(output.AlgorithmParam);
+                                    }
+
+                                    if (output.WithWildMatch && output.WithWildMatch == 1)
+                                    {
+                                        $('#withwildmatch').prop("checked", true);
+                                        $('#wildmatchparam').val(output.WildMatchParam);
                                     }
 
                                     $('#RPeopleAddr').val(output.Appv_4);

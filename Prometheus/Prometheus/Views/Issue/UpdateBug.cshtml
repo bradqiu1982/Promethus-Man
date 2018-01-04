@@ -1132,11 +1132,23 @@ else
                 <div class="col-xs-2" data-intro = "If you are interest in this bug, you can click this."  data-step="@(step_idx++)">
                     @Html.Partial("~/Views/Shared/_Icare.cshtml")
                 </div>
-                <div class="col-xs-4"></div>
+                @if (ViewBag.isassignee != null && ViewBag.isassignee)
+                {
+                    <div class="col-xs-2" data-intro="You can set critical error alarm." data-step="@(step_idx++)">
+                        <input type="button" class="btn btn-danger" value="Critical Error Alarm" onclick="LowYieldWarning('@Model.IssueKey')" />
+                    </div>
+                }
             </div>
         </div>
     </div>
-
+    <script type="text/javascript">
+        function LowYieldWarning(oBT) {
+            if (confirm("Warning: only FA assignee can trigger Critical Error Alarm.")) {
+                var myurl = "/Project/LowYieldWarn?IssueKey=" + oBT;
+                window.open(myurl, '_blank');
+            }
+        }
+    </script>
     if (ViewBag.isassignee != null
         && ViewBag.isassignee
         && Model.FailureDetailCommentList.Count > 0

@@ -231,6 +231,8 @@ namespace Prometheus.Models
             return ret;
         }
 
+
+
         public static List<ProjectTestData> RetrieveProjectTestDataByDataID(string DataID)
         {
 
@@ -293,6 +295,19 @@ namespace Prometheus.Models
             sql = sql.Replace("<ProjectKey>", projectkey);
 
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
+            foreach (var item in dbret)
+            {
+                ret.Add(Convert.ToString(item[0]));
+            }
+            return ret;
+        }
+
+        public static List<string> RetrieveAllWaferNoPJ()
+        {
+            var ret = new List<string>();
+            var sql = "select DISTINCT Wafer from BITestData order by Wafer";
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var item in dbret)
             {
                 ret.Add(Convert.ToString(item[0]));

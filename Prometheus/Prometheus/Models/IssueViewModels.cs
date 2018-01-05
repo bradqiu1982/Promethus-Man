@@ -2797,8 +2797,17 @@ namespace Prometheus.Models
         public static Dictionary<string,string> RetrieveAllBIRootCause(string pjkey)
         {
             var ret =  new Dictionary<string, string>();
-            var csql = "select ModuleSN,RootCause from BIROOTCAUSE where ProjectKey = '<ProjectKey>'";
-            csql = csql.Replace("<ProjectKey>", pjkey);
+            var csql = "";
+            if (!string.IsNullOrEmpty(pjkey))
+            {
+                csql = "select ModuleSN,RootCause from BIROOTCAUSE where ProjectKey = '<ProjectKey>'";
+                csql = csql.Replace("<ProjectKey>", pjkey);
+            }
+            else
+            {
+                csql = "select ModuleSN,RootCause from BIROOTCAUSE";
+            }
+
             var dbret = DBUtility.ExeLocalSqlWithRes(csql,null);
             foreach (var line in dbret)
             {

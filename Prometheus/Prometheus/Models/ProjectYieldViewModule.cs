@@ -65,7 +65,7 @@ namespace Prometheus.Models
         public Dictionary<string, bool> ErrSNDict { get { return errsndict; } }
 
         private Dictionary<string, bool> corsndict = new Dictionary<string, bool>();
-        public Dictionary<string, bool> CorSNDict { get { return errsndict; } }
+        public Dictionary<string, bool> CorSNDict { get { return corsndict; } }
     }
 
     public class ProjectYieldViewModule

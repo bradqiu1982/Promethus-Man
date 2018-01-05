@@ -5188,7 +5188,10 @@ namespace Prometheus.Controllers
                         foreach (var item in lines)
                         {
                             var keyvalue = item.Split(new string[] { "<>" }, StringSplitOptions.RemoveEmptyEntries);
-                            ret.Add(keyvalue[0].Trim(), Convert.ToDouble(keyvalue[1].Trim()));
+                            if (!ret.ContainsKey(keyvalue[0].Trim()))
+                            {
+                                ret.Add(keyvalue[0].Trim(), Convert.ToDouble(keyvalue[1].Trim()));
+                            }
                         }
                     }
                     return ret;
@@ -5246,16 +5249,18 @@ namespace Prometheus.Controllers
                 }
             }
 
-            foreach (var item in pjkeylist)
+            //foreach (var item in pjkeylist)
             {
-                var pjval = ProjectViewModels.RetrieveOneProject(item);
-                if (string.Compare(pjval.MonitorVcsel, "False", true) == 0)
-                {
-                    continue;
-                }
-                var warningyield = Convert.ToDouble(pjval.VcselWarningYield) * 0.01;
+                //var pjval = ProjectViewModels.RetrieveOneProject(item);
+                //if (string.Compare(pjval.MonitorVcsel, "False", true) == 0)
+                //{
+                //    continue;
+                //}
+                //var warningyield = Convert.ToDouble(pjval.VcselWarningYield) * 0.01;
 
-                var waferlist = BITestData.RetrieveAllWafer(item);
+                //var waferlist = BITestData.RetrieveAllWafer(item);
+
+                var waferlist = BITestData.RetrieveAllWaferNoPJ();
 
                 foreach (var w in waferlist)
                 {
@@ -5264,11 +5269,14 @@ namespace Prometheus.Controllers
                         continue;
                     }
 
-
-                    var yield = ProjectBIYieldViewModule.GetYieldByWafer(item, w);
-                    if (yield.CorrectLastYield > 0.1 && yield.CorrectLastYield < warningyield)
+                    if (string.IsNullOrEmpty(w))
                     {
+                        continue;
+                    }
 
+                    var yield = ProjectBIYieldViewModule.GetYieldByWaferNoPJ(w);
+                    if (yield.CorrectLastYield > 0.1 && yield.CorrectLastYield < 0.96)
+                    {
                         var alldict = new Dictionary<string, bool>();
                         var errdict = new Dictionary<string, bool>();
                         var cordict = new Dictionary<string, bool>();
@@ -5306,7 +5314,7 @@ namespace Prometheus.Controllers
                         }
 
                         hascontent = true;
-                        var tempcontent1 = "Warning: the corrective yield of " + item + " wafer " + w + " is " + (yield.CorrectLastYield * 100.0).ToString("0.00") + "% \r\n\r\n"
+                        var tempcontent1 = "Warning: the corrective yield of  wafer " + w + " is " + (yield.CorrectLastYield * 100.0).ToString("0.00") + "% \r\n\r\n"
                             + " Total Input: " + alldict.Count.ToString() + " ,Failed Modules: " + errdict.Count.ToString() + " ,Reviewed Modules: " + cordict.Count.ToString() + " \r\n\r\n";
 
                         if (errdict.Count == cordict.Count)
@@ -5314,14 +5322,14 @@ namespace Prometheus.Controllers
                             tempcontent1 = "[Reviewed ] " + tempcontent1;
                         }
 
-                        if (!emailed.ContainsKey(item + "-" + w))
+                        if (!emailed.ContainsKey(w))
                         {
                             tempcontent1 = "[new ] " + tempcontent1;
-                            emailed.Add(item + "-" + w, yield.CorrectLastYield);
+                            emailed.Add(w, yield.CorrectLastYield);
                         }
                         else
                         {
-                            var lasttimeyield = Convert.ToDouble(emailed[item + "-" + w].ToString("0.0"));
+                            var lasttimeyield = Convert.ToDouble(emailed[w].ToString("0.0"));
                             var currentyield = Convert.ToDouble(yield.CorrectLastYield.ToString("0.0"));
                             if (currentyield > lasttimeyield)
                             {
@@ -5331,10 +5339,8 @@ namespace Prometheus.Controllers
                             {
                                 tempcontent1 = "[v] " + tempcontent1;
                             }
-                            emailed[item + "-" + w] = yield.CorrectLastYield;
+                            emailed[w] = yield.CorrectLastYield;
                         }
-                        //tempcontent2 = "<tr>"+ "<td>"+item+"</td>" + "<td>"+w+"</td>" + "<td>"+ (yield.CorrectLastYield * 100.0).ToString("0.00") + "%</td>" + "<td>"+ alldict.Count.ToString() + "</td>" + "<td>"+ ((int)(alldict.Count* yield.CorrectLastYield)).ToString() + "</td>" + "</tr>";
-                        //content = content + tempcontent2;
 
                         content1 = content1 + tempcontent1;
 
@@ -6285,7 +6291,7 @@ namespace Prometheus.Controllers
             {
                 try
                 {
-                    BITestData.RetrieveWaferDataFromMes(this, pjkey);
+                    //BITestData.RetrieveWaferDataFromMes(this, pjkey);
                     var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
                     RealCheckVcselYieldByWafer(pjkeylist);
                 }

@@ -71,42 +71,47 @@ namespace Prometheus.Models
             }
         }
 
-        private static void RetrieveCummYield(ProjectBIYieldViewModule pyvm, List<BITestData> plist)
+        private static void RetrieveCummYield(ProjectBIYieldViewModule pyvm, List<BITestData> plist,bool nopj = false)
         {
             var yielddict = new Dictionary<string, TestYield>();
             var sndict = new Dictionary<string, bool>();
 
             var correctbidict = new Dictionary<string, string>();
-            if (!string.IsNullOrEmpty(pyvm.ProjectKey))
+            if (!nopj)
             {
-                correctbidict = IssueViewModels.RetrieveAllBIRootCause(pyvm.ProjectKey);
+                if (!string.IsNullOrEmpty(pyvm.ProjectKey))
+                {
+                    correctbidict = IssueViewModels.RetrieveAllBIRootCause(pyvm.ProjectKey);
+                }
+                else
+                {
+                    var pjkeydict = new Dictionary<string, bool>();
+                    foreach (var item in plist)
+                    {
+                        if (!pjkeydict.ContainsKey(item.ProjectKey))
+                        {
+                            pjkeydict.Add(item.ProjectKey, true);
+                        }
+                    }
+
+                    var pjkeylist = pjkeydict.Keys;
+                    foreach (var pjkey in pjkeylist)
+                    {
+                        var tempcorrectdict = IssueViewModels.RetrieveAllBIRootCause(pjkey);
+                        foreach (var kvpair in tempcorrectdict)
+                        {
+                            if (!correctbidict.ContainsKey(kvpair.Key))
+                            {
+                                correctbidict.Add(kvpair.Key, kvpair.Value);
+                            }
+                        }
+                    }
+                }//end else
             }
             else
             {
-                var pjkeydict = new Dictionary<string, bool>();
-                foreach (var item in plist)
-                {
-                    if (!pjkeydict.ContainsKey(item.ProjectKey))
-                    {
-                        pjkeydict.Add(item.ProjectKey, true);
-                    }
-                }
-
-                var pjkeylist = pjkeydict.Keys;
-                foreach (var pjkey in pjkeylist)
-                {
-                    var tempcorrectdict = IssueViewModels.RetrieveAllBIRootCause(pjkey);
-                    foreach (var kvpair in tempcorrectdict)
-                    {
-                        if (!correctbidict.ContainsKey(kvpair.Key))
-                        {
-                            correctbidict.Add(kvpair.Key, kvpair.Value);
-                        }
-                    }
-                }
-            }//end else
-
-
+                correctbidict = IssueViewModels.RetrieveAllBIRootCause("");
+            }
 
             foreach (var p in plist)
             {
@@ -344,6 +349,19 @@ namespace Prometheus.Models
 
             return ret;
         }
+
+        public static ProjectBIYieldViewModule GetYieldByWaferNoPJ(string wafer)
+        {
+            var ret = new ProjectBIYieldViewModule();
+            ret.ProjectKey = "";
+            ret.StartDate = DateTime.Now;
+            ret.EndDate = DateTime.Now;
+
+            var plist = BITestData.RetrieveProjectTestDataByWafer("",wafer);
+            RetrieveCummYield(ret, plist,true);
+            return ret;
+        }
+
 
         public static List<ProjectBIYieldViewModule> GetYieldByDay(string pjkey, string starttime, string endtime)
         {

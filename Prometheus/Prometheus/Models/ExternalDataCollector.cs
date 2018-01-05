@@ -468,12 +468,15 @@ namespace Prometheus.Models
         {
             Temp = 25;
             CH = 0;
-            Value = 0;
+            Value = "";
         }
 
         public double Temp { set; get; }
         public int CH { set; get; }
-        public double Value { set; get; }
+        public double dValue { get {
+                return Convert.ToDouble(Value);
+            } }
+        public string Value { set; get; }
     }
 
     public class ExternalDataCollector
@@ -2880,7 +2883,7 @@ namespace Prometheus.Models
             return null;
         }
 
-        private static List<TraceViewData> RetrieveTestDataFromTraceView_DUTORDERED(string filename, string testcase, string datafield)
+        private static List<TraceViewData> RetrieveTestDataFromTraceView_DUTORDERED(ProjectCriticalErrorVM pjerror,string filename, string testcase, string datafield)
         {
             var ret = new List<TraceViewData>();
 
@@ -2926,39 +2929,73 @@ namespace Prometheus.Models
                     entertestcase = true;
                 }
 
-                if (entertestcase && line.Contains("] --- ") && uline.Contains(" "+datafield.ToUpper()+" "))
+                if (pjerror.WithWildMatch == 1)
                 {
-                    var fields = uline.Split(new string[] { " " + datafield.ToUpper() + " " }, StringSplitOptions.RemoveEmptyEntries);
-                    if (fields.Length > 1)
+                    if (entertestcase && uline.Contains(datafield.ToUpper()))
                     {
-                        var chstr = fields[0].Replace("\t", "").Replace(" ", "").Replace("[", "").Replace("]", "").Replace("-", "");
-                        try
-                        { crtch = Convert.ToInt32(chstr); }
-                        catch (Exception ex) { }
-
-                        var tmpvaluestr = fields[1].Trim();
-                        var tmpvals = tmpvaluestr.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-                        try
+                        var fields = uline.Split(new string[] {  datafield.ToUpper() }, StringSplitOptions.RemoveEmptyEntries);
+                        if (fields.Length > 1)
                         {
-                            if (!tmpvals[0].Contains("<NM>"))
+                            var chstr = fields[0].Replace("\t", "").Replace(" ", "").Replace("[", "").Replace("]", "").Replace("-", "");
+                            try
+                            { crtch = Convert.ToInt32(chstr); }
+                            catch (Exception ex) { }
+
+                            var tmpvaluestr = fields[1].Trim();
+                            var tmpvals = tmpvaluestr.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                            try
                             {
-                                var tempval = Convert.ToDouble(tmpvals[0]);
-                                var temptraceviewdata = new TraceViewData();
-                                temptraceviewdata.Temp = crttemp;
-                                temptraceviewdata.CH = crtch;
-                                temptraceviewdata.Value = tempval;
-                                ret.Add(temptraceviewdata);
+                                if (!tmpvals[0].Contains("<NM>"))
+                                {
+                                    var temptraceviewdata = new TraceViewData();
+                                    temptraceviewdata.Temp = crttemp;
+                                    temptraceviewdata.CH = crtch;
+                                    temptraceviewdata.Value = tmpvals[0].Replace("<","").Replace(">", "");
+                                    ret.Add(temptraceviewdata);
+                                }
                             }
+                            catch (Exception ex) { }
                         }
-                        catch (Exception ex) { }
-                    }//end if
-                }//en if
+                    }
+                }
+                else
+                {
+                    if (entertestcase && line.Contains("] --- ") && uline.Contains(" "+datafield.ToUpper()+" "))
+                    {
+                        var fields = uline.Split(new string[] { " " + datafield.ToUpper() + " " }, StringSplitOptions.RemoveEmptyEntries);
+                        if (fields.Length > 1)
+                        {
+                            var chstr = fields[0].Replace("\t", "").Replace(" ", "").Replace("[", "").Replace("]", "").Replace("-", "");
+                            try
+                            { crtch = Convert.ToInt32(chstr); }
+                            catch (Exception ex) { }
+
+                            var tmpvaluestr = fields[1].Trim();
+                            var tmpvals = tmpvaluestr.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                            try
+                            {
+                                if (!tmpvals[0].Contains("<NM>"))
+                                {
+                                    var tempval = Convert.ToDouble(tmpvals[0]);
+
+                                    var temptraceviewdata = new TraceViewData();
+                                    temptraceviewdata.Temp = crttemp;
+                                    temptraceviewdata.CH = crtch;
+                                    temptraceviewdata.Value = tmpvals[0];
+                                    ret.Add(temptraceviewdata);
+                                }
+                            }
+                            catch (Exception ex) { }
+                        }//end if
+                    }//en if
+                }
+
 
             }//end foreach
             return ret;
         }
 
-        private static List<TraceViewData> RetrieveTestDataFromTraceView_DUTx(string filename, string testcase, string datafield)
+        private static List<TraceViewData> RetrieveTestDataFromTraceView_DUTx(ProjectCriticalErrorVM pjerror, string filename, string testcase, string datafield)
         {
             var ret = new List<TraceViewData>();
 
@@ -3004,48 +3041,80 @@ namespace Prometheus.Models
                     entertestcase = true;
                 }
 
-                if (entertestcase && line.Contains("--- ") && uline.Contains(" " + datafield.ToUpper() + " "))
+                if (pjerror.WithWildMatch == 1)
                 {
-                    var fields = uline.Split(new string[] { " " + datafield.ToUpper() + " " }, StringSplitOptions.RemoveEmptyEntries);
-                    if (fields.Length > 1)
+                    if (entertestcase && uline.Contains(datafield.ToUpper()))
                     {
-                        //var chstr = fields[0].Replace("\t", "").Replace(" ", "").Replace("[", "").Replace("]", "").Replace("-", "");
-                        //try
-                        //{ crtch = Convert.ToInt32(chstr); }
-                        //catch (Exception ex) { }
-
-                        var tmpvaluestr = fields[1].Trim();
-                        var tmpvals = tmpvaluestr.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-                        try
+                        var fields = uline.Split(new string[] { datafield.ToUpper() }, StringSplitOptions.RemoveEmptyEntries);
+                        if (fields.Length > 1)
                         {
-                            if (!tmpvals[0].Contains("<NM>"))
+                            var chstr = fields[0].Replace("\t", "").Replace(" ", "").Replace("[", "").Replace("]", "").Replace("-", "");
+                            try
+                            { crtch = Convert.ToInt32(chstr); }
+                            catch (Exception ex) { }
+
+                            var tmpvaluestr = fields[1].Trim();
+                            var tmpvals = tmpvaluestr.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                            try
                             {
-                                var tempval = Convert.ToDouble(tmpvals[0]);
-                                var temptraceviewdata = new TraceViewData();
-                                temptraceviewdata.Temp = crttemp;
-                                temptraceviewdata.CH = crtch;
-                                temptraceviewdata.Value = tempval;
-                                ret.Add(temptraceviewdata);
+                                if (!tmpvals[0].Contains("<NM>"))
+                                {
+                                    var temptraceviewdata = new TraceViewData();
+                                    temptraceviewdata.Temp = crttemp;
+                                    temptraceviewdata.CH = crtch;
+                                    temptraceviewdata.Value = tmpvals[0].Replace("<", "").Replace(">", "");
+                                    ret.Add(temptraceviewdata);
+                                }
                             }
+                            catch (Exception ex) { }
                         }
-                        catch (Exception ex) { }
-                    }//end if
-                }//en if
+                    }
+                }
+                else
+                {
+                    if (entertestcase && line.Contains("--- ") && uline.Contains(" " + datafield.ToUpper() + " "))
+                    {
+                        var fields = uline.Split(new string[] { " " + datafield.ToUpper() + " " }, StringSplitOptions.RemoveEmptyEntries);
+                        if (fields.Length > 1)
+                        {
+                            //var chstr = fields[0].Replace("\t", "").Replace(" ", "").Replace("[", "").Replace("]", "").Replace("-", "");
+                            //try
+                            //{ crtch = Convert.ToInt32(chstr); }
+                            //catch (Exception ex) { }
+
+                            var tmpvaluestr = fields[1].Trim();
+                            var tmpvals = tmpvaluestr.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                            try
+                            {
+                                if (!tmpvals[0].Contains("<NM>"))
+                                {
+                                    var tempval = Convert.ToDouble(tmpvals[0]);
+                                    var temptraceviewdata = new TraceViewData();
+                                    temptraceviewdata.Temp = crttemp;
+                                    temptraceviewdata.CH = crtch;
+                                    temptraceviewdata.Value = tmpvals[0];
+                                    ret.Add(temptraceviewdata);
+                                }
+                            }
+                            catch (Exception ex) { }
+                        }//end if
+                    }//en if
+                }
 
             }//end foreach
             return ret;
         }
 
 
-        public static List<TraceViewData> RetrieveTestDataFromTraceView(string filename,string testcase,string datafield)
+        public static List<TraceViewData> RetrieveTestDataFromTraceView(ProjectCriticalErrorVM pjerror, string filename,string testcase,string datafield)
         {
             if (filename.ToUpper().Contains("_DUTORDERED_"))
             {
-                return RetrieveTestDataFromTraceView_DUTORDERED(filename, testcase, datafield);
+                return RetrieveTestDataFromTraceView_DUTORDERED(pjerror, filename, testcase, datafield);
             }
             else
             {
-                return RetrieveTestDataFromTraceView_DUTx(filename, testcase, datafield);
+                return RetrieveTestDataFromTraceView_DUTx(pjerror, filename, testcase, datafield);
             }
         }
 

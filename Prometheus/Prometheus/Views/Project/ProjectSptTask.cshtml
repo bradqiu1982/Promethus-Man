@@ -200,8 +200,8 @@
                     <th>High Limit</th>
                     <th>Algorithm</th>
                     <th>Algorithm Param</th>
+                    <th>Wild Match Param</th>
                     <th>FA Switch</th>
-                    
                     <th>Related People</th>
                 </tr>
             </thead>
@@ -220,6 +220,7 @@
                         <td>@((item.WithLimit == 1) ? item.HighLimit : "")</td>
                         <td>@((item.WithAlgorithm == 1) ? item.Algorithm : "")</td>
                         <td>@((item.WithAlgorithm == 1) ? item.AlgorithmParam : "")</td>
+                        <td>@((item.WithWildMatch == 1) ? item.WildMatchParam : "")</td>
                         <td>
                             @if (item.Appv_1 > 0)
                             {

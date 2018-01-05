@@ -2134,7 +2134,7 @@ namespace Prometheus.Controllers
         }
 
         [HttpPost, ActionName("AddPJCriticalError")]
-        [ValidateAntiForgeryToken]
+        [ValidateInput(false)]
         public ActionResult AddPJCriticalErrorPost()
         {
             var ckdict = CookieUtility.UnpackCookie(this);
@@ -2163,6 +2163,12 @@ namespace Prometheus.Controllers
                     vm.WithAlgorithm = 1;
                     vm.Algorithm = Request.Form["algorithmlist"];
                     vm.AlgorithmParam = Request.Form["algorithmparam"];
+                }
+
+                if (Request.Form["withwildmatch"] != null)
+                {
+                    vm.WithWildMatch = 1;
+                    vm.WildMatchParam = Request.Form["wildmatchparam"];
                 }
 
                 vm.Temperature = Request.Form["templist"];

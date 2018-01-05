@@ -32,6 +32,7 @@ namespace Prometheus.Models
             LowLimit = -9999.0;
             HighLimit = 9999.0;
             WithAlgorithm = 0;
+            WithWildMatch = 0;
 
             Algorithm = string.Empty;
             AlgorithmParam = string.Empty;
@@ -39,6 +40,8 @@ namespace Prometheus.Models
 
             Temperature = string.Empty;
             Channel = string.Empty;
+
+            WildMatchParam = string.Empty;
 
             Appv_1 = 0;
             Appv_2 = 0;
@@ -69,6 +72,9 @@ namespace Prometheus.Models
         public string SettingReason { set; get; }
         public string RuleID { set; get; }
 
+        public int WithWildMatch { set; get; }
+        public string WildMatchParam { set; get; }
+
         public void StorePJCriticalError()
         {
             if (RuleExist(ProjectKey,ErrorCode.Trim(),TestCaseName.Trim(),MatchCond.Trim(),LowLimit,HighLimit,Algorithm.Trim(), AlgorithmParam.Trim()))
@@ -76,27 +82,29 @@ namespace Prometheus.Models
                 return;
             }
 
-            var sql = "insert into ProjectCriticalError(ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel,Appv_4,databackuptm,SettingReason,RuleID) "
-                + " values('<ProjectKey>','<ErrorCode>','<TestCaseName>','<MatchCond>',<WithLimit>,<LowLimit>,<HighLimit>,<WithAlgorithm>,'<Algorithm>','<AlgorithmParam>','<Creater>','<Temperature>','<Channel>','<Appv_4>','<databackuptm>','<SettingReason>','<RuleID>')";
+            var sql = "insert into ProjectCriticalError(ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel,Appv_4,databackuptm,SettingReason,RuleID,WithWildMatch,WildMatchParam) "
+                + " values('<ProjectKey>','<ErrorCode>','<TestCaseName>','<MatchCond>',<WithLimit>,<LowLimit>,<HighLimit>,<WithAlgorithm>,'<Algorithm>','<AlgorithmParam>','<Creater>','<Temperature>','<Channel>','<Appv_4>','<databackuptm>','<SettingReason>','<RuleID>',<WithWildMatch>,'<WildMatchParam>')";
 
             sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ErrorCode>", ErrorCode.Trim()).Replace("<MatchCond>", MatchCond.Trim()).Replace("<TestCaseName>", TestCaseName.Trim())
                 .Replace("<WithLimit>", WithLimit.ToString()).Replace("<LowLimit>", LowLimit.ToString()).Replace("<HighLimit>", HighLimit.ToString())
                 .Replace("<WithAlgorithm>", WithAlgorithm.ToString()).Replace("<Algorithm>", Algorithm.Trim()).Replace("<AlgorithmParam>", AlgorithmParam.Trim())
                 .Replace("<Creater>", Creater).Replace("<Temperature>", Temperature).Replace("<Channel>", Channel).Replace("<Appv_4>", Appv_4)
-                .Replace("<databackuptm>", DateTime.Now.ToString()).Replace("<SettingReason>", SettingReason.Trim()).Replace("<RuleID>",IssueViewModels.GetUniqKey());
+                .Replace("<databackuptm>", DateTime.Now.ToString()).Replace("<SettingReason>", SettingReason.Trim()).Replace("<RuleID>",IssueViewModels.GetUniqKey())
+                .Replace("<WithWildMatch>",WithWildMatch.ToString()).Replace("<WildMatchParam>",WildMatchParam);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
         public void UpdatePJCriticalError(string ruleid)
         {
             var sql = "update ProjectCriticalError set ProjectKey = '<ProjectKey>',ErrorCode = '<ErrorCode>',TestCaseName = '<TestCaseName>',MatchCond = '<MatchCond>',WithLimit = <WithLimit>,LowLimit = <LowLimit>,HighLimit = <HighLimit>"
-                + ",WithAlgorithm = <WithAlgorithm>,Algorithm = '<Algorithm>',AlgorithmParam = '<AlgorithmParam>',Temperature = '<Temperature>',Channel = '<Channel>',Appv_4 = '<Appv_4>',SettingReason = '<SettingReason>' where RuleID = '<RuleID>'";
+                + ",WithAlgorithm = <WithAlgorithm>,Algorithm = '<Algorithm>',AlgorithmParam = '<AlgorithmParam>',Temperature = '<Temperature>',Channel = '<Channel>',Appv_4 = '<Appv_4>',SettingReason = '<SettingReason>',WithWildMatch=<WithWildMatch>,WildMatchParam='<WildMatchParam>' where RuleID = '<RuleID>'";
 
             sql = sql.Replace("<ProjectKey>", ProjectKey).Replace("<ErrorCode>", ErrorCode.Trim()).Replace("<MatchCond>", MatchCond.Trim()).Replace("<TestCaseName>", TestCaseName.Trim())
                 .Replace("<WithLimit>", WithLimit.ToString()).Replace("<LowLimit>", LowLimit.ToString()).Replace("<HighLimit>", HighLimit.ToString())
                 .Replace("<WithAlgorithm>", WithAlgorithm.ToString()).Replace("<Algorithm>", Algorithm.Trim()).Replace("<AlgorithmParam>", AlgorithmParam.Trim())
                 .Replace("<Creater>", Creater).Replace("<Temperature>", Temperature).Replace("<Channel>", Channel).Replace("<Appv_4>", Appv_4)
-                .Replace("<SettingReason>", SettingReason.Trim()).Replace("<RuleID>", ruleid);
+                .Replace("<SettingReason>", SettingReason.Trim()).Replace("<RuleID>", ruleid)
+                .Replace("<WithWildMatch>", WithWildMatch.ToString()).Replace("<WildMatchParam>", WildMatchParam);
 
             DBUtility.ExeLocalSqlNoRes(sql);
         }
@@ -148,12 +156,12 @@ namespace Prometheus.Models
             var sql = string.Empty;
             if (!string.IsNullOrEmpty(errorcode))
             {
-                sql = "select ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel,Appv_5,Appv_4,Appv_3,Appv_1,SettingReason,RuleID from ProjectCriticalError where ProjectKey='<ProjectKey>' and ErrorCode='<ErrorCode>'";
+                sql = "select ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel,Appv_5,Appv_4,Appv_3,Appv_1,SettingReason,RuleID,WithWildMatch,WildMatchParam from ProjectCriticalError where ProjectKey='<ProjectKey>' and ErrorCode='<ErrorCode>'";
                 sql = sql.Replace("<ProjectKey>", pjkey).Replace("<ErrorCode>", errorcode);
             }
             else
             {
-                sql = "select ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel,Appv_5,Appv_4,Appv_3,Appv_1,SettingReason,RuleID from ProjectCriticalError where ProjectKey='<ProjectKey>'";
+                sql = "select ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel,Appv_5,Appv_4,Appv_3,Appv_1,SettingReason,RuleID,WithWildMatch,WildMatchParam from ProjectCriticalError where ProjectKey='<ProjectKey>'";
                 sql = sql.Replace("<ProjectKey>", pjkey);
             }
 
@@ -180,6 +188,8 @@ namespace Prometheus.Models
                 tempvm.Appv_1 = Convert.ToDouble(line[16]);
                 tempvm.SettingReason = Convert.ToString(line[17]);
                 tempvm.RuleID = Convert.ToString(line[18]);
+                tempvm.WithWildMatch = Convert.ToInt32(line[19]);
+                tempvm.WildMatchParam = Convert.ToString(line[20]);
 
                 if (string.IsNullOrEmpty(tempvm.RuleID))
                 {
@@ -197,7 +207,7 @@ namespace Prometheus.Models
         public static ProjectCriticalErrorVM RetrieveOneRule(string rid)
         {
             var tempvm = new ProjectCriticalErrorVM();
-            var sql = "select ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel,Appv_5,Appv_4,Appv_3,Appv_1,SettingReason,RuleID from ProjectCriticalError where RuleID='<RuleID>'";
+            var sql = "select ProjectKey,ErrorCode,TestCaseName,MatchCond,WithLimit,LowLimit,HighLimit,WithAlgorithm,Algorithm,AlgorithmParam,Creater,Temperature,Channel,Appv_5,Appv_4,Appv_3,Appv_1,SettingReason,RuleID,WithWildMatch,WildMatchParam from ProjectCriticalError where RuleID='<RuleID>'";
             sql = sql.Replace("<RuleID>", rid);
 
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
@@ -222,6 +232,8 @@ namespace Prometheus.Models
                 tempvm.Appv_1 = Convert.ToDouble(line[16]);
                 tempvm.SettingReason = Convert.ToString(line[17]);
                 tempvm.RuleID = Convert.ToString(line[18]);
+                tempvm.WithWildMatch = Convert.ToInt32(line[19]);
+                tempvm.WildMatchParam = Convert.ToString(line[20]);
             }
 
             return tempvm;

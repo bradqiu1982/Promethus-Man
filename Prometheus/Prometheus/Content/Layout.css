@@ -30,8 +30,14 @@
     min-width: 1200px;
 }
 .div-nav-right{
-    margin-left: 10%;
+    margin-left: 10% !important;
 }
+
+.div-nav-right-1 {
+    float: right !important;
+    /*margin-left: 50% !important;*/
+}
+
 
 .glyphicon{
     font-size: 16px;

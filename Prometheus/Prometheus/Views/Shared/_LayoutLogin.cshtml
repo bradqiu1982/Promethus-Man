@@ -1,0 +1,214 @@
+﻿@using Prometheus.Models;
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8,IE=9,IE=10,IE=Edge" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+
+    <link href="@Url.Content("~/Content/themes/base/jquery-ui.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Scripts/lobilist/dist/lobilist.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Scripts/lobilist/lib/lobibox/css/lobibox.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Scripts/lobilist/lib/highlight/github.css")" rel="stylesheet" type="text/css" />
+
+    <link href="@Url.Content("~/Content/themes/bootstrapfileinput.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/themes/jquery.dataTables.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Scripts/intro/introjs.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Scripts/intro/introjs-rtl.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Scripts/intro/arial-narrow.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Scripts/jquery.flexdatalist.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/Layout.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/bootstrap-3.3.7/css/bootstrap.min.css")" rel="stylesheet" type="text/css" />
+
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/jquery-ui")
+    <style type="text/css">
+        thead {
+            background-color: #006DC0;
+            font-family: 'Arial Narrow';
+            color: white !important;
+        }
+        table.dataTable tbody td {
+            padding: 4px 10px;
+        }
+    </style>
+    <script src="~/Content/bootstrap-3.3.7/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="~/Scripts/ajaxfileupload.js" type="text/javascript"></script>
+    <script src="~/Scripts/jquery.base64.js" type="text/javascript"></script>
+    <script src="~/Scripts/intro/intro.min.js" type="text/javascript"></script>
+    <script src="~/Scripts/jquery.stickytableheaders.js"></script>
+    <script src="~/Scripts/jquery.dataTables.min.js"></script>
+
+</head>
+
+<body>
+    <div class="navbar navbar-default navbar-fixed-top div-nav">
+        <nav class="navbar navbar-default navbar-fixed-top nav-content">
+            <div class="container">
+                <div class="row">
+                    <div class="navbar-header logo">
+                        <a class="navbar-brand" href="#">
+                            <img alt="Brand" src="~/Content/images/FinisarLogo.jpg" height="54" width="250">
+                        </a>
+                    </div>
+                    <div id="navbar" class="navbar-collapse collapse div-navlink">
+                        <ul class="nav navbar-nav" data-toggle="modal" data-target="#myModal">
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">3rd Party Data<span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        @Html.ActionLink("Debug Tree", "DebugTree", "DashBoard")
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <ul class="nav navbar-nav div-nav-right-1">
+                            <ul class="nav navbar-nav div-nav-right-1">
+                                <li>
+                                    <a href="javascript:void(0)" onclick="introJs().start()">
+                                        <span class="glyphicon glyphicon-question-sign" title="Help" data-toggle="tooltip"></span>
+                                    </a>
+                                </li>
+                            </ul>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                    <span class="glyphicon glyphicon-link" title="Friendly Links" data-toggle="tooltip"></span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a href="http://cn-traceview/" target="_blank">Trace View</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <ul class="nav navbar-nav div-nav-right-1">
+                            @{
+                                var ckdict = CookieUtility.UnpackCookie(Request);
+                                if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+                                {
+                                    <li>
+                                        <a href="/User/LoginOutUser">
+                                            <span class="glyphicon glyphicon-log-out" title="Log Out" data-toggle="tooltip"></span>
+                                        </a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li>
+                                        <a href="/User/LoginUser">
+                                            <span class="glyphicon glyphicon-log-in" title="Log In" data-toggle="tooltip"></span>
+                                        </a>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </div>
+    <div class="container body-content">
+
+        @RenderBody()
+
+        <hr />
+        <footer>
+            <p class="red-text text-center" style="font-family:'Arial';">&copy; @DateTime.Now.Year - WUXI Engineering System</p>
+        </footer>
+        <script src="~/Scripts/placeholders.min.js"></script>
+        <script src="~/Scripts/intro/intro.min.js" type="text/javascript"></script>
+        <script type="text/javascript">
+                        function RealSaveUserContent(myval)
+                        {
+                            if (myval)
+                            {
+                                var userdata = {};
+                                $.base64.utf8encode = true;
+                                userdata['myval'] = $.base64.btoa(myval);
+
+                                $.ajax({
+                                    url: "/User/SaveCacheInfo",
+                                    data: userdata,
+                                    type: 'POST',
+                                    dataType: 'text',
+                                    success: function (data, e)
+                                    {
+                                        alert(data);
+                                    },
+                                    error: function (e)
+                                    {
+                                        alert(e);
+                                    }
+                                });
+                            }
+
+                            return false;
+                        }
+
+                        function UserCacheContent()
+                        {
+                            var myurl = '/User/UserCachedInfo';
+                            window.open(myurl, '_blank');
+                        }
+
+                        function npireadmode()
+                        {
+                            $('.form-control').attr('disabled', 'disabled');
+                            $('input').attr('disabled', 'disabled');
+                            $('.btn-available').removeAttr('disabled');
+                            $('input[type=hidden]').removeAttr('disabled');
+                        }
+
+                        function npieditmode()
+                        {
+                            $('.form-control').removeAttr('disabled');
+                            $('input').removeAttr('disabled');
+                        }
+
+                        function changepagemode()
+                        {
+                            if ($("#editablebt").children("span").hasClass("glyphicon-edit")) {
+                                $("#editablebt").children("span").removeClass("glyphicon-edit").addClass("glyphicon-eye-open");
+                                npieditmode();
+                            }
+                            else
+                            {
+                                $("#editablebt").children("span").removeClass("glyphicon-eye-open").addClass("glyphicon-edit");
+                                 npireadmode();
+                            }
+                        }
+        </script>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog loading-modal">
+            <!--[if lt IE 9]>
+            <h1>Loading!  Please waiting...</h1>
+            <![endif]-->
+
+            <div class="row">
+                <div class="spinner">
+                    <div class="cube1"></div>
+                    <div class="cube2"></div>
+                </div>
+            </div>
+            <div class="loading-content">
+                <h4>
+                    <span class="loading-span">F</span>
+                    <span class="loading-span loading-span-i-0">I</span>
+                    <span class="loading-span">N</span>
+                    <span class="loading-span loading-span-i-1">I</span>
+                    <span class="loading-span">S</span>
+                    <span class="loading-span">A</span>
+                    <span class="loading-span">R</span>
+                </h4>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

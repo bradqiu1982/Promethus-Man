@@ -25,6 +25,29 @@ namespace Prometheus.Controllers
             
             return View(systemeventlist);
         }
+        
+        public ActionResult DebugTree()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+            }
+            else
+            {
+                return RedirectToAction("LoginUser", "User");
+            }
+            ViewBag.isMe = false;
+            var usernm = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            var syscfg = CfgUtility.GetSysConfig(this);
+            var melist = syscfg["ME"].ToUpper().Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+            var uname = usernm.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].ToUpper().ToString();
+            if (melist.Contains(uname))
+            {
+                ViewBag.isMe = true;
+            }
+            ViewBag.List = ProjectErrorViewModels.GetAllOrignalCode();
 
+            return View();
+        }
     }
 }

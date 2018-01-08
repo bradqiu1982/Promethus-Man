@@ -424,6 +424,13 @@ namespace Prometheus.Controllers
                     hasEditPermit = true;
                 }
 
+                var userdict = UserMatrixVM.RetrieveUserMatrixAuthByuName(updater);
+                if (string.Compare(ret.IssueType, ISSUETP.NPIPROC) == 0 
+                    && string.Compare(userdict[updater.ToUpper()].ToUpper(), USERAUTH.MANAGE.ToUpper()) == 0)
+                {
+                    ViewBag.isassignee = true;
+                }
+
                 ViewBag.hasEditDueDate = CheckModifyDueDatePermit(key, updater, hasEditPermit);
 
                 ViewBag.authrized = true;

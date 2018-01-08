@@ -900,6 +900,25 @@ namespace Prometheus.Models
             }
         }
 
+        public static List<string> GetAllOrignalCode()
+        {
+            var sql = @"select pe.orignalcode, count(*) as analysis_cnt from ErrorComments as ec 
+                inner join ProjectError as pe on ec.ErrorKey = pe.ErrorKey 
+                where ec.APVal1 <> 'delete' and ec.AnalyzeID <> ''
+				group by pe.OrignalCode order by analysis_cnt desc, pe.OrignalCode asc;";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            var res = new List<string>();
+            if(dbret.Count > 0)
+            {
+                foreach(var item in dbret)
+                {
+                    res.Add(Convert.ToString(item[0]));
+                }
+            }
+
+            return res;
+
+        }
 
     }
 }

@@ -235,6 +235,7 @@ namespace Prometheus.Controllers
             }
 
             var ckdict = CookieUtility.UnpackCookie(this);
+
             if (ckdict.ContainsKey("logonredirectctrl") 
                 && ckdict.ContainsKey("logonredirectact")
                 && !string.IsNullOrEmpty(ckdict["logonredirectact"])
@@ -478,9 +479,16 @@ namespace Prometheus.Controllers
                 usernm = ckdict["logonuser"].Split(new char[] { '|' })[0];
             }
 
-            
             if (!string.IsNullOrEmpty(usernm))
             {
+                var syscfg = CfgUtility.GetSysConfig(this);
+                var melist = syscfg["ME"].ToUpper().Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+                var uname = usernm.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].ToUpper().ToString();
+                if (melist.Contains(uname))
+                {
+                    return RedirectToAction("DebugTree", "DashBoard");
+                }
+
                 UserAuth(usernm);
 
                 //asign to me

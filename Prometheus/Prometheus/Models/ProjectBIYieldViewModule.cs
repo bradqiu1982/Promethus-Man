@@ -357,7 +357,7 @@ namespace Prometheus.Models
             ret.StartDate = DateTime.Now;
             ret.EndDate = DateTime.Now;
 
-            var plist = BITestData.RetrieveProjectTestDataByWafer("",wafer);
+            var plist = BIDataUtility.RetrieveAllBIDataByWafer(wafer);
             RetrieveCummYield(ret, plist,true);
             return ret;
         }

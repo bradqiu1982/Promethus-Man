@@ -6291,7 +6291,7 @@ namespace Prometheus.Controllers
             {
                 try
                 {
-                    //BITestData.RetrieveWaferDataFromMes(this, pjkey);
+                    BITestData.RetrieveWaferDataFromMes(this, pjkey);
                     var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
                     RealCheckVcselYieldByWafer(pjkeylist);
                 }
@@ -7566,6 +7566,15 @@ namespace Prometheus.Controllers
         {
             ViewBag.ProjectKey = ProjectKey;
             ViewBag.OriginalCode = OrignalCode;
+
+            ViewBag.isie8 = false;
+            var browse = Request.Browser;
+            if (string.Compare(browse.Browser, "IE", true) == 0
+                && (string.Compare(browse.Version, "7.0", true) == 0
+                || string.Compare(browse.Version, "8.0", true) == 0))
+            {
+                ViewBag.isie8 = true;
+            }
 
             return View();
         }

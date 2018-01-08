@@ -30,7 +30,7 @@
     var DEFAULT_OPTIONS = {
         container : '',   // id of the container
         editable : false, // you can change it in your options
-        theme : null,
+        theme : 'greensea',
         mode :'full',     // full or side
         support_html : true,
 
@@ -941,8 +941,8 @@
             },
             merge:function(b,a){
                 for(var o in a){
-                    if(o in b){
-                        if(typeof b[o] === 'object' &&
+                    if (o in b) {
+                        if (typeof b[o] === 'object' &&
                             Object.prototype.toString.call(b[o]).toLowerCase() == '[object object]' &&
                             !b[o].length){
                             jm.util.json.merge(b[o], a[o]);

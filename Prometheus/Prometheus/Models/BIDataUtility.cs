@@ -1093,6 +1093,22 @@ namespace Prometheus.Models
             }
         }
 
+        public static List<BITestData> RetrieveAllBIDataByWafer(string wafer)
+        {
+            var ret = new List<BITestData>();
+            var sql = "select SN,TestName,Failure,TestTimeStamp,Station,ProductName,DataID from BITestResult where Wafer = '<Wafer>' order by SN,TestTimeStamp Desc";
+            sql = sql.Replace("<Wafer>", wafer);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var tempdata = new BITestData("",Convert.ToString(line[6]),Convert.ToString(line[0]),Convert.ToString(line[1]),"",Convert.ToString(line[2])
+                    ,Convert.ToString(line[3]),Convert.ToString(line[4]),Convert.ToString(line[5]),wafer,"");
+                ret.Add(tempdata);
+            }
+            return ret;
+        }
+
+
         public static void RetrievePjWaferAllData(Controller ctrl, ProjectViewModels vm)
         {
             try

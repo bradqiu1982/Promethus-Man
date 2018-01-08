@@ -6291,7 +6291,7 @@ namespace Prometheus.Controllers
             {
                 try
                 {
-                    //BITestData.RetrieveWaferDataFromMes(this, pjkey);
+                    BITestData.RetrieveWaferDataFromMes(this, pjkey);
                     var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
                     RealCheckVcselYieldByWafer(pjkeylist);
                 }

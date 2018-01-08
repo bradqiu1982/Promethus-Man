@@ -74,8 +74,8 @@ namespace Prometheus.Controllers
         {
             return View();
         }
-         
-        private void SendActiveEmail(string username,string updatetime)
+
+        private void SendActiveEmail(string username, string updatetime)
         {
             var routevalue = new RouteValueDictionary();
             routevalue.Add("validatestr", Convert.ToBase64String(UTF8Encoding.UTF8.GetBytes(username + "||" + updatetime)));
@@ -88,7 +88,7 @@ namespace Prometheus.Controllers
 
             var toaddrs = new List<string>();
             toaddrs.Add(username);
-            EmailUtility.SendEmail(this,"WUXI Engineering System", toaddrs, validatestr);
+            EmailUtility.SendEmail(this, "WUXI Engineering System", toaddrs, validatestr);
         }
 
         [HttpPost, ActionName("RegisterUser")]
@@ -96,7 +96,7 @@ namespace Prometheus.Controllers
         public ActionResult RegisterUserPOST()
         {
 
-           if (UserViewModels.CheckUserExist(Request.Form["Email"]))
+            if (UserViewModels.CheckUserExist(Request.Form["Email"]))
             {
                 var createerror = "<h3><font color=\"red\">Fail to create User: User Exist</font></h3>";
                 ViewBag.CreateError = createerror;
@@ -146,10 +146,10 @@ namespace Prometheus.Controllers
                 ViewBag.CreateError = createerror;
                 RedirectToAction("RegisterUser");
             }
-            
+
             var bs = Convert.FromBase64String(validatestr);
             var val = UTF8Encoding.UTF8.GetString(bs);
-            var username = val.Split(new string[] { "||" },StringSplitOptions.None)[0];
+            var username = val.Split(new string[] { "||" }, StringSplitOptions.None)[0];
             var updatetime = val.Split(new string[] { "||" }, StringSplitOptions.None)[1];
             UserViewModels.ActiveUser(username);
             return RedirectToAction("ValidateNoticeB");
@@ -210,7 +210,7 @@ namespace Prometheus.Controllers
 
             var toaddrs = new List<string>();
             toaddrs.Add(username);
-            EmailUtility.SendEmail(this,"WUXI Engineering System", toaddrs, validatestr);
+            EmailUtility.SendEmail(this, "WUXI Engineering System", toaddrs, validatestr);
             return RedirectToAction("ResetNoticeA");
         }
 
@@ -219,7 +219,7 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        private ActionResult NormalLogin(string username,string dbpwd,string inputpwd)
+        private ActionResult NormalLogin(string username, string dbpwd, string inputpwd)
         {
             ////for test log4net
             //var dic = new Dictionary<string, string>();
@@ -236,7 +236,7 @@ namespace Prometheus.Controllers
 
             var ckdict = CookieUtility.UnpackCookie(this);
 
-            if (ckdict.ContainsKey("logonredirectctrl") 
+            if (ckdict.ContainsKey("logonredirectctrl")
                 && ckdict.ContainsKey("logonredirectact")
                 && !string.IsNullOrEmpty(ckdict["logonredirectact"])
                 && !string.IsNullOrEmpty(ckdict["logonredirectctrl"]))
@@ -248,8 +248,8 @@ namespace Prometheus.Controllers
                 string logonuser = username + "||" + DateTime.Now.ToString();
                 var ck = new Dictionary<string, string>();
                 ck.Add("logonuser", logonuser);
-                ck.Add("logonredirectact","");
-                ck.Add("logonredirectctrl","");
+                ck.Add("logonredirectact", "");
+                ck.Add("logonredirectctrl", "");
                 CookieUtility.SetCookie(this, ck);
 
                 return RedirectToAction(logonredirectact, logonredirectctrl);
@@ -372,7 +372,7 @@ namespace Prometheus.Controllers
             var slist = CreateSelectList(asilist, "");
             ViewBag.chooseuserlist = slist;
 
-            var months = new string[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "18" };
+            var months = new string[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "18" };
             asilist = new List<string>();
             asilist.AddRange(months);
             slist = CreateSelectList(asilist, "");
@@ -404,7 +404,7 @@ namespace Prometheus.Controllers
             return sBuilder.ToString();
         }
 
-        public ActionResult UserCenter(string username,string month,string smartkey=null)
+        public ActionResult UserCenter(string username, string month, string smartkey = null)
         {
             if (smartkey != null)
             {
@@ -431,7 +431,7 @@ namespace Prometheus.Controllers
                                 return Redirect("http://wuxinpi.china.ads.finisar.com:8081/");
                             }
                         }
-                        catch (Exception ex) { return Redirect("http://wuxinpi.china.ads.finisar.com:8081/");}
+                        catch (Exception ex) { return Redirect("http://wuxinpi.china.ads.finisar.com:8081/"); }
 
                     }
                     else
@@ -474,7 +474,7 @@ namespace Prometheus.Controllers
             {
                 usernm = username;
             }
-            else if(ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            else if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
             {
                 usernm = ckdict["logonuser"].Split(new char[] { '|' })[0];
             }
@@ -580,7 +580,7 @@ namespace Prometheus.Controllers
                 usernm = ckdict["logonuser"].Split(new char[] { '|' })[0];
             }
 
-            
+
             if (!string.IsNullOrEmpty(usernm))
             {
                 ViewBag.UserName = usernm.Split(new char[] { '@' })[0];
@@ -733,7 +733,9 @@ namespace Prometheus.Controllers
                     }
                     else
                     {
-                        try { tempmonth = Convert.ToInt32(month);
+                        try
+                        {
+                            tempmonth = Convert.ToInt32(month);
                             ViewBag.month = month;
                         }
                         catch (Exception ex) { tempmonth = 1; ViewBag.month = ""; }
@@ -833,7 +835,7 @@ namespace Prometheus.Controllers
             return RedirectToAction("ICare", "User", dict);
         }
 
-        public ActionResult UserIssues(string username,string month)
+        public ActionResult UserIssues(string username, string month)
         {
             var ckdict = CookieUtility.UnpackCookie(this);
             if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
@@ -936,7 +938,7 @@ namespace Prometheus.Controllers
         public ActionResult AddShareTagPost()
         {
             var tagstr = Request.Form["querystring"];
-            var tags = tagstr.Split(new string[] { ";","," }, StringSplitOptions.RemoveEmptyEntries);
+            var tags = tagstr.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
             var taglist = new List<string>();
             taglist.AddRange(tags);
             ShareDocVM.StoreShareTags(taglist);
@@ -1000,7 +1002,7 @@ namespace Prometheus.Controllers
             var newprojlist = new List<string>();
             newprojlist.Add("Project Tag");
             newprojlist.AddRange(projlist);
-            var projectlist= CreateSelectList2(newprojlist);
+            var projectlist = CreateSelectList2(newprojlist);
             projectlist[0].Disabled = true;
             projectlist[0].Selected = true;
             ViewBag.projectlist = projectlist;
@@ -1091,7 +1093,7 @@ namespace Prometheus.Controllers
             var usertagdict = ShareDocVM.RetrieveUserBookedTag(updater).DOCTagDict;
             usertaglist.AddRange(usertagdict.Keys);
 
-            var pjtag = "NONE"; 
+            var pjtag = "NONE";
             if (Request.Form["projectlist"] != null)
             {
                 pjtag = Request.Form["projectlist"].ToString();
@@ -1148,10 +1150,10 @@ namespace Prometheus.Controllers
 
             if (Request.Form["matchpostfile"] != null)
             {
-                ShareDocVM.MatchAllPostDocForUser(updater,this);
+                ShareDocVM.MatchAllPostDocForUser(updater, this);
                 return RedirectToAction("ILearn");
             }
-            
+
             var tags = string.Empty;
             for (var i = 0; i < 600; i++)
             {
@@ -1160,10 +1162,10 @@ namespace Prometheus.Controllers
                     tags = tags + Request.Form["check" + i] + ";";
                 }
             }
-            ShareDocVM.SetUserBookTag(updater,tags);
+            ShareDocVM.SetUserBookTag(updater, tags);
 
 
-            return RedirectToAction("ITag","User");
+            return RedirectToAction("ITag", "User");
         }
 
         public ActionResult ILearn()
@@ -1187,7 +1189,7 @@ namespace Prometheus.Controllers
             ViewBag.RealUserID = updater;
 
             var asilist = UserViewModels.RetrieveAllUser();
-            ViewBag.towholist = CreateSelectList(asilist,"");
+            ViewBag.towholist = CreateSelectList(asilist, "");
 
             var ilearntable = new List<ShareDocVM>();
             var iweeklytable = new List<ShareDocVM>();
@@ -1224,13 +1226,13 @@ namespace Prometheus.Controllers
             }
 
             ViewBag.ILearn = ilearntable;
-            ViewBag.IShare = ShareDocVM.RetrieveMyShare(updater,this);
+            ViewBag.IShare = ShareDocVM.RetrieveMyShare(updater, this);
             ViewBag.IWeeklyReport = iweeklytable;
             ViewBag.ITrainingReport = itrainingtable;
             return View();
         }
 
-        public ActionResult ReviewILearn(string DOCTYPE,string DOCKEY,string DOCCreator)
+        public ActionResult ReviewILearn(string DOCTYPE, string DOCKEY, string DOCCreator)
         {
             var ckdict = CookieUtility.UnpackCookie(this);
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
@@ -1243,7 +1245,7 @@ namespace Prometheus.Controllers
                     return RedirectToAction("ILearn", "User");
                 }
 
-                UserKPIVM.StoreUserReviewed(updater, issue.ProjectKey,"View Task: "+issue.Summary, "/Issue/UpdateIssue?issuekey=" + DOCKEY);
+                UserKPIVM.StoreUserReviewed(updater, issue.ProjectKey, "View Task: " + issue.Summary, "/Issue/UpdateIssue?issuekey=" + DOCKEY);
 
                 var dict = new RouteValueDictionary();
                 dict.Add("issuekey", DOCKEY);
@@ -1254,7 +1256,7 @@ namespace Prometheus.Controllers
                 var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(DOCKEY, this);
                 var Summary = debugtree[0].ProjectKey + "-" + debugtree[0].OrignalCode;
 
-                UserKPIVM.StoreUserReviewed(updater, debugtree[0].ProjectKey, "View DebugTree: "+Summary, "/Project/UpdateProjectError?ErrorKey=" + DOCKEY);
+                UserKPIVM.StoreUserReviewed(updater, debugtree[0].ProjectKey, "View DebugTree: " + Summary, "/Project/UpdateProjectError?ErrorKey=" + DOCKEY);
 
                 var dict = new RouteValueDictionary();
                 dict.Add("ErrorKey", DOCKEY);
@@ -1263,7 +1265,7 @@ namespace Prometheus.Controllers
             else if (string.Compare(DOCTYPE, ShareDocType.DOCUMENT, true) == 0)
             {
                 var Summary = DOCKEY;
-                UserKPIVM.StoreUserReviewed(updater,"ALL", "View Document: " + Summary, "/User/WebDoc?DocKey=" + DOCKEY + "&Creator=" + DOCCreator);
+                UserKPIVM.StoreUserReviewed(updater, "ALL", "View Document: " + Summary, "/User/WebDoc?DocKey=" + DOCKEY + "&Creator=" + DOCCreator);
 
                 var dict = new RouteValueDictionary();
                 dict.Add("DocKey", DOCKEY);
@@ -1311,7 +1313,7 @@ namespace Prometheus.Controllers
             return RedirectToAction("ILearn", "User");
         }
 
-        public ActionResult ILike(string DOCKey,string DOCCreator)
+        public ActionResult ILike(string DOCKey, string DOCCreator)
         {
             var ckdict = CookieUtility.UnpackCookie(this);
             if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
@@ -1332,7 +1334,7 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(DOCKey)
                 && !string.IsNullOrEmpty(DOCCreator))
             {
-                ShareDocVM.LikeDoc(DOCKey, DOCCreator, updater,this);
+                ShareDocVM.LikeDoc(DOCKey, DOCCreator, updater, this);
                 ClearILearnCache(updater);
             }
             return RedirectToAction("ILearn", "User");
@@ -1388,7 +1390,7 @@ namespace Prometheus.Controllers
             return RedirectToAction("ILearn", "User");
         }
 
-        public ActionResult IPush(string DOCPJK, string DOCKey,string ToWho)
+        public ActionResult IPush(string DOCPJK, string DOCKey, string ToWho)
         {
             var ckdict = CookieUtility.UnpackCookie(this);
             if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
@@ -1405,10 +1407,10 @@ namespace Prometheus.Controllers
             }
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
-            var whoes = ToWho.Split(new string[] { ";", ","," " }, StringSplitOptions.RemoveEmptyEntries);
+            var whoes = ToWho.Split(new string[] { ";", ",", " " }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var w in whoes)
             {
-                ShareDocVM.IPushDoc(DOCPJK, DOCKey, w.Trim().ToUpper(),updater,this);
+                ShareDocVM.IPushDoc(DOCPJK, DOCKey, w.Trim().ToUpper(), updater, this);
                 ClearILearnCache(w.Trim());
             }
 
@@ -1439,12 +1441,12 @@ namespace Prometheus.Controllers
 
             var users = UserViewModels.RetrieveAllUser();
             ViewBag.towholist = CreateSelectList(users);
-            
+
             var vm = UserBlogVM.RetrieveAllBlogDoc(updater);
             return View(vm);
         }
 
-        public ActionResult IBLogPush(string DOCKey, string ToWho,string Reason)
+        public ActionResult IBLogPush(string DOCKey, string ToWho, string Reason)
         {
             var ckdict = CookieUtility.UnpackCookie(this);
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
@@ -1464,15 +1466,15 @@ namespace Prometheus.Controllers
                 catch (Exception ex) { }
             }
 
-            var vm = UserBlogVM.RetrieveBlogDoc(DOCKey,this);
+            var vm = UserBlogVM.RetrieveBlogDoc(DOCKey, this);
 
-            var docid = ShareDocVM.ShareDoc("ALL", ShareDocType.BLOG, DOCKey, vm.Tag, vm.UserName, vm.CreateDate.ToString(),vm.DocURL);
+            var docid = ShareDocVM.ShareDoc("ALL", ShareDocType.BLOG, DOCKey, vm.Tag, vm.UserName, vm.CreateDate.ToString(), vm.DocURL);
 
             var whoes = ToWho.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var w in whoes)
             {
                 ClearILearnCache(w.Trim());
-                ShareDocVM.PushDoc(w.Trim().ToUpper(), "ALL", ShareDocType.BLOG, DOCKey, vm.Tag, vm.UserName, DateTime.Now.ToString(), "",docid,vm.DocURL);
+                ShareDocVM.PushDoc(w.Trim().ToUpper(), "ALL", ShareDocType.BLOG, DOCKey, vm.Tag, vm.UserName, DateTime.Now.ToString(), "", docid, vm.DocURL);
                 ShareDocVM.SendPushDocEvent("a new document about " + vm.Tag, vm.DocURL, ToWho, updater.ToUpper(), this, tempreason);
             }
 
@@ -1565,7 +1567,7 @@ namespace Prometheus.Controllers
             return ret;
         }
 
-        private void DefaultActionForBlogDoc(UserBlogVM blog,string updater)
+        private void DefaultActionForBlogDoc(UserBlogVM blog, string updater)
         {
             if (blog.Tag.ToUpper().Contains(SPECIALBLOGType.WEEKLYREPORT))
             {
@@ -1573,11 +1575,11 @@ namespace Prometheus.Controllers
                 if (!string.IsNullOrEmpty(reportgroup))
                 {
 
-                    var docid = ShareDocVM.ShareDoc("ALL", ShareDocType.BLOG, blog.DocKey, blog.Tag, blog.UserName, blog.CreateDate.ToString(),blog.DocURL);
+                    var docid = ShareDocVM.ShareDoc("ALL", ShareDocType.BLOG, blog.DocKey, blog.Tag, blog.UserName, blog.CreateDate.ToString(), blog.DocURL);
                     var mbs = reportgroup.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (var mb in mbs)
                     {
-                        ShareDocVM.PushDoc(mb.ToUpper(), "ALL", ShareDocType.BLOG, blog.DocKey, blog.Tag, blog.UserName, DateTime.Now.ToString(), "",docid,blog.DocURL);
+                        ShareDocVM.PushDoc(mb.ToUpper(), "ALL", ShareDocType.BLOG, blog.DocKey, blog.Tag, blog.UserName, DateTime.Now.ToString(), "", docid, blog.DocURL);
                     }
                 }
             }
@@ -1587,11 +1589,11 @@ namespace Prometheus.Controllers
                 var workgroup = UserGroupVM.RetreiveUserGroup(updater, UserGroupType.WorkGroup);
                 if (!string.IsNullOrEmpty(workgroup))
                 {
-                    var docid = ShareDocVM.ShareDoc("ALL", ShareDocType.BLOG, blog.DocKey, blog.Tag, blog.UserName, blog.CreateDate.ToString(),blog.DocURL);
+                    var docid = ShareDocVM.ShareDoc("ALL", ShareDocType.BLOG, blog.DocKey, blog.Tag, blog.UserName, blog.CreateDate.ToString(), blog.DocURL);
                     var mbs = workgroup.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (var mb in mbs)
                     {
-                        ShareDocVM.PushDoc(mb.ToUpper(), "ALL", ShareDocType.BLOG, blog.DocKey, blog.Tag, blog.UserName, DateTime.Now.ToString(), "",docid,blog.DocURL);
+                        ShareDocVM.PushDoc(mb.ToUpper(), "ALL", ShareDocType.BLOG, blog.DocKey, blog.Tag, blog.UserName, DateTime.Now.ToString(), "", docid, blog.DocURL);
                     }
                 }
             }
@@ -1654,7 +1656,7 @@ namespace Prometheus.Controllers
                 var blog = new UserBlogVM();
                 blog.UserName = updater;
                 blog.ContentType = UserBlogContentType.COMMENT;
-                blog.Content = SeverHtmlDecode.Decode(this,Request.Form["docinputeditor"]);
+                blog.Content = SeverHtmlDecode.Decode(this, Request.Form["docinputeditor"]);
 
                 blog.Tag = tag;
                 if (string.IsNullOrEmpty(Request.Form["DocTitle"]))
@@ -1697,7 +1699,7 @@ namespace Prometheus.Controllers
             ViewBag.UserName = updater.Split(new char[] { '@' })[0];
             ViewBag.RealUserID = updater;
 
-            var vm = UserBlogVM.RetrieveBlogDoc(DocKey,this);
+            var vm = UserBlogVM.RetrieveBlogDoc(DocKey, this);
             return View(vm);
         }
 
@@ -1706,12 +1708,12 @@ namespace Prometheus.Controllers
         public ActionResult ModifyBlogDocPost()
         {
             var dockey = Request.Form["HDocKey"];
-            var vm = UserBlogVM.RetrieveBlogDoc(dockey,this);
+            var vm = UserBlogVM.RetrieveBlogDoc(dockey, this);
 
 
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
-                vm.Content = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
+                vm.Content = SeverHtmlDecode.Decode(this, Request.Form["editor1"]);
                 vm.UpdateBlogDoc();
             }
             else
@@ -1729,7 +1731,7 @@ namespace Prometheus.Controllers
             return RedirectToAction("WebDoc", "User", dict);
         }
 
-        public ActionResult WebDoc(string DocKey,string Creator = "")
+        public ActionResult WebDoc(string DocKey, string Creator = "")
         {
             var ckdict = CookieUtility.UnpackCookie(this);
             if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
@@ -1753,14 +1755,14 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(DocKey))
             {
-                var vm = UserBlogVM.RetrieveBlogDoc(DocKey,this);
+                var vm = UserBlogVM.RetrieveBlogDoc(DocKey, this);
 
                 if (string.IsNullOrEmpty(vm.DocKey))
                 {
                     var backlink = ShareDocVM.RetrieveBackLink(DocKey);
 
                     var tempstrs = DocKey.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
-                    var datestr = tempstrs[tempstrs.Length - 1].Substring(0,8);
+                    var datestr = tempstrs[tempstrs.Length - 1].Substring(0, 8);
                     vm.ContentType = UserBlogContentType.ATTACH;
                     vm.Title = DocKey;
                     vm.Content = "/userfiles/docs/" + datestr + "/" + DocKey;
@@ -1781,7 +1783,7 @@ namespace Prometheus.Controllers
             {
                 if (ckdict.ContainsKey("DocKey") && !string.IsNullOrEmpty(ckdict["DocKey"]))
                 {
-                    var vm = UserBlogVM.RetrieveBlogDoc(ckdict["DocKey"],this);
+                    var vm = UserBlogVM.RetrieveBlogDoc(ckdict["DocKey"], this);
 
                     var tempDocKey = ckdict["DocKey"];
                     if (string.IsNullOrEmpty(vm.DocKey))
@@ -1858,7 +1860,7 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(Request.Form["docinputeditor"]))
             {
                 var com = new ErrorComments();
-                com.Comment = SeverHtmlDecode.Decode(this,Request.Form["docinputeditor"]);
+                com.Comment = SeverHtmlDecode.Decode(this, Request.Form["docinputeditor"]);
                 if (!string.IsNullOrEmpty(com.Comment))
                 {
                     var towholist = new List<string>();
@@ -1885,7 +1887,7 @@ namespace Prometheus.Controllers
             //return View(vm);
         }
 
-        public ActionResult UpdateWebDocComment(string ErrorKey, string CommentType, string Date,string Creator)
+        public ActionResult UpdateWebDocComment(string ErrorKey, string CommentType, string Date, string Creator)
         {
             if (!string.IsNullOrEmpty(ErrorKey) && !string.IsNullOrEmpty(CommentType) && !string.IsNullOrEmpty(Date))
             {
@@ -1920,7 +1922,7 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(Request.Form["editor1"]))
             {
                 var tempcommment = new ErrorComments();
-                tempcommment.Comment = SeverHtmlDecode.Decode(this,Request.Form["editor1"]);
+                tempcommment.Comment = SeverHtmlDecode.Decode(this, Request.Form["editor1"]);
                 ProjectErrorViewModels.UpdateSPComment(errorkey, commenttype, commentdate, tempcommment.dbComment);
             }
             else
@@ -1997,7 +1999,7 @@ namespace Prometheus.Controllers
             var asilist = UserViewModels.RetrieveAllUser();
             ViewBag.towholist1 = CreateSelectList(asilist, "");
 
-            var grouptype = new string[] { "Please choose your group type", UserGroupType.WorkGroup,UserGroupType.ReportGroup,UserGroupType.LYTGroup};
+            var grouptype = new string[] { "Please choose your group type", UserGroupType.WorkGroup, UserGroupType.ReportGroup, UserGroupType.LYTGroup };
             var grouptypelist = CreateSelectList(grouptype.ToList(), "");
             grouptypelist[0].Selected = true;
             grouptypelist[0].Disabled = true;
@@ -2056,7 +2058,7 @@ namespace Prometheus.Controllers
                 {
                     if (!errordict.ContainsKey(item.OrignalCode))
                     {
-                        errordict.Add(item.OrignalCode,true);
+                        errordict.Add(item.OrignalCode, true);
                     }
                 }//end foreach
             }//end foreach
@@ -2263,7 +2265,7 @@ namespace Prometheus.Controllers
 
             var vm = UserKPIVM.RetrieveRankByUserName(updater, DateTime.Now.AddMonths(0 - tempmonth).ToString());
 
-            var sarray = new string[] { "1", "2", "3", "4", "5", "6", "12", "18", "24","30","36" };
+            var sarray = new string[] { "1", "2", "3", "4", "5", "6", "12", "18", "24", "30", "36" };
             var slist = new List<string>();
             slist.Add("KPI In Months");
             slist.AddRange(sarray);
@@ -2318,7 +2320,7 @@ namespace Prometheus.Controllers
                 vm.AddRange(tempvm);
             }
 
-            vm.Sort(delegate (UserKPIVM u1,UserKPIVM u2)
+            vm.Sort(delegate (UserKPIVM u1, UserKPIVM u2)
             {
                 if (u1.UpdateTime > u2.UpdateTime)
                     return -1;
@@ -2353,8 +2355,8 @@ namespace Prometheus.Controllers
 
             for (var idx = 0; idx < rankcount; idx++)
             {
-                if (!string.IsNullOrEmpty(Request.Form["admirerank"+idx.ToString()]) 
-                    && !string.IsNullOrEmpty(Request.Form["rankid"+idx.ToString()])
+                if (!string.IsNullOrEmpty(Request.Form["admirerank" + idx.ToString()])
+                    && !string.IsNullOrEmpty(Request.Form["rankid" + idx.ToString()])
                     && !string.IsNullOrEmpty(Request.Form["updatetime" + idx.ToString()]))
                 {
                     var admirerank = 0;
@@ -2366,7 +2368,7 @@ namespace Prometheus.Controllers
                     { admirerank = 0; }
                     var rankid = (Request.Form["rankid" + idx.ToString()]);
                     var updatetime = Request.Form["updatetime" + idx.ToString()];
-                    UserKPIVM.UpdateAdmireRank(rankid, admirerank,updatetime);
+                    UserKPIVM.UpdateAdmireRank(rankid, admirerank, updatetime);
                 }
             }
 
@@ -2450,7 +2452,7 @@ namespace Prometheus.Controllers
                 { tempmonth = 1; }
             }
 
-            var vm = ShareDocVM.RetrieveUserShare(DateTime.Now.AddMonths(0 - tempmonth).ToString(),this);
+            var vm = ShareDocVM.RetrieveUserShare(DateTime.Now.AddMonths(0 - tempmonth).ToString(), this);
 
             var sarray = new string[] { "1", "2", "3", "4", "5", "6", "12", "18", "24", "30", "36" };
             var slist = new List<string>();
@@ -2475,7 +2477,8 @@ namespace Prometheus.Controllers
                     if (!string.IsNullOrEmpty(tempvm.GroupID))
                     {
                         var ret1 = new JsonResult();
-                        ret1.Data = new {
+                        ret1.Data = new
+                        {
                             success = true,
                             gid = tempvm.GroupID,
                             tag = tempvm.GroupTag,
@@ -2490,7 +2493,7 @@ namespace Prometheus.Controllers
             var ret = new JsonResult();
             ret.Data = new { success = false };
             return ret;
-            
+
         }
 
         public JsonResult RetrieveOneRule()
@@ -2549,9 +2552,9 @@ namespace Prometheus.Controllers
             //task project
             var taskprojectlist = UserViewModels.GetUserProjects(username);
 
-            if(taskprojectlist.Count > 0)
+            if (taskprojectlist.Count > 0)
             {
-                foreach(var pro in taskprojectlist)
+                foreach (var pro in taskprojectlist)
                 {
                     if (!projectlist.ContainsKey(pro.Key))
                     {
@@ -2584,15 +2587,15 @@ namespace Prometheus.Controllers
             foreach (var project in projectlist)
             {
                 var task_total = 0;
-                
+
                 //yield
-                if(setting.Yield == 1)
+                if (setting.Yield == 1)
                 {
                     YieldDataList.Add(project.Key, getProjectYield(project.Key, sDate, eDate));
                 }
 
                 //i care
-                if(setting.ICare == 1)
+                if (setting.ICare == 1)
                 {
                     historyIcareList.Add(project.Key, getIcareTask(username, project.Key, 0, stDate, cDate));
                     var icarelist_tmp = getIcareTask(username, project.Key, 1, stDate, cDate);
@@ -2680,7 +2683,7 @@ namespace Prometheus.Controllers
             var eDateStr = Convert.ToDateTime(eDate).ToString("yyyyMMddHHmmss");
             var mycache = HttpContext.Cache;
             var data = mycache.Get(projectkey + "_" + eDateStr + "_WR_Yield_CUST");
-            if(data != null)
+            if (data != null)
             {
                 return (WeeklyYieldData)data;
             }
@@ -2834,7 +2837,7 @@ namespace Prometheus.Controllers
                         }
                     }
                 }
-                
+
                 var ChartxAxisValues = "";
 
                 foreach (var item in peralist)
@@ -2863,7 +2866,7 @@ namespace Prometheus.Controllers
                     abpecentvalue = abpecentvalue + (item.percent * 100).ToString("0.0") + ",";
                 }
                 abpecentvalue = abpecentvalue.Substring(0, abpecentvalue.Length - 1);
-                
+
                 var reurl = "window.open('/Project/ProjectErrAbbr?ProjectKey=" + ProjectKey + "'" + "+'&ErrAbbr='+this.category)";
                 if (!string.IsNullOrEmpty(StartDate) && !string.IsNullOrEmpty(EndDate))
                 {
@@ -2924,7 +2927,7 @@ namespace Prometheus.Controllers
                     ChartxAxisValues = ChartxAxisValues + "'" + item + "',";
                 }
                 ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
-                
+
                 var famout = "";
                 foreach (var item in famountlist)
                 {
@@ -3034,7 +3037,7 @@ namespace Prometheus.Controllers
 
         private TaskDataWithUpdateFlg getProjectTask(string username, string projectkey, int period, string sDate, string eDate, int iType, bool wSubTask = true)
         {
-            if(period == 0)
+            if (period == 0)
             {
                 var sDateStr = Convert.ToDateTime(sDate).ToString("yyyyMMdd");
                 var mycache = HttpContext.Cache;
@@ -3059,7 +3062,7 @@ namespace Prometheus.Controllers
                 var sDateStr = Convert.ToDateTime(sDate).ToString("yyyyMMdd");
                 var mycache = HttpContext.Cache;
                 var icareList = mycache.Get(username + "_" + projectkey + "_" + sDateStr + "_Icare_TASK_CUST");
-                if(icareList == null)
+                if (icareList == null)
                 {
                     icareList = IssueViewModels.getIcareTask(username, projectkey, period, sDate, eDate);
                     mycache.Insert(username + "_" + projectkey + "_" + sDateStr + "_Icare_TASK_CUST", icareList, null, DateTime.Now.AddHours(12), Cache.NoSlidingExpiration);
@@ -3122,7 +3125,7 @@ namespace Prometheus.Controllers
             var ret = new JsonResult();
             var ckdict = CookieUtility.UnpackCookie(this);
             if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
-            { 
+            {
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
                 var pKey = Request.Form["pKey"];
                 var sType = Convert.ToInt32(Request.Form["sType"]);
@@ -3130,7 +3133,7 @@ namespace Prometheus.Controllers
                 var Mark = Request.Form["Mark"];
                 var data = (List<List<string>>)Newtonsoft.Json.JsonConvert.DeserializeObject(Request.Form["data"], (new List<List<string>>()).GetType());
                 var reports = new List<WeeklyReportVM>();
-               
+
                 if (data.Count > 0)
                 {
                     DateTimeFormatInfo dfi = DateTimeFormatInfo.CurrentInfo;
@@ -3159,7 +3162,7 @@ namespace Prometheus.Controllers
                             var issuecomment = new IssueComments();
                             issuecomment.Comment = SeverHtmlDecode.Decode(this, item[2]);
                             IssueViewModels.StoreUniqueIssueComment(item[0], issuecomment.dbComment, updater, COMMENTTYPE.WeeklyReportSummary);
-                            LogVM.WriteLog(updater.ToUpper(), pKey, DetermineCompName(Request.UserHostName), 
+                            LogVM.WriteLog(updater.ToUpper(), pKey, DetermineCompName(Request.UserHostName),
                                     Request.Url.ToString(), "Issue", "AddComment", item[0], LogType.Task, Log4NetLevel.Info, "");
                         }
                     }
@@ -3193,7 +3196,7 @@ namespace Prometheus.Controllers
                 var rma = Request.Form["m_rma"];
                 var debugtree = Request.Form["m_debugtree"];
                 var others = Request.Form["m_others"];
-                
+
                 var setting = new WeeklyReportSetting(
                     "",
                     cur_user,
@@ -3238,5 +3241,114 @@ namespace Prometheus.Controllers
                 mycache.Remove(updater.ToUpper() + key);
             }
         }
+
+        [HttpPost]
+        public JsonResult GetWeeklyReportShareStatus()
+        {
+            var ret = new JsonResult();
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                var ikey = Request.Form["iKey"];
+                var data = WeeklyReportShareVM.GetWRS(ikey, updater.ToUpper());
+                if(data.ID > 0 && data.Status == 1)
+                {
+                    ret.Data = new { success = true, status = data.Status };
+                }
+                else
+                {
+                    ret.Data = new { success = true, status =  0};
+                }
+                return ret;
+            }
+
+            ret.Data = new { success = false };
+            return ret;
+        }
+
+        [HttpPost]
+        public JsonResult ShareWeeklyReport()
+        {
+            var ret = new JsonResult();
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                var ikey = Request.Form["iKey"];
+                WeeklyReportShareVM.OpWRS(ikey, updater.ToUpper());
+                ret.Data = new { success = true };
+                return ret;
+            }
+
+            ret.Data = new { success = false };
+            return ret;
+
+        }
+
+        public ActionResult WeeklyReportShare()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "WeeklyReportShare");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            ViewBag.UserName = updater.Split(new char[] { '@' })[0];
+            ViewBag.RealUserID = updater;
+
+            ViewBag.shareList = WeeklyReportShareVM.GetWRSList();
+            ViewBag.ivoteList = WeeklyReportShareVoteVM.GetVoteList(updater.ToUpper());
+
+            return View();
+        }
+
+        [HttpPost]
+        public JsonResult WeeklyReportShareVote()
+        {
+            var ret = new JsonResult();
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                var sID = Request.Form["sID"];
+                var iType = Request.Form["iType"];
+                WeeklyReportShareVoteVM.OpVote(sID, updater.ToUpper(), iType);
+                ret.Data = new { success = true };
+                return ret;
+            }
+
+            ret.Data = new { success = false };
+            return ret;
+        }
+
+        [HttpPost]
+        public JsonResult WeeklyReportShareCancelVote()
+        {
+            var ret = new JsonResult();
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                var sID = Request.Form["sID"];
+                var iType = Request.Form["iType"];
+                WeeklyReportShareVoteVM.cancelVote(sID, updater.ToUpper(), iType);
+                ret.Data = new { success = true };
+                return ret;
+            }
+
+            ret.Data = new { success = false };
+            return ret;
+        }
+
     }
 }

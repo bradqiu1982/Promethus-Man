@@ -160,12 +160,75 @@
             $('#myModal').modal('show');
             window.location.href = '/User/WeeklyReport?username='+$.trim($(this).val());
         })
+
+        $('body').on('click', '.ishare', function () {
+            var ikey = $(this).attr('data-id');
+            var that = this;
+            $.post('/User/ShareWeeklyReport', {
+                iKey: ikey
+            }, function (output) {
+                if (output.success) {
+                    alert('Share Successfully!');
+                    $(that).removeClass('ishare').addClass('hasshare');
+                }
+            })
+        })
+
+        $.each($('.ishare'), function () {
+            var ikey = $(this).attr('data-id');
+            var that = this;
+            $.post('/User/GetWeeklyReportShareStatus', {
+                iKey: ikey
+            }, function (output) {
+                if (output.success) {
+                    if (output.status == 1) {
+                        $(that).removeClass('ishare').addClass('hasshare');
+                    }
+                }
+            })
+        })
+    }
+
+    var wrs_show = function () {
+        $('body').on('click', '.ivote', function () {
+            var sID = $(this).attr('data-id');
+            var iType = $(this).attr('data-type');
+            $.post('/User/WeeklyReportShareVote', {
+                sID: sID,
+                iType: iType
+            }, function (output) {
+                if (output.success) {
+                    window.location.reload();
+                }
+                else {
+                    alert("Failed");
+                }
+            })
+        })
+        $('body').on('click', '.cancel-vote', function () {
+            var sID = $(this).attr('data-id');
+            var iType = $(this).attr('data-type');
+            $.post('/User/WeeklyReportShareCancelVote', {
+                sID: sID,
+                iType: iType
+            }, function (output) {
+                if (output.success) {
+                    window.location.reload();
+                }
+                else {
+                    alert("Failed");
+                }
+            })
+        })
     }
 
 
     return {
         init: function () {
             show();
+        },
+        wrs_show: function () {
+            wrs_show();
         }
     };
 }();

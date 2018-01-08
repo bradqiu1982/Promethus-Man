@@ -1,0 +1,102 @@
+﻿
+@{
+    ViewBag.Title = "WeeklyReportShare";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var idx = 1;
+}
+
+<link href="~/Content/common.css" rel="stylesheet" type="text/css" />
+<script src="~/Scripts/weeklyreport.js"></script>
+
+<ul class="nav nav-pills nav-stacked col-xs-2" data-intro="Select tab to see detail." data-step="1">
+    <li><a href="/User/ILearn">I Learn</a></li>
+    <li><a href="/User/WeeklyReportList">Weekly Report</a></li>
+    <li class="active"><a href="/User/WeeklyReportShare">Weekly Report Share</a></li>
+    <li><a href="/User/ILearn">Training</a></li>
+    <li><a href="/User/ILearn">I Share</a></li>
+</ul>
+
+<div class="tab-content col-xs-10" data-intro="Show detail of tab" data-step="2">
+    <div class="wr-list">
+        <table class="table table-hover table-condensed share-content" cellpadding="0">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Summary</th>
+                    <th>Reporter</th>
+                    <th>Date</th>
+                    <th>Score</th>
+                    <th>Useful</th>
+                    <th>Logic Clear</th>
+                    <th>Good Summary</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in ViewBag.shareList)
+                {
+                    var vote_score_1 = 0;
+                    var vote_score_2 = 0;
+                    var vote_score_3 = 0;
+                    if (item.Value.ILikeType.ContainsKey(Prometheus.Models.ILikeType.Useful))
+                    {
+                        vote_score_1 = item.Value.ILikeType[Prometheus.Models.ILikeType.Useful] * 5;
+                    }
+                    if (item.Value.ILikeType.ContainsKey(Prometheus.Models.ILikeType.LogicClear))
+                    {
+                        vote_score_2 = item.Value.ILikeType[Prometheus.Models.ILikeType.LogicClear] * 5;
+                    }
+                    if (item.Value.ILikeType.ContainsKey(Prometheus.Models.ILikeType.GoodSummary))
+                    {
+                        vote_score_3 = item.Value.ILikeType[Prometheus.Models.ILikeType.GoodSummary] * 5;
+                    }
+                    var vote_flg_1 = "-empty ivote";
+                    var vote_flg_2 = "-empty ivote";
+                    var vote_flg_3 = "-empty ivote";
+                    if (ViewBag.ivoteList.ContainsKey(item.Value.ShareID))
+                    {
+                        var votelist = ViewBag.ivoteList[item.Value.ShareID];
+                        if (votelist.ContainsKey(Prometheus.Models.ILikeType.Useful) && votelist[Prometheus.Models.ILikeType.Useful].Status != 0)
+                        {
+                            vote_flg_1 = " cancel-vote";
+                        }
+                        if (votelist.ContainsKey(Prometheus.Models.ILikeType.LogicClear) && votelist[Prometheus.Models.ILikeType.LogicClear].Status != 0)
+                        {
+                            vote_flg_2 = " cancel-vote";
+                        }
+                        if (votelist.ContainsKey(Prometheus.Models.ILikeType.GoodSummary) && votelist[Prometheus.Models.ILikeType.GoodSummary].Status != 0)
+                        {
+                            vote_flg_3 = " cancel-vote";
+                        }
+                    }
+
+                    <tr>
+                        <td>@idx</td>
+                        <td><a href="/Issue/UpdateIssue?issuekey=@item.Value.IssueKey" target="_blank">@item.Value.IssueSummary</a></td>
+                        <td>@item.Value.CreateTime</td>
+                        <td>@item.Value.UserName.Split(new char[] { '@' })[0]</td>
+                        <td>@(vote_score_1 + " / " + vote_score_2 + " / " + vote_score_3)</td>
+                        <td><span class="glyphicon glyphicon-heart@(vote_flg_1) color-heart" data-id="@item.Value.ShareID" data-type="@Prometheus.Models.ILikeType.Useful"></span></td>
+                        <td><span class="glyphicon glyphicon-heart@(vote_flg_2) color-heart" data-id="@item.Value.ShareID" data-type="@Prometheus.Models.ILikeType.LogicClear"></span></td>
+                        <td><span class="glyphicon glyphicon-heart@(vote_flg_3) color-heart" data-id="@item.Value.ShareID" data-type="@Prometheus.Models.ILikeType.GoodSummary"></span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        WeeklyReport.wrs_show();
+    })
+    $(document).ready(function () {
+        $('.share-content').DataTable({
+            'iDisplayLength': 5,
+            'aLengthMenu': [[5, 25, 50, 100, -1],
+            [5, 25, 50, 100, "All"]],
+            "bAutoWidth": false,
+            "aaSorting": [],
+            "order": []
+        });
+    })
+</script>

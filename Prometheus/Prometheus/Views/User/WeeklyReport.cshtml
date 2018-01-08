@@ -31,6 +31,7 @@
 <ul class="nav nav-pills nav-stacked col-xs-2" data-intro="Select tab to see detail." data-step="1">
     <li><a href="/User/ILearn">I Learn</a></li>
     <li class="active"><a href="/User/WeeklyReportList">Weekly Report</a></li>
+    <li><a href="/User/WeeklyReportShare">Weekly Report Share</a></li>
     <li><a href="/User/ILearn">Training</a></li>
     <li><a href="/User/ILearn">I Share</a></li>
 </ul>
@@ -273,13 +274,14 @@
                                     <table class="table table-condensed" cellpadding="0">
                                         <colgroup>
                                             <col style="width: 5%;">
-                                            <col style="width: 45%;">
+                                            <col style="width: 40%;">
                                             <col style="width: 12%;">
                                             <col style="width: 10%;">
                                             <col style="width: 6%;">
                                             <col style="width: 6%;">
                                             <col style="width: 10%;">
                                             <col style="width: 6%;">
+                                            <col style="width: 5%;">
                                         </colgroup>
                                         <thead>
                                             <tr>
@@ -291,6 +293,7 @@
                                                 <th>Due</th>
                                                 <th>Update</th>
                                                 <th>Attachment</th>
+                                                <th>Share</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -316,9 +319,18 @@
                                                             <a href="/Issue/IssueAttach?issuekey=@task.Key" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></a>
                                                         }
                                                     </td>
+                                                    <td>
+                                                        @if(task.Value.Assignee == ViewBag.RealUserID
+                                                            && task.Value.Status != "Open" && task.Value.Status != "Pending"
+                                                            && task.Value.Status != "Working" && task.Value.Status != "ReOpen")
+                                                        {
+                                                            <span class="glyphicon glyphicon-share-alt ishare" data-id="@task.Key" 
+                                                                  title="Share" data-toggle="tooltip"></span>
+                                                        }
+                                                    </td>
                                                 </tr>
                                                 <tr class="even" data-ikey="@task.Key">
-                                                    <td colspan="8">
+                                                    <td colspan="9">
                                                         <div class="col-xs-12 summary">Summary:</div>
                                                         @{
                                                             var isummary = "";
@@ -475,13 +487,14 @@
                                     <table class="table table-condensed" cellpadding="0">
                                         <colgroup>
                                             <col style="width: 5%;">
-                                            <col style="width: 45%;">
+                                            <col style="width: 40%;">
                                             <col style="width: 10%;">
                                             <col style="width: 6%;">
                                             <col style="width: 6%;">
                                             <col style="width: 6%;">
                                             <col style="width: 10%;">
                                             <col style="width: 12%;">
+                                            <col style="width: 5%;" >
                                         </colgroup>
                                         <thead>
                                             <tr>
@@ -493,6 +506,7 @@
                                                 <th>Update</th>
                                                 <th>Attachment</th>
                                                 <th>Mark</th>
+                                                <th>Share</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -524,6 +538,16 @@
                                                             <option value="2" @(tmark == "2" ? "selected" : "")>Lowlight</option>
                                                         </select>
                                                     </td>
+                                                    <td>
+                                                        @if (task.Value.Assignee == ViewBag.RealUserID
+                                                            && task.Value.Status != "Open" && task.Value.Status != "Pending"
+                                                            && task.Value.Status != "Working" && task.Value.Status != "ReOpen")
+                                                        {
+                                                            <span class="glyphicon glyphicon-share-alt ishare" data-id="@task.Key"
+                                                                  title="Share" data-toggle="tooltip"></span>
+                                                        }
+                                                    </td>
+
                                                 </tr>
                                                 m++;
                                             }
@@ -601,12 +625,13 @@
                                     <table class="table table-condensed" cellpadding="0">
                                         <colgroup>
                                             <col style="width: 5%;">
-                                            <col style="width: 45%;">
+                                            <col style="width: 40%;">
                                             <col style="width: 10%;">
                                             <col style="width: 10%;">
                                             <col style="width: 10%;">
                                             <col style="width: 10%;">
                                             <col style="width: 10%;">
+                                            <col style="width: 5%;" />
                                         </colgroup>
                                         <thead>
                                             <tr>
@@ -617,6 +642,7 @@
                                                 <th>Due</th>
                                                 <th>Update</th>
                                                 <th>Attachment</th>
+                                                <th>Share</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -641,9 +667,18 @@
                                                             <a href="/Issue/IssueAttach?issuekey=@task.Key" target="_blank"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></a>
                                                         }
                                                     </td>
+                                                    <td>
+                                                        @if (task.Value.Assignee == ViewBag.RealUserID
+                                                            && task.Value.Status != "Open" && task.Value.Status != "Pending"
+                                                            && task.Value.Status != "Working" && task.Value.Status != "ReOpen")
+                                                        {
+                                                            <span class="glyphicon glyphicon-share-alt ishare" data-id="@task.Key"
+                                                                  title="Share" data-toggle="tooltip"></span>
+                                                        }
+                                                    </td>
                                                 </tr>
                                                 <tr class="even" data-ikey="@task.Key">
-                                                    <td colspan="7">
+                                                    <td colspan="8">
                                                         <div class="col-xs-12 summary">Summary:</div>
                                                         @{
                                                             var csummary = "";
@@ -807,13 +842,14 @@
                                     <table class="table table-condensed" cellpadding="0">
                                         <colgroup>
                                             <col style="width: 5%;">
-                                            <col style="width: 45%;">
+                                            <col style="width: 40%;">
                                             <col style="width: 10%;">
                                             <col style="width: 6%;">
                                             <col style="width: 6%;">
                                             <col style="width: 6%;">
                                             <col style="width: 10%;">
                                             <col style="width: 12%;">
+                                            <col style="width: 5%;">
                                         </colgroup>
                                         <thead>
                                             <tr>
@@ -825,6 +861,7 @@
                                                 <th>Update</th>
                                                 <th>Attachment</th>
                                                 <th>Mark</th>
+                                                <th>Share</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -856,6 +893,16 @@
                                                             <option value="2" @(rmark == "2" ? "selected" : "")>Lowlight</option>
                                                         </select>
                                                     </td>
+                                                    <td>
+                                                        @if (task.Value.Assignee == ViewBag.RealUserID
+                                                            && task.Value.Status != "Open" && task.Value.Status != "Pending"
+                                                            && task.Value.Status != "Working" && task.Value.Status != "ReOpen")
+                                                        {
+                                                            <span class="glyphicon glyphicon-share-alt ishare" data-id="@task.Key"
+                                                                  title="Share" data-toggle="tooltip"></span>
+                                                        }
+                                                    </td>
+
                                                 </tr>
                                                 m++;
                                             }

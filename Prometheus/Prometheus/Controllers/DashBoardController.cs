@@ -47,6 +47,15 @@ namespace Prometheus.Controllers
             }
             ViewBag.List = ProjectErrorViewModels.GetAllOrignalCode();
 
+            ViewBag.isie8 = false;
+            var browse = Request.Browser;
+            if (string.Compare(browse.Browser, "IE", true) == 0
+                && (string.Compare(browse.Version, "7.0", true) == 0
+                || string.Compare(browse.Version, "8.0", true) == 0))
+            {
+                ViewBag.isie8 = true;
+            }
+
             return View();
         }
     }

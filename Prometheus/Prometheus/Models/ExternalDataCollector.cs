@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -474,7 +475,15 @@ namespace Prometheus.Models
         public double Temp { set; get; }
         public int CH { set; get; }
         public double dValue { get {
-                return Convert.ToDouble(Value);
+                if (Value.ToUpper().Contains("0X"))
+                {
+                    long parsed = long.Parse(Value.ToUpper().Replace("0X", ""), NumberStyles.AllowHexSpecifier);
+                    return Convert.ToDouble(parsed);
+                }
+                else
+                {
+                    return Convert.ToDouble(Value);
+                }
             } }
         public string Value { set; get; }
     }

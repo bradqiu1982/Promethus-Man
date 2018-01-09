@@ -24,22 +24,23 @@
     <div class="form-group">
         <div class="row">
             <div class="col-xs-6">
-                @if (ViewBag.ModuleSn != null)
-                {
-                    <input id="ModuleSNList" name="ModuleSNList" list="leftquerys" placeholder="Please input module sn" class="form-control text-box single-line" type="text" value="@ViewBag.ModuleSn" />
-                }
-                else
-                {
-                    <input id="ModuleSNList" name="ModuleSNList" list="leftquerys" placeholder="Please input module sn" class="form-control text-box single-line" type="text" />
-                }
-                <datalist id="leftquerys">
-                    @foreach (var item in ViewBag.modulequeryvallist)
+                <div class="col-xs-9">
+                    @if (ViewBag.ModuleSn != null)
                     {
-                        <option value="@item">@item</option>
+                        <input id="ModuleSNList" name="ModuleSNList" list="leftquerys" placeholder="Please input module sn" class="form-control text-box single-line" type="text" value="@ViewBag.ModuleSn" />
                     }
-                </datalist>
+                    else
+                    {
+                        <input id="ModuleSNList" name="ModuleSNList" list="leftquerys" placeholder="Please input module sn" class="form-control text-box single-line" type="text" />
+                    }
+                    <datalist id="leftquerys">
+                        @foreach (var item in ViewBag.modulequeryvallist)
+                        {
+                            <option value="@item">@item</option>
+                        }
+                    </datalist>
 
-                <script type="text/javascript">
+                    <script type="text/javascript">
                     $(document).ready(function () {
                         $("#ModuleSNList").flexdatalist({
                             minLength: 0,
@@ -47,9 +48,15 @@
                             maxShownResults: 300
                         });
                     });
-                </script>
+                    </script>
+                </div>
+                <div class="col-xs-3">
+                    <input type="checkbox" id="moredata" name="moredata" value="true" data-toggle="tooltip" title="More data will be more precise,but response slow">
+                    <label  data-toggle="tooltip" title="More data will be more precise,but response slow">More Data</label>
+                </div>
             </div>
             <div class="col-xs-6">
+
             </div>
         </div>
     </div>

@@ -166,12 +166,15 @@ namespace Prometheus.Models
             return dict;
         }
 
-        public static List<double> RetrieveBITestData(string querycond, string datafield,string condtype,string optioncond)
+        public static List<double> RetrieveBITestData(string querycond, string datafield,string condtype,string optioncond,bool moredata=false)
         {
             var real2db = BIRealName2DBColName();
             var realdatafield = real2db[datafield];
 
-            var sql = "select <datafield> from BITestResultDataField";
+            var datacount = 15000;
+            if (moredata) datacount = 30000;
+
+            var sql = "select top <datacount> <datafield> from BITestResultDataField";
             if (condtype.Contains(TXOQUERYTYPE.BR))
             {
                 sql = sql + " where JO like '%<cond>%' ";
@@ -185,10 +188,13 @@ namespace Prometheus.Models
                 sql = sql + " where JO = '<cond>' ";
             }
 
-            var ret = new List<double>();
-            sql = sql.Replace("<datafield>", realdatafield).Replace("<cond>", querycond);
+            sql = sql + " and <datafield> <> 0";
 
-            sql = sql + optioncond;
+            var ret = new List<double>();
+            sql = sql.Replace("<datafield>", realdatafield).Replace("<cond>", querycond).Replace("<datacount>",datacount.ToString());
+
+            sql = sql + optioncond + " order by TestTimeStamp DESC";
+
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
             {
@@ -347,12 +353,14 @@ namespace Prometheus.Models
             return dict;
         }
 
-        public static List<double> RetrieveModuleTestData(string querycond, string datafield, string condtype,string optionalcond)
+        public static List<double> RetrieveModuleTestData(string querycond, string datafield, string condtype,string optionalcond,bool moredata = false)
         {
             var real2db = ModuleRealName2DBColName();
             var realdatafield = real2db[datafield];
+            var datacount = 15000;
+            if (moredata) datacount = 30000;
 
-            var sql = "select <datafield> from ModuleTXOData ";
+            var sql = "select top <datacount> <datafield> from ModuleTXOData ";
             if (condtype.Contains(TXOQUERYTYPE.BR))
             {
                 sql = sql + " where JO like '%<cond>%' ";
@@ -367,8 +375,8 @@ namespace Prometheus.Models
             }
 
             var ret = new List<double>();
-            sql = sql.Replace("<datafield>", realdatafield).Replace("<cond>", querycond);
-            sql = sql + optionalcond;
+            sql = sql.Replace("<datafield>", realdatafield).Replace("<cond>", querycond).Replace("<datacount>", datacount.ToString());
+            sql = sql + optionalcond + " order by TestTimeStamp DESC";
 
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
@@ -487,12 +495,14 @@ namespace Prometheus.Models
             return dict;
         }
 
-        public static List<double> RetrieveAlignmentTestData(string querycond, string datafield, string condtype, string optionalcond)
+        public static List<double> RetrieveAlignmentTestData(string querycond, string datafield, string condtype, string optionalcond,bool moredata=false)
         {
             var real2db = ProcessRealName2DBColName();
             var realdatafield = real2db[datafield];
+            var datacount = 15000;
+            if (moredata) datacount = 30000;
 
-            var sql = "select <datafield> from AlignmentPower ";
+            var sql = "select top <datacount> <datafield> from AlignmentPower ";
             if (condtype.Contains(TXOQUERYTYPE.BR))
             {
                 sql = sql + " where JO like '%<cond>%' ";
@@ -507,7 +517,7 @@ namespace Prometheus.Models
             }
 
             var ret = new List<double>();
-            sql = sql.Replace("<datafield>", realdatafield).Replace("<cond>", querycond);
+            sql = sql.Replace("<datafield>", realdatafield).Replace("<cond>", querycond).Replace("<datacount>", datacount.ToString());
             if (string.IsNullOrEmpty(optionalcond))
             {
                 sql = sql + " and TestName ='"+AlignmentPowerType.AlignmentPower+"' ";
@@ -517,7 +527,7 @@ namespace Prometheus.Models
                 sql = sql + optionalcond;
             }
 
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql + " order by TestTimeStamp DESC", null);
             foreach (var line in dbret)
             {
                 if (line[0] == null)

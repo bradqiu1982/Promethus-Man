@@ -1250,7 +1250,7 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        private void ModuleInBI(string BR,string modulevalue)
+        private void ModuleInBI(string BR,string modulevalue,bool moredata)
         {
             var channel = Request.Form["leftmdchannellist"];
             var bitestname = Request.Form["leftbistationlist"];
@@ -1268,7 +1268,7 @@ namespace Prometheus.Controllers
                 fieldappend = fieldappend + "-CH" + channel;
             }
 
-            var rawlist = BITestResultDataField.RetrieveBITestData(BR, TXOQUERYCOND.BURNIN + "PO_LD", TXOQUERYTYPE.BR, optioncond);
+            var rawlist = BITestResultDataField.RetrieveBITestData(BR, TXOQUERYCOND.BURNIN + "PO_LD", TXOQUERYTYPE.BR, optioncond, moredata);
             if (rawlist.Count > 5)
             {
                 var filteddata = GetCleanDataWithStdDev(rawlist);
@@ -1276,7 +1276,7 @@ namespace Prometheus.Controllers
             }
         }
 
-        private void ModuleInAlign(string BR, string modulevalue)
+        private void ModuleInAlign(string BR, string modulevalue,bool moredata)
         {
             var channel = Request.Form["leftmdchannellist"];
             var aligntestname = Request.Form["leftaligntestlist"];
@@ -1302,7 +1302,7 @@ namespace Prometheus.Controllers
             }
         }
 
-        private void ModuleInModule(string BR, string modulevalue)
+        private void ModuleInModule(string BR, string modulevalue,bool moredata)
         {
             var channel = Request.Form["leftmdchannellist"];
             var temperature = Request.Form["leftmdtemplist"];
@@ -1338,7 +1338,7 @@ namespace Prometheus.Controllers
                 fieldappend = fieldappend + "-" + temperature;
             }
 
-            var rawlist = ModuleTXOData.RetrieveModuleTestData(BR, TXOQUERYCOND.TEST + "TxPower", TXOQUERYTYPE.BR, optioncond);
+            var rawlist = ModuleTXOData.RetrieveModuleTestData(BR, TXOQUERYCOND.TEST + "TxPower", TXOQUERYTYPE.BR, optioncond, moredata);
             if (rawlist.Count > 5)
             {
                 var filteddata = GetCleanDataWithStdDev(rawlist);
@@ -1429,6 +1429,13 @@ namespace Prometheus.Controllers
             var aligntestdata = RetrieveModuleTestDataBySN_AG(ModuleSn);
             var moduletestdata = RetrieveModuleTestDataBySN_MD(ModuleSn);
 
+            bool moredata = false;
+            if (Request.Form["moredata"] != null
+                && string.Compare(Request.Form["moredata"].ToUpper(),"TRUE") == 0)
+            {
+                moredata = true;
+            }
+
             ViewBag.bitestdata = bitestdata;
             ViewBag.aligntestdata = aligntestdata;
             ViewBag.moduletestdata = moduletestdata;
@@ -1442,7 +1449,7 @@ namespace Prometheus.Controllers
                 if (jos.Length == 3)
                 {
                     var BR = "-" + jos[1] + "-";
-                    ModuleInBI(BR,bitestdata[bitestdata.Count-1].PO_LD.ToString());
+                    ModuleInBI(BR,bitestdata[bitestdata.Count-1].PO_LD.ToString(),moredata);
                 }
             }
 
@@ -1453,7 +1460,7 @@ namespace Prometheus.Controllers
                 if (jos.Length == 3)
                 {
                     var BR = "-" + jos[1] + "-";
-                    ModuleInAlign(BR, aligntestdata[aligntestdata.Count -1].TxPower.ToString());
+                    ModuleInAlign(BR, aligntestdata[aligntestdata.Count -1].TxPower.ToString(),moredata);
                 }
             }
 
@@ -1464,7 +1471,7 @@ namespace Prometheus.Controllers
                 if (jos.Length == 3)
                 {
                     var BR = "-" + jos[1] + "-";
-                    ModuleInModule(BR, moduletestdata[moduletestdata.Count -1].TxPower.ToString());
+                    ModuleInModule(BR, moduletestdata[moduletestdata.Count -1].TxPower.ToString(),moredata);
                 }
             }
 

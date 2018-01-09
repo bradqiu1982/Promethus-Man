@@ -527,7 +527,7 @@ namespace Prometheus.Models
             }
             pjcond = pjcond.Substring(0, pjcond.Length - 2) + ") ";
 
-            var sql = "select distinct top 500 ModuleSN,ReportDate from Issue where ProjectKey in <pjcond> and ModuleSN <> '' order by ReportDate DESC";
+            var sql = "select distinct top 500 ModuleSN,ReportDate from Issue where ProjectKey in <pjcond> and ModuleSN <> '' and Resolution <> 'AutoClose' order by ReportDate DESC";
             sql = sql.Replace("<pjcond>", pjcond);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             var ret = new Dictionary<string,bool>();

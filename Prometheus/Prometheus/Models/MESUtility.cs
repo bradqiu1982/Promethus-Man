@@ -1,6 +1,7 @@
 ﻿using Prometheus.Controllers;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -458,8 +459,27 @@ namespace Prometheus.Models
                         try
                         {
                             var lowhigh = pjerror.WildMatchParam.Split(new string[] { "##" }, StringSplitOptions.RemoveEmptyEntries);
-                            var low = Convert.ToDouble(lowhigh[0]);
-                            var high = Convert.ToDouble(lowhigh[1]);
+                            var low = 0.0;
+                            var high = 0.0;
+                            if (lowhigh[0].ToUpper().Contains("0X"))
+                            {
+                                var parsed = long.Parse(lowhigh[0].ToUpper().Replace("0X", ""), NumberStyles.AllowHexSpecifier);
+                                low = Convert.ToDouble(parsed);
+                            }
+                            else
+                            {
+                                low = Convert.ToDouble(lowhigh[0]);
+                            }
+                            if (lowhigh[1].ToUpper().Contains("0X"))
+                            {
+                                var parsed = long.Parse(lowhigh[1].ToUpper().Replace("0X", ""), NumberStyles.AllowHexSpecifier);
+                                high = Convert.ToDouble(parsed);
+                            }
+                            else
+                            {
+                                high = Convert.ToDouble(lowhigh[1]);
+                            }
+
                             if (item.dValue > low && item.dValue < high)
                             {
                                 return true;

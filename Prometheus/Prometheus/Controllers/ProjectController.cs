@@ -5308,7 +5308,7 @@ namespace Prometheus.Controllers
                             }
                         }
 
-                        if (alldict.Count < 80)
+                        if (alldict.Count < 100)
                         {
                             continue;
                         }
@@ -5397,10 +5397,10 @@ namespace Prometheus.Controllers
 
         private void CheckVecselYieldByWafer(List<string> pjkeylist)
         {
-            var filename = "log" + DateTime.Now.ToString("yyyy-MM-dd");
-            var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
+            var fn = "VCSEL_WAFER_SN" + DateTime.Now.ToString("yyyy-MM-dd") + ".txt";
+            var logvcsel = Server.MapPath("~/userfiles") + "\\" + fn;
 
-            if (!System.IO.File.Exists(wholefilename))
+            if (!System.IO.File.Exists(fn))
             {
                 RealCheckVcselYieldByWafer(pjkeylist);
             }
@@ -6138,7 +6138,7 @@ namespace Prometheus.Controllers
             //{
             //    ProjectYieldViewModule.GetYieldByWeeks(pjkey.ProjectKey, HttpContext.Cache, 4);
             //}
-            //MESUtility.DebugCriticalFunction("4803b080008d6752", "OE25LPTE", this);
+            //MESUtility.DebugCriticalFunction("4803b080008cde33", "OE25LPTE", this);
             //try
             //{
             //    var ckeylist = new List<string>();

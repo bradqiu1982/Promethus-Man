@@ -22,21 +22,21 @@ else
     <div class="nav navbar-nav navbar-left">
         <img src="~/Content/images/PJ/Task.png" height="35" width="35">
     </div>
-    <div class="nav navbar-nav navbar-left" data-toggle="modal" data-target="#myModal">
+    <div class="nav navbar-nav navbar-left">
         <ol class="breadcrumb">
-            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
+            <li data-toggle="modal" data-target="#myModal"><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
             @if (Model != null)
             {
-                <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ProjectKey)">Project Detail</a></li>
+                <li data-toggle="modal" data-target="#myModal"><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ProjectKey)">Project Detail</a></li>
             }
             @if (Model != null)
             {
-                <li><a data-toggle="tooltip" title="Goto Project Task" href="/Project/ProjectIssues?ProjectKey=@(Model.ProjectKey)">Project Task</a></li>
+                <li data-toggle="modal" data-target="#myModal"><a data-toggle="tooltip" title="Goto Project Task" href="/Project/ProjectIssues?ProjectKey=@(Model.ProjectKey)">Project Task</a></li>
             }
 
             @if (Model != null && !string.IsNullOrEmpty(Model.ParentIssueKey))
             {
-                <li><a data-toggle="tooltip" title="Goto Parent Task" href="/Issue/UpdateIssue?issuekey=@(Model.ParentIssueKey)">Parent Task</a></li>
+                <li data-toggle="modal" data-target="#myModal"><a data-toggle="tooltip" title="Goto Parent Task" href="/Issue/UpdateIssue?issuekey=@(Model.ParentIssueKey)">Parent Task</a></li>
             }
             <li class="active">Update Task</li>
         </ol>

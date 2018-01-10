@@ -10,14 +10,14 @@
     <div class="nav navbar-nav navbar-left">
         <img src="~/Content/images/PJ/FA.png" style="height:35px; width:35px;margin-right: 15px;">
     </div>
-    <div class="nav navbar-nav navbar-left" data-toggle="modal" data-target="#myModal">
+    <div class="nav navbar-nav navbar-left">
         <ol class="breadcrumb" style="width:600px">
-            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
+            <li data-toggle="modal" data-target="#myModal"><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
 
                     @if (ViewBag.projectkey != null)
             {
-                        <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(ViewBag.projectkey)">Project Detail</a></li>
-                        <li><a href="/Project/ProjectFA?ProjectKey=@(ViewBag.projectkey)">All Pending FA</a></li>
+                        <li data-toggle="modal" data-target="#myModal"><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(ViewBag.projectkey)">Project Detail</a></li>
+                        <li data-toggle="modal" data-target="#myModal"><a href="/Project/ProjectFA?ProjectKey=@(ViewBag.projectkey)">All Pending FA</a></li>
                         <li class="active">@ViewBag.projectkey FA</li>
                     }
                     else

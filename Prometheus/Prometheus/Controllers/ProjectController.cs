@@ -5400,7 +5400,7 @@ namespace Prometheus.Controllers
             var fn = "VCSEL_WAFER_SN" + DateTime.Now.ToString("yyyy-MM-dd") + ".txt";
             var logvcsel = Server.MapPath("~/userfiles") + "\\" + fn;
 
-            if (!System.IO.File.Exists(fn))
+            if (!System.IO.File.Exists(logvcsel))
             {
                 RealCheckVcselYieldByWafer(pjkeylist);
             }
@@ -5566,8 +5566,8 @@ namespace Prometheus.Controllers
             var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
             if (!System.IO.File.Exists(wholefilename))
             {
-                var hello = "hello";
-                System.IO.File.WriteAllText(wholefilename, hello);
+                //var hello = "hello";
+                //System.IO.File.WriteAllText(wholefilename, hello);
                 var currenttime = DateTime.Now;
 
                 var alluser = UserViewModels.RetrieveAllUser();

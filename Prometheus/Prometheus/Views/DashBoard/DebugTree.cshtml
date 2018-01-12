@@ -7,7 +7,7 @@
     }
     else
     {
-        Layout = "~/Views/Shared/_Layout.cshtml";
+        Layout = "~/Views/Shared/_LayoutNew.cshtml";
     }
 }
 
@@ -57,11 +57,7 @@ else
         <div class="col-xs-8">
             <div class="errcode_jm_container" id="jsmind_container"></div>
         </div>
-
     </div>
-
-
-
     <div class="modal fade" id="analysis-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -75,9 +71,26 @@ else
                     <input type="hidden" id="analysis-id" />
                     <div class="row form-group">
                         <label class="col-xs-2">Analysis Title</label>
-                        <div class="col-xs-8" id="display-title">
-                            <input type="text" class="form-control" style="width: 80%; display: inline-block;" id="span-title" name="span-title" readonly />
-                        </div>
+                        @if (ViewBag.isMe)
+                        {
+                            <div class="col-xs-8" id="display-title">
+                                <input type="text" class="form-control" style="width: 80%; display: inline-block;" id="span-title" name="span-title" readonly />
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-xs-8 hidden" id="display-title">
+                                <input type="text" class="form-control" style="width: 80%; display: inline-block;" id="span-title" name="span-title" readonly />
+                                <input type="button" class="btn btn-success"
+                                       id="btn-edit" name="btn-edit" value="Edit" />
+                            </div>
+                            <div class="col-xs-8" id="edit-title">
+                                <input type="text" class="form-control" style="width: 80%; display: inline-block;"
+                                       id="analysis-name" name="analysis-name" />
+                                <input type="button" class="btn btn-success"
+                                       id="btn-save" name="btn-save" value="Save" />
+                            </div>
+                        }
                     </div>
                     <div class="panel panel-default">
                         <div class="panel-heading">
@@ -133,79 +146,102 @@ else
     </div>
 
     <script type="text/javascript">
-    var _jm = null;
-    $(function () {
-        $('#ondatatable').DataTable({
-            'sPaginationType': 'simple',
-            'bLengthChange': false,
-            'iDisplayLength': 15,
-            "bAutoWidth": false,
-            "ordering": false,
-            "aaSorting": [],
-        });
-    })
-
-    $('body').on('click', '#ondatatable tr td', function () {
-        var options = {
-            container: 'jsmind_container',
-            theme: 'greensea',
-            editable: true,
-            mode: 'side',
-            view: {
-                hmargin: 10,
-                vmargin: 10,
-                line_width: 2,
-                line_color: '#555'
-            },
-            layout: {
-                hspace: 20,
-                vspace: 10,
-                pspace: 0
-            }
-        }
-        $('#jsmind_container').empty();
-        var OriginalCode = $(this).attr('data-id');
-        $.post('/Project/ProjectErrorData',
-        {
-            OriginalCode: OriginalCode
-        }, function (output) {
-            if (output.success) {
-                var mind = {
-                    "format": "node_array",
-                    "data": output.jm_data
-                };
-                _jm = jsMind.show(options, mind);
-            }
-        });
-    })
-
-    $('body').on('click', 'jmnode', function () {
-        var select_node = _jm.get_selected_node();
-        if (select_node.children.length > 0) {
-            return false;
-        }
-        var analysis_id = select_node.id;
-
-        $('#display-title').addClass('hidden');
-        $('#edit-title').removeClass('hidden');
-        $.post('/Project/RetrieveErrorCommentsByAnalyzeID',
-        {
-            id: analysis_id
-        }, function (output) {
-            $('#analysis-id').val(analysis_id);
-            $('#span-title').val(output.title.content);
-            $('#analysis-name').val(output.title.content);
-            $('#des-info').html(output.failuredetail.content);
-            $('#des-reporter').html(output.failuredetail.reporter);
-            $('#des-datetime').html(output.failuredetail.time);
-            $('#rc-info').html(output.rootcause.content);
-            $('#rc-reporter').html(output.rootcause.reporter);
-            $('#rc-datetime').html(output.rootcause.time);
-            $('#res-info').html(output.result.content);
-            $('#res-reporter').html(output.result.reporter);
-            $('#res-datetime').html(output.result.time);
-            $('#analysis-modal').modal('show');
+        var _jm = null;
+        $(function () {
+            $('#ondatatable').DataTable({
+                'sPaginationType': 'simple',
+                'bLengthChange': false,
+                'iDisplayLength': 15,
+                "bAutoWidth": false,
+                "ordering": false,
+                "aaSorting": [],
+            });
         })
-    })
+
+        $('body').on('click', '#ondatatable tr td', function () {
+            var options = {
+                container: 'jsmind_container',
+                theme: 'greensea',
+                editable: true,
+                mode: 'side',
+                view: {
+                    hmargin: 10,
+                    vmargin: 10,
+                    line_width: 2,
+                    line_color: '#555'
+                },
+                layout: {
+                    hspace: 20,
+                    vspace: 10,
+                    pspace: 0
+                }
+            }
+            $('#jsmind_container').empty();
+            var OriginalCode = $(this).attr('data-id');
+            $.post('/Project/ProjectErrorData',
+            {
+                OriginalCode: OriginalCode
+            }, function (output) {
+                if (output.success) {
+                    var mind = {
+                        "format": "node_array",
+                        "data": output.jm_data
+                    };
+                    _jm = jsMind.show(options, mind);
+                }
+            });
+        })
+
+        $('body').on('click', 'jmnode', function () {
+            var select_node = _jm.get_selected_node();
+            if (select_node.isroot || select_node.children.length > 0) {
+                return false;
+            }
+            var analysis_id = select_node.id;
+            var isMe = '@ViewBag.IsMe';
+            if (isMe != 'True') {
+                $('#display-title').addClass('hidden');
+                $('#edit-title').removeClass('hidden');
+            }
+            $.post('/Project/RetrieveErrorCommentsByAnalyzeID',
+            {
+                id: analysis_id
+            }, function (output) {
+                $('#analysis-id').val(analysis_id);
+                $('#span-title').val(output.title.content);
+                $('#analysis-name').val(output.title.content);
+                $('#des-info').html(output.failuredetail.content);
+                $('#des-reporter').html(output.failuredetail.reporter);
+                $('#des-datetime').html(output.failuredetail.time);
+                $('#rc-info').html(output.rootcause.content);
+                $('#rc-reporter').html(output.rootcause.reporter);
+                $('#rc-datetime').html(output.rootcause.time);
+                $('#res-info').html(output.result.content);
+                $('#res-reporter').html(output.result.reporter);
+                $('#res-datetime').html(output.result.time);
+                $('#analysis-modal').modal('show');
+            })
+            })
+
+        $('body').on('click', '#btn-edit', function () {
+            $('#display-title').addClass('hidden');
+            $('#edit-title').removeClass('hidden');
+        })
+
+        $('body').on('click', '#btn-save', function () {
+            var id = $('#analysis-id').val();
+            var name = $('#analysis-name').val();
+            $.post('/Project/UpdateErrorCommentTitle', {
+                id: id,
+                name: name
+            }, function (output) {
+                if (output.success) {
+                    $('#span-title').val(name);
+                    $('jmnode[nodeid=' + id + ']').html(name);
+                    $('#display-title').removeClass('hidden');
+                    $('#edit-title').addClass('hidden');
+                }
+            })
+        })
     </script>
 }

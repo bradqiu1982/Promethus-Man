@@ -3055,7 +3055,17 @@ namespace Prometheus.Models
             var issues = IssueViewModels.RRetrieveFABySN(pjkey, SN, whichtest,ctrl);
             foreach (var tobedata in issues)
             {
-                if (tobedata.CommentList.Count < 2)
+                bool customercomm = false;
+                foreach (var item in tobedata.CommentList)
+                {
+                    if (string.Compare(item.Reporter, "system", true) != 0)
+                    {
+                        customercomm = true;
+                        break;
+                    }
+                }
+
+                if (!customercomm)
                 {
                     tobedata.Resolution = Resolute.AutoClose;
                     tobedata.Description = "Module " + SN + " passed " + whichtest + " test @" + tester + " @" + datestr;
@@ -3074,7 +3084,17 @@ namespace Prometheus.Models
             var issues = IssueViewModels.RRetrieveFABySN(pjkey, SN, whichtest,ctrl);
             foreach (var tobedata in issues)
             {
-                if (tobedata.CommentList.Count < 2)
+                bool customercomm = false;
+                foreach (var item in tobedata.CommentList)
+                {
+                    if (string.Compare(item.Reporter, "system", true) != 0)
+                    {
+                        customercomm = true;
+                        break;
+                    }
+                }
+
+                if (!customercomm)
                 {
                     tobedata.Resolution = Resolute.AutoClose;
                     tobedata.Description = "Module " + SN + " faild for " + whichtest + " test @" + tester + " @" + datestr+" again";

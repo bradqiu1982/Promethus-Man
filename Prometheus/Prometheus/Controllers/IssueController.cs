@@ -643,24 +643,34 @@ namespace Prometheus.Controllers
             LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
                 Request.Url.ToString(), "Issue", "Update", issuekey, LogType.Task, Log4NetLevel.Info, "");
 
+            var ismanage = CheckHasManagePermit(updater);
+            if (ismanage && Request.Form["DueDate"] != null)
+            {
+                //modify duedate
+                var nDuedate = DateTime.Parse(Request.Form["DueDate"]);
+                IssueViewModels.UpdateIssueDueDate(originaldata.IssueKey, nDuedate);
+            }
+
+            var userdict = UserMatrixVM.RetrieveUserMatrixAuthByuName(updater);
             if (string.Compare(updater, originaldata.Assignee, true) == 0
             || string.Compare(updater, originaldata.Reporter, true) == 0
-            || string.Compare(updater, originaldata.Creator, true) == 0)
+            || string.Compare(updater, originaldata.Creator, true) == 0
+            || (string.Compare(Request.Form["issuetypelist"].ToString(), ISSUETP.NPIPROC) == 0
+                && string.Compare(userdict[updater.ToUpper()].ToUpper(), USERAUTH.MANAGE.ToUpper()) == 0))
             { }
             else
             {
-                var ismanage = CheckHasManagePermit(updater);
-                if (ismanage && Request.Form["DueDate"] != null)
-                {
-                    //modify duedate
-                    var nDuedate = DateTime.Parse(Request.Form["DueDate"]);
-                    IssueViewModels.UpdateIssueDueDate(originaldata.IssueKey, nDuedate);
-                }
                 if (!string.IsNullOrEmpty(Request.Form["editor1"]))
                 {
                     var issuecomment = new IssueComments();
                     issuecomment.Comment = SeverHtmlDecode.Decode(this, Request.Form["editor1"]);
                     IssueViewModels.StoreIssueComment(originaldata.IssueKey, issuecomment.dbComment, updater, COMMENTTYPE.Description);
+
+                    var commenter = updater.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
+                    var dic_towho = GetEmailToWho(updater, originaldata.Assignee, originaldata.Reporter, issuecomment.Comment, originaldata.RelativePeopleList);
+                    var towho = new List<string>(dic_towho.Keys);
+                    var commentcontent = System.Text.RegularExpressions.Regex.Replace(issuecomment.Comment.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
+                    SendTaskCommentEmail(originaldata.IssueKey, originaldata.Summary, commenter, towho, commentcontent);
                 }
 
                 var dict2 = new RouteValueDictionary();
@@ -690,7 +700,9 @@ namespace Prometheus.Controllers
 
             if (string.Compare(originaldata.Reporter, updater, true) == 0
                 || string.Compare(originaldata.Assignee, updater, true) == 0
-                || string.Compare(originaldata.Creator, updater, true) == 0)
+                || string.Compare(originaldata.Creator, updater, true) == 0
+                || (string.Compare(Request.Form["issuetypelist"].ToString(), ISSUETP.NPIPROC) == 0
+                && string.Compare(userdict[updater.ToUpper()].ToUpper(), USERAUTH.MANAGE.ToUpper()) == 0))
             {
                 vm.Assignee = Request.Form["assigneelist"].ToString();
                 vm.Resolution = Request.Form["resolutionlist"].ToString();
@@ -708,7 +720,6 @@ namespace Prometheus.Controllers
             {
                 vm.Description = SeverHtmlDecode.Decode(this, Request.Form["editor1"]);
                 vm.CommentType = COMMENTTYPE.Description;
-
 
                 //if (string.Compare(updater.ToUpper(), originaldata.Assignee) != 0)
                 //{
@@ -1598,24 +1609,32 @@ namespace Prometheus.Controllers
                 }
             }
 
+            var ismanage = CheckHasManagePermit(updater);
+            if (ismanage && Request.Form["DueDate"] != null)
+            {
+                //modify duedate
+                var nDuedate = DateTime.Parse(Request.Form["DueDate"]);
+                IssueViewModels.UpdateIssueDueDate(originaldata.IssueKey, nDuedate);
+            }
+
             if (pjmemauth || string.Compare(updater, originaldata.Assignee, true) == 0
                 || string.Compare(updater, originaldata.Reporter, true) == 0
                 || string.Compare(updater, originaldata.Creator, true) == 0)
             { }
             else
             {
-                var ismanage = CheckHasManagePermit(updater);
-                if (ismanage && Request.Form["DueDate"] != null)
-                {
-                    //modify duedate
-                    var nDuedate = DateTime.Parse(Request.Form["DueDate"]);
-                    IssueViewModels.UpdateIssueDueDate(originaldata.IssueKey, nDuedate);
-                }
+
                 if (!string.IsNullOrEmpty(Request.Form["editor1"]))
                 {
                     var issuecomment = new IssueComments();
                     issuecomment.Comment = SeverHtmlDecode.Decode(this, Request.Form["editor1"]);
                     IssueViewModels.StoreIssueComment(originaldata.IssueKey, issuecomment.dbComment, updater, COMMENTTYPE.Description);
+
+                    var commenter = updater.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
+                    var dic_towho = GetEmailToWho(updater, originaldata.Assignee, originaldata.Reporter, issuecomment.Comment, originaldata.RelativePeopleList);
+                    var towho = new List<string>(dic_towho.Keys);
+                    var commentcontent = System.Text.RegularExpressions.Regex.Replace(issuecomment.Comment.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
+                    SendTaskCommentEmail(originaldata.IssueKey, originaldata.Summary, commenter, towho, commentcontent);
                 }
                 var dict2 = new RouteValueDictionary();
                 dict2.Add("issuekey", originaldata.IssueKey);
@@ -2208,24 +2227,32 @@ namespace Prometheus.Controllers
             LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
                 Request.Url.ToString(), "RMA", "Update", issuekey, LogType.Task, Log4NetLevel.Info, "");
 
+            var ismanage = CheckHasManagePermit(updater);
+            if (ismanage && Request.Form["DueDate"] != null)
+            {
+                //modify duedate
+                var nDuedate = DateTime.Parse(Request.Form["DueDate"]);
+                IssueViewModels.UpdateIssueDueDate(originaldata.IssueKey, nDuedate);
+            }
+
+
             if (string.Compare(updater, originaldata.Assignee, true) == 0
                 || string.Compare(updater, originaldata.Reporter, true) == 0
                 || string.Compare(updater, originaldata.Creator, true) == 0)
             { }
             else
             {
-                var ismanage = CheckHasManagePermit(updater);
-                if (ismanage && Request.Form["DueDate"] != null)
-                {
-                    //modify duedate
-                    var nDuedate = DateTime.Parse(Request.Form["DueDate"]);
-                    IssueViewModels.UpdateIssueDueDate(originaldata.IssueKey, nDuedate);
-                }
                 if (!string.IsNullOrEmpty(Request.Form["editor1"]))
                 {
                     var issuecomment = new IssueComments();
                     issuecomment.Comment = SeverHtmlDecode.Decode(this, Request.Form["editor1"]);
                     IssueViewModels.StoreIssueComment(originaldata.IssueKey, issuecomment.dbComment, updater, COMMENTTYPE.Description);
+
+                    var commenter = updater.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
+                    var dic_towho = GetEmailToWho(updater, originaldata.Assignee, originaldata.Reporter, issuecomment.Comment, originaldata.RelativePeopleList);
+                    var towho = new List<string>(dic_towho.Keys);
+                    var commentcontent = System.Text.RegularExpressions.Regex.Replace(issuecomment.Comment.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
+                    SendTaskCommentEmail(originaldata.IssueKey, originaldata.Summary, commenter, towho, commentcontent);
                 }
 
                 var dict2 = new RouteValueDictionary();
@@ -2635,24 +2662,32 @@ namespace Prometheus.Controllers
             LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
                 Request.Url.ToString(), "REL", "Update", issuekey, LogType.Task, Log4NetLevel.Info, "");
 
+            var ismanage = CheckHasManagePermit(updater);
+            if (ismanage && Request.Form["DueDate"] != null)
+            {
+                //modify duedate
+                var nDuedate = DateTime.Parse(Request.Form["DueDate"]);
+                IssueViewModels.UpdateIssueDueDate(originaldata.IssueKey, nDuedate);
+            }
+
             if (string.Compare(updater, originaldata.Assignee, true) == 0
                 || string.Compare(updater, originaldata.Reporter, true) == 0
                 || string.Compare(updater, originaldata.Creator, true) == 0)
             { }
             else
             {
-                var ismanage = CheckHasManagePermit(updater);
-                if (ismanage && Request.Form["DueDate"] != null)
-                {
-                    //modify duedate
-                    var nDuedate = DateTime.Parse(Request.Form["DueDate"]);
-                    IssueViewModels.UpdateIssueDueDate(originaldata.IssueKey, nDuedate);
-                }
+
                 if (!string.IsNullOrEmpty(Request.Form["editor1"]))
                 {
                     var issuecomment = new IssueComments();
                     issuecomment.Comment = SeverHtmlDecode.Decode(this, Request.Form["editor1"]);
                     IssueViewModels.StoreIssueComment(originaldata.IssueKey, issuecomment.dbComment, updater, COMMENTTYPE.Description);
+
+                    var commenter = updater.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
+                    var dic_towho = GetEmailToWho(updater, originaldata.Assignee, originaldata.Reporter, issuecomment.Comment, originaldata.RelativePeopleList);
+                    var towho = new List<string>(dic_towho.Keys);
+                    var commentcontent = System.Text.RegularExpressions.Regex.Replace(issuecomment.Comment.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
+                    SendTaskCommentEmail(originaldata.IssueKey, originaldata.Summary, commenter, towho, commentcontent);
                 }
                 var dict2 = new RouteValueDictionary();
                 dict2.Add("issuekey", originaldata.IssueKey);
@@ -2893,24 +2928,32 @@ namespace Prometheus.Controllers
             LogVM.WriteLog(updater.ToUpper(), originaldata.ProjectKey, DetermineCompName(Request.UserHostName),
                 Request.Url.ToString(), "OBA", "Update", issuekey, LogType.Task, Log4NetLevel.Info, "");
 
+            var ismanage = CheckHasManagePermit(updater);
+            if (ismanage && Request.Form["DueDate"] != null)
+            {
+                //modify duedate
+                var nDuedate = DateTime.Parse(Request.Form["DueDate"]);
+                IssueViewModels.UpdateIssueDueDate(originaldata.IssueKey, nDuedate);
+            }
+
             if (string.Compare(updater, originaldata.Assignee, true) == 0
                 || string.Compare(updater, originaldata.Reporter, true) == 0
                 || string.Compare(updater, originaldata.Creator, true) == 0)
             { }
             else
             {
-                var ismanage = CheckHasManagePermit(updater);
-                if (ismanage && Request.Form["DueDate"] != null)
-                {
-                    //modify duedate
-                    var nDuedate = DateTime.Parse(Request.Form["DueDate"]);
-                    IssueViewModels.UpdateIssueDueDate(originaldata.IssueKey, nDuedate);
-                }
+
                 if (!string.IsNullOrEmpty(Request.Form["editor1"]))
                 {
                     var issuecomment = new IssueComments();
                     issuecomment.Comment = SeverHtmlDecode.Decode(this, Request.Form["editor1"]);
                     IssueViewModels.StoreIssueComment(originaldata.IssueKey, issuecomment.dbComment, updater, COMMENTTYPE.Description);
+
+                    var commenter = updater.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
+                    var dic_towho = GetEmailToWho(updater, originaldata.Assignee, originaldata.Reporter, issuecomment.Comment, originaldata.RelativePeopleList);
+                    var towho = new List<string>(dic_towho.Keys);
+                    var commentcontent = System.Text.RegularExpressions.Regex.Replace(issuecomment.Comment.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty).Trim();
+                    SendTaskCommentEmail(originaldata.IssueKey, originaldata.Summary, commenter, towho, commentcontent);
                 }
 
                 var dict2 = new RouteValueDictionary();

@@ -1163,9 +1163,14 @@ else
                 <span class="field-validation-valid text-danger" data-valmsg-for="analysetitle" data-valmsg-replace="true"></span>
             </div>
             <div class="col-xs-1"  data-toggle="tooltip" title="Link 2 Debug Tree">
-                    <img src="~/Content/images/PJ/DebugTreeicon.png" MYTP="HOVER" style="height:30px; width:30px" onclick="link2dbgtree()">
-                </div>
-            <div class="col-xs-5">
+                <img src="~/Content/images/PJ/DebugTreeicon.png" MYTP="HOVER" style="height:30px; width:30px" onclick="link2dbgtree()">
+            </div>
+            <div class="col-xs-1" data-toggle="tooltip" title="Debug Tree Map">
+                <a href="/Project/ProjectErrorMind?ProjectKey=@Model.ProjectKey&OrignalCode=@Model.ErrAbbr" target="_blank">
+                    <span class="glyphicon glyphicon-globe" style="font-size: 25px;"></span>
+                </a>
+            </div>
+            <div class="col-xs-4">
                 <input type="submit" value="Link2DebugTree" id="linkisu" name="linkisu" class="btn btn-default" style="display:none;"/>
             </div>
             <script type="text/javascript">

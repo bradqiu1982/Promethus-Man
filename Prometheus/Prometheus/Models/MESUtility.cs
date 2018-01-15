@@ -117,6 +117,8 @@ namespace Prometheus.Models
             string pncond = PNCondition(projectmodel.PNList);
 
             var joinstr = " LEFT JOIN Insite.Container b WITH (NOLOCK) ON b.containername = a.ModuleSerialNum LEFT JOIN Insite.MfgOrder d WITH(NOLOCK) ON d.MfgOrderId = b.MfgOrderId ";
+            //var joinstr = " LEFT JOIN Insite.SUM_Popular_Contnaier d WITH (NOLOCK) ON d.ContainerName = a.ModuleSerialNum ";
+
             var sql = "select a.dc_<DCTABLE>HistoryId,a.ModuleSerialNum, a.WhichTest, a.ModuleType, a.ErrAbbr, a.TestTimeStamp, a.TestStation,a.assemblypartnum ,d.MfgOrderName from "
                 + " insite.dc_<DCTABLE> a (nolock) "+ joinstr + " where assemblypartnum in  (<PNCOND>)  <TIMECOND>  order by  moduleserialnum,testtimestamp DESC";
 
@@ -143,6 +145,8 @@ namespace Prometheus.Models
                 return string.Empty;
 
             var joinstr = " LEFT JOIN Insite.Container b WITH (NOLOCK) ON b.containername = a.ModuleSerialNum LEFT JOIN Insite.MfgOrder d WITH(NOLOCK) ON d.MfgOrderId = b.MfgOrderId ";
+            //var joinstr = " LEFT JOIN Insite.SUM_Popular_Contnaier d WITH (NOLOCK) ON d.ContainerName = a.ModuleSerialNum ";
+
             var sql = "select a.dc_OSAMultiValueTestHistoryId,a.ModuleSerialNum, a.WhichTest, a.ModuleType,a.TestResult, a.TestTimeStamp, a.TestStation,a.ModulePartNum ,d.MfgOrderName from "
                 + " insite.dc_OSAMultiValueTest a (nolock) " + joinstr + " where a.ModulePartNum in  (<PNCOND>)  <TIMECOND>  order by  moduleserialnum,testtimestamp DESC";
             return sql.Replace("<PNCOND>", pncond);

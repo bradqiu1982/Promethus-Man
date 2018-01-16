@@ -4463,5 +4463,88 @@ namespace Prometheus.Controllers
             issuecomment.Comment = SeverHtmlDecode.Decode(ctrl, comment);
             IssueViewModels.StoreIssueComment(iKey, issuecomment.dbComment, updater, COMMENTTYPE.AddAttachment);
         }
+
+        public JsonResult InitTaskLink(string IssueKey,string searchkey)
+        {
+
+            var searchlist = new List<object>();
+            var linklist = new List<object>();
+
+            searchlist.Add(
+                        new
+                        {
+                            id = "1",
+                            title = "Summary 1" + "  <a href='/Issue/UpdateIssue?issuekey=" + "1" + "' target='_blank'>Detail</a>",
+                            description = "Description 1",
+                            dueDate = "2017-05-06"
+                        });
+            searchlist.Add(
+                        new
+                        {
+                        id = "2",
+                        title = "Summary 2" + "  <a href='/Issue/UpdateIssue?issuekey=" + "2" + "' target='_blank'>Detail</a>",
+                        description = "Description 2",
+                        dueDate = "2017-09-06"
+                        });
+
+            searchlist.Add(
+                        new
+                        {
+                            id = "3",
+                            title = "Summary 3" + "  <a href='/Issue/UpdateIssue?issuekey=" + "3" + "' target='_blank'>Detail</a>",
+                            description = "Description 3",
+                            dueDate = "2017-10-06"
+                        });
+
+
+            linklist.Add(
+                        new
+                        {
+                            id = "4",
+                            title = "Summary 4" + "  <a href='/Issue/UpdateIssue?issuekey=" + "4" + "' target='_blank'>Detail</a>",
+                            description = "Description 4",
+                            dueDate = "2017-11-06"
+                        });
+
+
+
+            var mylists = new List<object>();
+            mylists.Add(
+                new
+                {
+                    id = "mysearchlist",
+                    title = "SearchList",
+                    defaultStyle = "lobilist-warning",
+                    controls = false,
+                    useCheckboxes = false,
+                    items = searchlist
+                });
+
+            mylists.Add(
+                new
+                {
+                    id = "mylinklist",
+                    title = "LinkList",
+                    defaultStyle = "lobilist-success",
+                    controls = false,
+                    useCheckboxes = false,
+                    items = linklist
+                });
+
+            var res = new JsonResult();
+            res.Data = new { lists = mylists };
+            res.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
+            return res;
+        }
+
+        public JsonResult MoveTaskLink()
+        {
+            var masterid = Request.Form["masterid"];
+            var slaveid = Request.Form["slaveid"];
+            var res = new JsonResult();
+            res.Data = new { success = true };
+            res.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
+            return res;
+        }
     }
 }

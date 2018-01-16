@@ -2,7 +2,7 @@
 
 @{
     ViewBag.Title = "Update Task";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
     var step_idx = 1;
 }
 
@@ -17,6 +17,11 @@ else
         });
     </script>
 }
+
+<script src="~/Scripts/lobilist/lib/jquery/jquery.ui.touch-punch-improved.js"></script>
+<script src="~/Scripts/lobilist/dist/lobilist_tasklink.js"></script>
+<script src="~/Scripts/lobilist/lib/lobibox/js/lobibox.min.js"></script>
+<script src="~/Scripts/lobilist/lib/highlight/highlight.pack.js"></script>
 
 <div class="row">
     <div class="nav navbar-nav navbar-left">
@@ -75,6 +80,15 @@ else
             function AddSubTask() {
                 $("#subtaskid").submit();
                 return false;
+            }
+        </script>
+    </div>
+    <div class="col-xs-2">
+        <button type="button" class="form-control" style="background-color:#006DC0;height:3em;color:white;" onclick="linktask()">Link Task</button>
+        <script type="text/javascript">
+            function linktask()
+            {
+                $('#linktaskmodal').modal({ backdrop: 'static' });
             }
         </script>
     </div>
@@ -962,6 +976,72 @@ else
         </div>
     </div>
 
+    <div class="modal" id="linktaskmodal" tabindex="-1" role="dialog" aria-labelledby="linktaskmodalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="linktaskmodalLabel">Link Task</h4>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="bs-example" style="text-align:center">
+                        <div class="col-lg-1">
+                        </div>
+                        <div class="col-lg-4">
+                            <input class="form-control" id="searchkey" name="searchkey">
+                        </div>
+                        <div class="col-lg-2">
+                            <button type="button" class="form-control" id="btn-search" style="background-color:#006DC0;height:3em;color:white;">Search Task</button>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div id="demoparent" class="bs-example" style="text-align:center">
+                        <div id="todo-lists-basic-demo"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" onclick="refreshlinktask()">Close</button>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            function refreshlinktask()
+            {
+                $('#linktaskmodal').modal('hide');
+                window.location.href = '/Issue/UpdateIssue?issuekey=' + $('#masterid').val();
+            }
+
+            $('body').on('click', '#btn-search', function () {
+                if ($('#searchkey').val() == ''){ return false; }
+                
+                $('#demoparent').empty();
+                $('#demoparent').append('<div id="todo-lists-basic-demo"></div>');
+                $('#todo-lists-basic-demo').lobiList({
+                    actions: {
+                        load: '/Issue/InitTaskLink?IssueKey=@(Model.IssueKey)&searchkey=' + $('#searchkey').val(),
+                        move: '/Issue/MoveTaskLink'
+                    },
+                    enableTodoRemove: false,
+                    enableTodoEdit: false,
+                    controls: []
+                });
+            })
+            $(function () {
+                //Basic example
+                $('#todo-lists-basic-demo').lobiList({
+                    actions: {
+                        load: '/Issue/InitTaskLink?IssueKey=@(Model.IssueKey)&searchkey=',
+                        move: '/Issue/MoveTaskLink'
+                    },
+                    enableTodoRemove: false,
+                    enableTodoEdit: false,
+                    controls: []
+                });
+            });
+        </script>
+    </div>
 
     <div class="row">
         <div class="form-group">
@@ -969,6 +1049,7 @@ else
                 @if (Model != null && !string.IsNullOrEmpty(Model.IssueKey))
                 {
                     <input class="form-control text-box single-line" value="@(Model.IssueKey)" id="IssueKey" name="IssueKey" type="hidden" />
+                    <input class="form-control text-box single-line" value="@(Model.IssueKey)" id="masterid" name="masterid" type="hidden" />
                 }
                 else
                 {

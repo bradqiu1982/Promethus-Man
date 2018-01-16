@@ -3531,10 +3531,11 @@ namespace Prometheus.Models
 
         public static List<IssueViewModels> GetIssuesByKeys(string IssueKey, string searchKey)
         {
-            var sql = @"select i.IssueKey, i.ProjectKey, i.Summary, 
+            var sql = @"select top 30 i.IssueKey, i.ProjectKey, i.Summary, 
                     i.Assignee, i.DueDate, i.Reporter, i.IssueType, i.ModuleSN, i.ErrAbbr, i.Priority, 
                     i.Resolution from Issue as i
-                    Where i.IssueKey != '<IssueKey>' and i.Summary like '%<searchKey>%' and i.ParentIssueKey = ''";
+                    Where i.IssueKey != '<IssueKey>' and i.Summary like '%<searchKey>%' and i.ParentIssueKey = ''
+                     and i.IssueKey not in ( select SlaveIssueKey from IssueRelationShip where MasterIssueKey = '<IssueKey>') order by i.DueDate DESC";
 
             sql = sql.Replace("<IssueKey>", IssueKey).Replace("<searchKey>", searchKey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);

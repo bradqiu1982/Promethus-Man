@@ -1365,3 +1365,10 @@ GO
 
 EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'1: valid vote 0: invalid ' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'WeeklyReportShare', @level2type=N'COLUMN',@level2name=N'Status'
 GO
+
+/* for add issue relationship*/
+CREATE TABLE [dbo].[IssueRelationShip](
+	[MasterIssueKey] [nvarchar](50) NOT NULL,
+	[SlaveIssueKey] [nvarchar](50) NOT NULL,
+	[CreateTime] [datetime] NOT NULL
+) ON [PRIMARY]

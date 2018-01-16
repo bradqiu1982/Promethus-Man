@@ -474,6 +474,7 @@ namespace Prometheus.Controllers
                 var asilist = UserViewModels.RetrieveAllUser();
                 ViewBag.towholist = CreateSelectList(asilist, "");
                 ViewBag.towholist1 = CreateSelectList(asilist, "");
+                ViewBag.RelationLinks = IssueRelationShipVM.GetIssueRelationShip(key);
 
                 return View(ret);
             }
@@ -1566,6 +1567,7 @@ namespace Prometheus.Controllers
                 {
                     ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
                 }
+                ViewBag.RelationLinks = IssueRelationShipVM.GetIssueRelationShip(key);
 
                 return View(ret);
             }
@@ -4469,45 +4471,41 @@ namespace Prometheus.Controllers
 
             var searchlist = new List<object>();
             var linklist = new List<object>();
-
-            searchlist.Add(
+            if (!string.IsNullOrEmpty(searchkey))
+            {
+                var Searchs = IssueViewModels.GetIssuesByKeys(IssueKey, searchkey);
+                if (Searchs.Count > 0)
+                {
+                    foreach (var item in Searchs)
+                    {
+                        searchlist.Add(
+                            new
+                            {
+                                id = item.IssueKey,
+                                title = "[" + item.ProjectKey + "]  <a href='/Issue/UpdateIssue?issuekey=" + item.IssueKey + "' target='_blank'>" + item.Summary + "</a>",
+                                description = "Assignee: " + item.Assignee.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0],
+                                dueDate = item.DueDate.ToString("yyyy-MM-dd")
+                            }
+                        );
+                    }
+                }
+            }
+            var SlaveLinks = IssueRelationShipVM.GetIssueRelationShip(IssueKey);
+            if (SlaveLinks.Count > 0)
+            {
+                foreach (var item in SlaveLinks)
+                {
+                    linklist.Add(
                         new
                         {
-                            id = "1",
-                            title = "Summary 1" + "  <a href='/Issue/UpdateIssue?issuekey=" + "1" + "' target='_blank'>Detail</a>",
-                            description = "Description 1",
-                            dueDate = "2017-05-06"
-                        });
-            searchlist.Add(
-                        new
-                        {
-                        id = "2",
-                        title = "Summary 2" + "  <a href='/Issue/UpdateIssue?issuekey=" + "2" + "' target='_blank'>Detail</a>",
-                        description = "Description 2",
-                        dueDate = "2017-09-06"
-                        });
-
-            searchlist.Add(
-                        new
-                        {
-                            id = "3",
-                            title = "Summary 3" + "  <a href='/Issue/UpdateIssue?issuekey=" + "3" + "' target='_blank'>Detail</a>",
-                            description = "Description 3",
-                            dueDate = "2017-10-06"
-                        });
-
-
-            linklist.Add(
-                        new
-                        {
-                            id = "4",
-                            title = "Summary 4" + "  <a href='/Issue/UpdateIssue?issuekey=" + "4" + "' target='_blank'>Detail</a>",
-                            description = "Description 4",
-                            dueDate = "2017-11-06"
-                        });
-
-
-
+                            id = item.IssueKey,
+                            title = "[" + item.ProjectKey + "]  <a href='/Issue/UpdateIssue?issuekey=" + item.IssueKey + "' target='_blank'>" + item.Summary + "</a>",
+                            description = "Assignee: " + item.Assignee.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0],
+                            dueDate = item.DueDate.ToString("yyyy-MM-dd")
+                        }
+                    );
+                }
+            }
             var mylists = new List<object>();
             mylists.Add(
                 new
@@ -4518,8 +4516,8 @@ namespace Prometheus.Controllers
                     controls = false,
                     useCheckboxes = false,
                     items = searchlist
-                });
-
+                }
+            );
             mylists.Add(
                 new
                 {
@@ -4529,7 +4527,8 @@ namespace Prometheus.Controllers
                     controls = false,
                     useCheckboxes = false,
                     items = linklist
-                });
+                }
+            );
 
             var res = new JsonResult();
             res.Data = new { lists = mylists };
@@ -4542,6 +4541,10 @@ namespace Prometheus.Controllers
             var masterid = Request.Form["masterid"];
             var slaveid = Request.Form["slaveid"];
             var res = new JsonResult();
+            var irs = new IssueRelationShipVM();
+            irs.MasterIssueKey = masterid;
+            irs.SlaveIssueKey = slaveid;
+            IssueRelationShipVM.UpdateIssueRelationShip(irs);
             res.Data = new { success = true };
             res.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
             return res;

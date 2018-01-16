@@ -2,7 +2,7 @@
 
 @{
     ViewBag.Title = "Update FA";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
     var step_idx = 1;
 }
 
@@ -18,6 +18,10 @@ else
     </script>
 }
 
+<script src="~/Scripts/lobilist/lib/jquery/jquery.ui.touch-punch-improved.js"></script>
+<script src="~/Scripts/lobilist/dist/lobilist_tasklink.js"></script>
+<script src="~/Scripts/lobilist/lib/lobibox/js/lobibox.min.js"></script>
+<script src="~/Scripts/lobilist/lib/highlight/highlight.pack.js"></script>
 
 <div class="row">
     <div class="nav navbar-nav navbar-left">
@@ -48,7 +52,7 @@ else
             <li class="active">Update FA</li>
         </ol>
     </div>
-    <div class="nav navbar-nav navbar-right">
+    <div class="col-xs-2">
         @if (Model != null && string.IsNullOrEmpty(Model.ParentIssueKey))
         {
             using (Html.BeginForm("PrepareSubIssue", "Issue", FormMethod.Post, new { enctype = "multipart/form-data", id = "subtaskid", name = "subtaskid" }))
@@ -57,6 +61,7 @@ else
                 if (Model != null && !string.IsNullOrEmpty(Model.IssueKey))
                 {
                     <input class="form-control text-box single-line" value="@(Model.IssueKey)" id="HIssueKey" name="HIssueKey" type="hidden" />
+                    <input class="form-control text-box single-line" value="@(Model.IssueKey)" id="masterid" name="masterid" type="hidden" />
                 }
                 else
                 {
@@ -85,6 +90,15 @@ else
             }
         </script>
     </div>
+    <div class="col-xs-2">
+        <button type="button" class="form-control" style="background-color:#006DC0;height:35px;color:white;" onclick="linktask()">Link Task</button>
+        <script type="text/javascript">
+            function linktask() {
+                $('#linktaskmodal').modal({ backdrop: 'static' });
+            }
+        </script>
+    </div>
+
 </div>
 
 
@@ -424,13 +438,13 @@ else
 
     <hr style="border-color:#006DC0;" />
 
-    if (Model != null && Model.SubIssues.Count > 0)
+    if (Model != null && (Model.GeneralActions.Count > 0 || ViewBag.RelationLinks.Count > 0))
     {
         <div class="row" data-intro = "Sub tasks of your issue."  data-step="@(step_idx++)">
             <div MYTP="yello" class="row" style="margin-left:3px">
                 <div class="col-xs-12">
                     <a data-toggle="collapse" href="#subtasks" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
-                        <font color="black"><strong>&nbsp;&nbsp;@(Model.SubIssues.Count) Sub Tasks</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
+                        <font color="black"><strong>&nbsp;&nbsp;@(Model.SubIssues.Count + ViewBag.RelationLinks.Count) Sub Tasks</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
                     </a>
                 </div>
             </div>
@@ -451,15 +465,31 @@ else
                                         <div class="col-xs-2">DueDate</div>
                                         <div class="col-xs-2"></div>
                                     </div>
-                                    @foreach (var item in Model.SubIssues)
+                                    @if (Model.GeneralActions.Count > 0)
                                     {
-                                        <div class="row">
-                                            <div class="col-xs-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></div>
-                                            <div class="col-xs-2">@item.Resolution</div>
-                                            <div class="col-xs-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
-                                            <div class="col-xs-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
-                                            <div class="col-xs-2"></div>
-                                        </div>
+                                        foreach (var item in Model.SubIssues)
+                                        {
+                                            <div class="row">
+                                                <div class="col-xs-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></div>
+                                                <div class="col-xs-2">@item.Resolution</div>
+                                                <div class="col-xs-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
+                                                <div class="col-xs-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
+                                                <div class="col-xs-2"></div>
+                                            </div>
+                                        }
+                                    }
+                                    @if (ViewBag.RelationLinks.Count > 0)
+                                    {
+                                        foreach (var item in ViewBag.RelationLinks)
+                                        {
+                                            <div class="row">
+                                                <div class="col-xs-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></div>
+                                                <div class="col-xs-2">@item.Resolution</div>
+                                                <div class="col-xs-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
+                                                <div class="col-xs-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
+                                                <div class="col-xs-2"></div>
+                                            </div>
+                                        }
                                     }
                                 </div>
                             </div>
@@ -1276,7 +1306,72 @@ else
             </div>
         </div>
     </div>
+    
+    <div class="modal" id="linktaskmodal" tabindex="-1" role="dialog" aria-labelledby="linktaskmodalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="linktaskmodalLabel">Link Task</h4>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="bs-example" style="text-align:center">
+                        <div class="col-lg-1">
+                        </div>
+                        <div class="col-lg-4">
+                            <input class="form-control" id="searchkey" name="searchkey">
+                        </div>
+                        <div class="col-lg-2">
+                            <button type="button" class="form-control" id="btn-search" style="background-color:#006DC0;height:35px;color:white;">Search Task</button>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div id="demoparent" class="bs-example" style="text-align:center">
+                        <div id="todo-lists-basic-demo"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" onclick="refreshlinktask()">Close</button>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            function refreshlinktask()
+            {
+                $('#linktaskmodal').modal('hide');
+                window.location.href = '/Issue/UpdateBug?issuekey=' + $('#masterid').val();
+            }
 
+            $('body').on('click', '#btn-search', function () {
+                if ($('#searchkey').val() == ''){ return false; }
+                $('#demoparent').empty();
+                $('#demoparent').append('<div id="todo-lists-basic-demo"></div>');
+                $('#todo-lists-basic-demo').lobiList({
+                    actions: {
+                        load: '/Issue/InitTaskLink?IssueKey=@(Model.IssueKey)&searchkey=' + $('#searchkey').val(),
+                        move: '/Issue/MoveTaskLink'
+                    },
+                    enableTodoRemove: false,
+                    enableTodoEdit: false,
+                    controls: []
+                });
+            })
+            $(function () {
+                //Basic example
+                $('#todo-lists-basic-demo').lobiList({
+                    actions: {
+                        load: '/Issue/InitTaskLink?IssueKey=@(Model.IssueKey)&searchkey=',
+                        move: '/Issue/MoveTaskLink'
+                    },
+                    enableTodoRemove: false,
+                    enableTodoEdit: false,
+                    controls: []
+                });
+            });
+        </script>
+    </div>
     <div class="modal" id="towhotag" tabindex="-1" role="dialog" aria-labelledby="towhoLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">

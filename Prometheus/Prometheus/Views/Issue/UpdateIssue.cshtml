@@ -69,7 +69,7 @@ else
                     <input class="form-control text-box single-line" id="HProjectKey" name="HProjectKey" type="hidden" value="" />
                 }
 
-                <button type="submit" class="form-control" style="background-color:#006DC0;height:3em;color:white;">Add Sub-Task</button>
+                <button type="submit" class="form-control" style="background-color:#006DC0;height:35px;color:white;">Add Sub-Task</button>
             }
         }
         else if (Model != null && !string.IsNullOrEmpty(Model.ParentIssueKey))
@@ -84,7 +84,7 @@ else
         </script>
     </div>
     <div class="col-xs-2">
-        <button type="button" class="form-control" style="background-color:#006DC0;height:3em;color:white;" onclick="linktask()">Link Task</button>
+        <button type="button" class="form-control" style="background-color:#006DC0;height:35px;color:white;" onclick="linktask()">Link Task</button>
         <script type="text/javascript">
             function linktask()
             {
@@ -410,13 +410,13 @@ else
 
         <hr style="border-color:#006DC0;" />
 
-    if (Model != null && Model.GeneralActions.Count > 0)
+    if (Model != null && (Model.GeneralActions.Count > 0 || ViewBag.RelationLinks.Count > 0) )
     {
         <div class="row" data-intro = "Sub tasks of your issue."  data-step="@(step_idx++)">
             <div  MYTP="yello"  class="row" style="margin-left:3px">
                 <div class="col-xs-12">
                     <a data-toggle="collapse" href="#subtasks" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
-                        <font color="black"><strong>&nbsp;&nbsp;@(Model.GeneralActions.Count) Sub Tasks</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
+                        <font color="black"><strong>&nbsp;&nbsp;@(Model.GeneralActions.Count + ViewBag.RelationLinks.Count) Sub Tasks</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
                     </a>
                 </div>
             </div>
@@ -437,15 +437,30 @@ else
                                         <div class="col-xs-2">DueDate</div>
                                         <div class="col-xs-2"></div>
                                     </div>
-                                    @foreach (var item in Model.GeneralActions)
+                                    @if (Model.GeneralActions.Count > 0) {
+                                        foreach (var item in Model.GeneralActions)
+                                        {
+                                            <div class="row">
+                                                <div class="col-xs-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></div>
+                                                <div class="col-xs-2">@item.Resolution</div>
+                                                <div class="col-xs-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
+                                                <div class="col-xs-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
+                                                <div class="col-xs-2"></div>
+                                            </div>
+                                        }
+                                    }
+                                    @if (ViewBag.RelationLinks.Count > 0)
                                     {
-                                        <div class="row">
-                                            <div class="col-xs-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></div>
-                                            <div class="col-xs-2">@item.Resolution</div>
-                                            <div class="col-xs-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
-                                            <div class="col-xs-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
-                                            <div class="col-xs-2"></div>
-                                        </div>
+                                        foreach (var item in ViewBag.RelationLinks)
+                                        {
+                                            <div class="row">
+                                                <div class="col-xs-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></div>
+                                                <div class="col-xs-2">@item.Resolution</div>
+                                                <div class="col-xs-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
+                                                <div class="col-xs-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
+                                                <div class="col-xs-2"></div>
+                                            </div>
+                                        }
                                     }
                                 </div>
                             </div>
@@ -991,7 +1006,7 @@ else
                             <input class="form-control" id="searchkey" name="searchkey">
                         </div>
                         <div class="col-lg-2">
-                            <button type="button" class="form-control" id="btn-search" style="background-color:#006DC0;height:3em;color:white;">Search Task</button>
+                            <button type="button" class="form-control" id="btn-search" style="background-color:#006DC0;height:35px;color:white;">Search Task</button>
                         </div>
                     </div>
                 </div>
@@ -1015,7 +1030,6 @@ else
 
             $('body').on('click', '#btn-search', function () {
                 if ($('#searchkey').val() == ''){ return false; }
-                
                 $('#demoparent').empty();
                 $('#demoparent').append('<div id="todo-lists-basic-demo"></div>');
                 $('#todo-lists-basic-demo').lobiList({

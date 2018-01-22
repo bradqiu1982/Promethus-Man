@@ -656,7 +656,8 @@ namespace Prometheus.Controllers
             if (string.Compare(updater, originaldata.Assignee, true) == 0
             || string.Compare(updater, originaldata.Reporter, true) == 0
             || string.Compare(updater, originaldata.Creator, true) == 0
-            || (string.Compare(Request.Form["issuetypelist"].ToString(), ISSUETP.NPIPROC) == 0
+            || (Request.Form["issuetypelist"] != null 
+                && string.Compare(Request.Form["issuetypelist"].ToString(), ISSUETP.NPIPROC) == 0
                 && string.Compare(userdict[updater.ToUpper()].ToUpper(), USERAUTH.MANAGE.ToUpper()) == 0))
             { }
             else

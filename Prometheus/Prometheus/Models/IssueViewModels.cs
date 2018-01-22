@@ -278,8 +278,13 @@ namespace Prometheus.Models
         public string Creator { set; get; }
         public string Resolution { set; get; }
 
+        public string TestStation { set; get; }
+        public string ModuleSerialNum { set; get; }
+        public string tErrAbbr { set; get; }
+
         private string sDescription = "";
-        public string Description {
+        public string Description
+        {
             set { sDescription = value; }
             get { return sDescription; }
         }
@@ -1434,7 +1439,15 @@ namespace Prometheus.Models
             }
 
             //var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples,APVal2,ModuleSN,DataID from Issue where  APVal1 <> 'delete' and  ParentIssueKey = '' and ProjectKey = '<ProjectKey>' and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType>' order by ReportDate DESC";
-            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples,APVal2,ModuleSN,DataID,ErrAbbr from Issue where  APVal1 <> 'delete' and  ParentIssueKey = '' and ProjectKey = '<ProjectKey>' and Resolution in <cond> and IssueType <> '<IssueType>' order by ReportDate DESC";
+            var sql = @"select top <topnum> i.ProjectKey,i.IssueKey,i.IssueType,i.Summary,
+                    i.Priority,i.DueDate,i.ResolvedDate,i.ReportDate,i.Assignee,i.Reporter,i.Resolution,
+                    i.ParentIssueKey,i.RelativePeoples,i.APVal2,i.ModuleSN,i.DataID,i.ErrAbbr,
+                    d.TestStation, d.ModuleSerialNum, d.ErrAbbr as tErrAbbr
+                    from Issue as i left join ProjectTestData as d on i.IssueKey = d.DataID 
+                    where i.APVal1 <> 'delete' and  i.ParentIssueKey = '' 
+                    and i.ProjectKey = '<ProjectKey>' and i.Resolution in <cond> 
+                    and i.IssueType <> '<IssueType>' 
+                    order by i.ReportDate DESC";
             sql = sql.Replace("<ProjectKey>", pjkey).Replace("<cond>", cond).Replace("<topnum>", Convert.ToString(topnum))
                     .Replace("<IssueType>", ISSUETP.NPIPROC);
 
@@ -1452,6 +1465,9 @@ namespace Prometheus.Models
                 ret.ModuleSN = Convert.ToString(line[14]);
                 ret.DataID = Convert.ToString(line[15]);
                 ret.ErrAbbr = Convert.ToString(line[16]);
+                ret.TestStation = Convert.ToString(line[17]);
+                ret.ModuleSerialNum = Convert.ToString(line[18]);
+                ret.tErrAbbr = Convert.ToString(line[19]);
 
                 //ret.SubIssues = RetrieveSubIssue(ret.IssueKey);
 
@@ -3055,17 +3071,7 @@ namespace Prometheus.Models
             var issues = IssueViewModels.RRetrieveFABySN(pjkey, SN, whichtest, ctrl);
             foreach (var tobedata in issues)
             {
-                bool customercomm = false;
-                foreach (var item in tobedata.CommentList)
-                {
-                    if (string.Compare(item.Reporter, "system", true) != 0)
-                    {
-                        customercomm = true;
-                        break;
-                    }
-                }
-
-                if (!customercomm)
+                if (tobedata.CommentList.Count < 2)
                 {
                     tobedata.Resolution = Resolute.AutoClose;
                     tobedata.Description = "Module " + SN + " passed " + whichtest + " test @" + tester + " @" + datestr;
@@ -3084,17 +3090,7 @@ namespace Prometheus.Models
             var issues = IssueViewModels.RRetrieveFABySN(pjkey, SN, whichtest, ctrl);
             foreach (var tobedata in issues)
             {
-                bool customercomm = false;
-                foreach (var item in tobedata.CommentList)
-                {
-                    if (string.Compare(item.Reporter, "system", true) != 0)
-                    {
-                        customercomm = true;
-                        break;
-                    }
-                }
-
-                if (!customercomm)
+                if (tobedata.CommentList.Count < 2)
                 {
                     tobedata.Resolution = Resolute.AutoClose;
                     tobedata.Description = "Module " + SN + " faild for " + whichtest + " test @" + tester + " @" + datestr + " again";
@@ -3528,35 +3524,6 @@ namespace Prometheus.Models
             }
             return filedate;
         }
-
-        public static List<IssueViewModels> GetIssuesByKeys(string IssueKey, string searchKey)
-        {
-            var sql = @"select top 30 i.IssueKey, i.ProjectKey, i.Summary, 
-                    i.Assignee, i.DueDate, i.Reporter, i.IssueType, i.ModuleSN, i.ErrAbbr, i.Priority, 
-                    i.Resolution from Issue as i
-                    Where i.IssueKey != '<IssueKey>' and i.Summary like '%<searchKey>%' and i.ParentIssueKey = ''
-                     and i.IssueKey not in ( select SlaveIssueKey from IssueRelationShip where MasterIssueKey = '<IssueKey>') order by i.DueDate DESC";
-
-            sql = sql.Replace("<IssueKey>", IssueKey).Replace("<searchKey>", searchKey);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
-            var res = new List<IssueViewModels>();
-            if (dbret.Count > 0)
-            {
-                foreach(var item in dbret)
-                {
-                    var tmp = new IssueViewModels();
-                    tmp.IssueKey = Convert.ToString(item[0]);
-                    tmp.ProjectKey = Convert.ToString(item[1]);
-                    tmp.Summary = Convert.ToString(item[2]);
-                    tmp.Assignee = Convert.ToString(item[3]);
-                    tmp.DueDate = Convert.ToDateTime(item[4]);
-                    tmp.Resolution = Convert.ToString(item[10]);
-                    res.Add(tmp);
-                }
-            }
-            return res;
-
-        }
     }
 
     public class IssueTypeVM
@@ -3608,84 +3575,6 @@ namespace Prometheus.Models
             new IssueTypeVM().SaveIssueType(templist);
         }
 
-    }
-
-    public class IssueRelationShipVM
-    {
-        public string MasterIssueKey { set; get; }
-        public string SlaveIssueKey { set; get; }
-        public string CreateTime { set; get; }
-
-        public static void UpdateIssueRelationShip(IssueRelationShipVM irs)
-        {
-            var sql = @"select MasterIssueKey, SlaveIssueKey from IssueRelationShip 
-                    where MasterIssueKey = @mIssueKey and SlaveIssueKey = @sIssueKey";
-
-            var param = new Dictionary<string, string>();
-            param.Add("@mIssueKey", irs.MasterIssueKey);
-            param.Add("@sIssueKey", irs.SlaveIssueKey);
-
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
-            if(dbret.Count > 0)
-            {
-                DelIssueRelationShip(irs);
-            }
-            else
-            {
-                AddIssueRelationShip(irs);
-            }
-        }
-
-        public static void AddIssueRelationShip(IssueRelationShipVM irs)
-        {
-            var sql = @"insert into IssueRelationShip (MasterIssueKey, SlaveIssueKey, 
-                    CreateTime) values (@mIssueKey, @sIssueKey, @cTime)";
-            var param = new Dictionary<string, string>();
-            param.Add("@mIssueKey", irs.MasterIssueKey);
-            param.Add("@sIssueKey", irs.SlaveIssueKey);
-            param.Add("@cTime", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-
-            DBUtility.ExeLocalSqlNoRes(sql, param);
-        }
-
-        public static void DelIssueRelationShip(IssueRelationShipVM irs)
-        {
-            var sql = @"delete from IssueRelationShip where MasterIssueKey = @mIssueKey 
-                and SlaveIssueKey = @sIssueKey";
-            var param = new Dictionary<string, string>();
-            param.Add("@mIssueKey", irs.MasterIssueKey);
-            param.Add("@sIssueKey", irs.SlaveIssueKey);
-
-            DBUtility.ExeLocalSqlNoRes(sql, param);
-        }
-
-        public static List<IssueViewModels> GetIssueRelationShip(string mIssueKey)
-        {
-            var sql = @"select i.IssueKey, i.ProjectKey, i.Summary, 
-                    i.Assignee, i.DueDate, i.Reporter, i.IssueType, i.ModuleSN, i.ErrAbbr, i.Priority, 
-                    i.Resolution from IssueRelationShip as irs 
-                    left join Issue as i on irs.SlaveIssueKey = i.IssueKey
-                    Where irs.MasterIssueKey = @mIssueKey";
-            var param = new Dictionary<string, string>();
-            param.Add("@mIssueKey", mIssueKey);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
-            var res = new List<IssueViewModels>();
-            if (dbret.Count > 0)
-            {
-                foreach(var item in dbret)
-                {
-                    var tmp = new IssueViewModels();
-                    tmp.IssueKey = Convert.ToString(item[0]);
-                    tmp.ProjectKey = Convert.ToString(item[1]);
-                    tmp.Summary = Convert.ToString(item[2]);
-                    tmp.Assignee = Convert.ToString(item[3]);
-                    tmp.DueDate = Convert.ToDateTime(item[4]);
-                    tmp.Resolution = Convert.ToString(item[10]);
-                    res.Add(tmp);
-                }
-            }
-            return res;
-        }
     }
 
 }

@@ -6,7 +6,25 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title</title>
-
+    @{ 
+        var isie8 = false;
+        var browse = Request.Browser;
+        if (string.Compare(browse.Browser, "IE", true) == 0
+            && (string.Compare(browse.Version, "7.0", true) == 0
+            || string.Compare(browse.Version, "8.0", true) == 0))
+        {
+            isie8 = true;
+        }
+    }
+    @if (isie8)
+    {
+        @Styles.Render("~/Content/css")
+    }
+    else
+    {
+        <link href="@Url.Content("~/Content/bootstrap-3.3.7/css/bootstrap.min.css")" rel="stylesheet" type="text/css" />
+    }
+    
     <link href="@Url.Content("~/Content/themes/base/jquery-ui.css")" rel="stylesheet" type="text/css" />
     <link href="@Url.Content("~/Scripts/lobilist/dist/lobilist.min.css")" rel="stylesheet" type="text/css" />
     <link href="@Url.Content("~/Scripts/lobilist/lib/lobibox/css/lobibox.min.css")" rel="stylesheet" type="text/css" />
@@ -18,7 +36,6 @@
     <link href="@Url.Content("~/Scripts/intro/introjs-rtl.min.css")" rel="stylesheet" type="text/css" />
     <link href="@Url.Content("~/Scripts/intro/arial-narrow.css")" rel="stylesheet" type="text/css" />
     <link href="@Url.Content("~/Scripts/jquery.flexdatalist.min.css")" rel="stylesheet" type="text/css" />
-    <link href="@Url.Content("~/Content/bootstrap-3.3.7/css/bootstrap.min.css")" rel="stylesheet" type="text/css" />
     <link href="@Url.Content("~/Content/Layout.css")" rel="stylesheet" type="text/css" />
 
     @Scripts.Render("~/bundles/modernizr")
@@ -27,7 +44,15 @@
     @Scripts.Render("~/bundles/jquery-ui")
     @Scripts.Render("~/bundles/datatables")
 
-    <script src="~/Content/bootstrap-3.3.7/js/bootstrap.min.js" type="text/javascript"></script>
+    @if (isie8)
+    {
+        @Scripts.Render("~/bundles/bootstrap")
+    }
+    else
+    {
+        <script src="~/Content/bootstrap-3.3.7/js/bootstrap.min.js" type="text/javascript"></script>
+    }
+
     <script src="~/Scripts/ajaxfileupload.js" type="text/javascript"></script>
     <script src="~/Scripts/jquery.base64.js" type="text/javascript"></script>
     <script src="~/Scripts/intro/intro.min.js" type="text/javascript"></script>

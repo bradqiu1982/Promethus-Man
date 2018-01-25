@@ -1,0 +1,52 @@
+﻿<script type="text/javascript">
+  $(function () {
+      $('##ElementID#').highcharts({
+        chart:{
+          type: 'scatter'
+        },
+        title: {
+            text: '#Title#'
+        },
+        xAxis: {
+            crosshair: true,
+            title:{
+              text: 'Date'
+            }
+        },
+        yAxis: [{
+            title: {
+                text: 'Amount'
+            },
+            min: 0,
+            max: #AmountMAX#
+        },
+        plotOptions: {
+            scatter: {
+                marker: {
+                    radius: 5,
+                    states: {
+                        hover: {
+                            enabled: true,
+                            lineColor: 'rgb(100,100,100)'
+                        }
+                    }
+                },
+                states: {
+                    hover: {
+                        marker: {
+                            enabled: false
+                        }
+                    }
+                },
+                tooltip: {
+                    headerFormat: '<b>{series.name}</b>',
+                    pointFormat: '{point.y}'
+                }
+            }
+        },
+        series:[#DATA#]
+      });
+  });
+</script>
+
+

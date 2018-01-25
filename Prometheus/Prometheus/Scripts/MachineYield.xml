@@ -1,0 +1,111 @@
+﻿<script type="text/javascript">
+$(function () {
+    var tooltiparray1=[#FINALTOOLTIP#];
+    
+    $('##ElementID#').highcharts({
+        title: {
+            text: '#Title#'
+        },
+        chart:
+        {
+          alignTicks: false
+        },
+        xAxis: {
+            categories: [#ChartxAxisValues#],
+            crosshair: true,
+            title:{
+              text: '#XAxisTitle#'
+            }
+        },
+        yAxis: [{
+            title: {
+                text: 'Amount'
+            },
+            min: 0,
+            max: #AmountMAX#
+        }, {
+            title: {
+                text: 'Percent'
+            },
+            min: 0,
+            max: 100,
+            gridLineWidth: 0,
+            tickPixelInterval: 36,
+            opposite: true
+        }],
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            },
+            series:{
+              allowPointSelect:true,
+              point: {
+                        events:{
+                          click:function(e)
+                          {
+                            #REDIRECTURL#
+                          }
+                        }
+                        }
+            }
+        },
+				tooltip: {
+            		useHTML: true,
+      					enabled: true,
+                formatter: function(args) {
+                  var this_point_index = 0;
+                  var dataarray = this.series.data;
+                  for(var i = 0;i < dataarray.length;i++)
+                  {
+                    if(dataarray[i] === this.point)
+                    {
+                      this_point_index = i;
+                    }
+                  }
+                  
+                  var this_series_index = this.series.index;
+                  
+                  if(this_series_index == 0)
+                  {
+                  		return this.point.y;
+                  }
+                  
+                  if(this_series_index == 1||this_series_index == 2)
+                  {
+                  	return tooltiparray1[this_point_index];
+                  }
+                  
+                  }
+        			},
+        series: [{
+            type: 'column',
+            name: 'Input Count',
+            data: [#FirstAmount#],
+            yAxis:0
+        },
+        {
+            type: 'line',
+            name: 'FPY',
+            data: [#FirstYield#],
+            marker: {
+                lineWidth: 2,
+                fillColor: 'red'
+            },
+            yAxis:1
+        },
+        {
+            type: 'line',
+            name: 'FY',
+            data: [#RetestYield#],
+            marker: {
+                lineWidth: 2,
+                fillColor: 'green'
+            },
+            yAxis:1
+        }]
+    });
+});
+</script>
+
+

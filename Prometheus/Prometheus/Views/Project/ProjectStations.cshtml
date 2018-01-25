@@ -2,31 +2,55 @@
 @{
     ViewBag.Title = "ProjectStations";
     Layout = "~/Views/Shared/_LayoutNew.cshtml";
+    var idx = 0;
 }
+
+
+<script src="~/Scripts/highcharts.js"></script>
+<script src="~/Scripts/exporting.js"></script>
+
 <link href="~/Content/projectstation.css" rel="stylesheet" type="text/css" />
 <div class="body-content">
     <div class="content-left list-group col-xs-3">
-        <a href="#" class="list-group-item active">ETRC</a>
-        <a href="#" class="list-group-item">Dapibus ac facilisis in</a>
-        <a href="#" class="list-group-item">Morbi leo risus</a>
-        <a href="#" class="list-group-item">Porta ac consectetur ac</a>
-        <a href="#" class="list-group-item">Vestibulum at eros</a>
+        @if (ViewBag.WhichTestList != null && ViewBag.WhichTestList.Count > 0)
+        {
+            foreach (var item in ViewBag.WhichTestList)
+            {
+                <a href="/Project/ProjectStations?pjkey=@(ViewBag.pjkey)&whichtest=@(item)" class="list-group-item active">@item</a>
+            }
+        }
     </div>
     <div class="content-right col-xs-9">
         <div class="tester-yield" id="tester-yield">
         </div>
         <div class="station-list">
-            <div class="station-detail">
-                <div class="station-title span-primary">
-                    <span class="glyphicon glyphicon-blackboard"></span>
-                    <span>Test Station1</span>
-                </div>
-                <div class="station-chart">
-                    <div class="station-pareto col-xs-6" id="station-pareto-idx"></div>
-                    <div class="station-scatter col-xs-6" id="station-scatter-idx"></div>
-                </div>
-            </div>
-            <div class="station-detail">
+            @if (ViewBag.StationList != null && ViewBag.StationList.Count > 0)
+            {
+                foreach (var station in ViewBag.StationList)
+                {
+                    idx = idx + 1;
+                    var chartstr = ViewBag.Scattdict[station];
+
+                    <div class="station-detail">
+                        <div class="station-title span-primary">
+                            <span class="glyphicon glyphicon-blackboard"></span>
+                            <span>Test Station1</span>
+                        </div>
+                        <div class="station-chart">
+                            <div class="station-pareto col-xs-6" id="station-pareto-idx"></div>
+                            <div class="station-scatter col-xs-6" id="station-scatter-@(idx)"></div>
+                        </div>
+                    </div>
+
+                    @Html.Raw(ViewBag.chartscript)
+
+
+                }
+            }
+
+
+
+            @*<div class="station-detail">
                 <div class="station-title span-danger">
                     <span class="glyphicon glyphicon-blackboard"></span>
                     <span>Test Station1</span>
@@ -45,7 +69,7 @@
                     <div class="station-pareto col-xs-6" id="station-pareto-idx"></div>
                     <div class="station-scatter col-xs-6" id="station-scatter-idx"></div>
                 </div>
-            </div>
+            </div>*@
         </div>
     </div>
 </div>

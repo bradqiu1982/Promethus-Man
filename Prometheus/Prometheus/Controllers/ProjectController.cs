@@ -7659,10 +7659,86 @@ namespace Prometheus.Controllers
             return ret;
         }
 
-        public ActionResult ProjectStations()
+        public string MachineScattChart(ProjectYieldViewModule yield,string station, int dividx)
         {
+            var failurepair = new Dictionary<string, List<KeyValuePair<string, int>>>();
+            var maxamount = 0;
+
+            var failuredict = yield.FirstYieldFailureTimeDist;
+            foreach (var item in failuredict)
+            {
+                var date = item.Key.Split(new string[] { "##" }, StringSplitOptions.RemoveEmptyEntries)[0];
+                var failure = item.Key.Split(new string[] { "##" }, StringSplitOptions.RemoveEmptyEntries)[1];
+                var amount = item.Value;
+                if (amount > maxamount) maxamount = amount;
+
+
+                if (failurepair.ContainsKey(failure))
+                {
+                    failurepair[failure].Add(new KeyValuePair<string, int>(date, amount));
+                }
+                else
+                {
+                    var templist = new List<KeyValuePair<string, int>>();
+                    templist.Add(new KeyValuePair<string, int>(date,amount));
+                    failurepair.Add(failure, templist);
+                }
+            }
+
+            var chartdata = "";
+            foreach (var kv in failurepair)
+            {
+                var tempdata = "{name: '<name>',data:[<data>]},";
+                tempdata = tempdata.Replace("<name>", kv.Key);
+
+                var internaldata = "";
+                foreach (var item in kv.Value)
+                {
+                    internaldata = internaldata + "[" + item.Key + "," + item.Value + "],";
+                }
+                if (internaldata.Length > 0)
+                    internaldata = internaldata.Substring(0, internaldata.Length - 1);
+                tempdata = tempdata.Replace("<data>", internaldata);
+
+                chartdata = chartdata + tempdata;
+            }
+            if (chartdata.Length > 0)
+                chartdata = chartdata.Substring(0, chartdata.Length - 1);
+
+            var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/FailureTimeDist.xml"));
+            var mscott = tempscript.Replace("#ElementID#", "station-scatter-"+dividx)
+                .Replace("#Title#", station+" Failure Scatt")
+                .Replace("#AmountMAX#", maxamount.ToString())
+                .Replace("#DATA#", chartdata);
+
+            return mscott;
+        }
+
+        public ActionResult ProjectStations(string pjkey,string whichtest)
+        {
+
+            ViewBag.pjkey = "EDRLP";
+            ViewBag.WhichTestList = MachineVM.RetrieveWhichTest("EDRLP");
+
+            var testdata = MachineVM.RetrieveWhichTestData("EDRLP", "ER TEMP COMP"
+                , DateTime.Now.AddMonths(-2).ToString("yyyy-MM-dd HH:mm:ss"), DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            var machineyielddict = MachineVM.RetrieveWhichTestYieldByStation(testdata);
+
+            var keylist = machineyielddict.Keys;
+            var scattchartdict = new Dictionary<string, string>();
+            var idx = 1;
+            foreach (var key in keylist)
+            {
+                scattchartdict.Add(key, MachineScattChart(machineyielddict[key],key, idx));
+                idx++;
+            }
+
+            ViewBag.StationList = keylist;
+            ViewBag.Scattdict = scattchartdict;
+
             return View();
         }
+
 
     }
 

@@ -7659,6 +7659,11 @@ namespace Prometheus.Controllers
             return ret;
         }
 
+        public ActionResult ProjectStations()
+        {
+            return View();
+        }
+
     }
 
 }

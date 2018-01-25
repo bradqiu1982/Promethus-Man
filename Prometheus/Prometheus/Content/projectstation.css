@@ -1,0 +1,54 @@
+﻿.content-left {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.content-right {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.tester-yield {
+    height: 300px;
+    border: 1px #000 solid;
+}
+
+.station-detail {
+    border: 1px #000 solid;
+    margin-top: 1%;
+}
+
+.station-title {
+    display: inline;
+    color: #fff;
+    padding: 5px;
+}
+
+.span-primary {
+    background-color: #337ab7;
+}
+
+.span-danger {
+    padding: 5px;
+    background-color: #d9534f;
+}
+
+.span-warning {
+    padding: 5px;
+    background-color: #f0ad4e;
+}
+
+.span-success {
+    padding: 5px;
+    background-color: #5cb85c;
+}
+
+.station-chart {
+    display: block;
+    height: 250px;
+}
+
+.station-pareto, .station-scatter {
+    height: 100%;
+    border: 1px #000 solid;
+}

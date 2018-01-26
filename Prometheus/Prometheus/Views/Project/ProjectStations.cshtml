@@ -5,7 +5,20 @@
     var idx = 0;
 }
 
+<div class="row" style="margin-top:1%">
+    <div class="nav navbar-nav navbar-left">
+        <img src="~/Content/images/PJ/RMA.png" style="height:35px; width:35px;margin-right: 15px;">
+    </div>
+    <div class="nav navbar-nav navbar-left">
+        <ol class="breadcrumb" style="width:600px">
+            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
+            <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(ViewBag.pjkey)">Project Detail</a></li>
+            <li class="active">Project Stations</li>
+        </ol>
+    </div>
+</div>
 
+<script src="~/Scripts/moment.min.js"></script>
 <script src="~/Scripts/highcharts.js"></script>
 <script src="~/Scripts/exporting.js"></script>
 
@@ -16,60 +29,64 @@
         {
             foreach (var item in ViewBag.WhichTestList)
             {
-                <a href="/Project/ProjectStations?pjkey=@(ViewBag.pjkey)&whichtest=@(item)" class="list-group-item active">@item</a>
+                if (string.Compare(item, ViewBag.ActiveStation) == 0)
+                {
+                    <a href="/Project/ProjectStations?pjkey=@(ViewBag.pjkey)&whichtest=@(item)" class="list-group-item active">@item</a>
+                }
+                else
+                {
+                    <a href="/Project/ProjectStations?pjkey=@(ViewBag.pjkey)&whichtest=@(item)" class="list-group-item">@item</a>
+                }
             }
         }
+        <div class="chossedate-div">
+            <label class="form-control date-label">Start Date</label>
+            <input type="text" id="startdate" name="startdate" class="form-control date-input"/>
+        </div>
+        <div class="chossedate-div">
+            <label class="form-control date-label">End Date</label>
+            <input type="text" id="startdate" name="startdate" class="form-control date-input" />
+        </div>
     </div>
     <div class="content-right col-xs-9">
         <div class="tester-yield" id="tester-yield">
         </div>
+        @if (ViewBag.MachineYield != null && !string.IsNullOrEmpty(ViewBag.MachineYield))
+        {
+            @Html.Raw(ViewBag.MachineYield)
+        }
+
         <div class="station-list">
             @if (ViewBag.StationList != null && ViewBag.StationList.Count > 0)
             {
                 foreach (var station in ViewBag.StationList)
                 {
                     idx = idx + 1;
-                    var chartstr = ViewBag.Scattdict[station];
+                    var scattchart = ViewBag.Scattdict[station];
+                    var paretochart = ViewBag.paretodict[station];
 
                     <div class="station-detail">
                         <div class="station-title span-primary">
                             <span class="glyphicon glyphicon-blackboard"></span>
-                            <span>Test Station1</span>
+                            <span>@(station)</span>
                         </div>
                         <div class="station-chart">
-                            <div class="station-pareto col-xs-6" id="station-pareto-idx"></div>
+                            <div class="station-pareto col-xs-6" id="station-pareto-@(idx)"></div>
                             <div class="station-scatter col-xs-6" id="station-scatter-@(idx)"></div>
                         </div>
                     </div>
 
-                    @Html.Raw(ViewBag.chartscript)
-
-
-                }
+                    if (!string.IsNullOrEmpty(scattchart))
+                    {
+                        @Html.Raw(scattchart);
+                    }
+                    if (!string.IsNullOrEmpty(paretochart))
+                    {
+                        @Html.Raw(paretochart);
+                    }
+                }//end foreach
             }
 
-
-
-            @*<div class="station-detail">
-                <div class="station-title span-danger">
-                    <span class="glyphicon glyphicon-blackboard"></span>
-                    <span>Test Station1</span>
-                </div>
-                <div class="station-chart">
-                    <div class="station-pareto col-xs-6" id="station-pareto-idx"></div>
-                    <div class="station-scatter col-xs-6" id="station-scatter-idx"></div>
-                </div>
-            </div>
-            <div class="station-detail">
-                <div class="station-title span-success">
-                    <span class="glyphicon glyphicon-blackboard"></span>
-                    <span>Test Station1</span>
-                </div>
-                <div class="station-chart">
-                    <div class="station-pareto col-xs-6" id="station-pareto-idx"></div>
-                    <div class="station-scatter col-xs-6" id="station-scatter-idx"></div>
-                </div>
-            </div>*@
         </div>
     </div>
 </div>

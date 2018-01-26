@@ -6,22 +6,26 @@
 .content-right {
     padding-left: 0;
     padding-right: 0;
+    border-left: 1px #aaa solid;
+    border-right: 1px #aaa solid;
 }
 
 .tester-yield {
     height: 300px;
-    border: 1px #000 solid;
+    border-top: 1px #aaa solid;
+    border-bottom: 1px #aaa solid;
 }
 
 .station-detail {
-    border: 1px #000 solid;
-    margin-top: 1%;
+    /*border: 1px #000 solid;*/
+    margin-top: 2%;
 }
 
 .station-title {
     display: inline;
     color: #fff;
     padding: 5px;
+    font-size:18px;
 }
 
 .span-primary {
@@ -45,10 +49,17 @@
 
 .station-chart {
     display: block;
-    height: 250px;
+    height: 300px;
 }
 
-.station-pareto, .station-scatter {
+.station-pareto{
     height: 100%;
-    border: 1px #000 solid;
+    border-top: 1px #aaa solid;
+    border-bottom: 1px #aaa solid;
+}
+.station-scatter {
+    height: 100%;
+    border-top: 1px #aaa solid;
+    border-bottom: 1px #aaa solid;
+    border-left: 1px #000 dashed;
 }

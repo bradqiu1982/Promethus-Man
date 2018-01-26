@@ -7659,7 +7659,7 @@ namespace Prometheus.Controllers
             return ret;
         }
 
-        public string MachineScattChart(ProjectYieldViewModule yield,string station, int dividx)
+        private string MachineScattChart(ProjectYieldViewModule yield,string station, string divid)
         {
             var failurepair = new Dictionary<string, List<KeyValuePair<string, int>>>();
             var maxamount = 0;
@@ -7694,47 +7694,321 @@ namespace Prometheus.Controllers
                 var internaldata = "";
                 foreach (var item in kv.Value)
                 {
-                    internaldata = internaldata + "[" + item.Key + "," + item.Value + "],";
+                    if (item.Value > 2)
+                    {
+                        internaldata = internaldata + "[moment('" + item.Key + "').valueOf()," + item.Value + "],";
+                    }
                 }
-                if (internaldata.Length > 0)
-                    internaldata = internaldata.Substring(0, internaldata.Length - 1);
-                tempdata = tempdata.Replace("<data>", internaldata);
 
-                chartdata = chartdata + tempdata;
+                if (internaldata.Length > 0)
+                {
+                    internaldata = internaldata.Substring(0, internaldata.Length - 1);
+                    tempdata = tempdata.Replace("<data>", internaldata);
+                    chartdata = chartdata + tempdata;
+                }
             }
+
             if (chartdata.Length > 0)
                 chartdata = chartdata.Substring(0, chartdata.Length - 1);
 
             var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/FailureTimeDist.xml"));
-            var mscott = tempscript.Replace("#ElementID#", "station-scatter-"+dividx)
-                .Replace("#Title#", station+" Failure Scatt")
+            var mscott = tempscript.Replace("#ElementID#",divid)
+                .Replace("#Title#","")// station+" Failure Scatt")
                 .Replace("#AmountMAX#", maxamount.ToString())
                 .Replace("#DATA#", chartdata);
 
             return mscott;
         }
 
-        public ActionResult ProjectStations(string pjkey,string whichtest)
+        private string MachineParetoChart(ProjectYieldViewModule yield, string station, string divid,string projectkey,string starttime,string endtime)
         {
+            var piedatadict = new Dictionary<string, int>();
+            var eklist = new List<string>();
+            eklist.AddRange(yield.FErrorMap.Keys);
 
-            ViewBag.pjkey = "EDRLP";
-            ViewBag.WhichTestList = MachineVM.RetrieveWhichTest("EDRLP");
-
-            var testdata = MachineVM.RetrieveWhichTestData("EDRLP", "ER TEMP COMP"
-                , DateTime.Now.AddMonths(-2).ToString("yyyy-MM-dd HH:mm:ss"), DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-            var machineyielddict = MachineVM.RetrieveWhichTestYieldByStation(testdata);
-
-            var keylist = machineyielddict.Keys;
-            var scattchartdict = new Dictionary<string, string>();
-            var idx = 1;
-            foreach (var key in keylist)
+            foreach (var error in eklist)
             {
-                scattchartdict.Add(key, MachineScattChart(machineyielddict[key],key, idx));
-                idx++;
+                if (string.Compare(error, "PASS", true) != 0)
+                {
+                    foreach (var test in yield.FirstYields)
+                    {
+                        var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yield.FErrorMap);
+
+                        if (piedatadict.ContainsKey(error))
+                        {
+                            var preval = piedatadict[error];
+                            piedatadict[error] = preval + val;
+                        }
+                        else
+                        {
+                            piedatadict.Add(error, val);
+                        }
+                    }
+                }
             }
 
-            ViewBag.StationList = keylist;
-            ViewBag.Scattdict = scattchartdict;
+            var firstdatalist = piedatadict.ToList();
+
+            if (firstdatalist.Count > 0)
+            {
+                var peralist = new List<ParetoData>();
+
+                if (firstdatalist.Count > 1)
+                {
+                    firstdatalist.Sort(delegate (KeyValuePair<string, int> pair1, KeyValuePair<string, int> pair2)
+                    {
+                        return pair2.Value.CompareTo(pair1.Value);
+                    });
+                }
+
+                var sum = 0;
+                for (var i = 0; i < firstdatalist.Count; i++)
+                {
+                    sum = sum + firstdatalist[i].Value;
+                }
+
+                var otherpercent = 0.0;
+
+                for (var i = 0; i < firstdatalist.Count; i++)
+                {
+                    if (firstdatalist.Count > 5 && peralist.Count > 0 && peralist[peralist.Count - 1].sumpercent > 0.95)
+                    {
+                        otherpercent = otherpercent + firstdatalist[i].Value / (double)sum;
+                        if (i == (firstdatalist.Count - 1))
+                        {
+                            var tempperato = new ParetoData();
+                            tempperato.key = "Other";
+                            tempperato.count = (int)(otherpercent * sum);
+                            tempperato.percent = otherpercent;
+                            tempperato.sumpercent = 1.0;
+                            peralist.Add(tempperato);
+                        }
+                    }
+                    else
+                    {
+                        var tempperato = new ParetoData();
+                        tempperato.key = firstdatalist[i].Key;
+                        if (i == 0)
+                        {
+                            tempperato.count = firstdatalist[i].Value;
+                            tempperato.percent = tempperato.count / (double)sum;
+                            tempperato.sumpercent = tempperato.percent;
+                            peralist.Add(tempperato);
+                        }
+                        else
+                        {
+                            tempperato.count = firstdatalist[i].Value;
+                            tempperato.percent = tempperato.count / (double)sum;
+                            tempperato.sumpercent = peralist[peralist.Count - 1].sumpercent + tempperato.percent;
+                            peralist.Add(tempperato);
+                        }
+                    }
+                }
+
+                //xaxis
+                var ChartxAxisValues = "";
+
+                foreach (var item in peralist)
+                {
+                    ChartxAxisValues = ChartxAxisValues + "'" + item.key + "',";
+                }
+                ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
+
+
+                var pcountvalue = "";
+                foreach (var item in peralist)
+                {
+                    pcountvalue = pcountvalue + item.count.ToString() + ",";
+                }
+                pcountvalue = pcountvalue.Substring(0, pcountvalue.Length - 1);
+
+                var ppecentvalue = "";
+                foreach (var item in peralist)
+                {
+                    ppecentvalue = ppecentvalue + (item.sumpercent * 100).ToString("0.0") + ",";
+                }
+                ppecentvalue = ppecentvalue.Substring(0, ppecentvalue.Length - 1);
+
+                var abpecentvalue = "";
+                foreach (var item in peralist)
+                {
+                    abpecentvalue = abpecentvalue + (item.percent * 100).ToString("0.0") + ",";
+                }
+                abpecentvalue = abpecentvalue.Substring(0, abpecentvalue.Length - 1);
+
+                //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
+
+                var reurl = "window.location.href = '/Project/ProjectErrAbbr?ProjectKey=" + projectkey + "'" + "+'&ErrAbbr='+this.category";
+                if (!string.IsNullOrEmpty(starttime) && !string.IsNullOrEmpty(endtime))
+                {
+                    reurl = reurl + "+'&StartDate='+'" + starttime + "'+'&EndDate='+'" + endtime + "'";
+                }
+
+                var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ParetoChart.xml"));
+                return tempscript.Replace("#ElementID#", divid)
+                    .Replace("#Title#", "")
+                    .Replace("#XAxisTitle#", "")
+                    .Replace("#ChartxAxisValues#", ChartxAxisValues)
+                    .Replace("#AmountMAX#", sum.ToString())
+                    .Replace("#PCount#", pcountvalue)
+                    .Replace("#ABPercent#", abpecentvalue)
+                    .Replace("#PPercent#", ppecentvalue)
+                    .Replace("#REDIRECTURL#", reurl);
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+
+        private  string MachineYield( string ProjectKey, Dictionary<string, ProjectYieldViewModule> machineyielddict,string divid)
+        {
+            if (machineyielddict.Count > 0)
+            {
+                var ChartxAxisValues = "";
+
+                var ftimelist = new List<string>();
+                var famountlist = new List<int>();
+                var fyieldlist = new List<double>();
+                var ryieldlist = new List<double>();
+                var maxamout = 0;
+
+                foreach (var item in machineyielddict)
+                {
+                    ftimelist.Add(item.Key);
+
+                    fyieldlist.Add(item.Value.FirstYield * 100.0);
+                    ryieldlist.Add(item.Value.LastYield * 100.0);
+
+                    var tempfamount = 0;
+                    foreach (var d in item.Value.FirstYields)
+                    {
+                        if (d.InputCount > tempfamount) { tempfamount = d.InputCount; }
+                        if (d.InputCount > maxamout) { maxamout = d.InputCount; }
+                    }
+                    famountlist.Add(tempfamount);
+                }
+
+                //xaxis
+                foreach (var item in ftimelist)
+                {
+                    ChartxAxisValues = ChartxAxisValues + "'" + item + "',";
+                }
+                ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
+
+
+                var famout = "";
+                foreach (var item in famountlist)
+                {
+                    famout = famout + item.ToString() + ",";
+                }
+                famout = famout.Substring(0, famout.Length - 1);
+
+                var ftempvalue = "";
+                foreach (var item in fyieldlist)
+                {
+                    ftempvalue = ftempvalue + item.ToString("0.00") + ",";
+                }
+                ftempvalue = ftempvalue.Substring(0, ftempvalue.Length - 1);
+
+                var rtempvalue = "";
+                foreach (var item in ryieldlist)
+                {
+                    rtempvalue = rtempvalue + item.ToString("0.00") + ",";
+                }
+                rtempvalue = rtempvalue.Substring(0, rtempvalue.Length - 1);
+
+                var FINALTOOLTIP = "";
+
+                for (var idx = 0; idx < fyieldlist.Count; idx++)
+                {
+                    FINALTOOLTIP = FINALTOOLTIP + "'<!doctype html><table>"
+                        + "<tr><td><b>FPY</b></td><td>" + fyieldlist[idx].ToString("0.00") + "&#37;</td></tr>"
+                        + "<tr><td><b>FY</b></td><td>" + ryieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
+
+                    foreach (var d in machineyielddict[ftimelist[idx]].LastYields)
+                    {
+                        FINALTOOLTIP = FINALTOOLTIP + "<tr><td><b>" + d.WhichTest + " </b></td><td>Input:</td><td>" + d.InputCount.ToString() + "</td><td> Output:</td><td>" + d.OutputCount.ToString() + "</td></tr>";
+                    }
+
+                    FINALTOOLTIP = FINALTOOLTIP + "</table>'";
+                    FINALTOOLTIP = FINALTOOLTIP + ",";
+                }
+                FINALTOOLTIP = FINALTOOLTIP.Substring(0, FINALTOOLTIP.Length - 1);
+
+                //rederect url
+                var reurl = "";
+
+                var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/MachineYield.xml"));
+                return tempscript.Replace("#ElementID#", divid)
+                    .Replace("#Title#", "Stations Yield")
+                    .Replace("#ChartxAxisValues#", ChartxAxisValues)
+                    .Replace("#XAxisTitle#", "")
+                    .Replace("#AmountMAX#", maxamout.ToString())
+                    .Replace("#FirstAmount#", famout)
+                    .Replace("#FirstYield#", ftempvalue)
+                    .Replace("#RetestYield#", rtempvalue)
+                    .Replace("#FINALTOOLTIP#", FINALTOOLTIP)
+                    .Replace("#REDIRECTURL#", reurl);
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+
+        public ActionResult ProjectStations(string pjkey,string whichtest,string StartTime,string EndTime)
+        {
+
+            ViewBag.pjkey = pjkey;
+            ViewBag.WhichTestList = MachineVM.RetrieveWhichTest(pjkey);
+            if (!string.IsNullOrEmpty(whichtest))
+            {
+                ViewBag.ActiveStation = whichtest;
+
+                var starttime = "";
+                var endtime = "";
+                if (!string.IsNullOrEmpty(StartTime) && !string.IsNullOrEmpty(EndTime))
+                {
+                    starttime = StartTime;
+                    endtime = EndTime;
+                }
+                else
+                {
+                    starttime = DateTime.Now.AddMonths(-2).ToString("yyyy-MM-dd HH:mm:ss");
+                    endtime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                }
+
+                var testdata = MachineVM.RetrieveWhichTestData(pjkey, whichtest, starttime , endtime);
+                var machineyielddict = MachineVM.RetrieveWhichTestYieldByStation(testdata);
+
+                var keylist = machineyielddict.Keys;
+                var scattchartdict = new Dictionary<string, string>();
+                var idx = 1;
+                foreach (var key in keylist)
+                {
+                    var divid = "station-scatter-" + idx;
+                    scattchartdict.Add(key, MachineScattChart(machineyielddict[key],key, divid));
+                    idx++;
+                }
+
+                var paretochartdict = new Dictionary<string, string>();
+                idx = 1;
+                foreach (var key in keylist)
+                {
+                    var divid = "station-pareto-" + idx;
+                    paretochartdict.Add(key, MachineParetoChart(machineyielddict[key], key, divid, ViewBag.pjkey, starttime,endtime));
+                    idx++;
+                }
+
+                ViewBag.StationList = keylist;
+                ViewBag.Scattdict = scattchartdict;
+                ViewBag.paretodict = paretochartdict;
+                ViewBag.MachineYield = MachineYield(ViewBag.pjkey, machineyielddict, "tester-yield");
+            }
+            else {
+                ViewBag.ActiveStation = ViewBag.WhichTestList[0];
+            }
 
             return View();
         }

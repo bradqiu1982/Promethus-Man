@@ -55,6 +55,19 @@ namespace Prometheus.Models
                 }
             }
 
+            var removekeylist = new List<string>();
+            foreach (var item in stationtestdata) {
+                if (item.Value.Count < 20)
+                {
+                    removekeylist.Add(item.Key);
+                }
+            }
+
+            foreach (var key in removekeylist)
+            {
+                stationtestdata.Remove(key);
+            }
+
             foreach (var kv in stationtestdata)
             {
                 ret.Add(kv.Key,ProjectYieldViewModule.GetYieldByTestData(kv.Value));

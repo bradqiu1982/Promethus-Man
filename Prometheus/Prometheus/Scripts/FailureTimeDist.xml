@@ -1,47 +1,62 @@
 ﻿<script type="text/javascript">
   $(function () {
+
       $('##ElementID#').highcharts({
         chart:{
           type: 'scatter'
         },
-        title: {
-            text: '#Title#'
+        title:{
+          text:'#Title#'
+        },
+        exporting:{
+          enabled:false
         },
         xAxis: {
             crosshair: true,
+            type : 'datetime',
             title:{
-              text: 'Date'
+              text: ''
             }
         },
-        yAxis: [{
-            title: {
-                text: 'Amount'
-            },
-            min: 0,
-            max: #AmountMAX#
-        },
+        yAxis: {
+                  title: {
+                      text: 'Amount'
+                  },
+                  min: 0,
+                  max: #AmountMAX#
+            }, 
         plotOptions: {
-            scatter: {
+            scatter:{
                 marker: {
                     radius: 5,
                     states: {
                         hover: {
                             enabled: true,
                             lineColor: 'rgb(100,100,100)'
-                        }
+                        },
+                    width:15,
+                    height:15
                     }
                 },
                 states: {
                     hover: {
                         marker: {
-                            enabled: false
+                            enabled: true
                         }
                     }
-                },
-                tooltip: {
-                    headerFormat: '<b>{series.name}</b>',
-                    pointFormat: '{point.y}'
                 }
+             }
+        },
+        legend:{
+          itemStyle:{
+            fontSize:'10px'
+          }
+        },
+        tooltip: {
+            useHTML: true,
+            formatter: function() {
+                    var mydate = moment(this.x).format('YYYY-MM-DD');
+                    return '<b>' +this.series.name+ '</b><br/> ' + mydate + ' ' + this.y;
             }
         },
         series:[#DATA#]

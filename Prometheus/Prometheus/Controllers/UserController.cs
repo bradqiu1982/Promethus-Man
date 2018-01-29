@@ -323,7 +323,6 @@ namespace Prometheus.Controllers
             }
         }
 
-
         public ActionResult LoginOutUser(string ctrl, string action)
         {
             var val = CookieUtility.UnpackCookie(this);
@@ -338,6 +337,7 @@ namespace Prometheus.Controllers
             }
 
             CookieUtility.SetCookie(this, val);
+            CookieUtility.RemoveCookie(this);
             return RedirectToAction("UserCenter", "User");
         }
 

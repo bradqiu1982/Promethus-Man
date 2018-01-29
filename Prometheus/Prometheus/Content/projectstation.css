@@ -8,6 +8,7 @@
     padding-right: 0;
     border-left: 1px #aaa solid;
     border-right: 1px #aaa solid;
+    border-top: 1px #aaa solid;
 }
 
 .tester-yield {
@@ -62,4 +63,25 @@
     border-top: 1px #aaa solid;
     border-bottom: 1px #aaa solid;
     border-left: 1px #000 dashed;
+}
+
+.date-label {
+    padding:5px;
+    width:80px!important;
+    display:inline-block;
+}
+
+.date-input {
+    padding:5px;
+    width:auto!important;
+    display:inline-block;
+}
+
+.date-group {
+margin-left:5px;
+margin-top:5px;
+}
+
+.list-group-item {
+    cursor:pointer;
 }

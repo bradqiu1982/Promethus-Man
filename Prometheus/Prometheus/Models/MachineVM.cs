@@ -57,7 +57,7 @@ namespace Prometheus.Models
 
             var removekeylist = new List<string>();
             foreach (var item in stationtestdata) {
-                if (item.Value.Count < 20)
+                if (item.Value.Count < 10)
                 {
                     removekeylist.Add(item.Key);
                 }

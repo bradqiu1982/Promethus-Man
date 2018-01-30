@@ -21,15 +21,6 @@
 <script src="~/Scripts/moment.min.js"></script>
 <script src="~/Scripts/highcharts.js"></script>
 <script src="~/Scripts/exporting.js"></script>
-<script scr="~/Script" type="text/javascript"></script>
-
-
-@*<script src="~/Scripts/Prometheus.js" type="text/javascript">
-    $(function () {
-        Prometheus.Init();
-    });
-</script>*@
-
 <link href="~/Content/projectstation.css" rel="stylesheet" type="text/css" />
 <div class="body-content">
     <div class="content-left list-group col-xs-3">
@@ -40,12 +31,10 @@
                 if (string.Compare(item, ViewBag.ActiveStation) == 0)
                 {
                     <span class="list-group-item active station-val" onclick="PJStation('pjkey=@(ViewBag.pjkey)&whichtest=@(item)')">@item</span>
-                    @*<a href="/Project/ProjectStations?pjkey=@(ViewBag.pjkey)&whichtest=@(item)" class="list-group-item active">@item</a>*@
                 }
                 else
                 {
                     <span class="list-group-item" onclick="PJStation('pjkey=@(ViewBag.pjkey)&whichtest=@(item)')">@item</span>
-                    @*<a href="/Project/ProjectStations?pjkey=@(ViewBag.pjkey)&whichtest=@(item)" class="list-group-item">@item</a>*@
                 }
             }
         }
@@ -136,53 +125,44 @@
                     }
                 }//end foreach
             }
-
         </div>
     </div>
 </div>
 
 <script type="text/javascript">
-            $(function () {
-                $('#startdate').datepicker({
-                    changeMonth: true,
-                    changeYear: true,
-                    dateFormat: 'yy-mm-dd'
-                });
-                $('#enddate').datepicker({
-                    changeMonth: true,
-                    changeYear: true,
-                    dateFormat: 'yy-mm-dd'
-                });
-            })
+    $(function () {
+        $('#startdate').datepicker({
+            changeMonth: true,
+            changeYear: true,
+            dateFormat: 'yy-mm-dd'
+        });
+        $('#enddate').datepicker({
+            changeMonth: true,
+            changeYear: true,
+            dateFormat: 'yy-mm-dd'
+        });
+    })
 
-            function PJStation(param)
-            {
-                var startdate = $('#startdate').val();
-                var enddate = $('#enddate').val();
-                if (startdate && enddate) {
-                    window.location.href = '/Project/ProjectStations?' + param + '&StartTime=' + startdate + '&EndTime=' + enddate;
-                }
-                else {
-                    window.location.href = '/Project/ProjectStations?' + param;
-                }
-            }
-
-            function PJStationByDate()
-            {
-                var startdate = $('#startdate').val();
-                var enddate = $('#enddate').val();
-                var activewhichtest = $('.station-val').html();
-                if (startdate && enddate) {
-                    window.location.href = '/Project/ProjectStations?' + 'pjkey=@(ViewBag.pjkey)&whichtest=' + activewhichtest + '&StartTime=' + startdate + '&EndTime=' + enddate;
-                }
-                return false;
-            }
-
-    $('body').on('click', '.chart-modal', function (e) {
-        var cname = ' ' + e.target.className;
-        if (cname.indexOf('chart-modal') !== -1) {
-            $(this).removeClass('chart-modal');
-            $(this).children().eq(0).highcharts().reflow();
+    function PJStation(param)
+    {
+        var startdate = $('#startdate').val();
+        var enddate = $('#enddate').val();
+        if (startdate && enddate) {
+            window.location.href = '/Project/ProjectStations?' + param + '&StartTime=' + startdate + '&EndTime=' + enddate;
         }
-    });
+        else {
+            window.location.href = '/Project/ProjectStations?' + param;
+        }
+    }
+
+    function PJStationByDate()
+    {
+        var startdate = $('#startdate').val();
+        var enddate = $('#enddate').val();
+        var activewhichtest = $('.station-val').html();
+        if (startdate && enddate) {
+            window.location.href = '/Project/ProjectStations?' + 'pjkey=@(ViewBag.pjkey)&whichtest=' + activewhichtest + '&StartTime=' + startdate + '&EndTime=' + enddate;
+        }
+        return false;
+    }
 </script>

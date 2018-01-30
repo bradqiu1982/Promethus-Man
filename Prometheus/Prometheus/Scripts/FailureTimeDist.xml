@@ -8,9 +8,6 @@
         title:{
           text:'#Title#'
         },
-        exporting:{
-          enabled:false
-        },
         xAxis: {
             crosshair: true,
             type : 'datetime',
@@ -59,7 +56,23 @@
                     return '<b>' +this.series.name+ '</b><br/> ' + mydate + ' ' + this.y;
             }
         },
-        series:[#DATA#]
+        series:[#DATA#],
+        exporting: {
+            menuItemDefinitions: {
+                fullscreen: {
+                    onclick: function () {
+                              $('##ElementID#').parent().toggleClass('chart-modal');
+                              $('##ElementID#').highcharts().reflow();
+                    },
+                    text: 'full screen'
+                }
+            },
+            buttons: {
+                contextButton: {
+                    menuItems: ['fullscreen','printChart','separator','downloadPNG','downloadJPEG','downloadPDF','downloadSVG']
+                }
+            }
+        }
       });
   });
 </script>

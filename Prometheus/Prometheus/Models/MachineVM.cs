@@ -36,7 +36,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static Dictionary<string, ProjectYieldViewModule> RetrieveWhichTestYieldByStation(List<ProjectTestData> testdata)
+        public static Dictionary<string, ProjectYieldViewModule> RetrieveWhichTestYieldByStation(List<ProjectTestData> testdata,int dayspan)
         {
             var ret = new Dictionary<string, ProjectYieldViewModule>();
 
@@ -55,9 +55,19 @@ namespace Prometheus.Models
                 }
             }
 
+            var leastdatalimit = 0;
+            if (dayspan >= 8)
+            {
+                leastdatalimit = 60;
+            }
+            else
+            {
+                leastdatalimit = 10;
+            }
+
             var removekeylist = new List<string>();
             foreach (var item in stationtestdata) {
-                if (item.Value.Count < 10)
+                if (item.Value.Count < leastdatalimit)
                 {
                     removekeylist.Add(item.Key);
                 }

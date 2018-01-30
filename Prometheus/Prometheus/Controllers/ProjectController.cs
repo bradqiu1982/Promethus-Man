@@ -7979,8 +7979,19 @@ namespace Prometheus.Controllers
                     endtime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                 }
 
+                var dayspan = (DateTime.Parse(endtime) - DateTime.Parse(starttime)).Days;
+
                 var testdata = MachineVM.RetrieveWhichTestData(pjkey, whichtest, starttime , endtime);
-                var machineyielddict = MachineVM.RetrieveWhichTestYieldByStation(testdata);
+                var machineyielddict = MachineVM.RetrieveWhichTestYieldByStation(testdata, dayspan);
+
+                var allstationkey = "AllStations";
+                var allstationdata = new List<ProjectTestData>();
+                foreach (var item in testdata)
+                {
+                    item.TestStation = allstationkey;
+                    allstationdata.Add(item);
+                }
+                var allmachineyielddict = MachineVM.RetrieveWhichTestYieldByStation(allstationdata,dayspan);
 
                 var keylist = machineyielddict.Keys;
                 var scattchartdict = new Dictionary<string, string>();
@@ -7992,6 +8003,11 @@ namespace Prometheus.Controllers
                     idx++;
                 }
 
+                if (allmachineyielddict.Count > 0)
+                {
+                    ViewBag.allstationscatter = MachineScattChart(allmachineyielddict[allstationkey], allstationkey, "allstationscatter");
+                }
+
                 var paretochartdict = new Dictionary<string, string>();
                 idx = 1;
                 foreach (var key in keylist)
@@ -8001,9 +8017,20 @@ namespace Prometheus.Controllers
                     idx++;
                 }
 
-                ViewBag.StationList = keylist;
+                if (allmachineyielddict.Count > 0)
+                {
+                    ViewBag.allstationpareto = MachineParetoChart(allmachineyielddict[allstationkey], allstationkey, "allstationpareto", ViewBag.pjkey, starttime, endtime);
+                }
+
+                ViewBag.StationList = new List<string>();
+                ViewBag.StationList.AddRange(keylist);
                 ViewBag.Scattdict = scattchartdict;
                 ViewBag.paretodict = paretochartdict;
+
+                if (allmachineyielddict.Count > 0)
+                {
+                    machineyielddict.Add(allstationkey, allmachineyielddict[allstationkey]);
+                }
                 ViewBag.MachineYield = MachineYield(ViewBag.pjkey, machineyielddict, "tester-yield");
             }
             else {

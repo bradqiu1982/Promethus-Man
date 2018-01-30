@@ -21,6 +21,14 @@
 <script src="~/Scripts/moment.min.js"></script>
 <script src="~/Scripts/highcharts.js"></script>
 <script src="~/Scripts/exporting.js"></script>
+<script scr="~/Script" type="text/javascript"></script>
+
+
+@*<script src="~/Scripts/Prometheus.js" type="text/javascript">
+    $(function () {
+        Prometheus.Init();
+    });
+</script>*@
 
 <link href="~/Content/projectstation.css" rel="stylesheet" type="text/css" />
 <div class="body-content">
@@ -46,11 +54,11 @@
     <div class="content-right col-xs-9">
         <div class="row date-group">
             <div class="col-xs-4">
-                <label class="form-control date-label">Start Date</label>
+                <label class="date-label">Start Date</label>
                 <input type="text" id="startdate" name="startdate" class="form-control date-input" />
             </div>
             <div class="col-xs-4">
-                <label class="form-control date-label">End Date</label>
+                <label class="date-label">End Date</label>
                 <input type="text" id="enddate" name="enddate" class="form-control date-input" />
             </div>
             <div class="col-xs-1">
@@ -66,6 +74,35 @@
         }
 
         <div class="station-list">
+            @if (!string.IsNullOrEmpty(ViewBag.allstationpareto)
+                || !string.IsNullOrEmpty(ViewBag.allstationscatter))
+            {
+                var scattchart = ViewBag.allstationscatter;
+                var paretochart = ViewBag.allstationpareto;
+                <div class="station-detail">
+                    <div class="station-title span-primary">
+                        <span class="glyphicon glyphicon-blackboard"></span>
+                        <span>All Stations</span>
+                    </div>
+                    <div class="station-chart">
+                        <div class="pareto-container col-xs-6">
+                            <div class="station-pareto" id="allstationpareto"></div>
+                        </div>
+                        <div class="scatter-container col-xs-6">
+                            <div class="station-scatter" id="allstationscatter"></div>
+                        </div>
+                    </div>
+                </div>
+                if (!string.IsNullOrEmpty(scattchart))
+                {
+                    @Html.Raw(scattchart);
+                }
+                if (!string.IsNullOrEmpty(paretochart))
+                {
+                    @Html.Raw(paretochart);
+                }
+            }
+
             @if (ViewBag.StationList != null && ViewBag.StationList.Count > 0)
             {
                 foreach (var station in ViewBag.StationList)
@@ -80,8 +117,12 @@
                             <span>@(station)</span>
                         </div>
                         <div class="station-chart">
-                            <div class="station-pareto col-xs-6" id="station-pareto-@(idx)"></div>
-                            <div class="station-scatter col-xs-6" id="station-scatter-@(idx)"></div>
+                            <div class="pareto-container col-xs-6">
+                                <div class="station-pareto" id="station-pareto-@(idx)"></div>
+                            </div>
+                            <div class="scatter-container col-xs-6">
+                                <div class="station-scatter" id="station-scatter-@(idx)"></div>
+                            </div>
                         </div>
                     </div>
 
@@ -136,4 +177,12 @@
                 }
                 return false;
             }
+
+    $('body').on('click', '.chart-modal', function (e) {
+        var cname = ' ' + e.target.className;
+        if (cname.indexOf('chart-modal') !== -1) {
+            $(this).removeClass('chart-modal');
+            $(this).children().eq(0).highcharts().reflow();
+        }
+    });
 </script>

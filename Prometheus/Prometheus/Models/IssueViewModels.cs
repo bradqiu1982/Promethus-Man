@@ -1443,7 +1443,7 @@ namespace Prometheus.Models
                     i.Priority,i.DueDate,i.ResolvedDate,i.ReportDate,i.Assignee,i.Reporter,i.Resolution,
                     i.ParentIssueKey,i.RelativePeoples,i.APVal2,i.ModuleSN,i.DataID,i.ErrAbbr,
                     d.TestStation, d.ModuleSerialNum, d.ErrAbbr as tErrAbbr
-                    from Issue as i left join ProjectTestData as d on i.IssueKey = d.DataID 
+                    from Issue as i left join ProjectTestData as d on (i.IssueKey = d.DataID and i.ProjectKey = d.ProjectKey)
                     where i.APVal1 <> 'delete' and  i.ParentIssueKey = '' 
                     and i.ProjectKey = '<ProjectKey>' and i.Resolution in <cond> 
                     and i.IssueType <> '<IssueType>' 

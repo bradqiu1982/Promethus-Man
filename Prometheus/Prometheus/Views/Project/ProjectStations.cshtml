@@ -54,9 +54,11 @@
                 <input class="btn btn-default" type="button" onclick="PJStationByDate()" value="Search" />
             </div>
         </div>
-
-        <div class="tester-yield" id="tester-yield">
+        <div class="test-yield-container">
+            <div class="tester-yield" id="tester-yield">
+            </div>
         </div>
+
         @if (ViewBag.MachineYield != null && !string.IsNullOrEmpty(ViewBag.MachineYield))
         {
             @Html.Raw(ViewBag.MachineYield)

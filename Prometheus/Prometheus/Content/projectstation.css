@@ -11,10 +11,14 @@
     border-top: 1px #aaa solid;
 }
 
-.tester-yield {
+.test-yield-container {
     height: 300px;
     border-top: 1px #aaa solid;
     border-bottom: 1px #aaa solid;
+}
+
+.tester-yield {
+    height: 100%;
 }
 
 .station-detail {

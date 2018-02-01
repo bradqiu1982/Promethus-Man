@@ -13,7 +13,23 @@
             min:#YMIN#,
             max:#YMAX#
         },
-     series: [#SERIESVALUE#]
+     series: [#SERIESVALUE#],
+        exporting: {
+            menuItemDefinitions: {
+                fullscreen: {
+                    onclick: function () {
+                              $('##ElementID#').parent().toggleClass('chart-modal');
+                              $('##ElementID#').highcharts().reflow();
+                    },
+                    text: 'full screen'
+                }
+            },
+            buttons: {
+                contextButton: {
+                    menuItems: ['fullscreen','printChart','separator','downloadPNG','downloadJPEG','downloadPDF','downloadSVG']
+                }
+            }
+        }
   });
   });
 </script>

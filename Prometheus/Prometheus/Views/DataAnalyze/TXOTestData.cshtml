@@ -12,9 +12,7 @@
     </ol>
 </div>
 
-<script src="~/Scripts/highcharts.js"></script>
 <script src="~/Scripts/heatmap.js"></script>
-<script src="~/Scripts/exporting.js"></script>
 <script src="~/Scripts/highcharts-more.js"></script>
 
 @using (Html.BeginForm("TXOTestData", "DataAnalyze", FormMethod.Post, new { enctype = "multipart/form-data",id = "txoform",name = "txoform" }))
@@ -233,8 +231,8 @@
                         <div class="col-11">
                             @if (ViewBag.lefthotscript != null)
                             {
-                                @Html.Raw(ViewBag.lefthotscript)
                                 <div id="lefthotscript" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+                                @Html.Raw(ViewBag.lefthotscript)
                             }
                         </div>
                         <div class="col-1">
@@ -250,8 +248,8 @@
                         <div class="col-11">
                             @if (ViewBag.righthotscript != null)
                             {
-                                @Html.Raw(ViewBag.righthotscript)
                                 <div id="righthotscript" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+                                @Html.Raw(ViewBag.righthotscript)
                             }
                         </div>
                     </div>
@@ -266,8 +264,8 @@
                         <div class="col-11">
                             @if (ViewBag.leftnormaldistr != null)
                             {
-                                @Html.Raw(ViewBag.leftnormaldistr)
                                 <div id="leftnormaldistr" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+                                @Html.Raw(ViewBag.leftnormaldistr)
                             }
                         </div>
                         <div class="col-1">
@@ -287,8 +285,8 @@
                         <div class="col-11">
                             @if (ViewBag.rightnormaldistr != null)
                             {
-                                @Html.Raw(ViewBag.rightnormaldistr)
                                 <div id="rightnormaldistr" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+                                @Html.Raw(ViewBag.rightnormaldistr)
                             }
                         </div>
                     </div>
@@ -309,8 +307,8 @@
                     <div class="row">
                         @if (ViewBag.combinenormaldistr != null)
                         {
-                            @Html.Raw(ViewBag.combinenormaldistr)
                             <div id="combinenormaldistr" style="min-width: 600px; height: 600px; margin: 0 auto"></div>
+                            @Html.Raw(ViewBag.combinenormaldistr)
                         }
                     </div>
                 </div>
@@ -326,8 +324,8 @@
                         <div class="col-11">
                             @if (ViewBag.leftboxplot != null)
                             {
-                                @Html.Raw(ViewBag.leftboxplot)
                                 <div id="leftboxplot" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+                                @Html.Raw(ViewBag.leftboxplot)
                             }
                         </div>
                         <div class="col-1">
@@ -347,8 +345,8 @@
                         <div class="col-11">
                             @if (ViewBag.rightboxplot != null)
                             {
-                                @Html.Raw(ViewBag.rightboxplot)
                                 <div id="rightboxplot" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+                                @Html.Raw(ViewBag.rightboxplot)
                             }
                         </div>
                     </div>
@@ -368,8 +366,8 @@
                     <div class="row">
                         @if (ViewBag.combineboxplot != null)
                         {
-                            @Html.Raw(ViewBag.combineboxplot)
                             <div id="combineboxplot" style="min-width: 600px; height: 600px; margin: 0 auto"></div>
+                            @Html.Raw(ViewBag.combineboxplot)
                         }
                     </div>
                 </div>

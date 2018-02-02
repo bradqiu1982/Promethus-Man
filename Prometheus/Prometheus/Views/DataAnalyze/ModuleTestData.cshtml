@@ -12,9 +12,7 @@
     </ol>
 </div>
 
-<script src="~/Scripts/highcharts.js"></script>
 <script src="~/Scripts/heatmap.js"></script>
-<script src="~/Scripts/exporting.js"></script>
 <script src="~/Scripts/highcharts-more.js"></script>
 
 @using (Html.BeginForm("ModuleTestData", "DataAnalyze", FormMethod.Post, new { enctype = "multipart/form-data", id = "moduletxoform", name = "moduletxoform" }))
@@ -219,8 +217,8 @@
                                 <div class="col-12">
                                     @if (ViewBag.leftbinormaldistr != null)
                                     {
-                                        @Html.Raw(ViewBag.leftbinormaldistr)
                                         <div id="leftbinormaldistr" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+                                        @Html.Raw(ViewBag.leftbinormaldistr)
                                     }
                                 </div>
                             </div>
@@ -241,8 +239,8 @@
                                 <div class="col-12">
                                     @if (ViewBag.alignnormaldistr != null)
                                     {
-                                        @Html.Raw(ViewBag.alignnormaldistr)
                                         <div id="alignnormaldistr" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+                                        @Html.Raw(ViewBag.alignnormaldistr)
                                     }
                                 </div>
 
@@ -264,8 +262,8 @@
                                 <div class="col-12">
                                     @if (ViewBag.modulenormaldistr != null)
                                     {
-                                        @Html.Raw(ViewBag.modulenormaldistr)
                                         <div id="modulenormaldistr" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+                                        @Html.Raw(ViewBag.modulenormaldistr)
                                     }
                                 </div>
 

@@ -111,7 +111,7 @@ $(function () {
                               $('##ElementID#').parent().toggleClass('chart-modal');
                               $('##ElementID#').highcharts().reflow();
                     },
-                    text: 'full screen'
+                    text: 'Full Screen'
                 }
             },
             buttons: {

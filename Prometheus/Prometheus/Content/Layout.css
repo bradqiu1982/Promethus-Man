@@ -7,7 +7,7 @@
     bottom:0;
     right:0;
     padding: 10% 15% !important;
-    background: rgba(0, 0, 0, 0.4);
+    background: #aaa;
     z-index:1020;
 }
 

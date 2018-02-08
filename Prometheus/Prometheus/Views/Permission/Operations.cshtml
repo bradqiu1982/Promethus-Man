@@ -1,0 +1,106 @@
+﻿
+@{
+    ViewBag.Title = "Operations";
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
+}
+<link href="~/Content/UserPermission.css" rel="stylesheet" />
+<script src="~/Scripts/permission.js" type="text/javascript"></script>
+<script>
+    $(function () {
+        UserPermission.operations();
+    })
+</script>
+
+<div class="row">
+    <div class="col-sm-2">
+        <nav class="nav-sidebar">
+            <ul class="nav">
+                <li><a href="/Permission/MemberList">Members</a></li>
+                <li><a href="/Permission/GroupList">Groups</a></li>
+                <li><a href="/Permission/RoleList">Roles</a></li>
+                <li><a href="/Permission/Menus">Menus</a></li>
+                <li><a href="/Permission/Functions">Functions</a></li>
+                <li class="active"><a href="/Permission/Operations">Operation</a></li>
+                @*<li class="nav-divider"></li>*@
+            </ul>
+        </nav>
+    </div>
+    <div class="col-sm-10">
+        <div class="row">
+            <div class="nav navbar-nav navbar-left">
+                <ol class="breadcrumb">
+                    <li><a href="javascript:;">Permission</a></li>
+                    <li class="active">Operations</li>
+                </ol>
+            </div>
+        </div>
+        <div class="row">
+            <div class="m-op m-row">
+                <input type="button" class="btn btn-success" id="btn-add-op" name="btn-add-op" value="Add Operation" />
+            </div>
+            <div class="m-content">
+                <table class="table table-condensed">
+                    <caption>
+                        <div class="col-xs-4 tb-total">
+                            <span>Total: @ViewBag.TotalCnt</span>
+                        </div>
+                        <div class="search-container col-xs-4">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="tb-search" name="tb-search" placeholder="Search Keys" value="@ViewBag.Keywords" />
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-search" id="m-btn-search"></span></span>
+                            </div>
+                        </div>
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Operation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.Operations != null)
+                        {
+                            foreach (var item in ViewBag.Operations)
+                            {
+                                <tr>
+                                    <td>@item.ID</td>
+                                    <td>@item.Name</td>
+                                    <td>
+                                        <a data-id="@item.ID" class="edit-op">Edit</a>
+                                        <a data-id="@item.ID" class="del-op">Delete</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+                @Html.Partial("~/Views/Shared/_Pagination.cshtml")
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modal-add-op" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="m-title">Add Operations</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="m-oid" name="m-oid" />
+                <div class="row m-row">
+                    <label class="col-xs-3">Name</label>
+                    <div class="col-xs-9">
+                        <input type="text" class="form-control" id="modal-name" name="modal-name" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="m-btn-submit">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+

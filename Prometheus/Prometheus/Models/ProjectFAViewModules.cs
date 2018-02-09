@@ -167,18 +167,11 @@ namespace Prometheus.Models
             var vm = IssueViewModels.RRetrieveFAByErrAbbr(ProjectKey, ErrAbbr, 500, ctrl);
             foreach (var item in vm)
             {
-                var testStation = "";
-                var pjdata = ProjectTestData.RetrieveProjectTestData(item.IssueKey);
-                if (pjdata.Count > 0)
-                {
-                    testStation = pjdata[0].TestStation;
-                }
-
                 var pd = new ProjectTestData();
                 pd.ModuleSerialNum = item.ModuleSN;
                 pd.ErrAbbr = item.ErrAbbr;
                 pd.ProjectKey = item.ProjectKey;
-                pd.TestStation = testStation;
+                pd.TestStation = item.TestStation;
                 ret.Add(new ProjectFAViewModules(item, pd));
             }
             return ret;

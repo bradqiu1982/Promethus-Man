@@ -58,14 +58,14 @@
     display: inline-block;
     margin-left: 1%;
     height: 300px;
-    width: 48%;
+    width: 100%;
 }
 .wyield{
     /*border: #000 1px solid;*/
     display: inline-block;
     margin-left: 1%;
     height: 300px;
-    width: 48%;
+    width: 100%;
 }
 
 .cursor-pointer{

@@ -1483,10 +1483,11 @@ namespace Prometheus.Models
         {
             var retdict = new List<IssueViewModels>();
 
-            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,"
-                + "DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,"
-                + "RelativePeoples,APVal2,ModuleSN,DataID,ErrAbbr from Issue "
-                + " where  APVal1 <> 'delete' and  ParentIssueKey = '' and ProjectKey = '<ProjectKey>' and ErrAbbr = '<ErrAbbr>' and Resolution <> '<AutoClose>' order by ReportDate DESC";
+            var sql = "select top <topnum> i.ProjectKey,i.IssueKey,i.IssueType,i.Summary,i.Priority,"
+                + "i.DueDate,i.ResolvedDate,i.ReportDate,i.Assignee,i.Reporter,i.Resolution,i.ParentIssueKey,"
+                + "i.RelativePeoples,i.APVal2,i.ModuleSN,i.DataID,i.ErrAbbr, pd.TestStation from Issue as i left join "
+                + "ProjectTestData as pd on (i.IssueKey = pd.DataID and i.ProjectKey = pd.ProjectKey)"
+                + " where  i.APVal1 <> 'delete' and  i.ParentIssueKey = '' and i.ProjectKey = '<ProjectKey>' and i.ErrAbbr = '<ErrAbbr>' and i.Resolution <> '<AutoClose>' order by i.ReportDate DESC";
             sql = sql.Replace("<ProjectKey>", pjkey).Replace("<topnum>", Convert.ToString(topnum)).Replace("<ErrAbbr>", errabbr).Replace("<AutoClose>", Resolute.AutoClose);
 
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
@@ -1503,8 +1504,9 @@ namespace Prometheus.Models
                 ret.ModuleSN = Convert.ToString(line[14]);
                 ret.DataID = Convert.ToString(line[15]);
                 ret.ErrAbbr = Convert.ToString(line[16]);
+                ret.TestStation = Convert.ToString(line[17]);
 
-                ret.RetrieveComment(ctrl);
+                //ret.RetrieveComment(ctrl);
                 //ret.RetrieveAttachment(ret.IssueKey);
                 retdict.Add(ret);
             }

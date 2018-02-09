@@ -31,13 +31,8 @@ else
 
 <hr />
 
-<script src="~/Scripts/highcharts.js"></script>
-<script src="~/Scripts/exporting.js"></script>
-
 @if (ViewBag.chartscript != null)
 {
-    @Html.Raw(ViewBag.chartscript)
-
     <div class="row">
         <div class="col-xs-12">
             <div class="panel panel-default">
@@ -52,6 +47,8 @@ else
             </div>
         </div>
     </div>
+    @Html.Raw(ViewBag.chartscript)
+
 }
 
 <hr/>

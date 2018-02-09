@@ -373,18 +373,20 @@ namespace Prometheus.Controllers
         {
             if (piedatadict.Count > 0)
             {
-                var keys = piedatadict.Keys;
                 var namevaluepair = "";
-                foreach (var k in keys)
+                var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
+                foreach (var item in piedatadict_tmp)
                 {
-                    if (piedatadict[k] > 0)
-                        namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                    if (item.Value > 0)
+                    {
+                        namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                    }
                 }
 
                 namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
 
                 var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
-                return tempscript.Replace("#Title#", date+" Failure")
+                return tempscript.Replace("#Title#", date + " Failure")
                     .Replace("#SERIESNAME#", "Failure")
                     .Replace("#NAMEVALUEPAIRS#", namevaluepair);
             }

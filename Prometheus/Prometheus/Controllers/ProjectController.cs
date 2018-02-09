@@ -1610,14 +1610,13 @@ namespace Prometheus.Controllers
                         piedatadict.Add(item.TestData.ErrAbbr, 1);
                     }
                 }
-
-                var keys = piedatadict.Keys;
-                if (keys.Count > 0)
+                if (piedatadict.Count > 0)
                 {
                     var namevaluepair = "";
-                    foreach (var k in keys)
+                    var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
+                    foreach (var item in piedatadict_tmp)
                     {
-                        namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                        namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
                     }
 
                     namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
@@ -1627,6 +1626,7 @@ namespace Prometheus.Controllers
                         .Replace("#Title#", ProjectKey + " FA Realtime Failure")
                         .Replace("#SERIESNAME#", "Failure")
                         .Replace("#NAMEVALUEPAIRS#", namevaluepair);
+
                 }
 
                 var asilist = UserViewModels.RetrieveAllUser();
@@ -1717,14 +1717,15 @@ namespace Prometheus.Controllers
                     }
                 }
 
-                var keys = piedatadict.Keys;
-                if (keys.Count > 0)
+                if (piedatadict.Count > 0)
                 {
                     var namevaluepair = "";
-                    foreach (var k in keys)
+                    var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
+
+                    foreach (var item in piedatadict_tmp)
                     {
-                        var pkey = descdict.ContainsKey(k) ? descdict[k] : k;
-                        namevaluepair = namevaluepair + "{ name:'" + pkey + "',y:" + piedatadict[k].ToString() + "},";
+                        var pkey = descdict.ContainsKey(item.Key) ? descdict[item.Key] : item.Key;
+                        namevaluepair = namevaluepair + "{ name:'" + pkey + "',y:" + item.Value.ToString() + "},";
                     }
 
                     namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
@@ -1736,6 +1737,9 @@ namespace Prometheus.Controllers
                         .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                 }
 
+
+
+                var keys = piedatadict.Keys;
                 piedatadict = new Dictionary<string, int>();
                 foreach (var item in vm)
                 {
@@ -1744,17 +1748,15 @@ namespace Prometheus.Controllers
                         piedatadict.Add(item.OrignalCode, item.ErrorCount-item.AutoClosed);
                     }
                 }
-
-                keys = piedatadict.Keys;
-                if (keys.Count > 0)
+                if(piedatadict.Count  > 0)
                 {
                     var namevaluepair = "";
-                    foreach (var k in keys)
+                    var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
+                    foreach(var item in piedatadict_tmp)
                     {
-                        var pkey = descdict.ContainsKey(k) ? descdict[k] : k;
-                        namevaluepair = namevaluepair + "{ name:'" + pkey + "',y:" + piedatadict[k].ToString() + "},";
+                        var pkey = descdict.ContainsKey(item.Key) ? descdict[item.Key] : item.Key;
+                        namevaluepair = namevaluepair + "{ name:'" + pkey + "',y:" + item.Value.ToString() + "},";
                     }
-
                     namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
 
                     var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
@@ -1774,7 +1776,6 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(ErrAbbr))
             {
                 ViewBag.projectkey = ProjectKey;
-
                 var vm = ProjectFAViewModules.RetrieveFADataWithErrAbbr(ProjectKey, ErrAbbr, this);
 
                 var pendingitems = new List<ProjectFAViewModules>();
@@ -1837,7 +1838,7 @@ namespace Prometheus.Controllers
                         pendingitems.Add(item);
                     }
                 }
-
+                
                 if (tempitems.Count > 0)
                 {
                     var pslist = new List<SelectListItem>();
@@ -1910,15 +1911,14 @@ namespace Prometheus.Controllers
                 }
             }
 
-            var keys = piedatadict.Keys;
-            if (keys.Count > 0)
+            if(piedatadict.Count > 0)
             {
                 var namevaluepair = "";
-                foreach (var k in keys)
+                var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
+                foreach(var item in piedatadict_tmp)
                 {
-                    namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                    namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
                 }
-
                 namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
 
                 var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
@@ -2315,21 +2315,25 @@ namespace Prometheus.Controllers
 
                     piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.FirstYields[yieldvm.FirstYields.Count - 1].WhichTest, yieldvm.FErrorMap);
 
-                    var keys = piedatadict.Keys;
-                    var namevaluepair = "";
-                    foreach (var k in keys)
+                    if(piedatadict.Count > 0)
                     {
-                        if (piedatadict[k] > 0)
-                            namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                        var namevaluepair = "";
+                        var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
+                        foreach(var item in piedatadict_tmp)
+                        {
+                            if(item.Value > 0)
+                            {
+                                namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                            }
+                        }
+                        namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                        ViewBag.fchartscript = tempscript.Replace("#ElementID#", "ffailurepie")
+                            .Replace("#Title#", "First Failure")
+                            .Replace("#SERIESNAME#", "FFailure")
+                            .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                     }
-
-                    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
-                    ViewBag.fchartscript = tempscript.Replace("#ElementID#", "ffailurepie")
-                        .Replace("#Title#", "First Failure")
-                        .Replace("#SERIESNAME#", "FFailure")
-                        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                 }
 
 
@@ -2366,22 +2370,25 @@ namespace Prometheus.Controllers
                     retestdatalist = piedatadict.ToList();
 
                     piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.SNYields[yieldvm.SNYields.Count - 1].WhichTest, yieldvm.SNErrorMap);
-
-                    var keys = piedatadict.Keys;
-                    var namevaluepair = "";
-                    foreach (var k in keys)
+                    if (piedatadict.Count > 0)
                     {
-                        if (piedatadict[k] > 0)
-                            namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                        var namevaluepair = "";
+                        var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
+                        foreach (var item in piedatadict_tmp)
+                        {
+                            if (item.Value > 0)
+                            {
+                                namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                            }
+                        }
+                        namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                        ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
+                            .Replace("#Title#", "SN Trace Failure")
+                            .Replace("#SERIESNAME#", "SNFailure")
+                            .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                     }
-
-                    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
-                    ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
-                        .Replace("#Title#", "SN Trace Failure")
-                        .Replace("#SERIESNAME#", "SNFailure")
-                        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                 }
 
                 if (yieldvm.LastYields.Count > 0)
@@ -2417,21 +2424,25 @@ namespace Prometheus.Controllers
                     fytestdatalist = piedatadict.ToList();
                     piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.LastYields[yieldvm.LastYields.Count - 1].WhichTest, yieldvm.LErrorMap);
 
-                    var keys = piedatadict.Keys;
-                    var namevaluepair = "";
-                    foreach (var k in keys)
+                    if(piedatadict.Count > 0)
                     {
-                        if (piedatadict[k] > 0)
-                            namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                        var namevaluepair = "";
+                        var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
+                        foreach(var item in piedatadict_tmp)
+                        {
+                            if(item.Value > 0)
+                            {
+                                namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                            }
+                        }
+                        namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                        ViewBag.fychartscript = tempscript.Replace("#ElementID#", "fyfailurepie")
+                            .Replace("#Title#", "Final Failure")
+                            .Replace("#SERIESNAME#", "RFailure")
+                            .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                     }
-
-                    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
-                    ViewBag.fychartscript = tempscript.Replace("#ElementID#", "fyfailurepie")
-                        .Replace("#Title#", "Final Failure")
-                        .Replace("#SERIESNAME#", "RFailure")
-                        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                 }
 
                 if (firstdatalist.Count > 0)
@@ -2496,15 +2507,14 @@ namespace Prometheus.Controllers
                     }
                 }
 
-                var keys = piedatadict.Keys;
-                if (keys.Count > 0)
+                if(piedatadict.Count > 0)
                 {
                     var namevaluepair = "";
-                    foreach (var k in keys)
+                    var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
+                    foreach(var item in piedatadict_tmp)
                     {
-                        namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                        namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
                     }
-
                     namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
 
                     var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
@@ -2546,16 +2556,14 @@ namespace Prometheus.Controllers
                         }
                     }
                 }
-
-                var keys = piedatadict.Keys;
-                if (keys.Count > 0)
+                if(piedatadict.Count > 0)
                 {
                     var namevaluepair = "";
-                    foreach (var k in keys)
+                    var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
+                    foreach(var item in piedatadict_tmp)
                     {
-                        namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                        namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
                     }
-
                     namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
 
                     var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
@@ -3165,21 +3173,26 @@ namespace Prometheus.Controllers
 
                     piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.FirstYields[yieldvm.FirstYields.Count - 1].WhichTest, yieldvm.FErrorMap);
 
-                    var keys = piedatadict.Keys;
-                    var namevaluepair = "";
-                    foreach (var k in keys)
+                    if (piedatadict.Count > 0)
                     {
-                        if (piedatadict[k] > 0)
-                            namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                        var namevaluepair = "";
+                        var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
+                        foreach(var item in piedatadict_tmp)
+                        {
+                            if(item.Value > 0)
+                            {
+                                namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                            }
+                        }
+                        namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                        ViewBag.fchartscript = tempscript.Replace("#ElementID#", "ffailurepie")
+                            .Replace("#Title#", "First Failure")
+                            .Replace("#SERIESNAME#", "FFailure")
+                            .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                     }
 
-                    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
-                    ViewBag.fchartscript = tempscript.Replace("#ElementID#", "ffailurepie")
-                        .Replace("#Title#", "First Failure")
-                        .Replace("#SERIESNAME#", "FFailure")
-                        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                 }
 
 
@@ -3268,21 +3281,25 @@ namespace Prometheus.Controllers
 
                     piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.SNYields[yieldvm.SNYields.Count - 1].WhichTest, yieldvm.SNErrorMap);
 
-                    var keys = piedatadict.Keys;
-                    var namevaluepair = "";
-                    foreach (var k in keys)
+                    if(piedatadict.Count > 0)
                     {
-                        if (piedatadict[k] > 0)
-                            namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                        var namevaluepair = "";
+                        var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
+                        foreach(var item in piedatadict_tmp)
+                        {
+                            if(item.Value > 0)
+                            {
+                                namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                            }
+                        }
+                        namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                        ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
+                            .Replace("#Title#", "SN Trace Failure")
+                            .Replace("#SERIESNAME#", "SNFailure")
+                            .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                     }
-
-                    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
-                    ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
-                        .Replace("#Title#", "SN Trace Failure")
-                        .Replace("#SERIESNAME#", "SNFailure")
-                        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                 }
 
                 if (yieldvm.LastYields.Count > 0)
@@ -3318,21 +3335,25 @@ namespace Prometheus.Controllers
                     fytestdatalist = piedatadict.ToList();
                     piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.LastYields[yieldvm.LastYields.Count - 1].WhichTest, yieldvm.LErrorMap);
 
-                    var keys = piedatadict.Keys;
-                    var namevaluepair = "";
-                    foreach (var k in keys)
+                    if (piedatadict.Count > 0)
                     {
-                        if (piedatadict[k] > 0)
-                            namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                        var namevaluepair = "";
+                        var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
+                        foreach (var item in piedatadict_tmp)
+                        {
+                            if (item.Value > 0)
+                            {
+                                namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                            }
+                        }
+                        namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                        ViewBag.fychartscript = tempscript.Replace("#ElementID#", "fyfailurepie")
+                            .Replace("#Title#", "Final Failure")
+                            .Replace("#SERIESNAME#", "RFailure")
+                            .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                     }
-
-                    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
-                    ViewBag.fychartscript = tempscript.Replace("#ElementID#", "fyfailurepie")
-                        .Replace("#Title#", "Final Failure")
-                        .Replace("#SERIESNAME#", "RFailure")
-                        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                 }
 
                 if (firstdatalist.Count > 0)
@@ -3415,21 +3436,26 @@ namespace Prometheus.Controllers
 
                     piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.FirstYields[yieldvm.FirstYields.Count - 1].WhichTest, yieldvm.FErrorMap);
 
-                    var keys = piedatadict.Keys;
-                    var namevaluepair = "";
-                    foreach (var k in keys)
+                    if (piedatadict.Count > 0)
                     {
-                        if (piedatadict[k] > 0)
-                            namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                        var namevaluepair = "";
+                        var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
+                        foreach (var item in piedatadict_tmp)
+                        {
+                            if (item.Value > 0)
+                            {
+                                namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                            }
+                        }
+
+                        namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                        ViewBag.fchartscript = tempscript.Replace("#ElementID#", "ffailurepie")
+                            .Replace("#Title#", "First Failure")
+                            .Replace("#SERIESNAME#", "FFailure")
+                            .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                     }
-
-                    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
-                    ViewBag.fchartscript = tempscript.Replace("#ElementID#", "ffailurepie")
-                        .Replace("#Title#", "First Failure")
-                        .Replace("#SERIESNAME#", "FFailure")
-                        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                 }
 
 
@@ -3517,22 +3543,26 @@ namespace Prometheus.Controllers
                     retestdatalist = piedatadict.ToList();
 
                     piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.SNYields[yieldvm.SNYields.Count - 1].WhichTest, yieldvm.SNErrorMap);
-
-                    var keys = piedatadict.Keys;
-                    var namevaluepair = "";
-                    foreach (var k in keys)
+                    if (piedatadict.Count > 0)
                     {
-                        if (piedatadict[k] > 0)
-                            namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                        var namevaluepair = "";
+                        var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
+                        foreach (var item in piedatadict_tmp)
+                        {
+                            if (item.Value > 0)
+                            {
+                                namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                            }
+                        }
+                        namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                        ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
+                            .Replace("#Title#", "SN Trace Failure")
+                            .Replace("#SERIESNAME#", "SNFailure")
+                            .Replace("#NAMEVALUEPAIRS#", namevaluepair);
+
                     }
-
-                    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
-                    ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
-                        .Replace("#Title#", "SN Trace Failure")
-                        .Replace("#SERIESNAME#", "SNFailure")
-                        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                 }
 
                 if (yieldvm.LastYields.Count > 0)
@@ -3568,21 +3598,27 @@ namespace Prometheus.Controllers
                     fytestdatalist = piedatadict.ToList();
                     piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.LastYields[yieldvm.LastYields.Count - 1].WhichTest, yieldvm.LErrorMap);
 
-                    var keys = piedatadict.Keys;
-                    var namevaluepair = "";
-                    foreach (var k in keys)
+                    if (piedatadict.Count > 0)
                     {
-                        if (piedatadict[k] > 0)
-                            namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                        var namevaluepair = "";
+                        var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
+                        foreach (var item in piedatadict_tmp)
+                        {
+                            if (item.Value > 0)
+                            {
+                                namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                            }
+                        }
+
+                        namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                        ViewBag.fychartscript = tempscript.Replace("#ElementID#", "fyfailurepie")
+                            .Replace("#Title#", "Final Failure")
+                            .Replace("#SERIESNAME#", "RFailure")
+                            .Replace("#NAMEVALUEPAIRS#", namevaluepair);
+
                     }
-
-                    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
-                    ViewBag.fychartscript = tempscript.Replace("#ElementID#", "fyfailurepie")
-                        .Replace("#Title#", "Final Failure")
-                        .Replace("#SERIESNAME#", "RFailure")
-                        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                 }
 
                 if (firstdatalist.Count > 0)
@@ -3798,22 +3834,27 @@ namespace Prometheus.Controllers
                         firstdatalist = piedatadict.ToList();
 
                         piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.FirstYields[yieldvm.FirstYields.Count - 1].WhichTest, yieldvm.FErrorMap);
-
-                        var keys = piedatadict.Keys;
-                        var namevaluepair = "";
-                        foreach (var k in keys)
+                        if (piedatadict.Count > 0)
                         {
-                            if (piedatadict[k] > 0)
-                                namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                            var namevaluepair = "";
+                            var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
+                            foreach (var item in piedatadict_tmp)
+                            {
+                                if (item.Value > 0)
+                                {
+                                    namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                                }
+                            }
+
+                            namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                            var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                            ViewBag.fchartscript = tempscript.Replace("#ElementID#", "ffailurepie")
+                                .Replace("#Title#", "First Failure")
+                                .Replace("#SERIESNAME#", "FFailure")
+                                .Replace("#NAMEVALUEPAIRS#", namevaluepair);
+
                         }
-
-                        namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
-                        ViewBag.fchartscript = tempscript.Replace("#ElementID#", "ffailurepie")
-                            .Replace("#Title#", "First Failure")
-                            .Replace("#SERIESNAME#", "FFailure")
-                            .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                     }
 
 
@@ -3901,22 +3942,27 @@ namespace Prometheus.Controllers
                         retestdatalist = piedatadict.ToList();
 
                         piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.SNYields[yieldvm.SNYields.Count - 1].WhichTest, yieldvm.SNErrorMap);
-
-                        var keys = piedatadict.Keys;
-                        var namevaluepair = "";
-                        foreach (var k in keys)
+                        if (piedatadict.Count > 0)
                         {
-                            if (piedatadict[k] > 0)
-                                namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                            var namevaluepair = "";
+                            var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
+                            foreach (var item in piedatadict_tmp)
+                            {
+                                if (item.Value > 0)
+                                {
+                                    namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                                }
+                            }
+
+                            namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                            var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                            ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
+                                .Replace("#Title#", "SN Trace Failure")
+                                .Replace("#SERIESNAME#", "SNFailure")
+                                .Replace("#NAMEVALUEPAIRS#", namevaluepair);
+
                         }
-
-                        namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
-                        ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
-                            .Replace("#Title#", "SN Trace Failure")
-                            .Replace("#SERIESNAME#", "SNFailure")
-                            .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                     }
 
                     if (yieldvm.LastYields.Count > 0)
@@ -3952,22 +3998,27 @@ namespace Prometheus.Controllers
                         fytestdatalist = piedatadict.ToList();
 
                         piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.LastYields[yieldvm.LastYields.Count - 1].WhichTest, yieldvm.LErrorMap);
-
-                        var keys = piedatadict.Keys;
-                        var namevaluepair = "";
-                        foreach (var k in keys)
+                        if (piedatadict.Count > 0)
                         {
-                            if (piedatadict[k] > 0)
-                                namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                            var namevaluepair = "";
+                            var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
+                            foreach (var item in piedatadict_tmp)
+                            {
+                                if (item.Value > 0)
+                                {
+                                    namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                                }
+                            }
+
+                            namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                            var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                            ViewBag.fychartscript = tempscript.Replace("#ElementID#", "fyfailurepie")
+                                .Replace("#Title#", "Final Failure")
+                                .Replace("#SERIESNAME#", "RFailure")
+                                .Replace("#NAMEVALUEPAIRS#", namevaluepair);
+
                         }
-
-                        namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
-                        ViewBag.fychartscript = tempscript.Replace("#ElementID#", "fyfailurepie")
-                            .Replace("#Title#", "Final Failure")
-                            .Replace("#SERIESNAME#", "RFailure")
-                            .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                     }
 
                     if (firstdatalist.Count > 0)
@@ -4545,22 +4596,27 @@ namespace Prometheus.Controllers
                     firstdatalist = piedatadict.ToList();
 
                     piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.FirstYields[yieldvm.FirstYields.Count - 1].WhichTest, yieldvm.FErrorMap);
-
-                    var keys = piedatadict.Keys;
-                    var namevaluepair = "";
-                    foreach (var k in keys)
+                    if (piedatadict.Count > 0)
                     {
-                        if (piedatadict[k] > 0)
-                            namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                        var namevaluepair = "";
+                        var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
+                        foreach (var item in piedatadict_tmp)
+                        {
+                            if (item.Value > 0)
+                            {
+                                namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                            }
+                        }
+
+                        namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                        ViewBag.fchartscript = tempscript.Replace("#ElementID#", "ffailurepie")
+                            .Replace("#Title#", "First Failure")
+                            .Replace("#SERIESNAME#", "FFailure")
+                            .Replace("#NAMEVALUEPAIRS#", namevaluepair);
+
                     }
-
-                    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
-                    ViewBag.fchartscript = tempscript.Replace("#ElementID#", "ffailurepie")
-                        .Replace("#Title#", "First Failure")
-                        .Replace("#SERIESNAME#", "FFailure")
-                        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                 }
 
 
@@ -4648,22 +4704,27 @@ namespace Prometheus.Controllers
                     retestdatalist = piedatadict.ToList();
 
                     piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.SNYields[yieldvm.SNYields.Count - 1].WhichTest, yieldvm.SNErrorMap);
-
-                    var keys = piedatadict.Keys;
-                    var namevaluepair = "";
-                    foreach (var k in keys)
+                    if (piedatadict.Count > 0)
                     {
-                        if (piedatadict[k] > 0)
-                            namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                        var namevaluepair = "";
+                        var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
+                        foreach (var item in piedatadict_tmp)
+                        {
+                            if (item.Value > 0)
+                            {
+                                namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                            }
+                        }
+
+                        namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                        ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
+                            .Replace("#Title#", "SN Trace Failure")
+                            .Replace("#SERIESNAME#", "SNFailure")
+                            .Replace("#NAMEVALUEPAIRS#", namevaluepair);
+
                     }
-
-                    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
-                    ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
-                        .Replace("#Title#", "SN Trace Failure")
-                        .Replace("#SERIESNAME#", "SNFailure")
-                        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                 }
 
                 if (yieldvm.LastYields.Count > 0)
@@ -4699,22 +4760,27 @@ namespace Prometheus.Controllers
                     fytestdatalist = piedatadict.ToList();
 
                     piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.LastYields[yieldvm.LastYields.Count - 1].WhichTest, yieldvm.LErrorMap);
-
-                    var keys = piedatadict.Keys;
-                    var namevaluepair = "";
-                    foreach (var k in keys)
+                    if (piedatadict.Count > 0)
                     {
-                        if (piedatadict[k] > 0)
-                            namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
+                        var namevaluepair = "";
+                        var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
+                        foreach (var item in piedatadict_tmp)
+                        {
+                            if (item.Value > 0)
+                            {
+                                namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                            }
+                        }
+
+                        namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                        ViewBag.fychartscript = tempscript.Replace("#ElementID#", "fyfailurepie")
+                            .Replace("#Title#", "Final Failure")
+                            .Replace("#SERIESNAME#", "RFailure")
+                            .Replace("#NAMEVALUEPAIRS#", namevaluepair);
+
                     }
-
-                    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
-                    ViewBag.fychartscript = tempscript.Replace("#ElementID#", "fyfailurepie")
-                        .Replace("#Title#", "Final Failure")
-                        .Replace("#SERIESNAME#", "RFailure")
-                        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                 }
 
                 if (firstdatalist.Count > 0)

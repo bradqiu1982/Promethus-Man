@@ -23,8 +23,6 @@
 </div>
 <input type="hidden" id="current_user" name="current_user" value="@ViewBag.cUserID" />
 
-<script src="~/Scripts/highcharts.js"></script>
-<script src="~/Scripts/exporting.js"></script>
 <script src="~/Scripts/weeklyreport.js"></script>
 
 
@@ -154,13 +152,17 @@
                                 <div id="chart_@idx">
                                     @if (!string.IsNullOrEmpty(wyielddata.Pareto))
                                     {
+                                        <div class="col-xs-6">
+                                            <div class="fypareto" id="fypareto_@idx"></div>
+                                        </div>
                                         @Html.Raw(wyielddata.Pareto.Replace("#ElementID#", "fypareto_" + idx))
-                                        <div class="fypareto" id="fypareto_@idx"></div>
                                     }
                                     @if (!string.IsNullOrEmpty(wyielddata.Trend))
                                     {
+                                        <div class="col-xs-6">
+                                            <div class="wyield" id="wyield_@idx"></div>
+                                        </div>
                                         @Html.Raw(wyielddata.Trend.Replace("#ElementID#", "wyield_" + idx))
-                                        <div class="wyield" id="wyield_@idx"></div>
                                     }
                                 </div>
                                 <div class="yield-summary">

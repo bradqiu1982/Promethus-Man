@@ -973,7 +973,7 @@ namespace Prometheus.Models
                     }//end foreach
                 }//end foreach
 
-                if ((starttime != null) && (DateTime.Parse(starttime) != vm.StartDate))
+                if (vm.FinishRating < 90 && (starttime != null) && (DateTime.Parse(starttime) != vm.StartDate))
                 {
                     IssueViewModels.CloseBIIssueAutomaticlly(failurelist);
                     IssueViewModels.CloseBIIssueAutomaticlly(passlist);
@@ -1088,7 +1088,7 @@ namespace Prometheus.Models
                                 kv.Value.StoreBIData();
                             }//end foreach
 
-                            if (DateTime.Parse(starttime) != vm.StartDate)
+                            if (vm.FinishRating < 90 && DateTime.Parse(starttime) != vm.StartDate)
                             {
                                 IssueViewModels.CloseBIIssueAutomaticlly(failurelist);
                                 IssueViewModels.CloseBIIssueAutomaticlly(passlist);

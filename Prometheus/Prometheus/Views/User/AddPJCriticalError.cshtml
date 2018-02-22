@@ -4,6 +4,7 @@
     ViewBag.Title = "Add Project Critical Error";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<script src="~/Scripts/autocompletefill.js"></script>
 
 <div class="row">
     <div class="nav navbar-nav navbar-left">
@@ -206,13 +207,11 @@
                             <label class="control-label">To Who</label>
                         </div>
                         <div class="col-xs-9">
-                            @Html.DropDownList("towholist1", null, new { @id = "towholist1", @class = "form-control", @onchange = "chooseapusher1()" })
+                            <input class="form-control" id="towholist1" name="towholist1"
+                                   type="text" value="" />
                         </div>
                         <script type="text/javascript">
-                            function chooseapusher1()
-                            {
-                                document.getElementById("towhoinput1").value = document.getElementById("towhoinput1").value + ';' + document.getElementById("towholist1").value;
-                            }
+                            autoCompleteFill('towholist1', @Html.Raw(ViewBag.AllUserList), true, 'towhoinput1');
                         </script>
                     </div>
                     <hr />

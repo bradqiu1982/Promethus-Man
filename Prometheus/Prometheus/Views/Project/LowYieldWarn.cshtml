@@ -18,6 +18,8 @@
     </div>
 </div>
 
+<script src="~/Scripts/autocompletefill.js"></script>
+
 <div class="row">
     <div class="col-xs-12">&nbsp;</div>
 </div>
@@ -52,18 +54,18 @@
             </div>
 
             <script type="text/javascript">
-                            function chooserelatedpeople()
-                            {
-                                document.getElementById("towhoinput1").value = document.getElementById("RPeopleAddr").value;
-                                $('#relatedmodal').modal({ backdrop: 'static' });
-                            }
+                function chooserelatedpeople()
+                {
+                    document.getElementById("towhoinput1").value = document.getElementById("RPeopleAddr").value;
+                    $('#relatedmodal').modal({ backdrop: 'static' });
+                }
 
-                            function fillreleatepeople()
-                            {
-                                $('#relatedmodal').modal('hide');
-                                document.getElementById("RPeopleAddr").value = document.getElementById("towhoinput1").value;
-                                document.getElementById("RPeopleAddr").focus();
-                            }
+                function fillreleatepeople()
+                {
+                    $('#relatedmodal').modal('hide');
+                    document.getElementById("RPeopleAddr").value = document.getElementById("towhoinput1").value;
+                    document.getElementById("RPeopleAddr").focus();
+                }
             </script>
         </div>
 
@@ -116,13 +118,11 @@
                             <label class="control-label">To Who</label>
                         </div>
                         <div class="col-xs-9">
-                            @Html.DropDownList("towholist1", null, new { @id = "towholist1", @class = "form-control", @onchange = "chooseapusher1()" })
+                            <input class="form-control" id="towholist1" name="towholist1"
+                                   type="text" value="" />
                         </div>
                         <script type="text/javascript">
-                            function chooseapusher1()
-                            {
-                                document.getElementById("towhoinput1").value = document.getElementById("towhoinput1").value + ';' + document.getElementById("towholist1").value;
-                            }
+                            autoCompleteFill('towholist1', @Html.Raw(ViewBag.AllUserList), true, 'towhoinput1');
                         </script>
                     </div>
                     <hr />

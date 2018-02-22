@@ -22,6 +22,7 @@ else
 <script src="~/Scripts/lobilist/dist/lobilist_tasklink.js"></script>
 <script src="~/Scripts/lobilist/lib/lobibox/js/lobibox.min.js"></script>
 <script src="~/Scripts/lobilist/lib/highlight/highlight.pack.js"></script>
+<script src="~/Scripts/autocompletefill.js"></script>
 
 <div class="row">
     <div class="nav navbar-nav navbar-left">
@@ -124,7 +125,11 @@ else
                     <div class="col-xs-6">
                         <label class="control-label col-xs-2" for="projectlist">Project<font color="red">*</font></label>
                         <div class="col-xs-10">
-                            @Html.DropDownList("projectlist", null, new { @id = "projectlist", @class = "form-control", @readonly = "readonly" })
+                            <input class="form-control" id="projectlist" name="projectlist"
+                                   type="text" value="@(string.IsNullOrEmpty(Model.ProjectKey)?"":Model.ProjectKey)" readonly />
+                            <script type="text/javascript">
+                                autoCompleteFill('projectlist', @Html.Raw(ViewBag.projectlist));
+                            </script>
                         </div>
                     </div>
                     <div class="col-xs-6">
@@ -191,7 +196,11 @@ else
                     <div class="col-xs-6">
                         <label class="control-label col-xs-2" for="assigneelist">Assignee</label>
                         <div class="col-xs-10">
-                            @Html.DropDownList("assigneelist", null, new { @id = "assigneelist", @class = "form-control" })
+                            <input class="form-control" id="assigneelist" name="assigneelist"
+                                   type="text" value="@(string.IsNullOrEmpty(Model.Assignee)?Model.Reporter:Model.Assignee)" />
+                            <script type="text/javascript">
+                                autoCompleteFill('assigneelist', @Html.Raw(ViewBag.AllUserList));
+                            </script>
                         </div>
                     </div>
                 </div>
@@ -918,13 +927,11 @@ else
                         <label class="control-label">To Who</label>
                     </div>
                     <div class="col-xs-9">
-                        @Html.DropDownList("towholist", null, new { @id = "towholist", @class = "form-control", @onchange = "chooseapusher()" })
+                        <input class="form-control" id="towholist" name="towholist"
+                               type="text" value="" />
                     </div>
                     <script type="text/javascript">
-                            function chooseapusher()
-                            {
-                                document.getElementById("towhoinput").value = document.getElementById("towhoinput").value + ';' + document.getElementById("towholist").value;
-                            }
+                        autoCompleteFill('towholist', @Html.Raw(ViewBag.AllUserList), true, 'towhoinput');
                     </script>
                 </div>
                 <hr />
@@ -966,13 +973,11 @@ else
                         <label class="control-label">To Who</label>
                     </div>
                     <div class="col-xs-9">
-                        @Html.DropDownList("towholist1", null, new { @id = "towholist1", @class = "form-control", @onchange = "chooseapusher1()" })
+                        <input class="form-control" id="towholist1" name="towholist1"
+                               type="text" value="" />
                     </div>
                     <script type="text/javascript">
-                            function chooseapusher1()
-                            {
-                                document.getElementById("towhoinput1").value = document.getElementById("towhoinput1").value + ';' + document.getElementById("towholist1").value;
-                            }
+                        autoCompleteFill('towholist1', @Html.Raw(ViewBag.AllUserList), true, 'towhoinput1');
                     </script>
                 </div>
                 <hr />

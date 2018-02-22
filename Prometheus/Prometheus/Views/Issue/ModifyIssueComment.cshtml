@@ -60,34 +60,34 @@
                         <div class="col-xs-5"></div>
                     </div>
                     <script type="text/javascript">
-                                            function ShowFileNames6(oFile) {
-                                                ajaxFileUpload();
-                                            }
-                                            function ajaxFileUpload() {
-                                                $.ajaxFileUpload
-                                                (
-                                                    {
-                                                        url: '/userfiles/ImageUpload.ashx',
-                                                        secureuri: false,
-                                                        fileElementId: 'file6',
-                                                        dataType: 'HTML',
-                                                        success: function (data, status)
-                                                        {
-                                                            var wholeval = CKEDITOR.instances.editor1.getData() + data;
-                                                            CKEDITOR.instances.editor1.setData(wholeval);
-                                                        },
-                                                        error: function (e)
-                                                        {
-                                                            alert(e);
-                                                        }
-                                                    }
-                                                )
-                                                return false;
-                                            }
-                                            function SaveUserContent() {
-                                                RealSaveUserContent(CKEDITOR.instances.editor1.getData());
-                                                return false;
-                                            }
+                        function ShowFileNames6(oFile) {
+                            ajaxFileUpload();
+                        }
+                        function ajaxFileUpload() {
+                            $.ajaxFileUpload
+                            (
+                                {
+                                    url: '/userfiles/ImageUpload.ashx',
+                                    secureuri: false,
+                                    fileElementId: 'file6',
+                                    dataType: 'HTML',
+                                    success: function (data, status)
+                                    {
+                                        var wholeval = CKEDITOR.instances.editor1.getData() + data;
+                                        CKEDITOR.instances.editor1.setData(wholeval);
+                                    },
+                                    error: function (e)
+                                    {
+                                        alert(e);
+                                    }
+                                }
+                            )
+                            return false;
+                        }
+                        function SaveUserContent() {
+                            RealSaveUserContent(CKEDITOR.instances.editor1.getData());
+                            return false;
+                        }
                     </script>
                 </div>
             </div>

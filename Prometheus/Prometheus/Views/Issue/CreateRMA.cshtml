@@ -17,6 +17,7 @@
 </div>
 
 <script src="../../ckeditor/ckeditor.js"></script>
+<script src="~/Scripts/autocompletefill.js"></script>
 
 @using (Html.BeginForm("CreateRMA", "Issue", FormMethod.Post, new { enctype = "multipart/form-data", id = "issueform", name = "issueform" }))
 {
@@ -32,7 +33,11 @@
                         <div class="col-xs-6">
                             <label class="control-label col-xs-4" for="ProjectName">Project<font color="red">*</font></label>
                             <div class="col-xs-8">
-                                @Html.DropDownList("projectlist", null, new { @id = "ProjectKey", @class = "form-control" })
+                                <input class="form-control" id="ProjectKey" name="projectlist"
+                                       type="text" value="@(string.IsNullOrEmpty(Model.ProjectKey)?"":Model.ProjectKey)" />
+                                <script type="text/javascript">
+                                    autoCompleteFill('ProjectKey', @Html.Raw(ViewBag.projectlist));
+                                </script>
                             </div>
                         </div>
                         <div class="col-xs-6">
@@ -92,12 +97,11 @@
                         <div class="col-xs-6">
                             <label class="control-label col-xs-4" for="Assignee">Assignee</label>
                             <div class="col-xs-8">
-                                <select id="Assignee" name="assigneelist" class="form-control">
-                                    @foreach (var item in ViewBag.assigneelist)
-                                    {
-                                        <option value="@item.Value" @(string.Compare(Model.Reporter, item.Value) == 0 ? "selected" : "")>@item.Text.ToUpper()</option>
-                                    }
-                                </select>
+                                <input class="form-control" id="Assignee" name="assigneelist"
+                                       type="text" value="@(string.IsNullOrEmpty(Model.Assignee)?Model.Reporter:Model.Assignee)" />
+                                <script type="text/javascript">
+                                    autoCompleteFill('Assignee', @Html.Raw(ViewBag.AllUserList));
+                                </script>
                             </div>
                         </div>
                     </div>
@@ -174,7 +178,7 @@
                             <label class="control-label col-xs-4" for="ECustomer">End Customer<font color="red">*</font></label>
                             <div class="col-xs-8">
                                 @if (Model != null && !string.IsNullOrEmpty(Model.ECustomer))
-                {
+                                {
                                     <input class="form-control text-box single-line" value="@Model.ECustomer" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 180." data-val-length-max="180" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" data-val-required="The field is required." id="ECustomer" name="ECustomer" type="text" />
                                 }
                                 else
@@ -189,7 +193,7 @@
                             <label class="control-label col-xs-4" for="CRMANUM">Customer RMA</label>
                             <div class="col-xs-8">
                                 @if (Model != null && !string.IsNullOrEmpty(Model.CRMANUM))
-                {
+                                {
                                     <input class="form-control text-box single-line" value="@Model.CRMANUM" data-val="true" data-val-length="The field must be a string with a minimum length of 2 and a maximum length of 50." data-val-length-max="50" data-val-length-min="2" data-val-regex="The field should not contain \'" data-val-regex-pattern="^(?!.*&#39;).*$" id="CRMANUM" name="CRMANUM" type="text" />
                                 }
                                 else
@@ -377,6 +381,40 @@
             </div>
         </div>
 
+        <div class="modal" id="relatedmodal" tabindex="-1" role="dialog" aria-labelledby="relatedmodalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="relatedmodalLabel">Choose People</h4>
+                    </div>
+                    <div class="row"></div>
+                    <div class="row col-xs-12">
+                        <div class="col-xs-3">
+                            <label class="control-label">To Who</label>
+                        </div>
+                        <div class="col-xs-9">
+                            <input class="form-control" id="towholist" name="towholist"
+                                   type="text" value="" />
+                        </div>
+                        <script type="text/javascript">
+                            autoCompleteFill('towholist', @Html.Raw(ViewBag.AllUserList), true, 'towhoinput1');
+                        </script>
+                    </div>
+                    <hr />
+                    <div class="row col-xs-12">
+                        <div class="col-xs-3">
+                            <label class="control-label">To who Input</label>
+                        </div>
+                        <div class="col-xs-9" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
+                            <textarea class="form-control col-xs-12" name="towhoinput1" id="towhoinput1" style="height:100px;min-width:300px;"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" onclick="fillreleatepeople()">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
    
     </div>
 }

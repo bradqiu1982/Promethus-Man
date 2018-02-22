@@ -5,6 +5,8 @@
 }
 
 
+<script src="~/Scripts/autocompletefill.js"></script>
+
 <div class="row">
     <div class="nav navbar-nav navbar-left">
         <img src="~/Content/images/ucicon/ILearnIcons.png" style="height:40px; width:40px">
@@ -370,8 +372,12 @@
                     <label class="control-label">To Who</label>
                 </div>
                 <div class="col-xs-9">
-                    @Html.DropDownList("towholist", null, new { @id = "towholist", @class = "form-control" })
+                    <input class="form-control" id="towholist" name="towholist"
+                           type="text" value="" />
                 </div>
+                <script type="text/javascript">
+                    autoCompleteFill('towholist', @Html.Raw(ViewBag.AllUserList), true, 'towhoinput');
+                </script>
             </div>
             <hr/>
             <div class="row col-xs-12">

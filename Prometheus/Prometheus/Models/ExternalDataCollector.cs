@@ -350,6 +350,7 @@ namespace Prometheus.Models
             AppV_N = string.Empty;
             AppV_O = string.Empty;
             AppV_P = string.Empty;
+            AppV_Q = string.Empty;
             Attachs = new List<string>();
         }
 
@@ -369,6 +370,7 @@ namespace Prometheus.Models
         public string AppV_N { set; get; }
         public string AppV_O { set; get; }
         public string AppV_P { set; get; }
+        public string AppV_Q { set; get; }
 
         public List<string> Attachs { set; get; }
     }
@@ -1528,7 +1530,7 @@ namespace Prometheus.Models
                 sql = "update IQEBackupData set AppV_B = N'<AppV_B>',AppV_C = N'<AppV_C>',AppV_D = N'<AppV_D>'"
                     + ",AppV_E = N'<AppV_E>',AppV_F = N'<AppV_F>',AppV_G = N'<AppV_G>',AppV_H = N'<AppV_H>',AppV_I = N'<AppV_I>'"
                     + ",AppV_J = N'<AppV_J>',AppV_K = N'<AppV_K>',AppV_L = N'<AppV_L>',AppV_M = N'<AppV_M>',AppV_N = N'<AppV_N>'"
-                    + ",AppV_O = '<AppV_O>'"
+                    + ",AppV_O = '<AppV_O>', AppV_Q = N'<AppV_Q>'"
                     + "  where AppV_A=N'<AppV_A>'";
                 sql = sql.Replace("<AppV_A>", relid);
             }
@@ -1538,7 +1540,7 @@ namespace Prometheus.Models
                     + ",AppV_G,AppV_H,AppV_I,AppV_J,AppV_K,AppV_L,AppV_M,AppV_N,AppV_O"
                     + ",databackuptm)"
                     + " values(N'<AppV_A>',N'<AppV_B>',N'<AppV_C>',N'<AppV_D>',N'<AppV_E>',N'<AppV_F>'"
-                    + ",N'<AppV_G>',N'<AppV_H>',N'<AppV_I>',N'<AppV_J>',N'<AppV_K>',N'<AppV_L>',N'<AppV_M>',N'<AppV_N>','<AppV_O>'"
+                    + ",N'<AppV_G>',N'<AppV_H>',N'<AppV_I>',N'<AppV_J>',N'<AppV_K>',N'<AppV_L>',N'<AppV_M>',N'<AppV_N>','<AppV_O>',N'<AppV_Q>'"
                     + ",'<databackuptm>')";
                 sql = sql.Replace("<AppV_A>", rmadata.AppV_A);
 
@@ -1554,6 +1556,7 @@ namespace Prometheus.Models
                 .Replace("<AppV_G>", rmadata.AppV_G).Replace("<AppV_H>", rmadata.AppV_H).Replace("<AppV_I>", rmadata.AppV_I)
                 .Replace("<AppV_J>", rmadata.AppV_J).Replace("<AppV_K>", rmadata.AppV_K).Replace("<AppV_L>", rmadata.AppV_L)
                 .Replace("<AppV_M>", rmadata.AppV_M).Replace("<AppV_N>", rmadata.AppV_N).Replace("<AppV_O>",ConvertToDateStr(rmadata.AppV_O))
+                .Replace("<AppV_Q>", rmadata.AppV_Q)
                 .Replace("<databackuptm>", DateTime.Now.ToString());
 
             DBUtility.ExeLocalSqlNoRes(sql);
@@ -1580,6 +1583,7 @@ namespace Prometheus.Models
             tempdata.AppV_M = line[12];
             tempdata.AppV_N = line[13];
             tempdata.AppV_O = line[14];
+            tempdata.AppV_Q = line[15];
 
             return tempdata;
         }
@@ -1619,7 +1623,7 @@ namespace Prometheus.Models
             var ret = new List<IQERAWData>();
 
             var sql = "select AppV_A,AppV_B,AppV_C,AppV_D,AppV_E,AppV_F"
-                    + ",AppV_G,AppV_H,AppV_I,AppV_J,AppV_K,AppV_L,AppV_M,AppV_N,AppV_O,AppV_P"
+                    + ",AppV_G,AppV_H,AppV_I,AppV_J,AppV_K,AppV_L,AppV_M,AppV_N,AppV_O,AppV_P, AppV_Q"
                     + " from IQEBackupData order by AppV_O DESC";
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
@@ -1643,6 +1647,7 @@ namespace Prometheus.Models
                     tempdata.AppV_N = Convert.ToString(line[13]);
                     tempdata.AppV_O = Convert.ToDateTime(line[14]).ToString("yyyy-MM-dd HH:mm:ss");
                     tempdata.AppV_P = Convert.ToString(line[15]);
+                    tempdata.AppV_Q = Convert.ToString(line[16]);
                     tempdata.Attachs.AddRange(RetrieveIQEAttach(tempdata.AppV_A));
                     ret.Add(tempdata);
                 }

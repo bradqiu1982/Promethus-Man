@@ -1857,14 +1857,14 @@ namespace Prometheus.Controllers
         {
             var ret = new List<string>();
             var allreldata = ExternalDataCollector.RetrieveAllIQEData();
-            var line = "ID,Product line,IQC missing?(Y/N),Category,Horizontal spread(Y/N),PN,Description,Supplier,Issue,Status,RCCA,Evidence,Owner,IQE,Due Data";
+            var line = "ID,Product line,IQC missing?(Y/N),Category,Horizontal spread(Y/N),RISK ASSESSMENT,PN,Description,Supplier,Issue,Status,RCCA,Evidence,Owner,IQE,Due Data";
             ret.Add(line);
 
             foreach (var item in allreldata)
             {
                 var line1 = string.Empty;
                 line1 = "\"" + item.AppV_A.ToString().Replace("\"", "") + "\"," + "\"" + item.AppV_B.Replace("\"", "") + "\"," + "\"" + item.AppV_C.Replace("\"", "") + "\","
-                    + "\"" + item.AppV_D.Replace("\"", "") + "\"," + "\"" + item.AppV_E.Replace("\"", "") + "\"," + "\"" + item.AppV_F.Replace("\"", "") + "\","
+                    + "\"" + item.AppV_D.Replace("\"", "") + "\"," + "\"" + item.AppV_E.Replace("\"", "") + "\"," + "\"" + item.AppV_Q.Replace("\"", "") + "\"," + "\"" + item.AppV_F.Replace("\"", "") + "\","
                     + "\"" + item.AppV_G.Replace("\"", "") + "\"," + "\"" + item.AppV_H.Replace("\"", "") + "\"," + "\"" + item.AppV_I.Replace("\"", "") + "\","
                     + "\"" + item.AppV_J.Replace("\"", "") + "\"," + "\"" + item.AppV_K.Replace("\"", "") + "\"," + "\"" + item.AppV_L.Replace("\"", "") + "\","
                     + "\"" + item.AppV_M.Replace("\"", "") + "\"," + "\"" + item.AppV_N.Replace("\"", "") + "\"," + "\"" + item.AppV_O.Replace("\"", "") + "\",";

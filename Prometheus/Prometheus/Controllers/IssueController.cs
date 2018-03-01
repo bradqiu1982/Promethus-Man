@@ -460,8 +460,9 @@ namespace Prometheus.Controllers
                 if (ret.Summary.Contains(CRITICALERRORTYPE.LYTTASK) || ret.Summary.Contains(CRITICALERRORTYPE.LYTTASK1))
                 {
                     var templist = new List<string>();
-                    templist.Add("YES");
                     templist.Add("NO");
+                    templist.Add("YES");
+                    
                     ViewBag.iscriticaltasklist = CreateSelectList(templist, "");
 
                     ViewBag.tobechoosetags = ShareDocVM.RetrieveCriticalTags(this);
@@ -1559,8 +1560,9 @@ namespace Prometheus.Controllers
                 if (ret.Summary.Contains(CRITICALERRORTYPE.LYTTASK) || ret.Summary.Contains(CRITICALERRORTYPE.LYTTASK1))
                 {
                     var templist = new List<string>();
-                    templist.Add("YES");
                     templist.Add("NO");
+                    templist.Add("YES");
+                    
                     ViewBag.iscriticaltasklist = CreateSelectList(templist, "");
                     ViewBag.tobechoosetags = ShareDocVM.RetrieveCriticalTags(this);
                 }

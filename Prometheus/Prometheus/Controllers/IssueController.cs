@@ -41,46 +41,26 @@ namespace Prometheus.Controllers
 
         private void CreateAllLists(IssueViewModels vm)
         {
+            var asilist = UserViewModels.RetrieveAllUser();
+            ViewBag.AllUserList = "[\"" + string.Join("\",\"", asilist.ToArray()) + "\"]";
 
             var projlist = ProjectViewModels.RetrieveAllProjectKey();
-            var slist = CreateSelectList(projlist, vm.ProjectKey);
-            ViewBag.projectlist = slist;
+            ViewBag.projectlist = "[\""+string.Join("\",\"", projlist.ToArray())+"\"]";
 
             var typelist = new List<string>();
             string[] tlist = { ISSUETP.Task, ISSUETP.Bug, ISSUETP.RMA, ISSUETP.OBA, ISSUETP.NPIPROC,ISSUETP.IQE };
-
             typelist.AddRange(tlist);
-            slist = CreateSelectList(typelist, vm.IssueType);
-            ViewBag.issuetypelist = slist;
+            ViewBag.issuetypelist = CreateSelectList(typelist, vm.IssueType);
 
             var prilist = new List<string>();
-            string[] prlist = { ISSUEPR.Major, ISSUEPR.Blocker,ISSUEPR.Critical
-            ,ISSUEPR.Minor,ISSUEPR.Trivial};
-
+            string[] prlist = { ISSUEPR.Major, ISSUEPR.Blocker,ISSUEPR.Critical,ISSUEPR.Minor,ISSUEPR.Trivial};
             prilist.AddRange(prlist);
-            slist = CreateSelectList(prilist, vm.Priority);
-            ViewBag.prioritylist = slist;
+            ViewBag.prioritylist = CreateSelectList(prilist, vm.Priority);
 
             var rsilist = new List<string>();
             string[] rlist = { Resolute.Pending, Resolute.Working, Resolute.Reopen, Resolute.Fixed, Resolute.Done, Resolute.NotFix, Resolute.Unresolved, Resolute.NotReproduce, Resolute.AutoClose };
             rsilist.AddRange(rlist);
-            slist = CreateSelectList(rsilist, vm.Resolution);
-            ViewBag.resolutionlist = slist;
-
-            var asilist = UserViewModels.RetrieveAllUser();
-            if (string.IsNullOrEmpty(vm.Assignee))
-            {
-                slist = CreateSelectList(asilist, vm.Reporter);
-            }
-            else
-            {
-                slist = CreateSelectList(asilist, vm.Assignee);
-            }
-            ViewBag.assigneelist = slist;
-
-            var rpilist = UserViewModels.RetrieveAllUser();
-            slist = CreateSelectList(rpilist, vm.Reporter);
-            ViewBag.reporterlist = slist;
+            ViewBag.resolutionlist = CreateSelectList(rsilist, vm.Resolution);
 
             var fcilist = new List<string>();
             string[] clist = { "None", RMAFAILCODE.Cable, RMAFAILCODE.CDR, RMAFAILCODE.Contamination, RMAFAILCODE.Epoxy, RMAFAILCODE.Firmware, RMAFAILCODE.Flex,
@@ -88,22 +68,12 @@ namespace Prometheus.Controllers
             RMAFAILCODE.Passivecomponent,RMAFAILCODE.PCB,RMAFAILCODE.PD,RMAFAILCODE.Process,RMAFAILCODE.SMT,RMAFAILCODE.TIA,RMAFAILCODE.VCSEL,RMAFAILCODE.VMI,RMAFAILCODE.WrongEEPROM,RMAFAILCODE.Customerissue};
 
             fcilist.AddRange(clist);
-            slist = CreateSelectList(fcilist, vm.RMAFailureCode);
-            ViewBag.RMAFailureCode = slist;
+            ViewBag.RMAFailureCode = CreateSelectList(fcilist, vm.RMAFailureCode);
 
             var metriallist = new List<string>();
             string[] mlist = { "None", "Scrap", "Rework", "UAI", "Sorting", "Purge" };
             metriallist.AddRange(mlist);
-            slist = CreateSelectList(metriallist, vm.MaterialDisposition);
-            ViewBag.dispositionlist = slist;
-
-            //var cmelist = new List<string>();
-            //string[] clist = { COMMENTTYPE.Description,COMMENTTYPE.RootCause,COMMENTTYPE.CustomReport,COMMENTTYPE.InternalReport};
-            //cmelist.AddRange(clist);
-            //slist = CreateSelectList(cmelist, "");
-            //ViewBag.cemtypelist = slist;
-
-
+            ViewBag.dispositionlist = CreateSelectList(metriallist, vm.MaterialDisposition);
         }
 
         // GET: Issue
@@ -117,10 +87,6 @@ namespace Prometheus.Controllers
                 CreateAllLists(vm);
 
                 ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
-
-                var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist = CreateSelectList(asilist, "");
-
 
                 var typelist = new List<string>();
                 string[] tlist = { ISSUETP.Task, ISSUETP.Bug, ISSUETP.NPIPROC };
@@ -364,10 +330,6 @@ namespace Prometheus.Controllers
 
             if (string.IsNullOrEmpty(key))
             {
-                var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist = CreateSelectList(asilist, "");
-                ViewBag.towholist1 = CreateSelectList(asilist, "");
-
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);
                 ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
@@ -447,8 +409,6 @@ namespace Prometheus.Controllers
                         break;
                     }
                 }
-
-                //ret.Reporter = updater;
                 CreateAllLists(ret);
 
                 if (ret.Summary.Contains(" @Burn-In Step "))
@@ -471,20 +431,13 @@ namespace Prometheus.Controllers
                 {
                     ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
                 }
-
-                var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist = CreateSelectList(asilist, "");
-                ViewBag.towholist1 = CreateSelectList(asilist, "");
+                
                 ViewBag.RelationLinks = IssueRelationShipVM.GetIssueRelationShip(key);
 
                 return View(ret);
             }
             else
             {
-                var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist = CreateSelectList(asilist, "");
-                ViewBag.towholist1 = CreateSelectList(asilist, "");
-
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);
                 ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
@@ -979,7 +932,8 @@ namespace Prometheus.Controllers
             ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
 
             var asilist = UserViewModels.RetrieveAllUser();
-            ViewBag.towholist = CreateSelectList(asilist, "");
+
+            ViewBag.AllUserList = "[\"" + string.Join("\",\"", asilist.ToArray()) + "\"]";
 
             var typelist = new List<string>();
             string[] tlist = { ISSUETP.Task, ISSUETP.Bug };
@@ -1145,26 +1099,22 @@ namespace Prometheus.Controllers
 
         private void CreateAllSearchLists()
         {
+
+            var asilist = UserViewModels.RetrieveAllUser();
+            ViewBag.AllUserList = "[\"" + string.Join("\",\"", asilist.ToArray()) + "\"]";
+
             var projlist = ProjectViewModels.RetrieveAllProjectKey();
-            var slist = CreateSearchSelectList(projlist, "");
-            ViewBag.projectlist = slist;
+            ViewBag.projectlist = "[\"" + string.Join("\",\"", projlist.ToArray()) + "\"]";
 
             var typelist = new List<string>();
             string[] tlist = { ISSUETP.Bug, ISSUETP.Task, ISSUETP.RMA, ISSUETP.OBA, ISSUETP.NewFeature, ISSUETP.Improvement, ISSUETP.Document, ISSUETP.NPIPROC };
             typelist.AddRange(tlist);
-            slist = CreateSearchSelectList(typelist, "");
-            ViewBag.issuetypelist = slist;
+            ViewBag.issuetypelist = CreateSearchSelectList(typelist, "");
 
             var rsilist = new List<string>();
             string[] rlist = { Resolute.Pending, Resolute.Working, Resolute.Reopen, Resolute.Fixed, Resolute.Done, Resolute.NotFix, Resolute.Unresolved, Resolute.NotReproduce };
             rsilist.AddRange(rlist);
-            slist = CreateSearchSelectList(rsilist, "");
-            ViewBag.resolutionlist = slist;
-
-            var asilist = UserViewModels.RetrieveAllUser();
-            slist = CreateSearchSelectList(asilist, "");
-            ViewBag.assigneelist = slist;
-
+            ViewBag.resolutionlist = CreateSearchSelectList(rsilist, "");
         }
 
         private void CreateSearchParams(string pj, string tp, string rs, string asn, string sd, string ed, string desp)
@@ -1505,10 +1455,6 @@ namespace Prometheus.Controllers
 
             if (string.IsNullOrEmpty(key))
             {
-                var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist = CreateSelectList(asilist, "");
-                ViewBag.towholist1 = CreateSelectList(asilist, "");
-
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);
 
@@ -1544,7 +1490,6 @@ namespace Prometheus.Controllers
                     hasEditPermit = true;
                 }
                 ViewBag.hasEditDueDate = CheckModifyDueDatePermit(key, updater, hasEditPermit);
-                //ret.Reporter = updater;
                 CreateAllLists(ret);
 
                 if (ret.Summary.Contains(" @Burn-In Step "))
@@ -1552,10 +1497,6 @@ namespace Prometheus.Controllers
                     var sn = ret.Summary.Split(new string[] { " " }, StringSplitOptions.None)[1].Trim().ToUpper();
                     ViewBag.birootcauselist = CreateBIRootIssue(ret.ProjectKey, sn);
                 }
-
-                var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist = CreateSelectList(asilist, "");
-                ViewBag.towholist1 = CreateSelectList(asilist, "");
 
                 if (ret.Summary.Contains(CRITICALERRORTYPE.LYTTASK) || ret.Summary.Contains(CRITICALERRORTYPE.LYTTASK1))
                 {
@@ -1576,10 +1517,6 @@ namespace Prometheus.Controllers
             }
             else
             {
-                var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist = CreateSelectList(asilist, "");
-                ViewBag.towholist1 = CreateSelectList(asilist, "");
-
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);
 
@@ -2126,9 +2063,6 @@ namespace Prometheus.Controllers
             {
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);
-                var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist = CreateSelectList(asilist, "");
-                ViewBag.towholist1 = CreateSelectList(asilist, "");
                 return View();
             }
 
@@ -2163,18 +2097,12 @@ namespace Prometheus.Controllers
 
                 ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
                 CreateAllLists(ret);
-                var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist = CreateSelectList(asilist, "");
-                ViewBag.towholist1 = CreateSelectList(asilist, "");
                 return View(ret);
             }
             else
             {
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);
-                var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist = CreateSelectList(asilist, "");
-                ViewBag.towholist1 = CreateSelectList(asilist, "");
                 return View();
             }
         }
@@ -2608,10 +2536,6 @@ namespace Prometheus.Controllers
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);
 
-                var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist = CreateSelectList(asilist, "");
-                ViewBag.towholist1 = CreateSelectList(asilist, "");
-
                 return View();
             }
 
@@ -2634,20 +2558,12 @@ namespace Prometheus.Controllers
                 ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
                 CreateAllLists(ret);
 
-                var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist = CreateSelectList(asilist, "");
-                ViewBag.towholist1 = CreateSelectList(asilist, "");
-
                 return View(ret);
             }
             else
             {
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);
-
-                var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist = CreateSelectList(asilist, "");
-                ViewBag.towholist1 = CreateSelectList(asilist, "");
 
                 return View();
             }
@@ -2878,9 +2794,6 @@ namespace Prometheus.Controllers
             {
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);
-                var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist = CreateSelectList(asilist, "");
-                ViewBag.towholist1 = CreateSelectList(asilist, "");
                 return View();
             }
 
@@ -2899,22 +2812,14 @@ namespace Prometheus.Controllers
                     hasEditPermit = true;
                 }
                 ViewBag.hasEditDueDate = CheckModifyDueDatePermit(key, updater, hasEditPermit);
-                //ret.Reporter = updater;
-
                 ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
                 CreateAllLists(ret);
-                var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist = CreateSelectList(asilist, "");
-                ViewBag.towholist1 = CreateSelectList(asilist, "");
                 return View(ret);
             }
             else
             {
                 var tempvm = new IssueViewModels();
                 CreateAllLists(tempvm);
-                var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist = CreateSelectList(asilist, "");
-                ViewBag.towholist1 = CreateSelectList(asilist, "");
                 return View();
             }
         }
@@ -3040,13 +2945,6 @@ namespace Prometheus.Controllers
 
 
             var issuetag = string.Empty;
-            //for (var i = 0; i < 200; i++)
-            //{
-            //    if (Request.Form["issuetagcheck" + i] != null)
-            //    {
-            //        issuetag = issuetag + Request.Form["issuetagcheck" + i] + ";";
-            //    }
-            //}
 
             var attachtag = string.Empty;
             for (var i = 0; i < 200; i++)
@@ -3146,19 +3044,6 @@ namespace Prometheus.Controllers
                 }
             }
 
-            //var newdata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
-            //CreateAllLists(newdata);
-
-            //ViewBag.isassignee = false;
-            //if (string.Compare(updater, newdata.Assignee, true) == 0
-            //        || string.Compare(updater, newdata.Reporter, true) == 0
-            //        || string.Compare(updater, newdata.Creator, true) == 0)
-            //{
-            //    ViewBag.isassignee = true;
-            //}
-            //ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
-            //return View(newdata);
-
             LogModifyDueDate(originaldata, updater, vm.DueDate.ToString("yyyy-MM-dd HH:mm:ss"));
             var dict1 = new RouteValueDictionary();
             dict1.Add("issuekey", originaldata.IssueKey);
@@ -3221,7 +3106,6 @@ namespace Prometheus.Controllers
                     hasEditPermit = true;
                 }
                 ViewBag.hasEditDueDate = CheckModifyDueDatePermit(key, updater, hasEditPermit);
-                //ret.Reporter = updater;
 
                 CreateAllLists(ret);
                 ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
@@ -3419,19 +3303,6 @@ namespace Prometheus.Controllers
                     SendIssueEvent(vm, "reopened", ISSUETP.Quality, true);
                 }
             }
-
-            //var newdata = IssueViewModels.RetrieveIssueByIssueKey(issuekey);
-            //CreateAllLists(newdata);
-
-            //ViewBag.isassignee = false;
-            //if (string.Compare(updater, newdata.Assignee, true) == 0
-            //        || string.Compare(updater, newdata.Reporter, true) == 0
-            //        || string.Compare(updater, newdata.Creator, true) == 0)
-            //{
-            //    ViewBag.isassignee = true;
-            //}
-
-            //return View(newdata);
 
             LogModifyDueDate(originaldata, updater, vm.DueDate.ToString("yyyy-MM-dd HH:mm:ss"));
 

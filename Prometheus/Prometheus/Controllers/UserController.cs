@@ -1189,7 +1189,7 @@ namespace Prometheus.Controllers
             ViewBag.RealUserID = updater;
 
             var asilist = UserViewModels.RetrieveAllUser();
-            ViewBag.towholist = CreateSelectList(asilist, "");
+            ViewBag.AllUserList = "[\"" + string.Join("\",\"", asilist.ToArray()) + "\"]";
 
             var ilearntable = new List<ShareDocVM>();
             var iweeklytable = new List<ShareDocVM>();
@@ -1439,8 +1439,8 @@ namespace Prometheus.Controllers
             ViewBag.UserName = updater.Split(new char[] { '@' })[0];
             ViewBag.RealUserID = updater;
 
-            var users = UserViewModels.RetrieveAllUser();
-            ViewBag.towholist = CreateSelectList(users);
+            var asilist = UserViewModels.RetrieveAllUser();
+            ViewBag.AllUserList = "[\"" + string.Join("\",\"", asilist.ToArray()) + "\"]";
 
             var vm = UserBlogVM.RetrieveAllBlogDoc(updater);
             return View(vm);
@@ -1997,7 +1997,7 @@ namespace Prometheus.Controllers
             ViewBag.RealUserID = updater;
 
             var asilist = UserViewModels.RetrieveAllUser();
-            ViewBag.towholist1 = CreateSelectList(asilist, "");
+            ViewBag.AllUserList = "[\"" + string.Join("\",\"", asilist.ToArray()) + "\"]";
 
             var grouptype = new string[] { "Please choose your group type", UserGroupType.WorkGroup, UserGroupType.ReportGroup, UserGroupType.LYTGroup };
             var grouptypelist = CreateSelectList(grouptype.ToList(), "");
@@ -2128,7 +2128,7 @@ namespace Prometheus.Controllers
             }
 
             var asilist = UserViewModels.RetrieveAllUser();
-            ViewBag.towholist1 = CreateSelectList(asilist, "");
+            ViewBag.AllUserList = "[\"" + string.Join("\",\"", asilist.ToArray()) + "\"]";
 
             ViewBag.tobechoosetags = ShareDocVM.RetrieveCriticalSymptom(this);
 

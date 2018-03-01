@@ -682,7 +682,7 @@ namespace Prometheus.Controllers
                 CreateProjectTypeList(vm);
 
                 var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist = CreateSelectList(asilist, "");
+                ViewBag.AllUserList = "[\"" + string.Join("\",\"", asilist.ToArray()) + "\"]";
 
                 var cfgpjlist = CfgUtility.GetStandardPJList(this);
                 var suggestpjlist = new List<string>();
@@ -1054,7 +1054,7 @@ namespace Prometheus.Controllers
             if (!RetrieveProjectDate(projectmodel))
             {
                 var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist = CreateSelectList(asilist, "");
+                ViewBag.AllUserList = "[\"" + string.Join("\",\"", asilist.ToArray()) + "\"]";
 
                 CreateAllUserLists(projectmodel);
                 CreateProjectTypeList(projectmodel);
@@ -1071,7 +1071,7 @@ namespace Prometheus.Controllers
             if (!ProjectValidate(projectmodel))
             {
                 var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist = CreateSelectList(asilist, "");
+                ViewBag.AllUserList = "[\"" + string.Join("\",\"", asilist.ToArray()) + "\"]";
 
                 CreateAllUserLists(projectmodel);
                 CreateProjectTypeList(projectmodel);
@@ -1242,7 +1242,7 @@ namespace Prometheus.Controllers
                     var vm = ProjectViewModels.RetrieveOneProject(realkey);
 
                     var asilist = UserViewModels.RetrieveAllUser();
-                    ViewBag.towholist = CreateSelectList(asilist, "");
+                    ViewBag.AllUserList = "[\"" + string.Join("\",\"", asilist.ToArray()) + "\"]";
 
                     CreateAllUserLists(vm);
                     CreateUpdateIssueList(vm);
@@ -4852,7 +4852,7 @@ namespace Prometheus.Controllers
                 }
 
                 var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist = CreateSelectList(asilist, "");
+                ViewBag.AllUserList = "[\"" + string.Join("\",\"", asilist.ToArray()) + "\"]";
 
                 return View(vm[0]);
             }
@@ -4927,6 +4927,9 @@ namespace Prometheus.Controllers
                 CookieUtility.SetCookie(this, ck);
             }
 
+            var asilist = UserViewModels.RetrieveAllUser();
+            ViewBag.AllUserList = "[\"" + string.Join("\",\"", asilist.ToArray()) + "\"]";
+
             if (!string.IsNullOrEmpty(key))
             {
                 var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key, this);
@@ -4940,14 +4943,10 @@ namespace Prometheus.Controllers
                 {
                     ViewBag.assigee = false;
                 }
-
-                var asilist1 = UserViewModels.RetrieveAllUser();
-                ViewBag.towholist = CreateSelectList(asilist1, "");
+                
                 return View("UpdateProjectError", vm[0]);
             }
 
-            var asilist = UserViewModels.RetrieveAllUser();
-            ViewBag.towholist = CreateSelectList(asilist, "");
             return View("UpdateProjectError");
         }
 
@@ -6409,7 +6408,7 @@ namespace Prometheus.Controllers
             }
 
             var asilist = UserViewModels.RetrieveAllUser();
-            ViewBag.towholist1 = CreateSelectList(asilist, "");
+            ViewBag.AllUserList = "[\"" + string.Join("\",\"", asilist.ToArray()) + "\"]";
 
             var ret = IssueViewModels.RetrieveIssueByIssueKey(key, this);
             if (ret != null)
@@ -7225,7 +7224,7 @@ namespace Prometheus.Controllers
             }
 
             var asilist = UserViewModels.RetrieveAllUser();
-            ViewBag.towholist = CreateSelectList(asilist, "");
+            ViewBag.AllUserList = "[\"" + string.Join("\",\"", asilist.ToArray()) + "\"]";
 
             var issuekeybits = Convert.FromBase64String(keys);
             var issuekeystr = System.Text.Encoding.UTF8.GetString(issuekeybits);

@@ -11,8 +11,8 @@
 else
 {
     <script type="text/javascript">
-            $(document).ready(function () {
-                npireadmode();
+        $(document).ready(function () {
+            npireadmode();
         });
     </script>
 }
@@ -133,6 +133,7 @@ else
 <hr />
 
 <script src="../../ckeditor/ckeditor.js"></script>
+<script src="~/Scripts/autocompletefill.js"></script>
 
 @using (Html.BeginForm("UpdateQuality", "Issue", FormMethod.Post, new { enctype = "multipart/form-data", id = "issueform", name = "issueform" }))
 {
@@ -145,7 +146,11 @@ else
                 <div class="col-xs-6">
                     <label class="control-label col-xs-2" for="projectlist">Project<font color="red">*</font></label>
                     <div class="col-xs-10">
-                        @Html.DropDownList("projectlist", null, new { @id = "projectlist", @class = "form-control", @readonly = "readonly" })
+                        <input class="form-control" id="projectlist" name="projectlist"
+                               type="text" value="@(string.IsNullOrEmpty(Model.ProjectKey)?"":Model.ProjectKey)" readonly />
+                        <script type="text/javascript">
+                            autoCompleteFill('projectlist', @Html.Raw(ViewBag.projectlist));
+                        </script>
                     </div>
                 </div>
                 <div class="col-xs-6">
@@ -168,14 +173,12 @@ else
                 <div class="col-xs-6">
                     <label class="control-label col-xs-2" for="assigneelist">Assignee</label>
                     <div class="col-xs-10">
-                        @if (ViewBag.isassignee != null && ViewBag.isassignee)
-                        {
-                            @Html.DropDownList("assigneelist", null, new { @id = "assigneelist", @class = "form-control" })
-                        }
-                        else
-                        {
-                            @Html.DropDownList("assigneelist", null, new { @id = "assigneelist", @class = "form-control", @readonly = "readonly" })
-                        }
+                        <input class="form-control" id="assigneelist" name="assigneelist" 
+                               @((ViewBag.isassignee != null && ViewBag.isassignee)?"":"readonly")
+                               type="text" value="@(string.IsNullOrEmpty(Model.Assignee)?Model.Reporter:Model.Assignee)" />
+                        <script type="text/javascript">
+                                autoCompleteFill('assigneelist', @Html.Raw(ViewBag.AllUserList));
+                        </script>
                     </div>
                 </div>
 

@@ -4,7 +4,7 @@
     ViewBag.Title = "OcapAlarm";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
+<script src="~/Scripts/autocompletefill.js"></script>
 <script type="text/javascript">
     function chooserelatedpeople()
     {
@@ -60,18 +60,6 @@
 @if (Model != null)
 {
     <h3>@Model.ElementAt(0).Summary.Replace(Prometheus.Models.CRITICALERRORTYPE.SECONDMATCH, "")</h3>
-    @*<div class="collapsed collapse-summary" aria-expanded="false" data-toggle="collapse" data-target="#summaryCollapse">
-        <span>Summary</span>
-        <span class="summary-span-etc glyphicon glyphicon-chevron-down"></span>
-    </div>
-    <div id="summaryCollapse" class="collapse">
-        @foreach(var summary in ViewBag.SummaryList)
-        {
-            <div class="summary-span">
-                <span>@summary.Replace(Prometheus.Models.CRITICALERRORTYPE.SECONDMATCH, "")</span>
-            </div>
-        }
-    </div>*@
     <hr />
     using (Html.BeginForm("OcapWarn", "Project", FormMethod.Post, new { enctype = "multipart/form-data", id = "ocapwarnform", name = "ocapwarnform" }))
     {
@@ -152,13 +140,11 @@
                             <label class="control-label">To Who</label>
                         </div>
                         <div class="col-xs-9">
-                            @Html.DropDownList("towholist", null, new { @id = "towholist", @class = "form-control", @onchange = "chooseapusher1()" })
+                            <input class="form-control" id="towholist" name="towholist"
+                                   type="text" value="" />
                         </div>
                         <script type="text/javascript">
-                            function chooseapusher1()
-                            {
-                                document.getElementById("towhoinput1").value = document.getElementById("towhoinput1").value + ';' + document.getElementById("towholist").value;
-                            }
+                            autoCompleteFill('towholist', @Html.Raw(ViewBag.AllUserList), true, 'towhoinput1');
                         </script>
                     </div>
                     <hr />

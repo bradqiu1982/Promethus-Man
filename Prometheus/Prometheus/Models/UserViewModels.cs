@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net.Mail;
 using System.Web;
 
 namespace Prometheus.Models
@@ -144,6 +145,20 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static bool IsEmaileValid(string emailaddress)
+        {
+            try
+            {
+                MailAddress m = new MailAddress(emailaddress);
+                return true;
+            }
+            catch (FormatException)
+            {
+                return false;
+            }
+        }
+
+
         public static void RegisterUserAuto(string name)
         {
             var dbret = UserViewModels.RetrieveUser(name);
@@ -153,6 +168,11 @@ namespace Prometheus.Models
                 if (!name.Contains("@"))
                 {
                     tempname = (name.Replace(" ", ".") + "@finisar.com").ToUpper();
+                }
+
+                if (!IsEmaileValid(tempname))
+                {
+                    return;
                 }
 
                 var user = new UserViewModels();

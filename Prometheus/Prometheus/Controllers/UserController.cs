@@ -282,6 +282,13 @@ namespace Prometheus.Controllers
             {
                 if (string.Compare(password, "abc@123", true) == 0)
                 {
+                    if (!UserViewModels.IsEmaileValid(username.ToUpper()))
+                    {
+                        var loginerror = "<h3><font color=\"red\">user name is not a corrective email format </font></h3>";
+                        ViewBag.loginerror = loginerror;
+                        return View();
+                    }
+
                     var user = new UserViewModels();
                     user.Email = username.ToUpper();
                     user.Password = password;

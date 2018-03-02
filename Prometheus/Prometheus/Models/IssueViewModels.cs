@@ -2506,7 +2506,23 @@ namespace Prometheus.Models
                 fixresolve = Resolute.Done;
             }
 
-            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples,ModuleSN,ParentIssueKey from Issue where APVal1 <> 'delete' and  Assignee = '<Assignee>' and Resolution in <cond> and IssueType <> '<IssueType1>' and  Reporter <> 'System' order by ReportDate DESC";
+            var sql = @"select distinct * from (select top <topnum> ProjectKey,IssueKey,IssueType,Summary,
+                Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,
+                RelativePeoples,ModuleSN,ParentIssueKey 
+                from Issue 
+                where APVal1 <> 'delete' and  Assignee = '<Assignee>' 
+                and Resolution in <cond> and IssueType <> '<IssueType1>' 
+                and  Reporter <> 'System'
+                Union All
+                select i.ProjectKey,i.IssueKey,i.IssueType,i.Summary,
+                i.Priority,i.DueDate,i.ResolvedDate,i.ReportDate,i.Assignee,i.Reporter,i.Resolution,
+                i.RelativePeoples,i.ModuleSN,i.ParentIssueKey
+                from IssueIcare as ii 
+                inner join issue as i on ii.IssueKey = i.IssueKey 
+                where i.APVal1 <> 'delete' and  i.Assignee = '<Assignee>' 
+                and i.Resolution in <cond> and i.IssueType <> '<IssueType1>' 
+                and ii.UserName = '<Assignee>' and ii.ICare = 1) as tmp_table
+                order by ReportDate DESC";
             sql = sql.Replace("<Assignee>", assignee).Replace("<topnum>", Convert.ToString(topnum)).Replace("<cond>", cond).Replace("<IssueType1>", ISSUETP.NPIPROC);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             var ret = new List<IssueViewModels>();
@@ -2546,7 +2562,22 @@ namespace Prometheus.Models
                 fixresolve = Resolute.Done;
             }
 
-            var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples,ModuleSN,ParentIssueKey from Issue where APVal1 <> 'delete' and  Assignee = '<Assignee>' and Resolution in <cond> order by ReportDate DESC";
+            var sql = @"select distinct * from (select top <topnum> ProjectKey,IssueKey,IssueType,
+                Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,
+                Reporter,Resolution,RelativePeoples,ModuleSN,ParentIssueKey 
+                from Issue 
+                where APVal1 <> 'delete' and  Assignee = '<Assignee>' 
+                and Resolution in <cond> 
+                Union All
+                select i.ProjectKey,i.IssueKey,i.IssueType,i.Summary,
+                i.Priority,i.DueDate,i.ResolvedDate,i.ReportDate,i.Assignee,i.Reporter,i.Resolution,
+                i.RelativePeoples,i.ModuleSN,i.ParentIssueKey
+                from IssueIcare as ii 
+                inner join issue as i on ii.IssueKey = i.IssueKey 
+                where i.APVal1 <> 'delete' and  i.Assignee = '<Assignee>' 
+                and i.Resolution in <cond> 
+                and ii.UserName = '<Assignee>' and ii.ICare = 1) as tmp_table
+                order by ReportDate DESC";
             sql = sql.Replace("<Assignee>", assignee).Replace("<topnum>", Convert.ToString(topnum)).Replace("<cond>", cond).Replace("<IssueType>", ISSUETP.Bug);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             var ret = new List<IssueViewModels>();

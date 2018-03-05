@@ -159,15 +159,17 @@
 }
 
 .tr-highlight {
-    border-left-width: 6px;
+    /*border-left-width: 6px;
     border-left-style: solid;
-    border-left-color: #5cb85c;
+    border-left-color: #5cb85c;*/
+    background-color: #98dd7f;
 }
 
 .tr-lowlight {
-    border-left-width: 6px;
+    /*border-left-width: 6px;
     border-left-style: solid;
-    border-left-color: #c9302c;
+    border-left-color: #c9302c;*/
+    background-color: #f6baba;
 }
 
 .wr-op-setting{

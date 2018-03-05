@@ -1464,6 +1464,8 @@ namespace Prometheus.Controllers
         {
             if (ProjectKey != null)
             {
+                ViewBag.PJKey = ProjectKey;
+
                 var list1 = IssueViewModels.RetrieveTaskByProjectKey(ProjectKey, Resolute.Pending);
                 var list2 = IssueViewModels.RetrieveTaskByProjectKey(ProjectKey, Resolute.Working);
                 var list3 = IssueViewModels.RetrieveTaskByProjectKey(ProjectKey, Resolute.Done);
@@ -1593,6 +1595,7 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(ProjectKey))
             {
+                ViewBag.PJKey = ProjectKey;
                 ViewBag.projectkey = ProjectKey;
 
                 var vm = ProjectFAViewModules.RetrievePendingFAData(ProjectKey, this);
@@ -1675,6 +1678,8 @@ namespace Prometheus.Controllers
 
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
+            ViewBag.PJKey = ProjectKey;
+
             //null is for qm, not null for parallel project
             var vm = IssueViewModels.RetrieveSptIssue(this, ProjectKey);
             ViewBag.rules = ProjectCriticalErrorVM.RetrievePJCriticalError(ProjectKey, null);
@@ -1704,6 +1709,8 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(ProjectKey))
             {
+                ViewBag.PJKey = ProjectKey;
+
                 var vm = ProjectErrorViewModels.RetrieveErrorByPJKey(ProjectKey, this);
                 var descdict = ProjectErrorViewModels.RetrieveShortDescDict(ProjectKey);
 
@@ -1775,6 +1782,8 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(ErrAbbr))
             {
+                ViewBag.PJKey = ProjectKey;
+
                 ViewBag.projectkey = ProjectKey;
                 var vm = ProjectFAViewModules.RetrieveFADataWithErrAbbr(ProjectKey, ErrAbbr, this);
 
@@ -1872,6 +1881,8 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(SN))
             {
+                ViewBag.PJKey = ProjectKey;
+
                 ViewBag.projectkey = ProjectKey;
 
                 var vm = ProjectFAViewModules.RetrieveFADataWithSN(ProjectKey, SN, this);
@@ -1894,6 +1905,8 @@ namespace Prometheus.Controllers
         {
             var projectkey = Request.Form["HProjectKey"];
             ViewBag.projectkey = projectkey;
+
+            ViewBag.PJKey = projectkey;
 
             var vm = ProjectFAViewModules.RetrieveDoneFAData(projectkey, this);
 
@@ -1943,6 +1956,8 @@ namespace Prometheus.Controllers
         {
             if (ProjectKey != null)
             {
+                ViewBag.PJKey = ProjectKey;
+
                 var vmlist = IssueViewModels.RetrieveNPIPROCIssue(ProjectKey, this);
                 var pj = ProjectViewModels.RetrieveOneProject(ProjectKey);
 
@@ -1971,6 +1986,8 @@ namespace Prometheus.Controllers
         public static void ProjectWeeklyTrend(Controller ctrl, string ProjectKey, int weeks)
         {
             ctrl.ViewBag.Weeks = weeks.ToString();
+
+            ctrl.ViewBag.PJKey = ProjectKey;
 
             var vmlist = ProjectYieldViewModule.GetYieldByWeeks(ProjectKey, ctrl.HttpContext.Cache, weeks);
             if (vmlist.Count > 0)
@@ -2211,6 +2228,8 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(ProjectKey)
                 && !string.IsNullOrEmpty(PBRNUM))
             {
+                ViewBag.PJKey = ProjectKey;
+
                 ViewBag.pjkey = ProjectKey;
                 ViewBag.brnum = PBRNUM;
 
@@ -2260,6 +2279,8 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(EndDate))
             {
+                ViewBag.PJKey = ProjectKey;
+
                 var edate = DateTime.Parse(DateTime.Parse(EndDate).ToString("yyyy-MM-dd") + " 07:30:00");
                 var sdate = edate.AddDays(-7);
                 if (sdate.DayOfWeek != DayOfWeek.Thursday)
@@ -2469,6 +2490,8 @@ namespace Prometheus.Controllers
         {
             if (ProjectKey != null)
             {
+                ViewBag.PJKey = ProjectKey;
+
                 var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Pending, ISSUETP.RMA, this);
                 var list2 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Working, ISSUETP.RMA, this);
                 var list3 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Done, ISSUETP.RMA, this);
@@ -2483,6 +2506,8 @@ namespace Prometheus.Controllers
         {
             if (ProjectKey != null)
             {
+                ViewBag.PJKey = ProjectKey;
+
                 var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Pending, ISSUETP.RMA, this);
                 var list2 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Working, ISSUETP.RMA, this);
                 var list3 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Done, ISSUETP.RMA, this);
@@ -2533,6 +2558,7 @@ namespace Prometheus.Controllers
         {
             if (ProjectKey != null)
             {
+
                 var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Working, ISSUETP.Rel, this);
                 var list2 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Pending, ISSUETP.Rel, this);
                 var list3 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Done, ISSUETP.Rel, this);
@@ -2582,6 +2608,7 @@ namespace Prometheus.Controllers
         {
             if (ProjectKey != null)
             {
+
                 //var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Pending, ISSUETP.OBA, this);
                 //var list2 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Working, ISSUETP.OBA, this);
                 //var list3 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Done, ISSUETP.OBA, this);
@@ -2635,6 +2662,7 @@ namespace Prometheus.Controllers
         {
             if (ProjectKey != null)
             {
+
                 //var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Pending, ISSUETP.OBA, this);
                 //var list2 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Working, ISSUETP.OBA, this);
                 //var list3 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Done, ISSUETP.OBA, this);
@@ -2810,6 +2838,7 @@ namespace Prometheus.Controllers
         {
             if (ProjectKey != null)
             {
+                ViewBag.PJKey = ProjectKey;
                 ViewBag.pjkey = ProjectKey;
 
                 var vmlist = ProjectYieldViewModule.GetYieldByMonth(ProjectKey, HttpContext.Cache, Months);
@@ -2968,6 +2997,8 @@ namespace Prometheus.Controllers
         {
             if (ProjectKey != null && StartDate != null && EndDate != null)
             {
+                ViewBag.PJKey = ProjectKey;
+
                 var EndDate2 = DateTime.Parse(EndDate).AddDays(1).ToString();
                 ViewBag.pjkey = ProjectKey;
                 var vmlist = ProjectYieldViewModule.GetYieldByDay(ProjectKey, StartDate, EndDate2, HttpContext.Cache);
@@ -3126,6 +3157,7 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(EndDate))
             {
+                ViewBag.PJKey = ProjectKey;
 
                 ViewBag.StartDate = VStartDate;
                 ViewBag.EndDate = VEndDate;
@@ -3382,6 +3414,8 @@ namespace Prometheus.Controllers
 
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(EndDate))
             {
+                ViewBag.PJKey = ProjectKey;
+
                 var edate = DateTime.Parse(DateTime.Parse(EndDate).ToString("yyyy-MM-dd") + " 07:30:00");
                 var datestr = EndDate.Split(new char[] { '-', ' ' })[2];
 
@@ -3646,6 +3680,8 @@ namespace Prometheus.Controllers
             var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
             var vmlist = ProjectYieldViewModule.GetYieldByBRNum(ProjectKey, BRNUM, pvm, HttpContext.Cache, BRType);
 
+            ViewBag.PJKey = ProjectKey;
+
             if (vmlist.Count > 0)
             {
                 var ChartxAxisValues = "";
@@ -3749,6 +3785,8 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(BRNUM))
             {
+                ViewBag.PJKey = ProjectKey;
+
                 ViewBag.pjkey = ProjectKey;
                 ProjectBRTypeYield(ProjectKey, BRNUM, YIELDTYPE.BR);
                 return View();
@@ -3761,6 +3799,8 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(BRNUM))
             {
+                ViewBag.PJKey = ProjectKey;
+
                 ViewBag.pjkey = ProjectKey;
                 ProjectBRTypeYield(ProjectKey, BRNUM, YIELDTYPE.PN);
                 return View();
@@ -3774,6 +3814,8 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(BRNUM))
             {
+                ViewBag.PJKey = ProjectKey;
+
                 ViewBag.pjkey = ProjectKey;
                 ProjectBRTypeYield(ProjectKey, BRNUM, YIELDTYPE.JO);
                 return View();
@@ -3788,6 +3830,8 @@ namespace Prometheus.Controllers
                 && !string.IsNullOrEmpty(WholeBRNUM)
                 && !string.IsNullOrEmpty(BRType))
             {
+                ViewBag.PJKey = ProjectKey;
+
                 ViewBag.BRNUM = WholeBRNUM;
                 ViewBag.BRType = BRType;
 
@@ -4048,6 +4092,8 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(StartDate) && !string.IsNullOrEmpty(EndDate))
             {
+                ViewBag.PJKey = ProjectKey;
+
                 ViewBag.pjkey = ProjectKey;
 
                 var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
@@ -4553,6 +4599,8 @@ namespace Prometheus.Controllers
         {
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(StartDate) && !string.IsNullOrEmpty(EndDate))
             {
+                ViewBag.PJKey = ProjectKey;
+
                 ViewBag.StartDate = StartDate;
                 ViewBag.EndDate = EndDate;
 
@@ -4841,6 +4889,9 @@ namespace Prometheus.Controllers
             {
                 var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key, this);
                 var AllPJMember = ProjectViewModels.RetrieveOneProject(vm[0].ProjectKey).AllPJMember;
+
+                ViewBag.PJKey = vm[0].ProjectKey;
+
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
                 if (AllPJMember.ToUpper().Contains(updater.ToUpper()))
                 {
@@ -4933,6 +4984,9 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(key))
             {
                 var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key, this);
+
+                ViewBag.PJKey = vm[0].ProjectKey;
+
                 var AllPJMember = ProjectViewModels.RetrieveOneProject(vm[0].ProjectKey).AllPJMember;
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
                 if (AllPJMember.ToUpper().Contains(updater.ToUpper()))
@@ -6803,6 +6857,8 @@ namespace Prometheus.Controllers
                     return RedirectToAction("LoginUser", "User");
                 }
 
+                ViewBag.PJKey = PJKey;
+
                 var ck1 = new Dictionary<string, string>();
                 ck1.Add("PJKey", PJKey);
                 CookieUtility.SetCookie(this, ck1);
@@ -7629,6 +7685,8 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectErrorMind(string ProjectKey, string OrignalCode)
         {
+            ViewBag.PJKey = ProjectKey;
+
             ViewBag.ProjectKey = ProjectKey;
             ViewBag.OriginalCode = OrignalCode;
 
@@ -8024,6 +8082,7 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectStations(string pjkey,string whichtest,string StartTime,string EndTime)
         {
+            ViewBag.PJKey = pjkey;
 
             ViewBag.pjkey = pjkey;
             ViewBag.WhichTestList = MachineVM.RetrieveWhichTest(pjkey);

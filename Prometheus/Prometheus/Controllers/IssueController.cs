@@ -340,6 +340,8 @@ namespace Prometheus.Controllers
 
             if (ret != null)
             {
+                ViewBag.PJKey = ret.ProjectKey;
+
                 if (string.Compare(ret.IssueType, ISSUETP.RMA) == 0)
                 {
                     var dict = new RouteValueDictionary();
@@ -1466,6 +1468,8 @@ namespace Prometheus.Controllers
 
             if (ret != null)
             {
+                ViewBag.PJKey = ret.ProjectKey;
+
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
                 ViewBag.isassignee = false;
                 var hasEditPermit = false;
@@ -2069,6 +2073,8 @@ namespace Prometheus.Controllers
             var ret = IssueViewModels.RetrieveIssueByIssueKey(key, this);
             if (ret != null)
             {
+                ViewBag.PJKey = ret.ProjectKey;
+
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
                 if (ret.ContainmentActions.Count == 0)

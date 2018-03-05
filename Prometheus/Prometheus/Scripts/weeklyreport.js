@@ -75,7 +75,7 @@
                     if (sumstr != '') {
                         arrtmp.push(ikey, mark, sumstr);
                         data.push(arrtmp)
-                        var tr_class = (mark == 1) ? "summary-highlight" : ((mark == 2) ? "summary-lowlight" : "");
+                        var tr_class = (mark == 1) ? "tr-highlight" : ((mark == 2) ? "tr-lowlight" : "");
                         $(this).prev().removeClass().addClass(tr_class);
                     }
                 })

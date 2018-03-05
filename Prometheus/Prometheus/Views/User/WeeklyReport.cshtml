@@ -304,8 +304,8 @@
                                                 var itr_class = "";
                                                 if (summarylist != null && summarylist.ContainsKey(task.Key))
                                                 {
-                                                    itr_class = (summarylist[task.Key][0].Mark == "1") ? "summary-highlight"
-                                                                : ((summarylist[task.Key][0].Mark == "2") ? "summary-lowlight" : "");
+                                                    itr_class = (summarylist[task.Key][0].Mark == "1") ? "tr-highlight"
+                                                                : ((summarylist[task.Key][0].Mark == "2") ? "tr-lowlight" : "");
                                                 }
                                                 <tr data-data="cur-icare-@idx-@m" class="@itr_class">
                                                     <td>@(m + 1)</td>
@@ -367,7 +367,7 @@
                                                                       name="cur_icare_summary">@Html.Raw(isummary)</textarea>
                                                         </div>
                                                         <div class="col-xs-4">
-                                                            <select class="form-control">
+                                                            <select class="form-control" autocomplete="off">
                                                                 <option value="0" @(imark == "0" ? "selected" : "")>Normal</option>
                                                                 <option value="1" @(imark == "1" ? "selected" : "")>Highlight</option>
                                                                 <option value="2" @(imark == "2" ? "selected" : "")>Lowlight</option>
@@ -534,7 +534,7 @@
                                                     </td>
                                                     <td>
                                                         <input type="hidden" value="@tmark"/>
-                                                        <select class="form-control">
+                                                        <select class="form-control" autocomplete="off">
                                                             <option value="0" @(tmark == "0" ? "selected" : "")>Normal</option>
                                                             <option value="1" @(tmark == "1" ? "selected" : "")>Highlight</option>
                                                             <option value="2" @(tmark == "2" ? "selected" : "")>Lowlight</option>
@@ -715,7 +715,7 @@
                                                                       name="cur_icare_summary">@Html.Raw(csummary)</textarea>
                                                         </div>
                                                         <div class="col-xs-4">
-                                                            <select class="form-control">
+                                                            <select class="form-control" autocomplete="off">
                                                                 <option value="0" @(cmark == "0" ? "selected" : "")>Normal</option>
                                                                 <option value="1" @(cmark == "1" ? "selected" : "")>Highlight</option>
                                                                 <option value="2" @(cmark == "2" ? "selected" : "")>Lowlight</option>
@@ -889,7 +889,7 @@
                                                     </td>
                                                     <td>
                                                         <input type="hidden" value="@rmark" />
-                                                        <select class="form-control">
+                                                        <select class="form-control" autocomplete="off">
                                                             <option value="0" @(rmark == "0" ? "selected" : "")>Normal</option>
                                                             <option value="1" @(rmark == "1" ? "selected" : "")>Highlight</option>
                                                             <option value="2" @(rmark == "2" ? "selected" : "")>Lowlight</option>

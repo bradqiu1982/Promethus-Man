@@ -66,6 +66,9 @@ namespace Prometheus.Models
 
         private Dictionary<string, bool> corsndict = new Dictionary<string, bool>();
         public Dictionary<string, bool> CorSNDict { get { return corsndict; } }
+
+        public string StartDate { set; get; }
+        public string EndDate { set; get; }
     }
 
     public class ProjectYieldViewModule
@@ -455,7 +458,7 @@ namespace Prometheus.Models
 
         }
 
-        private static void RetrieveFirstYield(ProjectYieldViewModule pyvm, List<ProjectTestData> plist, ProjectViewModels pvm)
+        private static void RetrieveFirstYield(ProjectYieldViewModule pyvm, List<ProjectTestData> plist, ProjectViewModels pvm,string sdate = null,string edate = null)
         {
 
             var yielddict = new Dictionary<string, TestYield>();
@@ -475,6 +478,9 @@ namespace Prometheus.Models
                     else
                     {
                         var tempyield = new TestYield();
+                        tempyield.StartDate = sdate;
+                        tempyield.EndDate = edate;
+
                         tempyield.InputCount = 1;
                         if (string.Compare(p.ErrAbbr, "PASS", true) == 0)
                             tempyield.OutputCount = 1;
@@ -587,7 +593,7 @@ namespace Prometheus.Models
 
         }
 
-        private static void RetrieveCummYield(ProjectYieldViewModule pyvm, List<ProjectTestData> plist, ProjectViewModels pvm)
+        private static void RetrieveCummYield(ProjectYieldViewModule pyvm, List<ProjectTestData> plist, ProjectViewModels pvm, string sdate = null, string edate = null)
         {
             var yielddict = new Dictionary<string, TestYield>();
             var sndict = new Dictionary<string, bool>();
@@ -606,6 +612,9 @@ namespace Prometheus.Models
                     else
                     {
                         var tempyield = new TestYield();
+                        tempyield.StartDate = sdate;
+                        tempyield.EndDate = edate;
+
                         tempyield.InputCount = 1;
                         if (string.Compare(p.ErrAbbr, "PASS", true) == 0)
                             tempyield.OutputCount = 1;
@@ -818,7 +827,7 @@ namespace Prometheus.Models
                     filteredPjData.Add(item);
                 }
             }
-            RetrieveFirstYield(ret, filteredPjData, pvm);
+            RetrieveFirstYield(ret, filteredPjData, pvm,startdate, enddate);
 
 
             filteredPjData2 = new List<ProjectTestData>();
@@ -829,7 +838,7 @@ namespace Prometheus.Models
                     filteredPjData2.Add(item);
                 }
             }
-            RetrieveCummYield(ret, filteredPjData2, pvm);
+            RetrieveCummYield(ret, filteredPjData2, pvm, startdate, enddate);
 
             datatfromstart.Clear();
             previoussnstationdict.Clear();

@@ -86,7 +86,19 @@
                                     <th>Yield</th>
                                     @foreach (var item in Model.FirstYields)
                                     {
-                                        <td>@((item.Yield * 100.0).ToString("0.00"))%</td>
+                                        if (!string.IsNullOrEmpty(item.StartDate)
+                                            && !string.IsNullOrEmpty(item.EndDate))
+                                        {
+                                            var sdate = DateTime.Parse(item.StartDate).ToString("yyyy-MM-dd");
+                                            var edate = DateTime.Parse(item.EndDate).ToString("yyyy-MM-dd");
+                                            var pjkey = Model.ProjectKey;
+                                            var site = item.WhichTest;
+                                            <td><a href="/Project/ProjectStations?pjkey=@(pjkey)&whichtest=@(site)&StartTime=@(sdate)&EndTime=@(edate)" target="_blank">@((item.Yield * 100.0).ToString("0.00"))%</a></td>
+                                        }
+                                        else
+                                        {
+                                            <td>@((item.Yield * 100.0).ToString("0.00"))%</td>
+                                        }
                                     }
                                     <td>@((Model.FirstYield * 100.0).ToString("0.00"))%</td>
                                 </tr>
@@ -140,7 +152,19 @@
                                     <th>Yield</th>
                                     @foreach (var item in Model.LastYields)
                                     {
-                                        <td>@((item.Yield * 100.0).ToString("0.00"))%</td>
+                                        if (!string.IsNullOrEmpty(item.StartDate)
+                                            && !string.IsNullOrEmpty(item.EndDate))
+                                        {
+                                            var sdate = DateTime.Parse(item.StartDate).ToString("yyyy-MM-dd");
+                                            var edate = DateTime.Parse(item.EndDate).ToString("yyyy-MM-dd");
+                                            var pjkey = Model.ProjectKey;
+                                            var site = item.WhichTest;
+                                            <td><a href="/Project/ProjectStations?pjkey=@(pjkey)&whichtest=@(site)&StartTime=@(sdate)&EndTime=@(edate)" target="_blank">@((item.Yield * 100.0).ToString("0.00"))%</a></td>
+                                        }
+                                        else
+                                        {
+                                            <td>@((item.Yield * 100.0).ToString("0.00"))%</td>
+                                        }
                                     }
                                     <td>@((Model.LastYield * 100.0).ToString("0.00"))%</td>
                                 </tr>

@@ -5,6 +5,15 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<link href="~/Content/videorecorder.css" rel="stylesheet" type="text/css" />
+<script src="~/Scripts/VideoRecorderJs-master/dist/VideoRecorderJS.min.js" type="text/javascript"></script>
+<script src="~/Scripts/MyVideoRecord.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+    $(function(){
+        MyVideoRecord.Init();
+    })
+</script>
 
 <div class="row">
     <div class="nav navbar-nav navbar-left">
@@ -229,8 +238,9 @@
                                                 <span class="btn btn-success btn-file" id="choosefile6" data-intro="Click to add attachment in description." data-step="4">
                                                     <strong>Editor Attachment </strong><input type="file" name="file6" id="file6" runat="server" onchange="ShowFileNames6(this)" />
                                                 </span>
+                                                
                                             </div>
-                                            <div class="col-xs-1"></div>
+                                            <div class="col-xs-1"><button class="btn btn-video maineditor-video" type="button"><span class="glyphicon glyphicon-facetime-video home-video-icon" style="text-align:center;"></span></button></div>
                                             <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
                                             <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
                                             <div class="col-xs-5"></div>
@@ -351,7 +361,46 @@
 
         </div>
 
+        @Html.Partial("~/Views/Shared/_VideoRecordModal.cshtml")
 
+        <script type="text/javascript">
+
+        $(function () {
+            $('body').on('click', '.m-video-upload', function () {
+                var videoblob = MyVideoRecord.GetVideoBlob();
+                var virec = MyVideoRecord.GetViRec();
+
+                if (videoblob) {
+                    var fd = new FormData();
+                    fd.append('fname', 'myvideo.webm');
+                    fd.append('data', videoblob);
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/Issue/UploadWebmVideoData',
+                        data: fd,
+                        processData: false,
+                        contentType: false
+                    }).done(function (output) {
+                        var wholeval = CKEDITOR.instances.CommentEditor.getData() + output.data;
+                        CKEDITOR.instances.CommentEditor.setData(wholeval);
+
+                        if (virec) {
+                            virec.clearRecording();
+                            MyVideoRecord.StopTheCountDown();
+                        }
+
+                        $('.mc-start').removeClass('hidden');
+                        $('#m-video-record').removeClass('hidden');
+                        $('#m-video-play').addClass('hidden');
+                        $('#m-video-play').attr('src', '');
+                        MyVideoRecord.SetViRec(null);
+                        $('#modal-video').modal('hide');
+                    });
+                }
+            })
+    })
+        </script>
 
 
 

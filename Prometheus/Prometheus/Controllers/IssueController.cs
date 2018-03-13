@@ -4429,5 +4429,58 @@ namespace Prometheus.Controllers
             res.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
             return res;
         }
+
+        public JsonResult UploadWebmVideoData()
+        {
+            foreach (string fl in Request.Files)
+            {
+                if (fl != null && Request.Files[fl].ContentLength > 0)
+                {
+                    string datestring = DateTime.Now.ToString("yyyyMMdd");
+                    string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+                    if (!Directory.Exists(imgdir))
+                    {
+                        Directory.CreateDirectory(imgdir);
+                    }
+
+                    var fn = "V" + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".webm";
+                    var onlyname = Path.GetFileNameWithoutExtension(fn);
+                    var srcvfile = imgdir + fn;
+                    Request.Files[fl].SaveAs(srcvfile);
+
+                    //var imgname = onlyname + ".jpg";
+                    //var imgpath = imgdir + imgname;
+                    //var ffMpeg = new NReco.VideoConverter.FFMpegConverter();
+                    //ffMpeg.GetVideoThumbnail(srcvfile, imgpath);
+
+                    //var oggname = onlyname + ".ogg";
+                    //var oggpath = imgdir + oggname;
+                    //var ffMpeg1 = new NReco.VideoConverter.FFMpegConverter();
+                    //ffMpeg1.ConvertMedia(srcvfile, oggpath, NReco.VideoConverter.Format.ogg);
+
+                    var mp4name = onlyname + ".mp4";
+                    var mp4path = imgdir + mp4name;
+                    var ffMpeg2 = new NReco.VideoConverter.FFMpegConverter();
+
+                    var setting = new NReco.VideoConverter.ConvertSettings();
+                    setting.VideoFrameRate = 30;
+                    setting.AudioSampleRate = 44100;
+
+                    ffMpeg2.ConvertMedia(srcvfile, NReco.VideoConverter.Format.webm, mp4path, NReco.VideoConverter.Format.mp4, setting);
+
+                    var url = "/userfiles/docs/" + datestring + "/" + mp4name;
+                    var videohtml = "<p><video width='640' height='480' controls src='" + url + "' type='video/mp4'>"
+                        + "Your browser does not support the video tag. </video></p>";
+
+                    var ret1 = new JsonResult();
+                    ret1.Data = new { data = videohtml };
+                    return ret1;
+                }
+            }
+            var ret = new JsonResult();
+            ret.Data = new { data = "<p></p>" };
+            return ret;
+        }
+
     }
 }

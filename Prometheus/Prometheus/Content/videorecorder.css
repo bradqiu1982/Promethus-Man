@@ -8,6 +8,13 @@
     background-color:#efefef;
 }
 
+.home-video-icon{
+    /*margin-top:17px;*/
+    width:80px;
+    font-size:20px!important;
+    color:#00B050;
+}
+
 .m-video-header{
     position: fixed;
     right: 5px;

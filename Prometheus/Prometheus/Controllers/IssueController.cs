@@ -4468,6 +4468,8 @@ namespace Prometheus.Controllers
 
                     ffMpeg2.ConvertMedia(srcvfile, NReco.VideoConverter.Format.webm, mp4path, NReco.VideoConverter.Format.mp4, setting);
 
+                    try { System.IO.File.Delete(srcvfile); } catch (Exception ex) { }
+
                     var url = "/userfiles/docs/" + datestring + "/" + mp4name;
                     var videohtml = "<p><video width='640' height='480' controls src='" + url + "' type='video/mp4'>"
                         + "Your browser does not support the video tag. </video></p>";

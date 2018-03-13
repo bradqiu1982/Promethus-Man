@@ -39,6 +39,7 @@ CKEDITOR.editorConfig = function( config ) {
     config.pasteFromWordRemoveFontStyles = false;
     config.ForcePasteAsPlainText = false;
     config.image_previewText = '';
-    config.filebrowserUploadUrl = '/userfiles/Upload.ashx?command=QuickUpload'
+    config.filebrowserUploadUrl = '/userfiles/Upload.ashx?command=QuickUpload';
+    config.extraPlugins = 'html5video';
 };
  

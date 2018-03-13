@@ -63,6 +63,10 @@
       <HintPath>..\packages\Microsoft.Office.Interop.Excel.15.0.4795.1000\lib\net20\Microsoft.Office.Interop.Excel.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
+    <Reference Include="NReco.VideoConverter, Version=1.1.2.0, Culture=neutral, PublicKeyToken=395ccb334978a0cd, processorArchitecture=MSIL">
+      <HintPath>..\packages\NReco.VideoConverter.1.1.2\lib\net20\NReco.VideoConverter.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Oracle.DataAccess, Version=4.112.4.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\oracle\odp.net\bin\4\Oracle.DataAccess.dll</HintPath>
@@ -426,6 +430,17 @@
     <Content Include="ckeditor\plugins\forms\dialogs\textarea.js" />
     <Content Include="ckeditor\plugins\forms\dialogs\textfield.js" />
     <Content Include="ckeditor\plugins\forms\images\hiddenfield.gif" />
+    <Content Include="ckeditor\plugins\html5video\dialogs\html5video.js" />
+    <Content Include="ckeditor\plugins\html5video\icons\html5video.png" />
+    <Content Include="ckeditor\plugins\html5video\lang\de.js" />
+    <Content Include="ckeditor\plugins\html5video\lang\en.js" />
+    <Content Include="ckeditor\plugins\html5video\lang\es.js" />
+    <Content Include="ckeditor\plugins\html5video\lang\eu.js" />
+    <Content Include="ckeditor\plugins\html5video\lang\fr.js" />
+    <Content Include="ckeditor\plugins\html5video\lang\ru.js" />
+    <Content Include="ckeditor\plugins\html5video\lang\uk.js" />
+    <Content Include="ckeditor\plugins\html5video\lang\uz.js" />
+    <Content Include="ckeditor\plugins\html5video\plugin.js" />
     <Content Include="ckeditor\plugins\icons.png" />
     <Content Include="ckeditor\plugins\icons_hidpi.png" />
     <Content Include="ckeditor\plugins\iframe\dialogs\iframe.js" />
@@ -700,6 +715,7 @@
     <Content Include="Content\images\PJ\REL.png" />
     <Content Include="Content\images\PJ\RMA.png" />
     <Content Include="Content\images\PJ\Spt.png" />
+    <Content Include="Content\images\PJ\station.png" />
     <Content Include="Content\images\PJ\Task.png" />
     <Content Include="Content\images\PJ\Yield.png" />
     <Content Include="Content\images\sort_asc.png" />
@@ -729,7 +745,11 @@
     <Content Include="Content\Layout.css" />
     <Content Include="Content\Login.css" />
     <Content Include="Content\projectstation.css" />
+    <Content Include="Scripts\autocompletefill.js" />
+    <Content Include="Scripts\exporting.js" />
     <Content Include="Scripts\FailureTimeDist.xml" />
+    <Content Include="Scripts\highcharts-more.js" />
+    <Content Include="Scripts\highcharts.js" />
     <Content Include="Scripts\jquery-autocomplete\jquery.auto-complete.css" />
     <Content Include="Scripts\jquery-autocomplete\jquery.auto-complete.js" />
     <Content Include="Scripts\jquery-autocomplete\jquery.auto-complete.min.js" />
@@ -885,16 +905,13 @@
     <Content Include="ckeditor\skins\moono-lisa\readme.md" />
     <None Include="Properties\PublishProfiles\Test.pubxml" />
     <Content Include="Scripts\burn_in_pn_list.xlsx" />
-    <Content Include="Scripts\highcharts-more.js" />
     <Content Include="Scripts\intro\arial-narrow_d0eb64ed2b91fe9a67f7800c1b14868b.ttf" />
     <Content Include="Scripts\intro\arial-narrow_d0eb64ed2b91fe9a67f7800c1b14868b.woff" />
     <Content Include="Scripts\25G_Wireless_TOSA_failure_code_map_file.xlsx" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
-    <Content Include="Scripts\exporting.js" />
     <Content Include="Scripts\HeartBeat.exe" />
     <Content Include="Scripts\heartbeat.txt" />
     <Content Include="Scripts\heatmap.js" />
-    <Content Include="Scripts\highcharts.js" />
     <Content Include="Scripts\HotMap.xml" />
     <Content Include="Scripts\intro\arial-narrow.css" />
     <Content Include="Scripts\BoxPlot.xml" />
@@ -960,11 +977,13 @@
     <Content Include="Scripts\NormalDistribution.xml" />
     <Content Include="Scripts\NormalDistribution1.xml" />
     <Content Include="Scripts\NormalDistributionCombine.xml" />
+    <Content Include="Scripts\oldie.js" />
     <Content Include="Scripts\ParetoChart.xml">
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Scripts\PieChart.xml" />
     <Content Include="Scripts\placeholders.min.js" />
+    <Content Include="Scripts\Prometheus.js" />
     <Content Include="Scripts\Promethus-db-script.txt" />
     <Content Include="Scripts\PromethusCfg.txt" />
     <Content Include="Scripts\respond.js" />
@@ -1157,6 +1176,7 @@
     <Content Include="Views\Shared\_LayoutLogin.cshtml" />
     <Content Include="Views\User\WeeklyReportShare.cshtml" />
     <Content Include="Views\Project\ProjectStations.cshtml" />
+    <Content Include="Views\Shared\_ProjectMenus.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

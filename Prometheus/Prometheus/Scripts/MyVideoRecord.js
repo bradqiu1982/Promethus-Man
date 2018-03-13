@@ -91,9 +91,11 @@
         $('body').on('click', '.video-close', function () {
             $('#modal-video').modal('hide');
             if (virec) {
-                virec.clearRecording();
+                //virec.clearRecording();
                 stopCountDown();
                 virec = null;
+                $('#m-video-play').attr('src', '');
+                $('#m-video-record').attr('src', '');
             }
         })
 

@@ -1494,6 +1494,10 @@ else
 
         $(function () {
             $('body').on('click', '.m-video-upload', function () {
+                $('.m-video-upload').addClass('hidden');
+                $('.mc-play').removeClass('hidden');
+                $(".m-video-loading").removeClass('hidden');
+
                 var videoblob = MyVideoRecord.GetVideoBlob();
                 var virec = MyVideoRecord.GetViRec();
 
@@ -1517,8 +1521,8 @@ else
                             MyVideoRecord.StopTheCountDown();
                         }
 
-                        $('.mc-start').removeClass('hidden');
-                        $('#m-video-record').removeClass('hidden');
+                        //$('.mc-start').removeClass('hidden');
+                        //$('#m-video-record').removeClass('hidden');
                         $('#m-video-play').addClass('hidden');
                         $('#m-video-play').attr('src', '');
                         $('#m-video-record').attr('src', '');

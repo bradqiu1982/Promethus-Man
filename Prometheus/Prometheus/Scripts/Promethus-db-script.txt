@@ -1372,3 +1372,13 @@ CREATE TABLE [dbo].[IssueRelationShip](
 	[SlaveIssueKey] [nvarchar](50) NOT NULL,
 	[CreateTime] [datetime] NOT NULL
 ) ON [PRIMARY]
+
+
+CREATE TABLE [dbo].[TechVideoVM] (
+    [VID]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[VSubject]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[VDescription]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[VPath]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[Updater]   NVARCHAR (200) DEFAULT ('') NOT NULL
+	);

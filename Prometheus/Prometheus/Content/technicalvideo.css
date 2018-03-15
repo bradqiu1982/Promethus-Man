@@ -1,0 +1,159 @@
+﻿
+.Tvideo-container {
+    height: 420px;
+    border-top: 1px #aaa solid;
+    border-left: 1px #aaa solid;
+    border-right: 1px #aaa solid;
+}
+
+.item-show{
+    margin-left: 5px;
+}
+
+.item-panels{
+    height: 100%;
+    width:37.2%;
+    padding-left:8px;
+    padding-right:8px;
+    border-right: 1px #aaa solid;
+
+    display: inline-block;
+}
+
+.item-details-show{
+    min-height:400px;
+    width:61.8%;
+    display: inline-block;
+}
+
+.item-panel{
+    min-height: 100px;
+    margin-top: 10px;
+    border: 1px #aaa solid;
+    border-left-width: 5px;
+}
+
+.item-panel-active{
+    min-height: 100px;
+    margin-top: 5px;
+    border: 1px #337ab7 solid;
+    border-left-width: 5px;
+}
+
+.item-details{
+    height: 100%;
+    padding-top: 10px;
+    border-left: 1px #aaa solid;
+}
+
+.item-title{
+    padding: 5px;
+    background-color: #eee;
+    border-bottom: 1px #aaa dashed;
+}
+
+.item-name{
+    display: inline-block;
+    width: 50%;
+}
+
+.item-content {
+    cursor:pointer;
+}
+
+.item-op{
+    display: inline-block;
+    float: right;
+}
+
+.item-content{
+    padding: 5px;
+}
+
+.item-date{
+    display: inline-block;
+    width: 50%
+}
+
+.item-panel-toolbar {
+    min-height: 35px;
+    margin-top: 5px;
+}
+
+.toolbar-img{
+    height: 20px;
+    width: 20px;
+    margin: 5px;
+}
+.search-input {
+    width:85%;
+    display:inline-block;
+}
+
+.search-img{
+    width: 30px;
+    height: 30px;
+    background-color: #5C2576; 
+    opacity: 0.8;
+    -moz-opacity: 0.8;
+    filter: alpha(opacity=80);
+    cursor: pointer;
+    display:inline-block;
+}
+
+.search-video{
+    width:80%;
+    display:inline-block;
+    height:30px;
+    float:right;
+    text-align:right;
+}
+
+.add-video-btn {
+    display:inline-block;
+    width: 30px;
+    height: 30px;
+    background-color: #00539F; 
+    opacity: 0.8;
+    -moz-opacity: 0.8;
+    filter: alpha(opacity=80);
+    cursor: pointer;
+    float:right;
+    margin-left:2px;
+}
+.search-keywords{
+    width:100%;
+    height: 30px;
+    padding-left: 5px;
+    padding-right: 5px;
+    border: #5C2576 1px solid;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius:  3px;
+    background-color: transparent;
+}
+
+.upload-video-container {
+    margin-top:10px;
+    height:230px;
+}
+
+.upload-video-footer{
+    margin: -30px -15px -15px -15px;
+    height: 60px;
+    padding: 10px;
+    border-top: 1px #aaa solid;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    background-color: #afafaf;
+    opacity: 0.8;
+}
+
+.upload-play {
+    text-align:center;
+}
+
+.upload-video-op{
+    height: 40px;
+    width: 40px;
+    cursor:pointer;
+}

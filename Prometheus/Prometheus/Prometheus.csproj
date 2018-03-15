@@ -251,6 +251,7 @@
     <Compile Include="Models\SameAsDBTVM.cs" />
     <Compile Include="Models\ShareDocVM.cs" />
     <Compile Include="Models\MYStaticFileModule.cs" />
+    <Compile Include="Models\TechVideoVM.cs" />
     <Compile Include="Models\UserBlogVM.cs" />
     <Compile Include="Models\UserCacheVM.cs" />
     <Compile Include="Models\UserGroupVM.cs" />
@@ -688,6 +689,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Content\images\add_column.png" />
+    <Content Include="Content\images\end.png" />
     <Content Include="Content\images\favicon.ico" />
     <Content Include="Content\images\FinisarBuilding.jpg" />
     <Content Include="Content\images\FinisarLogo.jpg" />
@@ -718,11 +721,13 @@
     <Content Include="Content\images\PJ\station.png" />
     <Content Include="Content\images\PJ\Task.png" />
     <Content Include="Content\images\PJ\Yield.png" />
+    <Content Include="Content\images\search.png" />
     <Content Include="Content\images\sort_asc.png" />
     <Content Include="Content\images\sort_asc_disabled.png" />
     <Content Include="Content\images\sort_both.png" />
     <Content Include="Content\images\sort_desc.png" />
     <Content Include="Content\images\sort_desc_disabled.png" />
+    <Content Include="Content\images\start.png" />
     <Content Include="Content\images\ucicon\Assigned2MeIcons.png" />
     <Content Include="Content\images\ucicon\IAssignedIcons.png" />
     <Content Include="Content\images\ucicon\IBlogIcons.png" />
@@ -732,6 +737,7 @@
     <Content Include="Content\images\ucicon\IProjectIcons.png" />
     <Content Include="Content\images\ucicon\ITagIcons.png" />
     <Content Include="Content\images\ucicon\MystautesIcons.png" />
+    <Content Include="Content\images\upload.png" />
     <Content Include="Content\images\usercenter\Assign2Me.png" />
     <Content Include="Content\images\usercenter\IAssigned.png" />
     <Content Include="Content\images\usercenter\IBlog.png" />
@@ -741,10 +747,13 @@
     <Content Include="Content\images\usercenter\IProject.png" />
     <Content Include="Content\images\usercenter\ITag.png" />
     <Content Include="Content\images\usercenter\MyStatus.png" />
+    <Content Include="Content\images\videoloading.gif" />
     <Content Include="Content\jsmind.css" />
     <Content Include="Content\Layout.css" />
     <Content Include="Content\Login.css" />
     <Content Include="Content\projectstation.css" />
+    <Content Include="Content\technicalvideo.css" />
+    <Content Include="Content\videorecorder.css" />
     <Content Include="Scripts\autocompletefill.js" />
     <Content Include="Scripts\exporting.js" />
     <Content Include="Scripts\FailureTimeDist.xml" />
@@ -974,6 +983,7 @@
     <Content Include="Scripts\moment-with-locales.min.js" />
     <Content Include="Scripts\moment.js" />
     <Content Include="Scripts\moment.min.js" />
+    <Content Include="Scripts\MyVideoRecord.js" />
     <Content Include="Scripts\NormalDistribution.xml" />
     <Content Include="Scripts\NormalDistribution1.xml" />
     <Content Include="Scripts\NormalDistributionCombine.xml" />
@@ -990,6 +1000,9 @@
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\StandardPJList.txt" />
     <Content Include="Scripts\SuperYield.xml" />
+    <Content Include="Scripts\technicalvideo.js" />
+    <Content Include="Scripts\VideoRecorderJs-master\dist\recorderWorker.js" />
+    <Content Include="Scripts\VideoRecorderJs-master\dist\VideoRecorderJS.min.js" />
     <Content Include="Scripts\weeklyreport.js" />
     <Content Include="Scripts\_references.js" />
     <Content Include="Scripts\ColumnChart.xml" />
@@ -1177,6 +1190,8 @@
     <Content Include="Views\User\WeeklyReportShare.cshtml" />
     <Content Include="Views\Project\ProjectStations.cshtml" />
     <Content Include="Views\Shared\_ProjectMenus.cshtml" />
+    <Content Include="Views\Shared\_VideoRecordModal.cshtml" />
+    <Content Include="Views\User\TechnicalVideo.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

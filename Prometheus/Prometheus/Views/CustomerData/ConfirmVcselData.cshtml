@@ -1,9 +1,24 @@
 ﻿@model IEnumerable<IEnumerable<string>>
         
 @{
-        ViewBag.Title = "ConfirmVcselData";
-        Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "ConfirmVcselData";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var vcseldata = new List<List<string>>();
+    var colcount = 12;
+    if (Model != null)
+    {
+        foreach (var line in Model)
+        {
+            var templist = new List<string>();
+            for (var idx = 0; idx < colcount; idx++)
+            {
+                templist.Add(line.ElementAt(idx));
+            }
+            vcseldata.Add(templist);
+        }
     }
+
+}
 
 
 <div class="row">
@@ -24,10 +39,10 @@
     @using (Html.BeginForm("ConfirmVcselData", "CustomerData", FormMethod.Post, new { enctype = "multipart/form-data" }))
     {
         @Html.AntiForgeryToken()
-        if (Model != null && Model.Count() > 0)
+        if (vcseldata.Count > 0)
         {
             <input class="form-control" id="rowcount" name="rowcount" value="@ViewBag.ROWCOUNT" type="hidden" />
-            <input class="form-control" id="colcount" name="colcount" value="@ViewBag.COLCOUNT" type="hidden" />
+            <input class="form-control" id="colcount" name="colcount" value="@colcount" type="hidden" />
 
             var rowcnt = 0;
             var colcnt = 0;
@@ -40,7 +55,7 @@
 
                             <thead class="header">
                                 <tr>
-                                    @foreach (var item in Model.ElementAt(0))
+                                    @foreach (var item in vcseldata[0])
                                     {
                                         <th>
                                             
@@ -52,9 +67,9 @@
                             </thead>
 
                             <tbody>
-                                @foreach (var line in Model)
+                                @foreach (var line in vcseldata)
                                 {
-                                    if (string.IsNullOrEmpty(line.ElementAt(1).Trim()) || line.Count() != 12)
+                                    if (string.IsNullOrEmpty(line[1].Trim()) || line.Count() != 12)
                                     {
                                         continue;
                                     }

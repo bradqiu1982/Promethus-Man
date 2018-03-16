@@ -16,8 +16,8 @@
     padding-left:8px;
     padding-right:8px;
     border-right: 1px #aaa solid;
-
     display: inline-block;
+    overflow-y: auto;
 }
 
 .item-details-show{

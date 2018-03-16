@@ -19,6 +19,15 @@
             }
         });
 
+        $('body').on('click', '.item-content', function () {
+            var vid = $(this).attr("videoid");
+            if (vid) {
+                window.location.href = '/User/TechnicalVideo?activeid=' + vid;
+            }
+        });
+
+        
+
         $('body').on('click', '.add-video-btn', function () {
             $("#add-video-modal").modal({ backdrop: 'static' });
         });

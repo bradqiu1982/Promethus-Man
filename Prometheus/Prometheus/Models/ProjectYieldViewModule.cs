@@ -918,6 +918,10 @@ namespace Prometheus.Models
             var ret = new List<ProjectYieldViewModule>();
 
             var pvm = ProjectViewModels.RetrieveOneProject(pjkey);
+            if (pvm == null)
+            {
+                return ret;
+            }
             var  ldate = RetrieveDateSpanByWeek(pvm.StartDate.ToString(), DateTime.Now.ToString());
 
             var startidx = 0;

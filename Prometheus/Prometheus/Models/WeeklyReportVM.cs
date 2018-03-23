@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 
 namespace Prometheus.Models
 {
@@ -109,17 +110,17 @@ namespace Prometheus.Models
 
         public static List<WeeklyReportVM> GetSummary(string iKey)
         {
-            var sql = "select ID, UserName, ProjectKey, IssueKey, Summary, Type, Year, Week, "+
-                "Mark, Status, CreateTime, UpdateTime "+
-                "from WeeklyReport "+
-                "where IssueKey = N'<IssueKey>' "+ 
+            var sql = "select ID, UserName, ProjectKey, IssueKey, Summary, Type, Year, Week, " +
+                "Mark, Status, CreateTime, UpdateTime " +
+                "from WeeklyReport " +
+                "where IssueKey = N'<IssueKey>' " +
                 "and Status = '<Status>' " +
                 "and (Summary <> '' or Summary <> null)" +
                 "order by UpdateTime Desc; ";
             sql = sql.Replace("<IssueKey>", iKey).Replace("<Status>", SummaryStatus.Valid.ToString());
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             var ret = new List<WeeklyReportVM>();
-            foreach(var line in dbret)
+            foreach (var line in dbret)
             {
                 ret.Add(new WeeklyReportVM(
                     Convert.ToString(line[0]),
@@ -141,7 +142,7 @@ namespace Prometheus.Models
 
         public static void SaveWeeklyReport(List<WeeklyReportVM> report)
         {
-            foreach(var rep in report)
+            foreach (var rep in report)
             {
                 var s_sql = "select Summary, Mark from WeeklyReport " +
                         "where ProjectKey = @ProjectKey " +
@@ -150,13 +151,13 @@ namespace Prometheus.Models
                         "and Type = @Type and UserName = @UserName " +
                         "and Status = @Status;";
                 var param = new Dictionary<string, string>();
-                    param.Add("@ProjectKey", rep.ProjectKey);
-                    param.Add("@IssueKey", rep.IssueKey);
-                    param.Add("@Year", rep.Year);
-                    param.Add("@Week", rep.Week);
-                    param.Add("@Type", rep.Type);
-                    param.Add("@UserName", rep.UserName);
-                    param.Add("@Status", SummaryStatus.Valid.ToString());
+                param.Add("@ProjectKey", rep.ProjectKey);
+                param.Add("@IssueKey", rep.IssueKey);
+                param.Add("@Year", rep.Year);
+                param.Add("@Week", rep.Week);
+                param.Add("@Type", rep.Type);
+                param.Add("@UserName", rep.UserName);
+                param.Add("@Status", SummaryStatus.Valid.ToString());
                 var exist_data = DBUtility.ExeLocalSqlWithRes(s_sql, null, param);
                 if (exist_data.Count == 1 && string.Compare(exist_data[0][0].ToString(), rep.Summary) == 0
                     && string.Compare(exist_data[0][1].ToString(), rep.Mark) == 0)
@@ -165,7 +166,7 @@ namespace Prometheus.Models
                 }
                 else
                 {
-                    if(exist_data.Count > 0)
+                    if (exist_data.Count > 0)
                     {
                         var sqltmp = "update WeeklyReport set Status = @DelStatus " +
                             "where ProjectKey = @ProjectKey " +
@@ -174,14 +175,14 @@ namespace Prometheus.Models
                             "and Type = @Type and UserName = @UserName " +
                             "and Status = @Status;";
                         var param1 = new Dictionary<string, string>();
-                            param1.Add("@DelStatus", SummaryStatus.Delete.ToString());
-                            param1.Add("@ProjectKey", rep.ProjectKey);
-                            param1.Add("@IssueKey", rep.IssueKey);
-                            param1.Add("@Year", rep.Year);
-                            param1.Add("@Week", rep.Week);
-                            param1.Add("@Type", rep.Type);
-                            param1.Add("@UserName", rep.UserName);
-                            param1.Add("@Status", SummaryStatus.Valid.ToString());
+                        param1.Add("@DelStatus", SummaryStatus.Delete.ToString());
+                        param1.Add("@ProjectKey", rep.ProjectKey);
+                        param1.Add("@IssueKey", rep.IssueKey);
+                        param1.Add("@Year", rep.Year);
+                        param1.Add("@Week", rep.Week);
+                        param1.Add("@Type", rep.Type);
+                        param1.Add("@UserName", rep.UserName);
+                        param1.Add("@Status", SummaryStatus.Valid.ToString());
                         DBUtility.ExeLocalSqlNoRes(sqltmp, param1);
                     }
                     var sql = @"insert into WeeklyReport (UserName, ProjectKey, IssueKey, 
@@ -190,17 +191,17 @@ namespace Prometheus.Models
                                 @IssueKey, @Summary, @Type, @Year, @Week, @Mark,
                                 @Status, @CreateTime, @UpdateTime); ";
                     var param2 = new Dictionary<string, string>();
-                        param2.Add("@UserName", rep.UserName);
-                        param2.Add("@ProjectKey", rep.ProjectKey);
-                        param2.Add("@IssueKey", rep.IssueKey);
-                        param2.Add("@Summary", rep.Summary);
-                        param2.Add("@Type", rep.Type);
-                        param2.Add("@Year", rep.Year);
-                        param2.Add("@Week", rep.Week);
-                        param2.Add("@Mark", rep.Mark);
-                        param2.Add("@Status", rep.Status);
-                        param2.Add("@CreateTime", rep.CreateTime);
-                        param2.Add("@UpdateTime", rep.UpdateTime);
+                    param2.Add("@UserName", rep.UserName);
+                    param2.Add("@ProjectKey", rep.ProjectKey);
+                    param2.Add("@IssueKey", rep.IssueKey);
+                    param2.Add("@Summary", rep.Summary);
+                    param2.Add("@Type", rep.Type);
+                    param2.Add("@Year", rep.Year);
+                    param2.Add("@Week", rep.Week);
+                    param2.Add("@Mark", rep.Mark);
+                    param2.Add("@Status", rep.Status);
+                    param2.Add("@CreateTime", rep.CreateTime);
+                    param2.Add("@UpdateTime", rep.UpdateTime);
 
                     DBUtility.ExeLocalSqlNoRes(sql, param2);
                 }
@@ -404,7 +405,7 @@ namespace Prometheus.Models
             var sql = "select ID from WeeklyReportSetting where UserName = '<UserName>'";
             sql = sql.Replace("<UserName>", setting.UserName);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
-            if(dbret.Count > 0)
+            if (dbret.Count > 0)
             {
                 var updatesql = "update WeeklyReportSetting set Yield = '<Yield>', "
                             + "ICare = '<ICare>', Task = '<Task>', CriticalFailure = '<CriticalFailure>', "
@@ -458,9 +459,251 @@ namespace Prometheus.Models
             IsUpdate = isupdate;
             TaskList = tasklist;
         }
-        
+
         public bool IsUpdate { set; get; }
 
         public Dictionary<string, TaskData> TaskList { set; get; }
+    }
+
+    public class KPIVM
+    {
+        public KPIVM()
+        {
+            UserName = "";
+            Task = 0;
+            CriticalTask = 0;
+            Bug = 0;
+            RMA = 0;
+            DebugTree = 0;
+        }
+        public string UserName { set; get; }
+        public double Task { set; get; }
+        public double CriticalTask { set; get; }
+        public double Bug { set; get; }
+        public double RMA { set; get; }
+        public double DebugTree { set; get; }
+
+        public static Dictionary<string, KPIVM> GetAllKPI(Controller ctrl, List<string> uName = null, string sDate = "", string eDate = "", int period = 1)
+        {
+            var res_task = GetKPI(uName, sDate, eDate, period);
+            var avg = GetGroupAvg(ctrl, sDate, eDate);
+
+            res_task.Add("h_avg", avg["h_avg"]);
+            res_task.Add("y_avg", avg["y_avg"]);
+
+            return res_task;
+        }
+
+        public static Dictionary<string, KPIVM> GetKPI(List<string> uName = null, string sDate = "", string eDate = "", int period = 1)
+        {
+            if (string.IsNullOrEmpty(sDate))
+            {
+                sDate = (period == 1) ? DateTime.Now.AddYears(-1).ToString("yyyy-MM-dd 00:00:00") : DateTime.Now.AddMonths(-6).ToString("yyyy-MM-dd 00:00:00");
+            }
+            if (string.IsNullOrEmpty(eDate))
+            {
+                eDate = DateTime.Now.ToString("yyyy-MM-dd 23:59:59");
+            }
+            var res_task = GetTasks(uName, sDate, eDate);
+            var res_debug = GetDebugTree(uName, sDate, eDate);
+
+            foreach (var item in uName)
+            {
+                if (res_task.ContainsKey(item))
+                {
+                    if (res_debug.ContainsKey(item))
+                    {
+                        res_task[item].DebugTree = res_debug[item].DebugTree;
+                    }
+                }
+                else
+                {
+                    var tmp = new KPIVM();
+                    if (res_debug.ContainsKey(item))
+                    {
+                        tmp.DebugTree = res_debug[item].DebugTree;
+                    }
+                    res_task.Add(item, tmp);
+                }
+            }
+
+            return res_task;
+        }
+
+        public static Dictionary<string, KPIVM> GetTasks(List<string> uName = null, string sDate = "", string eDate = "")
+        {
+            var param = new Dictionary<string, string>();
+            var sql = @"select i.Assignee, it.IssueSubType, count(*) as cnt 
+                        from issue as i 
+                        left join IssueType as it on i.IssueKey = it.IssueKey 
+                        where i.APVal1 <> 'delete'
+                        and i.Resolution in (@Fixed, @NotFix, @Done)  ";
+
+            param.Add("@Fixed", Resolute.Fixed);
+            param.Add("@NotFix", Resolute.NotFix);
+            param.Add("@Done", Resolute.Done);
+            if (uName != null)
+            {
+                var arr_name = new List<string>();
+                var idx = 0;
+                foreach (var item in uName)
+                {
+                    arr_name.Add("@uName" + idx);
+                    param.Add("@uName" + idx, item);
+                    idx++;
+                }
+                sql += " and i.Assignee in (" + string.Join(",", arr_name.ToArray()) + ")";
+            }
+            if (!string.IsNullOrEmpty(sDate))
+            {
+                sql += " and i.ResolvedDate >= @sDate ";
+                param.Add("@sDate", sDate);
+            }
+
+            if (!string.IsNullOrEmpty(eDate))
+            {
+                sql += " and i.ResolvedDate <= @eDate ";
+                param.Add("@eDate", eDate);
+            }
+            sql += " group by i.Assignee, it.IssueSubType order by Assignee; ";
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
+            var res = new Dictionary<string, KPIVM>();
+            if (dbret.Count > 0)
+            {
+                foreach (var item in dbret)
+                {
+                    if (res.ContainsKey(Convert.ToString(item[0])))
+                    {
+                        if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.Task)
+                        {
+                            res[Convert.ToString(item[0])].Task = Convert.ToDouble(item[2]);
+                        }
+                        else if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.CrititalFailureTask)
+                        {
+                            res[Convert.ToString(item[0])].CriticalTask = Convert.ToDouble(item[2]);
+                        }
+                        else if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.Bug || Convert.ToInt32(item[1]) == ISSUESUBTYPE.NonCrititalFailureTask)
+                        {
+                            res[Convert.ToString(item[0])].Bug = Convert.ToDouble(item[2]);
+                        }
+                        else if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.RMA)
+                        {
+                            res[Convert.ToString(item[0])].RMA = Convert.ToDouble(item[2]);
+                        }
+                    }
+                    else
+                    {
+                        var kpi_tmp = new KPIVM();
+                        kpi_tmp.UserName = Convert.ToString(item[0]);
+                        if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.Task)
+                        {
+                            kpi_tmp.Task = Convert.ToDouble(item[2]);
+                        }
+                        else if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.CrititalFailureTask)
+                        {
+                            kpi_tmp.CriticalTask = Convert.ToDouble(item[2]);
+                        }
+                        else if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.Bug || Convert.ToInt32(item[1]) == ISSUESUBTYPE.NonCrititalFailureTask)
+                        {
+                            kpi_tmp.Bug = Convert.ToDouble(item[2]);
+                        }
+                        else if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.RMA)
+                        {
+                            kpi_tmp.RMA = Convert.ToDouble(item[2]);
+                        }
+                        res.Add(Convert.ToString(item[0]), kpi_tmp);
+                    }
+                }
+            }
+            return res;
+        }
+
+        public static Dictionary<string, KPIVM> GetDebugTree(List<string> uName = null, string sDate = "", string eDate = "")
+        {
+            var param = new Dictionary<string, string>();
+            var sql = @"select Reporter, count(*) as cnt 
+                from (
+                    select distinct(AnalyzeID), Reporter, CommentDate 
+                    from ErrorComments 
+                    where APVal1 <> 'delete' and AnalyzeID <> '' and Reporter <> '' ";
+            if (uName != null)
+            {
+                var arr_name = new List<string>();
+                var idx = 0;
+                foreach (var item in uName)
+                {
+                    arr_name.Add("@Reporter" + idx);
+                    param.Add("@Reporter" + idx, item);
+                    idx++;
+                }
+                sql += " and Reporter in (" + string.Join(",", arr_name.ToArray()) + ")";
+            }
+            if (!string.IsNullOrEmpty(sDate))
+            {
+                sql += " and CommentDate >= @sDate ";
+                param.Add("@sDate", sDate);
+            }
+
+            if (!string.IsNullOrEmpty(eDate))
+            {
+                sql += " and CommentDate <= @eDate ";
+                param.Add("@eDate", eDate);
+            }
+            sql += " ) tmp_a group by Reporter order by Reporter; ";
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
+            var res = new Dictionary<string, KPIVM>();
+            if(dbret.Count > 0)
+            {
+                foreach (var item in dbret)
+                {
+                    var kpi_tmp = new KPIVM();
+                    kpi_tmp.UserName = Convert.ToString(item[0]);
+                    kpi_tmp.DebugTree = Convert.ToDouble(item[1]);
+                    res.Add(Convert.ToString(item[0]), kpi_tmp);
+                }
+            }
+            return res;
+        }
+
+        public static Dictionary<string, KPIVM> GetGroupAvg(Controller ctrl, string sDate, string eDate)
+        {
+            var syscfg = CfgUtility.GetSysConfig(ctrl);
+            var ulist = syscfg["KPIGROUP1"].ToUpper().Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            var half_data = GetKPI(ulist, sDate, eDate, 0);
+            var year_data = GetKPI(ulist, sDate, eDate, 1);
+
+            var half_avg = GetAvg(half_data);
+            var year_avg = GetAvg(year_data);
+
+            var res = new Dictionary<string, KPIVM>();
+            res.Add("h_avg", half_avg);
+            res.Add("y_avg", year_avg);
+            return res;
+        }
+
+        public static KPIVM GetAvg(Dictionary<string, KPIVM> data)
+        {
+            var u_cnt = data.Count();
+            var total = new KPIVM();
+            foreach(var user in data)
+            {
+                total.Task += user.Value.Task;
+                total.CriticalTask += user.Value.CriticalTask;
+                total.Bug += user.Value.Bug;
+                total.RMA += user.Value.RMA; 
+                total.DebugTree += user.Value.DebugTree;
+            }
+            var res = new KPIVM();
+            res.Task = Math.Round(total.Task / u_cnt, 4);
+            res.CriticalTask = Math.Round(total.CriticalTask / u_cnt, 4);
+            res.Bug = Math.Round(total.Bug / u_cnt, 4);
+            res.RMA = Math.Round(total.RMA / u_cnt, 4);
+            res.DebugTree = Math.Round(total.DebugTree / u_cnt, 4);
+
+            return res;
+        }
     }
 }

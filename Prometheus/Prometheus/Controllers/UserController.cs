@@ -3465,5 +3465,33 @@ namespace Prometheus.Controllers
             return RedirectToAction("TechnicalVideo", "User");
         }
 
+
+        public ActionResult GetKPI(string uName="", string sDate = "", string eDate = "")
+        {
+            var ulist = new List<string>();
+            if (!string.IsNullOrEmpty(uName))
+            {
+                ulist = uName.ToUpper().Split(new char[] { ';' }).ToList();
+            }
+            else
+            {
+                var syscfg = CfgUtility.GetSysConfig(this);
+                ulist = syscfg["KPIGROUP2"].ToUpper().Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            }
+
+            ViewBag.uName = uName;
+            ViewBag.sDate = sDate;
+            ViewBag.eDate = eDate;
+            ViewBag.flg = 0;
+            ViewBag.data1 = KPIVM.GetAllKPI(this, ulist, sDate, eDate);
+            if(string.IsNullOrEmpty(sDate) && string.IsNullOrEmpty(eDate))
+            {
+                ViewBag.flg = 1;
+                ViewBag.data2 = KPIVM.GetAllKPI(this, ulist, sDate, eDate, 0);
+            }
+
+            return View();
+        }
+
     }
 }

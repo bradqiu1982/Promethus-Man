@@ -43,7 +43,7 @@
 
             var vfn = $('#attachmentupload').val();
             var ext = vfn.substr((vfn.lastIndexOf('.') + 1)).toLowerCase();
-            if (".mp4,.mp3,.h264,.wmv,.wav,.avi,.flv,.mov,.mkv,.webm,.ogg".indexOf(ext) == -1)
+            if (".mp4,.mp3,.h264,.wmv,.wav,.avi,.flv,.mov,.mkv,.webm,.ogg,.mov,.mpg".indexOf(ext) == -1)
             {
                 alert('A video file is necessary!')
                 return false;

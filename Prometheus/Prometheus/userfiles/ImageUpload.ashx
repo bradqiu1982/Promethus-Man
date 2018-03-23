@@ -18,7 +18,7 @@ public class ImageUpload : IHttpHandler {
 
             var ext = Path.GetExtension(tempfn).ToLower();
             var allitype = ".jpg,.png,.gif,.jpeg";
-            var allvtype = ".mp4,.mp3,.h264,.wmv,.wav,.avi,.flv,.mov,.mkv,.webm,.ogg";
+            var allvtype = ".mp4,.mp3,.h264,.wmv,.wav,.avi,.flv,.mov,.mkv,.webm,.ogg,.mov,.mpg";
 
             if (allitype.Contains(ext))
             {
@@ -76,6 +76,7 @@ public class ImageUpload : IHttpHandler {
                     var mp4path = imgdir + mp4name;
                     var ffMpeg2 = new NReco.VideoConverter.FFMpegConverter();
                     ffMpeg2.ConvertMedia(srcvfile, mp4path, NReco.VideoConverter.Format.mp4);
+                    try { System.IO.File.Delete(srcvfile); } catch (Exception ex) { }
                 }
 
                 url = "/userfiles/docs/" + datestring + "/" + onlyname;

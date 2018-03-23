@@ -3407,7 +3407,7 @@ namespace Prometheus.Controllers
                             .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
 
                         var ext = Path.GetExtension(fn).ToLower();
-                        var allvtype = ".mp4,.mp3,.h264,.wmv,.wav,.avi,.flv,.mov,.mkv,.webm,.ogg";
+                        var allvtype = ".mp4,.mp3,.h264,.wmv,.wav,.avi,.flv,.mov,.mkv,.webm,.ogg,.mov,.mpg";
 
                         if (allvtype.Contains(ext))
                         {

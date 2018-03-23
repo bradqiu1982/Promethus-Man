@@ -26,7 +26,7 @@
 </script>
 
 <div class="Tvideo-container row">
-    <div class="col-sm-3 item-panels">
+    <div class="col-sm-3 item-panels" >
 
         <div class="item-panel-toolbar">
             @if (!string.IsNullOrEmpty(ViewBag.updater))
@@ -69,7 +69,7 @@
                 </div>
 
                 <div class="item-content" videoid="@item.VID">
-                    <div class="item-date">2018-03-05</div>
+                    <div class="item-date">@item.UpdateTime</div>
                 </div>
                 <div class="item-content" videoid="@item.VID">
                     <div>@item.VSubject</div>

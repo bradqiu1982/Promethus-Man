@@ -3493,5 +3493,13 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        public JsonResult GetUsers()
+        {
+            var allusers = UserViewModels.RetrieveAllUser();
+            var res = new JsonResult();
+            res.Data = new { success = true, data = allusers };
+
+            return res;
+        }
     }
 }

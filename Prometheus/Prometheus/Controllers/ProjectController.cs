@@ -6155,6 +6155,44 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        public ActionResult RefreshCache()
+        {
+            var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();
+            //heartbeatlog("refresh cache");
+            try
+            {
+                var ckeylist = new List<string>();
+
+                var mycache = HttpContext.Cache;
+                var cacheitem = mycache.GetEnumerator();
+                while (cacheitem.MoveNext())
+                {
+                    var ckey = Convert.ToString(cacheitem.Key);
+                    ckeylist.Add(ckey);
+                }
+
+                foreach (var ckey in ckeylist)
+                {
+                    if (ckey.Contains("_CUST"))
+                    {
+                        mycache.Remove(ckey);
+                    }
+                }
+
+                foreach (var pjkey in pjkeylist)
+                {
+                    ProjectYieldViewModule.GetYieldByWeeks(pjkey, mycache, 4);
+                }
+                _viewallprivate();
+            }
+            catch (Exception ex)
+            { }
+
+            //heartbeatlog("refresh cache end");
+
+            return RedirectToAction("ViewAll", "Project");
+        }
+
         private static void logjoinfo(string info)
         {
             var filename = "d:\\log\\updatejo-" + DateTime.Now.ToString("yyyy-MM-dd");

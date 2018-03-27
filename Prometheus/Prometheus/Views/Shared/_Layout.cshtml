@@ -346,6 +346,12 @@
                                             @Html.ActionLink("User Shared Info", "UserSharedInfo", "User")
                                         }
                                     </li>
+                                    <li>
+                                        @if ((ViewBag.IsSuper != null && ViewBag.IsSuper) || (ViewBag.IsManage != null && ViewBag.IsManage))
+                                        {
+                                            @Html.ActionLink("KPI Summary", "GetKPI", "User")
+                                        }
+                                    </li>
                                 </ul>
                             </li>
                         </ul>

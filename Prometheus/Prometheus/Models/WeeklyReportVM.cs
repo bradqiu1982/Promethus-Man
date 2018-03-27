@@ -475,15 +475,21 @@ namespace Prometheus.Models
             Bug = 0;
             RMA = 0;
             DebugTree = 0;
-            RMAWorking = 0;
+            TaskAll = 0;
+            CriticalTaskAll = 0;
+            BugAll = 0;
+            RMAAll = 0;
         }
         public string UserName { set; get; }
         public double Task { set; get; }
+        public double TaskAll { set; get; }
         public double CriticalTask { set; get; }
+        public double CriticalTaskAll { set; get; }
         public double Bug { set; get; }
+        public double BugAll { set; get; }
         public double RMA { set; get; }
+        public double RMAAll { set; get; }
         public double DebugTree { set; get; }
-        public double RMAWorking { set; get; }
         public double ShareDocument { set; get; }
 
 
@@ -554,6 +560,8 @@ namespace Prometheus.Models
             }
             var res_task = GetTasks(uName, sDate, eDate);
             var res_debug = GetDebugTree(uName, sDate, eDate);
+            var allTasks = GetAllTasks(uName, sDate, eDate);
+            var sharedoc = GetShareDoc(uName, sDate, eDate);
 
             foreach (var item in uName)
             {
@@ -563,6 +571,17 @@ namespace Prometheus.Models
                     {
                         res_task[item].DebugTree = res_debug[item].DebugTree;
                     }
+                    if (allTasks.ContainsKey(item))
+                    {
+                        res_task[item].TaskAll = allTasks[item].TaskAll;
+                        res_task[item].CriticalTaskAll = allTasks[item].CriticalTaskAll;
+                        res_task[item].BugAll = allTasks[item].BugAll;
+                        res_task[item].RMAAll = allTasks[item].RMAAll;
+                    }
+                    if (sharedoc.ContainsKey(item))
+                    {
+                        res_task[item].ShareDocument = sharedoc[item];
+                    }
                 }
                 else
                 {
@@ -570,6 +589,17 @@ namespace Prometheus.Models
                     if (res_debug.ContainsKey(item))
                     {
                         tmp.DebugTree = res_debug[item].DebugTree;
+                    }
+                    if (allTasks.ContainsKey(item))
+                    {
+                        tmp.TaskAll = allTasks[item].TaskAll;
+                        tmp.CriticalTaskAll = allTasks[item].CriticalTaskAll;
+                        tmp.BugAll = allTasks[item].BugAll;
+                        tmp.RMAAll = allTasks[item].RMAAll;
+                    }
+                    if (sharedoc.ContainsKey(item))
+                    {
+                        tmp.ShareDocument = sharedoc[item];
                     }
                     res_task.Add(item, tmp);
                 }
@@ -632,7 +662,7 @@ namespace Prometheus.Models
                         }
                         else if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.Bug || Convert.ToInt32(item[1]) == ISSUESUBTYPE.NonCrititalFailureTask)
                         {
-                            res[Convert.ToString(item[0])].Bug = Convert.ToDouble(item[2]);
+                            res[Convert.ToString(item[0])].Bug += Convert.ToDouble(item[2]);
                         }
                         else if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.RMA)
                         {
@@ -653,7 +683,7 @@ namespace Prometheus.Models
                         }
                         else if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.Bug || Convert.ToInt32(item[1]) == ISSUESUBTYPE.NonCrititalFailureTask)
                         {
-                            kpi_tmp.Bug = Convert.ToDouble(item[2]);
+                            kpi_tmp.Bug += Convert.ToDouble(item[2]);
                         }
                         else if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.RMA)
                         {
@@ -663,31 +693,89 @@ namespace Prometheus.Models
                     }
                 }
             }
+            return res;
+        }
 
-            var rma_working = GetRMAWorking(uName, sDate, eDate);
-            if(rma_working.Count > 0)
+        public static Dictionary<string, KPIVM> GetAllTasks(List<string> uName = null, string sDate = "", string eDate = "")
+        {
+            var param = new Dictionary<string, string>();
+            var sql = @"select i.Assignee, it.IssueSubType, count(*) as cnt 
+                        from issue as i
+                        left join IssueType as it on i.IssueKey = it.IssueKey
+                        where i.APVal1 <> 'delete' ";
+            if (uName != null)
             {
-                foreach(var rma in rma_working)
+                var arr_name = new List<string>();
+                var idx = 0;
+                foreach (var item in uName)
                 {
-                    if (res.ContainsKey(rma.Key))
+                    arr_name.Add("@uName" + idx);
+                    param.Add("@uName" + idx, item);
+                    idx++;
+                }
+                sql += " and i.Assignee in (" + string.Join(",", arr_name.ToArray()) + ")";
+            }
+            if (!string.IsNullOrEmpty(sDate))
+            {
+                sql += " and i.ReportDate >= @sDate ";
+                param.Add("@sDate", sDate);
+            }
+
+            if (!string.IsNullOrEmpty(eDate))
+            {
+                sql += " and i.ReportDate <= @eDate ";
+                param.Add("@eDate", eDate);
+            }
+            sql += " group by i.Assignee, it.IssueSubType order by Assignee; ";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
+            var res = new Dictionary<string, KPIVM>();
+            if (dbret.Count > 0)
+            {
+                foreach (var item in dbret)
+                {
+                    if (res.ContainsKey(Convert.ToString(item[0])))
                     {
-                        res[rma.Key].RMAWorking = rma.Value;
+                        if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.Task)
+                        {
+                            res[Convert.ToString(item[0])].TaskAll = Convert.ToDouble(item[2]);
+                        }
+                        else if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.CrititalFailureTask)
+                        {
+                            res[Convert.ToString(item[0])].CriticalTaskAll = Convert.ToDouble(item[2]);
+                        }
+                        else if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.Bug || Convert.ToInt32(item[1]) == ISSUESUBTYPE.NonCrititalFailureTask)
+                        {
+                            res[Convert.ToString(item[0])].BugAll += Convert.ToDouble(item[2]);
+                        }
+                        else if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.RMA)
+                        {
+                            res[Convert.ToString(item[0])].RMAAll = Convert.ToDouble(item[2]);
+                        }
+                    }
+                    else
+                    {
+                        var kpi_tmp = new KPIVM();
+                        kpi_tmp.UserName = Convert.ToString(item[0]);
+                        if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.Task)
+                        {
+                            kpi_tmp.TaskAll = Convert.ToDouble(item[2]);
+                        }
+                        else if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.CrititalFailureTask)
+                        {
+                            kpi_tmp.CriticalTaskAll = Convert.ToDouble(item[2]);
+                        }
+                        else if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.Bug || Convert.ToInt32(item[1]) == ISSUESUBTYPE.NonCrititalFailureTask)
+                        {
+                            kpi_tmp.BugAll += Convert.ToDouble(item[2]);
+                        }
+                        else if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.RMA)
+                        {
+                            kpi_tmp.RMAAll = Convert.ToDouble(item[2]);
+                        }
+                        res.Add(Convert.ToString(item[0]), kpi_tmp);
                     }
                 }
             }
-
-            var sharedoc = GetShareDoc(uName, sDate, eDate);
-            if (sharedoc.Count > 0)
-            {
-                foreach (var item in sharedoc)
-                {
-                    if (res.ContainsKey(item.Key))
-                    {
-                        res[item.Key].ShareDocument = item.Value;
-                    }
-                }
-            }
-
             return res;
         }
 
@@ -813,7 +901,6 @@ namespace Prometheus.Models
                 total.Bug += user.Value.Bug;
                 total.RMA += user.Value.RMA; 
                 total.DebugTree += user.Value.DebugTree;
-                total.RMAWorking += user.Value.RMAWorking;
                 total.ShareDocument += user.Value.ShareDocument;
             }
             var res = new KPIVM();
@@ -822,7 +909,6 @@ namespace Prometheus.Models
             res.Bug = Math.Round(total.Bug / u_cnt, 4);
             res.RMA = Math.Round(total.RMA / u_cnt, 4);
             res.DebugTree = Math.Round(total.DebugTree / u_cnt, 4);
-            res.RMAWorking = Math.Round(total.RMAWorking / u_cnt, 4);
             res.ShareDocument = Math.Round(total.ShareDocument / u_cnt, 4);
             return res;
         }

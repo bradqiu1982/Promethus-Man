@@ -484,6 +484,8 @@ namespace Prometheus.Models
         public double RMA { set; get; }
         public double DebugTree { set; get; }
         public double RMAWorking { set; get; }
+        public double ShareDocument { set; get; }
+
 
         public static Dictionary<string, KPIVM> GetAllKPI(Controller ctrl, List<string> uName = null, string sDate = "", string eDate = "", int period = 1)
         {
@@ -494,6 +496,50 @@ namespace Prometheus.Models
             res_task.Add("y_avg", avg["y_avg"]);
 
             return res_task;
+        }
+
+        public static Dictionary<string, double> GetShareDoc(List<string> uName = null, string sDate = "", string eDate = "")
+        {
+            var param = new Dictionary<string, string>();
+            var sql = @"select i.DOCCreator, count(*) as cnt 
+                        from ShareDoc as i 
+                        where DOCTag <> 'RMA;' and DOCTag not like '%WEEKLYREPORT;%' and DOCTag <> 'REL;'  and DOCTag <>  'Process;'";
+            if (uName != null)
+            {
+                var arr_name = new List<string>();
+                var idx = 0;
+                foreach (var item in uName)
+                {
+                    arr_name.Add("@uName" + idx);
+                    param.Add("@uName" + idx, item);
+                    idx++;
+                }
+                sql += " and i.DOCCreator in (" + string.Join(",", arr_name.ToArray()) + ")";
+            }
+            if (!string.IsNullOrEmpty(sDate))
+            {
+                sql += " and i.DOCDate >= @sDate ";
+                param.Add("@sDate", sDate);
+            }
+
+            if (!string.IsNullOrEmpty(eDate))
+            {
+                sql += " and i.DOCDate <= @eDate ";
+                param.Add("@eDate", eDate);
+            }
+            sql += " group by i.DOCCreator order by i.DOCCreator; ";
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
+            var ret = new Dictionary<string, double>();
+            if (dbret.Count > 0)
+            {
+                foreach (var item in dbret)
+                {
+                    ret.Add(Convert.ToString(item[0]), Convert.ToDouble(item[1]));
+                }
+            }
+            return ret;
+
         }
 
         public static Dictionary<string, KPIVM> GetKPI(List<string> uName = null, string sDate = "", string eDate = "", int period = 1)
@@ -629,6 +675,19 @@ namespace Prometheus.Models
                     }
                 }
             }
+
+            var sharedoc = GetShareDoc(uName, sDate, eDate);
+            if (sharedoc.Count > 0)
+            {
+                foreach (var item in sharedoc)
+                {
+                    if (res.ContainsKey(item.Key))
+                    {
+                        res[item.Key].ShareDocument = item.Value;
+                    }
+                }
+            }
+
             return res;
         }
 
@@ -755,6 +814,7 @@ namespace Prometheus.Models
                 total.RMA += user.Value.RMA; 
                 total.DebugTree += user.Value.DebugTree;
                 total.RMAWorking += user.Value.RMAWorking;
+                total.ShareDocument += user.Value.ShareDocument;
             }
             var res = new KPIVM();
             res.Task = Math.Round(total.Task / u_cnt, 4);
@@ -763,7 +823,7 @@ namespace Prometheus.Models
             res.RMA = Math.Round(total.RMA / u_cnt, 4);
             res.DebugTree = Math.Round(total.DebugTree / u_cnt, 4);
             res.RMAWorking = Math.Round(total.RMAWorking / u_cnt, 4);
-
+            res.ShareDocument = Math.Round(total.ShareDocument / u_cnt, 4);
             return res;
         }
     }

@@ -82,7 +82,7 @@
                             if (idx < ViewBag.data2.Count - 2)
                             {
                                 <tr>
-                                    <td rowspan="6">@item.Key.Split(new char[] { '@' })[0]</td>
+                                    <td rowspan="7"><a href="~/user/GetKPI?uName=@item.Key">@item.Key.Split(new char[] { '@' })[0]</a></td>
                                     <td>Task</td>
                                     <td>@item.Value.Task</td>
                                     <td>@((ViewBag.data2["h_avg"].Task != 0) ? (Math.Round(item.Value.Task / ViewBag.data2["h_avg"].Task, 4) * 100):0) %</td>
@@ -124,6 +124,14 @@
                                     <td>@(ViewBag.data1[item.Key].DebugTree)</td>
                                     <td>@((ViewBag.data2["y_avg"].DebugTree != 0) ? (Math.Round(ViewBag.data1[item.Key].DebugTree / ViewBag.data2["y_avg"].DebugTree, 4) * 100) : 0) %</td>
                                 </tr>
+                                <tr>
+                                    <td>Document Sharing</td>
+                                    <td>@item.Value.ShareDocument</td>
+                                    <td>@((ViewBag.data2["h_avg"].ShareDocument != 0) ? (Math.Round(item.Value.ShareDocument / ViewBag.data2["h_avg"].ShareDocument, 4) * 100) : 0) %</td>
+                                    <td>@(ViewBag.data1[item.Key].ShareDocument)</td>
+                                    <td>@((ViewBag.data2["y_avg"].ShareDocument != 0) ? (Math.Round(ViewBag.data1[item.Key].ShareDocument / ViewBag.data2["y_avg"].ShareDocument, 4) * 100) : 0) %</td>
+                                </tr>
+
                                 idx++;
                             }
                         }
@@ -150,7 +158,7 @@
                             if (idx < ViewBag.data1.Count - 2)
                             {
                                 <tr>
-                                    <td rowspan="6">@item.Key.Split(new char[] { '@' })[0]</td>
+                                    <td rowspan="7">@item.Key.Split(new char[] { '@' })[0]</td>
                                     <td>Task</td>
                                     <td>@item.Value.Task</td>
                                     <td>@((ViewBag.data1["h_avg"].Task != 0) ? (Math.Round(item.Value.Task / ViewBag.data1["h_avg"].Task, 4) * 100) : 0)  %</td>
@@ -179,6 +187,11 @@
                                     <td>DebugTree</td>
                                     <td>@item.Value.DebugTree</td>
                                     <td>@((ViewBag.data1["h_avg"].DebugTree != 0) ? (Math.Round(item.Value.DebugTree / ViewBag.data1["h_avg"].DebugTree, 4) * 100) : 0)  %</td>
+                                </tr>
+                                <tr>
+                                    <td>Document Sharing</td>
+                                    <td>@item.Value.ShareDocument</td>
+                                    <td>@((ViewBag.data1["h_avg"].ShareDocument != 0) ? (Math.Round(item.Value.ShareDocument / ViewBag.data1["h_avg"].ShareDocument, 4) * 100) : 0)  %</td>
                                 </tr>
                                 idx++;
                             }

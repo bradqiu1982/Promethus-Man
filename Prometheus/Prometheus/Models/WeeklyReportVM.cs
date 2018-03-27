@@ -475,6 +475,7 @@ namespace Prometheus.Models
             Bug = 0;
             RMA = 0;
             DebugTree = 0;
+            RMAWorking = 0;
         }
         public string UserName { set; get; }
         public double Task { set; get; }
@@ -482,6 +483,7 @@ namespace Prometheus.Models
         public double Bug { set; get; }
         public double RMA { set; get; }
         public double DebugTree { set; get; }
+        public double RMAWorking { set; get; }
 
         public static Dictionary<string, KPIVM> GetAllKPI(Controller ctrl, List<string> uName = null, string sDate = "", string eDate = "", int period = 1)
         {
@@ -537,8 +539,7 @@ namespace Prometheus.Models
                         from issue as i 
                         left join IssueType as it on i.IssueKey = it.IssueKey 
                         where i.APVal1 <> 'delete'
-                        and i.Resolution in (@Fixed, @NotFix, @Done)  ";
-
+                        and i.Resolution in (@Fixed, @NotFix, @Done)";
             param.Add("@Fixed", Resolute.Fixed);
             param.Add("@NotFix", Resolute.NotFix);
             param.Add("@Done", Resolute.Done);
@@ -616,7 +617,65 @@ namespace Prometheus.Models
                     }
                 }
             }
+
+            var rma_working = GetRMAWorking(uName, sDate, eDate);
+            if(rma_working.Count > 0)
+            {
+                foreach(var rma in rma_working)
+                {
+                    if (res.ContainsKey(rma.Key))
+                    {
+                        res[rma.Key].RMAWorking = rma.Value;
+                    }
+                }
+            }
             return res;
+        }
+
+        public static Dictionary<string, double> GetRMAWorking(List<string> uName = null, string sDate = "", string eDate = "")
+        {
+            var param = new Dictionary<string, string>();
+            var sql = @"select i.Assignee, count(*) as cnt 
+                        from issue as i
+                        left join IssueType as it on i.IssueKey = it.IssueKey
+                        where i.APVal1 <> 'delete'
+                        and i.Resolution = @Working and it.IssueSubType = @RMAType ";
+            param.Add("@Working", Resolute.Working);
+            param.Add("@RMAType", ISSUESUBTYPE.RMA.ToString());
+            if (uName != null)
+            {
+                var arr_name = new List<string>();
+                var idx = 0;
+                foreach (var item in uName)
+                {
+                    arr_name.Add("@uName" + idx);
+                    param.Add("@uName" + idx, item);
+                    idx++;
+                }
+                sql += " and i.Assignee in (" + string.Join(",", arr_name.ToArray()) + ")";
+            }
+            if (!string.IsNullOrEmpty(sDate))
+            {
+                sql += " and i.ReportDate >= @sDate ";
+                param.Add("@sDate", sDate);
+            }
+
+            if (!string.IsNullOrEmpty(eDate))
+            {
+                sql += " and i.ReportDate <= @eDate ";
+                param.Add("@eDate", eDate);
+            }
+            sql += " group by i.Assignee order by Assignee; ";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
+            var rma_working = new Dictionary<string, double>();
+            if(dbret.Count > 0)
+            {
+                foreach(var item in dbret)
+                {
+                    rma_working.Add(Convert.ToString(item[0]), Convert.ToDouble(item[1]));
+                }
+            }
+            return rma_working;
         }
 
         public static Dictionary<string, KPIVM> GetDebugTree(List<string> uName = null, string sDate = "", string eDate = "")
@@ -695,6 +754,7 @@ namespace Prometheus.Models
                 total.Bug += user.Value.Bug;
                 total.RMA += user.Value.RMA; 
                 total.DebugTree += user.Value.DebugTree;
+                total.RMAWorking += user.Value.RMAWorking;
             }
             var res = new KPIVM();
             res.Task = Math.Round(total.Task / u_cnt, 4);
@@ -702,6 +762,7 @@ namespace Prometheus.Models
             res.Bug = Math.Round(total.Bug / u_cnt, 4);
             res.RMA = Math.Round(total.RMA / u_cnt, 4);
             res.DebugTree = Math.Round(total.DebugTree / u_cnt, 4);
+            res.RMAWorking = Math.Round(total.RMAWorking / u_cnt, 4);
 
             return res;
         }

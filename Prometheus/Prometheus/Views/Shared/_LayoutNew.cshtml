@@ -113,7 +113,22 @@
     </style>
 </head>
 
+@{
+    var isvideook = true;
+    var ua = Request.UserAgent;
+    if (ua.IndexOf("MSIE ") > 0)
+    { isvideook = false; }
+    if (ua.IndexOf("Edge/") > 0 || ua.IndexOf("Trident/") > 0)
+    { isvideook = true; }
+}
+
 <body>
+    <script type="text/javascript">
+    $(function () {
+        $('[data-toggle="popover"]').popover({ html: true, placement: 'bottom' });
+    })
+    </script>
+
     <div class="navbar navbar-default navbar-fixed-top div-nav">
         <nav class="navbar navbar-default navbar-fixed-top nav-content">
             <div class="container">
@@ -275,6 +290,7 @@
                             </li>
                         </ul>
                         @Html.Partial("_LoginPartial")
+
                         <ul class="nav navbar-nav">
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
@@ -289,18 +305,28 @@
                         </ul>
                         <ul class="nav navbar-nav">
                             <li>
+                                @if (isvideook)
+                                {
+                                    <a tabindex="0" class="btn" role="button" data-toggle="popover" data-container="body" placement="bottom" title="WXUI Engineering Introduce" data-content="<video src='/Content/FAIntroduce.mp4' width='200' height='160' controls type='video/mp4'></video>">
+                                        <span class="glyphicon glyphicon-question-sign"></span>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a href="javascript:void(0)" onclick="introJs().start()">
+                                        <span class="glyphicon glyphicon-question-sign" title="Help" data-toggle="tooltip"></span>
+                                    </a>
+                                }
+                            </li>
+                        </ul>
+                        <ul class="nav navbar-nav">
+                            <li>
                                 <a MYTP="HOVER" id="editablebt" name="editablebt" onclick="changepagemode()">
                                     <span class="glyphicon glyphicon-edit" title="Edit Mode" data-toggle="tooltip"></span>
                                 </a>
                             </li>
                         </ul>
-                        <ul class="nav navbar-nav">
-                            <li>
-                                <a href="javascript:void(0)" onclick="introJs().start()">
-                                    <span class="glyphicon glyphicon-question-sign" title="Help" data-toggle="tooltip"></span>
-                                </a>
-                            </li>
-                        </ul>
+                        
                     </div>
                 </div>
             </div>

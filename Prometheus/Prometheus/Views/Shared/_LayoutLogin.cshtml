@@ -50,9 +50,9 @@
 @{
     var isvideook = true;
     var ua = Request.UserAgent;
-    if (ua.IndexOf("MSIE ") > 0 || ua.IndexOf("Trident/") > 0)
+    if (ua.IndexOf("MSIE ") > 0)
     { isvideook = false; }
-    if (ua.IndexOf("Edge/") > 0)
+    if (ua.IndexOf("Edge/") > 0 || ua.IndexOf("Trident/") > 0)
     {  isvideook = true; }
 }
 
@@ -112,7 +112,6 @@
                                         <span class="glyphicon glyphicon-question-sign" title="Help" data-toggle="tooltip"></span>
                                     </a>
                                 }
-
                             </li>
 
                         </ul>

@@ -35,6 +35,9 @@
         table.dataTable tbody td {
             padding: 4px 10px;
         }
+        .popover-content {
+            padding:2px;
+        }
     </style>
     <script src="~/Content/bootstrap-3.3.7/js/bootstrap.min.js" type="text/javascript"></script>
     <script src="~/Scripts/ajaxfileupload.js" type="text/javascript"></script>
@@ -44,8 +47,24 @@
     <script src="~/Scripts/jquery.dataTables.min.js"></script>
 
 </head>
+@{
+    var isvideook = true;
+    var ua = Request.UserAgent;
+    if (ua.IndexOf("MSIE ") > 0 || ua.IndexOf("Trident/") > 0)
+    { isvideook = false; }
+    if (ua.IndexOf("Edge/") > 0)
+    {  isvideook = true; }
+}
 
 <body>
+
+    <script type="text/javascript">
+    $(function () {
+        $('[data-toggle="popover"]').popover({ html: true, placement: 'bottom' });
+        $('[data-toggle="popover"]').popover('show');
+    })
+    </script>
+
     <div class="navbar navbar-default navbar-fixed-top div-nav">
         <nav class="navbar navbar-default navbar-fixed-top nav-content">
             <div class="container">
@@ -67,23 +86,35 @@
                             </li>
                         </ul>
                         <ul class="nav navbar-nav div-nav-right-1">
+
                             <ul class="nav navbar-nav div-nav-right-1">
-                                <li>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                        <span class="glyphicon glyphicon-link" title="Friendly Links" data-toggle="tooltip"></span>
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a href="http://cn-traceview/" target="_blank">Trace View</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <li>
+                                @if (isvideook)
+                                {
+                                    <a tabindex="0" class="btn" role="button" data-toggle="popover" data-container="body" placement="bottom" title="WXUI Engineering Introduce" data-content="<video src='/Content/FAIntroduce.mp4' width='200' height='160' controls type='video/mp4'></video>">
+                                        <span class="glyphicon glyphicon-question-sign"></span>
+                                    </a>
+                                }
+                                else
+                                {
                                     <a href="javascript:void(0)" onclick="introJs().start()">
                                         <span class="glyphicon glyphicon-question-sign" title="Help" data-toggle="tooltip"></span>
                                     </a>
-                                </li>
-                            </ul>
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                    <span class="glyphicon glyphicon-link" title="Friendly Links" data-toggle="tooltip"></span>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <a href="http://cn-traceview/" target="_blank">Trace View</a>
-                                    </li>
-                                </ul>
+                                }
+
                             </li>
+
                         </ul>
                         <ul class="nav navbar-nav div-nav-right-1">
                             @{

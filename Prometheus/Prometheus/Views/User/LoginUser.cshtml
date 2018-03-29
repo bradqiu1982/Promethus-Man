@@ -3,6 +3,13 @@
 @{
     ViewBag.Title = "LoginUser";
     Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+
+    var isvideook = true;
+    var ua = Request.UserAgent;
+    if (ua.IndexOf("MSIE ") > 0 || ua.IndexOf("Trident/") > 0)
+    { isvideook = false; }
+    if (ua.IndexOf("Edge/") > 0)
+    { isvideook = true; }
 }
 
 <link rel="stylesheet" href="~/Content/Login.css" />
@@ -25,26 +32,46 @@
 
     <div class="row login-content">
         <div class="login-form">
+            
+    @if (isvideook)
+    {
+            <div class="form-group">
+                @Html.TextBoxFor(model => model.Email, new { @class = "form-control login-input", @placeholder = "FINISAR Email" })
+            </div>
+            <div class="form-group">
+                @Html.PasswordFor(model => model.Password, new { @class = "form-control login-input", @placeholder = "Password: abc@123" })
+            </div>
+            <div class="form-group">
+                <input type="submit" class="btn btn-default login-submit" id="Login" name="Login" value="Log in" />
+            </div>
+            <div class="form-group">
+                <input type="submit" class="btn btn-default login-forget-pwd" id="ForgetPassword" name="ForgetPassword" value="Change Password" />
+            </div>
+    }
+    else
+    {
             <div class="form-group">
                 <div data-intro = "Input your Finisar Email"  data-step="1">
-                    @Html.TextBoxFor(model => model.Email, new { @class = "form-control login-input", @placeholder = "FINISAR Email"})
+                @Html.TextBoxFor(model => model.Email, new { @class = "form-control login-input", @placeholder = "FINISAR Email" })
                 </div>
             </div>
             <div class="form-group">
                 <div data-intro = "Default Password:abc@123"  data-step="2">
-                    @Html.PasswordFor(model => model.Password, new { @class = "form-control login-input", @placeholder = "Password: abc@123" })
+                @Html.PasswordFor(model => model.Password, new { @class = "form-control login-input", @placeholder = "Password: abc@123" })
                 </div>
             </div>
             <div class="form-group">
                 <div data-intro="You can login from this" data-step="3">
-                    <input type="submit" class="btn btn-default login-submit" id="Login" name="Login" value="Log in" />
+                <input type="submit" class="btn btn-default login-submit" id="Login" name="Login" value="Log in" />
                 </div>
             </div>
             <div class="form-group">
                 <div data-intro="You can change password here" data-step="4">
-                    <input type="submit" class="btn btn-default login-forget-pwd" id="ForgetPassword" name="ForgetPassword" value="Change Password" />
+                <input type="submit" class="btn btn-default login-forget-pwd" id="ForgetPassword" name="ForgetPassword" value="Change Password" />
                 </div>
             </div>
+    }
+
         </div>
     </div>
 }

@@ -5924,6 +5924,75 @@ namespace Prometheus.Controllers
             catch (Exception ex) { }
         }
 
+        private void SendIQETaskAlertEmail()
+        {
+            try
+            {
+                //phase 1
+                var sDate_1 = DateTime.Now.AddDays(-14).ToString("yyyy-MM-dd 00:00:00");
+                var eDate_1 = DateTime.Now.AddDays(-10).ToString("yyyy-MM-dd 23:59:59");
+                var phase_1 = IssueViewModels.Retrieve_Alert_TaskByDate(ISSUETP.IQE, sDate_1, eDate_1);
+                //phase 2
+                sDate_1 = DateTime.Now.AddDays(-17).ToString("yyyy-MM-dd 00:00:00");
+                eDate_1 = DateTime.Now.AddDays(-15).ToString("yyyy-MM-dd 23:59:59");
+                var phase_2 = IssueViewModels.Retrieve_Alert_TaskByDate(ISSUETP.IQE, sDate_1, eDate_1);
+
+                foreach (var item in phase_1)
+                {
+                    var routevalue = new RouteValueDictionary();
+                    routevalue.Add("issuekey", item.IssueKey);
+                    //send validate email
+                    string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                    string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+
+                    var netcomputername = EmailUtility.RetrieveCurrentMachineName();
+                    validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
+
+                    var date_diff = 14 - (Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd")) - Convert.ToDateTime(item.ReportDate.ToString("yyyy-MM-dd"))).Days;
+
+                    var content = "Warning: your task - " + item.Summary + " is close to its Due Date(Left: " + date_diff + ") :\r\n " + validatestr;
+                    var toaddrs = new List<string>();
+                    toaddrs.Add(item.Reporter);
+                    toaddrs.Add(item.Assignee);
+                    toaddrs.Add(item.RelativePeopleList[0]);
+                    EmailUtility.SendEmail(this, "WUXI Engineering System", toaddrs, content);
+                    new System.Threading.ManualResetEvent(false).WaitOne(200);
+                }
+
+                foreach (var item in phase_2)
+                {
+                    var routevalue = new RouteValueDictionary();
+                    routevalue.Add("issuekey", item.IssueKey);
+                    //send validate email
+                    string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
+                    string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
+
+                    var netcomputername = EmailUtility.RetrieveCurrentMachineName();
+                    validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
+
+                    var date_diff = 14 - (Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd")) - Convert.ToDateTime(item.ReportDate.ToString("yyyy-MM-dd"))).Days;
+
+                    var content = "Warning: your task - " + item.Summary + " is close to its Due Date(Left: "+ date_diff + ") :\r\n " + validatestr;
+                    var toaddrs = new List<string>();
+                    toaddrs.Add(item.Reporter);
+                    toaddrs.Add(item.Assignee);
+                    toaddrs.AddRange(item.RelativePeopleList);
+                    EmailUtility.SendEmail(this, "WUXI Engineering System", toaddrs, content);
+                    new System.Threading.ManualResetEvent(false).WaitOne(200);
+                }
+
+                foreach (var item in phase_1)
+                {
+                    item.UpdateAlertEmailDate();
+                }
+                foreach(var item in phase_2)
+                {
+                    item.UpdateAlertEmailDate();
+                }
+            }
+            catch (Exception ex) { }
+        }
+
         private void heartbeatlog(string msg)
         {
             try
@@ -5976,7 +6045,7 @@ namespace Prometheus.Controllers
             try
             {
                 SendTaskAlertEmail(ISSUETP.Task);
-                SendTaskAlertEmail(ISSUETP.IQE);
+                SendIQETaskAlertEmail();
                 SendRMAAlertEmail();
                 SendOBAAlertEmail();
             }

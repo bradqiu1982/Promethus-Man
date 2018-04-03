@@ -2430,11 +2430,47 @@ namespace Prometheus.Models
             var fixresolve = Resolute.Pending;
 
             //2 days for fv,5 days for fa
-            var stattime = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd") + " 00:00:01").AddDays(2).ToString();
+            var stattime = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd") + " 00:00:00").AddDays(2).ToString();
             var endtime = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd") + " 23:59:59").AddDays(2).ToString();
 
             var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,RelativePeoples,ModuleSN,AlertEmailUpdateDate from Issue where APVal1 <> 'delete' and Resolution in <cond> and  ParentIssueKey = '' and IssueType = '<IssueType>' and DueDate >= '<stattime>' and DueDate <= '<endtime>' ";
             sql = sql.Replace("<cond>", cond).Replace("<IssueType>", tasktype).Replace("<stattime>", stattime).Replace("<endtime>", endtime);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            var ret = new List<IssueViewModels>();
+            foreach (var line in dbret)
+            {
+                var alertdate = DateTime.Parse(Convert.ToString(line[13]));
+
+                if (string.Compare(alertdate.ToString("yyyy-MM-dd"), DateTime.Now.ToString("yyyy-MM-dd")) != 0)
+                {
+                    var tempvm = new IssueViewModels(Convert.ToString(line[0])
+                        , Convert.ToString(line[1]), Convert.ToString(line[2])
+                        , Convert.ToString(line[3]), Convert.ToString(line[4])
+                        , Convert.ToString(line[5]), Convert.ToString(line[6])
+                        , Convert.ToString(line[7]), Convert.ToString(line[8])
+                        , Convert.ToString(line[9]), fixresolve, "", Convert.ToString(line[11]));
+                    tempvm.ModuleSN = Convert.ToString(line[12]);
+                    tempvm.AlertEmailUpdateDate = alertdate;
+                    ret.Add(tempvm);
+                }//only add the issues which have not send alert email today
+
+            }//end foreach
+
+            return ret;
+        }
+
+        public static List<IssueViewModels> Retrieve_Alert_TaskByDate(string iType, string sDate, string eDate)
+        {
+            var cond = "('" + Resolute.Pending + "','" + Resolute.Working + "','" + Resolute.Reopen + "')";
+            var fixresolve = Resolute.Pending;
+
+            var sql = @"select ProjectKey,IssueKey,IssueType,Summary,Priority,
+                    DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,
+                    RelativePeoples,ModuleSN,AlertEmailUpdateDate from Issue 
+                    where APVal1 <> 'delete' and Resolution in <cond> and 
+                    ParentIssueKey = '' and IssueType = '<IssueType>' and 
+                    ReportDate >= '<sDate>' and ReportDate <= '<eDate>' ";
+            sql = sql.Replace("<cond>", cond).Replace("<IssueType>", iType).Replace("<sDate>", sDate).Replace("<eDate>", eDate);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             var ret = new List<IssueViewModels>();
             foreach (var line in dbret)

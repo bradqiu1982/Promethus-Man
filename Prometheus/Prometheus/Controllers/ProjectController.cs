@@ -5943,8 +5943,40 @@ namespace Prometheus.Controllers
             { }
         }
 
+        public void SundayReport()
+        {
+
+        }
+
         public ActionResult HeartBeat()
         {
+            //add files to let sundayreport have enough time to solve report
+            var currenttime = DateTime.Now;
+            var sundayreportStart = Server.MapPath("~/userfiles") + "\\" + "SundayReportStart" + currenttime.ToString("yyyy-MM-dd");
+            var sundayreportDone = Server.MapPath("~/userfiles") + "\\" + "SundayReportDone" + currenttime.ToString("yyyy-MM-dd");
+
+            if (System.IO.File.Exists(sundayreportStart))
+            {
+                return View();
+            }
+
+            if (DateTime.Now.DayOfWeek == DayOfWeek.Sunday)
+            {
+                if (!System.IO.File.Exists(sundayreportDone))
+                {
+                    System.IO.File.WriteAllText(sundayreportStart, "hello world");
+                    try
+                    {
+                        SundayReport();
+                    }
+                    catch (Exception ex) { }
+                    System.IO.File.WriteAllText(sundayreportDone, "hello world");
+                    System.IO.File.Delete(sundayreportStart);
+                    return View();
+                }
+            }
+
+            //daily report start
             var starttime = DateTime.Now.ToString();
 
             var pjkeylist = ProjectViewModels.RetrieveAllProjectKey();

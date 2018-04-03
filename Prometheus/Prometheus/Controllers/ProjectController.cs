@@ -5949,8 +5949,16 @@ namespace Prometheus.Controllers
                     validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
                     var date_diff = 14 - (Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd")) - Convert.ToDateTime(item.ReportDate.ToString("yyyy-MM-dd"))).Days;
-
-                    var content = "Warning: your task - " + item.Summary + " is close to its Due Date(Left: " + date_diff + ") :\r\n " + validatestr;
+                    var diff_str = "";
+                    if (date_diff < 0)
+                    {
+                        diff_str = " Over: " + Math.Abs(date_diff);
+                    }
+                    else
+                    {
+                        diff_str = " Left: " + date_diff;
+                    }
+                    var content = "Warning: your task - " + item.Summary + " is close to its Due Date(" + diff_str + ") :\r\n " + validatestr;
                     var toaddrs = new List<string>();
                     toaddrs.Add(item.Reporter);
                     toaddrs.Add(item.Assignee);
@@ -5971,8 +5979,17 @@ namespace Prometheus.Controllers
                     validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
 
                     var date_diff = 14 - (Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd")) - Convert.ToDateTime(item.ReportDate.ToString("yyyy-MM-dd"))).Days;
+                    var diff_str = "";
+                    if(date_diff < 0)
+                    {
+                        diff_str = " Over: " + Math.Abs(date_diff);
+                    }
+                    else
+                    {
+                        diff_str = " Left: " + date_diff;
+                    }
 
-                    var content = "Warning: your task - " + item.Summary + " is close to its Due Date(Left: "+ date_diff + ") :\r\n " + validatestr;
+                    var content = "Warning: your task - " + item.Summary + " is close to its Due Date( " + diff_str + " ) :\r\n " + validatestr;
                     var toaddrs = new List<string>();
                     toaddrs.Add(item.Reporter);
                     toaddrs.Add(item.Assignee);

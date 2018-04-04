@@ -1537,7 +1537,7 @@ namespace Prometheus.Models
             else
             {
                 sql = "insert into IQEBackupData(AppV_A,AppV_B,AppV_C,AppV_D,AppV_E,AppV_F"
-                    + ",AppV_G,AppV_H,AppV_I,AppV_J,AppV_K,AppV_L,AppV_M,AppV_N,AppV_O"
+                    + ",AppV_G,AppV_H,AppV_I,AppV_J,AppV_K,AppV_L,AppV_M,AppV_N,AppV_O,AppV_Q"
                     + ",databackuptm)"
                     + " values(N'<AppV_A>',N'<AppV_B>',N'<AppV_C>',N'<AppV_D>',N'<AppV_E>',N'<AppV_F>'"
                     + ",N'<AppV_G>',N'<AppV_H>',N'<AppV_I>',N'<AppV_J>',N'<AppV_K>',N'<AppV_L>',N'<AppV_M>',N'<AppV_N>','<AppV_O>',N'<AppV_Q>'"

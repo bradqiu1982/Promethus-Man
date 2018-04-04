@@ -8250,7 +8250,7 @@ namespace Prometheus.Controllers
                 var endtime = "";
                 if (!string.IsNullOrEmpty(StartTime) && !string.IsNullOrEmpty(EndTime))
                 {
-                    starttime = StartTime + " 00:00:01";
+                    starttime = StartTime + " 00:00:00";
                     endtime = EndTime + " 23:59:59";
                 }
                 else

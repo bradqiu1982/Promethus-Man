@@ -623,7 +623,7 @@ namespace Prometheus.Models
         {
             var ret = new List<ShareDocVM>();
             string tempdate = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
-            var starttime = tempdate + " 00:00:01";
+            var starttime = tempdate + " 00:00:00";
             var endtime = tempdate + " 23:59:59";
 
             var sql = "select DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,DOCFavorTimes,APVal1,BackLink from ShareDoc where DOCDate >= '<starttime>' and DOCDate <= '<endtime>'";

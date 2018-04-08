@@ -5963,6 +5963,7 @@ namespace Prometheus.Controllers
                     toaddrs.Add(item.Reporter);
                     toaddrs.Add(item.Assignee);
                     toaddrs.Add(item.RelativePeopleList[0]);
+                    toaddrs.Add(item.RelativePeopleList[1]);
                     EmailUtility.SendEmail(this, "WUXI Engineering System", toaddrs, content);
                     new System.Threading.ManualResetEvent(false).WaitOne(200);
                 }

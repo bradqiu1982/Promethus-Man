@@ -10,7 +10,7 @@ namespace Prometheus.Controllers
     public class ShareDataController : ApiController
     {
         [HttpGet]
-        public Dictionary<string, List<string>> DataMap()
+        public string  DataMap()
         {
             var plist = new Dictionary<string, List<string>>();
             var slist = new List<string>();
@@ -22,7 +22,7 @@ namespace Prometheus.Controllers
             slist.Add("fish");
             plist.Add("food", slist);
 
-            return plist;
+            return Newtonsoft.Json.JsonConvert.SerializeObject(plist);
         }
     }
 }

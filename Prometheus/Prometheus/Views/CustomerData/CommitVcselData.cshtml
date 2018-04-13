@@ -36,7 +36,7 @@
                     <label class="control-label" id="showfile1" name="showfile1"></label>
                 </div>
                 <div class="col-xs-1">
-                    <input class="form-control text-box single-line" value="" id="VcselFileName" name="VcselFileName" type="hidden" />
+                    <input class="form-control text-box single-line" value="" id="RMAFileName" name="RMAFileName" type="hidden" />
                 </div>
             </div>
         </div>
@@ -44,7 +44,7 @@
             <script type="text/javascript">
                 function ShowFileNames1(oFile) {
                     $('#showfile1').text(oFile.value);
-                    document.getElementById("VcselFileName").value = oFile.value;
+                    document.getElementById("RMAFileName").value = oFile.value;
                 }
             </script>
     </div>

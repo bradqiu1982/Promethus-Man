@@ -1382,3 +1382,42 @@ CREATE TABLE [dbo].[TechVideoVM] (
 	[UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
 	[Updater]   NVARCHAR (200) DEFAULT ('') NOT NULL
 	);
+
+CREATE TABLE [dbo].[VcselPNData] (
+    [PN]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Rate]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Channel]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	);
+
+CREATE TABLE [dbo].[VcselMonthData] (
+    [StartDate]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[VTYPE]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Failure]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Num]   NVARCHAR (126) DEFAULT ('0') NOT NULL,
+	[UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	);
+
+CREATE TABLE [dbo].[VcselTimeRange] (
+	[WaferNo]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+    [StartDate]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[EndDate]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	);
+
+CREATE TABLE [dbo].[WaferTestSum] (
+    [WaferNo]    NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[WhichTest]    NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[VTYPE]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Failure]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Num]   NVARCHAR (126) DEFAULT ('0') NOT NULL,
+	[DataIDs]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	);
+
+CREATE TABLE [dbo].[WaferBGDFiled] (
+    [WaferNo]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[FieldName]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[BoxData]   NVARCHAR (300) DEFAULT ('0') NOT NULL,
+	[UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	);

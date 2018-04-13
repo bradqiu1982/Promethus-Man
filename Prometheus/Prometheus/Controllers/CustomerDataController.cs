@@ -57,17 +57,14 @@ namespace Prometheus.Controllers
             }
         }
 
-
-        [HttpPost, ActionName("CommitVcselData")]
-        [ValidateAntiForgeryToken]
-        public ActionResult CommitVcselDataPost()
+        private string RetriveCommitFile()
         {
             var wholefn = "";
             try
             {
-                if (!string.IsNullOrEmpty(Request.Form["VcselFileName"]))
+                if (!string.IsNullOrEmpty(Request.Form["RMAFileName"]))
                 {
-                    var customereportfile = Request.Form["VcselFileName"];
+                    var customereportfile = Request.Form["RMAFileName"];
                     var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_");
 
                     foreach (string fl in Request.Files)
@@ -95,6 +92,21 @@ namespace Prometheus.Controllers
                         }//end if
                     }//end foreach
 
+                }//end if
+            }
+            catch (Exception ex)
+            { }
+
+            return wholefn;
+        }
+
+
+        [HttpPost, ActionName("CommitVcselData")]
+        [ValidateAntiForgeryToken]
+        public ActionResult CommitVcselDataPost()
+        {
+            var wholefn = RetriveCommitFile();
+
                     if (!string.IsNullOrEmpty(wholefn))
                     {
                         var data = RetrieveDataFromExcelWithAuth(this,wholefn);
@@ -106,12 +118,52 @@ namespace Prometheus.Controllers
                         }
                     }
 
-                }//end if
-            }
-            catch (Exception ex)
-            {  }
-
             return View();
+        }
+
+        public ActionResult CommitVcselPNInfo()
+        {
+            return View();
+        }
+
+        [HttpPost, ActionName("CommitVcselPNInfo")]
+        [ValidateAntiForgeryToken]
+        public ActionResult CommitVcselPNInfoPost()
+        {
+            var wholefn = RetriveCommitFile();
+
+            if (!string.IsNullOrEmpty(wholefn))
+            {
+                var data = RetrieveDataFromExcelWithAuth(this, wholefn);
+                if (data.Count > 0 && string.Compare(data[0][6], "BOM PN", true) == 0)
+                {
+                    foreach (var line in data)
+                    {
+                        var PN = line[6];
+                        var CH = line[2];
+                        var Rate = line[3];
+
+                        if (!string.IsNullOrEmpty(PN)
+                            && !string.IsNullOrEmpty(CH)
+                            && !string.IsNullOrEmpty(Rate))
+                        {
+                            if (Rate.ToUpper().Contains("28G"))
+                            {
+                                VcselPNData.UpdateVPnInfo(PN, "25G", CH);
+                            }
+                            else
+                            {
+                                VcselPNData.UpdateVPnInfo(PN, Rate, CH);
+                            }
+                        }//end if
+                    }//end foreach
+                }
+                else
+                {
+                    return RedirectToAction("CommitVcselPNInfo");
+                }
+            }
+            return RedirectToAction("ViewAll","Project");
         }
 
         [HttpPost, ActionName("ConfirmVcselData")]
@@ -301,40 +353,7 @@ namespace Prometheus.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult CommitFADataPost()
         {
-            var wholefn = "";
-            try
-            {
-                if (!string.IsNullOrEmpty(Request.Form["RMAFileName"]))
-                {
-                    var customereportfile = Request.Form["RMAFileName"];
-                    var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                    foreach (string fl in Request.Files)
-                    {
-                        if (fl != null && Request.Files[fl].ContentLength > 0)
-                        {
-                            string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                            string datestring = DateTime.Now.ToString("yyyyMMdd");
-                            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
-
-                            if (!Directory.Exists(imgdir))
-                            {
-                                Directory.CreateDirectory(imgdir);
-                            }
-
-                            fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
-                            Request.Files[fl].SaveAs(imgdir + fn);
-
-                            if (fn.Contains(originalname))
-                            {
-                                wholefn = imgdir + fn;
-                                break;
-                            }
-                        }//end if
-                    }//end foreach
+            var wholefn = RetriveCommitFile();
 
                     if (!string.IsNullOrEmpty(wholefn))
                     {
@@ -450,10 +469,6 @@ namespace Prometheus.Controllers
                         }
                     }//end if
 
-                }//end if
-            }
-            catch (Exception ex) { }
-
             return RedirectToAction("ViewAll", "Project");
         }
 
@@ -465,40 +480,7 @@ namespace Prometheus.Controllers
         {
             var projlist = ProjectViewModels.RetrieveAllProjectKey();
 
-            var wholefn = "";
-            try
-            {
-                if (!string.IsNullOrEmpty(Request.Form["RMAFileName"]))
-                {
-                    var customereportfile = Request.Form["RMAFileName"];
-                    var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                    foreach (string fl in Request.Files)
-                    {
-                        if (fl != null && Request.Files[fl].ContentLength > 0)
-                        {
-                            string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                            string datestring = DateTime.Now.ToString("yyyyMMdd");
-                            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
-
-                            if (!Directory.Exists(imgdir))
-                            {
-                                Directory.CreateDirectory(imgdir);
-                            }
-
-                            fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
-                            Request.Files[fl].SaveAs(imgdir + fn);
-
-                            if (fn.Contains(originalname))
-                            {
-                                wholefn = imgdir + fn;
-                                break;
-                            }
-                        }//end if
-                    }//end foreach
+            var wholefn = RetriveCommitFile();
 
                     if (!string.IsNullOrEmpty(wholefn))
                     {
@@ -598,11 +580,6 @@ namespace Prometheus.Controllers
                         }
                     }
 
-                }//end if
-            }
-            catch (Exception ex)
-            { }
-
             return View();
         }
 
@@ -615,40 +592,8 @@ namespace Prometheus.Controllers
         {
             var projlist = ProjectViewModels.RetrieveAllProjectKey();
 
-            var wholefn = "";
-            try
-            {
-                if (!string.IsNullOrEmpty(Request.Form["RMAFileName"]))
-                {
-                    var customereportfile = Request.Form["RMAFileName"];
-                    var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+            var wholefn = RetriveCommitFile();
 
-                    foreach (string fl in Request.Files)
-                    {
-                        if (fl != null && Request.Files[fl].ContentLength > 0)
-                        {
-                            string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                            string datestring = DateTime.Now.ToString("yyyyMMdd");
-                            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
-
-                            if (!Directory.Exists(imgdir))
-                            {
-                                Directory.CreateDirectory(imgdir);
-                            }
-
-                            fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
-                            Request.Files[fl].SaveAs(imgdir + fn);
-
-                            if (fn.Contains(originalname))
-                            {
-                                wholefn = imgdir + fn;
-                                break;
-                            }
-                        }//end if
-                    }//end foreach
 
                     if (!string.IsNullOrEmpty(wholefn))
                     {
@@ -755,11 +700,6 @@ namespace Prometheus.Controllers
                         }
                     }
 
-                }//end if
-            }
-            catch (Exception ex)
-            { }
-
             return View();
         }
 
@@ -769,40 +709,7 @@ namespace Prometheus.Controllers
         {
             var projlist = ProjectViewModels.RetrieveAllProjectKey();
 
-            var wholefn = "";
-            try
-            {
-                if (!string.IsNullOrEmpty(Request.Form["RMAFileName"]))
-                {
-                    var customereportfile = Request.Form["RMAFileName"];
-                    var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                    foreach (string fl in Request.Files)
-                    {
-                        if (fl != null && Request.Files[fl].ContentLength > 0)
-                        {
-                            string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                            string datestring = DateTime.Now.ToString("yyyyMMdd");
-                            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
-
-                            if (!Directory.Exists(imgdir))
-                            {
-                                Directory.CreateDirectory(imgdir);
-                            }
-
-                            fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
-                            Request.Files[fl].SaveAs(imgdir + fn);
-
-                            if (fn.Contains(originalname))
-                            {
-                                wholefn = imgdir + fn;
-                                break;
-                            }
-                        }//end if
-                    }//end foreach
+            var wholefn = RetriveCommitFile();
 
                     if (!string.IsNullOrEmpty(wholefn))
                     {
@@ -903,11 +810,6 @@ namespace Prometheus.Controllers
                         }
                     }
 
-                }//end if
-            }
-            catch (Exception ex)
-            { }
-
             return View();
         }
 
@@ -917,40 +819,7 @@ namespace Prometheus.Controllers
         {
             var projlist = ProjectViewModels.RetrieveAllProjectKey();
 
-            var wholefn = "";
-            try
-            {
-                if (!string.IsNullOrEmpty(Request.Form["RMAFileName"]))
-                {
-                    var customereportfile = Request.Form["RMAFileName"];
-                    var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                    foreach (string fl in Request.Files)
-                    {
-                        if (fl != null && Request.Files[fl].ContentLength > 0)
-                        {
-                            string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                            string datestring = DateTime.Now.ToString("yyyyMMdd");
-                            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
-
-                            if (!Directory.Exists(imgdir))
-                            {
-                                Directory.CreateDirectory(imgdir);
-                            }
-
-                            fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
-                            Request.Files[fl].SaveAs(imgdir + fn);
-
-                            if (fn.Contains(originalname))
-                            {
-                                wholefn = imgdir + fn;
-                                break;
-                            }
-                        }//end if
-                    }//end foreach
+            var wholefn = RetriveCommitFile();
 
                     if (!string.IsNullOrEmpty(wholefn))
                     {
@@ -1046,11 +915,6 @@ namespace Prometheus.Controllers
                             return View("ConfirmRelData", realdata);
                         }
                     }
-
-                }//end if
-            }
-            catch (Exception ex)
-            { }
 
             return View();
         }
@@ -1718,40 +1582,7 @@ namespace Prometheus.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult CommitUserMatrixPost()
         {
-            var wholefn = "";
-            try
-            {
-                if (!string.IsNullOrEmpty(Request.Form["RMAFileName"]))
-                {
-                    var customereportfile = Request.Form["RMAFileName"];
-                    var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                    foreach (string fl in Request.Files)
-                    {
-                        if (fl != null && Request.Files[fl].ContentLength > 0)
-                        {
-                            string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                            string datestring = DateTime.Now.ToString("yyyyMMdd");
-                            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
-
-                            if (!Directory.Exists(imgdir))
-                            {
-                                Directory.CreateDirectory(imgdir);
-                            }
-
-                            fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
-                            Request.Files[fl].SaveAs(imgdir + fn);
-
-                            if (fn.Contains(originalname))
-                            {
-                                wholefn = imgdir + fn;
-                                break;
-                            }
-                        }//end if
-                    }//end foreach
+            var wholefn = RetriveCommitFile();
 
                     int idx = 0;
                     if (!string.IsNullOrEmpty(wholefn))
@@ -1769,11 +1600,6 @@ namespace Prometheus.Controllers
                             }
                         }//end if
                     }//end if
-
-                }//end if
-            }
-            catch (Exception ex)
-            { }
 
             return View();
         }

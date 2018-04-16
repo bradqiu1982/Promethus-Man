@@ -102,7 +102,7 @@ namespace Prometheus.Models
             var keydict = new Dictionary<string, Dictionary<string, int>>();
             foreach (var line in mdata)
             {
-                //if (VcselPNInfo.ContainsKey(line.ProductName))
+                if (VcselPNInfo.ContainsKey(line.ProductName))
                 {
                     var key = line.TestName + "_" + VcselPNInfo[line.ProductName].Rate + "_" + VcselPNInfo[line.ProductName].Channel;
                     if (keydict.ContainsKey(key))

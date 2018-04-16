@@ -322,8 +322,35 @@ namespace Prometheus.Models
         public static List<ShareDocVM> RetrieveMyLearn(string UserName, Controller ctrl)
         {
             var ret = new List<ShareDocVM>();
-            var sql = "select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,a.DOCDate,a.DOCPusher,a.DOCFavor,b.DOCFavorTimes,b.APVal1,a.BackLink from UserLearn a left join ShareDoc b ON a.DOCKey = b.DOCKey where a.UserName= '<UserName>' and a.DOCType <> '<DOCType>' order by a.DOCDate DESC";
-            sql = sql.Replace("<UserName>", UserName).Replace("<DOCType>", ShareDocType.BLOG);
+            var sql = @"select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,
+                    a.DOCDate,a.DOCPusher,a.DOCFavor,b.DOCFavorTimes,b.APVal1,
+                    a.BackLink, i.Summary, CONCAT('<IssueUrl>', i.IssueKey) as DocURL from UserLearn a 
+                    left join ShareDoc b ON a.DOCKey = b.DOCKey 
+                    inner join issue as i on (i.IssueKey = a.DOCKey and a.DOCType = '<Type1>' and a.APVal1 <> 'delete')
+                    where a.UserName= '<UserName>'
+                    union all 
+                    select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,
+                    a.DOCDate,a.DOCPusher,a.DOCFavor,b.DOCFavorTimes,b.APVal1,
+                    a.BackLink, CONCAT(pe.ProjectKey, '-', pe.OrignalCode) as Summary, 
+                    CONCAT('<DebugUrl>', pe.ErrorKey) as DocURL 
+                    from UserLearn a left join ShareDoc b ON a.DOCKey = b.DOCKey 
+                    inner join ProjectError as pe on (a.DOCKey = pe.ErrorKey and a.DOCType = '<Type2>')
+                    where a.UserName= '<UserName>'
+                    union all
+                    select a.DOCPJK,a.DOCType,a.DOCKey,a.DOCTag,a.DOCCreator,
+                    a.DOCDate,a.DOCPusher,a.DOCFavor,b.DOCFavorTimes,b.APVal1,
+                    a.BackLink, a.DOCKey as Summary, CONCAT('<WebUrl1>', a.DOCKey, '<WebUrl2>', a.DOCCreator) as DocURL
+                    from UserLearn a left join ShareDoc b ON a.DOCKey = b.DOCKey 
+                    where a.UserName= '<UserName>' and a.DOCType not in ('<Type1>', '<Type2>', '<Type3>')
+                    order by a.DOCDate DESC";
+            sql = sql.Replace("<UserName>", UserName)
+                    .Replace("<Type1>", ShareDocType.ISSUE)
+                    .Replace("<Type2>", ShareDocType.DEBUG)
+                    .Replace("<Type3>", ShareDocType.BLOG)
+                    .Replace("<IssueUrl>", "/Issue/UpdateIssue?issuekey=")
+                    .Replace("<DebugUrl>", "/Project/UpdateProjectError?ErrorKey=")
+                    .Replace("<WebUrl1>", "/User/WebDoc?DocKey=")
+                    .Replace("<WebUrl2>", "&Creator="); ;
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
             {
@@ -340,60 +367,22 @@ namespace Prometheus.Models
                 tempvm.DOCFavorTimes = Convert.ToInt32(line[8]);
                 tempvm.DocID = Convert.ToString(line[9]);
                 tempvm.BACKLink = Convert.ToString(line[10]);
+                tempvm.Summary = Convert.ToString(line[11]);
+                tempvm.DocURL = Convert.ToString(line[12]);
 
-                if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
+                if (string.IsNullOrEmpty(tempvm.DocID))
                 {
-                    var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey, ctrl);
-                    if (issue == null)
-                    {
-                        continue;
-                    }
-
-                    tempvm.Summary = issue.Summary;
-                    tempvm.DocURL = "/Issue/UpdateIssue?issuekey=" + tempvm.DOCKey;
-                }
-                else if (string.Compare(tempvm.DOCType, ShareDocType.DEBUG, true) == 0)
-                {
-                    var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(tempvm.DOCKey, ctrl);
-                    tempvm.Summary = debugtree[0].ProjectKey + "-" + debugtree[0].OrignalCode;
-                    tempvm.DocURL = "/Project/UpdateProjectError?ErrorKey=" + tempvm.DOCKey;
-                }
-                else if (string.Compare(tempvm.DOCType, ShareDocType.DOCUMENT, true) == 0)
-                {
-                    tempvm.Summary = tempvm.DOCKey;
-                    tempvm.DocURL = "/User/WebDoc?DocKey=" + tempvm.DOCKey + "&Creator=" + tempvm.DOCCreator;
+                    tempvm.DocID = UpdateDocID(tempvm.DOCPJK, tempvm.DOCKey);
                 }
 
                 ret.Add(tempvm);
             }
 
-            foreach (var doc in ret)
-            {
-                if (string.IsNullOrEmpty(doc.DocID))
-                {
-                    doc.DocID = UpdateDocID(doc.DOCPJK, doc.DOCKey);
-                }
-            }
-
-            var bloglist = RetrieveMyLearnBlog(UserName,ctrl);
+            var bloglist = RetrieveMyLearnBlog(UserName, ctrl);
             if (bloglist.Count > 0)
             {
                 ret.AddRange(bloglist);
             }
-
-            ret.Sort(delegate (ShareDocVM item1, ShareDocVM item2)
-            {
-                if (item1.DOCDate > item2.DOCDate)
-                {
-                    return -1;
-                }
-                else if (item1.DOCDate < item2.DOCDate)
-                {
-                    return 1;
-                }
-                else
-                    return 0;
-            });
 
             return ret;
         }
@@ -430,15 +419,20 @@ namespace Prometheus.Models
         private static List<ShareDocVM> RetrieveMyLearnBlog(string UserName, Controller ctrl)
         {
             var ret = new List<ShareDocVM>();
-            var sql = "(select DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,'' as DOCPusher, '' as DOCFavor, APVal1,BackLink"+ 
-                        " from ShareDoc where DOCTag like '%TRAINING%')"+
-                        " UNION ALL"+
-                        " (select a.DOCPJK, a.DOCType, a.DOCKey, a.DOCTag, a.DOCCreator, a.DOCDate, a.DOCPusher, a.DOCFavor, b.APVal1, a.BackLink"+
-                        " from UserLearn a left"+
-                        " join ShareDoc b ON a.DOCKey = b.DOCKey"+
-                        " where a.UserName = '<UserName>' and a.DOCType = '<DOCType>' and a.DOCTag not like '%TRAINING%')" +
-                        " ORDER by DOCDate Desc; ";
-            sql = sql.Replace("<UserName>", UserName).Replace("<DOCType>", ShareDocType.BLOG);
+            var sql = @"select tmp_a.*, ub.APVal3 as Summary, CONCAT('<BlogUrl>', ub.APVal2) as DocURL
+                 from ((select DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,'' as DOCPusher,
+                 '' as DOCFavor, APVal1,BackLink, DOCFavorTimes
+                 from ShareDoc where DOCTag like '%TRAINING%') 
+                 UNION ALL
+                 (select a.DOCPJK, a.DOCType, a.DOCKey, a.DOCTag, a.DOCCreator, 
+                 a.DOCDate, a.DOCPusher, a.DOCFavor, b.APVal1, a.BackLink, b.DOCFavorTimes 
+                 from UserLearn a left join ShareDoc b ON a.DOCKey = b.DOCKey 
+                 where a.UserName = '<UserName>' and a.DOCType = 'Type' and a.DOCTag not like '%TRAINING%') 
+                 ) as tmp_a inner join UserBlog as ub on tmp_a.DOCKey = ub.APVal2
+                 ORDER by DOCDate Desc ";
+            sql = sql.Replace("<UserName>", UserName)
+                .Replace("<Type>", ShareDocType.BLOG)
+                .Replace("<BlogUrl>", "/User/WebDoc?DocKey=");
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
             {
@@ -452,29 +446,27 @@ namespace Prometheus.Models
                 tempvm.DOCDate = DateTime.Parse(Convert.ToString(line[5]));
                 tempvm.DOCPusher = Convert.ToString(line[6]);
                 tempvm.DOCFavor = Convert.ToString(line[7]);
-                tempvm.DOCFavorTimes = RetrieveBlogFavorTimes(tempvm.DOCKey, tempvm.DOCCreator) ;
+                tempvm.DOCFavorTimes = Convert.ToInt32(line[10]);
                 tempvm.DocID = Convert.ToString(line[8]);
                 tempvm.BACKLink = Convert.ToString(line[9]);
-
-                var blog = UserBlogVM.RetrieveBlogDoc(tempvm.DOCKey,ctrl);
-                if (string.IsNullOrEmpty(blog.DocKey))
-                    continue;
-
-                tempvm.Summary = blog.Title;
-                tempvm.DocURL = blog.DocURL;
+                tempvm.Summary = (tempvm.DOCType == ShareDocType.BLOG) ? ConvertComment(Convert.ToString(line[11])) : Convert.ToString(line[11]);
+                tempvm.DocURL = Convert.ToString(line[12]);
+                if (string.IsNullOrEmpty(tempvm.DocID))
+                {
+                    tempvm.DocID = UpdateDocID(tempvm.DOCPJK, tempvm.DOCKey);
+                }
 
                 ret.Add(tempvm);
             }
 
-            foreach (var doc in ret)
-            {
-                if (string.IsNullOrEmpty(doc.DocID))
-                {
-                    doc.DocID = UpdateDocID(doc.DOCPJK, doc.DOCKey);
-                }
-            }
-
             return ret;
+        }
+
+        public static string ConvertComment(string comment)
+        {
+            var com = new UserBlogVM();
+            com.dbTitle = comment;
+            return com.Title;
         }
 
         public static List<ShareDocVM> RetrieveMyShare(string UserName,Controller ctrl)
@@ -619,15 +611,38 @@ namespace Prometheus.Models
 
 
 
-        public static List<ShareDocVM> RetrieveYesterdayDocs(Controller ctrl)
+        public static List<ShareDocVM> RetrieveYesterdayDocs()
         {
             var ret = new List<ShareDocVM>();
             string tempdate = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
             var starttime = tempdate + " 00:00:00";
             var endtime = tempdate + " 23:59:59";
-
-            var sql = "select DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,DOCFavorTimes,APVal1,BackLink from ShareDoc where DOCDate >= '<starttime>' and DOCDate <= '<endtime>'";
-            sql = sql.Replace("<starttime>", starttime).Replace("<endtime>",endtime);
+            var sql = @"select sd.DOCPJK, sd.DOCType, sd.DOCKey, sd.DOCTag, sd.DOCCreator, sd.DOCDate, sd.DOCFavorTimes, sd.APVal1, sd.BackLink, i.Summary, CONCAT('<IssueUrl>', i.IssueKey) as DocURL
+                    from ShareDoc as sd inner join issue as i on sd.DOCKey = i.IssueKey
+                    where sd.DOCType = '<Type1>' and i.APVal1 <> 'delete' and sd.DOCDate >= '<starttime>' and sd.DOCDate <= '<endtime>'
+                    UNION ALL
+                    select sd.DOCPJK, sd.DOCType, sd.DOCKey, sd.DOCTag, sd.DOCCreator, sd.DOCDate, sd.DOCFavorTimes, sd.APVal1, sd.BackLink, CONCAT(pe.ProjectKey, '-', pe.OrignalCode) as Summary, CONCAT('<DebugUrl>', pe.ErrorKey) as DocURL
+                    from ShareDoc as sd inner join ProjectError as pe on sd.DOCKey = pe.ErrorKey
+                    where sd.DOCType = '<Type2>' and sd.DOCDate >= '<starttime>' and sd.DOCDate <= '<endtime>'
+                    UNION ALL
+                    select sd.DOCPJK, sd.DOCType, sd.DOCKey, sd.DOCTag, sd.DOCCreator, sd.DOCDate, sd.DOCFavorTimes, sd.APVal1, sd.BackLink, ub.APVal3 as Summary, CONCAT('<BlogUrl>', ub.APVal2) as DocURL
+                    from ShareDoc as sd inner join UserBlog as ub on sd.DOCKey = ub.APVal2
+                    WHERE sd.DOCType = '<Type3>' and sd.DOCDate >= '<starttime>' and sd.DOCDate <= '<endtime>'
+                    UNION ALL
+                    select sd.DOCPJK, sd.DOCType, sd.DOCKey, sd.DOCTag, sd.DOCCreator, sd.DOCDate, sd.DOCFavorTimes, sd.APVal1, sd.BackLink, sd.DOCKey as Summary, CONCAT('<WebUrl1>', sd.DOCKey, '<WebUrl2>', sd.DOCCreator) as DocURL
+                    from ShareDoc as sd 
+                    where sd.DOCType NOT IN ('<Type1>', '<Type2>', '<Type3>') and sd.DOCDate >= '<starttime>' and sd.DOCDate <= '<endtime>'
+                    order by sd.DOCDate";
+            sql = sql.Replace("<Type1>", ShareDocType.ISSUE)
+                     .Replace("<Type2>", ShareDocType.DEBUG)
+                     .Replace("<Type3>", ShareDocType.BLOG)
+                     .Replace("<IssueUrl>", "/Issue/UpdateIssue?issuekey=")
+                     .Replace("<DebugUrl>", "/Project/UpdateProjectError?ErrorKey=")
+                     .Replace("<BlogUrl>", "/User/WebDoc?DocKey=")
+                     .Replace("<WebUrl1>", "/User/WebDoc?DocKey=")
+                     .Replace("<WebUrl2>", "&Creator=")
+                     .Replace("<starttime>", starttime)
+                     .Replace("<endtime>",endtime);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
             {
@@ -641,42 +656,42 @@ namespace Prometheus.Models
                 tempvm.DOCFavorTimes = Convert.ToInt32(line[6]);
                 tempvm.DocID = Convert.ToString(line[7]);
                 tempvm.BACKLink = Convert.ToString(line[8]);
-
-                if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
-                {
-                    var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey,ctrl);
-                    if (issue == null)
-                    {
-                        continue;
-                    }
-
-                    tempvm.Summary = issue.Summary;
-                    tempvm.DocURL = "/Issue/UpdateIssue?issuekey=" + tempvm.DOCKey;
-                }
-                else if (string.Compare(tempvm.DOCType, ShareDocType.DEBUG, true) == 0)
-                {
-                    var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(tempvm.DOCKey,ctrl);
-                    tempvm.Summary = debugtree[0].ProjectKey + "-" + debugtree[0].OrignalCode;
-                    tempvm.DocURL = "/Project/UpdateProjectError?ErrorKey=" + tempvm.DOCKey;
-                }
-                else
-                {
-                    tempvm.Summary = tempvm.DOCKey;
-                    //var tempstrs = tempvm.Summary.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
-                    //var datestr = tempstrs[tempstrs.Length - 1].Substring(0, 8);
-                    //tempvm.DocURL = "/userfiles/docs/" + datestr + "/" + tempvm.DOCKey;
-                    tempvm.DocURL = "/User/WebDoc?DocKey=" + tempvm.DOCKey + "&Creator=" + tempvm.DOCCreator;
-                }
+                tempvm.Summary = (tempvm.DOCType == ShareDocType.BLOG) ? ConvertComment(Convert.ToString(line[9])) : Convert.ToString(line[9]);
+                tempvm.DocURL = Convert.ToString(line[10]);
 
                 ret.Add(tempvm);
             }
             return ret;
         }
 
-        public static List<ShareDocVM> RetrieveAllSharedDocs(Controller ctrl)
+        public static List<ShareDocVM> RetrieveAllSharedDocs()
         {
             var ret = new List<ShareDocVM>();
-            var sql = "select DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,DOCFavorTimes,APVal1,BackLink from ShareDoc order by DOCDate";
+            var sql = @"select sd.DOCPJK, sd.DOCType, sd.DOCKey, sd.DOCTag, sd.DOCCreator, sd.DOCDate, sd.DOCFavorTimes, sd.APVal1, sd.BackLink, i.Summary, CONCAT('<IssueUrl>', i.IssueKey) as DocURL
+                    from ShareDoc as sd inner join issue as i on sd.DOCKey = i.IssueKey
+                    where sd.DOCType = '<Type1>' and  i.APVal1 <> 'delete'
+                    UNION ALL
+                    select sd.DOCPJK, sd.DOCType, sd.DOCKey, sd.DOCTag, sd.DOCCreator, sd.DOCDate, sd.DOCFavorTimes, sd.APVal1, sd.BackLink, CONCAT(pe.ProjectKey, '-', pe.OrignalCode) as Summary, CONCAT('<DebugUrl>', pe.ErrorKey) as DocURL
+                    from ShareDoc as sd inner join ProjectError as pe on sd.DOCKey = pe.ErrorKey
+                    where sd.DOCType = '<Type2>'
+                    UNION ALL
+                    select sd.DOCPJK, sd.DOCType, sd.DOCKey, sd.DOCTag, sd.DOCCreator, sd.DOCDate, sd.DOCFavorTimes, sd.APVal1, sd.BackLink, ub.APVal3 as Summary, CONCAT('<BlogUrl>', ub.APVal2) as DocURL
+                    from ShareDoc as sd inner join UserBlog as ub on sd.DOCKey = ub.APVal2
+                    WHERE sd.DOCType = '<Type3>'
+                    UNION ALL
+                    select sd.DOCPJK, sd.DOCType, sd.DOCKey, sd.DOCTag, sd.DOCCreator, sd.DOCDate, sd.DOCFavorTimes, sd.APVal1, sd.BackLink, sd.DOCKey as Summary, CONCAT('<WebUrl1>', sd.DOCKey, '<WebUrl2>', sd.DOCCreator) as DocURL
+                    from ShareDoc as sd 
+                    where sd.DOCType NOT IN ('<Type1>', '<Type2>', '<Type3>')
+                    order by sd.DOCDate";
+            sql = sql.Replace("<Type1>", ShareDocType.ISSUE)
+                     .Replace("<Type2>", ShareDocType.DEBUG)
+                     .Replace("<Type3>", ShareDocType.BLOG)
+                     .Replace("<IssueUrl>", "/Issue/UpdateIssue?issuekey=")
+                     .Replace("<DebugUrl>", "/Project/UpdateProjectError?ErrorKey=")
+                     .Replace("<BlogUrl>", "/User/WebDoc?DocKey=")
+                     .Replace("<WebUrl1>", "/User/WebDoc?DocKey=")
+                     .Replace("<WebUrl2>", "&Creator=");
+
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
             foreach (var line in dbret)
             {
@@ -690,41 +705,8 @@ namespace Prometheus.Models
                 tempvm.DOCFavorTimes = Convert.ToInt32(line[6]);
                 tempvm.DocID = Convert.ToString(line[7]);
                 tempvm.BACKLink = Convert.ToString(line[8]);
-
-                if (string.Compare(tempvm.DOCType, ShareDocType.ISSUE, true) == 0)
-                {
-                    var issue = IssueViewModels.RetrieveIssueByIssueKey(tempvm.DOCKey,ctrl);
-                    if (issue == null)
-                    {
-                        continue;
-                    }
-
-                    tempvm.Summary = issue.Summary;
-                    tempvm.DocURL = "/Issue/UpdateIssue?issuekey=" + tempvm.DOCKey;
-                }
-                else if (string.Compare(tempvm.DOCType, ShareDocType.DEBUG, true) == 0)
-                {
-                    var debugtree = ProjectErrorViewModels.RetrieveErrorByErrorKey(tempvm.DOCKey, ctrl);
-                    tempvm.Summary = debugtree[0].ProjectKey + "-" + debugtree[0].OrignalCode;
-                    tempvm.DocURL = "/Project/UpdateProjectError?ErrorKey=" + tempvm.DOCKey;
-                }
-                else if (string.Compare(tempvm.DOCType, ShareDocType.BLOG, true) == 0)
-                {
-                    var blog = UserBlogVM.RetrieveBlogDoc(tempvm.DOCKey, ctrl);
-                    if (string.IsNullOrEmpty(blog.DocKey))
-                        continue;
-
-                    tempvm.Summary = blog.Title;
-                    tempvm.DocURL = blog.DocURL;
-                }
-                else
-                {
-                    tempvm.Summary = tempvm.DOCKey;
-                    //var tempstrs = tempvm.Summary.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
-                    //var datestr = tempstrs[tempstrs.Length - 1].Substring(0, 8);
-                    //tempvm.DocURL = "/userfiles/docs/" + datestr + "/" + tempvm.DOCKey;
-                    tempvm.DocURL = "/User/WebDoc?DocKey=" + tempvm.DOCKey + "&Creator=" + tempvm.DOCCreator;
-                }
+                tempvm.Summary = (tempvm.DOCType == ShareDocType.BLOG) ? ConvertComment(Convert.ToString(line[9])) : Convert.ToString(line[9]);
+                tempvm.DocURL = Convert.ToString(line[10]);
 
                 ret.Add(tempvm);
             }
@@ -956,7 +938,7 @@ namespace Prometheus.Models
 
         public static void MatchAllPostDocForUser(string username,Controller ctrl)
         {
-            var allpostdoc = RetrieveAllSharedDocs(ctrl);
+            var allpostdoc = RetrieveAllSharedDocs();
 
             var usertag = RetrieveUserBookedTag(username);
             var usertaglist = new List<string>();
@@ -984,7 +966,7 @@ namespace Prometheus.Models
         public static void MatchAllYesterdayDoc(Controller ctrl)
         {
             var userlist = RetrieveAllUserBookedTag();
-            var ydoc = RetrieveYesterdayDocs(ctrl);
+            var ydoc = RetrieveYesterdayDocs();
 
             foreach (var u in userlist)
             {

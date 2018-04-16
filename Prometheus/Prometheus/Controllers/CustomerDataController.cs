@@ -142,6 +142,10 @@ namespace Prometheus.Controllers
                         var PN = line[6];
                         var CH = line[2];
                         var Rate = line[3];
+                        if (!string.IsNullOrEmpty(line[7]))
+                        {
+                            CH = CH + "_" + line[7];
+                        }
 
                         if (!string.IsNullOrEmpty(PN)
                             && !string.IsNullOrEmpty(CH)

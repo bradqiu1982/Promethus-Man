@@ -428,7 +428,7 @@ namespace Prometheus.Models
             foreach (var line in dbret)
             {
                 var val = Convert.ToDouble(line[0]);
-                var sn = Convert.ToString(line[2]);
+                var sn = Convert.ToString(line[1]);
 
                 var adddata = false;
                 if (limitexist)
@@ -596,11 +596,12 @@ namespace Prometheus.Models
         private static void AddData(string wafer,string fieldname,string boxdata)
         {
             CleanWaferData(wafer, fieldname);
-            var sql = "insert into WaferBGDFiled(WaferNo,FieldName,BoxData) values(@WaferNo,@FieldName,@BoxData)";
+            var sql = "insert into WaferBGDFiled(WaferNo,FieldName,BoxData,UpdateTime) values(@WaferNo,@FieldName,@BoxData,@UpdateTime)";
             var dict = new Dictionary<string, string>();
             dict.Add("@WaferNo",wafer);
             dict.Add("@FieldName",fieldname);
             dict.Add("@BoxData",boxdata);
+            dict.Add("@UpdateTime", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             DBUtility.ExeLocalSqlNoRes(sql, dict);
         }
 
@@ -705,7 +706,23 @@ namespace Prometheus.Models
         }
 
 
+        public static void TestVcselBGDComputer(DateTime StartDate, Dictionary<string, VcselPNData> VcselPNInfo, Controller ctrl)
+        {
+            var EndDate = StartDate.AddDays(7);
+            var monthlytestdata = RetrieveBITestData(StartDate, EndDate);
+            VcselMonthData.UpdateMonthData(StartDate, monthlytestdata, VcselPNInfo);
+            VcselTimeRange.UpateWaferTimeRange(StartDate, monthlytestdata);
 
+            var waferdict = new Dictionary<string, bool>();
+            foreach (var data in monthlytestdata)
+            {
+                if (!waferdict.ContainsKey(data.Wafer))
+                {
+                    waferdict.Add(data.Wafer, true);
+                }
+            }
+            SolveDataByWafer(waferdict, VcselPNInfo, ctrl);
+        }
 
     }
 

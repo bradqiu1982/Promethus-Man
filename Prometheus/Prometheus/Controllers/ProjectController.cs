@@ -6457,6 +6457,15 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
+            //try
+            //{
+            //    var vcselpninfo = VcselPNData.RetrieveVcselPNInfo();
+            //    VcselBGDVM.TestVcselBGDComputer(DateTime.Parse("2017-12-01 00:00:00"), vcselpninfo, this);
+            //}
+            //catch (Exception ex) {
+            //    System.Windows.MessageBox.Show(ex.Message);
+            //}
+
             //ExternalDataCollector.RefreshIQEData(this);
 
             //ProjectTestData.PrePareOSALatestData("25GWIRELESSTOSAG", this);

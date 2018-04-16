@@ -1416,8 +1416,8 @@ CREATE TABLE [dbo].[WaferTestSum] (
 	);
 
 CREATE TABLE [dbo].[WaferBGDFiled] (
-    [WaferNo]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+    [WaferNo]   NVARCHAR (200) DEFAULT ('') NOT NULL,
 	[FieldName]   NVARCHAR (200) DEFAULT ('') NOT NULL,
-	[BoxData]   NVARCHAR (300) DEFAULT ('0') NOT NULL,
-	[UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[BoxData]   NVARCHAR (300) DEFAULT ('') NOT NULL,
+	[UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
 	);

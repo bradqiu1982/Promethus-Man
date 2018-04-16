@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 
@@ -315,12 +316,21 @@ namespace Prometheus.Models
                 vtype =  VcselPNInfo[waferdata[0].ProductName].Rate + "_" + VcselPNInfo[waferdata[0].ProductName].Channel;
             }
 
-            var dataids = "('";
+            StringBuilder sb = new StringBuilder(36 * (waferdata.Count + 1));
+            sb.Append("('");
             foreach (var line in waferdata)
             {
-                dataids = dataids + line.DataID + "','";
+                sb.Append(line.DataID + "','");
             }
-            dataids = dataids.Substring(0, dataids.Length - 2) + ")";
+            var tempstr = sb.ToString();
+            var dataids = tempstr.Substring(0,tempstr.Length-2) + ")";
+
+            //var dataids = "('";
+            //foreach (var line in waferdata)
+            //{
+            //    dataids = dataids + line.DataID + "','";
+            //}
+            //dataids = dataids.Substring(0, dataids.Length - 2) + ")";
 
             CleanWaferData(wafer);
 
@@ -572,12 +582,14 @@ namespace Prometheus.Models
 
         public static void UpdateWaferFields(string wafer, List<BITestResult> waferdata, Controller ctrl)
         {
-            var idcond = "('";
+            StringBuilder sb = new StringBuilder(36*(waferdata.Count+1));
+            sb.Append("('");
             foreach (var line in waferdata)
             {
-                idcond = idcond + line.DataID + "','";
+                sb.Append(line.DataID + "','");
             }
-            idcond = idcond.Substring(0, idcond.Length - 2)+")";
+            var tempstr = sb.ToString();
+            var idcond = tempstr.Substring(0, tempstr.Length - 2)+")";
 
             SolveNormalField(wafer,"Delta_PO_LD",idcond,ctrl);
             SolveNormalField(wafer, "Delta_PO_Uniformity",idcond,ctrl);

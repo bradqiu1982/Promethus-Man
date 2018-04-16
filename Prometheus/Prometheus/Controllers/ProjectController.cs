@@ -6020,9 +6020,70 @@ namespace Prometheus.Controllers
             { }
         }
 
+        private void sundaylog(string msg)
+        {
+            try
+            {
+                var filename = "sunday-report-log" + DateTime.Now.ToString("yyyy-MM-dd");
+                var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
+
+                var content = "";
+                if (System.IO.File.Exists(wholefilename))
+                {
+                    content = System.IO.File.ReadAllText(wholefilename);
+                }
+                content = content + msg + " @ " + DateTime.Now.ToString() + "\r\n";
+                System.IO.File.WriteAllText(wholefilename, content);
+            }
+            catch (Exception ex)
+            { }
+        }
+
         public void SundayReport()
         {
+            sundaylog("Sunday Report Start....");
 
+            var times = 0;
+
+            var glbcfg = CfgUtility.GetSysConfig(this);
+            var vcselbgdzeropoint = DateTime.Parse(glbcfg["VCSELBIGDATAZEROPOINT"]);
+
+            var vcselpninfo = VcselPNData.RetrieveVcselPNInfo();
+            if (vcselpninfo.Count == 0)
+            {
+                sundaylog("Sunday Report End for vcsel pn is empty....");
+                return;
+            }
+
+            while (true)
+            {
+                if (!VcselMonthData.MonthDataExist(vcselbgdzeropoint))
+                {
+                    var currenttime = DateTime.Now;
+                    if (currenttime.Hour > 18 || vcselbgdzeropoint.AddMonths(1) > currenttime)
+                    {
+                        sundaylog("Sunday Report End for time....");
+                        return;
+                    }
+
+                    sundaylog("start computer " + vcselbgdzeropoint.ToString("yyyy-MM-dd HH:mm:ss") + " Monthly data");
+                    VcselBGDVM.StartVcselBGDComputer(vcselbgdzeropoint, vcselpninfo,this);
+                    vcselbgdzeropoint = vcselbgdzeropoint.AddMonths(1);
+                }
+                else
+                {
+                    //EXIST SUCH DATA
+                    sundaylog(vcselbgdzeropoint.ToString("yyyy-MM-dd HH:mm:ss")+" Monthly data exist");
+                    vcselbgdzeropoint = vcselbgdzeropoint.AddMonths(1);
+                    continue;
+                }
+
+                times = times + 1;
+                if (times > 10)
+                {
+                    break;
+                }
+            }//end while
         }
 
         public ActionResult HeartBeat()
@@ -6037,7 +6098,8 @@ namespace Prometheus.Controllers
                 return View();
             }
 
-            if (DateTime.Now.DayOfWeek == DayOfWeek.Sunday)
+            if (DateTime.Now.DayOfWeek == DayOfWeek.Sunday
+                || DateTime.Now.DayOfWeek == DayOfWeek.Saturday)
             {
                 if (!System.IO.File.Exists(sundayreportDone))
                 {
@@ -6395,6 +6457,15 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
+            //try
+            //{
+            //    var vcselpninfo = VcselPNData.RetrieveVcselPNInfo();
+            //    VcselBGDVM.TestVcselBGDComputer(DateTime.Parse("2017-12-01 00:00:00"), vcselpninfo, this);
+            //}
+            //catch (Exception ex) {
+            //    System.Windows.MessageBox.Show(ex.Message);
+            //}
+
             //ExternalDataCollector.RefreshIQEData(this);
 
             //ProjectTestData.PrePareOSALatestData("25GWIRELESSTOSAG", this);

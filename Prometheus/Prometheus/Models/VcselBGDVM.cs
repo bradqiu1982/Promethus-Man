@@ -343,6 +343,28 @@ namespace Prometheus.Models
             }
         }
 
+        public static List<string> VcselTypeList()
+        {
+            var ret = new List<string>();
+            var sql = "select distinct VTYPE from WaferTestSum";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
+            foreach (var line in dbret)
+            { ret.Add(Convert.ToString(line[0])); }
+            ret.Sort();
+            return ret;
+        }
+
+        public static List<string> VcselTestList()
+        {
+            var ret = new List<string>();
+            var sql = "select distinct WhichTest from WaferTestSum";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            { ret.Add(Convert.ToString(line[0])); }
+            ret.Sort();
+            return ret;
+        }
+
         public string WaferNo { set; get; }
         public string WhichTest { set; get; }
         //RATE_CHANNEL
@@ -753,6 +775,17 @@ namespace Prometheus.Models
             }
             SolveDataByWafer(waferdict, VcselPNInfo, ctrl);
         }
+
+        public static List<string> VcselTypeList()
+        {
+            return WaferTestSum.VcselTypeList();
+        }
+
+        public static List<string> VcselTestList()
+        {
+            return WaferTestSum.VcselTestList();
+        }
+
 
     }
 

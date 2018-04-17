@@ -1,0 +1,111 @@
+﻿
+@{
+    ViewBag.Title = "MonthlyVcsel";
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
+}
+
+<link type="text/css" rel="stylesheet" href="~/Content/bootstrap-datepicker/bootstrap-datepicker.min.css" />
+<link type="text/css" rel="stylesheet" href="~/Scripts/jquery-autocomplete/jquery.auto-complete.css" />
+<link type="text/css" rel="stylesheet" href="~/Content/burnin.css" />
+
+<script type="text/javascript" src="~/Scripts/jquery-autocomplete/jquery.auto-complete.min.js"></script>
+<script type="text/javascript" src="~/Scripts/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
+<script type="text/javascript" src="~/Scripts/highcharts.js"></script>
+<script type="text/javascript" src="~/Scripts/highcharts-more.js"></script>
+<script type="text/javascript" src="~/Scripts/burnin.js"></script>
+<script type="text/javascript">
+        $(function(){
+            BurnIn.init();
+        })
+</script>
+
+
+<div class="row" style="margin-left:5px;padding:15px;">
+    <div class="nav navbar-nav navbar-left">
+        <img src="~/Content/images/PJ/Yield.png" style="height:40px; width:40px">
+    </div>
+    <div class="nav navbar-nav navbar-left">
+        <ol class="breadcrumb" style="width:600px">
+            <li class="active">VCSEL YIELD</li>
+        </ol>
+    </div>
+</div>
+
+<div class="row">
+    <nav class="col-xs-2 nav-sidebar">
+        <ul class="nav">
+            <li class="active">
+                <a href="#">
+                    <span class="item-show">BurnIn Yield</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <span class="item-show">Data Distribution</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <div class="col-xs-10 body-content">
+        <div class="v-container">
+            <div class="v-filter">
+                <div class="row row-margin">
+                    <label class="col-xs-3">Date Period</label>
+                    <div class="col-xs-3">
+                        <div class="input-group date" data-date=""
+                             data-date-format="yyyy-mm">
+                            <input type="text" class="form-control"
+                                   id="sdate" name="sdate" value="" readonly>
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-th"></span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-xs-1 text-center">~</div>
+                    <div class="col-xs-3">
+                        <div class="input-group date" data-date=""
+                             data-date-format="yyyy-mm">
+                            <input type="text" class="form-control"
+                                   id="edate" name="edate" value="" readonly>
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-th"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row row-margin">
+                    <label class="col-xs-3">Wafer Type</label>
+                    <div class="col-xs-3">
+                        @Html.DropDownList("vcseltypeselectlist", null, new { @id = "vcseltypeselectlist", @class = "form-control" })
+                        @*<input type="text" class="form-control" id="wf-type" name="wf-type">*@
+                    </div>
+                    <div class="col-xs-1"></div>
+                    <div class="col-xs-3 box-search">
+                        <input type="button" class="btn btn-success" name="btn-search" id="btn-search" value="Search">
+                    </div>
+                </div>
+            </div>
+            <div class="v-content">
+                @*<div class="col-xs-6">
+                    <div class="v-box" id="type_pre_1"></div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="v-box" id="type_post_2"></div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="v-box" id="type_fm_1"></div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="v-box" id="type_fm_2"></div>
+                </div>
+                <div class="v-lengend row">
+                    <span class="span-fm label label-success">P130</span>
+                    <span class="span-fm label label-success">P130</span>
+                    <span class="span-fm label label-success">P130</span>
+                </div>*@
+            </div>
+        </div>
+    </div>
+</div>
+
+

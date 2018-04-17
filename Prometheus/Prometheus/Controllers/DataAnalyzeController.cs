@@ -77,6 +77,167 @@ namespace Prometheus.Controllers
         }
 
 
+        public ActionResult MonthlyVcsel()
+        {
+            var vcseltypelist = VcselBGDVM.VcselTypeList();
+            ViewBag.vcseltypeselectlist = CreateSelectList(vcseltypelist, "");
+
+
+            return View();
+        }
+
+        public JsonResult MonthlyVcselYield()
+        {
+            var sdate = DateTime.Parse(Request.Form["sdate"]);
+            var edate = DateTime.Parse(Request.Form["edate"]);
+            var vtype = Request.Form["wf_type"];
+            var startdate = DateTime.Now;
+            var enddate = DateTime.Now;
+            if (sdate < edate)
+            {
+                startdate = DateTime.Parse(sdate.ToString("yyyy-MM") + "-01 00:00:00");
+                enddate = DateTime.Parse(edate.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(1).AddDays(-1);
+            }
+            else
+            {
+                startdate = DateTime.Parse(edate.ToString("yyyy-MM") + "-01 00:00:00");
+                enddate = DateTime.Parse(sdate.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(1).AddDays(-1);
+            }
+
+            var yieldarray = new List<object>();
+            var failurearray = new List<object>();
+
+            var retdata = VcselBGDVM.RetrieveVcselMonthlyData(DateTime.Parse("2017-12-01 00:00:00"), DateTime.Parse("2017-12-30 00:00:00"), "10G_1x12");
+            var testylist = (List<testtypeyield>)retdata[0];
+            var testflist = (List<TestFailureColumn>)retdata[1];
+
+            foreach (var item in testylist)
+            {
+                if (item.DYield.Count > 0)
+                {
+                    var id = "y_" + item.TestType.Replace(" ", "_") + "_id";
+
+                    var lastdidx = item.DYield.Count - 1;
+                    var title = Convert.ToDateTime(item.DYield[0].date).ToString("yyyy/MM") + " ~ " +Convert.ToDateTime(item.DYield[lastdidx].date).ToString("yyyy/MM") + " VCSEL Yield (" +item.TestType+ ")";
+
+                    var xdata = new List<string>();
+                    var ydata = new List<double>();
+                    foreach (var dy in item.DYield)
+                    {
+                        xdata.Add(Convert.ToDateTime(dy.date).ToString("yyyy/MM"));
+                        ydata.Add(Math.Round(dy.yield, 2));
+                    }
+
+                    var xAxis = new { data = xdata };
+
+                    var yAxis = new
+                    {
+                        title = "Yield (%)",
+                        min = 70,
+                        max = 100
+                    };
+
+                    var min = new
+                    {
+                        name = "Min",
+                        color= "#F0AD4E",
+                        data=94,
+                        style= "dash"
+                    };
+
+                    var max = new
+                    {
+                        name = "Max",
+                        color = "#C9302C",
+                        data = 98,
+                        style = "solid"
+                    };
+
+                    var data = new
+                    {
+                        name = "Yield",
+                        color = "#5CB85C",
+                        data = ydata
+                    };
+
+                    var combinedata = new {
+                        min = min,
+                        max = max,
+                        data = data
+                    };
+
+                    yieldarray.Add(new
+                    {
+                        id = id,
+                        title = title,
+                        xAxis = xAxis,
+                        yAxis = yAxis,
+                        data = combinedata
+                    });
+                }
+            }
+
+            foreach(var item in testflist)
+            {
+                if(item.DateColSeg.Count > 0)
+                {
+                    var id = "f_" + item.TestType.Replace(" ", "_") + "_id";
+
+                    var lastdidx = item.DateColSeg.Count - 1;
+                    var title = Convert.ToDateTime(item.DateColSeg[0].date).ToString("yyyy/MM") + " ~ " + Convert.ToDateTime(item.DateColSeg[lastdidx].date).ToString("yyyy/MM") + " Faliure Mode (" + item.TestType + ")";
+                    var xdata = new List<string>();
+                    var ydata = new List<FailureColumnData>();
+                    var count = 0;
+                    foreach (var f_item in item.DateColSeg)
+                    {
+                        xdata.Add(Convert.ToDateTime(f_item.date).ToString("yyyy/MM"));
+                        count = (f_item.DateColSeg.Count > count) ? f_item.DateColSeg.Count : count;
+                    }
+                    var num = item.DateColSeg.Count;
+                    var n = 1;
+                    for(var i = count - 1; i >= 0; i--)
+                    {
+                        var ydata_tmp = new List<FailureColumnSeg>();
+                        for(var m = 0; m < num; m++)
+                        {
+                            if(i < item.DateColSeg[m].DateColSeg.Count){
+                                ydata_tmp.Add(item.DateColSeg[m].DateColSeg[i]);
+                            }
+                        }
+                        ydata.Add(new FailureColumnData() { index = n, data = ydata_tmp });
+                        n++;
+                    }
+                    var xAxis = new { data = xdata };
+
+                    var yAxis = new
+                    {
+                        title = "(%)",
+                        min = 0,
+                        max = 100
+                    };
+
+                    failurearray.Add(new
+                    {
+                        id = id,
+                        title = title,
+                        xAxis = xAxis,
+                        yAxis = yAxis,
+                        data = ydata
+                    });
+                }
+            }
+
+            var ret = new JsonResult();
+            ret.Data = new { success = true,
+                yieldarray = yieldarray,
+                failurearray = failurearray,
+                colors = retdata[2],
+            };
+            return ret;
+        }
+
+
+
         private void preparetxotestdata(List<string> waferlist,string leftcond, string leftfield, string rightcond, string rightfield)
         {
             

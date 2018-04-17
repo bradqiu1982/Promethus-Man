@@ -16,7 +16,7 @@ namespace Prometheus.Models
             Channel = "";
         }
 
-        public static void UpdateVPnInfo(string pn,string rate,string ch)
+        public static void UpdateVPnInfo(string pn, string rate, string ch)
         {
             var sql = "delete from VcselPNData where PN = @PN";
             var dict = new Dictionary<string, string>();
@@ -56,8 +56,8 @@ namespace Prometheus.Models
         public string Channel { set; get; }
 
         //[PN]   NVARCHAR (200) DEFAULT ('') NOT NULL,
-	    //[Rate]   NVARCHAR (200) DEFAULT ('') NOT NULL,
-	    //[Channel]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+        //[Rate]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+        //[Channel]   NVARCHAR (200) DEFAULT ('') NOT NULL,
     }
 
     public class VcselMonthData
@@ -68,7 +68,7 @@ namespace Prometheus.Models
             VTYPE = "";
             Failure = "";
             Num = "1";
-    }
+        }
 
         public static bool MonthDataExist(DateTime sdate)
         {
@@ -86,7 +86,7 @@ namespace Prometheus.Models
             }
         }
 
-        private static void StoreMonthData(DateTime sdate,string vtype,string failure,string num) {
+        private static void StoreMonthData(DateTime sdate, string vtype, string failure, string num) {
             var sql = "insert into VcselMonthData(StartDate,VTYPE,Failure,Num,UpdateTime) values(@StartDate,@VTYPE,@Failure,@Num,@UpdateTime)";
             var dict = new Dictionary<string, string>();
             dict.Add("@StartDate", sdate.ToString("yyyy-MM-dd HH:mm:ss"));
@@ -95,9 +95,9 @@ namespace Prometheus.Models
             dict.Add("@Num", num);
             dict.Add("@UpdateTime", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             DBUtility.ExeLocalSqlNoRes(sql, dict);
-        } 
+        }
 
-        public static void UpdateMonthData(DateTime sdate, List<BITestResult> mdata , Dictionary<string, VcselPNData> VcselPNInfo)
+        public static void UpdateMonthData(DateTime sdate, List<BITestResult> mdata, Dictionary<string, VcselPNData> VcselPNInfo)
         {
             var keydict = new Dictionary<string, Dictionary<string, int>>();
             foreach (var line in mdata)
@@ -120,7 +120,7 @@ namespace Prometheus.Models
                     else
                     {
                         var tempdict = new Dictionary<string, int>();
-                        tempdict.Add(line.Failure,1);
+                        tempdict.Add(line.Failure, 1);
                         keydict.Add(key, tempdict);
                     }
                 }//check vcsel pn info
@@ -133,6 +133,53 @@ namespace Prometheus.Models
                     StoreMonthData(sdate, typevaluekv.Key, failurekv.Key, failurekv.Value.ToString());
                 }
             }
+        }
+
+        public static Dictionary<string, Dictionary<string, Dictionary<string, int>>> RetrieveMonthlyData(DateTime startdate, DateTime enddate, string vtype)
+        {
+            var ret = new Dictionary<string, Dictionary<string, Dictionary<string, int>>>();
+
+            var sql = "select StartDate,VTYPE,Failure,Num from VcselMonthData where VTYPE like @VTYPE and StartDate >= @sdate and StartDate < @edate";
+            var dict = new Dictionary<string, string>();
+            dict.Add("@VTYPE", "%_" + vtype);
+            dict.Add("@sdate", startdate.ToString("yyyy-MM-dd HH:mm:ss"));
+            dict.Add("@edate", enddate.ToString("yyyy-MM-dd HH:mm:ss"));
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, dict);
+            foreach (var line in dbret)
+            {
+                var sdate = Convert.ToDateTime(line[0]).ToString("yyyy-MM-dd");
+                var testtype = Convert.ToString(line[1]).Replace("_" + vtype, "");
+                var failure = Convert.ToString(line[2]);
+                var num = Convert.ToInt32(line[3]);
+
+                if (ret.ContainsKey(testtype))
+                {
+                    if (ret[testtype].ContainsKey(sdate))
+                    {
+                        if (!ret[testtype][sdate].ContainsKey(failure))
+                        {
+                            ret[testtype][sdate].Add(failure, num);
+                        }
+                    }
+                    else
+                    {
+                        var sub1dict = new Dictionary<string, Dictionary<string, int>>();
+                        var sub2dict = new Dictionary<string, int>();
+                        sub2dict.Add(failure, num);
+                        ret[testtype].Add(sdate, sub2dict);
+                    }
+                }
+                else
+                {
+                    var sub1dict = new Dictionary<string, Dictionary<string, int>>();
+                    var sub2dict = new Dictionary<string, int>();
+                    sub2dict.Add(failure, num);
+                    sub1dict.Add(sdate, sub2dict);
+                    ret.Add(testtype, sub1dict);
+                }
+            }
+
+            return ret;
         }
 
         public DateTime StartDate { set; get; }
@@ -174,7 +221,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<string> RetrieveWafer(DateTime starttime,DateTime endtime)
+        public static List<string> RetrieveWafer(DateTime starttime, DateTime endtime)
         {
             var ret = new List<string>();
             var sql = "select WaferNo from VcselTimeRange where (EndDate > @S1 and EndDate < @E1) OR (StartDate >= @S2 and EndDate <= @E2) OR (StartDate >= @S3 and StartDate < @E3)";
@@ -213,7 +260,7 @@ namespace Prometheus.Models
                 if (sdate.AddMonths(1) > ret[0].EndDate)
                 {
                     sql = "update VcselTimeRange set EndDate = @EndDate where WaferNo = @WaferNo";
-                    dict.Add("@EndDate",sdate.AddMonths(1).ToString("yyyy-MM-dd HH:mm:ss"));
+                    dict.Add("@EndDate", sdate.AddMonths(1).ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 if (sdate < ret[0].StartDate)
                 {
@@ -261,16 +308,16 @@ namespace Prometheus.Models
             Num = "1";
         }
 
-        private static void StoreWaferData(string waferno, string whichtest, string vtype, string failure, string num,string dataids)
+        private static void StoreWaferData(string waferno, string whichtest, string vtype, string failure, string num, string dataids)
         {
             var sql = "insert into WaferTestSum(WaferNo,WhichTest,VTYPE,Failure,Num,UpdateTime,DataIDs) values(@WaferNo,@WhichTest,@VTYPE,@Failure,@Num,@UpdateTime,@DataIDs)";
             var dict = new Dictionary<string, string>();
-            dict.Add("@WaferNo",waferno);
-            dict.Add("@WhichTest",whichtest);
-            dict.Add("@VTYPE",vtype);
-            dict.Add("@Failure",failure);
-            dict.Add("@Num",num);
-            dict.Add("@UpdateTime",DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            dict.Add("@WaferNo", waferno);
+            dict.Add("@WhichTest", whichtest);
+            dict.Add("@VTYPE", vtype);
+            dict.Add("@Failure", failure);
+            dict.Add("@Num", num);
+            dict.Add("@UpdateTime", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             dict.Add("@DataIDs", dataids);
 
             DBUtility.ExeLocalSqlNoRes(sql, dict);
@@ -289,31 +336,31 @@ namespace Prometheus.Models
             var keydict = new Dictionary<string, Dictionary<string, int>>();
             foreach (var line in waferdata)
             {
-                    var key = line.TestName;
-                    if (keydict.ContainsKey(key))
+                var key = line.TestName;
+                if (keydict.ContainsKey(key))
+                {
+                    var tempdict = keydict[key];
+                    if (tempdict.ContainsKey(line.Failure))
                     {
-                        var tempdict = keydict[key];
-                        if (tempdict.ContainsKey(line.Failure))
-                        {
-                            tempdict[line.Failure] = tempdict[line.Failure] + 1;
-                        }
-                        else
-                        {
-                            tempdict.Add(line.Failure, 1);
-                        }
+                        tempdict[line.Failure] = tempdict[line.Failure] + 1;
                     }
                     else
                     {
-                        var tempdict = new Dictionary<string, int>();
                         tempdict.Add(line.Failure, 1);
-                        keydict.Add(key, tempdict);
                     }
+                }
+                else
+                {
+                    var tempdict = new Dictionary<string, int>();
+                    tempdict.Add(line.Failure, 1);
+                    keydict.Add(key, tempdict);
+                }
             }//loop BI test data
 
             var vtype = "";
             if (VcselPNInfo.ContainsKey(waferdata[0].ProductName))
             {
-                vtype =  VcselPNInfo[waferdata[0].ProductName].Rate + "_" + VcselPNInfo[waferdata[0].ProductName].Channel;
+                vtype = VcselPNInfo[waferdata[0].ProductName].Rate + "_" + VcselPNInfo[waferdata[0].ProductName].Channel;
             }
 
             StringBuilder sb = new StringBuilder(36 * (waferdata.Count + 1));
@@ -323,7 +370,7 @@ namespace Prometheus.Models
                 sb.Append(line.DataID + "','");
             }
             var tempstr = sb.ToString();
-            var dataids = tempstr.Substring(0,tempstr.Length-2) + ")";
+            var dataids = tempstr.Substring(0, tempstr.Length - 2) + ")";
 
             //var dataids = "('";
             //foreach (var line in waferdata)
@@ -338,7 +385,7 @@ namespace Prometheus.Models
             {
                 foreach (var failurekv in typevaluekv.Value)
                 {
-                    StoreWaferData(wafer,typevaluekv.Key,vtype, failurekv.Key, failurekv.Value.ToString(),dataids);
+                    StoreWaferData(wafer, typevaluekv.Key, vtype, failurekv.Key, failurekv.Value.ToString(), dataids);
                 }
             }
         }
@@ -347,7 +394,7 @@ namespace Prometheus.Models
         {
             var ret = new List<string>();
             var sql = "select distinct VTYPE from WaferTestSum";
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
             { ret.Add(Convert.ToString(line[0])); }
             ret.Sort();
@@ -440,7 +487,7 @@ namespace Prometheus.Models
             return rawdata;
         }
 
-        private static Dictionary<string,List<double>> RetrieveBIFieldDataSNDict(string fieldname, string idcond, Controller ctrl)
+        private static Dictionary<string, List<double>> RetrieveBIFieldDataSNDict(string fieldname, string idcond, Controller ctrl)
         {
             var glbcfg = CfgUtility.GetSysConfig(ctrl);
             bool limitexist = false;
@@ -534,7 +581,7 @@ namespace Prometheus.Models
                 var lower = GetBoxMeanValue(lowlist);
                 var upper = GetBoxMeanValue(upperlist);
 
-                object ret = new { mean = mean, min = min,max = max,lower= lower,upper = upper };
+                object ret = new { mean = mean, min = min, max = max, lower = lower, upper = upper };
                 return Newtonsoft.Json.JsonConvert.SerializeObject(ret);
             }
             else
@@ -564,7 +611,7 @@ namespace Prometheus.Models
 
         }
 
-        private static void SolveNormalField(string wafer, string fieldname,string idcond, Controller ctrl)
+        private static void SolveNormalField(string wafer, string fieldname, string idcond, Controller ctrl)
         {
             var rawdata = RetrieveBIFieldData(fieldname, idcond, ctrl);
             if (rawdata.Count < 200) {
@@ -604,21 +651,21 @@ namespace Prometheus.Models
 
         public static void UpdateWaferFields(string wafer, List<BITestResult> waferdata, Controller ctrl)
         {
-            StringBuilder sb = new StringBuilder(36*(waferdata.Count+1));
+            StringBuilder sb = new StringBuilder(36 * (waferdata.Count + 1));
             sb.Append("('");
             foreach (var line in waferdata)
             {
                 sb.Append(line.DataID + "','");
             }
             var tempstr = sb.ToString();
-            var idcond = tempstr.Substring(0, tempstr.Length - 2)+")";
+            var idcond = tempstr.Substring(0, tempstr.Length - 2) + ")";
 
-            SolveNormalField(wafer,"Delta_PO_LD",idcond,ctrl);
-            SolveNormalField(wafer, "Delta_PO_Uniformity",idcond,ctrl);
-            SolveComputerField(wafer, "Delta_PO_LD",idcond,ctrl);
+            SolveNormalField(wafer, "Delta_PO_LD", idcond, ctrl);
+            SolveNormalField(wafer, "Delta_PO_Uniformity", idcond, ctrl);
+            SolveComputerField(wafer, "Delta_PO_LD", idcond, ctrl);
         }
 
-        private static void CleanWaferData(string waferno,string fieldname)
+        private static void CleanWaferData(string waferno, string fieldname)
         {
             var sql = "delete from WaferBGDFiled where WaferNo = @WaferNo and FieldName = @FieldName";
             var dict = new Dictionary<string, string>();
@@ -627,14 +674,14 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql, dict);
         }
 
-        private static void AddData(string wafer,string fieldname,string boxdata)
+        private static void AddData(string wafer, string fieldname, string boxdata)
         {
             CleanWaferData(wafer, fieldname);
             var sql = "insert into WaferBGDFiled(WaferNo,FieldName,BoxData,UpdateTime) values(@WaferNo,@FieldName,@BoxData,@UpdateTime)";
             var dict = new Dictionary<string, string>();
-            dict.Add("@WaferNo",wafer);
-            dict.Add("@FieldName",fieldname);
-            dict.Add("@BoxData",boxdata);
+            dict.Add("@WaferNo", wafer);
+            dict.Add("@FieldName", fieldname);
+            dict.Add("@BoxData", boxdata);
             dict.Add("@UpdateTime", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             DBUtility.ExeLocalSqlNoRes(sql, dict);
         }
@@ -642,6 +689,75 @@ namespace Prometheus.Models
         public string WaferNo { set; get; }
         public string FieldName { set; get; }
         public string BoxData { set; get; }
+    }
+
+    public class DateYield {
+        public DateYield(string d, double y)
+        {
+            date = d;
+            yield = y;
+        }
+        public string date { set; get; }
+        public double yield { set; get; }
+    }
+
+    public class testtypeyield {
+        public string TestType { set; get; }
+        private List<DateYield> dateyield = new List<DateYield>();
+        public List<DateYield> DYield {
+            set {
+                dateyield.Clear();
+                dateyield.AddRange(value);
+            }
+            get {
+                return dateyield;
+            }
+        }
+    }
+
+    public class FailureColumnSeg{
+        public string name { set; get; }
+        public int y { set; get; }
+        public string color { set; get; }
+    }
+
+    public class FailureColumnData
+    {
+        public int index { set; get; }
+        public List<FailureColumnSeg> data { set; get; }
+    }
+
+    public class DateFailureColumn
+    {
+        public string date { set; get; }
+        private List<FailureColumnSeg> colseglist = new List<FailureColumnSeg>();
+        public List<FailureColumnSeg> DateColSeg {
+            set {
+                colseglist.Clear();
+                colseglist.AddRange(value);
+            }
+            get {
+                return colseglist;
+            }
+        }
+    }
+
+    public class TestFailureColumn
+    {
+        public string TestType { set; get; }
+        private List<DateFailureColumn> colseglist = new List<DateFailureColumn>();
+        public List<DateFailureColumn> DateColSeg
+        {
+            set
+            {
+                colseglist.Clear();
+                colseglist.AddRange(value);
+            }
+            get
+            {
+                return colseglist;
+            }
+        }
     }
 
     public class VcselBGDVM
@@ -785,6 +901,158 @@ namespace Prometheus.Models
         {
             return WaferTestSum.VcselTestList();
         }
+
+        public static List<string> FMColor()
+        {
+            return new List<string> {
+                "#b7d28d","#dcff93","#ff9b6a",
+                "#f1b8e4","#d9b8f1","#f1ccb8",
+                "#f1f1b8","#b8f1ed","#b8f1cc",
+                "#e7dac9","#f55066","#fe9778",
+                "#9bffa4","#4fffb2","#0fb784"
+            };
+        }
+
+        public static List<FailureColumnSeg> AlignmentFailureOthers(List<FailureColumnSeg> failseglist, int totalfailurecount)
+        {
+            var newfailseglist = new List<FailureColumnSeg>();
+            var overed = false;
+            var others = 0;
+            var tempsum = 0;
+            for (var idx = 0; idx < failseglist.Count; idx++)
+            {
+                tempsum = tempsum + failseglist[idx].y;
+                if ((double)tempsum / (double)totalfailurecount > 0.9 && !overed)
+                {
+                    overed = true;
+                    newfailseglist.Add(failseglist[idx]);
+                }
+                else if (!overed)
+                {
+                    newfailseglist.Add(failseglist[idx]);
+                }
+                else
+                {
+                    others = others + failseglist[idx].y;
+                }
+            }
+
+            if (others > 0)
+            {
+                var tempfailcolseg1 = new FailureColumnSeg();
+                tempfailcolseg1.name = "OTHERS";
+                tempfailcolseg1.y = others;
+                newfailseglist.Add(tempfailcolseg1);
+            }
+
+            return newfailseglist;
+        }
+
+        public static List<object> RetrieveVcselMonthlyData(DateTime sdate, DateTime edate, string vtype)
+        {
+            var ret = new List<object>();
+
+            var alldata = VcselMonthData.RetrieveMonthlyData(sdate, edate, vtype);
+
+            var testylist = new List<testtypeyield>();
+            var testflist = new List<TestFailureColumn>();
+
+
+            var name_colors = new Dictionary<string, string>();
+            var colors = FMColor();
+            var color_idx = 0;
+
+            foreach (var testkv in alldata)
+            {
+                var dateylist = new List<DateYield>();
+                var dateflist = new List<DateFailureColumn>();
+
+                foreach (var datekv in testkv.Value)
+                {
+                    var pass = 0;
+                    var fail = 0;
+
+                    var failseglist = new List<FailureColumnSeg>();
+                    var totalfailurecount = 0;
+
+                    foreach (var failurekv in datekv.Value)
+                    {
+                        if (failurekv.Key.ToUpper().Contains("PASS"))
+                        {
+                            pass = failurekv.Value;
+                        }
+                        else
+                        {
+                            fail = fail + failurekv.Value;
+
+                            var tempfailcolseg = new FailureColumnSeg();
+                            tempfailcolseg.name = failurekv.Key;
+                            tempfailcolseg.y = failurekv.Value;
+                            //tempfailcolseg.color = (name_colors.ContainsKey(failurekv.Key)?name_colors[failurekv.Key]:"#000");
+                            failseglist.Add(tempfailcolseg);
+                            totalfailurecount = totalfailurecount + tempfailcolseg.y;
+                        }
+                    }//end foreach
+                    double yield = (double)pass / ((double)pass + fail)*100.0;
+                    dateylist.Add(new DateYield(datekv.Key,yield));
+
+                    failseglist.Sort(delegate (FailureColumnSeg obj1,FailureColumnSeg obj2)
+                    {
+                        return obj2.y.CompareTo(obj1.y);
+                    });
+
+                    var alignmentedfailseglist = AlignmentFailureOthers(failseglist, totalfailurecount);
+                    foreach (var item in alignmentedfailseglist)
+                    {
+                        if (!name_colors.ContainsKey(item.name))
+                        {
+                            name_colors.Add(item.name, colors[color_idx % colors.Count]);
+                            item.color = colors[color_idx % colors.Count];
+                            color_idx++;
+                        }
+                        else
+                        {
+                            item.color = name_colors[item.name];
+                        }
+                    }
+
+
+                    var datefailcol = new DateFailureColumn();
+                    datefailcol.date = datekv.Key;
+                    datefailcol.DateColSeg = alignmentedfailseglist;
+
+                    dateflist.Add(datefailcol);
+                }//end foreach
+
+                dateylist.Sort(delegate (DateYield obj1, DateYield obj2) {
+                    return DateTime.Parse(obj1.date).CompareTo(DateTime.Parse(obj2.date));
+                });
+
+                dateflist.Sort(delegate (DateFailureColumn obj1,DateFailureColumn obj2)
+                {
+                    return DateTime.Parse(obj1.date).CompareTo(DateTime.Parse(obj2.date));
+                });
+
+                var temptesty = new testtypeyield();
+                temptesty.TestType = testkv.Key;
+                temptesty.DYield = dateylist;
+
+                testylist.Add(temptesty);
+
+                var temptestf = new TestFailureColumn();
+                temptestf.TestType = testkv.Key;
+                temptestf.DateColSeg = dateflist;
+
+                testflist.Add(temptestf);
+            }//end foreach
+            
+            ret.Add(testylist);
+            ret.Add(testflist);
+            ret.Add(name_colors);
+            return ret;
+        }
+
+
 
 
     }

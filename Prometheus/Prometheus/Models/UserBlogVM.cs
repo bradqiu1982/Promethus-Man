@@ -46,7 +46,7 @@ namespace Prometheus.Models
             get { return sTitle; }
         }
 
-        private string dbTitle
+        public string dbTitle
         {
             get
             {
@@ -97,7 +97,7 @@ namespace Prometheus.Models
             get { return sContent; }
         }
 
-        private string dbContent
+        public string dbContent
         {
             get
             {

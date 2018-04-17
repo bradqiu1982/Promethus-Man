@@ -1161,14 +1161,9 @@ namespace Prometheus.Controllers
                 return RedirectToAction("ILearn");
             }
 
-            var tags = string.Empty;
-            for (var i = 0; i < 600; i++)
-            {
-                if (Request.Form["check" + i] != null)
-                {
-                    tags = tags + Request.Form["check" + i] + ";";
-                }
-            }
+            var tags = Request.Form["check[]"];
+            tags = string.IsNullOrEmpty(tags)?"":tags.Replace(",", ";");
+
             ShareDocVM.SetUserBookTag(updater, tags);
 
 

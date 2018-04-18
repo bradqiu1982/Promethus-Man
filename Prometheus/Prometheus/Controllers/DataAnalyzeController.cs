@@ -88,26 +88,40 @@ namespace Prometheus.Controllers
 
         public JsonResult MonthlyVcselYield()
         {
-            var sdate = DateTime.Parse(Request.Form["sdate"]);
-            var edate = DateTime.Parse(Request.Form["edate"]);
+            var ssdate = Request.Form["sdate"];
+            var sedate = Request.Form["edate"];
+
             var vtype = Request.Form["wf_type"];
             var startdate = DateTime.Now;
             var enddate = DateTime.Now;
-            if (sdate < edate)
+
+
+            if (!string.IsNullOrEmpty(ssdate) && !string.IsNullOrEmpty(sedate))
             {
-                startdate = DateTime.Parse(sdate.ToString("yyyy-MM") + "-01 00:00:00");
-                enddate = DateTime.Parse(edate.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(1).AddDays(-1);
+                var sdate = DateTime.Parse(Request.Form["sdate"]);
+                var edate = DateTime.Parse(Request.Form["edate"]);
+                if (sdate < edate)
+                {
+                    startdate = DateTime.Parse(sdate.ToString("yyyy-MM") + "-01 00:00:00");
+                    enddate = DateTime.Parse(edate.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(1).AddDays(-1);
+                }
+                else
+                {
+                    startdate = DateTime.Parse(edate.ToString("yyyy-MM") + "-01 00:00:00");
+                    enddate = DateTime.Parse(sdate.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(1).AddDays(-1);
+                }
             }
             else
             {
-                startdate = DateTime.Parse(edate.ToString("yyyy-MM") + "-01 00:00:00");
-                enddate = DateTime.Parse(sdate.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(1).AddDays(-1);
+                startdate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(-6);
+                enddate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM") + "-01 00:00:00").AddDays(-1);
             }
+
 
             var yieldarray = new List<object>();
             var failurearray = new List<object>();
 
-            var retdata = VcselBGDVM.RetrieveVcselMonthlyData(DateTime.Parse("2017-12-01 00:00:00"), DateTime.Parse("2017-12-30 00:00:00"), "10G_1x12");
+            var retdata = VcselBGDVM.RetrieveVcselMonthlyData(startdate, enddate, vtype);
             var testylist = (List<testtypeyield>)retdata[0];
             var testflist = (List<TestFailureColumn>)retdata[1];
 
@@ -184,13 +198,13 @@ namespace Prometheus.Controllers
                     var id = "f_" + item.TestType.Replace(" ", "_") + "_id";
 
                     var lastdidx = item.DateColSeg.Count - 1;
-                    var title = Convert.ToDateTime(item.DateColSeg[0].date).ToString("yyyy/MM") + " ~ " + Convert.ToDateTime(item.DateColSeg[lastdidx].date).ToString("yyyy/MM") + " Faliure Mode (" + item.TestType + ")";
+                    var title = Convert.ToDateTime(item.DateColSeg[0].xkey).ToString("yyyy/MM") + " ~ " + Convert.ToDateTime(item.DateColSeg[lastdidx].xkey).ToString("yyyy/MM") + " Faliure Mode (" + item.TestType + ")";
                     var xdata = new List<string>();
                     var ydata = new List<FailureColumnData>();
                     var count = 0;
                     foreach (var f_item in item.DateColSeg)
                     {
-                        xdata.Add(Convert.ToDateTime(f_item.date).ToString("yyyy/MM"));
+                        xdata.Add(Convert.ToDateTime(f_item.xkey).ToString("yyyy/MM"));
                         count = (f_item.DateColSeg.Count > count) ? f_item.DateColSeg.Count : count;
                     }
                     var num = item.DateColSeg.Count;
@@ -219,6 +233,7 @@ namespace Prometheus.Controllers
                     failurearray.Add(new
                     {
                         id = id,
+                        coltype = "percent",
                         title = title,
                         xAxis = xAxis,
                         yAxis = yAxis,
@@ -236,6 +251,142 @@ namespace Prometheus.Controllers
             return ret;
         }
 
+        public ActionResult WaferDistribution()
+        {
+            var vcseltypelist = VcselBGDVM.VcselTypeList();
+
+            var nvcseltypelist = new List<string>();
+            nvcseltypelist.Add(" ");
+            nvcseltypelist.AddRange(vcseltypelist);
+
+            ViewBag.vcseltypeselectlist = CreateSelectList(nvcseltypelist, "");
+
+            return View();
+        }
+
+        public JsonResult WaferNOAutoCompelete()
+        {
+            var vlist = VcselBGDVM.WaferNOList();
+            var ret = new JsonResult();
+            ret.Data = new { data = vlist };
+            return ret;
+        }
+
+        public JsonResult WaferDistributionData() {
+            var sdate = DateTime.Parse(Request.Form["sdate"]);
+            var edate = DateTime.Parse(Request.Form["edate"]);
+            var wf_no = Request.Form["wf_no"];
+            var vtype = Request.Form["wf_type"].Trim();
+
+            var wflist = new List<string>();
+            if (!string.IsNullOrEmpty(wf_no))
+            {
+                wflist.AddRange(wf_no.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries));
+            }
+            else
+            {
+                var startdate = DateTime.Now;
+                var enddate = DateTime.Now;
+                if (sdate < edate)
+                {
+                    startdate = DateTime.Parse(sdate.ToString("yyyy-MM") + "-01 00:00:00");
+                    enddate = DateTime.Parse(edate.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(1).AddDays(-1);
+                }
+                else
+                {
+                    startdate = DateTime.Parse(edate.ToString("yyyy-MM") + "-01 00:00:00");
+                    enddate = DateTime.Parse(sdate.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(1).AddDays(-1);
+                }
+
+                wflist.AddRange(VcselTimeRange.RetrieveWafer(startdate,enddate));
+            }
+
+            if (wflist.Count > 0)
+            {
+                var retdata = VcselBGDVM.RetrieveWaferData(wflist, vtype);
+                //fieldname,wafer,boxlist
+                var fieldboxlist = (Dictionary<string, Dictionary<string, List<string>>>)retdata[0];
+                var testflist = (List<TestFailureColumn>)retdata[1];
+
+                var boxarray = new List<object>();
+                var failurearray = new List<object>();
+
+
+                foreach (var item in testflist)
+                {
+                    if (item.DateColSeg.Count > 0)
+                    {
+                        var id = "f_" + item.TestType.Replace(" ", "_") + "_id";
+
+                        var lastdidx = item.DateColSeg.Count - 1;
+                        var title = "Faliure Mode (" + item.TestType + ")";
+
+                        var xdata = new List<string>();
+                        var ydata = new List<FailureColumnData>();
+                        var count = 0;
+                        foreach (var f_item in item.DateColSeg)
+                        {
+                            xdata.Add(f_item.xkey);
+                            count = (f_item.DateColSeg.Count > count) ? f_item.DateColSeg.Count : count;
+                        }
+                        var num = item.DateColSeg.Count;
+                        var n = 1;
+                        for (var i = count - 1; i >= 0; i--)
+                        {
+                            var ydata_tmp = new List<FailureColumnSeg>();
+                            for (var m = 0; m < num; m++)
+                            {
+                                if (i < item.DateColSeg[m].DateColSeg.Count)
+                                {
+                                    item.DateColSeg[m].DateColSeg[i].y = Math.Round(item.DateColSeg[m].DateColSeg[i].y, 3);
+                                    ydata_tmp.Add(item.DateColSeg[m].DateColSeg[i]);
+                                }
+                            }
+                            ydata.Add(new FailureColumnData() { index = n, data = ydata_tmp });
+                            n++;
+                        }
+                        
+                        var xAxis = new { data = xdata };
+                        var yAxis = new
+                        {
+                            title = "(%)",
+                            min = 0,
+                            max = 10
+                        };
+
+                        failurearray.Add(new
+                        {
+                            id = id,
+                            coltype = "normal",
+                            title = title,
+                            xAxis = xAxis,
+                            yAxis = yAxis,
+                            data = ydata
+                        });
+                    }
+                }
+
+                var ret = new JsonResult();
+                ret.Data = new
+                {
+                    success = true,
+                    boxarray = boxarray,
+                    failurearray = failurearray,
+                    colors = retdata[2],
+                };
+                return ret;
+            }
+            else
+            {
+                var ret = new JsonResult();
+                ret.Data = new
+                {
+                    success = false,
+                    msg = "No wafer match query condition."
+                };
+                return ret;
+            }
+        }
 
 
         private void preparetxotestdata(List<string> waferlist,string leftcond, string leftfield, string rightcond, string rightfield)

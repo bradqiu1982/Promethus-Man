@@ -5,6 +5,7 @@ var BurnIn = function(){
             var sdate = $.trim($('#sdate').val());
             var edate = $.trim($('#edate').val());
             var wf_type = $.trim($('#vcseltypeselectlist').val());
+            
             $.post('/DataAnalyze/MonthlyVcselYield', {
                  sdate: sdate,
                  edate: edate,
@@ -41,29 +42,67 @@ var BurnIn = function(){
 
     var distribution = function(){
         $('.date').datepicker({ autoclose: true, viewMode: "months", minViewMode: "months" });
+
+        var waferautolist = [];
+
+        $('.wafer-no').tagsinput({
+            typeahead: {
+                afterSelect: function(val) { this.$element.val(""); },
+                source: function ()
+                {
+                    $.post('/DataAnalyze/WaferNOAutoCompelete', {}, function (output) {
+                                   return ["Wafer 1", "Wafer 2", "Wafer 3", "Wafer 4", "Wafer 5"];
+                            });
+                }
+            }
+        });
+
         $('body').on('click', '#btn-search', function(){
             var sdate = $.trim($('#sdate').val());
             var edate = $.trim($('#edate').val());
-            var wf_no = $.trim($('#wf-no').val());
-            // $.post('/', {
-            //     sdate: sdate,
-            //     edate: edate,
-            //     wf_no: wf_no
-            // }, function(output){
-                var output = {
-                    success: true,
-                    data:{
-                        po_ld: boxplot_po_ld,
-                        po_uniformity: wafer_po_uniformity,
-                        variation_uniformity_pold: variation_uniformity_pold
-                    }
+            var wf_no = $.trim($('#wf-no').tagsinput('items'));
+            var wf_type = $.trim($('#vcseltypeselectlist').val());
+
+            if (wf_no === '') {
+                if (sdate === '' || edate === '')
+                {
+                    alert("Please input your query condition.");
+                    return false;
                 }
-                if(output.success){
-                    drawboxplot(output.data.po_ld);
-                    drawboxplot(output.data.po_uniformity);
-                    drawdbboxplot(output.data.variation_uniformity_pold);
+            }
+
+
+            $.post('/DataAnalyze/WaferDistributionData', {
+                 sdate: sdate,
+                 edate: edate,
+                 wf_no: wf_no,
+                 wf_type:wf_type
+             }, function(output){
+
+                 if (output.success) {
+                     $('.v-content').empty();
+                     var appendstr = "";
+
+                     $.each(output.failurearray, function (i, val) {
+                         appendstr = '<div class="col-xs-6">' +
+                                '<div class="v-box" id="' + val.id + '"></div>' +
+                                '</div>';
+                         $('.v-content').append(appendstr);
+                         drawcolumn(val);
+                     })
+                     $('.v-content').append('<div class="v-lengend row"></div>');
+                     var colorStr = "";
+                     $.each(output.colors, function (i, val) {
+                         console.log(i);
+                         colorStr = '<span class="span-fm label label-success" style="background-color: ' + val + '">' + i + '</span>';
+                         $('.v-lengend').append(colorStr);
+                     })
+
+                    //drawboxplot(output.data.po_ld);
+                    //drawboxplot(output.data.po_uniformity);
+                    //drawdbboxplot(output.data.variation_uniformity_pold);
                 }
-            // })
+             })
         })
         var boxplot_po_ld = {
             id: 'wafer_po_ld',
@@ -321,12 +360,12 @@ var BurnIn = function(){
             },
             tooltip: {
                 headerFormat: '',
-                pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.percentage:.0f}%</b><br/>',
+                pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{'+((col_data.coltype == 'percent')?"point.percentage:.0f":"point.y")+'}%</b><br/>',
                 shared: true
             },
             plotOptions: {
                 column: {
-                    stacking: 'percent'
+                    stacking: col_data.coltype
                 }
             },
             series: col_data.data

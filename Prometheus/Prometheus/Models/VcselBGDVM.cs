@@ -163,7 +163,6 @@ namespace Prometheus.Models
                     }
                     else
                     {
-                        var sub1dict = new Dictionary<string, Dictionary<string, int>>();
                         var sub2dict = new Dictionary<string, int>();
                         sub2dict.Add(failure, num);
                         ret[testtype].Add(sdate, sub2dict);
@@ -288,6 +287,17 @@ namespace Prometheus.Models
             }
         }
 
+        public static List<string> WaferNOList()
+        {
+            var ret = new List<string>();
+            var sql = "select distinct WaferNo from VcselTimeRange";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            { ret.Add(Convert.ToString(line[0])); }
+            ret.Sort();
+            return ret;
+        }
+
         public string WaferNo { set; get; }
         public DateTime StartDate { set; get; }
         public DateTime EndDate { set; get; }
@@ -329,6 +339,19 @@ namespace Prometheus.Models
             var dict = new Dictionary<string, string>();
             dict.Add("@WaferNo", waferno);
             DBUtility.ExeLocalSqlNoRes(sql, dict);
+        }
+
+        public static string DataIDCond(string waferno)
+        {
+            var sql = "select top 1 DataIDs from WaferTestSum where WaferNo = @WaferNo";
+            var dict = new Dictionary<string, string>();
+            dict.Add("@WaferNo", waferno);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, dict);
+            foreach (var line in dbret)
+            {
+                return Convert.ToString(line[0]);
+            }
+            return string.Empty;
         }
 
         public static void UpdateWaferTestData(string wafer, List<BITestResult> waferdata, Dictionary<string, VcselPNData> VcselPNInfo)
@@ -411,6 +434,65 @@ namespace Prometheus.Models
             ret.Sort();
             return ret;
         }
+
+        public static Dictionary<string, Dictionary<string, Dictionary<string,int>>> RetriveWaferFailure(List<string> wflist,string vtype)
+        {
+            var ret = new Dictionary<string, Dictionary<string, Dictionary<string, int>>>();
+
+            StringBuilder sb = new StringBuilder(20 * (wflist.Count + 1));
+            sb.Append("('");
+            foreach (var line in wflist)
+            {
+                sb.Append(line + "','");
+            }
+            var tempstr = sb.ToString();
+            var waferids = tempstr.Substring(0, tempstr.Length - 2) + ")";
+
+            var sql = "select WaferNo,WhichTest,Failure,Num from WaferTestSum where WaferNo in <WAFERCOND>";
+            sql = sql.Replace("<WAFERCOND>", waferids);
+            if (!string.IsNullOrEmpty(vtype))
+            {
+                sql = sql + " and VTYPE = '<VTYPE>'";
+                sql = sql.Replace("<VTYPE>", vtype);
+            }
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var wafer = Convert.ToString(line[0]);
+                var testtype = Convert.ToString(line[1]);
+                var failure = Convert.ToString(line[2]);
+                var num = Convert.ToInt32(line[3]);
+
+                if (ret.ContainsKey(testtype))
+                {
+                    if (ret[testtype].ContainsKey(wafer))
+                    {
+                        if (!ret[testtype][wafer].ContainsKey(failure))
+                        {
+                            ret[testtype][wafer].Add(failure, num);
+                        }
+                    }
+                    else
+                    {
+                        var sub2dict = new Dictionary<string, int>();
+                        sub2dict.Add(failure, num);
+                        ret[testtype].Add(wafer, sub2dict);
+                    }
+                }
+                else
+                {
+                    var sub1dict = new Dictionary<string, Dictionary<string, int>>();
+                    var sub2dict = new Dictionary<string, int>();
+                    sub2dict.Add(failure, num);
+                    sub1dict.Add(wafer, sub2dict);
+                    ret.Add(testtype, sub1dict);
+                }
+            }
+
+            return ret;
+        }
+
 
         public string WaferNo { set; get; }
         public string WhichTest { set; get; }
@@ -686,6 +768,67 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql, dict);
         }
 
+        public static Dictionary<string,Dictionary<string,List<string>>> RetriveWaferBoxData(List<string> wflist,string vtype)
+        {
+            var ret = new Dictionary<string, Dictionary<string, List<string>>>();
+
+            StringBuilder sb = new StringBuilder(20 * (wflist.Count + 1));
+            sb.Append("('");
+            foreach (var line in wflist)
+            {
+                sb.Append(line + "','");
+            }
+            var tempstr = sb.ToString();
+            var waferids = tempstr.Substring(0, tempstr.Length - 2) + ")";
+
+            var sql = @"select w.WaferNo,w.FieldName,w.BoxData  from WaferBGDFiled w
+                        left join (select distinct WaferNo,VTYPE from WaferTestSum ) s on s.WaferNo = w.WaferNo
+                        where w.WaferNo in <WAFERCOND> ";
+            sql = sql.Replace("<WAFERCOND>", waferids);
+
+            if (!string.IsNullOrEmpty(vtype))
+            {
+                sql = sql + " and s.VTYPE = '<VTYPE>'";
+                sql = sql.Replace("<VTYPE>", vtype);
+            }
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var wf = Convert.ToString(line[0]);
+                var name = Convert.ToString(line[1]);
+                var data = Convert.ToString(line[2]);
+                if (name.Contains("_Delta_PO_LD"))
+                {
+                    name = "POLD_Combine";
+                }
+
+                if (ret.ContainsKey(name))
+                {
+                    if (ret[name].ContainsKey(wf))
+                    {
+                        ret[name][wf].Add(data);
+                    }
+                    else
+                    {
+                        var sublist = new List<string>();
+                        sublist.Add(data);
+                        ret[name].Add(wf, sublist);
+                    }
+                }
+                else
+                {
+                    var sublist = new List<string>();
+                    sublist.Add(data);
+                    var subdict = new Dictionary<string, List<string>>();
+                    subdict.Add(wf, sublist);
+                    ret.Add(name, subdict);
+                }
+            }
+
+            return ret;
+        }
+
         public string WaferNo { set; get; }
         public string FieldName { set; get; }
         public string BoxData { set; get; }
@@ -717,7 +860,7 @@ namespace Prometheus.Models
 
     public class FailureColumnSeg{
         public string name { set; get; }
-        public int y { set; get; }
+        public double y { set; get; }
         public string color { set; get; }
     }
 
@@ -727,9 +870,10 @@ namespace Prometheus.Models
         public List<FailureColumnSeg> data { set; get; }
     }
 
-    public class DateFailureColumn
+    public class DateWaferFailureColumn
     {
-        public string date { set; get; }
+        public string xkey { set; get; }
+
         private List<FailureColumnSeg> colseglist = new List<FailureColumnSeg>();
         public List<FailureColumnSeg> DateColSeg {
             set {
@@ -745,8 +889,8 @@ namespace Prometheus.Models
     public class TestFailureColumn
     {
         public string TestType { set; get; }
-        private List<DateFailureColumn> colseglist = new List<DateFailureColumn>();
-        public List<DateFailureColumn> DateColSeg
+        private List<DateWaferFailureColumn> colseglist = new List<DateWaferFailureColumn>();
+        public List<DateWaferFailureColumn> DateColSeg
         {
             set
             {
@@ -905,20 +1049,20 @@ namespace Prometheus.Models
         public static List<string> FMColor()
         {
             return new List<string> {
-                "#b7d28d","#dcff93","#ff9b6a",
-                "#f1b8e4","#d9b8f1","#f1ccb8",
-                "#f1f1b8","#b8f1ed","#b8f1cc",
-                "#e7dac9","#f55066","#fe9778",
-                "#9bffa4","#4fffb2","#0fb784"
+                "#f2debd","#b7d28d","#dcff93",
+                "#ff9b6a","#f1b8e4","#d9b8f1",
+                "#f1ccb8","#f1f1b8","#b8f1ed",
+                "#b8f1cc","#e7dac9","#c86f67",
+                "#fecf45","#ef5464"
             };
         }
 
-        public static List<FailureColumnSeg> AlignmentFailureOthers(List<FailureColumnSeg> failseglist, int totalfailurecount)
+        public static List<FailureColumnSeg> AlignmentFailureOthers(List<FailureColumnSeg> failseglist, double totalfailurecount)
         {
             var newfailseglist = new List<FailureColumnSeg>();
             var overed = false;
-            var others = 0;
-            var tempsum = 0;
+            var others = 0.0;
+            var tempsum = 0.0;
             for (var idx = 0; idx < failseglist.Count; idx++)
             {
                 tempsum = tempsum + failseglist[idx].y;
@@ -965,7 +1109,7 @@ namespace Prometheus.Models
             foreach (var testkv in alldata)
             {
                 var dateylist = new List<DateYield>();
-                var dateflist = new List<DateFailureColumn>();
+                var dateflist = new List<DateWaferFailureColumn>();
 
                 foreach (var datekv in testkv.Value)
                 {
@@ -973,7 +1117,7 @@ namespace Prometheus.Models
                     var fail = 0;
 
                     var failseglist = new List<FailureColumnSeg>();
-                    var totalfailurecount = 0;
+                    var totalfailurecount = 0.0;
 
                     foreach (var failurekv in datekv.Value)
                     {
@@ -1014,11 +1158,12 @@ namespace Prometheus.Models
                         {
                             item.color = name_colors[item.name];
                         }
+                        item.y = item.y / totalfailurecount * 100;
                     }
 
 
-                    var datefailcol = new DateFailureColumn();
-                    datefailcol.date = datekv.Key;
+                    var datefailcol = new DateWaferFailureColumn();
+                    datefailcol.xkey = datekv.Key;
                     datefailcol.DateColSeg = alignmentedfailseglist;
 
                     dateflist.Add(datefailcol);
@@ -1028,9 +1173,9 @@ namespace Prometheus.Models
                     return DateTime.Parse(obj1.date).CompareTo(DateTime.Parse(obj2.date));
                 });
 
-                dateflist.Sort(delegate (DateFailureColumn obj1,DateFailureColumn obj2)
+                dateflist.Sort(delegate (DateWaferFailureColumn obj1,DateWaferFailureColumn obj2)
                 {
-                    return DateTime.Parse(obj1.date).CompareTo(DateTime.Parse(obj2.date));
+                    return DateTime.Parse(obj1.xkey).CompareTo(DateTime.Parse(obj2.xkey));
                 });
 
                 var temptesty = new testtypeyield();
@@ -1052,7 +1197,89 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static List<string> WaferNOList()
+        {
+            return VcselTimeRange.WaferNOList();
+        }
 
+        public static List<object> RetrieveWaferData(List<string> wflist,string vtype = "")
+        {
+            var ret = new List<object>();
+            var boxdata = WaferBGDFiled.RetriveWaferBoxData(wflist,vtype);
+            
+            var waferfaile =  WaferTestSum.RetriveWaferFailure(wflist,vtype);
+            var name_colors = new Dictionary<string, string>();
+            var colors = FMColor();
+            var color_idx = 0;
+            var testflist = new List<TestFailureColumn>();
+
+            foreach (var testkv in waferfaile)
+            {
+                var waferflist = new List<DateWaferFailureColumn>();
+                foreach (var waferkv in testkv.Value)
+                {
+                    var failseglist = new List<FailureColumnSeg>();
+                    var totalcount = 0.0;
+
+                    foreach (var failurekv in waferkv.Value)
+                    {
+                        if (failurekv.Key.ToUpper().Contains("PASS"))
+                        {
+                            totalcount = totalcount + failurekv.Value;
+                        }
+                        else
+                        {
+                            var tempfailcolseg = new FailureColumnSeg();
+                            tempfailcolseg.name = failurekv.Key;
+                            tempfailcolseg.y = failurekv.Value;
+                            failseglist.Add(tempfailcolseg);
+                            totalcount = totalcount + tempfailcolseg.y;
+                        }
+                    }//end foreach
+                    failseglist.Sort(delegate (FailureColumnSeg obj1, FailureColumnSeg obj2)
+                    {
+                        return obj2.y.CompareTo(obj1.y);
+                    });
+
+                    foreach (var item in failseglist)
+                    {
+                        if (!name_colors.ContainsKey(item.name))
+                        {
+                            name_colors.Add(item.name, colors[color_idx % colors.Count]);
+                            item.color = colors[color_idx % colors.Count];
+                            color_idx++;
+                        }
+                        else
+                        {
+                            item.color = name_colors[item.name];
+                        }
+                        item.y = item.y / totalcount * 100;
+                    }
+
+                    var waferf = new DateWaferFailureColumn();
+                    waferf.xkey = waferkv.Key;
+                    waferf.DateColSeg = failseglist;
+
+                    waferflist.Add(waferf);
+
+                }//end foreach
+
+                var temptestf = new TestFailureColumn();
+                temptestf.TestType = testkv.Key;
+                temptestf.DateColSeg = waferflist;
+
+                testflist.Add(temptestf);
+            }//end foreach
+
+            testflist.Sort(delegate (TestFailureColumn obj1, TestFailureColumn obj2)
+            {
+                return obj2.TestType.CompareTo(obj1.TestType);
+            });
+            ret.Add(boxdata);
+            ret.Add(testflist);
+            ret.Add(name_colors);
+            return ret;
+        }
 
 
     }

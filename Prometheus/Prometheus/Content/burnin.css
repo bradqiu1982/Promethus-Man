@@ -55,6 +55,7 @@ body{
 .v-filter, .w-filter{
     padding-bottom: 5px;
     border-bottom: 1px solid #aaa;
+    padding-left: 8%;
 }
 
 .box-search{
@@ -80,4 +81,8 @@ body{
 
 .row-margin{
     margin-bottom: 5px;
+}
+
+.bootstrap-tagsinput{
+    width: 100%;
 }

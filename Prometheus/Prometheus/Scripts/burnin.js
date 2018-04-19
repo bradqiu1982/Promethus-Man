@@ -42,19 +42,22 @@ var BurnIn = function(){
 
     var distribution = function(){
         $('.date').datepicker({ autoclose: true, viewMode: "months", minViewMode: "months" });
-
-        var waferautolist = [];
-
-        $('.wafer-no').tagsinput({
-            typeahead: {
-                afterSelect: function(val) { this.$element.val(""); },
-                source: function ()
-                {
-                    $.post('/DataAnalyze/WaferNOAutoCompelete', {}, function (output) {
-                                   return ["Wafer 1", "Wafer 2", "Wafer 3", "Wafer 4", "Wafer 5"];
-                            });
+        $.post('/DataAnalyze/WaferNOAutoCompelete', {}, function (output) {
+            $('.wafer-no').tagsinput({
+                freeInput: false,
+                typeahead: {
+                    source: output.data,
+                    minLength: 0,
+                    showHintOnFocus: true,
+                    autoSelect: false,
+                    selectOnBlur: false,
+                    changeInputOnSelect: false,
+                    changeInputOnMove: false,
+                    afterSelect: function (val) {
+                        this.$element.val("");
+                    }
                 }
-            }
+            });
         });
 
         $('body').on('click', '#btn-search', function(){

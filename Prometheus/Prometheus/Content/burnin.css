@@ -6,12 +6,13 @@ html,body{
 }
 
 body{
+    width: 100%;
 }
 
 .container{
-    margin: 0;
-    padding: 0;
-    width: 100%;
+    margin: auto 2% auto 5%;
+    padding: 2px;
+    width: 93%;
 }
 
 .nav-sidebar {
@@ -85,4 +86,9 @@ body{
 
 .bootstrap-tagsinput{
     width: 100%;
+}
+
+.glyphicon {
+    font-size: inherit;
+    width: auto;
 }

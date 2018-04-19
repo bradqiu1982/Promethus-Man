@@ -65,6 +65,7 @@ var BurnIn = function(){
             var edate = $.trim($('#edate').val());
             var wf_no = $.trim($('#wf-no').tagsinput('items'));
             var wf_type = $.trim($('#vcseltypeselectlist').val());
+            var math_rect = $.trim($('#mathrectlist').val());
 
             if (wf_no === '') {
                 if (sdate === '' || edate === '')
@@ -79,12 +80,32 @@ var BurnIn = function(){
                  sdate: sdate,
                  edate: edate,
                  wf_no: wf_no,
-                 wf_type:wf_type
+                 wf_type: wf_type,
+                math_rect:math_rect
              }, function(output){
 
                  if (output.success) {
                      $('.v-content').empty();
                      var appendstr = "";
+
+                     $.each(output.boxarray, function (i, val) {
+
+                         if (val.id === 'variation_uniformity_pold_id') {
+                             appendstr = '<div class="col-xs-12">' +
+                               '<div class="v-box" id="' + val.id + '"></div>' +
+                               '</div>';
+                             $('.v-content').append(appendstr);
+                             drawdbboxplot(val);
+                         }
+                         else {
+                             appendstr = '<div class="col-xs-6">' +
+                           '<div class="v-box" id="' + val.id + '"></div>' +
+                           '</div>';
+                             $('.v-content').append(appendstr);
+                            drawboxplot(val);
+                         }
+
+                     })
 
                      $.each(output.failurearray, function (i, val) {
                          appendstr = '<div class="col-xs-6">' +
@@ -375,6 +396,7 @@ var BurnIn = function(){
         };
         Highcharts.chart(col_data.id, options);
     }
+
     var drawboxplot = function(boxplot_data){
         var options = {
             chart: {
@@ -399,19 +421,7 @@ var BurnIn = function(){
             yAxis: {
                 title: {
                     text: boxplot_data.yAxis.title
-                },
-                plotLines: [{
-                    value: boxplot_data.yAxis.plotLines.value,
-                    color: boxplot_data.yAxis.plotLines.color,
-                    width: 1,
-                    label: {
-                        text: boxplot_data.yAxis.plotLines.text,
-                        align: 'left',
-                        style: {
-                            color: 'gray'
-                        }
-                    }
-                }]
+                }
             },
 
             series: [{
@@ -420,20 +430,8 @@ var BurnIn = function(){
                 tooltip: {
                     headerFormat: '<em>{point.key}</em><br/>'
                 }
-            }, {
-                name: boxplot_data.outlier.name,
-                color: boxplot_data.outlier.color,
-                type: 'scatter',
-                data: boxplot_data.outlier.data,
-                marker: {
-                    fillColor: boxplot_data.outlier.marker.fillColor,
-                    lineWidth: boxplot_data.outlier.marker.lineWidth,
-                    lineColor: boxplot_data.outlier.marker.lineColor,
-                },
-                tooltip: {
-                    pointFormat: '{point.y}'
-                }
-            },{
+            },
+            {
                 name: boxplot_data.line.name,
                 color: boxplot_data.line.color,
                 type: 'line',
@@ -467,38 +465,13 @@ var BurnIn = function(){
             yAxis: [{
                 title: {
                     text: dbboxplot_data.left.yAxis.title
-                },
-                plotLines: [{
-                    value: dbboxplot_data.left.yAxis.plotLines.value,
-                    color: dbboxplot_data.left.yAxis.plotLines.color,
-                    width: 1,
-                    dashStyle: dbboxplot_data.left.yAxis.plotLines.style,
-                    label: {
-                        text: dbboxplot_data.left.yAxis.plotLines.text,
-                        align: 'left',
-                        style: {
-                            color: 'gray'
-                        }
-                    }
-                }]
+                }
             },{
                 opposite: true,
                 title: {
                     text: dbboxplot_data.right.yAxis.title
-                },
-                plotLines: [{
-                    value: dbboxplot_data.right.yAxis.plotLines.value,
-                    color: dbboxplot_data.right.yAxis.plotLines.color,
-                    width: 1,
-                    dashStyle: dbboxplot_data.right.yAxis.plotLines.style,
-                    label: {
-                        text: dbboxplot_data.right.yAxis.plotLines.text,
-                        align: 'right',
-                        style: {
-                            color: 'gray'
-                        }
-                    }
-                }]
+                }
+
             }],
 
             series: [{
@@ -508,26 +481,15 @@ var BurnIn = function(){
                 tooltip: {
                     headerFormat: '<em>{point.key}</em><br/>'
                 }
-            }, {
-                name: dbboxplot_data.left.outlier.name,
-                color: dbboxplot_data.left.outlier.color,
-                type: 'scatter',
-                data: dbboxplot_data.left.outlier.data,
-                marker: {
-                    fillColor: dbboxplot_data.left.outlier.marker.fillColor,
-                    lineWidth: dbboxplot_data.left.outlier.marker.lineWidth,
-                    lineColor: dbboxplot_data.left.outlier.marker.lineColor,
-                },
-                tooltip: {
-                    pointFormat: '{point.y}'
-                }
-            // },{
-            //     name: dbboxplot_data.left.line.name,
-            //     color: dbboxplot_data.left.line.color,
-            //     type: 'line',
-            //     data: dbboxplot_data.left.line.data,
-            //     lineWidth: dbboxplot_data.left.line.lineWidth
-            },{
+            },
+            {
+                 name: dbboxplot_data.left.line.name,
+                 color: dbboxplot_data.left.line.color,
+                 type: 'line',
+                 data: dbboxplot_data.left.line.data,
+                 lineWidth: dbboxplot_data.left.line.lineWidth
+            },
+            {
                 name: dbboxplot_data.right.data.name,
                 data: dbboxplot_data.right.data.data,
                 color: dbboxplot_data.right.data.color,
@@ -535,29 +497,15 @@ var BurnIn = function(){
                     headerFormat: '<em>{point.key}</em><br/>'
                 },
                 yAxis: 1
-            }, {
-                name: dbboxplot_data.right.outlier.name,
-                color: dbboxplot_data.right.outlier.color,
-                type: 'scatter',
-                data: dbboxplot_data.right.outlier.data,
-                marker: {
-                    fillColor: dbboxplot_data.right.outlier.marker.fillColor,
-                    lineWidth: dbboxplot_data.right.outlier.marker.lineWidth,
-                    lineColor: dbboxplot_data.right.outlier.marker.lineColor,
-                },
-                tooltip: {
-                    pointFormat: '{point.y}'
-                },
-                yAxis: 1
-            }
-            // ,{
-            //     name: dbboxplot_data.right.line.name,
-            //     color: dbboxplot_data.right.line.color,
-            //     type: 'line',
-            //     data: dbboxplot_data.right.line.data,
-            //     lineWidth: dbboxplot_data.right.line.lineWidth,
-            //     yAxis: 1
-            // }
+            },
+             {
+                 name: dbboxplot_data.right.line.name,
+                 color: dbboxplot_data.right.line.color,
+                 type: 'line',
+                 data: dbboxplot_data.right.line.data,
+                 lineWidth: dbboxplot_data.right.line.lineWidth,
+                 yAxis: 1
+             }
             ]
         };
         Highcharts.chart(dbboxplot_data.id, options);

@@ -537,15 +537,10 @@ namespace Prometheus.Models
         private static List<double> RetrieveBIFieldData(string fieldname, string idcond, Controller ctrl)
         {
             var glbcfg = CfgUtility.GetSysConfig(ctrl);
-            bool limitexist = false;
-            var lowlimit = 0.0;
-            var highlimit = 0.0;
-            if (glbcfg.ContainsKey(fieldname + "_LIMIT"))
-            {
-                limitexist = true;
-                lowlimit = Convert.ToDouble(glbcfg[fieldname + "_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]);
-                highlimit = Convert.ToDouble(glbcfg[fieldname + "_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
-            }
+            
+            var lowlimit = Convert.ToDouble(glbcfg[fieldname + "_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+            var highlimit = Convert.ToDouble(glbcfg[fieldname + "_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
+
 
             var rawdata = new List<double>();
             var sql = "select <fieldname> from BITestResultDataField where <fieldname> <> 0 and DataID in <idcond>";
@@ -554,14 +549,7 @@ namespace Prometheus.Models
             foreach (var line in dbret)
             {
                 var val = Convert.ToDouble(line[0]);
-                if (limitexist)
-                {
-                    if (val >= lowlimit && val <= highlimit)
-                    {
-                        rawdata.Add(val);
-                    }
-                }
-                else
+                if (val > lowlimit && val < highlimit)
                 {
                     rawdata.Add(val);
                 }
@@ -572,16 +560,10 @@ namespace Prometheus.Models
         private static Dictionary<string, List<double>> RetrieveBIFieldDataSNDict(string fieldname, string idcond, Controller ctrl)
         {
             var glbcfg = CfgUtility.GetSysConfig(ctrl);
-            bool limitexist = false;
-            var lowlimit = 0.0;
-            var highlimit = 0.0;
-            if (glbcfg.ContainsKey(fieldname + "_LIMIT"))
-            {
-                limitexist = true;
-                lowlimit = Convert.ToDouble(glbcfg[fieldname + "_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]);
-                highlimit = Convert.ToDouble(glbcfg[fieldname + "_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
-            }
-
+            
+            var  lowlimit = Convert.ToDouble(glbcfg[fieldname + "_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+            var  highlimit = Convert.ToDouble(glbcfg[fieldname + "_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
+            
             var rawdata = new Dictionary<string, List<double>>();
             var sql = "select <fieldname>,SN from BITestResultDataField where <fieldname> <> 0 and DataID in <idcond>";
             sql = sql.Replace("<fieldname>", fieldname).Replace("<idcond>", idcond);
@@ -591,20 +573,7 @@ namespace Prometheus.Models
                 var val = Convert.ToDouble(line[0]);
                 var sn = Convert.ToString(line[1]);
 
-                var adddata = false;
-                if (limitexist)
-                {
-                    if (val >= lowlimit && val <= highlimit)
-                    {
-                        adddata = true;
-                    }
-                }
-                else
-                {
-                    adddata = true;
-                }
-
-                if (adddata)
+                if (val > lowlimit && val < highlimit)
                 {
                     if (rawdata.ContainsKey(sn))
                     {
@@ -618,6 +587,7 @@ namespace Prometheus.Models
                     }
                 }
             }
+
             return rawdata;
         }
 
@@ -711,6 +681,12 @@ namespace Prometheus.Models
                 return;
             }
 
+            var glbcfg = CfgUtility.GetSysConfig(ctrl);
+            var vlowlimit = Convert.ToDouble(glbcfg["Variation_POLD_Delta_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+            var vhighlimit = Convert.ToDouble(glbcfg["Variation_POLD_Delta_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
+            var ulowlimit = Convert.ToDouble(glbcfg["Uniformity_POLD_Delta_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+            var uhighlimit = Convert.ToDouble(glbcfg["Uniformity_POLD_Delta_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
+
             var variatelist = new List<double>();
             var uniformlist = new List<double>();
             foreach (var kv in rawdata)
@@ -720,8 +696,12 @@ namespace Prometheus.Models
                 if (av != 0)
                 {
                     var u = v / av;
-                    variatelist.Add(v);
-                    uniformlist.Add(u);
+
+                    if (v > vlowlimit && v < vhighlimit)
+                    { variatelist.Add(v); }
+
+                    if (u > ulowlimit && u < uhighlimit)
+                    { uniformlist.Add(u); }
                 }
             }
 
@@ -795,12 +775,25 @@ namespace Prometheus.Models
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
             {
+                
                 var wf = Convert.ToString(line[0]);
                 var name = Convert.ToString(line[1]);
-                var data = Convert.ToString(line[2]);
-                if (name.Contains("_Delta_PO_LD"))
+                var suffix = "";
+                if (name.ToUpper().Contains("Variation_Delta_PO_LD".ToUpper()))
                 {
-                    name = "POLD_Combine";
+                    suffix = "#V";
+                }
+                if (name.ToUpper().Contains("Uniformity_Delta_PO_LD".ToUpper()))
+                {
+                    suffix = "#U";
+                }
+
+                var data = Convert.ToString(line[2])+suffix;
+
+                if (name.ToUpper().Contains("Variation_Delta_PO_LD".ToUpper())
+                    || name.ToUpper().Contains("Uniformity_Delta_PO_LD".ToUpper()))
+                {
+                    name = "variation_uniformity_pold";
                 }
 
                 if (ret.ContainsKey(name))

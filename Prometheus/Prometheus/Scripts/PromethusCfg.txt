@@ -38,6 +38,13 @@ CRITICALDEFAULTRULE:::OBA_TEST,EEFAIL
 VCSELBIGDATAZEROPOINT:::2017-10-01 00:00:00
 Delta_PO_LD_LIMIT:::-2:2
 Delta_PO_Uniformity_LIMIT:::-0.1:0.1
+Variation_POLD_Delta_LIMIT:::-0.5:0.5
+Uniformity_POLD_Delta_LIMIT:::-2:2
+
+Plot_Delta_PO_LD_LIMIT:::-0.1:0.1
+Plot_Delta_PO_Uniformity_LIMIT:::-0.03:0.03
+Plot_Variation_POLD_Delta_LIMIT:::-0.2:0.5
+Plot_Uniformity_POLD_Delta_LIMIT:::-2:2
 
 OBA--PARA-10G OE:::Nevin.Niu
 OBA--PARA-25G OE:::Hao.Xu

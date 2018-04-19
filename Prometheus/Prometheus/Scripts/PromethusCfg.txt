@@ -43,7 +43,7 @@ Uniformity_POLD_Delta_LIMIT:::-2:2
 
 Plot_Delta_PO_LD_LIMIT:::-0.1:0.1
 Plot_Delta_PO_Uniformity_LIMIT:::-0.03:0.03
-Plot_Variation_POLD_Delta_LIMIT:::-0.2:1
+Plot_Variation_POLD_Delta_LIMIT:::-0.2:0.5
 Plot_Uniformity_POLD_Delta_LIMIT:::-2:2
 
 OBA--PARA-10G OE:::Nevin.Niu

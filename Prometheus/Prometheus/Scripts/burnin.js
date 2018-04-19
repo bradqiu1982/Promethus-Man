@@ -62,6 +62,7 @@ var BurnIn = function(){
             var edate = $.trim($('#edate').val());
             var wf_no = $.trim($('#wf-no').tagsinput('items'));
             var wf_type = $.trim($('#vcseltypeselectlist').val());
+            var math_rect = $.trim($('#mathrectlist').val());
 
             if (wf_no === '') {
                 if (sdate === '' || edate === '')
@@ -76,7 +77,8 @@ var BurnIn = function(){
                  sdate: sdate,
                  edate: edate,
                  wf_no: wf_no,
-                 wf_type:wf_type
+                 wf_type: wf_type,
+                math_rect:math_rect
              }, function(output){
 
                  if (output.success) {

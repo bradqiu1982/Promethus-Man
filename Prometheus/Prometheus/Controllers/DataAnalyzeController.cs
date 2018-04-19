@@ -261,6 +261,11 @@ namespace Prometheus.Controllers
 
             ViewBag.vcseltypeselectlist = CreateSelectList(nvcseltypelist, "");
 
+            var mathlist = new List<string>();
+            mathlist.Add("Math Rectification");
+            mathlist.Add("No Rectification");
+            ViewBag.mathrectlist = CreateSelectList(mathlist, "");
+
             return View();
         }
 
@@ -277,6 +282,7 @@ namespace Prometheus.Controllers
             var edate = DateTime.Parse(Request.Form["edate"]);
             var wf_no = Request.Form["wf_no"];
             var vtype = Request.Form["wf_type"].Trim();
+            var math_rect = Request.Form["math_rect"];
 
             var wflist = new List<string>();
             if (!string.IsNullOrEmpty(wf_no))
@@ -303,15 +309,38 @@ namespace Prometheus.Controllers
 
             if (wflist.Count > 0)
             {
-                var glbcfg = CfgUtility.GetSysConfig(this);
-                var poldlowlimit = Convert.ToDouble(glbcfg["Plot_Delta_PO_LD_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]);
-                var poldhighlimit = Convert.ToDouble(glbcfg["Plot_Delta_PO_LD_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
-                var poulowlimit = Convert.ToDouble(glbcfg["Plot_Delta_PO_Uniformity_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]);
-                var pouhighlimit = Convert.ToDouble(glbcfg["Plot_Delta_PO_Uniformity_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
-                var vlowlimit = Convert.ToDouble(glbcfg["Plot_Variation_POLD_Delta_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]);
-                var vhighlimit = Convert.ToDouble(glbcfg["Plot_Variation_POLD_Delta_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
-                var ulowlimit = Convert.ToDouble(glbcfg["Plot_Uniformity_POLD_Delta_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]);
-                var uhighlimit = Convert.ToDouble(glbcfg["Plot_Uniformity_POLD_Delta_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
+                
+                var poldlowlimit = 0.0;
+                var poldhighlimit = 0.0;
+                var poulowlimit = 0.0;
+                var pouhighlimit = 0.0;
+                var vlowlimit = 0.0;
+                var vhighlimit = 0.0;
+                var ulowlimit = 0.0;
+                var uhighlimit = 0.0;
+
+                if (math_rect.ToUpper().Contains("MATH")){
+                    var glbcfg = CfgUtility.GetSysConfig(this);
+                    poldlowlimit = Convert.ToDouble(glbcfg["Plot_Delta_PO_LD_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+                    poldhighlimit = Convert.ToDouble(glbcfg["Plot_Delta_PO_LD_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
+                    poulowlimit = Convert.ToDouble(glbcfg["Plot_Delta_PO_Uniformity_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+                    pouhighlimit = Convert.ToDouble(glbcfg["Plot_Delta_PO_Uniformity_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
+                    vlowlimit = Convert.ToDouble(glbcfg["Plot_Variation_POLD_Delta_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+                    vhighlimit = Convert.ToDouble(glbcfg["Plot_Variation_POLD_Delta_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
+                    ulowlimit = Convert.ToDouble(glbcfg["Plot_Uniformity_POLD_Delta_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+                    uhighlimit = Convert.ToDouble(glbcfg["Plot_Uniformity_POLD_Delta_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
+                }
+                else {
+                    poldlowlimit = -9999.0;
+                    poldhighlimit = 9999.0;
+                    poulowlimit = -9999.0;
+                    pouhighlimit = 9999.0;
+                    vlowlimit = -9999.0;
+                    vhighlimit = 9999.0;
+                    ulowlimit = -9999.0;
+                    uhighlimit = 9999.0;
+
+                }
 
                 var retdata = VcselBGDVM.RetrieveWaferData(wflist, vtype);
                 //fieldname,wafer,boxlist
@@ -501,7 +530,7 @@ namespace Prometheus.Controllers
                             count = (f_item.DateColSeg.Count > count) ? f_item.DateColSeg.Count : count;
                         }
 
-                        var ymax = 5;
+                        var ymax = 3;
                         var num = item.DateColSeg.Count;
                         var n = 1;
                         for (var i = count - 1; i >= 0; i--)
@@ -519,6 +548,7 @@ namespace Prometheus.Controllers
                             }
                             ydata.Add(new FailureColumnData() { index = n, data = ydata_tmp });
                             n++;
+                            if (tempmax > 3.0) ymax = 5;
                             if (tempmax > 5.0) ymax = 10;
                             if (tempmax > 10.0) ymax = 15;
                             if (tempmax > 15.0) ymax = 20;

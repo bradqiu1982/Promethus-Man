@@ -303,6 +303,16 @@ namespace Prometheus.Controllers
 
             if (wflist.Count > 0)
             {
+                var glbcfg = CfgUtility.GetSysConfig(this);
+                var poldlowlimit = Convert.ToDouble(glbcfg["Plot_Delta_PO_LD_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+                var poldhighlimit = Convert.ToDouble(glbcfg["Plot_Delta_PO_LD_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
+                var poulowlimit = Convert.ToDouble(glbcfg["Plot_Delta_PO_Uniformity_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+                var pouhighlimit = Convert.ToDouble(glbcfg["Plot_Delta_PO_Uniformity_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
+                var vlowlimit = Convert.ToDouble(glbcfg["Plot_Variation_POLD_Delta_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+                var vhighlimit = Convert.ToDouble(glbcfg["Plot_Variation_POLD_Delta_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
+                var ulowlimit = Convert.ToDouble(glbcfg["Plot_Uniformity_POLD_Delta_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+                var uhighlimit = Convert.ToDouble(glbcfg["Plot_Uniformity_POLD_Delta_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
+
                 var retdata = VcselBGDVM.RetrieveWaferData(wflist, vtype);
                 //fieldname,wafer,boxlist
                 var fieldboxlist = (Dictionary<string, Dictionary<string, List<string>>>)retdata[0];
@@ -310,6 +320,167 @@ namespace Prometheus.Controllers
 
                 var boxarray = new List<object>();
                 var failurearray = new List<object>();
+
+                foreach (var fieldkv in fieldboxlist)
+                {
+                    var fieldname = fieldkv.Key;
+                    var xaxisdata = new List<string>();
+
+                    var ldatadata = new List<List<double>>();
+                    var llinedata = new List<double>();
+
+                    var rdatadata = new List<List<double>>();
+                    var rlinedata = new List<double>();
+
+                    foreach (var wfkv in fieldkv.Value)
+                    {
+                        var wf = wfkv.Key;
+                        xaxisdata.Add(wf);
+                        foreach (var box in wfkv.Value)
+                        {
+                            if (box.Contains("#V"))
+                            {
+                                var cbox = (CBOXData)Newtonsoft.Json.JsonConvert.DeserializeObject(box.Replace("#V",""), (new CBOXData()).GetType());
+                                var tempdd = new List<double>();
+                                tempdd.Add((cbox.min < vlowlimit) ? vlowlimit : Math.Round(cbox.min, 3));
+                                tempdd.Add(Math.Round(cbox.lower, 3));
+                                tempdd.Add(Math.Round(cbox.mean, 3));
+                                tempdd.Add(Math.Round(cbox.upper, 3));
+                                tempdd.Add((cbox.max > vhighlimit) ? vhighlimit : Math.Round(cbox.max, 3));
+                                ldatadata.Add(tempdd);
+                                llinedata.Add(Math.Round(cbox.mean, 3));
+                            }
+                            else if (box.Contains("#U"))
+                            {
+                                var cbox = (CBOXData)Newtonsoft.Json.JsonConvert.DeserializeObject(box.Replace("#U", ""), (new CBOXData()).GetType());
+                                var tempdd = new List<double>();
+                                tempdd.Add((cbox.min < ulowlimit) ? ulowlimit : Math.Round(cbox.min, 3));
+                                tempdd.Add(Math.Round(cbox.lower, 3));
+                                tempdd.Add(Math.Round(cbox.mean, 3));
+                                tempdd.Add(Math.Round(cbox.upper, 3));
+                                tempdd.Add((cbox.max > uhighlimit) ? uhighlimit : Math.Round(cbox.max, 3));
+                                rdatadata.Add(tempdd);
+                                rlinedata.Add(Math.Round(cbox.mean, 3));
+                            }
+                            else {
+                                var cbox = (CBOXData)Newtonsoft.Json.JsonConvert.DeserializeObject(box, (new CBOXData()).GetType());
+                                var tempdd = new List<double>();
+
+                                if (fieldname.ToUpper().Contains("Delta_PO_LD".ToUpper()))
+                                {
+                                    tempdd.Add((cbox.min < poldlowlimit) ? poldlowlimit : Math.Round(cbox.min, 3));
+                                    tempdd.Add(Math.Round(cbox.lower, 3));
+                                    tempdd.Add(Math.Round(cbox.mean, 3));
+                                    tempdd.Add(Math.Round(cbox.upper, 3));
+                                    tempdd.Add((cbox.max > poldhighlimit) ? poldhighlimit : Math.Round(cbox.max, 3));
+                                }
+                                else if (fieldname.ToUpper().Contains("Delta_PO_Uniformity".ToUpper()))
+                                {
+                                    tempdd.Add((cbox.min < poulowlimit) ? poulowlimit : Math.Round(cbox.min, 3));
+                                    tempdd.Add(Math.Round(cbox.lower, 3));
+                                    tempdd.Add(Math.Round(cbox.mean, 3));
+                                    tempdd.Add(Math.Round(cbox.upper, 3));
+                                    tempdd.Add((cbox.max > pouhighlimit) ? pouhighlimit : Math.Round(cbox.max, 3));
+                                }
+                                else
+                                {
+                                    tempdd.Add(Math.Round(cbox.min,3));
+                                    tempdd.Add(Math.Round(cbox.lower, 3));
+                                    tempdd.Add(Math.Round(cbox.mean, 3));
+                                    tempdd.Add(Math.Round(cbox.upper, 3));
+                                    tempdd.Add(Math.Round(cbox.max, 3));
+                                }
+                                ldatadata.Add(tempdd);
+                                llinedata.Add(Math.Round(cbox.mean, 3));
+                            }
+                        }//end foreach
+                    }//end forea
+
+                    var id = fieldname.Replace(" ", "_") + "_id";
+                    var title = fieldname + " Distribution by Wafer";
+                    var xAxis = new
+                    {
+                        title = "Wafer#",
+                        data = xaxisdata
+                    };
+                    
+                    if (fieldname.Contains("variation_uniformity_pold"))
+                    {
+                        var lyAxis = new { title = "Variation_POLD_Delta" };
+                        var ryAxis = new { title = "Uniformity_POLD_Delta" };
+                        var ldata = new {
+                            name = "Variation_POLD_Delta",
+                            color = "#00b050",
+                            data = ldatadata
+                        };
+                        var rdata = new
+                        {
+                            name = "Uniformity_POLD_Delta",
+                            color = "#0099ff",
+                            data = rdatadata
+                        };
+                        var lline = new
+                        {
+                            name = "Mean Line",
+                            data = llinedata,
+                            color = "#ffc000",
+                            lineWidth = 1
+                        };
+                        var rline = new
+                        {
+                            name = "Mean Line",
+                            data = rlinedata,
+                            color = "#C9302C",
+                            lineWidth = 1
+                        };
+
+                        var left = new {
+                            yAxis = lyAxis,
+                            data = ldata,
+                            line = lline
+                        };
+                        var right = new
+                        {
+                            yAxis = ryAxis,
+                            data = rdata,
+                            line = rline
+                        };
+
+                        boxarray.Add(new
+                        {
+                            id = id,
+                            title = title,
+                            xAxis = xAxis,
+                            left = left,
+                            right = right
+                        });
+                    }
+                    else
+                    {
+                        var yAxis = new { title = "Value" };
+                        var data = new {
+                            name = fieldname,
+                            data = ldatadata
+                        };
+                        var line = new
+                        {
+                            name = "Mean Line",
+                            data = llinedata,
+                            color = "#ffc000",
+                            lineWidth = 1
+                        };
+
+                        boxarray.Add(new
+                        {
+                            id = id,
+                            title = title,
+                            xAxis = xAxis,
+                            yAxis = yAxis,
+                            data = data,
+                            line = line
+                        });
+                    }
+                }//end foreach
 
 
                 foreach (var item in testflist)
@@ -329,21 +500,29 @@ namespace Prometheus.Controllers
                             xdata.Add(f_item.xkey);
                             count = (f_item.DateColSeg.Count > count) ? f_item.DateColSeg.Count : count;
                         }
+
+                        var ymax = 5;
                         var num = item.DateColSeg.Count;
                         var n = 1;
                         for (var i = count - 1; i >= 0; i--)
                         {
+                            var tempmax = 0.0;
                             var ydata_tmp = new List<FailureColumnSeg>();
                             for (var m = 0; m < num; m++)
                             {
                                 if (i < item.DateColSeg[m].DateColSeg.Count)
                                 {
                                     item.DateColSeg[m].DateColSeg[i].y = Math.Round(item.DateColSeg[m].DateColSeg[i].y, 3);
+                                    tempmax = tempmax + item.DateColSeg[m].DateColSeg[i].y;
                                     ydata_tmp.Add(item.DateColSeg[m].DateColSeg[i]);
                                 }
                             }
                             ydata.Add(new FailureColumnData() { index = n, data = ydata_tmp });
                             n++;
+                            if (tempmax > 5.0) ymax = 10;
+                            if (tempmax > 10.0) ymax = 15;
+                            if (tempmax > 15.0) ymax = 20;
+                            if (tempmax > 20.0) ymax = 100;
                         }
                         
                         var xAxis = new { data = xdata };
@@ -351,7 +530,7 @@ namespace Prometheus.Controllers
                         {
                             title = "(%)",
                             min = 0,
-                            max = 10
+                            max = ymax
                         };
 
                         failurearray.Add(new

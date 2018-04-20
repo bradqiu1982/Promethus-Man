@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Prometheus.Models;
+using System.Text;
 
 namespace Prometheus.Controllers
 {
@@ -136,10 +137,12 @@ namespace Prometheus.Controllers
 
                     var xdata = new List<string>();
                     var ydata = new List<double>();
+                    var cydata = new List<double>();
                     foreach (var dy in item.DYield)
                     {
                         xdata.Add(Convert.ToDateTime(dy.date).ToString("yyyy/MM"));
                         ydata.Add(Math.Round(dy.yield, 2));
+                        cydata.Add(dy.totle);
                     }
 
                     var xAxis = new { data = xdata };
@@ -170,7 +173,7 @@ namespace Prometheus.Controllers
                     var data = new
                     {
                         name = "Yield",
-                        color = "#5CB85C",
+                        color = "#ffa500",
                         data = ydata
                     };
 
@@ -180,13 +183,20 @@ namespace Prometheus.Controllers
                         data = data
                     };
 
+                    var cdata = new
+                    {
+                        name = "Test Modules",
+                        data = cydata
+                    };
+
                     yieldarray.Add(new
                     {
                         id = id,
                         title = title,
                         xAxis = xAxis,
                         yAxis = yAxis,
-                        data = combinedata
+                        data = combinedata,
+                        cdata = cdata
                     });
                 }
             }
@@ -597,6 +607,50 @@ namespace Prometheus.Controllers
             }
         }
 
+        private List<string> PrepeareAllWaferData(string wf_no)
+        {
+            var ret = new List<string>();
+            var allreldata = VcselBGDVM.RetrieveWaferData(wf_no);
+            var line = "SN,TestName,TestTimeStamp,PN,Wafer,JO,Channel,SLOPE,PO_LD,PO_Uniformity,THOLD,Delta_PO_LD,Delta_SLOPE,Delta_THOLD, Delta_PO_Uniformity, ProductName";
+            ret.Add(line);
+
+            foreach (var item in allreldata)
+            {
+                var line1 = string.Empty;
+                line1 = "\"" + item.SN.ToString().Replace("\"", "") + "\"," + "\"" + item.TestName.Replace("\"", "") + "\"," + "\"" + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss").Replace("\"", "") + "\"," + "\"" + item.PN.Replace("\"", "") + "\"," 
+                    + "\"" + item.Wafer.Replace("\"", "") + "\"," + "\"" + item.JO.Replace("\"", "") + "\"," + "\"" + item.Channel.Replace("\"", "") + "\","
+                    + "\"" + item.SLOPE.ToString().Replace("\"", "") + "\"," + "\"" + item.PO_LD.ToString().Replace("\"", "") + "\"," + "\"" + item.PO_Uniformity.ToString().Replace("\"", "") + "\","
+                    + "\"" + item.THOLD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_PO_LD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_SLOPE.ToString().Replace("\"", "") + "\","
+                    + "\"" + item.Delta_THOLD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_PO_Uniformity.ToString().Replace("\"", "") + "\"," + "\"" + item.ProductName.Replace("\"", "") + "\",";
+                ret.Add(line1);
+            }
+
+            return ret;
+        }
+
+        public ActionResult DownLoadWafer(string wf_no)
+        {
+            string datestring = DateTime.Now.ToString("yyyyMMdd");
+            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+            if (!System.IO.Directory.Exists(imgdir))
+            {
+                System.IO.Directory.CreateDirectory(imgdir);
+            }
+
+            var fn = "Wafer_"+wf_no+"_TestData_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+            var filename = imgdir + fn;
+
+            var lines = PrepeareAllWaferData(wf_no);
+
+            var wholefile = "";
+            foreach (var l in lines)
+            {
+                wholefile = wholefile + l + "\r\n";
+            }
+            System.IO.File.WriteAllText(filename, wholefile, Encoding.UTF8);
+
+            return File(filename, "application/vnd.ms-excel", fn);
+        }
 
         private void preparetxotestdata(List<string> waferlist,string leftcond, string leftfield, string rightcond, string rightfield)
         {

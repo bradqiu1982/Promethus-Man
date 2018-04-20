@@ -828,13 +828,15 @@ namespace Prometheus.Models
     }
 
     public class DateYield {
-        public DateYield(string d, double y)
+        public DateYield(string d, double y,double tt)
         {
             date = d;
             yield = y;
+            totle = tt;
         }
         public string date { set; get; }
         public double yield { set; get; }
+        public double totle { set; get; }
     }
 
     public class testtypeyield {
@@ -1041,12 +1043,18 @@ namespace Prometheus.Models
 
         public static List<string> FMColor()
         {
+            //return new List<string> {
+            //    "#f2debd","#b7d28d","#dcff93",
+            //    "#ff9b6a","#f1b8e4","#d9b8f1",
+            //    "#f1ccb8","#f1f1b8","#b8f1ed",
+            //    "#b8f1cc","#e7dac9","#c86f67",
+            //    "#fecf45","#ef5464"
+            //};
             return new List<string> {
-                "#f2debd","#b7d28d","#dcff93",
-                "#ff9b6a","#f1b8e4","#d9b8f1",
-                "#f1ccb8","#f1f1b8","#b8f1ed",
-                "#b8f1cc","#e7dac9","#c86f67",
-                "#fecf45","#ef5464"
+                "#105D9C","#23735D","#A55417","#821A08","#7030A0",
+                "#0C779D","#34AC8B","#D85C00","#CC044D","#B925A7",
+                "#4FADF3","#12CC92","#FA9604","#ED6161","#EF46FC",
+                "#8CC9F7","#BEEBDF","#FDEEC3","#F6B0B0","#EC88F4"
             };
         }
 
@@ -1131,7 +1139,7 @@ namespace Prometheus.Models
                         }
                     }//end foreach
                     double yield = (double)pass / ((double)pass + fail)*100.0;
-                    dateylist.Add(new DateYield(datekv.Key,yield));
+                    dateylist.Add(new DateYield(datekv.Key,yield,(double)(pass+fail)));
 
                     failseglist.Sort(delegate (FailureColumnSeg obj1,FailureColumnSeg obj2)
                     {
@@ -1263,7 +1271,7 @@ namespace Prometheus.Models
 
                 testflist.Add(temptestf);
             }//end foreach
-
+            
             testflist.Sort(delegate (TestFailureColumn obj1, TestFailureColumn obj2)
             {
                 return obj2.TestType.CompareTo(obj1.TestType);
@@ -1271,6 +1279,27 @@ namespace Prometheus.Models
             ret.Add(boxdata);
             ret.Add(testflist);
             ret.Add(name_colors);
+            return ret;
+        }
+
+        public static List<BITestResultDataField> RetrieveWaferData(string wf_no)
+        {
+            var ret = new List<BITestResultDataField>();
+            var sql = @"SELECT SN,TestName,TestTimeStamp,PN,Wafer,JO,Channel,SLOPE,PO_LD,PO_Uniformity,THOLD,Delta_PO_LD,Delta_SLOPE
+                        , Delta_THOLD, Delta_PO_Uniformity, ProductName FROM BITestResultDataField where Wafer = @Wafer";
+            var dict = new Dictionary<string, string>();
+            dict.Add("@Wafer", wf_no);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, dict);
+            foreach (var line in dbret)
+            {
+                var tempvm = new BITestResultDataField(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToDateTime(line[2])
+                    , Convert.ToString(line[3]), Convert.ToString(line[4]), Convert.ToString(line[5])
+                    , Convert.ToString(line[6]), Convert.ToDouble(line[7]), Convert.ToDouble(line[8])
+                    , Convert.ToDouble(line[9]), Convert.ToDouble(line[10]), Convert.ToDouble(line[11])
+                    , Convert.ToDouble(line[12]), Convert.ToDouble(line[13]), Convert.ToDouble(line[14])
+                    , Convert.ToString(line[15]));
+                ret.Add(tempvm);
+            }
             return ret;
         }
 

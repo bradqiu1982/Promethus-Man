@@ -150,8 +150,8 @@ namespace Prometheus.Controllers
                     var yAxis = new
                     {
                         title = "Yield (%)",
-                        min = 70,
-                        max = 100
+                        min = 85.0,
+                        max = 100.0
                     };
 
                     var min = new
@@ -245,8 +245,8 @@ namespace Prometheus.Controllers
                     var yAxis = new
                     {
                         title = "(%)",
-                        min = 0,
-                        max = 100
+                        min = 0.0,
+                        max = 100.0
                     };
 
                     failurearray.Add(new
@@ -549,19 +549,32 @@ namespace Prometheus.Controllers
                             count = (f_item.DateColSeg.Count > count) ? f_item.DateColSeg.Count : count;
                         }
 
-                        var ymax = 3;
+                        var ymax = 3.0;
+                        foreach (var wfitem in item.DateColSeg)
+                        {
+                            var tempmax = 0.0;
+                            foreach (var fitem in wfitem.DateColSeg)
+                            {
+                                tempmax = tempmax + fitem.y;
+                            }
+                            if (tempmax > 3.0) ymax = 5.0;
+                            if (tempmax > 5.0) ymax = 10.0;
+                            if (tempmax > 10.0) ymax = 15.0;
+                            if (tempmax > 15.0) ymax = 20.0;
+                            if (tempmax > 20.0) ymax = 100.0;
+                        }
+
                         var num = item.DateColSeg.Count;
                         var n = 1;
                         for (var i = count - 1; i >= 0; i--)
                         {
-                            var tempmax = 0.0;
+
                             var ydata_tmp = new List<FailureColumnSeg>();
                             for (var m = 0; m < num; m++)
                             {
                                 if (i < item.DateColSeg[m].DateColSeg.Count)
                                 {
                                     item.DateColSeg[m].DateColSeg[i].y = Math.Round(item.DateColSeg[m].DateColSeg[i].y, 3);
-                                    tempmax = tempmax + item.DateColSeg[m].DateColSeg[i].y;
                                     ydata_tmp.Add(item.DateColSeg[m].DateColSeg[i]);
                                 }
                                 else
@@ -575,12 +588,8 @@ namespace Prometheus.Controllers
                             }
                             ydata.Add(new FailureColumnData() { index = n, data = ydata_tmp });
                             n++;
-                            if (tempmax > 3.0) ymax = 5;
-                            if (tempmax > 5.0) ymax = 10;
-                            if (tempmax > 10.0) ymax = 15;
-                            if (tempmax > 15.0) ymax = 20;
-                            if (tempmax > 20.0) ymax = 100;
                         }
+
                         
                         var xAxis = new { data = xdata };
                         var yAxis = new

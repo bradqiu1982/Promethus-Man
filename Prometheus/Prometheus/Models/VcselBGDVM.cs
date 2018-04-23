@@ -1159,7 +1159,7 @@ namespace Prometheus.Models
                         {
                             item.color = name_colors[item.name];
                         }
-                        item.y = item.y / totalfailurecount * 100;
+                        item.y = Math.Round(item.y / totalfailurecount * 100,3);
                     }
 
 
@@ -1254,7 +1254,7 @@ namespace Prometheus.Models
                         {
                             item.color = name_colors[item.name];
                         }
-                        item.y = item.y / totalcount * 100;
+                        item.y = Math.Round(item.y / totalcount * 100,3);
                     }
 
                     var waferf = new DateWaferFailureColumn();

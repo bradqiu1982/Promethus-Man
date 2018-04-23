@@ -231,7 +231,11 @@ var BurnIn = function(){
             },
             tooltip: {
                 headerFormat: '',
-                pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{'+((col_data.coltype == 'percent')?"point.percentage:.0f":"point.y")+'}%</b><br/>',
+                //pointFormat:(this.y==0)?'':'<span style="color:{point.color}">{point.name}</span>: <b>{'+((col_data.coltype == 'percent')?"point.percentage:.0f":"point.y")+'}%</b><br/>',
+                pointFormatter:function()
+                {
+                    return (this.y == 0) ? '' : '<span style="color:' + this.color + '">' + this.name + '</span>: <b>' + ((col_data.coltype == 'percent') ? this.percentage : this.y) + '%</b><br/>';
+                },
                 shared: true
             },
             plotOptions: {

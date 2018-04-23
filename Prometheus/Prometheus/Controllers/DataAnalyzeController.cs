@@ -224,8 +224,17 @@ namespace Prometheus.Controllers
                         var ydata_tmp = new List<FailureColumnSeg>();
                         for(var m = 0; m < num; m++)
                         {
-                            if(i < item.DateColSeg[m].DateColSeg.Count){
+                            if (i < item.DateColSeg[m].DateColSeg.Count)
+                            {
                                 ydata_tmp.Add(item.DateColSeg[m].DateColSeg[i]);
+                            }
+                            else
+                            {
+                                var tempvm = new FailureColumnSeg();
+                                tempvm.name = "";
+                                tempvm.y = 0;
+                                tempvm.color = "#000";
+                                ydata_tmp.Add(tempvm);
                             }
                         }
                         ydata.Add(new FailureColumnData() { index = n, data = ydata_tmp });
@@ -243,7 +252,7 @@ namespace Prometheus.Controllers
                     failurearray.Add(new
                     {
                         id = id,
-                        coltype = "percent",
+                        coltype = "normal",
                         title = title,
                         xAxis = xAxis,
                         yAxis = yAxis,
@@ -554,6 +563,14 @@ namespace Prometheus.Controllers
                                     item.DateColSeg[m].DateColSeg[i].y = Math.Round(item.DateColSeg[m].DateColSeg[i].y, 3);
                                     tempmax = tempmax + item.DateColSeg[m].DateColSeg[i].y;
                                     ydata_tmp.Add(item.DateColSeg[m].DateColSeg[i]);
+                                }
+                                else
+                                {
+                                    var tempvm = new FailureColumnSeg();
+                                    tempvm.name = "";
+                                    tempvm.y = 0;
+                                    tempvm.color = "#000";
+                                    ydata_tmp.Add(tempvm);
                                 }
                             }
                             ydata.Add(new FailureColumnData() { index = n, data = ydata_tmp });

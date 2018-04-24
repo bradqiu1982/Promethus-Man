@@ -84,30 +84,30 @@
                                 <tr>
                                     <td rowspan="6"><a href="~/user/GetKPI?uName=@item.Key">@item.Key.Split(new char[] { '@' })[0]</a></td>
                                     <td>Task</td>
-                                    <td>@(item.Value.Task + " / " + item.Value.TaskAll)</td>
+                                    <td>@(item.Value.Task + " # " + item.Value.TaskAll)</td>
                                     <td>@((ViewBag.data2["h_avg"].Task != 0) ? (Math.Round(item.Value.Task / ViewBag.data2["h_avg"].Task, 4) * 100) : 0) %</td>
-                                    <td>@(ViewBag.data1[item.Key].Task + " / " + ViewBag.data1[item.Key].TaskAll)</td>
+                                    <td>@(ViewBag.data1[item.Key].Task + " # " + ViewBag.data1[item.Key].TaskAll)</td>
                                     <td>@((ViewBag.data2["y_avg"].Task != 0) ?(Math.Round(ViewBag.data1[item.Key].Task / ViewBag.data2["y_avg"].Task, 4) * 100):0) %</td>
                                 </tr>
                                 <tr>
                                     <td>CriticalTask</td>
-                                    <td>@(item.Value.CriticalTask + " / " + item.Value.CriticalTaskAll)</td>
+                                    <td>@(item.Value.CriticalTask + " # " + item.Value.CriticalTaskAll)</td>
                                     <td>@((ViewBag.data2["h_avg"].CriticalTask != 0) ? (Math.Round(item.Value.CriticalTask / ViewBag.data2["h_avg"].CriticalTask, 4) * 100) : 0) %</td>
-                                    <td>@(ViewBag.data1[item.Key].CriticalTask + " / " + ViewBag.data1[item.Key].CriticalTaskAll)</td>
+                                    <td>@(ViewBag.data1[item.Key].CriticalTask + " # " + ViewBag.data1[item.Key].CriticalTaskAll)</td>
                                     <td>@((ViewBag.data2["y_avg"].CriticalTask != 0) ? (Math.Round(ViewBag.data1[item.Key].CriticalTask / ViewBag.data2["y_avg"].CriticalTask, 4) * 100) : 0) %</td>
                                 </tr>
                                 <tr>
                                     <td>Bug</td>
-                                    <td>@(item.Value.Bug + " / " + item.Value.BugAll)</td>
+                                    <td>@(item.Value.Bug + " # " + item.Value.BugAll)</td>
                                     <td>@((ViewBag.data2["h_avg"].Bug != 0) ? (Math.Round(item.Value.Bug / ViewBag.data2["h_avg"].Bug, 4) * 100) : 0) %</td>
-                                    <td>@(ViewBag.data1[item.Key].Bug + " / " + ViewBag.data1[item.Key].BugAll)</td>
+                                    <td>@(ViewBag.data1[item.Key].Bug + " # " + ViewBag.data1[item.Key].BugAll)</td>
                                     <td>@((ViewBag.data2["y_avg"].Bug != 0) ? (Math.Round(ViewBag.data1[item.Key].Bug / ViewBag.data2["y_avg"].Bug, 4) * 100) : 0) %</td>
                                 </tr>
                                 <tr>
                                     <td>RMA</td>
-                                    <td>@(item.Value.RMA + " / " + item.Value.RMAAll)</td>
+                                    <td>@(item.Value.RMA + " # " + item.Value.RMAAll)</td>
                                     <td>@((ViewBag.data2["h_avg"].RMA != 0) ? (Math.Round(item.Value.RMA / ViewBag.data2["h_avg"].RMA, 4) * 100) : 0) %</td>
-                                    <td>@(ViewBag.data1[item.Key].RMA + " / " + ViewBag.data1[item.Key].RMAAll)</td>
+                                    <td>@(ViewBag.data1[item.Key].RMA + " # " + ViewBag.data1[item.Key].RMAAll)</td>
                                     <td>@((ViewBag.data2["y_avg"].RMA != 0) ? (Math.Round(ViewBag.data1[item.Key].RMA / ViewBag.data2["y_avg"].RMA, 4) * 100) : 0) %</td>
                                 </tr>
                                 <tr>
@@ -153,22 +153,22 @@
                                 <tr>
                                     <td rowspan="6">@item.Key.Split(new char[] { '@' })[0]</td>
                                     <td>Task</td>
-                                    <td>@(item.Value.Task + " / " + item.Value.TaskAll)</td>
+                                    <td>@(item.Value.Task + " # " + item.Value.TaskAll)</td>
                                     <td>@((ViewBag.data1["h_avg"].Task != 0) ? (Math.Round(item.Value.Task / ViewBag.data1["h_avg"].Task, 4) * 100) : 0)  %</td>
                                 </tr>
                                 <tr>
                                     <td>CriticalTask</td>
-                                    <td>@(item.Value.CriticalTask + " / " + item.Value.CriticalTaskAll)</td>
+                                    <td>@(item.Value.CriticalTask + " # " + item.Value.CriticalTaskAll)</td>
                                     <td>@((ViewBag.data1["h_avg"].CriticalTask != 0) ? (Math.Round(item.Value.CriticalTask / ViewBag.data1["h_avg"].CriticalTask, 4) * 100) : 0)  %</td>
                                 </tr>
                                 <tr>
                                     <td>Bug</td>
-                                    <td>@(item.Value.Bug + " / " + item.Value.BugAll)</td>
+                                    <td>@(item.Value.Bug + " # " + item.Value.BugAll)</td>
                                     <td>@((ViewBag.data1["h_avg"].Bug != 0) ? (Math.Round(item.Value.Bug / ViewBag.data1["h_avg"].Bug, 4) * 100) : 0)  %</td>
                                 </tr>
                                 <tr>
                                     <td>RMA</td>
-                                    <td>@(item.Value.RMA + " / " + item.Value.RMAAll)</td>
+                                    <td>@(item.Value.RMA + " # " + item.Value.RMAAll)</td>
                                     <td>@((ViewBag.data1["h_avg"].RMA != 0) ? (Math.Round(item.Value.RMA / ViewBag.data1["h_avg"].RMA, 4) * 100) : 0)  %</td>
                                 </tr>
                                 <tr>

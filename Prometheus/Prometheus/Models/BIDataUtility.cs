@@ -125,6 +125,28 @@ namespace Prometheus.Models
             databackuptm = DateTime.Now;
         }
 
+        public BITestResultDataField(string sn, string testname, DateTime testtime, string pn, string wafer, string jo, string ch
+            , double slope, double pold, double pouniformity, double thold, double dpold, double dslope, double dthold, double dpouniformity, string productname)
+        {
+            Init();
+            SN = sn;
+            TestName = testname;
+            TestTimeStamp = testtime;
+            PN = pn;
+            JO = jo;
+            Channel = ch;
+            SLOPE = slope;
+            PO_LD = pold;
+            PO_Uniformity = pouniformity;
+            THOLD = thold;
+            Delta_PO_LD = dpold;
+            Delta_SLOPE = dslope;
+            Delta_THOLD = dthold;
+            Delta_PO_Uniformity = dpouniformity;
+            Wafer = wafer;
+            ProductName = productname;
+        }
+
         private void Init()
         {
             SN = string.Empty;

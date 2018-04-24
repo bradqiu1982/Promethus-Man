@@ -122,213 +122,28 @@ var BurnIn = function(){
                          $('.v-lengend').append(colorStr);
                      })
 
-                    //drawboxplot(output.data.po_ld);
-                    //drawboxplot(output.data.po_uniformity);
-                    //drawdbboxplot(output.data.variation_uniformity_pold);
                 }
              })
         })
-        var boxplot_po_ld = {
-            id: 'wafer_po_ld',
-            title: 'Delta PO_LD Distribution by Wafer',
-            xAxis: {
-                title: 'Wafer#',
-                data: ['Wafer 1', 'Wafer 2', 'Wafer 3', 'Wafer 4', 'Wafer 5'],
-            },
-            yAxis: {
-                title: 'Value',
-                plotLines: {
-                    value: '929',
-                    color: '#ff3399',
-                    text: 'Limit Value'
-                }
-            },
-            data: {
-                name: 'Delta PO_LD',
-                data: [
-                    [760, 801, 848, 895, 965],
-                    [733, 853, 939, 980, 1080],
-                    [714, 762, 817, 870, 918],
-                    [724, 802, 806, 871, 950],
-                    [834, 836, 864, 882, 910]
-                ]
-            },
-            outlier: {
-                name: 'Outlier',
-                data: [
-                    [0, 644],
-                    [4, 718],
-                    [4, 951],
-                    [4, 969]
-                ],
-                color: '#ffc000',
-                marker: {
-                    fillColor: 'white',
-                    lineWidth: 1,
-                    lineColor: Highcharts.getOptions().colors[0]
-                }
-            },
-            line: {
-                name: 'Line',
-                data: [848, 939, 817, 806, 864],
-                color: '#ffc000',
-                lineWidth: 1,
-            }
-        }
-        var wafer_po_uniformity = {
-            id: 'wafer_po_uniformity',
-            title: 'Delta Po_Uniformity Distribution by Wafer',
-            xAxis: {
-                title: 'Wafer#',
-                data: ['Wafer 1', 'Wafer 2', 'Wafer 3', 'Wafer 4', 'Wafer 5'],
-            },
-            yAxis: {
-                title: 'Value',
-                plotLines: {
-                    value: '929',
-                    color: '#ff3399',
-                    text: 'Limit Value'
-                }
-            },
-            data: {
-                name: 'Delta Po_Uniformity',
-                data: [
-                    [760, 801, 848, 895, 965],
-                    [733, 853, 939, 980, 1080],
-                    [714, 762, 817, 870, 918],
-                    [724, 802, 806, 871, 950],
-                    [834, 836, 864, 882, 910]
-                ]
-            },
-            outlier: {
-                name: 'Outlier',
-                data: [
-                    [0, 644],
-                    [4, 718],
-                    [4, 951],
-                    [4, 969]
-                ],
-                color: '#ffc000',
-                marker: {
-                    fillColor: 'white',
-                    lineWidth: 1,
-                    lineColor: Highcharts.getOptions().colors[0]
-                }
-            },
-            line: {
-                name: 'Line',
-                data: [848, 939, 817, 806, 864],
-                color: '#ffc000',
-                lineWidth: 1,
-            }
-        }
-        var variation_uniformity_pold = {
-            id: 'variation_uniformity_pold',
-            title: 'Variation_POLD_Delta & Uniformity_POLD_Delta Distribution by Wafer',
-            xAxis: {
-                title: 'Wafer#',
-                data: ['Wafer 1', 'Wafer 2', 'Wafer 3', 'Wafer 4', 'Wafer 5'],
-            },
-            left: {
-                yAxis: {
-                    title: 'Variation_POLD_Delta',
-                    plotLines: {
-                        value: '929',
-                        color: '#ff3399',
-                        text: 'Limit Value',
-                        style: 'dash'
-                    }
-                },
-                data: {
-                    name: 'Variation_POLD_Delta',
-                    color: '#00b050',
-                    data: [
-                        [760, 801, 848, 895, 965],
-                        [733, 853, 939, 980, 1080],
-                        [714, 762, 817, 870, 918],
-                        [724, 802, 806, 871, 950],
-                        [834, 836, 864, 882, 910]
-                    ]
-                },
-                outlier: {
-                    name: 'Outlier',
-                    data: [
-                        [0, 644],
-                        [4, 718],
-                        [4, 951],
-                        [4, 969]
-                    ],
-                    color: '#ffc000',
-                    marker: {
-                        fillColor: 'white',
-                        lineWidth: 1,
-                        lineColor: Highcharts.getOptions().colors[0]
-                    }
-                },
-                line: {
-                    name: 'Line',
-                    data: [848, 939, 817, 806, 864],
-                    color: '#ffc000',
-                    lineWidth: 1,
-                }
-            },
-            right:{
-                yAxis: {
-                    title: 'Uniformity_POLD_Delta',
-                    plotLines: {
-                        value: '980',
-                        color: '#C9302C',
-                        text: 'High Value',
-                        style: 'solid'
-                    }
-                },
-                data:{
-                    name: 'Uniformity_POLD_Delta',
-                    color: '#0099ff',
-                    data: [
-                        [834, 836, 864, 882, 910],
-                        [714, 762, 817, 870, 918],
-                        [724, 802, 806, 871, 950],
-                        [760, 801, 848, 895, 965],
-                        [733, 853, 939, 980, 1080]
-                    ]
-                },
-                outlier: {
-                    name: 'Outlier',
-                    data: [
-                        [4, 644],
-                        [2, 718],
-                        [1, 951],
-                        [3, 969]
-                    ],
-                    color: '#ffc000',
-                    marker: {
-                        fillColor: '#ffc000',
-                        lineWidth: 1,
-                        lineColor: '#ffc000'
-                    }
-                },
-                line:{
-                    name: 'Line',
-                    data: [864,817,806,848,939],
-                    color: '#C9302C',
-                    lineWidth: 1,
-                }
-            }
-        }
+
+        $('body').on('click', '#btn-wf-download', function () {
+            var wafer_no = $.trim($('#m-wf-no').val());
+            $('#boxplot-alert').modal('hide');
+            window.open("/DataAnalyze/DownLoadWafer?" + "wf_no=" + wafer_no);
+        })
     }
     var drawline = function(line_data){
         var options = {
-            chart: {
-                type: 'line'
-            },
+            //chart: {
+            //    type: 'line'
+            //},
             title: {
                 text: line_data.title
             },
             xAxis: {
                 categories: line_data.xAxis.data
             },
-            yAxis: {
+            yAxis: [{
                 title: {
                     text: line_data.yAxis.title
                 },
@@ -345,19 +160,51 @@ var BurnIn = function(){
                     dashStyle: line_data.data.max.style,
                     width: 1
                 }]
-            },
+            }, {
+                opposite: true,
+                title: {
+                    text: 'Amount'
+                }
+
+            }],
             series: [{
-                name: line_data.data.data.name,
-                dataLabels: {
-                    enabled: true,
-                    color: line_data.data.data.color,
+                 name: line_data.cdata.name,
+                 color: '#12cc92',
+                 type: 'column',
+                 data: line_data.cdata.data,
+                 yAxis: 1
                 },
-                marker: {
-                    radius: 2
+                {
+                    name: line_data.data.data.name,
+                    type: 'line',
+                    dataLabels: {
+                        enabled: true,
+                        color: line_data.data.data.color,
+                    },
+                    marker: {
+                        radius: 2
+                    },
+                    enableMouseTracking: false,
+                    data: line_data.data.data.data,
+                    color: '#ffa500'
+                }
+             ],
+            exporting: {
+                menuItemDefinitions: {
+                    fullscreen: {
+                        onclick: function () {
+                            $('#' + line_data.id).parent().toggleClass('chart-modal');
+                            $('#' + line_data.id).highcharts().reflow();
+                        },
+                        text: 'Full Screen'
+                    }
                 },
-                enableMouseTracking: false,
-                data: line_data.data.data.data
-            }]
+                buttons: {
+                    contextButton: {
+                        menuItems: ['fullscreen', 'printChart', 'separator', 'downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
+                    }
+                }
+            }
         };
         Highcharts.chart(line_data.id, options);
     }
@@ -384,7 +231,11 @@ var BurnIn = function(){
             },
             tooltip: {
                 headerFormat: '',
-                pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{'+((col_data.coltype == 'percent')?"point.percentage:.0f":"point.y")+'}%</b><br/>',
+                //pointFormat:(this.y==0)?'':'<span style="color:{point.color}">{point.name}</span>: <b>{'+((col_data.coltype == 'percent')?"point.percentage:.0f":"point.y")+'}%</b><br/>',
+                pointFormatter:function()
+                {
+                    return (this.y == 0) ? '' : '<span style="color:' + this.color + '">' + this.name + '</span>: <b>' + ((col_data.coltype == 'percent') ? this.percentage : this.y) + '%</b><br/>';
+                },
                 shared: true
             },
             plotOptions: {
@@ -392,7 +243,23 @@ var BurnIn = function(){
                     stacking: col_data.coltype
                 }
             },
-            series: col_data.data
+            series: col_data.data,
+            exporting: {
+                menuItemDefinitions: {
+                    fullscreen: {
+                        onclick: function () {
+                            $('#' + col_data.id).parent().toggleClass('chart-modal');
+                            $('#' + col_data.id).highcharts().reflow();
+                        },
+                        text: 'Full Screen'
+                    }
+                },
+                buttons: {
+                    contextButton: {
+                        menuItems: ['fullscreen', 'printChart', 'separator', 'downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
+                    }
+                }
+            }
         };
         Highcharts.chart(col_data.id, options);
     }
@@ -423,6 +290,17 @@ var BurnIn = function(){
                     text: boxplot_data.yAxis.title
                 }
             },
+            plotOptions: {
+                series: {
+                    cursor: 'pointer',
+                    events: {
+                        click: function (event) {
+                            $('#m-wf-no').val(event.point.category);
+                            $('#boxplot-alert').modal('show')
+                        }
+                    }
+                }
+            },
 
             series: [{
                 name: boxplot_data.data.name,
@@ -437,7 +315,23 @@ var BurnIn = function(){
                 type: 'line',
                 data: boxplot_data.line.data,
                 lineWidth: boxplot_data.line.lineWidth
-            }]
+            }],
+            exporting: {
+                        menuItemDefinitions: {
+                            fullscreen: {
+                                onclick: function () {
+                                    $('#' + boxplot_data.id).parent().toggleClass('chart-modal');
+                                    $('#' + boxplot_data.id).highcharts().reflow();
+                                },
+                                text: 'Full Screen'
+                            }
+                        },
+                        buttons: {
+                        contextButton: {
+                                    menuItems: ['fullscreen','printChart','separator','downloadPNG','downloadJPEG','downloadPDF','downloadSVG']
+                            }
+                        }
+                    }
         };
         Highcharts.chart(boxplot_data.id, options);
     }
@@ -473,6 +367,17 @@ var BurnIn = function(){
                 }
 
             }],
+            plotOptions: {
+                series: {
+                    cursor: 'pointer',
+                    events: {
+                        click: function (event) {
+                            $('#m-wf-no').val(event.point.category);
+                            $('#boxplot-alert').modal('show')
+                        }
+                    }
+                }
+            },
 
             series: [{
                 name: dbboxplot_data.left.data.name,
@@ -506,7 +411,23 @@ var BurnIn = function(){
                  lineWidth: dbboxplot_data.right.line.lineWidth,
                  yAxis: 1
              }
-            ]
+            ],
+            exporting: {
+                menuItemDefinitions: {
+                    fullscreen: {
+                        onclick: function () {
+                            $('#' + dbboxplot_data.id).parent().toggleClass('chart-modal');
+                            $('#' + dbboxplot_data.id).highcharts().reflow();
+                        },
+                        text: 'Full Screen'
+                    }
+                },
+                buttons: {
+                    contextButton: {
+                        menuItems: ['fullscreen', 'printChart', 'separator', 'downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
+                    }
+                }
+            }
         };
         Highcharts.chart(dbboxplot_data.id, options);
     }

@@ -8,7 +8,9 @@ html,body{
 body{
     width: 100%;
 }
-
+.body-content {
+    margin-top:1%!important;
+}
 .container{
     margin: auto 2% auto 5%;
     padding: 2px;

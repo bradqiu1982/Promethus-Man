@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Prometheus.Models;
+using System.Text;
 
 namespace Prometheus.Controllers
 {
@@ -136,10 +137,12 @@ namespace Prometheus.Controllers
 
                     var xdata = new List<string>();
                     var ydata = new List<double>();
+                    var cydata = new List<double>();
                     foreach (var dy in item.DYield)
                     {
                         xdata.Add(Convert.ToDateTime(dy.date).ToString("yyyy/MM"));
                         ydata.Add(Math.Round(dy.yield, 2));
+                        cydata.Add(dy.totle);
                     }
 
                     var xAxis = new { data = xdata };
@@ -147,8 +150,8 @@ namespace Prometheus.Controllers
                     var yAxis = new
                     {
                         title = "Yield (%)",
-                        min = 70,
-                        max = 100
+                        min = 85.0,
+                        max = 100.0
                     };
 
                     var min = new
@@ -170,7 +173,7 @@ namespace Prometheus.Controllers
                     var data = new
                     {
                         name = "Yield",
-                        color = "#5CB85C",
+                        color = "#ffa500",
                         data = ydata
                     };
 
@@ -180,13 +183,20 @@ namespace Prometheus.Controllers
                         data = data
                     };
 
+                    var cdata = new
+                    {
+                        name = "Test Modules",
+                        data = cydata
+                    };
+
                     yieldarray.Add(new
                     {
                         id = id,
                         title = title,
                         xAxis = xAxis,
                         yAxis = yAxis,
-                        data = combinedata
+                        data = combinedata,
+                        cdata = cdata
                     });
                 }
             }
@@ -214,8 +224,17 @@ namespace Prometheus.Controllers
                         var ydata_tmp = new List<FailureColumnSeg>();
                         for(var m = 0; m < num; m++)
                         {
-                            if(i < item.DateColSeg[m].DateColSeg.Count){
+                            if (i < item.DateColSeg[m].DateColSeg.Count)
+                            {
                                 ydata_tmp.Add(item.DateColSeg[m].DateColSeg[i]);
+                            }
+                            else
+                            {
+                                var tempvm = new FailureColumnSeg();
+                                tempvm.name = "";
+                                tempvm.y = 0;
+                                tempvm.color = "#000";
+                                ydata_tmp.Add(tempvm);
                             }
                         }
                         ydata.Add(new FailureColumnData() { index = n, data = ydata_tmp });
@@ -226,14 +245,14 @@ namespace Prometheus.Controllers
                     var yAxis = new
                     {
                         title = "(%)",
-                        min = 0,
-                        max = 100
+                        min = 0.0,
+                        max = 100.0
                     };
 
                     failurearray.Add(new
                     {
                         id = id,
-                        coltype = "percent",
+                        coltype = "normal",
                         title = title,
                         xAxis = xAxis,
                         yAxis = yAxis,
@@ -530,30 +549,47 @@ namespace Prometheus.Controllers
                             count = (f_item.DateColSeg.Count > count) ? f_item.DateColSeg.Count : count;
                         }
 
-                        var ymax = 3;
+                        var ymax = 3.0;
+                        foreach (var wfitem in item.DateColSeg)
+                        {
+                            var tempmax = 0.0;
+                            foreach (var fitem in wfitem.DateColSeg)
+                            {
+                                tempmax = tempmax + fitem.y;
+                            }
+                            if (tempmax > 3.0) ymax = 5.0;
+                            if (tempmax > 5.0) ymax = 10.0;
+                            if (tempmax > 10.0) ymax = 15.0;
+                            if (tempmax > 15.0) ymax = 20.0;
+                            if (tempmax > 20.0) ymax = 100.0;
+                        }
+
                         var num = item.DateColSeg.Count;
                         var n = 1;
                         for (var i = count - 1; i >= 0; i--)
                         {
-                            var tempmax = 0.0;
+
                             var ydata_tmp = new List<FailureColumnSeg>();
                             for (var m = 0; m < num; m++)
                             {
                                 if (i < item.DateColSeg[m].DateColSeg.Count)
                                 {
                                     item.DateColSeg[m].DateColSeg[i].y = Math.Round(item.DateColSeg[m].DateColSeg[i].y, 3);
-                                    tempmax = tempmax + item.DateColSeg[m].DateColSeg[i].y;
                                     ydata_tmp.Add(item.DateColSeg[m].DateColSeg[i]);
+                                }
+                                else
+                                {
+                                    var tempvm = new FailureColumnSeg();
+                                    tempvm.name = "";
+                                    tempvm.y = 0;
+                                    tempvm.color = "#000";
+                                    ydata_tmp.Add(tempvm);
                                 }
                             }
                             ydata.Add(new FailureColumnData() { index = n, data = ydata_tmp });
                             n++;
-                            if (tempmax > 3.0) ymax = 5;
-                            if (tempmax > 5.0) ymax = 10;
-                            if (tempmax > 10.0) ymax = 15;
-                            if (tempmax > 15.0) ymax = 20;
-                            if (tempmax > 20.0) ymax = 100;
                         }
+
                         
                         var xAxis = new { data = xdata };
                         var yAxis = new
@@ -597,6 +633,50 @@ namespace Prometheus.Controllers
             }
         }
 
+        private List<string> PrepeareAllWaferData(string wf_no)
+        {
+            var ret = new List<string>();
+            var allreldata = VcselBGDVM.RetrieveWaferData(wf_no);
+            var line = "SN,TestName,TestTimeStamp,PN,Wafer,JO,Channel,SLOPE,PO_LD,PO_Uniformity,THOLD,Delta_PO_LD,Delta_SLOPE,Delta_THOLD, Delta_PO_Uniformity, ProductName";
+            ret.Add(line);
+
+            foreach (var item in allreldata)
+            {
+                var line1 = string.Empty;
+                line1 = "\"" + item.SN.ToString().Replace("\"", "") + "\"," + "\"" + item.TestName.Replace("\"", "") + "\"," + "\"" + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss").Replace("\"", "") + "\"," + "\"" + item.PN.Replace("\"", "") + "\"," 
+                    + "\"" + item.Wafer.Replace("\"", "") + "\"," + "\"" + item.JO.Replace("\"", "") + "\"," + "\"" + item.Channel.Replace("\"", "") + "\","
+                    + "\"" + item.SLOPE.ToString().Replace("\"", "") + "\"," + "\"" + item.PO_LD.ToString().Replace("\"", "") + "\"," + "\"" + item.PO_Uniformity.ToString().Replace("\"", "") + "\","
+                    + "\"" + item.THOLD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_PO_LD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_SLOPE.ToString().Replace("\"", "") + "\","
+                    + "\"" + item.Delta_THOLD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_PO_Uniformity.ToString().Replace("\"", "") + "\"," + "\"" + item.ProductName.Replace("\"", "") + "\",";
+                ret.Add(line1);
+            }
+
+            return ret;
+        }
+
+        public ActionResult DownLoadWafer(string wf_no)
+        {
+            string datestring = DateTime.Now.ToString("yyyyMMdd");
+            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+            if (!System.IO.Directory.Exists(imgdir))
+            {
+                System.IO.Directory.CreateDirectory(imgdir);
+            }
+
+            var fn = "Wafer_"+wf_no+"_TestData_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+            var filename = imgdir + fn;
+
+            var lines = PrepeareAllWaferData(wf_no);
+
+            var wholefile = "";
+            foreach (var l in lines)
+            {
+                wholefile = wholefile + l + "\r\n";
+            }
+            System.IO.File.WriteAllText(filename, wholefile, Encoding.UTF8);
+
+            return File(filename, "application/vnd.ms-excel", fn);
+        }
 
         private void preparetxotestdata(List<string> waferlist,string leftcond, string leftfield, string rightcond, string rightfield)
         {

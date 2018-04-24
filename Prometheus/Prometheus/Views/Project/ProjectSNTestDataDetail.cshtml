@@ -1,0 +1,77 @@
+﻿
+@{
+    ViewBag.Title = "ProjectSNTestDataDetail";
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
+}
+<div class="row" style="margin-top:1%">
+    <div class="nav navbar-nav navbar-left">
+        <img src="~/Content/images/PJ/FA.png" style="height:35px; width:35px;margin-right: 15px;">
+    </div>
+    <div class="nav navbar-nav navbar-left">
+        <ol class="breadcrumb" style="width:600px">
+            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
+            <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(ViewBag.pkey)">@(ViewBag.pkey)</a></li>
+            <li class="active">Project SN Test Data Detail</li>
+        </ol>
+    </div>
+</div>
+<div class="row">
+    <h4>@("SN Trace Failure -- "+ViewBag.FM + " ( " + ViewBag.sDate + " ~ " + ViewBag.eDate + " )")</h4>
+</div>
+<div>
+    <table id="datatable" class="display" cellspacing="0">
+        <thead>
+            <tr>
+                <td>ModuleSN</td>
+                <td>WhichTest</td>
+                <td>ErrAbbr</td>
+                <td>Station</td>
+                <td>TestTime</td>
+                <td>FA Status</td>
+                <td>Assignee</td>
+                <td>Failure Desc</td>
+                <td>DueDate</td>
+            </tr>
+        </thead>
+        <tbody>
+            @if (ViewBag.data.Count > 0)
+            {
+                foreach (var item in ViewBag.data)
+                {
+                    <tr>
+                        <td>
+                            <a href="/Project/SNIssue?ProjectKey=@ViewBag.pkey&SN=@item.Value.ModuleSerialNum">@item.Value.ModuleSerialNum</a>
+                        </td>
+                        <td>@item.Value.WhichTest</td>
+                        <td>
+                            <a href="/Project/ProjectErrAbbr?ProjectKey=@ViewBag.pkey&ErrAbbr=@item.Value.ErrAbbr">@item.Value.ErrAbbr</a>
+                            <a href="/Project/UpdateProjectError2?ProjectKey=@ViewBag.pkey&ErrorCode=@item.Value.ErrAbbr"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
+                        </td>
+                        <td>@item.Value.TestStation</td>
+                        <td>@(Convert.ToDateTime(item.Value.TestTimeStamp).ToString("yyyy-MM-dd"))</td>
+                        <td>@(!string.IsNullOrEmpty(item.Value.Resolution) ? item.Value.Resolution : "")</td>
+                        <td>@(!string.IsNullOrEmpty(item.Value.Assignee) ? item.Value.Assignee.Split(new char[] { '@' })[0] : "")</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.Value.IssueKey))
+                            {
+                                <a href="/Issue/UpdateIssue?issuekey=@item.Value.IssueKey">@item.Value.Summary</a>
+                            }
+                        </td>
+                        <td>@(!string.IsNullOrEmpty(item.Value.DueDate) ? Convert.ToDateTime(item.Value.DueDate).ToString("yyyy-MM-dd") : "")</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#datatable').DataTable({
+                'iDisplayLength': 50,
+                'aLengthMenu': [[20, 50, 100, -1],
+                                [20, 50, 100, "All"]],
+                "aaSorting": [],
+                "order": []
+            });
+        })
+    </script>
+</div>

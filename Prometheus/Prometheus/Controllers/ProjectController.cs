@@ -2295,6 +2295,9 @@ namespace Prometheus.Controllers
                     }
                 }
 
+                ViewBag.sDate = sdate;
+                ViewBag.eDate = edate;
+
                 var firstdatalist = new List<KeyValuePair<string, int>>();
                 var retestdatalist = new List<KeyValuePair<string, int>>();
                 var fytestdatalist = new List<KeyValuePair<string, int>>();
@@ -2349,10 +2352,13 @@ namespace Prometheus.Controllers
                         }
                         namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
 
-                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                        var reurl = "window.location.href = '/Project/ProjectTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
+                        reurl += "+'&StartDate='+'" + sdate + "'+'&EndDate='+'" + edate + "'+'&Type=FirstFailure'";
+                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart4FF.xml"));
                         ViewBag.fchartscript = tempscript.Replace("#ElementID#", "ffailurepie")
                             .Replace("#Title#", "First Failure")
                             .Replace("#SERIESNAME#", "FFailure")
+                            .Replace("#REDIRECTURL#", reurl)
                             .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                     }
                 }
@@ -2403,11 +2409,13 @@ namespace Prometheus.Controllers
                             }
                         }
                         namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                        var reurl = "window.location.href = '/Project/ProjectSNTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
+                        reurl += "+'&StartDate='+'" + sdate + "'+'&EndDate='+'" + edate + "'+'&Type=SNFailure'";
+                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart4FF.xml"));
                         ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
                             .Replace("#Title#", "SN Trace Failure")
                             .Replace("#SERIESNAME#", "SNFailure")
+                            .Replace("#REDIRECTURL#", reurl)
                             .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                     }
                 }
@@ -2457,11 +2465,13 @@ namespace Prometheus.Controllers
                             }
                         }
                         namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
+                        var reurl = "window.location.href = '/Project/ProjectTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
+                        reurl += "+'&StartDate='+'" + sdate + "'+'&EndDate='+'" + edate + "'+'&Type=FinalFailure'";
+                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart4FF.xml"));
                         ViewBag.fychartscript = tempscript.Replace("#ElementID#", "fyfailurepie")
                             .Replace("#Title#", "Final Failure")
                             .Replace("#SERIESNAME#", "RFailure")
+                            .Replace("#REDIRECTURL#", reurl)
                             .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                     }
                 }
@@ -2483,6 +2493,39 @@ namespace Prometheus.Controllers
 
                 return View(yieldvm);
             }
+            return View();
+        }
+
+        public ActionResult ProjectTestDataDetail(string ProjectKey, string FM = "", string StartDate = "", string EndDate = "", string Type = "")
+        {
+            var all_data = IssueViewModels.GetIssuesByConditions(ProjectKey, Type, FM, StartDate, EndDate);
+            var all_sn_before = ProjectTestData.RetrieveSNBeforeDateWithStation_N(ProjectKey, StartDate);
+            all_data.Keys.Intersect(all_sn_before.Keys).ToList().ForEach(key => all_data.Remove(key));
+            ViewBag.data = all_data;
+            ViewBag.pkey = ProjectKey;
+            ViewBag.fm = FM;
+            ViewBag.sDate = StartDate;
+            ViewBag.eDate = EndDate;
+            ViewBag.type = Type;
+
+            return View();
+        }
+
+        public ActionResult ProjectSNTestDataDetail(string ProjectKey, string FM = "", string StartDate = "", string EndDate = "", string Type = "")
+        {
+            var all_sn_data = ProjectTestData.RetrieveSNBeforeDate_N(ProjectKey, StartDate, EndDate);
+            var all_sn_before = ProjectTestData.RetrieveSNBeforeDate_N(ProjectKey, "", StartDate);
+            all_sn_data.Keys.Intersect(all_sn_before.Keys).ToList().ForEach(key => all_sn_data.Remove(key));
+
+            var all_data = IssueViewModels.GetSNIssuesByConditions(ProjectKey, Type, FM, StartDate, "", String.Join("', '", all_sn_data.Keys.ToArray()));
+            
+            ViewBag.data = all_data;
+            ViewBag.pkey = ProjectKey;
+            ViewBag.fm = FM;
+            ViewBag.sDate = StartDate;
+            ViewBag.eDate = EndDate;
+            ViewBag.type = Type;
+
             return View();
         }
 

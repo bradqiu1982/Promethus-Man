@@ -1,0 +1,63 @@
+﻿<script type="text/javascript">
+$(function () {
+    $('##ElementID#').highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: '#Title#'
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                }
+            },
+            series:{
+              allowPointSelect:true,
+              point: {
+                        events:{
+                          click:function(e)
+                          {
+                            #REDIRECTURL#
+                          }
+                        }
+                        }
+            }
+        },
+        series: [{
+            name: '#SERIESNAME#',
+            colorByPoint: true,
+            data: [#NAMEVALUEPAIRS#]
+        }],
+        exporting: {
+            menuItemDefinitions: {
+                fullscreen: {
+                    onclick: function () {
+                              $('##ElementID#').parent().toggleClass('chart-modal');
+                              $('##ElementID#').highcharts().reflow();
+                    },
+                    text: 'Full Screen'
+                }
+            },
+            buttons: {
+                contextButton: {
+                    menuItems: ['fullscreen','printChart','separator','downloadPNG','downloadJPEG','downloadPDF','downloadSVG']
+                }
+            }
+        }
+    });
+});
+		</script>

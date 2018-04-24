@@ -1479,7 +1479,7 @@ namespace Prometheus.Models
             return retdict;
         }
 
-        public static List<IssueViewModels> RRetrieveFAByErrAbbr(string pjkey, string errabbr, int topnum, Controller ctrl)
+        public static List<IssueViewModels> RRetrieveFAByErrAbbr(string pjkey, string errabbr, int topnum, Controller ctrl, string sDate = "", string eDate = "")
         {
             var retdict = new List<IssueViewModels>();
 
@@ -1487,8 +1487,22 @@ namespace Prometheus.Models
                 + "i.DueDate,i.ResolvedDate,i.ReportDate,i.Assignee,i.Reporter,i.Resolution,i.ParentIssueKey,"
                 + "i.RelativePeoples,i.APVal2,i.ModuleSN,i.DataID,i.ErrAbbr, pd.TestStation from Issue as i left join "
                 + "ProjectTestData as pd on (i.IssueKey = pd.DataID and i.ProjectKey = pd.ProjectKey)"
-                + " where  i.APVal1 <> 'delete' and  i.ParentIssueKey = '' and i.ProjectKey = '<ProjectKey>' and i.ErrAbbr = '<ErrAbbr>' and i.Resolution <> '<AutoClose>' order by i.ReportDate DESC";
-            sql = sql.Replace("<ProjectKey>", pjkey).Replace("<topnum>", Convert.ToString(topnum)).Replace("<ErrAbbr>", errabbr).Replace("<AutoClose>", Resolute.AutoClose);
+                + " where  i.APVal1 <> 'delete' and  i.ParentIssueKey = '' and i.ProjectKey = '<ProjectKey>' and i.ErrAbbr = '<ErrAbbr>' and i.Resolution <> '<AutoClose>'";
+            if (!string.IsNullOrEmpty(sDate))
+            {
+                sql += " and i.ReportDate >= '<sDate>' ";
+            }
+            if (!string.IsNullOrEmpty(eDate))
+            {
+                sql += " and i.ReportDate <= '<eDate>' ";
+            }
+            sql += " order by i.ReportDate DESC";
+            sql = sql.Replace("<ProjectKey>", pjkey)
+                .Replace("<topnum>", Convert.ToString(topnum))
+                .Replace("<ErrAbbr>", errabbr)
+                .Replace("<AutoClose>", Resolute.AutoClose)
+                .Replace("<sDate>", sDate)
+                .Replace("<eDate>", eDate);
 
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
@@ -3644,6 +3658,154 @@ namespace Prometheus.Models
             return res;
 
         }
+        public static Dictionary<string, ProjectYieldIssueVM> GetIssuesByConditions(string pKey, string type, string fm = "", string sdate = "", string edate = "")
+        {
+            var param = new Dictionary<string, string>();
+            var sql = @"select ptd1.ModuleSerialNum, ptd1.WhichTest, ptd1.ErrAbbr, 
+                    ptd1.TestTimeStamp, ptd1.TestStation, ptd1.PN, i.Summary, i.IssueType, 
+                    i.Assignee, i.DueDate, i.Resolution, i.IssueKey
+                    from ProjectTestData as ptd1 
+                    inner join (select ";
+            if(string.Compare(type, "FinalFailure", true) == 0)
+            {
+                sql += @" MAX(ptd.TestTimeStamp) as TestTimeStamp, ";
+            }
+            else if(string.Compare(type, "FirstFailure", true) == 0)
+            {
+                sql += @" Min(ptd.TestTimeStamp) as TestTimeStamp, ";
+            }
+            sql += @" ModuleSerialNum, WhichTest from ProjectTestData as ptd where ptd.ProjectKey = @pKey";
+            param.Add("@pKey", pKey);
+            if (!string.IsNullOrEmpty(sdate))
+            {
+                sql += " and ptd.TestTimeStamp >= @sDate ";
+                param.Add("@sDate", sdate);
+            }
+            if (!string.IsNullOrEmpty(edate))
+            {
+                sql += " and ptd.TestTimeStamp <= @eDate ";
+                param.Add("@eDate", edate);
+            }
+            sql += @" group by ModuleSerialNum, WhichTesT)   as tmp_a
+                    on (ptd1.ModuleSerialNum = tmp_a.ModuleSerialNum and ptd1.WhichTest = tmp_a.WhichTest and ptd1.TestTimeStamp = tmp_a.TestTimeStamp)
+                    left join issue as i on (ptd1.DataID = i.IssueKey and ptd1.ProjectKey = i.ProjectKey)
+                    where ptd1.ProjectKey = @pKey ";
+
+            if (!string.IsNullOrEmpty(sdate))
+            {
+                sql += " and ptd1.TestTimeStamp >= @sDate ";
+            }
+            if (!string.IsNullOrEmpty(edate))
+            {
+                sql += " and ptd1.TestTimeStamp <= @eDate ";
+            }
+            if (!string.IsNullOrEmpty(fm))
+            {
+                sql += " and ptd1.ErrAbbr = @fm ";
+                param.Add("@fm", fm);
+            }
+            sql += @" order by ptd1.TestTimeStamp desc";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
+            var res = new Dictionary<string, ProjectYieldIssueVM>();
+            if(dbret.Count > 0)
+            {
+                foreach(var item in dbret)
+                {
+                    var tmp = new ProjectYieldIssueVM();
+                    tmp.ModuleSerialNum = Convert.ToString(item[0]);
+                    tmp.WhichTest = Convert.ToString(item[1]);
+                    tmp.ErrAbbr = Convert.ToString(item[2]);
+                    tmp.TestTimeStamp = Convert.ToString(item[3]);
+                    tmp.TestStation = Convert.ToString(item[4]);
+                    tmp.PN = Convert.ToString(item[5]);
+                    tmp.Summary = Convert.ToString(item[6]);
+                    tmp.IssueType = Convert.ToString(item[7]);
+                    tmp.Assignee = Convert.ToString(item[8]);
+                    tmp.DueDate = Convert.ToString(item[9]);
+                    tmp.Resolution = Convert.ToString(item[10]);
+                    tmp.IssueKey = Convert.ToString(item[11]);
+                    res.Add((tmp.ModuleSerialNum + ":" + tmp.WhichTest).ToUpper(), tmp);
+                }
+            }
+            return res;
+        }
+
+        public static Dictionary<string, ProjectYieldIssueVM> GetSNIssuesByConditions(string pKey, string type, string fm = "", string sdate = "", string edate = "", string ikeys = "")
+        {
+            var param = new Dictionary<string, string>();
+            var sql = @"select ptd1.ModuleSerialNum, ptd1.WhichTest, ptd1.ErrAbbr, 
+                    ptd1.TestTimeStamp, ptd1.TestStation, ptd1.PN, i.Summary, i.IssueType, 
+                    i.Assignee, i.DueDate, i.Resolution, i.IssueKey
+                    from ProjectTestData as ptd1 
+                    inner join (select ";
+            if (string.Compare(type, "SNFailure", true) == 0)
+            {
+                sql += @" MAX(ptd.TestTimeStamp) as TestTimeStamp, WhichTest, ";
+            }
+            else
+            {
+                sql += @" Min(ptd.TestTimeStamp) as TestTimeStamp, WhichTest, ";
+            }
+            sql += @" ModuleSerialNum from ProjectTestData as ptd where ptd.ProjectKey = @pKey";
+            param.Add("@pKey", pKey);
+            if (!string.IsNullOrEmpty(sdate))
+            {
+                sql += " and ptd.TestTimeStamp >= @sDate ";
+                param.Add("@sDate", sdate);
+            }
+            if (!string.IsNullOrEmpty(edate))
+            {
+                sql += " and ptd.TestTimeStamp <= @eDate ";
+                param.Add("@eDate", edate);
+            }
+            sql += @" group by ModuleSerialNum, WhichTest) as tmp_a
+                    on (ptd1.ModuleSerialNum = tmp_a.ModuleSerialNum and ptd1.WhichTest = tmp_a.WhichTest and ptd1.TestTimeStamp = tmp_a.TestTimeStamp)
+                    left join issue as i on (ptd1.DataID = i.IssueKey and ptd1.ProjectKey = i.ProjectKey)
+                    where ptd1.ProjectKey = @pKey ";
+
+            if (!string.IsNullOrEmpty(sdate))
+            {
+                sql += " and ptd1.TestTimeStamp >= @sDate ";
+            }
+            if (!string.IsNullOrEmpty(edate))
+            {
+                sql += " and ptd1.TestTimeStamp <= @eDate ";
+            }
+            if (!string.IsNullOrEmpty(fm))
+            {
+                sql += " and ptd1.ErrAbbr = @fm ";
+                param.Add("@fm", fm);
+            }
+            if (!string.IsNullOrEmpty(ikeys))
+            {
+                sql += " and UPPER(ptd1.ModuleSerialNum) in (<@ikeys>) ";
+                sql = sql.Replace("<@ikeys>", "'" + ikeys + "'");
+            }
+            sql += @" order by ptd1.TestTimeStamp desc";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
+            var res = new Dictionary<string, ProjectYieldIssueVM>();
+            if (dbret.Count > 0)
+            {
+                foreach (var item in dbret)
+                {
+                    var tmp = new ProjectYieldIssueVM();
+                    tmp.ModuleSerialNum = Convert.ToString(item[0]);
+                    tmp.WhichTest = Convert.ToString(item[1]);
+                    tmp.ErrAbbr = Convert.ToString(item[2]);
+                    tmp.TestTimeStamp = Convert.ToString(item[3]);
+                    tmp.TestStation = Convert.ToString(item[4]);
+                    tmp.PN = Convert.ToString(item[5]);
+                    tmp.Summary = Convert.ToString(item[6]);
+                    tmp.IssueType = Convert.ToString(item[7]);
+                    tmp.Assignee = Convert.ToString(item[8]);
+                    tmp.DueDate = Convert.ToString(item[9]);
+                    tmp.Resolution = Convert.ToString(item[10]);
+                    tmp.IssueKey = Convert.ToString(item[11]);
+                    res.Add((tmp.ModuleSerialNum+":" + tmp.WhichTest).ToUpper(), tmp);
+                }
+            }
+            return res;
+        }
     }
 
     public class IssueTypeVM
@@ -3773,6 +3935,23 @@ namespace Prometheus.Models
             }
             return res;
         }
+
+    }
+
+    public class ProjectYieldIssueVM
+    {
+        public string ModuleSerialNum { set; get; }
+        public string WhichTest { set; get; }
+        public string ErrAbbr { set; get; }
+        public string TestTimeStamp { set; get; }
+        public string TestStation { set; get; }
+        public string PN { set; get; }
+        public string Summary { set; get; }
+        public string IssueType { set; get; }
+        public string Assignee { set; get; }
+        public string DueDate { set; get; }
+        public string Resolution { set; get; }
+        public string IssueKey { set; get; }
     }
 
 }

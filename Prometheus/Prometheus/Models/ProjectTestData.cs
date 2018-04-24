@@ -541,6 +541,51 @@ namespace Prometheus.Models
             }
             return ret.Keys.ToList();
         }
+        public static Dictionary<string, bool> RetrieveSNBeforeDateWithStation_N(string projectkey, string edate)
+        {
+            var sql = @"select distinct ModuleSerialNum, WhichTest 
+                    from ProjectTestData 
+                    where ProjectKey = @pKey and TestTimeStamp < @eDate";
+            var param = new Dictionary<string, string>();
+            param.Add("@pKey", projectkey);
+            param.Add("@eDate", edate);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
+            var ret = new Dictionary<string, bool>();
+            foreach (var item in dbret)
+            {
+                var sn = Convert.ToString(item[0]);
+                var station = Convert.ToString(item[1]);
+                ret.Add((sn + ":" + station).ToUpper(), true);
+            }
+            return ret;
+        }
+
+        public static Dictionary<string, bool> RetrieveSNBeforeDate_N(string projectkey, string sdate = "", string edate="")
+        {
+            var sql = @"select distinct ModuleSerialNum
+                    from ProjectTestData 
+                    where ProjectKey = @pKey ";
+            var param = new Dictionary<string, string>();
+            param.Add("@pKey", projectkey);
+            if (!string.IsNullOrEmpty(sdate))
+            {
+                sql += " and TestTimeStamp >= @sDate";
+                param.Add("@sDate", sdate);
+            }
+            if (!string.IsNullOrEmpty(edate))
+            {
+                sql += " and TestTimeStamp <= @eDate";
+                param.Add("@eDate", edate);
+            }
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
+            var ret = new Dictionary<string, bool>();
+            foreach (var item in dbret)
+            {
+                var sn = Convert.ToString(item[0]);
+                ret.Add((sn).ToUpper(), true);
+            }
+            return ret;
+        }
 
     }
 }

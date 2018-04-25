@@ -2496,39 +2496,6 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        public ActionResult ProjectTestDataDetail(string ProjectKey, string FM = "", string StartDate = "", string EndDate = "", string Type = "")
-        {
-            var all_data = IssueViewModels.GetIssuesByConditions(ProjectKey, Type, FM, StartDate, EndDate);
-            var all_sn_before = ProjectTestData.RetrieveSNBeforeDateWithStation_N(ProjectKey, StartDate);
-            all_data.Keys.Intersect(all_sn_before.Keys).ToList().ForEach(key => all_data.Remove(key));
-            ViewBag.data = all_data;
-            ViewBag.pkey = ProjectKey;
-            ViewBag.fm = FM;
-            ViewBag.sDate = StartDate;
-            ViewBag.eDate = EndDate;
-            ViewBag.type = Type;
-
-            return View();
-        }
-
-        public ActionResult ProjectSNTestDataDetail(string ProjectKey, string FM = "", string StartDate = "", string EndDate = "", string Type = "")
-        {
-            var all_sn_data = ProjectTestData.RetrieveSNBeforeDate_N(ProjectKey, StartDate, EndDate);
-            var all_sn_before = ProjectTestData.RetrieveSNBeforeDate_N(ProjectKey, "", StartDate);
-            all_sn_data.Keys.Intersect(all_sn_before.Keys).ToList().ForEach(key => all_sn_data.Remove(key));
-
-            var all_data = IssueViewModels.GetSNIssuesByConditions(ProjectKey, Type, FM, StartDate, "", String.Join("', '", all_sn_data.Keys.ToArray()));
-            
-            ViewBag.data = all_data;
-            ViewBag.pkey = ProjectKey;
-            ViewBag.fm = FM;
-            ViewBag.sDate = StartDate;
-            ViewBag.eDate = EndDate;
-            ViewBag.type = Type;
-
-            return View();
-        }
-
         public ActionResult ProjectRMA(string ProjectKey)
         {
             if (ProjectKey != null)
@@ -4393,11 +4360,8 @@ namespace Prometheus.Controllers
 
                 //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
 
-                var reurl = "window.location.href = '/Project/ProjectErrAbbr?ProjectKey=" + ProjectKey + "'" + "+'&ErrAbbr='+this.category";
-                if (!string.IsNullOrEmpty(StartDate) && !string.IsNullOrEmpty(EndDate))
-                {
-                    reurl = reurl + "+'&StartDate='+'"+ StartDate + "'+'&EndDate='+'"+ EndDate + "'";
-                }
+                var reurl = "window.location.href = '/Project/ProjectTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.category";
+                reurl += "+'&StartDate='+'" + ViewBag.sDate + "'+'&EndDate='+'" + ViewBag.eDate + "'+'&Type=FirstFailure'";
 
                 var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ParetoChart.xml"));
                 ViewBag.fparetoscript = tempscript.Replace("#ElementID#", "fparetochart")
@@ -4506,11 +4470,8 @@ namespace Prometheus.Controllers
 
                 //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
 
-                var reurl = "window.location.href = '/Project/ProjectErrAbbr?ProjectKey=" + ProjectKey + "'" + "+'&ErrAbbr='+this.category";
-                if (!string.IsNullOrEmpty(StartDate) && !string.IsNullOrEmpty(EndDate))
-                {
-                    reurl = reurl + "+'&StartDate='+'" + StartDate + "'+'&EndDate='+'" + EndDate + "'";
-                }
+                var reurl = "window.location.href = '/Project/ProjectSNTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.category";
+                reurl += "+'&StartDate='+'" + ViewBag.sDate + "'+'&EndDate='+'" + ViewBag.eDate + "'+'&Type=SNFailure'";
 
                 var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ParetoChart.xml"));
                 ViewBag.rparetoscript = tempscript.Replace("#ElementID#", "rparetochart")
@@ -4619,11 +4580,8 @@ namespace Prometheus.Controllers
 
                 //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
 
-                var reurl = "window.location.href = '/Project/ProjectErrAbbr?ProjectKey=" + ProjectKey + "'" + "+'&ErrAbbr='+this.category";
-                if (!string.IsNullOrEmpty(StartDate) && !string.IsNullOrEmpty(EndDate))
-                {
-                    reurl = reurl + "+'&StartDate='+'" + StartDate + "'+'&EndDate='+'" + EndDate + "'";
-                }
+                var reurl = "window.location.href = '/Project/ProjectTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.category";
+                reurl += "+'&StartDate='+'" + ViewBag.sDate + "'+'&EndDate='+'" + ViewBag.eDate + "'+'&Type=FinalFailure'";
 
                 var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ParetoChart.xml"));
                 ViewBag.fyparetoscript = tempscript.Replace("#ElementID#", "fyparetochart")
@@ -8442,6 +8400,127 @@ namespace Prometheus.Controllers
             ExternalDataCollector.RefreshWaferCoord(this);
             return View();
         }
+
+        public ActionResult ProjectTestDataDetail(string ProjectKey, string FM = "", string StartDate = "", string EndDate = "", string Type = "")
+        {
+            if (!string.IsNullOrEmpty(EndDate)
+                    && string.Compare(Convert.ToDateTime(EndDate).ToString("yyyy-MM-dd"), DateTime.Now.ToString("yyyy-MM-dd")) == 0)
+            {
+                EndDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            }
+            var all_data = IssueViewModels.GetIssuesByConditions(ProjectKey, Type, FM, StartDate, EndDate);
+            var all_sn_before = ProjectTestData.RetrieveSNBeforeDateWithStation_N(ProjectKey, StartDate);
+            all_data.Keys.Intersect(all_sn_before.Keys).ToList().ForEach(key => all_data.Remove(key));
+            if(string.Compare(FM, "Other", true) == 0)
+            {
+                var fm_data = new Dictionary<string, List<ProjectYieldIssueVM>>();
+                foreach(var item in all_data)
+                {
+                    if (fm_data.ContainsKey(item.Value.ErrAbbr.ToUpper()))
+                    {
+                        fm_data[item.Value.ErrAbbr.ToUpper()].Add(item.Value);
+                    }
+                    else
+                    {
+                        fm_data.Add(item.Value.ErrAbbr.ToUpper(), new List<ProjectYieldIssueVM> { item.Value });
+                    }
+                }
+                var otherper = 0.0;
+                var other_data = new List<ProjectYieldIssueVM>();
+                var total_cnt = all_data.Count - fm_data["PASS"].Count;
+                foreach (var item in fm_data.OrderBy( x => x.Value.Count))
+                {
+                    if(Math.Round(otherper + Math.Round((float)item.Value.Count / total_cnt, 4), 2) <= 0.05)
+                    {
+                        otherper += Math.Round((float)item.Value.Count / total_cnt, 4);
+                        other_data.AddRange(item.Value);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                all_data.Clear();
+                foreach(var item in other_data)
+                {
+                    if (!all_data.ContainsKey((item.ModuleSerialNum + ":" + item.WhichTest).ToUpper()))
+                    {
+                        all_data.Add((item.ModuleSerialNum + ":" + item.WhichTest).ToUpper(), item);
+                    }
+                }
+            }
+            ViewBag.data = all_data;
+            ViewBag.pkey = ProjectKey;
+            ViewBag.fm = FM;
+            ViewBag.sDate = StartDate;
+            ViewBag.eDate = EndDate;
+            ViewBag.type = Type;
+
+            return View();
+        }
+
+        public ActionResult ProjectSNTestDataDetail(string ProjectKey, string FM = "", string StartDate = "", string EndDate = "", string Type = "")
+        {
+            if (!string.IsNullOrEmpty(EndDate) 
+                    && string.Compare(Convert.ToDateTime(EndDate).ToString("yyyy-MM-dd"), DateTime.Now.ToString("yyyy-MM-dd")) == 0)
+            {
+                EndDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            }
+            var all_sn_data = ProjectTestData.RetrieveSNBeforeDate_N(ProjectKey, StartDate, EndDate);
+            var all_sn_before = ProjectTestData.RetrieveSNBeforeDate_N(ProjectKey, "", StartDate);
+            all_sn_data.Keys.Intersect(all_sn_before.Keys).ToList().ForEach(key => all_sn_data.Remove(key));
+            var all_data = new Dictionary<string, ProjectYieldIssueVM>();
+            for (var i = 0; i < Math.Ceiling(all_sn_data.Count / 1000.0); i++)
+            {
+                var sn_tmp = all_sn_data.Keys.Skip(i * 1000).Take(1000).ToList();
+                var data_tmp = IssueViewModels.GetSNIssuesByConditions(ProjectKey, Type, FM, StartDate, "", String.Join("', '", sn_tmp.ToArray()));
+                all_data = all_data.Concat(data_tmp).ToDictionary(x => x.Key, x => x.Value);
+            }
+            if (string.Compare(FM, "Other", true) == 0)
+            {
+                var fm_data = new Dictionary<string, List<ProjectYieldIssueVM>>();
+                foreach (var item in all_data)
+                {
+                    if (fm_data.ContainsKey(item.Value.ErrAbbr.ToUpper()))
+                    {
+                        fm_data[item.Value.ErrAbbr.ToUpper()].Add(item.Value);
+                    }
+                    else
+                    {
+                        fm_data.Add(item.Value.ErrAbbr.ToUpper(), new List<ProjectYieldIssueVM> { item.Value });
+                    }
+                }
+                var otherper = 0.0;
+                var other_data = new List<ProjectYieldIssueVM>();
+                var total_cnt = all_data.Count - fm_data["PASS"].Count;
+                foreach (var item in fm_data.OrderBy(x => x.Value.Count))
+                {
+                    if (Math.Round(otherper + Math.Round((float)item.Value.Count / total_cnt, 4), 2) <= 0.05)
+                    {
+                        otherper += Math.Round((float)item.Value.Count / total_cnt, 4);
+                        other_data.AddRange(item.Value);
+                    }
+                }
+                all_data.Clear();
+                foreach (var item in other_data)
+                {
+                    if (all_data.ContainsKey((item.ModuleSerialNum + ":" + item.WhichTest).ToUpper()))
+                    {
+                        all_data.Add((item.ModuleSerialNum + ":" + item.WhichTest).ToUpper(), item);
+                    }
+                }
+            }
+
+            ViewBag.data = all_data;
+            ViewBag.pkey = ProjectKey;
+            ViewBag.fm = FM;
+            ViewBag.sDate = StartDate;
+            ViewBag.eDate = EndDate;
+            ViewBag.type = Type;
+
+            return View();
+        }
+        
     }
 
 }

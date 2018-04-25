@@ -3699,7 +3699,7 @@ namespace Prometheus.Models
             {
                 sql += " and ptd1.TestTimeStamp <= @eDate ";
             }
-            if (!string.IsNullOrEmpty(fm))
+            if (!string.IsNullOrEmpty(fm) && string.Compare(fm, "Other", true) != 0)
             {
                 sql += " and ptd1.ErrAbbr = @fm ";
                 param.Add("@fm", fm);
@@ -3724,7 +3724,11 @@ namespace Prometheus.Models
                     tmp.DueDate = Convert.ToString(item[9]);
                     tmp.Resolution = Convert.ToString(item[10]);
                     tmp.IssueKey = Convert.ToString(item[11]);
-                    res.Add((tmp.ModuleSerialNum + ":" + tmp.WhichTest).ToUpper(), tmp);
+                    if (!res.ContainsKey((tmp.ModuleSerialNum + ":" + tmp.WhichTest).ToUpper()))
+                    {
+                        res.Add((tmp.ModuleSerialNum + ":" + tmp.WhichTest).ToUpper(), tmp);
+                    }
+                    
                 }
             }
             return res;
@@ -3771,7 +3775,7 @@ namespace Prometheus.Models
             {
                 sql += " and ptd1.TestTimeStamp <= @eDate ";
             }
-            if (!string.IsNullOrEmpty(fm))
+            if (!string.IsNullOrEmpty(fm) && string.Compare(fm, "Other", true) != 0)
             {
                 sql += " and ptd1.ErrAbbr = @fm ";
                 param.Add("@fm", fm);
@@ -3801,7 +3805,10 @@ namespace Prometheus.Models
                     tmp.DueDate = Convert.ToString(item[9]);
                     tmp.Resolution = Convert.ToString(item[10]);
                     tmp.IssueKey = Convert.ToString(item[11]);
-                    res.Add((tmp.ModuleSerialNum+":" + tmp.WhichTest).ToUpper(), tmp);
+                    if (!res.ContainsKey((tmp.ModuleSerialNum + ":" + tmp.WhichTest).ToUpper()))
+                    {
+                        res.Add((tmp.ModuleSerialNum + ":" + tmp.WhichTest).ToUpper(), tmp);
+                    }
                 }
             }
             return res;

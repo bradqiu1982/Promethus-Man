@@ -1596,70 +1596,388 @@ namespace Prometheus.Models
         }
 
 
-        private static void RealBIWaferBySN(List<string> snlist, Dictionary<string, BISNRelation> snwaferdict)
+        //private static void RealBIWaferBySN(List<string> snlist, Dictionary<string, BISNRelation> snwaferdict)
+        //{
+        //    var sncond = "('";
+        //    foreach (var item in snlist)
+        //    {
+        //            sncond = sncond + item + "','";
+        //    }
+
+        //    if (sncond.Length > 5)
+        //        sncond = sncond.Substring(0, sncond.Length - 2);
+        //    sncond = sncond + ")";
+
+        //    var sql = "select ToContainer,Wafer,FromProductName,FromPNDescription,Vendorlot from dbo.ComponentIssueSummary where ToContainer in <SNCOND>";
+        //    sql = sql.Replace("<SNCOND>", sncond);
+
+        //    var dbret = DBUtility.ExeMESReportSqlWithRes(sql);
+        //    foreach (var line in dbret)
+        //    {
+        //        try
+        //        {
+        //            var pndesc = Convert.ToString(line[3]);
+
+        //            if ((pndesc.ToUpper().Contains("LD,") && pndesc.ToUpper().Contains("VCSEL,"))
+        //                ||(pndesc.ToUpper().Contains("CSG") && (pndesc.ToUpper().Contains("INGAAS VCSEL") || pndesc.ToUpper().Contains("VCSEL ARRAY")) ))
+        //            {
+        //                var sn = Convert.ToString(line[0]);
+        //                var wafer = Convert.ToString(line[1]);
+        //                var productname = Convert.ToString(line[2]);
+        //                var vendlot = Convert.ToString(line[4]);
+        //                if (!string.IsNullOrEmpty(wafer) && wafer.Contains("-"))
+        //                {
+        //                    var fidx = wafer.IndexOf("-");
+        //                    var ridx = wafer.IndexOf("-", fidx + 1);
+        //                    if (ridx != -1)
+        //                    {
+        //                        var head = wafer.Substring(0, ridx);
+        //                            if (!snwaferdict.ContainsKey(sn))
+        //                            {
+        //                                var snitems = new BISNRelation();
+        //                                snitems.wafer = head;
+        //                                snitems.productname = productname;
+        //                                snwaferdict.Add(sn, snitems);
+        //                            }//end if
+        //                    }
+        //                }
+        //                else if (!string.IsNullOrEmpty(vendlot) && vendlot.Contains("-"))
+        //                {
+        //                    var fidx = vendlot.IndexOf("-");
+        //                    var ridx = vendlot.IndexOf("-",fidx+1);
+        //                    if (ridx != -1)
+        //                    {
+        //                        var head = vendlot.Substring(0, ridx);
+        //                            if (!snwaferdict.ContainsKey(sn))
+        //                            {
+        //                                var snitems = new BISNRelation();
+        //                                snitems.wafer = head;
+        //                                snitems.productname = productname;
+        //                                snwaferdict.Add(sn, snitems);
+        //                            }//end if
+        //                    }//end if
+        //                }//end else if
+        //            }//end if
+        //        } catch (Exception ex) { }
+        //    }//end foreach
+        //}
+
+        private static Dictionary<string,List<string>> RealBIWaferBySN_private(List<string> snlist)
         {
-            var sncond = "('";
-            foreach (var item in snlist)
+            var ret = new Dictionary<string, List<string>>();
+            if (snlist.Count == 0) return ret;
+
+            StringBuilder sb = new StringBuilder(10 * (snlist.Count + 5));
+            sb.Append("('");
+            foreach (var line in snlist)
             {
-                    sncond = sncond + item + "','";
+                sb.Append(line + "','");
             }
+            var tempstr = sb.ToString();
+            var sncond = tempstr.Substring(0, tempstr.Length - 2) + ")";
 
-            if (sncond.Length > 5)
-                sncond = sncond.Substring(0, sncond.Length - 2);
-            sncond = sncond + ")";
+            var queryedsndict = new Dictionary<string, bool>();
 
-            var sql = "select ToContainer,Wafer,FromProductName,FromPNDescription,Vendorlot from dbo.ComponentIssueSummary where ToContainer in <SNCOND>";
+            var sql = "select ToContainer,Wafer,FromProductName,FromPNDescription from [PDMS].[dbo].[ComponentIssueSummary] where ToContainer in <SNCOND> and Wafer is not null and FromPNDescription is not null order by Wafer";
             sql = sql.Replace("<SNCOND>", sncond);
 
-            var dbret = DBUtility.ExeMESReportSqlWithRes(null, sql);
+            var dbret = DBUtility.ExeMESReportSqlWithRes(sql);
             foreach (var line in dbret)
             {
-                try
-                {
-                    var pndesc = Convert.ToString(line[3]);
+                var pndesc = Convert.ToString(line[3]);
 
-                    if ((pndesc.ToUpper().Contains("LD,") && pndesc.ToUpper().Contains("VCSEL,"))
-                        ||(pndesc.ToUpper().Contains("CSG") && (pndesc.ToUpper().Contains("INGAAS VCSEL") || pndesc.ToUpper().Contains("VCSEL ARRAY")) ))
+                if ((pndesc.ToUpper().Contains("LD,") && pndesc.ToUpper().Contains("VCSEL,"))
+                        || (pndesc.ToUpper().Contains("CSG") && (pndesc.ToUpper().Contains("INGAAS VCSEL") || pndesc.ToUpper().Contains("VCSEL ARRAY"))))
+                {
+                    var SN = Convert.ToString(line[0]);
+                    var WaferNum = Convert.ToString(line[1]);
+                    if (WaferNum.Length > 3)
                     {
-                        var sn = Convert.ToString(line[0]);
-                        var wafer = Convert.ToString(line[1]);
-                        var productname = Convert.ToString(line[2]);
-                        var vendlot = Convert.ToString(line[4]);
-                        if (!string.IsNullOrEmpty(wafer) && wafer.Contains("-"))
+                        WaferNum = WaferNum.Substring(0, WaferNum.Length - 3);
+                    }
+                    var PN = Convert.ToString(line[2]);
+
+                    if (!string.IsNullOrEmpty(WaferNum) && !string.IsNullOrEmpty(PN))
+                    {
+                        var key = PN + ":::" + WaferNum;
+                        if (ret.ContainsKey(key))
                         {
-                            var fidx = wafer.IndexOf("-");
-                            var ridx = wafer.IndexOf("-", fidx + 1);
-                            if (ridx != -1)
-                            {
-                                var head = wafer.Substring(0, ridx);
-                                    if (!snwaferdict.ContainsKey(sn))
-                                    {
-                                        var snitems = new BISNRelation();
-                                        snitems.wafer = head;
-                                        snitems.productname = productname;
-                                        snwaferdict.Add(sn, snitems);
-                                    }//end if
-                            }
+                            ret[key].Add(SN);
                         }
-                        else if (!string.IsNullOrEmpty(vendlot) && vendlot.Contains("-"))
+                        else
                         {
-                            var fidx = vendlot.IndexOf("-");
-                            var ridx = vendlot.IndexOf("-",fidx+1);
-                            if (ridx != -1)
-                            {
-                                var head = vendlot.Substring(0, ridx);
-                                    if (!snwaferdict.ContainsKey(sn))
-                                    {
-                                        var snitems = new BISNRelation();
-                                        snitems.wafer = head;
-                                        snitems.productname = productname;
-                                        snwaferdict.Add(sn, snitems);
-                                    }//end if
-                            }//end if
-                        }//end else if
-                    }//end if
-                } catch (Exception ex) { }
+                            var templist = new List<string>();
+                            templist.Add(SN);
+                            ret.Add(key,templist);
+                        }
+
+                        if (!queryedsndict.ContainsKey(SN.Trim().ToUpper()))
+                        {
+                            queryedsndict.Add(SN.Trim().ToUpper(), true);
+                        }
+                    }//ENDIF
+                }//end if
             }//end foreach
+
+
+            var leftsnlist = new List<string>();
+            foreach (var item in snlist)
+            {
+                if (!string.IsNullOrEmpty(item.Trim())
+                    && !queryedsndict.ContainsKey(item.Trim().ToUpper()))
+                {
+                    leftsnlist.Add(item.Trim());
+                }
+            }
+
+
+            if (leftsnlist.Count > 0)
+            {
+                StringBuilder sb1 = new StringBuilder(10 * (leftsnlist.Count + 5));
+                sb1.Append("('");
+                foreach (var line in leftsnlist)
+                {
+                    sb1.Append(line + "','");
+                }
+                var tempstr1 = sb1.ToString();
+                var sncond1 = tempstr1.Substring(0, tempstr1.Length - 2) + ")";
+
+                sql = @"SELECT distinct c.ContainerName as SerialName,isnull(dc.[ParamValueString],'') as WaferLot,pb.productname MaterialPN 
+                        FROM InsiteDB.insite.container c with (nolock) 
+                        left join InsiteDB.insite.currentStatus cs (nolock) on c.currentStatusId = cs.currentStatusId 
+                        left join InsiteDB.insite.workflowstep ws(nolock) on  cs.WorkflowStepId = ws.WorkflowStepId 
+                        left join InsiteDB.insite.componentRemoveHistory crh with (nolock) on crh.historyId = c.containerId 
+                        left join InsiteDB.insite.removeHistoryDetail rhd on rhd.componentRemoveHistoryId = crh.componentRemoveHistoryId 
+                        left join InsiteDB.insite.starthistorydetail  shd(nolock) on c.containerid=shd.containerId and shd.historyId <> shd.containerId 
+                        left join InsiteDB.insite.container co (nolock) on co.containerid=shd.historyId 
+                        left join InsiteDB.insite.historyMainline hml with (nolock) on c.containerId = hml.containerId 
+                        left join InsiteDB.insite.componentIssueHistory cih with (nolock) on  hml.historyMainlineId=cih.historyMainlineId 
+                        left join InsiteDB.insite.issueHistoryDetail ihd with (nolock) on cih.componentIssueHistoryId = ihd.componentIssueHistoryId 
+                        left join InsiteDB.insite.issueActualsHistory iah with (nolock) on  ihd.issueHistoryDetailId = iah.issueHistoryDetailId 
+                        left join InsiteDB.insite.RemoveHistoryDetail rem with (nolock) on iah.IssueActualsHistoryId = rem.IssueActualsHistoryId 
+                        left join InsiteDB.insite.RemovalReason re with (nolock) on rem.RemovalReasonId = re.RemovalReasonId 
+                        left join InsiteDB.insite.container cFrom with (nolock) on iah.fromContainerId = cFrom.containerId 
+                        left join InsiteDB.insite.product p with (nolock) on  cFrom.productId = p.productId 
+                        left join InsiteDB.insite.productBase pb with (nolock) on p.productBaseId  = pb.productBaseId 
+                        left join InsiteDB.insite.historyMainline hmll with (nolock)on cFrom.OriginalcontainerId=hmll.historyid 
+                        left join InsiteDB.insite.product pp with (nolock) on c.productid=pp.productid 
+                        left join InsiteDB.insite.productfamily pf (nolock) on  pp.productFamilyId = pf.productFamilyId 
+                        left join InsiteDB.insite.productbase pbb with (nolock) on pp.productbaseid=pbb.productbaseid 
+                        left join InsiteDB.insite.dc_AOC_ManualInspection dc (nolock) on hmll.[HistoryMainlineId]=dc.[HistoryMainlineId] 
+                        WHERE dc.parametername='Trace_ID' and p.description like '%VCSEL%' and dc.[ParamValueString] like '%-%'and c.containername in <SNCOND> order by pb.productname,c.ContainerName";
+
+                sql = sql.Replace("<SNCOND>", sncond1);
+                dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+                foreach (var line in dbret)
+                {
+                    var SN = Convert.ToString(line[0]);
+                    var WaferNum = Convert.ToString(line[1]);
+                    if (WaferNum.Length > 3)
+                    {
+                        WaferNum = WaferNum.Substring(0, WaferNum.Length - 3);
+                    }
+                    var PN = Convert.ToString(line[2]);
+                    if (!string.IsNullOrEmpty(WaferNum) && !string.IsNullOrEmpty(PN))
+                    {
+                        var key = PN + ":::" + WaferNum;
+                        if (ret.ContainsKey(key))
+                        {
+                            ret[key].Add(SN);
+                        }
+                        else
+                        {
+                            var templist = new List<string>();
+                            templist.Add(SN);
+                            ret.Add(key, templist);
+                        }
+                    }//end if
+                }//end foreach
+            }//end if
+
+            return ret;
+        }
+
+        private static Dictionary<string, List<string>> RealBIWaferBySN_private4up(List<string> snlist)
+        {
+            var ret = new Dictionary<string, List<string>>();
+            if (snlist.Count == 0) return ret;
+
+            if (snlist.Count > 0)
+            {
+                StringBuilder sb1 = new StringBuilder(10 * (snlist.Count + 5));
+                sb1.Append("('");
+                foreach (var line in snlist)
+                {
+                    sb1.Append(line + "','");
+                }
+                var tempstr1 = sb1.ToString();
+                var sncond1 = tempstr1.Substring(0, tempstr1.Length - 2) + ")";
+
+                var sql = @"SELECT distinct c.ContainerName as SerialName,isnull(dc.[ParamValueString],'') as WaferLot,pb.productname MaterialPN 
+                        FROM InsiteDB.insite.container c with (nolock) 
+                        left join InsiteDB.insite.currentStatus cs (nolock) on c.currentStatusId = cs.currentStatusId 
+                        left join InsiteDB.insite.workflowstep ws(nolock) on  cs.WorkflowStepId = ws.WorkflowStepId 
+                        left join InsiteDB.insite.componentRemoveHistory crh with (nolock) on crh.historyId = c.containerId 
+                        left join InsiteDB.insite.removeHistoryDetail rhd on rhd.componentRemoveHistoryId = crh.componentRemoveHistoryId 
+                        left join InsiteDB.insite.starthistorydetail  shd(nolock) on c.containerid=shd.containerId and shd.historyId <> shd.containerId 
+                        left join InsiteDB.insite.container co (nolock) on co.containerid=shd.historyId 
+                        left join InsiteDB.insite.historyMainline hml with (nolock) on c.containerId = hml.containerId 
+                        left join InsiteDB.insite.componentIssueHistory cih with (nolock) on  hml.historyMainlineId=cih.historyMainlineId 
+                        left join InsiteDB.insite.issueHistoryDetail ihd with (nolock) on cih.componentIssueHistoryId = ihd.componentIssueHistoryId 
+                        left join InsiteDB.insite.issueActualsHistory iah with (nolock) on  ihd.issueHistoryDetailId = iah.issueHistoryDetailId 
+                        left join InsiteDB.insite.RemoveHistoryDetail rem with (nolock) on iah.IssueActualsHistoryId = rem.IssueActualsHistoryId 
+                        left join InsiteDB.insite.RemovalReason re with (nolock) on rem.RemovalReasonId = re.RemovalReasonId 
+                        left join InsiteDB.insite.container cFrom with (nolock) on iah.fromContainerId = cFrom.containerId 
+                        left join InsiteDB.insite.product p with (nolock) on  cFrom.productId = p.productId 
+                        left join InsiteDB.insite.productBase pb with (nolock) on p.productBaseId  = pb.productBaseId 
+                        left join InsiteDB.insite.historyMainline hmll with (nolock)on cFrom.OriginalcontainerId=hmll.historyid 
+                        left join InsiteDB.insite.product pp with (nolock) on c.productid=pp.productid 
+                        left join InsiteDB.insite.productfamily pf (nolock) on  pp.productFamilyId = pf.productFamilyId 
+                        left join InsiteDB.insite.productbase pbb with (nolock) on pp.productbaseid=pbb.productbaseid 
+                        left join InsiteDB.insite.dc_AOC_ManualInspection dc (nolock) on hmll.[HistoryMainlineId]=dc.[HistoryMainlineId] 
+                        WHERE dc.parametername='Trace_ID' and p.description like '%VCSEL%' and dc.[ParamValueString] like '%-%'and c.containername in <SNCOND> order by pb.productname,c.ContainerName";
+
+                sql = sql.Replace("<SNCOND>", sncond1);
+                var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+                foreach (var line in dbret)
+                {
+                    var SN = Convert.ToString(line[0]);
+                    var WaferNum = Convert.ToString(line[1]);
+                    if (WaferNum.Length > 3)
+                    {
+                        WaferNum = WaferNum.Substring(0, WaferNum.Length - 3);
+                    }
+                    var PN = Convert.ToString(line[2]);
+                    if (!string.IsNullOrEmpty(WaferNum) && !string.IsNullOrEmpty(PN))
+                    {
+                        var key = PN + ":::" + WaferNum;
+                        if (ret.ContainsKey(key))
+                        {
+                            ret[key].Add(SN);
+                        }
+                        else
+                        {
+                            var templist = new List<string>();
+                            templist.Add(SN);
+                            ret.Add(key, templist);
+                        }
+                    }//end if
+                }//end foreach
+            }//end if
+
+            return ret;
+        }
+
+        private static List<string> RetrieveBISNNoMaterialPN(DateTime StartDate, DateTime EndDate)
+        {
+            var ret = new List<string>();
+            var sql = "SELECT distinct SN FROM BITestResult where TestTimeStamp >= '<StartDate>' and TestTimeStamp < '<EndDate>' and ProductName = ''";
+            sql = sql.Replace("<StartDate>",StartDate.ToString("yyyy-MM-dd HH:mm:ss")).Replace("<EndDate>", EndDate.ToString("yyyy-MM-dd HH:mm:ss"));
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                ret.Add(Convert.ToString(line[0]));
+            }
+            return ret;
+        }
+
+        private static void RealUpdateBITestResultWaferPN(string PN, string Wafer, List<string> snlist)
+        {
+            if (snlist.Count == 0) return;
+            StringBuilder sb = new StringBuilder(10 * (snlist.Count + 5));
+            sb.Append("('");
+            foreach (var line in snlist)
+            {
+                sb.Append(line + "','");
+            }
+            var tempstr = sb.ToString();
+            var sncond = tempstr.Substring(0, tempstr.Length - 2) + ")";
+
+            var sql = "Update BITestResult set ProductName = @ProductName,Wafer = @Wafer where SN in <SNCOND>";
+            sql = sql.Replace("<SNCOND>", sncond);
+            var dict = new Dictionary<string, string>();
+            dict.Add("@ProductName", PN);
+            dict.Add("@Wafer", Wafer);
+
+            DBUtility.ExeLocalSqlNoRes(sql, dict);
+        }
+
+        public static void UpdateBITestResultWaferPN(DateTime StartDate)
+        {
+            var now = DateTime.Now;
+            while (StartDate < now)
+            {
+                var EndDate = StartDate.AddMonths(1);
+                var snlist = RetrieveBISNNoMaterialPN(StartDate,EndDate);
+                if (snlist.Count > 0)
+                {
+                    var pnwfsn = RealBIWaferBySN(snlist);
+                    foreach (var kv in pnwfsn)
+                    {
+                        var kvarray = kv.Key.Split(new string[] { ":::" }, StringSplitOptions.None);
+                        RealUpdateBITestResultWaferPN(kvarray[0], kvarray[1], kv.Value);
+                    }//end foreach
+                }//end if
+                StartDate = StartDate.AddMonths(1);
+            }//end while
+        }
+
+        private static Dictionary<string, List<string>> RealBIWaferBySN(List<string> testresultlist)
+        {
+            var ret = new Dictionary<string, List<string>>();
+
+            var sndict = new Dictionary<string, bool>();
+            foreach (var item in testresultlist)
+            {
+                if (!sndict.ContainsKey(item))
+                { sndict.Add(item, true); }
+            }
+            var snlist = sndict.Keys.ToList();
+            var startidx = 0;
+            var totalsn = snlist.Count;
+
+            while (true)
+            {
+                var done = false;
+                var tempsnlist = new List<string>();
+                for (var idx = startidx; idx < startidx + 3000; idx++)
+                {
+                    if (idx < totalsn)
+                    {
+                        tempsnlist.Add(snlist[idx]);
+                    }
+                    else
+                    {
+                        done = true;
+                        break;
+                    }
+                }
+
+                if (tempsnlist.Count > 0)
+                {
+                    var pnwfsn = RealBIWaferBySN_private4up(tempsnlist);
+                    foreach (var kv in pnwfsn)
+                    {
+                        if (ret.ContainsKey(kv.Key))
+                        {
+                            ret[kv.Key].AddRange(kv.Value);
+                        }
+                        else
+                        {
+                            var templist = new List<string>();
+                            templist.AddRange(kv.Value);
+                            ret.Add(kv.Key, templist);
+                        }
+                    }
+                }
+
+                if (done)
+                    break;
+
+                startidx = startidx + 3000;
+            }//end while(true)
+
+            return ret;
         }
 
         private static void RetrieveBIWaferBySN(List<BITestResult> testresultlist, Dictionary<string, BISNRelation> snwaferdict)
@@ -1678,7 +1996,7 @@ namespace Prometheus.Models
             {
                 var done = false;
                 var tempsnlist = new List<string>();
-                for (var idx = startidx; idx < startidx + 20000; idx++)
+                for (var idx = startidx; idx < startidx + 3000; idx++)
                 {
                     if (idx < totalsn)
                     {
@@ -1693,71 +2011,83 @@ namespace Prometheus.Models
 
                 if (tempsnlist.Count > 0)
                 {
-                    RealBIWaferBySN(tempsnlist, snwaferdict);
+                    var pnwfsn = RealBIWaferBySN_private(tempsnlist);
+                    foreach (var kv in pnwfsn)
+                    {
+                        var pnwfarray = kv.Key.Split(new string[] { ":::" },StringSplitOptions.None);
+                        foreach(var sn in kv.Value)
+                        {
+                            if (!snwaferdict.ContainsKey(sn))
+                            {
+                                var snitems = new BISNRelation();
+                                snitems.wafer = pnwfarray[1];
+                                snitems.productname = pnwfarray[0];
+                                snwaferdict.Add(sn, snitems);
+                            }//end if
+                        }
+                    }
                 }
 
                 if (done)
                     break;
 
-                startidx = startidx + 20000;
+                startidx = startidx + 3000;
             }//end while(true)
 
         }
+
+        public static Dictionary<string, string> RealBIWaferBySN4WaferCoord(string sns)
+        {
+            var ret = new Dictionary<string, string>();
+            if (string.IsNullOrEmpty(sns)) return ret;
+
+            var sql = @"SELECT distinct c.ContainerName as SerialName,isnull(dc.[ParamValueString],'') as WaferLot,pb.productname MaterialPN 
+                    FROM InsiteDB.insite.container c with (nolock) 
+                    left join InsiteDB.insite.currentStatus cs (nolock) on c.currentStatusId = cs.currentStatusId 
+                    left join InsiteDB.insite.workflowstep ws(nolock) on  cs.WorkflowStepId = ws.WorkflowStepId 
+                    left join InsiteDB.insite.componentRemoveHistory crh with (nolock) on crh.historyId = c.containerId 
+                    left join InsiteDB.insite.removeHistoryDetail rhd on rhd.componentRemoveHistoryId = crh.componentRemoveHistoryId 
+                    left join InsiteDB.insite.starthistorydetail  shd(nolock) on c.containerid=shd.containerId and shd.historyId <> shd.containerId 
+                    left join InsiteDB.insite.container co (nolock) on co.containerid=shd.historyId 
+                    left join InsiteDB.insite.historyMainline hml with (nolock) on c.containerId = hml.containerId 
+                    left join InsiteDB.insite.componentIssueHistory cih with (nolock) on  hml.historyMainlineId=cih.historyMainlineId 
+                    left join InsiteDB.insite.issueHistoryDetail ihd with (nolock) on cih.componentIssueHistoryId = ihd.componentIssueHistoryId 
+                    left join InsiteDB.insite.issueActualsHistory iah with (nolock) on  ihd.issueHistoryDetailId = iah.issueHistoryDetailId 
+                    left join InsiteDB.insite.RemoveHistoryDetail rem with (nolock) on iah.IssueActualsHistoryId = rem.IssueActualsHistoryId 
+                    left join InsiteDB.insite.RemovalReason re with (nolock) on rem.RemovalReasonId = re.RemovalReasonId 
+                    left join InsiteDB.insite.container cFrom with (nolock) on iah.fromContainerId = cFrom.containerId 
+                    left join InsiteDB.insite.product p with (nolock) on  cFrom.productId = p.productId 
+                    left join InsiteDB.insite.productBase pb with (nolock) on p.productBaseId  = pb.productBaseId 
+                    left join InsiteDB.insite.historyMainline hmll with (nolock)on cFrom.OriginalcontainerId=hmll.historyid 
+                    left join InsiteDB.insite.product pp with (nolock) on c.productid=pp.productid 
+                    left join InsiteDB.insite.productfamily pf (nolock) on  pp.productFamilyId = pf.productFamilyId 
+                    left join InsiteDB.insite.productbase pbb with (nolock) on pp.productbaseid=pbb.productbaseid 
+                    left join InsiteDB.insite.dc_AOC_ManualInspection dc (nolock) on hmll.[HistoryMainlineId]=dc.[HistoryMainlineId] 
+                    WHERE dc.parametername='Trace_ID' and p.description like '%VCSEL%' and dc.[ParamValueString] like '%-%'and c.containername in <SNCOND> order by pb.productname,c.ContainerName";
+
+            sql = sql.Replace("<SNCOND>", "(" + sns + ")");
+            var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                var SN = Convert.ToString(line[0]);
+                var WaferNum = Convert.ToString(line[1]);
+                if (WaferNum.Length > 3)
+                {
+                    WaferNum = WaferNum.Substring(0, WaferNum.Length - 3);
+                }
+                if (!string.IsNullOrEmpty(WaferNum))
+                {
+                    if (!ret.ContainsKey(SN))
+                    {
+                        ret.Add(SN, WaferNum);
+                    }
+                }
+            }
+
+            return ret;
+        }
         #endregion
 
-        //private static Dictionary<string, BISNRelation> RetrieveBIWaferBySN(List<BITestResult> testresultlist)
-        //{
-        //    var snwaferdict = new Dictionary<string, BISNRelation>();
-
-        //    var sncond = "('";
-        //    var sndict = new Dictionary<string, bool>();
-        //    foreach (var item in testresultlist)
-        //    {
-        //        if (!sndict.ContainsKey(item.SN))
-        //        {
-        //            sncond = sncond + item.SN + "','";
-        //            sndict.Add(item.SN,true);
-        //        }
-        //    }
-
-        //    if (sncond.Length > 5)
-        //        sncond = sncond.Substring(0, sncond.Length - 2);
-        //    sncond = sncond + ")";
-
-        //    var sql = "SELECT distinct c.ContainerName as SN,dc.[ParamValueString] as wafer,pb.productname MaterialPN,pf.productfamilyname FROM insite.container c with(nolock)"
-        //    + " inner join insite.currentStatus cs(nolock) on c.currentStatusId = cs.currentStatusId "
-        //    + "inner join insite.workflowstep ws(nolock) on cs.WorkflowStepId = ws.WorkflowStepId "
-        //    + "inner join insite.historyMainline hml with (nolock) on c.containerId = hml.containerId "
-        //    + "inner join insite.componentIssueHistory cih with (nolock) on hml.historyMainlineId=cih.historyMainlineId "
-        //    + "inner join insite.issueHistoryDetail ihd with (nolock) on cih.componentIssueHistoryId = ihd.componentIssueHistoryId "
-        //    + "inner join insite.issueActualsHistory iah with (nolock) on ihd.issueHistoryDetailId = iah.issueHistoryDetailId "
-        //    + "inner join insite.container cFrom with (nolock) on iah.fromContainerId = cFrom.containerId "
-        //    + "inner join insite.product p with (nolock) on cFrom.productId = p.productId "
-        //    + "inner join insite.productBase pb with (nolock) on p.productBaseId  = pb.productBaseId "
-        //    + "inner join insite.historyMainline hmll with (nolock)on cFrom.containerId=hmll.historyid "
-        //    + "inner join insite.product pp with (nolock) on c.productid=pp.productid "
-        //    + "left outer join insite.productfamily pf (nolock) on pp.productFamilyId = pf.productFamilyId "
-        //    + "inner join insite.productbase pbb with (nolock) on pp.productbaseid=pbb.productbaseid "
-        //    + "inner join[InsiteDB].[insite].[dc_AOC_ManualInspection] dc (nolock) on hmll.[HistoryMainlineId]= dc.[HistoryMainlineId] "
-        //    + "where dc.parametername= 'Trace_ID'  and p.description like '%VCSEL%'  and c.containername in <SNCOND> order by c.ContainerName,pb.productname ";
-
-        //    sql = sql.Replace("<SNCOND>", sncond);
-
-        //    var dbret = DBUtility.ExeMESBackupSqlWithRes(null, sql);
-        //    foreach (var line in dbret)
-        //    {
-        //        var sn = Convert.ToString(line[0]);
-        //        var snitems = new BISNRelation();
-        //        snitems.wafer = Convert.ToString(line[1]);
-        //        snitems.productname = Convert.ToString(line[3]);
-        //        if (!snwaferdict.ContainsKey(sn))
-        //        {
-        //            snwaferdict.Add(sn, snitems);
-        //        }
-        //    }
-
-        //    return snwaferdict;
-        //}
 
         #region module
         private static string RetrieveLatestTimeStampOfATxpTable(string bt, string bizerotime)

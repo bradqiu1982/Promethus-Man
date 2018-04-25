@@ -1421,3 +1421,14 @@ CREATE TABLE [dbo].[WaferBGDFiled] (
 	[BoxData]   NVARCHAR (300) DEFAULT ('') NOT NULL,
 	[UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
 	);
+
+CREATE TABLE [dbo].[WaferCoordData](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[SN] [nvarchar](200) Default '' NOT NULL,
+	[Coord_X] [nvarchar](max) Default '' NOT NULL,
+	[Coord_Y] [nvarchar](max) Default '' NOT NULL,
+	[Wafer_No] [nvarchar](200) Default '' NOT NULL,
+	[Bin] [nvarchar](max) Default '' NOT NULL,
+	[TestTime] [date] Default '' NOT NULL,
+	[SyncTime] [datetime] Default '' NOT NULL
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]

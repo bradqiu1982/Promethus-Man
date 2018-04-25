@@ -1,0 +1,102 @@
+﻿
+@{
+    ViewBag.Title = "ReviewWaferCoordData";
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
+}
+
+<link type="text/css" rel="stylesheet" href="~/Content/bootstrap-datepicker/bootstrap-datepicker.min.css" />
+<link type="text/css" rel="stylesheet" href="~/Scripts/bootstrap-tagsinput/bootstrap-tagsinput.css" />
+<link type="text/css" rel="stylesheet" href="~/Content/wafercoorddata.css" />
+<script type="text/javascript" src="~/Scripts/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
+<script type="text/javascript" src="~/Scripts/bootstrap-tagsinput/bootstrap-tagsinput.js"></script>
+<script type="text/javascript" src="~/Scripts/bootstrap-tagsinput/bootstrap3-typeahead.js"></script>
+<script type="text/javascript" src="~/Scripts/wafercoorddata.js"></script>
+<script>
+    $(function () {
+        WaferCoordData.init();
+    })
+</script>
+<div class="row row-margin">
+    <div class="nav navbar-nav navbar-left">
+        <ol class="breadcrumb" style="width:600px">
+            <li class="active">Wafer Coord Data</li>
+        </ol>
+    </div>
+</div>
+<div class="search-filter">
+    <div class="row row-margin">
+        <label class="col-xs-2">SN List</label>
+        <div class="col-xs-9">
+            <input type="text" class="form-control" id="skey" placeholder="Separate from semicolon(;) or comma(,)" 
+                   name="skey" value="@ViewBag.skey" autocomplete="off" />
+        </div>
+    </div>
+    <div class="row row-margin">
+        <label class="col-xs-2">TestTime</label>
+        <div class="col-xs-4">
+            <div class="input-group date" data-date="@ViewBag.sdate" data-date-format="yyyy-mm-dd">
+                <input type="text" class="form-control"
+                       id="sdate" name="sdate" value="@ViewBag.sdate" readonly>
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-th"></span>
+                </span>
+            </div>
+        </div>
+        <div class="col-xs-1 text-center">~</div>
+        <div class="col-xs-4">@ViewBag.sdata
+            <div class="input-group date" data-date="@ViewBag.edate" data-date-format="yyyy-mm-dd">
+                <input type="text" class="form-control"
+                        id="edate" name="edate" value="@ViewBag.edate" readonly>
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-th"></span>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="row row-margin text-right">
+        <input type="button" class="btn btn-warning" value="Clear" id="btn-clear" name="btn-clear" />
+        <input type="button" class="btn btn-success" value="Search" id="btn-search" name="btn-search" />
+    </div>
+</div>
+<div>
+    <table id="datatable" class="display" cellspacing="0">
+        <thead>
+            <tr>
+                <th>SN</th>
+                <th>Wafer</th>
+                <th>Coord-X</th>
+                <th>Coord-Y</th>
+                <th>Bin</th>
+                <th>Test Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (ViewBag.data.Count > 0)
+            {
+                foreach (var item in ViewBag.data)
+                {
+                    <tr>
+                        <td>@item.Value.SN</td>
+                        <td>@item.Value.Wafer_No</td>
+                        <td>@item.Value.Coord_X</td>
+                        <td>@item.Value.Coord_Y</td>
+                        <td>@item.Value.Bin</td>
+                        <td>@(Convert.ToDateTime(item.Value.TestTime).ToString("yyyy-MM-dd"))</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#datatable').DataTable({
+                'iDisplayLength': 50,
+                'aLengthMenu': [[25, 50, 100, -1],
+                [25, 50, 100, "All"]],
+                "aaSorting": [],
+                "order": []
+            });
+        });
+    </script>
+</div>
+

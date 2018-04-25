@@ -6333,6 +6333,14 @@ namespace Prometheus.Controllers
             }
             catch (Exception ex) { }
 
+            heartbeatlog("ExternalDataCollector.RefreshWaferCoord");
+
+            try
+            {
+                ExternalDataCollector.RefreshWaferCoord(this);
+            }
+            catch (Exception ex) { }
+
             heartbeatlog("refresh cache");
 
             try
@@ -6500,6 +6508,8 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
+            //BIDataUtility.UpdateBITestResultWaferPN(DateTime.Parse("2017-10-01 00:00:00"));
+
             //try
             //{
             //    var vcselpninfo = VcselPNData.RetrieveVcselPNInfo();
@@ -8427,7 +8437,11 @@ namespace Prometheus.Controllers
             return View();
         }
 
-
+        public ActionResult RefreshWaferCoord()
+        {
+            ExternalDataCollector.RefreshWaferCoord(this);
+            return View();
+        }
     }
 
 }

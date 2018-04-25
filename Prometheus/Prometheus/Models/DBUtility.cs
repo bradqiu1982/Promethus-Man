@@ -912,7 +912,7 @@ namespace Prometheus.Models
          * you can prepare @param in sql,
          * and give @param-values in parameters.
          */
-        public static List<List<object>> ExeMESReportSqlWithRes(Controller ctrl, string sql, Dictionary<string, string> parameters = null)
+        public static List<List<object>> ExeMESReportSqlWithRes(string sql, Dictionary<string, string> parameters = null)
         {
             //var syscfgdict = CfgUtility.GetSysConfig(ctrl);
 

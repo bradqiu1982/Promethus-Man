@@ -1278,6 +1278,9 @@ namespace Prometheus.Models
 
                 var temptestf = new TestFailureColumn();
                 temptestf.TestType = testkv.Key;
+                waferflist.Sort(delegate(DateWaferFailureColumn obj1, DateWaferFailureColumn obj2) {
+                    return obj1.xkey.CompareTo(obj2.xkey);
+                });
                 temptestf.DateColSeg = waferflist;
 
                 testflist.Add(temptestf);

@@ -370,6 +370,9 @@ namespace Prometheus.Controllers
                 var boxarray = new List<object>();
                 var failurearray = new List<object>();
 
+                var xwaferlist = new List<string>();
+                var xwaferdict = new Dictionary<string, bool>();
+
                 foreach (var item in testflist)
                 {
                     if (item.DateColSeg.Count > 0)
@@ -385,6 +388,12 @@ namespace Prometheus.Controllers
                         foreach (var f_item in item.DateColSeg)
                         {
                             xdata.Add(f_item.xkey);
+                            if (!xwaferdict.ContainsKey(f_item.xkey))
+                            {
+                                xwaferlist.Add(f_item.xkey);
+                                xwaferdict.Add(f_item.xkey, true);
+                            }
+
                             count = (f_item.DateColSeg.Count > count) ? f_item.DateColSeg.Count : count;
                         }
 
@@ -469,11 +478,19 @@ namespace Prometheus.Controllers
                     var rdatadata = new List<List<double>>();
                     var rlinedata = new List<double>();
 
-                    foreach (var wfkv in fieldkv.Value)
+                    //foreach (var wfkv in fieldkv.Value)
+                    foreach(var x in xwaferlist)
                     {
-                        var wf = wfkv.Key;
+                        //var wf = wfkv.Key;
+                        //xaxisdata.Add(wf);
+                        //foreach (var box in wfkv.Value)
+
+                        if (!fieldkv.Value.ContainsKey(x)) continue;
+
+                        var wf = x;
                         xaxisdata.Add(wf);
-                        foreach (var box in wfkv.Value)
+                        var boxdict = fieldkv.Value[x];
+                        foreach(var box in boxdict)
                         {
                             if (box.Contains("#V"))
                             {

@@ -366,8 +366,97 @@ namespace Prometheus.Controllers
                 var fieldboxlist = (Dictionary<string, Dictionary<string, List<string>>>)retdata[0];
                 var testflist = (List<TestFailureColumn>)retdata[1];
 
+                var yieldarray = new List<object>();
                 var boxarray = new List<object>();
                 var failurearray = new List<object>();
+
+                foreach (var item in testflist)
+                {
+                    if (item.DateColSeg.Count > 0)
+                    {
+                        var id = "f_yield_" + item.TestType.Replace(" ", "_") + "_id";
+                        var title = item.TestType + " Wafer Yield";
+
+                        var xdata = new List<string>();
+                        var ydata = new List<double>();
+                        var cydata = new List<double>();
+
+                        var count = 0;
+                        foreach (var f_item in item.DateColSeg)
+                        {
+                            xdata.Add(f_item.xkey);
+                            count = (f_item.DateColSeg.Count > count) ? f_item.DateColSeg.Count : count;
+                        }
+
+                        foreach (var wfitem in item.DateColSeg)
+                        {
+                            var failpercent = 0.0;
+                            foreach (var fitem in wfitem.DateColSeg)
+                            {
+                                failpercent = failpercent + fitem.y;
+                            }
+                            ydata.Add(100.0 - failpercent);
+                            cydata.Add(wfitem.total);
+                        }
+
+
+                        var xAxis = new { data = xdata };
+
+                        var yAxis = new
+                        {
+                            title = "Yield (%)",
+                            min = 85.0,
+                            max = 100.0
+                        };
+
+                        var min = new
+                        {
+                            name = "Min",
+                            color = "#F0AD4E",
+                            data = 94,
+                            style = "dash"
+                        };
+
+                        var max = new
+                        {
+                            name = "Max",
+                            color = "#C9302C",
+                            data = 98,
+                            style = "solid"
+                        };
+
+                        var data = new
+                        {
+                            name = "Yield",
+                            color = "#ffa500",
+                            data = ydata
+                        };
+
+                        var combinedata = new
+                        {
+                            min = min,
+                            max = max,
+                            data = data
+                        };
+
+                        var cdata = new
+                        {
+                            name = "Test Modules",
+                            data = cydata
+                        };
+
+                        yieldarray.Add(new
+                        {
+                            id = id,
+                            title = title,
+                            xAxis = xAxis,
+                            yAxis = yAxis,
+                            data = combinedata,
+                            cdata = cdata
+                        });
+                    }//end if
+                }//end foreach
+
 
                 foreach (var fieldkv in fieldboxlist)
                 {
@@ -537,7 +626,6 @@ namespace Prometheus.Controllers
                     {
                         var id = "f_" + item.TestType.Replace(" ", "_") + "_id";
 
-                        var lastdidx = item.DateColSeg.Count - 1;
                         var title = "Faliure Mode (" + item.TestType + ")";
 
                         var xdata = new List<string>();
@@ -615,6 +703,7 @@ namespace Prometheus.Controllers
                 ret.Data = new
                 {
                     success = true,
+                    yieldarray = yieldarray,
                     boxarray = boxarray,
                     failurearray = failurearray,
                     colors = retdata[2],

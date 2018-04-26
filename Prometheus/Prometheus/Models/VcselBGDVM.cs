@@ -879,6 +879,7 @@ namespace Prometheus.Models
                 return colseglist;
             }
         }
+        public double total { set; get; }
     }
 
     public class TestFailureColumn
@@ -1260,6 +1261,7 @@ namespace Prometheus.Models
                     var waferf = new DateWaferFailureColumn();
                     waferf.xkey = waferkv.Key;
                     waferf.DateColSeg = failseglist;
+                    waferf.total = totalcount;
 
                     waferflist.Add(waferf);
 

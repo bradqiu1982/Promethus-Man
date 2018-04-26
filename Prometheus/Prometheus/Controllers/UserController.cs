@@ -3496,5 +3496,30 @@ namespace Prometheus.Controllers
 
             return res;
         }
+
+        public ActionResult IDashboard(string uname = "", string sdate = "", string edate = "")
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "ILearn");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            ViewBag.UserName = updater.Split(new char[] { '@' })[0];
+            ViewBag.RealUserID = updater;
+            ViewBag.cUserName = uname.Split(new char[] { '@' })[0];
+            ViewBag.cUserID = uname;
+
+            return View();
+        }
     }
 }

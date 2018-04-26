@@ -1735,5 +1735,27 @@ namespace Prometheus.Controllers
             return View(vm);
         }
 
+        public ActionResult ReviewWaferCoordData(string sn = "", string sdate="", string edate ="")
+        {
+            if (string.IsNullOrEmpty(sdate))
+            {
+                sdate = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd 00:00:00");
+            }
+            if (string.IsNullOrEmpty(edate))
+            {
+                edate = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd 23:59:59");
+            }
+            var sn_str = "";
+            if (!string.IsNullOrEmpty(sn))
+            {
+                sn_str = "'" + string.Join("','", sn.Split(new char[] { ';', ',' })) + "'";
+            }
+            var data = WaferCoordRAWData.GetWaferCoordData("", sn_str, sdate, edate);
+            ViewBag.data = data;
+            ViewBag.skey = sn;
+            ViewBag.sdate = Convert.ToDateTime(sdate).ToString("yyyy-MM-dd");
+            ViewBag.edate = Convert.ToDateTime(edate).ToString("yyyy-MM-dd");
+            return View();
+        }
     }
 }

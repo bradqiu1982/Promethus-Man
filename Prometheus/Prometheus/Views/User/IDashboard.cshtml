@@ -1,0 +1,18 @@
+﻿
+@{
+    ViewBag.Title = "IDashboard";
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
+}
+<link href="~/Content/common.css" rel="stylesheet" type="text/css" />
+<div class="row">
+    <div class="nav navbar-nav navbar-left">
+        <img src="~/Content/images/ucicon/ILearnIcons.png" style="height:40px; width:40px">
+    </div>
+    <div class="nav navbar-nav navbar-left">
+        <ol class="breadcrumb">
+            <li><a href="/User/UserCenter?username=@(ViewBag.RealUserID)">@ViewBag.UserName Center</a></li>
+            <li><a href="/User/WeeklyReportList">Weekly Report</a></li>
+            <li class="active">@ViewBag.cUserName</li>
+        </ol>
+    </div>
+</div>

@@ -86,6 +86,13 @@ namespace Prometheus.Models
             }
         }
 
+        private static void CleanMonthData(DateTime sdate)
+        {
+            var sql = "delete from VcselMonthData where StartDate = '<StartDate>'";
+            sql = sql.Replace("<StartDate>", sdate.ToString("yyyy-MM-dd HH:mm:ss"));
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
         private static void StoreMonthData(DateTime sdate, string vtype, string failure, string num) {
             var sql = "insert into VcselMonthData(StartDate,VTYPE,Failure,Num,UpdateTime) values(@StartDate,@VTYPE,@Failure,@Num,@UpdateTime)";
             var dict = new Dictionary<string, string>();
@@ -125,6 +132,8 @@ namespace Prometheus.Models
                     }
                 }//check vcsel pn info
             }//loop BI test data
+
+            CleanMonthData(sdate);
 
             foreach (var typevaluekv in keydict)
             {

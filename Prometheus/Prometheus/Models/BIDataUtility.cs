@@ -2041,7 +2041,8 @@ namespace Prometheus.Models
             var ret = new Dictionary<string, string>();
             if (string.IsNullOrEmpty(sns)) return ret;
 
-            var sql = @"SELECT distinct c.ContainerName as SerialName,isnull(dc.[ParamValueString],'') as WaferLot,pb.productname MaterialPN 
+            var sql = @"SELECT distinct c.ContainerName as SerialName,isnull(dc.[ParamValueString],'') as WaferLot,
+                    pb.productname MaterialPN, hml.MfgDate
                     FROM InsiteDB.insite.container c with (nolock) 
                     left join InsiteDB.insite.currentStatus cs (nolock) on c.currentStatusId = cs.currentStatusId 
                     left join InsiteDB.insite.workflowstep ws(nolock) on  cs.WorkflowStepId = ws.WorkflowStepId 
@@ -2063,8 +2064,8 @@ namespace Prometheus.Models
                     left join InsiteDB.insite.productfamily pf (nolock) on  pp.productFamilyId = pf.productFamilyId 
                     left join InsiteDB.insite.productbase pbb with (nolock) on pp.productbaseid=pbb.productbaseid 
                     left join InsiteDB.insite.dc_AOC_ManualInspection dc (nolock) on hmll.[HistoryMainlineId]=dc.[HistoryMainlineId] 
-                    WHERE dc.parametername='Trace_ID' and p.description like '%VCSEL%' and dc.[ParamValueString] like '%-%'and c.containername in <SNCOND> order by pb.productname,c.ContainerName";
-
+                    WHERE dc.parametername='Trace_ID' and p.description like '%VCSEL%' and dc.[ParamValueString] like '%-%'and c.containername in <SNCOND> 
+                    order by pb.productname,c.ContainerName, hml.MfgDate Desc";
             sql = sql.Replace("<SNCOND>", "(" + sns + ")");
             var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
             foreach (var line in dbret)

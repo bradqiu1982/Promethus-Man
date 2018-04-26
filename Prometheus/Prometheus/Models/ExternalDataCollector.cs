@@ -3245,32 +3245,27 @@ namespace Prometheus.Models
                 Directory.CreateDirectory(imgdir);
             }
             var new_data = new Dictionary<string, WaferCoordRAWData>();
-            var logInfo = "";
             foreach (var srcf in coordsrcfiles)
             {
                 var filename = Path.GetFileName(srcf);
 
                 try
                 {
-                    logInfo += "\r\nStart to copy file: " + srcf;
                     var desfile = imgdir + filename;
                     FileCopy(ctrl, srcf, desfile, true);
                     if (FileExist(ctrl, desfile))
                     {
-                        logInfo += "\r\ntry to get data from file: " + desfile;
                         var data = RetrieveDataFromExcelWithAuth(ctrl, desfile, 9);
-                        logInfo += "\r\nget data count: " + data[0].Count.ToString();
                         var tmp = SaveWaferCoordData(data, datestring, coordsrcfolder, ctrl);
                         new_data = new_data.Concat(tmp).ToDictionary(x => x.Key, x => x.Value);
                     }
                 }
                 catch (Exception ex)
                 {
-                    logInfo += "\r\nSolveWaferCoordData Exception: " + ex.Message;
+                    var logInfo = "\r\nSolveWaferCoordData Exception: " + ex.Message;
                     logthdinfo(logInfo, "wafercoordtrace");
                 }
             }
-            logthdinfo(logInfo, "wafercoordtrace");
             if(new_data.Count > 0)
             {
                 var wafer_coords = WaferCoordRAWData.GetWaferInfoByKeys(new_data);

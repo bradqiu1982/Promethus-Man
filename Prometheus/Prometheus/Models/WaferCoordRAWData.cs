@@ -123,7 +123,10 @@ namespace Prometheus.Models
                         tmp.Coord_X = Convert.ToString(item[1]);
                         tmp.Coord_Y = Convert.ToString(item[2]);
                         tmp.Bin = Convert.ToString(item[3]);
-                        res.Add(tmp.Wafer_No + ":" + tmp.Coord_X + ":" + tmp.Coord_Y, tmp);
+                        if (!res.ContainsKey(tmp.Wafer_No + ":" + tmp.Coord_X + ":" + tmp.Coord_Y))
+                        {
+                            res.Add(tmp.Wafer_No + ":" + tmp.Coord_X + ":" + tmp.Coord_Y, tmp);
+                        }
                     }
                 }
             }
@@ -144,7 +147,8 @@ namespace Prometheus.Models
 
         public static void CreateWaferCoordData(List<WaferCoordRAWData> data)
         {
-            var sql = @"insert into WaferCoordData values ";
+            var sql = @"insert into WaferCoordData 
+                (SN, Coord_X, Coord_Y, Wafer_No, Bin, TestTime, SyncTime) values ";
             var param = new Dictionary<string, string>();
             var idx = 0;
             foreach (var item in data)

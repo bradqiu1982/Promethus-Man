@@ -1430,5 +1430,9 @@ CREATE TABLE [dbo].[WaferCoordData](
 	[Wafer_No] [nvarchar](200) Default '' NOT NULL,
 	[Bin] [nvarchar](max) Default '' NOT NULL,
 	[TestTime] [date] Default '' NOT NULL,
-	[SyncTime] [datetime] Default '' NOT NULL
+	[SyncTime] [datetime] Default '' NOT NULL,
+    [APVal1] NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [APVal2] NVARCHAR (200)  DEFAULT ('') NOT NULL,
+    [APVal3] NVARCHAR (MAX)  DEFAULT ('') NOT NULL,
+    [APVal4] DATETIME       DEFAULT ('') NOT NULL
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]

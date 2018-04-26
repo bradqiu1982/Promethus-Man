@@ -75,21 +75,26 @@ var BurnIn = function(){
                 }
             }
 
-
             $.post('/DataAnalyze/WaferDistributionData', {
                  sdate: sdate,
                  edate: edate,
                  wf_no: wf_no,
                  wf_type: wf_type,
                 math_rect:math_rect
-             }, function(output){
+            }, function (output) {
 
                  if (output.success) {
                      $('.v-content').empty();
                      var appendstr = "";
+                     $.each(output.yieldarray, function (i, val) {
+                         appendstr = '<div class="col-xs-6">' +
+                             '<div class="v-box" id="' + val.id + '"></div>' +
+                             '</div>';
+                         $('.v-content').append(appendstr);
+                         drawline(val);
+                     })
 
                      $.each(output.boxarray, function (i, val) {
-
                          if (val.id === 'variation_uniformity_pold_id') {
                              appendstr = '<div class="col-xs-12">' +
                                '<div class="v-box" id="' + val.id + '"></div>' +
@@ -104,7 +109,6 @@ var BurnIn = function(){
                              $('.v-content').append(appendstr);
                             drawboxplot(val);
                          }
-
                      })
 
                      $.each(output.failurearray, function (i, val) {

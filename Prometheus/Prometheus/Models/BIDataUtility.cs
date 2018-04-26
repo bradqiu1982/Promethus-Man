@@ -1678,7 +1678,7 @@ namespace Prometheus.Models
 
             var queryedsndict = new Dictionary<string, bool>();
 
-            var sql = "select ToContainer,Wafer,FromProductName,FromPNDescription from [PDMS].[dbo].[ComponentIssueSummary] where ToContainer in <SNCOND> and Wafer is not null and FromPNDescription is not null order by Wafer";
+            var sql = "select ToContainer,Wafer,FromProductName,FromPNDescription,IssueDate from [PDMS].[dbo].[ComponentIssueSummary] where ToContainer in <SNCOND> and Wafer is not null and FromPNDescription is not null order by Wafer,IssueDate DESC";
             sql = sql.Replace("<SNCOND>", sncond);
 
             var dbret = DBUtility.ExeMESReportSqlWithRes(sql);
@@ -1699,20 +1699,20 @@ namespace Prometheus.Models
 
                     if (!string.IsNullOrEmpty(WaferNum) && !string.IsNullOrEmpty(PN))
                     {
-                        var key = PN + ":::" + WaferNum;
-                        if (ret.ContainsKey(key))
-                        {
-                            ret[key].Add(SN);
-                        }
-                        else
-                        {
-                            var templist = new List<string>();
-                            templist.Add(SN);
-                            ret.Add(key,templist);
-                        }
-
                         if (!queryedsndict.ContainsKey(SN.Trim().ToUpper()))
                         {
+                            var key = PN + ":::" + WaferNum;
+                            if (ret.ContainsKey(key))
+                            {
+                                ret[key].Add(SN);
+                            }
+                            else
+                            {
+                                var templist = new List<string>();
+                                templist.Add(SN);
+                                ret.Add(key,templist);
+                            }
+
                             queryedsndict.Add(SN.Trim().ToUpper(), true);
                         }
                     }//ENDIF
@@ -1742,7 +1742,7 @@ namespace Prometheus.Models
                 var tempstr1 = sb1.ToString();
                 var sncond1 = tempstr1.Substring(0, tempstr1.Length - 2) + ")";
 
-                sql = @"SELECT distinct c.ContainerName as SerialName,isnull(dc.[ParamValueString],'') as WaferLot,pb.productname MaterialPN 
+                sql = @"SELECT distinct c.ContainerName as SerialName,isnull(dc.[ParamValueString],'') as WaferLot,pb.productname MaterialPN ,hml.MfgDate
                         FROM InsiteDB.insite.container c with (nolock) 
                         left join InsiteDB.insite.currentStatus cs (nolock) on c.currentStatusId = cs.currentStatusId 
                         left join InsiteDB.insite.workflowstep ws(nolock) on  cs.WorkflowStepId = ws.WorkflowStepId 
@@ -1764,7 +1764,7 @@ namespace Prometheus.Models
                         left join InsiteDB.insite.productfamily pf (nolock) on  pp.productFamilyId = pf.productFamilyId 
                         left join InsiteDB.insite.productbase pbb with (nolock) on pp.productbaseid=pbb.productbaseid 
                         left join InsiteDB.insite.dc_AOC_ManualInspection dc (nolock) on hmll.[HistoryMainlineId]=dc.[HistoryMainlineId] 
-                        WHERE dc.parametername='Trace_ID' and p.description like '%VCSEL%' and dc.[ParamValueString] like '%-%'and c.containername in <SNCOND> order by pb.productname,c.ContainerName";
+                        WHERE dc.parametername='Trace_ID' and p.description like '%VCSEL%' and dc.[ParamValueString] like '%-%'and c.containername in <SNCOND> order by pb.productname,c.ContainerName,hml.MfgDate DESC";
 
                 sql = sql.Replace("<SNCOND>", sncond1);
                 dbret = DBUtility.ExeRealMESSqlWithRes(sql);
@@ -1779,16 +1779,21 @@ namespace Prometheus.Models
                     var PN = Convert.ToString(line[2]);
                     if (!string.IsNullOrEmpty(WaferNum) && !string.IsNullOrEmpty(PN))
                     {
-                        var key = PN + ":::" + WaferNum;
-                        if (ret.ContainsKey(key))
+                        if (!queryedsndict.ContainsKey(SN.Trim().ToUpper()))
                         {
-                            ret[key].Add(SN);
-                        }
-                        else
-                        {
-                            var templist = new List<string>();
-                            templist.Add(SN);
-                            ret.Add(key, templist);
+                            var key = PN + ":::" + WaferNum;
+                            if (ret.ContainsKey(key))
+                            {
+                                ret[key].Add(SN);
+                            }
+                            else
+                            {
+                                var templist = new List<string>();
+                                templist.Add(SN);
+                                ret.Add(key, templist);
+                            }
+
+                            queryedsndict.Add(SN.Trim().ToUpper(), true);
                         }
                     }//end if
                 }//end foreach
@@ -1813,7 +1818,7 @@ namespace Prometheus.Models
                 var tempstr1 = sb1.ToString();
                 var sncond1 = tempstr1.Substring(0, tempstr1.Length - 2) + ")";
 
-                var sql = @"SELECT distinct c.ContainerName as SerialName,isnull(dc.[ParamValueString],'') as WaferLot,pb.productname MaterialPN 
+                var sql = @"SELECT distinct c.ContainerName as SerialName,isnull(dc.[ParamValueString],'') as WaferLot,pb.productname MaterialPN  ,hml.MfgDate
                         FROM InsiteDB.insite.container c with (nolock) 
                         left join InsiteDB.insite.currentStatus cs (nolock) on c.currentStatusId = cs.currentStatusId 
                         left join InsiteDB.insite.workflowstep ws(nolock) on  cs.WorkflowStepId = ws.WorkflowStepId 
@@ -1835,7 +1840,7 @@ namespace Prometheus.Models
                         left join InsiteDB.insite.productfamily pf (nolock) on  pp.productFamilyId = pf.productFamilyId 
                         left join InsiteDB.insite.productbase pbb with (nolock) on pp.productbaseid=pbb.productbaseid 
                         left join InsiteDB.insite.dc_AOC_ManualInspection dc (nolock) on hmll.[HistoryMainlineId]=dc.[HistoryMainlineId] 
-                        WHERE dc.parametername='Trace_ID' and p.description like '%VCSEL%' and dc.[ParamValueString] like '%-%'and c.containername in <SNCOND> order by pb.productname,c.ContainerName";
+                        WHERE dc.parametername='Trace_ID' and p.description like '%VCSEL%' and dc.[ParamValueString] like '%-%'and c.containername in <SNCOND> order by pb.productname,c.ContainerName,hml.MfgDate DESC";
 
                 sql = sql.Replace("<SNCOND>", sncond1);
                 var dbret = DBUtility.ExeRealMESSqlWithRes(sql);

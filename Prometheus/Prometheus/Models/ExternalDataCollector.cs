@@ -3294,17 +3294,20 @@ namespace Prometheus.Models
             {
                 if (!string.IsNullOrEmpty(line))
                 {
-                    var tmp = new WaferCoordRAWData();
-                    tmp.SN = line;
-                    tmp.Coord_X = data[2][idx].Split(new char[] { ',' })[0];
-                    tmp.Coord_Y = data[2][idx].Split(new char[] { ',' })[1];
-                    tmp.TestTime = test_time;
-                    tmp.SyncTime = now;
-                    if (!all_coords.ContainsKey(tmp.SN + ":" + tmp.Coord_X + ":" + tmp.Coord_Y))
+                    if(data[2][idx].Split(new char[] { ',' }).Length >= 2)
                     {
-                        all_coords.Add(tmp.SN + ":" + tmp.Coord_X + ":" + tmp.Coord_Y, tmp);
+                        var tmp = new WaferCoordRAWData();
+                        tmp.SN = line;
+                        tmp.Coord_X = data[2][idx].Split(new char[] { ',' })[0];
+                        tmp.Coord_Y = data[2][idx].Split(new char[] { ',' })[1];
+                        tmp.TestTime = test_time;
+                        tmp.SyncTime = now;
+                        if (!all_coords.ContainsKey(tmp.SN + ":" + tmp.Coord_X + ":" + tmp.Coord_Y))
+                        {
+                            all_coords.Add(tmp.SN + ":" + tmp.Coord_X + ":" + tmp.Coord_Y, tmp);
+                        }
+                        idx++;
                     }
-                    idx++;
                 }
             }
             if(all_coords.Count > 0)
@@ -3352,7 +3355,6 @@ namespace Prometheus.Models
                 RefreshWaferCoordByDate(ctrl, tmp_day.ToString("yyyyMMdd"));
                 tmp_day = Convert.ToDateTime(tmp_day).AddDays(+1);
             }
-            RefreshWaferCoordByDate(ctrl, DateTime.Now.ToString("yyyyMMdd"));
         }
 
         #endregion

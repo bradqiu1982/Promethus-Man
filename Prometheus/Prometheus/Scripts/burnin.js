@@ -138,9 +138,10 @@ var BurnIn = function(){
     }
     var drawline = function(line_data){
         var options = {
-            //chart: {
-            //    type: 'line'
-            //},
+            chart: {
+                zoomType: 'xy',
+                type: 'line'
+            },
             title: {
                 text: line_data.title
             },
@@ -215,6 +216,7 @@ var BurnIn = function(){
     var drawcolumn = function(col_data){
         var options = {
             chart: {
+                zoomType: 'xy',
                 type: 'column'
             },
             title: {
@@ -271,6 +273,7 @@ var BurnIn = function(){
     var drawboxplot = function(boxplot_data){
         var options = {
             chart: {
+                zoomType: 'xy',
                 type: 'boxplot'
             },
 
@@ -342,6 +345,7 @@ var BurnIn = function(){
     var drawdbboxplot = function(dbboxplot_data){
         var options = {
             chart: {
+                zoomType: 'xy',
                 type: 'boxplot'
             },
 

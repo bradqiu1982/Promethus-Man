@@ -3345,7 +3345,7 @@ namespace Prometheus.Models
             //next
             var max_testtime = WaferCoordRAWData.GetSyncMaxTestTime();
             zero_day = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd"));
-            end_day = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd"));
+            end_day = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             if (!string.IsNullOrEmpty(max_testtime))
             {
                 zero_day = Convert.ToDateTime(max_testtime);

@@ -86,6 +86,13 @@ namespace Prometheus.Models
             }
         }
 
+        private static void CleanMonthData(DateTime sdate)
+        {
+            var sql = "delete from VcselMonthData where StartDate = '<StartDate>'";
+            sql = sql.Replace("<StartDate>", sdate.ToString("yyyy-MM-dd HH:mm:ss"));
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
         private static void StoreMonthData(DateTime sdate, string vtype, string failure, string num) {
             var sql = "insert into VcselMonthData(StartDate,VTYPE,Failure,Num,UpdateTime) values(@StartDate,@VTYPE,@Failure,@Num,@UpdateTime)";
             var dict = new Dictionary<string, string>();
@@ -125,6 +132,8 @@ namespace Prometheus.Models
                     }
                 }//check vcsel pn info
             }//loop BI test data
+
+            CleanMonthData(sdate);
 
             foreach (var typevaluekv in keydict)
             {
@@ -879,6 +888,7 @@ namespace Prometheus.Models
                 return colseglist;
             }
         }
+        public double total { set; get; }
     }
 
     public class TestFailureColumn
@@ -1260,6 +1270,7 @@ namespace Prometheus.Models
                     var waferf = new DateWaferFailureColumn();
                     waferf.xkey = waferkv.Key;
                     waferf.DateColSeg = failseglist;
+                    waferf.total = totalcount;
 
                     waferflist.Add(waferf);
 
@@ -1267,6 +1278,9 @@ namespace Prometheus.Models
 
                 var temptestf = new TestFailureColumn();
                 temptestf.TestType = testkv.Key;
+                waferflist.Sort(delegate(DateWaferFailureColumn obj1, DateWaferFailureColumn obj2) {
+                    return obj1.xkey.CompareTo(obj2.xkey);
+                });
                 temptestf.DateColSeg = waferflist;
 
                 testflist.Add(temptestf);

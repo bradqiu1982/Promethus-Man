@@ -6055,12 +6055,14 @@ namespace Prometheus.Controllers
                 return;
             }
 
+            var thismonth = DateTime.Now.Month;
+
             while (true)
             {
-                if (!VcselMonthData.MonthDataExist(vcselbgdzeropoint))
+                if (!VcselMonthData.MonthDataExist(vcselbgdzeropoint) || (thismonth == vcselbgdzeropoint.Month))
                 {
                     var currenttime = DateTime.Now;
-                    if (currenttime.Hour > 18 || vcselbgdzeropoint.AddMonths(1) > currenttime)
+                    if (currenttime.Hour > 18 || vcselbgdzeropoint > currenttime)
                     {
                         sundaylog("Sunday Report End for time....");
                         return;
@@ -6098,7 +6100,7 @@ namespace Prometheus.Controllers
                 return View();
             }
 
-            if (DateTime.Now.DayOfWeek == DayOfWeek.Sunday
+            if (DateTime.Now.DayOfWeek == DayOfWeek.Friday
                 || DateTime.Now.DayOfWeek == DayOfWeek.Saturday)
             {
                 if (!System.IO.File.Exists(sundayreportDone))

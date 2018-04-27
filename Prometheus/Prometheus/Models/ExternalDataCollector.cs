@@ -3248,7 +3248,7 @@ namespace Prometheus.Models
             foreach (var srcf in coordsrcfiles)
             {
                 var filename = Path.GetFileName(srcf);
-
+                var testtime = File.GetLastWriteTime(srcf).ToString("yyyy-MM-dd HH:mm:ss");
                 try
                 {
                     var desfile = imgdir + filename;
@@ -3256,7 +3256,8 @@ namespace Prometheus.Models
                     if (FileExist(ctrl, desfile))
                     {
                         var data = RetrieveDataFromExcelWithAuth(ctrl, desfile, 9);
-                        var tmp = SaveWaferCoordData(data, datestring, coordsrcfolder, ctrl);
+                        var tmp = SaveWaferCoordData(data, testtime, coordsrcfolder, ctrl);
+                        new_data.Intersect(tmp).ToList().ForEach(x => new_data.Remove(x.Key));
                         new_data = new_data.Concat(tmp).ToDictionary(x => x.Key, x => x.Value);
                     }
                 }
@@ -3294,17 +3295,20 @@ namespace Prometheus.Models
             {
                 if (!string.IsNullOrEmpty(line))
                 {
-                    var tmp = new WaferCoordRAWData();
-                    tmp.SN = line;
-                    tmp.Coord_X = data[2][idx].Split(new char[] { ',' })[0];
-                    tmp.Coord_Y = data[2][idx].Split(new char[] { ',' })[1];
-                    tmp.TestTime = test_time;
-                    tmp.SyncTime = now;
-                    if (!all_coords.ContainsKey(tmp.SN + ":" + tmp.Coord_X + ":" + tmp.Coord_Y))
+                    if(data[2][idx].Split(new char[] { ',' }).Length >= 2)
                     {
-                        all_coords.Add(tmp.SN + ":" + tmp.Coord_X + ":" + tmp.Coord_Y, tmp);
+                        var tmp = new WaferCoordRAWData();
+                        tmp.SN = line;
+                        tmp.Coord_X = data[2][idx].Split(new char[] { ',' })[0];
+                        tmp.Coord_Y = data[2][idx].Split(new char[] { ',' })[1];
+                        tmp.TestTime = test_time;
+                        tmp.SyncTime = now;
+                        if (!all_coords.ContainsKey(tmp.SN + ":" + tmp.Coord_X + ":" + tmp.Coord_Y))
+                        {
+                            all_coords.Add(tmp.SN + ":" + tmp.Coord_X + ":" + tmp.Coord_Y, tmp);
+                        }
+                        idx++;
                     }
-                    idx++;
                 }
             }
             if(all_coords.Count > 0)
@@ -3341,7 +3345,7 @@ namespace Prometheus.Models
             //next
             var max_testtime = WaferCoordRAWData.GetSyncMaxTestTime();
             zero_day = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd"));
-            end_day = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd"));
+            end_day = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             if (!string.IsNullOrEmpty(max_testtime))
             {
                 zero_day = Convert.ToDateTime(max_testtime);
@@ -3352,7 +3356,6 @@ namespace Prometheus.Models
                 RefreshWaferCoordByDate(ctrl, tmp_day.ToString("yyyyMMdd"));
                 tmp_day = Convert.ToDateTime(tmp_day).AddDays(+1);
             }
-            RefreshWaferCoordByDate(ctrl, DateTime.Now.ToString("yyyyMMdd"));
         }
 
         #endregion

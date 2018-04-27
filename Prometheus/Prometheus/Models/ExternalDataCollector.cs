@@ -3248,7 +3248,7 @@ namespace Prometheus.Models
             foreach (var srcf in coordsrcfiles)
             {
                 var filename = Path.GetFileName(srcf);
-
+                var testtime = File.GetLastWriteTime(srcf).ToString("yyyy-MM-dd HH:mm:ss");
                 try
                 {
                     var desfile = imgdir + filename;
@@ -3256,7 +3256,8 @@ namespace Prometheus.Models
                     if (FileExist(ctrl, desfile))
                     {
                         var data = RetrieveDataFromExcelWithAuth(ctrl, desfile, 9);
-                        var tmp = SaveWaferCoordData(data, datestring, coordsrcfolder, ctrl);
+                        var tmp = SaveWaferCoordData(data, testtime, coordsrcfolder, ctrl);
+                        new_data.Intersect(tmp).ToList().ForEach(x => new_data.Remove(x.Key));
                         new_data = new_data.Concat(tmp).ToDictionary(x => x.Key, x => x.Value);
                     }
                 }

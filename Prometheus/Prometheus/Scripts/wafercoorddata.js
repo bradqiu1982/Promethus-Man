@@ -31,6 +31,10 @@
             var x = $.trim($('#m-x').val());
             var y = $.trim($('#m-y').val());
             var bin = $.trim($('#m-bin').val());
+            if (x == "" || y == "" || bin == "" || waferno == "") {
+                alert("please input Wafer No, X, Y, Bin");
+                return false;
+            }
             $.post("/CustomerData/UpdateWaferCoordData",
             {
                 id: id,
@@ -41,6 +45,9 @@
             }, function (output) {
                 if (output.success) {
                     window.location.reload();
+                }
+                else {
+                    alert("Failed to update");
                 }
             })
         })
@@ -59,6 +66,66 @@
                     }
                 })
             }
+        })
+        $('body').on('click', '#check_all', function () {
+            var flg = $(this).prop('checked');
+            $('.check-id').each(function () {
+                $(this).prop("checked", flg);
+            })
+        })
+        $('body').on('click', '.check-id', function () {
+            if (!$(this).prop('checked')) {
+                $('#check_all').prop('checked', false);
+            }
+            else {
+                var flg = true;
+                $('.check-id').each(function () {
+                    if (!$(this).prop('checked')) {
+                        flg = false;
+                        return;
+                    }
+                })
+                if (flg) {
+                    $('#check_all').prop('checked', true);
+                }
+            }
+        })
+        $('body').on('click', '#batch-update', function () {
+            var ids = new Array();
+            var sns = new Array();
+            $('.check-id:checked').each(function () {
+                ids.push($(this).data('id'));
+                sns.push($(this).data('sn'));
+            })
+            if (ids.length > 0 && sns.length > 0) {
+                $('#m-ids').val(ids.join(','));
+                $('#m-sns').html(sns.join(','));
+                $('#modal-batch-edit').modal('show');
+            }
+            else {
+                alert("Please select one SN at least.");
+            }
+        })
+        $('body').on('click', '#btn-saves', function () {
+            var ids = $.trim($('#m-ids').val());
+            var bin = $.trim($('#m-bins').val());
+            if (ids == "" || bin == "") {
+                alert("please input bin");
+                return false;
+            }
+            $.post('/CustomerData/BatchUpdateWaferCoordData',
+            {
+                ids: ids,
+                bin: bin
+            }, function () {
+                if (output.success) {
+                    window.location.reload();
+                }
+                else {
+                    alert("Failed to update");
+                }
+            })
+
         })
     }
     return {

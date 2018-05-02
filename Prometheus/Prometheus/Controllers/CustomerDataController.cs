@@ -1805,5 +1805,25 @@ namespace Prometheus.Controllers
             }
             return res;
         }
+
+        [HttpPost]
+        public JsonResult BatchUpdateWaferCoordData()
+        {
+            var ids = Request.Form["ids"];
+            var bin = Request.Form["bin"];
+            var res = new JsonResult();
+            if(!string.IsNullOrEmpty(ids) && !string.IsNullOrEmpty(bin))
+            {
+                var ids_arr = ids.Split(new char[] { ',', ';' }).ToList();
+                WaferCoordRAWData.BatchUpdateWaferCoordData(ids_arr, bin);
+                res.Data = new { success = true };
+            }
+            else
+            {
+                res.Data = new { success = false };
+            }
+
+            return res;
+        }
     }
 }

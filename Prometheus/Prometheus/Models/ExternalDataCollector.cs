@@ -3301,8 +3301,8 @@ namespace Prometheus.Models
                     {
                         var tmp = new WaferCoordRAWData();
                         tmp.SN = line;
-                        tmp.Coord_X = data[2][idx].Split(new char[] { ',' })[0];
-                        tmp.Coord_Y = data[2][idx].Split(new char[] { ',' })[1];
+                        tmp.Coord_X = Convert.ToInt32(data[2][idx].Split(new char[] { ',' })[0]).ToString();
+                        tmp.Coord_Y = Convert.ToInt32(data[2][idx].Split(new char[] { ',' })[1]).ToString();
                         tmp.TestTime = test_time;
                         tmp.SyncTime = now;
                         if (!all_coords.ContainsKey(tmp.SN + ":" + tmp.Coord_X + ":" + tmp.Coord_Y))

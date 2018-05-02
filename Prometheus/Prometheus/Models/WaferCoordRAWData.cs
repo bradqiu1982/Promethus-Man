@@ -231,5 +231,19 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql, param);
         }
 
+        public static void BatchUpdateWaferCoordData(List<string> ids, string bin)
+        {
+            var sql = @"Update WaferCoordData set 
+                Bin = @bin, 
+                APVal4 = @uTime 
+                where ID in (<#ids>) ";
+            sql = sql.Replace("<#ids>", "'" + string.Join("','", ids) + "'");
+            var param = new Dictionary<string, string>();
+            param.Add("@bin", bin);
+            param.Add("@uTime", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+
+            DBUtility.ExeLocalSqlNoRes(sql, param);
+        }
+
     }
 }

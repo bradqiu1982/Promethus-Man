@@ -5,3 +5,9 @@
     cursor: pointer;
     margin-right: 15px;
 }
+#check_all{
+    margin-right: 15px;
+}
+#m-sns {
+    word-wrap: break-word;
+}

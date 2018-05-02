@@ -6100,7 +6100,7 @@ namespace Prometheus.Controllers
                 return View();
             }
 
-            if (DateTime.Now.DayOfWeek == DayOfWeek.Friday
+            if (DateTime.Now.DayOfWeek == DayOfWeek.Sunday
                 || DateTime.Now.DayOfWeek == DayOfWeek.Saturday)
             {
                 if (!System.IO.File.Exists(sundayreportDone))
@@ -6472,8 +6472,8 @@ namespace Prometheus.Controllers
             //try
             //{
             //    var vcselpninfo = VcselPNData.RetrieveVcselPNInfo();
-            //    VcselBGDVM.TestVcselBGDComputer(DateTime.Parse("2017-12-01 00:00:00"), vcselpninfo, this);
-            //    VcselBGDVM.TestVcselBGDComputer(DateTime.Parse("2018-01-01 00:00:00"), vcselpninfo, this);
+            //    //VcselBGDVM.TestVcselBGDComputer(DateTime.Parse("2017-12-01 00:00:00"), vcselpninfo, this);
+            //    VcselBGDVM.TestVcselBGDComputer(DateTime.Parse("2018-04-01 00:00:00"), vcselpninfo, this);
             //}
             //catch (Exception ex)
             //{

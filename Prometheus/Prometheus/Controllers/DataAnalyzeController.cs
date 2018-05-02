@@ -281,8 +281,10 @@ namespace Prometheus.Controllers
             ViewBag.vcseltypeselectlist = CreateSelectList(nvcseltypelist, "");
 
             var mathlist = new List<string>();
+            mathlist.Add("Only Pass Data");
             mathlist.Add("Math Rectification");
             mathlist.Add("No Rectification");
+            
             ViewBag.mathrectlist = CreateSelectList(mathlist, "");
 
             return View();
@@ -302,6 +304,8 @@ namespace Prometheus.Controllers
             var wf_no = Request.Form["wf_no"];
             var vtype = Request.Form["wf_type"].Trim();
             var math_rect = Request.Form["math_rect"];
+
+
 
             var wflist = new List<string>();
             if (!string.IsNullOrEmpty(wf_no))
@@ -361,10 +365,19 @@ namespace Prometheus.Controllers
 
                 }
 
-                var retdata = VcselBGDVM.RetrieveWaferData(wflist, vtype);
+                bool withfaileddata = true;
+                if (math_rect.ToUpper().Contains("ONLY PASS DATA"))
+                {
+                    withfaileddata = false;
+                }
+
+                var retdata = VcselBGDVM.RetrieveWaferData(wflist, withfaileddata, vtype);
+
                 //fieldname,wafer,boxlist
                 var fieldboxlist = (Dictionary<string, Dictionary<string, List<string>>>)retdata[0];
                 var testflist = (List<TestFailureColumn>)retdata[1];
+
+                //var fieldrawlist = (Dictionary<string, Dictionary<string, List<string>>>)retdata[3];
 
                 var yieldarray = new List<object>();
                 var boxarray = new List<object>();

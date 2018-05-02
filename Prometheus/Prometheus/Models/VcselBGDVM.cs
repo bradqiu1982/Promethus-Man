@@ -533,9 +533,17 @@ namespace Prometheus.Models
         public double upper { set; get; }
     }
 
-    public class WaferBGDFiled
+
+    public class WAFERFIELDDATATYPE {
+        public static string ALLBOX = "ALLBOX";
+        public static string PASSBOX = "PASSBOX";
+        public static string ALLRAW = "ALLRAW";
+        public static string PASSRAW = "PASSRAW";
+    }
+
+    public class WaferBGDField
     {
-        public WaferBGDFiled()
+        public WaferBGDField()
         {
             WaferNo = "";
             FieldName = "";
@@ -543,7 +551,7 @@ namespace Prometheus.Models
         }
 
 
-        private static List<double> RetrieveBIFieldData(string fieldname, string idcond, Controller ctrl)
+        private static List<double> RetrieveBIFieldData(string fieldname, string idcond, Controller ctrl,bool withfaileddata)
         {
             var glbcfg = CfgUtility.GetSysConfig(ctrl);
             
@@ -553,6 +561,13 @@ namespace Prometheus.Models
 
             var rawdata = new List<double>();
             var sql = "select <fieldname> from BITestResultDataField where <fieldname> <> 0 and DataID in <idcond>";
+            if (!withfaileddata)
+            {
+                sql = @"select bf.<fieldname> from BITestResultDataField bf 
+                        left join BITestResult br on bf.DataID = br.DataID
+                        where bf.<fieldname> <> 0 and bf.DataID in <idcond> and br.Failure = 'Pass'";
+            }
+
             sql = sql.Replace("<fieldname>", fieldname).Replace("<idcond>", idcond);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
@@ -566,7 +581,7 @@ namespace Prometheus.Models
             return rawdata;
         }
 
-        private static Dictionary<string, List<double>> RetrieveBIFieldDataSNDict(string fieldname, string idcond, Controller ctrl)
+        private static Dictionary<string, List<double>> RetrieveBIFieldDataSNDict(string fieldname, string idcond, Controller ctrl,bool withfaileddata)
         {
             var glbcfg = CfgUtility.GetSysConfig(ctrl);
             
@@ -575,6 +590,13 @@ namespace Prometheus.Models
             
             var rawdata = new Dictionary<string, List<double>>();
             var sql = "select <fieldname>,SN from BITestResultDataField where <fieldname> <> 0 and DataID in <idcond>";
+            if (!withfaileddata)
+            {
+                sql = @"select bf.<fieldname>,bf.SN from BITestResultDataField bf 
+                        left join BITestResult br on bf.DataID = br.DataID
+                        where bf.<fieldname> <> 0 and bf.DataID in <idcond> and br.Failure = 'Pass'";
+            }
+
             sql = sql.Replace("<fieldname>", fieldname).Replace("<idcond>", idcond);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
@@ -672,20 +694,24 @@ namespace Prometheus.Models
 
         }
 
-        private static void SolveNormalField(string wafer, string fieldname, string idcond, Controller ctrl)
+        private static void SolveNormalField(string wafer, string fieldname, string idcond, Controller ctrl,bool withfaileddata)
         {
-            var rawdata = RetrieveBIFieldData(fieldname, idcond, ctrl);
-            if (rawdata.Count < 200) {
+            var rawdata = RetrieveBIFieldData(fieldname, idcond, ctrl, withfaileddata);
+            if (rawdata.Count < 100) {
                 return;
             }
             var boxdata = GetBoxData(rawdata);
-            AddData(wafer, fieldname, boxdata);
+            AddData(wafer, fieldname, boxdata,withfaileddata);
+
+            var computeddata = Newtonsoft.Json.JsonConvert.SerializeObject(rawdata);
+            AddRawData(wafer, fieldname, computeddata, withfaileddata);
+
         }
 
-        private static void SolveComputerField(string wafer, string fieldname, string idcond, Controller ctrl)
+        private static void SolveComputeField(string wafer, string fieldname, string idcond, Controller ctrl,bool withfaileddata)
         {
-            var rawdata = RetrieveBIFieldDataSNDict(fieldname, idcond, ctrl);
-            if (rawdata.Count < 40)
+            var rawdata = RetrieveBIFieldDataSNDict(fieldname, idcond, ctrl, withfaileddata);
+            if (rawdata.Count < 20)
             {
                 return;
             }
@@ -716,11 +742,20 @@ namespace Prometheus.Models
 
             var vboxdata = GetBoxData(variatelist);
             var uboxdata = GetBoxData(uniformlist);
-            AddData(wafer, "Variation_" + fieldname, vboxdata);
-            AddData(wafer, "Uniformity_" + fieldname, uboxdata);
+            AddData(wafer, "Variation_" + fieldname, vboxdata,withfaileddata);
+            AddData(wafer, "Uniformity_" + fieldname, uboxdata,withfaileddata);
+
+
+
+            var vcomputeddata = Newtonsoft.Json.JsonConvert.SerializeObject(variatelist);
+            AddRawData(wafer, "Variation_" + fieldname, vcomputeddata,withfaileddata);
+
+            var ucomputeddata = Newtonsoft.Json.JsonConvert.SerializeObject(uniformlist);
+            AddRawData(wafer, "Uniformity_" + fieldname, ucomputeddata,withfaileddata);
+
         }
 
-        public static void UpdateWaferFields(string wafer, List<BITestResult> waferdata, Controller ctrl)
+        public static void UpdateWaferFields(string wafer, List<BITestResult> waferdata, Controller ctrl,bool withfaileddata = true)
         {
             StringBuilder sb = new StringBuilder(36 * (waferdata.Count + 1));
             sb.Append("('");
@@ -731,35 +766,71 @@ namespace Prometheus.Models
             var tempstr = sb.ToString();
             var idcond = tempstr.Substring(0, tempstr.Length - 2) + ")";
 
-            SolveNormalField(wafer, "Delta_PO_LD", idcond, ctrl);
-            SolveNormalField(wafer, "Delta_PO_Uniformity", idcond, ctrl);
-            SolveComputerField(wafer, "Delta_PO_LD", idcond, ctrl);
+            SolveNormalField(wafer, "Delta_PO_LD", idcond, ctrl, withfaileddata);
+            SolveNormalField(wafer, "Delta_PO_Uniformity", idcond, ctrl, withfaileddata);
+            SolveComputeField(wafer, "Delta_PO_LD", idcond, ctrl, withfaileddata);
         }
 
-        private static void CleanWaferData(string waferno, string fieldname)
+        private static void CleanWaferData(string waferno, string fieldname,string datatype)
         {
-            var sql = "delete from WaferBGDFiled where WaferNo = @WaferNo and FieldName = @FieldName";
+            var sql = "delete from WaferBGDField where WaferNo = @WaferNo and FieldName = @FieldName and DataType = @DataType";
+
             var dict = new Dictionary<string, string>();
             dict.Add("@WaferNo", waferno);
             dict.Add("@FieldName", fieldname);
+            dict.Add("@DataType", datatype);
             DBUtility.ExeLocalSqlNoRes(sql, dict);
         }
 
-        private static void AddData(string wafer, string fieldname, string boxdata)
+        private static void AddData(string wafer, string fieldname, string boxdata,bool withfaileddata)
         {
-            CleanWaferData(wafer, fieldname);
-            var sql = "insert into WaferBGDFiled(WaferNo,FieldName,BoxData,UpdateTime) values(@WaferNo,@FieldName,@BoxData,@UpdateTime)";
+            var datatype = WAFERFIELDDATATYPE.ALLBOX;
+            if (!withfaileddata) datatype = WAFERFIELDDATATYPE.PASSBOX;
+
+            CleanWaferData(wafer, fieldname, datatype);
+
+            var sql = "insert into WaferBGDField(WaferNo,FieldName,BoxData,UpdateTime,DataType) values(@WaferNo,@FieldName,@BoxData,@UpdateTime,@DataType)";
             var dict = new Dictionary<string, string>();
             dict.Add("@WaferNo", wafer);
             dict.Add("@FieldName", fieldname);
             dict.Add("@BoxData", boxdata);
             dict.Add("@UpdateTime", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            dict.Add("@DataType", datatype);
             DBUtility.ExeLocalSqlNoRes(sql, dict);
         }
 
-        public static Dictionary<string,Dictionary<string,List<string>>> RetriveWaferBoxData(List<string> wflist,string vtype)
+        private static void AddRawData(string wafer, string fieldname, string boxdata, bool withfaileddata)
         {
-            var ret = new Dictionary<string, Dictionary<string, List<string>>>();
+            var datatype = WAFERFIELDDATATYPE.ALLRAW;
+            if (!withfaileddata) datatype = WAFERFIELDDATATYPE.PASSRAW;
+
+            CleanWaferData(wafer, fieldname, datatype);
+
+            var sql = "insert into WaferBGDField(WaferNo,FieldName,BoxData,UpdateTime,DataType) values(@WaferNo,@FieldName,@BoxData,@UpdateTime,@DataType)";
+            var dict = new Dictionary<string, string>();
+            dict.Add("@WaferNo", wafer);
+            dict.Add("@FieldName", fieldname);
+            dict.Add("@BoxData", boxdata);
+            dict.Add("@UpdateTime", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            dict.Add("@DataType", datatype);
+            DBUtility.ExeLocalSqlNoRes(sql, dict);
+        }
+
+        public static Dictionary<string,Dictionary<string,List<string>>> RetriveWaferFieldData(List<string> wflist,bool withfaileddata,bool isbox,string vtype)
+        {
+            var datatype = "";
+            if (isbox)
+            {
+                datatype = WAFERFIELDDATATYPE.ALLBOX;
+                if (!withfaileddata) datatype = WAFERFIELDDATATYPE.PASSBOX;
+            }
+            else
+            {
+                datatype = WAFERFIELDDATATYPE.ALLRAW;
+                if (!withfaileddata) datatype = WAFERFIELDDATATYPE.PASSRAW;
+            }
+
+           var ret = new Dictionary<string, Dictionary<string, List<string>>>();
 
             StringBuilder sb = new StringBuilder(20 * (wflist.Count + 1));
             sb.Append("('");
@@ -770,10 +841,11 @@ namespace Prometheus.Models
             var tempstr = sb.ToString();
             var waferids = tempstr.Substring(0, tempstr.Length - 2) + ")";
 
-            var sql = @"select w.WaferNo,w.FieldName,w.BoxData  from WaferBGDFiled w
+            var sql = @"select w.WaferNo,w.FieldName,w.BoxData  from WaferBGDField w
                         left join (select distinct WaferNo,VTYPE from WaferTestSum ) s on s.WaferNo = w.WaferNo
-                        where w.WaferNo in <WAFERCOND> ";
-            sql = sql.Replace("<WAFERCOND>", waferids);
+                        where w.WaferNo in <WAFERCOND> and DataType = '<DataType>'  ";
+
+            sql = sql.Replace("<DataType>",datatype).Replace("<WAFERCOND>", waferids);
 
             if (!string.IsNullOrEmpty(vtype))
             {
@@ -830,6 +902,7 @@ namespace Prometheus.Models
 
             return ret;
         }
+
 
         public string WaferNo { set; get; }
         public string FieldName { set; get; }
@@ -981,7 +1054,8 @@ namespace Prometheus.Models
                 if (wafertestdata.Count > 200)
                 {
                     WaferTestSum.UpdateWaferTestData(kv.Key, wafertestdata, VcselPNInfo);
-                    WaferBGDFiled.UpdateWaferFields(kv.Key, wafertestdata,ctrl);
+                    WaferBGDField.UpdateWaferFields(kv.Key, wafertestdata,ctrl);
+                    WaferBGDField.UpdateWaferFields(kv.Key, wafertestdata, ctrl,false);
                 }
             }
         }
@@ -1213,11 +1287,12 @@ namespace Prometheus.Models
             return VcselTimeRange.WaferNOList();
         }
 
-        public static List<object> RetrieveWaferData(List<string> wflist,string vtype = "")
+        public static List<object> RetrieveWaferData(List<string> wflist,bool withfaileddata, string vtype = "")
         {
             var ret = new List<object>();
-            var boxdata = WaferBGDFiled.RetriveWaferBoxData(wflist,vtype);
-            
+            var boxdata = WaferBGDField.RetriveWaferFieldData(wflist, withfaileddata,true, vtype);
+            //var rawdata = WaferBGDField.RetriveWaferRawData(wflist, vtype);
+
             var waferfaile =  WaferTestSum.RetriveWaferFailure(wflist,vtype);
             var name_colors = new Dictionary<string, string>();
             var colors = FMColor();
@@ -1293,6 +1368,7 @@ namespace Prometheus.Models
             ret.Add(boxdata);
             ret.Add(testflist);
             ret.Add(name_colors);
+            //ret.Add(rawdata);
             return ret;
         }
 

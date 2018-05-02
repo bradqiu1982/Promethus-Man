@@ -6,6 +6,8 @@
     var fadata = (List<Prometheus.Models.ProjectFAViewModules>)Model;
 }
 
+<script src="~/Scripts/autocompletefill.js"></script>
+
 <div class="row">
     <div class="nav navbar-nav navbar-left">
         <img src="~/Content/images/PJ/FA.png" style="height:35px; width:35px;margin-right: 15px;">
@@ -17,8 +19,8 @@
             @if (ViewBag.projectkey != null)
             {
                 <li data-toggle="modal" data-target="#myModal"><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(ViewBag.projectkey)">Project Detail</a></li>
-                        <li data-toggle="modal" data-target="#myModal"><a href="/Project/ProjectFA?ProjectKey=@(ViewBag.projectkey)">All Pending FA</a></li>
-                        <li class="active">@ViewBag.projectkey FA</li>
+                <li data-toggle="modal" data-target="#myModal"><a href="/Project/ProjectFA?ProjectKey=@(ViewBag.projectkey)">All Pending FA</a></li>
+                <li class="active">@ViewBag.projectkey FA</li>
             }
             else
             {
@@ -33,7 +35,7 @@
             {
                 @Html.AntiForgeryToken()
                 <input class="form-control text-box single-line" value="@(ViewBag.projectkey)" id="HProjectKey" name="HProjectKey" type="hidden" />
-                        <button data-toggle="tooltip" title="Done FA" type="submit" class="btn btn-default" style="background-color:#006DC0;color:white;">FA Done</button>
+                <button data-toggle="tooltip" title="Done FA" type="submit" class="btn btn-default" style="background-color:#006DC0;color:white;">FA Done</button>
             }
         }
     </div>
@@ -66,7 +68,7 @@
     {
         var i = 0;
         @Html.AntiForgeryToken()
-
+        <input type="hidden" id="pKey" name="pKey" value="@ViewBag.projectkey" />
         <table id="pndatatable" class="display" cellspacing="0">
             <thead>
                 <tr>
@@ -84,10 +86,10 @@
             </thead>
             <tbody>
                 @foreach (var item in Model)
-                    {
+                {
                     <tr>
                         <td>
-                            <input type="checkbox" class="checkbox-idx" data-id="@i" id="check@(i)" name="check@(i)" value="true" />
+                            <input type="checkbox" class="checkbox-idx" data-id="@i" id="check@(i)" name="check_ids[]" value="@item.IssueData.IssueKey" />
                             <input class="form-control text-box single-line" value="@item.IssueData.IssueKey" id="HIssueKey@(i)" name="HIssueKey@(i)" type="hidden" />
                             <a href="/Project/SNIssue?ProjectKey=@item.TestData.ProjectKey&SN=@item.TestData.ModuleSerialNum">&nbsp;@item.TestData.ModuleSerialNum</a>
                         </td>
@@ -173,13 +175,11 @@
                     <input type="submit" value="Assign To" class="btn btn-success" />
                 </div>
                 <div class="col-xs-4 text-left">
-                    @Html.DropDownList("AllUserList", null, new { @id = "AllUserList", @class = "form-control" })
+                    <input type="text" class="form-control" id="Assignee" name="AllUserList" value="" />
+                    <script type="text/javascript">
+                        autoCompleteFill('Assignee', @Html.Raw(ViewBag.AllUserList));
+                    </script>
                 </div>
-                <div class="col-xs-1 text-left">
-                </div>
-                <div class="col-xs-4 text-left">
-                </div>
-
                 <script type="text/javascript">
                     function ChooseAll(oBox) {
                         $('.checkbox-idx').each(function () {

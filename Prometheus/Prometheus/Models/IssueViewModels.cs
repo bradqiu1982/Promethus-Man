@@ -1137,6 +1137,20 @@ namespace Prometheus.Models
             StoreIssueComment(DateTime.Now.ToString());
         }
 
+        public static void BatchUpdateAssignee(string pkey, List<string> ikeys, string operater, string assignee)
+        {
+            var sql = @"update Issue set Assignee = @assignee 
+                    where ProjectKey = @pkey and IssueKey in (<#ikeys>) 
+                    and Assignee = @operater";
+            sql = sql.Replace("<#ikeys>", "'" + string.Join("','", ikeys) + "'");
+            var param = new Dictionary<string, string>();
+            param.Add("@assignee", assignee);
+            param.Add("@pkey", pkey);
+            param.Add("@operater", operater);
+
+            DBUtility.ExeLocalSqlNoRes(sql, param);
+        }
+
         public void UpdateRMA()
         {
             var sql = "update Issue set Priority = '<Priority>',DueDate = '<DueDate>', Assignee = '<Assignee>',Resolution = '<Resolution>',RelativePeoples = '<RelativePeoples>' where IssueKey = '<IssueKey>'";

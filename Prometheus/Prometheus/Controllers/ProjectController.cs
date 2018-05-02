@@ -596,7 +596,6 @@ namespace Prometheus.Controllers
         {
             bool selected = false;
             var pslist = new List<SelectListItem>();
-
             foreach (var p in valist)
             {
                 var pitem = new SelectListItem();
@@ -1631,9 +1630,8 @@ namespace Prometheus.Controllers
                         .Replace("#NAMEVALUEPAIRS#", namevaluepair);
 
                 }
-
                 var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.AllUserList = CreateSelectList1(asilist, "");
+                ViewBag.AllUserList = "[\"" + string.Join("\",\"", asilist.ToArray()) + "\"]";
 
                 var ckdict = CookieUtility.UnpackCookie(this);
                 if (ckdict.ContainsKey("logonuser"))

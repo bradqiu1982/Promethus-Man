@@ -103,7 +103,7 @@ var BurnIn = function(){
                              drawdbboxplot(val);
                          }
                          else {
-                             appendstr = '<div class="col-xs-6">' +
+                             appendstr = '<div class="col-xs-12">' +
                            '<div class="v-box" id="' + val.id + '"></div>' +
                            '</div>';
                              $('.v-content').append(appendstr);

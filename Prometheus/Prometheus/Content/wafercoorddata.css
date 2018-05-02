@@ -1,6 +1,10 @@
 ﻿.row-margin{
     margin-bottom: 5px;
 }
+.glyphicon {
+    font-size: 14px;
+    width: auto;
+}
 .r-edit, .r-delete {
     cursor: pointer;
     margin-right: 15px;

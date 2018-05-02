@@ -666,26 +666,29 @@ namespace Prometheus.Models
 
         public static List<ShareDocVM> RetrieveAllSharedDocs()
         {
+            var docdate = DateTime.Now.AddMonths(-12).ToString("yyyy-MM-dd HH:mm:ss");
+
             var ret = new List<ShareDocVM>();
             var sql = @"select sd.DOCPJK, sd.DOCType, sd.DOCKey, sd.DOCTag, sd.DOCCreator, sd.DOCDate, sd.DOCFavorTimes, sd.APVal1, sd.BackLink, i.Summary, CONCAT('<IssueUrl>', i.IssueKey) as DocURL
                     from ShareDoc as sd inner join issue as i on sd.DOCKey = i.IssueKey
-                    where sd.DOCType = '<Type1>' and  i.APVal1 <> 'delete'
+                    where sd.DOCType = '<Type1>' and  i.APVal1 <> 'delete' and sd.DOCDate > '<docdate>'
                     UNION ALL
                     select sd.DOCPJK, sd.DOCType, sd.DOCKey, sd.DOCTag, sd.DOCCreator, sd.DOCDate, sd.DOCFavorTimes, sd.APVal1, sd.BackLink, CONCAT(pe.ProjectKey, '-', pe.OrignalCode) as Summary, CONCAT('<DebugUrl>', pe.ErrorKey) as DocURL
                     from ShareDoc as sd inner join ProjectError as pe on sd.DOCKey = pe.ErrorKey
-                    where sd.DOCType = '<Type2>'
+                    where sd.DOCType = '<Type2>' and sd.DOCDate > '<docdate>'
                     UNION ALL
                     select sd.DOCPJK, sd.DOCType, sd.DOCKey, sd.DOCTag, sd.DOCCreator, sd.DOCDate, sd.DOCFavorTimes, sd.APVal1, sd.BackLink, ub.APVal3 as Summary, CONCAT('<BlogUrl>', ub.APVal2) as DocURL
                     from ShareDoc as sd inner join UserBlog as ub on sd.DOCKey = ub.APVal2
-                    WHERE sd.DOCType = '<Type3>'
+                    WHERE sd.DOCType = '<Type3>' and sd.DOCDate > '<docdate>'
                     UNION ALL
                     select sd.DOCPJK, sd.DOCType, sd.DOCKey, sd.DOCTag, sd.DOCCreator, sd.DOCDate, sd.DOCFavorTimes, sd.APVal1, sd.BackLink, sd.DOCKey as Summary, CONCAT('<WebUrl1>', sd.DOCKey, '<WebUrl2>', sd.DOCCreator) as DocURL
                     from ShareDoc as sd 
-                    where sd.DOCType NOT IN ('<Type1>', '<Type2>', '<Type3>')
+                    where sd.DOCType NOT IN ('<Type1>', '<Type2>', '<Type3>') and sd.DOCDate > '<docdate>'
                     order by sd.DOCDate";
             sql = sql.Replace("<Type1>", ShareDocType.ISSUE)
                      .Replace("<Type2>", ShareDocType.DEBUG)
                      .Replace("<Type3>", ShareDocType.BLOG)
+                     .Replace("<docdate>", docdate)
                      .Replace("<IssueUrl>", "/Issue/UpdateIssue?issuekey=")
                      .Replace("<DebugUrl>", "/Project/UpdateProjectError?ErrorKey=")
                      .Replace("<BlogUrl>", "/User/WebDoc?DocKey=")

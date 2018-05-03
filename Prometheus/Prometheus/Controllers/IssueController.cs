@@ -3459,41 +3459,21 @@ namespace Prometheus.Controllers
         {
             var ckdict = CookieUtility.UnpackCookie(this);
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
-
+            var ikeys = Request.Form["check_ids[]"];
             var tobeassigee = Request.Form["AllUserList"].ToString();
+            var pKey = Request.Form["pKey"];
 
-            var tobeissuekey = new List<string>();
-            for (var i = 0; i < 600; i++)
+            var dict = new RouteValueDictionary();
+            dict.Add("ProjectKey", pKey);
+            if (string.IsNullOrEmpty(tobeassigee) || string.IsNullOrEmpty(ikeys))
             {
-                if (Request.Form["check" + i] != null && string.Compare(Request.Form["check" + i], "true", true) == 0)
-                {
-                    tobeissuekey.Add(Request.Form["HIssueKey" + i]);
-                }
-            }
-
-            //var targetdata = IssueViewModels.RetrieveIssueByIssueKey(targetissuekey);
-            foreach (var key in tobeissuekey)
-            {
-                var tobedata = IssueViewModels.RetrieveIssueByIssueKey(key, this);
-                if (string.Compare(tobedata.Assignee, updater, true) != 0)
-                {
-                    continue;
-                }
-                tobedata.Assignee = tobeassigee;
-                tobedata.UpdateIssue();
-            }
-
-            if (tobeissuekey.Count > 0)
-            {
-                var tempvm = IssueViewModels.RetrieveIssueByIssueKey(tobeissuekey[0], this);
-                var dict = new RouteValueDictionary();
-                dict.Add("ProjectKey", tempvm.ProjectKey);
                 return RedirectToAction("ProjectFA", "Project", dict);
             }
-            else
-            {
-                return RedirectToAction("ViewAll", "Project");
-            }
+
+            var tobeissuekey = ikeys.Split(new char[] { ',', ';' }).ToList();
+            IssueViewModels.BatchUpdateAssignee(pKey, tobeissuekey, updater, tobeassigee);
+            
+            return RedirectToAction("ProjectFA", "Project", dict);
         }
 
 

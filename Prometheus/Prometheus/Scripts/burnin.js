@@ -31,7 +31,6 @@ var BurnIn = function(){
                      $('.v-content').append('<div class="v-lengend row"></div>');
                      var colorStr = "";
                      $.each(output.colors, function (i, val) {
-                         console.log(i);
                          colorStr = '<span class="span-fm label label-success" style="background-color: '+val+'">'+i+'</span>';
                          $('.v-lengend').append(colorStr);
                      })
@@ -75,21 +74,26 @@ var BurnIn = function(){
                 }
             }
 
-
             $.post('/DataAnalyze/WaferDistributionData', {
                  sdate: sdate,
                  edate: edate,
                  wf_no: wf_no,
                  wf_type: wf_type,
                 math_rect:math_rect
-             }, function(output){
+            }, function (output) {
 
                  if (output.success) {
                      $('.v-content').empty();
                      var appendstr = "";
+                     $.each(output.yieldarray, function (i, val) {
+                         appendstr = '<div class="col-xs-6">' +
+                             '<div class="v-box" id="' + val.id + '"></div>' +
+                             '</div>';
+                         $('.v-content').append(appendstr);
+                         drawline(val);
+                     })
 
                      $.each(output.boxarray, function (i, val) {
-
                          if (val.id === 'variation_uniformity_pold_id') {
                              appendstr = '<div class="col-xs-12">' +
                                '<div class="v-box" id="' + val.id + '"></div>' +
@@ -98,13 +102,12 @@ var BurnIn = function(){
                              drawdbboxplot(val);
                          }
                          else {
-                             appendstr = '<div class="col-xs-6">' +
+                             appendstr = '<div class="col-xs-12">' +
                            '<div class="v-box" id="' + val.id + '"></div>' +
                            '</div>';
                              $('.v-content').append(appendstr);
                             drawboxplot(val);
                          }
-
                      })
 
                      $.each(output.failurearray, function (i, val) {
@@ -117,7 +120,6 @@ var BurnIn = function(){
                      $('.v-content').append('<div class="v-lengend row"></div>');
                      var colorStr = "";
                      $.each(output.colors, function (i, val) {
-                         console.log(i);
                          colorStr = '<span class="span-fm label label-success" style="background-color: ' + val + '">' + i + '</span>';
                          $('.v-lengend').append(colorStr);
                      })
@@ -134,9 +136,10 @@ var BurnIn = function(){
     }
     var drawline = function(line_data){
         var options = {
-            //chart: {
-            //    type: 'line'
-            //},
+            chart: {
+                zoomType: 'xy',
+                type: 'line'
+            },
             title: {
                 text: line_data.title
             },
@@ -197,11 +200,29 @@ var BurnIn = function(){
                             $('#' + line_data.id).highcharts().reflow();
                         },
                         text: 'Full Screen'
+                    },
+                    exportdata: {
+                        onclick: function () {
+                            var filename = line_data.title + '.csv';
+                            var outputCSV = ' ,Input,Yield\r\n';
+                            $(line_data.xAxis.data).each(function (i, val) {
+                                outputCSV += val + "," + line_data.cdata.data[i] + ","
+                                    + line_data.data.data.data[i] + ",\r\n";
+                            });
+                            var blobby = new Blob([outputCSV], { type: 'text/csv;chartset=utf-8' });
+                            $(exportLink).attr({
+                                'download': filename,
+                                'href': window.URL.createObjectURL(blobby),
+                                'target': '_blank'
+                            });
+                            exportLink.click();
+                        },
+                        text: 'Export Data'
                     }
                 },
                 buttons: {
                     contextButton: {
-                        menuItems: ['fullscreen', 'printChart', 'separator', 'downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
+                        menuItems: ['fullscreen', 'exportdata', 'printChart', 'separator', 'downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
                     }
                 }
             }
@@ -211,6 +232,7 @@ var BurnIn = function(){
     var drawcolumn = function(col_data){
         var options = {
             chart: {
+                zoomType: 'xy',
                 type: 'column'
             },
             title: {
@@ -231,7 +253,6 @@ var BurnIn = function(){
             },
             tooltip: {
                 headerFormat: '',
-                //pointFormat:(this.y==0)?'':'<span style="color:{point.color}">{point.name}</span>: <b>{'+((col_data.coltype == 'percent')?"point.percentage:.0f":"point.y")+'}%</b><br/>',
                 pointFormatter:function()
                 {
                     return (this.y == 0) ? '' : '<span style="color:' + this.color + '">' + this.name + '</span>: <b>' + ((col_data.coltype == 'percent') ? this.percentage : this.y) + '%</b><br/>';
@@ -252,11 +273,32 @@ var BurnIn = function(){
                             $('#' + col_data.id).highcharts().reflow();
                         },
                         text: 'Full Screen'
+                    },
+                    exportdata: {
+                        onclick: function () {
+                            var filename = col_data.title + '.csv';
+                            var outputCSV = ' ,Failure Mode,Failure Percent\r\n';
+                            $(col_data.xAxis.data).each(function (i, val) {
+                                $(col_data.data).each(function () {
+                                    if (this.data[i].name != '' && this.data[i].y != 0) {
+                                        outputCSV += val + "," + this.data[i].name + "," + this.data[i].y + ",\r\n";
+                                    }
+                                });
+                            })
+                            var blobby = new Blob([outputCSV], { type: 'text/csv;chartset=utf-8' });
+                            $(exportLink).attr({
+                                'download': filename,
+                                'href': window.URL.createObjectURL(blobby),
+                                'target': '_blank'
+                            });
+                            exportLink.click();
+                        },
+                        text: 'Export Data'
                     }
                 },
                 buttons: {
                     contextButton: {
-                        menuItems: ['fullscreen', 'printChart', 'separator', 'downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
+                        menuItems: ['fullscreen', 'exportdata', 'printChart', 'separator', 'downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
                     }
                 }
             }
@@ -267,6 +309,7 @@ var BurnIn = function(){
     var drawboxplot = function(boxplot_data){
         var options = {
             chart: {
+                zoomType: 'xy',
                 type: 'boxplot'
             },
 
@@ -338,6 +381,7 @@ var BurnIn = function(){
     var drawdbboxplot = function(dbboxplot_data){
         var options = {
             chart: {
+                zoomType: 'xy',
                 type: 'boxplot'
             },
 

@@ -5,6 +5,11 @@ using System.Web;
 
 namespace Prometheus.Models
 {
+    public class WaferCoordDataStatus
+    {
+        public static string Valid = "1";
+        public static string Invalid = "2";
+    }
     public class WaferCoordRAWData
     {
         public string ID { set; get; }
@@ -19,8 +24,9 @@ namespace Prometheus.Models
         public static Dictionary<string, WaferCoordRAWData> GetWaferCoordData(string uniquekeys = "", string SN = "", string sTestTime = "", string eTestTime = "")
         {
             var sql = @"select ID, SN, Coord_X, Coord_Y, Wafer_No, Bin, TestTime, SyncTime 
-                    from WaferCoordData where 1 = 1 ";
+                    from WaferCoordData where ApVal1 = @Status ";
             var param = new Dictionary<string, string>();
+            param.Add("@Status", WaferCoordDataStatus.Valid);
             if (!string.IsNullOrEmpty(uniquekeys))
             {
                 sql += " and Concat(SN, ':', Coord_X, ':', Coord_Y) in <#uniquekeys> ";
@@ -123,7 +129,10 @@ namespace Prometheus.Models
                         tmp.Coord_X = Convert.ToString(item[1]);
                         tmp.Coord_Y = Convert.ToString(item[2]);
                         tmp.Bin = Convert.ToString(item[3]);
-                        res.Add(tmp.Wafer_No + ":" + tmp.Coord_X + ":" + tmp.Coord_Y, tmp);
+                        if (!res.ContainsKey(tmp.Wafer_No + ":" + tmp.Coord_X + ":" + tmp.Coord_Y))
+                        {
+                            res.Add(tmp.Wafer_No + ":" + tmp.Coord_X + ":" + tmp.Coord_Y, tmp);
+                        }
                     }
                 }
             }
@@ -144,13 +153,15 @@ namespace Prometheus.Models
 
         public static void CreateWaferCoordData(List<WaferCoordRAWData> data)
         {
-            var sql = @"insert into WaferCoordData values ";
+            var sql = @"insert into WaferCoordData 
+                (SN, Coord_X, Coord_Y, Wafer_No, Bin, TestTime, SyncTime, APVal1, APVal4) values ";
             var param = new Dictionary<string, string>();
             var idx = 0;
             foreach (var item in data)
             {
                 sql += "( @SN_" + idx + ", @Coord_X_" + idx + ", @Coord_Y_" + idx
-                    + ", @Wafer_No_" + idx + ", @Bin_" + idx + ", @TestTime_" + idx + ", @SyncTime_" + idx + "),";
+                    + ", @Wafer_No_" + idx + ", @Bin_" + idx + ", @TestTime_" + idx
+                    + ", @SyncTime_" + idx + ", @ApVal1_" + idx + ", @ApVal4_" + idx + "),";
                 param.Add("@SN_" + idx, item.SN);
                 param.Add("@Coord_X_" + idx, item.Coord_X);
                 param.Add("@Coord_Y_" + idx, item.Coord_Y);
@@ -158,6 +169,8 @@ namespace Prometheus.Models
                 param.Add("@Bin_" + idx, item.Bin);
                 param.Add("@TestTime_" + idx, item.TestTime);
                 param.Add("@SyncTime_" + idx, item.SyncTime);
+                param.Add("@ApVal1_" + idx, WaferCoordDataStatus.Valid);
+                param.Add("@ApVal4_" + idx, item.SyncTime);
                 idx++;
             }
             sql = sql.Substring(0, sql.Length - 1);
@@ -186,6 +199,50 @@ namespace Prometheus.Models
                 return Convert.ToString(dbret[0][0]);
             }
             return res;
+        }
+
+        public static void UpdateWaferCoordData(string id, string waferno, string x, string y, string bin)
+        {
+            var sql = @"Update WaferCoordData set 
+                Bin = @bin, 
+                Wafer_No = @waferno, 
+                Coord_X = @x, 
+                Coord_Y = @y, 
+                APVal4 = @uTime 
+                where ID = @id ";
+            var param = new Dictionary<string, string>();
+            param.Add("@bin", bin);
+            param.Add("@waferno", waferno);
+            param.Add("@x", x);
+            param.Add("@y", y);
+            param.Add("@uTime", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            param.Add("@id", id);
+
+            DBUtility.ExeLocalSqlNoRes(sql, param);
+        }
+        public static void InvalidWaferCoordData(string id, string status)
+        {
+            var sql = @"Update WaferCoordData set APVal1 = @status, APVal4 = @uTime where ID = @id ";
+            var param = new Dictionary<string, string>();
+            param.Add("@status", status);
+            param.Add("@uTime", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            param.Add("@id", id);
+
+            DBUtility.ExeLocalSqlNoRes(sql, param);
+        }
+
+        public static void BatchUpdateWaferCoordData(List<string> ids, string bin)
+        {
+            var sql = @"Update WaferCoordData set 
+                Bin = @bin, 
+                APVal4 = @uTime 
+                where ID in (<#ids>) ";
+            sql = sql.Replace("<#ids>", "'" + string.Join("','", ids) + "'");
+            var param = new Dictionary<string, string>();
+            param.Add("@bin", bin);
+            param.Add("@uTime", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+
+            DBUtility.ExeLocalSqlNoRes(sql, param);
         }
 
     }

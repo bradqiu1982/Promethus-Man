@@ -27,7 +27,7 @@
     <div class="row row-margin">
         <label class="col-xs-2">SN List</label>
         <div class="col-xs-9">
-            <input type="text" class="form-control" id="skey" placeholder="Separate from semicolon(;) or comma(,)" 
+            <input type="text" class="form-control" id="skey" placeholder="Separate from semicolon(;) or comma(,)"
                    name="skey" value="@ViewBag.skey" autocomplete="off" />
         </div>
     </div>
@@ -43,10 +43,11 @@
             </div>
         </div>
         <div class="col-xs-1 text-center">~</div>
-        <div class="col-xs-4">@ViewBag.sdata
+        <div class="col-xs-4">
+            @ViewBag.sdata
             <div class="input-group date" data-date="@ViewBag.edate" data-date-format="yyyy-mm-dd">
                 <input type="text" class="form-control"
-                        id="edate" name="edate" value="@ViewBag.edate" readonly>
+                       id="edate" name="edate" value="@ViewBag.edate" readonly>
                 <span class="input-group-addon">
                     <span class="glyphicon glyphicon-th"></span>
                 </span>
@@ -60,14 +61,20 @@
 </div>
 <div>
     <table id="datatable" class="display" cellspacing="0">
+        <caption>
+            <input type="checkbox" id="check_all" name="check_all" />
+            <input type="button" class="btn btn-danger btn-sm" id="batch-update" value="Batch Update Bin" />
+        </caption>
         <thead>
             <tr>
+                <td></td>
                 <th>SN</th>
                 <th>Wafer</th>
                 <th>Coord-X</th>
                 <th>Coord-Y</th>
                 <th>Bin</th>
                 <th>Test Time</th>
+                <th>Operation</th>
             </tr>
         </thead>
         <tbody>
@@ -76,12 +83,21 @@
                 foreach (var item in ViewBag.data)
                 {
                     <tr>
+                        <td>
+                            <input type="checkbox" class="check-id" id="check_@item.Value.ID" 
+                                data-id="@item.Value.ID" data-sn="@item.Value.SN" /></td>
                         <td>@item.Value.SN</td>
                         <td>@item.Value.Wafer_No</td>
                         <td>@item.Value.Coord_X</td>
                         <td>@item.Value.Coord_Y</td>
                         <td>@item.Value.Bin</td>
-                        <td>@(Convert.ToDateTime(item.Value.TestTime).ToString("yyyy-MM-dd"))</td>
+                        <td>@(Convert.ToDateTime(item.Value.TestTime).ToString("yyyy-MM-dd HH:mm:ss"))</td>
+                        <td>
+                            <a class="r-edit" data-id="@item.Value.ID" data-sn="@item.Value.SN"
+                               data-waferno="@item.Value.Wafer_No" data-x="@item.Value.Coord_X"
+                               data-y="@item.Value.Coord_Y" data-bin="@item.Value.Bin" title="Edit"><span class="glyphicon glyphicon-pencil"></span></a>
+                            <a class="r-delete" data-id="@item.Value.ID" title="Delete"><span class="glyphicon glyphicon-trash"></span></a>
+                        </td>
                     </tr>
                 }
             }
@@ -90,7 +106,7 @@
     <script type="text/javascript">
         $(document).ready(function () {
             $('#datatable').DataTable({
-                'iDisplayLength': 50,
+                'iDisplayLength': 25,
                 'aLengthMenu': [[25, 50, 100, -1],
                 [25, 50, 100, "All"]],
                 "aaSorting": [],
@@ -98,5 +114,81 @@
             });
         });
     </script>
+</div>
+<div class="modal fade" id="modal-edit-wafercoorddata" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Edit</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="m-id" name="m-id" />
+                <div class="row row-margin">
+                    <label class="col-xs-3">SN</label>
+                    <div class="col-xs-8">
+                        <label id="m-sn"></label>
+                    </div>
+                </div>
+                <div class="row row-margin">
+                    <label class="col-xs-3">Wafer No</label>
+                    <div class="col-xs-8">
+                        <input type="text" name="m-waferno" id="m-waferno" class="form-control" />
+                    </div>
+                </div>
+                <div class="row row-margin">
+                    <label class="col-xs-3">Coord-X</label>
+                    <div class="col-xs-8">
+                        <input type="text" name="m-x" id="m-x" class="form-control" />
+                    </div>
+                </div>
+                <div class="row row-margin">
+                    <label class="col-xs-3">Coord-Y</label>
+                    <div class="col-xs-8">
+                        <input type="text" name="m-y" id="m-y" class="form-control" />
+                    </div>
+                </div>
+                <div class="row row-margin">
+                    <label class="col-xs-3">Bin</label>
+                    <div class="col-xs-8">
+                        <input type="text" name="m-bin" id="m-bin" class="form-control" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btn-save">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modal-batch-edit" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Edit</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="m-ids" name="m-ids" />
+                <div class="row row-margin">
+                    <label class="col-xs-3">SN</label>
+                    <div class="col-xs-8">
+                        <span id="m-sns"></span>
+                    </div>
+                </div>
+                <div class="row row-margin">
+                    <label class="col-xs-3">Bin</label>
+                    <div class="col-xs-8">
+                        <input type="text" name="m-bins" id="m-bins" class="form-control" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btn-saves">Save</button>
+            </div>
+        </div>
+    </div>
 </div>
 

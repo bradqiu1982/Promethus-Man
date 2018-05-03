@@ -1741,9 +1741,17 @@ namespace Prometheus.Controllers
             {
                 sdate = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd 00:00:00");
             }
+            else
+            {
+                sdate = Convert.ToDateTime(sdate).ToString("yyyy-MM-dd 00:00:00");
+            }
             if (string.IsNullOrEmpty(edate))
             {
                 edate = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd 23:59:59");
+            }
+            else
+            {
+                edate = Convert.ToDateTime(edate).ToString("yyyy-MM-dd 23:59:59");
             }
             var sn_str = "";
             if (!string.IsNullOrEmpty(sn))
@@ -1756,6 +1764,66 @@ namespace Prometheus.Controllers
             ViewBag.sdate = Convert.ToDateTime(sdate).ToString("yyyy-MM-dd");
             ViewBag.edate = Convert.ToDateTime(edate).ToString("yyyy-MM-dd");
             return View();
+        }
+
+        [HttpPost]
+        public JsonResult UpdateWaferCoordData()
+        {
+            var id = Request.Form["id"];
+            var bin = Request.Form["bin"];
+            var waferno = Request.Form["waferno"];
+            var x = Request.Form["x"];
+            var y = Request.Form["y"];
+
+            var res = new JsonResult();
+            if (!string.IsNullOrEmpty(id) && !string.IsNullOrEmpty(bin))
+            {
+                WaferCoordRAWData.UpdateWaferCoordData(id, waferno, x, y, bin);
+                res.Data = new { success = true };
+            }
+            else
+            {
+                res.Data = new { success = false };
+            }
+            return res;
+
+        }
+        [HttpPost]
+        public JsonResult InvaidWaferCoordData()
+        {
+            var id = Request.Form["id"];
+            var status = WaferCoordDataStatus.Invalid;
+            var res = new JsonResult();
+            if (!string.IsNullOrEmpty(id))
+            {
+                WaferCoordRAWData.InvalidWaferCoordData(id, status);
+                res.Data = new { success = true };
+            }
+            else
+            {
+                res.Data = new { success = false };
+            }
+            return res;
+        }
+
+        [HttpPost]
+        public JsonResult BatchUpdateWaferCoordData()
+        {
+            var ids = Request.Form["ids"];
+            var bin = Request.Form["bin"];
+            var res = new JsonResult();
+            if(!string.IsNullOrEmpty(ids) && !string.IsNullOrEmpty(bin))
+            {
+                var ids_arr = ids.Split(new char[] { ',', ';' }).ToList();
+                WaferCoordRAWData.BatchUpdateWaferCoordData(ids_arr, bin);
+                res.Data = new { success = true };
+            }
+            else
+            {
+                res.Data = new { success = false };
+            }
+
+            return res;
         }
     }
 }

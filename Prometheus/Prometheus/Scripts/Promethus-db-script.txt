@@ -1415,11 +1415,13 @@ CREATE TABLE [dbo].[WaferTestSum] (
 	[UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
 	);
 
-CREATE TABLE [dbo].[WaferBGDFiled] (
+
+CREATE TABLE [dbo].[WaferBGDField] (
     [WaferNo]   NVARCHAR (200) DEFAULT ('') NOT NULL,
 	[FieldName]   NVARCHAR (200) DEFAULT ('') NOT NULL,
-	[BoxData]   NVARCHAR (300) DEFAULT ('') NOT NULL,
-	[UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+	[BoxData]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[DataType] NVARCHAR (200) DEFAULT ('') NOT NULL
 	);
 
 CREATE TABLE [dbo].[WaferCoordData](
@@ -1429,6 +1431,10 @@ CREATE TABLE [dbo].[WaferCoordData](
 	[Coord_Y] [nvarchar](max) Default '' NOT NULL,
 	[Wafer_No] [nvarchar](200) Default '' NOT NULL,
 	[Bin] [nvarchar](max) Default '' NOT NULL,
-	[TestTime] [date] Default '' NOT NULL,
-	[SyncTime] [datetime] Default '' NOT NULL
+	[TestTime] [datetime] Default '' NOT NULL,
+	[SyncTime] [datetime] Default '' NOT NULL,
+    [APVal1] NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [APVal2] NVARCHAR (200)  DEFAULT ('') NOT NULL,
+    [APVal3] NVARCHAR (MAX)  DEFAULT ('') NOT NULL,
+    [APVal4] DATETIME       DEFAULT ('') NOT NULL
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]

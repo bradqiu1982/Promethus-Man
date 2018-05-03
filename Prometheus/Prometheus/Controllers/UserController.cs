@@ -3496,5 +3496,277 @@ namespace Prometheus.Controllers
 
             return res;
         }
+
+        public ActionResult IDashboard(string uname = "", string sdate = "", string edate = "")
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "ILearn");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            if (string.IsNullOrEmpty(uname))
+            {
+                uname = updater;
+            }
+            if (string.IsNullOrEmpty(sdate))
+            {
+                if(DateTime.Now.DayOfWeek != DayOfWeek.Friday)
+                {
+                    var dayofweek = Convert.ToInt32(DateTime.Now.AddMonths(-1).DayOfWeek);
+                    sdate = DateTime.Now.AddMonths(-1).AddDays((5 - dayofweek) - 7).ToString("yyyy-MM-dd");
+                }
+                else
+                {
+                    sdate = DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd");
+                }
+            }
+            else
+            {
+                if (Convert.ToDateTime(sdate).DayOfWeek != DayOfWeek.Friday)
+                {
+                    var dayofweek = Convert.ToInt32(Convert.ToDateTime(sdate).DayOfWeek);
+                    sdate = Convert.ToDateTime(sdate).AddDays((5 - dayofweek) - 7).ToString("yyyy-MM-dd");
+                }
+                else
+                {
+                    sdate = Convert.ToDateTime(sdate).ToString("yyyy-MM-dd");
+                }
+            }
+            if (string.IsNullOrEmpty(edate))
+            {
+                edate = DateTime.Now.ToString("yyyy-MM-dd");
+            }
+            var usergroup = UserGroupVM.RetreiveUserGroup(updater, UserGroupType.ReportGroup);
+            ViewBag.UserName = updater.Split(new char[] { '@' })[0];
+            ViewBag.RealUserID = updater;
+            ViewBag.cUserName = uname.Split(new char[] { '@' })[0];
+            ViewBag.cUserID = uname;
+            ViewBag.sdate = Convert.ToDateTime(sdate).ToString("yyyy-MM-dd");
+            ViewBag.edate = Convert.ToDateTime(edate).ToString("yyyy-MM-dd");
+            ViewBag.userreportlist = usergroup.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            return View();
+        }
+
+        public JsonResult GetDashboardData()
+        {
+            var res = new JsonResult();
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+                var uname = Request.Form["uname"];
+                var sdate = Request.Form["sdate"];
+                var edate = Request.Form["edate"];
+                sdate = Convert.ToDateTime(sdate).ToString("yyyy-MM-dd 00:00:00");
+                edate = Convert.ToDateTime(edate).ToString("yyyy-MM-dd 23:59:59");
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                var usergroup = UserGroupVM.RetreiveUserGroup(updater, UserGroupType.ReportGroup);
+                var userlist = usergroup.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                var weeks = IDashboardVM.CalculateWeek(sdate, edate);
+                var data = IDashboardVM.RetrieveDashboardData(new List<string> { uname }, "", sdate, edate);
+
+                var xAxis_data = new List<string>();
+                foreach(var week in weeks)
+                {
+                    xAxis_data.Add(week.Date);
+                }
+                var task_data = new List<int>();
+                var ctask_data = new List<int>();
+                var bug_data = new List<int>();
+                var cbug_data = new List<int>();
+                var critask_data = new List<int>();
+                var ccritask_data = new List<int>();
+                var dtree_data = new List<int>();
+                foreach(var item in data)
+                {
+                    task_data.Add((item.Value.TaskList != null) ? item.Value.TaskList.Count : 0);
+                    ctask_data.Add((item.Value.TaskClosedList != null) ? item.Value.TaskClosedList.Count : 0);
+                    bug_data.Add((item.Value.BugList != null) ? item.Value.BugList.Count : 0);
+                    cbug_data.Add((item.Value.BugClosedList != null) ? item.Value.BugClosedList.Count : 0);
+                    critask_data.Add((item.Value.CriticalTaskList != null) ? item.Value.CriticalTaskList.Count : 0);
+                    ccritask_data.Add((item.Value.CriticalTaskClosedList != null) ? item.Value.CriticalTaskClosedList.Count : 0);
+                    dtree_data.Add((item.Value.DebugTreeList != null) ? item.Value.DebugTreeList.Count : 0);
+                }
+
+                res.Data = new
+                {
+                    success = true,
+                    tdata = new
+                    {
+                        id = "task_container",
+                        title = "Task",
+                        type = DashboardType.Task,
+                        xAxis = new
+                        {
+                            data = xAxis_data
+                        },
+                        yAxis = new
+                        {
+                            title = "Amount"
+                        },
+                        data = new List<object> {
+                            new{
+                                name = "New Task",
+                                data = task_data
+                            },
+                            new{
+                                name = "Closed Task",
+                                data = ctask_data
+                            }
+                        }
+                    },
+                    bdata = new
+                    {
+                        id = "bug_container",
+                        title = "Bug",
+                        type = DashboardType.Bug,
+                        xAxis = new
+                        {
+                            data = xAxis_data
+                        },
+                        yAxis = new
+                        {
+                            title = "Amount"
+                        },
+                        data = new List<object> {
+                            new{
+                                name = "New Bug",
+                                data = bug_data
+                            },
+                            new{
+                                name = "Closed Bug",
+                                data = cbug_data
+                            }
+                        }
+                    },
+                    cdata = new
+                    {
+                        id = "ctask_container",
+                        title = "Critical Failure Task",
+                        type = DashboardType.CrititalFailureTask,
+                        xAxis = new
+                        {
+                            data = xAxis_data
+                        },
+                        yAxis = new
+                        {
+                            title = "Amount"
+                        },
+                        data = new List<object> {
+                            new{
+                                name = "New Critical Failure Bug",
+                                data = critask_data
+                            },
+                            new{
+                                name = "Closed Critical Failure Bug",
+                                data = ccritask_data
+                            }
+                        }
+                    },
+                    ddata = new
+                    {
+                        id = "dtree_container",
+                        title = "DebugTree",
+                        type = DashboardType.DebugTree,
+                        xAxis = new
+                        {
+                            data = xAxis_data
+                        },
+                        yAxis = new
+                        {
+                            title = "Amount"
+                        },
+                        data = new List<object> {
+                            new{
+                                name = "Debug Tree",
+                                data = dtree_data
+                            }
+                        }
+                    }
+                };
+            }
+            else
+            {
+                res.Data = new { success = false };
+            }
+
+            return res;
+        }
+
+        public ActionResult DashboardDetail(string uname, string type, string date)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "ILearn");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            var sdate = Convert.ToDateTime(date).ToString("yyyy-MM-dd 00:00:00");
+            var edate = Convert.ToDateTime(date).AddDays(+6).ToString("yyyy-MM-dd 23:59:59");
+            var type_list = new List<string>();
+            if(type == DashboardType.Task.ToString())
+            {
+                type_list.Add(ISSUESUBTYPE.Other.ToString());
+                type_list.Add(ISSUESUBTYPE.Task.ToString());
+                type_list.Add(ISSUESUBTYPE.NonCrititalFailureTask.ToString());
+                type_list.Add(ISSUESUBTYPE.OBA.ToString());
+                type_list.Add(ISSUESUBTYPE.RMA.ToString());
+                type_list.Add(ISSUESUBTYPE.REL.ToString());
+                type_list.Add(ISSUESUBTYPE.NPIProcess.ToString());
+            }
+            else if (type == DashboardType.Bug.ToString())
+            {
+                type_list.Add(ISSUESUBTYPE.Bug.ToString());
+            }
+            else if(type == DashboardType.CrititalFailureTask.ToString())
+            {
+                type_list.Add(ISSUESUBTYPE.CrititalFailureTask.ToString());
+            }
+            var o_data = new Dictionary<string, IssueList4DashboardWithWeek>();
+            var c_data = new Dictionary<string, IssueList4DashboardWithWeek>();
+            var d_data = new Dictionary<string, DebugTreeVM>();
+            if (type_list.Count > 0)
+            {
+                var itype = "('" + string.Join("','", type_list.ToArray()) + "')";
+                o_data = IDashboardVM.GetIssuesByConditions(new List<string> { uname }, itype, sdate, edate, 1);
+                c_data = IDashboardVM.GetIssuesByConditions(new List<string> { uname }, itype, sdate, edate, 2);
+            }
+            else
+            {
+                //debug tree
+                d_data = IDashboardVM.GetDebugTreeDetail(new List<string> { uname }, sdate, edate);
+            }
+            ViewBag.UserName = updater.Split(new char[] { '@' })[0];
+            ViewBag.RealUserID = updater;
+            ViewBag.cUserName = uname.Split(new char[] { '@' })[0];
+            ViewBag.cUserID = uname;
+            ViewBag.sdate = Convert.ToDateTime(sdate).ToString("yyyy-MM-dd");
+            ViewBag.edate = Convert.ToDateTime(edate).ToString("yyyy-MM-dd");
+            ViewBag.type = type;
+            ViewBag.o_data = o_data;
+            ViewBag.c_data = c_data;
+            ViewBag.d_data = d_data;
+
+            return View();
+        }
     }
 }

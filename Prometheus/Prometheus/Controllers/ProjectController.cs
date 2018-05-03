@@ -596,7 +596,6 @@ namespace Prometheus.Controllers
         {
             bool selected = false;
             var pslist = new List<SelectListItem>();
-
             foreach (var p in valist)
             {
                 var pitem = new SelectListItem();
@@ -1631,9 +1630,8 @@ namespace Prometheus.Controllers
                         .Replace("#NAMEVALUEPAIRS#", namevaluepair);
 
                 }
-
                 var asilist = UserViewModels.RetrieveAllUser();
-                ViewBag.AllUserList = CreateSelectList1(asilist, "");
+                ViewBag.AllUserList = "[\"" + string.Join("\",\"", asilist.ToArray()) + "\"]";
 
                 var ckdict = CookieUtility.UnpackCookie(this);
                 if (ckdict.ContainsKey("logonuser"))
@@ -6056,12 +6054,14 @@ namespace Prometheus.Controllers
                 return;
             }
 
+            var thismonth = DateTime.Now.Month;
+
             while (true)
             {
-                if (!VcselMonthData.MonthDataExist(vcselbgdzeropoint))
+                if (!VcselMonthData.MonthDataExist(vcselbgdzeropoint) || (thismonth == vcselbgdzeropoint.Month))
                 {
                     var currenttime = DateTime.Now;
-                    if (currenttime.Hour > 18 || vcselbgdzeropoint.AddMonths(1) > currenttime)
+                    if (currenttime.Hour > 18 || vcselbgdzeropoint > currenttime)
                     {
                         sundaylog("Sunday Report End for time....");
                         return;
@@ -6471,8 +6471,8 @@ namespace Prometheus.Controllers
             //try
             //{
             //    var vcselpninfo = VcselPNData.RetrieveVcselPNInfo();
-            //    VcselBGDVM.TestVcselBGDComputer(DateTime.Parse("2017-12-01 00:00:00"), vcselpninfo, this);
-            //    VcselBGDVM.TestVcselBGDComputer(DateTime.Parse("2018-01-01 00:00:00"), vcselpninfo, this);
+            //    //VcselBGDVM.TestVcselBGDComputer(DateTime.Parse("2017-12-01 00:00:00"), vcselpninfo, this);
+            //    VcselBGDVM.TestVcselBGDComputer(DateTime.Parse("2018-04-01 00:00:00"), vcselpninfo, this);
             //}
             //catch (Exception ex)
             //{

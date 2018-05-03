@@ -1,0 +1,30 @@
+﻿.body-content {
+    margin-top: 1% !important;
+}
+
+.container {
+    margin: auto 2% auto 5%;
+    padding: 2px;
+    width: 93%;
+}
+
+.glyphicon {
+    font-size: 14px;
+    width: auto;
+}
+
+.d-filter{
+    padding-bottom: 5px;
+    border-bottom: 1px solid #aaa;
+}
+.d-box {
+    height: 400px;
+}
+
+.row-margin{
+    margin-bottom: 5px;
+}
+
+.analysis-detail{
+    cursor: pointer;
+}

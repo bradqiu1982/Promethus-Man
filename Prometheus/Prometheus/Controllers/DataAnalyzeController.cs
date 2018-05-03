@@ -299,13 +299,9 @@ namespace Prometheus.Controllers
         }
 
         public JsonResult WaferDistributionData() {
-            var sdate = DateTime.Parse(Request.Form["sdate"]);
-            var edate = DateTime.Parse(Request.Form["edate"]);
             var wf_no = Request.Form["wf_no"];
             var vtype = Request.Form["wf_type"].Trim();
             var math_rect = Request.Form["math_rect"];
-
-
 
             var wflist = new List<string>();
             if (!string.IsNullOrEmpty(wf_no))
@@ -314,6 +310,8 @@ namespace Prometheus.Controllers
             }
             else
             {
+                var sdate = DateTime.Parse(Request.Form["sdate"]);
+                var edate = DateTime.Parse(Request.Form["edate"]);
                 var startdate = DateTime.Now;
                 var enddate = DateTime.Now;
                 if (sdate < edate)

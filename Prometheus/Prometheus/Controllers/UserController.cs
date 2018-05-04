@@ -1477,9 +1477,9 @@ namespace Prometheus.Controllers
             {
                 ClearILearnCache(w.Trim());
                 ShareDocVM.PushDoc(w.Trim().ToUpper(), "ALL", ShareDocType.BLOG, DOCKey, vm.Tag, vm.UserName, DateTime.Now.ToString(), "", docid, vm.DocURL);
-                ShareDocVM.SendPushDocEvent("a new document about " + vm.Tag, vm.DocURL, ToWho, updater.ToUpper(), this, tempreason);
             }
 
+            ShareDocVM.SendPushDocEvent("a new document about " + vm.Tag, vm.DocURL, ToWho, updater.ToUpper(), this, tempreason);
             ShareDocVM.SendPushDocEvent("a new document about " + vm.Tag, vm.DocURL, updater.ToUpper(), updater.ToUpper(), this, tempreason);
 
 
@@ -3767,6 +3767,21 @@ namespace Prometheus.Controllers
             ViewBag.d_data = d_data;
 
             return View();
+        }
+
+        public JsonResult TransferRule()
+        {
+            var transpeople = Request.Form["transpeople"];
+            var transid = Request.Form["transid[]"];
+            var transferids = transid.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var item in transferids)
+            {
+                ProjectCriticalErrorVM.TransferRule(item, transpeople);
+            }
+
+            var ret = new JsonResult();
+            ret.Data = new { success=true };
+            return ret;
         }
     }
 }

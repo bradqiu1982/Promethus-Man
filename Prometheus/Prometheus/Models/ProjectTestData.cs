@@ -574,7 +574,7 @@ namespace Prometheus.Models
             }
             if (!string.IsNullOrEmpty(edate))
             {
-                sql += " and TestTimeStamp <= @eDate";
+                sql += " and TestTimeStamp < @eDate";
                 param.Add("@eDate", edate);
             }
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);

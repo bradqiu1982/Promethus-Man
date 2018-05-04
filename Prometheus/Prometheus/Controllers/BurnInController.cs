@@ -294,6 +294,8 @@ namespace Prometheus.Controllers
                     }
                 }
 
+                ViewBag.sDate = Convert.ToDateTime(sdate).ToString("yyyy-MM-dd");
+                ViewBag.eDate = Convert.ToDateTime(edate).ToString("yyyy-MM-dd");
 
                 var retestdatalist = new List<KeyValuePair<string, int>>();
 

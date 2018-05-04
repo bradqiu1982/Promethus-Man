@@ -3697,7 +3697,7 @@ namespace Prometheus.Models
             }
             if (!string.IsNullOrEmpty(edate))
             {
-                sql += " and ptd.TestTimeStamp <= @eDate ";
+                sql += " and ptd.TestTimeStamp < @eDate ";
                 param.Add("@eDate", edate);
             }
             sql += @" group by ModuleSerialNum, WhichTesT)   as tmp_a
@@ -3773,7 +3773,7 @@ namespace Prometheus.Models
             }
             if (!string.IsNullOrEmpty(edate))
             {
-                sql += " and ptd.TestTimeStamp <= @eDate ";
+                sql += " and ptd.TestTimeStamp < @eDate ";
                 param.Add("@eDate", edate);
             }
             sql += @" group by ModuleSerialNum, WhichTest) as tmp_a
@@ -3798,6 +3798,76 @@ namespace Prometheus.Models
             {
                 sql += " and UPPER(ptd1.ModuleSerialNum) in (<@ikeys>) ";
                 sql = sql.Replace("<@ikeys>", "'" + ikeys + "'");
+            }
+            sql += @" order by ptd1.TestTimeStamp desc";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
+            var res = new Dictionary<string, ProjectYieldIssueVM>();
+            if (dbret.Count > 0)
+            {
+                foreach (var item in dbret)
+                {
+                    var tmp = new ProjectYieldIssueVM();
+                    tmp.ModuleSerialNum = Convert.ToString(item[0]);
+                    tmp.WhichTest = Convert.ToString(item[1]);
+                    tmp.ErrAbbr = Convert.ToString(item[2]);
+                    tmp.TestTimeStamp = Convert.ToString(item[3]);
+                    tmp.TestStation = Convert.ToString(item[4]);
+                    tmp.PN = Convert.ToString(item[5]);
+                    tmp.Summary = Convert.ToString(item[6]);
+                    tmp.IssueType = Convert.ToString(item[7]);
+                    tmp.Assignee = Convert.ToString(item[8]);
+                    tmp.DueDate = Convert.ToString(item[9]);
+                    tmp.Resolution = Convert.ToString(item[10]);
+                    tmp.IssueKey = Convert.ToString(item[11]);
+                    if (!res.ContainsKey((tmp.ModuleSerialNum + ":" + tmp.WhichTest).ToUpper()))
+                    {
+                        res.Add((tmp.ModuleSerialNum + ":" + tmp.WhichTest).ToUpper(), tmp);
+                    }
+                }
+            }
+            return res;
+        }
+
+        public static Dictionary<string, ProjectYieldIssueVM> GetBRIssuesByConditions(string pKey, string type, string bType, string br, string fm = "")
+        {
+            var param = new Dictionary<string, string>();
+            var sql = @"select ptd1.ModuleSerialNum, ptd1.WhichTest, ptd1.ErrAbbr, 
+                    ptd1.TestTimeStamp, ptd1.TestStation, ptd1.PN, i.Summary, i.IssueType, 
+                    i.Assignee, i.DueDate, i.Resolution, i.IssueKey
+                    from ProjectTestData as ptd1 
+                    inner join (select ";
+            if (string.Compare(type, "FirstFailure", true) == 0)
+            {
+                sql += @" Min(ptd.TestTimeStamp) as TestTimeStamp, WhichTest, ";
+            }
+            else
+            {
+                sql += @" MAX(ptd.TestTimeStamp) as TestTimeStamp, WhichTest, ";
+            }
+            sql += @" ModuleSerialNum from ProjectTestData as ptd where ptd.ProjectKey = @pKey <#cond>";
+            var cond = "";
+            if (string.Compare(bType, YIELDTYPE.JO) == 0)
+            {
+                cond = " and ptd.APPV1 ='" + br + "'";
+            }
+            else if (string.Compare(bType, YIELDTYPE.BR) == 0)
+            {
+                cond = " and ptd.APPV1 like '%" + br + "%'";
+            }
+            else
+            {
+                cond = " and ptd.PN = '" + br + "'";
+            }
+            sql += @" group by ModuleSerialNum, WhichTest) as tmp_a
+                    on (ptd1.ModuleSerialNum = tmp_a.ModuleSerialNum and ptd1.WhichTest = tmp_a.WhichTest and ptd1.TestTimeStamp = tmp_a.TestTimeStamp)
+                    left join issue as i on (ptd1.DataID = i.IssueKey and ptd1.ProjectKey = i.ProjectKey)
+                    where ptd1.ProjectKey = @pKey ";
+            param.Add("@pKey", pKey);
+            sql = sql.Replace("<#cond>", cond);
+            if (!string.IsNullOrEmpty(fm) && string.Compare(fm, "Other", true) != 0)
+            {
+                sql += " and ptd1.ErrAbbr = @fm ";
+                param.Add("@fm", fm);
             }
             sql += @" order by ptd1.TestTimeStamp desc";
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);

@@ -975,7 +975,7 @@ namespace Prometheus.Models
             var etime = DateTime.Parse(endtime);
 
             var ldate = new List<DateTime>();
-            for (var item = stime; item < etime;)
+            for (var item = stime; item <= etime;)
             {
                 ldate.Add(item);
                 item = item.AddDays(1);

@@ -3768,5 +3768,20 @@ namespace Prometheus.Controllers
 
             return View();
         }
+
+        public JsonResult TransferRule()
+        {
+            var transpeople = Request.Form["transpeople"];
+            var transid = Request.Form["transid[]"];
+            var transferids = transid.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var item in transferids)
+            {
+                ProjectCriticalErrorVM.TransferRule(item, transpeople);
+            }
+
+            var ret = new JsonResult();
+            ret.Data = new { success=true };
+            return ret;
+        }
     }
 }

@@ -275,7 +275,10 @@ namespace Prometheus.Models
                     sql = "update VcselTimeRange set StartDate = @StartDate where WaferNo = @WaferNo";
                     dict.Add("@StartDate", sdate.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
-                DBUtility.ExeLocalSqlNoRes(sql, dict);
+                if (!string.IsNullOrEmpty(sql))
+                {
+                    DBUtility.ExeLocalSqlNoRes(sql, dict);
+                }
             }//end else
         }
 

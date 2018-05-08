@@ -1140,13 +1140,11 @@ namespace Prometheus.Models
         public static void BatchUpdateAssignee(string pkey, List<string> ikeys, string operater, string assignee)
         {
             var sql = @"update Issue set Assignee = @assignee 
-                    where ProjectKey = @pkey and IssueKey in (<#ikeys>) 
-                    and Assignee = @operater";
+                    where ProjectKey = @pkey and IssueKey in (<#ikeys>) ";
             sql = sql.Replace("<#ikeys>", "'" + string.Join("','", ikeys) + "'");
             var param = new Dictionary<string, string>();
             param.Add("@assignee", assignee);
             param.Add("@pkey", pkey);
-            param.Add("@operater", operater);
 
             DBUtility.ExeLocalSqlNoRes(sql, param);
         }
@@ -1436,20 +1434,24 @@ namespace Prometheus.Models
 
             var cond = "";
             var fixresolve = "";
+            var sort_str = "";
             if (string.Compare(issuestatus, Resolute.Pending) == 0)
             {
                 cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";
                 fixresolve = Resolute.Pending;
+                sort_str = "order by i.ReportDate DESC";
             }
             else if (string.Compare(issuestatus, Resolute.Working) == 0)
             {
                 cond = "('" + Resolute.Working + "')";
                 fixresolve = Resolute.Working;
+                sort_str = "order by i.ReportDate DESC";
             }
             else
             {
                 cond = "('" + Resolute.Fixed + "','" + Resolute.Done + "','" + Resolute.NotFix + "','" + Resolute.NotReproduce + "','" + Resolute.Unresolved + "')";
                 fixresolve = Resolute.Done;
+                sort_str = " order by i.ResolvedDate DESC ";
             }
 
             //var sql = "select top <topnum> ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples,APVal2,ModuleSN,DataID from Issue where  APVal1 <> 'delete' and  ParentIssueKey = '' and ProjectKey = '<ProjectKey>' and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType>' order by ReportDate DESC";
@@ -1460,8 +1462,7 @@ namespace Prometheus.Models
                     from Issue as i left join ProjectTestData as d on (i.IssueKey = d.DataID and i.ProjectKey = d.ProjectKey)
                     where i.APVal1 <> 'delete' and  i.ParentIssueKey = '' and  i.Creator = 'System'
                     and i.ProjectKey = '<ProjectKey>' and i.Resolution in <cond> 
-                    and i.IssueType <> '<IssueType>' 
-                    order by i.ReportDate DESC";
+                    and i.IssueType <> '<IssueType>' " + sort_str;
             sql = sql.Replace("<ProjectKey>", pjkey).Replace("<cond>", cond).Replace("<topnum>", Convert.ToString(topnum))
                     .Replace("<IssueType>", ISSUETP.NPIPROC);
 
@@ -3897,6 +3898,7 @@ namespace Prometheus.Models
             }
             return res;
         }
+
     }
 
     public class IssueTypeVM

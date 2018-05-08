@@ -156,10 +156,13 @@
         <script type="text/javascript">
             $(document).ready(function () {
                 $('#pndatatable').DataTable({
+                    "columnDefs": [
+                        { "type": "string", "targets": [7] },
+                    ],
                     'iDisplayLength': 50,
                     'aLengthMenu': [[20, 50, 100, -1],
-                    [20, 50, 100, "All"]],
-                    "aaSorting": [],
+                        [20, 50, 100, "All"]],
+                    'aaSorting': [],
                     "order": []
                 });
             })

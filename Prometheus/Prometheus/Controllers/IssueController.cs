@@ -3471,7 +3471,22 @@ namespace Prometheus.Controllers
             }
 
             var tobeissuekey = ikeys.Split(new char[] { ',', ';' }).ToList();
-            IssueViewModels.BatchUpdateAssignee(pKey, tobeissuekey, updater, tobeassigee);
+            var pjmemauth = false;
+            var pj = ProjectViewModels.RetrieveOneProject(pKey);
+            if (pj != null)
+            {
+                foreach (var item in pj.MemberList)
+                {
+                    if (string.Compare(updater, item.Name, true) == 0)
+                    {
+                        pjmemauth = true;
+                    }
+                }
+            }
+            if (pjmemauth)
+            {
+                IssueViewModels.BatchUpdateAssignee(pKey, tobeissuekey, updater, tobeassigee);
+            }
             
             return RedirectToAction("ProjectFA", "Project", dict);
         }

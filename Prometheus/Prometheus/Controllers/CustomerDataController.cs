@@ -1825,5 +1825,21 @@ namespace Prometheus.Controllers
 
             return res;
         }
+
+        public ActionResult NeoMapData(string sn = "", string wafer_no = "", string coord_x = "", string coord_y = "")
+        {
+            var data = new List<Dictionary<string, string>>();
+            if(!string.IsNullOrEmpty(sn) || !string.IsNullOrEmpty(coord_x) 
+                    || !string.IsNullOrEmpty(coord_y)){
+                data = NeoMAPVM.GetNeomapDataByConditions(sn, wafer_no, coord_x, coord_y);
+            }
+            ViewBag.sn = sn;
+            ViewBag.wafer_no = wafer_no;
+            ViewBag.coord_x = coord_x;
+            ViewBag.coord_y = coord_y;
+            ViewBag.data = data;
+
+            return View();
+        }
     }
 }

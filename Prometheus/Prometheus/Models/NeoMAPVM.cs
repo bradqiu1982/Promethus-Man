@@ -41,6 +41,56 @@ namespace Prometheus.Models
         }
 
 
+        public static List<Dictionary<string, string>> GetNeomapDataByConditions(string sn = "", string wafer_no = "", string coord_x = "", string coord_y = "")
+        {
+            var sql = @"select a.*, b.SN from NeoMapData as a 
+                    left join WaferCoordData as b 
+                    on (a.AppV_A = b.Wafer_No and a.AppV_D = b.Coord_X 
+                    and a.AppV_E = b.Coord_Y)
+                    where 1 = 1 ";
+            var param = new Dictionary<string, string>();
+            if (!string.IsNullOrEmpty(sn))
+            {
+                sql += " and b.SN like @sn ";
+                param.Add("@sn", "%" + sn + "%");
+            }
+            if (!string.IsNullOrEmpty(wafer_no))
+            {
+                sql += " and a.AppV_A = @wafer_no ";
+                param.Add("@wafer_no", wafer_no);
+            }
+            if (!string.IsNullOrEmpty(coord_x))
+            {
+                sql += " and a.AppV_D = @coord_x ";
+                param.Add("@coord_x", coord_x);
+            }
+            if (!string.IsNullOrEmpty(coord_y))
+            {
+                sql += " and a.AppV_E = @coord_y ";
+                param.Add("@coord_y", coord_y);
+            }
 
+            sql += "order by b.SN, a.AppV_A ";
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
+            var res = new List<Dictionary<string, string>>();
+            if(dbret.Count > 0)
+            {
+                var neomap = ExternalDataCollector.NeoMapDBColName2RealName();
+                foreach (var item in dbret)
+                {
+                    var tmp = new Dictionary<string, string>();
+                    tmp.Add("SN", Convert.ToString(item[37]));
+                    var idx = 0;
+                    foreach (var line in neomap)
+                    {
+                        tmp.Add(line.Value, Convert.ToString(item[idx]));
+                        idx++;
+                    }
+                    res.Add(tmp);
+                }
+            }
+            return res;
+        }
     }
 }

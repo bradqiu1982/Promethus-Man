@@ -1,0 +1,81 @@
+﻿
+@{
+    ViewBag.Title = "NeoMapData";
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
+}
+<link type="text/css" rel="stylesheet" href="~/Content/wafercoorddata.css" />
+<script type="text/javascript" src="~/Scripts/wafercoorddata.js"></script>
+<script>
+    $(function () {
+        WaferCoordData.search();
+    })
+    $(document).ready(function () {
+        $('.datatable').DataTable({
+            'scrollX': true,
+            'iDisplayLength': 25,
+            'aLengthMenu': [[25, 50, 100, -1],
+                [25, 50, 100, "All"]],
+            "aaSorting": [],
+            "order": []
+        });
+    });
+</script>
+<div class="row row-margin">
+    <div class="nav navbar-nav navbar-left">
+        <ol class="breadcrumb" style="width:600px">
+            <li><a href="/CustomerData/ReviewWaferCoordData">Wafer Coord Data</a></li>
+            <li class="active">Search NeoMap Data</li>
+        </ol>
+    </div>
+</div>
+<div class="search-filter">
+    <div class="row row-margin">
+        <label class="col-xs-2">SN</label>
+        <div class="col-xs-4">
+            <input type="text" class="form-control" name="s-sn" id="s-sn" value="@ViewBag.sn" />
+        </div>
+        <label class="col-xs-2">Wafer No</label>
+        <div class="col-xs-4">
+            <input type="text" class="form-control" name="s-wafer-no" id="s-wafer-no" value="@ViewBag.wafer_no" />
+        </div>
+    </div>
+    <div class="row row-margin">
+        <label class="col-xs-2">Coord X</label>
+        <div class="col-xs-4">
+            <input type="text" class="form-control" name="s-x" id="s-x" value="@ViewBag.coord_x" />
+        </div>
+        <label class="col-xs-2">Coord Y</label>
+        <div class="col-xs-4">
+            <input type="text" class="form-control" name="s-y" id="s-y" value="@ViewBag.coord_y" />
+        </div>
+    </div>
+    <div class="row-margin text-right">
+        <input type="button" class="btn btn-success" name="s-search" id="s-search" value="Search" />
+    </div>
+</div>
+<div>
+    @if (ViewBag.data.Count > 0)
+    {
+        <table class="table table-striped table-hover datatable">
+            <thead>
+                <tr>
+                    @foreach (var title in ViewBag.data[0].Keys)
+                    {
+                        <th>@(title.Length > 7 ? title.Substring(7) : title)</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in ViewBag.data)
+                {
+                    <tr>
+                        @foreach (var content in item.Values)
+                        {
+                            <td>@content</td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

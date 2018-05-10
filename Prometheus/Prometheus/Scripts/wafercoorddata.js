@@ -127,10 +127,29 @@
             })
 
         })
+        $('body').on('click', '#s-search', function () {
+            window.location.href = "/CustomerData/NeoMapData";
+        })
+    }
+    var search = function () {
+        $('body').on('click', '#s-search', function () {
+            var sn = $.trim($('#s-sn').val());
+            var wafer_no = $.trim($('#s-wafer-no').val());
+            var x = $.trim($('#s-x').val());
+            var y = $.trim($('#s-y').val());
+            if (wafer_no != "" && sn == "" && x == "" && y == "") {
+                alert("Please input more info, like SN, Coord_X, Coord_Y");
+                return false;
+            }
+            window.location.href = '/CustomerData/NeoMapData?sn=' + sn + '&wafer_no=' + wafer_no + '&coord_x=' + x + '&coord_y=' + y;
+        })
     }
     return {
         init: function () {
             show();
+        },
+        search: function () {
+            search();
         }
     }
 

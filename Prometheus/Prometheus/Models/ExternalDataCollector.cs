@@ -3437,7 +3437,7 @@ namespace Prometheus.Models
                         tempvm.VcselPN = line[11];
                         if (vcselpndict.ContainsKey(tempvm.VcselPN))
                         {
-                            tempvm.VcselType = vcselpndict[tempvm.VcselPN].Rate + "_" + vcselpndict[tempvm.VcselPN].Channel;
+                            tempvm.VcselType = vcselpndict[tempvm.VcselPN].Rate;
                         }
                         tempvm.RMANum = line[0];
                         tempvm.Customer = line[1];

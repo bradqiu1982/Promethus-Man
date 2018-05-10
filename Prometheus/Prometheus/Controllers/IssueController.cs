@@ -402,7 +402,7 @@ namespace Prometheus.Controllers
                 {
                     ViewBag.authrized = false;
                 }
-                var pj = ProjectViewModels.RetrieveOneProject(ret.ProjectKey);
+                var pj = ProjectViewModels.RetrieveOneProject2(ret.ProjectKey);
                 foreach (var item in pj.MemberList)
                 {
                     if (string.Compare(item.Name, updater, true) == 0)

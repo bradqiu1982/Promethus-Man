@@ -806,6 +806,41 @@ namespace Prometheus.Models
 
         }
 
+        public static ProjectViewModels RetrieveOneProject2(string key)
+        {
+            var sql = "select ProjectKey,ProjectName,StartDate,FinishRate,Description,APVal1,APVal2,ProjectType,APVal4 from Project where ProjectKey = '<ProjectKey>' and validate = 1";
+            sql = sql.Replace("<ProjectKey>", key);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            if (dbret.Count > 0)
+            {
+                var ret = new ProjectViewModels(Convert.ToString(dbret[0][0])
+                    , Convert.ToString(dbret[0][1]), Convert.ToString(dbret[0][2])
+                    , Convert.ToDouble(dbret[0][3]), Convert.ToString(dbret[0][4])
+                    , Convert.ToString(dbret[0][5]), Convert.ToString(dbret[0][6])
+                    , Convert.ToString(dbret[0][7]));
+
+                ret.MemberList = RetrieveProjectMembers(key);
+                ret.TabList = RetrieveProjectMesTable(key);
+                ret.PNList = RetrieveProjectPn(key);
+                ret.StationList = RetrieveProjectStation(key);
+                ret.MDIDList = RetrieveProjectModelID(key);
+                ret.SumDatasetList = RetrieveProjectSumDataSet(key);
+                return ret;
+            }
+            else
+            {
+                var res = new ProjectViewModels();
+                res.MemberList = new List<ProjectMembers>();
+                res.TabList = new List<ProjectMesTable>();
+                res.PNList = new List<ProjectPn>();
+                res.StationList = new List<ProjectStation>();
+                res.MDIDList = new List<ProjectPn>();
+                res.SumDatasetList = new List<ProjectStation>();
+
+                return res;
+            }
+        }
+
         public static List<ProjectViewModels> RetrieveAllProject()
         {
             var ret = new List<ProjectViewModels>();

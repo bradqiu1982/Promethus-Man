@@ -3404,12 +3404,8 @@ namespace Prometheus.Models
         #endregion
 
         #region VCSELRMA
-        public static void RefreshVcselRMAData(Controller ctrl)
+        private static void SolveVcselRMAData(Controller ctrl,string vcselrmafile)
         {
-            var syscfg = CfgUtility.GetSysConfig(ctrl);
-            var vcselrmafile = ExternalDataCollector.DownloadShareFile(syscfg["VCSELRMASHARE"], ctrl);
-            if (vcselrmafile != null && ExternalDataCollector.FileExist(ctrl, vcselrmafile))
-            {
                 var existrmasn = VcselRMAData.GetAllVcselRMASN();
                 var vcselpndict = VcselPNData.RetrieveVcselPNInfo();
 
@@ -3438,6 +3434,10 @@ namespace Prometheus.Models
                         if (vcselpndict.ContainsKey(tempvm.VcselPN))
                         {
                             tempvm.VcselType = vcselpndict[tempvm.VcselPN].Rate;
+                        }
+                        else
+                        {
+                            tempvm.VcselType = "OTHERS";
                         }
                         tempvm.RMANum = line[0];
                         tempvm.Customer = line[1];
@@ -3477,7 +3477,40 @@ namespace Prometheus.Models
                         WaferSNMap.UpdateWaferInfo(item.Wafer);
                     }
                 }
+        }
 
+        private static void SolveMailStoneData(Controller ctrl, string vcselrmafile)
+        {
+            var idx = 0;
+            var data = RetrieveDataFromExcelWithAuth(ctrl, vcselrmafile, "Changes milestone");
+            var milestonelist = new List<EngineeringMileStone>();
+
+            foreach (var line in data)
+            {
+                if (idx == 0)
+                {
+                    idx = idx + 1;
+                    continue;
+                }
+
+                var tempvm = new EngineeringMileStone();
+                tempvm.ActionDate = DateTime.Parse(line[2]);
+                tempvm.Location = line[3];
+                tempvm.ActionDetail = line[0] + " # " + line[4];
+                milestonelist.Add(tempvm);
+            }
+
+            EngineeringMileStone.UpdateVcselMileStone(milestonelist);
+        }
+
+        public static void RefreshVcselRMAData(Controller ctrl)
+        {
+            var syscfg = CfgUtility.GetSysConfig(ctrl);
+            var vcselrmafile = ExternalDataCollector.DownloadShareFile(syscfg["VCSELRMASHARE"], ctrl);
+            if (vcselrmafile != null && ExternalDataCollector.FileExist(ctrl, vcselrmafile))
+            {
+                //SolveVcselRMAData(ctrl, vcselrmafile);
+                SolveMailStoneData(ctrl, vcselrmafile);
             }//end if
         }
 

@@ -1439,11 +1439,18 @@ CREATE TABLE [dbo].[VcselRMAData] (
 	[Customer]   NVARCHAR (200) DEFAULT ('') NOT NULL
 	);
 
-	CREATE TABLE [dbo].[WaferSNMap] (
+CREATE TABLE [dbo].[WaferSNMap] (
     [Wafer]   NVARCHAR (200) DEFAULT ('') NOT NULL,
 	[SN]   NVARCHAR (200) DEFAULT ('') NOT NULL,
 	[CurrentWorkStep] NVARCHAR (300) DEFAULT ('') NOT NULL,
 	[LastMoveDate]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+	);
+
+CREATE TABLE [dbo].[EngineeringMileStone] (
+    [PJKey]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[ActionDate]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[Location]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[ActionDetail] NVARCHAR (MAX) DEFAULT ('') NOT NULL
 	);
 
 CREATE TABLE [dbo].[WaferCoordData](

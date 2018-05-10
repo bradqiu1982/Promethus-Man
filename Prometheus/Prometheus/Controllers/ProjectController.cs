@@ -6184,7 +6184,8 @@ namespace Prometheus.Controllers
                 return View();
             }
 
-            if (DateTime.Now.DayOfWeek == DayOfWeek.Sunday
+            if (DateTime.Now.DayOfWeek == DayOfWeek.Tuesday
+                ||DateTime.Now.DayOfWeek == DayOfWeek.Sunday
                 || DateTime.Now.DayOfWeek == DayOfWeek.Saturday)
             {
                 if (!System.IO.File.Exists(sundayreportDone))
@@ -6283,6 +6284,15 @@ namespace Prometheus.Controllers
                 ExternalDataCollector.RefreshRMAData(this);
             }
             catch (Exception ex) { }
+
+            heartbeatlog("ExternalDataCollector.RefreshVcselRMAData");
+
+            try
+            {
+                ExternalDataCollector.RefreshVcselRMAData(this);                
+            }
+            catch (Exception ex) { }
+
 
             heartbeatlog("ExternalDataCollector.RefreshRELData");
 
@@ -6551,6 +6561,8 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
+            //ExternalDataCollector.RefreshVcselRMAData(this);
+
             //BIDataUtility.UpdateBITestResultWaferPN(DateTime.Parse("2017-10-01 00:00:00"));
 
             //try

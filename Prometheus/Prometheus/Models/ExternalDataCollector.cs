@@ -490,12 +490,12 @@ namespace Prometheus.Models
         public string Value { set; get; }
     }
 
-    public class ExternalDataCollector
+     public class ExternalDataCollector
     {
 
         #region FILEOPERATE
 
-        private static List<List<string>> RetrieveDataFromExcelWithAuth(Controller ctrl, string filename, int columns = 101)
+        private static List<List<string>> RetrieveDataFromExcelWithAuth(Controller ctrl, string filename,string sheetname = null, int columns = 101)
         {
             try
             {
@@ -506,7 +506,7 @@ namespace Prometheus.Models
 
                 using (NativeMethods cv = new NativeMethods(folderuser, folderdomin, folderpwd))
                 {
-                    return ExcelReader.RetrieveDataFromExcel(filename, null, columns);
+                    return ExcelReader.RetrieveDataFromExcel(filename, sheetname, columns);
                 }
             }
             catch (Exception ex)
@@ -536,6 +536,28 @@ namespace Prometheus.Models
 
         }
 
+        public static string DownloadShareFile(string srcfile, Controller ctrl)
+        {
+            try
+            {
+                if (ExternalDataCollector.FileExist(ctrl, srcfile))
+                {
+                    var filename = System.IO.Path.GetFileName(srcfile);
+                    var descfolder = ctrl.Server.MapPath("~/userfiles") + "\\docs\\ShareFile\\";
+                    if (!ExternalDataCollector.DirectoryExists(ctrl, descfolder))
+                        ExternalDataCollector.CreateDirectory(ctrl, descfolder);
+                    var descfile = descfolder + System.IO.Path.GetFileNameWithoutExtension(srcfile) + DateTime.Now.ToString("yyyy-MM-dd") + System.IO.Path.GetExtension(srcfile);
+                    ExternalDataCollector.FileCopy(ctrl, srcfile, descfile, true);
+                    return descfile;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
         private static void FileCopy(Controller ctrl, string src, string des, bool overwrite, bool checklocal = false)
         {
             try
@@ -561,6 +583,25 @@ namespace Prometheus.Models
             catch (Exception ex)
             {
             }
+        }
+
+        public static void CreateDirectory(Controller ctrl, string dirname)
+        {
+            try
+            {
+                var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+                var folderuser = syscfgdict["SHAREFOLDERUSER"];
+                var folderdomin = syscfgdict["SHAREFOLDERDOMIN"];
+                var folderpwd = syscfgdict["SHAREFOLDERPWD"];
+
+                using (NativeMethods cv = new NativeMethods(folderuser, folderdomin, folderpwd))
+                {
+                    Directory.CreateDirectory(dirname);
+                }
+            }
+            catch (Exception ex)
+            { }
+
         }
 
         private static bool DirectoryExists(Controller ctrl, string dirname)
@@ -3229,7 +3270,7 @@ namespace Prometheus.Models
         }
         #endregion
 
-        #region
+        #region WAFERCOOR
         public static void RefreshWaferCoordByDate(Controller ctrl, string date)
         {
             var syscfgdict = CfgUtility.GetSysConfig(ctrl);
@@ -3256,7 +3297,7 @@ namespace Prometheus.Models
                         FileCopy(ctrl, srcf, desfile, true);
                         if (FileExist(ctrl, desfile))
                         {
-                            var data = RetrieveDataFromExcelWithAuth(ctrl, desfile, 9);
+                            var data = RetrieveDataFromExcelWithAuth(ctrl, desfile,null, 9);
                             var tmp = SaveWaferCoordData(data, testtime, coordsrcfolder, ctrl);
                             new_data.Intersect(tmp).ToList().ForEach(x => new_data.Remove(x.Key));
                             new_data = new_data.Concat(tmp).ToDictionary(x => x.Key, x => x.Value);
@@ -3362,5 +3403,84 @@ namespace Prometheus.Models
 
         #endregion
 
+        #region VCSELRMA
+        public static void RefreshVcselRMAData(Controller ctrl)
+        {
+            var syscfg = CfgUtility.GetSysConfig(ctrl);
+            var vcselrmafile = ExternalDataCollector.DownloadShareFile(syscfg["VCSELRMASHARE"], ctrl);
+            if (vcselrmafile != null && ExternalDataCollector.FileExist(ctrl, vcselrmafile))
+            {
+                var existrmasn = VcselRMAData.GetAllVcselRMASN();
+                var vcselpndict = VcselPNData.RetrieveVcselPNInfo();
+
+                var idx = 0;
+                var data = RetrieveDataFromExcelWithAuth(ctrl, vcselrmafile, "Master list");
+                var vcselrmalist = new List<VcselRMAData>();
+
+                foreach (var line in data)
+                {
+                    if (idx == 0)
+                    {
+                        idx = idx + 1;
+                        continue;
+                    }
+
+                    var sn = line[10];
+                    if (!existrmasn.ContainsKey(sn))
+                    {
+                        existrmasn.Add(sn, true);
+
+                        var tempvm = new VcselRMAData();
+                        tempvm.SN = sn;
+                        tempvm.PN = line[8];
+                        tempvm.PNDesc = line[9];
+                        tempvm.VcselPN = line[11];
+                        if (vcselpndict.ContainsKey(tempvm.VcselPN))
+                        {
+                            tempvm.VcselType = vcselpndict[tempvm.VcselPN].Rate + "_" + vcselpndict[tempvm.VcselPN].Channel;
+                        }
+                        tempvm.RMANum = line[0];
+                        tempvm.Customer = line[1];
+                        tempvm.ProductType = line[2];
+                        tempvm.ShipDate = line[3];
+                        tempvm.RMAOpenDate = line[4];
+
+                        vcselrmalist.Add(tempvm);
+                    }//not exist
+                }//end foreach
+
+                if (vcselrmalist.Count > 0)
+                {
+                    var snlist = new List<string>();
+                    foreach (var item in vcselrmalist)
+                    {
+                        snlist.Add(item.SN);
+                    }
+
+                    var snwaferdict = BIDataUtility.RetrieveBIWaferBySN_SNDict(snlist);
+                    foreach (var item in vcselrmalist)
+                    {
+                        if (snwaferdict.ContainsKey(item.SN))
+                        {
+                            item.Wafer = snwaferdict[item.SN].Key;
+                            item.BuildDate = DateTime.Parse(snwaferdict[item.SN].Value);
+
+                            item.StoreVcselRMA();
+                        }
+                    }//end foreach
+                }
+
+                foreach (var item in vcselrmalist)
+                {
+                    if (!string.IsNullOrEmpty(item.Wafer))
+                    {
+                        WaferSNMap.UpdateWaferInfo(item.Wafer);
+                    }
+                }
+
+            }//end if
+        }
+
+        #endregion
     }
 }

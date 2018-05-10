@@ -1802,9 +1802,80 @@ namespace Prometheus.Models
             return ret;
         }
 
-        private static Dictionary<string, List<string>> RealBIWaferBySN_private4up(List<string> snlist)
+        //private static Dictionary<string, List<string>> RealBIWaferBySN_private4up(List<string> snlist)
+        //{
+        //    var ret = new Dictionary<string, List<string>>();
+        //    if (snlist.Count == 0) return ret;
+
+        //    if (snlist.Count > 0)
+        //    {
+        //        StringBuilder sb1 = new StringBuilder(10 * (snlist.Count + 5));
+        //        sb1.Append("('");
+        //        foreach (var line in snlist)
+        //        {
+        //            sb1.Append(line + "','");
+        //        }
+        //        var tempstr1 = sb1.ToString();
+        //        var sncond1 = tempstr1.Substring(0, tempstr1.Length - 2) + ")";
+
+        //        var sql = @"SELECT distinct c.ContainerName as SerialName,isnull(dc.[ParamValueString],'') as WaferLot,pb.productname MaterialPN  ,hml.MfgDate
+        //                FROM InsiteDB.insite.container c with (nolock) 
+        //                left join InsiteDB.insite.currentStatus cs (nolock) on c.currentStatusId = cs.currentStatusId 
+        //                left join InsiteDB.insite.workflowstep ws(nolock) on  cs.WorkflowStepId = ws.WorkflowStepId 
+        //                left join InsiteDB.insite.componentRemoveHistory crh with (nolock) on crh.historyId = c.containerId 
+        //                left join InsiteDB.insite.removeHistoryDetail rhd on rhd.componentRemoveHistoryId = crh.componentRemoveHistoryId 
+        //                left join InsiteDB.insite.starthistorydetail  shd(nolock) on c.containerid=shd.containerId and shd.historyId <> shd.containerId 
+        //                left join InsiteDB.insite.container co (nolock) on co.containerid=shd.historyId 
+        //                left join InsiteDB.insite.historyMainline hml with (nolock) on c.containerId = hml.containerId 
+        //                left join InsiteDB.insite.componentIssueHistory cih with (nolock) on  hml.historyMainlineId=cih.historyMainlineId 
+        //                left join InsiteDB.insite.issueHistoryDetail ihd with (nolock) on cih.componentIssueHistoryId = ihd.componentIssueHistoryId 
+        //                left join InsiteDB.insite.issueActualsHistory iah with (nolock) on  ihd.issueHistoryDetailId = iah.issueHistoryDetailId 
+        //                left join InsiteDB.insite.RemoveHistoryDetail rem with (nolock) on iah.IssueActualsHistoryId = rem.IssueActualsHistoryId 
+        //                left join InsiteDB.insite.RemovalReason re with (nolock) on rem.RemovalReasonId = re.RemovalReasonId 
+        //                left join InsiteDB.insite.container cFrom with (nolock) on iah.fromContainerId = cFrom.containerId 
+        //                left join InsiteDB.insite.product p with (nolock) on  cFrom.productId = p.productId 
+        //                left join InsiteDB.insite.productBase pb with (nolock) on p.productBaseId  = pb.productBaseId 
+        //                left join InsiteDB.insite.historyMainline hmll with (nolock)on cFrom.OriginalcontainerId=hmll.historyid 
+        //                left join InsiteDB.insite.product pp with (nolock) on c.productid=pp.productid 
+        //                left join InsiteDB.insite.productfamily pf (nolock) on  pp.productFamilyId = pf.productFamilyId 
+        //                left join InsiteDB.insite.productbase pbb with (nolock) on pp.productbaseid=pbb.productbaseid 
+        //                left join InsiteDB.insite.dc_AOC_ManualInspection dc (nolock) on hmll.[HistoryMainlineId]=dc.[HistoryMainlineId] 
+        //                WHERE dc.parametername='Trace_ID' and p.description like '%VCSEL%' and dc.[ParamValueString] like '%-%'and c.containername in <SNCOND> order by pb.productname,c.ContainerName,hml.MfgDate DESC";
+
+        //        sql = sql.Replace("<SNCOND>", sncond1);
+        //        var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+        //        foreach (var line in dbret)
+        //        {
+        //            var SN = Convert.ToString(line[0]);
+        //            var WaferNum = Convert.ToString(line[1]);
+        //            if (WaferNum.Length > 3)
+        //            {
+        //                WaferNum = WaferNum.Substring(0, WaferNum.Length - 3);
+        //            }
+        //            var PN = Convert.ToString(line[2]);
+        //            if (!string.IsNullOrEmpty(WaferNum) && !string.IsNullOrEmpty(PN))
+        //            {
+        //                var key = PN + ":::" + WaferNum;
+        //                if (ret.ContainsKey(key))
+        //                {
+        //                    ret[key].Add(SN);
+        //                }
+        //                else
+        //                {
+        //                    var templist = new List<string>();
+        //                    templist.Add(SN);
+        //                    ret.Add(key, templist);
+        //                }
+        //            }//end if
+        //        }//end foreach
+        //    }//end if
+
+        //    return ret;
+        //}
+
+        public static Dictionary<string,KeyValuePair<string,string>> RetrieveBIWaferBySN_SNDict(List<string> snlist)
         {
-            var ret = new Dictionary<string, List<string>>();
+            var ret = new Dictionary<string, KeyValuePair<string, string>>();
             if (snlist.Count == 0) return ret;
 
             if (snlist.Count > 0)
@@ -1852,24 +1923,59 @@ namespace Prometheus.Models
                     {
                         WaferNum = WaferNum.Substring(0, WaferNum.Length - 3);
                     }
-                    var PN = Convert.ToString(line[2]);
-                    if (!string.IsNullOrEmpty(WaferNum) && !string.IsNullOrEmpty(PN))
+                    var BuildDate = Convert.ToDateTime(line[3]).ToString("yyyy-MM-dd HH:mm:ss");
+                    if (!ret.ContainsKey(SN))
                     {
-                        var key = PN + ":::" + WaferNum;
-                        if (ret.ContainsKey(key))
-                        {
-                            ret[key].Add(SN);
-                        }
-                        else
-                        {
-                            var templist = new List<string>();
-                            templist.Add(SN);
-                            ret.Add(key, templist);
-                        }
-                    }//end if
+                        ret.Add(SN, new KeyValuePair<string, string>(WaferNum, BuildDate));
+                    }
                 }//end foreach
             }//end if
 
+            return ret;
+        }
+
+        public static List<WaferSNMap> RetrieveSNByWafer(string wafer)
+        {
+            var ret = new List<WaferSNMap>();
+            var sql = @"select c.ContainerName,w.WorkflowStepName,cs.LastMoveDate from [InsiteDB].[insite].[Container] c (nolock) 
+                 left join[InsiteDB].[insite].[MfgOrder] m(nolock) on m.MfgOrderId = c.MfgOrderId
+                 left join InsiteDB.insite.CurrentStatus cs (nolock) on cs.CurrentStatusId = c.CurrentStatusId
+                 left join InsiteDB.insite.WorkflowStep w (nolock) on w.WorkflowStepId = cs.WorkflowStepId
+                  where (WorkflowStepName = 'main store' or WorkflowStepName = 'rma' or WorkflowStepName like '%ship%') and ContainerName  in (
+	                SELECT distinct c.ContainerName as SerialName
+                    FROM InsiteDB.insite.container c with (nolock) 
+                    left join InsiteDB.insite.currentStatus cs (nolock) on c.currentStatusId = cs.currentStatusId 
+                    left join InsiteDB.insite.workflowstep ws(nolock) on  cs.WorkflowStepId = ws.WorkflowStepId 
+                    left join InsiteDB.insite.componentRemoveHistory crh with (nolock) on crh.historyId = c.containerId 
+                    left join InsiteDB.insite.removeHistoryDetail rhd on rhd.componentRemoveHistoryId = crh.componentRemoveHistoryId 
+                    left join InsiteDB.insite.starthistorydetail  shd(nolock) on c.containerid=shd.containerId and shd.historyId <> shd.containerId 
+                    left join InsiteDB.insite.container co (nolock) on co.containerid=shd.historyId 
+                    left join InsiteDB.insite.historyMainline hml with (nolock) on c.containerId = hml.containerId 
+                    left join InsiteDB.insite.componentIssueHistory cih with (nolock) on  hml.historyMainlineId=cih.historyMainlineId 
+                    left join InsiteDB.insite.issueHistoryDetail ihd with (nolock) on cih.componentIssueHistoryId = ihd.componentIssueHistoryId 
+                    left join InsiteDB.insite.issueActualsHistory iah with (nolock) on  ihd.issueHistoryDetailId = iah.issueHistoryDetailId 
+                    left join InsiteDB.insite.RemoveHistoryDetail rem with (nolock) on iah.IssueActualsHistoryId = rem.IssueActualsHistoryId 
+                    left join InsiteDB.insite.RemovalReason re with (nolock) on rem.RemovalReasonId = re.RemovalReasonId 
+                    left join InsiteDB.insite.container cFrom with (nolock) on iah.fromContainerId = cFrom.containerId 
+                    left join InsiteDB.insite.product p with (nolock) on  cFrom.productId = p.productId 
+                    left join InsiteDB.insite.productBase pb with (nolock) on p.productBaseId  = pb.productBaseId 
+                    left join InsiteDB.insite.historyMainline hmll with (nolock)on cFrom.OriginalcontainerId=hmll.historyid 
+                    left join InsiteDB.insite.product pp with (nolock) on c.productid=pp.productid 
+                    left join InsiteDB.insite.productfamily pf (nolock) on  pp.productFamilyId = pf.productFamilyId 
+                    left join InsiteDB.insite.productbase pbb with (nolock) on pp.productbaseid=pbb.productbaseid 
+                    left join InsiteDB.insite.dc_AOC_ManualInspection dc (nolock) on hmll.[HistoryMainlineId]=dc.[HistoryMainlineId] 
+                    WHERE dc.parametername='Trace_ID' and p.description like '%VCSEL%' and dc.[ParamValueString] like ('<Wafer>%') )";
+            sql = sql.Replace("<Wafer>", wafer);
+            var dbret = DBUtility.ExeRealMESSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var tempvm = new WaferSNMap();
+                tempvm.Wafer = wafer;
+                tempvm.SN = Convert.ToString(line[0]);
+                tempvm.CurrentWorkStep = Convert.ToString(line[1]);
+                tempvm.LastMoveDate = Convert.ToDateTime(line[2]);
+                ret.Add(tempvm);
+            }
             return ret;
         }
 
@@ -1907,83 +2013,83 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql, dict);
         }
 
-        public static void UpdateBITestResultWaferPN(DateTime StartDate)
-        {
-            var now = DateTime.Now;
-            while (StartDate < now)
-            {
-                var EndDate = StartDate.AddMonths(1);
-                var snlist = RetrieveBISNNoMaterialPN(StartDate,EndDate);
-                if (snlist.Count > 0)
-                {
-                    var pnwfsn = RealBIWaferBySN(snlist);
-                    foreach (var kv in pnwfsn)
-                    {
-                        var kvarray = kv.Key.Split(new string[] { ":::" }, StringSplitOptions.None);
-                        RealUpdateBITestResultWaferPN(kvarray[0], kvarray[1], kv.Value);
-                    }//end foreach
-                }//end if
-                StartDate = StartDate.AddMonths(1);
-            }//end while
-        }
+        //public static void UpdateBITestResultWaferPN(DateTime StartDate)
+        //{
+        //    var now = DateTime.Now;
+        //    while (StartDate < now)
+        //    {
+        //        var EndDate = StartDate.AddMonths(1);
+        //        var snlist = RetrieveBISNNoMaterialPN(StartDate,EndDate);
+        //        if (snlist.Count > 0)
+        //        {
+        //            var pnwfsn = RealBIWaferBySN(snlist);
+        //            foreach (var kv in pnwfsn)
+        //            {
+        //                var kvarray = kv.Key.Split(new string[] { ":::" }, StringSplitOptions.None);
+        //                RealUpdateBITestResultWaferPN(kvarray[0], kvarray[1], kv.Value);
+        //            }//end foreach
+        //        }//end if
+        //        StartDate = StartDate.AddMonths(1);
+        //    }//end while
+        //}
 
-        private static Dictionary<string, List<string>> RealBIWaferBySN(List<string> testresultlist)
-        {
-            var ret = new Dictionary<string, List<string>>();
+        //private static Dictionary<string, List<string>> RealBIWaferBySN(List<string> testresultlist)
+        //{
+        //    var ret = new Dictionary<string, List<string>>();
 
-            var sndict = new Dictionary<string, bool>();
-            foreach (var item in testresultlist)
-            {
-                if (!sndict.ContainsKey(item))
-                { sndict.Add(item, true); }
-            }
-            var snlist = sndict.Keys.ToList();
-            var startidx = 0;
-            var totalsn = snlist.Count;
+        //    var sndict = new Dictionary<string, bool>();
+        //    foreach (var item in testresultlist)
+        //    {
+        //        if (!sndict.ContainsKey(item))
+        //        { sndict.Add(item, true); }
+        //    }
+        //    var snlist = sndict.Keys.ToList();
+        //    var startidx = 0;
+        //    var totalsn = snlist.Count;
 
-            while (true)
-            {
-                var done = false;
-                var tempsnlist = new List<string>();
-                for (var idx = startidx; idx < startidx + 3000; idx++)
-                {
-                    if (idx < totalsn)
-                    {
-                        tempsnlist.Add(snlist[idx]);
-                    }
-                    else
-                    {
-                        done = true;
-                        break;
-                    }
-                }
+        //    while (true)
+        //    {
+        //        var done = false;
+        //        var tempsnlist = new List<string>();
+        //        for (var idx = startidx; idx < startidx + 3000; idx++)
+        //        {
+        //            if (idx < totalsn)
+        //            {
+        //                tempsnlist.Add(snlist[idx]);
+        //            }
+        //            else
+        //            {
+        //                done = true;
+        //                break;
+        //            }
+        //        }
 
-                if (tempsnlist.Count > 0)
-                {
-                    var pnwfsn = RealBIWaferBySN_private4up(tempsnlist);
-                    foreach (var kv in pnwfsn)
-                    {
-                        if (ret.ContainsKey(kv.Key))
-                        {
-                            ret[kv.Key].AddRange(kv.Value);
-                        }
-                        else
-                        {
-                            var templist = new List<string>();
-                            templist.AddRange(kv.Value);
-                            ret.Add(kv.Key, templist);
-                        }
-                    }
-                }
+        //        if (tempsnlist.Count > 0)
+        //        {
+        //            var pnwfsn = RealBIWaferBySN_private4up(tempsnlist);
+        //            foreach (var kv in pnwfsn)
+        //            {
+        //                if (ret.ContainsKey(kv.Key))
+        //                {
+        //                    ret[kv.Key].AddRange(kv.Value);
+        //                }
+        //                else
+        //                {
+        //                    var templist = new List<string>();
+        //                    templist.AddRange(kv.Value);
+        //                    ret.Add(kv.Key, templist);
+        //                }
+        //            }
+        //        }
 
-                if (done)
-                    break;
+        //        if (done)
+        //            break;
 
-                startidx = startidx + 3000;
-            }//end while(true)
+        //        startidx = startidx + 3000;
+        //    }//end while(true)
 
-            return ret;
-        }
+        //    return ret;
+        //}
 
         private static void RetrieveBIWaferBySN(List<BITestResult> testresultlist, Dictionary<string, BISNRelation> snwaferdict)
         {

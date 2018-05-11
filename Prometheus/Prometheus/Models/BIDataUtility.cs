@@ -1693,7 +1693,12 @@ namespace Prometheus.Models
                     var WaferNum = Convert.ToString(line[1]);
                     if (WaferNum.Length > 3)
                     {
-                        WaferNum = WaferNum.Substring(0, WaferNum.Length - 3);
+                        var fidx = WaferNum.IndexOf("-");
+                        if (fidx != -1 && WaferNum.Length >= (fidx + 3))
+                        {
+                            WaferNum = WaferNum.Substring(0, fidx + 3);
+                        }
+
                     }
                     var PN = Convert.ToString(line[2]);
 
@@ -1774,7 +1779,11 @@ namespace Prometheus.Models
                     var WaferNum = Convert.ToString(line[1]);
                     if (WaferNum.Length > 3)
                     {
-                        WaferNum = WaferNum.Substring(0, WaferNum.Length - 3);
+                        var fidx = WaferNum.IndexOf("-");
+                        if (fidx != -1 && WaferNum.Length >= (fidx + 3))
+                        {
+                            WaferNum = WaferNum.Substring(0, fidx + 3);
+                        }
                     }
                     var PN = Convert.ToString(line[2]);
                     if (!string.IsNullOrEmpty(WaferNum) && !string.IsNullOrEmpty(PN))
@@ -1850,30 +1859,34 @@ namespace Prometheus.Models
         //            var WaferNum = Convert.ToString(line[1]);
         //            if (WaferNum.Length > 3)
         //            {
-        //                WaferNum = WaferNum.Substring(0, WaferNum.Length - 3);
-        //            }
-        //            var PN = Convert.ToString(line[2]);
-        //            if (!string.IsNullOrEmpty(WaferNum) && !string.IsNullOrEmpty(PN))
-        //            {
-        //                var key = PN + ":::" + WaferNum;
-        //                if (ret.ContainsKey(key))
-        //                {
-        //                    ret[key].Add(SN);
-        //                }
-        //                else
-        //                {
-        //                    var templist = new List<string>();
-        //                    templist.Add(SN);
-        //                    ret.Add(key, templist);
-        //                }
-        //            }//end if
-        //        }//end foreach
-        //    }//end if
+        //                var fidx = WaferNum.IndexOf("-");
+                        //if (fidx != -1 && WaferNum.Length >= (fidx + 3))
+                        //{
+                        //    WaferNum = WaferNum.Substring(0, fidx + 3);
+                        //}
+    //            }
+    //            var PN = Convert.ToString(line[2]);
+    //            if (!string.IsNullOrEmpty(WaferNum) && !string.IsNullOrEmpty(PN))
+    //            {
+    //                var key = PN + ":::" + WaferNum;
+    //                if (ret.ContainsKey(key))
+    //                {
+    //                    ret[key].Add(SN);
+    //                }
+    //                else
+    //                {
+    //                    var templist = new List<string>();
+    //                    templist.Add(SN);
+    //                    ret.Add(key, templist);
+    //                }
+    //            }//end if
+    //        }//end foreach
+    //    }//end if
 
-        //    return ret;
-        //}
+    //    return ret;
+    //}
 
-        public static Dictionary<string,KeyValuePair<string,string>> RetrieveBIWaferBySN_SNDict(List<string> snlist)
+    public static Dictionary<string,KeyValuePair<string,string>> RetrieveBIWaferBySN_SNDict(List<string> snlist)
         {
             var ret = new Dictionary<string, KeyValuePair<string, string>>();
             if (snlist.Count == 0) return ret;
@@ -1921,7 +1934,11 @@ namespace Prometheus.Models
                     var WaferNum = Convert.ToString(line[1]);
                     if (WaferNum.Length > 3)
                     {
-                        WaferNum = WaferNum.Substring(0, WaferNum.Length - 3);
+                        var fidx = WaferNum.IndexOf("-");
+                        if (fidx != -1 && WaferNum.Length >= (fidx + 3))
+                        {
+                            WaferNum = WaferNum.Substring(0, fidx + 3);
+                        }
                     }
                     var BuildDate = Convert.ToDateTime(line[3]).ToString("yyyy-MM-dd HH:mm:ss");
                     if (!ret.ContainsKey(SN))
@@ -2185,7 +2202,11 @@ namespace Prometheus.Models
                 var WaferNum = Convert.ToString(line[1]);
                 if (WaferNum.Length > 3)
                 {
-                    WaferNum = WaferNum.Substring(0, WaferNum.Length - 3);
+                    var fidx = WaferNum.IndexOf("-");
+                    if (fidx != -1 && WaferNum.Length >= (fidx + 3))
+                    {
+                        WaferNum = WaferNum.Substring(0, fidx + 3);
+                    }
                 }
                 if (!string.IsNullOrEmpty(WaferNum))
                 {

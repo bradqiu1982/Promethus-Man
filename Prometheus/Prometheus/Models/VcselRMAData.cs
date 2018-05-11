@@ -217,7 +217,7 @@ namespace Prometheus.Models
         public static Dictionary<string, int> RetriveWaferCountDict()
         {
             var ret = new Dictionary<string, int>();
-            var sql = "select count(*) as cnt,Wafer from WaferSNMap group by Wafer";
+            var sql = "select cnt,Wafer from (select count(*) as cnt,Wafer from WaferSNMap group by Wafer) as subquery where cnt >=50";
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
             {

@@ -41,7 +41,7 @@ var BurnIn = function(){
 
     var distribution = function(){
         $('.date').datepicker({ autoclose: true, viewMode: "months", minViewMode: "months" });
-        $.post('/DataAnalyze/WaferNOAutoCompelete', {}, function (output) {
+        $.post('/DataAnalyze/WaferNumAutoCompelete', {}, function (output) {
             $('.wafer-no').tagsinput({
                 freeInput: false,
                 typeahead: {

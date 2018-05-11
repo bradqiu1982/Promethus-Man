@@ -53,7 +53,7 @@ namespace Prometheus.Models
         public static Dictionary<string, int> RetriveWaferCountDict()
         {
             var ret = new Dictionary<string, int>();
-            var sql = "select count(*) as cnt,Wafer VcselRMAData group by Wafer";
+            var sql = "select count(*) as cnt,Wafer from VcselRMAData group by Wafer";
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
             {
@@ -106,14 +106,15 @@ namespace Prometheus.Models
         }
         
         //return dict<month,dict<rate,count>>
-        public static Dictionary<string,Dictionary<string,int>> RetrieveRMACountByMonth()
+        public static Dictionary<string,Dictionary<string,int>> RetrieveRMACountByMonth(Dictionary<string, string> vtypedict)
         {
             var ret = new Dictionary<string, Dictionary<string, int>>();
-
             var vlist = RetrievAllDataASC();
             foreach (var v in vlist)
             {
                 var month = v.BuildDate.ToString("yyyy-MM");
+                if (!vtypedict.ContainsKey(v.VcselType))
+                { vtypedict.Add(v.VcselType,""); }
 
                 if (ret.ContainsKey(month))
                 {
@@ -132,6 +133,18 @@ namespace Prometheus.Models
                     var ratedict = new Dictionary<string, int>();
                     ratedict.Add(v.VcselType, 1);
                     ret.Add(month, ratedict);
+                }
+            }
+
+            //add type to all month 
+            foreach (var r in ret)
+            {
+                foreach (var vt in vtypedict)
+                {
+                    if (!r.Value.ContainsKey(vt.Key))
+                    {
+                        r.Value.Add(vt.Key, 0);
+                    }
                 }
             }
 
@@ -204,7 +217,7 @@ namespace Prometheus.Models
         public static Dictionary<string, int> RetriveWaferCountDict()
         {
             var ret = new Dictionary<string, int>();
-            var sql = "select count(*) as cnt,Wafer WaferSNMap group by Wafer";
+            var sql = "select count(*) as cnt,Wafer from WaferSNMap group by Wafer";
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
             {
@@ -239,6 +252,17 @@ namespace Prometheus.Models
     }
 
     public class VcselRMASum {
+        public static List<string> FMColor()
+        {
+            return new List<string> {
+                "#ff3399","#0099ff","#00b050","#7030a0",
+                "#105D9C","#23735D","#A55417","#821A08","#7030A0",
+                "#0C779D","#34AC8B","#D85C00","#CC044D","#B925A7",
+                "#4FADF3","#12CC92","#FA9604","#ED6161","#EF46FC",
+                "#8CC9F7","#BEEBDF","#FDEEC3","#F6B0B0","#EC88F4"
+            };
+        }
+
         public static List<VcselRMADPPM> RetrieveVcselDPPM()
         {
             var ret = new List<VcselRMADPPM>();
@@ -253,10 +277,33 @@ namespace Prometheus.Models
                     var tempvm = new VcselRMADPPM();
                     tempvm.Wafer = w.Wafer;
                     tempvm.ShippedQty = wafercntdict[w.Wafer];
-                    tempvm.DPPM = rmacntdict[w.Wafer] / wafercntdict[w.Wafer] * 10000;
+                    tempvm.DPPM = Math.Round((double)rmacntdict[w.Wafer] /(double)wafercntdict[w.Wafer] * 10000,2);
                     ret.Add(tempvm);
                 }
             }//end foreach
+            return ret;
+        }
+
+        public static List<object> VcselRMAMileStoneData()
+        {
+            var ret = new List<object>();
+            var vtypedict = new Dictionary<string, string>();
+            var rmacountdata = VcselRMAData.RetrieveRMACountByMonth(vtypedict);
+            ret.Add(rmacountdata);
+
+            var milelist = EngineeringMileStone.RetrieveVcselMileStone();
+            ret.Add(milelist);
+
+            var colorlist = VcselRMASum.FMColor();
+            var vtypekeylist = vtypedict.Keys.ToList();
+            var cidx = 0;
+            foreach (var vk in vtypekeylist)
+            {
+                vtypedict[vk] = colorlist[cidx % colorlist.Count];
+                cidx = cidx + 1;
+            }
+            ret.Add(vtypedict);
+
             return ret;
         }
 

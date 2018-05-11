@@ -77,6 +77,231 @@ namespace Prometheus.Controllers
             return pslist;
         }
 
+        public ActionResult VcselRMA()
+        {
+            return View();
+        }
+
+        public JsonResult VcselRMADppmData()
+        {
+            var dppmlist = VcselRMASum.RetrieveVcselDPPM();
+            var xdatalist = new List<string>();
+            var dppmdatalist = new List<double>();
+            var shippeddatalist = new List<double>();
+            foreach (var dppm in dppmlist)
+            {
+                xdatalist.Add(dppm.Wafer);
+                dppmdatalist.Add(dppm.DPPM);
+                shippeddatalist.Add(dppm.ShippedQty);
+            }
+
+            var xAxis = new {
+                data = xdatalist
+            };
+            var yAxis = new {
+                title = "Dppm"
+            };
+            var dppmdata = new {
+                name = "Dppm",
+                color = "#5CB85C",
+                data = dppmdatalist
+            };
+            var shipdata = new {
+                name = "Shipped",
+                color = "#12CC92",
+                data = shippeddatalist
+            };
+            var alldata = new {
+                data = dppmdata,
+                cdata = shipdata
+            };
+            var dppmline = new {
+                id = "vcsel_dppm",
+                title = "Vcsel RMA Dppm",
+                xAxis = xAxis,
+                yAxis = yAxis,
+                data = alldata
+            };
+
+            var ret = new JsonResult();
+            ret.Data = new {
+                success = true,
+                dppmline = dppmline
+            };
+            return ret;
+        }
+
+
+        public JsonResult VcselRMAMileStoneData()
+        {
+            var combinexdict = new Dictionary<string, bool>();
+            var retdata = VcselRMASum.VcselRMAMileStoneData();
+
+            //dict<month,dict<rate,count>>
+            var monthlyrma = (Dictionary<string, Dictionary<string, int>>)retdata[0];
+            var milestonedata = (List<EngineeringMileStone>)retdata[1];
+            var vratecolordict = (Dictionary<string, string>)retdata[2];
+
+
+            var vratelist = vratecolordict.Keys.ToList();
+            vratelist.Sort();
+
+            foreach (var item in monthlyrma)
+            {
+                if (!combinexdict.ContainsKey(item.Key))
+                { combinexdict.Add(item.Key,true); }
+            }
+
+            var milestonedict = new Dictionary<string, string>();
+            foreach (var item in milestonedata)
+            {
+                var month = item.ActionDate.ToString("yyyy-MM");
+                if (!combinexdict.ContainsKey(month))
+                { combinexdict.Add(month, true); }
+
+                if (milestonedict.ContainsKey(month))
+                {
+                    milestonedict[month] = milestonedict[month] + "<br/>" + item.Location + "_" + item.ActionDetail;
+                }
+                else
+                {
+                    milestonedict.Add(month, item.Location + "_" + item.ActionDetail);
+                }
+            }
+
+
+            var combinxlist = combinexdict.Keys.ToList();
+            combinxlist.Sort();
+
+            //dict<rate,countlist>
+            var ratecountbydate = new Dictionary<string, List<int>>();
+            var maxrmacount = 0;
+            //get rate count list of each date
+            foreach (var date in combinxlist)
+            {
+                if (monthlyrma.ContainsKey(date))
+                {
+                    var ratedict = monthlyrma[date];
+                    var datecount = 0;
+                    foreach (var ratekv in ratedict)
+                    {
+                        if (ratecountbydate.ContainsKey(ratekv.Key))
+                        {
+                            ratecountbydate[ratekv.Key].Add(ratekv.Value);
+                            datecount += ratekv.Value;
+                        }
+                        else
+                        {
+                            var templist = new List<int>();
+                            templist.Add(ratekv.Value);
+                            ratecountbydate.Add(ratekv.Key, templist);
+                            datecount += ratekv.Value;
+                        }
+                    }
+
+                    if (datecount > maxrmacount) { maxrmacount = datecount; }
+                }
+                else
+                {
+                    foreach (var rate in vratelist)
+                    {
+                        if (ratecountbydate.ContainsKey(rate))
+                        {
+                            ratecountbydate[rate].Add(0);
+                        }
+                        else
+                        {
+                            var templist = new List<int>();
+                            templist.Add(0);
+                            ratecountbydate.Add(rate, templist);
+                        }
+                    }
+                }
+            }//end foreach
+
+            maxrmacount = maxrmacount + 1;
+
+
+            //construct milestone data array
+            var idx = 0;
+            var milestoneinfoarray = new List<object>();
+            foreach (var date in combinxlist)
+            {
+                if (milestonedict.ContainsKey(date))
+                {
+                    milestoneinfoarray.Add(new {
+                        x = idx,
+                        y = maxrmacount,
+                        name = milestonedict[date]
+                    });
+                }
+                idx = idx + 1;
+            }
+            //construct milestone struct
+            var mstmarker = new
+            {
+                radius = 6,
+                symbol = "circle",
+                fillColor = "#fff",
+                lineColor = "#ffc000",
+                lineWidth = 2
+            };
+            var msttooltip = new
+            {
+                useHTML = true,
+                headerFormat = "<span style='font-size: 10px'>{point.x}</span><br/>",
+                pointFormat = "{point.name}"
+            };
+
+            var mstseria = new
+            {
+                type = "scatter",
+                name = "Milestone",
+                marker = mstmarker,
+                tooltip = msttooltip,
+                data = milestoneinfoarray
+            };
+
+
+            //construct vcsel rate column data
+            var serialarray = new List<object>();
+            foreach (var rate in vratelist)
+            {
+                serialarray.Add(new {
+                    name = rate,
+                    color = vratecolordict[rate],
+                    data = ratecountbydate[rate]
+                });
+            }
+            serialarray.Add(mstseria);
+
+            var allx = new { data = combinxlist };
+            var ally = new { title = "Amount" };
+            var time = new {
+                name = "Milestone",
+                color = "#F0AD4E",
+                data = maxrmacount
+            };
+
+            var vcsel_milestone = new {
+                id = "vcsel_milestone",
+                title = "Vcsel RMA Statistic By Month",
+                coltype = "normal",
+                xAxis = allx,
+                yAxis = ally,
+                time = time,
+                data = serialarray
+            };
+
+            var ret = new JsonResult();
+            ret.Data = new
+            {
+                success = true,
+                vcsel_milestone = vcsel_milestone
+            };
+            return ret;
+        }
+
 
         public ActionResult MonthlyVcsel()
         {
@@ -290,7 +515,7 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        public JsonResult WaferNOAutoCompelete()
+        public JsonResult WaferNumAutoCompelete()
         {
             var vlist = VcselBGDVM.WaferNOList();
             var ret = new JsonResult();

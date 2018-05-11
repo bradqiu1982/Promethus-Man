@@ -3497,6 +3497,11 @@ namespace Prometheus.Models
                 tempvm.ActionDate = DateTime.Parse(line[2]);
                 tempvm.Location = line[3];
                 tempvm.ActionDetail = line[0] + " # " + line[4];
+                tempvm.AppendInfo = line[0];
+                if (string.IsNullOrEmpty(tempvm.AppendInfo))
+                {
+                    tempvm.AppendInfo = "OTHERS";
+                }
                 milestonelist.Add(tempvm);
             }
 
@@ -3509,7 +3514,7 @@ namespace Prometheus.Models
             var vcselrmafile = ExternalDataCollector.DownloadShareFile(syscfg["VCSELRMASHARE"], ctrl);
             if (vcselrmafile != null && ExternalDataCollector.FileExist(ctrl, vcselrmafile))
             {
-                //SolveVcselRMAData(ctrl, vcselrmafile);
+                SolveVcselRMAData(ctrl, vcselrmafile);
                 SolveMailStoneData(ctrl, vcselrmafile);
             }//end if
         }

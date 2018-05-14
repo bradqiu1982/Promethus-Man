@@ -1,0 +1,97 @@
+﻿
+@{
+    ViewBag.Title = "Transfer";
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
+}
+<script src="~/Scripts/autocompletefill.js"></script>
+<script type="text/javascript" src="~/Scripts/project.js"></script>
+<script>
+    $(function () {
+        Project.transfer();
+    })
+    function chooserelatedpeople(id) {
+        document.getElementById('towhoinput').value = document.getElementById(id).value;
+        $("#input_id").val(id);
+        $('#relatedmodal').modal({ backdrop: 'static' });
+    }
+
+    function fillreleatepeople() {
+        $('#relatedmodal').modal('hide');
+        var id = $("#input_id").val();
+        document.getElementById(id).value = document.getElementById('towhoinput').value;
+        document.getElementById(id).focus();
+    }
+</script>
+
+<div class="row">
+    <div class="nav navbar-nav navbar-left">
+        <img src="~/Content/images/ucicon/IProjectIcons.png" height="40" width="40">
+    </div>
+    <div class="nav navbar-nav navbar-left">
+        <ol class="breadcrumb">
+            <li data-toggle="modal" data-target="#myModal">
+                <a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll" data-intro="Back to ALL Project."
+                   data-step="6">All Projects</a>
+            </li>
+            <li><a href="/Project/ProjectDetail?ProjectKey=@(ViewBag.ProjectKey)">@(ViewBag.ProjectKey)</a></li>
+            <li class="active">Project Transfer</li>
+        </ol>
+    </div>
+</div>
+<div class="pro-content">
+    <input type="hidden" id="pkey" name="pkey" value="@ViewBag.ProjectKey" />
+    <div class="row row-margin">
+        <label class="col-xs-3">Transfer to: </label>
+        <div class="col-xs-6">
+            <select class="form-control" id="transfer-to" name="transfer-to">
+                <option value="ME">ME</option>
+            </select>
+        </div>
+    </div>
+    <div class="row row-margin">
+        <label class="col-xs-3">Manufacturer Engineer:</label>
+        <div class="col-xs-6">
+            <textarea class="form-control" rows="2" id="melist" name="melist" onclick="chooserelatedpeople('melist')" >@ViewBag.MeList</textarea>
+            <label><red>* If project transfer to ME, the first ME will be owner of this project.</red></label>
+        </div>
+    </div>
+    <div class="row row-margin">
+        <input type="button" class="btn btn-success" id="btn-submit" name="btn-submit" value="Submit" />
+    </div>
+</div>
+
+<div class="modal" id="relatedmodal" tabindex="-1" role="dialog" aria-labelledby="relatedmodalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="relatedmodalLabel">Choose People</h4>
+            </div>
+            <div class="row"></div>
+            <div class="row col-xs-12">
+                <div class="col-xs-3">
+                    <label class="control-label">To Who</label>
+                </div>
+                <div class="col-xs-9">
+                    <input class="form-control" id="towholist" name="towholist"
+                           type="text" value="" />
+                </div>
+                <script type="text/javascript">
+                        autoCompleteFill('towholist', @Html.Raw(ViewBag.AllUserList), true, 'towhoinput');
+                </script>
+            </div>
+            <hr />
+            <div class="row col-xs-12">
+                <div class="col-xs-3">
+                    <label class="control-label">To who Input</label>
+                </div>
+                <div class="col-xs-9" data-toggle="tooltip" data-placement="center" title="Exampel: Email Address; Email Address;Email Address;...">
+                    <textarea class="form-control col-xs-12" name="towhoinput" id="towhoinput" style="height:100px;min-width:300px;"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" id="input_id" name="input_id" />
+                <button type="button" class="btn btn-success" onclick="fillreleatepeople()">OK</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -197,11 +197,11 @@ namespace Prometheus.Models
                     string lastupdatetime = ProjectTestData.RetrieveLatestTimeOfLocalProject(projectkey);
                     if (!string.IsNullOrEmpty(lastupdatetime))
                     {
-                        MESUtility.UpdateOSAProjectData(vm, lastupdatetime, ctrl);
+                        MESUtility.UpdateOSAProjectData(vm, lastupdatetime, ctrl, !string.IsNullOrEmpty(vm.TransferFlg));
                     }
                     else
                     {
-                        MESUtility.UpdateOSAProjectData(vm, vm.StartDate.ToString(), ctrl);
+                        MESUtility.UpdateOSAProjectData(vm, vm.StartDate.ToString(), ctrl, !string.IsNullOrEmpty(vm.TransferFlg));
                     }
                 }
 

@@ -396,9 +396,10 @@ namespace Prometheus.Controllers
                             }
 
                             var firstengineer = "";
+                            var role = string.IsNullOrEmpty(pj.TransferFlg) ? ProjectViewModels.ENGROLE : ProjectViewModels.MEROLE;
                             foreach (var m in pj.MemberList)
                             {
-                                if (string.Compare(m.Role, ProjectViewModels.ENGROLE) == 0)
+                                if (string.Compare(m.Role, role) == 0)
                                 {
                                     firstengineer = m.Name;
                                     break;

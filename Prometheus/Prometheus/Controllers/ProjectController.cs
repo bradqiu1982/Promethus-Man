@@ -6143,7 +6143,9 @@ namespace Prometheus.Controllers
 
             while (true)
             {
-                if (!VcselMonthData.MonthDataExist(vcselbgdzeropoint) || (thismonth == vcselbgdzeropoint.Month))
+                if (!VcselMonthData.MonthDataExist(vcselbgdzeropoint) 
+                    || (thismonth == vcselbgdzeropoint.Month && DateTime.Now.Year == vcselbgdzeropoint.Year)
+                    || (thismonth-1 == vcselbgdzeropoint.Month && DateTime.Now.Year == vcselbgdzeropoint.Year))
                 {
                     var currenttime = DateTime.Now;
                     if (currenttime.Hour > 18 || vcselbgdzeropoint > currenttime)
@@ -6559,7 +6561,7 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
-            //ExternalDataCollector.RefreshVcselRMAData(this);
+            ExternalDataCollector.RefreshVcselRMAData(this);
 
             //BIDataUtility.UpdateBITestResultWaferPN(DateTime.Parse("2017-10-01 00:00:00"));
 

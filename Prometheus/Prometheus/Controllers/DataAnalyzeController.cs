@@ -77,14 +77,27 @@ namespace Prometheus.Controllers
             return pslist;
         }
 
-        public ActionResult VcselRMA()
+        public ActionResult VcselRMA(string rate)
         {
+            var defval = " ";
+            if (!string.IsNullOrEmpty(rate))
+            { defval = rate; }
+
+            var rlist = VcselRMAData.RetrieveVcselType();
+            var ratelist = new List<string>();
+            ratelist.Add(" ");
+            ratelist.AddRange(rlist);
+
+            ViewBag.vcselratelist = CreateSelectList(ratelist, defval);
+
             return View();
         }
 
         public JsonResult VcselRMADppmData()
         {
-            var dppmlist = VcselRMASum.RetrieveVcselDPPM();
+            var rate = Request.Form["rate"];
+            var dppmlist = VcselRMASum.RetrieveVcselDPPM(rate);
+
             var xdatalist = new List<string>();
             var dppmdatalist = new List<double>();
             var shippeddatalist = new List<double>();

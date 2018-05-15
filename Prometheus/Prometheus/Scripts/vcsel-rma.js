@@ -1,6 +1,10 @@
 var VCSEL_RMA = function(){
-    var show = function(){
-        $.post('/DataAnalyze/VcselRMADppmData', {}, function (output) {
+    var show = function () {
+        var rate = $("#vcselratelist").val();
+
+        $.post('/DataAnalyze/VcselRMADppmData',
+            { rate : rate },
+            function (output) {
             if (output.success) {
                 drawline(output.dppmline);
             }
@@ -17,6 +21,8 @@ var VCSEL_RMA = function(){
                 drawcolumn(output.vcsel_milestone);
             }
         });
+
+
     }
 
 

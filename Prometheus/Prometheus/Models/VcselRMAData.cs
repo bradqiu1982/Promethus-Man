@@ -222,6 +222,8 @@ namespace Prometheus.Models
             SN = "";
             CurrentWorkStep = "";
             LastMoveDate = DateTime.Parse("1982-05-06 10:00:00");
+            PN = "";
+            PNDesc = "";
         }
 
         public static bool WaferExist(string wafer)
@@ -251,12 +253,14 @@ namespace Prometheus.Models
 
         public void StoreData()
         {
-            var sql = "insert into WaferSNMap(Wafer,SN,CurrentWorkStep,LastMoveDate) values(@Wafer,@SN,@CurrentWorkStep,@LastMoveDate)";
+            var sql = "insert into WaferSNMap(Wafer,SN,CurrentWorkStep,LastMoveDate,PN,PNDesc) values(@Wafer,@SN,@CurrentWorkStep,@LastMoveDate,@PN,@PNDesc)";
             var dict = new Dictionary<string, string>();
             dict.Add("@Wafer", Wafer);
             dict.Add("@SN", SN);
             dict.Add("@CurrentWorkStep", CurrentWorkStep);
             dict.Add("@LastMoveDate", LastMoveDate.ToString("yyyy-MM-dd HH:mm:ss"));
+            dict.Add("@PN", PN);
+            dict.Add("@PNDesc", PNDesc);
             DBUtility.ExeLocalSqlNoRes(sql, dict);
         }
 
@@ -281,6 +285,8 @@ namespace Prometheus.Models
         public string SN { set; get; }
         public string CurrentWorkStep { set; get; }
         public DateTime LastMoveDate { set; get; }
+        public string PN { set; get; }
+        public string PNDesc { set; get; }
     }
 
     public class VcselRMADPPM

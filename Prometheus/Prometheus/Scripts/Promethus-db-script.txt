@@ -1443,7 +1443,9 @@ CREATE TABLE [dbo].[WaferSNMap] (
     [Wafer]   NVARCHAR (200) DEFAULT ('') NOT NULL,
 	[SN]   NVARCHAR (200) DEFAULT ('') NOT NULL,
 	[CurrentWorkStep] NVARCHAR (300) DEFAULT ('') NOT NULL,
-	[LastMoveDate]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+	[LastMoveDate]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[PN]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[PNDesc] NVARCHAR (300) DEFAULT ('') NOT NULL
 	);
 
 CREATE TABLE [dbo].[EngineeringMileStone] (

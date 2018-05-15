@@ -11,6 +11,12 @@ var VCSEL_RMA = function(){
                 drawcolumn(output.vcsel_milestone);
             }
         });
+
+        $.post('/DataAnalyze/VcselRMAMileStoneData?datetype=SHIPDATE', {}, function (output) {
+            if (output.success) {
+                drawcolumn(output.vcsel_milestone);
+            }
+        });
     }
 
 

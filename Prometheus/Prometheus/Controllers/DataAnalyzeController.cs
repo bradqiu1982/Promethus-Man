@@ -132,10 +132,25 @@ namespace Prometheus.Controllers
         }
 
 
-        public JsonResult VcselRMAMileStoneData()
+        public JsonResult VcselRMAMileStoneData(string datetype)
         {
             var combinexdict = new Dictionary<string, bool>();
-            var retdata = VcselRMASum.VcselRMAMileStoneData();
+            var retdata = new List<object>();
+            var id = "vcsel_milestone";
+            var title = "Vcsel RMA Statistic By Build Month";
+            if (!string.IsNullOrEmpty(datetype) && datetype.ToUpper().Contains("SHIPDATE"))
+            {
+                retdata = VcselRMASum.VcselRMAMileStoneDataByShipDate();
+                id = "vcsel_milestone_ship";
+                title = "Vcsel RMA Statistic By Ship Month";
+            }
+            else
+            {
+                retdata = VcselRMASum.VcselRMAMileStoneDataByBuildDate();
+                id = "vcsel_milestone";
+                title = "Vcsel RMA Statistic By Build Month";
+            }
+
 
             //dict<month,dict<rate,count>>
             var monthlyrma = (Dictionary<string, Dictionary<string, int>>)retdata[0];
@@ -284,8 +299,8 @@ namespace Prometheus.Controllers
             };
 
             var vcsel_milestone = new {
-                id = "vcsel_milestone",
-                title = "Vcsel RMA Statistic By Month",
+                id = id,
+                title = title,
                 coltype = "normal",
                 xAxis = allx,
                 yAxis = ally,
@@ -301,6 +316,7 @@ namespace Prometheus.Controllers
             };
             return ret;
         }
+
 
 
         public ActionResult MonthlyVcsel()

@@ -403,7 +403,7 @@ namespace Prometheus.Models
                             IssueViewModels.CloseIssueAutomaticllyWithFailedSN(item.ProjectKey, item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"),ctrl);
                         }
 
-                        CreateSystemIssues(failurelist);
+                        CreateSystemIssues(failurelist, !string.IsNullOrEmpty(vm.TransferFlg));
                     }
 
                     if (vm.FinishRating < 90 && DateTime.Parse(starttime) != vm.StartDate)
@@ -476,15 +476,16 @@ namespace Prometheus.Models
             return ret;
         }
 
-        private static void CreateSystemIssues(List<ProjectTestData> failurelist)
+        private static void CreateSystemIssues(List<ProjectTestData> failurelist, bool transflg = false)
         {
             if (failurelist.Count > 0)
             {
                 var pj = ProjectViewModels.RetrieveOneProject(failurelist[0].ProjectKey);
                 var firstengineer = "";
+                var role = transflg ? ProjectViewModels.MEROLE : ProjectViewModels.ENGROLE;
                 foreach (var m in pj.MemberList)
                 {
-                    if (string.Compare(m.Role, ProjectViewModels.ENGROLE) == 0)
+                    if (string.Compare(m.Role, role) == 0)
                     {
                         firstengineer = m.Name;
                         break;

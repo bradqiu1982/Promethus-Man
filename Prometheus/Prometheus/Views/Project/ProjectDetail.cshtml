@@ -197,28 +197,22 @@
 
     <div class="form-group" data-intro="Project status." data-step="3">
         <div MYTP="yello" class="row">
+            <div class="col-xs-1 text-left" style="font-family:'Arial Narrow';font-size:18px"><label class="control-label"><strong>Status</strong></label></div>
             @if (!string.IsNullOrEmpty(projectdata.CurrentNPIProc)
-                             && !string.IsNullOrEmpty(projectdata.PIP1Date)
-                             && !string.IsNullOrEmpty(projectdata.MVTDate))
+                    && !string.IsNullOrEmpty(projectdata.PIP1Date)
+                    && !string.IsNullOrEmpty(projectdata.MVTDate))
             {
-
-                <div class="col-xs-2 text-left" style="font-family:'Arial Narrow';font-size:18px"><strong>Status</strong></div>
-                        <div class="col-xs-1 text-left active"><a href="/Issue/UpdateIssue?issuekey=@projectdata.CurrentNPIProcKey">@projectdata.CurrentNPIProc</a></div>
-                        <div class="col-xs-2 text-left active">@projectdata.PIP1Date</div>
-                        <div class="col-xs-2 text-left active">@projectdata.MVTDate</div>
-                        <div class="col-xs-1 text-left"></div>
+                <div class="col-xs-1 text-left active"><a href="/Issue/UpdateIssue?issuekey=@projectdata.CurrentNPIProcKey">@projectdata.CurrentNPIProc</a></div>
+                <div class="col-xs-2 text-left active">@projectdata.PIP1Date</div>
+                <div class="col-xs-2 text-left active">@projectdata.MVTDate</div>
             }
-            else
-            {
-                <div class="col-xs-1 text-left" style="font-family:'Arial Narrow';font-size:18px"><label class="control-label"><strong>Status</strong></label></div>
-                        <div class="col-xs-1 text-left"></div>
-                        <div class="col-xs-7 text-left"></div>
-            }
-            <div class="col-xs-3 text-left"></div>
         </div>
+        @if (!string.IsNullOrEmpty(projectdata.TransferFlg)) {
+            <div class="pro-transfer">Transfer To <strong>@projectdata.TransferFlg</strong></div>
+        }
     </div>
 
-            <hr style="border-color:#006DC0;margin-bottom: 40px;" />
+    <hr style="border-color:#006DC0;margin-bottom: 40px;" />
 
     if (string.Compare(projectdata.ProjectType, Prometheus.Models.ProjectTypeInf.QM) != 0)
     {
@@ -384,6 +378,13 @@
                             </div>
 
                             <div class="col-xs-2">
+                                <div class="col-xs-3"></div>
+                                <div class="col-xs-6" data-toggle="modal" data-target="#myModal">
+                                    <div class="row" data-toggle="tooltip" title="Project Transfer">
+                                        <a href="/Project/Transfer?PJKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/Transfer.png" style="height:75px; width:75px"></a>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3"></div>
                             </div>
                         }
 

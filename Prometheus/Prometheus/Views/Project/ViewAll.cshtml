@@ -75,7 +75,15 @@
                                             <strong>@item.ProjectName</strong>
                                         }
                                         </div>
-
+                                        @if (!string.IsNullOrEmpty(item.TransferFlg))
+                                        {
+                                            <div class="row text-left">
+                                                <div class="col-xs-1"></div>
+                                                <div class="col-xs-11">
+                                                    <red>Transfer to @item.TransferFlg</red>
+                                                </div>
+                                            </div>
+                                        }
                                         @if (!string.IsNullOrEmpty(item.CurrentNPIProc)
                                                 && !string.IsNullOrEmpty(item.PIP1Date)
                                                 && !string.IsNullOrEmpty(item.MVTDate))

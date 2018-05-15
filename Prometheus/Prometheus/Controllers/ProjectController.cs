@@ -8430,6 +8430,8 @@ namespace Prometheus.Controllers
                     starttime = DateTime.Now.AddMonths(-2).ToString("yyyy-MM-dd HH:mm:ss");
                     endtime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                 }
+                ViewBag.sDate = Convert.ToDateTime(starttime).ToString("yyyy-MM-dd");
+                ViewBag.eDate = Convert.ToDateTime(endtime).ToString("yyyy-MM-dd");
 
                 var dayspan = (DateTime.Parse(endtime) - DateTime.Parse(starttime)).Days;
 
@@ -8633,7 +8635,64 @@ namespace Prometheus.Controllers
             ViewBag.fm = FM;
             return View();
         }
-        
+        public ActionResult Transfer(string PJKey)
+        {
+            var pro_info = ProjectViewModels.RetrieveOneProject(PJKey);
+            ViewBag.MeList = string.Empty;
+            if (pro_info != null)
+            {
+                if (pro_info.MemberList.Count > 0)
+                {
+                    var melist = new List<string>();
+                    foreach (var mem in pro_info.MemberList)
+                    {
+                        if (string.Compare(mem.Role, ProjectViewModels.MEROLE, true) == 0)
+                        {
+                            melist.Add(mem.Name.ToUpper());
+                        }
+                    }
+                    if (melist.Count > 0)
+                    {
+                        ViewBag.MeList = string.Join(";", melist);
+                    }
+                }
+            }
+            var asilist = UserViewModels.RetrieveAllUser();
+            ViewBag.AllUserList = "[\"" + string.Join("\",\"", asilist.ToArray()) + "\"]";
+
+            ViewBag.ProjectKey = PJKey;
+            return View();
+        }
+
+        [HttpPost]
+        public JsonResult SubmitTransfer()
+        {
+            var pkey = Request.Form["pKey"];
+            var trans_to = Request.Form["trans_to"];
+            var melist = Request.Form["melist"];
+
+
+            var res = new JsonResult();
+            if (string.IsNullOrEmpty(pkey) || string.IsNullOrEmpty(trans_to) || string.IsNullOrEmpty(melist))
+            {
+                res.Data = new { success = false };
+            }
+            else
+            {
+                var pro_info = ProjectViewModels.RetrieveOneProject(pkey);
+                if (string.Compare(pro_info.MeListStr, melist, true) != 0)
+                {
+                    //update project me
+                    var n_melist = melist.Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                    ProjectViewModels.UpdateProjectMemberbyRole(pkey, ProjectViewModels.MEROLE, n_melist);
+                }
+                //update transfer flag
+                ProjectViewModels.ProjectTransfer(pkey, trans_to);
+
+                res.Data = new { success = true };
+            }
+            return res;
+        }
     }
 
 }

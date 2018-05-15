@@ -2549,23 +2549,14 @@ namespace Prometheus.Controllers
             ViewBag.userreportlist = WeeklyReportVM.GetUserLatestTime("'" + string.Join("','", userlist) + "'");
 
             //user's project list
-            var projectlist = UserViewModels.RetrieveUserProjectKeyDict(username);
-
-            //task project
-            var taskprojectlist = UserViewModels.GetUserProjects(username);
-
-            if (taskprojectlist.Count > 0)
+            var projectstr = UserViewModels.RetrieveUserProjectKeyStr(username);
+            var projectlist = new List<string>();
+            if (!string.IsNullOrEmpty(projectstr))
             {
-                foreach (var pro in taskprojectlist)
-                {
-                    if (!projectlist.ContainsKey(pro.Key))
-                    {
-                        projectlist.Add(pro.Key, pro.Value);
-                    }
-                }
+                projectlist = projectstr.Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries).ToList();
             }
-
-
+            //all project
+            var taskprojectlist = UserViewModels.GetUserProjects(username, projectlist);
             var dayofweek = Convert.ToInt32(DateTime.Now.DayOfWeek);
             var sDate = DateTime.Now.AddDays((4 - dayofweek) - 7).ToString("yyyy-MM-dd 07:30:00");
             var stDate = DateTime.Now.AddDays((4 - dayofweek) - 7).AddDays(1).ToString("yyyy-MM-dd 07:30:00");
@@ -2586,45 +2577,55 @@ namespace Prometheus.Controllers
             var DebugTreeList = new Dictionary<string, List<ProjectErrorViewModels>>();
             var setting = WeeklyReportSetting.GetWeeklyReportSetting(username);
 
-            foreach (var project in projectlist)
+            foreach (var project in taskprojectlist)
             {
                 var task_total = 0;
 
                 //yield
-                if (setting.Yield == 1)
+                if (string.IsNullOrEmpty(project.Value.TransferFlg))
                 {
-                    YieldDataList.Add(project.Key, getProjectYield(project.Key, sDate, eDate));
-                }
+                    if (setting.Yield == 1)
+                    {
+                        YieldDataList.Add(project.Key, getProjectYield(project.Key, sDate, eDate));
+                    }
+                    //i care
+                    if (setting.ICare == 1)
+                    {
+                        historyIcareList.Add(project.Key, getIcareTask(username, project.Key, 0, stDate, cDate));
+                        var icarelist_tmp = getIcareTask(username, project.Key, 1, stDate, cDate);
+                        task_total += icarelist_tmp.TaskList.Count;
+                        icareList.Add(project.Key, icarelist_tmp);
+                        //debug tree
+                        icareDebugTree.Add(project.Key, ProjectErrorICareVM.GetProjectErrorICareList(username, project.Key, stDate, cDate, this));
+                    }
 
-                //i care
-                if (setting.ICare == 1)
-                {
-                    historyIcareList.Add(project.Key, getIcareTask(username, project.Key, 0, stDate, cDate));
-                    var icarelist_tmp = getIcareTask(username, project.Key, 1, stDate, cDate);
-                    task_total += icarelist_tmp.TaskList.Count;
-                    icareList.Add(project.Key, icarelist_tmp);
+                    //task
+                    if (setting.Task == 1)
+                    {
+                        historyTaskList.Add(project.Key, getProjectTask(username, project.Key, 0, stDate, cDate, ISSUESUBTYPE.Task));
+                        var taskList_tmp = getProjectTask(username, project.Key, 1, stDate, cDate, ISSUESUBTYPE.Task);
+                        task_total += taskList_tmp.TaskList.Count;
+                        taskList.Add(project.Key, taskList_tmp);
+                    }
+
+                    //critical failure task
+                    if (setting.CriticalFailure == 1)
+                    {
+                        historyCriList.Add(project.Key, getProjectTask(username, project.Key, 0, stDate, cDate, ISSUESUBTYPE.CrititalFailureTask, false));
+                        var criList_tmp = getProjectTask(username, project.Key, 1, stDate, cDate, ISSUESUBTYPE.CrititalFailureTask, false);
+                        task_total += criList_tmp.TaskList.Count;
+                        criticalList.Add(project.Key, criList_tmp);
+                    }
+
                     //debug tree
-                    icareDebugTree.Add(project.Key, ProjectErrorICareVM.GetProjectErrorICareList(username, project.Key, stDate, cDate, this));
-                }
+                    if (setting.DebugTree == 1)
+                    {
+                        DebugTreeList.Add(project.Key, ProjectErrorViewModels.RetrieveWeeklyErrorByPJKey(project.Key, stDate, cDate, this));
+                    }
 
-                //task
-                if (setting.Task == 1)
-                {
-                    historyTaskList.Add(project.Key, getProjectTask(username, project.Key, 0, stDate, cDate, ISSUESUBTYPE.Task));
-                    var taskList_tmp = getProjectTask(username, project.Key, 1, stDate, cDate, ISSUESUBTYPE.Task);
-                    task_total += taskList_tmp.TaskList.Count;
-                    taskList.Add(project.Key, taskList_tmp);
+                    //get current week summary
+                    SummaryList.Add(project.Key, getCurWeekSummary(project.Key, stDate, cDate));
                 }
-
-                //critical failure task
-                if (setting.CriticalFailure == 1)
-                {
-                    historyCriList.Add(project.Key, getProjectTask(username, project.Key, 0, stDate, cDate, ISSUESUBTYPE.CrititalFailureTask, false));
-                    var criList_tmp = getProjectTask(username, project.Key, 1, stDate, cDate, ISSUESUBTYPE.CrititalFailureTask, false);
-                    task_total += criList_tmp.TaskList.Count;
-                    criticalList.Add(project.Key, criList_tmp);
-                }
-
                 //rma
                 if (setting.RMA == 1)
                 {
@@ -2634,16 +2635,10 @@ namespace Prometheus.Controllers
                     RMAList.Add(project.Key, rmaList_tmp);
                 }
 
-                //debug tree
-                if (setting.DebugTree == 1)
+                if(string.IsNullOrEmpty(project.Value.TransferFlg) || task_total != 0)
                 {
-                    DebugTreeList.Add(project.Key, ProjectErrorViewModels.RetrieveWeeklyErrorByPJKey(project.Key, stDate, cDate, this));
+                    ProjectKeyList.Add(project.Key, task_total);
                 }
-
-                //get current week summary
-                SummaryList.Add(project.Key, getCurWeekSummary(project.Key, stDate, cDate));
-
-                ProjectKeyList.Add(project.Key, task_total);
             }
 
             ViewBag.setting = setting;

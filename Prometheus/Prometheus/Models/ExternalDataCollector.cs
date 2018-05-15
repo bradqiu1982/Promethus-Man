@@ -3648,6 +3648,13 @@ namespace Prometheus.Models
                 }
                 else
                 {
+                    var issues = IssueViewModels.RetrieveIssueBySN(td.ModuleSerialNum, ctrl);
+                    foreach (var item in issues)
+                    {
+                        if (item.ReportDate.Equals(td.TestTimeStamp))
+                        { return; }
+                    }
+
                     var desc = "Module " + td.ModuleSerialNum + " latest status is: failed on " + td.WhichTest + " @ " + td.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss");
                     IssueViewModels.CloseIssueAutomaticlly(td.ModuleSerialNum, desc, ctrl);
 
@@ -3660,8 +3667,8 @@ namespace Prometheus.Models
                     vm.ModuleSN = td.ModuleSerialNum;
                     vm.ErrAbbr = td.ErrAbbr;
                     vm.Priority = ISSUEPR.Major;
-                    vm.DueDate = now.AddDays(7);
-                    vm.ReportDate = DateTime.Now;
+                    vm.DueDate = td.TestTimeStamp.AddDays(7);
+                    vm.ReportDate = td.TestTimeStamp;
                     vm.Assignee = asignee;
                     vm.Reporter = asignee;
                     vm.Creator = asignee;

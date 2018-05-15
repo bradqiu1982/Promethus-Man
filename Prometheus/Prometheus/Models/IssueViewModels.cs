@@ -1550,8 +1550,8 @@ namespace Prometheus.Models
             var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,"
                 + "DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,"
                 + "RelativePeoples,APVal2,ModuleSN,DataID,ErrAbbr from Issue "
-                + " where  APVal1 <> 'delete' and  ParentIssueKey = '' and ModuleSN = '<ModuleSN>' order by ReportDate DESC";
-            sql = sql.Replace("<ModuleSN>", sn);
+                + " where  APVal1 <> 'delete' and  ParentIssueKey = '' and ModuleSN = '<ModuleSN>'  and Resolution <> '<AutoClose>' order by ReportDate DESC";
+            sql = sql.Replace("<ModuleSN>", sn).Replace("<AutoClose>",Resolute.AutoClose);
 
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)

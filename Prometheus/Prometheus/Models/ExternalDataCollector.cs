@@ -2889,7 +2889,7 @@ namespace Prometheus.Models
                 toaddrs.Add(vm.Assignee);
                 toaddrs.Add(vm.Reporter);
                 EmailUtility.SendEmail(ctrl, "WUXI Engineering System", toaddrs, content);
-                new System.Threading.ManualResetEvent(false).WaitOne(200);
+                new System.Threading.ManualResetEvent(false).WaitOne(50);
             }
         }
 
@@ -3516,6 +3516,190 @@ namespace Prometheus.Models
             {
                 SolveVcselRMAData(ctrl, vcselrmafile);
                 SolveMailStoneData(ctrl, vcselrmafile);
+            }//end if
+        }
+
+        #endregion
+
+        #region MONITOROQMJO
+        private static Dictionary<string, bool> RetrieveOpeningOQMJo()
+        {
+            var oqmlist = new Dictionary<string, bool>();
+            var sql = "select JONumber from JOBaseInfo where BRKey = 'OQM' and JORealStatus = 'OPEN'";
+            var dbret = DBUtility.ExeNebulaSqlWithRes(sql, null);
+            {
+                foreach (var line in dbret)
+                {
+                    var jo = Conver2Str(line[0]);
+                    if (!string.IsNullOrEmpty(jo) && !oqmlist.ContainsKey(jo))
+                    { oqmlist.Add(jo, true); }
+                }
+            }
+            return oqmlist;
+        }
+
+        public static Dictionary<string, string> RetrieveSNFromJo(Dictionary<string, bool> oqmjolist)
+        {
+            var snlist = new Dictionary<string, string>();
+
+            StringBuilder sb1 = new StringBuilder(10 * (snlist.Count + 5));
+            sb1.Append("('");
+            foreach (var line in oqmjolist)
+            {
+                sb1.Append(line.Key + "','");
+            }
+            var tempstr1 = sb1.ToString();
+            var jocond = tempstr1.Substring(0, tempstr1.Length - 2) + ")";
+
+            var sql = @" select c.ContainerName,m.MfgOrderName from [InsiteDB].[insite].[Container] c (nolock) 
+                            left join[InsiteDB].[insite].[MfgOrder] m(nolock) on m.MfgOrderId = c.MfgOrderId
+                            where m.MfgOrderName  in <jocond>";
+            sql = sql.Replace("<jocond>", jocond);
+            var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                var sn = Conver2Str(line[0]);
+                var jo = Conver2Str(line[1]);
+                if (!snlist.ContainsKey(sn) && sn.Length <= 7)
+                {
+                    snlist.Add(sn, jo);
+                }
+            }
+            return snlist;
+        }
+
+        public static List<string> RetrieveDCTableFromSn(string sn)
+        {
+            var ret = new List<string>();
+            var dctabledict = new Dictionary<string, bool>();
+
+            var sql = @" select ddr.DataCollectionDefName from insitedb.insite.DataCollectionDefBase ddr  (nolock)
+	                    inner join insitedb.insite.TxnMap tm with(noloCK) ON tm.DataCollectionDefinitionBaseId = ddr.DataCollectionDefBaseId
+	                    inner join insitedb.insite.spec sp with(nolock) on sp.specid =  tm.specid
+	                    inner join InsiteDB.insite.WorkflowStep ws (nolock)on  ws.specbaseid = sp.specbaseid
+	                    inner join InsiteDB.insite.Workflow w (nolock)on w.WorkflowID = ws.WorkflowID
+                        inner join InsiteDB.insite.Product p(nolock) on w.WorkflowBaseId = p.WorkflowBaseId
+	                    inner join [InsiteDB].[insite].[Container] c(nolock) on c.ProductId = p.ProductId
+                        where c.ContainerName = '<ContainerName>' and ddr.DataCollectionDefName is not null";
+            sql = sql.Replace("<ContainerName>", sn);
+            var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                var dc = Conver2Str(line[0]).ToUpper();
+                if (dc.Length > 4 && dc.Substring(0, 4).Contains("DCD_"))
+                {
+                    var realdc = "";
+                    if (dc.Contains("DCD_Module_Initialization_0811".ToUpper()))
+                    { realdc = "dc_initial"; }
+                    else
+                    { realdc = "dc_" + dc.Substring(4); }
+
+                    if (!dctabledict.ContainsKey(realdc)) {
+                        dctabledict.Add(realdc, true);
+                    }
+                }//end if
+            }//end foreach
+            ret.AddRange(dctabledict.Keys);
+            return ret;
+        }
+
+        public static List<ProjectTestData> RetrieveLatestSNTestResult(string sn,string defaultpj)
+        {
+            var dctablelist = RetrieveDCTableFromSn(sn);
+            var testdatalist = new List<ProjectTestData>();
+
+            foreach (var dctable in dctablelist)
+            {
+                var sql = @"select top 1 a.<DCTABLE>HistoryId,a.ModuleSerialNum, a.WhichTest, a.ModuleType, a.ErrAbbr, a.TestTimeStamp, a.TestStation,a.assemblypartnum 
+                               from insite.<DCTABLE> a (nolock) where a.ModuleSerialNum = '<ModuleSerialNum>' order by  testtimestamp DESC";
+                sql = sql.Replace("<DCTABLE>", dctable).Replace("<ModuleSerialNum>", sn);
+                var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+                foreach (var item in dbret)
+                {
+                    var tempdata = new ProjectTestData(defaultpj, Convert.ToString(item[0]), Convert.ToString(item[1])
+                                        ,Convert.ToString(item[2]), Convert.ToString(item[3]), Convert.ToString(item[4])
+                                        , Convert.ToString(item[5]), Convert.ToString(item[6]), Convert.ToString(item[7]));
+                    testdatalist.Add(tempdata);
+                }
+            }
+
+            testdatalist.Sort(delegate (ProjectTestData obj1, ProjectTestData obj2)
+            {
+                return obj1.TestTimeStamp.CompareTo(obj2.TestTimeStamp);
+            });
+
+            var ret = new List<ProjectTestData>();
+            ret.Add(testdatalist[0]);
+            return ret;
+        }
+
+        public static void SolveOQMSN(string sn, string jo,string asignee, string defaultpj, Controller ctrl)
+        {
+
+            var testdata = RetrieveLatestSNTestResult(sn,defaultpj);
+            if (testdata.Count > 0)
+            {
+                var td = testdata[0];
+
+                if (string.Compare(td.ErrAbbr, "PASS", true) == 0)
+                {
+                    var desc = "Module " + td.ModuleSerialNum + " latest status is: pass on " + td.WhichTest + " @ " + td.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss");
+                    IssueViewModels.CloseIssueAutomaticlly(td.ModuleSerialNum, desc, ctrl);
+                }
+                else
+                {
+                    var desc = "Module " + td.ModuleSerialNum + " latest status is: failed on " + td.WhichTest + " @ " + td.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss");
+                    IssueViewModels.CloseIssueAutomaticlly(td.ModuleSerialNum, desc, ctrl);
+
+                    var now = DateTime.Now;
+                    var vm = new IssueViewModels();
+                    vm.ProjectKey = defaultpj;
+                    vm.IssueKey = td.DataID;
+                    vm.IssueType = ISSUETP.Task;
+                    vm.Summary = "OQM Task: "+ td.ModuleSerialNum + " failed for " + td.ErrAbbr + " @ " + td.WhichTest + " "+ td.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss");
+                    vm.ModuleSN = td.ModuleSerialNum;
+                    vm.ErrAbbr = td.ErrAbbr;
+                    vm.Priority = ISSUEPR.Major;
+                    vm.DueDate = now.AddDays(7);
+                    vm.ReportDate = DateTime.Now;
+                    vm.Assignee = asignee;
+                    vm.Reporter = asignee;
+                    vm.Creator = asignee;
+                    vm.Resolution = Resolute.Pending;
+                    vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+                    vm.RelativePeoples = "";
+                    vm.StoreIssue();
+
+                    var comment = new IssueComments();
+                    comment.Comment = "JO Distribution: http://wuxinpi.china.ads.finisar.com:8082/BRTrace/JODetail?JONum="+jo+"&Step=3";
+                    IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, vm.Assignee, COMMENTTYPE.Description);
+
+                    SendOBAEvent(vm, "created", ctrl, true);
+                }
+            }
+        }
+
+        public static void RefreshOQMJo(Controller ctrl)
+        {
+            var oqmlist = RetrieveOpeningOQMJo();
+            if (oqmlist.Count > 0)
+            {
+                var snlist = RetrieveSNFromJo(oqmlist);
+                if(snlist.Count > 0)
+                {
+                    var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+                    var OBAAdmin = syscfgdict["OBAADMIN"];
+                    var OBADefaultPJ = syscfgdict["OBADEFAULTPJ"];
+
+                    foreach (var snjo in snlist)
+                    {
+                        try
+                        {
+                            SolveOQMSN(snjo.Key, snjo.Value, OBAAdmin, OBADefaultPJ, ctrl);
+                        }
+                        catch (Exception ex) { }
+                    }
+                }//end if
             }//end if
         }
 

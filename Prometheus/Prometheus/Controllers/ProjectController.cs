@@ -6561,7 +6561,7 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
-            ExternalDataCollector.RefreshVcselRMAData(this);
+            //ExternalDataCollector.RefreshVcselRMAData(this);
 
             //BIDataUtility.UpdateBITestResultWaferPN(DateTime.Parse("2017-10-01 00:00:00"));
 

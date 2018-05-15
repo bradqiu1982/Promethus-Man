@@ -1543,6 +1543,41 @@ namespace Prometheus.Models
             return retdict;
         }
 
+        public static List<IssueViewModels> RetrieveIssueBySN(string sn, Controller ctrl)
+        {
+            var retdict = new List<IssueViewModels>();
+
+            var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,"
+                + "DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,"
+                + "RelativePeoples,APVal2,ModuleSN,DataID,ErrAbbr from Issue "
+                + " where  APVal1 <> 'delete' and  ParentIssueKey = '' and ModuleSN = '<ModuleSN>' order by ReportDate DESC";
+            sql = sql.Replace("<ModuleSN>", sn);
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var ret = new IssueViewModels(Convert.ToString(line[0])
+                    , Convert.ToString(line[1]), Convert.ToString(line[2])
+                    , Convert.ToString(line[3]), Convert.ToString(line[4])
+                    , Convert.ToString(line[5]), Convert.ToString(line[6])
+                    , Convert.ToString(line[7]), Convert.ToString(line[8])
+                    , Convert.ToString(line[9]), Convert.ToString(line[10])
+                    , Convert.ToString(line[11]), Convert.ToString(line[12]));
+                ret.LYT = Convert.ToString(line[13]);
+                ret.ModuleSN = Convert.ToString(line[14]);
+                ret.DataID = Convert.ToString(line[15]);
+                ret.ErrAbbr = Convert.ToString(line[16]);
+
+                //ret.SubIssues = RetrieveSubIssue(ret.IssueKey);
+
+                ret.RetrieveComment(ctrl);
+                ret.RetrieveAttachment(ret.IssueKey);
+                retdict.Add(ret);
+            }
+
+            return retdict;
+        }
+
         public static List<IssueViewModels> RRetrieveFABySN(string pjkey, string sn, Controller ctrl)
         {
             var retdict = new List<IssueViewModels>();
@@ -3163,6 +3198,31 @@ namespace Prometheus.Models
             CreateMPIssues(projectname, pjkey, firstengineer);
         }
 
+
+        public static void CloseIssueAutomaticlly(string SN,string desc, Controller ctrl)
+        {
+            var issues = IssueViewModels.RetrieveIssueBySN(SN,ctrl);
+            foreach (var tobedata in issues)
+            {
+                bool customercomm = false;
+                foreach (var item in tobedata.CommentList)
+                {
+                    if (string.Compare(item.Reporter, "system", true) != 0)
+                    {
+                        customercomm = true;
+                        break;
+                    }
+                }
+
+                if (!customercomm)
+                {
+                    tobedata.Resolution = Resolute.AutoClose;
+                    tobedata.Description =desc;
+                    tobedata.UpdateIssue();
+                    tobedata.CloseIssue();
+                }
+            }
+        }
 
         public static void CloseIssueAutomaticlly(string pjkey, string SN, string whichtest, string tester, string datestr, Controller ctrl)
         {

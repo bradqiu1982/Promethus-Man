@@ -60,20 +60,18 @@ var VCSEL_RMA = function(){
                 menuItemDefinitions: {
                     fullscreen: {
                         onclick: function () {
-                            $('#' + col_data.id).parent().toggleClass('chart-modal');
-                            $('#' + col_data.id).highcharts().reflow();
+                            $('#' + line_data.id).parent().toggleClass('chart-modal');
+                            $('#' + line_data.id).highcharts().reflow();
                         },
                         text: 'Full Screen'
                     },
                     exportdata: {
                         onclick: function () {
-                            var filename = col_data.title + '.csv';
-                            var outputCSV = ' ,Failure Mode,Failure Percent\r\n';
-                            $(col_data.xAxis.data).each(function (i, val) {
-                                $(col_data.data).each(function () {
-                                    if (this.data[i].name != '' && this.data[i].y != 0) {
-                                        outputCSV += val + "," + this.data[i].name + "," + this.data[i].y + ",\r\n";
-                                    }
+                            var filename = line_data.title + '.csv';
+                            var outputCSV = 'Wafer_No,Output,Dppm\r\n';
+                            $(line_data.xAxis.data).each(function (i, val) {
+                                $(line_data.data).each(function () {
+                                    outputCSV += val + "," + this.cdata.data[i] + "," + this.data.data[i] + ",\r\n";
                                 });
                             })
                             var blobby = new Blob([outputCSV], { type: 'text/csv;chartset=utf-8' });
@@ -146,14 +144,25 @@ var VCSEL_RMA = function(){
                     exportdata: {
                         onclick: function () {
                             var filename = col_data.title + '.csv';
-                            var outputCSV = ' ,Failure Mode,Failure Percent\r\n';
+                            var outputCSV = 'Date,Type,Amount\r\n';
+                            var milestonecsv = 'Date,Milestone\r\n';
                             $(col_data.xAxis.data).each(function (i, val) {
                                 $(col_data.data).each(function () {
-                                    if (this.data[i].name != '' && this.data[i].y != 0) {
-                                        outputCSV += val + "," + this.data[i].name + "," + this.data[i].y + ",\r\n";
+                                    if (this.name == 'Milestone') {
+                                        $(this.data).each(function() {
+                                            if (val == col_data.xAxis.data[this.x]) {
+                                                milestonecsv += val + "," + this.name.replace(',', ';').replace('<br/>', ' / ') + "\r\n";
+                                            }
+                                        })
+                                    }
+                                    else {
+                                        if (this.data[i] != 0) {
+                                            outputCSV += val + "," + this.name + "," + this.data[i] + "\r\n";
+                                        }
                                     }
                                 });
                             })
+                            outputCSV += "\r\n\r\n" + milestonecsv;
                             var blobby = new Blob([outputCSV], { type: 'text/csv;chartset=utf-8' });
                             $(exportLink).attr({
                                 'download': filename,

@@ -1574,6 +1574,36 @@ namespace Prometheus.Models
             }
         }
 
+        public static Dictionary<string, string> RetrievePNDescByPn(List<string> pnlist)
+        {
+            var ret = new Dictionary<string, string>();
+
+            StringBuilder sb1 = new StringBuilder(10 * (pnlist.Count + 5));
+            sb1.Append("('");
+            foreach (var line in pnlist)
+            {
+                sb1.Append(line + "','");
+            }
+            var tempstr1 = sb1.ToString();
+            var pncond = tempstr1.Substring(0, tempstr1.Length - 2) + ")";
+
+            var sql = @"  select distinct pb.ProductName,p.[Description] from [InsiteDB].[insite].[ProductBase] pb (nolock) 
+                        left join [InsiteDB].[insite].[Product] p with (nolock) on p.ProductBaseId = pb.ProductBaseId  
+                        where pb.ProductName in <pncond>";
+            sql = sql.Replace("<pncond>", pncond);
+            var dbret = DBUtility.ExeMESSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                var pn = Convert.ToString(line[0]);
+                var pndesc = Convert.ToString(line[1]);
+                if (!ret.ContainsKey(pn))
+                {
+                    ret.Add(pn, pndesc);
+                }
+            }
+            return ret;
+        }
+
 
     }
 }

@@ -29,6 +29,116 @@ namespace Prometheus.Models
             DBUtility.ExeATESqlWithRes(sql);
         }
 
+        public static List<ProjectTestData> RetrieveATEData(string family,DateTime startdate,DateTime enddate,Dictionary<string,bool> pndict)
+        {
+            var ret = new List<ProjectTestData>();
+
+            var sql = @"SELECT a.MFR_SN,d.DATASET_NAME,c.FAMILY,d.STATUS,d.END_TIME,d.STATION,a.MFR_PN,d.ROUTE_ID,d.dataset_id,b.state FROM PARTS a   
+                        INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX  
+                        INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID 
+                        INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID   
+                        WHERE c.FAMILY = '<family>' and d.END_TIME >= '<starttime>' and d.END_TIME <= '<endtime>' AND b.state <> 'GOLDEN'  ORDER BY a.MFR_SN,d.END_TIME ASC";
+            sql = sql.Replace("<family>", family).Replace("<starttime>", startdate.ToString("yyyyMMddhhmmss")).Replace("<endtime>", enddate.ToString("yyyyMMddhhmmss"));
+
+            var currentroutid = "";
+            var currentstation = "";
+            var currentsn = "";
+
+            var pjdatalist = new List<ProjectTestData>();
+
+            var dbret = DBUtility.ExeATESqlWithRes(sql);
+
+            foreach (var item in dbret)
+            {
+                try
+                {
+                    var sn = Convert.ToString(item[0]);
+                    var ds = Convert.ToString(item[1]);
+                    var mdtype = Convert.ToString(item[2]);
+                    var status = Convert.ToString(item[3]);
+
+                    var spdatetime = Convert.ToString(item[4]);
+                    var stdtime = spdatetime.Substring(0, 4) + "-" + spdatetime.Substring(4, 2) + "-" + spdatetime.Substring(6, 2) + " "
+                                          + spdatetime.Substring(8, 2) + ":" + spdatetime.Substring(10, 2) + ":" + spdatetime.Substring(12, 2);
+                    var station = Convert.ToString(item[5]);
+                    var pn = Convert.ToString(item[6]);
+                    if (!pndict.ContainsKey(pn))
+                    { pndict.Add(pn, true); }
+
+                    var temprouteid = Convert.ToString(item[7]);
+                    var tempdatasetid = Convert.ToString(item[8]);
+                    var state = Convert.ToString(item[9]);
+
+                    var setupflag = false;
+                    if (ds.ToUpper().Contains("_SETUP"))
+                    { setupflag = true; }
+
+                    if (string.Compare(currentroutid, temprouteid) != 0 
+                        || string.Compare(currentstation, station) != 0
+                        || string.Compare(currentsn, sn) != 0
+                        || setupflag)
+                    {
+                        currentroutid = temprouteid;
+                        currentstation = station;
+                        currentsn = sn;
+
+                        if (pjdatalist.Count > 0)
+                        {
+                            var err = "";
+                            var errid = "";
+                            foreach (var line in pjdatalist)
+                            {
+                                if (string.Compare(line.ErrAbbr, "PASS", true) != 0
+                                    && string.Compare(line.ErrAbbr, "INFO", true) != 0)
+                                {
+                                    err = line.WhichTest;
+                                    errid = line.DataID;
+                                    break;
+                                }
+                            }//end foreach
+
+                            var hours = (double)(pjdatalist[pjdatalist.Count - 1].TestTimeStamp - pjdatalist[0].TestTimeStamp).TotalSeconds / 3600.0;
+                            if (string.IsNullOrEmpty(errid))
+                            {
+                                var testdata = new ProjectTestData("TEMP", pjdatalist[0].DataID, pjdatalist[0].ModuleSerialNum, pjdatalist[0].WhichTest.Replace("_setup","")+ "/" + pjdatalist[0].JO, pjdatalist[0].ModuleType
+                                    , "PASS", pjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss")  , pjdatalist[0].TestStation, pjdatalist[0].PN);
+
+                                testdata.JO = (Math.Round(hours,3)).ToString();
+                                ret.Add(testdata);
+                            }
+                            else
+                            {
+                                var testdata = new ProjectTestData("TEMP", errid, pjdatalist[0].ModuleSerialNum, pjdatalist[0].WhichTest.Replace("_setup", "") + "/" + pjdatalist[0].JO, pjdatalist[0].ModuleType
+                                    , err, pjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), pjdatalist[0].TestStation, pjdatalist[0].PN);
+                                
+                                testdata.JO = (Math.Round(hours, 3)).ToString();
+                                ret.Add(testdata);
+                            }
+                        }
+
+                        pjdatalist.Clear();
+                      
+                        //(string pk, string did, string sn, string wtest, string mt, string err, string testtime, string station, string p)
+                        var tempdata = new ProjectTestData("TEMP", tempdatasetid, sn, ds, mdtype, status, stdtime, station, pn);
+                        tempdata.JO = state;
+                        pjdatalist.Add(tempdata);
+                    }
+                    else
+                    {
+                        //(string pk, string did, string sn, string wtest, string mt, string err, string testtime, string station, string p)
+                        var tempdata = new ProjectTestData("TEMP", tempdatasetid, sn , ds, mdtype, status, stdtime, station, pn);
+                        tempdata.JO = state;
+                        pjdatalist.Add(tempdata);
+                    }
+
+                }
+                catch (Exception ex)
+                { }
+            }
+
+            return ret;
+        }
+
         private static string GetUniqKey()
         {
             return Guid.NewGuid().ToString("N");

@@ -1954,10 +1954,12 @@ namespace Prometheus.Models
         public static List<WaferSNMap> RetrieveSNByWafer(string wafer)
         {
             var ret = new List<WaferSNMap>();
-            var sql = @"select c.ContainerName,w.WorkflowStepName,cs.LastMoveDate from [InsiteDB].[insite].[Container] c (nolock) 
+            var sql = @"select c.ContainerName,w.WorkflowStepName,cs.LastMoveDate,pb.ProductName,p.[Description] from [InsiteDB].[insite].[Container] c (nolock) 
                  left join[InsiteDB].[insite].[MfgOrder] m(nolock) on m.MfgOrderId = c.MfgOrderId
                  left join InsiteDB.insite.CurrentStatus cs (nolock) on cs.CurrentStatusId = c.CurrentStatusId
                  left join InsiteDB.insite.WorkflowStep w (nolock) on w.WorkflowStepId = cs.WorkflowStepId
+                 left join InsiteDB.insite.product p with (nolock) on  c.productId = p.productId 
+                 left join InsiteDB.insite.productBase pb with (nolock) on p.productBaseId  = pb.productBaseId 
                   where (WorkflowStepName = 'main store' or WorkflowStepName = 'rma' or WorkflowStepName like '%ship%') and ContainerName  in (
 	                SELECT distinct c.ContainerName as SerialName
                     FROM InsiteDB.insite.container c with (nolock) 
@@ -1991,6 +1993,8 @@ namespace Prometheus.Models
                 tempvm.SN = Convert.ToString(line[0]);
                 tempvm.CurrentWorkStep = Convert.ToString(line[1]);
                 tempvm.LastMoveDate = Convert.ToDateTime(line[2]);
+                tempvm.PN = Convert.ToString(line[3]);
+                tempvm.PNDesc = Convert.ToString(line[4]);
                 ret.Add(tempvm);
             }
             return ret;

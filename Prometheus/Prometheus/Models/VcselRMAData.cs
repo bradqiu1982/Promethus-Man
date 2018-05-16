@@ -67,11 +67,18 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<VcselRMAData> RetrieveDistinctWaferListASC()
+        public static List<VcselRMAData> RetrieveDistinctWaferListASC(string rate)
         {
             var ret = new List<VcselRMAData>();
             var wdict = new Dictionary<string, bool>();
-            var sql = "select Wafer,BuildDate,VcselType from VcselRMAData order by BuildDate ASC";
+            var sql = "select Wafer,BuildDate,VcselType from VcselRMAData ";
+            if (!string.IsNullOrEmpty(rate.Trim()))
+            {
+                sql = sql + "  where VcselType = '<VcselType>'  ";
+                sql = sql.Replace("<VcselType>", rate);
+            }
+            sql = sql+" order by BuildDate ASC";
+
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
             {
@@ -92,7 +99,7 @@ namespace Prometheus.Models
         private static List<VcselRMAData> RetrievAllDataASC()
         {
             var ret = new List<VcselRMAData>();
-            var sql = "select Wafer,BuildDate,VcselType from VcselRMAData order by BuildDate ASC";
+            var sql = "select Wafer,BuildDate,VcselType,ShipDate from VcselRMAData order by BuildDate ASC";
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
             {
@@ -100,13 +107,14 @@ namespace Prometheus.Models
                 tempvm.Wafer = Convert.ToString(line[0]);
                 tempvm.BuildDate = Convert.ToDateTime(line[1]);
                 tempvm.VcselType = Convert.ToString(line[2]);
+                tempvm.ShipDate = Convert.ToString(line[3]);
                 ret.Add(tempvm);
             }
             return ret;
         }
         
         //return dict<month,dict<rate,count>>
-        public static Dictionary<string,Dictionary<string,int>> RetrieveRMACountByMonth(Dictionary<string, string> vtypedict)
+        public static Dictionary<string,Dictionary<string,int>> RetrieveRMACountByBuildMonth(Dictionary<string, string> vtypedict)
         {
             var ret = new Dictionary<string, Dictionary<string, int>>();
             var vlist = RetrievAllDataASC();
@@ -151,6 +159,63 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static Dictionary<string, Dictionary<string, int>> RetrieveRMACountByShipMonth(Dictionary<string, string> vtypedict)
+        {
+            var ret = new Dictionary<string, Dictionary<string, int>>();
+            var vlist = RetrievAllDataASC();
+            foreach (var v in vlist)
+            {
+                var month = DateTime.Parse(v.ShipDate).ToString("yyyy-MM");
+                if (!vtypedict.ContainsKey(v.VcselType))
+                { vtypedict.Add(v.VcselType, ""); }
+
+                if (ret.ContainsKey(month))
+                {
+                    var ratedict = ret[month];
+                    if (ratedict.ContainsKey(v.VcselType))
+                    {
+                        ratedict[v.VcselType] = ratedict[v.VcselType] + 1;
+                    }
+                    else
+                    {
+                        ratedict.Add(v.VcselType, 1);
+                    }
+                }
+                else
+                {
+                    var ratedict = new Dictionary<string, int>();
+                    ratedict.Add(v.VcselType, 1);
+                    ret.Add(month, ratedict);
+                }
+            }
+
+            //add type to all month 
+            foreach (var r in ret)
+            {
+                foreach (var vt in vtypedict)
+                {
+                    if (!r.Value.ContainsKey(vt.Key))
+                    {
+                        r.Value.Add(vt.Key, 0);
+                    }
+                }
+            }
+
+            return ret;
+        }
+
+        public static List<string> RetrieveVcselType()
+        {
+            var sql = "select distinct VcselType from VcselRMAData where VcselType <> '' order by VcselType";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            var ret = new List<string>();
+            foreach (var line in dbret)
+            {
+                ret.Add(Convert.ToString(line[0]));
+            }
+            return ret;
+        }
+
         public string SN { set; get; }
         public DateTime BuildDate { set; get; }
         public string Wafer { set; get; }
@@ -176,6 +241,8 @@ namespace Prometheus.Models
             SN = "";
             CurrentWorkStep = "";
             LastMoveDate = DateTime.Parse("1982-05-06 10:00:00");
+            PN = "";
+            PNDesc = "";
         }
 
         public static bool WaferExist(string wafer)
@@ -205,12 +272,14 @@ namespace Prometheus.Models
 
         public void StoreData()
         {
-            var sql = "insert into WaferSNMap(Wafer,SN,CurrentWorkStep,LastMoveDate) values(@Wafer,@SN,@CurrentWorkStep,@LastMoveDate)";
+            var sql = "insert into WaferSNMap(Wafer,SN,CurrentWorkStep,LastMoveDate,PN,PNDesc) values(@Wafer,@SN,@CurrentWorkStep,@LastMoveDate,@PN,@PNDesc)";
             var dict = new Dictionary<string, string>();
             dict.Add("@Wafer", Wafer);
             dict.Add("@SN", SN);
             dict.Add("@CurrentWorkStep", CurrentWorkStep);
             dict.Add("@LastMoveDate", LastMoveDate.ToString("yyyy-MM-dd HH:mm:ss"));
+            dict.Add("@PN", PN);
+            dict.Add("@PNDesc", PNDesc);
             DBUtility.ExeLocalSqlNoRes(sql, dict);
         }
 
@@ -235,6 +304,8 @@ namespace Prometheus.Models
         public string SN { set; get; }
         public string CurrentWorkStep { set; get; }
         public DateTime LastMoveDate { set; get; }
+        public string PN { set; get; }
+        public string PNDesc { set; get; }
     }
 
     public class VcselRMADPPM
@@ -263,11 +334,11 @@ namespace Prometheus.Models
             };
         }
 
-        public static List<VcselRMADPPM> RetrieveVcselDPPM()
+        public static List<VcselRMADPPM> RetrieveVcselDPPM(string rate)
         {
             var ret = new List<VcselRMADPPM>();
 
-            var wlist = VcselRMAData.RetrieveDistinctWaferListASC();
+            var wlist = VcselRMAData.RetrieveDistinctWaferListASC(rate);
             var rmacntdict = VcselRMAData.RetriveWaferCountDict();
             var wafercntdict = WaferSNMap.RetriveWaferCountDict();
             foreach (var w in wlist)
@@ -284,11 +355,11 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<object> VcselRMAMileStoneData()
+        public static List<object> VcselRMAMileStoneDataByBuildDate()
         {
             var ret = new List<object>();
             var vtypedict = new Dictionary<string, string>();
-            var rmacountdata = VcselRMAData.RetrieveRMACountByMonth(vtypedict);
+            var rmacountdata = VcselRMAData.RetrieveRMACountByBuildMonth(vtypedict);
             ret.Add(rmacountdata);
 
             var milelist = EngineeringMileStone.RetrieveVcselMileStone();
@@ -307,6 +378,28 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static List<object> VcselRMAMileStoneDataByShipDate()
+        {
+            var ret = new List<object>();
+            var vtypedict = new Dictionary<string, string>();
+            var rmacountdata = VcselRMAData.RetrieveRMACountByShipMonth(vtypedict);
+            ret.Add(rmacountdata);
+
+            var milelist = EngineeringMileStone.RetrieveVcselMileStone();
+            ret.Add(milelist);
+
+            var colorlist = VcselRMASum.FMColor();
+            var vtypekeylist = vtypedict.Keys.ToList();
+            var cidx = 0;
+            foreach (var vk in vtypekeylist)
+            {
+                vtypedict[vk] = colorlist[cidx % colorlist.Count];
+                cidx = cidx + 1;
+            }
+            ret.Add(vtypedict);
+
+            return ret;
+        }
     }
 
 }

@@ -55,7 +55,12 @@
     </nav>
     <div class="col-xs-10">
         <div class="v-container">
-            <div class="v-filter">
+            <div class="v-filter" style="height:45px;">
+                    <div class="col-xs-2"><label class="control-label">VCSEL RATE</label></div>
+                    <div class="col-xs-3">
+                        @Html.DropDownList("vcselratelist", null, new { @id = "vcselratelist", @class = "form-control" })
+                    </div>
+                    <div class="col-xs-7"></div>
             </div>
             <div class="v-content">
                 <div class="col-xs-12">
@@ -63,6 +68,9 @@
                 </div>
                 <div class="col-xs-12">
                     <div class="v-box" id="vcsel_milestone"></div>
+                </div>
+                <div class="col-xs-12">
+                    <div class="v-box" id="vcsel_milestone_ship"></div>
                 </div>
             </div>
         </div>
@@ -73,3 +81,9 @@
     <a id="exportLink"></a>
 </div>
 
+<script type="text/javascript">
+    $('body').on('change', '#vcselratelist', function () {
+        var rate = $("#vcselratelist").val();
+        window.location.href = '/DataAnalyze/VcselRMA?rate=' + rate;
+    });
+</script>

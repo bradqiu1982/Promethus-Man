@@ -14,7 +14,6 @@ using System.Diagnostics;
 namespace Prometheus.Controllers
 {
 
-
     public class CustomerDataController : Controller
     {
         public ActionResult CommitVcselData()
@@ -1842,5 +1841,64 @@ namespace Prometheus.Controllers
 
             return View();
         }
+
+        public ActionResult DownLoadATETestData()
+        {
+            return View();
+        }
+
+        public StringBuilder PrePareATEData(List<ProjectTestData> atelist, Dictionary<string,string> pndescdict)
+        {
+            StringBuilder sb1 = new StringBuilder(300 * (atelist.Count+1));
+            sb1.Append("SN,WhichTest,Failure,TestTimestamp,Station,Module Family,PN,PN Desc\r\n");
+            foreach (var item in atelist)
+            {
+                var pndesc = "";
+                if (pndescdict.ContainsKey(item.PN))
+                { pndesc = pndescdict[item.PN]; }
+
+                sb1.Append("\"" + item.ModuleSerialNum.ToString().Replace("\"", "") + "\"," + "\"" + item.WhichTest.Replace("\"", "") + "\"," + "\"" + item.ErrAbbr.Replace("\"", "") + "\","
+                    + "\"" + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss") + "\"," + "\"" + item.TestStation.Replace("\"", "") + "\"," + "\"" + item.ModuleType.Replace("\"", "") + "\","
+                    + "\"" + item.PN.Replace("\"", "") + "\"," + "\"" + pndesc.Replace("\"", "") + "\",\r\n");
+            }
+            return sb1;
+        }
+
+        public ActionResult RealATETestData(string mdtype, string starttime, string endtime)
+        {
+            if (string.IsNullOrEmpty(mdtype)
+                || string.IsNullOrEmpty(starttime)
+                || string.IsNullOrEmpty(endtime)) {
+                return RedirectToAction("DownLoadATETestData", "CustomerData");
+            }
+
+            var sdate = DateTime.Parse(DateTime.Parse(starttime).ToString("yyyy-MM-dd") + " 00:00:00");
+            var edate = DateTime.Parse(DateTime.Parse(endtime).ToString("yyyy-MM-dd") + " 23:59:59");
+            var pndict = new Dictionary<string, bool>();
+            var atedatalist = ATEUtility.RetrieveATEData(mdtype, sdate, edate,pndict);
+            if (atedatalist.Count > 0)
+            {
+                var pndescdict = MESUtility.RetrievePNDescByPn(new List<string>(pndict.Keys));
+                var sb = PrePareATEData(atedatalist, pndescdict);
+
+                string datestring = DateTime.Now.ToString("yyyyMMdd");
+                string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+                if (!Directory.Exists(imgdir))
+                {
+                    Directory.CreateDirectory(imgdir);
+                }
+
+                var family = atedatalist[0].ModuleType.Replace(" ", "_").Replace("#", "").Replace("'", "")
+                            .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                var fn = "ATE_"+family+"_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+                var filename = imgdir + fn;
+                System.IO.File.WriteAllText(filename, sb.ToString(), Encoding.UTF8);
+                return File(filename, "application/vnd.ms-excel", fn);
+            }
+
+            return RedirectToAction("DownLoadATETestData", "CustomerData");
+        }
+
     }
 }

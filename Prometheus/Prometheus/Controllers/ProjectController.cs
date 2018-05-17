@@ -6433,6 +6433,9 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
+            //var pndict = new Dictionary<string, bool>();
+            //ATEUtility.RetrieveATEData("COHERENT", DateTime.Parse("2018-05-10 00:00:00"), DateTime.Parse("2018-05-15 23:59:59"),pndict);
+
             //ExternalDataCollector.RefreshVcselRMAData(this);
 
             //BIDataUtility.UpdateBITestResultWaferPN(DateTime.Parse("2017-10-01 00:00:00"));

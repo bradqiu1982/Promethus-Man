@@ -93,6 +93,11 @@
     {
         <script src="~/Scripts/oldie.js" type="text/javascript"></script>
     }
+    else
+    {
+        <script src="~/Scripts/offline-exporting.js"></script>
+    }
+
     <script type="text/javascript">
         $(function () {
             Prometheus.init();
@@ -204,9 +209,10 @@
                                     <li>
                                         @Html.ActionLink("Debug Tree", "DebugTree", "DashBoard")
                                     </li>
-                                    @*<li>
-            @Html.ActionLink("Technical Video", "TechnicalVideo", "User")
-        </li>*@
+
+                                    <li>
+                                        @Html.ActionLink("DownLoad ATE", "DownLoadATETestData", "CustomerData")
+                                    </li>
                                 </ul>
                             </li>
                         </ul>

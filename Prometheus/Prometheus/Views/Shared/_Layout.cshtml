@@ -35,7 +35,9 @@
     <script src="~/Scripts/Prometheus.js" type="text/javascript"></script>
     <script src="~/Scripts/moment.min.js"></script>
     <script src="~/Scripts/highcharts.js"></script>
+    <script src="~/Scripts/highcharts-more.js"></script>
     <script src="~/Scripts/exporting.js"></script>
+
     <script src="~/Scripts/jquery-autocomplete/jquery.auto-complete.min.js" type="text/javascript"></script>
     @{
         var browse = Request.Browser;
@@ -44,6 +46,10 @@
             || string.Compare(browse.Version, "8.0", true) == 0))
         {
             <script src="~/Scripts/oldie.js" type="text/javascript"></script>
+        }
+        else
+        {
+            <script src="~/Scripts/offline-exporting.js"></script>
         }
 
         //var isie = false;
@@ -296,9 +302,10 @@
                                     <li>
                                         @Html.ActionLink("Debug Tree", "DebugTree", "DashBoard")
                                     </li>
-                                    @*<li>
-            @Html.ActionLink("Technical Video", "TechnicalVideo", "User")
-        </li>*@
+                                    <li>
+                                        @Html.ActionLink("DownLoad ATE", "DownLoadATETestData", "CustomerData")
+                                    </li>
+
                                 </ul>
                             </li>
                         </ul>

@@ -78,8 +78,8 @@
                     <td>Assignee</td>
                     <td>Failure Desc</td>
                     <td>Tester</td>
-                    <td>Date</td>
-                    <td>ClosedDate</td>
+                    <td data-type="string">Date</td>
+                    <td data-type="string">ClosedDate</td>
                     <td><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></td>
                     <td>LYT</td>
                 </tr>
@@ -158,9 +158,6 @@
             <script type="text/javascript">
                 $(document).ready(function() {
                     $('#pndatatable').DataTable({
-                        //"columnDefs": [
-                        //    { "type": "string", "targets": [7, 8] },
-                        //],
                         'iDisplayLength': 50,
                         'aLengthMenu': [[20, 50, 100, -1],
                             [20, 50, 100, "All"]],

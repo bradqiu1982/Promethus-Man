@@ -6934,20 +6934,6 @@ namespace Prometheus.Controllers
             }
 
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
-            UserAuth(updater);
-
-            if (!ViewBag.IsSuper && !ViewBag.IsManage){
-                ViewBag.NoAuthrization = true;
-            }
-            else {
-                ViewBag.NoAuthrization = false;
-            }
-
-            var userpjdict = UserViewModels.RetrieveUserProjectKeyDict(updater);
-            if (userpjdict.Count == 0)
-            {
-                ViewBag.NoAuthrization = false;
-            }
 
             var allprojlist = ProjectViewModels.RetrieveAllProject();
 

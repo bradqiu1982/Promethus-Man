@@ -1,0 +1,49 @@
+﻿
+@{
+    ViewBag.Title = "JOMesProgress";
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
+}
+
+<div class="row">
+    <div class="col-xs-12">
+        <ol class="breadcrumb" style="font-size:18px">
+            <li class="active">JO Mes Progress</li>
+        </ol>
+    </div>
+</div>
+
+<script type="text/javascript" src="~/Scripts/JoMesStatus.js"></script>
+
+<script type="text/javascript">
+    $(function () {
+        JOMesStatus.show();
+    })
+</script>
+<div class="row">
+    <div class="col-xs-1"></div>
+    <div class="col-xs-2"><label class="form-control">Job Order</label></div>
+    <div class="col-xs-3"><input class="form-control" id="jo" name="jo" value="@ViewBag.JO"></div>
+    <div class="col-xs-2"><input type="button" class="btn btn-success" onclick="RetrieveJOStatus()" value="提交" /></div>
+    <div class="col-xs-3"></div>
+    <div class="col-xs-1"></div>
+</div>
+
+<div class="row">
+    <div id="jomesstatus"></div>
+</div>
+
+<div class="hidden">
+    <a id="exportLink"></a>
+</div>
+
+<script type="text/javascript">
+    function RetrieveJOStatus() {
+        var jo = $("#jo").val();
+        if (jo == '') {
+            alert('Job Order need to be input!');
+            return false;
+        }
+
+        window.location.href = '/CustomerData/JOMesProgress?jo=' + jo;
+    }
+</script>

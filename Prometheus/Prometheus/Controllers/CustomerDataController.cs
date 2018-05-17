@@ -1900,5 +1900,86 @@ namespace Prometheus.Controllers
             return RedirectToAction("DownLoadATETestData", "CustomerData");
         }
 
+        public ActionResult JOMesProgress(string jo)
+        {
+            ViewBag.JO = "";
+            if (!string.IsNullOrEmpty(jo))
+            {
+                ViewBag.JO = jo;
+            }
+            return View();
+        }
+
+        public JsonResult JOMesProgressAJAX()
+        {
+            var jo = Request.Form["jo"];
+            var statuslist = JOMesStatus.RetrieveJOMesStaus(jo);
+            var colorarray = new string[] {"#4572A7", "#AA4643", "#89A54E", "#80699B", "#3D96AE",
+                                                "#DB843D", "#92A8CD", "#A47D7C", "#B5CA92" };
+            var colorlist = colorarray.ToList();
+
+            var wfcntdict = new Dictionary<string, int>();
+            var wflist = new List<string>();
+            foreach (var item in statuslist)
+            {
+                if (wfcntdict.ContainsKey(item.WorkFlowStep))
+                {
+                    wfcntdict[item.WorkFlowStep] = wfcntdict[item.WorkFlowStep] + 1;
+                }
+                else
+                {
+                    wflist.Add(item.WorkFlowStep);
+                    wfcntdict.Add(item.WorkFlowStep, 1);
+                }
+            }
+
+            var cidx = 0;
+            var datalist = new List<object>();
+            foreach (var key in wflist)
+            {
+                datalist.Add(new {
+                    x = cidx,
+                    y = wfcntdict[key],
+                    color = colorlist[cidx % colorlist.Count]
+                });
+                cidx = cidx + 1;
+            }
+
+            var dataLabels = new
+            {
+                enabled = true,
+                color = "#FFFFFF",
+                align = "center",
+                format = "{point.y}"
+            };
+
+            var allx = new { data = wflist };
+            var ally = new { title = "Amount" };
+            var alldata = new List<object>();
+            alldata.Add(new {
+                name = "module",
+                data = datalist,
+                dataLabels = dataLabels
+            });
+
+            var jodistribution = new
+            {
+                id = "jomesstatus",
+                title = jo + " Distribution",
+                coltype = "normal",
+                xAxis = allx,
+                yAxis = ally,
+                data = alldata,
+                data2export = statuslist
+            };
+
+            var ret = new JsonResult();
+            ret.Data = new {
+                success = true,
+                jodistribution = jodistribution
+            };
+            return ret;
+        }
+
     }
 }

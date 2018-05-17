@@ -281,6 +281,18 @@ namespace Prometheus.Models
         public string TestStation { set; get; }
         public string ModuleSerialNum { set; get; }
         public string tErrAbbr { set; get; }
+        
+        public List<string> NAttachList { set; get; }
+        public List<string> NInternalAttachList { set; get; }
+        public List<string> NCustomAttachList { set; get; }
+        public List<IssueViewModels> NContainMent { set; get; }
+        public List<IssueViewModels> NCorrectMent { set; get; }
+        public List<IssueViewModels> NFailureVerifyActions { set; get; }
+        public List<IssueViewModels> NCorrectiveVerifyActions { set; get; }
+        public List<IssueComments> NRootCauseList { set; get; }
+        public List<IssueComments> NReport4CustomerCommentList { set; get; }
+        public List<IssueComments> NInternalReportCommentList { set; get; }
+        public List<IssueComments> NAnalysisCommentList { set; get; }
 
         private string sDescription = "";
         public string Description
@@ -2263,6 +2275,673 @@ namespace Prometheus.Models
             }
 
             return ret;
+        }
+
+        public static Dictionary<string, IssueViewModels> NRetrieveRMAByProjectKey(string projectkey, string StartDate, string EndDate, string issuetype, Controller ctrl)
+        {
+            var sql = @"select i.ProjectKey,i.IssueKey,i.IssueType,i.Summary,i.Priority,i.DueDate,
+                    i.ResolvedDate,i.ReportDate,i.Assignee,i.Reporter,i.Resolution,
+                    i.RelativePeoples,i.ModuleSN,i.APVal2, 
+                    ir.FinisarRMA,ir.FinisarModel,ir.ECustomer,ir.CRMANUM,ir.CReport,
+                    ir.ModuleSN,ir.RMAFailureCode,ir.FVCode,
+                    ib.IssueKey, ib.Summary, ib.Resolution, iaa.Attachment,
+                    ic.Comment,ic.Reporter,ic.CommentDate,ic.CommentType,iaa.APVal1
+                    from Issue as i 
+                    left join IssueRMA as ir on (i.IssueKey = ir.IssueKey and i.IssueType = 'RMA')
+                    left join Issue as ib on (i.IssueKey = ib.ParentIssueKey and ib.APVal1 <> 'delete')
+                    left join IssueAttachment as iaa on i.IssueKey = iaa.IssueKey
+                    left join IssueComments as ic on (i.IssueKey = ic.IssueKey and ic.Removed <> 'TRUE' and ic.CommentType = 'Root Cause')
+                    where i.APVal1 <> 'delete' and i.ProjectKey = @ProjectKey and i.ParentIssueKey = '' 
+                    and i.IssueType = @IssueType ";
+            var param = new Dictionary<string, string>();
+            param.Add("@ProjectKey", projectkey);
+            param.Add("@IssueType", issuetype);
+            if (string.Compare(StartDate, "NONE", true) != 0
+                && !string.IsNullOrEmpty(StartDate))
+            {
+                sql += " and i.ReportDate between @sDate and @eDate ";
+                param.Add("@sDate", StartDate);
+                param.Add("@eDate", EndDate);
+            }
+            sql += " order by i.DueDate DESC";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
+            var ret = new Dictionary<string, IssueViewModels>();
+            foreach (var line in dbret)
+            {
+                if (ret.ContainsKey(Convert.ToString(line[1])))
+                {
+                    //subissue
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[22])))
+                    {
+                        var sub_summary = Convert.ToString(line[23]);
+                        var sub_tmp = new IssueViewModels();
+                        sub_tmp.IssueKey = Convert.ToString(line[22]);
+                        sub_tmp.Summary = sub_summary;
+                        sub_tmp.Resolution = Convert.ToString(line[24]);
+
+                        NGetSubCommentList(ret[Convert.ToString(line[1])], sub_tmp);
+                    }
+                    //attachment
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[25])))
+                    {
+                        NGetAttachMentList(ret[Convert.ToString(line[1])], Convert.ToString(line[25]), Convert.ToString(line[30]));
+                    }
+                    //comment
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[26])))
+                    {
+                        var com_tmp = new IssueComments();
+                        com_tmp.IssueKey = Convert.ToString(line[1]);
+                        com_tmp.dbComment = Convert.ToString(line[26]);
+                        com_tmp.Reporter = Convert.ToString(line[27]);
+                        com_tmp.CommentDate = Convert.ToDateTime(line[28]);
+                        com_tmp.CommentType = Convert.ToString(line[29]);
+                        NGetCommentList(ret[Convert.ToString(line[1])], com_tmp);
+                    }
+                }
+                else
+                {
+                    var tempvm = new IssueViewModels(Convert.ToString(line[0])
+                        , Convert.ToString(line[1]), Convert.ToString(line[2])
+                        , Convert.ToString(line[3]), Convert.ToString(line[4])
+                        , Convert.ToString(line[5]), Convert.ToString(line[6])
+                        , Convert.ToString(line[7]), Convert.ToString(line[8])
+                        , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
+
+                    tempvm.ModuleSN = Convert.ToString(line[12]);
+                    tempvm.LYT = Convert.ToString(line[13]);
+                    //RMA
+                    tempvm.FinisarRMA = Convert.ToString(line[14]);
+                    tempvm.FinisarModel = Convert.ToString(line[15]);
+                    tempvm.ECustomer = Convert.ToString(line[16]);
+                    tempvm.CRMANUM = Convert.ToString(line[17]);
+                    tempvm.CReport = Convert.ToString(line[18]);
+                    tempvm.ModuleSN = Convert.ToString(line[19]);
+                    tempvm.RMAFailureCode = Convert.ToString(line[20]);
+                    tempvm.FVCode = Convert.ToString(line[21]);
+                    tempvm.NContainMent = new List<IssueViewModels>();
+                    tempvm.NCorrectMent = new List<IssueViewModels>();
+                    //subissue
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[22])))
+                    {
+                        var sub_summary = Convert.ToString(line[23]);
+                        var sub_tmp = new IssueViewModels();
+                        sub_tmp.IssueKey = Convert.ToString(line[22]);
+                        sub_tmp.Summary = sub_summary;
+                        sub_tmp.Resolution = Convert.ToString(line[24]);
+
+                        NGetSubCommentList(tempvm, sub_tmp);
+                    }
+                    //attachment
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[25])))
+                    {
+                        NGetAttachMentList(tempvm, Convert.ToString(line[25]), Convert.ToString(line[30]));
+                    }
+                    //comment
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[26])))
+                    {
+                        var com_tmp = new IssueComments();
+                        com_tmp.IssueKey = Convert.ToString(line[1]);
+                        com_tmp.dbComment = Convert.ToString(line[26]);
+                        com_tmp.Reporter = Convert.ToString(line[27]);
+                        com_tmp.CommentDate = Convert.ToDateTime(line[28]);
+                        com_tmp.CommentType = Convert.ToString(line[29]);
+                        NGetCommentList(tempvm, com_tmp);
+                    }
+
+                    ret.Add(Convert.ToString(line[1]), tempvm);
+                }
+            }
+            return ret;
+        }
+        public static Dictionary<string, IssueViewModels> NRetrieveOBAByProjectKey(string projectkey, string StartDate, string EndDate, string issuetype, Controller ctrl)
+        {
+            var sql = @"select i.ProjectKey,i.IssueKey,i.IssueType,i.Summary,i.Priority,i.DueDate,
+                    i.ResolvedDate,i.ReportDate,i.Assignee,i.Reporter,i.Resolution,
+                    i.RelativePeoples,i.ModuleSN,i.APVal2, 
+                    io.FinisarDMR,io.OBAFailureRate,io.MaterialDisposition,io.ModuleSN,io.FVCode,io.APVal1,
+                    ib.IssueKey, ib.Summary, ib.Resolution, iaa.Attachment,
+                    ic.Comment,ic.Reporter,ic.CommentDate,ic.CommentType, iaa.APVal1
+                    from Issue as i 
+                    left join IssueOBA as io on (i.IssueKey = io.IssueKey and i.IssueType = 'OBA')
+                    left join Issue as ib on (i.IssueKey = ib.ParentIssueKey and ib.APVal1 <> 'delete')
+                    left join IssueAttachment as iaa on (i.IssueKey = iaa.IssueKey 
+                        and i.APVal1 != 'InternalRMA' and i.APVal1 != 'CustomRMA')
+                    left join IssueComments as ic on (i.IssueKey = ic.IssueKey and ic.Removed <> 'TRUE' and ic.CommentType = 'Root Cause')
+                    where i.APVal1 <> 'delete' and i.ProjectKey = @ProjectKey and i.ParentIssueKey = '' 
+                    and i.IssueType = @IssueType ";
+            var param = new Dictionary<string, string>();
+            param.Add("@ProjectKey", projectkey);
+            param.Add("@IssueType", issuetype);
+            if (string.Compare(StartDate, "NONE", true) != 0
+                && !string.IsNullOrEmpty(StartDate))
+            {
+                sql += " and i.ReportDate between @sDate and @eDate ";
+                param.Add("@sDate", StartDate);
+                param.Add("@eDate", EndDate);
+            }
+            sql += " order by i.DueDate DESC";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
+            var ret = new Dictionary<string, IssueViewModels>();
+            foreach (var line in dbret)
+            {
+                if (ret.ContainsKey(Convert.ToString(line[1])))
+                {
+                    //subissue
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[20])))
+                    {
+                        var sub_summary = Convert.ToString(line[21]);
+                        var sub_tmp = new IssueViewModels();
+                        sub_tmp.IssueKey = Convert.ToString(line[20]);
+                        sub_tmp.Summary = sub_summary;
+                        sub_tmp.Resolution = Convert.ToString(line[22]);
+
+                        NGetSubCommentList(ret[Convert.ToString(line[1])], sub_tmp);
+                    }
+                    //attachment
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[23])))
+                    {
+                        NGetAttachMentList(ret[Convert.ToString(line[1])], Convert.ToString(line[23]), Convert.ToString(line[28]));
+                    }
+                    //comment
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[24])))
+                    {
+                        var com_tmp = new IssueComments();
+                        com_tmp.IssueKey = Convert.ToString(line[1]);
+                        com_tmp.dbComment = Convert.ToString(line[24]);
+                        com_tmp.Reporter = Convert.ToString(line[25]);
+                        com_tmp.CommentDate = Convert.ToDateTime(line[26]);
+                        com_tmp.CommentType = Convert.ToString(line[27]);
+                        NGetCommentList(ret[Convert.ToString(line[1])], com_tmp);
+                    }
+                }
+                else
+                {
+                    var tempvm = new IssueViewModels(Convert.ToString(line[0])
+                        , Convert.ToString(line[1]), Convert.ToString(line[2])
+                        , Convert.ToString(line[3]), Convert.ToString(line[4])
+                        , Convert.ToString(line[5]), Convert.ToString(line[6])
+                        , Convert.ToString(line[7]), Convert.ToString(line[8])
+                        , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
+
+                    tempvm.ModuleSN = Convert.ToString(line[12]);
+                    tempvm.LYT = Convert.ToString(line[13]);
+                    //OBA
+                    tempvm.FinisarDMR = Convert.ToString(line[14]);
+                    tempvm.OBAFailureRate = Convert.ToString(line[15]);
+                    tempvm.MaterialDisposition = Convert.ToString(line[16]);
+                    tempvm.ModuleSN = Convert.ToString(line[17]);
+                    tempvm.FVCode = Convert.ToString(line[18]);
+                    tempvm.ProductType = Convert.ToString(line[19]);
+                    tempvm.NContainMent = new List<IssueViewModels>();
+                    tempvm.NCorrectMent = new List<IssueViewModels>();
+                    //subissue
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[20])))
+                    {
+                        var sub_summary = Convert.ToString(line[21]);
+                        var sub_tmp = new IssueViewModels();
+                        sub_tmp.IssueKey = Convert.ToString(line[20]);
+                        sub_tmp.Summary = sub_summary;
+                        sub_tmp.Resolution = Convert.ToString(line[22]);
+
+                        NGetSubCommentList(tempvm, sub_tmp);
+                    }
+                    //attachment
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[23])))
+                    {
+                        NGetAttachMentList(tempvm, Convert.ToString(line[23]), Convert.ToString(line[28]));
+                    }
+                    //comment
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[24])))
+                    {
+                        var com_tmp = new IssueComments();
+                        com_tmp.IssueKey = Convert.ToString(line[1]);
+                        com_tmp.dbComment = Convert.ToString(line[24]);
+                        com_tmp.Reporter = Convert.ToString(line[25]);
+                        com_tmp.CommentDate = Convert.ToDateTime(line[26]);
+                        com_tmp.CommentType = Convert.ToString(line[27]);
+                        NGetCommentList(tempvm, com_tmp);
+                    }
+
+                    ret.Add(Convert.ToString(line[1]), tempvm);
+                }
+            }
+            return ret;
+        }
+        public static Dictionary<string, IssueViewModels> NRetrieveQualityByProjectKey(string projectkey, string StartDate, string EndDate, string issuetype, Controller ctrl)
+        {
+            var sql = @"select i.ProjectKey,i.IssueKey,i.IssueType,i.Summary,i.Priority,i.DueDate,
+                    i.ResolvedDate,i.ReportDate,i.Assignee,i.Reporter,i.Resolution,
+                    i.RelativePeoples,i.ModuleSN,i.APVal2, 
+                    ia.APVal1,ia.APVal2,ia.APVal3,ia.APVal4,
+                    ib.IssueKey, ib.Summary, ib.Resolution, iaa.Attachment,
+                    ic.Comment,ic.Reporter,ic.CommentDate,ic.CommentType,iaa.APVal1
+                    from Issue as i 
+                    left join IssueAttribute as ia on (i.IssueKey = ia.IssueKey and i.IssueType = 'Quality')
+                    left join Issue as ib on (i.IssueKey = ib.ParentIssueKey and ib.APVal1 <> 'delete')
+                    left join IssueAttachment as iaa on i.IssueKey = iaa.IssueKey
+                    left join IssueComments as ic on (i.IssueKey = ic.IssueKey and ic.Removed <> 'TRUE' and ic.CommentType = 'Root Cause')
+                    where i.APVal1 <> 'delete' and i.ProjectKey = @ProjectKey and i.ParentIssueKey = '' 
+                    and i.IssueType = @IssueType ";
+            var param = new Dictionary<string, string>();
+            param.Add("@ProjectKey", projectkey);
+            param.Add("@IssueType", issuetype);
+            if (string.Compare(StartDate, "NONE", true) != 0
+                && !string.IsNullOrEmpty(StartDate))
+            {
+                sql += " and i.ReportDate between @sDate and @eDate ";
+                param.Add("@sDate", StartDate);
+                param.Add("@eDate", EndDate);
+            }
+            sql += " order by i.DueDate DESC";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
+            var ret = new Dictionary<string, IssueViewModels>();
+            foreach (var line in dbret)
+            {
+                if (ret.ContainsKey(Convert.ToString(line[1])))
+                {
+                    //subissue
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[18])))
+                    {
+                        var sub_summary = Convert.ToString(line[19]);
+                        var sub_tmp = new IssueViewModels();
+                        sub_tmp.IssueKey = Convert.ToString(line[18]);
+                        sub_tmp.Summary = sub_summary;
+                        sub_tmp.Resolution = Convert.ToString(line[20]);
+
+                        NGetSubCommentList(ret[Convert.ToString(line[1])], sub_tmp);
+                    }
+                    //attachment
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[21])))
+                    {
+                        NGetAttachMentList(ret[Convert.ToString(line[1])], Convert.ToString(line[21]), Convert.ToString(line[26]));
+                    }
+                    //comment
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[22])))
+                    {
+                        var com_tmp = new IssueComments();
+                        com_tmp.IssueKey = Convert.ToString(line[1]);
+                        com_tmp.dbComment = Convert.ToString(line[22]);
+                        com_tmp.Reporter = Convert.ToString(line[23]);
+                        com_tmp.CommentDate = Convert.ToDateTime(line[24]);
+                        com_tmp.CommentType = Convert.ToString(line[25]);
+                        NGetCommentList(ret[Convert.ToString(line[1])], com_tmp);
+                    }
+                }
+                else
+                {
+                    var tempvm = new IssueViewModels(Convert.ToString(line[0])
+                        , Convert.ToString(line[1]), Convert.ToString(line[2])
+                        , Convert.ToString(line[3]), Convert.ToString(line[4])
+                        , Convert.ToString(line[5]), Convert.ToString(line[6])
+                        , Convert.ToString(line[7]), Convert.ToString(line[8])
+                        , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
+
+                    tempvm.ModuleSN = Convert.ToString(line[12]);
+                    tempvm.LYT = Convert.ToString(line[13]);
+                    //Quality
+                    tempvm.RMAFailureCode = Convert.ToString(line[14]);
+                    tempvm.ProductType = Convert.ToString(line[15]);
+                    tempvm.AffectRange = Convert.ToString(line[16]);
+                    tempvm.MaterialDisposition = Convert.ToString(line[17]);
+                    tempvm.NContainMent = new List<IssueViewModels>();
+                    tempvm.NCorrectMent = new List<IssueViewModels>();
+                    //subissue
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[18])))
+                    {
+                        var sub_summary = Convert.ToString(line[19]);
+                        var sub_tmp = new IssueViewModels();
+                        sub_tmp.IssueKey = Convert.ToString(line[18]);
+                        sub_tmp.Summary = sub_summary;
+                        sub_tmp.Resolution = Convert.ToString(line[20]);
+
+                        NGetSubCommentList(tempvm, sub_tmp);
+                    }
+                    //attachment
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[21])))
+                    {
+                        NGetAttachMentList(tempvm, Convert.ToString(line[21]), Convert.ToString(line[26]));
+                    }
+                    //comment
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[22])))
+                    {
+                        var com_tmp = new IssueComments();
+                        com_tmp.IssueKey = Convert.ToString(line[1]);
+                        com_tmp.dbComment = Convert.ToString(line[22]);
+                        com_tmp.Reporter = Convert.ToString(line[23]);
+                        com_tmp.CommentDate = Convert.ToDateTime(line[24]);
+                        com_tmp.CommentType = Convert.ToString(line[25]);
+                        NGetCommentList(tempvm, com_tmp);
+                    }
+
+                    ret.Add(Convert.ToString(line[1]), tempvm);
+                }
+            }
+            return ret;
+        }
+        public static Dictionary<string, IssueViewModels> NRetrieveRelByProjectKey(string projectkey, string StartDate, string EndDate, string issuetype, Controller ctrl)
+        {
+            var sql = @"select i.ProjectKey,i.IssueKey,i.IssueType,i.Summary,i.Priority,i.DueDate,
+                    i.ResolvedDate,i.ReportDate,i.Assignee,i.Reporter,i.Resolution,
+                    i.RelativePeoples,i.ModuleSN,i.APVal2, 
+                    iab.APVal1,iab.APVal2,iab.APVal3,iab.APVal4,iab.APVal5,iab.APVal6,
+                    iab.APVal7,iab.APVal8,iab.APVal9,iab.APVal10,iab.APVal11,iab.APVal12,
+                    ib.IssueKey, ib.Summary, ib.Resolution, iaa.Attachment,
+                    ic.Comment,ic.Reporter,ic.CommentDate,ic.CommentType,iaa.APVal1
+                    from Issue as i 
+                    left join IssueAttribute as iab on (i.IssueKey = iab.IssueKey and i.IssueType = 'Rel')
+                    left join Issue as ib on (i.IssueKey = ib.ParentIssueKey and ib.APVal1 <> 'delete')
+                    left join IssueAttachment as iaa on (i.IssueKey = iaa.IssueKey 
+                        and i.APVal1 != 'InternalRMA' and i.APVal1 != 'CustomRMA')
+                    left join IssueComments as ic on (i.IssueKey = ic.IssueKey and ic.Removed <> 'TRUE' and ic.CommentType = 'Root Cause')
+                    where i.APVal1 <> 'delete' and i.ProjectKey = @ProjectKey and i.ParentIssueKey = '' 
+                    and i.IssueType = @IssueType ";
+            var param = new Dictionary<string, string>();
+            param.Add("@ProjectKey", projectkey);
+            param.Add("@IssueType", issuetype);
+            if (string.Compare(StartDate, "NONE", true) != 0
+                && !string.IsNullOrEmpty(StartDate))
+            {
+                sql += " and i.ReportDate between @sDate and @eDate ";
+                param.Add("@sDate", StartDate);
+                param.Add("@eDate", EndDate);
+            }
+            sql += " order by i.DueDate DESC";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
+            var ret = new Dictionary<string, IssueViewModels>();
+            foreach (var line in dbret)
+            {
+                if (ret.ContainsKey(Convert.ToString(line[1])))
+                {
+                    //subissue
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[26])))
+                    {
+                        var sub_summary = Convert.ToString(line[27]);
+                        var sub_tmp = new IssueViewModels();
+                        sub_tmp.IssueKey = Convert.ToString(line[26]);
+                        sub_tmp.Summary = sub_summary;
+                        sub_tmp.Resolution = Convert.ToString(line[28]);
+                        NGetSubCommentList(ret[Convert.ToString(line[1])], sub_tmp);
+                    }
+                    //attachment
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[29])))
+                    {
+                        NGetAttachMentList(ret[Convert.ToString(line[1])], Convert.ToString(line[29]), Convert.ToString(line[34]));
+                    }
+                    //comment
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[30])))
+                    {
+                        var com_tmp = new IssueComments();
+                        com_tmp.IssueKey = Convert.ToString(line[1]);
+                        com_tmp.dbComment = Convert.ToString(line[30]);
+                        com_tmp.Reporter = Convert.ToString(line[31]);
+                        com_tmp.CommentDate = Convert.ToDateTime(line[32]);
+                        com_tmp.CommentType = Convert.ToString(line[33]);
+                        NGetCommentList(ret[Convert.ToString(line[1])], com_tmp);
+                    }
+                }
+                else
+                {
+                    var tempvm = new IssueViewModels(Convert.ToString(line[0])
+                        , Convert.ToString(line[1]), Convert.ToString(line[2])
+                        , Convert.ToString(line[3]), Convert.ToString(line[4])
+                        , Convert.ToString(line[5]), Convert.ToString(line[6])
+                        , Convert.ToString(line[7]), Convert.ToString(line[8])
+                        , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
+
+                    tempvm.ModuleSN = Convert.ToString(line[12]);
+                    tempvm.LYT = Convert.ToString(line[13]);
+                    //Rel
+                    tempvm.CaseID = Convert.ToString(line[14]);
+                    tempvm.ProductType = Convert.ToString(line[15]);
+                    tempvm.LineCategory = Convert.ToString(line[16]);
+                    tempvm.QualType = Convert.ToString(line[17]);
+                    tempvm.TestType = Convert.ToString(line[18]);
+                    tempvm.FailureInterval = Convert.ToString(line[19]);
+                    tempvm.TestFailure = Convert.ToString(line[20]);
+                    tempvm.Location = Convert.ToString(line[21]);
+                    tempvm.RequestID = Convert.ToString(line[22]);
+                    tempvm.FailQTY = Convert.ToString(line[23]);
+                    tempvm.TotalQTY = Convert.ToString(line[24]);
+                    tempvm.FVCode = Convert.ToString(line[25]);
+                    tempvm.NContainMent = new List<IssueViewModels>();
+                    tempvm.NCorrectMent = new List<IssueViewModels>();
+                    //subissue
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[26])))
+                    {
+                        var sub_summary = Convert.ToString(line[27]);
+                        var sub_tmp = new IssueViewModels();
+                        sub_tmp.IssueKey = Convert.ToString(line[26]);
+                        sub_tmp.Summary = sub_summary;
+                        sub_tmp.Resolution = Convert.ToString(line[28]);
+                        NGetSubCommentList(tempvm, sub_tmp);
+                    }
+                    //attachment
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[29])))
+                    {
+                        NGetAttachMentList(tempvm, Convert.ToString(line[29]), Convert.ToString(line[34]));
+                    }
+                    //comment
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[30])))
+                    {
+                        var com_tmp = new IssueComments();
+                        com_tmp.IssueKey = Convert.ToString(line[1]);
+                        com_tmp.dbComment = Convert.ToString(line[30]);
+                        com_tmp.Reporter = Convert.ToString(line[31]);
+                        com_tmp.CommentDate = Convert.ToDateTime(line[32]);
+                        com_tmp.CommentType = Convert.ToString(line[33]);
+                        NGetCommentList(tempvm, com_tmp);
+                    }
+
+                    ret.Add(Convert.ToString(line[1]), tempvm);
+                }
+            }
+            return ret;
+        }
+        public static Dictionary<string, IssueViewModels> NRetrieveOtherByProjectKey(string projectkey, string StartDate, string EndDate, string issuetype, Controller ctrl)
+        {
+            var sql = @"select i.ProjectKey,i.IssueKey,i.IssueType,i.Summary,i.Priority,i.DueDate,
+                    i.ResolvedDate,i.ReportDate,i.Assignee,i.Reporter,i.Resolution,
+                    i.RelativePeoples,i.ModuleSN,i.APVal2, 
+                    ib.IssueKey, ib.Summary, ib.Resolution, iaa.Attachment,
+                    ic.Comment,ic.Reporter,ic.CommentDate,ic.CommentType,iaa.APVal1
+                    from Issue as i 
+                    left join Issue as ib on (i.IssueKey = ib.ParentIssueKey and ib.APVal1 <> 'delete')
+                    left join IssueAttachment as iaa on (i.IssueKey = iaa.IssueKey 
+                        and i.APVal1 != 'InternalRMA' and i.APVal1 != 'CustomRMA')
+                    left join IssueComments as ic on (i.IssueKey = ic.IssueKey and ic.Removed <> 'TRUE' and ic.CommentType = 'Root Cause')
+                    where i.APVal1 <> 'delete' and i.ProjectKey = @ProjectKey and i.ParentIssueKey = '' 
+                    and i.IssueType = @IssueType ";
+            var param = new Dictionary<string, string>();
+            param.Add("@ProjectKey", projectkey);
+            param.Add("@IssueType", issuetype);
+            if (string.Compare(StartDate, "NONE", true) != 0
+                && !string.IsNullOrEmpty(StartDate))
+            {
+                sql += " and i.ReportDate between @sDate and @eDate ";
+                param.Add("@sDate", StartDate);
+                param.Add("@eDate", EndDate);
+            }
+            sql += " order by i.DueDate DESC";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
+            var ret = new Dictionary<string, IssueViewModels>();
+            foreach (var line in dbret)
+            {
+                if (ret.ContainsKey(Convert.ToString(line[1])))
+                {
+                    //subissue
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[14])))
+                    {
+                        var sub_summary = Convert.ToString(line[15]);
+                        var sub_tmp = new IssueViewModels();
+                        sub_tmp.IssueKey = Convert.ToString(line[14]);
+                        sub_tmp.Summary = sub_summary;
+                        sub_tmp.Resolution = Convert.ToString(line[16]);
+
+                        NGetSubCommentList(ret[Convert.ToString(line[1])], sub_tmp);
+                    }
+                    //attachment
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[17])))
+                    {
+                        NGetAttachMentList(ret[Convert.ToString(line[1])], Convert.ToString(line[17]), Convert.ToString(line[22]));
+                    }
+                    //comment
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[18])))
+                    {
+                        var com_tmp = new IssueComments();
+                        com_tmp.IssueKey = Convert.ToString(line[1]);
+                        com_tmp.dbComment = Convert.ToString(line[18]);
+                        com_tmp.Reporter = Convert.ToString(line[19]);
+                        com_tmp.CommentDate = Convert.ToDateTime(line[20]);
+                        com_tmp.CommentType = Convert.ToString(line[21]);
+                        NGetCommentList(ret[Convert.ToString(line[1])], com_tmp);
+                    }
+                }
+                else
+                {
+                    var tempvm = new IssueViewModels(Convert.ToString(line[0])
+                        , Convert.ToString(line[1]), Convert.ToString(line[2])
+                        , Convert.ToString(line[3]), Convert.ToString(line[4])
+                        , Convert.ToString(line[5]), Convert.ToString(line[6])
+                        , Convert.ToString(line[7]), Convert.ToString(line[8])
+                        , Convert.ToString(line[9]), Convert.ToString(line[10]), "", Convert.ToString(line[11]));
+
+                    tempvm.ModuleSN = Convert.ToString(line[12]);
+                    tempvm.LYT = Convert.ToString(line[13]);
+                    //Rel
+                    tempvm.NContainMent = new List<IssueViewModels>();
+                    tempvm.NCorrectMent = new List<IssueViewModels>();
+                    //subissue
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[14])))
+                    {
+                        var sub_summary = Convert.ToString(line[15]);
+                        var sub_tmp = new IssueViewModels();
+                        sub_tmp.IssueKey = Convert.ToString(line[14]);
+                        sub_tmp.Summary = sub_summary;
+                        sub_tmp.Resolution = Convert.ToString(line[16]);
+
+                        NGetSubCommentList(tempvm, sub_tmp);
+                    }
+                    //attachment
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[17])))
+                    {
+                        NGetAttachMentList(tempvm, Convert.ToString(line[17]), Convert.ToString(line[22]));
+                    }
+                    //comment
+                    if (!string.IsNullOrEmpty(Convert.ToString(line[18])))
+                    {
+                        var com_tmp = new IssueComments();
+                        com_tmp.IssueKey = Convert.ToString(line[1]);
+                        com_tmp.dbComment = Convert.ToString(line[18]);
+                        com_tmp.Reporter = Convert.ToString(line[19]);
+                        com_tmp.CommentDate = Convert.ToDateTime(line[20]);
+                        com_tmp.CommentType = Convert.ToString(line[21]);
+                        NGetCommentList(tempvm, com_tmp);
+                    }
+
+                    ret.Add(Convert.ToString(line[1]), tempvm);
+                }
+            }
+            return ret;
+        }
+        private static void NGetAttachMentList(IssueViewModels tempvm, string a_type, string a_path)
+        {
+            if(tempvm.NAttachList == null)
+            {
+                tempvm.NAttachList = new List<string>();
+            }
+            if(tempvm.NInternalAttachList == null)
+            {
+                tempvm.NInternalAttachList = new List<string>();
+            }
+            if(tempvm.NCustomAttachList == null)
+            {
+                tempvm.NCustomAttachList = new List<string>();
+            }
+            if (string.Compare(a_type, ISSUEATTACHTYPE.InternalRMA) == 0)
+            {
+                tempvm.NInternalAttachList.Add(Convert.ToString(a_path));
+            }
+            else if (string.Compare(a_type, ISSUEATTACHTYPE.CustomRMA) == 0)
+            {
+                tempvm.NCustomAttachList.Add(Convert.ToString(a_path));
+            }
+            else
+            {
+                tempvm.NAttachList.Add(Convert.ToString(a_path));
+            }
+        }
+        private static void NGetCommentList(IssueViewModels tempvm, IssueComments com_tmp)
+        {
+            if(tempvm.NRootCauseList == null)
+            {
+                tempvm.NRootCauseList = new List<IssueComments>();
+            }
+            if (tempvm.NInternalReportCommentList == null)
+            {
+                tempvm.NInternalReportCommentList = new List<IssueComments>();
+            }
+            if (tempvm.NReport4CustomerCommentList == null)
+            {
+                tempvm.NReport4CustomerCommentList = new List<IssueComments>();
+            }
+            if(tempvm.NAnalysisCommentList == null)
+            {
+                tempvm.NAnalysisCommentList = new List<IssueComments>();
+            }
+
+            if (string.Compare(Convert.ToString(com_tmp.CommentType), COMMENTTYPE.RootCause) == 0)
+            {
+                tempvm.NRootCauseList.Add(com_tmp);
+            }
+            if (string.Compare(Convert.ToString(com_tmp.CommentType), COMMENTTYPE.InternalReport) == 0)
+            {
+                tempvm.NInternalReportCommentList.Add(com_tmp);
+            }
+            if (string.Compare(Convert.ToString(com_tmp.CommentType), COMMENTTYPE.CustomReport) == 0)
+            {
+                tempvm.NReport4CustomerCommentList.Add(com_tmp);
+            }
+            if(string.Compare(Convert.ToString(com_tmp.CommentType), COMMENTTYPE.Analysis) == 0)
+            {
+                tempvm.NAnalysisCommentList.Add(com_tmp);
+            }
+        }
+        private static void NGetSubCommentList(IssueViewModels tempvm, IssueViewModels sub_vm)
+        {
+            if (tempvm.NContainMent == null)
+            {
+                tempvm.NContainMent = new List<IssueViewModels>();
+            }
+            if (tempvm.NCorrectMent == null)
+            {
+                tempvm.NCorrectMent = new List<IssueViewModels>();
+            }
+            if (tempvm.NFailureVerifyActions == null)
+            {
+                tempvm.NFailureVerifyActions = new List<IssueViewModels>();
+            }
+            if (tempvm.NCorrectiveVerifyActions == null)
+            {
+                tempvm.NCorrectiveVerifyActions = new List<IssueViewModels>();
+            }
+            if (sub_vm.Summary.Contains("[Containment]")
+                    || sub_vm.Summary.Contains(RELSubIssueType.CONTAINMENTACTION))
+            {
+                tempvm.NContainMent.Add(sub_vm);
+            }
+            else if (sub_vm.Summary.Contains("[Corrective]")
+                    || sub_vm.Summary.Contains(RELSubIssueType.CORRECTIVEACTION))
+            {
+                tempvm.NCorrectMent.Add(sub_vm);
+            }
+            else if (sub_vm.Summary.Contains(RELSubIssueType.FAILVERIFYACTION))
+            {
+                tempvm.NFailureVerifyActions.Add(sub_vm);
+            }
+            else if (sub_vm.Summary.Contains(RELSubIssueType.VERIFYCORRECTIVEACTION))
+            {
+                tempvm.NCorrectiveVerifyActions.Add(sub_vm);
+            }
         }
 
         public static List<IssueViewModels> RetrieveIssueTypeByProjectKey(string projectkey, string StartDate, string EndDate, string issuetype, Controller ctrl)

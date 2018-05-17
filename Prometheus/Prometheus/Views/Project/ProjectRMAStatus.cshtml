@@ -12,308 +12,244 @@
     <div class="nav navbar-nav navbar-left">
         <ol class="breadcrumb" style="width:600px">
             <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
-            @if (Model != null && Model.Count() > 0)
+            @if (ViewBag.data.Count > 0)
             {
-                <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ElementAt(0).ProjectKey)">Project Detail</a></li>
+                <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(ViewBag.pKey)">Project Detail</a></li>
             }
-
-            @if (Model != null && Model.Count() > 0)
-            {
-                <li class="active">@(Model.ElementAt(0).ProjectKey) RMA Status</li>
-            }
-            else
-            {
-                <li class="active">Project RMA Status</li>
-            }
+            <li class="active">@(ViewBag.pKey + " ")Project RMA Status</li>
         </ol>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-xs-12">&nbsp;</div>
+<div class="row row-margin">
+    <input type="hidden" id="pKey" name="pKey" value="@ViewBag.pKey" />
+    <div class="col-xs-1">
+        <label class="control-label" for="StartDate">StartDate</label>
+    </div>
+    <div class="col-xs-2">
+        <input class="form-control text-box single-line datepicker" id="StartDate"
+               name="StartDate" type="text" value="@ViewBag.sDate" />
+    </div>
+    <div class="col-xs-1">
+        <label class="control-label" for="EndDate">EndDate</label>
+    </div>
+    <div class="col-xs-2">
+        <input class="form-control text-box single-line datepicker" id="EndDate"
+               name="EndDate" type="text" value="@ViewBag.eDate" />
+    </div>
+    <div class="col-xs-2">
+        <input type="button" class="btn btn-success" name="btn-search" id="btn-search" value="Search" />
+    </div>
+    <div class="col-xs-1">
+        <button class="form-control" data-toggle="tooltip" title="Export RMA Report" onclick="ShareRMA()" type="button"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span></button>
+    </div>
+    <div class="col-xs-1">
+        <button class="form-control" data-toggle="tooltip" title="Export All RMA Report" onclick="ShareAllRMA()" type="button"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span>ALL</button>
+    </div>
 </div>
-
-
-    @if (Model != null)
+@if (ViewBag.data.Count > 0)
+{
+    if (ViewBag.chartscript != null)
     {
-
-        if (ViewBag.chartscript != null)
-        {
-
-            <div class="row">
-                <div class="col-xs-2"></div>
-                <div class="col-xs-8">
-                    <div id="failurepie" style="min-width: 310px; height: 300px; margin: 0 auto"></div>
-                </div>
-                <div class="col-xs-2"></div>
+        <div class="row">
+            <div class="col-xs-2"></div>
+            <div class="col-xs-8">
+                <div id="failurepie" style="min-width: 310px; height: 300px; margin: 0 auto"></div>
             </div>
+            <div class="col-xs-2"></div>
+        </div>
+        @Html.Raw(ViewBag.chartscript)
+    }
 
-            <div class="row">
-                <div class="col-xs-12">&nbsp;</div>
-            </div>
-            @Html.Raw(ViewBag.chartscript)
-        }
-
-        var i = 0;
-        @*<table id="firsttable" name="firsttable" class="table table-bordered table-hover">*@
-        <table id="firsttable"  class="display" cellspacing="0">
-            <thead>
-                <tr>
-                    <th width="10%"><font color="white">RMA#</font></th>
-                    <th width="10%"><font color="white">SN</font></th>
-                    <th width="8%"><font color="white">RootCause</font></th>
-                    <th width="8%"><font color="white">FV</font></th>
-                    <th width="8%"><font color="white">RMA Failure</font></th>
-                    <th width="8%"><font color="white">Containment</font></th>
-                    <th width="8%"><font color="white">Corrective</font></th>
-                    <th width="10%"><font color="white">Internal RPT</font></th>
-                    <th width="10%"><font color="white">Customer RPT</font></th>
-                    <th width="10%"><font color="white">Owner</font></th>
-                    <th width="10%"><font color="white">Report Date</font></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
+    var i = 0;
+    <table id="firsttable" class="display" cellspacing="0">
+        <thead>
+            <tr>
+                <th width="10%"><font color="white">RMA#</font></th>
+                <th width="10%"><font color="white">SN</font></th>
+                <th width="8%"><font color="white">RootCause</font></th>
+                <th width="8%"><font color="white">FV</font></th>
+                <th width="8%"><font color="white">RMA Failure</font></th>
+                <th width="8%"><font color="white">Containment</font></th>
+                <th width="8%"><font color="white">Corrective</font></th>
+                <th width="10%"><font color="white">Internal RPT</font></th>
+                <th width="10%"><font color="white">Customer RPT</font></th>
+                <th width="10%"><font color="white">Owner</font></th>
+                <th width="10%"><font color="white">Report Date</font></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in ViewBag.data)
+            {
+                var splitstrs = item.Value.Summary.Split(new string[] { "from" }, StringSplitOptions.None);
+                var rmatitle = item.Value.Summary;
+                if (splitstrs.Length > 1)
                 {
-                    var splitstrs = item.Summary.Split(new string[] { "from" }, StringSplitOptions.None);
-                    var rmatitle = item.Summary;
-                    if (splitstrs.Length > 1)
+                    rmatitle = splitstrs[1].Trim();
+                }
+
+                <tr>
+                    <td width="10%">
+                        <div class="row">
+                            <div class="col-xs-4">
+                                @(ViewBag.data.Count - i)
+                            </div>
+                            <div class="col-xs-8">
+                                <img src="~/Content/images/icon/LowYield.png" MYTP="HOVER" data-toggle="tooltip" title="Critical Error Alarm" style="height:16px;width:16px" onclick="LowYieldWarning('@item.Value.IssueKey')">
+                            </div>
+                        </div>
+                    </td>
+                    <td colspan="9" width="80%">
+                        <a href="/Issue/UpdateIssue?issuekey=@item.Value.IssueKey">
+                            <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
+                            @rmatitle.Substring(0, rmatitle.Length > 200 ? 200 : rmatitle.Length)
+                        </a>
+                    </td>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
+                    <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus2(item.Value.Resolution))</td>
+                </tr>
+                <tr>
+                    <td width="10%">
+                        @if (!string.IsNullOrEmpty(item.Value.LYT))
+                        {
+                            <span class="badge alert-danger">LYT</span>
+                        }
+                        @item.Value.FinisarRMA
+                    </td>
+                    <td width="10%">@item.Value.ModuleSN</td>
+                    @if (item.Value.NRootCauseList != null && item.Value.NRootCauseList.Count > 0)
                     {
-                        rmatitle = splitstrs[1].Trim();
+                        <td width="8%"><a href="/Issue/ShowRootCause?issuekey=@(item.Value.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></td>
+                    }
+                    else
+                    {
+                        <td width="8%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
+                    }
+                    <td width="8%">@item.Value.FVCode</td>
+                    <td width="8%">@item.Value.RMAFailureCode</td>
+
+                    @if (item.Value.NContainMent != null && item.Value.NContainMent.Count > 0)
+                    {
+                        <td width="8%"><a href="/Issue/ShowContainmentAction?issuekey=@(item.Value.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(item.Value.NContainMent[0].Resolution))</a></td>
+                    }
+                    else
+                    {
+                        <td width="8%">N/A</td>
                     }
 
-                    <tr>
-                        <td width="10%">
-                            <div class="row">
-                                <div class="col-xs-4">
-                                    @(Model.Count() - i)
-                                </div>
-                                <div class="col-xs-8">
-                                    <img src="~/Content/images/icon/LowYield.png" MYTP="HOVER" data-toggle="tooltip" title="Critical Error Alarm"  style="height:16px;width:16px" onclick="LowYieldWarning('@item.IssueKey')">
-                                </div>
-                            </div>
-                        </td>
-                        <td colspan="9" width="80%">
-                            <a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">
-                                <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
-                                @rmatitle.Substring(0, rmatitle.Length > 200 ? 200 : rmatitle.Length)
-                            </a>
-                        </td>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus2(item.Resolution))</td>
-                    </tr>
-                    <tr>
-                        <td width="10%">
-                            @if (!string.IsNullOrEmpty(item.LYT))
-                            {
-                                <span class="badge alert-danger">LYT</span>
-                            }
-                            @item.FinisarRMA
-                        </td>
-                        <td width="10%">@item.ModuleSN</td>
-                        @if (item.RootCauseCommentList.Count > 0)
+                    @if (item.Value.NCorrectMent != null && item.Value.NCorrectMent.Count > 0)
                     {
-                            <td width="8%"><a href="/Issue/ShowRootCause?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></td>
-                        }
-                        else
-                        {
-                            <td width="8%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
-                        }
-
-                        <td width="8%">@item.FVCode</td>
-                        <td width="8%">@item.RMAFailureCode</td>
-
-                        @if (item.ContainmentActions.Count > 0)
+                        <td width="8%"><a href="/Issue/ShowCorrectiveAction?issuekey=@(item.Value.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(item.Value.NCorrectMent[0].Resolution))</a></td>
+                    }
+                    else
                     {
-                            <td width="8%"><a href="/Issue/ShowContainmentAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.ContainmentActionStatus())</a></td>
-                        }
-                        else
-                        {
-                            <td width="8%">N/A</td>
-                        }
+                        <td width="8%">N/A</td>
+                    }
 
-                        @if (item.CorrectiveActions.Count > 0)
+                    @if (item.Value.NInternalReportCommentList != null && item.Value.NInternalReportCommentList.Count > 0)
                     {
-                            <td width="8%"><a href="/Issue/ShowCorrectiveAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.CorrectiveActionStatus())</a></td>
-                        }
-                        else
-                        {
-                            <td width="8%">N/A</td>
-                        }
-
-                       @if (item.InternalReportCommentList.Count > 0)
-                       {
-                        if (item.InternalReportCommentList[item.InternalReportCommentList.Count - 1].Comment.Contains("<a href"))
+                        if (item.Value.NInternalReportCommentList[item.Value.NInternalReportCommentList.Count - 1].Comment.Contains("<a href"))
                         {
                             var originalstr = System.Text.RegularExpressions.Regex.Replace(
-                                                        item.InternalReportCommentList[item.InternalReportCommentList.Count - 1].Comment, "<.*?>", string.Empty);
-                            var newcomment = item.InternalReportCommentList[item.InternalReportCommentList.Count - 1].Comment.Replace(originalstr
+                                                        item.Value.NInternalReportCommentList[item.Value.NInternalReportCommentList.Count - 1].Comment, "<.*?>", string.Empty);
+                            var newcomment = item.Value.NInternalReportCommentList[item.Value.NInternalReportCommentList.Count - 1].Comment.Replace(originalstr
                                 , Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done));
-                                <td width="10%">@Html.Raw(newcomment)</td>
-                            }
-                            else
-                            {
-                                <td width="10%"><p><a href="@item.InternalReportCommentList[item.InternalReportCommentList.Count - 1].Comment" target="_blank">@Html.Raw(Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></p></td>
-                            }
-                        }
-                        else if (item.InternalAttachList.Count > 0)
-                        {
-                            <td width="10%"><p><a href="@item.InternalAttachList[item.InternalAttachList.Count - 1]" target="_blank">@Html.Raw(Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></p></td>
+                            <td width="10%">@Html.Raw(newcomment)</td>
                         }
                         else
                         {
-                            <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
+                            <td width="10%"><p><a href="@item.Value.NInternalReportCommentList[item.Value.NInternalReportCommentList.Count - 1].Comment" target="_blank">@Html.Raw(Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></p></td>
                         }
-
-                        @if (item.Report4CustomerCommentList.Count > 0)
+                    }
+                    else if (item.Value.NInternalAttachList != null && item.Value.NInternalAttachList.Count > 0)
                     {
-                        if (item.Report4CustomerCommentList[item.Report4CustomerCommentList.Count - 1].Comment.Contains("<a href"))
+                        <td width="10%"><p><a href="@item.Value.NInternalAttachList[item.Value.NInternalAttachList.Count - 1]" target="_blank">@Html.Raw(Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></p></td>
+                    }
+                    else
+                    {
+                        <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
+                    }
+
+                    @if (item.Value.NReport4CustomerCommentList != null && item.Value.NReport4CustomerCommentList.Count > 0)
+                    {
+                        if (item.Value.NReport4CustomerCommentList[item.Value.NReport4CustomerCommentList.Count - 1].Comment.Contains("<a href"))
                         {
                             var originalstr = System.Text.RegularExpressions.Regex.Replace(
-                                item.Report4CustomerCommentList[item.Report4CustomerCommentList.Count - 1].Comment, "<.*?>", string.Empty);
-                            var newcomment = item.Report4CustomerCommentList[item.Report4CustomerCommentList.Count - 1].Comment.Replace(originalstr
+                                item.Value.NReport4CustomerCommentList[item.Value.NReport4CustomerCommentList.Count - 1].Comment, "<.*?>", string.Empty);
+                            var newcomment = item.Value.NReport4CustomerCommentList[item.Value.NReport4CustomerCommentList.Count - 1].Comment.Replace(originalstr
                                 , Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done));
-
-                                <td width="10%">@Html.Raw(newcomment)</td>
-                            }
-                            else
-                            {
-                                <td width="10%"><p><a href="@item.Report4CustomerCommentList[item.Report4CustomerCommentList.Count - 1].Comment" target="_blank">@Html.Raw(Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></p></td>
-                            }
-                        }
-                        else if (item.CustomAttachList.Count > 0)
-                        {
-                            <td width="10%"><p><a href="@item.CustomAttachList[item.CustomAttachList.Count - 1]" target="_blank">@Html.Raw(Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></p></td>
+                            <td width="10%">@Html.Raw(newcomment)</td>
                         }
                         else
                         {
-                            <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
+                            <td width="10%"><p><a href="@item.Value.NReport4CustomerCommentList[item.Value.NReport4CustomerCommentList.Count - 1].Comment" target="_blank">@Html.Raw(Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></p></td>
                         }
+                    }
+                    else if (item.Value.NCustomAttachList != null && item.Value.NCustomAttachList.Count > 0)
+                    {
+                        <td width="10%"><p><a href="@item.Value.NCustomAttachList[item.Value.NCustomAttachList.Count - 1]" target="_blank">@Html.Raw(Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></p></td>
+                    }
+                    else
+                    {
+                        <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
+                    }
 
-                        <td width="10%"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
-                        <td width="10%">@item.ReportDate.ToString("MM/dd-yy")</td>
-                    </tr>
-                    i = i + 1;
-                }
-            </tbody>
-        </table>
-        <script type="text/javascript">
-            //$(document).ready(function () {
-            //    var offset = $('.navbar').height();
-            //    offset = 1.6 * offset;
-            //    $("#firsttable").stickyTableHeaders({ fixedOffset: offset });
-            //});
-
-            $(document).ready(function () {
-                $('#firsttable').DataTable({
-                    'iDisplayLength': 20,
-                    'aLengthMenu': [[20, 50, 100, -1],
-                                    [20, 50, 100, "All"]],
-                    "aaSorting": [],
-                    "order": []
-                });
-            });
-
-            function LowYieldWarning(oBT) {
-                if (confirm("Warning: only FA assignee can trigger Critical Error Alarm.")) {
-                    var myurl = "/Project/LowYieldWarn?IssueKey=" + oBT;
-                    window.open(myurl, '_blank');
-                }
+                    <td width="10%"><a href="/User/UserCenter?username=@item.Value.Assignee">@item.Value.Assignee.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
+                    <td width="10%">@item.Value.ReportDate.ToString("MM/dd-yy")</td>
+                </tr>
+                i = i + 1;
             }
-        </script>
-
-        <div class="row">
-            <div class="col-xs-12">&nbsp;</div>
-        </div>
-
-        <div class="row">
-            @if (Model != null && Model.Count() > 0)
-            {
-                <div class="col-xs-1">
-                    <label class="control-label" for="StartDate">StartDate</label>
-                </div>
-                <div class="col-xs-2">
-                    <input class="form-control text-box single-line" id="StartDate" name="StartDate" type="text" value="" />
-                </div>
-                <div class="col-xs-1">
-                    <label class="control-label" for="EndDate">EndDate</label>
-                </div>
-                <div class="col-xs-2">
-                    <input class="form-control text-box single-line" id="EndDate" name="EndDate" type="text" value="" />
-                </div>
-            }
-            else
-            {
-                <div class="col-xs-6">
-                </div>
-            }
-
-            <div class="col-xs-1">
-                @if (Model != null && Model.Count() > 0)
-                {
-                    <button class="form-control" data-toggle="tooltip" title="Export RMA Report" onclick="ShareRMA()" type="button"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span></button>
-                }
-
-            </div>
-            <div class="col-xs-1">
-                @if (Model != null && Model.Count() > 0)
-                {
-                    <button class="form-control" data-toggle="tooltip" title="Export All RMA Report" onclick="ShareAllRMA()" type="button"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span>ALL</button>
-                }
-
-            </div>
-
-            <div class="col-xs-1">
-            </div>
-            <div class="col-xs-3"></div>
-
-            @if (Model != null && Model.Count() > 0)
-            {
-                <script type="text/javascript">
+        </tbody>
+    </table>
+    <script type="text/javascript">
         $(document).ready(function () {
-            $("#StartDate").datepicker({
-                changeMonth: true,
-                changeYear: true,
-                dateFormat: 'yy-mm-dd'
+            $('#firsttable').DataTable({
+                'iDisplayLength': 20,
+                'aLengthMenu': [[20, 50, 100, -1],
+                [20, 50, 100, "All"]],
+                "aaSorting": false,
+                "order": false
             });
-            $("#EndDate").datepicker({
+            $(".datepicker").datepicker({
                 changeMonth: true,
                 changeYear: true,
                 dateFormat: 'yy-mm-dd'
             });
         });
 
-            function ShareRMA() {
-                if (document.getElementById("StartDate").value && document.getElementById("EndDate").value) {
-                    var myurl = '/Issue/ExportRMAData?ProjectKey=@Model.ElementAt(0).ProjectKey&StartDate=' + document.getElementById("StartDate").value + '&EndDate=' + document.getElementById("EndDate").value;
-                    window.open(myurl, '_blank');
-                }
-                else {
-                    var myurl = '/Issue/ExportRMAData?ProjectKey=@Model.ElementAt(0).ProjectKey&StartDate=NONE&EndDate=NONE';
-                    window.open(myurl, '_blank');
-                }
+        function LowYieldWarning(oBT) {
+            if (confirm("Warning: only FA assignee can trigger Critical Error Alarm.")) {
+                var myurl = "/Project/LowYieldWarn?IssueKey=" + oBT;
+                window.open(myurl, '_blank');
             }
-
-            function ShareAllRMA() {
-                if (document.getElementById("StartDate").value && document.getElementById("EndDate").value) {
-                    var myurl = '/Issue/ExportAllRMAData?StartDate=' + document.getElementById("StartDate").value + '&EndDate=' + document.getElementById("EndDate").value;
-                    window.open(myurl, '_blank');
-                }
-                else
-                {
-                    var myurl = '/Issue/ExportAllRMAData?StartDate=NONE&EndDate=NONE';
-                    window.open(myurl, '_blank');
-                }
         }
-                </script>
-            }
 
-        </div>
-    }
+        $("body").on('click', '#btn-search', function () {
+            var pKey = $.trim($('#pKey').val());
+            var sDate = $.trim($('#StartDate').val());
+            var eDate = $.trim($('#EndDate').val());
+            window.location.href = '/Project/ProjectRMAStatus?ProjectKey=' + pKey + '&sDate=' + sDate + '&eDate=' + eDate;
+        })
+
+        function ShareRMA() {
+            var pKey = $.trim($('#pKey').val());
+            var sDate = $.trim($('#StartDate').val());
+            var eDate = $.trim($('#EndDate').val());
+            var myurl = '/Issue/ExportRMAData?ProjectKey=' + pKey + '&StartDate=' + sDate + '&EndDate=' + eDate;
+            window.open(myurl, '_blank');
+        }
+
+        function ShareAllRMA() {
+            var pKey = $.trim($('#pKey').val());
+            var myurl = '/Issue/ExportRMAData?ProjectKey=' + pKey;
+            window.open(myurl, '_blank');
+        }
+    </script>
+}

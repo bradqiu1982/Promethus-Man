@@ -12,33 +12,38 @@
     <div class="nav navbar-nav navbar-left">
         <ol class="breadcrumb" style="width:600px">
             <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
-            @if (Model != null && Model.Count() > 0)
+            @if (ViewBag.data.Count > 0)
             {
-                <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(Model.ElementAt(0).ProjectKey)">Project Detail</a></li>
+                <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(ViewBag.pKey)">Project Detail</a></li>
             }
-
-            @if (Model != null && Model.Count() > 0)
-            {
-                <li class="active">@(Model.ElementAt(0).ProjectKey) Reliability Task</li>
-            }
-            else
-            {
-                <li class="active">Reliability Task</li>
-            }
+            <li class="active">@(ViewBag.pKey + " ")Reliability Task</li>
         </ol>
     </div>
 </div>
-
-<div class="row">
-    <div class="col-xs-12">&nbsp;</div>
+<div class="row row-margin">
+    <input type="hidden" id="pKey" name="pKey" value="@ViewBag.pKey" />
+    <div class="col-xs-1">
+        <label class="control-label" for="StartDate">StartDate</label>
+    </div>
+    <div class="col-xs-2">
+        <input class="form-control text-box single-line datepicker" id="StartDate"
+               name="StartDate" type="text" value="@ViewBag.sDate" />
+    </div>
+    <div class="col-xs-1">
+        <label class="control-label" for="EndDate">EndDate</label>
+    </div>
+    <div class="col-xs-2">
+        <input class="form-control text-box single-line datepicker" id="EndDate"
+               name="EndDate" type="text" value="@ViewBag.eDate" />
+    </div>
+    <div class="col-xs-2">
+        <input type="button" class="btn btn-success" name="btn-search" id="btn-search" value="Search" />
+    </div>
 </div>
-
-
-@if (Model != null)
+@if (ViewBag.data.Count > 0)
 {
     if (ViewBag.chartscript != null)
     {
-
         <div class="row">
             <div class="col-xs-12">
                 <div class="panel panel-default">
@@ -54,7 +59,7 @@
             </div>
         </div>
         @Html.Raw(ViewBag.chartscript)
-        <hr/>
+        <hr />
     }
 
     var i = 0;
@@ -79,42 +84,44 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model)
-                {
+            @foreach (var item in ViewBag.data)
+            {
 
                 <tr>
-                    <td style="text-align:center">@item.ProductType</td>
-                     <td style="text-align:center;font-size:9px;" data-toggle="tooltip" title="@item.Summary"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary</a></td>
-                    <td style="text-align:center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus2(item.Resolution))</td>
-                    <td style="text-align:center">@item.FVCode</td>
+                    <td style="text-align:center">@item.Value.ProductType</td>
+                    <td style="text-align:center;font-size:9px;" data-toggle="tooltip" title="@item.Value.Summary"><a href="/Issue/UpdateIssue?issuekey=@item.Value.IssueKey">@item.Value.Summary</a></td>
+                    <td style="text-align:center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus2(item.Value.Resolution))</td>
+                    <td style="text-align:center">@item.Value.FVCode</td>
 
-                    @if (item.FailureVerifyActions.Count > 0)
+                    @if (item.Value.NFailureVerifyActions != null && item.Value.NFailureVerifyActions.Count > 0)
                     {
-                        <td style="text-align:center"><a href="/Issue/ShowVerifyAction?verifytype=@(Prometheus.Models.RELSubIssueType.FAILVERIFYACTION)&issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.FVerifyActionStatus())</a></td>
+                        <td style="text-align:center">
+                            <a href="/Issue/ShowVerifyAction?verifytype=@(Prometheus.Models.RELSubIssueType.FAILVERIFYACTION)&issuekey=@(item.Value.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(item.Value.NFailureVerifyActions[0].Resolution))</a>
+                        </td>
                     }
                     else
                     {
                         <td style="text-align:center">N/A</td>
                     }
 
-                    @if (item.ContainmentActions.Count > 0)
+                    @if (item.Value.NContainMent != null && item.Value.NContainMent.Count > 0)
                     {
-                        <td style="text-align:center"><a href="/Issue/ShowContainmentAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.ContainmentActionStatus())</a></td>
+                        <td style="text-align:center"><a href="/Issue/ShowContainmentAction?issuekey=@(item.Value.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(item.Value.NContainMent[0].Resolution))</a></td>
                     }
                     else
                     {
                         <td style="text-align:center">N/A</td>
                     }
 
-                    @if (item.RootCauseCommentList.Count > 0)
+                    @if (item.Value.NRootCauseList != null && item.Value.NRootCauseList.Count > 0)
                     {
-                        if (item.RootCauseCommentList[0].Comment.Contains("ROOTCAUSE: to be edited"))
+                        if (item.Value.NRootCauseList[0].Comment.Contains("ROOTCAUSE: to be edited"))
                         {
                             <td style="text-align:center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
                         }
                         else
                         {
-                            <td style="text-align:center"><a href="/Issue/ShowRootCause?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></td>
+                            <td style="text-align:center"><a href="/Issue/ShowRootCause?issuekey=@(item.Value.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></td>
                         }
                     }
                     else
@@ -122,50 +129,63 @@
                         <td style="text-align:center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
                     }
 
-                    @if (item.CorrectiveActions.Count > 0)
+                    @if (item.Value.NCorrectMent.Count > 0)
                     {
-                        <td style="text-align:center"><a href="/Issue/ShowCorrectiveAction?issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.CorrectiveActionStatus())</a></td>
+                        <td style="text-align:center"><a href="/Issue/ShowCorrectiveAction?issuekey=@(item.Value.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(item.Value.NCorrectMent[0].Resolution))</a></td>
                     }
                     else
                     {
                         <td style="text-align:center">N/A</td>
                     }
 
-                    @if (item.CorrectiveVerifyActions.Count > 0)
+                    @if (item.Value.NCorrectiveVerifyActions.Count > 0)
                     {
-                        <td style="text-align:center"><a href="/Issue/ShowVerifyAction?verifytype=@(Prometheus.Models.RELSubIssueType.VERIFYCORRECTIVEACTION)&issuekey=@(item.IssueKey)" target="_blank">@Html.Raw(item.CVerifyActionStatus())</a></td>
+                        <td style="text-align:center"><a href="/Issue/ShowVerifyAction?verifytype=@(Prometheus.Models.RELSubIssueType.VERIFYCORRECTIVEACTION)&issuekey=@(item.Value.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(item.Value.NCorrectiveVerifyActions[0].Resolution))</a></td>
                     }
                     else
                     {
                         <td style="text-align:center">N/A</td>
                     }
 
-                    <td style="text-align:center"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
-                    <td style="text-align:center"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
-                    <td style="text-align:center">@item.DueDate.ToString("yy-MM-dd")</td>
-                    <td style="text-align:center"><img src="~/Content/images/icon/LowYield.png" MYTP="HOVER" data-toggle="tooltip" title="Critical Error Alarm"  style="height:16px;width:16px" onclick="LowYieldWarning('@item.IssueKey')"></td>
+                    <td style="text-align:center"><a href="/User/UserCenter?username=@item.Value.Assignee">@item.Value.Assignee.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
+                    <td style="text-align:center"><a href="/User/UserCenter?username=@item.Value.Reporter">@item.Value.Reporter.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
+                    <td style="text-align:center">@item.Value.DueDate.ToString("yy-MM-dd")</td>
+                    <td style="text-align:center"><img src="~/Content/images/icon/LowYield.png" MYTP="HOVER" data-toggle="tooltip" title="Critical Error Alarm" style="height:16px;width:16px" onclick="LowYieldWarning('@item.Value.IssueKey')"></td>
                 </tr>
                 i = i + 1;
             }
         </tbody>
     </table>
-
-        <script type="text/javascript">
-            $(document).ready(function () {
-                $("#firsttable").DataTable({
-                    'iDisplayLength': 50,
-                    'aLengthMenu': [[25, 50, 100, -1],
-                                    [25, 50, 100, "All"]],
-                    "aaSorting": [],
-                    "order": []
-                });
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#firsttable").DataTable({
+                'scrollX': true,
+                'iDisplayLength': 50,
+                'aLengthMenu': [[25, 50, 100, -1],
+                [25, 50, 100, "All"]],
+                "aaSorting": false,
+                "order": false
             });
-            function LowYieldWarning(oBT) {
-                if (confirm("Warning: only FA assignee can trigger Critical Error Alarm.")) {
-                    var myurl = "/Project/LowYieldWarn?IssueKey=" + oBT;
-                    window.open(myurl, '_blank');
-                }
+            $(".datepicker").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: 'yy-mm-dd'
+            });
+        });
+
+        $("body").on('click', '#btn-search', function () {
+            var pKey = $.trim($('#pKey').val());
+            var sDate = $.trim($('#StartDate').val());
+            var eDate = $.trim($('#EndDate').val());
+            window.location.href = '/Project/ProjectReliability?ProjectKey=' + pKey + '&sDate=' + sDate + '&eDate=' + eDate;
+        })
+
+        function LowYieldWarning(oBT) {
+            if (confirm("Warning: only FA assignee can trigger Critical Error Alarm.")) {
+                var myurl = "/Project/LowYieldWarn?IssueKey=" + oBT;
+                window.open(myurl, '_blank');
             }
-        </script>
+        }
+    </script>
 }
 

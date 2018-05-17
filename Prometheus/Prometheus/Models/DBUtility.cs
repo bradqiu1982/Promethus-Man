@@ -8,6 +8,7 @@ using System.Data;
 using Oracle.DataAccess.Client;
 using System.Web.Caching;
 using System.Web.Mvc;
+using System.Text;
 
 namespace Prometheus.Models
 {
@@ -359,6 +360,42 @@ namespace Prometheus.Models
                 return null;
             }
         }
+        public static DataTable NExecuteSqlReturnTable(string sql, Dictionary<string, string> parameters = null)
+        {
+            var dt = new DataTable();
+            var conn = GetLocalConnector();
+            if (conn == null)
+                return dt;
+            try
+            {
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                if (parameters != null)
+                {
+                    foreach (var param in parameters)
+                    {
+                        SqlParameter parameter = new SqlParameter();
+                        parameter.ParameterName = param.Key;
+                        parameter.SqlDbType = SqlDbType.NVarChar;
+                        parameter.Value = param.Value;
+                        cmd.Parameters.Add(parameter);
+                    }
+                }
+                SqlDataAdapter myAd = new SqlDataAdapter(cmd);
+                myAd.SelectCommand.CommandTimeout = 0;
+                myAd.Fill(dt);
+                return dt;
+            }
+            catch (SqlException ex)
+            {
+                CloseConnector(conn);
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                CloseConnector(conn);
+                return dt;
+            }
+        }
         /* parameters: 
          * if you want to defense SQL injection,
          * you can prepare @param in sql,
@@ -403,19 +440,15 @@ namespace Prometheus.Models
                 sqlreader = command.ExecuteReader();
                 if (sqlreader.HasRows)
                 {
-
                     while (sqlreader.Read())
                     {
-                        var newline = new List<object>();
-                        for (var i = 0; i < sqlreader.FieldCount; i++)
-                        {
-                            newline.Add(sqlreader.GetValue(i));
-                        }
-                        ret.Add(newline);
+                        Object[] values = new Object[sqlreader.FieldCount];
+                        sqlreader.GetValues(values);
+                        ret.Add(values.ToList<object>());
                     }
 
                 }
-
+                
                 sqlreader.Close();
                 CloseConnector(conn);
 

@@ -2510,22 +2510,20 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        public ActionResult ProjectRMAStatus(string ProjectKey)
+        public ActionResult ProjectRMAStatus(string ProjectKey, string sDate= "", string eDate = "")
         {
+            ViewBag.pKey = null;
+            ViewBag.sDate = string.IsNullOrEmpty(sDate) ? DateTime.Now.AddMonths(-6).ToString("yyyy-MM-dd") : sDate;
+            ViewBag.eDate = string.IsNullOrEmpty(eDate) ? DateTime.Now.ToString("yyyy-MM-dd") : eDate;
             if (ProjectKey != null)
             {
-                ViewBag.PJKey = ProjectKey;
-
-                var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Pending, ISSUETP.RMA, this);
-                var list2 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Working, ISSUETP.RMA, this);
-                var list3 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Done, ISSUETP.RMA, this);
-                list1.AddRange(list2);
-                list1.AddRange(list3);
-
+                var list1 = IssueViewModels.NRetrieveRMAByProjectKey(ProjectKey, ViewBag.sDate + " 00:00:00", ViewBag.eDate + " 23:59:59", ISSUETP.RMA, this);
+                ViewBag.pKey = ProjectKey;
+                ViewBag.data = list1;
                 var piedatadict = new Dictionary<string, int>();
                 foreach (var item in list1)
                 {
-                    var rmafailurecode = item.RMAFailureCode.ToLower().Trim();
+                    var rmafailurecode = item.Value.RMAFailureCode.ToLower().Trim();
                     if (!string.IsNullOrEmpty(rmafailurecode))
                     {
                         if (piedatadict.ContainsKey(rmafailurecode))
@@ -2556,27 +2554,25 @@ namespace Prometheus.Controllers
                         .Replace("#SERIESNAME#", "Failure")
                         .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                 }
-
-                return View(list1);
             }
             return View();
         }
 
-        public ActionResult ProjectReliability(string ProjectKey)
+        public ActionResult ProjectReliability(string ProjectKey, string sDate = "", string eDate = "")
         {
+            ViewBag.pKey = null;
+            ViewBag.sDate = string.IsNullOrEmpty(sDate) ? DateTime.Now.AddMonths(-6).ToString("yyyy-MM-dd") : sDate;
+            ViewBag.eDate = string.IsNullOrEmpty(eDate) ? DateTime.Now.ToString("yyyy-MM-dd") : eDate;
             if (ProjectKey != null)
             {
-
-                var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Working, ISSUETP.Rel, this);
-                var list2 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Pending, ISSUETP.Rel, this);
-                var list3 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Done, ISSUETP.Rel, this);
-                list1.AddRange(list2);
-                list1.AddRange(list3);
+                var list1 = IssueViewModels.NRetrieveRelByProjectKey(ProjectKey, ViewBag.sDate + " 00:00:00", ViewBag.eDate + " 23:59:59", ISSUETP.Rel, this);
+                ViewBag.pKey = ProjectKey;
+                ViewBag.data = list1;
 
                 var piedatadict = new Dictionary<string, int>();
                 foreach (var item in list1)
                 {
-                    var rmafailurecode = item.FVCode.ToLower().Trim();
+                    var rmafailurecode = item.Value.FVCode.ToLower().Trim();
                     if (!string.IsNullOrEmpty(rmafailurecode))
                     {
                         if (piedatadict.ContainsKey(rmafailurecode))
@@ -2590,11 +2586,11 @@ namespace Prometheus.Controllers
                         }
                     }
                 }
-                if(piedatadict.Count > 0)
+                if (piedatadict.Count > 0)
                 {
                     var namevaluepair = "";
                     var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
-                    foreach(var item in piedatadict_tmp)
+                    foreach (var item in piedatadict_tmp)
                     {
                         namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
                     }
@@ -2606,169 +2602,45 @@ namespace Prometheus.Controllers
                         .Replace("#SERIESNAME#", "Failure")
                         .Replace("#NAMEVALUEPAIRS#", namevaluepair);
                 }
-
-                return View(list1);
             }
             return View();
         }
 
-        public ActionResult ProjectOBA(string ProjectKey)
+        public ActionResult ProjectOBA(string ProjectKey, string sDate="", string eDate="")
         {
+            ViewBag.pKey = null;
+            ViewBag.sDate = string.IsNullOrEmpty(sDate) ?DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd"): sDate;
+            ViewBag.eDate = string.IsNullOrEmpty(eDate) ? DateTime.Now.ToString("yyyy-MM-dd") : eDate;
             if (ProjectKey != null)
             {
-
-                //var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Pending, ISSUETP.OBA, this);
-                //var list2 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Working, ISSUETP.OBA, this);
-                //var list3 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Done, ISSUETP.OBA, this);
-                //list1.AddRange(list2);
-                //list1.AddRange(list3);
-
-                var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, "NONE", "NONE", ISSUETP.OBA, this);
-
-                //var piedatadict = new Dictionary<string, int>();
-                //foreach (var item in list1)
-                //{
-                //    var rmafailurecode = item.RMAFailureCode.ToLower().Trim();
-                //    if (!string.IsNullOrEmpty(rmafailurecode))
-                //    {
-                //        if (piedatadict.ContainsKey(rmafailurecode))
-                //        {
-                //            var preval = piedatadict[rmafailurecode];
-                //            piedatadict[rmafailurecode] = preval + 1;
-                //        }
-                //        else
-                //        {
-                //            piedatadict.Add(rmafailurecode, 1);
-                //        }
-                //    }
-                //}
-
-                //var keys = piedatadict.Keys;
-                //if (keys.Count > 0)
-                //{
-                //    var namevaluepair = "";
-                //    foreach (var k in keys)
-                //    {
-                //        namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
-                //    }
-
-                //    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                //    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
-                //    ViewBag.chartscript = tempscript.Replace("#ElementID#", "failurepie")
-                //        .Replace("#Title#", ProjectKey + " RMA Realtime Failure")
-                //        .Replace("#SERIESNAME#", "Failure")
-                //        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
-                //}
-
-                return View(list1);
+                ViewBag.pKey = ProjectKey;
+                ViewBag.data = IssueViewModels.NRetrieveOBAByProjectKey(ProjectKey, ViewBag.sDate + " 00:00:00", ViewBag.eDate + " 23:59:59", ISSUETP.OBA, this);
             }
             return View();
         }
 
-        public ActionResult ProjectIQC(string ProjectKey)
+        public ActionResult ProjectIQC(string ProjectKey, string sDate="", string eDate="")
         {
+            ViewBag.pKey = null;
+            ViewBag.sDate = string.IsNullOrEmpty(sDate) ? DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd") : sDate;
+            ViewBag.eDate = string.IsNullOrEmpty(eDate) ? DateTime.Now.ToString("yyyy-MM-dd") : eDate;
             if (ProjectKey != null)
             {
-
-                //var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Pending, ISSUETP.OBA, this);
-                //var list2 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Working, ISSUETP.OBA, this);
-                //var list3 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Done, ISSUETP.OBA, this);
-                //list1.AddRange(list2);
-                //list1.AddRange(list3);
-
-                var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, "NONE", "NONE", ISSUETP.IQE, this);
-
-                //var piedatadict = new Dictionary<string, int>();
-                //foreach (var item in list1)
-                //{
-                //    var rmafailurecode = item.RMAFailureCode.ToLower().Trim();
-                //    if (!string.IsNullOrEmpty(rmafailurecode))
-                //    {
-                //        if (piedatadict.ContainsKey(rmafailurecode))
-                //        {
-                //            var preval = piedatadict[rmafailurecode];
-                //            piedatadict[rmafailurecode] = preval + 1;
-                //        }
-                //        else
-                //        {
-                //            piedatadict.Add(rmafailurecode, 1);
-                //        }
-                //    }
-                //}
-
-                //var keys = piedatadict.Keys;
-                //if (keys.Count > 0)
-                //{
-                //    var namevaluepair = "";
-                //    foreach (var k in keys)
-                //    {
-                //        namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
-                //    }
-
-                //    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                //    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
-                //    ViewBag.chartscript = tempscript.Replace("#ElementID#", "failurepie")
-                //        .Replace("#Title#", ProjectKey + " RMA Realtime Failure")
-                //        .Replace("#SERIESNAME#", "Failure")
-                //        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
-                //}
-
-                return View(list1);
+                ViewBag.pKey = ProjectKey;
+                ViewBag.data = IssueViewModels.NRetrieveOtherByProjectKey(ProjectKey, ViewBag.sDate + " 00:00:00", ViewBag.eDate + " 23:59:59", ISSUETP.IQE, this);
             }
             return View();
         }
 
-        public ActionResult ProjectQuality(string ProjectKey)
+        public ActionResult ProjectQuality(string ProjectKey, string sDate="", string eDate="")
         {
+            ViewBag.pKey = null;
+            ViewBag.sDate = string.IsNullOrEmpty(sDate) ? DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd") : sDate;
+            ViewBag.eDate = string.IsNullOrEmpty(eDate) ? DateTime.Now.ToString("yyyy-MM-dd") : eDate;
             if (ProjectKey != null)
             {
-                //var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Pending, ISSUETP.Quality, this);
-                //var list2 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Working, ISSUETP.Quality, this);
-                //var list3 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, Resolute.Done, ISSUETP.Quality, this);
-                //list1.AddRange(list2);
-                //list1.AddRange(list3);
-
-                var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, "NONE", "NONE", ISSUETP.Quality, this);
-
-                //var piedatadict = new Dictionary<string, int>();
-                //foreach (var item in list1)
-                //{
-                //    var rmafailurecode = item.RMAFailureCode.ToLower().Trim();
-                //    if (!string.IsNullOrEmpty(rmafailurecode))
-                //    {
-                //        if (piedatadict.ContainsKey(rmafailurecode))
-                //        {
-                //            var preval = piedatadict[rmafailurecode];
-                //            piedatadict[rmafailurecode] = preval + 1;
-                //        }
-                //        else
-                //        {
-                //            piedatadict.Add(rmafailurecode, 1);
-                //        }
-                //    }
-                //}
-
-                //var keys = piedatadict.Keys;
-                //if (keys.Count > 0)
-                //{
-                //    var namevaluepair = "";
-                //    foreach (var k in keys)
-                //    {
-                //        namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
-                //    }
-
-                //    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                //    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
-                //    ViewBag.chartscript = tempscript.Replace("#ElementID#", "failurepie")
-                //        .Replace("#Title#", ProjectKey + " RMA Realtime Failure")
-                //        .Replace("#SERIESNAME#", "Failure")
-                //        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
-                //}
-
-                return View(list1);
+                ViewBag.pKey = ProjectKey;
+                ViewBag.data = IssueViewModels.NRetrieveQualityByProjectKey(ProjectKey, ViewBag.sDate + " 00:00:00", ViewBag.eDate + " 23:59:59", ISSUETP.Quality, this);
             }
             return View();
         }

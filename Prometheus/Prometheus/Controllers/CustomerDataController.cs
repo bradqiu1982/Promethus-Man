@@ -1850,7 +1850,7 @@ namespace Prometheus.Controllers
         public StringBuilder PrePareATEData(List<ProjectTestData> atelist, Dictionary<string,string> pndescdict)
         {
             StringBuilder sb1 = new StringBuilder(300 * (atelist.Count+1));
-            sb1.Append("SN,WhichTest,Failure,TestTimestamp,Station,Module Family,PN,PN Desc\r\n");
+            sb1.Append("SN,WhichTest,Failure,TestTimestamp,Station,Module Family,PN,PN Desc,Spend Time(in hour)\r\n");
             foreach (var item in atelist)
             {
                 var pndesc = "";
@@ -1859,7 +1859,7 @@ namespace Prometheus.Controllers
 
                 sb1.Append("\"" + item.ModuleSerialNum.ToString().Replace("\"", "") + "\"," + "\"" + item.WhichTest.Replace("\"", "") + "\"," + "\"" + item.ErrAbbr.Replace("\"", "") + "\","
                     + "\"" + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss") + "\"," + "\"" + item.TestStation.Replace("\"", "") + "\"," + "\"" + item.ModuleType.Replace("\"", "") + "\","
-                    + "\"" + item.PN.Replace("\"", "") + "\"," + "\"" + pndesc.Replace("\"", "") + "\",\r\n");
+                    + "\"" + item.PN.Replace("\"", "") + "\"," + "\"" + pndesc.Replace("\"", "") + "\"," + "\"" + item.JO.Replace("\"", "") + "\",\r\n");
             }
             return sb1;
         }

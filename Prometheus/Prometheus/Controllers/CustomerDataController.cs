@@ -1864,7 +1864,33 @@ namespace Prometheus.Controllers
             return sb1;
         }
 
-        public ActionResult RealATETestData(string mdtype, string starttime, string endtime)
+        public static List<ProjectTestData> FilteredATEData(string mdtype, DateTime sdate, DateTime edate, Dictionary<string, bool> pndict)
+        {
+            var ret = new List<ProjectTestData>();
+            var rawdata = ATEUtility.RetrieveATEData(mdtype, sdate, edate, pndict);
+            if (rawdata.Count > 0)
+            {
+                var allpndict = new Dictionary<string, bool>();
+                var previousdata = ATEUtility.RetrieveATEData(mdtype, sdate.AddMonths(-2), sdate, allpndict);
+                var filterdict = new Dictionary<string, bool>();
+                foreach (var item in previousdata)
+                {
+                    if (!filterdict.ContainsKey(item.ModuleSerialNum + ":::" + item.WhichTest)) {
+                        filterdict.Add(item.ModuleSerialNum + ":::" + item.WhichTest, true);
+                    }
+                }
+                foreach (var item in rawdata)
+                {
+                    if (!filterdict.ContainsKey(item.ModuleSerialNum + ":::" + item.WhichTest))
+                    {
+                        ret.Add(item);
+                    }
+                }
+            }
+            return ret;
+        }
+
+        public ActionResult RealATETestData(string mdtype, string starttime, string endtime,string filtered)
         {
             if (string.IsNullOrEmpty(mdtype)
                 || string.IsNullOrEmpty(starttime)
@@ -1875,7 +1901,16 @@ namespace Prometheus.Controllers
             var sdate = DateTime.Parse(DateTime.Parse(starttime).ToString("yyyy-MM-dd") + " 00:00:00");
             var edate = DateTime.Parse(DateTime.Parse(endtime).ToString("yyyy-MM-dd") + " 23:59:59");
             var pndict = new Dictionary<string, bool>();
-            var atedatalist = ATEUtility.RetrieveATEData(mdtype, sdate, edate,pndict);
+            var atedatalist = new List<ProjectTestData>();
+            if (!string.IsNullOrEmpty(filtered))
+            {
+                atedatalist = FilteredATEData(mdtype, sdate, edate, pndict);
+            }
+            else
+            {
+                atedatalist = ATEUtility.RetrieveATEData(mdtype, sdate, edate,pndict);
+            }
+
             if (atedatalist.Count > 0)
             {
                 var pndescdict = MESUtility.RetrievePNDescByPn(new List<string>(pndict.Keys));

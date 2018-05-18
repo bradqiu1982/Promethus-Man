@@ -511,54 +511,6 @@ else
                     <hr style="border-color:#006DC0;" />
                 }
 
-                @if (Model != null && Model.ContainmentActions.Count > 0)
-                {
-                    <div class="row" data-intro = "Show containment tasks." data-step="@(step_idx++)">
-                        <div MYTP="yello" class="row" style="margin-left:3px">
-                            <div class="col-xs-12">
-                                <a data-toggle="collapse" href="#containmenttasks" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
-                                    <font color="black"><strong>&nbsp;&nbsp;Containment Action</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
-                                </a>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-xs-12">&nbsp;</div>
-                        </div>
-                        <div class="row" style="margin-left:10px">
-                            <div class="collapse in" id="containmenttasks">
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-xs-1"></div>
-                                        <div class="col-xs-8">
-                                            <div class="well" style="margin-bottom:8px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px;padding-top:4px;padding-bottom:4px">
-                                                <div class="row">
-                                                    <div class="col-xs-4">Summary</div>
-                                                    <div class="col-xs-2">Status</div>
-                                                    <div class="col-xs-2">Asignee</div>
-                                                    <div class="col-xs-2">DueDate</div>
-                                                    <div class="col-xs-2"></div>
-                                                </div>
-                                                @foreach (var item in Model.ContainmentActions)
-                                                {
-                                                    <div class="row">
-                                                        <div class="col-xs-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace("[Containment]", "")</a></div>
-                                                        <div class="col-xs-2">@item.Resolution</div>
-                                                        <div class="col-xs-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
-                                                        <div class="col-xs-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
-                                                        <div class="col-xs-2"></div>
-                                                    </div>
-                                                }
-                                            </div>
-                                        </div>
-                                        <div class="col-xs-3"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr style="border-color:#006DC0;" />
-                }
 
                 @if (ViewBag.isassignee != null && ViewBag.isassignee && Model.RootCauseCommentList.Count == 0)
                 {
@@ -687,57 +639,6 @@ else
 
                     <hr style="border-color:#006DC0;" />
                 }
-
-
-                @if (Model != null && Model.CorrectiveActions.Count > 0)
-                {
-                    <div class="row" data-intro = "Show corrective actions." data-step="@(step_idx++)">
-                        <div MYTP="yello" class="row" style="margin-left:3px">
-                            <div class="col-xs-12">
-                                <a data-toggle="collapse" href="#correctivetasks" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
-                                    <font color="black"><strong>&nbsp;&nbsp;Corrective Action</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
-                                </a>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-xs-12">&nbsp;</div>
-                        </div>
-                        <div class="row" style="margin-left:10px">
-                            <div class="collapse in" id="correctivetasks">
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-xs-1"></div>
-                                        <div class="col-xs-8">
-                                            <div class="well" style="margin-bottom:8px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px;padding-top:4px;padding-bottom:4px">
-                                                <div class="row">
-                                                    <div class="col-xs-4">Summary</div>
-                                                    <div class="col-xs-2">Status</div>
-                                                    <div class="col-xs-2">Asignee</div>
-                                                    <div class="col-xs-2">DueDate</div>
-                                                    <div class="col-xs-2"></div>
-                                                </div>
-                                                @foreach (var item in Model.CorrectiveActions)
-                                                {
-                                                    <div class="row">
-                                                        <div class="col-xs-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace("[Corrective]", "")</a></div>
-                                                        <div class="col-xs-2">@item.Resolution</div>
-                                                        <div class="col-xs-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
-                                                        <div class="col-xs-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
-                                                        <div class="col-xs-2"></div>
-                                                    </div>
-                                                }
-                                            </div>
-                                        </div>
-                                        <div class="col-xs-3"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr style="border-color:#006DC0;" />
-                }
-
 
                 @if (Model.GeneralCommentList.Count > 0)
                 {

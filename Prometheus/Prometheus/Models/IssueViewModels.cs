@@ -462,35 +462,6 @@ namespace Prometheus.Models
             }
         }
 
-        private List<string> internalattachlist = new List<string>();
-        public List<string> InternalAttachList
-        {
-            set
-            {
-                internalattachlist.Clear();
-                internalattachlist.AddRange(value);
-            }
-            get
-            {
-                return internalattachlist;
-            }
-        }
-
-        private List<string> customattachlist = new List<string>();
-        public List<string> CustomAttachList
-        {
-            set
-            {
-                customattachlist.Clear();
-                customattachlist.AddRange(value);
-            }
-            get
-            {
-                return customattachlist;
-            }
-        }
-
-
         public string ParentIssueKey { set; get; }
 
         private List<IssueViewModels> sissue = new List<IssueViewModels>();
@@ -501,25 +472,13 @@ namespace Prometheus.Models
                 sissue.Clear();
                 sissue.AddRange(value);
 
-                containmentactionlist.Clear();
-                Correctiveactionlist.Clear();
                 failureverifyactionlist.Clear();
                 correctivverifyactionlist.Clear();
                 generalactionlist.Clear();
 
                 foreach (var item in value)
                 {
-                    if (item.Summary.Contains("[Containment]")
-                        || item.Summary.Contains(RELSubIssueType.CONTAINMENTACTION))
-                    {
-                        containmentactionlist.Add(item);
-                    }
-                    else if (item.Summary.Contains("[Corrective]")
-                        || item.Summary.Contains(RELSubIssueType.CORRECTIVEACTION))
-                    {
-                        Correctiveactionlist.Add(item);
-                    }
-                    else if (item.Summary.Contains(RELSubIssueType.FAILVERIFYACTION))
+                    if (item.Summary.Contains(RELSubIssueType.FAILVERIFYACTION))
                     {
                         failureverifyactionlist.Add(item);
                     }
@@ -541,8 +500,6 @@ namespace Prometheus.Models
         }
 
 
-        private List<IssueViewModels> containmentactionlist = new List<IssueViewModels>();
-        private List<IssueViewModels> Correctiveactionlist = new List<IssueViewModels>();
         private List<IssueViewModels> failureverifyactionlist = new List<IssueViewModels>();
         private List<IssueViewModels> correctivverifyactionlist = new List<IssueViewModels>();
         private List<IssueViewModels> generalactionlist = new List<IssueViewModels>();
@@ -550,82 +507,6 @@ namespace Prometheus.Models
         public List<IssueViewModels> GeneralActions
         {
             get { return generalactionlist; }
-        }
-
-        public List<IssueViewModels> ContainmentActions
-        {
-            get
-            { return containmentactionlist; }
-        }
-
-        public string ContainmentActionStatus()
-        {
-            if (containmentactionlist.Count > 0)
-            {
-                foreach (var item in containmentactionlist)
-                {
-                    if (item.Resolution == Resolute.Pending || item.Resolution == Resolute.Reopen)
-                    {
-                        return Resolute.ColorStatus(Resolute.Pending);
-                    }
-                    if (item.Resolution == Resolute.Working)
-                    {
-                        return Resolute.ColorStatus(Resolute.Working);
-                    }
-                    if (item.Resolution == Resolute.NotFix)
-                    {
-                        return Resolute.ColorStatus(Resolute.NotFix);
-                    }
-                    if (item.Resolution == Resolute.Unresolved)
-                    {
-                        return Resolute.ColorStatus(Resolute.Unresolved);
-                    }
-                    if (item.Resolution == Resolute.NotReproduce)
-                    {
-                        return Resolute.ColorStatus(Resolute.NotReproduce);
-                    }
-                }
-                return Resolute.ColorStatus(Resolute.Done);
-            }
-            return Resolute.ColorStatus(Resolute.Pending);
-        }
-
-        public List<IssueViewModels> CorrectiveActions
-        {
-            get
-            { return Correctiveactionlist; }
-        }
-
-        public string CorrectiveActionStatus()
-        {
-            if (Correctiveactionlist.Count > 0)
-            {
-                foreach (var item in Correctiveactionlist)
-                {
-                    if (item.Resolution == Resolute.Pending || item.Resolution == Resolute.Reopen)
-                    {
-                        return Resolute.ColorStatus(Resolute.Pending);
-                    }
-                    if (item.Resolution == Resolute.Working)
-                    {
-                        return Resolute.ColorStatus(Resolute.Working);
-                    }
-                    if (item.Resolution == Resolute.NotFix)
-                    {
-                        return Resolute.ColorStatus(Resolute.NotFix);
-                    }
-                    if (item.Resolution == Resolute.Unresolved)
-                    {
-                        return Resolute.ColorStatus(Resolute.Unresolved);
-                    }
-                    if (item.Resolution == Resolute.NotReproduce)
-                    {
-                        return Resolute.ColorStatus(Resolute.NotReproduce);
-                    }
-                }
-                return Resolute.ColorStatus(Resolute.Done);
-            }
-            return Resolute.ColorStatus(Resolute.Pending);
         }
 
         public List<IssueViewModels> FailureVerifyActions
@@ -1099,34 +980,12 @@ namespace Prometheus.Models
             csql = csql.Replace("<IssueKey>", issuekey);
 
             AttachList.Clear();
-            InternalAttachList.Clear();
-            CustomAttachList.Clear();
 
             var cdbret = DBUtility.ExeLocalSqlWithRes(csql, null);
             foreach (var r in cdbret)
             {
                 var type = Convert.ToString(r[1]);
-
-                if (string.IsNullOrEmpty(type))
-                {
-                    AttachList.Add(Convert.ToString(r[0]));
-                }
-                else if (string.Compare(type, ISSUEATTACHTYPE.Normal) == 0)
-                {
-                    AttachList.Add(Convert.ToString(r[0]));
-                }
-                else if (string.Compare(type, ISSUEATTACHTYPE.InternalRMA) == 0)
-                {
-                    InternalAttachList.Add(Convert.ToString(r[0]));
-                }
-                else if (string.Compare(type, ISSUEATTACHTYPE.CustomRMA) == 0)
-                {
-                    CustomAttachList.Add(Convert.ToString(r[0]));
-                }
-                else
-                {
-                    AttachList.Add(Convert.ToString(r[0]));
-                }
+                AttachList.Add(Convert.ToString(r[0]));
             }
         }
 

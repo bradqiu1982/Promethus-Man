@@ -58,96 +58,68 @@
         });
     </script>
 </div>
+
 @if (ViewBag.data.Count > 0)
 {
+    var i = 0;
     <table id="firsttable" name="firsttable" class="display" cellspacing="0">
         <thead>
             <tr style="color:white;">
-                <th width="12%">IQC#</th>
-                <th width="8%">RootCause</th>
-                <th width="8%">Containment Action</th>
-                <th width="8%">Corrective Action</th>
-                <th width="8%">Owner</th>
-                <th width="8%">IQE</th>
-                <th width="8%">Report Date</th>
-                <th width="8%">Attachment</th>
+                <th style="text-align:center">&nbsp;</th>
+                <th style="text-align:center">IQC#</th>
+                <th style="text-align:center">Summary</th>
+                <th style="text-align:center">RootCause</th>
+                <th style="text-align:center">Owner</th>
+                <th style="text-align:center">IQE</th>
+                <th style="text-align:center">Report Date</th>
+                <th style="text-align:center">Resolution</th>
+                <th style="text-align:center"><font color="white"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></font></th>
+                <th style="text-align:center"><img src="~/Content/images/icon/LowYield.png" style="height:16px;width:16px" /></th>
             </tr>
         </thead>
         <tbody>
             @foreach (var item in ViewBag.data)
-                {
+            {
                     var rmatitle = item.Value.Summary.Trim();
 
                 <tr>
-                    <td width="12%">
-                        <div class="row">
-                            <div class="col-xs-1"></div>
-                            <div class="col-xs-11">
-                                <img src="~/Content/images/icon/LowYield.png" data-toggle="tooltip" title="Critical Error Alarm" MYTP="HOVER" style="height:16px;width:16px" onclick="LowYieldWarning('@item.Value.IssueKey')">
-                            </div>
-                        </div>
-                    </td>
-                    <td colspan="6" width="80%">
-                        <a href="/Issue/UpdateIssue?issuekey=@item.Value.IssueKey">
-                            <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
-                            @rmatitle.Substring(0, rmatitle.Length > 125 ? 125 : rmatitle.Length)
-                        </a>
-                    </td>
-                    <td style="display: none;"></td>
-                    <td style="display: none;"></td>
-                    <td style="display: none;"></td>
-                    <td style="display: none;"></td>
-                    <td style="display: none;"></td>
-                    <td width="8%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus2(item.Value.Resolution))</td>
-                </tr>
-                <tr>
-                    <td width="12%">
+                    <td style="text-align:center">@(i+1)</td>
+                    <td style="text-align:center">
                         @if (!string.IsNullOrEmpty(item.Value.LYT))
                         {
                             <span class="badge alert-danger">LYT</span>
                         }
                         @item.Value.ModuleSN
                     </td>
-
+                    <td style="text-align:center;font-size:9px;" data-toggle="tooltip" title="@rmatitle"><a href="/Issue/UpdateIssue?issuekey=@item.Value.IssueKey">@rmatitle</a></td>
                     @if (item.Value.NRootCauseList != null && item.Value.NRootCauseList.Count > 0)
                     {
-                        <td width="8%"><a href="/Issue/ShowRootCause?issuekey=@(item.Value.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></td>
+                        <td style="text-align:center"><a href="/Issue/ShowRootCause?issuekey=@(item.Value.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></td>
                     }
                     else
                     {
-                        <td width="8%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
+                        <td style="text-align:center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
                     }
-
-                    @if (item.Value.NContainMent != null && item.Value.NContainMent.Count > 0)
-                    {
-                        <td width="8%"><a href="/Issue/ShowContainmentAction?issuekey=@(item.Value.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(item.Value.NContainMent[0].Resolution))</a></td>
-                    }
-                    else
-                    {
-                        <td width="8%">N/A</td>
-                    }
-
-                    @if (item.Value.NCorrectMent != null && item.Value.NCorrectMent.Count > 0)
-                    {
-                        <td width="8%"><a href="/Issue/ShowCorrectiveAction?issuekey=@(item.Value.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(item.Value.NCorrectMent[0].Resolution))</a></td>
-                    }
-                    else
-                    {
-                        <td width="8%">N/A</td>
-                    }
-
-                    <td width="8%"><a href="/User/UserCenter?username=@item.Value.Assignee">@item.Value.Assignee.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
-                    <td width="8%"><a href="/User/UserCenter?username=@item.Value.Reporter">@item.Value.Reporter.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
-                    <td width="8%">@item.Value.ReportDate.ToString("yy-MM-dd")</td>
-                    <td width="8%">
+                    <td style="text-align:center"><a href="/User/UserCenter?username=@item.Value.Assignee">@item.Value.Assignee.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
+                    <td style="text-align:center"><a href="/User/UserCenter?username=@item.Value.Reporter">@item.Value.Reporter.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
+                    <td style="text-align:center">@item.Value.ReportDate.ToString("yy-MM-dd")</td>
+                    <td style="text-align:center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus2(item.Value.Resolution))</td>
+                    <td style="text-align:center">
                         @if (item.Value.NAttachList != null && item.Value.NAttachList.Count > 0)
                         {
                             <a href="/Issue/IssueAttach?issuekey=@item.Value.IssueKey" target="_blank">
                                 <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>
                             </a>
                         }
-                </td>
+                    </td>
+                    <td style="text-align:center"><img src="~/Content/images/icon/LowYield.png" MYTP="HOVER" data-toggle="tooltip" title="Critical Error Alarm" style="height:16px;width:16px" onclick="LowYieldWarning('@item.Value.IssueKey')"></td>
+                </tr>
+                <tr>
+
+
+
             </tr>
+                i = i + 1;
             }
         </tbody>
     </table>

@@ -66,21 +66,17 @@
     <table id="firsttable" class="display" cellspacing="0">
         <thead>
             <tr style="color:white;">
+                <th style="text-align:center">&nbsp;</th>
                 <th style="text-align:center">Product</th>
                 <th style="text-align:center">Summary</th>
-                <th style="text-align:center">Status</th>
+                <th style="text-align:center">Resolution</th>
                 <th style="text-align:center">FV</th>
-
-                <th style="text-align:center">Failure Verification</th>
-                <th style="text-align:center">Containment Action</th>
                 <th style="text-align:center">RootCause</th>
-                <th style="text-align:center">Corrective Action</th>
-                <th style="text-align:center">Verification 4 Corrective</th>
-
                 <th style="text-align:center">Owner</th>
                 <th style="text-align:center">Rel.Engineer</th>
                 <th style="text-align:center">DueDate</th>
-                <th style="text-align:center">LYT</th>
+                <th style="text-align:center"><font color="white"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></font></th>
+                <th style="text-align:center"><img src="~/Content/images/icon/LowYield.png" style="height:16px;width:16px" /></th>
             </tr>
         </thead>
         <tbody>
@@ -88,30 +84,11 @@
             {
 
                 <tr>
+                    <td style="text-align:center">@(i+1)</td>
                     <td style="text-align:center">@item.Value.ProductType</td>
                     <td style="text-align:center;font-size:9px;" data-toggle="tooltip" title="@item.Value.Summary"><a href="/Issue/UpdateIssue?issuekey=@item.Value.IssueKey">@item.Value.Summary</a></td>
                     <td style="text-align:center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus2(item.Value.Resolution))</td>
                     <td style="text-align:center">@item.Value.FVCode</td>
-
-                    @if (item.Value.NFailureVerifyActions != null && item.Value.NFailureVerifyActions.Count > 0)
-                    {
-                        <td style="text-align:center">
-                            <a href="/Issue/ShowVerifyAction?verifytype=@(Prometheus.Models.RELSubIssueType.FAILVERIFYACTION)&issuekey=@(item.Value.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(item.Value.NFailureVerifyActions[0].Resolution))</a>
-                        </td>
-                    }
-                    else
-                    {
-                        <td style="text-align:center">N/A</td>
-                    }
-
-                    @if (item.Value.NContainMent != null && item.Value.NContainMent.Count > 0)
-                    {
-                        <td style="text-align:center"><a href="/Issue/ShowContainmentAction?issuekey=@(item.Value.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(item.Value.NContainMent[0].Resolution))</a></td>
-                    }
-                    else
-                    {
-                        <td style="text-align:center">N/A</td>
-                    }
 
                     @if (item.Value.NRootCauseList != null && item.Value.NRootCauseList.Count > 0)
                     {
@@ -129,27 +106,18 @@
                         <td style="text-align:center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
                     }
 
-                    @if (item.Value.NCorrectMent.Count > 0)
-                    {
-                        <td style="text-align:center"><a href="/Issue/ShowCorrectiveAction?issuekey=@(item.Value.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(item.Value.NCorrectMent[0].Resolution))</a></td>
-                    }
-                    else
-                    {
-                        <td style="text-align:center">N/A</td>
-                    }
-
-                    @if (item.Value.NCorrectiveVerifyActions.Count > 0)
-                    {
-                        <td style="text-align:center"><a href="/Issue/ShowVerifyAction?verifytype=@(Prometheus.Models.RELSubIssueType.VERIFYCORRECTIVEACTION)&issuekey=@(item.Value.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(item.Value.NCorrectiveVerifyActions[0].Resolution))</a></td>
-                    }
-                    else
-                    {
-                        <td style="text-align:center">N/A</td>
-                    }
 
                     <td style="text-align:center"><a href="/User/UserCenter?username=@item.Value.Assignee">@item.Value.Assignee.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
                     <td style="text-align:center"><a href="/User/UserCenter?username=@item.Value.Reporter">@item.Value.Reporter.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
                     <td style="text-align:center">@item.Value.DueDate.ToString("yy-MM-dd")</td>
+                    <td style="text-align:center">
+                        @if (item.Value.NAttachList != null && item.Value.NAttachList.Count > 0)
+                        {
+                            <a href="/Issue/IssueAttach?issuekey=@item.Value.IssueKey" target="_blank">
+                                <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>
+                            </a>
+                        }
+                    </td>
                     <td style="text-align:center"><img src="~/Content/images/icon/LowYield.png" MYTP="HOVER" data-toggle="tooltip" title="Critical Error Alarm" style="height:16px;width:16px" onclick="LowYieldWarning('@item.Value.IssueKey')"></td>
                 </tr>
                 i = i + 1;

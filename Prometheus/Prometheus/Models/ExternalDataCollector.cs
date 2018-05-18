@@ -2663,20 +2663,6 @@ namespace Prometheus.Models
             
         }
 
-        private static void UpdateCorrectiveAction(IssueViewModels obaissue, string correctiveinfo)
-        {
-            if (obaissue.CorrectiveActions.Count > 0)
-            {
-                if (obaissue.CorrectiveActions[0].CommentList.Count == 0)
-                {
-                    var tempcomment = new IssueComments();
-                    tempcomment.Comment = correctiveinfo;
-                    IssueViewModels.StoreIssueComment(obaissue.CorrectiveActions[0].IssueKey, tempcomment.dbComment, obaissue.Assignee, COMMENTTYPE.Description);
-                    obaissue.CorrectiveActions[0].CommentList.Add(tempcomment);
-                }
-            }
-        }
-
         private static void UpdateOBAAttachement(IssueViewModels obaissue, string attachment, Controller ctrl)
         {
             var srcfilename = Path.GetFileNameWithoutExtension(attachment);
@@ -2759,11 +2745,6 @@ namespace Prometheus.Models
                     if (!string.IsNullOrEmpty(tempdmr.RootCause))
                     {
                         UpdateOBARootCause(obaissue, tempdmr.RootCause);
-                    }
-
-                    if (!string.IsNullOrEmpty(tempdmr.CorrectiveAction))
-                    {
-                        UpdateCorrectiveAction(obaissue, tempdmr.CorrectiveAction);
                     }
 
                     if (!string.IsNullOrEmpty(tempdmr.Attachment) && File.Exists(tempdmr.Attachment))

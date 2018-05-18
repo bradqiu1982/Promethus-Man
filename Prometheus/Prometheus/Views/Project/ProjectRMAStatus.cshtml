@@ -65,17 +65,18 @@
     <table id="firsttable" class="display" cellspacing="0">
         <thead>
             <tr>
-                <th width="10%"><font color="white">RMA#</font></th>
-                <th width="10%"><font color="white">SN</font></th>
-                <th width="8%"><font color="white">RootCause</font></th>
-                <th width="8%"><font color="white">FV</font></th>
-                <th width="8%"><font color="white">RMA Failure</font></th>
-                <th width="8%"><font color="white">Containment</font></th>
-                <th width="8%"><font color="white">Corrective</font></th>
-                <th width="10%"><font color="white">Internal RPT</font></th>
-                <th width="10%"><font color="white">Customer RPT</font></th>
-                <th width="10%"><font color="white">Owner</font></th>
-                <th width="10%"><font color="white">Report Date</font></th>
+                <th style="text-align:center">&nbsp;</th>
+                <th style="text-align:center"><font color="white">RMA#</font></th>
+                <th style="text-align:center"><font color="white">SN</font></th>
+                <th style="text-align:center">Summary</th>
+                <th style="text-align:center"><font color="white">RootCause</font></th>
+                <th style="text-align:center"><font color="white">FV</font></th>
+                <th style="text-align:center"><font color="white">RMA Failure</font></th>
+                <th style="text-align:center"><font color="white">Owner</font></th>
+                <th style="text-align:center"><font color="white">Report Date</font></th>
+                <th style="text-align:center"><font color="white">Resolution</font></th>
+                <th style="text-align:center"><font color="white"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></font></th>
+                <th style="text-align:center"><img src="~/Content/images/icon/LowYield.png" style="height:16px;width:16px"/></th>
             </tr>
         </thead>
         <tbody>
@@ -89,120 +90,38 @@
                 }
 
                 <tr>
-                    <td width="10%">
-                        <div class="row">
-                            <div class="col-xs-4">
-                                @(ViewBag.data.Count - i)
-                            </div>
-                            <div class="col-xs-8">
-                                <img src="~/Content/images/icon/LowYield.png" MYTP="HOVER" data-toggle="tooltip" title="Critical Error Alarm" style="height:16px;width:16px" onclick="LowYieldWarning('@item.Value.IssueKey')">
-                            </div>
-                        </div>
-                    </td>
-                    <td colspan="9" width="80%">
-                        <a href="/Issue/UpdateIssue?issuekey=@item.Value.IssueKey">
-                            <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
-                            @rmatitle.Substring(0, rmatitle.Length > 200 ? 200 : rmatitle.Length)
-                        </a>
-                    </td>
-                    <td style="display: none;"></td>
-                    <td style="display: none;"></td>
-                    <td style="display: none;"></td>
-                    <td style="display: none;"></td>
-                    <td style="display: none;"></td>
-                    <td style="display: none;"></td>
-                    <td style="display: none;"></td>
-                    <td style="display: none;"></td>
-                    <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus2(item.Value.Resolution))</td>
-                </tr>
-                <tr>
-                    <td width="10%">
+                    <td style="text-align:center">@(i+1)</td>
+                    <td style="text-align:center">
                         @if (!string.IsNullOrEmpty(item.Value.LYT))
                         {
                             <span class="badge alert-danger">LYT</span>
                         }
                         @item.Value.FinisarRMA
                     </td>
-                    <td width="10%">@item.Value.ModuleSN</td>
+                    <td style="text-align:center">@item.Value.ModuleSN</td>
+                    <td style="text-align:center;font-size:9px;" data-toggle="tooltip" title="@rmatitle"><a href="/Issue/UpdateIssue?issuekey=@item.Value.IssueKey">@rmatitle</a></td>
                     @if (item.Value.NRootCauseList != null && item.Value.NRootCauseList.Count > 0)
                     {
-                        <td width="8%"><a href="/Issue/ShowRootCause?issuekey=@(item.Value.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></td>
+                        <td style="text-align:center"><a href="/Issue/ShowRootCause?issuekey=@(item.Value.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></td>
                     }
                     else
                     {
-                        <td width="8%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
+                        <td style="text-align:center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
                     }
-                    <td width="8%">@item.Value.FVCode</td>
-                    <td width="8%">@item.Value.RMAFailureCode</td>
-
-                    @if (item.Value.NContainMent != null && item.Value.NContainMent.Count > 0)
-                    {
-                        <td width="8%"><a href="/Issue/ShowContainmentAction?issuekey=@(item.Value.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(item.Value.NContainMent[0].Resolution))</a></td>
-                    }
-                    else
-                    {
-                        <td width="8%">N/A</td>
-                    }
-
-                    @if (item.Value.NCorrectMent != null && item.Value.NCorrectMent.Count > 0)
-                    {
-                        <td width="8%"><a href="/Issue/ShowCorrectiveAction?issuekey=@(item.Value.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(item.Value.NCorrectMent[0].Resolution))</a></td>
-                    }
-                    else
-                    {
-                        <td width="8%">N/A</td>
-                    }
-
-                    @if (item.Value.NInternalReportCommentList != null && item.Value.NInternalReportCommentList.Count > 0)
-                    {
-                        if (item.Value.NInternalReportCommentList[item.Value.NInternalReportCommentList.Count - 1].Comment.Contains("<a href"))
+                    <td style="text-align:center">@item.Value.FVCode</td>
+                    <td style="text-align:center">@item.Value.RMAFailureCode</td>
+                    <td style="text-align:center"><a href="/User/UserCenter?username=@item.Value.Assignee">@item.Value.Assignee.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
+                    <td style="text-align:center">@item.Value.ReportDate.ToString("yy-MM-dd")</td>
+                    <td style="text-align:center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus2(item.Value.Resolution))</td>
+                    <td style="text-align:center">
+                        @if (item.Value.NAttachList != null && item.Value.NAttachList.Count > 0)
                         {
-                            var originalstr = System.Text.RegularExpressions.Regex.Replace(
-                                                        item.Value.NInternalReportCommentList[item.Value.NInternalReportCommentList.Count - 1].Comment, "<.*?>", string.Empty);
-                            var newcomment = item.Value.NInternalReportCommentList[item.Value.NInternalReportCommentList.Count - 1].Comment.Replace(originalstr
-                                , Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done));
-                            <td width="10%">@Html.Raw(newcomment)</td>
+                            <a href="/Issue/IssueAttach?issuekey=@item.Value.IssueKey" target="_blank">
+                                <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>
+                            </a>
                         }
-                        else
-                        {
-                            <td width="10%"><p><a href="@item.Value.NInternalReportCommentList[item.Value.NInternalReportCommentList.Count - 1].Comment" target="_blank">@Html.Raw(Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></p></td>
-                        }
-                    }
-                    else if (item.Value.NInternalAttachList != null && item.Value.NInternalAttachList.Count > 0)
-                    {
-                        <td width="10%"><p><a href="@item.Value.NInternalAttachList[item.Value.NInternalAttachList.Count - 1]" target="_blank">@Html.Raw(Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></p></td>
-                    }
-                    else
-                    {
-                        <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
-                    }
-
-                    @if (item.Value.NReport4CustomerCommentList != null && item.Value.NReport4CustomerCommentList.Count > 0)
-                    {
-                        if (item.Value.NReport4CustomerCommentList[item.Value.NReport4CustomerCommentList.Count - 1].Comment.Contains("<a href"))
-                        {
-                            var originalstr = System.Text.RegularExpressions.Regex.Replace(
-                                item.Value.NReport4CustomerCommentList[item.Value.NReport4CustomerCommentList.Count - 1].Comment, "<.*?>", string.Empty);
-                            var newcomment = item.Value.NReport4CustomerCommentList[item.Value.NReport4CustomerCommentList.Count - 1].Comment.Replace(originalstr
-                                , Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done));
-                            <td width="10%">@Html.Raw(newcomment)</td>
-                        }
-                        else
-                        {
-                            <td width="10%"><p><a href="@item.Value.NReport4CustomerCommentList[item.Value.NReport4CustomerCommentList.Count - 1].Comment" target="_blank">@Html.Raw(Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></p></td>
-                        }
-                    }
-                    else if (item.Value.NCustomAttachList != null && item.Value.NCustomAttachList.Count > 0)
-                    {
-                        <td width="10%"><p><a href="@item.Value.NCustomAttachList[item.Value.NCustomAttachList.Count - 1]" target="_blank">@Html.Raw(Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></p></td>
-                    }
-                    else
-                    {
-                        <td width="10%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
-                    }
-
-                    <td width="10%"><a href="/User/UserCenter?username=@item.Value.Assignee">@item.Value.Assignee.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
-                    <td width="10%">@item.Value.ReportDate.ToString("MM/dd-yy")</td>
+                    </td>
+                    <td style="text-align:center"><img src="~/Content/images/icon/LowYield.png" MYTP="HOVER" data-toggle="tooltip" title="Critical Error Alarm" style="height:16px;width:16px" onclick="LowYieldWarning('@item.Value.IssueKey')"></td>
                 </tr>
                 i = i + 1;
             }

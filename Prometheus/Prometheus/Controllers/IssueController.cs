@@ -2077,17 +2077,17 @@ namespace Prometheus.Controllers
 
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
-                if (ret.ContainmentActions.Count == 0)
-                {
-                    CreateRMASubIssue(RMASubIssueType.CONTAINMENTACTION, "Cotainment Action for RMA " + ret.FinisarRMA, ret.ProjectKey, ret.IssueKey, ret.Assignee, ret.Reporter, ret.DueDate.AddDays(18), ISSUESUBTYPE.CONTAINMENT.ToString());
-                    ret = IssueViewModels.RetrieveIssueByIssueKey(key, this);
-                }
+                //if (ret.ContainmentActions.Count == 0)
+                //{
+                //    CreateRMASubIssue(RMASubIssueType.CONTAINMENTACTION, "Cotainment Action for RMA " + ret.FinisarRMA, ret.ProjectKey, ret.IssueKey, ret.Assignee, ret.Reporter, ret.DueDate.AddDays(18), ISSUESUBTYPE.CONTAINMENT.ToString());
+                //    ret = IssueViewModels.RetrieveIssueByIssueKey(key, this);
+                //}
 
-                if (ret.CorrectiveActions.Count == 0)
-                {
-                    CreateRMASubIssue(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for RMA " + ret.FinisarRMA, ret.ProjectKey, ret.IssueKey, ret.Assignee, ret.Reporter, ret.DueDate.AddDays(48), ISSUESUBTYPE.CORRECTIVE.ToString());
-                    ret = IssueViewModels.RetrieveIssueByIssueKey(key, this);
-                }
+                //if (ret.CorrectiveActions.Count == 0)
+                //{
+                //    CreateRMASubIssue(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for RMA " + ret.FinisarRMA, ret.ProjectKey, ret.IssueKey, ret.Assignee, ret.Reporter, ret.DueDate.AddDays(48), ISSUESUBTYPE.CORRECTIVE.ToString());
+                //    ret = IssueViewModels.RetrieveIssueByIssueKey(key, this);
+                //}
 
                 ViewBag.isassignee = false;
                 var hasEditPermit = false;
@@ -3339,21 +3339,13 @@ namespace Prometheus.Controllers
 
         public ActionResult ShowContainmentAction(string issuekey)
         {
-            if (!string.IsNullOrEmpty(issuekey))
-            {
-                var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey, this);
-                return View(vm.ContainmentActions);
-            }
+
             return View();
         }
 
         public ActionResult ShowCorrectiveAction(string issuekey)
         {
-            if (!string.IsNullOrEmpty(issuekey))
-            {
-                var vm = IssueViewModels.RetrieveIssueByIssueKey(issuekey, this);
-                return View(vm.CorrectiveActions);
-            }
+
             return View();
         }
 
@@ -3825,117 +3817,6 @@ namespace Prometheus.Controllers
 
             return File(filename, "application/vnd.ms-excel", fn);
         }
-
-        //private List<string> PrepeareOBAReport(string ProjectKey, string StartDate, string EndDate)
-        //{
-        //    var lines = new List<string>();
-        //    var list1 = IssueViewModels.RetrieveIssueTypeByProjectKey(ProjectKey, StartDate, EndDate, ISSUETP.OBA);
-
-        //    var line = "NO,ISSUE DATE,DMR#,Project Name,Failure Rate,Affected SN,FA Owner,OBA Description,Priority,Product Type,FV Results,ROOT CAUSE,Containment Action,Corrective Action,Material Disposition,Resolution,Attachement";
-        //    lines.Add(line);
-
-        //    var idx = 0;
-
-        //    foreach (var item in list1)
-        //    {
-        //        idx = idx + 1;
-
-        //        var index = idx.ToString();
-
-        //        var rootcause = "";
-        //        foreach (var r in item.RootCauseCommentList)
-        //        {
-        //            rootcause = rootcause + System.Text.RegularExpressions.Regex.Replace(r.Comment.Replace("\"", "").Replace("&nbsp;", ""), "<.*?>", string.Empty) + "||";
-        //        }
-
-
-        //        var routevalue = new RouteValueDictionary();
-        //        routevalue.Add("issuekey", "ABC");
-        //        string scheme = this.Url.RequestContext.HttpContext.Request.Url.Scheme;
-        //        string validatestr = this.Url.Action("UpdateIssue", "Issue", routevalue, scheme);
-        //        validatestr = validatestr.Split(new string[] { "/Issue" }, StringSplitOptions.None)[0];
-
-        //        var netcomputername = "";
-        //        try { netcomputername = System.Net.Dns.GetHostName(); }
-        //        catch (Exception ex) { }
-        //        validatestr = validatestr.Replace("/localhost/", "/" + netcomputername + "/");
-
-
-        //        var internalreport = "";
-        //        foreach (var a in item.AttachList)
-        //        {
-        //            var internalreport1 = "";
-        //            if (a.Contains("<a href"))
-        //            {
-        //                internalreport1 = a.Split(new string[] { "<a href=\"", "\" target=" }, StringSplitOptions.None)[1];
-        //            }
-        //            else
-        //            {
-        //                internalreport1 = a;
-        //            }
-        //            internalreport = internalreport+validatestr + internalreport1 + "||";
-        //        }
-
-        //        var issuedata = item.DueDate.AddDays(-6).ToString("MM/dd/yyyy");
-
-        //        var containmentaction = "";
-        //        foreach (var c in item.ContainmentActions)
-        //        {
-        //            containmentaction = containmentaction + c.Summary
-        //                + ":" + c.Resolution + "//";
-        //        }
-
-        //        var correctiveaction = "";
-        //        foreach (var c in item.CorrectiveActions)
-        //        {
-        //            correctiveaction = c.Summary
-        //                + ":" + c.Resolution + "//";
-        //        }
-
-
-        //        line = string.Empty;
-        //        line = "\"" + index + "\"," + "\"" + issuedata + "\"," + "\"" + item.FinisarDMR.Replace("\"", "") + "\","
-        //            + "\"" + item.ProjectKey + "\"," + "\"'" + item.OBAFailureRate.Replace("\"", "") + "\"," + "\"" + item.ModuleSN.Replace("\"", "") + "\"," 
-        //            + "\"" + item.Assignee.Replace("\"", "") + "\","+ "\"" + item.Summary.Replace("\"", "") + "\","
-        //            + "\"" + item.Priority.Replace("\"", "") + "\"," + "\"" + item.ProductType.Replace("\"", "") + "\","
-        //            + "\"" + item.FVCode.Replace("\"", "") + "\"," + "\"" + rootcause.Replace("\"", "").Trim() + "\","
-        //            + "\"" + containmentaction.Replace("\"", "") + "\"," + "\"" + correctiveaction.Replace("\"", "") + "\"," 
-        //            + "\"" + item.MaterialDisposition + "\"," + "\"" + item.Resolution + "\"," + "\"" + internalreport + "\","
-        //            + "\"http://wux-app1.china.ads.finisar.com/eDMR/DMR_Edit/DMR_View.asp?DMR_ID=" + item.FinisarDMR + "\",";
-
-        //        lines.Add(line);
-        //    }
-
-        //    return lines;
-        //}
-
-        //public ActionResult ExportOBAData(string ProjectKey, string StartDate, string EndDate)
-        //{
-        //    if (!string.IsNullOrEmpty(ProjectKey))
-        //    {
-        //        string datestring = DateTime.Now.ToString("yyyyMMdd");
-        //        string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
-        //        if (!Directory.Exists(imgdir))
-        //        {
-        //            Directory.CreateDirectory(imgdir);
-        //        }
-
-        //        var fn = ProjectKey + "_OBA_Report_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
-        //        var filename = imgdir + fn;
-
-        //        var lines = PrepeareOBAReport(ProjectKey, StartDate, EndDate);
-
-        //        var wholefile = "";
-        //        foreach (var l in lines)
-        //        {
-        //            wholefile = wholefile + l + "\r\n";
-        //        }
-        //        System.IO.File.WriteAllText(filename, wholefile);
-
-        //        return File(filename, "application/vnd.ms-excel", fn);
-        //    }
-        //    return RedirectToAction("ViewAll", "Project");
-        //}
 
         private List<string> PrepeareAllOBAReport(string ProjectKey, string StartDate="", string EndDate="")
         {

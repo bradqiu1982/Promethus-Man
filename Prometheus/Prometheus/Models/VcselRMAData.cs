@@ -348,7 +348,7 @@ namespace Prometheus.Models
                     var tempvm = new VcselRMADPPM();
                     tempvm.Wafer = w.Wafer;
                     tempvm.ShippedQty = wafercntdict[w.Wafer];
-                    tempvm.DPPM = Math.Round((double)rmacntdict[w.Wafer] /(double)wafercntdict[w.Wafer] * 10000,2);
+                    tempvm.DPPM = Math.Round((double)rmacntdict[w.Wafer] /(double)wafercntdict[w.Wafer] * 1000000,2);
                     ret.Add(tempvm);
                 }
             }//end foreach

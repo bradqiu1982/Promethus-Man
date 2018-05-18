@@ -6,7 +6,7 @@
 
 <link type="text/css" rel="stylesheet" href="~/Content/bootstrap-datepicker/bootstrap-datepicker.min.css" />
 <script type="text/javascript" src="~/Scripts/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
-
+<script type="text/javascript" src="~/Scripts/autocompletefill.js"></script>
 <div class="row">
     <div class="col-xs-12">
         <ol class="breadcrumb" style="font-size:18px">
@@ -51,7 +51,9 @@
     <div class="col-xs-1"></div>
     <div class="col-xs-2"><input type="button" class="btn btn-success" onclick="DownloadFilterATE()" value="Download Filtered Data" /></div>
     <div class="col-xs-1"></div>
-    
+    <script type="text/javascript">
+        autoCompleteFill('modulefamily', @Html.Raw(ViewBag.ModuleFamily),false,'defaultid');
+    </script>
 </div>
 <script type="text/javascript">
     $(function () {

@@ -111,6 +111,18 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(isql);
         }
 
+        public static List<string> RetrieveModuleFamily()
+        {
+            var ret = new List<string>();
+            var sql = "select distinct ModuleType from ProjectTestData";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                ret.Add(Convert.ToString(line[0]));
+            }
+            return ret;
+        }
+
         public static void PrePareMESLatestData(string projectkey, Controller ctrl)
         {
             if (UpdatePJLockUsing(projectkey))

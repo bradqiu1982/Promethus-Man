@@ -1844,6 +1844,8 @@ namespace Prometheus.Controllers
 
         public ActionResult DownLoadATETestData()
         {
+            var ModuleFamily = ProjectTestData.RetrieveModuleFamily();
+            ViewBag.ModuleFamily = Newtonsoft.Json.JsonConvert.SerializeObject(ModuleFamily);
             return View();
         }
 

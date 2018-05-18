@@ -50,6 +50,40 @@ var VCSEL_RMA = function(){
                     text: 'Amount'
                 }
             }],
+            plotOptions: {
+                series: {
+                    cursor: 'pointer',
+                    events: {
+                        click: function (event) {
+                            var wafer = event.point.category;
+                            $('#waferval').html(wafer);
+
+                            $.post('/DataAnalyze/RetrieveVcselRMARawData',
+                                {
+                                    wafer: wafer
+                                },
+                                function (outputdata) {
+                                    $('#ramrawbody').empty();
+                                    $.each(outputdata.waferdatalist, function (i, val) {
+                                        var appendstr = '<tr>' +
+                                            '<td>' + (i+1) + '</td>' +
+                                            '<td>'+val.SN+'</td>'+
+                                            '<td>'+val.PN+'</td>'+
+                                            '<td>' + val.VcselType + '</td>' +
+                                            '<td>' + val.ProductType + '</td>' +
+                                            '<td>' + val.ShipDate + '</td>' +
+                                            '<td>' + val.RMAOpenDate + '</td>' +
+                                            '<td>' + val.Customer + '</td>'
+                                            + '</tr>';
+                                        $('#ramrawbody').append(appendstr);
+                                    });
+                                    $('#rmarawdata').modal('show')
+                            })
+                            
+                        }
+                    }
+                }
+            },
             series: [{
                 name: line_data.data.cdata.name,
                 color: line_data.data.cdata.color,
@@ -65,7 +99,7 @@ var VCSEL_RMA = function(){
                 marker: {
                     radius: 4
                 },
-                enableMouseTracking: false,
+                enableMouseTracking: true,
                 data: line_data.data.data.data
             }],
             exporting: {

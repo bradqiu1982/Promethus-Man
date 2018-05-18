@@ -144,6 +144,14 @@ namespace Prometheus.Controllers
             return ret;
         }
 
+        public JsonResult RetrieveVcselRMARawData()
+        {
+            var wafer = Request.Form["wafer"];
+            var waferdatalist = VcselRMAData.RetrieveWaferRawData(wafer);
+            var ret = new JsonResult();
+            ret.Data = new { waferdatalist = waferdatalist };
+            return ret;
+        }
 
         public JsonResult VcselRMAMileStoneData(string datetype)
         {

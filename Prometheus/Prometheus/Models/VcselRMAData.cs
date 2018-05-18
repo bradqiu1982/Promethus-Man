@@ -50,6 +50,36 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql, dict);
         }
 
+        public static List<VcselRMAData> RetrieveWaferRawData(string wafer)
+        {
+            var ret = new List<VcselRMAData>();
+            var sql = "select SN,BuildDate,Wafer,PN,PNDesc,VcselPN,VcselType,ProductType,ShipDate,RMAOpenDate,RMANum,Customer from VcselRMAData where Wafer = @Wafer";
+            var dict = new Dictionary<string, string>();
+            dict.Add("@Wafer", wafer);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, dict);
+            foreach (var line in dbret)
+            {
+                var tempvm = new VcselRMAData();
+                tempvm.SN = Convert.ToString(line[0]);
+                tempvm.BuildDate = Convert.ToDateTime(line[1]);
+                tempvm.Wafer = Convert.ToString(line[2]);
+
+                tempvm.PN = Convert.ToString(line[3]);
+                tempvm.PNDesc = Convert.ToString(line[4]);
+                tempvm.VcselPN = Convert.ToString(line[5]);
+                tempvm.VcselType = Convert.ToString(line[6]);
+
+                tempvm.ProductType = Convert.ToString(line[7]);
+                tempvm.ShipDate = Convert.ToString(line[8]);
+                tempvm.RMAOpenDate = Convert.ToString(line[9]);
+                tempvm.RMANum = Convert.ToString(line[10]);
+                tempvm.Customer = Convert.ToString(line[11]);
+
+                ret.Add(tempvm);
+            }
+            return ret;
+        }
+
         public static Dictionary<string, int> RetriveWaferCountDict()
         {
             var ret = new Dictionary<string, int>();

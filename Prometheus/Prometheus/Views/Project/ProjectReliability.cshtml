@@ -90,16 +90,11 @@
                     <td style="text-align:center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus2(item.Value.Resolution))</td>
                     <td style="text-align:center">@item.Value.FVCode</td>
 
-                    @if (item.Value.NRootCauseList != null && item.Value.NRootCauseList.Count > 0)
+                    @if (item.Value.NRootCauseList != null
+                        && ((!item.Value.NRootCauseList[0].Comment.Contains(Prometheus.Models.IssueCommentEmpty.TOBEEDIT) && item.Value.NRootCauseList[0].Comment.Length > 0)
+                        || (item.Value.NRootCauseList[0].Comment.Contains(Prometheus.Models.IssueCommentEmpty.TOBEEDIT) && item.Value.NRootCauseList[0].Comment.Length > 30)))
                     {
-                        if (item.Value.NRootCauseList[0].Comment.Contains("ROOTCAUSE: to be edited"))
-                        {
-                            <td style="text-align:center">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
-                        }
-                        else
-                        {
-                            <td style="text-align:center"><a href="/Issue/ShowRootCause?issuekey=@(item.Value.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></td>
-                        }
+                         <td style="text-align:center"><a href="/Issue/ShowRootCause?issuekey=@(item.Value.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></td>
                     }
                     else
                     {

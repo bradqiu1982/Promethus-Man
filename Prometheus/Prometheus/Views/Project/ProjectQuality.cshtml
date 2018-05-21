@@ -86,8 +86,8 @@
                 <th width="8%">Product Disposal</th>
                 <th width="8%">Analysis</th>
                 <th width="8%">RootCause</th>
-                <th width="8%">Containment Action</th>
-                <th width="8%">Corrective Action</th>
+                @*<th width="8%">Containment Action</th>
+                <th width="8%">Corrective Action</th>*@
                 <th width="8%">Owner</th>
                 <th width="8%">Report Date</th>
                 <th width="8%">Attachment</th>
@@ -111,7 +111,7 @@
                             </div>
                         </div>
                     </td>
-                    <td colspan="10" width="80%">
+                    <td colspan="8" width="80%">
                         <a href="/Issue/UpdateIssue?issuekey=@item.Value.IssueKey">
                             <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
                             @rmatitle.Substring(0, rmatitle.Length > 125 ? 125 : rmatitle.Length)
@@ -151,7 +151,7 @@
                         <td width="8%">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Pending))</td>
                     }
 
-                    @if (item.Value.NContainMent != null && item.Value.NContainMent.Count > 0)
+                    @*@if (item.Value.NContainMent != null && item.Value.NContainMent.Count > 0)
                     {
                         <td width="12%"><a href="/Issue/ShowContainmentAction?issuekey=@(item.Value.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(item.Value.NContainMent[0].Resolution))</a></td>
                     }
@@ -167,7 +167,7 @@
                     else
                     {
                         <td width="12%">N/A</td>
-                    }
+                    }*@
 
                     <td width="8%"><a href="/User/UserCenter?username=@item.Value.Assignee">@item.Value.Assignee.Split(new string[] { "@" }, StringSplitOptions.None)[0]</a></td>
                     <td width="8%">@item.Value.ReportDate.ToString("MM/dd")</td>

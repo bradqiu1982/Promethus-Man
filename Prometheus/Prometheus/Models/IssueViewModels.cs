@@ -160,6 +160,12 @@ namespace Prometheus.Models
         public static string Analysis = "Analysis";
         public static string WeeklyReportSummary = "WeeklyReportSummary";
         public static string AddAttachment = "AddAttachment";
+        public static string ContainmentAction = "ContainmentAction";
+        public static string CorrectiveAction = "CorrectiveAction";
+    }
+
+    public class IssueCommentEmpty {
+        public static string TOBEEDIT = "to be edited";
     }
 
     public class IssueComments
@@ -285,10 +291,10 @@ namespace Prometheus.Models
         public List<string> NAttachList { set; get; }
         public List<string> NInternalAttachList { set; get; }
         public List<string> NCustomAttachList { set; get; }
-        public List<IssueViewModels> NContainMent { set; get; }
-        public List<IssueViewModels> NCorrectMent { set; get; }
-        public List<IssueViewModels> NFailureVerifyActions { set; get; }
-        public List<IssueViewModels> NCorrectiveVerifyActions { set; get; }
+        //public List<IssueViewModels> NContainMent { set; get; }
+        //public List<IssueViewModels> NCorrectMent { set; get; }
+        //public List<IssueViewModels> NFailureVerifyActions { set; get; }
+        //public List<IssueViewModels> NCorrectiveVerifyActions { set; get; }
         public List<IssueComments> NRootCauseList { set; get; }
         public List<IssueComments> NReport4CustomerCommentList { set; get; }
         public List<IssueComments> NInternalReportCommentList { set; get; }
@@ -363,6 +369,8 @@ namespace Prometheus.Models
                 failuredetailcommentlist.Clear();
                 resultcommentlist.Clear();
                 analysiscommentlist.Clear();
+                containmentactionlist.Clear();
+                correctiveactionlist.Clear();
 
                 foreach (var item in cemlist)
                 {
@@ -373,29 +381,39 @@ namespace Prometheus.Models
                     {
                         generalcommentlist.Add(item);
                     }
-                    if (string.Compare(item.CommentType, COMMENTTYPE.RootCause) == 0)
+                    else if (string.Compare(item.CommentType, COMMENTTYPE.RootCause) == 0)
                     {
                         rootcausecommentlist.Add(item);
                     }
-                    if (string.Compare(item.CommentType, COMMENTTYPE.CustomReport) == 0)
+                    else if (string.Compare(item.CommentType, COMMENTTYPE.CustomReport) == 0)
                     {
                         repot4customercommentlist.Add(item);
                     }
-                    if (string.Compare(item.CommentType, COMMENTTYPE.InternalReport) == 0)
+                    else if (string.Compare(item.CommentType, COMMENTTYPE.InternalReport) == 0)
                     {
                         internalrepotcommentlist.Add(item);
                     }
-                    if (string.Compare(item.CommentType, COMMENTTYPE.FailureDetail) == 0)
+                    else if (string.Compare(item.CommentType, COMMENTTYPE.FailureDetail) == 0)
                     {
                         failuredetailcommentlist.Add(item);
                     }
-                    if (string.Compare(item.CommentType, COMMENTTYPE.Result) == 0)
+                    else if (string.Compare(item.CommentType, COMMENTTYPE.Result) == 0)
                     {
                         resultcommentlist.Add(item);
                     }
-                    if (string.Compare(item.CommentType, COMMENTTYPE.Analysis) == 0)
+                    else if (string.Compare(item.CommentType, COMMENTTYPE.Analysis) == 0)
                     {
                         analysiscommentlist.Add(item);
+                    }
+                    else if (string.Compare(item.CommentType,COMMENTTYPE.ContainmentAction) == 0) {
+                        containmentactionlist.Add(item);
+                    }
+                    else if (string.Compare(item.CommentType,COMMENTTYPE.CorrectiveAction) == 0) {
+                        correctiveactionlist.Add(item);
+                    }
+                    else
+                    {
+                        generalcommentlist.Add(item);
                     }
                 }
             }
@@ -412,6 +430,10 @@ namespace Prometheus.Models
         private List<IssueComments> failuredetailcommentlist = new List<IssueComments>();
         private List<IssueComments> resultcommentlist = new List<IssueComments>();
         private List<IssueComments> analysiscommentlist = new List<IssueComments>();
+
+        private List<IssueComments> containmentactionlist = new List<IssueComments>();
+        private List<IssueComments> correctiveactionlist = new List<IssueComments>();
+
 
         public List<IssueComments> GeneralCommentList
         {
@@ -448,6 +470,15 @@ namespace Prometheus.Models
             get { return analysiscommentlist; }
         }
 
+        public List<IssueComments> ContainmentActionList
+        {
+            get { return containmentactionlist; }
+        }
+
+        public List<IssueComments> CorrectiveActionList {
+            get { return correctiveactionlist; }
+        }
+
         private List<string> attachlist = new List<string>();
         public List<string> AttachList
         {
@@ -472,24 +503,11 @@ namespace Prometheus.Models
                 sissue.Clear();
                 sissue.AddRange(value);
 
-                failureverifyactionlist.Clear();
-                correctivverifyactionlist.Clear();
                 generalactionlist.Clear();
 
                 foreach (var item in value)
                 {
-                    if (item.Summary.Contains(RELSubIssueType.FAILVERIFYACTION))
-                    {
-                        failureverifyactionlist.Add(item);
-                    }
-                    else if (item.Summary.Contains(RELSubIssueType.VERIFYCORRECTIVEACTION))
-                    {
-                        correctivverifyactionlist.Add(item);
-                    }
-                    else
-                    {
-                        generalactionlist.Add(item);
-                    }
+                    generalactionlist.Add(item);
                 }//end foreach
             }
 
@@ -500,8 +518,7 @@ namespace Prometheus.Models
         }
 
 
-        private List<IssueViewModels> failureverifyactionlist = new List<IssueViewModels>();
-        private List<IssueViewModels> correctivverifyactionlist = new List<IssueViewModels>();
+
         private List<IssueViewModels> generalactionlist = new List<IssueViewModels>();
 
         public List<IssueViewModels> GeneralActions
@@ -509,78 +526,6 @@ namespace Prometheus.Models
             get { return generalactionlist; }
         }
 
-        public List<IssueViewModels> FailureVerifyActions
-        {
-            get
-            { return failureverifyactionlist; }
-        }
-        public string FVerifyActionStatus()
-        {
-            if (failureverifyactionlist.Count > 0)
-            {
-                foreach (var item in failureverifyactionlist)
-                {
-                    if (item.Resolution == Resolute.Pending || item.Resolution == Resolute.Reopen)
-                    {
-                        return Resolute.ColorStatus(Resolute.Pending);
-                    }
-                    if (item.Resolution == Resolute.Working)
-                    {
-                        return Resolute.ColorStatus(Resolute.Working);
-                    }
-                    if (item.Resolution == Resolute.NotFix)
-                    {
-                        return Resolute.ColorStatus(Resolute.NotFix);
-                    }
-                    if (item.Resolution == Resolute.Unresolved)
-                    {
-                        return Resolute.ColorStatus(Resolute.Unresolved);
-                    }
-                    if (item.Resolution == Resolute.NotReproduce)
-                    {
-                        return Resolute.ColorStatus(Resolute.NotReproduce);
-                    }
-                }
-                return Resolute.ColorStatus(Resolute.Done);
-            }
-            return Resolute.ColorStatus(Resolute.Pending);
-        }
-        public List<IssueViewModels> CorrectiveVerifyActions
-        {
-            get
-            { return correctivverifyactionlist; }
-        }
-        public string CVerifyActionStatus()
-        {
-            if (correctivverifyactionlist.Count > 0)
-            {
-                foreach (var item in correctivverifyactionlist)
-                {
-                    if (item.Resolution == Resolute.Pending || item.Resolution == Resolute.Reopen)
-                    {
-                        return Resolute.ColorStatus(Resolute.Pending);
-                    }
-                    if (item.Resolution == Resolute.Working)
-                    {
-                        return Resolute.ColorStatus(Resolute.Working);
-                    }
-                    if (item.Resolution == Resolute.NotFix)
-                    {
-                        return Resolute.ColorStatus(Resolute.NotFix);
-                    }
-                    if (item.Resolution == Resolute.Unresolved)
-                    {
-                        return Resolute.ColorStatus(Resolute.Unresolved);
-                    }
-                    if (item.Resolution == Resolute.NotReproduce)
-                    {
-                        return Resolute.ColorStatus(Resolute.NotReproduce);
-                    }
-                }
-                return Resolute.ColorStatus(Resolute.Done);
-            }
-            return Resolute.ColorStatus(Resolute.Pending);
-        }
 
         #region OBA
         public string FinisarDMR { set; get; }
@@ -2217,8 +2162,8 @@ namespace Prometheus.Models
                     tempvm.ModuleSN = Convert.ToString(line[19]);
                     tempvm.RMAFailureCode = Convert.ToString(line[20]);
                     tempvm.FVCode = Convert.ToString(line[21]);
-                    tempvm.NContainMent = new List<IssueViewModels>();
-                    tempvm.NCorrectMent = new List<IssueViewModels>();
+                    //tempvm.NContainMent = new List<IssueViewModels>();
+                    //tempvm.NCorrectMent = new List<IssueViewModels>();
                     //subissue
                     if (!string.IsNullOrEmpty(Convert.ToString(line[22])))
                     {
@@ -2331,8 +2276,8 @@ namespace Prometheus.Models
                     tempvm.ModuleSN = Convert.ToString(line[17]);
                     tempvm.FVCode = Convert.ToString(line[18]);
                     tempvm.ProductType = Convert.ToString(line[19]);
-                    tempvm.NContainMent = new List<IssueViewModels>();
-                    tempvm.NCorrectMent = new List<IssueViewModels>();
+                    //tempvm.NContainMent = new List<IssueViewModels>();
+                    //tempvm.NCorrectMent = new List<IssueViewModels>();
                     //subissue
                     if (!string.IsNullOrEmpty(Convert.ToString(line[20])))
                     {
@@ -2442,8 +2387,8 @@ namespace Prometheus.Models
                     tempvm.ProductType = Convert.ToString(line[15]);
                     tempvm.AffectRange = Convert.ToString(line[16]);
                     tempvm.MaterialDisposition = Convert.ToString(line[17]);
-                    tempvm.NContainMent = new List<IssueViewModels>();
-                    tempvm.NCorrectMent = new List<IssueViewModels>();
+                    //tempvm.NContainMent = new List<IssueViewModels>();
+                    //tempvm.NCorrectMent = new List<IssueViewModels>();
                     //subissue
                     if (!string.IsNullOrEmpty(Convert.ToString(line[18])))
                     {
@@ -2562,8 +2507,8 @@ namespace Prometheus.Models
                     tempvm.FailQTY = Convert.ToString(line[23]);
                     tempvm.TotalQTY = Convert.ToString(line[24]);
                     tempvm.FVCode = Convert.ToString(line[25]);
-                    tempvm.NContainMent = new List<IssueViewModels>();
-                    tempvm.NCorrectMent = new List<IssueViewModels>();
+                    //tempvm.NContainMent = new List<IssueViewModels>();
+                    //tempvm.NCorrectMent = new List<IssueViewModels>();
                     //subissue
                     if (!string.IsNullOrEmpty(Convert.ToString(line[26])))
                     {
@@ -2667,8 +2612,8 @@ namespace Prometheus.Models
                     tempvm.ModuleSN = Convert.ToString(line[12]);
                     tempvm.LYT = Convert.ToString(line[13]);
                     //Rel
-                    tempvm.NContainMent = new List<IssueViewModels>();
-                    tempvm.NCorrectMent = new List<IssueViewModels>();
+                    //tempvm.NContainMent = new List<IssueViewModels>();
+                    //tempvm.NCorrectMent = new List<IssueViewModels>();
                     //subissue
                     if (!string.IsNullOrEmpty(Convert.ToString(line[14])))
                     {
@@ -2767,40 +2712,40 @@ namespace Prometheus.Models
         }
         private static void NGetSubCommentList(IssueViewModels tempvm, IssueViewModels sub_vm)
         {
-            if (tempvm.NContainMent == null)
-            {
-                tempvm.NContainMent = new List<IssueViewModels>();
-            }
-            if (tempvm.NCorrectMent == null)
-            {
-                tempvm.NCorrectMent = new List<IssueViewModels>();
-            }
-            if (tempvm.NFailureVerifyActions == null)
-            {
-                tempvm.NFailureVerifyActions = new List<IssueViewModels>();
-            }
-            if (tempvm.NCorrectiveVerifyActions == null)
-            {
-                tempvm.NCorrectiveVerifyActions = new List<IssueViewModels>();
-            }
-            if (sub_vm.Summary.Contains("[Containment]")
-                    || sub_vm.Summary.Contains(RELSubIssueType.CONTAINMENTACTION))
-            {
-                tempvm.NContainMent.Add(sub_vm);
-            }
-            else if (sub_vm.Summary.Contains("[Corrective]")
-                    || sub_vm.Summary.Contains(RELSubIssueType.CORRECTIVEACTION))
-            {
-                tempvm.NCorrectMent.Add(sub_vm);
-            }
-            else if (sub_vm.Summary.Contains(RELSubIssueType.FAILVERIFYACTION))
-            {
-                tempvm.NFailureVerifyActions.Add(sub_vm);
-            }
-            else if (sub_vm.Summary.Contains(RELSubIssueType.VERIFYCORRECTIVEACTION))
-            {
-                tempvm.NCorrectiveVerifyActions.Add(sub_vm);
-            }
+            //if (tempvm.NContainMent == null)
+            //{
+            //    tempvm.NContainMent = new List<IssueViewModels>();
+            //}
+            //if (tempvm.NCorrectMent == null)
+            //{
+            //    tempvm.NCorrectMent = new List<IssueViewModels>();
+            //}
+            //if (tempvm.NFailureVerifyActions == null)
+            //{
+            //    tempvm.NFailureVerifyActions = new List<IssueViewModels>();
+            //}
+            //if (tempvm.NCorrectiveVerifyActions == null)
+            //{
+            //    tempvm.NCorrectiveVerifyActions = new List<IssueViewModels>();
+            //}
+            //if (sub_vm.Summary.Contains("[Containment]")
+            //        || sub_vm.Summary.Contains(RELSubIssueType.CONTAINMENTACTION))
+            //{
+            //    tempvm.NContainMent.Add(sub_vm);
+            //}
+            //else if (sub_vm.Summary.Contains("[Corrective]")
+            //        || sub_vm.Summary.Contains(RELSubIssueType.CORRECTIVEACTION))
+            //{
+            //    tempvm.NCorrectMent.Add(sub_vm);
+            //}
+            //else if (sub_vm.Summary.Contains(RELSubIssueType.FAILVERIFYACTION))
+            //{
+            //    tempvm.NFailureVerifyActions.Add(sub_vm);
+            //}
+            //else if (sub_vm.Summary.Contains(RELSubIssueType.VERIFYCORRECTIVEACTION))
+            //{
+            //    tempvm.NCorrectiveVerifyActions.Add(sub_vm);
+            //}
         }
 
         public static List<IssueViewModels> RetrieveIssueTypeByProjectKey(string projectkey, string StartDate, string EndDate, string issuetype, Controller ctrl)

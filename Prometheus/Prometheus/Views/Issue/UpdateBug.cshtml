@@ -36,6 +36,15 @@ else
     </script>
 }
 
+@if (ViewBag.TaskNoticeInfo != null)
+{
+    <script type="text/javascript">
+        $(function(){
+            alert(@Html.Raw(ViewBag.TaskNoticeInfo));
+        });
+    </script>
+}
+
 <script src="~/Scripts/lobilist/lib/jquery/jquery.ui.touch-punch-improved.js"></script>
 <script src="~/Scripts/lobilist/dist/lobilist_tasklink.js"></script>
 <script src="~/Scripts/lobilist/lib/lobibox/js/lobibox.min.js"></script>
@@ -532,7 +541,7 @@ else
 
     if (ViewBag.isassignee != null
         && ViewBag.isassignee
-        && Model.FailureDetailCommentList.Count == 0)
+        && (Model.FailureDetailCommentList.Count == 0 || Model.RootCauseCommentList.Count == 0 || Model.ResultCommentList.Count == 0))
     {
         <div class="row" data-intro = "Analysis of your issue."  data-step="@(step_idx++)">
             <div MYTP="red" class="row" style="margin-left:3px">
@@ -551,6 +560,7 @@ else
                         <div class="row">
                             <div class="col-xs-1"></div>
                             <div class="col-xs-10">
+                                @if(Model.FailureDetailCommentList.Count == 0 ){
                                 <div class="row" data-intro = "Please input your failure detail."  data-step="@(step_idx++)">
                                     <div class="form-group">
                                         <label class="control-label">Failure Detail</label>
@@ -610,7 +620,8 @@ else
                                 <div class="row">
                                     <div class="col-xs-12">&nbsp;</div>
                                 </div>
-
+                                }
+                                @if (Model.RootCauseCommentList.Count == 0) { 
                                 <div class="row" data-intro = "Please input root cause investigation."  data-step="@(step_idx++)">
                                     <div class="form-group">
                                         <label class="control-label">Root Cause Investigation</label>
@@ -675,7 +686,8 @@ else
                                 <div class="row">
                                     <div class="col-xs-12">&nbsp;</div>
                                 </div>
-
+                                }
+                                @if (Model.ResultCommentList.Count == 0) { 
                                 <div class="row" data-intro = "Please input result."  data-step="@(step_idx++)">
                                     <div class="form-group">
                                         <label class="control-label">Result</label>
@@ -730,6 +742,7 @@ else
                                         </div>
                                     </div>
                                 </div>
+                                }
                             </div>
                             <div class="col-xs-1"></div>
 
@@ -774,9 +787,9 @@ else
                                                         </a>
                                                     </div>
                                                     <div class="col-xs-1">
-                                                        <a href="/Issue/DeleteSPIssueComment?IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
+                                                        @*<a href="/Issue/DeleteSPIssueComment?IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
                                                             <img src="~/Content/images/icon/delete2.png" MYTP="HOVER" style="height:34px; width:24px">
-                                                        </a>
+                                                        </a>*@
                                                     </div>
                                                 </div>
                                                 <div class="col-xs-6"></div>
@@ -804,7 +817,7 @@ else
             <div  MYTP="blue"  class="row" style="margin-left:3px">
                 <div class="col-xs-12">
                     <a data-toggle="collapse" href="#rootcausecom" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
-                        <font color="black"><strong>&nbsp;&nbsp;RootCause Investigation</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
+                        <font color="black"><strong>&nbsp;&nbsp;RootCause Investigation</strong></font><font color="red"><strong>*</strong></font>&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
                     </a>
                 </div>
             </div>
@@ -882,9 +895,9 @@ else
                                                         </a>
                                                     </div>
                                                     <div class="col-xs-1">
-                                                        <a href="/Issue/DeleteSPIssueComment?IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
+                                                        @*<a href="/Issue/DeleteSPIssueComment?IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
                                                             <img src="~/Content/images/icon/delete2.png" MYTP="HOVER" style="height:34px; width:24px">
-                                                        </a>
+                                                        </a>*@
                                                     </div>
                                                 </div>
                                                 <div class="col-xs-6"></div>

@@ -18,6 +18,15 @@ else
     </script>
 }
 
+@if (ViewBag.TaskNoticeInfo != null)
+{
+    <script type="text/javascript">
+        $(function(){
+            alert(@Html.Raw(ViewBag.TaskNoticeInfo));
+        });
+    </script>
+}
+
 <div class="row">
     <div class="nav navbar-nav navbar-left">
         <img src="~/Content/images/PJ/REL.png" style="height:35px; width:35px;margin-right: 15px;">
@@ -596,13 +605,13 @@ else
         <hr style="border-color:#006DC0;" />
     }
 
-    if (Model != null && Model.FailureVerifyActions.Count > 0)
+    if (Model.ContainmentActionList.Count > 0)
     {
-        <div class="row" data-intro = "Show failure verify actions."  data-step="@(step_idx++)">
-            <div  MYTP="yello"  class="row" style="margin-left:3px">
+        <div class="row" data-intro="Show containment action." data-step="@(step_idx++)">
+            <div MYTP="blue" class="row" style="margin-left:3px">
                 <div class="col-xs-12">
-                    <a data-toggle="collapse" href="#failureverifytasks" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
-                        <font color="black"><strong>&nbsp;&nbsp;Failure Verification</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:auto">
+                    <a data-toggle="collapse" href="#containmentaction" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
+                        <font color="black"><strong>&nbsp;&nbsp;Containment Action</strong></font><font color="red"><strong>*</strong></font>&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
                     </a>
                 </div>
             </div>
@@ -610,41 +619,43 @@ else
                 <div class="col-xs-12">&nbsp;</div>
             </div>
             <div class="row" style="margin-left:10px">
-                <div class="collapse in" id="failureverifytasks">
+                <div class="collapse in" id="containmentaction">
                     <div class="form-group">
                         <div class="row">
                             <div class="col-xs-1"></div>
-                            <div class="col-xs-8">
-                                <div class="well" style="margin-bottom:8px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px;padding-top:4px;padding-bottom:4px">
-                                    <div class="row">
-                                        <div class="col-xs-4">Summary</div>
-                                        <div class="col-xs-2">Status</div>
-                                        <div class="col-xs-2">Asignee</div>
-                                        <div class="col-xs-2">DueDate</div>
-                                        <div class="col-xs-2"></div>
-                                    </div>
-                                    @foreach (var item in Model.FailureVerifyActions)
-                                    {
-                                        <div class="row">
-                                            <div class="col-xs-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace(Prometheus.Models.RELSubIssueType.FAILVERIFYACTION, "")</a></div>
-                                            <div class="col-xs-2">@item.Resolution</div>
-                                            <div class="col-xs-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
-                                            <div class="col-xs-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
-                                            <div class="col-xs-2"></div>
+                            <div class="col-xs-11">
+                                @foreach (var item in Model.ContainmentActionList)
+                                {
+                                    <div class="well" style="margin-bottom:2px;padding-bottom:2px;margin-top:2px;padding-top:2px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px;border-top-width:0px">
+                                        <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                            <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                                <div class="col-xs-6">
+                                                    <div class="col-xs-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd HH:mm:ss")</div>
+                                                    <div class="col-xs-1">
+                                                        <a href="/Issue/ModifyIssueComment?IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
+                                                            <img src="~/Content/images/icon/edit2.png" MYTP="HOVER" style="height:34px; width:24px">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-6"></div>
+                                            </div>
+                                            <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                                <div class="col-xs-1"></div>
+                                                <div class="col-xs-11">@Html.Raw(item.Comment)</div>
+                                            </div>
                                         </div>
-                                    }
-                                </div>
+                                    </div>
+
+                                }
                             </div>
-                            <div class="col-xs-3"></div>
+
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <hr style="border-color:#006DC0;" />
+            <hr style="border-color:#006DC0;" />
     }
-
 
     if (Model.RootCauseCommentList.Count > 0)
     {
@@ -704,13 +715,13 @@ else
         <hr style="border-color:#006DC0;" />
     }
 
-    if (Model != null && Model.CorrectiveVerifyActions.Count > 0)
+    if (Model.CorrectiveActionList.Count > 0)
     {
-        <div class="row" data-intro = "Show corrctive verify actions."  data-step="@(step_idx++)">
-            <div MYTP="yello"  class="row" style="margin-left:3px">
+        <div class="row" data-intro="Show corrective action." data-step="@(step_idx++)">
+            <div MYTP="blue" class="row" style="margin-left:3px">
                 <div class="col-xs-12">
-                    <a data-toggle="collapse" href="#correctiveverifytasks" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
-                        <font color="black"><strong>&nbsp;&nbsp;Corrective/Preventive Verification</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:auto">
+                    <a data-toggle="collapse" href="#correctiveaction" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
+                        <font color="black"><strong>&nbsp;&nbsp;Corrective Action</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
                     </a>
                 </div>
             </div>
@@ -718,41 +729,43 @@ else
                 <div class="col-xs-12">&nbsp;</div>
             </div>
             <div class="row" style="margin-left:10px">
-                <div class="collapse in" id="correctiveverifytasks">
+                <div class="collapse in" id="correctiveaction">
                     <div class="form-group">
                         <div class="row">
                             <div class="col-xs-1"></div>
-                            <div class="col-xs-8">
-                                <div class="well" style="margin-bottom:8px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px;padding-top:4px;padding-bottom:4px">
-                                    <div class="row">
-                                        <div class="col-xs-4">Summary</div>
-                                        <div class="col-xs-2">Status</div>
-                                        <div class="col-xs-2">Asignee</div>
-                                        <div class="col-xs-2">DueDate</div>
-                                        <div class="col-xs-2"></div>
-                                    </div>
-                                    @foreach (var item in Model.CorrectiveVerifyActions)
-                                    {
-                                        <div class="row">
-                                            <div class="col-xs-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace(Prometheus.Models.RELSubIssueType.VERIFYCORRECTIVEACTION, "")</a></div>
-                                            <div class="col-xs-2">@item.Resolution</div>
-                                            <div class="col-xs-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
-                                            <div class="col-xs-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
-                                            <div class="col-xs-2"></div>
+                            <div class="col-xs-11">
+                                @foreach (var item in Model.CorrectiveActionList)
+                                {
+                                    <div class="well" style="margin-bottom:2px;padding-bottom:2px;margin-top:2px;padding-top:2px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px;border-top-width:0px">
+                                        <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                            <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                                <div class="col-xs-6">
+                                                    <div class="col-xs-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd HH:mm:ss")</div>
+                                                    <div class="col-xs-1">
+                                                        <a href="/Issue/ModifyIssueComment?IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
+                                                            <img src="~/Content/images/icon/edit2.png" MYTP="HOVER" style="height:34px; width:24px">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-6"></div>
+                                            </div>
+                                            <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                                <div class="col-xs-1"></div>
+                                                <div class="col-xs-11">@Html.Raw(item.Comment)</div>
+                                            </div>
                                         </div>
-                                    }
-                                </div>
+                                    </div>
+
+                                }
                             </div>
-                            <div class="col-xs-3"></div>
+
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
         <hr style="border-color:#006DC0;" />
     }
-
 
     if (Model.GeneralCommentList.Count > 0)
     {

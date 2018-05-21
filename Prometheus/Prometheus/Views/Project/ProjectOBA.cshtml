@@ -109,7 +109,9 @@
                     </td>
                     <td style="text-align:center">@item.Value.ModuleSN</td>
                     <td style="text-align:center;font-size:9px;" data-toggle="tooltip" title="@rmatitle"><a href="/Issue/UpdateIssue?issuekey=@item.Value.IssueKey">@rmatitle</a></td>
-                    @if (item.Value.NRootCauseList != null && item.Value.NRootCauseList.Count > 0)
+                    @if (item.Value.NRootCauseList != null 
+                        && ((!item.Value.NRootCauseList[0].Comment.Contains(Prometheus.Models.IssueCommentEmpty.TOBEEDIT) && item.Value.NRootCauseList[0].Comment.Length > 0)
+                        || (item.Value.NRootCauseList[0].Comment.Contains(Prometheus.Models.IssueCommentEmpty.TOBEEDIT) && item.Value.NRootCauseList[0].Comment.Length > 30)))
                     {
                         <td style="text-align:center"><a href="/Issue/ShowRootCause?issuekey=@(item.Value.IssueKey)" target="_blank">@Html.Raw(@Prometheus.Models.Resolute.ColorStatus(Prometheus.Models.Resolute.Done))</a></td>
                     }

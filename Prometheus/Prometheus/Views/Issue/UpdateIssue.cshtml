@@ -36,6 +36,15 @@ else
     </script>
 }
 
+@if (ViewBag.TaskNoticeInfo != null)
+{
+    <script type="text/javascript">
+        $(function(){
+            alert(@Html.Raw(ViewBag.TaskNoticeInfo));
+        });
+    </script>
+}
+
 <script src="~/Scripts/lobilist/lib/jquery/jquery.ui.touch-punch-improved.js"></script>
 <script src="~/Scripts/lobilist/dist/lobilist_tasklink.js"></script>
 <script src="~/Scripts/lobilist/lib/lobibox/js/lobibox.min.js"></script>
@@ -501,14 +510,66 @@ else
         <hr style="border-color:#006DC0;" />
     }
 
+    if (Model.ContainmentActionList.Count > 0)
+    {
+        <div class="row" data-intro="Show containment action." data-step="@(step_idx++)">
+            <div MYTP="blue" class="row" style="margin-left:3px">
+                <div class="col-xs-12">
+                    <a data-toggle="collapse" href="#containmentaction" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
+                        <font color="black"><strong>&nbsp;&nbsp;Containment Action</strong></font><font color="red"><strong>*</strong></font>&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
+                    </a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">&nbsp;</div>
+            </div>
+            <div class="row" style="margin-left:10px">
+                <div class="collapse in" id="containmentaction">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-xs-1"></div>
+                            <div class="col-xs-11">
+                                @foreach (var item in Model.ContainmentActionList)
+                                {
+                                    <div class="well" style="margin-bottom:2px;padding-bottom:2px;margin-top:2px;padding-top:2px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px;border-top-width:0px">
+                                        <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                            <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                                <div class="col-xs-6">
+                                                    <div class="col-xs-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd HH:mm:ss")</div>
+                                                    <div class="col-xs-1">
+                                                        <a href="/Issue/ModifyIssueComment?IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
+                                                            <img src="~/Content/images/icon/edit2.png" MYTP="HOVER" style="height:34px; width:24px">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-6"></div>
+                                            </div>
+                                            <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                                <div class="col-xs-1"></div>
+                                                <div class="col-xs-11">@Html.Raw(item.Comment)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                }
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    }
+
 
     if (Model.RootCauseCommentList.Count > 0)
-                {
+    {
         <div class="row" data-intro = "Show root cause comments." data-step="@(step_idx++)">
             <div MYTP="blue" class="row" style="margin-left:3px">
                 <div class="col-xs-12">
                     <a data-toggle="collapse" href="#rootcausecom" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
-                        <font color="black"><strong>&nbsp;&nbsp;RootCause Investigation</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
+                        <font color="black"><strong>&nbsp;&nbsp;RootCause Investigation</strong></font><font color="red"><strong>*</strong></font>&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
                     </a>
                 </div>
             </div>
@@ -553,6 +614,58 @@ else
         </div>
 
                     <hr style="border-color:#006DC0;" />
+    }
+
+    if (Model.CorrectiveActionList.Count > 0)
+    {
+        <div class="row" data-intro="Show corrective action." data-step="@(step_idx++)">
+            <div MYTP="blue" class="row" style="margin-left:3px">
+                <div class="col-xs-12">
+                    <a data-toggle="collapse" href="#correctiveaction" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
+                        <font color="black"><strong>&nbsp;&nbsp;Corrective Action</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
+                    </a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">&nbsp;</div>
+            </div>
+            <div class="row" style="margin-left:10px">
+                <div class="collapse in" id="correctiveaction">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-xs-1"></div>
+                            <div class="col-xs-11">
+                                @foreach (var item in Model.CorrectiveActionList)
+                                {
+                                    <div class="well" style="margin-bottom:2px;padding-bottom:2px;margin-top:2px;padding-top:2px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px;border-top-width:0px">
+                                        <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                            <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                                <div class="col-xs-6">
+                                                    <div class="col-xs-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd HH:mm:ss")</div>
+                                                    <div class="col-xs-1">
+                                                        <a href="/Issue/ModifyIssueComment?IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
+                                                            <img src="~/Content/images/icon/edit2.png" MYTP="HOVER" style="height:34px; width:24px">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-6"></div>
+                                            </div>
+                                            <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                                <div class="col-xs-1"></div>
+                                                <div class="col-xs-11">@Html.Raw(item.Comment)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                }
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     }
 
 

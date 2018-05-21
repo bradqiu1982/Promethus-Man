@@ -375,19 +375,19 @@ namespace Prometheus.Models
         public List<string> Attachs { set; get; }
     }
 
-    public class RELSubIssueType
-    {
-        public static string CONTAINMENTACTION = "[CONTAINMENTACTION]";
-        public static string CORRECTIVEACTION = "[CORRECTIVEACTION]";
-        public static string FAILVERIFYACTION = "[FAILVERIFYACTION]";
-        public static string VERIFYCORRECTIVEACTION = "[VERIFYCORRECTIVEACTION]";
-    }
+    //public class RELSubIssueType
+    //{
+    //    public static string CONTAINMENTACTION = "[CONTAINMENTACTION]";
+    //    public static string CORRECTIVEACTION = "[CORRECTIVEACTION]";
+    //    public static string FAILVERIFYACTION = "[FAILVERIFYACTION]";
+    //    public static string VERIFYCORRECTIVEACTION = "[VERIFYCORRECTIVEACTION]";
+    //}
 
-    public class RMASubIssueType
-    {
-        public static string CONTAINMENTACTION = "[Containment]";
-        public static string CORRECTIVEACTION = "[Corrective]";
-    }
+    //public class RMASubIssueType
+    //{
+    //    public static string CONTAINMENTACTION = "[Containment]";
+    //    public static string CORRECTIVEACTION = "[Corrective]";
+    //}
 
     public class CRITICALERRORTYPE
     {
@@ -982,25 +982,25 @@ namespace Prometheus.Models
             }//analyser in usermatrisx
         }
 
-        private static void CreateRMASubIssue(string presum, string sum, string pjkey, string parentkey, string analyser, string reporter, DateTime duedate,string moretag)
-        {
-            var vm = new IssueViewModels();
-            vm.ProjectKey = pjkey;
-            vm.IssueKey = IssueViewModels.GetUniqKey();
-            vm.ParentIssueKey = parentkey;
-            vm.IssueType = ISSUETP.Task;
-            vm.Summary = presum + sum;
-            vm.Priority = ISSUEPR.Major;
-            vm.DueDate = duedate;
-            vm.ReportDate = DateTime.Now;
-            vm.Assignee = analyser;
-            vm.Reporter = reporter;
-            vm.Resolution = Resolute.Pending;
-            vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
-            vm.StoreSubIssue();
+        //private static void CreateRMASubIssue(string presum, string sum, string pjkey, string parentkey, string analyser, string reporter, DateTime duedate,string moretag)
+        //{
+        //    var vm = new IssueViewModels();
+        //    vm.ProjectKey = pjkey;
+        //    vm.IssueKey = IssueViewModels.GetUniqKey();
+        //    vm.ParentIssueKey = parentkey;
+        //    vm.IssueType = ISSUETP.Task;
+        //    vm.Summary = presum + sum;
+        //    vm.Priority = ISSUEPR.Major;
+        //    vm.DueDate = duedate;
+        //    vm.ReportDate = DateTime.Now;
+        //    vm.Assignee = analyser;
+        //    vm.Reporter = reporter;
+        //    vm.Resolution = Resolute.Pending;
+        //    vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+        //    vm.StoreSubIssue();
 
-            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.Task.ToString(),moretag);
-        }
+        //    IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.Task.ToString(),moretag);
+        //}
 
         private static void CreateRMAIssue(RMARAWData rawdata,Controller ctrl)
         {
@@ -1083,8 +1083,22 @@ namespace Prometheus.Models
 
             UserViewModels.RegisterUserAuto(vm.Assignee);
 
-            CreateRMASubIssue(RMASubIssueType.CONTAINMENTACTION, "Cotainment Action for RMA " + vm.FinisarRMA, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(18),ISSUESUBTYPE.CONTAINMENT.ToString());
-            CreateRMASubIssue(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for RMA " + vm.FinisarRMA, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(48),ISSUESUBTYPE.CORRECTIVE.ToString());
+
+            //CreateRMASubIssue(RMASubIssueType.CONTAINMENTACTION, "Cotainment Action for RMA " + vm.FinisarRMA, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(18),ISSUESUBTYPE.CONTAINMENT.ToString());
+            //CreateRMASubIssue(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for RMA " + vm.FinisarRMA, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(48),ISSUESUBTYPE.CORRECTIVE.ToString());
+            
+            var comment = new IssueComments();
+            comment.Comment = IssueCommentEmpty.TOBEEDIT;
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, vm.Assignee, COMMENTTYPE.ContainmentAction);
+
+            comment = new IssueComments();
+            comment.Comment = IssueCommentEmpty.TOBEEDIT;
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, vm.Assignee, COMMENTTYPE.RootCause);
+
+            comment = new IssueComments();
+            comment.Comment = IssueCommentEmpty.TOBEEDIT;
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, vm.Assignee, COMMENTTYPE.CorrectiveAction);
+
             SendRMAEvent(vm, "created",ctrl, true);
         }
 
@@ -1539,14 +1553,20 @@ namespace Prometheus.Models
 
             IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.IQE.ToString());
 
-            CreateRMASubIssue(RMASubIssueType.CONTAINMENTACTION, "Cotainment Action for "+ shortissue
-                , vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(18), ISSUESUBTYPE.CONTAINMENT.ToString());
-            CreateRMASubIssue(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for "+ shortissue
-                , vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(48), ISSUESUBTYPE.CORRECTIVE.ToString());
+            //CreateRMASubIssue(RMASubIssueType.CONTAINMENTACTION, "Cotainment Action for "+ shortissue
+            //    , vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(18), ISSUESUBTYPE.CONTAINMENT.ToString());
+            //CreateRMASubIssue(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for "+ shortissue
+            //    , vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(48), ISSUESUBTYPE.CORRECTIVE.ToString());
 
             var comment = new IssueComments();
-            comment.Comment = "ROOTCAUSE: to be edited";
-            IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, analyser, COMMENTTYPE.RootCause);
+            comment.Comment = IssueCommentEmpty.TOBEEDIT;
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, vm.Assignee, COMMENTTYPE.ContainmentAction);
+            comment = new IssueComments();
+            comment.Comment = IssueCommentEmpty.TOBEEDIT;
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, vm.Assignee, COMMENTTYPE.RootCause);
+            comment = new IssueComments();
+            comment.Comment = IssueCommentEmpty.TOBEEDIT;
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, vm.Assignee, COMMENTTYPE.CorrectiveAction);
 
             if (!IsDebug())
             {
@@ -2411,14 +2431,20 @@ namespace Prometheus.Models
 
             IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.REL.ToString());
 
-            CreateRelSubIssue(RELSubIssueType.FAILVERIFYACTION, "Failure Verify for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(2),ISSUESUBTYPE.FAILVERIFY.ToString());
-            CreateRelSubIssue(RELSubIssueType.CONTAINMENTACTION, "Cotainment Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(30),ISSUESUBTYPE.CONTAINMENT.ToString());
-            CreateRelSubIssue(RELSubIssueType.CORRECTIVEACTION, "Corrective/PreVentive Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(60),ISSUESUBTYPE.CORRECTIVE.ToString());
-            CreateRelSubIssue(RELSubIssueType.VERIFYCORRECTIVEACTION, "Verify Corrective/PreVentive Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, reporter, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(75),ISSUESUBTYPE.CORRECTIVEVERIFY.ToString());
+            //CreateRelSubIssue(RELSubIssueType.FAILVERIFYACTION, "Failure Verify for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(2),ISSUESUBTYPE.FAILVERIFY.ToString());
+            //CreateRelSubIssue(RELSubIssueType.CONTAINMENTACTION, "Cotainment Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(30),ISSUESUBTYPE.CONTAINMENT.ToString());
+            //CreateRelSubIssue(RELSubIssueType.CORRECTIVEACTION, "Corrective/PreVentive Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(60),ISSUESUBTYPE.CORRECTIVE.ToString());
+            //CreateRelSubIssue(RELSubIssueType.VERIFYCORRECTIVEACTION, "Verify Corrective/PreVentive Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, reporter, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(75),ISSUESUBTYPE.CORRECTIVEVERIFY.ToString());
 
             var comment = new IssueComments();
-            comment.Comment = "ROOTCAUSE: to be edited";
+            comment.Comment = IssueCommentEmpty.TOBEEDIT;
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, analyser, COMMENTTYPE.ContainmentAction);
+            comment = new IssueComments();
+            comment.Comment = IssueCommentEmpty.TOBEEDIT;
             IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, analyser, COMMENTTYPE.RootCause);
+            comment = new IssueComments();
+            comment.Comment = IssueCommentEmpty.TOBEEDIT;
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, analyser, COMMENTTYPE.CorrectiveAction);
 
             if (!IsDebug())
             {
@@ -2640,14 +2666,13 @@ namespace Prometheus.Models
             if (obaissue.RootCauseCommentList.Count > 0)
             {
                 var rootcomment = obaissue.RootCauseCommentList[0];
-                if (string.Compare(rootcomment.Comment, "ROOTCAUSE: to be edited") == 0)
-                {
-                    var temprootcomment = new IssueComments();
-                    temprootcomment.Comment = rootcause;
-                    IssueViewModels.UpdateSPComment(obaissue.IssueKey, rootcomment.CommentType, rootcomment.CommentDate.ToString(), temprootcomment.dbComment);
-                    obaissue.RootCauseCommentList.Clear();
-                    obaissue.RootCauseCommentList.Add(temprootcomment);
-                }
+
+                var temprootcomment = new IssueComments();
+                temprootcomment.Comment = rootcause;
+                IssueViewModels.UpdateSPComment(obaissue.IssueKey, rootcomment.CommentType, rootcomment.CommentDate.ToString(), temprootcomment.dbComment);
+                obaissue.RootCauseCommentList.Clear();
+                obaissue.RootCauseCommentList.Add(temprootcomment);
+
             }
             else
             {
@@ -2840,12 +2865,18 @@ namespace Prometheus.Models
             UserViewModels.RegisterUserAuto(vm.Assignee);
             SendOBAEvent(vm, "created",ctrl, true);
 
-            CreateRMASubIssue(RMASubIssueType.CONTAINMENTACTION, "Cotainment Action for OBA " + vm.FinisarDMR, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(14),ISSUESUBTYPE.CONTAINMENT.ToString());
-            CreateRMASubIssue(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for OBA " + vm.FinisarDMR, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(28),ISSUESUBTYPE.CORRECTIVE.ToString());
+            //CreateRMASubIssue(RMASubIssueType.CONTAINMENTACTION, "Cotainment Action for OBA " + vm.FinisarDMR, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(14),ISSUESUBTYPE.CONTAINMENT.ToString());
+            //CreateRMASubIssue(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for OBA " + vm.FinisarDMR, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(28),ISSUESUBTYPE.CORRECTIVE.ToString());
 
             var comment = new IssueComments();
-            comment.Comment = "ROOTCAUSE: to be edited";
+            comment.Comment = IssueCommentEmpty.TOBEEDIT;
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, vm.Assignee, COMMENTTYPE.ContainmentAction);
+            comment = new IssueComments();
+            comment.Comment = IssueCommentEmpty.TOBEEDIT;
             IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, vm.Assignee, COMMENTTYPE.RootCause);
+            comment = new IssueComments();
+            comment.Comment = IssueCommentEmpty.TOBEEDIT;
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, vm.Assignee, COMMENTTYPE.CorrectiveAction);
         }
 
         private static void SendOBAEvent(IssueViewModels vm, string operate, Controller ctrl, bool nocheck = false)

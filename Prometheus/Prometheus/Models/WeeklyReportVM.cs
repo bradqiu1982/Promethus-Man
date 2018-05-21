@@ -541,7 +541,7 @@ namespace Prometheus.Models
             {
                 foreach (var item in dbret)
                 {
-                    ret.Add(Convert.ToString(item[0]), Convert.ToDouble(item[1]));
+                    ret.Add(Convert.ToString(item[0]).ToUpper(), Convert.ToDouble(item[1]));
                 }
             }
             return ret;
@@ -650,29 +650,29 @@ namespace Prometheus.Models
             {
                 foreach (var item in dbret)
                 {
-                    if (res.ContainsKey(Convert.ToString(item[0])))
+                    if (res.ContainsKey(Convert.ToString(item[0]).ToUpper()))
                     {
                         if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.Task)
                         {
-                            res[Convert.ToString(item[0])].Task = Convert.ToDouble(item[2]);
+                            res[Convert.ToString(item[0]).ToUpper()].Task = Convert.ToDouble(item[2]);
                         }
                         else if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.CrititalFailureTask)
                         {
-                            res[Convert.ToString(item[0])].CriticalTask = Convert.ToDouble(item[2]);
+                            res[Convert.ToString(item[0]).ToUpper()].CriticalTask = Convert.ToDouble(item[2]);
                         }
                         else if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.Bug || Convert.ToInt32(item[1]) == ISSUESUBTYPE.NonCrititalFailureTask)
                         {
-                            res[Convert.ToString(item[0])].Bug += Convert.ToDouble(item[2]);
+                            res[Convert.ToString(item[0]).ToUpper()].Bug += Convert.ToDouble(item[2]);
                         }
                         else if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.RMA)
                         {
-                            res[Convert.ToString(item[0])].RMA = Convert.ToDouble(item[2]);
+                            res[Convert.ToString(item[0]).ToUpper()].RMA = Convert.ToDouble(item[2]);
                         }
                     }
                     else
                     {
                         var kpi_tmp = new KPIVM();
-                        kpi_tmp.UserName = Convert.ToString(item[0]);
+                        kpi_tmp.UserName = Convert.ToString(item[0]).ToUpper();
                         if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.Task)
                         {
                             kpi_tmp.Task = Convert.ToDouble(item[2]);
@@ -689,7 +689,7 @@ namespace Prometheus.Models
                         {
                             kpi_tmp.RMA = Convert.ToDouble(item[2]);
                         }
-                        res.Add(Convert.ToString(item[0]), kpi_tmp);
+                        res.Add(Convert.ToString(item[0]).ToUpper(), kpi_tmp);
                     }
                 }
             }
@@ -733,29 +733,29 @@ namespace Prometheus.Models
             {
                 foreach (var item in dbret)
                 {
-                    if (res.ContainsKey(Convert.ToString(item[0])))
+                    if (res.ContainsKey(Convert.ToString(item[0]).ToUpper()))
                     {
                         if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.Task)
                         {
-                            res[Convert.ToString(item[0])].TaskAll = Convert.ToDouble(item[2]);
+                            res[Convert.ToString(item[0]).ToUpper()].TaskAll = Convert.ToDouble(item[2]);
                         }
                         else if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.CrititalFailureTask)
                         {
-                            res[Convert.ToString(item[0])].CriticalTaskAll = Convert.ToDouble(item[2]);
+                            res[Convert.ToString(item[0]).ToUpper()].CriticalTaskAll = Convert.ToDouble(item[2]);
                         }
                         else if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.Bug || Convert.ToInt32(item[1]) == ISSUESUBTYPE.NonCrititalFailureTask)
                         {
-                            res[Convert.ToString(item[0])].BugAll += Convert.ToDouble(item[2]);
+                            res[Convert.ToString(item[0]).ToUpper()].BugAll += Convert.ToDouble(item[2]);
                         }
                         else if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.RMA)
                         {
-                            res[Convert.ToString(item[0])].RMAAll = Convert.ToDouble(item[2]);
+                            res[Convert.ToString(item[0]).ToUpper()].RMAAll = Convert.ToDouble(item[2]);
                         }
                     }
                     else
                     {
                         var kpi_tmp = new KPIVM();
-                        kpi_tmp.UserName = Convert.ToString(item[0]);
+                        kpi_tmp.UserName = Convert.ToString(item[0]).ToUpper();
                         if (Convert.ToInt32(item[1]) == ISSUESUBTYPE.Task)
                         {
                             kpi_tmp.TaskAll = Convert.ToDouble(item[2]);
@@ -772,7 +772,7 @@ namespace Prometheus.Models
                         {
                             kpi_tmp.RMAAll = Convert.ToDouble(item[2]);
                         }
-                        res.Add(Convert.ToString(item[0]), kpi_tmp);
+                        res.Add(Convert.ToString(item[0]).ToUpper(), kpi_tmp);
                     }
                 }
             }
@@ -865,9 +865,9 @@ namespace Prometheus.Models
                 foreach (var item in dbret)
                 {
                     var kpi_tmp = new KPIVM();
-                    kpi_tmp.UserName = Convert.ToString(item[0]);
+                    kpi_tmp.UserName = Convert.ToString(item[0]).ToUpper();
                     kpi_tmp.DebugTree = Convert.ToDouble(item[1]);
-                    res.Add(Convert.ToString(item[0]), kpi_tmp);
+                    res.Add(Convert.ToString(item[0]).ToUpper(), kpi_tmp);
                 }
             }
             return res;

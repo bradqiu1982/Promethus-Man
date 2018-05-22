@@ -369,6 +369,13 @@
             //$(window).load(function () {
             //    $(".se-pre-con").fadeOut("slow");
             //});
+            function SetReplyPeople(reply)
+            {
+                CKEDITOR.instances.editor1.setData(reply+'&nbsp;');
+                $('#commentinput').collapse('show');
+                var scrollingElement = (document.scrollingElement || document.body)
+                scrollingElement.scrollTop = scrollingElement.scrollHeight;
+            }
 
                         function RealSaveUserContent(myval)
                         {

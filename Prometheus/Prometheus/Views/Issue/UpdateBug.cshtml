@@ -1325,7 +1325,12 @@ else
                     {
                         <div class="row" style="margin-left:3%!important">
                             <label class="control-label" style="display:inline-block!important">Is Real Critical Error</label>
-                            @Html.DropDownList("iscriticaltasklist", null, new { @id = "iscriticaltasklist", @class = "form-control", @style = "display:inline-block!important;margin-left:5%!important" })
+                            <select class="form-control" id="iscriticaltasklist" name="iscriticaltasklist">
+                                <option value="">Select Critical Type</option>
+                                <option value="YES">YES</option>
+                                <option value="NO">NO</option>
+                            </select>
+                            @*@Html.DropDownList("iscriticaltasklist", null, new { @id = "iscriticaltasklist", @class = "form-control", @style = "display:inline-block!important;margin-left:5%!important" })*@
                         </div>
                     }
                     <div class="row" style="margin-top:2%!important;margin-bottom:2%!important">
@@ -1346,12 +1351,39 @@ else
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Done</button>
+                    <button type="button" class="btn btn-primary"  onclick="CloseCriticalModal()">Done</button>
                 </div>
             </div>
         </div>
     </div>
-    
+
+    if (ViewBag.iscriticaltasklist != null)
+    {
+        <script type="text/javascript">
+        function CloseCriticalModal()
+        {
+            if($('#iscriticaltasklist').val() == '')
+            {
+                alert('Please select critial type!')
+                return false;
+            }
+            else
+            {
+                $('#issuetag').modal('hide');
+            }
+        }
+        </script>
+    }
+    else
+    {
+        <script type="text/javascript">
+        function CloseCriticalModal()
+        {
+           $('#issuetag').modal('hide');
+        }
+        </script>
+    }
+
     <div class="modal" id="linktaskmodal" tabindex="-1" role="dialog" aria-labelledby="linktaskmodalLabel">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">

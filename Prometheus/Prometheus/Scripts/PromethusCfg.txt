@@ -30,7 +30,7 @@ BAKSRCMACHINE:::WUX-D80008792
 OUTSIDEPEOPLEAUTH:::TRUE
 MOVEHISTORYZEROTIME:::2017-07-10 07:30:00
 SHARETAG:::BER;EF;Epoxy;FLEX;IC;IC Setting;Lens;LOL;Los;LYT;OBA;ORT;PCB(A);Process;REL;RMA;SBR;Sensitivity;TX Power;VCSEL;CRITICALERROR
-CRITICALFAILURERT:::VCSEL;Lens detachment;EOS/ESD;Components damage;Components missing;PCBA open/short;Cable crack;LYT;Others
+CRITICALFAILURERT:::VCSEL;Lens detachment;EOS/ESD;Components damage;Components missing;PCBA open/short;Cable crack;LYT;Others;Wire Bonding Short;Capacitor Short;Process;Silver Paste;Rework Operation;
 CRITICALFAILURESYMPTOM:::LOL;LowPwr;High Power Consumption;High BitError;Low RSSI;Low RX Amptitude;RSSI Uniformity;IC
 CRITICALDEFAULTRULE:::OBA_TEST,EEFAIL
 #CRITICALDEFAULTRULE:::TEST1,FAILURECODE1:TEST2,FAILURECODE2

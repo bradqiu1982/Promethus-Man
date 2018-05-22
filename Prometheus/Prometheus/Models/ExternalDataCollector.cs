@@ -2724,7 +2724,7 @@ namespace Prometheus.Models
             var ret = new List<RawDMR>();
             var sql = @"select a.DMR_ID,Created_at,Prod_Line,Defect_Qty,Inspected_Qty,Actual_Problem,Justification,a.Remark,File_URL from dbo.DMR_Detail_List_View a (nolock) 
                         left join View_OQC_Function_60_Approval_Remark b with (nolock) on b.DMR_ID = a.DMR_ID 
-                         where a.Created_at > '<CreateTime>' and b.Remark like '%<RCCA>%'";
+                         where a.Created_at > '<CreateTime>' and b.Remark like '%[RCCA]%'";
 
             sql = sql.Replace("<CreateTime>", OBAUpdateTime);
             var dbret = DBUtility.ExeFAISqlWithRes(sql);

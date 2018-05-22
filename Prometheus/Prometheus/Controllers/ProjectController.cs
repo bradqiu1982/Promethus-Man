@@ -8554,6 +8554,113 @@ namespace Prometheus.Controllers
             }
             return res;
         }
+
+        public ActionResult ProjectMileStone(string ProjectKey, string sDate = "", string eDate = "")
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "Project");
+                ck.Add("logonredirectact", "ProjectMileStone");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            var action_data = ProjectMileStonesVM.GetProjectMileStones(ProjectKey, updater, false, sDate, eDate);
+
+            ViewBag.sDate = sDate;
+            ViewBag.eDate = eDate;
+            ViewBag.ProjectKey = ProjectKey;
+            ViewBag.actionlist = action_data;
+
+            return View();
+        }
+
+        [HttpPost]
+        public JsonResult AddProMileStone()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            var pKey = Request.Form["pKey"];
+            var actionid = Request.Form["actionid"];
+            var date = Request.Form["date"];
+            var action = Request.Form["action"];
+            var ispublish = Request.Form["ispublish"];
+            var pmvm = new ProjectMileStonesVM();
+            pmvm.AddDate = date;
+            pmvm.Action = action;
+            pmvm.IsPublish = ispublish;
+            pmvm.UpdateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+            if (string.IsNullOrEmpty(actionid))
+            {
+                pmvm.ProjectKey = pKey;
+                pmvm.UserName = updater;
+                pmvm.Status = ActionStatus.ValidStatus;
+                pmvm.CreateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                ProjectMileStonesVM.AddProjectMileStones(pmvm);
+            }
+            else
+            {
+                pmvm.ID = actionid;
+                ProjectMileStonesVM.UpdateProjectMileStones(pmvm);
+            }
+
+            var res = new JsonResult();
+            res.Data = new { success = true };
+            return res;
+        }
+        [HttpPost]
+        public JsonResult InvalidProMileStone()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            var actionid = Request.Form["actionid"];
+
+            var pmvm = new ProjectMileStonesVM();
+            pmvm.ID = actionid;
+            pmvm.Status = ActionStatus.InValidStatus;
+            pmvm.UpdateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            ProjectMileStonesVM.UpdateProjectMileStones(pmvm);
+
+            var res = new JsonResult();
+            res.Data = new { success = true };
+            return res;
+        }
+
+        [HttpPost]
+        public JsonResult UpdateProMileStone()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            var actionid = Request.Form["actionid"];
+            var ispublish = Request.Form["ispublish"];
+
+            var pmvm = new ProjectMileStonesVM();
+            pmvm.ID = actionid;
+            pmvm.IsPublish = string.Compare(ispublish, IsPublishStatus.mPublic) == 0 ? IsPublishStatus.mPrivate : IsPublishStatus.mPublic;
+            pmvm.UpdateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            ProjectMileStonesVM.UpdateProjectMileStones(pmvm);
+
+            var res = new JsonResult();
+            res.Data = new { success = true };
+            return res;
+        }
+
+        [HttpPost]
+        public JsonResult GetProMileStoneData()
+        {
+            var res = new JsonResult();
+            res.Data = new { success = true };
+            return res;
+        }
     }
 
 }

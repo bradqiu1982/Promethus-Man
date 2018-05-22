@@ -1469,4 +1469,21 @@ CREATE TABLE [dbo].[WaferCoordData](
     [APVal2] NVARCHAR (200)  DEFAULT ('') NOT NULL,
     [APVal3] NVARCHAR (MAX)  DEFAULT ('') NOT NULL,
     [APVal4] DATETIME       DEFAULT ('') NOT NULL
-) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY];
+
+Create Table [dbo].[ProjectMileStones](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[ProjectKey]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[UserName] [nvarchar](50) DEFAULT ('') NOT NULL,
+	[Action] NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[IsPublish] [tinyint] DEFAULT (1) NOT NULL, -- 1: public 2: private
+	[Status] [tinyint] DEFAULT (1) NOT NULL,	-- 1: valid 2: invalid
+	[AddDate] DATE DEFAULT ('') NOT NULL,
+	[CreateTime] DATETIME DEFAULT ('') NOT NULL,
+	[UpdateTime] DATETIME DEFAULT ('') NOT NULL,
+    [APVal1] NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [APVal2] NVARCHAR (200)  DEFAULT ('') NOT NULL,
+    [APVal3] NVARCHAR (MAX)  DEFAULT ('') NOT NULL,
+    [APVal4] DATETIME       DEFAULT ('') NOT NULL
+);
+

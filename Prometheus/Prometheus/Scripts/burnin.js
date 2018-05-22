@@ -66,13 +66,18 @@ var BurnIn = function(){
             var wf_type = $.trim($('#vcseltypeselectlist').val());
             var math_rect = $.trim($('#mathrectlist').val());
 
-            if (wf_no === '') {
-                if (sdate === '' || edate === '')
-                {
-                    alert("Please input your query condition.");
-                    return false;
-                }
+            if (wf_no == '')
+            {
+                wf_no = $.trim($('#wf-no').parent().find('input').eq(0).val());
             }
+
+
+            if (wf_no == '' && (sdate == '' || edate == ''))
+            {
+                alert("Please input your query condition.");
+                return false;
+            }
+
 
             $.post('/DataAnalyze/WaferDistributionData', {
                  sdate: sdate,

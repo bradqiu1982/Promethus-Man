@@ -30,7 +30,7 @@ BAKSRCMACHINE:::WUX-D80008792
 OUTSIDEPEOPLEAUTH:::TRUE
 MOVEHISTORYZEROTIME:::2017-07-10 07:30:00
 SHARETAG:::BER;EF;Epoxy;FLEX;IC;IC Setting;Lens;LOL;Los;LYT;OBA;ORT;PCB(A);Process;REL;RMA;SBR;Sensitivity;TX Power;VCSEL;CRITICALERROR
-CRITICALFAILURERT:::VCSEL;Lens detachment;EOS/ESD;Components damage;Components missing;PCBA open/short;Cable crack;LYT;Others
+CRITICALFAILURERT:::VCSEL;Lens detachment;EOS/ESD;Components damage;Components missing;PCBA open/short;Cable crack;LYT;Others;Wire Bonding Short;Capacitor Short;Process;Silver Paste;Rework Operation;
 CRITICALFAILURESYMPTOM:::LOL;LowPwr;High Power Consumption;High BitError;Low RSSI;Low RX Amptitude;RSSI Uniformity;IC
 CRITICALDEFAULTRULE:::OBA_TEST,EEFAIL
 #CRITICALDEFAULTRULE:::TEST1,FAILURECODE1:TEST2,FAILURECODE2
@@ -47,28 +47,28 @@ Plot_Variation_POLD_Delta_LIMIT:::-0.2:0.5
 Plot_Uniformity_POLD_Delta_LIMIT:::-2:2
 
 OBA--PARA-10G OE:::Nevin.Niu
-OBA--PARA-25G OE:::Hao.Xu
-OBA--PARA-CFP2 SR10:::Hao.Xu
-OBA--PARA-CFP4 SR4:::Hao.Xu
-OBA--PARA-C-Wire GEN1 10.5G:::Hao.Xu
-OBA--PARA-C-Wire GEN1 12.5G:::Hao.Xu
-OBA--PARA-C-Wire GEN2 10.5G:::Hao.Xu
-OBA--PARA-C-Wire GEN2 12.5G:::Hao.Xu
-OBA--PARA-C-Wire GEN2 300M:::Hao.Xu
-OBA--PARA-CXP GEN1 10.5G:::Hao.Xu
-OBA--PARA-CXP GEN1 12.5G:::Hao.Xu
-OBA--PARA-CXP GEN2 10.5G:::Hao.Xu
-OBA--PARA-CXP GEN2 12.5G:::Hao.Xu
-OBA--PARA-CXP GEN2 300M:::Hao.Xu
+OBA--PARA-25G OE:::Doris.Kong
+OBA--PARA-CFP2 SR10:::Doris.Kong
+OBA--PARA-CFP4 SR4:::Doris.Kong
+OBA--PARA-C-Wire GEN1 10.5G:::Popo.Zhang
+OBA--PARA-C-Wire GEN1 12.5G:::Popo.Zhang
+OBA--PARA-C-Wire GEN2 10.5G:::Popo.Zhang
+OBA--PARA-C-Wire GEN2 12.5G:::Popo.Zhang
+OBA--PARA-C-Wire GEN2 300M:::Popo.Zhang
+OBA--PARA-CXP GEN1 10.5G:::Popo.Zhang
+OBA--PARA-CXP GEN1 12.5G:::Popo.Zhang
+OBA--PARA-CXP GEN2 10.5G:::Popo.Zhang
+OBA--PARA-CXP GEN2 12.5G:::Popo.Zhang
+OBA--PARA-CXP GEN2 300M:::Popo.Zhang
 OBA--PARA-EDR:::Doris.Kong
 OBA--PARA-FDR:::Doris.Kong
 OBA--PARA-FDR Lite transceiver:::Doris.Kong
-OBA--PARA-Octopus:::Hao.Xu
+OBA--PARA-Octopus:::Bright.Zhang
 OBA--PARA-OE28LP:::Bright.Zhang
 OBA--PARA-QSFP FDR transceiver:::Doris.Kong
 OBA--PARA-QSFP GEN4:::Doris.Kong
 OBA--PARA-QSFP SR4 Gen4:::Doris.Kong
-OBA--PARA-QSFP28G-PSM4:::Hao.Xu
+OBA--PARA-QSFP28G-PSM4:::Doris.Kong
 OBA--PARA-QSFP28G-SR4:::Bright.Zhang
 OBA--PARA-QSFP-GEN2:::Doris.Kong
 OBA--PARA-QSFP-GEN3:::Doris.Kong
@@ -77,7 +77,7 @@ OBA--PARA-Q-Wire Gen3:::Bright.Zhang
 OBA--PARA-Q-Wire(10.5G):::Bright.Zhang
 OBA--PARA-SR4 GEN3:::Doris.Kong
 OBA--PARA-Topaz OE:::Nevin.Niu
-OBA--SFP-Wire:::Hao.Xu
+OBA--SFP-Wire:::Popo.Zhang
 
 ME:::Jie.Zhu;Chengjing.Wu;Xiangguo.Xie;Stone.Chen;Cl.Zhang;Youji.Liu;Yvonne.Liang;Tyler.Jiang;Tom.Zhang;Li.Fang;Shaohua.Zhong;Emma.Xu;Hogan.Liu;Aries.Yang;Eric.Wang;Peng.Hu;Lan.Zhou;Chauncey.Wang;Laplace.Hu;Tristan.Ying;Edo.Gao
 

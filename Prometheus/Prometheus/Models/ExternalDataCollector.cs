@@ -2631,17 +2631,17 @@ namespace Prometheus.Models
                 }
                 catch (Exception ex)
                 {
-                    OBAUpdateTime = DateTime.Parse("2017-05-23 01:00:00");
+                    OBAUpdateTime = DateTime.Parse("2018-05-23 01:00:00");
                 }
             }
 
             return OBAUpdateTime.ToString();
         }
 
-        private static Dictionary<string, IssueViewModels> RetrieveExistDMRDict(Controller ctrl)
+        private static Dictionary<string, IssueViewModels> RetrieveExistDMRDict(Controller ctrl,string sdate,string enddate)
         {
             var ret = new Dictionary<string, IssueViewModels>();
-            var obalist = IssueViewModels.RetrieveAllIssueTypeIssue("NONE", "NONE", ISSUETP.OBA, ctrl);
+            var obalist = IssueViewModels.RetrieveAllIssueTypeIssue(sdate, enddate, ISSUETP.OBA, ctrl);
             foreach (var item in obalist)
             {
                 if (!string.IsNullOrEmpty(item.FinisarDMR.Trim()) && !ret.ContainsKey(item.FinisarDMR.Trim()))
@@ -2722,10 +2722,11 @@ namespace Prometheus.Models
         private static List<RawDMR> RetrieveDMRFromITDB(string OBAUpdateTime, Dictionary<string, IssueViewModels> DMRDict, Controller ctrl)
         {
             var ret = new List<RawDMR>();
-            var onemonthago = DateTime.Parse(OBAUpdateTime).AddMonths(-1).ToString("yyyy-MM-dd HH:mm:ss");
+            var sql = @"select a.DMR_ID,Created_at,Prod_Line,Defect_Qty,Inspected_Qty,Actual_Problem,Justification,a.Remark,File_URL from dbo.DMR_Detail_List_View a (nolock) 
+                        left join View_OQC_Function_60_Approval_Remark b with (nolock) on b.DMR_ID = a.DMR_ID 
+                         where a.Created_at > '<CreateTime>' and b.Remark like '%[RCCA]%'";
 
-            var sql = "select DMR_ID,Created_at,Prod_Line,Defect_Qty,Inspected_Qty,Actual_Problem,Justification,Remark,File_URL from dbo.DMR_Detail_List_View where Created_at > '<CreateTime>'";
-            sql = sql.Replace("<CreateTime>", onemonthago);
+            sql = sql.Replace("<CreateTime>", OBAUpdateTime);
             var dbret = DBUtility.ExeFAISqlWithRes(sql);
 
             foreach (var line in dbret)
@@ -2758,25 +2759,25 @@ namespace Prometheus.Models
                     }
                     catch (Exception ex) { }
                 }//end if
-                else if (!string.IsNullOrEmpty(dmrid) && DMRDict.ContainsKey(dmrid))
-                {
-                    var obaissue = DMRDict[dmrid];
-                    var tempdmr = new RawDMR();
-                    tempdmr.DMR_ID = dmrid;
-                    tempdmr.RootCause = Conver2Str(line[6]);
-                    tempdmr.CorrectiveAction = Conver2Str(line[7]);
-                    tempdmr.Attachment = Conver2Str(line[8]);
+                //else if (!string.IsNullOrEmpty(dmrid) && DMRDict.ContainsKey(dmrid))
+                //{
+                //    var obaissue = DMRDict[dmrid];
+                //    var tempdmr = new RawDMR();
+                //    tempdmr.DMR_ID = dmrid;
+                //    tempdmr.RootCause = Conver2Str(line[6]);
+                //    tempdmr.CorrectiveAction = Conver2Str(line[7]);
+                //    tempdmr.Attachment = Conver2Str(line[8]);
 
-                    if (!string.IsNullOrEmpty(tempdmr.RootCause))
-                    {
-                        UpdateOBARootCause(obaissue, tempdmr.RootCause);
-                    }
+                //    if (!string.IsNullOrEmpty(tempdmr.RootCause))
+                //    {
+                //        UpdateOBARootCause(obaissue, tempdmr.RootCause);
+                //    }
 
-                    if (!string.IsNullOrEmpty(tempdmr.Attachment) && File.Exists(tempdmr.Attachment))
-                    {
-                        UpdateOBAAttachement(obaissue, tempdmr.Attachment, ctrl);
-                    }
-                }
+                //    if (!string.IsNullOrEmpty(tempdmr.Attachment) && File.Exists(tempdmr.Attachment))
+                //    {
+                //        UpdateOBAAttachement(obaissue, tempdmr.Attachment, ctrl);
+                //    }
+                //}
             }//end foreach
 
             return ret;
@@ -2921,7 +2922,7 @@ namespace Prometheus.Models
             }
 
             var OBAUpdateTime = RetrieveOBAUpdateTime();
-            var DMRDict = RetrieveExistDMRDict(ctrl);
+            var DMRDict = RetrieveExistDMRDict(ctrl,DateTime.Now.AddDays(-14).ToString("yyyy-MM-dd HH:mm:ss"),DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             var dmrlist = RetrieveDMRFromITDB(OBAUpdateTime, DMRDict,ctrl);
             var currentdbdmrfilter = new Dictionary<string, bool>();
             foreach (var dmr in dmrlist)

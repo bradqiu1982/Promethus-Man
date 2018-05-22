@@ -568,7 +568,7 @@ namespace Prometheus.Controllers
             var wflist = new List<string>();
             if (!string.IsNullOrEmpty(wf_no))
             {
-                wflist.AddRange(wf_no.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries));
+                wflist.AddRange(wf_no.Split(new string[] { ",",";"," " }, StringSplitOptions.RemoveEmptyEntries));
             }
             else
             {

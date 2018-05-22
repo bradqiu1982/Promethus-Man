@@ -963,7 +963,7 @@ namespace Prometheus.Controllers
             }
 
             var issue = IssueViewModels.RetrieveIssueByIssueKey(IssueKey, this);
-            ShareDocVM.ShareDoc(issue.ProjectKey, ShareDocType.ISSUE, issue.IssueKey, issue.Summary, updater, DateTime.Now.ToString(), "/Issue/UpdateIssue?issuekey=" + IssueKey);
+            ShareDocVM.ShareDoc(issue.ProjectKey, ShareDocType.ISSUE, issue.IssueKey, "", updater, DateTime.Now.ToString(), "/Issue/UpdateIssue?issuekey=" + IssueKey);
 
             var whoes = ToWho.Split(new string[] { ";", ",", " " }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var w in whoes)

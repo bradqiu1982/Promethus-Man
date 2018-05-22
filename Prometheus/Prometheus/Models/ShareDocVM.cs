@@ -88,6 +88,7 @@ namespace Prometheus.Models
 
         public static string ShareDoc(string DOCPJK, string DOCType, string DOCKey, string DOCTag, string DOCCreator, string DOCDate,string BackLink)
         {
+            
             var sql = "select APVal1,DOCTag from ShareDoc where DOCPJK='<DOCPJK>' and DOCKey=N'<DOCKey>'";
             sql = sql.Replace("<DOCPJK>", DOCPJK).Replace("<DOCKey>", DOCKey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,null);
@@ -98,16 +99,19 @@ namespace Prometheus.Models
                 {
                     docid1 = UpdateDocID(DOCPJK,DOCKey);
                 }
-                var newtag = DOCTag +  Convert.ToString(dbret[0][1]);
-                UpdateTag(newtag, DOCKey);
+                var tempvm = new ShareDocVM();
+                tempvm.DOCTag =DOCTag +  Convert.ToString(dbret[0][1]);
+                UpdateTag(tempvm.DOCTag, DOCKey);
                 return docid1;
             }
 
             var docid = IssueViewModels.GetUniqKey();
+            var tempvm1 = new ShareDocVM();
+            tempvm1.DOCTag = DOCTag;
 
             sql = "insert into ShareDoc(DOCPJK,DOCType,DOCKey,DOCTag,DOCCreator,DOCDate,APVal1,BackLink,databackuptm) values('<DOCPJK>','<DOCType>',N'<DOCKey>','<DOCTag>','<DOCCreator>','<DOCDate>','<DOCID>','<BackLink>','<databackuptm>')";
             sql = sql.Replace("<DOCPJK>", DOCPJK).Replace("<DOCType>", DOCType)
-                .Replace("<DOCKey>", DOCKey).Replace("<DOCTag>", DOCTag)
+                .Replace("<DOCKey>", DOCKey).Replace("<DOCTag>", tempvm1.DOCTag)
                 .Replace("<DOCCreator>", DOCCreator).Replace("<DOCDate>", DOCDate)
                 .Replace("<DOCID>", docid).Replace("<BackLink>", BackLink).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
@@ -122,7 +126,9 @@ namespace Prometheus.Models
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
             {
-                return Convert.ToString(line[0]).Replace(CRITICALERRORTYPE.CRITICALERRORTAG+";","");
+                var tempvm = new ShareDocVM();
+                tempvm.DOCTag = Convert.ToString(line[0]).Replace(CRITICALERRORTYPE.CRITICALERRORTAG + ";", "");
+                return tempvm.DOCTag;
             }
             return string.Empty;
         }

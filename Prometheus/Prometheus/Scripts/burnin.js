@@ -65,6 +65,7 @@ var BurnIn = function(){
             var wf_no = $.trim($('#wf-no').tagsinput('items'));
             var wf_type = $.trim($('#vcseltypeselectlist').val());
             var math_rect = $.trim($('#mathrectlist').val());
+            var outlier = $('#outlier').val();
 
             if (wf_no == '')
             {
@@ -78,13 +79,23 @@ var BurnIn = function(){
                 return false;
             }
 
+            var options = {
+                loadingTips: "load vcsel data.....",
+                backgroundColor: "#aaa",
+                borderColor: "#fff",
+                opacity: 0.8,
+                borderColor: "#fff",
+                TipsColor: "#000",
+            }
+            $.bootstrapLoading.start(options);
 
-            $.post('/DataAnalyze/WaferDistributionData', {
+            $.post('/DataAnalyze/WaferDistributionRawData', {
                  sdate: sdate,
                  edate: edate,
                  wf_no: wf_no,
                  wf_type: wf_type,
-                math_rect:math_rect
+                math_rect:math_rect,
+                outlier:outlier
             }, function (output) {
 
                  if (output.success) {
@@ -129,7 +140,8 @@ var BurnIn = function(){
                          $('.v-lengend').append(colorStr);
                      })
 
-                }
+                 }
+                 $.bootstrapLoading.end();
              })
         })
 
@@ -363,6 +375,22 @@ var BurnIn = function(){
                 type: 'line',
                 data: boxplot_data.line.data,
                 lineWidth: boxplot_data.line.lineWidth
+            },
+            {
+                name: 'Outlier',
+                color: Highcharts.getOptions().colors[0],
+                type: 'scatter',
+                data: boxplot_data.outlierdata,
+                marker: {
+                    fillColor: Highcharts.getOptions().colors[0],
+                    lineWidth: 1,
+                    radius: 2,
+                    lineColor: Highcharts.getOptions().colors[0]
+                },
+                tooltip: {
+                    headerFormat: '',
+                    pointFormat:"{point.y}"
+                }
             }],
             exporting: {
                         menuItemDefinitions: {

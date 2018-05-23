@@ -15,6 +15,7 @@
 <script type="text/javascript" src="~/Scripts/bootstrap-tagsinput/bootstrap3-typeahead.js"></script>
 
 <script type="text/javascript" src="~/Scripts/burnin.js"></script>
+<script type="text/javascript" src="~/Scripts/jquery-bootstrap-loading.js"></script>
 
 <script type="text/javascript">
     $(function () {
@@ -92,7 +93,15 @@
                         @Html.DropDownList("vcseltypeselectlist", null, new { @id = "vcseltypeselectlist", @class = "form-control" })
                     </div>
                     <div class="col-xs-3">
-                        @Html.DropDownList("mathrectlist", null, new { @id = "mathrectlist", @class = "form-control" })
+                        <div class="col-xs-6">
+                            @Html.DropDownList("mathrectlist", null, new { @id = "mathrectlist", @class = "form-control" })
+                        </div>
+                        <div class="col-xs-6">
+                            <select class="form-control" id="outlier" name="outlier">
+                                <option value="NO" selected>No Outlier</option>
+                                <option value="YES">With Outlier</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="col-xs-1 box-search" style="padding-left:0">
                         <input type="button" class="btn btn-success" name="btn-search" id="btn-search" value="Search">

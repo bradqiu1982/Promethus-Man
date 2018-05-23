@@ -697,6 +697,72 @@ namespace Prometheus.Models
 
         }
 
+        public static CBOXData GetBoxData(List<double> rawdata,double llimit,double hlimit)
+        {
+            var mean = 0.0;
+            var min = 0.0;
+            var max = 0.0;
+            var lower = 0.0;
+            var upper = 0.0;
+            if ((rawdata.Count % 2) == 0)
+            {
+                var mididx1 = rawdata.Count / 2;
+                var mididx2 = mididx1 + 1;
+
+                mean = (rawdata[mididx1] + rawdata[mididx2]) / 2.0;
+                //min = rawdata[0];
+                //max = rawdata[rawdata.Count - 1];
+
+                var lowlist = new List<double>();
+                var upperlist = new List<double>();
+                for (var idx = 0; idx < mididx2; idx++)
+                {
+                    lowlist.Add(rawdata[idx]);
+                }
+                for (var idx = mididx2; idx < rawdata.Count; idx++)
+                {
+                    upperlist.Add(rawdata[idx]);
+                }
+
+                lower = GetBoxMeanValue(lowlist);
+                upper = GetBoxMeanValue(upperlist);
+
+
+            }
+            else
+            {
+                var mididx = (rawdata.Count + 1) / 2;
+                mean = rawdata[mididx];
+                //min = rawdata[0];
+                //max = rawdata[rawdata.Count - 1];
+
+                var lowlist = new List<double>();
+                var upperlist = new List<double>();
+                for (var idx = 0; idx < mididx; idx++)
+                {
+                    lowlist.Add(rawdata[idx]);
+                }
+                for (var idx = mididx + 1; idx < rawdata.Count; idx++)
+                {
+                    upperlist.Add(rawdata[idx]);
+                }
+
+                lower = GetBoxMeanValue(lowlist);
+                upper = GetBoxMeanValue(upperlist);
+            }
+
+            var cbox = new CBOXData();
+            cbox.mean = mean;
+            cbox.lower = lower;
+            cbox.upper = upper;
+            max = upper + (upper - lower) * 1.5;
+            cbox.max = (max < hlimit)?max:hlimit;
+            min = lower - (upper - lower) * 1.5;
+            cbox.min = (min > llimit)?min:llimit;
+
+            return cbox;
+        }
+
         private static void SolveNormalField(string wafer, string fieldname, string idcond, Controller ctrl,bool withfaileddata)
         {
             var rawdata = RetrieveBIFieldData(fieldname, idcond, ctrl, withfaileddata);
@@ -983,6 +1049,18 @@ namespace Prometheus.Models
                 return colseglist;
             }
         }
+    }
+
+    public class VXVal
+    {
+        public VXVal()
+        {
+            x = 0.0;
+            ival = 0.0;
+        }
+
+        public double x { set; get; }
+        public double ival { set; get; }
     }
 
     public class VcselBGDVM
@@ -1290,10 +1368,10 @@ namespace Prometheus.Models
             return VcselTimeRange.WaferNOList();
         }
 
-        public static List<object> RetrieveWaferData(List<string> wflist,bool withfaileddata, string vtype = "")
+        public static List<object> RetrieveWaferData(List<string> wflist,bool withfaileddata, string vtype = "",bool isbox=true)
         {
             var ret = new List<object>();
-            var boxdata = WaferBGDField.RetriveWaferFieldData(wflist, withfaileddata,true, vtype);
+            var boxdata = WaferBGDField.RetriveWaferFieldData(wflist, withfaileddata, isbox, vtype);
             //var rawdata = WaferBGDField.RetriveWaferRawData(wflist, vtype);
 
             var waferfaile =  WaferTestSum.RetriveWaferFailure(wflist,vtype);
@@ -1396,7 +1474,40 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static List<object> CBOXFromRaw(string rawdata, double llimit, double hlimit,bool nooutlier)
+        {
+            var ret = new List<object>();
+            var listdata = (List<double>)Newtonsoft.Json.JsonConvert.DeserializeObject(rawdata, (new List<double>()).GetType());
+            listdata.Sort();
+            var cbox = WaferBGDField.GetBoxData(listdata, llimit, hlimit);
 
+            var outlierlist = new List<VXVal>();
+
+            if (!nooutlier)
+            {
+                var rad = new System.Random(DateTime.Now.Second);
+                var idx = 0;
+                foreach (var data in listdata)
+                {
+                    if ((data > llimit && data < cbox.min)
+                        || (data < hlimit && data > cbox.max))
+                    {
+                        var tempdata = new VXVal();
+                        tempdata.ival = data;
+                        if (idx % 2 == 0)
+                        { tempdata.x = rad.NextDouble() / 5.0; }
+                        else
+                        { tempdata.x = 0-rad.NextDouble() / 5.0; }
+                        outlierlist.Add(tempdata);
+                        idx = idx + 1;
+                    }
+                }
+            }
+
+            ret.Add(cbox);
+            ret.Add(outlierlist);
+            return ret;
+        }
     }
 
 }

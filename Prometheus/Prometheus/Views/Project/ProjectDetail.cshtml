@@ -1,6 +1,7 @@
 ﻿@model Prometheus.Models.ProjectViewModels
 
 @{
+    var istep = 1;
     ViewBag.Title = "ProjectDetail";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -13,7 +14,7 @@
         <ol class="breadcrumb">
             <li data-toggle="modal" data-target="#myModal">
                 <a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll" data-intro="Back to ALL Project."
-                   data-step="6">All Projects</a>
+                   data-step="@(istep++)">All Projects</a>
             </li>
             @if (Model != null)
             {
@@ -28,11 +29,10 @@
     <div class="nav navbar-nav navbar-right">
         @if (Model != null)
         {
-            <a href="/Project/EditProject?ProjectKey=@Model.ProjectKey">
-                <img src="~/Content/images/icon/edit.png" height="30" data-intro="Edit project here."
-                     data-step="1" />
-            </a>
+            <a class="btn btn-info" href="/Project/Transfer?PJKey=@Model.ProjectKey" data-toggle="tooltip"  title="Transfer project to other group">Transfer</a>
+            <a class="btn btn-info" href="/Project/EditProject?ProjectKey=@Model.ProjectKey" data-intro="Edit project here." data-step="@(istep++)"> Edit</a>
         }
+
     </div>
 </div>
 
@@ -74,7 +74,7 @@
 
 @if (projectdata != null)
 {
-    <div class="row" data-intro="Base information of this project." data-step="2">
+    <div class="row" data-intro="Base information of this project." data-step="@(istep++)">
         <div MYTP="orange" class="col-xs-2">
             <strong class="pro-info">Information</strong>
         </div>
@@ -195,7 +195,7 @@
     </div>
     <hr style="border-color:#006DC0;" />
 
-    <div class="form-group" data-intro="Project status." data-step="3">
+    <div class="form-group" data-intro="Project status." data-step="@(istep++)">
         <div MYTP="yello" class="row">
             <div class="col-xs-1 text-left" style="font-family:'Arial Narrow';font-size:18px"><label class="control-label"><strong>Status</strong></label></div>
             @if (!string.IsNullOrEmpty(projectdata.CurrentNPIProc)
@@ -216,7 +216,7 @@
 
     if (string.Compare(projectdata.ProjectType, Prometheus.Models.ProjectTypeInf.QM) != 0)
     {
-        <div class="form-group" data-intro="detail informaton show here." data-step="4">
+        <div class="form-group" data-intro="detail informaton show here." data-step="@(istep++)">
             <div class="form-group">
                 <div class="row">
                     <div class="col-xs-12" style="padding-left:10%;padding-right:10%">
@@ -380,8 +380,9 @@
                             <div class="col-xs-2">
                                 <div class="col-xs-3"></div>
                                 <div class="col-xs-6" data-toggle="modal" data-target="#myModal">
-                                    <div class="row" data-toggle="tooltip" title="Project Transfer">
-                                        <a href="/Project/Transfer?PJKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/Transfer.png" style="height:75px; width:75px"></a>
+                                    <div class="row" data-toggle="tooltip" title="Project MileStone">
+                                        <a href="/Project/ProjectMileStone?ProjectKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/milestone.png" style="height:75px; width:75px"></a>
+                                        @*<a href="/Project/Transfer?PJKey=@projectdata.ProjectKey"><img src="~/Content/images/PJ/Transfer.png" style="height:75px; width:75px"></a>*@
                                     </div>
                                 </div>
                                 <div class="col-xs-3"></div>
@@ -395,7 +396,7 @@
     }
     else
     {
-        <div class="form-group" data-intro="Edit project here." data-step="4">
+        <div class="form-group" data-intro="Edit project here." data-step="@(istep++)">
             <div class="row">
                 <div class="col-xs-12">
                     <div class="col-xs-1">
@@ -462,7 +463,7 @@
         <hr style="border-color:#006DC0;margin-top: 40px;" />
     }
 
-    <div class="form-group" data-intro="Project Description." data-step="5">
+    <div class="form-group" data-intro="Project Description." data-step="@(istep++)">
         <div class="row">
             @if (!string.IsNullOrEmpty(projectdata.Description))
             {

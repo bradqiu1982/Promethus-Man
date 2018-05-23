@@ -40,6 +40,7 @@ var ProMilestones = function(){
                             x: 2, 
                             y: 15,
                             name: 'CDR',
+
                         },{
                             x: 3, 
                             y: 15,
@@ -48,7 +49,7 @@ var ProMilestones = function(){
                             x: 3, 
                             y: 25,
                             name: 'CDR',
-                        }
+                            }
                     ]
                 },
                 plotBands:[{
@@ -56,36 +57,39 @@ var ProMilestones = function(){
                     from: -0.5,
                     to: 0.5,
                     label: {
-                        text: '. Add public<br/> action',
+                        text: '* action',
                         style: {
-                            color: '#999999',
-                            fontSize: '8px',
+                            color: '#000',
+                            fontSize: '0px',
                         },
-                        y: 50
+                        y: 50.0,
+                        align:'left'
                     },
                 },{
                     color: '#ffffef',
                     from: 1.5,
                     to: 2.5,
                     label: {
-                        text: '. Add public<br/> action',
+                        text: '* Add public action',
                         style: {
-                            color: '#999999',
-                            fontSize: '8px',
+                            color: '#000',
+                            fontSize: '0px',
                         },
-                        y: 50
+                        y: 62.0,
+                        align: 'left'
                     },
                 },{
                     color: '#ffefff',
                     from: 2.5,
                     to: 3.5,
                     label: {
-                        text: '. Add public<br/> action',
+                        text: '* Add public action',
                         style: {
-                            color: '#999999',
-                            fontSize: '8px',
+                            color: '#000',
+                            fontSize: '0px',
                         },
-                        y: 50,
+                        y: 74.0,
+                        align: 'left'
                     },
                 }],
             }
@@ -194,7 +198,8 @@ var ProMilestones = function(){
         function drawchart(data){
             var options = {
                 chart: {
-                    type: 'line'
+                    type: 'line',
+                    zoomType: 'x',
                 },
                 title: {
                     text: data.title
@@ -202,6 +207,22 @@ var ProMilestones = function(){
                 xAxis: {
                     categories: data.xAxis.data,
                     plotBands: data.data.plotBands,
+                    events: {
+                        afterSetExtremes: function (event) {
+                            if (event.max < 8) {    
+                                $(this.options.plotBands).each(function () {
+                                    this.label.style.fontSize = '14px';
+                                });
+                                this.chart.xAxis[0].update();
+                            }
+                            else {
+                                $(this.options.plotBands).each(function () {
+                                    this.label.style.fontSize = '0px';
+                                });
+                                this.chart.xAxis[0].update();
+                            }
+                        }
+                    }
                 },
                 yAxis: [{
                     title: {

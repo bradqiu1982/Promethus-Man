@@ -6046,6 +6046,17 @@ namespace Prometheus.Controllers
             }//end while
         }
 
+        private void SendATETestData()
+        {
+            var filename = "log" + DateTime.Now.ToString("yyyy-MM-dd");
+            var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
+            if (!System.IO.File.Exists(wholefilename))
+            {
+                ATEUtility.EmailATETestDailyData("SFP+ TUNABLE", this);
+                ATEUtility.EmailATETestDailyData("XFP TUNABLE", this);
+            }
+        }
+
         public ActionResult HeartBeat()
         {
             //add files to let sundayreport have enough time to solve report
@@ -6100,6 +6111,12 @@ namespace Prometheus.Controllers
             }
             catch (Exception ex)
             { }
+
+            try
+            {
+                SendATETestData();
+            }
+            catch (Exception ex) { }
 
             heartbeatlog("heart beat start");
 
@@ -6433,6 +6450,8 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
+            //ATEUtility.EmailATETestDailyData("SFP+ TUNABLE", this);
+
             //var pndict = new Dictionary<string, bool>();
             //ATEUtility.RetrieveATEData("COHERENT", DateTime.Parse("2018-05-10 00:00:00"), DateTime.Parse("2018-05-15 23:59:59"),pndict);
 

@@ -33,7 +33,7 @@ SHARETAG:::BER;EF;Epoxy;FLEX;IC;IC Setting;Lens;LOL;Los;LYT;OBA;ORT;PCB(A);Proce
 CRITICALFAILURERT:::VCSEL;Lens detachment;EOS/ESD;Components damage;Components missing;PCBA open/short;Cable crack;LYT;Others;Wire Bonding Short;Capacitor Short;Process;Silver Paste;Rework Operation;
 CRITICALFAILURESYMPTOM:::LOL;LowPwr;High Power Consumption;High BitError;Low RSSI;Low RX Amptitude;RSSI Uniformity;IC
 CRITICALDEFAULTRULE:::OBA_TEST,EEFAIL
-#CRITICALDEFAULTRULE:::TEST1,FAILURECODE1:TEST2,FAILURECODE2
+TUNABLETESTDATAOWNER:::cherry.gu@finisar.com;Jon.Xiang@finisar.com;
 
 VCSELBIGDATAZEROPOINT:::2017-05-01 00:00:00
 Delta_PO_LD_LIMIT:::-2:2

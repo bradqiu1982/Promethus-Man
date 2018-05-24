@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 
@@ -29,6 +31,61 @@ namespace Prometheus.Models
             DBUtility.ExeATESqlWithRes(sql);
         }
 
+        public static void EmailATETestDailyData(string mdtype,Controller ctrl)
+        {
+            var syscfg = CfgUtility.GetSysConfig(ctrl);
+            var towho = syscfg["TUNABLETESTDATAOWNER"].Split(new string[] { ";",","," " }, StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            var onedayagon = DateTime.Now.AddDays(-1);
+            var sdate = DateTime.Parse(onedayagon.ToString("yyyy-MM-dd") + " 00:00:00");
+            var edate = DateTime.Parse(onedayagon.ToString("yyyy-MM-dd") + " 23:59:59");
+
+            var pndict = new Dictionary<string, bool>();
+            var atedatalist = ATEUtility.FilteredATEData(mdtype, sdate, edate, pndict);
+
+            if (atedatalist.Count > 0)
+            {
+                var pndescdict = MESUtility.RetrievePNDescByPn(new List<string>(pndict.Keys));
+                var sb = PrePareATEData(atedatalist, pndescdict);
+
+                string datestring = DateTime.Now.ToString("yyyyMMdd");
+                string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+                if (!Directory.Exists(imgdir))
+                {
+                    Directory.CreateDirectory(imgdir);
+                }
+
+                var family = atedatalist[0].ModuleType.Replace(" ", "_").Replace("#", "").Replace("'", "")
+                            .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                var fn = "ATE_" + family + "_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+                var filename = imgdir + fn;
+                System.IO.File.WriteAllText(filename, sb.ToString(), Encoding.UTF8);
+
+                EmailUtility.SendEmail(ctrl, "ATE Daily Test Data - " + mdtype, towho
+                    , "Daily Test Data\r\nFYI", true, filename);
+                new System.Threading.ManualResetEvent(false).WaitOne(500);
+            }
+
+        }
+
+        public static StringBuilder PrePareATEData(List<ProjectTestData> atelist, Dictionary<string, string> pndescdict)
+        {
+            StringBuilder sb1 = new StringBuilder(300 * (atelist.Count + 1));
+            sb1.Append("SN,WhichTest,Failure,TestTimestamp,Station,Module Family,PN,PN Desc,Spend Time(in hour)\r\n");
+            foreach (var item in atelist)
+            {
+                var pndesc = "";
+                if (pndescdict.ContainsKey(item.PN))
+                { pndesc = pndescdict[item.PN]; }
+
+                sb1.Append("\"" + item.ModuleSerialNum.ToString().Replace("\"", "") + "\"," + "\"" + item.WhichTest.Replace("\"", "") + "\"," + "\"" + item.ErrAbbr.Replace("\"", "") + "\","
+                    + "\"" + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss") + "\"," + "\"" + item.TestStation.Replace("\"", "") + "\"," + "\"" + item.ModuleType.Replace("\"", "") + "\","
+                    + "\"" + item.PN.Replace("\"", "") + "\"," + "\"" + pndesc.Replace("\"", "") + "\"," + "\"" + item.JO.Replace("\"", "") + "\",\r\n");
+            }
+            return sb1;
+        }
+
         public static List<ProjectTestData> RetrieveATEData(string family,DateTime startdate,DateTime enddate,Dictionary<string,bool> pndict)
         {
             var ret = new List<ProjectTestData>();
@@ -38,7 +95,7 @@ namespace Prometheus.Models
                         INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID 
                         INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID   
                         WHERE c.FAMILY = '<family>' and d.END_TIME >= '<starttime>' and d.END_TIME <= '<endtime>' AND b.state <> 'GOLDEN'  ORDER BY a.MFR_SN,d.END_TIME ASC";
-            sql = sql.Replace("<family>", family).Replace("<starttime>", startdate.ToString("yyyyMMddhhmmss")).Replace("<endtime>", enddate.ToString("yyyyMMddhhmmss"));
+            sql = sql.Replace("<family>", family).Replace("<starttime>", startdate.ToString("yyyyMMddHHmmss")).Replace("<endtime>", enddate.ToString("yyyyMMddHHmmss"));
 
             var currentroutid = "";
             var currentstation = "";
@@ -136,6 +193,33 @@ namespace Prometheus.Models
                 { }
             }
 
+            return ret;
+        }
+
+        public static List<ProjectTestData> FilteredATEData(string mdtype, DateTime sdate, DateTime edate, Dictionary<string, bool> pndict)
+        {
+            var ret = new List<ProjectTestData>();
+            var rawdata = ATEUtility.RetrieveATEData(mdtype, sdate, edate, pndict);
+            if (rawdata.Count > 0)
+            {
+                var allpndict = new Dictionary<string, bool>();
+                var previousdata = ATEUtility.RetrieveATEData(mdtype, sdate.AddMonths(-2), sdate, allpndict);
+                var filterdict = new Dictionary<string, bool>();
+                foreach (var item in previousdata)
+                {
+                    if (!filterdict.ContainsKey(item.ModuleSerialNum + ":::" + item.WhichTest))
+                    {
+                        filterdict.Add(item.ModuleSerialNum + ":::" + item.WhichTest, true);
+                    }
+                }
+                foreach (var item in rawdata)
+                {
+                    if (!filterdict.ContainsKey(item.ModuleSerialNum + ":::" + item.WhichTest))
+                    {
+                        ret.Add(item);
+                    }
+                }
+            }
             return ret;
         }
 

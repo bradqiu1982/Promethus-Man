@@ -6112,11 +6112,11 @@ namespace Prometheus.Controllers
             catch (Exception ex)
             { }
 
-            try
-            {
-                SendATETestData();
-            }
-            catch (Exception ex) { }
+            //try
+            //{
+            //    SendATETestData();
+            //}
+            //catch (Exception ex) { }
 
             heartbeatlog("heart beat start");
 

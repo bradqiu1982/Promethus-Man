@@ -287,7 +287,7 @@ namespace Prometheus.Models
         public string TestStation { set; get; }
         public string ModuleSerialNum { set; get; }
         public string tErrAbbr { set; get; }
-        
+
         public List<string> NAttachList { set; get; }
         public List<string> NInternalAttachList { set; get; }
         public List<string> NCustomAttachList { set; get; }
@@ -405,10 +405,10 @@ namespace Prometheus.Models
                     {
                         analysiscommentlist.Add(item);
                     }
-                    else if (string.Compare(item.CommentType,COMMENTTYPE.ContainmentAction) == 0) {
+                    else if (string.Compare(item.CommentType, COMMENTTYPE.ContainmentAction) == 0) {
                         containmentactionlist.Add(item);
                     }
-                    else if (string.Compare(item.CommentType,COMMENTTYPE.CorrectiveAction) == 0) {
+                    else if (string.Compare(item.CommentType, COMMENTTYPE.CorrectiveAction) == 0) {
                         correctiveactionlist.Add(item);
                     }
                     else
@@ -1357,6 +1357,24 @@ namespace Prometheus.Models
             }
 
             return retdict;
+        }
+
+        public static Dictionary<string, string> RetrieveIssueBySNs(string sncond)
+        {
+            var ret = new Dictionary<string, string>();
+            var sql = "select ModuleSN,IssueKey from Issue where ModuleSN in <sncond> and IssueType='<IssueType>'";
+            sql = sql.Replace("<sncond>", sncond).Replace("<IssueType>", ISSUETP.RMA);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var sn = Convert.ToString(line[0]);
+                var key = Convert.ToString(line[1]);
+                if (!ret.ContainsKey(sn))
+                {
+                    ret.Add(sn, key);
+                }
+            }
+            return ret;
         }
 
         public static List<IssueViewModels> RetrieveIssueBySN(string sn, Controller ctrl)

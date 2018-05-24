@@ -23,6 +23,7 @@ namespace Prometheus.Models
             RMAOpenDate = "";
             RMANum = "";
             Customer = "";
+            IssueKey = "";
         }
 
         public static Dictionary<string, bool> GetAllVcselRMASN()
@@ -77,6 +78,28 @@ namespace Prometheus.Models
 
                 ret.Add(tempvm);
             }
+
+            if (ret.Count > 0)
+            {
+                var sncond = "('";
+                foreach (var item in ret)
+                {
+                    if (!string.IsNullOrEmpty(item.SN))
+                    {
+                        sncond = sncond + item.SN + "','";
+                    }
+                }
+                sncond = sncond.Substring(0, sncond.Length - 2) + ")";
+                var snkeydict = IssueViewModels.RetrieveIssueBySNs(sncond);
+                foreach (var item in ret)
+                {
+                    if (snkeydict.ContainsKey(item.SN))
+                    {
+                        item.IssueKey = snkeydict[item.SN];
+                    }
+                }
+            }
+
             return ret;
         }
 
@@ -261,6 +284,7 @@ namespace Prometheus.Models
         public string RMAOpenDate { set; get; }
         public string RMANum { set; get; }
         public string Customer { set; get; }
+        public string IssueKey { set; get; }
     }
 
     public class WaferSNMap

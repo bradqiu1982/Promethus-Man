@@ -59,7 +59,8 @@ var BurnIn = function(){
             });
         });
 
-        $('body').on('click', '#btn-search', function(){
+        function searchdata()
+        {
             var sdate = $.trim($('#sdate').val());
             var edate = $.trim($('#edate').val());
             var wf_no = $.trim($('#wf-no').tagsinput('items'));
@@ -143,7 +144,17 @@ var BurnIn = function(){
                  }
                  $.bootstrapLoading.end();
              })
+        }
+
+        $('body').on('click', '#btn-search', function(){
+            searchdata();
         })
+
+        var mywafer = $.trim($('#wf-no').tagsinput('items'));
+        if (mywafer != '')
+        {
+            searchdata();
+        }
 
         $('body').on('click', '#btn-wf-download', function () {
             var wafer_no = $.trim($('#m-wf-no').val());

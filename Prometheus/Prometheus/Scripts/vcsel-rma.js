@@ -57,7 +57,8 @@ var VCSEL_RMA = function(){
                         click: function (event) {
                             var wafer = event.point.category;
                             $('#waferval').html(wafer);
-
+                            $('#waferyield').attr('href', '/DataAnalyze/WaferDistribution?defaultwafer='+wafer);
+                            $('#wafertestdata').attr('href', '/DataAnalyze/DownLoadWafer?wf_no='+wafer);
                             $.post('/DataAnalyze/RetrieveVcselRMARawData',
                                 {
                                     wafer: wafer
@@ -65,6 +66,12 @@ var VCSEL_RMA = function(){
                                 function (outputdata) {
                                     $('#ramrawbody').empty();
                                     $.each(outputdata.waferdatalist, function (i, val) {
+                                        var rmalink = '<td> </td>';
+                                        if (val.IssueKey != '')
+                                        {
+                                            rmalink = '<td><a href="/Issue/UpdateIssue?issuekey=' + val.IssueKey + '" target="_blank" >Report</a></td>'
+                                        }
+
                                         var appendstr = '<tr>' +
                                             '<td>' + (i+1) + '</td>' +
                                             '<td>'+val.SN+'</td>'+
@@ -73,7 +80,8 @@ var VCSEL_RMA = function(){
                                             '<td>' + val.ProductType + '</td>' +
                                             '<td>' + val.ShipDate + '</td>' +
                                             '<td>' + val.RMAOpenDate + '</td>' +
-                                            '<td>' + val.Customer + '</td>'
+                                            '<td>' + val.Customer + '</td>' +
+                                            rmalink
                                             + '</tr>';
                                         $('#ramrawbody').append(appendstr);
                                     });

@@ -4,7 +4,7 @@ var ProMilestones = function(){
             id: 'pro-charts',
             title: 'Project Detail',
             xAxis: {
-                data: ['2017-01', '2017-02', '2017-03', '2017-04', '2017-05', '2017-06', '2017-07', '2017-08', '2017-09', '2017-10', '2017-11', '2017-12', '2018-01', '2018-02', '2018-03', '2018-04', '2018-05']
+                data: ['2016-08', '2016-09', '2016-10', '2016-11', '2016-12', '2017-01', '2017-02', '2017-03', '2017-04', '2017-05', '2017-06', '2017-07', '2017-08', '2017-09', '2017-10', '2017-11', '2017-12', '2018-01', '2018-02', '2018-03', '2018-04', '2018-05']
             },
             yAxis: {
                 0: {
@@ -20,12 +20,12 @@ var ProMilestones = function(){
                 yield_data:{
                     name: 'Yield',
                     color: '#5CB85C',
-                    data:[94.5, 91, 94.5, 97, 94.5, 94.5, 91, 94.5, 97, 94.5, 95, 94.5, 92, 94.5, 85, 94.5, 93]
+                    data: [94.5, 91, 94.5, 97, 94.5, 94.5, 91, 94.5, 97, 94.5, 94.5, 91, 94.5, 97, 94.5, 95, 94.5, 92, 94.5, 85, 94.5, 93]
                 },
                 amount_data:{
                     name: 'Amount',
                     color: '#ff3399',
-                    data:[900, 1120, 1091, 809, 1293, 900, 1120, 1091, 809, 1293, 1001, 800, 987, 920, 1120, 1032, 1409]
+                    data: [1091, 809, 1293, 1001, 800, 900, 1120, 1091, 809, 1293, 900, 1120, 1091, 809, 1293, 1001, 800, 987, 920, 1120, 1032, 1409]
                 },
                 rma_data:{
                     name: 'RMA',
@@ -54,8 +54,8 @@ var ProMilestones = function(){
                 },
                 plotBands:[{
                     color: '#efffff',
-                    from: -0.5,
-                    to: 0.5,
+                    from: 14.5,
+                    to: 15.5,
                     label: {
                         text: '* action',
                         style: {
@@ -67,8 +67,8 @@ var ProMilestones = function(){
                     },
                 },{
                     color: '#ffffef',
-                    from: 1.5,
-                    to: 2.5,
+                    from: 16.5,
+                    to: 17.5,
                     label: {
                         text: '* Add public action',
                         style: {
@@ -80,8 +80,8 @@ var ProMilestones = function(){
                     },
                 },{
                     color: '#ffefff',
-                    from: 2.5,
-                    to: 3.5,
+                    from: 17.5,
+                    to: 18.5,
                     label: {
                         text: '* Add public action',
                         style: {
@@ -209,7 +209,7 @@ var ProMilestones = function(){
                     plotBands: data.data.plotBands,
                     events: {
                         afterSetExtremes: function (event) {
-                            if (event.max < 8) {    
+                            if ((event.max - event.min) < 7) {
                                 $(this.options.plotBands).each(function () {
                                     this.label.style.fontSize = '14px';
                                 });

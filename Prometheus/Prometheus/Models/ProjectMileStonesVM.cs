@@ -27,7 +27,7 @@ namespace Prometheus.Models
         public string CreateTime { set; get; }
         public string UpdateTime { set; get; }
 
-        public static List<ProjectMileStonesVM> GetProjectMileStones(string pKey, string uName, bool ispublish = false, string sDate = "", string eDate = "")
+        public static List<ProjectMileStonesVM> GetProjectMileStones(string pKey, string uName,string withPrivate, string sDate = "", string eDate = "")
         {
             var sql = @"select ID, ProjectKey, UserName, Action, IsPublish, Status, AddDate, CreateTime, UpdateTime 
                         from ProjectMileStones as pm 
@@ -35,16 +35,18 @@ namespace Prometheus.Models
             var param = new Dictionary<string, string>();
             param.Add("@pKey", pKey);
             param.Add("@Status", ActionStatus.ValidStatus);
-            param.Add("@uName", uName);
-            if (ispublish)
+            
+            if (string.Compare(withPrivate,"TRUE",true) == 0)
             {
                 sql += " and (IsPublish = @mPublic or (UserName = @uName and IsPublish = @mPrivate)) ";
                 param.Add("@mPublic", IsPublishStatus.mPublic);
                 param.Add("@mPrivate", IsPublishStatus.mPrivate);
+                param.Add("@uName", uName);
             }
             else
             {
-                sql += " and UserName = @uName ";
+                sql += " and IsPublish = @mPublic ";
+                param.Add("@mPublic", IsPublishStatus.mPublic);
             }
             if (!string.IsNullOrEmpty(sDate))
             {
@@ -56,6 +58,7 @@ namespace Prometheus.Models
                 sql += " and AddDate <= @eDate ";
                 param.Add("@eDate", eDate);
             }
+            sql += " order by AddDate asc";
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
             var res = new List<ProjectMileStonesVM>();
             if(dbret.Count > 0)
@@ -69,15 +72,50 @@ namespace Prometheus.Models
                     tmp.Action = Convert.ToString(item[3]);
                     tmp.IsPublish = Convert.ToString(item[4]);
                     tmp.Status = Convert.ToString(item[5]);
-                    tmp.AddDate = Convert.ToString(item[6]);
-                    tmp.CreateTime = Convert.ToString(item[7]);
-                    tmp.UpdateTime = Convert.ToString(item[8]);
+                    tmp.AddDate = Convert.ToDateTime(item[6]).ToString("yyyy-MM-dd HH:mm:ss");
+                    tmp.CreateTime = Convert.ToDateTime(item[6]).ToString("yyyy-MM-dd HH:mm:ss");
+                    tmp.UpdateTime = Convert.ToDateTime(item[6]).ToString("yyyy-MM-dd HH:mm:ss");
                     res.Add(tmp);
                 }
             }
             return res;
         }
-        
+
+        public static List<ProjectMileStonesVM> GetProjectMileStones4Owner(string pKey, string uName)
+        {
+            var sql = @"select ID, ProjectKey, UserName, Action, IsPublish, Status, AddDate, CreateTime, UpdateTime 
+                        from ProjectMileStones as pm 
+                        where Status = @Status and ProjectKey = @pKey ";
+            sql += " and UserName = @uName ";
+            sql += " order by AddDate asc";
+
+            var param = new Dictionary<string, string>();
+            param.Add("@pKey", pKey);
+            param.Add("@Status", ActionStatus.ValidStatus);
+            param.Add("@uName", uName);
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
+            var res = new List<ProjectMileStonesVM>();
+            if (dbret.Count > 0)
+            {
+                foreach (var item in dbret)
+                {
+                    var tmp = new ProjectMileStonesVM();
+                    tmp.ID = Convert.ToString(item[0]);
+                    tmp.ProjectKey = Convert.ToString(item[1]);
+                    tmp.UserName = Convert.ToString(item[2]);
+                    tmp.Action = Convert.ToString(item[3]);
+                    tmp.IsPublish = Convert.ToString(item[4]);
+                    tmp.Status = Convert.ToString(item[5]);
+                    tmp.AddDate = Convert.ToDateTime(item[6]).ToString("yyyy-MM-dd HH:mm:ss");
+                    tmp.CreateTime = Convert.ToDateTime(item[6]).ToString("yyyy-MM-dd HH:mm:ss");
+                    tmp.UpdateTime = Convert.ToDateTime(item[6]).ToString("yyyy-MM-dd HH:mm:ss");
+                    res.Add(tmp);
+                }
+            }
+            return res;
+        }
+
         public static void UpdateProjectMileStones(ProjectMileStonesVM pmvm)
         {
             var sql = @"update ProjectMileStones set ";

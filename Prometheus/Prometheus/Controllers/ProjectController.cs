@@ -8574,7 +8574,7 @@ namespace Prometheus.Controllers
             return res;
         }
 
-        public ActionResult ProjectMileStone(string ProjectKey, string sDate = "", string eDate = "")
+        public ActionResult ProjectMileStone(string ProjectKey, string sDate = "", string eDate = "",string withprivate="")
         {
             var ckdict = CookieUtility.UnpackCookie(this);
             if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
@@ -8589,16 +8589,17 @@ namespace Prometheus.Controllers
                 CookieUtility.SetCookie(this, ck);
                 return RedirectToAction("LoginUser", "User");
             }
-
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
-            var action_data = ProjectMileStonesVM.GetProjectMileStones(ProjectKey, updater, false, sDate, eDate);
-
+            ViewBag.actionlist = ProjectMileStonesVM.GetProjectMileStones4Owner(ProjectKey, updater);
             ViewBag.sDate = sDate;
             ViewBag.eDate = eDate;
             ViewBag.ProjectKey = ProjectKey;
-            ViewBag.actionlist = action_data;
-
+            ViewBag.withprivate = "FALSE";
+            if (!string.IsNullOrEmpty(withprivate))
+            {
+                ViewBag.withprivate = withprivate;
+            }
             return View();
         }
 
@@ -8676,8 +8677,204 @@ namespace Prometheus.Controllers
         [HttpPost]
         public JsonResult GetProMileStoneData()
         {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            var pKey = Request.Form["pKey"];
+            var sDate = Request.Form["sDate"];
+            var eDate = Request.Form["eDate"];
+            var withPrivate = Request.Form["withPrivate"];
+
+            var pvm = ProjectViewModels.RetrieveOneProject(pKey);
+
+            var requestmonth = 18;
+            var action_data = new List<ProjectMileStonesVM>();
+            var yvmlist = new List<ProjectYieldViewModule>();
+
+            if (!string.IsNullOrEmpty(sDate) && !string.IsNullOrEmpty(eDate))
+            {
+                if (DateTime.Parse(sDate) > DateTime.Parse(eDate))
+                {
+                    var tempd = sDate;
+                    sDate = eDate;
+                    eDate = tempd;
+                }
+
+                var mlist = ProjectYieldViewModule.RetrieveDateSpanByMonth(sDate, eDate);
+                requestmonth = mlist.Count - 1;
+                var s = mlist[0].ToString("yyyy-MM-dd HH:mm:ss");
+                var e = mlist[mlist.Count - 1].ToString("yyyy-MM-dd HH:mm:ss");
+                action_data = ProjectMileStonesVM.GetProjectMileStones(pKey, updater, withPrivate,s ,e );
+
+                for (var yidx = 0;yidx <= mlist.Count-2;yidx++)
+                {
+                    var pyvm = ProjectYieldViewModule.GetYieldByDateRange(pKey, mlist[yidx].ToString("yyyy-MM-dd HH:mm:ss"), mlist[yidx + 1].AddMinutes(-1).ToString("yyyy-MM-dd HH:mm:ss"), pvm, HttpContext.Cache);
+                    if (pyvm.RealTimeYields.Count > 0)
+                    {
+                        yvmlist.Add(pyvm);
+                    }
+                }
+            }
+            else
+            {
+                var s = DateTime.Now.AddMonths(-18).ToString("yyyy-MM") + "-01 00:00:00";
+                var e = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                action_data = ProjectMileStonesVM.GetProjectMileStones(pKey, updater, withPrivate,s ,e);
+                yvmlist = ProjectYieldViewModule.GetYieldByMonth(pKey, HttpContext.Cache, requestmonth);
+            }
+
+            var combindatedict = new Dictionary<string, DateTime>();
+            var yvmdict = new Dictionary<string, ProjectYieldViewModule>();
+
+            foreach (var item in action_data)
+            {
+                var mstr = DateTime.Parse(item.AddDate).ToString("yyyy-MM");
+                if (!combindatedict.ContainsKey(mstr))
+                {
+                    combindatedict.Add(mstr, DateTime.Parse(mstr + "-01 00:00:00"));
+                }
+            }
+            foreach (var item in yvmlist)
+            {
+                var mstr = item.EndDate.ToString("yyyy-MM");
+                if (!combindatedict.ContainsKey(mstr))
+                {
+                    combindatedict.Add(mstr, DateTime.Parse(mstr + "-01 00:00:00"));
+                }
+
+                yvmdict.Add(mstr, item);
+            }
+
+            var alldatelist = combindatedict.Values.ToList();
+            alldatelist.Sort();
+
+
+            var xtimelist = new List<string>();
+            var amountlist = new List<int>();
+            var fyieldlist = new List<double>();
+            var ryieldlist = new List<double>();
+            var snyieldlist = new List<double>();
+
+            var maxamout = 0;
+            var xidx = 0;
+            var alldatedict = new Dictionary<string, int>();
+            foreach (var item in alldatelist)
+            {
+                var datestr = item.ToString("yyyy-MM");
+                xtimelist.Add(datestr);
+                if (yvmdict.ContainsKey(datestr))
+                {
+                    var yd = yvmdict[datestr];
+                    fyieldlist.Add(Math.Round(yd.FirstYield * 100.0,2));
+                    ryieldlist.Add(Math.Round(yd.LastYield * 100.0,2));
+                    snyieldlist.Add(Math.Round(yd.SNYield * 100,2));
+                    var tempfamount = 0;
+                    foreach (var d in yd.FirstYields)
+                    {
+                        if (d.InputCount > tempfamount) { tempfamount = d.InputCount; }
+                        if (d.InputCount > maxamout) { maxamout = d.InputCount; }
+                    }
+                    amountlist.Add(tempfamount);
+                }
+                else
+                {
+                    fyieldlist.Add(0.0);
+                    ryieldlist.Add(0.0);
+                    snyieldlist.Add(0.0);
+                    amountlist.Add(0);
+                }
+
+                alldatedict.Add(datestr, xidx);
+                xidx = xidx + 1;
+            }
+
+
+            var plotcolor = (new string[] {"#8CC9F7","#BEEBDF","#FDEEC3","#F6B0B0","#EC88F4"
+                , "#4FADF3","#12CC92","#FA9604","#ED6161","#EF46FC" }).ToList();
+            var labelylist = (new int[] { 50, 64, 78, 92, 106 }).ToList();
+
+            var cidx = 0;
+            var plotarray = new List<object>();
+            foreach (var item in action_data)
+            {
+                var mstr = DateTime.Parse(item.AddDate).ToString("yyyy-MM");
+                plotarray.Add(
+                    new
+                    {
+                        color = plotcolor[alldatedict[mstr] % plotcolor.Count],
+                        from = alldatedict[mstr] - 0.5,
+                        to = alldatedict[mstr] + 0.5,
+                        label = new
+                        {
+                            //text = "* " + item.Action+ "--" + item.UserName.Split(new string[] {"@"},StringSplitOptions.RemoveEmptyEntries)[0],
+                            text = "* " + item.Action,
+                            style = new
+                            {
+                                color = "#000",
+                                fontSize = (alldatelist.Count < 7) ? "12px" : "0px"
+                            },
+                            y = labelylist[cidx % labelylist.Count],
+                            align = "left"
+                        },
+                    });
+                cidx = cidx + 1;
+            }
+
+            var yAxis = new List<object>();
+            yAxis.Add(new {
+                title = "Yield (%)",
+                min  = 0,
+                max = 100
+            });
+            yAxis.Add(new
+            {
+                title = "Amount"
+            });
+
+            var allrmadata = IssueViewModels.RetrieveRMAWithTestTime(pKey);
+            var rmaarray = new List<object>();
+            foreach (var rma in allrmadata)
+            {
+                var datestr = rma.ReportDate.ToString("yyyy-MM");
+                if (alldatedict.ContainsKey(datestr))
+                {
+                    rmaarray.Add(
+                        new {
+                            x = alldatedict[datestr],
+                            y = 20,
+                            name = rma.ModuleSN
+                        }
+                        );
+                }
+            }
+
+            //#8085e9,#434348
             var res = new JsonResult();
-            res.Data = new { success = true };
+            res.Data = new { success = true,
+                             data = new {
+                                 id = "pro-charts",
+                                 title = "Project Detail",
+                                 xAxis = new { data = xtimelist },
+                                 yAxis =yAxis,
+                                 data = new {
+                                     yield_data = new {
+                                         name = "Final Yield",
+                                         color = "#90ed7d",
+                                         data = ryieldlist
+                                     },
+                                     amount_data = new {
+                                         name = "Amount",
+                                         color = "#ff3399",
+                                         data = amountlist
+                                     },
+                                     rma_data = new {
+                                         name = "RMA",
+                                         color = "#00b050",
+                                         data = rmaarray
+                                     },
+                                     plotBands = plotarray
+                                 }
+                             }
+                            };
             return res;
         }
     }

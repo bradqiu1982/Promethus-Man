@@ -285,6 +285,8 @@ namespace Prometheus.Models
         public string Resolution { set; get; }
 
         public string TestStation { set; get; }
+
+        //this parameter already exist for modulesn
         public string ModuleSerialNum { set; get; }
         public string tErrAbbr { set; get; }
 
@@ -785,6 +787,35 @@ namespace Prometheus.Models
                 .Replace("<FinisarModel>", FinisarModel).Replace("<ECustomer>", ECustomer)
                 .Replace("<CRMANUM>", CRMANUM).Replace("<CReport>", CReport).Replace("<ModuleSN>", ModuleSN).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        public static List<IssueViewModels> RetrieveRMAWithTestTime(string pjkey)
+        {
+            var sql = @"SELECT i.ModuleSN,r.RMAFailureCode,p.TestTimeStamp FROM [NPITrace].[dbo].[Issue] i (NOLOCK) 
+                         left join [NPITrace].[dbo].[IssueRMA] r with (nolock) on i.IssueKey = r.IssueKey 
+                         left join [NPITrace].[dbo].[ProjectTestData] p with (nolock) on i.ModuleSN = p.ModuleSerialNum 
+                         where i.ProjectKey = @pjkey and i.IssueType = @IssueType and r.RMAFailureCode <> '' order by p.ModuleSerialNum,p.TestTimeStamp desc";
+            var dict = new Dictionary<string, string>();
+            dict.Add("@pjkey", pjkey);
+            dict.Add("@IssueType", ISSUETP.RMA);
+            var ret = new List<IssueViewModels>();
+            var sndict = new Dictionary<string, bool>();
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, dict);
+            foreach (var line in dbret)
+            {
+                var sn = Convert.ToString(line[0]);
+
+                if (!sndict.ContainsKey(sn))
+                {
+                    sndict.Add(sn, true);
+                    var tempvm = new IssueViewModels();
+                    tempvm.ModuleSN = sn;
+                    tempvm.RMAFailureCode = Convert.ToString(line[1]);
+                    tempvm.ReportDate = Convert.ToDateTime(line[2]);
+                    ret.Add(tempvm);
+                }
+            }
+            return ret;
         }
 
         private void RetrieveRMA()

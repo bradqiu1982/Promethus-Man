@@ -30,6 +30,7 @@
 
 <div class="row v-fitter">
     <input type="hidden" id="pKey" name="pKey" value="@ViewBag.ProjectKey" />
+    <input type="hidden" id="withprivate" name="withprivate" value="@ViewBag.withprivate" />
     <label class="col-xs-2">Date Period</label>
     <div class="col-xs-3">
         <div class="input-group date" data-date="@ViewBag.sDate"
@@ -64,12 +65,15 @@
     </div>
 </div>
 <div class="v-milestone">
-    <div class="bs-callout bs-callout-info">Actions<a><span class="add-action glyphicon glyphicon-plus-sign"></span></a></div>
+    <div class="bs-callout bs-callout-info">Actions
+        <a><span class="add-action glyphicon glyphicon-plus-sign"></span></a>
+        <a data-toggle="tooltip" title="Show My Private MileStone"><span class="show-action glyphicon glyphicon-eye-open"></span></a>
+    </div>
     <div class="row action-lists">
         <ul class="list-group">
             @foreach (var item in ViewBag.actionlist)
             {
-                <li class="list-group-item list-group-item-@(item.IsPublish == "1"?"warning":"info")" data-actionid="@item.ID">
+                <li class="list-group-item list-group-item-@(item.IsPublish == "1"?"success":"warning")" data-actionid="@item.ID">
                     <span class="span-right">
                         <a class="public-actions" title="@(item.IsPublish == "1" ?"Cancel ":"")Publish" data-ispublish="@item.IsPublish">
                             <span class="glyphicon glyphicon-share-alt @(item.IsPublish == "1" ?"private-icon":"")"></span>

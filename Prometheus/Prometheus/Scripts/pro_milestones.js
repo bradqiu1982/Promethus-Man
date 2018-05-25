@@ -6,16 +6,16 @@ var ProMilestones = function(){
             xAxis: {
                 data: ['2016-08', '2016-09', '2016-10', '2016-11', '2016-12', '2017-01', '2017-02', '2017-03', '2017-04', '2017-05', '2017-06', '2017-07', '2017-08', '2017-09', '2017-10', '2017-11', '2017-12', '2018-01', '2018-02', '2018-03', '2018-04', '2018-05']
             },
-            yAxis: {
-                0: {
+            yAxis: [
+                {
                     title: 'Yield (%)',
                     min: 0,
                     max: 100,
                 },
-                1: {
+                 {
                     title: 'Amount',
-                },
-            },
+                }
+            ],
             data: {
                 yield_data:{
                     name: 'Yield',
@@ -53,11 +53,11 @@ var ProMilestones = function(){
                     ]
                 },
                 plotBands:[{
-                    color: '#efffff',
+                    color: '#4FADF3',
                     from: 14.5,
                     to: 15.5,
                     label: {
-                        text: '* action',
+                        text: '* action a',
                         style: {
                             color: '#000',
                             fontSize: '0px',
@@ -65,7 +65,20 @@ var ProMilestones = function(){
                         y: 50.0,
                         align:'left'
                     },
-                },{
+                }, {
+                    color: '#4FADF3',
+                    from: 14.5,
+                    to: 15.5,
+                    label: {
+                        text: '* Add public action b',
+                        style: {
+                            color: '#000',
+                            fontSize: '0px',
+                        },
+                        y: 65.0,
+                        align: 'left'
+                    },
+                }, {
                     color: '#ffffef',
                     from: 16.5,
                     to: 17.5,
@@ -97,11 +110,11 @@ var ProMilestones = function(){
         $('.date').datepicker({ autoclose: true });
         $.post('/Project/GetProMileStoneData',
         {
-            pKey: $.trim($('#pKey').val())
+            pKey: $.trim($('#pKey').val()),
+            sDate: $.trim($('#sdate').val()),
+            eDate: $.trim($('#edate').val()),
+            withPrivate: $.trim($('#withprivate').val())
         }, function (output) {
-            output = {
-                data: chartdata
-            };
             drawchart(output.data);
          })
         $('body').on('click', '.add-action', function(){
@@ -166,6 +179,7 @@ var ProMilestones = function(){
         })
 
         $('body').on('click', '.public-actions', function () {
+            $('#withprivate').val('FALSE');
             var actionid = $(this).parent().parent().attr("data-actionid");
             var ispublish = $(this).attr('data-ispublish');
             $.post('/Project/UpdateProMileStone', {
@@ -179,6 +193,13 @@ var ProMilestones = function(){
                     alert("Failed to operate");
                 }
             })
+        })
+        
+        $('body').on('click', '.show-action', function () {
+            var sDate = $.trim($('#sdate').val());
+            var eDate = $.trim($('#edate').val());
+            var pKey = $.trim($('#pKey').val());
+            window.location.href = "/Project/ProjectMileStone?ProjectKey=" + pKey + "&sDate=" + sDate + "&eDate=" + eDate + "&withprivate=TRUE";
         })
 
         $('body').on('click', '#btn-search', function(){
@@ -211,7 +232,7 @@ var ProMilestones = function(){
                         afterSetExtremes: function (event) {
                             if ((event.max - event.min) < 7) {
                                 $(this.options.plotBands).each(function () {
-                                    this.label.style.fontSize = '14px';
+                                    this.label.style.fontSize = '12px';
                                 });
                                 this.chart.xAxis[0].update();
                             }
@@ -246,7 +267,6 @@ var ProMilestones = function(){
                     marker: {
                         radius: 2
                     },
-                    enableMouseTracking: false,
                     data: data.data.yield_data.data
                 },{
                     type: 'line',

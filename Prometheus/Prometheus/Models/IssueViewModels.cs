@@ -873,7 +873,7 @@ namespace Prometheus.Models
         {
 
             var dayofweek = Convert.ToInt32(DateTime.Now.DayOfWeek);
-            var sDate = DateTime.Now.AddDays((dayofweek > 4) ? (4 - dayofweek) : ((4 - dayofweek) - 7)).ToString("yyyy-MM-dd 07:30:00");
+            var sDate = DateTime.Now.AddDays((dayofweek > 4) ? (4 - dayofweek) : ((4 - dayofweek) - 7)).AddDays(1).ToString("yyyy-MM-dd 07:30:00");
             var eDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             var sql = "select Comment from IssueComments "
                     + "where IssueKey = N'<IssueKey>' "

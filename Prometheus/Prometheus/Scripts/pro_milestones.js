@@ -17,9 +17,17 @@ var ProMilestones = function(){
                 }
             ],
             data: {
-                yield_data:{
-                    name: 'Yield',
+                fyield_data:{
+                    name: 'Final Yield',
                     color: '#5CB85C',
+                    data: [94.5, 91, 94.5, 97, 94.5, 94.5, 91, 94.5, 97, 94.5, 94.5, 91, 94.5, 97, 94.5, 95, 94.5, 92, 94.5, 85, 94.5, 93]
+                },
+                fpyield_data: {
+                    name: 'First Yield',
+                    data: [94.5, 91, 94.5, 97, 94.5, 94.5, 91, 94.5, 97, 94.5, 94.5, 91, 94.5, 97, 94.5, 95, 94.5, 92, 94.5, 85, 94.5, 93]
+                },
+                snyield_data:{
+                    name: 'SN Yield',
                     data: [94.5, 91, 94.5, 97, 94.5, 94.5, 91, 94.5, 97, 94.5, 94.5, 91, 94.5, 97, 94.5, 95, 94.5, 92, 94.5, 85, 94.5, 93]
                 },
                 amount_data:{
@@ -259,16 +267,39 @@ var ProMilestones = function(){
                     opposite: true,
                 }],
                 series: [{
-                    name: data.data.yield_data.name,
+                    name: data.data.fyield_data.name,
                     dataLabels: {
                         enabled: true,
-                        color: data.data.yield_data.color,
+                        color: data.data.fyield_data.color,
                     },
                     marker: {
                         radius: 2
                     },
-                    data: data.data.yield_data.data
-                },{
+                    data: data.data.fyield_data.data
+                },
+                {
+                    name: data.data.fpyield_data.name,
+                    visible: false,
+                    dataLabels: {
+                        enabled: true
+                    },
+                    marker: {
+                        radius: 2
+                    },
+                    data: data.data.fpyield_data.data
+                },
+                {
+                    name: data.data.snyield_data.name,
+                    visible: false,
+                    dataLabels: {
+                        enabled: true
+                    },
+                    marker: {
+                        radius: 2
+                    },
+                    data: data.data.snyield_data.data
+                },
+                {
                     type: 'line',
                     yAxis: 1,
                     name: data.data.amount_data.name,
@@ -285,7 +316,8 @@ var ProMilestones = function(){
                     dataLabels:{
                         enabled: true,
                         align: 'left',
-                        verticalAlign: 'middle',
+                        allowOverlap: true,
+                        padding: 0,
                         formatter: function(){
                             return this.point.name;
                         },
@@ -313,15 +345,15 @@ var ProMilestones = function(){
                         exportdata: {
                             onclick: function () {
                                 var filename = data.title + '.csv';
-                                var outputCSV = 'Date,Output,Yield\r\n';
+                                var outputCSV = 'Date,Output,Final Yield,First Pass Yield,SN Yield\r\n';
                                 $(data.xAxis.data).each(function (i, val) {
                                     outputCSV += val + "," + data.data.amount_data.data[i]
-                                        + "," + data.data.yield_data.data[i] + ",\r\n";
+                                        + "," + data.data.fyield_data.data[i] + "," + data.data.fpyield_data.data[i] + "," + data.data.snyield_data.data[i] + ",\r\n";
                                 });
                                 outputCSV += "\r\n\r\n";
                                 outputCSV += "Date,RMA RootCause,\r\n";
                                 $(data.data.rma_data.data).each(function (i, val) {
-                                    outputCSV += data.xAxis.data[val.x] + "," + val.name + ",\r\n";
+                                    outputCSV += val.date + "," + val.name + ",\r\n";
                                 });
                                 outputCSV += "\r\n\r\n";
                                 outputCSV += "Date,MileStones,\r\n";

@@ -8830,6 +8830,8 @@ namespace Prometheus.Controllers
                 title = "Amount"
             });
 
+            var rmaylist = (new int[] {0, 5, 10, 15, 20, 25,30,35,40,45,50 }).ToList();
+            var ccidx = 0;
             var allrmadata = IssueViewModels.RetrieveRMAWithTestTime(pKey);
             var rmaarray = new List<object>();
             foreach (var rma in allrmadata)
@@ -8839,11 +8841,13 @@ namespace Prometheus.Controllers
                 {
                     rmaarray.Add(
                         new {
-                            x = alldatedict[datestr],
-                            y = 20,
-                            name = rma.ModuleSN
+                            x = alldatedict[datestr]-0.4,
+                            y = rmaylist[ccidx%rmaylist.Count],
+                            date = rma.ReportDate.ToString("yyyy-MM-dd"),
+                            name = rma.ModuleSN + "-" + rma.RMAFailureCode
                         }
                         );
+                    ccidx = ccidx + 1;
                 }
             }
 
@@ -8856,10 +8860,20 @@ namespace Prometheus.Controllers
                                  xAxis = new { data = xtimelist },
                                  yAxis =yAxis,
                                  data = new {
-                                     yield_data = new {
+                                     fyield_data = new {
                                          name = "Final Yield",
                                          color = "#90ed7d",
                                          data = ryieldlist
+                                     },
+                                     fpyield_data = new
+                                     {
+                                         name = "First Pass Yield",
+                                         data = fyieldlist
+                                     },
+                                     snyield_data = new
+                                     {
+                                         name = "SN Yield",
+                                         data = snyieldlist
                                      },
                                      amount_data = new {
                                          name = "Amount",

@@ -791,7 +791,7 @@ namespace Prometheus.Models
 
         public static List<IssueViewModels> RetrieveRMAWithTestTime(string pjkey)
         {
-            var sql = @"SELECT i.ModuleSN,r.RMAFailureCode,p.TestTimeStamp FROM [NPITrace].[dbo].[Issue] i (NOLOCK) 
+            var sql = @"SELECT i.ModuleSN,r.RMAFailureCode,p.TestTimeStamp,i.IssueKey FROM [NPITrace].[dbo].[Issue] i (NOLOCK) 
                          left join [NPITrace].[dbo].[IssueRMA] r with (nolock) on i.IssueKey = r.IssueKey 
                          left join [NPITrace].[dbo].[ProjectTestData] p with (nolock) on i.ModuleSN = p.ModuleSerialNum 
                          where i.ProjectKey = @pjkey and i.IssueType = @IssueType and r.RMAFailureCode <> '' order by p.ModuleSerialNum,p.TestTimeStamp desc";
@@ -812,6 +812,7 @@ namespace Prometheus.Models
                     tempvm.ModuleSN = sn;
                     tempvm.RMAFailureCode = Convert.ToString(line[1]);
                     tempvm.ReportDate = Convert.ToDateTime(line[2]);
+                    tempvm.IssueKey = Convert.ToString(line[3]);
                     ret.Add(tempvm);
                 }
             }

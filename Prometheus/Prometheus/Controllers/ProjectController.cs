@@ -8851,7 +8851,7 @@ namespace Prometheus.Controllers
                             x = alldatedict[datestr]-0.4,
                             y = rmaylist[ccidx%rmaylist.Count],
                             date = rma.ReportDate.ToString("yyyy-MM-dd"),
-                            name = rma.ModuleSN + "-" + rma.RMAFailureCode
+                            name = "<a href='/Issue/UpdateIssue?issuekey="+rma.IssueKey+"' target='_blank'>" + rma.ModuleSN + "-" + rma.RMAFailureCode+"</a>"
                         }
                         );
                     ccidx = ccidx + 1;

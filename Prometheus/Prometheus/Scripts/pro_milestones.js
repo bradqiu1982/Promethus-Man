@@ -116,6 +116,18 @@ var ProMilestones = function(){
             }
         };
         $('.date').datepicker({ autoclose: true });
+
+
+        var options = {
+            loadingTips: "load data.....",
+            backgroundColor: "#aaa",
+            borderColor: "#fff",
+            opacity: 0.8,
+            borderColor: "#fff",
+            TipsColor: "#000",
+        }
+        $.bootstrapLoading.start(options);
+
         $.post('/Project/GetProMileStoneData',
         {
             pKey: $.trim($('#pKey').val()),
@@ -124,7 +136,10 @@ var ProMilestones = function(){
             withPrivate: $.trim($('#withprivate').val())
         }, function (output) {
             drawchart(output.data);
-         })
+            $.bootstrapLoading.end();
+        })
+
+
         $('body').on('click', '.add-action', function(){
             $('#m-actionid').val('');
             $('#m-date').val('');
@@ -318,6 +333,7 @@ var ProMilestones = function(){
                         align: 'left',
                         allowOverlap: true,
                         padding: 0,
+                        useHTML:true,
                         formatter: function(){
                             return this.point.name;
                         },

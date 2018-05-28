@@ -6209,6 +6209,12 @@ namespace Prometheus.Controllers
 
             heartbeatlog("LoadBITestDateFromAuto");
 
+            try {
+                ExternalDataCollector.RefreshOQMJo(this);
+            }
+            catch (Exception ex) { }
+            heartbeatlog("RefreshOQMJo");
+
             try
             {
                 BIDataUtility.LoadBITestDateFromAuto(this);
@@ -6450,6 +6456,7 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
+            
             //ATEUtility.EmailATETestDailyData("SFP+ TUNABLE", this);
 
             //var pndict = new Dictionary<string, bool>();

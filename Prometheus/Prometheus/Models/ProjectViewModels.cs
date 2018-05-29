@@ -16,6 +16,11 @@ namespace Prometheus.Models
         public static string Others = "Others";
     }
 
+    public class ProjectStatus
+    {
+        public static string Open = "Open";
+        public static string Close = "Close";
+    }
 
     public class ProjectStation
     {
@@ -105,9 +110,10 @@ namespace Prometheus.Models
             MeListStr = string.Empty;
             PqeListStr = string.Empty;
             TransferFlg = string.Empty;
+            ProStatus = ProjectStatus.Open;
         }
 
-        public ProjectViewModels(string prokey, string proname, string startdate, double finshrate, string sdescription, string monitorvcsel, string vcselwarning, string pjtype, string transfer_flg = "")
+        public ProjectViewModels(string prokey, string proname, string startdate, double finshrate, string sdescription, string monitorvcsel, string vcselwarning, string pjtype, string transfer_flg = "", string status = "")
         {
             this.ProjectKey = prokey;
             this.dbProjectName = proname;
@@ -117,6 +123,7 @@ namespace Prometheus.Models
             this.MonitorVcsel = monitorvcsel;
             this.ProjectType = pjtype;
             this.TransferFlg = transfer_flg;
+            this.ProStatus = status;
             if (string.IsNullOrEmpty(vcselwarning))
             {
                 this.VcselWarningYield = "98.0";
@@ -142,6 +149,7 @@ namespace Prometheus.Models
         public string MeListStr { set; get; }
         public string PqeListStr { set; get; }
         public string TransferFlg { set; get; }
+        public string ProStatus { set; get; }
 
         public string WaferYieldExceptList { set; get; }
 
@@ -682,7 +690,7 @@ namespace Prometheus.Models
 
         public static List<string> RetrieveAllProjectKey()
         {
-            var sql = "select ProjectKey from Project order by ProjectKey ASC";
+            var sql = "select ProjectKey from Project where APVal5 <> 'Close' order by ProjectKey ASC";
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             var ret = new List<string>();
             foreach (var line in dbret)
@@ -789,7 +797,7 @@ namespace Prometheus.Models
 
         public static ProjectViewModels RetrieveOneProject(string key)
         {
-            var sql = "select ProjectKey,ProjectName,StartDate,FinishRate,Description,APVal1,APVal2,ProjectType,APVal4 from Project where ProjectKey = '<ProjectKey>' and validate = 1";
+            var sql = "select ProjectKey,ProjectName,StartDate,FinishRate,Description,APVal1,APVal2,ProjectType,APVal4 from Project where APVal5 <> 'Close' and ProjectKey = '<ProjectKey>' and validate = 1";
             sql = sql.Replace("<ProjectKey>", key);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             if (dbret.Count > 0)
@@ -824,6 +832,36 @@ namespace Prometheus.Models
                 {
                     ret.Add(r);
                 }
+            }
+            return ret;
+        }
+
+        public static List<ProjectViewModels> N_RetrieveProjectInfo(string pKey = "")
+        {
+            var ret = new List<ProjectViewModels>();
+            var sql = @"select ProjectKey, ProjectName, ProjectType, 
+                    FinishRate from Project
+                    where APVal5 <> 'Close' ";
+            var param = new Dictionary<string, string>();
+            if (!string.IsNullOrEmpty(pKey))
+            {
+                sql += " and ProjectKey = @pKey";
+                param.Add("@pKey", pKey);
+            }
+            sql += " order by ProjectKey ASC";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
+            foreach (var line in dbret)
+            {
+                var tmp = new ProjectViewModels();
+                tmp.ProjectKey = Convert.ToString(line[0]);
+                tmp.dbProjectName = Convert.ToString(line[1]);
+                tmp.ProjectType = Convert.ToString(line[2]);
+                tmp.FinishRating = Convert.ToDouble(line[3]);
+
+                tmp.StationList = RetrieveProjectStation(Convert.ToString(line[0]));
+                tmp.SumDatasetList = RetrieveProjectSumDataSet(Convert.ToString(line[0]));
+
+                ret.Add(tmp);
             }
             return ret;
         }
@@ -942,5 +980,16 @@ namespace Prometheus.Models
                 UserViewModels.UpdateUserProject(item.ToUpper(), pKey);
             }
         }
+
+        public static void UpdateProjectStatus(string pKey, string status)
+        {
+            var sql = @"update Project set APVal5 = @Status where ProjectKey = @pKey ";
+            var param = new Dictionary<string, string>();
+            param.Add("@pKey", pKey);
+            param.Add("@Status", status);
+
+            DBUtility.ExeLocalSqlNoRes(sql, param);
+        }
+        
     }
 }

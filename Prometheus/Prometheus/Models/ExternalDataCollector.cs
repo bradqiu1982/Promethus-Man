@@ -968,6 +968,8 @@ namespace Prometheus.Models
                                     rmaissuedict[rawdata.AppV_B] = rmaissuedict[rawdata.AppV_B] + ":" + rawdata.AppV_I.ToUpper();
                                     //create RMA issue
                                     CreateRMAIssue(rawdata,ctrl);
+                                    //reopen project
+                                    ProjectViewModels.UpdateProjectStatus(pjk, ProjectStatus.Open);
                                 }
                             }
                             else
@@ -975,6 +977,8 @@ namespace Prometheus.Models
                                 rmaissuedict.Add(rawdata.AppV_B, rawdata.AppV_I);
                                 //create RMA issue
                                 CreateRMAIssue(rawdata,ctrl);
+                                //reopen project
+                                ProjectViewModels.UpdateProjectStatus(pjk, ProjectStatus.Open);
                             }//check whether issue exist
                         }//issue open in one week
                     }// Product type is exist in system

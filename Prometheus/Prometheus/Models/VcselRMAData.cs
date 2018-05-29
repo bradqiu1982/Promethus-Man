@@ -149,10 +149,10 @@ namespace Prometheus.Models
             return ret;
         }
 
-        private static List<VcselRMAData> RetrievAllDataASC()
+        public static List<VcselRMAData> RetrievAllDataASC()
         {
             var ret = new List<VcselRMAData>();
-            var sql = "select Wafer,BuildDate,VcselType,ShipDate from VcselRMAData order by BuildDate ASC";
+            var sql = "select Wafer,BuildDate,VcselType,ShipDate,RMAOpenDate,SN from VcselRMAData order by BuildDate ASC";
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
             {
@@ -161,6 +161,8 @@ namespace Prometheus.Models
                 tempvm.BuildDate = Convert.ToDateTime(line[1]);
                 tempvm.VcselType = Convert.ToString(line[2]);
                 tempvm.ShipDate = Convert.ToString(line[3]);
+                tempvm.RMAOpenDate = Convert.ToString(line[4]);
+                tempvm.SN = Convert.ToString(line[5]);
                 ret.Add(tempvm);
             }
             return ret;

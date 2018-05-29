@@ -205,6 +205,27 @@ namespace Prometheus.Models
             return dict;
         }
 
+        public static Dictionary<string, bool> N_RetrieveUserProjectKeyDict(string username)
+        {
+            var dict = new Dictionary<string, bool>();
+            var us = RetrieveUserProjectKeyStr(username);
+
+            if (!string.IsNullOrEmpty(us))
+            {
+                var pjs = us.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var pj in pjs)
+                {
+                    var onepj = ProjectViewModels.N_RetrieveProjectInfo(pj);
+                    if (onepj != null && !dict.ContainsKey(pj))
+                    {
+                        dict.Add(pj, true);
+                    }
+                }//end foreach
+            }//end if
+
+            return dict;
+        }
+
         public static string RetrieveUserProjectKeyStr(string username)
         {
             var sql = "select APVal1 from UserTable where UserName = N'<UserName>'";
@@ -259,13 +280,13 @@ namespace Prometheus.Models
         {
             var sql1 = @"select distinct i.ProjectKey, p.APVal4 from issue as i 
                     inner join Project as p on i.ProjectKey = p.ProjectKey 
-                    where i.Assignee = @Username and i.APVal1 != 'delete' ";
+                    where i.Assignee = @Username and i.APVal1 != 'delete' and p.APVal5 != 'Close' ";
             var sql2 = "";
             if(pKeys.Count > 0)
             {
                 sql2 += @" union all
                     select ProjectKey, APVal4 from project where projectkey
-					in (<#projectkey>) ";
+					in (<#projectkey>)  and APVal5 != 'Close'";
                 sql2 = sql2.Replace("<#projectkey>", "'" + string.Join("','", pKeys) + "'");
             }
             var sql = string.IsNullOrEmpty(sql2) ? sql1 

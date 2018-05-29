@@ -305,3 +305,12 @@ red{
 .pro-content{
     margin-left: 8%;
 }
+.margin-left-15{
+    margin-left: -15px;
+}
+.margin-left-30 {
+    margin-left: -30px;
+}
+.margin-top-15{
+    margin-top: 15px;
+}

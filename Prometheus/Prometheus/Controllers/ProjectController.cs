@@ -253,8 +253,8 @@ namespace Prometheus.Controllers
             var cachepjlist = mycache.Get(updater + "_pjlist_CUST");
             if (cachepjlist == null)
             {
-                var allprojlist = ProjectViewModels.RetrieveAllProject();
-                var userpj = UserViewModels.RetrieveUserProjectKeyDict(updater);
+                var allprojlist = ProjectViewModels.N_RetrieveProjectInfo();
+                var userpj = UserViewModels.N_RetrieveUserProjectKeyDict(updater);
                 foreach (var pjk in allprojlist)
                 {
                     if (userpj.ContainsKey(pjk.ProjectKey) || (ViewBag.IsSuper != null && ViewBag.IsSuper))
@@ -299,7 +299,8 @@ namespace Prometheus.Controllers
                     }
                 }
             }
-
+            var uProModules = new Dictionary<string, List<ProjectSortVM>>();
+            var pmvm = new ProjectModuleVM();
             foreach (var item in projlist)
             {
                 filteritem = new SelectListItem();
@@ -392,7 +393,26 @@ namespace Prometheus.Controllers
                 {
                     item.PendingSptCount = Convert.ToString(sptcount);
                 }
-
+                var user_pro_module = UserProjectModuleMatrix.GetUserProjectModuleMatrix(updater, item.ProjectKey);
+                var pro_modules = new List<ProjectSortVM>();
+                if (user_pro_module.Count == 0)
+                {
+                    foreach (var module in pmvm.AllModules)
+                    {
+                        if (module.Value.Visible)
+                        {
+                            var tmp = new ProjectSortVM();
+                            tmp.key = module.Value.Key;
+                            tmp.visible = module.Value.Visible ? "1" : "0";
+                            pro_modules.Add(tmp);
+                        }
+                    }
+                }
+                else
+                {
+                    pro_modules = user_pro_module[item.ProjectKey].SortData;
+                }
+                uProModules.Add(item.ProjectKey, pro_modules);
             }
 
             filterlist[0].Disabled = true;
@@ -428,6 +448,10 @@ namespace Prometheus.Controllers
                     ViewBag.pjtpdict.Add(tpstr, true);
                 }
             }
+
+
+            ViewBag.uProModules = uProModules;
+            ViewBag.Default_Modules = pmvm.AllModules;
 
             return View(projlist);
         }
@@ -1584,6 +1608,27 @@ namespace Prometheus.Controllers
                     }
 
                 }
+
+                var user_pro_module = UserProjectModuleMatrix.GetUserProjectModuleMatrix(updater, ProjectKey);
+                var pro_modules = new List<ProjectSortVM>();
+                var pmvm = new ProjectModuleVM();
+                if (user_pro_module.Count == 0)
+                {
+                    foreach(var item in pmvm.AllModules)
+                    {
+                        var tmp = new ProjectSortVM();
+                        tmp.key = item.Value.Key;
+                        tmp.visible = item.Value.Visible ? "1" : "0";
+                        pro_modules.Add(tmp);
+                    }
+                }
+                else
+                {
+                    pro_modules = user_pro_module[ProjectKey].SortData;
+                }
+
+                ViewBag.Default_Modules = pmvm.AllModules;
+                ViewBag.Modules = pro_modules;
 
                 return View(vm);
             }
@@ -6112,12 +6157,6 @@ namespace Prometheus.Controllers
             catch (Exception ex)
             { }
 
-            //try
-            //{
-            //    SendATETestData();
-            //}
-            //catch (Exception ex) { }
-
             heartbeatlog("heart beat start");
 
             try
@@ -7053,8 +7092,9 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        public ActionResult ProjectDash(string PJKey)
+        public ActionResult ProjectDash(string ProjectKey)
         {
+            var PJKey = ProjectKey;
             if (!string.IsNullOrEmpty(PJKey))
             {
                 var ckdict = CookieUtility.UnpackCookie(this);
@@ -8295,8 +8335,9 @@ namespace Prometheus.Controllers
             }
         }
 
-        public ActionResult ProjectStations(string pjkey,string whichtest,string StartTime,string EndTime)
+        public ActionResult ProjectStations(string ProjectKey, string whichtest,string StartTime,string EndTime)
         {
+            var pjkey = ProjectKey;
             ViewBag.PJKey = pjkey;
 
             ViewBag.pjkey = pjkey;
@@ -8522,9 +8563,9 @@ namespace Prometheus.Controllers
             ViewBag.fm = FM;
             return View();
         }
-        public ActionResult Transfer(string PJKey)
+        public ActionResult Transfer(string ProjectKey)
         {
-            var pro_info = ProjectViewModels.RetrieveOneProject(PJKey);
+            var pro_info = ProjectViewModels.RetrieveOneProject(ProjectKey);
             ViewBag.MeList = string.Empty;
             if (pro_info != null)
             {
@@ -8547,7 +8588,7 @@ namespace Prometheus.Controllers
             var asilist = UserViewModels.RetrieveAllUser();
             ViewBag.AllUserList = "[\"" + string.Join("\",\"", asilist.ToArray()) + "\"]";
 
-            ViewBag.ProjectKey = PJKey;
+            ViewBag.ProjectKey = ProjectKey;
             return View();
         }
 
@@ -8896,6 +8937,63 @@ namespace Prometheus.Controllers
                                  }
                              }
                             };
+            return res;
+        }
+        [HttpPost]
+        public JsonResult SavePersonalProModule()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            var pKey = Request.Form["pKey"];
+
+            var sortvals = System.Web.Helpers.Json.Decode(Request.Form["sortvals"], (new List<object>()).GetType());
+            var data = new List<Dictionary<string, string>>();
+            foreach (var item in sortvals)
+            {
+                var tmp = new Dictionary<string, string>();
+                foreach (var line in item)
+                {
+                    var val = line.Value;
+                    if (line.Key == "y" && (val < 0 || val < 90))
+                    {
+                        val = 0;
+                    }
+                    tmp.Add(line.Key, val.ToString());
+                }
+                data.Add(tmp);
+            }
+            var n_data = data.OrderBy(dict => dict["y"]).ThenBy(dict => dict["x"]).ToList<Dictionary<string, string>>();
+
+            var sortdata = new List<ProjectSortVM>();
+            foreach (var item in n_data)
+            {
+                var tmp = new ProjectSortVM();
+                tmp.key = item["val"];
+                tmp.visible = item["visible"];
+                sortdata.Add(tmp);
+            }
+
+            UserProjectModuleMatrix.SaveUserProModuleMatrix(updater.ToUpper(), pKey, sortdata);
+
+            var res = new JsonResult();
+            res.Data = new { success = true };
+            return res;
+        }
+
+        [HttpPost]
+        public JsonResult CloseProject()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            var mycache = HttpContext.Cache;
+            mycache.Remove(updater + "_pjlist_CUST");
+
+            var pKey = Request.Form["pKey"];
+            ProjectViewModels.UpdateProjectStatus(pKey, ProjectStatus.Close);
+
+            var res = new JsonResult();
+            res.Data = new { success = true };
             return res;
         }
     }

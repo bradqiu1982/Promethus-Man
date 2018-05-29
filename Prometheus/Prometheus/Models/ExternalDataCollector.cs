@@ -3682,6 +3682,9 @@ namespace Prometheus.Models
                     vm.Priority = ISSUEPR.Major;
                     vm.DueDate = td.TestTimeStamp.AddDays(7);
                     vm.ReportDate = td.TestTimeStamp;
+                    if (!asignee.Contains("@"))
+                    { asignee = asignee + "@finisar.com"; }
+
                     vm.Assignee = asignee;
                     vm.Reporter = asignee;
                     vm.Creator = asignee;
@@ -3692,7 +3695,7 @@ namespace Prometheus.Models
 
                     var comment = new IssueComments();
                     comment.Comment = "JO Distribution: http://wuxinpi.china.ads.finisar.com:8082/BRTrace/JODetail?JONum="+jo+"&Step=3";
-                    IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, vm.Assignee, COMMENTTYPE.Description);
+                    IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, "system", COMMENTTYPE.Description);
 
                     SendOBAEvent(vm, "created", ctrl, true);
                 }

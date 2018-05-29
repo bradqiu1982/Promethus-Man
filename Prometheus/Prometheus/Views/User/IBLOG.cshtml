@@ -4,6 +4,7 @@
     ViewBag.Title = "IBLOG";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<script src="~/Scripts/autocompletefill.js"></script>
 
 <div class="row">
     <div class="nav navbar-nav navbar-left">
@@ -129,13 +130,11 @@
                                 <label class="control-label">To Who</label>
                             </div>
                             <div class="col-xs-9">
-                                @Html.DropDownList("towholist", null, new { @id = "towholist", @class = "form-control", @onchange = "chooseapusher()" })
+                                <input class="form-control" id="towholist" name="towholist"
+                                       type="text" value="" />
                             </div>
                             <script type="text/javascript">
-                            function chooseapusher()
-                            {
-                                document.getElementById("towhoinput").value = document.getElementById("towhoinput").value + ';' + document.getElementById("towholist").value;
-                            }
+                                autoCompleteFill('towholist', @Html.Raw(ViewBag.AllUserList), true, 'towhoinput');
                             </script>
                         </div>
                         <hr />

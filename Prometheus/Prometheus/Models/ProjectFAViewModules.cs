@@ -22,8 +22,8 @@ namespace Prometheus.Models
         public static List<ProjectFAViewModules> RetrievePendingFAData(string pjkey, Controller ctrl)
         {
             var ret = new List<ProjectFAViewModules>();
-            var issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Working,50,ctrl);
-            var issuedict2 = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Pending, 300,ctrl);
+            var issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Working, 50, ctrl);
+            var issuedict2 = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Pending, 300, ctrl);
             issuedict.AddRange(issuedict2);
 
             var bisndict = new Dictionary<string, string>();
@@ -38,94 +38,62 @@ namespace Prometheus.Models
 
                 if (!string.IsNullOrEmpty(d.ModuleSN) && !string.IsNullOrEmpty(d.ErrAbbr))
                 {
-                    var testStation = "";
-
-                    var pjdata = ProjectTestData.RetrieveProjectTestData(d.IssueKey);
-                    
-                    if (pjdata.Count > 0)
-                    {
-                        testStation = pjdata[0].TestStation;
-                    }
                     var pd = new ProjectTestData();
                     pd.ModuleSerialNum = d.ModuleSN;
                     pd.ErrAbbr = d.ErrAbbr;
                     pd.ProjectKey = d.ProjectKey;
-                    pd.TestStation = testStation;
+                    pd.TestStation = string.IsNullOrEmpty(d.TestStation) ? string.Empty : d.TestStation;
                     ret.Add(new ProjectFAViewModules(d, pd));
                 }
                 else
                 {
                     if (d.Summary.Contains("@Burn-In Step"))
                     {
-                        var sn = "";
-                        var testStation = "";
+                        var sn = string.IsNullOrEmpty(d.ModuleSerialNum) ? string.Empty : d.ModuleSerialNum;
 
-                        var pjdata = new List<ProjectTestData>();
-                        if (!string.IsNullOrEmpty(d.DataID))
+                        if (!string.IsNullOrEmpty(sn))
                         {
-                            pjdata = BITestData.RetrieveProjectTestDataByDataID(d.DataID);
-                        }
-                        else
-                        {
-                            pjdata = BITestData.RetrieveProjectTestDataByDataID(d.IssueKey);
-                        }
-
-                        if (pjdata.Count > 0)
-                        {
-                            sn = pjdata[0].ModuleSerialNum;
-                            testStation = pjdata[0].TestStation;
-                        }
-
-                        if (!string.IsNullOrEmpty(sn) && !bisndict.ContainsKey(sn))
-                        {
-                            bisndict.Add(sn, d.ReportDate.ToString());
-                            var pd = new ProjectTestData();
-                            pd.ModuleSerialNum = sn;
-                            pd.ErrAbbr = pjdata[0].ErrAbbr;
-                            pd.ProjectKey = d.ProjectKey;
-                            pd.TestStation = testStation;
-                            ret.Add(new ProjectFAViewModules(d, pd));
-                        }
-                        else if (!string.IsNullOrEmpty(sn) && bisndict.ContainsKey(sn))
-                        {
-                            //close automaticlly
-                            IssueViewModels.CloseDupBIIssueAutomaticlly(d.ProjectKey, sn, bisndict[sn]);
+                            if (!bisndict.ContainsKey(sn))
+                            {
+                                bisndict.Add(sn, d.ReportDate.ToString());
+                                var pd = new ProjectTestData();
+                                pd.ModuleSerialNum = sn;
+                                pd.ErrAbbr = d.tErrAbbr;
+                                pd.ProjectKey = d.ProjectKey;
+                                pd.TestStation = string.IsNullOrEmpty(d.TestStation) ? string.Empty : d.TestStation; ;
+                                ret.Add(new ProjectFAViewModules(d, pd));
+                            }
+                            else
+                            {
+                                //close automaticlly
+                                IssueViewModels.CloseDupBIIssueAutomaticlly(d.ProjectKey, sn, bisndict[sn]);
+                            }
                         }
                     }
                     else
                     {
-
-                        var sn = "";
-                        var pjdata = new List<ProjectTestData>();
-                        if (!string.IsNullOrEmpty(d.DataID))
+                        var sn = string.IsNullOrEmpty(d.ModuleSerialNum) ? string.Empty : d.ModuleSerialNum;
+                        if (!string.IsNullOrEmpty(sn))
                         {
-                            pjdata = ProjectTestData.RetrieveProjectTestData(d.DataID);
+                            if (!fasndict.ContainsKey(sn))
+                            {
+                                fasndict.Add(sn, d.ReportDate.ToString());
+                                var pd = new ProjectTestData();
+                                pd.ModuleSerialNum = sn;
+                                pd.ErrAbbr = d.ErrAbbr;
+                                pd.ProjectKey = d.ProjectKey;
+                                pd.TestStation = string.IsNullOrEmpty(d.TestStation) ? string.Empty : d.TestStation;
+                                ret.Add(new ProjectFAViewModules(d, pd));
+                            }
+                            else
+                            {
+                                //close automaticlly
+                                IssueViewModels.CloseDupIssueAutomaticlly(d.ProjectKey, sn, fasndict[sn]);
+                            }
                         }
-                        else
-                        {
-                            pjdata = ProjectTestData.RetrieveProjectTestData(d.IssueKey);
-                        }
-
-                        if (pjdata.Count > 0)
-                        {
-                            sn = pjdata[0].ModuleSerialNum;
-                        }
-
-                        if (!string.IsNullOrEmpty(sn) && !fasndict.ContainsKey(sn))
-                        {
-                            fasndict.Add(sn, d.ReportDate.ToString());
-                            ret.Add(new ProjectFAViewModules(d, pjdata[0]));
-                        }
-                        else if (!string.IsNullOrEmpty(sn) && fasndict.ContainsKey(sn))
-                        {
-                            //close automaticlly
-                            IssueViewModels.CloseDupIssueAutomaticlly(d.ProjectKey, sn, fasndict[sn]);
-                        }
-
                     }
                 }
             }
-
             return ret;
         }
 
@@ -133,85 +101,54 @@ namespace Prometheus.Models
         {
             var ret = new List<ProjectFAViewModules>();
 
-            var issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Done, 500,ctrl);
+            var issuedict = IssueViewModels.RRetrieveFAByPjkey(pjkey, Resolute.Done, 500, ctrl);
             foreach (var d in issuedict)
             {
-                    if (d.CommentList.Count == 2)
+                if (d.CommentList.Count == 2)
+                {
+                    bool sameas = false;
+                    foreach (var com in d.CommentList)
                     {
-                        bool sameas = false;
-                        foreach (var com in d.CommentList)
+                        if (com.Comment.Contains("<p>Issue Same As <a"))
                         {
-                            if (com.Comment.Contains("<p>Issue Same As <a"))
-                            {
-                                sameas = true;
-                                break;
-                            }
-
-                            if (com.Comment.Contains("passed")
-                                && string.Compare(com.Reporter, "System", true) == 0)
-                            {
-                                sameas = true;
-                                break;
-                            }
+                            sameas = true;
+                            break;
                         }
-                        if (sameas)
+
+                        if (com.Comment.Contains("passed")
+                            && string.Compare(com.Reporter, "System", true) == 0)
                         {
-                            continue;
+                            sameas = true;
+                            break;
                         }
                     }
-
-                    if (d.Summary.Contains(CRITICALERRORTYPE.SECONDMATCH1) || d.Summary.Contains(CRITICALERRORTYPE.SECONDMATCH))
+                    if (sameas)
                     {
                         continue;
                     }
-
-                    if (!string.IsNullOrEmpty(d.ModuleSN) && !string.IsNullOrEmpty(d.ErrAbbr))
-                    {
-                        var testStation = "";
-                        var pjdata = ProjectTestData.RetrieveProjectTestData(d.IssueKey);
-                        if (pjdata.Count > 0)
-                        {
-                            testStation = pjdata[0].TestStation;
-                        }
-
-                        var pd = new ProjectTestData();
-                            pd.ModuleSerialNum = d.ModuleSN;
-                            pd.ErrAbbr = d.ErrAbbr;
-                            pd.ProjectKey = d.ProjectKey;
-                            pd.TestStation = testStation;
-                        ret.Add(new ProjectFAViewModules(d, pd));
-                    }
-                    else
-                    {
-                        if (d.Summary.Contains("@Burn-In Step"))
-                        {
-                            var pjdata = BITestData.RetrieveProjectTestDataByDataID(d.IssueKey);
-                            if (pjdata.Count > 0)
-                            {
-                                var pd = new ProjectTestData();
-                                pd.ModuleSerialNum = pjdata[0].ModuleSerialNum;
-                                pd.ErrAbbr = pjdata[0].ErrAbbr;
-                                pd.ProjectKey = d.ProjectKey;
-                                pd.TestStation = pjdata[0].TestStation;
-                                ret.Add(new ProjectFAViewModules(d, pd));
-                            }
-                        }
-                        else
-                        {
-                            var pjdata = ProjectTestData.RetrieveProjectTestData(d.IssueKey);
-                            if (pjdata.Count > 0)
-                            {
-                                ret.Add(new ProjectFAViewModules(d, pjdata[0]));
-                            }
-                        }
-                    }
                 }
+
+                if (d.Summary.Contains(CRITICALERRORTYPE.SECONDMATCH1) || d.Summary.Contains(CRITICALERRORTYPE.SECONDMATCH))
+                {
+                    continue;
+                }
+
+                var sn = string.IsNullOrEmpty(d.ModuleSerialNum) ? string.Empty : d.ModuleSerialNum;
+                var testStation = string.IsNullOrEmpty(d.TestStation) ? string.Empty : d.TestStation;
+
+                var pd = new ProjectTestData();
+                pd.ModuleSerialNum = !string.IsNullOrEmpty(d.ModuleSN) ? d.ModuleSN : sn;
+                pd.ErrAbbr = !string.IsNullOrEmpty(d.ErrAbbr) ? d.ErrAbbr : d.TestStation;
+                pd.ProjectKey = d.ProjectKey;
+                pd.TestStation = testStation;
+                ret.Add(new ProjectFAViewModules(d, pd));
+            }
 
             return ret;
 
         }
 
-        public static int RetrieveFADataCount(string pjkey,bool pending=true)
+        public static int RetrieveFADataCount(string pjkey, bool pending = true)
         {
             if (pending)
             {
@@ -230,18 +167,11 @@ namespace Prometheus.Models
             var vm = IssueViewModels.RRetrieveFAByErrAbbr(ProjectKey, ErrAbbr, 500, ctrl);
             foreach (var item in vm)
             {
-                var testStation = "";
-                var pjdata = ProjectTestData.RetrieveProjectTestData(item.IssueKey);
-                if (pjdata.Count > 0)
-                {
-                    testStation = pjdata[0].TestStation;
-                }
-
                 var pd = new ProjectTestData();
                 pd.ModuleSerialNum = item.ModuleSN;
                 pd.ErrAbbr = item.ErrAbbr;
                 pd.ProjectKey = item.ProjectKey;
-                pd.TestStation = testStation;
+                pd.TestStation = item.TestStation;
                 ret.Add(new ProjectFAViewModules(item, pd));
             }
             return ret;

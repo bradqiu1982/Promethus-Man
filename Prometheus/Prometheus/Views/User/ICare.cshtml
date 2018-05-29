@@ -19,9 +19,6 @@
     <div class="col-xs-12">&nbsp;</div>
 </div>
 
-<script src="~/Scripts/highcharts.js"></script>
-<script src="~/Scripts/exporting.js"></script>
-
 @if (ViewBag.chooseuserlist != null)
 {
     using (Html.BeginForm("OperateICare", "User", FormMethod.Post, new { enctype = "multipart/form-data" }))
@@ -157,12 +154,12 @@
         <div class="row">
             <div class="col-xs-12">
                 <div class="col-xs-6">
-                    @Html.Raw(ViewBag.icareranklist[idx].UserRankTrend)
                     <div id="@((ViewBag.icareranklist[idx].CurrentUser.Split(new char[] { '@' })[0]).Replace(".",""))userrankchart" style="margin: 0 auto;"></div>
+                    @Html.Raw(ViewBag.icareranklist[idx].UserRankTrend)
                 </div>
                 <div class="col-xs-6">
-                    @Html.Raw(item.UserIssueTrend)
                     <div id="@((item.CurrentUser.Split(new char[] { '@' })[0]).Replace(".",""))issuetrendchart" style="margin: 0 auto;"></div>
+                    @Html.Raw(item.UserIssueTrend)
                 </div>
             </div>
         </div>

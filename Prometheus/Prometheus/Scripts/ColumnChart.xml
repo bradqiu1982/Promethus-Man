@@ -42,7 +42,23 @@ $(function () {
                         }
             }
         },
-        series: [#ChartSearies#]
+        series: [#ChartSearies#],
+        exporting: {
+            menuItemDefinitions: {
+                fullscreen: {
+                    onclick: function () {
+                              $('##ElementID#').parent().toggleClass('chart-modal');
+                              $('##ElementID#').highcharts().reflow();
+                    },
+                    text: 'Full Screen'
+                }
+            },
+            buttons: {
+                contextButton: {
+                    menuItems: ['fullscreen','printChart','separator','downloadPNG','downloadJPEG','downloadPDF','downloadSVG']
+                }
+            }
+        }
     });
 });
 </script>

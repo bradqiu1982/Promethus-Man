@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net.Mail;
 using System.Web;
 
 namespace Prometheus.Models
@@ -144,6 +145,20 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static bool IsEmaileValid(string emailaddress)
+        {
+            try
+            {
+                MailAddress m = new MailAddress(emailaddress);
+                return true;
+            }
+            catch (FormatException)
+            {
+                return false;
+            }
+        }
+
+
         public static void RegisterUserAuto(string name)
         {
             var dbret = UserViewModels.RetrieveUser(name);
@@ -153,6 +168,11 @@ namespace Prometheus.Models
                 if (!name.Contains("@"))
                 {
                     tempname = (name.Replace(" ", ".") + "@finisar.com").ToUpper();
+                }
+
+                if (!IsEmaileValid(tempname))
+                {
+                    return;
                 }
 
                 var user = new UserViewModels();
@@ -185,7 +205,28 @@ namespace Prometheus.Models
             return dict;
         }
 
-        private static string RetrieveUserProjectKeyStr(string username)
+        public static Dictionary<string, bool> N_RetrieveUserProjectKeyDict(string username)
+        {
+            var dict = new Dictionary<string, bool>();
+            var us = RetrieveUserProjectKeyStr(username);
+
+            if (!string.IsNullOrEmpty(us))
+            {
+                var pjs = us.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var pj in pjs)
+                {
+                    var onepj = ProjectViewModels.N_RetrieveProjectInfo(pj);
+                    if (onepj != null && !dict.ContainsKey(pj))
+                    {
+                        dict.Add(pj, true);
+                    }
+                }//end foreach
+            }//end if
+
+            return dict;
+        }
+
+        public static string RetrieveUserProjectKeyStr(string username)
         {
             var sql = "select APVal1 from UserTable where UserName = N'<UserName>'";
             sql = sql.Replace("<UserName>", username.ToUpper());
@@ -209,16 +250,9 @@ namespace Prometheus.Models
             else
             {
                 var dict = new Dictionary<string, bool>();
-                var pjs = us.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (var pj in pjs)
-                {
-                    if (!dict.ContainsKey(pj))
-                    {
-                        dict.Add(pj, true);
-                    }
-                }
+                var pjs = us.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
 
-                if (!dict.ContainsKey(projectkey))
+                if (!pjs.Contains(projectkey))
                 {
                     var sql = "update UserTable set APVal1 = '<APVal1>' where UserName = N'<UserName>'";
                     sql = sql.Replace("<UserName>", username.ToUpper()).Replace("<APVal1>", us+";"+projectkey);
@@ -242,19 +276,34 @@ namespace Prometheus.Models
             }
         }
 
-        public static Dictionary<string, bool> GetUserProjects(string uName)
+        public static Dictionary<string, ProjectViewModels> GetUserProjects(string uName, List<string> pKeys)
         {
-            var sql = "select distinct ProjectKey from issue where Assignee = @Username";
+            var sql1 = @"select distinct i.ProjectKey, p.APVal4 from issue as i 
+                    inner join Project as p on i.ProjectKey = p.ProjectKey 
+                    where i.Assignee = @Username and i.APVal1 != 'delete' and p.APVal5 != 'Close' ";
+            var sql2 = "";
+            if(pKeys.Count > 0)
+            {
+                sql2 += @" union all
+                    select ProjectKey, APVal4 from project where projectkey
+					in (<#projectkey>)  and APVal5 != 'Close'";
+                sql2 = sql2.Replace("<#projectkey>", "'" + string.Join("','", pKeys) + "'");
+            }
+            var sql = string.IsNullOrEmpty(sql2) ? sql1 
+                        : ("select distinct ProjectKey, APVal4 from ( " + sql1 + sql2 + " ) as tmp_a");
             var param = new Dictionary<string, string>();
             param.Add("@Username", uName);
 
             var data = DBUtility.ExeLocalSqlWithRes(sql, null, param);
-            var res = new Dictionary<string, bool>();
+            var res = new Dictionary<string, ProjectViewModels>();
             if(data.Count > 0)
             {
                 foreach(var item in data)
                 {
-                    res.Add(Convert.ToString(item[0]), true);
+                    var tmp = new ProjectViewModels();
+                    tmp.ProjectKey = Convert.ToString(item[0]);
+                    tmp.TransferFlg = Convert.ToString(item[1]);
+                    res.Add(Convert.ToString(item[0]), tmp);
                 }
             }
             return res;

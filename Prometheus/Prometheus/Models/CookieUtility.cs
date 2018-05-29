@@ -45,6 +45,7 @@ namespace Prometheus.Models
                 else
                 {
                     ck = new HttpCookie("activenpi");
+                    ck.Expires = DateTime.Now.AddDays(7);
                     foreach (var item in values)
                     {
                         ck.Values[item.Key] = Convert.ToBase64String(UTF8Encoding.UTF8.GetBytes(item.Value));
@@ -100,6 +101,12 @@ namespace Prometheus.Models
                 ret.Clear();
                 return ret;
             }
+        }
+
+        public static bool RemoveCookie(Controller ctrl)
+        {
+            ctrl.Response.Cookies["activenpi"].Expires = DateTime.Now.AddDays(-1000);
+            return true;
         }
     }
 }

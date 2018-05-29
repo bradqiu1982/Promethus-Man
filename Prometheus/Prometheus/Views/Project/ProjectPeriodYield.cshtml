@@ -33,8 +33,8 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-xs-12">&nbsp;</div>
+<div class="row text-center">
+    <h3>@(ViewBag.sDate + " ~ " + ViewBag.eDate)</h3>
 </div>
 
 <form>
@@ -46,14 +46,11 @@
 
 @if (ViewBag.chartscript != null)
 {
-    @Html.Raw(ViewBag.chartscript)
-
-    <script src="~/Scripts/highcharts.js"></script>
-    <script src="~/Scripts/exporting.js"></script>
 
     <div class="row">
 
-                        <div id="periodyield" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+        <div id="periodyield" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
     </div>
+    @Html.Raw(ViewBag.chartscript)
 }
 

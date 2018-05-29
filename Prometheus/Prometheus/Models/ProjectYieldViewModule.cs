@@ -66,6 +66,9 @@ namespace Prometheus.Models
 
         private Dictionary<string, bool> corsndict = new Dictionary<string, bool>();
         public Dictionary<string, bool> CorSNDict { get { return corsndict; } }
+
+        public string StartDate { set; get; }
+        public string EndDate { set; get; }
     }
 
     public class ProjectYieldViewModule
@@ -161,8 +164,48 @@ namespace Prometheus.Models
         private Dictionary<string, TestDataErrorSum> semap = new Dictionary<string, TestDataErrorSum>();
         public Dictionary<string, TestDataErrorSum> SNErrorMap { get { return semap; } }
 
-        public static void RegisterError(string errorcode1, string whichtest,string SN, Dictionary<string, TestDataErrorSum> emap)
+        //public static void RegisterError(string errorcode1, string whichtest,string SN, Dictionary<string, TestDataErrorSum> emap)
+        //{
+        //    var errorcode = errorcode1;
+        //    if (string.Compare(errorcode, "pass", true) == 0)
+        //        errorcode = "PASS";
+
+        //    if (emap.ContainsKey(errorcode))
+        //    {
+        //        var tempdict = emap[errorcode];
+        //        if (tempdict.whichtestdict.ContainsKey(whichtest))
+        //        {
+        //            tempdict.whichtestdict[whichtest] = tempdict.whichtestdict[whichtest] + 1;
+        //        }
+        //        else
+        //        {
+        //            tempdict.whichtestdict.Add(whichtest, 1);
+        //        }
+
+        //        if (!tempdict.sndict.ContainsKey(SN))
+        //        {
+        //            tempdict.sndict.Add(SN, true);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        var errsum = new TestDataErrorSum();
+        //        errsum.whichtestdict.Add(whichtest, 1);
+        //        emap.Add(errorcode, errsum);
+
+        //        if (!errsum.sndict.ContainsKey(SN))
+        //        {
+        //            errsum.sndict.Add(SN, true);
+        //        }
+        //    }
+        //}
+
+        public static void RegisterError(ProjectTestData testdata, Dictionary<string, TestDataErrorSum> emap)
         {
+            string errorcode1 = testdata.ErrAbbr;
+            string whichtest = testdata.WhichTest;
+            string SN = testdata.ModuleSerialNum;
+
             var errorcode = errorcode1;
             if (string.Compare(errorcode, "pass", true) == 0)
                 errorcode = "PASS";
@@ -265,42 +308,27 @@ namespace Prometheus.Models
             return ret;
         }
 
-        private static List<DateTime> RetrieveDateSpanByMonth(string startdate,string enddate)
+        public static List<DateTime> RetrieveDateSpanByMonth(string startdate,string enddate)
         {
             var ret = new List<DateTime>();
-            var sdate = DateTime.Parse(DateTime.Parse(startdate).ToString("yyyy-MM-dd") + " 07:30:00");
+            var sdate = DateTime.Parse(DateTime.Parse(startdate).ToString("yyyy-MM") + "-01 00:00:00");
+            
+            var temptimepoint = sdate;
+            var edate = DateTime.Parse(DateTime.Parse(enddate).ToString("yyyy-MM-dd") + " 23:59:59");
+
             ret.Add(sdate);
 
-            var temptimepoint = sdate;
-            var edate = DateTime.Parse(enddate);
-
-            temptimepoint = temptimepoint.AddMonths(1);
-            temptimepoint = DateTime.Parse(temptimepoint.ToString("yyyy-MM") + "-01 07:30:00");
-
-
-            if (temptimepoint > edate)
-            {
-                ret.Add(DateTime.Parse(DateTime.Parse(enddate).ToString("yyyy-MM-dd") + " 07:30:00"));
-                return ret;
-            }
-            else
-            {
-                ret.Add(temptimepoint);
-            }
-
-            while (temptimepoint < edate)
+            while (true)
             {
                 temptimepoint = temptimepoint.AddMonths(1);
                 if (temptimepoint > edate)
                 {
-                    ret.Add(DateTime.Parse(DateTime.Parse(enddate).ToString("yyyy-MM-dd") + " 07:30:00"));
-                    return ret;
+                    ret.Add(edate);
+                    break;
                 }
-                else
-                {
-                    ret.Add(DateTime.Parse(temptimepoint.ToString("yyyy-MM-dd") + " 07:30:00"));
-                }
+                ret.Add(temptimepoint);
             }
+
             return ret;
         }
 
@@ -373,7 +401,7 @@ namespace Prometheus.Models
                         yielddict[p.WhichTest].InputCount = yielddict[p.WhichTest].InputCount + 1;
                         if (string.Compare(p.ErrAbbr, "PASS", true) == 0)
                             yielddict[p.WhichTest].OutputCount = yielddict[p.WhichTest].OutputCount + 1;
-                        RegisterError(p.ErrAbbr, p.WhichTest,p.ModuleSerialNum, pyvm.SNErrorMap);
+                        RegisterError(p, pyvm.SNErrorMap);
                     }
                     else
                     {
@@ -386,7 +414,7 @@ namespace Prometheus.Models
                         tempyield.WhichTest = p.WhichTest;
 
                         yielddict.Add(p.WhichTest, tempyield);
-                        RegisterError(p.ErrAbbr, p.WhichTest,p.ModuleSerialNum, pyvm.SNErrorMap);
+                        RegisterError(p, pyvm.SNErrorMap);
                     }
                 }
             }
@@ -415,7 +443,7 @@ namespace Prometheus.Models
 
         }
 
-        private static void RetrieveFirstYield(ProjectYieldViewModule pyvm, List<ProjectTestData> plist, ProjectViewModels pvm)
+        private static void RetrieveFirstYield(ProjectYieldViewModule pyvm, List<ProjectTestData> plist, ProjectViewModels pvm,string sdate = null,string edate = null)
         {
 
             var yielddict = new Dictionary<string, TestYield>();
@@ -430,11 +458,14 @@ namespace Prometheus.Models
                         yielddict[p.WhichTest].InputCount = yielddict[p.WhichTest].InputCount + 1;
                         if (string.Compare(p.ErrAbbr, "PASS", true) == 0)
                             yielddict[p.WhichTest].OutputCount = yielddict[p.WhichTest].OutputCount + 1;
-                        RegisterError(p.ErrAbbr, p.WhichTest,p.ModuleSerialNum,pyvm.FErrorMap);
+                        RegisterError(p,pyvm.FErrorMap);
                     }
                     else
                     {
                         var tempyield = new TestYield();
+                        tempyield.StartDate = sdate;
+                        tempyield.EndDate = edate;
+
                         tempyield.InputCount = 1;
                         if (string.Compare(p.ErrAbbr, "PASS", true) == 0)
                             tempyield.OutputCount = 1;
@@ -442,7 +473,7 @@ namespace Prometheus.Models
                             tempyield.OutputCount = 0;
                         tempyield.WhichTest = p.WhichTest;
 
-                        RegisterError(p.ErrAbbr, p.WhichTest,p.ModuleSerialNum, pyvm.FErrorMap);
+                        RegisterError(p, pyvm.FErrorMap);
                         yielddict.Add(p.WhichTest, tempyield);
                     }
                 }
@@ -472,7 +503,82 @@ namespace Prometheus.Models
 
         }
 
-        private static void RetrieveCummYield(ProjectYieldViewModule pyvm, List<ProjectTestData> plist, ProjectViewModels pvm)
+        private Dictionary<string, int> ffailuretimedist = new Dictionary<string, int>();
+        public Dictionary<string, int> FirstYieldFailureTimeDist { get { return ffailuretimedist; } }
+
+        private static void RetrieveFirstYield(ProjectYieldViewModule pyvm, List<ProjectTestData> plist)
+        {
+
+            var yielddict = new Dictionary<string, TestYield>();
+            var sndict = new Dictionary<string, bool>();
+            foreach (var p in plist)
+            {
+                if (!sndict.ContainsKey(p.WhichTest + ":" + p.ModuleSerialNum))
+                {
+                    sndict.Add(p.WhichTest + ":" + p.ModuleSerialNum, true);
+                    if (yielddict.ContainsKey(p.WhichTest))
+                    {
+                        yielddict[p.WhichTest].InputCount = yielddict[p.WhichTest].InputCount + 1;
+                        if (string.Compare(p.ErrAbbr, "PASS", true) == 0)
+                        {
+                            yielddict[p.WhichTest].OutputCount = yielddict[p.WhichTest].OutputCount + 1;
+                        }
+                        else
+                        {
+                            var key = p.TestTimeStamp.ToString("yyyy-MM-dd") + "##" + p.ErrAbbr;
+                            var tempdict = pyvm.FirstYieldFailureTimeDist;
+                            if (tempdict.ContainsKey(key))
+                            {
+                                tempdict[key] = tempdict[key] + 1;
+                            }
+                            else
+                            {
+                                tempdict.Add(key, 1);
+                            }
+                        }
+
+                        RegisterError(p, pyvm.FErrorMap);
+                    }
+                    else
+                    {
+                        var tempyield = new TestYield();
+                        tempyield.InputCount = 1;
+                        if (string.Compare(p.ErrAbbr, "PASS", true) == 0)
+                        {
+                            tempyield.OutputCount = 1;
+                        }
+                        else
+                        { 
+                            tempyield.OutputCount = 0;
+
+                            var key = p.TestTimeStamp.ToString("yyyy-MM-dd") + "##" + p.ErrAbbr;
+                            var tempdict = pyvm.FirstYieldFailureTimeDist;
+                            if (tempdict.ContainsKey(key))
+                            {
+                                tempdict[key] = tempdict[key] + 1;
+                            }
+                            else
+                            {
+                                tempdict.Add(key, 1);
+                            }
+                        }
+
+                        tempyield.WhichTest = p.WhichTest;
+
+                        RegisterError(p, pyvm.FErrorMap);
+                        yielddict.Add(p.WhichTest, tempyield);
+                    }
+                }
+            }
+
+            foreach (var kv in yielddict)
+            {
+                pyvm.FirstYields.Add(kv.Value);
+            }
+
+        }
+
+        private static void RetrieveCummYield(ProjectYieldViewModule pyvm, List<ProjectTestData> plist, ProjectViewModels pvm, string sdate = null, string edate = null)
         {
             var yielddict = new Dictionary<string, TestYield>();
             var sndict = new Dictionary<string, bool>();
@@ -486,11 +592,14 @@ namespace Prometheus.Models
                         yielddict[p.WhichTest].InputCount = yielddict[p.WhichTest].InputCount + 1;
                         if (string.Compare(p.ErrAbbr, "PASS", true) == 0)
                             yielddict[p.WhichTest].OutputCount = yielddict[p.WhichTest].OutputCount + 1;
-                        RegisterError(p.ErrAbbr, p.WhichTest,p.ModuleSerialNum, pyvm.LErrorMap);
+                        RegisterError(p, pyvm.LErrorMap);
                     }
                     else
                     {
                         var tempyield = new TestYield();
+                        tempyield.StartDate = sdate;
+                        tempyield.EndDate = edate;
+
                         tempyield.InputCount = 1;
                         if (string.Compare(p.ErrAbbr, "PASS", true) == 0)
                             tempyield.OutputCount = 1;
@@ -498,7 +607,7 @@ namespace Prometheus.Models
                             tempyield.OutputCount = 0;
                         tempyield.WhichTest = p.WhichTest;
 
-                        RegisterError(p.ErrAbbr, p.WhichTest,p.ModuleSerialNum, pyvm.LErrorMap);
+                        RegisterError(p, pyvm.LErrorMap);
                         yielddict.Add(p.WhichTest, tempyield);
                     }
                 }
@@ -523,6 +632,76 @@ namespace Prometheus.Models
                         pyvm.LastYields.Add(yielddict[s.Station]);
                     }
                 }
+            }
+        }
+
+        private Dictionary<string,int> flfailuretimedist = new Dictionary<string, int>();
+        public Dictionary<string, int> FinalYieldFailureTimeDist { get { return flfailuretimedist; } }
+
+        private static void RetrieveCummYield(ProjectYieldViewModule pyvm, List<ProjectTestData> plist)
+        {
+            var yielddict = new Dictionary<string, TestYield>();
+            var sndict = new Dictionary<string, bool>();
+            foreach (var p in plist)
+            {
+                if (!sndict.ContainsKey(p.WhichTest + ":" + p.ModuleSerialNum))
+                {
+                    sndict.Add(p.WhichTest + ":" + p.ModuleSerialNum, true);
+                    if (yielddict.ContainsKey(p.WhichTest))
+                    {
+                        yielddict[p.WhichTest].InputCount = yielddict[p.WhichTest].InputCount + 1;
+                        if (string.Compare(p.ErrAbbr, "PASS", true) == 0)
+                        {
+                            yielddict[p.WhichTest].OutputCount = yielddict[p.WhichTest].OutputCount + 1;
+                        }
+                        else
+                        {
+                            var key = p.TestTimeStamp.ToString("yyyy-MM-dd") + "##" + p.ErrAbbr;
+                            var tempdict = pyvm.FinalYieldFailureTimeDist;
+                            if (tempdict.ContainsKey(key))
+                            {
+                                tempdict[key] = tempdict[key] + 1;
+                            }
+                            else
+                            {
+                                tempdict.Add(key, 1);
+                            }
+                        }
+
+                        RegisterError(p, pyvm.LErrorMap);
+                    }
+                    else
+                    {
+                        var tempyield = new TestYield();
+                        tempyield.InputCount = 1;
+                        if (string.Compare(p.ErrAbbr, "PASS", true) == 0) { 
+                            tempyield.OutputCount = 1;
+                        }
+                        else{ 
+                            tempyield.OutputCount = 0;
+
+                            var key = p.TestTimeStamp.ToString("yyyy-MM-dd") + "##" + p.ErrAbbr;
+                            var tempdict = pyvm.FinalYieldFailureTimeDist;
+                            if (tempdict.ContainsKey(key))
+                            {
+                                tempdict[key] = tempdict[key] + 1;
+                            }
+                            else
+                            {
+                                tempdict.Add(key, 1);
+                            }
+                        }
+
+                        tempyield.WhichTest = p.WhichTest;
+                        RegisterError(p, pyvm.LErrorMap);
+                        yielddict.Add(p.WhichTest, tempyield);
+                    }
+                }
+            }
+
+            foreach (var kv in yielddict)
+            {
+                pyvm.LastYields.Add(kv.Value);
             }
         }
 
@@ -633,7 +812,7 @@ namespace Prometheus.Models
                     filteredPjData.Add(item);
                 }
             }
-            RetrieveFirstYield(ret, filteredPjData, pvm);
+            RetrieveFirstYield(ret, filteredPjData, pvm,startdate, enddate);
 
 
             filteredPjData2 = new List<ProjectTestData>();
@@ -644,7 +823,7 @@ namespace Prometheus.Models
                     filteredPjData2.Add(item);
                 }
             }
-            RetrieveCummYield(ret, filteredPjData2, pvm);
+            RetrieveCummYield(ret, filteredPjData2, pvm, startdate, enddate);
 
             datatfromstart.Clear();
             previoussnstationdict.Clear();
@@ -662,6 +841,23 @@ namespace Prometheus.Models
                     mycache.Insert(ckey, ret, null, DateTime.Now.AddHours(2), Cache.NoSlidingExpiration);
                 }
             }
+
+            return ret;
+        }
+
+        public static ProjectYieldViewModule GetYieldByTestData(List<ProjectTestData> testdata)
+        {
+            var ret = new ProjectYieldViewModule();
+
+            RetrieveCummYield(ret, testdata);
+
+            var reversedata = new List<ProjectTestData>();
+            var datacount = testdata.Count - 1;
+            for (int idx = datacount; idx >= 0; idx--)
+            {
+                reversedata.Add(testdata[idx]);
+            }
+            RetrieveFirstYield(ret, reversedata);
 
             return ret;
         }
@@ -707,6 +903,10 @@ namespace Prometheus.Models
             var ret = new List<ProjectYieldViewModule>();
 
             var pvm = ProjectViewModels.RetrieveOneProject(pjkey);
+            if (pvm == null)
+            {
+                return ret;
+            }
             var  ldate = RetrieveDateSpanByWeek(pvm.StartDate.ToString(), DateTime.Now.ToString());
 
             var startidx = 0;
@@ -742,7 +942,7 @@ namespace Prometheus.Models
 
             for (int idx = startidx; idx < ldate.Count - 1; idx++)
             {
-                var temp = GetYieldByDateRange(pjkey, ldate[idx].ToString(), ldate[idx + 1].ToString(), pvm,mycache);
+                var temp = GetYieldByDateRange(pjkey, ldate[idx].ToString(), ldate[idx + 1].AddMinutes(-1).ToString(), pvm,mycache);
                 if (temp.RealTimeYields.Count > 0)
                 {
                     ret.Add(temp);
@@ -760,7 +960,7 @@ namespace Prometheus.Models
             var etime = DateTime.Parse(endtime);
 
             var ldate = new List<DateTime>();
-            for (var item = stime; item < etime;)
+            for (var item = stime; item <= etime;)
             {
                 ldate.Add(item);
                 item = item.AddDays(1);

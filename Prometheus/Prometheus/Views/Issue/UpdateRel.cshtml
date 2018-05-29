@@ -2,7 +2,7 @@
 
 @{
     ViewBag.Title = "UpdateRel";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
     var step_idx = 1;
 }
 
@@ -14,6 +14,15 @@ else
     <script type="text/javascript">
             $(document).ready(function () {
                 npireadmode();
+        });
+    </script>
+}
+
+@if (ViewBag.TaskNoticeInfo != null)
+{
+    <script type="text/javascript">
+        $(function(){
+            alert(@Html.Raw(ViewBag.TaskNoticeInfo));
         });
     </script>
 }
@@ -109,6 +118,7 @@ else
 </div>
 
 <script src="../../ckeditor/ckeditor.js"></script>
+<script src="~/Scripts/autocompletefill.js"></script>
 
 @using (Html.BeginForm("UpdateRel", "Issue", FormMethod.Post, new { enctype = "multipart/form-data", id = "issueform", name = "issueform" }))
 {
@@ -126,7 +136,11 @@ else
                             <div class="col-xs-6">
                                 <label class="control-label col-xs-4" for="projectlist">Project</label>
                                 <div class="col-xs-8">
-                                    @Html.DropDownList("projectlist", null, new { @id = "projectlist", @class = "form-control", @readonly = "readonly" })
+                                    <input class="form-control" id="projectlist" name="projectlist"
+                                           type="text" value="@(string.IsNullOrEmpty(Model.ProjectKey)?"":Model.ProjectKey)" readonly />
+                                    <script type="text/javascript">
+                                        autoCompleteFill('projectlist', @Html.Raw(ViewBag.projectlist));
+                                    </script>
                                 </div>
                             </div>
                             <div class="col-xs-6">
@@ -291,7 +305,11 @@ else
                             <div class="col-xs-6">
                                 <label class="control-label col-xs-4" for="assigneelist">Assignee</label>
                                 <div class="col-xs-8">
-                                    @Html.DropDownList("assigneelist", null, new { @id = "assigneelist", @class = "form-control" })
+                                    <input class="form-control" id="assigneelist" name="assigneelist"
+                                           type="text" value="@(string.IsNullOrEmpty(Model.Assignee)?Model.Reporter:Model.Assignee)" />
+                                    <script type="text/javascript">
+                                        autoCompleteFill('assigneelist', @Html.Raw(ViewBag.AllUserList));
+                                    </script>
                                 </div>
                             </div>
                         </div>
@@ -587,13 +605,13 @@ else
         <hr style="border-color:#006DC0;" />
     }
 
-    if (Model != null && Model.FailureVerifyActions.Count > 0)
+    if (Model.ContainmentActionList.Count > 0)
     {
-        <div class="row" data-intro = "Show failure verify actions."  data-step="@(step_idx++)">
-            <div  MYTP="yello"  class="row" style="margin-left:3px">
+        <div class="row" data-intro="Show containment action." data-step="@(step_idx++)">
+            <div MYTP="blue" class="row" style="margin-left:3px">
                 <div class="col-xs-12">
-                    <a data-toggle="collapse" href="#failureverifytasks" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
-                        <font color="black"><strong>&nbsp;&nbsp;Failure Verification</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:auto">
+                    <a data-toggle="collapse" href="#containmentaction" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
+                        <font color="black"><strong>&nbsp;&nbsp;Containment Action</strong></font><font color="red"><strong>*</strong></font>&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
                     </a>
                 </div>
             </div>
@@ -601,89 +619,42 @@ else
                 <div class="col-xs-12">&nbsp;</div>
             </div>
             <div class="row" style="margin-left:10px">
-                <div class="collapse in" id="failureverifytasks">
+                <div class="collapse in" id="containmentaction">
                     <div class="form-group">
                         <div class="row">
                             <div class="col-xs-1"></div>
-                            <div class="col-xs-8">
-                                <div class="well" style="margin-bottom:8px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px;padding-top:4px;padding-bottom:4px">
-                                    <div class="row">
-                                        <div class="col-xs-4">Summary</div>
-                                        <div class="col-xs-2">Status</div>
-                                        <div class="col-xs-2">Asignee</div>
-                                        <div class="col-xs-2">DueDate</div>
-                                        <div class="col-xs-2"></div>
-                                    </div>
-                                    @foreach (var item in Model.FailureVerifyActions)
-                                    {
-                                        <div class="row">
-                                            <div class="col-xs-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace(Prometheus.Models.RELSubIssueType.FAILVERIFYACTION, "")</a></div>
-                                            <div class="col-xs-2">@item.Resolution</div>
-                                            <div class="col-xs-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
-                                            <div class="col-xs-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
-                                            <div class="col-xs-2"></div>
+                            <div class="col-xs-11">
+                                @foreach (var item in Model.ContainmentActionList)
+                                {
+                                    <div class="well" style="margin-bottom:2px;padding-bottom:2px;margin-top:2px;padding-top:2px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px;border-top-width:0px">
+                                        <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                            <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                                <div class="col-xs-6">
+                                                    <div class="col-xs-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd HH:mm:ss")</div>
+                                                    <div class="col-xs-1">
+                                                        <a href="/Issue/ModifyIssueComment?IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
+                                                            <img src="~/Content/images/icon/edit2.png" MYTP="HOVER" style="height:34px; width:24px">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-6"></div>
+                                            </div>
+                                            <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                                <div class="col-xs-1"></div>
+                                                <div class="col-xs-11">@Html.Raw(item.Comment)</div>
+                                            </div>
                                         </div>
-                                    }
-                                </div>
+                                    </div>
+
+                                }
                             </div>
-                            <div class="col-xs-3"></div>
+
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <hr style="border-color:#006DC0;" />
-    }
-
-
-    if (Model != null && Model.ContainmentActions.Count > 0)
-    {
-        <div class="row" data-intro = "Show containment actions."  data-step="@(step_idx++)">
-            <div  MYTP="yello"  class="row" style="margin-left:3px">
-                <div class="col-xs-12">
-                    <a data-toggle="collapse" href="#containmenttasks" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
-                        <font color="black"><strong>&nbsp;&nbsp;Containment Action</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:auto">
-                    </a>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-xs-12">&nbsp;</div>
-            </div>
-            <div class="row" style="margin-left:10px">
-                <div class="collapse in" id="containmenttasks">
-                    <div class="form-group">
-                        <div class="row">
-                            <div class="col-xs-1"></div>
-                            <div class="col-xs-8">
-                                <div class="well" style="margin-bottom:8px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px;padding-top:4px;padding-bottom:4px">
-                                    <div class="row">
-                                        <div class="col-xs-4">Summary</div>
-                                        <div class="col-xs-2">Status</div>
-                                        <div class="col-xs-2">Asignee</div>
-                                        <div class="col-xs-2">DueDate</div>
-                                        <div class="col-xs-2"></div>
-                                    </div>
-                                    @foreach (var item in Model.ContainmentActions)
-                                    {
-                                        <div class="row">
-                                            <div class="col-xs-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace(Prometheus.Models.RELSubIssueType.CONTAINMENTACTION, "")</a></div>
-                                            <div class="col-xs-2">@item.Resolution</div>
-                                            <div class="col-xs-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
-                                            <div class="col-xs-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
-                                            <div class="col-xs-2"></div>
-                                        </div>
-                                    }
-                                </div>
-                            </div>
-                            <div class="col-xs-3"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <hr style="border-color:#006DC0;" />
+            <hr style="border-color:#006DC0;" />
     }
 
     if (Model.RootCauseCommentList.Count > 0)
@@ -744,13 +715,13 @@ else
         <hr style="border-color:#006DC0;" />
     }
 
-    if (Model != null && Model.CorrectiveActions.Count > 0)
+    if (Model.CorrectiveActionList.Count > 0)
     {
-        <div class="row" data-intro = "Show corrective actions."  data-step="@(step_idx++)">
-            <div MYTP="yello"  class="row" style="margin-left:3px">
+        <div class="row" data-intro="Show corrective action." data-step="@(step_idx++)">
+            <div MYTP="blue" class="row" style="margin-left:3px">
                 <div class="col-xs-12">
-                    <a data-toggle="collapse" href="#correctivetasks" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
-                        <font color="black"><strong>&nbsp;&nbsp;Corrective Action</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:auto">
+                    <a data-toggle="collapse" href="#correctiveaction" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
+                        <font color="black"><strong>&nbsp;&nbsp;Corrective Action</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:14px">
                     </a>
                 </div>
             </div>
@@ -758,90 +729,43 @@ else
                 <div class="col-xs-12">&nbsp;</div>
             </div>
             <div class="row" style="margin-left:10px">
-                <div class="collapse in" id="correctivetasks">
+                <div class="collapse in" id="correctiveaction">
                     <div class="form-group">
                         <div class="row">
                             <div class="col-xs-1"></div>
-                            <div class="col-xs-8">
-                                <div class="well" style="margin-bottom:8px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px;padding-top:4px;padding-bottom:4px">
-                                    <div class="row">
-                                        <div class="col-xs-4">Summary</div>
-                                        <div class="col-xs-2">Status</div>
-                                        <div class="col-xs-2">Asignee</div>
-                                        <div class="col-xs-2">DueDate</div>
-                                        <div class="col-xs-2"></div>
-                                    </div>
-                                    @foreach (var item in Model.CorrectiveActions)
-                                    {
-                                        <div class="row">
-                                            <div class="col-xs-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace(Prometheus.Models.RELSubIssueType.CORRECTIVEACTION, "")</a></div>
-                                            <div class="col-xs-2">@item.Resolution</div>
-                                            <div class="col-xs-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
-                                            <div class="col-xs-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
-                                            <div class="col-xs-2"></div>
+                            <div class="col-xs-11">
+                                @foreach (var item in Model.CorrectiveActionList)
+                                {
+                                    <div class="well" style="margin-bottom:2px;padding-bottom:2px;margin-top:2px;padding-top:2px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px;border-top-width:0px">
+                                        <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                            <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                                <div class="col-xs-6">
+                                                    <div class="col-xs-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd HH:mm:ss")</div>
+                                                    <div class="col-xs-1">
+                                                        <a href="/Issue/ModifyIssueComment?IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
+                                                            <img src="~/Content/images/icon/edit2.png" MYTP="HOVER" style="height:34px; width:24px">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-6"></div>
+                                            </div>
+                                            <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
+                                                <div class="col-xs-1"></div>
+                                                <div class="col-xs-11">@Html.Raw(item.Comment)</div>
+                                            </div>
                                         </div>
-                                    }
-                                </div>
+                                    </div>
+
+                                }
                             </div>
-                            <div class="col-xs-3"></div>
+
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
         <hr style="border-color:#006DC0;" />
     }
-
-    if (Model != null && Model.CorrectiveVerifyActions.Count > 0)
-    {
-        <div class="row" data-intro = "Show corrctive verify actions."  data-step="@(step_idx++)">
-            <div MYTP="yello"  class="row" style="margin-left:3px">
-                <div class="col-xs-12">
-                    <a data-toggle="collapse" href="#correctiveverifytasks" aria-expanded="false" aria-controls="collapseExample" style="font-size:18px;font-family:'Arial Narrow';">
-                        <font color="black"><strong>&nbsp;&nbsp;Corrective/Preventive Verification</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;<img src="~/Content/images/icon/extend.png" style="height:25px; width:auto">
-                    </a>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-xs-12">&nbsp;</div>
-            </div>
-            <div class="row" style="margin-left:10px">
-                <div class="collapse in" id="correctiveverifytasks">
-                    <div class="form-group">
-                        <div class="row">
-                            <div class="col-xs-1"></div>
-                            <div class="col-xs-8">
-                                <div class="well" style="margin-bottom:8px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px;padding-top:4px;padding-bottom:4px">
-                                    <div class="row">
-                                        <div class="col-xs-4">Summary</div>
-                                        <div class="col-xs-2">Status</div>
-                                        <div class="col-xs-2">Asignee</div>
-                                        <div class="col-xs-2">DueDate</div>
-                                        <div class="col-xs-2"></div>
-                                    </div>
-                                    @foreach (var item in Model.CorrectiveVerifyActions)
-                                    {
-                                        <div class="row">
-                                            <div class="col-xs-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace(Prometheus.Models.RELSubIssueType.VERIFYCORRECTIVEACTION, "")</a></div>
-                                            <div class="col-xs-2">@item.Resolution</div>
-                                            <div class="col-xs-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
-                                            <div class="col-xs-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
-                                            <div class="col-xs-2"></div>
-                                        </div>
-                                    }
-                                </div>
-                            </div>
-                            <div class="col-xs-3"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <hr style="border-color:#006DC0;" />
-    }
-
 
     if (Model.GeneralCommentList.Count > 0)
     {
@@ -864,11 +788,13 @@ else
                             <div class="col-xs-11">
                                 @foreach (var item in Model.GeneralCommentList)
                                 {
+                                    var reporter = "@" + item.Reporter.Split(new char[] { '@' })[0];
+
                                     <div class="well" MYTP="HOVER" style="margin-bottom:2px;padding-bottom:2px;margin-top:2px;padding-top:2px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px;border-top-width:0px">
                                         <div class="row" MYTP="HOVER" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
                                             <div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">
                                                 <div class="col-xs-6">
-                                                    <div class="col-xs-10"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd HH:mm:ss")</div>
+                                                    <div class="col-xs-9"><a href="/User/UserCenter?username=@item.Reporter">@item.Reporter.Split(new char[] { '@' })[0]</a>&nbsp;&nbsp;@item.CommentDate.ToString("yyyy-MM-dd HH:mm:ss")</div>
                                                     <div class="col-xs-1">
                                                         <a href="/Issue/ModifyIssueComment?IssueKey=@(item.IssueKey)&CommentType=@(item.CommentType)&Date=@(item.CommentDate.ToString())">
                                                             <img src="~/Content/images/icon/edit2.png" MYTP="HOVER" style="height:34px; width:auto">
@@ -879,6 +805,7 @@ else
                                                             <img src="~/Content/images/icon/delete2.png" MYTP="HOVER" style="height:34px; width:24px">
                                                         </a>
                                                     </div>
+                                                    <div class="col-xs-1"><input class="btn btn-success" type="button" value="Reply" onclick="SetReplyPeople('@reporter')" /></div>
                                                 </div>
                                                 <div class="col-xs-6"></div>
                                             </div>
@@ -1176,13 +1103,11 @@ else
                                     <label class="control-label">To Who</label>
                                 </div>
                                 <div class="col-xs-9">
-                                    @Html.DropDownList("towholist", null, new { @id = "towholist", @class = "form-control", @onchange = "chooseapusher()" })
+                                    <input class="form-control" id="towholist" name="towholist"
+                                           type="text" value="" />
                                 </div>
                                 <script type="text/javascript">
-                                    function chooseapusher()
-                                    {
-                                        document.getElementById("towhoinput").value = document.getElementById("towhoinput").value + ';' + document.getElementById("towholist").value;
-                                    }
+                                    autoCompleteFill('towholist', @Html.Raw(ViewBag.AllUserList), true, 'towhoinput');
                                 </script>
                             </div>
                             <hr />
@@ -1224,13 +1149,11 @@ else
                                     <label class="control-label">To Who</label>
                                 </div>
                                 <div class="col-xs-9">
-                                    @Html.DropDownList("towholist1", null, new { @id = "towholist1", @class = "form-control", @onchange = "chooseapusher1()" })
+                                    <input class="form-control" id="towholist1" name="towholist1"
+                                           type="text" value="" />
                                 </div>
                                 <script type="text/javascript">
-                            function chooseapusher1()
-                            {
-                                document.getElementById("towhoinput1").value = document.getElementById("towhoinput1").value + ';' + document.getElementById("towholist1").value;
-                            }
+                                    autoCompleteFill('towholist1', @Html.Raw(ViewBag.AllUserList), true, 'towhoinput1');
                                 </script>
                             </div>
                             <hr />

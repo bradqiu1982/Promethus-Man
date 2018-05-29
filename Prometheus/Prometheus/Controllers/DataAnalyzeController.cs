@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Prometheus.Models;
+using System.Text;
 
 namespace Prometheus.Controllers
 {
@@ -76,6 +77,1728 @@ namespace Prometheus.Controllers
             return pslist;
         }
 
+        public ActionResult VcselRMA(string rate)
+        {
+            var defval = " ";
+            if (!string.IsNullOrEmpty(rate))
+            { defval = rate; }
+
+            var rlist = VcselRMAData.RetrieveVcselType();
+            var ratelist = new List<string>();
+            ratelist.Add(" ");
+            ratelist.AddRange(rlist);
+
+            ViewBag.vcselratelist = CreateSelectList(ratelist, defval);
+
+            return View();
+        }
+
+        public JsonResult VcselRMADppmData()
+        {
+            var rate = Request.Form["rate"];
+            var dppmlist = VcselRMASum.RetrieveVcselDPPM(rate);
+
+            var xdatalist = new List<string>();
+            var dppmdatalist = new List<double>();
+            var shippeddatalist = new List<double>();
+            foreach (var dppm in dppmlist)
+            {
+                xdatalist.Add(dppm.Wafer);
+                dppmdatalist.Add(dppm.DPPM);
+                shippeddatalist.Add(dppm.ShippedQty);
+            }
+
+            var xAxis = new {
+                data = xdatalist
+            };
+            var yAxis = new {
+                title = "Dppm"
+            };
+            var dppmdata = new {
+                name = "Dppm",
+                color = "#5CB85C",
+                data = dppmdatalist
+            };
+            var shipdata = new {
+                name = "Shipped",
+                color = "#12CC92",
+                data = shippeddatalist
+            };
+            var alldata = new {
+                data = dppmdata,
+                cdata = shipdata
+            };
+            var dppmline = new {
+                id = "vcsel_dppm",
+                title = "Vcsel RMA Dppm",
+                xAxis = xAxis,
+                yAxis = yAxis,
+                data = alldata
+            };
+
+            var ret = new JsonResult();
+            ret.Data = new {
+                success = true,
+                dppmline = dppmline
+            };
+            return ret;
+        }
+
+        public JsonResult RetrieveVcselRMARawData()
+        {
+            var wafer = Request.Form["wafer"];
+            var waferdatalist = VcselRMAData.RetrieveWaferRawData(wafer);
+            var ret = new JsonResult();
+            ret.Data = new { waferdatalist = waferdatalist };
+            return ret;
+        }
+
+        public JsonResult VcselRMAMileStoneData(string datetype)
+        {
+            var combinexdict = new Dictionary<string, bool>();
+            var retdata = new List<object>();
+            var id = "vcsel_milestone";
+            var title = "Vcsel RMA Statistic By Build Month";
+            if (!string.IsNullOrEmpty(datetype) && datetype.ToUpper().Contains("SHIPDATE"))
+            {
+                retdata = VcselRMASum.VcselRMAMileStoneDataByShipDate();
+                id = "vcsel_milestone_ship";
+                title = "Vcsel RMA Statistic By Ship Month";
+            }
+            else
+            {
+                retdata = VcselRMASum.VcselRMAMileStoneDataByBuildDate();
+                id = "vcsel_milestone";
+                title = "Vcsel RMA Statistic By Build Month";
+            }
+
+
+            //dict<month,dict<rate,count>>
+            var monthlyrma = (Dictionary<string, Dictionary<string, int>>)retdata[0];
+            var milestonedata = (List<EngineeringMileStone>)retdata[1];
+            var vratecolordict = (Dictionary<string, string>)retdata[2];
+
+
+            var vratelist = vratecolordict.Keys.ToList();
+            vratelist.Sort();
+
+            foreach (var item in monthlyrma)
+            {
+                if (!combinexdict.ContainsKey(item.Key))
+                { combinexdict.Add(item.Key,true); }
+            }
+
+            var milestonedict = new Dictionary<string, string>();
+            foreach (var item in milestonedata)
+            {
+                var month = item.ActionDate.ToString("yyyy-MM");
+                if (!combinexdict.ContainsKey(month))
+                { combinexdict.Add(month, true); }
+
+                if (milestonedict.ContainsKey(month))
+                {
+                    milestonedict[month] = milestonedict[month] + "<br/>" + item.Location + "_" + item.ActionDetail;
+                }
+                else
+                {
+                    milestonedict.Add(month, item.Location + "_" + item.ActionDetail);
+                }
+            }
+
+
+            var combinxlist = combinexdict.Keys.ToList();
+            combinxlist.Sort();
+
+            //dict<rate,countlist>
+            var ratecountbydate = new Dictionary<string, List<int>>();
+            var maxrmacount = 0;
+            //get rate count list of each date
+            foreach (var date in combinxlist)
+            {
+                if (monthlyrma.ContainsKey(date))
+                {
+                    var ratedict = monthlyrma[date];
+                    var datecount = 0;
+                    foreach (var ratekv in ratedict)
+                    {
+                        if (ratecountbydate.ContainsKey(ratekv.Key))
+                        {
+                            ratecountbydate[ratekv.Key].Add(ratekv.Value);
+                            datecount += ratekv.Value;
+                        }
+                        else
+                        {
+                            var templist = new List<int>();
+                            templist.Add(ratekv.Value);
+                            ratecountbydate.Add(ratekv.Key, templist);
+                            datecount += ratekv.Value;
+                        }
+                    }
+
+                    if (datecount > maxrmacount) { maxrmacount = datecount; }
+                }
+                else
+                {
+                    foreach (var rate in vratelist)
+                    {
+                        if (ratecountbydate.ContainsKey(rate))
+                        {
+                            ratecountbydate[rate].Add(0);
+                        }
+                        else
+                        {
+                            var templist = new List<int>();
+                            templist.Add(0);
+                            ratecountbydate.Add(rate, templist);
+                        }
+                    }
+                }
+            }//end foreach
+
+            maxrmacount = maxrmacount + 1;
+
+
+            //construct milestone data array
+            var idx = 0;
+            var milestoneinfoarray = new List<object>();
+            foreach (var date in combinxlist)
+            {
+                if (milestonedict.ContainsKey(date))
+                {
+                    milestoneinfoarray.Add(new {
+                        x = idx,
+                        y = maxrmacount,
+                        name = milestonedict[date]
+                    });
+                }
+                idx = idx + 1;
+            }
+            //construct milestone struct
+            var mstmarker = new
+            {
+                radius = 6,
+                symbol = "circle",
+                fillColor = "#fff",
+                lineColor = "#ffc000",
+                lineWidth = 2
+            };
+            var msttooltip = new
+            {
+                useHTML = true,
+                headerFormat = "<span style='font-size: 10px'>{point.x}</span><br/>",
+                pointFormat = "{point.name}"
+            };
+
+            var mstseria = new
+            {
+                type = "scatter",
+                name = "Milestone",
+                marker = mstmarker,
+                tooltip = msttooltip,
+                data = milestoneinfoarray
+            };
+
+
+            //construct vcsel rate column data
+            var serialarray = new List<object>();
+            foreach (var rate in vratelist)
+            {
+                serialarray.Add(new {
+                    name = rate,
+                    color = vratecolordict[rate],
+                    data = ratecountbydate[rate]
+                });
+            }
+            serialarray.Add(mstseria);
+
+            var allx = new { data = combinxlist };
+            var ally = new { title = "Amount" };
+            var time = new {
+                name = "Milestone",
+                color = "#F0AD4E",
+                data = maxrmacount
+            };
+
+            var vcsel_milestone = new {
+                id = id,
+                title = title,
+                coltype = "normal",
+                xAxis = allx,
+                yAxis = ally,
+                time = time,
+                data = serialarray
+            };
+
+            var ret = new JsonResult();
+            ret.Data = new
+            {
+                success = true,
+                vcsel_milestone = vcsel_milestone
+            };
+            return ret;
+        }
+
+        public static int DaysToMonth(double days)
+        {
+            var ret = 3;
+            if (days <= 90)
+                ret = 3;
+            else if (days > 90 && days <= 180)
+                ret = 6;
+            else if (days > 180 && days <= 360)
+                ret = 12;
+            else if (days > 360 && days <= 540)
+                ret = 18;
+            else if (days > 540 && days <= 720)
+                ret = 24;
+            else if (days > 720 && days <= 900)
+                ret = 30;
+            else if (days > 900 && days <= 1080)
+                ret = 36;
+            else if (days > 1080)
+                ret = 48;
+
+            return ret;
+        }
+
+        public JsonResult VcselVSTimeData()
+        {
+            //<month,<type,count>>
+            var rmavsshipdate = new Dictionary<string, Dictionary<string, int>>();
+            //<type,sumlist>
+            var typesumlist = new Dictionary<string, List<double>>();
+            //<type,countlist>
+            var typecntlist = new Dictionary<string, List<int>>();
+
+            var alldata = VcselRMAData.RetrievAllDataASC();
+            var typedict = new Dictionary<string, bool>();
+            var monthxlist = (new string[] {"3","6","12","18","24","30","36","48" }).ToList();
+
+            foreach (var item in alldata)
+            {
+                if (!typedict.ContainsKey(item.VcselType))
+                {
+                    typedict.Add(item.VcselType, true);
+                }
+
+                try
+                {
+                    var rdate = DateTime.Parse(item.RMAOpenDate);
+                    var sdate = DateTime.Parse(item.ShipDate);
+                    var vsmonth = DaysToMonth((rdate - sdate).TotalDays).ToString();
+                    if (rmavsshipdate.ContainsKey(vsmonth))
+                    {
+                        var temptypedict = rmavsshipdate[vsmonth];
+                        temptypedict["ALL_TYPE"] = temptypedict["ALL_TYPE"] + 1;
+                        if (temptypedict.ContainsKey(item.VcselType))
+                        {
+                            temptypedict[item.VcselType] = temptypedict[item.VcselType] + 1;
+                        }
+                        else
+                        {
+                            temptypedict.Add(item.VcselType,1);
+                        }
+                    }
+                    else
+                    {
+                        var temptypedict = new Dictionary<string,int>();
+                        temptypedict.Add("ALL_TYPE",1);
+                        temptypedict.Add(item.VcselType, 1);
+                        rmavsshipdate.Add(vsmonth, temptypedict);
+                    }
+                }
+                catch (Exception ex) { }
+            }//end foreach
+
+            typedict.Add("ALL_TYPE", true);
+
+            //fill the whole struct
+            foreach (var m in monthxlist)
+            {
+                if (rmavsshipdate.ContainsKey(m))
+                {
+                    var rmaship = rmavsshipdate[m];
+                    foreach (var t in typedict)
+                    {
+                        if (!rmaship.ContainsKey(t.Key))
+                        {
+                            rmaship.Add(t.Key, 0);
+                        }
+                    }
+                }
+                else
+                {
+                    var temptypedict = new Dictionary<string, int>();
+                    foreach (var t in typedict)
+                    {
+                        temptypedict.Add(t.Key, 0);
+                    }
+                    rmavsshipdate.Add(m, temptypedict);
+                }
+            }
+
+
+            foreach (var m in monthxlist)
+            {
+                //has data of this month
+                var temptypedict = rmavsshipdate[m];
+                foreach (var t in typedict)
+                {
+                    if (typesumlist.ContainsKey(t.Key))
+                    {
+                        var tempsumlist = typesumlist[t.Key];
+                        if (tempsumlist.Count == 0)
+                        {
+                            tempsumlist.Add(temptypedict[t.Key]);
+                        }
+                        else
+                        {
+                            var lastval = tempsumlist[tempsumlist.Count - 1]+ temptypedict[t.Key];
+                            tempsumlist.Add(lastval);
+                        }
+                    }
+                    else
+                    {
+                        var tempsumlist = new List<double>();
+                        tempsumlist.Add(temptypedict[t.Key]);
+                        typesumlist.Add(t.Key, tempsumlist);
+                    }
+
+                    if (!typecntlist.ContainsKey(t.Key))
+                    {
+                        var tempcntlist = new List<int>();
+                        tempcntlist.Add(temptypedict[t.Key]);
+                        typecntlist.Add(t.Key, tempcntlist);
+                    }
+                    else
+                    {
+                        typecntlist[t.Key].Add(temptypedict[t.Key]);
+                    }
+                }//end foreach
+            }//end foreach
+            
+            var rmashipchartdata = new List<object>();
+            foreach (var kv in typecntlist)
+            {
+                rmashipchartdata.Add(new {
+                    name = kv.Key+" Failure",
+                    data = kv.Value
+                });
+            }
+
+            var rmaaccudata = new List<object>();
+            foreach (var kv in typesumlist)
+            {
+                var last = kv.Value.Last();
+                if (last != 0.0)
+                {
+                    var templist = new List<double>();
+                    foreach (var c in kv.Value)
+                    {
+                        templist.Add(Math.Round(c / last * 100.0, 2));
+                    }
+                    rmaaccudata.Add(new
+                    {
+                        name = kv.Key + " accu",
+                        data = templist
+                    });
+                }
+            }
+
+            var sxaxisdata = new List<string>();
+            for (var midx=0;midx < monthxlist.Count;midx++)
+            {
+                if (midx == 0)
+                    sxaxisdata.Add("in " + monthxlist[midx] + " M");
+                else
+                    sxaxisdata.Add("From " + monthxlist[midx - 1] + " To " + monthxlist[midx] + " M");
+            }
+
+            var cxaxisdata = new List<string>();
+            for (var midx = 0; midx < monthxlist.Count; midx++)
+            {
+                cxaxisdata.Add("in " + monthxlist[midx] + " M");
+            }
+
+            var ret = new JsonResult();
+            ret.Data = new {
+                success = true,
+                shipdatedata = new {
+                    id = "rmavshipdate",
+                    title = "VCSEL RMA Failure vs Ship Date",
+                    xaxis = sxaxisdata,
+                    data = rmashipchartdata
+                },
+                accumulatedata = new {
+                    id = "rmaaccumulatedata",
+                    title = "VCSEL RMA Accumulate Failure Rate vs Time",
+                    xaxis = cxaxisdata,
+                    data = rmaaccudata
+                }
+            };
+            return ret;
+        }
+
+        public ActionResult MonthlyVcsel()
+        {
+            var vcseltypelist = VcselBGDVM.VcselTypeList();
+            ViewBag.vcseltypeselectlist = CreateSelectList(vcseltypelist, "");
+
+
+            return View();
+        }
+
+        public JsonResult MonthlyVcselYield()
+        {
+            var ssdate = Request.Form["sdate"];
+            var sedate = Request.Form["edate"];
+
+            var vtype = Request.Form["wf_type"];
+            var startdate = DateTime.Now;
+            var enddate = DateTime.Now;
+
+
+            if (!string.IsNullOrEmpty(ssdate) && !string.IsNullOrEmpty(sedate))
+            {
+                var sdate = DateTime.Parse(Request.Form["sdate"]);
+                var edate = DateTime.Parse(Request.Form["edate"]);
+                if (sdate < edate)
+                {
+                    startdate = DateTime.Parse(sdate.ToString("yyyy-MM") + "-01 00:00:00");
+                    enddate = DateTime.Parse(edate.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(1).AddDays(-1);
+                }
+                else
+                {
+                    startdate = DateTime.Parse(edate.ToString("yyyy-MM") + "-01 00:00:00");
+                    enddate = DateTime.Parse(sdate.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(1).AddDays(-1);
+                }
+            }
+            else
+            {
+                startdate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(-6);
+                enddate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM") + "-01 00:00:00").AddDays(-1);
+            }
+
+
+            var yieldarray = new List<object>();
+            var failurearray = new List<object>();
+
+            var retdata = VcselBGDVM.RetrieveVcselMonthlyData(startdate, enddate, vtype);
+            var testylist = (List<testtypeyield>)retdata[0];
+            var testflist = (List<TestFailureColumn>)retdata[1];
+
+            foreach (var item in testylist)
+            {
+                if (item.DYield.Count > 0)
+                {
+                    var id = "y_" + item.TestType.Replace(" ", "_") + "_id";
+
+                    var lastdidx = item.DYield.Count - 1;
+                    var title = Convert.ToDateTime(item.DYield[0].date).ToString("yyyy/MM") + " ~ " +Convert.ToDateTime(item.DYield[lastdidx].date).ToString("yyyy/MM") + " VCSEL Yield (" +item.TestType+ ")";
+
+                    var xdata = new List<string>();
+                    var ydata = new List<double>();
+                    var cydata = new List<double>();
+                    foreach (var dy in item.DYield)
+                    {
+                        xdata.Add(Convert.ToDateTime(dy.date).ToString("yyyy/MM"));
+                        ydata.Add(Math.Round(dy.yield, 2));
+                        cydata.Add(dy.totle);
+                    }
+
+                    var xAxis = new { data = xdata };
+
+                    var yAxis = new
+                    {
+                        title = "Yield (%)",
+                        min = 85.0,
+                        max = 100.0
+                    };
+
+                    var min = new
+                    {
+                        name = "Min",
+                        color= "#F0AD4E",
+                        data=94,
+                        style= "dash"
+                    };
+
+                    var max = new
+                    {
+                        name = "Max",
+                        color = "#C9302C",
+                        data = 98,
+                        style = "solid"
+                    };
+
+                    var data = new
+                    {
+                        name = "Yield",
+                        color = "#ffa500",
+                        data = ydata
+                    };
+
+                    var combinedata = new {
+                        min = min,
+                        max = max,
+                        data = data
+                    };
+
+                    var cdata = new
+                    {
+                        name = "Test Modules",
+                        data = cydata
+                    };
+
+                    yieldarray.Add(new
+                    {
+                        id = id,
+                        title = title,
+                        xAxis = xAxis,
+                        yAxis = yAxis,
+                        data = combinedata,
+                        cdata = cdata
+                    });
+                }
+            }
+
+            foreach(var item in testflist)
+            {
+                if(item.DateColSeg.Count > 0)
+                {
+                    var id = "f_" + item.TestType.Replace(" ", "_") + "_id";
+
+                    var lastdidx = item.DateColSeg.Count - 1;
+                    var title = Convert.ToDateTime(item.DateColSeg[0].xkey).ToString("yyyy/MM") + " ~ " + Convert.ToDateTime(item.DateColSeg[lastdidx].xkey).ToString("yyyy/MM") + " Faliure Mode (" + item.TestType + ")";
+                    var xdata = new List<string>();
+                    var ydata = new List<FailureColumnData>();
+                    var count = 0;
+                    foreach (var f_item in item.DateColSeg)
+                    {
+                        xdata.Add(Convert.ToDateTime(f_item.xkey).ToString("yyyy/MM"));
+                        count = (f_item.DateColSeg.Count > count) ? f_item.DateColSeg.Count : count;
+                    }
+                    var num = item.DateColSeg.Count;
+                    var n = 1;
+                    for(var i = count - 1; i >= 0; i--)
+                    {
+                        var ydata_tmp = new List<FailureColumnSeg>();
+                        for(var m = 0; m < num; m++)
+                        {
+                            if (i < item.DateColSeg[m].DateColSeg.Count)
+                            {
+                                ydata_tmp.Add(item.DateColSeg[m].DateColSeg[i]);
+                            }
+                            else
+                            {
+                                var tempvm = new FailureColumnSeg();
+                                tempvm.name = "";
+                                tempvm.y = 0;
+                                tempvm.color = "#000";
+                                ydata_tmp.Add(tempvm);
+                            }
+                        }
+                        ydata.Add(new FailureColumnData() { index = n, data = ydata_tmp });
+                        n++;
+                    }
+                    var xAxis = new { data = xdata };
+
+                    var yAxis = new
+                    {
+                        title = "(%)",
+                        min = 0.0,
+                        max = 100.0
+                    };
+
+                    failurearray.Add(new
+                    {
+                        id = id,
+                        coltype = "normal",
+                        title = title,
+                        xAxis = xAxis,
+                        yAxis = yAxis,
+                        data = ydata
+                    });
+                }
+            }
+
+            var ret = new JsonResult();
+            ret.Data = new { success = true,
+                yieldarray = yieldarray,
+                failurearray = failurearray,
+                colors = retdata[2],
+            };
+            return ret;
+        }
+
+        public ActionResult WaferDistribution(string defaultwafer)
+        {
+            var vcseltypelist = VcselBGDVM.VcselTypeList();
+
+            var nvcseltypelist = new List<string>();
+            nvcseltypelist.Add(" ");
+            nvcseltypelist.AddRange(vcseltypelist);
+
+            ViewBag.vcseltypeselectlist = CreateSelectList(nvcseltypelist, "");
+
+            var mathlist = new List<string>();
+            mathlist.Add("Only Pass Data");
+            mathlist.Add("Math Rectification");
+            mathlist.Add("No Rectification");
+            
+            ViewBag.mathrectlist = CreateSelectList(mathlist, "");
+
+            ViewBag.DefaultWafer = "";
+            if (!string.IsNullOrEmpty(defaultwafer))
+            { ViewBag.DefaultWafer = defaultwafer; }
+
+            return View();
+        }
+
+        public JsonResult WaferNumAutoCompelete()
+        {
+            var vlist = VcselBGDVM.WaferNOList();
+            var ret = new JsonResult();
+            ret.Data = new { data = vlist };
+            return ret;
+        }
+
+        public JsonResult WaferDistributionData() {
+            var wf_no = Request.Form["wf_no"];
+            var vtype = Request.Form["wf_type"].Trim();
+            var math_rect = Request.Form["math_rect"];
+
+            var wflist = new List<string>();
+            if (!string.IsNullOrEmpty(wf_no))
+            {
+                wflist.AddRange(wf_no.Split(new string[] { ",",";"," " }, StringSplitOptions.RemoveEmptyEntries));
+            }
+            else
+            {
+                var sdate = DateTime.Parse(Request.Form["sdate"]);
+                var edate = DateTime.Parse(Request.Form["edate"]);
+                var startdate = DateTime.Now;
+                var enddate = DateTime.Now;
+                if (sdate < edate)
+                {
+                    startdate = DateTime.Parse(sdate.ToString("yyyy-MM") + "-01 00:00:00");
+                    enddate = DateTime.Parse(edate.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(1).AddDays(-1);
+                }
+                else
+                {
+                    startdate = DateTime.Parse(edate.ToString("yyyy-MM") + "-01 00:00:00");
+                    enddate = DateTime.Parse(sdate.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(1).AddDays(-1);
+                }
+
+                wflist.AddRange(VcselTimeRange.RetrieveWafer(startdate,enddate));
+            }
+
+            if (wflist.Count > 0)
+            {
+                
+                var poldlowlimit = 0.0;
+                var poldhighlimit = 0.0;
+                var poulowlimit = 0.0;
+                var pouhighlimit = 0.0;
+                var vlowlimit = 0.0;
+                var vhighlimit = 0.0;
+                var ulowlimit = 0.0;
+                var uhighlimit = 0.0;
+
+                if (math_rect.ToUpper().Contains("MATH")){
+                    var glbcfg = CfgUtility.GetSysConfig(this);
+                    poldlowlimit = Convert.ToDouble(glbcfg["Plot_Delta_PO_LD_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+                    poldhighlimit = Convert.ToDouble(glbcfg["Plot_Delta_PO_LD_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
+                    poulowlimit = Convert.ToDouble(glbcfg["Plot_Delta_PO_Uniformity_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+                    pouhighlimit = Convert.ToDouble(glbcfg["Plot_Delta_PO_Uniformity_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
+                    vlowlimit = Convert.ToDouble(glbcfg["Plot_Variation_POLD_Delta_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+                    vhighlimit = Convert.ToDouble(glbcfg["Plot_Variation_POLD_Delta_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
+                    ulowlimit = Convert.ToDouble(glbcfg["Plot_Uniformity_POLD_Delta_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+                    uhighlimit = Convert.ToDouble(glbcfg["Plot_Uniformity_POLD_Delta_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
+                }
+                else {
+                    poldlowlimit = -9999.0;
+                    poldhighlimit = 9999.0;
+                    poulowlimit = -9999.0;
+                    pouhighlimit = 9999.0;
+                    vlowlimit = -9999.0;
+                    vhighlimit = 9999.0;
+                    ulowlimit = -9999.0;
+                    uhighlimit = 9999.0;
+
+                }
+
+                bool withfaileddata = true;
+                if (math_rect.ToUpper().Contains("ONLY PASS DATA"))
+                {
+                    withfaileddata = false;
+                }
+
+                var retdata = VcselBGDVM.RetrieveWaferData(wflist, withfaileddata, vtype,true);
+
+                //fieldname,wafer,boxlist
+                var fieldboxlist = (Dictionary<string, Dictionary<string, List<string>>>)retdata[0];
+                var testflist = (List<TestFailureColumn>)retdata[1];
+
+                //var fieldrawlist = (Dictionary<string, Dictionary<string, List<string>>>)retdata[3];
+
+                var yieldarray = new List<object>();
+                var boxarray = new List<object>();
+                var failurearray = new List<object>();
+
+                var xwaferlist = new List<string>();
+                var xwaferdict = new Dictionary<string, bool>();
+
+                foreach (var item in testflist)
+                {
+                    if (item.DateColSeg.Count > 0)
+                    {
+                        var id = "f_yield_" + item.TestType.Replace(" ", "_") + "_id";
+                        var title = item.TestType + " Wafer Yield";
+
+                        var xdata = new List<string>();
+                        var ydata = new List<double>();
+                        var cydata = new List<double>();
+
+                        var count = 0;
+                        foreach (var f_item in item.DateColSeg)
+                        {
+                            xdata.Add(f_item.xkey);
+                            if (!xwaferdict.ContainsKey(f_item.xkey))
+                            {
+                                xwaferlist.Add(f_item.xkey);
+                                xwaferdict.Add(f_item.xkey, true);
+                            }
+
+                            count = (f_item.DateColSeg.Count > count) ? f_item.DateColSeg.Count : count;
+                        }
+
+                        foreach (var wfitem in item.DateColSeg)
+                        {
+                            var failpercent = 0.0;
+                            foreach (var fitem in wfitem.DateColSeg)
+                            {
+                                failpercent = failpercent + fitem.y;
+                            }
+                            ydata.Add(100.0 - failpercent);
+                            cydata.Add(wfitem.total);
+                        }
+
+
+                        var xAxis = new { data = xdata };
+
+                        var yAxis = new
+                        {
+                            title = "Yield (%)",
+                            min = 85.0,
+                            max = 100.0
+                        };
+
+                        var min = new
+                        {
+                            name = "Min",
+                            color = "#F0AD4E",
+                            data = 94,
+                            style = "dash"
+                        };
+
+                        var max = new
+                        {
+                            name = "Max",
+                            color = "#C9302C",
+                            data = 98,
+                            style = "solid"
+                        };
+
+                        var data = new
+                        {
+                            name = "Yield",
+                            color = "#ffa500",
+                            data = ydata
+                        };
+
+                        var combinedata = new
+                        {
+                            min = min,
+                            max = max,
+                            data = data
+                        };
+
+                        var cdata = new
+                        {
+                            name = "Test Modules",
+                            data = cydata
+                        };
+
+                        yieldarray.Add(new
+                        {
+                            id = id,
+                            title = title,
+                            xAxis = xAxis,
+                            yAxis = yAxis,
+                            data = combinedata,
+                            cdata = cdata
+                        });
+                    }//end if
+                }//end foreach
+
+
+                foreach (var fieldkv in fieldboxlist)
+                {
+                    var fieldname = fieldkv.Key;
+                    var xaxisdata = new List<string>();
+
+                    var ldatadata = new List<List<double>>();
+                    var llinedata = new List<double>();
+
+                    var rdatadata = new List<List<double>>();
+                    var rlinedata = new List<double>();
+
+                    //foreach (var wfkv in fieldkv.Value)
+                    foreach(var x in xwaferlist)
+                    {
+                        //var wf = wfkv.Key;
+                        //xaxisdata.Add(wf);
+                        //foreach (var box in wfkv.Value)
+
+                        if (!fieldkv.Value.ContainsKey(x)) continue;
+
+                        var wf = x;
+                        xaxisdata.Add(wf);
+                        var boxdict = fieldkv.Value[x];
+                        foreach(var box in boxdict)
+                        {
+                            if (box.Contains("#V"))
+                            {
+                                var cbox = (CBOXData)Newtonsoft.Json.JsonConvert.DeserializeObject(box.Replace("#V",""), (new CBOXData()).GetType());
+                                var tempdd = new List<double>();
+                                tempdd.Add((cbox.min < vlowlimit) ? vlowlimit : Math.Round(cbox.min, 4));
+                                tempdd.Add(Math.Round(cbox.lower, 4));
+                                tempdd.Add(Math.Round(cbox.mean, 4));
+                                tempdd.Add(Math.Round(cbox.upper, 4));
+                                tempdd.Add((cbox.max > vhighlimit) ? vhighlimit : Math.Round(cbox.max, 4));
+                                ldatadata.Add(tempdd);
+                                llinedata.Add(Math.Round(cbox.mean, 4));
+                            }
+                            else if (box.Contains("#U"))
+                            {
+                                var cbox = (CBOXData)Newtonsoft.Json.JsonConvert.DeserializeObject(box.Replace("#U", ""), (new CBOXData()).GetType());
+                                var tempdd = new List<double>();
+                                tempdd.Add((cbox.min < ulowlimit) ? ulowlimit : Math.Round(cbox.min, 4));
+                                tempdd.Add(Math.Round(cbox.lower, 4));
+                                tempdd.Add(Math.Round(cbox.mean, 4));
+                                tempdd.Add(Math.Round(cbox.upper, 4));
+                                tempdd.Add((cbox.max > uhighlimit) ? uhighlimit : Math.Round(cbox.max, 4));
+                                rdatadata.Add(tempdd);
+                                rlinedata.Add(Math.Round(cbox.mean, 4));
+                            }
+                            else {
+                                var cbox = (CBOXData)Newtonsoft.Json.JsonConvert.DeserializeObject(box, (new CBOXData()).GetType());
+                                var tempdd = new List<double>();
+
+                                if (fieldname.ToUpper().Contains("Delta_PO_LD".ToUpper()))
+                                {
+                                    tempdd.Add((cbox.min < poldlowlimit) ? poldlowlimit : Math.Round(cbox.min, 4));
+                                    tempdd.Add(Math.Round(cbox.lower, 4));
+                                    tempdd.Add(Math.Round(cbox.mean, 4));
+                                    tempdd.Add(Math.Round(cbox.upper, 4));
+                                    tempdd.Add((cbox.max > poldhighlimit) ? poldhighlimit : Math.Round(cbox.max, 4));
+                                }
+                                else if (fieldname.ToUpper().Contains("Delta_PO_Uniformity".ToUpper()))
+                                {
+                                    tempdd.Add((cbox.min < poulowlimit) ? poulowlimit : Math.Round(cbox.min, 4));
+                                    tempdd.Add(Math.Round(cbox.lower, 4));
+                                    tempdd.Add(Math.Round(cbox.mean, 4));
+                                    tempdd.Add(Math.Round(cbox.upper, 4));
+                                    tempdd.Add((cbox.max > pouhighlimit) ? pouhighlimit : Math.Round(cbox.max, 4));
+                                }
+                                else
+                                {
+                                    tempdd.Add(Math.Round(cbox.min, 4));
+                                    tempdd.Add(Math.Round(cbox.lower, 4));
+                                    tempdd.Add(Math.Round(cbox.mean, 4));
+                                    tempdd.Add(Math.Round(cbox.upper, 4));
+                                    tempdd.Add(Math.Round(cbox.max, 4));
+                                }
+                                ldatadata.Add(tempdd);
+                                llinedata.Add(Math.Round(cbox.mean, 4));
+                            }
+                        }//end foreach
+                    }//end forea
+
+                    var id = fieldname.Replace(" ", "_") + "_id";
+                    var title = fieldname + " Distribution by Wafer";
+                    var xAxis = new
+                    {
+                        title = "Wafer#",
+                        data = xaxisdata
+                    };
+                    
+                    if (fieldname.Contains("variation_uniformity_pold"))
+                    {
+                        var lyAxis = new { title = "Variation_POLD_Delta" };
+                        var ryAxis = new { title = "Uniformity_POLD_Delta" };
+                        var ldata = new {
+                            name = "Variation_POLD_Delta",
+                            color = "#00b050",
+                            data = ldatadata
+                        };
+                        var rdata = new
+                        {
+                            name = "Uniformity_POLD_Delta",
+                            color = "#0099ff",
+                            data = rdatadata
+                        };
+                        var lline = new
+                        {
+                            name = "Mean Line",
+                            data = llinedata,
+                            color = "#ffc000",
+                            lineWidth = 1
+                        };
+                        var rline = new
+                        {
+                            name = "Mean Line",
+                            data = rlinedata,
+                            color = "#C9302C",
+                            lineWidth = 1
+                        };
+
+                        var left = new {
+                            yAxis = lyAxis,
+                            data = ldata,
+                            line = lline
+                        };
+                        var right = new
+                        {
+                            yAxis = ryAxis,
+                            data = rdata,
+                            line = rline
+                        };
+
+                        boxarray.Add(new
+                        {
+                            id = id,
+                            title = title,
+                            xAxis = xAxis,
+                            left = left,
+                            right = right
+                        });
+                    }
+                    else
+                    {
+                        var yAxis = new { title = "Value" };
+                        var data = new {
+                            name = fieldname,
+                            data = ldatadata
+                        };
+                        var line = new
+                        {
+                            name = "Mean Line",
+                            data = llinedata,
+                            color = "#ffc000",
+                            lineWidth = 1
+                        };
+
+                        boxarray.Add(new
+                        {
+                            id = id,
+                            title = title,
+                            xAxis = xAxis,
+                            yAxis = yAxis,
+                            data = data,
+                            line = line
+                        });
+                    }
+                }//end foreach
+
+
+                foreach (var item in testflist)
+                {
+                    if (item.DateColSeg.Count > 0)
+                    {
+                        var id = "f_" + item.TestType.Replace(" ", "_") + "_id";
+
+                        var title = "Faliure Mode (" + item.TestType + ")";
+
+                        var xdata = new List<string>();
+                        var ydata = new List<FailureColumnData>();
+                        var count = 0;
+                        foreach (var f_item in item.DateColSeg)
+                        {
+                            xdata.Add(f_item.xkey);
+                            count = (f_item.DateColSeg.Count > count) ? f_item.DateColSeg.Count : count;
+                        }
+
+                        var ymax = 3.0;
+                        foreach (var wfitem in item.DateColSeg)
+                        {
+                            var tempmax = 0.0;
+                            foreach (var fitem in wfitem.DateColSeg)
+                            {
+                                tempmax = tempmax + fitem.y;
+                            }
+                            if (tempmax > 3.0) ymax = 5.0;
+                            if (tempmax > 5.0) ymax = 10.0;
+                            if (tempmax > 10.0) ymax = 15.0;
+                            if (tempmax > 15.0) ymax = 20.0;
+                            if (tempmax > 20.0) ymax = 100.0;
+                        }
+
+                        var num = item.DateColSeg.Count;
+                        var n = 1;
+                        for (var i = count - 1; i >= 0; i--)
+                        {
+
+                            var ydata_tmp = new List<FailureColumnSeg>();
+                            for (var m = 0; m < num; m++)
+                            {
+                                if (i < item.DateColSeg[m].DateColSeg.Count)
+                                {
+                                    item.DateColSeg[m].DateColSeg[i].y = Math.Round(item.DateColSeg[m].DateColSeg[i].y, 4);
+                                    ydata_tmp.Add(item.DateColSeg[m].DateColSeg[i]);
+                                }
+                                else
+                                {
+                                    var tempvm = new FailureColumnSeg();
+                                    tempvm.name = "";
+                                    tempvm.y = 0;
+                                    tempvm.color = "#000";
+                                    ydata_tmp.Add(tempvm);
+                                }
+                            }
+                            ydata.Add(new FailureColumnData() { index = n, data = ydata_tmp });
+                            n++;
+                        }
+
+                        
+                        var xAxis = new { data = xdata };
+                        var yAxis = new
+                        {
+                            title = "(%)",
+                            min = 0,
+                            max = ymax
+                        };
+
+                        failurearray.Add(new
+                        {
+                            id = id,
+                            coltype = "normal",
+                            title = title,
+                            xAxis = xAxis,
+                            yAxis = yAxis,
+                            data = ydata
+                        });
+                    }
+                }
+
+                var ret = new JsonResult();
+                ret.Data = new
+                {
+                    success = true,
+                    yieldarray = yieldarray,
+                    boxarray = boxarray,
+                    failurearray = failurearray,
+                    colors = retdata[2],
+                };
+                return ret;
+            }
+            else
+            {
+                var ret = new JsonResult();
+                ret.Data = new
+                {
+                    success = false,
+                    msg = "No wafer match query condition."
+                };
+                return ret;
+            }
+        }
+
+
+        public JsonResult WaferDistributionRawData()
+        {
+            var wf_no = Request.Form["wf_no"];
+            var vtype = Request.Form["wf_type"].Trim();
+            var math_rect = Request.Form["math_rect"];
+            var nooutlier = true;
+            var boutlier = Request.Form["outlier"];
+            if (string.Compare(boutlier, "YES", true) == 0)
+            { nooutlier = false; }
+
+            var wflist = new List<string>();
+            if (!string.IsNullOrEmpty(wf_no))
+            {
+                wflist.AddRange(wf_no.Split(new string[] { ",", ";", " " }, StringSplitOptions.RemoveEmptyEntries));
+            }
+            else
+            {
+                var sdate = DateTime.Parse(Request.Form["sdate"]);
+                var edate = DateTime.Parse(Request.Form["edate"]);
+                var startdate = DateTime.Now;
+                var enddate = DateTime.Now;
+                if (sdate < edate)
+                {
+                    startdate = DateTime.Parse(sdate.ToString("yyyy-MM") + "-01 00:00:00");
+                    enddate = DateTime.Parse(edate.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(1).AddDays(-1);
+                }
+                else
+                {
+                    startdate = DateTime.Parse(edate.ToString("yyyy-MM") + "-01 00:00:00");
+                    enddate = DateTime.Parse(sdate.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(1).AddDays(-1);
+                }
+
+                wflist.AddRange(VcselTimeRange.RetrieveWafer(startdate, enddate));
+            }
+
+            if (wflist.Count > 0)
+            {
+
+                var poldlowlimit = 0.0;
+                var poldhighlimit = 0.0;
+                var poulowlimit = 0.0;
+                var pouhighlimit = 0.0;
+                var vlowlimit = 0.0;
+                var vhighlimit = 0.0;
+                var ulowlimit = 0.0;
+                var uhighlimit = 0.0;
+
+                if (math_rect.ToUpper().Contains("MATH"))
+                {
+                    var glbcfg = CfgUtility.GetSysConfig(this);
+                    poldlowlimit = Convert.ToDouble(glbcfg["Plot_Delta_PO_LD_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+                    poldhighlimit = Convert.ToDouble(glbcfg["Plot_Delta_PO_LD_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
+                    poulowlimit = Convert.ToDouble(glbcfg["Plot_Delta_PO_Uniformity_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+                    pouhighlimit = Convert.ToDouble(glbcfg["Plot_Delta_PO_Uniformity_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
+                    vlowlimit = Convert.ToDouble(glbcfg["Plot_Variation_POLD_Delta_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+                    vhighlimit = Convert.ToDouble(glbcfg["Plot_Variation_POLD_Delta_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
+                    ulowlimit = Convert.ToDouble(glbcfg["Plot_Uniformity_POLD_Delta_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+                    uhighlimit = Convert.ToDouble(glbcfg["Plot_Uniformity_POLD_Delta_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
+                }
+                else
+                {
+                    poldlowlimit = -9999.0;
+                    poldhighlimit = 9999.0;
+                    poulowlimit = -9999.0;
+                    pouhighlimit = 9999.0;
+                    vlowlimit = -9999.0;
+                    vhighlimit = 9999.0;
+                    ulowlimit = -9999.0;
+                    uhighlimit = 9999.0;
+
+                }
+
+                bool withfaileddata = true;
+                if (math_rect.ToUpper().Contains("ONLY PASS DATA"))
+                {
+                    withfaileddata = false;
+                }
+
+                var retdata = VcselBGDVM.RetrieveWaferData(wflist, withfaileddata, vtype,false);
+
+                //fieldname,wafer,boxlist
+                var fieldboxlist = (Dictionary<string, Dictionary<string, List<string>>>)retdata[0];
+                var testflist = (List<TestFailureColumn>)retdata[1];
+
+                //var fieldrawlist = (Dictionary<string, Dictionary<string, List<string>>>)retdata[3];
+
+                var yieldarray = new List<object>();
+                var boxarray = new List<object>();
+                var failurearray = new List<object>();
+
+                var xwaferlist = new List<string>();
+                var xwaferdict = new Dictionary<string, bool>();
+
+                foreach (var item in testflist)
+                {
+                    if (item.DateColSeg.Count > 0)
+                    {
+                        var id = "f_yield_" + item.TestType.Replace(" ", "_") + "_id";
+                        var title = item.TestType + " Wafer Yield";
+
+                        var xdata = new List<string>();
+                        var ydata = new List<double>();
+                        var cydata = new List<double>();
+
+                        var count = 0;
+                        foreach (var f_item in item.DateColSeg)
+                        {
+                            xdata.Add(f_item.xkey);
+                            if (!xwaferdict.ContainsKey(f_item.xkey))
+                            {
+                                xwaferlist.Add(f_item.xkey);
+                                xwaferdict.Add(f_item.xkey, true);
+                            }
+
+                            count = (f_item.DateColSeg.Count > count) ? f_item.DateColSeg.Count : count;
+                        }
+
+                        foreach (var wfitem in item.DateColSeg)
+                        {
+                            var failpercent = 0.0;
+                            foreach (var fitem in wfitem.DateColSeg)
+                            {
+                                failpercent = failpercent + fitem.y;
+                            }
+                            ydata.Add(100.0 - failpercent);
+                            cydata.Add(wfitem.total);
+                        }
+
+
+                        var xAxis = new { data = xdata };
+
+                        var yAxis = new
+                        {
+                            title = "Yield (%)",
+                            min = 85.0,
+                            max = 100.0
+                        };
+
+                        var min = new
+                        {
+                            name = "Min",
+                            color = "#F0AD4E",
+                            data = 94,
+                            style = "dash"
+                        };
+
+                        var max = new
+                        {
+                            name = "Max",
+                            color = "#C9302C",
+                            data = 98,
+                            style = "solid"
+                        };
+
+                        var data = new
+                        {
+                            name = "Yield",
+                            color = "#ffa500",
+                            data = ydata
+                        };
+
+                        var combinedata = new
+                        {
+                            min = min,
+                            max = max,
+                            data = data
+                        };
+
+                        var cdata = new
+                        {
+                            name = "Test Modules",
+                            data = cydata
+                        };
+
+                        yieldarray.Add(new
+                        {
+                            id = id,
+                            title = title,
+                            xAxis = xAxis,
+                            yAxis = yAxis,
+                            data = combinedata,
+                            cdata = cdata
+                        });
+                    }//end if
+                }//end foreach
+
+
+                foreach (var fieldkv in fieldboxlist)
+                {
+                    var fieldname = fieldkv.Key;
+                    var xaxisdata = new List<string>();
+
+                    var ldatadata = new List<List<double>>();
+                    var llinedata = new List<double>();
+
+                    var rdatadata = new List<List<double>>();
+                    var rlinedata = new List<double>();
+
+                    var loutlierdata = new List<List<double>>();
+                    var routlierdata = new List<List<double>>();
+
+                    var widx = 0.0;
+                    //foreach (var wfkv in fieldkv.Value)
+                    foreach (var x in xwaferlist)
+                    {
+                        //var wf = wfkv.Key;
+                        //xaxisdata.Add(wf);
+                        //foreach (var box in wfkv.Value)
+
+                        if (!fieldkv.Value.ContainsKey(x)) continue;
+
+                        var wf = x;
+                        xaxisdata.Add(wf);
+                        var boxdict = fieldkv.Value[x];
+                        foreach (var box in boxdict)
+                        {
+                            if (box.Contains("#V"))
+                            {
+                                var tempret = VcselBGDVM.CBOXFromRaw(box.Replace("#V", ""), vlowlimit, vhighlimit, nooutlier);
+                                var cbox = (CBOXData)tempret[0];
+                                var outlier = (List<VXVal>)tempret[1];
+
+                                //var cbox = (CBOXData)Newtonsoft.Json.JsonConvert.DeserializeObject(box.Replace("#V", ""), (new CBOXData()).GetType());
+                                var tempdd = new List<double>();
+                                tempdd.Add((cbox.min < vlowlimit) ? vlowlimit : Math.Round(cbox.min, 4));
+                                tempdd.Add(Math.Round(cbox.lower, 4));
+                                tempdd.Add(Math.Round(cbox.mean, 4));
+                                tempdd.Add(Math.Round(cbox.upper, 4));
+                                tempdd.Add((cbox.max > vhighlimit) ? vhighlimit : Math.Round(cbox.max, 4));
+
+                                
+                                foreach (var outitem in outlier)
+                                {
+                                    var tempout = new List<double>();
+                                    tempout.Add(Math.Round(widx + outitem.x, 4));
+                                    tempout.Add(Math.Round(outitem.ival, 4));
+                                    loutlierdata.Add(tempout);
+                                }
+
+                                ldatadata.Add(tempdd);
+                                llinedata.Add(Math.Round(cbox.mean, 4));
+                            }
+                            else if (box.Contains("#U"))
+                            {
+                                var tempret = VcselBGDVM.CBOXFromRaw(box.Replace("#U", ""), ulowlimit, uhighlimit, nooutlier);
+                                var cbox = (CBOXData)tempret[0];
+                                var outlier = (List<VXVal>)tempret[1];
+
+                                //var cbox = (CBOXData)Newtonsoft.Json.JsonConvert.DeserializeObject(box.Replace("#U", ""), (new CBOXData()).GetType());
+                                var tempdd = new List<double>();
+                                tempdd.Add((cbox.min < ulowlimit) ? ulowlimit : Math.Round(cbox.min, 4));
+                                tempdd.Add(Math.Round(cbox.lower, 4));
+                                tempdd.Add(Math.Round(cbox.mean, 4));
+                                tempdd.Add(Math.Round(cbox.upper, 4));
+                                tempdd.Add((cbox.max > uhighlimit) ? uhighlimit : Math.Round(cbox.max, 4));
+
+                                foreach (var outitem in outlier)
+                                {
+                                    var tempout = new List<double>();
+                                    tempout.Add(Math.Round(widx + outitem.x, 4));
+                                    tempout.Add(Math.Round(outitem.ival, 4));
+                                    routlierdata.Add(tempout);
+                                }
+
+                                rdatadata.Add(tempdd);
+                                rlinedata.Add(Math.Round(cbox.mean, 4));
+                            }
+                            else
+                            {
+                                //var cbox = (CBOXData)Newtonsoft.Json.JsonConvert.DeserializeObject(box, (new CBOXData()).GetType());
+                                var tempdd = new List<double>();
+
+                                if (fieldname.ToUpper().Contains("Delta_PO_LD".ToUpper()))
+                                {
+                                    var tempret = VcselBGDVM.CBOXFromRaw(box, poldlowlimit, poldhighlimit, nooutlier);
+                                    var cbox = (CBOXData)tempret[0];
+                                    var outlier = (List<VXVal>)tempret[1];
+
+                                    tempdd.Add((cbox.min < poldlowlimit) ? poldlowlimit : Math.Round(cbox.min, 4));
+                                    tempdd.Add(Math.Round(cbox.lower, 4));
+                                    tempdd.Add(Math.Round(cbox.mean, 4));
+                                    tempdd.Add(Math.Round(cbox.upper, 4));
+                                    tempdd.Add((cbox.max > poldhighlimit) ? poldhighlimit : Math.Round(cbox.max, 4));
+
+                                    foreach (var outitem in outlier)
+                                    {
+                                        var tempout = new List<double>();
+                                        tempout.Add(Math.Round(widx + outitem.x, 4));
+                                        tempout.Add(Math.Round(outitem.ival, 4));
+                                        loutlierdata.Add(tempout);
+                                    }
+                                    llinedata.Add(Math.Round(cbox.mean, 4));
+                                }
+                                else if (fieldname.ToUpper().Contains("Delta_PO_Uniformity".ToUpper()))
+                                {
+                                    var tempret = VcselBGDVM.CBOXFromRaw(box, poulowlimit, pouhighlimit, nooutlier);
+                                    var cbox = (CBOXData)tempret[0];
+                                    var outlier = (List<VXVal>)tempret[1];
+
+                                    tempdd.Add((cbox.min < poulowlimit) ? poulowlimit : Math.Round(cbox.min, 4));
+                                    tempdd.Add(Math.Round(cbox.lower, 4));
+                                    tempdd.Add(Math.Round(cbox.mean, 4));
+                                    tempdd.Add(Math.Round(cbox.upper, 4));
+                                    tempdd.Add((cbox.max > pouhighlimit) ? pouhighlimit : Math.Round(cbox.max, 4));
+
+                                    foreach (var outitem in outlier)
+                                    {
+                                        var tempout = new List<double>();
+                                        tempout.Add(Math.Round(widx + outitem.x, 4));
+                                        tempout.Add(Math.Round(outitem.ival, 4));
+                                        loutlierdata.Add(tempout);
+                                    }
+
+                                    llinedata.Add(Math.Round(cbox.mean, 4));
+                                }
+                                else
+                                {
+                                    var tempret = VcselBGDVM.CBOXFromRaw(box, -99999.0, 99999.0, nooutlier);
+                                    var cbox = (CBOXData)tempret[0];
+                                    var outlier = (List<VXVal>)tempret[1];
+
+                                    tempdd.Add(Math.Round(cbox.min, 4));
+                                    tempdd.Add(Math.Round(cbox.lower, 4));
+                                    tempdd.Add(Math.Round(cbox.mean, 4));
+                                    tempdd.Add(Math.Round(cbox.upper, 4));
+                                    tempdd.Add(Math.Round(cbox.max, 4));
+
+                                    foreach (var outitem in outlier)
+                                    {
+                                        var tempout = new List<double>();
+                                        tempout.Add(Math.Round(widx + outitem.x, 4));
+                                        tempout.Add(Math.Round(outitem.ival, 4));
+                                        loutlierdata.Add(tempout);
+                                    }
+
+                                    llinedata.Add(Math.Round(cbox.mean, 4));
+                                }
+                                ldatadata.Add(tempdd);
+                                
+                            }
+                        }//end foreach
+
+                        widx = widx + 1.0;
+                    }//end forea
+
+                    var id = fieldname.Replace(" ", "_") + "_id";
+                    var title = fieldname + " Distribution by Wafer";
+                    var xAxis = new
+                    {
+                        title = "Wafer#",
+                        data = xaxisdata
+                    };
+
+                    if (fieldname.Contains("variation_uniformity_pold"))
+                    {
+                        var lyAxis = new { title = "Variation_POLD_Delta" };
+                        var ryAxis = new { title = "Uniformity_POLD_Delta" };
+                        var ldata = new
+                        {
+                            name = "Variation_POLD_Delta",
+                            color = "#00b050",
+                            data = ldatadata
+                        };
+                        var rdata = new
+                        {
+                            name = "Uniformity_POLD_Delta",
+                            color = "#0099ff",
+                            data = rdatadata
+                        };
+                        var lline = new
+                        {
+                            name = "Mean Line",
+                            data = llinedata,
+                            color = "#ffc000",
+                            lineWidth = 1
+                        };
+                        var rline = new
+                        {
+                            name = "Mean Line",
+                            data = rlinedata,
+                            color = "#C9302C",
+                            lineWidth = 1
+                        };
+
+                        var left = new
+                        {
+                            yAxis = lyAxis,
+                            data = ldata,
+                            line = lline
+                        };
+                        var right = new
+                        {
+                            yAxis = ryAxis,
+                            data = rdata,
+                            line = rline
+                        };
+
+                        boxarray.Add(new
+                        {
+                            id = id,
+                            title = title,
+                            xAxis = xAxis,
+                            left = left,
+                            right = right
+                        });
+                    }
+                    else
+                    {
+                        var yAxis = new { title = "Value" };
+                        var data = new
+                        {
+                            name = fieldname,
+                            data = ldatadata
+                        };
+                        var line = new
+                        {
+                            name = "Mean Line",
+                            data = llinedata,
+                            color = "#ffc000",
+                            lineWidth = 1
+                        };
+
+                        boxarray.Add(new
+                        {
+                            id = id,
+                            title = title,
+                            xAxis = xAxis,
+                            yAxis = yAxis,
+                            data = data,
+                            line = line,
+                            outlierdata = loutlierdata
+                        });
+                    }
+                }//end foreach
+
+
+                foreach (var item in testflist)
+                {
+                    if (item.DateColSeg.Count > 0)
+                    {
+                        var id = "f_" + item.TestType.Replace(" ", "_") + "_id";
+
+                        var title = "Faliure Mode (" + item.TestType + ")";
+
+                        var xdata = new List<string>();
+                        var ydata = new List<FailureColumnData>();
+                        var count = 0;
+                        foreach (var f_item in item.DateColSeg)
+                        {
+                            xdata.Add(f_item.xkey);
+                            count = (f_item.DateColSeg.Count > count) ? f_item.DateColSeg.Count : count;
+                        }
+
+                        var ymax = 3.0;
+                        foreach (var wfitem in item.DateColSeg)
+                        {
+                            var tempmax = 0.0;
+                            foreach (var fitem in wfitem.DateColSeg)
+                            {
+                                tempmax = tempmax + fitem.y;
+                            }
+                            if (tempmax > 3.0) ymax = 5.0;
+                            if (tempmax > 5.0) ymax = 10.0;
+                            if (tempmax > 10.0) ymax = 15.0;
+                            if (tempmax > 15.0) ymax = 20.0;
+                            if (tempmax > 20.0) ymax = 100.0;
+                        }
+
+                        var num = item.DateColSeg.Count;
+                        var n = 1;
+                        for (var i = count - 1; i >= 0; i--)
+                        {
+
+                            var ydata_tmp = new List<FailureColumnSeg>();
+                            for (var m = 0; m < num; m++)
+                            {
+                                if (i < item.DateColSeg[m].DateColSeg.Count)
+                                {
+                                    item.DateColSeg[m].DateColSeg[i].y = Math.Round(item.DateColSeg[m].DateColSeg[i].y, 4);
+                                    ydata_tmp.Add(item.DateColSeg[m].DateColSeg[i]);
+                                }
+                                else
+                                {
+                                    var tempvm = new FailureColumnSeg();
+                                    tempvm.name = "";
+                                    tempvm.y = 0;
+                                    tempvm.color = "#000";
+                                    ydata_tmp.Add(tempvm);
+                                }
+                            }
+                            ydata.Add(new FailureColumnData() { index = n, data = ydata_tmp });
+                            n++;
+                        }
+
+
+                        var xAxis = new { data = xdata };
+                        var yAxis = new
+                        {
+                            title = "(%)",
+                            min = 0,
+                            max = ymax
+                        };
+
+                        failurearray.Add(new
+                        {
+                            id = id,
+                            coltype = "normal",
+                            title = title,
+                            xAxis = xAxis,
+                            yAxis = yAxis,
+                            data = ydata
+                        });
+                    }
+                }
+
+                var ret = new JsonResult();
+                ret.MaxJsonLength = Int32.MaxValue;
+                ret.Data = new
+                {
+                    success = true,
+                    yieldarray = yieldarray,
+                    boxarray = boxarray,
+                    failurearray = failurearray,
+                    colors = retdata[2],
+                };
+                return ret;
+            }
+            else
+            {
+                var ret = new JsonResult();
+                ret.Data = new
+                {
+                    success = false,
+                    msg = "No wafer match query condition."
+                };
+                return ret;
+            }
+        }
+
+        private List<string> PrepeareAllWaferData(string wf_no)
+        {
+            var ret = new List<string>();
+            var allreldata = VcselBGDVM.RetrieveWaferData(wf_no);
+            var line = "SN,TestName,TestTimeStamp,PN,Wafer,JO,Channel,SLOPE,PO_LD,PO_Uniformity,THOLD,Delta_PO_LD,Delta_SLOPE,Delta_THOLD, Delta_PO_Uniformity, ProductName";
+            ret.Add(line);
+
+            foreach (var item in allreldata)
+            {
+                var line1 = string.Empty;
+                line1 = "\"" + item.SN.ToString().Replace("\"", "") + "\"," + "\"" + item.TestName.Replace("\"", "") + "\"," + "\"" + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss").Replace("\"", "") + "\"," + "\"" + item.PN.Replace("\"", "") + "\"," 
+                    + "\"" + item.Wafer.Replace("\"", "") + "\"," + "\"" + item.JO.Replace("\"", "") + "\"," + "\"" + item.Channel.Replace("\"", "") + "\","
+                    + "\"" + item.SLOPE.ToString().Replace("\"", "") + "\"," + "\"" + item.PO_LD.ToString().Replace("\"", "") + "\"," + "\"" + item.PO_Uniformity.ToString().Replace("\"", "") + "\","
+                    + "\"" + item.THOLD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_PO_LD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_SLOPE.ToString().Replace("\"", "") + "\","
+                    + "\"" + item.Delta_THOLD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_PO_Uniformity.ToString().Replace("\"", "") + "\"," + "\"" + item.ProductName.Replace("\"", "") + "\",";
+                ret.Add(line1);
+            }
+
+            return ret;
+        }
+
+        public ActionResult DownLoadWafer(string wf_no)
+        {
+            string datestring = DateTime.Now.ToString("yyyyMMdd");
+            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+            if (!System.IO.Directory.Exists(imgdir))
+            {
+                System.IO.Directory.CreateDirectory(imgdir);
+            }
+
+            var fn = "Wafer_"+wf_no+"_TestData_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+            var filename = imgdir + fn;
+
+            var lines = PrepeareAllWaferData(wf_no);
+
+            var wholefile = "";
+            foreach (var l in lines)
+            {
+                wholefile = wholefile + l + "\r\n";
+            }
+            System.IO.File.WriteAllText(filename, wholefile, Encoding.UTF8);
+
+            return File(filename, "application/vnd.ms-excel", fn);
+        }
 
         private void preparetxotestdata(List<string> waferlist,string leftcond, string leftfield, string rightcond, string rightfield)
         {

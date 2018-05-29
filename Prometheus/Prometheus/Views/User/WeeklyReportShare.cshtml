@@ -7,16 +7,27 @@
 
 <link href="~/Content/common.css" rel="stylesheet" type="text/css" />
 <script src="~/Scripts/weeklyreport.js"></script>
-
-<ul class="nav nav-pills nav-stacked col-xs-2" data-intro="Select tab to see detail." data-step="1">
+<div class="row">
+    <div class="nav navbar-nav navbar-left">
+        <img src="~/Content/images/ucicon/ILearnIcons.png" style="height:40px; width:40px">
+    </div>
+    <div class="nav navbar-nav navbar-left">
+        <ol class="breadcrumb">
+            <li><a href="/User/UserCenter?username=@(ViewBag.RealUserID)">@ViewBag.UserName Center</a></li>
+            <li class="active">Weekly Report Share</li>
+        </ol>
+    </div>
+</div>
+<ul class="nav nav-pills nav-stacked col-xs-2">
     <li><a href="/User/ILearn">I Learn</a></li>
     <li><a href="/User/WeeklyReportList">Weekly Report</a></li>
     <li class="active"><a href="/User/WeeklyReportShare">Weekly Report Share</a></li>
+    <li><a href="/User/IDashboard">I Dashboard</a></li>
     <li><a href="/User/ILearn">Training</a></li>
     <li><a href="/User/ILearn">I Share</a></li>
 </ul>
 
-<div class="tab-content col-xs-10" data-intro="Show detail of tab" data-step="2">
+<div class="tab-content col-xs-10">
     <div class="wr-list">
         <table class="table table-hover table-condensed share-content" cellpadding="0">
             <thead>

@@ -5,14 +5,6 @@
 }
 
 <div class="row">
-    <div class="col-xs-12">&nbsp;</div>
-</div>
-
-<div class="row">
-    <div class="col-xs-12">&nbsp;</div>
-</div>
-
-<div class="row">
     <div class="col-xs-1 text-right">
         <img src="~/Content/images/PJ/Yield.png" style="height:45px; width:45px">
     </div>
@@ -41,11 +33,6 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-xs-12">&nbsp;</div>
-</div>
-
-
 <form>
     @if (ViewBag.pjkey != null)
     {
@@ -55,10 +42,6 @@
 
 @if (ViewBag.chartscript != null)
 {
-    @Html.Raw(ViewBag.chartscript)
-
-    <script src="~/Scripts/highcharts.js"></script>
-    <script src="~/Scripts/exporting.js"></script>
 
     <div class="row">
 
@@ -66,5 +49,6 @@
                         <div id="monthlyyield" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
                     </div>
     </div>
+    @Html.Raw(ViewBag.chartscript)
 }
 

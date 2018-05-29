@@ -6,6 +6,47 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title</title>
+    @{
+        var isie8 = false;
+        var browse = Request.Browser;
+        if (string.Compare(browse.Browser, "IE", true) == 0
+            && (string.Compare(browse.Version, "7.0", true) == 0
+            || string.Compare(browse.Version, "8.0", true) == 0))
+        {
+            isie8 = true;
+        }
+
+        //var isie = false;
+        //var ua = Request.UserAgent;
+        //var msie = ua.IndexOf("MSIE ");
+        //if (msie > 0)
+        //{
+        //    // IE 10 or older => return version number
+        //    isie = true;
+        //}
+        //var trident = ua.IndexOf("Trident/");
+        //if (trident > 0)
+        //{
+        //    // IE 11 => return version number
+        //    isie = true;
+        //}
+        //var edge = ua.IndexOf("Edge/");
+        //if (edge > 0)
+        //{
+        //    // Edge (IE 12+) => return version number
+        //    isie = true;
+        //}
+    }
+
+
+    @if (isie8)
+    {
+        @Styles.Render("~/Content/css")
+    }
+    else
+    {
+        <link href="@Url.Content("~/Content/bootstrap-3.3.7/css/bootstrap.min.css")" rel="stylesheet" type="text/css" />
+    }
 
     <link href="@Url.Content("~/Content/themes/base/jquery-ui.css")" rel="stylesheet" type="text/css" />
     <link href="@Url.Content("~/Scripts/lobilist/dist/lobilist.min.css")" rel="stylesheet" type="text/css" />
@@ -18,21 +59,51 @@
     <link href="@Url.Content("~/Scripts/intro/introjs-rtl.min.css")" rel="stylesheet" type="text/css" />
     <link href="@Url.Content("~/Scripts/intro/arial-narrow.css")" rel="stylesheet" type="text/css" />
     <link href="@Url.Content("~/Scripts/jquery.flexdatalist.min.css")" rel="stylesheet" type="text/css" />
-    <link href="@Url.Content("~/Content/bootstrap-3.3.7/css/bootstrap.min.css")" rel="stylesheet" type="text/css" />
+    <link href="~/Scripts/jquery-autocomplete/jquery.auto-complete.css" rel="stylesheet" type="text/css" />
     <link href="@Url.Content("~/Content/Layout.css")" rel="stylesheet" type="text/css" />
 
     @Scripts.Render("~/bundles/modernizr")
-    @Scripts.Render("~/bundles/jquery")
+    @*@Scripts.Render("~/bundles/jquery")*@
+    <script src="~/Scripts/jquery.1.12.4/jquery-1.12.4.min.js" type="text/javascript"></script>
     @Scripts.Render("~/bundles/jqueryval")
     @Scripts.Render("~/bundles/jquery-ui")
     @Scripts.Render("~/bundles/datatables")
 
-    <script src="~/Content/bootstrap-3.3.7/js/bootstrap.min.js" type="text/javascript"></script>
+    @if (isie8)
+    {
+        @Scripts.Render("~/bundles/bootstrap")
+    }
+    else
+    {
+        <script src="~/Content/bootstrap-3.3.7/js/bootstrap.min.js" type="text/javascript"></script>
+    }
+
     <script src="~/Scripts/ajaxfileupload.js" type="text/javascript"></script>
     <script src="~/Scripts/jquery.base64.js" type="text/javascript"></script>
     <script src="~/Scripts/intro/intro.min.js" type="text/javascript"></script>
-    <script src="~/Scripts/jquery.stickytableheaders.js"></script>
+    <script src="~/Scripts/jquery.stickytableheaders.js" type="text/javascript"></script>
+    <script src="~/Scripts/Prometheus.js" type="text/javascript"></script>
+    <script src="~/Scripts/moment.min.js"></script>
+    <script src="~/Scripts/highcharts.js"></script>
+    <script src="~/Scripts/highcharts-more.js"></script>
+    <script src="~/Scripts/exporting.js"></script>
+    <script src="~/Scripts/jquery-autocomplete/jquery.auto-complete.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="~/Scripts/jquery-bootstrap-loading.js"></script>
 
+    @if (isie8)
+    {
+        <script src="~/Scripts/oldie.js" type="text/javascript"></script>
+    }
+    else
+    {
+        <script src="~/Scripts/offline-exporting.js"></script>
+    }
+
+    <script type="text/javascript">
+        $(function () {
+            Prometheus.init();
+        });
+    </script>
     <style>
         thead {
             background-color: #006DC0;
@@ -50,7 +121,22 @@
     </style>
 </head>
 
+@{
+    var isvideook = true;
+    var ua = Request.UserAgent;
+    if (ua.IndexOf("MSIE ") > 0)
+    { isvideook = false; }
+    if (ua.IndexOf("Edge/") > 0 || ua.IndexOf("Trident/") > 0)
+    { isvideook = true; }
+}
+
 <body>
+    <script type="text/javascript">
+    $(function () {
+        $('[data-toggle="popover"]').popover({ html: true, placement: 'bottom' });
+    })
+    </script>
+
     <div class="navbar navbar-default navbar-fixed-top div-nav">
         <nav class="navbar navbar-default navbar-fixed-top nav-content">
             <div class="container">
@@ -98,6 +184,9 @@
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">3rd Party Data<span class="caret"></span></a>
                                 <ul class="dropdown-menu">
                                     <li>
+                                        @Html.ActionLink("Submit Vcsel PN Info", "CommitVcselPNInfo", "CustomerData")
+                                    </li>
+                                    <li>
                                         @Html.ActionLink("Submit Vcsel Data", "CommitVcselData", "CustomerData")
                                     </li>
                                     <li>
@@ -116,7 +205,14 @@
                                         @Html.ActionLink("Review Wafer Info", "ReviewWaferInfo", "CustomerData")
                                     </li>
                                     <li>
+                                        @Html.ActionLink("Review Wafer Coord Data", "ReviewWaferCoordData", "CustomerData")
+                                    </li>
+                                    <li>
                                         @Html.ActionLink("Debug Tree", "DebugTree", "DashBoard")
+                                    </li>
+
+                                    <li>
+                                        @Html.ActionLink("DownLoad ATE", "DownLoadATETestData", "CustomerData")
                                     </li>
                                 </ul>
                             </li>
@@ -186,6 +282,12 @@
                                             @Html.ActionLink("User Shared Info", "UserSharedInfo", "User")
                                         }
                                     </li>
+                                    <li>
+                                        @if ((ViewBag.IsSuper != null && ViewBag.IsSuper) || (ViewBag.IsManage != null && ViewBag.IsManage))
+                                        {
+                                            @Html.ActionLink("KPI Summary", "GetKPI", "User")
+                                        }
+                                    </li>
                                 </ul>
                             </li>
                         </ul>
@@ -193,16 +295,26 @@
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Analysis<span class="caret"></span></a>
                                 <ul class="dropdown-menu">
-                                    <li>
+                                    @*<li>
                                         @Html.ActionLink("TXO Trend Compare", "TXOTestData", "DataAnalyze")
                                     </li>
                                     <li>
                                         @Html.ActionLink("Module TXO Analysis", "ModuleTestData", "DataAnalyze")
+                                    </li>*@
+                                    <li>
+                                        @Html.ActionLink("VCSEL Monthly Yield", "MonthlyVcsel", "DataAnalyze")
+                                    </li>
+                                    <li>
+                                        @Html.ActionLink("VCSEL Wafer Distribution", "WaferDistribution", "DataAnalyze")
+                                    </li>
+                                    <li>
+                                        @Html.ActionLink("VCSEL RMA", "VcselRMA", "DataAnalyze")
                                     </li>
                                 </ul>
                             </li>
                         </ul>
                         @Html.Partial("_LoginPartial")
+
                         <ul class="nav navbar-nav">
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
@@ -217,25 +329,35 @@
                         </ul>
                         <ul class="nav navbar-nav">
                             <li>
+                                @if (isvideook)
+                                {
+                                    <a tabindex="0" class="btn" role="button" data-toggle="popover" data-container="body" placement="bottom" title="WXUI Engineering Introduce" data-content="<video src='/Content/FAIntroduce.mp4' width='220' height='140' controls type='video/mp4'></video>">
+                                        <span class="glyphicon glyphicon-question-sign"></span>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a href="javascript:void(0)" onclick="introJs().start()">
+                                        <span class="glyphicon glyphicon-question-sign" title="Help" data-toggle="tooltip"></span>
+                                    </a>
+                                }
+                            </li>
+                        </ul>
+                        <ul class="nav navbar-nav">
+                            <li>
                                 <a MYTP="HOVER" id="editablebt" name="editablebt" onclick="changepagemode()">
                                     <span class="glyphicon glyphicon-edit" title="Edit Mode" data-toggle="tooltip"></span>
                                 </a>
                             </li>
                         </ul>
-                        <ul class="nav navbar-nav">
-                            <li>
-                                <a href="javascript:void(0)" onclick="introJs().start()">
-                                    <span class="glyphicon glyphicon-question-sign" title="Help" data-toggle="tooltip"></span>
-                                </a>
-                            </li>
-                        </ul>
+                        
                     </div>
                 </div>
             </div>
         </nav>
     </div>
     <div class="container body-content">
-
+        @Html.Partial("~/Views/Shared/_ProjectMenus.cshtml")
         @RenderBody()
 
         <hr />
@@ -248,6 +370,13 @@
             //$(window).load(function () {
             //    $(".se-pre-con").fadeOut("slow");
             //});
+            function SetReplyPeople(reply)
+            {
+                CKEDITOR.instances.editor1.setData(reply+'&nbsp;');
+                $('#commentinput').collapse('show');
+                var scrollingElement = (document.scrollingElement || document.body)
+                scrollingElement.scrollTop = scrollingElement.scrollHeight;
+            }
 
                         function RealSaveUserContent(myval)
                         {
@@ -337,5 +466,6 @@
             </div>
         </div>
     </div>
+    
 </body>
 </html>

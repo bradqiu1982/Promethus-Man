@@ -282,6 +282,13 @@ namespace Prometheus.Controllers
             {
                 if (string.Compare(password, "abc@123", true) == 0)
                 {
+                    if (!UserViewModels.IsEmaileValid(username.ToUpper()))
+                    {
+                        var loginerror = "<h3><font color=\"red\">user name is not a corrective email format </font></h3>";
+                        ViewBag.loginerror = loginerror;
+                        return View();
+                    }
+
                     var user = new UserViewModels();
                     user.Email = username.ToUpper();
                     user.Password = password;
@@ -323,7 +330,6 @@ namespace Prometheus.Controllers
             }
         }
 
-
         public ActionResult LoginOutUser(string ctrl, string action)
         {
             var val = CookieUtility.UnpackCookie(this);
@@ -338,6 +344,7 @@ namespace Prometheus.Controllers
             }
 
             CookieUtility.SetCookie(this, val);
+            CookieUtility.RemoveCookie(this);
             return RedirectToAction("UserCenter", "User");
         }
 
@@ -1154,14 +1161,9 @@ namespace Prometheus.Controllers
                 return RedirectToAction("ILearn");
             }
 
-            var tags = string.Empty;
-            for (var i = 0; i < 600; i++)
-            {
-                if (Request.Form["check" + i] != null)
-                {
-                    tags = tags + Request.Form["check" + i] + ";";
-                }
-            }
+            var tags = Request.Form["check[]"];
+            tags = string.IsNullOrEmpty(tags)?"":tags.Replace(",", ";");
+
             ShareDocVM.SetUserBookTag(updater, tags);
 
 
@@ -1189,7 +1191,7 @@ namespace Prometheus.Controllers
             ViewBag.RealUserID = updater;
 
             var asilist = UserViewModels.RetrieveAllUser();
-            ViewBag.towholist = CreateSelectList(asilist, "");
+            ViewBag.AllUserList = "[\"" + string.Join("\",\"", asilist.ToArray()) + "\"]";
 
             var ilearntable = new List<ShareDocVM>();
             var iweeklytable = new List<ShareDocVM>();
@@ -1439,8 +1441,8 @@ namespace Prometheus.Controllers
             ViewBag.UserName = updater.Split(new char[] { '@' })[0];
             ViewBag.RealUserID = updater;
 
-            var users = UserViewModels.RetrieveAllUser();
-            ViewBag.towholist = CreateSelectList(users);
+            var asilist = UserViewModels.RetrieveAllUser();
+            ViewBag.AllUserList = "[\"" + string.Join("\",\"", asilist.ToArray()) + "\"]";
 
             var vm = UserBlogVM.RetrieveAllBlogDoc(updater);
             return View(vm);
@@ -1475,9 +1477,9 @@ namespace Prometheus.Controllers
             {
                 ClearILearnCache(w.Trim());
                 ShareDocVM.PushDoc(w.Trim().ToUpper(), "ALL", ShareDocType.BLOG, DOCKey, vm.Tag, vm.UserName, DateTime.Now.ToString(), "", docid, vm.DocURL);
-                ShareDocVM.SendPushDocEvent("a new document about " + vm.Tag, vm.DocURL, ToWho, updater.ToUpper(), this, tempreason);
             }
 
+            ShareDocVM.SendPushDocEvent("a new document about " + vm.Tag, vm.DocURL, ToWho, updater.ToUpper(), this, tempreason);
             ShareDocVM.SendPushDocEvent("a new document about " + vm.Tag, vm.DocURL, updater.ToUpper(), updater.ToUpper(), this, tempreason);
 
 
@@ -1997,7 +1999,7 @@ namespace Prometheus.Controllers
             ViewBag.RealUserID = updater;
 
             var asilist = UserViewModels.RetrieveAllUser();
-            ViewBag.towholist1 = CreateSelectList(asilist, "");
+            ViewBag.AllUserList = "[\"" + string.Join("\",\"", asilist.ToArray()) + "\"]";
 
             var grouptype = new string[] { "Please choose your group type", UserGroupType.WorkGroup, UserGroupType.ReportGroup, UserGroupType.LYTGroup };
             var grouptypelist = CreateSelectList(grouptype.ToList(), "");
@@ -2128,7 +2130,7 @@ namespace Prometheus.Controllers
             }
 
             var asilist = UserViewModels.RetrieveAllUser();
-            ViewBag.towholist1 = CreateSelectList(asilist, "");
+            ViewBag.AllUserList = "[\"" + string.Join("\",\"", asilist.ToArray()) + "\"]";
 
             ViewBag.tobechoosetags = ShareDocVM.RetrieveCriticalSymptom(this);
 
@@ -2547,23 +2549,14 @@ namespace Prometheus.Controllers
             ViewBag.userreportlist = WeeklyReportVM.GetUserLatestTime("'" + string.Join("','", userlist) + "'");
 
             //user's project list
-            var projectlist = UserViewModels.RetrieveUserProjectKeyDict(username);
-
-            //task project
-            var taskprojectlist = UserViewModels.GetUserProjects(username);
-
-            if (taskprojectlist.Count > 0)
+            var projectstr = UserViewModels.RetrieveUserProjectKeyStr(username);
+            var projectlist = new List<string>();
+            if (!string.IsNullOrEmpty(projectstr))
             {
-                foreach (var pro in taskprojectlist)
-                {
-                    if (!projectlist.ContainsKey(pro.Key))
-                    {
-                        projectlist.Add(pro.Key, pro.Value);
-                    }
-                }
+                projectlist = projectstr.Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries).ToList();
             }
-
-
+            //all project
+            var taskprojectlist = UserViewModels.GetUserProjects(username, projectlist);
             var dayofweek = Convert.ToInt32(DateTime.Now.DayOfWeek);
             var sDate = DateTime.Now.AddDays((4 - dayofweek) - 7).ToString("yyyy-MM-dd 07:30:00");
             var stDate = DateTime.Now.AddDays((4 - dayofweek) - 7).AddDays(1).ToString("yyyy-MM-dd 07:30:00");
@@ -2584,45 +2577,55 @@ namespace Prometheus.Controllers
             var DebugTreeList = new Dictionary<string, List<ProjectErrorViewModels>>();
             var setting = WeeklyReportSetting.GetWeeklyReportSetting(username);
 
-            foreach (var project in projectlist)
+            foreach (var project in taskprojectlist)
             {
                 var task_total = 0;
 
                 //yield
-                if (setting.Yield == 1)
+                if (string.IsNullOrEmpty(project.Value.TransferFlg))
                 {
-                    YieldDataList.Add(project.Key, getProjectYield(project.Key, sDate, eDate));
-                }
+                    if (setting.Yield == 1)
+                    {
+                        YieldDataList.Add(project.Key, getProjectYield(project.Key, sDate, eDate));
+                    }
+                    //i care
+                    if (setting.ICare == 1)
+                    {
+                        historyIcareList.Add(project.Key, getIcareTask(username, project.Key, 0, stDate, cDate));
+                        var icarelist_tmp = getIcareTask(username, project.Key, 1, stDate, cDate);
+                        task_total += icarelist_tmp.TaskList.Count;
+                        icareList.Add(project.Key, icarelist_tmp);
+                        //debug tree
+                        icareDebugTree.Add(project.Key, ProjectErrorICareVM.GetProjectErrorICareList(username, project.Key, stDate, cDate, this));
+                    }
 
-                //i care
-                if (setting.ICare == 1)
-                {
-                    historyIcareList.Add(project.Key, getIcareTask(username, project.Key, 0, stDate, cDate));
-                    var icarelist_tmp = getIcareTask(username, project.Key, 1, stDate, cDate);
-                    task_total += icarelist_tmp.TaskList.Count;
-                    icareList.Add(project.Key, icarelist_tmp);
+                    //task
+                    if (setting.Task == 1)
+                    {
+                        historyTaskList.Add(project.Key, getProjectTask(username, project.Key, 0, stDate, cDate, ISSUESUBTYPE.Task));
+                        var taskList_tmp = getProjectTask(username, project.Key, 1, stDate, cDate, ISSUESUBTYPE.Task);
+                        task_total += taskList_tmp.TaskList.Count;
+                        taskList.Add(project.Key, taskList_tmp);
+                    }
+
+                    //critical failure task
+                    if (setting.CriticalFailure == 1)
+                    {
+                        historyCriList.Add(project.Key, getProjectTask(username, project.Key, 0, stDate, cDate, ISSUESUBTYPE.CrititalFailureTask, false));
+                        var criList_tmp = getProjectTask(username, project.Key, 1, stDate, cDate, ISSUESUBTYPE.CrititalFailureTask, false);
+                        task_total += criList_tmp.TaskList.Count;
+                        criticalList.Add(project.Key, criList_tmp);
+                    }
+
                     //debug tree
-                    icareDebugTree.Add(project.Key, ProjectErrorICareVM.GetProjectErrorICareList(username, project.Key, stDate, cDate, this));
-                }
+                    if (setting.DebugTree == 1)
+                    {
+                        DebugTreeList.Add(project.Key, ProjectErrorViewModels.RetrieveWeeklyErrorByPJKey(project.Key, stDate, cDate, this));
+                    }
 
-                //task
-                if (setting.Task == 1)
-                {
-                    historyTaskList.Add(project.Key, getProjectTask(username, project.Key, 0, stDate, cDate, ISSUESUBTYPE.Task));
-                    var taskList_tmp = getProjectTask(username, project.Key, 1, stDate, cDate, ISSUESUBTYPE.Task);
-                    task_total += taskList_tmp.TaskList.Count;
-                    taskList.Add(project.Key, taskList_tmp);
+                    //get current week summary
+                    SummaryList.Add(project.Key, getCurWeekSummary(project.Key, stDate, cDate));
                 }
-
-                //critical failure task
-                if (setting.CriticalFailure == 1)
-                {
-                    historyCriList.Add(project.Key, getProjectTask(username, project.Key, 0, stDate, cDate, ISSUESUBTYPE.CrititalFailureTask, false));
-                    var criList_tmp = getProjectTask(username, project.Key, 1, stDate, cDate, ISSUESUBTYPE.CrititalFailureTask, false);
-                    task_total += criList_tmp.TaskList.Count;
-                    criticalList.Add(project.Key, criList_tmp);
-                }
-
                 //rma
                 if (setting.RMA == 1)
                 {
@@ -2632,16 +2635,10 @@ namespace Prometheus.Controllers
                     RMAList.Add(project.Key, rmaList_tmp);
                 }
 
-                //debug tree
-                if (setting.DebugTree == 1)
+                if(string.IsNullOrEmpty(project.Value.TransferFlg) || task_total != 0)
                 {
-                    DebugTreeList.Add(project.Key, ProjectErrorViewModels.RetrieveWeeklyErrorByPJKey(project.Key, stDate, cDate, this));
+                    ProjectKeyList.Add(project.Key, task_total);
                 }
-
-                //get current week summary
-                SummaryList.Add(project.Key, getCurWeekSummary(project.Key, stDate, cDate));
-
-                ProjectKeyList.Add(project.Key, task_total);
             }
 
             ViewBag.setting = setting;
@@ -2690,7 +2687,7 @@ namespace Prometheus.Controllers
             else
             {
                 var datalist = new List<string>();
-                var pvm = ProjectViewModels.RetrieveOneProject(projectkey);
+                var pvm = ProjectViewModels.N_RetrieveProjectInfo(projectkey);
                 var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(projectkey, sDate, eDate, pvm, HttpContext.Cache);
                 var firstdatalist = new List<KeyValuePair<string, int>>();
                 var fpy = yieldvm.FirstYield * 100;
@@ -3350,5 +3347,436 @@ namespace Prometheus.Controllers
             return ret;
         }
 
+        public ActionResult TechnicalVideo(string activeid,string searchkey)
+        {
+            ViewBag.updater = "";
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+                ViewBag.updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            }
+
+            var vm = TechVideoVM.RetrieveVideo(searchkey);
+            if (vm.Count > 0)
+            {
+                if (string.IsNullOrEmpty(activeid))
+                {
+                    ViewBag.ActiveVideo = vm[0];
+                }
+                else
+                {
+                    foreach (var item in vm)
+                    {
+                        if (string.Compare(activeid, item.VID) == 0)
+                        {
+                            ViewBag.ActiveVideo = item;
+                        }
+                    }
+                    if (ViewBag.ActiveVideo == null)
+                    {
+                        ViewBag.ActiveVideo = vm[0];
+                    }
+                }
+            }
+
+            return View(vm);
+        }
+
+        public string RetrieveUploadVideo()
+        {
+            var ret = "";
+
+            try
+            {
+                foreach (string fl in Request.Files)
+                {
+                    if (fl != null && Request.Files[fl].ContentLength > 0)
+                    {
+                        string fn = Path.GetFileName(Request.Files[fl].FileName)
+                            .Replace(" ", "_").Replace("#", "")
+                            .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                        var ext = Path.GetExtension(fn).ToLower();
+                        var allvtype = ".mp4,.mp3,.h264,.wmv,.wav,.avi,.flv,.mov,.mkv,.webm,.ogg,.mov,.mpg";
+
+                        if (allvtype.Contains(ext))
+                        {
+                            string datestring = DateTime.Now.ToString("yyyyMMdd");
+                            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+
+                            if (!Directory.Exists(imgdir))
+                            {
+                                Directory.CreateDirectory(imgdir);
+                            }
+
+                            var srvfd = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
+                            Request.Files[fl].SaveAs(imgdir + srvfd);
+
+                            if (!ext.Contains("mp4"))
+                            {
+                                var mp4name = Path.GetFileNameWithoutExtension(srvfd) + ".mp4";
+                                var mp4path = imgdir + mp4name;
+                                var ffMpeg2 = new NReco.VideoConverter.FFMpegConverter();
+                                ffMpeg2.ConvertMedia(imgdir + srvfd, mp4path, NReco.VideoConverter.Format.mp4);
+
+                                try { System.IO.File.Delete(imgdir + srvfd); } catch (Exception ex) { }
+                                return "/userfiles/docs/" + datestring + "/" + mp4name;
+                            }
+
+                            return "/userfiles/docs/" + datestring + "/" + srvfd;
+
+                        }//end if
+                    }//end if
+                }
+
+            }
+            catch (Exception ex){ }
+            return ret; 
+        }
+
+        public ActionResult UploadTechnicalVideo()
+        {
+
+            var mp4url = RetrieveUploadVideo();
+            var vsubject = Request.Form["vsubject"];
+            var vdesc = Request.Form["vdesc"];
+            if (!string.IsNullOrEmpty(mp4url) && !string.IsNullOrEmpty(vsubject))
+            {
+                var updater = "";
+                var ckdict = CookieUtility.UnpackCookie(this);
+                if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+                {
+                    updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                    updater = updater.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].ToUpper();
+                }
+
+                TechVideoVM.StoreVideo(vsubject, vdesc, mp4url, updater);
+            }
+            return RedirectToAction("TechnicalVideo", "User");
+        }
+
+
+        public ActionResult GetKPI(string uName="", string sDate = "", string eDate = "")
+        {
+            var ulist = new List<string>();
+            if (!string.IsNullOrEmpty(uName))
+            {
+                ulist = uName.ToUpper().Split(new char[] { ';' }).ToList();
+            }
+            else
+            {
+                var syscfg = CfgUtility.GetSysConfig(this);
+                ulist = syscfg["KPIGROUP2"].ToUpper().Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            }
+
+            ViewBag.uName = uName;
+            ViewBag.sDate = sDate;
+            ViewBag.eDate = eDate;
+            ViewBag.flg = 0;
+            ViewBag.data1 = KPIVM.GetAllKPI(this, ulist, sDate, eDate);
+            if(string.IsNullOrEmpty(sDate) && string.IsNullOrEmpty(eDate))
+            {
+                ViewBag.flg = 1;
+                ViewBag.data2 = KPIVM.GetAllKPI(this, ulist, sDate, eDate, 0);
+            }
+
+            return View();
+        }
+
+        public JsonResult GetUsers()
+        {
+            var allusers = UserViewModels.RetrieveAllUser();
+            var res = new JsonResult();
+            res.Data = new { success = true, data = allusers };
+
+            return res;
+        }
+
+        public ActionResult IDashboard(string uname = "", string sdate = "", string edate = "")
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "IDashboard");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            if (string.IsNullOrEmpty(uname))
+            {
+                uname = updater;
+            }
+            if (string.IsNullOrEmpty(sdate))
+            {
+                if(DateTime.Now.DayOfWeek != DayOfWeek.Friday)
+                {
+                    var dayofweek = Convert.ToInt32(DateTime.Now.AddMonths(-1).DayOfWeek);
+                    sdate = DateTime.Now.AddMonths(-1).AddDays((5 - dayofweek) - 7).ToString("yyyy-MM-dd");
+                }
+                else
+                {
+                    sdate = DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd");
+                }
+            }
+            else
+            {
+                if (Convert.ToDateTime(sdate).DayOfWeek != DayOfWeek.Friday)
+                {
+                    var dayofweek = Convert.ToInt32(Convert.ToDateTime(sdate).DayOfWeek);
+                    sdate = Convert.ToDateTime(sdate).AddDays((5 - dayofweek) - 7).ToString("yyyy-MM-dd");
+                }
+                else
+                {
+                    sdate = Convert.ToDateTime(sdate).ToString("yyyy-MM-dd");
+                }
+            }
+            if (string.IsNullOrEmpty(edate))
+            {
+                edate = DateTime.Now.ToString("yyyy-MM-dd");
+            }
+            var usergroup = UserGroupVM.RetreiveUserGroup(updater, UserGroupType.ReportGroup);
+            ViewBag.UserName = updater.Split(new char[] { '@' })[0];
+            ViewBag.RealUserID = updater;
+            ViewBag.cUserName = uname.Split(new char[] { '@' })[0];
+            ViewBag.cUserID = uname;
+            ViewBag.sdate = Convert.ToDateTime(sdate).ToString("yyyy-MM-dd");
+            ViewBag.edate = Convert.ToDateTime(edate).ToString("yyyy-MM-dd");
+            ViewBag.userreportlist = usergroup.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            return View();
+        }
+
+        public JsonResult GetDashboardData()
+        {
+            var res = new JsonResult();
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+                var uname = Request.Form["uname"];
+                var sdate = Request.Form["sdate"];
+                var edate = Request.Form["edate"];
+                sdate = Convert.ToDateTime(sdate).ToString("yyyy-MM-dd 00:00:00");
+                edate = Convert.ToDateTime(edate).ToString("yyyy-MM-dd 23:59:59");
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                var usergroup = UserGroupVM.RetreiveUserGroup(updater, UserGroupType.ReportGroup);
+                var userlist = usergroup.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                var weeks = IDashboardVM.CalculateWeek(sdate, edate);
+                var data = IDashboardVM.RetrieveDashboardData(new List<string> { uname }, "", sdate, edate);
+
+                var xAxis_data = new List<string>();
+                foreach(var week in weeks)
+                {
+                    xAxis_data.Add(week.Date);
+                }
+                var task_data = new List<int>();
+                var ctask_data = new List<int>();
+                var bug_data = new List<int>();
+                var cbug_data = new List<int>();
+                var critask_data = new List<int>();
+                var ccritask_data = new List<int>();
+                var dtree_data = new List<int>();
+                foreach(var item in data)
+                {
+                    task_data.Add((item.Value.TaskList != null) ? item.Value.TaskList.Count : 0);
+                    ctask_data.Add((item.Value.TaskClosedList != null) ? item.Value.TaskClosedList.Count : 0);
+                    bug_data.Add((item.Value.BugList != null) ? item.Value.BugList.Count : 0);
+                    cbug_data.Add((item.Value.BugClosedList != null) ? item.Value.BugClosedList.Count : 0);
+                    critask_data.Add((item.Value.CriticalTaskList != null) ? item.Value.CriticalTaskList.Count : 0);
+                    ccritask_data.Add((item.Value.CriticalTaskClosedList != null) ? item.Value.CriticalTaskClosedList.Count : 0);
+                    dtree_data.Add((item.Value.DebugTreeList != null) ? item.Value.DebugTreeList.Count : 0);
+                }
+
+                res.Data = new
+                {
+                    success = true,
+                    tdata = new
+                    {
+                        id = "task_container",
+                        title = "Task",
+                        type = DashboardType.Task,
+                        xAxis = new
+                        {
+                            data = xAxis_data
+                        },
+                        yAxis = new
+                        {
+                            title = "Amount"
+                        },
+                        data = new List<object> {
+                            new{
+                                name = "New Task",
+                                data = task_data
+                            },
+                            new{
+                                name = "Closed Task",
+                                data = ctask_data
+                            }
+                        }
+                    },
+                    bdata = new
+                    {
+                        id = "bug_container",
+                        title = "Bug",
+                        type = DashboardType.Bug,
+                        xAxis = new
+                        {
+                            data = xAxis_data
+                        },
+                        yAxis = new
+                        {
+                            title = "Amount"
+                        },
+                        data = new List<object> {
+                            new{
+                                name = "New Bug",
+                                data = bug_data
+                            },
+                            new{
+                                name = "Closed Bug",
+                                data = cbug_data
+                            }
+                        }
+                    },
+                    cdata = new
+                    {
+                        id = "ctask_container",
+                        title = "Critical Failure Task",
+                        type = DashboardType.CrititalFailureTask,
+                        xAxis = new
+                        {
+                            data = xAxis_data
+                        },
+                        yAxis = new
+                        {
+                            title = "Amount"
+                        },
+                        data = new List<object> {
+                            new{
+                                name = "New Critical Failure Bug",
+                                data = critask_data
+                            },
+                            new{
+                                name = "Closed Critical Failure Bug",
+                                data = ccritask_data
+                            }
+                        }
+                    },
+                    ddata = new
+                    {
+                        id = "dtree_container",
+                        title = "DebugTree",
+                        type = DashboardType.DebugTree,
+                        xAxis = new
+                        {
+                            data = xAxis_data
+                        },
+                        yAxis = new
+                        {
+                            title = "Amount"
+                        },
+                        data = new List<object> {
+                            new{
+                                name = "Debug Tree",
+                                data = dtree_data
+                            }
+                        }
+                    }
+                };
+            }
+            else
+            {
+                res.Data = new { success = false };
+            }
+
+            return res;
+        }
+
+        public ActionResult DashboardDetail(string uname, string type, string date)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "ILearn");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            var sdate = Convert.ToDateTime(date).ToString("yyyy-MM-dd 00:00:00");
+            var edate = Convert.ToDateTime(date).AddDays(+6).ToString("yyyy-MM-dd 23:59:59");
+            var type_list = new List<string>();
+            if(type == DashboardType.Task.ToString())
+            {
+                type_list.Add(ISSUESUBTYPE.Other.ToString());
+                type_list.Add(ISSUESUBTYPE.Task.ToString());
+                type_list.Add(ISSUESUBTYPE.NonCrititalFailureTask.ToString());
+                type_list.Add(ISSUESUBTYPE.OBA.ToString());
+                type_list.Add(ISSUESUBTYPE.RMA.ToString());
+                type_list.Add(ISSUESUBTYPE.REL.ToString());
+                type_list.Add(ISSUESUBTYPE.NPIProcess.ToString());
+            }
+            else if (type == DashboardType.Bug.ToString())
+            {
+                type_list.Add(ISSUESUBTYPE.Bug.ToString());
+            }
+            else if(type == DashboardType.CrititalFailureTask.ToString())
+            {
+                type_list.Add(ISSUESUBTYPE.CrititalFailureTask.ToString());
+            }
+            var o_data = new Dictionary<string, IssueList4DashboardWithWeek>();
+            var c_data = new Dictionary<string, IssueList4DashboardWithWeek>();
+            var d_data = new Dictionary<string, DebugTreeVM>();
+            if (type_list.Count > 0)
+            {
+                var itype = "('" + string.Join("','", type_list.ToArray()) + "')";
+                o_data = IDashboardVM.GetIssuesByConditions(new List<string> { uname }, itype, sdate, edate, 1);
+                c_data = IDashboardVM.GetIssuesByConditions(new List<string> { uname }, itype, sdate, edate, 2);
+            }
+            else
+            {
+                //debug tree
+                d_data = IDashboardVM.GetDebugTreeDetail(new List<string> { uname }, sdate, edate);
+            }
+            ViewBag.UserName = updater.Split(new char[] { '@' })[0];
+            ViewBag.RealUserID = updater;
+            ViewBag.cUserName = uname.Split(new char[] { '@' })[0];
+            ViewBag.cUserID = uname;
+            ViewBag.sdate = Convert.ToDateTime(sdate).ToString("yyyy-MM-dd");
+            ViewBag.edate = Convert.ToDateTime(edate).ToString("yyyy-MM-dd");
+            ViewBag.type = type;
+            ViewBag.o_data = o_data;
+            ViewBag.c_data = c_data;
+            ViewBag.d_data = d_data;
+
+            return View();
+        }
+
+        public JsonResult TransferRule()
+        {
+            var transpeople = Request.Form["transpeople"];
+            var transid = Request.Form["transid[]"];
+            var transferids = transid.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var item in transferids)
+            {
+                ProjectCriticalErrorVM.TransferRule(item, transpeople);
+            }
+
+            var ret = new JsonResult();
+            ret.Data = new { success=true };
+            return ret;
+        }
     }
 }

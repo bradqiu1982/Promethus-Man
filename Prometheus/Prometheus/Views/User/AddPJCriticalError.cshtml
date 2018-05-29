@@ -3,7 +3,9 @@
 @{
     ViewBag.Title = "Add Project Critical Error";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var ruleidx = 0;
 }
+<script src="~/Scripts/autocompletefill.js"></script>
 
 <div class="row">
     <div class="nav navbar-nav navbar-left">
@@ -206,13 +208,11 @@
                             <label class="control-label">To Who</label>
                         </div>
                         <div class="col-xs-9">
-                            @Html.DropDownList("towholist1", null, new { @id = "towholist1", @class = "form-control", @onchange = "chooseapusher1()" })
+                            <input class="form-control" id="towholist1" name="towholist1"
+                                   type="text" value="" />
                         </div>
                         <script type="text/javascript">
-                            function chooseapusher1()
-                            {
-                                document.getElementById("towhoinput1").value = document.getElementById("towhoinput1").value + ';' + document.getElementById("towholist1").value;
-                            }
+                            autoCompleteFill('towholist1', @Html.Raw(ViewBag.AllUserList), true, 'towhoinput1');
                         </script>
                     </div>
                     <hr />
@@ -281,6 +281,7 @@
                     <table class="table table-bordered table-hover"  style="font-size:10px;">
                         <thead>
                             <tr>
+                                <th>&nbsp;</th>
                                 <th>Project</th>
                                 <th>Failure Symptom</th>
                                 <th>Error Code</th>
@@ -294,7 +295,7 @@
                                 <th>Algorithm Param</th>
                                 <th>Wild Match Param</th>
                                 <th>FA Switch</th>
-                                
+                                <th>Rule Owner</th>
                                 <th>Related People</th>
                                 <th>&nbsp;</th>
                                 <th>&nbsp;</th>
@@ -304,6 +305,7 @@
                             @foreach (var item in Model)
                             {
                                 <tr>
+                                    <td><input class="transferruleids" type="checkbox" id="rulecheck@(ruleidx)" name="issuetagcheck@(ruleidx)" value="@(item.RuleID)" /></td>
                                     <td>@item.ProjectKey</td>
                                     <td>@item.SettingReason</td>
                                     <td>@item.ErrorCode</td>
@@ -353,11 +355,13 @@
                                             </button>
                                         }
                                     </td>
-                                    
+                                    <td>@item.Creater.Replace("@FINISAR.COM", "")</td>
                                     <td>@item.Appv_4.Replace("@FINISAR.COM","")</td>
                                     <td><img src="~/Content/images/icon/edit2.png" MYTP="HOVER" style="height:30px; width:18px" onclick="EditPJCriticalError('@(item.RuleID)')"></td>
                                     <td><img src="~/Content/images/icon/delete2.png" MYTP="HOVER" style="height:30px; width:18px" onclick="DeletePJCriticalError('RuleID=@(item.RuleID)')"></td>
                                 </tr>
+
+                                ruleidx = ruleidx + 1;
                             }
                         </tbody>
                     </table>
@@ -445,4 +449,51 @@
         </div>
     }
 
-}
+
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="col-xs-2">
+                    <button MYTP="BT" type="button" class="btn btn-default" style="width:10.5em;" onclick="transferrules()">Transfer To</button>
+                </div>
+                <div class="col-xs-10">
+                    <input class="form-control" id="transferpeople" name="transferpeople"
+                           type="text" value="" />
+                </div>
+                <script type="text/javascript">
+                    autoCompleteFill('transferpeople', @Html.Raw(ViewBag.AllUserList),false,'defaultid');
+
+                    function transferrules()
+                    {
+                        var transpeople = $.trim($('#transferpeople').val());
+                        if(transpeople === '')
+                        {
+                            alert('Transfer people should be input!');
+                            return false;
+                        }
+                        var transid = new Array();
+                        $('.transferruleids:checked').each(function () {
+                            transid.push($(this).val());
+                        })
+                        if(transid.length == 0)
+                        {
+                            alert('At least one rule should be choose');
+                            return false;
+                        }
+
+                        $.post('/User/TransferRule',
+                        {
+                            transpeople:transpeople,
+                            transid:transid
+                        },
+                        function(){
+                            $('#transferpeople').val('');
+                            $('.transferruleids').prop('checked',false);
+                            window.location.href = window.location.href;
+                        });
+                    }
+                </script>
+            </div>
+        </div>
+    </div>
+ }

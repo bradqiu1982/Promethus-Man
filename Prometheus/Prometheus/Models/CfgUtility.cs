@@ -168,7 +168,10 @@ namespace Prometheus.Models
         {
             public static string Decode(Controller ctrl, string src)
             {
-                return ctrl.Server.HtmlDecode(src).Replace("border=\"0\"", "border=\"2\"");
+                var ret = ctrl.Server.HtmlDecode(src).Replace("border=\"0\"", "border=\"2\"");
+                ret = System.Text.RegularExpressions.Regex.Replace(ret, "<div.*?>", string.Empty).Trim();
+                ret = ret.Replace("</div>", "");
+                return ret;
             }
         }
 

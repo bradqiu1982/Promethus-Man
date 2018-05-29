@@ -1365,3 +1365,138 @@ GO
 
 EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'1: valid vote 0: invalid ' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'WeeklyReportShare', @level2type=N'COLUMN',@level2name=N'Status'
 GO
+
+/* for add issue relationship*/
+CREATE TABLE [dbo].[IssueRelationShip](
+	[MasterIssueKey] [nvarchar](50) NOT NULL,
+	[SlaveIssueKey] [nvarchar](50) NOT NULL,
+	[CreateTime] [datetime] NOT NULL
+) ON [PRIMARY]
+
+
+CREATE TABLE [dbo].[TechVideoVM] (
+    [VID]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[VSubject]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[VDescription]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[VPath]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[Updater]   NVARCHAR (200) DEFAULT ('') NOT NULL
+	);
+
+CREATE TABLE [dbo].[VcselPNData] (
+    [PN]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Rate]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Channel]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	);
+
+CREATE TABLE [dbo].[VcselMonthData] (
+    [StartDate]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[VTYPE]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Failure]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Num]   NVARCHAR (126) DEFAULT ('0') NOT NULL,
+	[UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	);
+
+CREATE TABLE [dbo].[VcselTimeRange] (
+	[WaferNo]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+    [StartDate]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[EndDate]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	);
+
+CREATE TABLE [dbo].[WaferTestSum] (
+    [WaferNo]    NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[WhichTest]    NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[VTYPE]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Failure]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Num]   NVARCHAR (126) DEFAULT ('0') NOT NULL,
+	[DataIDs]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	);
+
+
+CREATE TABLE [dbo].[WaferBGDField] (
+    [WaferNo]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[FieldName]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[BoxData]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[DataType] NVARCHAR (200) DEFAULT ('') NOT NULL
+	);
+
+CREATE TABLE [dbo].[VcselRMAData] (
+    [SN]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[BuildDate]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[Wafer]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[PN]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[PNDesc]   NVARCHAR (300) DEFAULT ('') NOT NULL,
+	[VcselPN]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[VcselType]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[ProductType]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[ShipDate]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[RMAOpenDate]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[RMANum]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Customer]   NVARCHAR (200) DEFAULT ('') NOT NULL
+	);
+
+CREATE TABLE [dbo].[WaferSNMap] (
+    [Wafer]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[SN]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[CurrentWorkStep] NVARCHAR (300) DEFAULT ('') NOT NULL,
+	[LastMoveDate]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[PN]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[PNDesc] NVARCHAR (300) DEFAULT ('') NOT NULL
+	);
+
+CREATE TABLE [dbo].[EngineeringMileStone] (
+    [PJKey]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[ActionDate]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[Location]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[ActionDetail] NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[AppendInfo]   NVARCHAR (200) DEFAULT ('') NOT NULL
+	);
+
+CREATE TABLE [dbo].[WaferCoordData](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[SN] [nvarchar](200) Default '' NOT NULL,
+	[Coord_X] [nvarchar](max) Default '' NOT NULL,
+	[Coord_Y] [nvarchar](max) Default '' NOT NULL,
+	[Wafer_No] [nvarchar](200) Default '' NOT NULL,
+	[Bin] [nvarchar](max) Default '' NOT NULL,
+	[TestTime] [datetime] Default '' NOT NULL,
+	[SyncTime] [datetime] Default '' NOT NULL,
+    [APVal1] NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [APVal2] NVARCHAR (200)  DEFAULT ('') NOT NULL,
+    [APVal3] NVARCHAR (MAX)  DEFAULT ('') NOT NULL,
+    [APVal4] DATETIME       DEFAULT ('') NOT NULL
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY];
+
+Create Table [dbo].[ProjectMileStones](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[ProjectKey]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[UserName] [nvarchar](50) DEFAULT ('') NOT NULL,
+	[Action] NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[IsPublish] [tinyint] DEFAULT (1) NOT NULL, -- 1: public 2: private
+	[Status] [tinyint] DEFAULT (1) NOT NULL,	-- 1: valid 2: invalid
+	[AddDate] DATETIME DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[CreateTime] DATETIME DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[UpdateTime] DATETIME DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+    [APVal1] NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [APVal2] NVARCHAR (200)  DEFAULT ('') NOT NULL,
+    [APVal3] NVARCHAR (MAX)  DEFAULT ('') NOT NULL,
+    [APVal4] DATETIME       DEFAULT ('') NOT NULL
+);
+
+Create Table [dbo].[UserProjectModuleMatrix](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[UserName] [nvarchar](50) DEFAULT ('') NOT NULL,
+	[ProjectKey] NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[SortData] NVARCHAR (Max) DEFAULT ('') NOT NULL,
+	[Status] [tinyint] DEFAULT (1) NOT NULL,	-- 1: valid 2: invalid
+	[CreateTime] DATETIME DEFAULT ('') NOT NULL,
+	[UpdateTime] DATETIME DEFAULT ('') NOT NULL,
+    [APVal1] NVARCHAR (50)  DEFAULT ('') NOT NULL,
+    [APVal2] NVARCHAR (200)  DEFAULT ('') NOT NULL,
+    [APVal3] NVARCHAR (MAX)  DEFAULT ('') NOT NULL,
+    [APVal4] DATETIME       DEFAULT ('') NOT NULL
+);

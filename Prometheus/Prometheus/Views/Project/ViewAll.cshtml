@@ -30,16 +30,32 @@
         }
     </div>
     <script type="text/javascript">
-            function ShowProjectDetail() {
-                if (document.getElementById("pjfilterlist").value && document.getElementById("pjfilterlist").value != 'NONE') {
-                    window.location.href = '/Project/ProjectDetail?ProjectKey=' + document.getElementById("pjfilterlist").value;
+        function ShowProjectDetail() {
+            if (document.getElementById("pjfilterlist").value && document.getElementById("pjfilterlist").value != 'NONE') {
+                window.location.href = '/Project/ProjectDetail?ProjectKey=' + document.getElementById("pjfilterlist").value;
+            }
+        }
+        function LoadProject()
+        {
+            window.location.href = '/Project/LoadProjects';
+        }
+        $('body').on('click', '.close-project', function () {
+            if (!confirm("If you close project, this project will not display in projectlist")) {
+                return false;
+            }
+            var pKey = $(this).attr("data-pkey");
+            $.post('/Project/CloseProject', {
+                pKey: pKey,
+            }, function (output) {
+                if (output.success) {
+                    window.location.reload();
                 }
-            }
-
-            function LoadProject()
-            {
-                window.location.href = '/Project/LoadProjects';
-            }
+            })
+        })
+        $('body').on('click', '.edit-project', function () {
+            var pKey = $(this).attr("data-pkey");
+            window.location.href = "/Project/EditProject?ProjectKey=" + pKey;
+        })
     </script>
 </div>
 
@@ -75,7 +91,15 @@
                                             <strong>@item.ProjectName</strong>
                                         }
                                         </div>
-
+                                        @if (!string.IsNullOrEmpty(item.TransferFlg))
+                                        {
+                                            <div class="row text-left">
+                                                <div class="col-xs-1"></div>
+                                                <div class="col-xs-11">
+                                                    <red>Transfer to @item.TransferFlg</red>
+                                                </div>
+                                            </div>
+                                        }
                                         @if (!string.IsNullOrEmpty(item.CurrentNPIProc)
                                                 && !string.IsNullOrEmpty(item.PIP1Date)
                                                 && !string.IsNullOrEmpty(item.MVTDate))
@@ -96,7 +120,10 @@
                                             </div>
                                             <div class="row text-left">
                                                 <div class="col-xs-1"></div>
-                                                <div class="col-xs-11"><a href="/Project/EditProject?ProjectKey=@item.ProjectKey"><img src="~/Content/images/icon/edit.png" style="height:34px; width:24px"></a></div>
+                                                <div class="col-xs-11">
+                                                    <input type="button" class="btn btn-success btn-sm edit-project" data-pkey="@item.ProjectKey" value="Edit" />
+                                                    <input type="button" class="btn btn-danger btn-sm close-project" data-pkey="@item.ProjectKey" value="Close" />
+                                                </div>
                                             </div>
                                             }
                                             else
@@ -112,7 +139,10 @@
                                             </div>
                                             <div class="row text-left">
                                                 <div class="col-xs-1"></div>
-                                                <div class="col-xs-11"><a href="/Project/EditProject?ProjectKey=@item.ProjectKey"><img src="~/Content/images/icon/edit.png" style="height:34px; width:24px"></a></div>
+                                                <div class="col-xs-11">
+					                                <input type="button" class="btn btn-success btn-sm edit-project" data-pkey="@item.ProjectKey" value="Edit" />
+                                                    <input type="button" class="btn btn-danger btn-sm close-project" data-pkey="@item.ProjectKey" value="Close" />
+                                                </div>
                                             </div>
                                             }
                                     </div>
@@ -120,122 +150,60 @@
 
                                 @if (string.Compare(item.ProjectType, Prometheus.Models.ProjectTypeInf.QM) != 0)
                                 {
-                                <div class="col-xs-2">
-                                    <div class="col-xs-7" data-toggle="modal" data-target="#myModal">
-                                        <div class="row">
-                                            <div style="font-size:14px;">&nbsp;</div>
-                                        </div>
-                                        <div class="row" data-toggle="tooltip" title="Yield">
-                                            <a href="/Project/ProjectYieldMain?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/Yield.png" MYTP="HOVER" style="height:80px; width:80px"></a>
-                                        </div>
-                                    </div>
-                                    <div class="col-xs-5">
-                                        <div class="row">
-                                            <div style="font-size:14px;">&nbsp;</div>
-                                        </div>
-                                        @if (item.FirstYield > 0)
-                                            {
-                                            <div class="row"><span class="badge" style="color:white;background-color:red">FPY @((item.FirstYield * 100.0).ToString("0.0")) %</span></div>
-                                            }
-                                            else
-                                            {
-                                            <div class="row">
-                                                <div style="font-size:14px;">&nbsp;</div>
-                                            </div>
-                                            }
-                                        @if (item.RetestYield > 0)
-                                            {
-                                            <div class="row"><span class="badge" style="color:white;background-color:red">FY @((item.RetestYield * 100.0).ToString("0.0")) %</span></div>
-                                            }
-                                            else
-                                            {
-                                            <div class="row">
-                                                <div style="font-size:14px;">&nbsp;</div>
-                                            </div>
-                                            }
-
-                                    </div>
-                                </div>
-                                <div class="col-xs-2">
-                                    @if (!ViewBag.IsOutSide)
+                                    var m = 0;
+                                    foreach(var mod in ViewBag.uProModules[item.ProjectKey])
                                     {
-                                        <div class="col-xs-7" data-toggle="modal" data-target="#myModal">
-
-                                            <div class="row">
-                                                <div style="font-size:14px;">&nbsp;</div>
+                                        if(m >= 5)
+                                        {
+                                            break;
+                                        }
+                                        <div class="col-xs-2 row-margin margin-top-15" data-sort-val="@mod.key">
+                                            <div class="col-xs-7" data-toggle="modal" data-target="#myModal">
+                                                <div data-toggle="tooltip" title="@mod.key">
+                                                    <a href="@(ViewBag.Default_Modules[mod.key].Url)?ProjectKey=@item.ProjectKey"><img src="@(ViewBag.Default_Modules[mod.key].ImgUrl)" style="height:75px; width:75px"></a>
+                                                </div>
                                             </div>
-                                            <div class="row">
-                                                <a href="/Project/ProjectFA?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/FA.png" MYTP="HOVER" style="height:80px; width:80px"></a>
-                                            </div>
+                                            @if(string.Compare(mod.key, "Yield", true) == 0)
+                                            {
+                                                <div class="col-xs-5">
+                                                    @if (item.FirstYield > 0)
+                                                    {
+                                                        <span class="badge margin-left-30" style="color:white;background-color:red">FPY @((item.FirstYield * 100.0).ToString("0.0")) %</span>
+                                                    }
+                                                    @if (item.RetestYield > 0)
+                                                    {
+                                                        <span class="badge margin-left-30" style="color:white;background-color:red">FY @((item.RetestYield * 100.0).ToString("0.0")) %</span>
+                                                    }
+                                                </div>
+                                            }
+                                            @if(string.Compare(mod.key, "FA", true) == 0)
+                                            {
+                                                <div class="col-xs-3">
+                                                    @if (item.FinishRating < 90)
+                                                    {
+                                                        <span class="badge margin-left-30" style="color:white;background-color:red">@item.PendingFACount</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge margin-left-30" style="color:white;background-color:forestgreen">@item.PendingFACount</span>
+                                                    }
+                                                </div>
+                                            }
+                                            @if(string.Compare(mod.key, "Task", true) == 0)
+                                            {
+                                                <div class="col-xs-3">
+                                                    <span class="badge margin-left-30" style="color:white;background-color:red">@item.PendingTaskCount</span>
+                                                </div>
+                                            }
+                                            @if(string.Compare(mod.key, "RMA", true) == 0)
+                                            {
+                                                <div class="col-xs-3">
+                                                    <span class="badge margin-left-30" style="color:white;background-color:red">@item.PendingRMACount</span>
+                                                </div>
+                                            }
                                         </div>
-                                        <div class="col-xs-5">
-
-                                            <div class="row">
-                                                <div style="font-size:14px;">&nbsp;</div>
-                                            </div>
-                                            <div class="row">
-                                                @if (item.FinishRating < 90)
-                                                {
-                                                    <div class="row"><span class="badge" style="color:white;background-color:red">@item.PendingFACount</span></div>
-                                                }
-                                                else
-                                                {
-                                                    <div class="row"><span class="badge" style="color:white;background-color:forestgreen">@item.PendingFACount</span></div>
-                                                }
-                                            </div>
-                                        </div>
+                                        m++;
                                     }
-                                </div>
-                                <div class="col-xs-2">
-                                    <div class="col-xs-7" data-toggle="modal" data-target="#myModal">
-
-                                        <div class="row">
-                                            <div style="font-size:14px;">&nbsp;</div>
-                                        </div>
-                                        <div class="row" data-toggle="tooltip" title="Task">
-                                            <a href="/Project/ProjectIssues?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/Task.png" MYTP="HOVER" style="height:80px; width:80px"></a>
-                                        </div>
-                                    </div>
-                                    <div class="col-xs-5">
-
-                                        <div class="row">
-                                            <div style="font-size:14px;">&nbsp;</div>
-                                        </div>
-                                        <div class="row"><span class="badge" style="color:white;background-color:red">@item.PendingTaskCount</span></div>
-                                    </div>
-                                </div>
-                                <div class="col-xs-2">
-                                    <div class="col-xs-7" data-toggle="modal" data-target="#myModal">
-
-                                        <div class="row">
-                                            <div style="font-size:14px;">&nbsp;</div>
-                                        </div>
-                                        <div class="row">
-                                            <a href="/Project/ProjectSptTask?ProjectKey=@item.ProjectKey" title="Critical Task" data-toggle="tooltip"><img src="~/Content/images/PJ/Spt.png" MYTP="HOVER" style="height:80px; width:80px"></a>
-                                        </div>
-                                    </div>
-                                    <div class="col-xs-5">
-                                        <div class="row">
-                                            <div style="font-size:14px;">&nbsp;</div>
-                                        </div>
-                                        <div class="row"><span class="badge" style="color:white;background-color:red">@item.PendingSptCount</span></div>
-                                    </div>
-                                </div>
-                                <div class="col-xs-2">
-                                    @if (!ViewBag.IsOutSide)
-                                    {
-                                        <div class="col-xs-7" data-toggle="modal" data-target="#myModal">
-                                            <div class="row">
-                                                <div style="font-size:14px;">&nbsp;</div>
-                                            </div>
-                                            <div class="row" data-toggle="tooltip" title="Debug Tree">
-                                                <a href="/Project/ProjectError?ProjectKey=@item.ProjectKey"><img src="~/Content/images/PJ/DebugTreeicon.png" MYTP="HOVER" style="height:80px; width:80px"></a>
-                                            </div>
-                                        </div>
-                                        <div class="col-xs-5">
-                                        </div>
-                                    }
-                                </div>
                                 }
                                 else
                                 {

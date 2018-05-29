@@ -23,15 +23,14 @@
 </div>
 <input type="hidden" id="current_user" name="current_user" value="@ViewBag.cUserID" />
 
-<script src="~/Scripts/highcharts.js"></script>
-<script src="~/Scripts/exporting.js"></script>
 <script src="~/Scripts/weeklyreport.js"></script>
 
 
-<ul class="nav nav-pills nav-stacked col-xs-2" data-intro="Select tab to see detail." data-step="1">
+<ul class="nav nav-pills nav-stacked col-xs-2">
     <li><a href="/User/ILearn">I Learn</a></li>
     <li class="active"><a href="/User/WeeklyReportList">Weekly Report</a></li>
     <li><a href="/User/WeeklyReportShare">Weekly Report Share</a></li>
+    <li><a href="/User/IDashboard">I Dashboard</a></li>
     <li><a href="/User/ILearn">Training</a></li>
     <li><a href="/User/ILearn">I Share</a></li>
 </ul>
@@ -78,25 +77,25 @@
             {
                 icare_dt_flg = ViewBag.icareDebugTree.ContainsKey(pKey) && ViewBag.icareDebugTree[pKey].Count > 0;
                 icare_flg = ViewBag.icareList.ContainsKey(pKey) && ViewBag.icareList[pKey].TaskList.Count > 0;
-                icare_update = ViewBag.icareList[pKey].IsUpdate || icare_dt_flg;
+                icare_update = (ViewBag.icareList.ContainsKey(pKey) && ViewBag.icareList[pKey].IsUpdate) || icare_dt_flg;
                 icare_cnt = icare_flg ? ViewBag.icareList[pKey].TaskList.Count : 0;
             }
             if (ViewBag.setting.Task == 1)
             {
                 task_flg = ViewBag.taskList.ContainsKey(pKey) && ViewBag.taskList[pKey].TaskList.Count > 0;
-                task_update = ViewBag.taskList[pKey].IsUpdate;
+                task_update = ViewBag.taskList.ContainsKey(pKey) && ViewBag.taskList[pKey].IsUpdate;
                 task_cnt = task_flg ? ViewBag.taskList[pKey].TaskList.Count : 0;
             }
             if (ViewBag.setting.CriticalFailure == 1)
             {
                 cri_flg = ViewBag.criticalList.ContainsKey(pKey) && ViewBag.criticalList[pKey].TaskList.Count > 0;
-                cri_update = ViewBag.criticalList[pKey].IsUpdate;
+                cri_update = ViewBag.criticalList.ContainsKey(pKey) && ViewBag.criticalList[pKey].IsUpdate;
                 cri_cnt = cri_flg ? ViewBag.criticalList[pKey].TaskList.Count : 0;
             }
             if (ViewBag.setting.RMA == 1)
             {
                 rma_flg = ViewBag.RMAList.ContainsKey(pKey) && ViewBag.RMAList[pKey].TaskList.Count > 0;
-                rma_update = ViewBag.RMAList[pKey].IsUpdate;
+                rma_update = ViewBag.RMAList.ContainsKey(pKey) && ViewBag.RMAList[pKey].IsUpdate;
                 rma_cnt = rma_flg ? ViewBag.RMAList[pKey].TaskList.Count : 0;
             }
             if(ViewBag.setting.DebugTree == 1)
@@ -154,13 +153,17 @@
                                 <div id="chart_@idx">
                                     @if (!string.IsNullOrEmpty(wyielddata.Pareto))
                                     {
+                                        <div class="col-xs-6">
+                                            <div class="fypareto" id="fypareto_@idx"></div>
+                                        </div>
                                         @Html.Raw(wyielddata.Pareto.Replace("#ElementID#", "fypareto_" + idx))
-                                        <div class="fypareto" id="fypareto_@idx"></div>
                                     }
                                     @if (!string.IsNullOrEmpty(wyielddata.Trend))
                                     {
+                                        <div class="col-xs-6">
+                                            <div class="wyield" id="wyield_@idx"></div>
+                                        </div>
                                         @Html.Raw(wyielddata.Trend.Replace("#ElementID#", "wyield_" + idx))
-                                        <div class="wyield" id="wyield_@idx"></div>
                                     }
                                 </div>
                                 <div class="yield-summary">
@@ -302,8 +305,8 @@
                                                 var itr_class = "";
                                                 if (summarylist != null && summarylist.ContainsKey(task.Key))
                                                 {
-                                                    itr_class = (summarylist[task.Key][0].Mark == "1") ? "summary-highlight"
-                                                                : ((summarylist[task.Key][0].Mark == "2") ? "summary-lowlight" : "");
+                                                    itr_class = (summarylist[task.Key][0].Mark == "1") ? "tr-highlight"
+                                                                : ((summarylist[task.Key][0].Mark == "2") ? "tr-lowlight" : "");
                                                 }
                                                 <tr data-data="cur-icare-@idx-@m" class="@itr_class">
                                                     <td>@(m + 1)</td>
@@ -365,7 +368,7 @@
                                                                       name="cur_icare_summary">@Html.Raw(isummary)</textarea>
                                                         </div>
                                                         <div class="col-xs-4">
-                                                            <select class="form-control">
+                                                            <select class="form-control" autocomplete="off">
                                                                 <option value="0" @(imark == "0" ? "selected" : "")>Normal</option>
                                                                 <option value="1" @(imark == "1" ? "selected" : "")>Highlight</option>
                                                                 <option value="2" @(imark == "2" ? "selected" : "")>Lowlight</option>
@@ -532,7 +535,7 @@
                                                     </td>
                                                     <td>
                                                         <input type="hidden" value="@tmark"/>
-                                                        <select class="form-control">
+                                                        <select class="form-control" autocomplete="off">
                                                             <option value="0" @(tmark == "0" ? "selected" : "")>Normal</option>
                                                             <option value="1" @(tmark == "1" ? "selected" : "")>Highlight</option>
                                                             <option value="2" @(tmark == "2" ? "selected" : "")>Lowlight</option>
@@ -713,7 +716,7 @@
                                                                       name="cur_icare_summary">@Html.Raw(csummary)</textarea>
                                                         </div>
                                                         <div class="col-xs-4">
-                                                            <select class="form-control">
+                                                            <select class="form-control" autocomplete="off">
                                                                 <option value="0" @(cmark == "0" ? "selected" : "")>Normal</option>
                                                                 <option value="1" @(cmark == "1" ? "selected" : "")>Highlight</option>
                                                                 <option value="2" @(cmark == "2" ? "selected" : "")>Lowlight</option>
@@ -887,7 +890,7 @@
                                                     </td>
                                                     <td>
                                                         <input type="hidden" value="@rmark" />
-                                                        <select class="form-control">
+                                                        <select class="form-control" autocomplete="off">
                                                             <option value="0" @(rmark == "0" ? "selected" : "")>Normal</option>
                                                             <option value="1" @(rmark == "1" ? "selected" : "")>Highlight</option>
                                                             <option value="2" @(rmark == "2" ? "selected" : "")>Lowlight</option>

@@ -1,0 +1,54 @@
+﻿<style type="text/css">
+    .ProjectMenuBar {
+        position:fixed;
+        top:160px;
+        right:15px;
+        z-index:1009;
+        width:60px;
+        border-width: 0px!important;
+        text-align:center;
+    }
+
+    .ProjectMenuItem {
+        height:50px;
+        border-width: 0px!important;
+        cursor:pointer;
+        margin-top:5px;
+    }
+
+    .ProjectMenuItem:hover {
+        background-color:#efefef;
+        text-align:center;
+    }
+
+    .ProjectMenuImg {
+        width:50px!important;
+        height:50px!important;
+    }
+
+</style>
+
+@if (ViewBag.PJKey != null)
+{
+    <div class="ProjectMenuBar">
+        <div class="ProjectMenuItem" data-toggle="tooltip" title="Yield">
+            <a href="/Project/ProjectYieldMain?ProjectKey=@ViewBag.PJKey"><img class="ProjectMenuImg" src="~/Content/images/PJ/Yield.png"></a>
+        </div>
+        <div class="ProjectMenuItem">
+            <a href="/Project/ProjectStations?pjkey=@ViewBag.PJKey"><img class="ProjectMenuImg" src="~/Content/images/PJ/station.png"></a>
+        </div>
+        <div class="ProjectMenuItem">
+            <a href="/Project/ProjectFA?ProjectKey=@ViewBag.PJKey"><img class="ProjectMenuImg" src="~/Content/images/PJ/FA.png"></a>
+        </div>
+        <div class="ProjectMenuItem" data-toggle="tooltip" title="Task">
+            <a href="/Project/ProjectIssues?ProjectKey=@ViewBag.PJKey"><img class="ProjectMenuImg" src="~/Content/images/PJ/Task.png"></a>
+        </div>
+        <div class="ProjectMenuItem" data-toggle="tooltip" title="Debug Tree">
+            <a href="/Project/ProjectError?ProjectKey=@ViewBag.PJKey"><img class="ProjectMenuImg" src="~/Content/images/PJ/DebugTreeicon.png"></a>
+        </div>
+        <div class="ProjectMenuItem" data-toggle="tooltip" title="Critical Task">
+            <a href="/Project/ProjectSptTask?ProjectKey=@ViewBag.PJKey"><img class="ProjectMenuImg" src="~/Content/images/PJ/Spt.png"></a>
+        </div>
+    </div>
+}
+

@@ -1,7 +1,7 @@
 ﻿PROJECTTYPE:::Parallel;Tunable;Telecom;LineCard;OSA;QM;Others
 SHAREFOLDERUSER:::brad.qiu
 SHAREFOLDERDOMIN:::china
-SHAREFOLDERPWD:::wangle@123456
+SHAREFOLDERPWD:::wangle@345678
 APPEMAILADRESS:::WXNPI.Trace@finisar.com
 APPEMAILPWD:::abc@12345
 #EMAILSERVER:::wmail.finisar.com
@@ -11,7 +11,7 @@ RMACLOSEATTACHES:::\\wux-fs\PUBLIC\Quality\10.Quality case summary\Customer Qual
 #NeoMAPDataFolder:::\\wux-file01\Public\Wuxi Parallel NPI\NeoMAP Data
 NeoMAPDataFolder:::\\wux-fs\public\Quality\20.Report of IQA\IQC对外分享文件\MESA VCSEL Tracking\NeoMAPwaferData
 RELSHAREFOLDER:::\\Cn-file01\public\Quality\Reliability\Failure Analysis\FA-AutoTracking\SummaryTable
-IQESHAREFOLDER:::\\wux-fs\public\Quality\20.Report of IQA\IQC内部记录\新项目\IQE job follow up items\system data
+IQESHAREFOLDER:::\\wux-fs\public\Quality\20.Report of IQA\新项目\IQE job follow up items\system data
 BIAUTOTABLES:::dbo.v_BICFP2Output;dbo.v_BICFP4Output;dbo.v_BICXPOutput;dbo.v_BIEDROutput;dbo.v_BIFDROutput;dbo.v_BIOEOutput;dbo.v_BIQSFP28GOutput;dbo.v_BIQSFPGen3Output;dbo.v_BIQWireOutput;dbo.v_BITopazOutput;
 BIZEROTIME:::2017-05-01 07:30:00
 TXPOWERTABLES:::ersetup;ertempcomp;
@@ -22,7 +22,7 @@ OBADEFAULTPJ:::PQE
 RELDEFAULTPJ:::RELIABILITY
 IQEDEFAULTPJ:::IQE
 BIADMIN:::tyler.zhang@finisar.com
-BITEAM:::tyler.zhang@finisar.com;tony.lv@finisar.com;windy.ju@finisar.com;Zhongxi.Yu@finisar.com;Zhijun.Chen@finisar.com
+BITEAM:::tyler.zhang@finisar.com;tony.lv@finisar.com;windy.ju@finisar.com;Zhongxi.Yu@finisar.com;Zhijun.Chen@finisar.com;martin.lu@finisar.com
 VALUEABLEATTACH:::PDF;DOCX;DOC;XLS;XLSX;XLSM;PPTX;PPT;ODP;ODT;ODS;WPS
 TRACEVIEWFOLDER:::\\cn-traceview\Traceview
 BAKTARGETMACHINE:::SHG-L80003583
@@ -30,34 +30,45 @@ BAKSRCMACHINE:::WUX-D80008792
 OUTSIDEPEOPLEAUTH:::TRUE
 MOVEHISTORYZEROTIME:::2017-07-10 07:30:00
 SHARETAG:::BER;EF;Epoxy;FLEX;IC;IC Setting;Lens;LOL;Los;LYT;OBA;ORT;PCB(A);Process;REL;RMA;SBR;Sensitivity;TX Power;VCSEL;CRITICALERROR
-CRITICALFAILURERT:::VCSEL;Lens detachment;EOS/ESD;Components damage;Components missing;PCBA open/short;Cable crack;LYT;Others
-CRITICALFAILURESYMPTOM:::LOL;LowPwr;High Power Consumption;High BitError;Low RSSI;Low RX Amptitude;RSSI Uniformity;IC
+CRITICALFAILURERT:::VCSEL;Lens detachment;EOS/ESD;Components damage;Components missing;PCBA open/short;Cable crack;LYT;Others;Wire Bonding Short;Capacitor Short;Process;Silver Paste;Rework Operation;
+CRITICALFAILURESYMPTOM:::LOL;LowPwr;High Power Consumption;High BitError;Low RSSI;Low RX Amptitude;RSSI Uniformity;IC;Voltage Abnormal;LDI Abnormal;CDR Fail;Wire Bonding Short;
 CRITICALDEFAULTRULE:::OBA_TEST,EEFAIL
-#CRITICALDEFAULTRULE:::TEST1,FAILURECODE1:TEST2,FAILURECODE2
+TUNABLETESTDATAOWNER:::cherry.gu@finisar.com;
+
+VCSELBIGDATAZEROPOINT:::2017-05-01 00:00:00
+Delta_PO_LD_LIMIT:::-2:2
+Delta_PO_Uniformity_LIMIT:::-0.1:0.1
+Variation_POLD_Delta_LIMIT:::-0.5:0.5
+Uniformity_POLD_Delta_LIMIT:::-2:2
+
+Plot_Delta_PO_LD_LIMIT:::-0.1:0.1
+Plot_Delta_PO_Uniformity_LIMIT:::-0.03:0.03
+Plot_Variation_POLD_Delta_LIMIT:::-0.2:0.5
+Plot_Uniformity_POLD_Delta_LIMIT:::-2:2
 
 OBA--PARA-10G OE:::Nevin.Niu
-OBA--PARA-25G OE:::Hao.Xu
-OBA--PARA-CFP2 SR10:::Hao.Xu
-OBA--PARA-CFP4 SR4:::Hao.Xu
-OBA--PARA-C-Wire GEN1 10.5G:::Hao.Xu
-OBA--PARA-C-Wire GEN1 12.5G:::Hao.Xu
-OBA--PARA-C-Wire GEN2 10.5G:::Hao.Xu
-OBA--PARA-C-Wire GEN2 12.5G:::Hao.Xu
-OBA--PARA-C-Wire GEN2 300M:::Hao.Xu
-OBA--PARA-CXP GEN1 10.5G:::Hao.Xu
-OBA--PARA-CXP GEN1 12.5G:::Hao.Xu
-OBA--PARA-CXP GEN2 10.5G:::Hao.Xu
-OBA--PARA-CXP GEN2 12.5G:::Hao.Xu
-OBA--PARA-CXP GEN2 300M:::Hao.Xu
+OBA--PARA-25G OE:::Doris.Kong
+OBA--PARA-CFP2 SR10:::Doris.Kong
+OBA--PARA-CFP4 SR4:::Doris.Kong
+OBA--PARA-C-Wire GEN1 10.5G:::Popo.Zhang
+OBA--PARA-C-Wire GEN1 12.5G:::Popo.Zhang
+OBA--PARA-C-Wire GEN2 10.5G:::Popo.Zhang
+OBA--PARA-C-Wire GEN2 12.5G:::Popo.Zhang
+OBA--PARA-C-Wire GEN2 300M:::Popo.Zhang
+OBA--PARA-CXP GEN1 10.5G:::Popo.Zhang
+OBA--PARA-CXP GEN1 12.5G:::Popo.Zhang
+OBA--PARA-CXP GEN2 10.5G:::Popo.Zhang
+OBA--PARA-CXP GEN2 12.5G:::Popo.Zhang
+OBA--PARA-CXP GEN2 300M:::Popo.Zhang
 OBA--PARA-EDR:::Doris.Kong
 OBA--PARA-FDR:::Doris.Kong
 OBA--PARA-FDR Lite transceiver:::Doris.Kong
-OBA--PARA-Octopus:::Hao.Xu
+OBA--PARA-Octopus:::Bright.Zhang
 OBA--PARA-OE28LP:::Bright.Zhang
 OBA--PARA-QSFP FDR transceiver:::Doris.Kong
 OBA--PARA-QSFP GEN4:::Doris.Kong
 OBA--PARA-QSFP SR4 Gen4:::Doris.Kong
-OBA--PARA-QSFP28G-PSM4:::Hao.Xu
+OBA--PARA-QSFP28G-PSM4:::Doris.Kong
 OBA--PARA-QSFP28G-SR4:::Bright.Zhang
 OBA--PARA-QSFP-GEN2:::Doris.Kong
 OBA--PARA-QSFP-GEN3:::Doris.Kong
@@ -66,6 +77,12 @@ OBA--PARA-Q-Wire Gen3:::Bright.Zhang
 OBA--PARA-Q-Wire(10.5G):::Bright.Zhang
 OBA--PARA-SR4 GEN3:::Doris.Kong
 OBA--PARA-Topaz OE:::Nevin.Niu
-OBA--SFP-Wire:::Hao.Xu
+OBA--SFP-Wire:::Popo.Zhang
 
 ME:::Jie.Zhu;Chengjing.Wu;Xiangguo.Xie;Stone.Chen;Cl.Zhang;Youji.Liu;Yvonne.Liang;Tyler.Jiang;Tom.Zhang;Li.Fang;Shaohua.Zhong;Emma.Xu;Hogan.Liu;Aries.Yang;Eric.Wang;Peng.Hu;Lan.Zhou;Chauncey.Wang;Laplace.Hu;Tristan.Ying;Edo.Gao
+
+KPIGROUP1:::ALEX.CHEN@FINISAR.COM;LEON.REN@FINISAR.COM;SEAN.PENG@FINISAR.COM;ZHAO.LIU@FINISAR.COM;GLORIA.LIU@FINISAR.COM;LOUIS.WANG@FINISAR.COM;TONY.LV@FINISAR.COM;
+KPIGROUP2:::ALEX.CHEN@FINISAR.COM;LEON.REN@FINISAR.COM;SEAN.PENG@FINISAR.COM;ZHAO.LIU@FINISAR.COM;GLORIA.LIU@FINISAR.COM;LOUIS.WANG@FINISAR.COM;TONY.LV@FINISAR.COM;TYLER.ZHANG@FINISAR.COM;MARTIN.LU@FINISAR.COM;CHANGJUN.ZHANG@FINISAR.COM;
+
+WAFERCOORD:::\\wux-fs02\Production_Test_Data\OSA_ME\OGP\WUX-E81000068
+VCSELRMASHARE:::\\wux-fs\public\Quality\10.Quality case summary\Customer Quality Case Summary\RMA & Complaint New\VCSEL Issue Tracking Master List.xlsx

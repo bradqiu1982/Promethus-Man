@@ -109,6 +109,15 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
+        public static void TransferRule(string ruleid, string newpeople)
+        {
+            var sql = "update ProjectCriticalError set Creater = @Creater where RuleID = @RuleID";
+            var dict = new Dictionary<string, string>();
+            dict.Add("@RuleID", ruleid);
+            dict.Add("@Creater", newpeople);
+            DBUtility.ExeLocalSqlNoRes(sql, dict);
+        }
+
         private static bool RuleExist(string pjkey, string errorcode, string testcasename, string matchcond, double lowlimit, double highlimit, string Algorithm, string algorithmparam)
         {
             var sql = "select RuleID from ProjectCriticalError where ProjectKey = '<ProjectKey>' and ErrorCode = '<ErrorCode>' and TestCaseName = '<TestCaseName>' and MatchCond = '<MatchCond>' and LowLimit = <LowLimit> and HighLimit = <HighLimit> and Algorithm = '<Algorithm>' and AlgorithmParam = '<AlgorithmParam>'";

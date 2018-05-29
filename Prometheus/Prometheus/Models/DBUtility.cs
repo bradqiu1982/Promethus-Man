@@ -8,6 +8,7 @@ using System.Data;
 using Oracle.DataAccess.Client;
 using System.Web.Caching;
 using System.Web.Mvc;
+using System.Text;
 
 namespace Prometheus.Models
 {
@@ -53,9 +54,9 @@ namespace Prometheus.Models
                 //conn.ConnectionString = "Data Source = (LocalDb)\\MSSQLLocalDB; AttachDbFilename = ~\\App_Data\\Prometheus.mdf; Integrated Security = True";
                 if (IsDebug())
                 {
-                    conn.ConnectionString = "Server=WUX-D80008792;User ID=dbg;Password=dbgpwd;Database=DebugDB;Connection Timeout=120;";
+                    //conn.ConnectionString = "Server=WUX-D80008792;User ID=dbg;Password=dbgpwd;Database=DebugDB;Connection Timeout=120;";
                     //conn.ConnectionString = "Server=WUX-D80008792;User ID=NPI;Password=NPI@NPI;Database=NPITrace;Connection Timeout=120;";
-                    //conn.ConnectionString = "Server=wuxinpi;User ID=NPI;Password=NPI@NPI;Database=NPITrace;Connection Timeout=120;";
+                    conn.ConnectionString = "Server=wuxinpi;User ID=NPI;Password=NPI@NPI;Database=NPITrace;Connection Timeout=120;";
                 }
                 else
                 {
@@ -149,7 +150,11 @@ namespace Prometheus.Models
                 {
                     foreach (var param in parameters)
                     {
-                        command.Parameters.AddWithValue(param.Key, param.Value);
+                        SqlParameter parameter = new SqlParameter();
+                        parameter.ParameterName = param.Key;
+                        parameter.SqlDbType = SqlDbType.NVarChar;
+                        parameter.Value = param.Value;
+                        command.Parameters.Add(parameter);
                     }
                 }
                 sqlreader = command.ExecuteReader();
@@ -254,7 +259,11 @@ namespace Prometheus.Models
                 {
                     foreach(var param in parameters)
                     {
-                        command.Parameters.AddWithValue(param.Key, param.Value);
+                        SqlParameter parameter = new SqlParameter();
+                        parameter.ParameterName = param.Key;
+                        parameter.SqlDbType = SqlDbType.NVarChar;
+                        parameter.Value = param.Value;
+                        command.Parameters.Add(parameter);
                     }
                 }
                 command.ExecuteNonQuery();
@@ -351,6 +360,42 @@ namespace Prometheus.Models
                 return null;
             }
         }
+        public static DataTable NExecuteSqlReturnTable(string sql, Dictionary<string, string> parameters = null)
+        {
+            var dt = new DataTable();
+            var conn = GetLocalConnector();
+            if (conn == null)
+                return dt;
+            try
+            {
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                if (parameters != null)
+                {
+                    foreach (var param in parameters)
+                    {
+                        SqlParameter parameter = new SqlParameter();
+                        parameter.ParameterName = param.Key;
+                        parameter.SqlDbType = SqlDbType.NVarChar;
+                        parameter.Value = param.Value;
+                        cmd.Parameters.Add(parameter);
+                    }
+                }
+                SqlDataAdapter myAd = new SqlDataAdapter(cmd);
+                myAd.SelectCommand.CommandTimeout = 0;
+                myAd.Fill(dt);
+                return dt;
+            }
+            catch (SqlException ex)
+            {
+                CloseConnector(conn);
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                CloseConnector(conn);
+                return dt;
+            }
+        }
         /* parameters: 
          * if you want to defense SQL injection,
          * you can prepare @param in sql,
@@ -385,25 +430,25 @@ namespace Prometheus.Models
                 {
                     foreach (var param in parameters)
                     {
-                        command.Parameters.AddWithValue(param.Key, param.Value);
+                        SqlParameter parameter = new SqlParameter();
+                        parameter.ParameterName = param.Key;
+                        parameter.SqlDbType = SqlDbType.NVarChar;
+                        parameter.Value = param.Value;
+                        command.Parameters.Add(parameter);
                     }
                 }
                 sqlreader = command.ExecuteReader();
                 if (sqlreader.HasRows)
                 {
-
                     while (sqlreader.Read())
                     {
-                        var newline = new List<object>();
-                        for (var i = 0; i < sqlreader.FieldCount; i++)
-                        {
-                            newline.Add(sqlreader.GetValue(i));
-                        }
-                        ret.Add(newline);
+                        Object[] values = new Object[sqlreader.FieldCount];
+                        sqlreader.GetValues(values);
+                        ret.Add(values.ToList<object>());
                     }
 
                 }
-
+                
                 sqlreader.Close();
                 CloseConnector(conn);
 
@@ -469,6 +514,94 @@ namespace Prometheus.Models
                 return ret;
             }
         }
+
+        private static SqlConnection GetNebulaConnector()
+        {
+            var conn = new SqlConnection();
+            try
+            {
+                conn.ConnectionString = @"Server=wuxinpi;User ID=NebulaNPI;Password=abc@123;Database=NebulaTrace;Connection Timeout=120;";
+                conn.Open();
+                return conn;
+            }
+            catch (SqlException ex)
+            {
+                logthdinfo("fail to connect to the mes report pdms database:" + ex.Message);
+                //System.Windows.MessageBox.Show(ex.ToString());
+                return null;
+            }
+            catch (Exception ex)
+            {
+                logthdinfo("fail to connect to the mes report pdms database" + ex.Message);
+                //System.Windows.MessageBox.Show(ex.ToString());
+                return null;
+            }
+        }
+
+        /* parameters: 
+         * if you want to defense SQL injection,
+         * you can prepare @param in sql,
+         * and give @param-values in parameters.
+         */
+        public static List<List<object>> ExeNebulaSqlWithRes(string sql, Dictionary<string, string> parameters = null)
+        {
+            //var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+
+            var ret = new List<List<object>>();
+            var conn = GetNebulaConnector();
+            try
+            {
+                if (conn == null)
+                    return ret;
+
+                var command = conn.CreateCommand();
+                command.CommandTimeout = 60;
+                command.CommandText = sql;
+                if (parameters != null)
+                {
+                    foreach (var param in parameters)
+                    {
+                        command.Parameters.AddWithValue(param.Key, param.Value);
+                    }
+                }
+                var sqlreader = command.ExecuteReader();
+                if (sqlreader.HasRows)
+                {
+
+                    while (sqlreader.Read())
+                    {
+                        var newline = new List<object>();
+                        for (var i = 0; i < sqlreader.FieldCount; i++)
+                        {
+                            newline.Add(sqlreader.GetValue(i));
+                        }
+                        ret.Add(newline);
+                    }
+                }
+
+                sqlreader.Close();
+                CloseConnector(conn);
+                return ret;
+            }
+            catch (SqlException ex)
+            {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                //System.Windows.MessageBox.Show(ex.ToString());
+                CloseConnector(conn);
+                ret.Clear();
+                return ret;
+            }
+            catch (Exception ex)
+            {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                //System.Windows.MessageBox.Show(ex.ToString());
+                CloseConnector(conn);
+                ret.Clear();
+                return ret;
+            }
+        }
+
+
 
         private static SqlConnection GetMESConnector()
         {
@@ -900,7 +1033,7 @@ namespace Prometheus.Models
          * you can prepare @param in sql,
          * and give @param-values in parameters.
          */
-        public static List<List<object>> ExeMESReportSqlWithRes(Controller ctrl, string sql, Dictionary<string, string> parameters = null)
+        public static List<List<object>> ExeMESReportSqlWithRes(string sql, Dictionary<string, string> parameters = null)
         {
             //var syscfgdict = CfgUtility.GetSysConfig(ctrl);
 
@@ -957,6 +1090,8 @@ namespace Prometheus.Models
                 return ret;
             }
         }
+
+
 
         private static SqlConnection GetMESReportMasterConnector()
         {

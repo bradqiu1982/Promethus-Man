@@ -1,0 +1,88 @@
+﻿
+@{
+    ViewBag.Title = "DownLoadATETestData";
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
+}
+
+<link type="text/css" rel="stylesheet" href="~/Content/bootstrap-datepicker/bootstrap-datepicker.min.css" />
+<script type="text/javascript" src="~/Scripts/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
+<script type="text/javascript" src="~/Scripts/autocompletefill.js"></script>
+<div class="row">
+    <div class="col-xs-12">
+        <ol class="breadcrumb" style="font-size:18px">
+            <li class="active">Download ATE Test Data</li>
+        </ol>
+    </div>
+</div>
+
+
+
+<div class="row">
+    <div class="col-xs-1"></div>
+    <div class="col-xs-2"><label class="form-control">Start Date</label></div>
+    <div class="col-xs-3">
+        <div class="input-group date" data-date=""
+             data-date-format="yyyy-mm-dd">
+            <input type="text" class="form-control"
+                   id="sdate" name="sdate" value="" readonly>
+            <span class="input-group-addon">
+                <span class="glyphicon glyphicon-th"></span>
+            </span>
+        </div>
+    </div>
+    <div class="col-xs-2"><label class="form-control">End Date</label></div>
+    <div class="col-xs-3">
+        <div class="input-group date" data-date=""
+             data-date-format="yyyy-mm-dd">
+            <input type="text" class="form-control"
+                   id="edate" name="edate" value="" readonly>
+            <span class="input-group-addon">
+                <span class="glyphicon glyphicon-th"></span>
+            </span>
+        </div>
+    </div>
+    <div class="col-xs-1"></div>
+</div>
+<div class="row">
+    <div class="col-xs-1"></div>
+    <div class="col-xs-2"><label class="form-control">Module Family</label></div>
+    <div class="col-xs-3"><input class="form-control" id="modulefamily" name="modulefamily" value=""></div>
+    <div class="col-xs-2"><input type="button" class="btn btn-success" onclick="DownloadATE()" value="Download Raw Data"/></div>
+    <div class="col-xs-1"></div>
+    <div class="col-xs-2"><input type="button" class="btn btn-success" onclick="DownloadFilterATE()" value="Download Filtered Data" /></div>
+    <div class="col-xs-1"></div>
+    <script type="text/javascript">
+        autoCompleteFill('modulefamily', @Html.Raw(ViewBag.ModuleFamily),false,'defaultid');
+    </script>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $('.date').datepicker({ autoclose: true });
+    });
+
+        function DownloadATE()
+        {
+            var startdate = $("#sdate").val();
+            var enddate = $("#edate").val();
+            var mfamily = $("#modulefamily").val();
+            if (startdate === '' || enddate === '' || mfamily === '')
+            {
+                alert("All information need to be input!");
+                return false;
+            }
+
+            window.location.href = "/CustomerData/RealATETestData?mdtype=" + mfamily + "&starttime=" + startdate + "&endtime=" + enddate;
+        }
+
+        function DownloadFilterATE() {
+
+            var startdate = $("#sdate").val();
+            var enddate = $("#edate").val();
+            var mfamily = $("#modulefamily").val();
+            if (startdate === '' || enddate === '' || mfamily === '') {
+                alert("All information need to be input!");
+                return false;
+            }
+            window.location.href = "/CustomerData/RealATETestData?mdtype=" + mfamily + "&starttime=" + startdate + "&endtime=" + enddate+"&filtered=true";
+        }
+</script>

@@ -117,6 +117,8 @@ namespace Prometheus.Models
             string pncond = PNCondition(projectmodel.PNList);
 
             var joinstr = " LEFT JOIN Insite.Container b WITH (NOLOCK) ON b.containername = a.ModuleSerialNum LEFT JOIN Insite.MfgOrder d WITH(NOLOCK) ON d.MfgOrderId = b.MfgOrderId ";
+            //var joinstr = " LEFT JOIN Insite.SUM_Popular_Contnaier d WITH (NOLOCK) ON d.ContainerName = a.ModuleSerialNum ";
+
             var sql = "select a.dc_<DCTABLE>HistoryId,a.ModuleSerialNum, a.WhichTest, a.ModuleType, a.ErrAbbr, a.TestTimeStamp, a.TestStation,a.assemblypartnum ,d.MfgOrderName from "
                 + " insite.dc_<DCTABLE> a (nolock) "+ joinstr + " where assemblypartnum in  (<PNCOND>)  <TIMECOND>  order by  moduleserialnum,testtimestamp DESC";
 
@@ -143,6 +145,8 @@ namespace Prometheus.Models
                 return string.Empty;
 
             var joinstr = " LEFT JOIN Insite.Container b WITH (NOLOCK) ON b.containername = a.ModuleSerialNum LEFT JOIN Insite.MfgOrder d WITH(NOLOCK) ON d.MfgOrderId = b.MfgOrderId ";
+            //var joinstr = " LEFT JOIN Insite.SUM_Popular_Contnaier d WITH (NOLOCK) ON d.ContainerName = a.ModuleSerialNum ";
+
             var sql = "select a.dc_OSAMultiValueTestHistoryId,a.ModuleSerialNum, a.WhichTest, a.ModuleType,a.TestResult, a.TestTimeStamp, a.TestStation,a.ModulePartNum ,d.MfgOrderName from "
                 + " insite.dc_OSAMultiValueTest a (nolock) " + joinstr + " where a.ModulePartNum in  (<PNCOND>)  <TIMECOND>  order by  moduleserialnum,testtimestamp DESC";
             return sql.Replace("<PNCOND>", pncond);
@@ -760,7 +764,7 @@ namespace Prometheus.Models
             return false;
         }
 
-        private static void CreateSystemIssues(List<ProjectTestData> failurelist, Controller ctrl,bool normalFAEnable = true)
+        private static void CreateSystemIssues(List<ProjectTestData> failurelist, Controller ctrl,bool normalFAEnable = true, bool transflg = false)
         {
             if (failurelist.Count > 0)
             {
@@ -782,9 +786,10 @@ namespace Prometheus.Models
                 //get first engineer
                 var pj = ProjectViewModels.RetrieveOneProject(failurelist[0].ProjectKey);
                 var firstengineer = "";
+                var role = transflg ? ProjectViewModels.MEROLE : ProjectViewModels.ENGROLE;
                 foreach (var m in pj.MemberList)
                 {
-                    if (string.Compare(m.Role,ProjectViewModels.ENGROLE) == 0)
+                    if (string.Compare(m.Role, role) == 0)
                     {
                         firstengineer = m.Name;
                         break;
@@ -804,7 +809,7 @@ namespace Prometheus.Models
 
                     if (!CheckPJCriticalError(item,pjcriticalerrorlist,ctrl))
                     {
-                        if (normalFAEnable)
+                        if (normalFAEnable && !transflg)
                         {
                             CreateFA(item, firstengineer,ctrl);
                         }
@@ -1134,7 +1139,7 @@ namespace Prometheus.Models
             return datafield;
         }
 
-        public static void UpdateOSAProjectData(ProjectViewModels vm, string starttime, Controller ctrl)
+        public static void UpdateOSAProjectData(ProjectViewModels vm, string starttime, Controller ctrl, bool transflg = false)
         {
             var endtime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
@@ -1213,9 +1218,10 @@ namespace Prometheus.Models
                         var datafield = RetrieveOSAFailedDataField(newdatalist);
 
                         var firstengineer = "";
+                        var role = transflg ? ProjectViewModels.MEROLE : ProjectViewModels.ENGROLE;
                         foreach (var m in vm.MemberList)
                         {
-                            if (string.Compare(m.Role, ProjectViewModels.ENGROLE) == 0)
+                            if (string.Compare(m.Role, role) == 0)
                             {
                                 firstengineer = m.Name;
                                 break;
@@ -1243,7 +1249,10 @@ namespace Prometheus.Models
                                                 sndict.Add(dt.ModuleSerialNum, true);
                                                 if (vm.FinishRating < 90 && DateTime.Parse(starttime) != vm.StartDate)
                                                 {
-                                                    CreateOSAFA(vm, dt, datafield[dt.DataID], priority, failedparam, firstengineer,ctrl);
+                                                    if (!transflg)
+                                                    {
+                                                        CreateOSAFA(vm, dt, datafield[dt.DataID], priority, failedparam, firstengineer, ctrl);
+                                                    }
                                                 }
                                             }
 
@@ -1495,27 +1504,27 @@ namespace Prometheus.Models
                     }
                 }
 
-                    if (vm.FinishRating < 90 && DateTime.Parse(starttime) != vm.StartDate)
+                if (vm.FinishRating < 90 && DateTime.Parse(starttime) != vm.StartDate)
+                {
+                    //use latest failure cover previous failure
+                    foreach (var item in failurelist)
                     {
-                        //use latest failure cover previous failure
-                        foreach (var item in failurelist)
-                        {
-                            IssueViewModels.CloseIssueAutomaticllyWithFailedSN(item.ProjectKey, item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), ctrl);
-                        }
+                        IssueViewModels.CloseIssueAutomaticllyWithFailedSN(item.ProjectKey, item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), ctrl);
+                    }
 
-                        CreateSystemIssues(failurelist, ctrl);
-                    }
-                    else
-                    {
-                        CreateSystemIssues(failurelist, ctrl,false);
-                    }
+                    CreateSystemIssues(failurelist, ctrl, true, !string.IsNullOrEmpty(vm.TransferFlg));
+                }
+                else
+                {
+                    CreateSystemIssues(failurelist, ctrl, false);
+                }
 
                 if (vm.FinishRating < 90 && DateTime.Parse(starttime) != vm.StartDate)
                 {
-                        //use pass sn cover previous failure
-                        foreach (var item in passlist)
+                    //use pass sn cover previous failure
+                    foreach (var item in passlist)
                     {
-                        IssueViewModels.CloseIssueAutomaticlly(item.ProjectKey,item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"),ctrl);
+                        IssueViewModels.CloseIssueAutomaticlly(item.ProjectKey,item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), ctrl);
                     }
                 }
                 
@@ -1563,6 +1572,36 @@ namespace Prometheus.Models
                 }
                 return ret;
             }
+        }
+
+        public static Dictionary<string, string> RetrievePNDescByPn(List<string> pnlist)
+        {
+            var ret = new Dictionary<string, string>();
+
+            StringBuilder sb1 = new StringBuilder(10 * (pnlist.Count + 5));
+            sb1.Append("('");
+            foreach (var line in pnlist)
+            {
+                sb1.Append(line + "','");
+            }
+            var tempstr1 = sb1.ToString();
+            var pncond = tempstr1.Substring(0, tempstr1.Length - 2) + ")";
+
+            var sql = @"  select distinct pb.ProductName,p.[Description] from [InsiteDB].[insite].[ProductBase] pb (nolock) 
+                        left join [InsiteDB].[insite].[Product] p with (nolock) on p.ProductBaseId = pb.ProductBaseId  
+                        where pb.ProductName in <pncond>";
+            sql = sql.Replace("<pncond>", pncond);
+            var dbret = DBUtility.ExeMESSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                var pn = Convert.ToString(line[0]);
+                var pndesc = Convert.ToString(line[1]);
+                if (!ret.ContainsKey(pn))
+                {
+                    ret.Add(pn, pndesc);
+                }
+            }
+            return ret;
         }
 
 

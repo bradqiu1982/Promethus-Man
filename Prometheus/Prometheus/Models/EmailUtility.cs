@@ -39,6 +39,19 @@ namespace Prometheus.Models
             }
         }
 
+        public static bool IsEmaileValid(string emailaddress)
+        {
+            try
+            {
+                MailAddress m = new MailAddress(emailaddress);
+                return true;
+            }
+            catch (FormatException)
+            {
+                return false;
+            }
+        }
+
         public static bool SendEmail(Controller ctrl,string title, List<string> tolist, string content, bool isHtml = true,string attachpath = null)
         {
             try
@@ -58,6 +71,7 @@ namespace Prometheus.Models
                 {
                     if (!item.Contains("@"))
                         continue;
+
                     try
                     {
                         if (item.Contains(";"))
@@ -65,12 +79,17 @@ namespace Prometheus.Models
                             var ts = item.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
                             foreach (var t in ts)
                             {
-                                message.To.Add(t);
+                                if (IsEmaileValid(t)) {
+                                    message.To.Add(t);
+                                }
                             }
                         }
                         else
                         {
-                            message.To.Add(item);
+                            if (IsEmaileValid(item))
+                            {
+                                message.To.Add(item);
+                            }
                         }
                     }
                     catch (Exception e) { logthdinfo("Address exception: " + e.Message); }

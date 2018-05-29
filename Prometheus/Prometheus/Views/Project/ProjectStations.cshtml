@@ -1,0 +1,167 @@
+﻿
+@{
+    ViewBag.Title = "ProjectStations";
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
+    var idx = 0;
+}
+
+<div class="row" style="margin-top:1%">
+    <div class="nav navbar-nav navbar-left">
+        <img src="~/Content/images/PJ/RMA.png" style="height:35px; width:35px;margin-right: 15px;">
+    </div>
+    <div class="nav navbar-nav navbar-left">
+        <ol class="breadcrumb" style="width:600px">
+            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
+            <li><a data-toggle="tooltip" title="Goto Project Detail" href="/Project/ProjectDetail?ProjectKey=@(ViewBag.pjkey)">Project Detail</a></li>
+            <li class="active">Project Stations</li>
+        </ol>
+    </div>
+</div>
+
+<link href="~/Content/projectstation.css" rel="stylesheet" type="text/css" />
+<div class="body-content">
+    <div class="content-left list-group col-xs-3">
+        @if (ViewBag.WhichTestList != null && ViewBag.WhichTestList.Count > 0)
+        {
+            foreach (var item in ViewBag.WhichTestList)
+            {
+                if (string.Compare(item, ViewBag.ActiveStation) == 0)
+                {
+                    <span class="list-group-item active station-val" onclick="PJStation('pjkey=@(ViewBag.pjkey)&whichtest=@(item)')">@item</span>
+                }
+                else
+                {
+                    <span class="list-group-item" onclick="PJStation('pjkey=@(ViewBag.pjkey)&whichtest=@(item)')">@item</span>
+                }
+            }
+        }
+
+    </div>
+    <div class="content-right col-xs-9">
+        <div class="row date-group">
+            <div class="col-xs-4">
+                <label class="date-label">Start Date</label>
+                <input type="text" id="startdate" name="startdate" class="form-control date-input" />
+            </div>
+            <div class="col-xs-4">
+                <label class="date-label">End Date</label>
+                <input type="text" id="enddate" name="enddate" class="form-control date-input" />
+            </div>
+            <div class="col-xs-1">
+                <input class="btn btn-default" type="button" onclick="PJStationByDate()" value="Search" />
+            </div>
+        </div>
+        <div class="test-yield-container">
+            <div class="tester-yield" id="tester-yield">
+            </div>
+        </div>
+
+        @if (ViewBag.MachineYield != null && !string.IsNullOrEmpty(ViewBag.MachineYield))
+        {
+            @Html.Raw(ViewBag.MachineYield)
+        }
+
+        <div class="station-list">
+            @if (!string.IsNullOrEmpty(ViewBag.allstationpareto)
+                || !string.IsNullOrEmpty(ViewBag.allstationscatter))
+            {
+                var scattchart = ViewBag.allstationscatter;
+                var paretochart = ViewBag.allstationpareto;
+                <div class="station-detail">
+                    <div class="station-title span-primary">
+                        <span class="glyphicon glyphicon-blackboard"></span>
+                        <span>All Stations</span>
+                    </div>
+                    <div class="station-chart">
+                        <div class="pareto-container col-xs-6">
+                            <div class="station-pareto" id="allstationpareto"></div>
+                        </div>
+                        <div class="scatter-container col-xs-6">
+                            <div class="station-scatter" id="allstationscatter"></div>
+                        </div>
+                    </div>
+                </div>
+                if (!string.IsNullOrEmpty(scattchart))
+                {
+                    @Html.Raw(scattchart);
+                }
+                if (!string.IsNullOrEmpty(paretochart))
+                {
+                    @Html.Raw(paretochart);
+                }
+            }
+
+            @if (ViewBag.StationList != null && ViewBag.StationList.Count > 0)
+            {
+                foreach (var station in ViewBag.StationList)
+                {
+                    idx = idx + 1;
+                    var scattchart = ViewBag.Scattdict[station];
+                    var paretochart = ViewBag.paretodict[station];
+
+                    <div class="station-detail">
+                        <div class="station-title span-primary">
+                            <span class="glyphicon glyphicon-blackboard"></span>
+                            <span>@(station)</span>
+                        </div>
+                        <div class="station-chart">
+                            <div class="pareto-container col-xs-6">
+                                <div class="station-pareto" id="station-pareto-@(idx)"></div>
+                            </div>
+                            <div class="scatter-container col-xs-6">
+                                <div class="station-scatter" id="station-scatter-@(idx)"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    if (!string.IsNullOrEmpty(scattchart))
+                    {
+                        @Html.Raw(scattchart);
+                    }
+                    if (!string.IsNullOrEmpty(paretochart))
+                    {
+                        @Html.Raw(paretochart);
+                    }
+                }//end foreach
+            }
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $('#startdate').datepicker({
+            changeMonth: true,
+            changeYear: true,
+            dateFormat: 'yy-mm-dd'
+        });
+        $('#enddate').datepicker({
+            changeMonth: true,
+            changeYear: true,
+            dateFormat: 'yy-mm-dd'
+        });
+    })
+
+    function PJStation(param)
+    {
+        var startdate = $('#startdate').val();
+        var enddate = $('#enddate').val();
+        if (startdate && enddate) {
+            window.location.href = '/Project/ProjectStations?' + param + '&StartTime=' + startdate + '&EndTime=' + enddate;
+        }
+        else {
+            window.location.href = '/Project/ProjectStations?' + param;
+        }
+    }
+
+    function PJStationByDate()
+    {
+        var startdate = $('#startdate').val();
+        var enddate = $('#enddate').val();
+        var activewhichtest = $('.station-val').html();
+        if (startdate && enddate) {
+            window.location.href = '/Project/ProjectStations?' + 'pjkey=@(ViewBag.pjkey)&whichtest=' + activewhichtest + '&StartTime=' + startdate + '&EndTime=' + enddate;
+        }
+        return false;
+    }
+</script>

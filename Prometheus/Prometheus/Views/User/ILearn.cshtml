@@ -5,6 +5,8 @@
 }
 
 
+<script src="~/Scripts/autocompletefill.js"></script>
+
 <div class="row">
     <div class="nav navbar-nav navbar-left">
         <img src="~/Content/images/ucicon/ILearnIcons.png" style="height:40px; width:40px">
@@ -18,16 +20,14 @@
 </div>
 
 
-<script src="~/Scripts/highcharts.js"></script>
-<script src="~/Scripts/exporting.js"></script>
-
-
-<ul class="nav nav-pills nav-stacked col-xs-2" data-intro = "Select tab to see detail."  data-step="1">
+<ul class="nav nav-pills nav-stacked col-xs-2" data-intro="Select tab to see detail." data-step="1">
     <li class="active"><a href="#tab_a" data-toggle="pill">I Learn</a></li>
     <li><a href="/User/WeeklyReportList">Weekly Report</a></li>
     <li><a href="/User/WeeklyReportShare">Weekly Report Share</a></li>
+    <li><a href="/User/IDashboard">I Dashboard</a></li>
     <li><a href="#tab_c" data-toggle="pill">Training</a></li>
     <li><a href="#tab_d" data-toggle="pill">I Share</a></li>
+    @*<li><a href="/User/TechnicalVideo">Technical Video</a></li>*@
 </ul>
 
 <div class="tab-content col-xs-10" data-intro = "Show detail of tab"  data-step="2">
@@ -374,8 +374,12 @@
                     <label class="control-label">To Who</label>
                 </div>
                 <div class="col-xs-9">
-                    @Html.DropDownList("towholist", null, new { @id = "towholist", @class = "form-control" })
+                    <input class="form-control" id="towholist" name="towholist"
+                           type="text" value="" />
                 </div>
+                <script type="text/javascript">
+                    autoCompleteFill('towholist', @Html.Raw(ViewBag.AllUserList), true, 'towhoinput');
+                </script>
             </div>
             <hr/>
             <div class="row col-xs-12">

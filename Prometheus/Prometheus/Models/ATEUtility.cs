@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 
@@ -27,6 +29,198 @@ namespace Prometheus.Models
         {
             var sql = "SELECT d.ROUTE_ID,a.MFR_SN,d.DATASET_NAME,c.FAMILY,d.STATUS,d.END_TIME,d.STATION,a.MFR_PN FROM PARTS a INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID WHERE(c.MODEL_ID like 'FTLX6871%' or c.MODEL_ID like 'FTLX6872%' or c.MODEL_ID like 'FTLX6672%') and d.END_TIME > '20161119080000'  and d.DATASET_NAME IN('final', 'assembly', 'tune_rf', 'tune', 'temp_test_7up') ORDER BY d.END_TIME DESC";
             DBUtility.ExeATESqlWithRes(sql);
+        }
+
+        public static void EmailATETestDailyData(string mdtype,Controller ctrl)
+        {
+            var syscfg = CfgUtility.GetSysConfig(ctrl);
+            var towho = syscfg["TUNABLETESTDATAOWNER"].Split(new string[] { ";",","," " }, StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            var onedayagon = DateTime.Now.AddDays(-1);
+            var sdate = DateTime.Parse(onedayagon.ToString("yyyy-MM-dd") + " 00:00:00");
+            var edate = DateTime.Parse(onedayagon.ToString("yyyy-MM-dd") + " 23:59:59");
+
+            var pndict = new Dictionary<string, bool>();
+            var atedatalist = ATEUtility.FilteredATEData(mdtype, sdate, edate, pndict);
+
+            if (atedatalist.Count > 0)
+            {
+                var pndescdict = MESUtility.RetrievePNDescByPn(new List<string>(pndict.Keys));
+                var sb = PrePareATEData(atedatalist, pndescdict);
+
+                string datestring = DateTime.Now.ToString("yyyyMMdd");
+                string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+                if (!Directory.Exists(imgdir))
+                {
+                    Directory.CreateDirectory(imgdir);
+                }
+
+                var family = atedatalist[0].ModuleType.Replace(" ", "_").Replace("#", "").Replace("'", "")
+                            .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                var fn = "ATE_" + family + "_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+                var filename = imgdir + fn;
+                System.IO.File.WriteAllText(filename, sb.ToString(), Encoding.UTF8);
+
+                EmailUtility.SendEmail(ctrl, "ATE Daily Test Data - " + mdtype, towho
+                    , "Daily Test Data\r\nFYI", true, filename);
+                new System.Threading.ManualResetEvent(false).WaitOne(500);
+            }
+
+        }
+
+        public static StringBuilder PrePareATEData(List<ProjectTestData> atelist, Dictionary<string, string> pndescdict)
+        {
+            StringBuilder sb1 = new StringBuilder(300 * (atelist.Count + 1));
+            sb1.Append("SN,WhichTest,Failure,TestTimestamp,Station,Module Family,PN,PN Desc,Spend Time(in hour)\r\n");
+            foreach (var item in atelist)
+            {
+                var pndesc = "";
+                if (pndescdict.ContainsKey(item.PN))
+                { pndesc = pndescdict[item.PN]; }
+
+                sb1.Append("\"" + item.ModuleSerialNum.ToString().Replace("\"", "") + "\"," + "\"" + item.WhichTest.Replace("\"", "") + "\"," + "\"" + item.ErrAbbr.Replace("\"", "") + "\","
+                    + "\"" + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss") + "\"," + "\"" + item.TestStation.Replace("\"", "") + "\"," + "\"" + item.ModuleType.Replace("\"", "") + "\","
+                    + "\"" + item.PN.Replace("\"", "") + "\"," + "\"" + pndesc.Replace("\"", "") + "\"," + "\"" + item.JO.Replace("\"", "") + "\",\r\n");
+            }
+            return sb1;
+        }
+
+        public static List<ProjectTestData> RetrieveATEData(string family,DateTime startdate,DateTime enddate,Dictionary<string,bool> pndict)
+        {
+            var ret = new List<ProjectTestData>();
+
+            var sql = @"SELECT a.MFR_SN,d.DATASET_NAME,c.FAMILY,d.STATUS,d.END_TIME,d.STATION,a.MFR_PN,d.ROUTE_ID,d.dataset_id,b.state FROM PARTS a   
+                        INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX  
+                        INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID 
+                        INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID   
+                        WHERE c.FAMILY = '<family>' and d.END_TIME >= '<starttime>' and d.END_TIME <= '<endtime>' AND b.state <> 'GOLDEN'  ORDER BY a.MFR_SN,d.END_TIME ASC";
+            sql = sql.Replace("<family>", family).Replace("<starttime>", startdate.ToString("yyyyMMddHHmmss")).Replace("<endtime>", enddate.ToString("yyyyMMddHHmmss"));
+
+            var currentroutid = "";
+            var currentstation = "";
+            var currentsn = "";
+
+            var pjdatalist = new List<ProjectTestData>();
+
+            var dbret = DBUtility.ExeATESqlWithRes(sql);
+
+            foreach (var item in dbret)
+            {
+                try
+                {
+                    var sn = Convert.ToString(item[0]);
+                    var ds = Convert.ToString(item[1]);
+                    var mdtype = Convert.ToString(item[2]);
+                    var status = Convert.ToString(item[3]);
+
+                    var spdatetime = Convert.ToString(item[4]);
+                    var stdtime = spdatetime.Substring(0, 4) + "-" + spdatetime.Substring(4, 2) + "-" + spdatetime.Substring(6, 2) + " "
+                                          + spdatetime.Substring(8, 2) + ":" + spdatetime.Substring(10, 2) + ":" + spdatetime.Substring(12, 2);
+                    var station = Convert.ToString(item[5]);
+                    var pn = Convert.ToString(item[6]);
+                    if (!pndict.ContainsKey(pn))
+                    { pndict.Add(pn, true); }
+
+                    var temprouteid = Convert.ToString(item[7]);
+                    var tempdatasetid = Convert.ToString(item[8]);
+                    var state = Convert.ToString(item[9]);
+
+                    var setupflag = false;
+                    if (ds.ToUpper().Contains("_SETUP"))
+                    { setupflag = true; }
+
+                    if (string.Compare(currentroutid, temprouteid) != 0 
+                        || string.Compare(currentstation, station) != 0
+                        || string.Compare(currentsn, sn) != 0
+                        || setupflag)
+                    {
+                        currentroutid = temprouteid;
+                        currentstation = station;
+                        currentsn = sn;
+
+                        if (pjdatalist.Count > 0)
+                        {
+                            var err = "";
+                            var errid = "";
+                            foreach (var line in pjdatalist)
+                            {
+                                if (string.Compare(line.ErrAbbr, "PASS", true) != 0
+                                    && string.Compare(line.ErrAbbr, "INFO", true) != 0)
+                                {
+                                    err = line.WhichTest;
+                                    errid = line.DataID;
+                                    break;
+                                }
+                            }//end foreach
+
+                            var hours = (double)(pjdatalist[pjdatalist.Count - 1].TestTimeStamp - pjdatalist[0].TestTimeStamp).TotalSeconds / 3600.0;
+                            if (string.IsNullOrEmpty(errid))
+                            {
+                                var testdata = new ProjectTestData("TEMP", pjdatalist[0].DataID, pjdatalist[0].ModuleSerialNum, pjdatalist[0].WhichTest.Replace("_setup","")+ "/" + pjdatalist[0].JO, pjdatalist[0].ModuleType
+                                    , "PASS", pjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss")  , pjdatalist[0].TestStation, pjdatalist[0].PN);
+
+                                testdata.JO = (Math.Round(hours,3)).ToString();
+                                ret.Add(testdata);
+                            }
+                            else
+                            {
+                                var testdata = new ProjectTestData("TEMP", errid, pjdatalist[0].ModuleSerialNum, pjdatalist[0].WhichTest.Replace("_setup", "") + "/" + pjdatalist[0].JO, pjdatalist[0].ModuleType
+                                    , err, pjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), pjdatalist[0].TestStation, pjdatalist[0].PN);
+                                
+                                testdata.JO = (Math.Round(hours, 3)).ToString();
+                                ret.Add(testdata);
+                            }
+                        }
+
+                        pjdatalist.Clear();
+                      
+                        //(string pk, string did, string sn, string wtest, string mt, string err, string testtime, string station, string p)
+                        var tempdata = new ProjectTestData("TEMP", tempdatasetid, sn, ds, mdtype, status, stdtime, station, pn);
+                        tempdata.JO = state;
+                        pjdatalist.Add(tempdata);
+                    }
+                    else
+                    {
+                        //(string pk, string did, string sn, string wtest, string mt, string err, string testtime, string station, string p)
+                        var tempdata = new ProjectTestData("TEMP", tempdatasetid, sn , ds, mdtype, status, stdtime, station, pn);
+                        tempdata.JO = state;
+                        pjdatalist.Add(tempdata);
+                    }
+
+                }
+                catch (Exception ex)
+                { }
+            }
+
+            return ret;
+        }
+
+        public static List<ProjectTestData> FilteredATEData(string mdtype, DateTime sdate, DateTime edate, Dictionary<string, bool> pndict)
+        {
+            var ret = new List<ProjectTestData>();
+            var rawdata = ATEUtility.RetrieveATEData(mdtype, sdate, edate, pndict);
+            if (rawdata.Count > 0)
+            {
+                var allpndict = new Dictionary<string, bool>();
+                var previousdata = ATEUtility.RetrieveATEData(mdtype, sdate.AddMonths(-2), sdate, allpndict);
+                var filterdict = new Dictionary<string, bool>();
+                foreach (var item in previousdata)
+                {
+                    if (!filterdict.ContainsKey(item.ModuleSerialNum + ":::" + item.WhichTest))
+                    {
+                        filterdict.Add(item.ModuleSerialNum + ":::" + item.WhichTest, true);
+                    }
+                }
+                foreach (var item in rawdata)
+                {
+                    if (!filterdict.ContainsKey(item.ModuleSerialNum + ":::" + item.WhichTest))
+                    {
+                        ret.Add(item);
+                    }
+                }
+            }
+            return ret;
         }
 
         private static string GetUniqKey()
@@ -403,7 +597,7 @@ namespace Prometheus.Models
                             IssueViewModels.CloseIssueAutomaticllyWithFailedSN(item.ProjectKey, item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"),ctrl);
                         }
 
-                        CreateSystemIssues(failurelist);
+                        CreateSystemIssues(failurelist, !string.IsNullOrEmpty(vm.TransferFlg));
                     }
 
                     if (vm.FinishRating < 90 && DateTime.Parse(starttime) != vm.StartDate)
@@ -476,15 +670,16 @@ namespace Prometheus.Models
             return ret;
         }
 
-        private static void CreateSystemIssues(List<ProjectTestData> failurelist)
+        private static void CreateSystemIssues(List<ProjectTestData> failurelist, bool transflg = false)
         {
             if (failurelist.Count > 0)
             {
                 var pj = ProjectViewModels.RetrieveOneProject(failurelist[0].ProjectKey);
                 var firstengineer = "";
+                var role = transflg ? ProjectViewModels.MEROLE : ProjectViewModels.ENGROLE;
                 foreach (var m in pj.MemberList)
                 {
-                    if (string.Compare(m.Role, ProjectViewModels.ENGROLE) == 0)
+                    if (string.Compare(m.Role, role) == 0)
                     {
                         firstengineer = m.Name;
                         break;

@@ -20,8 +20,7 @@
 }
 
 <script src="../../ckeditor/ckeditor.js"></script>
-<link href="~/Scripts/jquery-autocomplete/jquery.auto-complete.css" rel="stylesheet" type="text/css" />
-<script src="~/Scripts/jquery-autocomplete/jquery.auto-complete.min.js" type="text/javascript"></script>
+<script src="~/Scripts/autocompletefill.js"></script>
 
 <script type="text/javascript">
     $(document).ready(function () {
@@ -526,12 +525,11 @@
                         <label class="control-label">To Who</label>
                     </div>
                     <div class="col-xs-9">
-                        @Html.DropDownList("towholist", null, new { @id = "towholist", @class = "form-control", @onchange = "chooseapusher()" })
+                        <input class="form-control" id="towholist" name="towholist"
+                               type="text" value="" />
                     </div>
                     <script type="text/javascript">
-                    function chooseapusher() {
-                        document.getElementById("towhoinput").value = document.getElementById("towhoinput").value + ';' + document.getElementById("towholist").value;
-                    }
+                        autoCompleteFill('towholist', @Html.Raw(ViewBag.AllUserList), true, 'towhoinput');
                     </script>
                 </div>
                 <hr />

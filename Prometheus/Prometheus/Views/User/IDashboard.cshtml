@@ -1,0 +1,91 @@
+﻿
+@{
+    ViewBag.Title = "IDashboard";
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
+}
+<link type="text/css" rel="stylesheet" href="~/Content/bootstrap-datepicker/bootstrap-datepicker.min.css" />
+<link href="~/Content/common.css" rel="stylesheet" type="text/css" />
+<link href="~/Content/idashboard.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="~/Scripts/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
+<script src="~/Scripts/idashboard.js" type="text/javascript"></script>
+<script>
+    $(function () {
+        IDashboard.init();
+    })
+</script>
+<div class="row">
+    <div class="nav navbar-nav navbar-left">
+        <img src="~/Content/images/ucicon/ILearnIcons.png" style="height:40px; width:40px">
+    </div>
+    <div class="nav navbar-nav navbar-left">
+        <ol class="breadcrumb">
+            <li><a href="/User/UserCenter?username=@(ViewBag.RealUserID)">@ViewBag.UserName Center</a></li>
+            <li><a href="/User/IDashbaord">I DashBord</a></li>
+            <li class="active">@ViewBag.cUserName</li>
+        </ol>
+    </div>
+</div>
+<ul class="nav nav-pills nav-stacked col-xs-2">
+    <li><a href="/User/ILearn">I Learn</a></li>
+    <li><a href="/User/WeeklyReportList">Weekly Report</a></li>
+    <li><a href="/User/WeeklyReportShare">Weekly Report Share</a></li>
+    <li class="active"><a href="/User/IDashboard">I Dashboard</a></li>
+    <li><a href="/User/ILearn">Training</a></li>
+    <li><a href="/User/ILearn">I Share</a></li>
+</ul>
+<div class="col-xs-10 body-content">
+    <div class="row d-filter">
+        <div class="row row-margin">
+            <label class="col-xs-3">Date Period</label>
+            <div class="col-xs-3">
+                <div class="input-group date" data-date="" data-date-format="yyyy-mm-dd">
+                    <input type="text" class="form-control" id="sdate" name="sdate"
+                           value="@ViewBag.sdate" readonly>
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-th"></span>
+                    </span>
+                </div>
+            </div>
+            <div class="col-xs-1 text-center">~</div>
+            <div class="col-xs-3">
+                <div class="input-group date" data-date="" data-date-format="yyyy-mm-dd">
+                    <input type="text" class="form-control" id="edate" name="edate"
+                           value="@ViewBag.edate" readonly>
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-th"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="row row-margin">
+            <label class="col-xs-3">UserList</label>
+            <div class="col-xs-3">
+                <select class="form-control" id="uname" name="uname">
+                    @foreach (var user in ViewBag.userreportlist)
+                    {
+                        <option value="@user" @(string.Compare(user.ToUpper(), ViewBag.cUserID.ToUpper()) == 0 ? "selected" : "")>@user</option>
+                    }
+                </select>
+            </div>
+            <div class="col-xs-1"></div>
+            <div class="col-xs-3 text-right">
+                <input type="button" class="btn btn-warning" name="btn-clear" id="btn-clear" value="Clear" />
+                <input type="button" class="btn btn-success" name="btn-search" id="btn-search" value="Search" />
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-6">
+            <div class="d-box" id="task_container"></div>
+        </div>
+        <div class="col-xs-6">
+            <div class="d-box" id="bug_container"></div>
+        </div>
+        <div class="col-xs-6">
+            <div class="d-box" id="ctask_container"></div>
+        </div>
+        <div class="col-xs-6">
+            <div class="d-box" id="dtree_container"></div>
+        </div>
+    </div>
+</div>

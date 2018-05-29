@@ -350,6 +350,7 @@ namespace Prometheus.Models
             AppV_N = string.Empty;
             AppV_O = string.Empty;
             AppV_P = string.Empty;
+            AppV_Q = string.Empty;
             Attachs = new List<string>();
         }
 
@@ -369,23 +370,24 @@ namespace Prometheus.Models
         public string AppV_N { set; get; }
         public string AppV_O { set; get; }
         public string AppV_P { set; get; }
+        public string AppV_Q { set; get; }
 
         public List<string> Attachs { set; get; }
     }
 
-    public class RELSubIssueType
-    {
-        public static string CONTAINMENTACTION = "[CONTAINMENTACTION]";
-        public static string CORRECTIVEACTION = "[CORRECTIVEACTION]";
-        public static string FAILVERIFYACTION = "[FAILVERIFYACTION]";
-        public static string VERIFYCORRECTIVEACTION = "[VERIFYCORRECTIVEACTION]";
-    }
+    //public class RELSubIssueType
+    //{
+    //    public static string CONTAINMENTACTION = "[CONTAINMENTACTION]";
+    //    public static string CORRECTIVEACTION = "[CORRECTIVEACTION]";
+    //    public static string FAILVERIFYACTION = "[FAILVERIFYACTION]";
+    //    public static string VERIFYCORRECTIVEACTION = "[VERIFYCORRECTIVEACTION]";
+    //}
 
-    public class RMASubIssueType
-    {
-        public static string CONTAINMENTACTION = "[Containment]";
-        public static string CORRECTIVEACTION = "[Corrective]";
-    }
+    //public class RMASubIssueType
+    //{
+    //    public static string CONTAINMENTACTION = "[Containment]";
+    //    public static string CORRECTIVEACTION = "[Corrective]";
+    //}
 
     public class CRITICALERRORTYPE
     {
@@ -488,12 +490,12 @@ namespace Prometheus.Models
         public string Value { set; get; }
     }
 
-    public class ExternalDataCollector
+     public class ExternalDataCollector
     {
 
         #region FILEOPERATE
 
-        private static List<List<string>> RetrieveDataFromExcelWithAuth(Controller ctrl, string filename)
+        private static List<List<string>> RetrieveDataFromExcelWithAuth(Controller ctrl, string filename,string sheetname = null, int columns = 101)
         {
             try
             {
@@ -504,7 +506,7 @@ namespace Prometheus.Models
 
                 using (NativeMethods cv = new NativeMethods(folderuser, folderdomin, folderpwd))
                 {
-                    return ExcelReader.RetrieveDataFromExcel(filename, null);
+                    return ExcelReader.RetrieveDataFromExcel(filename, sheetname, columns);
                 }
             }
             catch (Exception ex)
@@ -534,6 +536,28 @@ namespace Prometheus.Models
 
         }
 
+        public static string DownloadShareFile(string srcfile, Controller ctrl)
+        {
+            try
+            {
+                if (ExternalDataCollector.FileExist(ctrl, srcfile))
+                {
+                    var filename = System.IO.Path.GetFileName(srcfile);
+                    var descfolder = ctrl.Server.MapPath("~/userfiles") + "\\docs\\ShareFile\\";
+                    if (!ExternalDataCollector.DirectoryExists(ctrl, descfolder))
+                        ExternalDataCollector.CreateDirectory(ctrl, descfolder);
+                    var descfile = descfolder + System.IO.Path.GetFileNameWithoutExtension(srcfile) + DateTime.Now.ToString("yyyy-MM-dd") + System.IO.Path.GetExtension(srcfile);
+                    ExternalDataCollector.FileCopy(ctrl, srcfile, descfile, true);
+                    return descfile;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
         private static void FileCopy(Controller ctrl, string src, string des, bool overwrite, bool checklocal = false)
         {
             try
@@ -559,6 +583,25 @@ namespace Prometheus.Models
             catch (Exception ex)
             {
             }
+        }
+
+        public static void CreateDirectory(Controller ctrl, string dirname)
+        {
+            try
+            {
+                var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+                var folderuser = syscfgdict["SHAREFOLDERUSER"];
+                var folderdomin = syscfgdict["SHAREFOLDERDOMIN"];
+                var folderpwd = syscfgdict["SHAREFOLDERPWD"];
+
+                using (NativeMethods cv = new NativeMethods(folderuser, folderdomin, folderpwd))
+                {
+                    Directory.CreateDirectory(dirname);
+                }
+            }
+            catch (Exception ex)
+            { }
+
         }
 
         private static bool DirectoryExists(Controller ctrl, string dirname)
@@ -600,7 +643,7 @@ namespace Prometheus.Models
             }
             catch (Exception ex)
             {
-                return null;
+                return new List<string>();
             }
         }
 
@@ -631,11 +674,11 @@ namespace Prometheus.Models
             }
         }
 
-        private static void logthdinfo(string info)
+        private static void logthdinfo(string info, string file_dir = "rmabackuptrace")
         {
             try
             {
-                var filename = "d:\\log\\rmabackuptrace-" + DateTime.Now.ToString("yyyy-MM-dd");
+                var filename = "d:\\log\\" + file_dir + "-" + DateTime.Now.ToString("yyyy-MM-dd");
                 if (File.Exists(filename))
                 {
                     var content = System.IO.File.ReadAllText(filename);
@@ -925,6 +968,8 @@ namespace Prometheus.Models
                                     rmaissuedict[rawdata.AppV_B] = rmaissuedict[rawdata.AppV_B] + ":" + rawdata.AppV_I.ToUpper();
                                     //create RMA issue
                                     CreateRMAIssue(rawdata,ctrl);
+                                    //reopen project
+                                    ProjectViewModels.UpdateProjectStatus(pjk, ProjectStatus.Open);
                                 }
                             }
                             else
@@ -932,6 +977,8 @@ namespace Prometheus.Models
                                 rmaissuedict.Add(rawdata.AppV_B, rawdata.AppV_I);
                                 //create RMA issue
                                 CreateRMAIssue(rawdata,ctrl);
+                                //reopen project
+                                ProjectViewModels.UpdateProjectStatus(pjk, ProjectStatus.Open);
                             }//check whether issue exist
                         }//issue open in one week
                     }// Product type is exist in system
@@ -939,25 +986,25 @@ namespace Prometheus.Models
             }//analyser in usermatrisx
         }
 
-        private static void CreateRMASubIssue(string presum, string sum, string pjkey, string parentkey, string analyser, string reporter, DateTime duedate,string moretag)
-        {
-            var vm = new IssueViewModels();
-            vm.ProjectKey = pjkey;
-            vm.IssueKey = IssueViewModels.GetUniqKey();
-            vm.ParentIssueKey = parentkey;
-            vm.IssueType = ISSUETP.Task;
-            vm.Summary = presum + sum;
-            vm.Priority = ISSUEPR.Major;
-            vm.DueDate = duedate;
-            vm.ReportDate = DateTime.Now;
-            vm.Assignee = analyser;
-            vm.Reporter = reporter;
-            vm.Resolution = Resolute.Pending;
-            vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
-            vm.StoreSubIssue();
+        //private static void CreateRMASubIssue(string presum, string sum, string pjkey, string parentkey, string analyser, string reporter, DateTime duedate,string moretag)
+        //{
+        //    var vm = new IssueViewModels();
+        //    vm.ProjectKey = pjkey;
+        //    vm.IssueKey = IssueViewModels.GetUniqKey();
+        //    vm.ParentIssueKey = parentkey;
+        //    vm.IssueType = ISSUETP.Task;
+        //    vm.Summary = presum + sum;
+        //    vm.Priority = ISSUEPR.Major;
+        //    vm.DueDate = duedate;
+        //    vm.ReportDate = DateTime.Now;
+        //    vm.Assignee = analyser;
+        //    vm.Reporter = reporter;
+        //    vm.Resolution = Resolute.Pending;
+        //    vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+        //    vm.StoreSubIssue();
 
-            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.Task.ToString(),moretag);
-        }
+        //    IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.Task.ToString(),moretag);
+        //}
 
         private static void CreateRMAIssue(RMARAWData rawdata,Controller ctrl)
         {
@@ -1040,8 +1087,22 @@ namespace Prometheus.Models
 
             UserViewModels.RegisterUserAuto(vm.Assignee);
 
-            CreateRMASubIssue(RMASubIssueType.CONTAINMENTACTION, "Cotainment Action for RMA " + vm.FinisarRMA, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(18),ISSUESUBTYPE.CONTAINMENT.ToString());
-            CreateRMASubIssue(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for RMA " + vm.FinisarRMA, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(48),ISSUESUBTYPE.CORRECTIVE.ToString());
+
+            //CreateRMASubIssue(RMASubIssueType.CONTAINMENTACTION, "Cotainment Action for RMA " + vm.FinisarRMA, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(18),ISSUESUBTYPE.CONTAINMENT.ToString());
+            //CreateRMASubIssue(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for RMA " + vm.FinisarRMA, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(48),ISSUESUBTYPE.CORRECTIVE.ToString());
+            
+            var comment = new IssueComments();
+            comment.Comment = IssueCommentEmpty.TOBEEDIT;
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, vm.Assignee, COMMENTTYPE.ContainmentAction);
+
+            comment = new IssueComments();
+            comment.Comment = IssueCommentEmpty.TOBEEDIT;
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, vm.Assignee, COMMENTTYPE.RootCause);
+
+            comment = new IssueComments();
+            comment.Comment = IssueCommentEmpty.TOBEEDIT;
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, vm.Assignee, COMMENTTYPE.CorrectiveAction);
+
             SendRMAEvent(vm, "created",ctrl, true);
         }
 
@@ -1496,14 +1557,20 @@ namespace Prometheus.Models
 
             IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.IQE.ToString());
 
-            CreateRMASubIssue(RMASubIssueType.CONTAINMENTACTION, "Cotainment Action for "+ shortissue
-                , vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(18), ISSUESUBTYPE.CONTAINMENT.ToString());
-            CreateRMASubIssue(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for "+ shortissue
-                , vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(48), ISSUESUBTYPE.CORRECTIVE.ToString());
+            //CreateRMASubIssue(RMASubIssueType.CONTAINMENTACTION, "Cotainment Action for "+ shortissue
+            //    , vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(18), ISSUESUBTYPE.CONTAINMENT.ToString());
+            //CreateRMASubIssue(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for "+ shortissue
+            //    , vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(48), ISSUESUBTYPE.CORRECTIVE.ToString());
 
             var comment = new IssueComments();
-            comment.Comment = "ROOTCAUSE: to be edited";
-            IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, analyser, COMMENTTYPE.RootCause);
+            comment.Comment = IssueCommentEmpty.TOBEEDIT;
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, vm.Assignee, COMMENTTYPE.ContainmentAction);
+            comment = new IssueComments();
+            comment.Comment = IssueCommentEmpty.TOBEEDIT;
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, vm.Assignee, COMMENTTYPE.RootCause);
+            comment = new IssueComments();
+            comment.Comment = IssueCommentEmpty.TOBEEDIT;
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, vm.Assignee, COMMENTTYPE.CorrectiveAction);
 
             if (!IsDebug())
             {
@@ -1528,17 +1595,17 @@ namespace Prometheus.Models
                 sql = "update IQEBackupData set AppV_B = N'<AppV_B>',AppV_C = N'<AppV_C>',AppV_D = N'<AppV_D>'"
                     + ",AppV_E = N'<AppV_E>',AppV_F = N'<AppV_F>',AppV_G = N'<AppV_G>',AppV_H = N'<AppV_H>',AppV_I = N'<AppV_I>'"
                     + ",AppV_J = N'<AppV_J>',AppV_K = N'<AppV_K>',AppV_L = N'<AppV_L>',AppV_M = N'<AppV_M>',AppV_N = N'<AppV_N>'"
-                    + ",AppV_O = '<AppV_O>'"
+                    + ",AppV_O = '<AppV_O>', AppV_Q = N'<AppV_Q>'"
                     + "  where AppV_A=N'<AppV_A>'";
                 sql = sql.Replace("<AppV_A>", relid);
             }
             else
             {
                 sql = "insert into IQEBackupData(AppV_A,AppV_B,AppV_C,AppV_D,AppV_E,AppV_F"
-                    + ",AppV_G,AppV_H,AppV_I,AppV_J,AppV_K,AppV_L,AppV_M,AppV_N,AppV_O"
+                    + ",AppV_G,AppV_H,AppV_I,AppV_J,AppV_K,AppV_L,AppV_M,AppV_N,AppV_O,AppV_Q"
                     + ",databackuptm)"
                     + " values(N'<AppV_A>',N'<AppV_B>',N'<AppV_C>',N'<AppV_D>',N'<AppV_E>',N'<AppV_F>'"
-                    + ",N'<AppV_G>',N'<AppV_H>',N'<AppV_I>',N'<AppV_J>',N'<AppV_K>',N'<AppV_L>',N'<AppV_M>',N'<AppV_N>','<AppV_O>'"
+                    + ",N'<AppV_G>',N'<AppV_H>',N'<AppV_I>',N'<AppV_J>',N'<AppV_K>',N'<AppV_L>',N'<AppV_M>',N'<AppV_N>','<AppV_O>',N'<AppV_Q>'"
                     + ",'<databackuptm>')";
                 sql = sql.Replace("<AppV_A>", rmadata.AppV_A);
 
@@ -1554,6 +1621,7 @@ namespace Prometheus.Models
                 .Replace("<AppV_G>", rmadata.AppV_G).Replace("<AppV_H>", rmadata.AppV_H).Replace("<AppV_I>", rmadata.AppV_I)
                 .Replace("<AppV_J>", rmadata.AppV_J).Replace("<AppV_K>", rmadata.AppV_K).Replace("<AppV_L>", rmadata.AppV_L)
                 .Replace("<AppV_M>", rmadata.AppV_M).Replace("<AppV_N>", rmadata.AppV_N).Replace("<AppV_O>",ConvertToDateStr(rmadata.AppV_O))
+                .Replace("<AppV_Q>", rmadata.AppV_Q)
                 .Replace("<databackuptm>", DateTime.Now.ToString());
 
             DBUtility.ExeLocalSqlNoRes(sql);
@@ -1580,6 +1648,7 @@ namespace Prometheus.Models
             tempdata.AppV_M = line[12];
             tempdata.AppV_N = line[13];
             tempdata.AppV_O = line[14];
+            tempdata.AppV_Q = line[15];
 
             return tempdata;
         }
@@ -1619,7 +1688,7 @@ namespace Prometheus.Models
             var ret = new List<IQERAWData>();
 
             var sql = "select AppV_A,AppV_B,AppV_C,AppV_D,AppV_E,AppV_F"
-                    + ",AppV_G,AppV_H,AppV_I,AppV_J,AppV_K,AppV_L,AppV_M,AppV_N,AppV_O,AppV_P"
+                    + ",AppV_G,AppV_H,AppV_I,AppV_J,AppV_K,AppV_L,AppV_M,AppV_N,AppV_O,AppV_P, AppV_Q"
                     + " from IQEBackupData order by AppV_O DESC";
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
@@ -1643,6 +1712,7 @@ namespace Prometheus.Models
                     tempdata.AppV_N = Convert.ToString(line[13]);
                     tempdata.AppV_O = Convert.ToDateTime(line[14]).ToString("yyyy-MM-dd HH:mm:ss");
                     tempdata.AppV_P = Convert.ToString(line[15]);
+                    tempdata.AppV_Q = Convert.ToString(line[16]);
                     tempdata.Attachs.AddRange(RetrieveIQEAttach(tempdata.AppV_A));
                     ret.Add(tempdata);
                 }
@@ -2365,14 +2435,20 @@ namespace Prometheus.Models
 
             IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.REL.ToString());
 
-            CreateRelSubIssue(RELSubIssueType.FAILVERIFYACTION, "Failure Verify for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(2),ISSUESUBTYPE.FAILVERIFY.ToString());
-            CreateRelSubIssue(RELSubIssueType.CONTAINMENTACTION, "Cotainment Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(30),ISSUESUBTYPE.CONTAINMENT.ToString());
-            CreateRelSubIssue(RELSubIssueType.CORRECTIVEACTION, "Corrective/PreVentive Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(60),ISSUESUBTYPE.CORRECTIVE.ToString());
-            CreateRelSubIssue(RELSubIssueType.VERIFYCORRECTIVEACTION, "Verify Corrective/PreVentive Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, reporter, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(75),ISSUESUBTYPE.CORRECTIVEVERIFY.ToString());
+            //CreateRelSubIssue(RELSubIssueType.FAILVERIFYACTION, "Failure Verify for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(2),ISSUESUBTYPE.FAILVERIFY.ToString());
+            //CreateRelSubIssue(RELSubIssueType.CONTAINMENTACTION, "Cotainment Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(30),ISSUESUBTYPE.CONTAINMENT.ToString());
+            //CreateRelSubIssue(RELSubIssueType.CORRECTIVEACTION, "Corrective/PreVentive Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, analyser, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(60),ISSUESUBTYPE.CORRECTIVE.ToString());
+            //CreateRelSubIssue(RELSubIssueType.VERIFYCORRECTIVEACTION, "Verify Corrective/PreVentive Action for CaseID " + vm.CaseID, RELPJKEY, vm.IssueKey, reporter, reporter, DateTime.Parse(rawdata.AppV_C).AddDays(75),ISSUESUBTYPE.CORRECTIVEVERIFY.ToString());
 
             var comment = new IssueComments();
-            comment.Comment = "ROOTCAUSE: to be edited";
+            comment.Comment = IssueCommentEmpty.TOBEEDIT;
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, analyser, COMMENTTYPE.ContainmentAction);
+            comment = new IssueComments();
+            comment.Comment = IssueCommentEmpty.TOBEEDIT;
             IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, analyser, COMMENTTYPE.RootCause);
+            comment = new IssueComments();
+            comment.Comment = IssueCommentEmpty.TOBEEDIT;
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, analyser, COMMENTTYPE.CorrectiveAction);
 
             if (!IsDebug())
             {
@@ -2559,17 +2635,17 @@ namespace Prometheus.Models
                 }
                 catch (Exception ex)
                 {
-                    OBAUpdateTime = DateTime.Parse("2017-05-23 01:00:00");
+                    OBAUpdateTime = DateTime.Parse("2018-05-23 01:00:00");
                 }
             }
 
             return OBAUpdateTime.ToString();
         }
 
-        private static Dictionary<string, IssueViewModels> RetrieveExistDMRDict(Controller ctrl)
+        private static Dictionary<string, IssueViewModels> RetrieveExistDMRDict(Controller ctrl,string sdate,string enddate)
         {
             var ret = new Dictionary<string, IssueViewModels>();
-            var obalist = IssueViewModels.RetrieveAllIssueTypeIssue("NONE", "NONE", ISSUETP.OBA, ctrl);
+            var obalist = IssueViewModels.RetrieveAllIssueTypeIssue(sdate, enddate, ISSUETP.OBA, ctrl);
             foreach (var item in obalist)
             {
                 if (!string.IsNullOrEmpty(item.FinisarDMR.Trim()) && !ret.ContainsKey(item.FinisarDMR.Trim()))
@@ -2594,14 +2670,13 @@ namespace Prometheus.Models
             if (obaissue.RootCauseCommentList.Count > 0)
             {
                 var rootcomment = obaissue.RootCauseCommentList[0];
-                if (string.Compare(rootcomment.Comment, "ROOTCAUSE: to be edited") == 0)
-                {
-                    var temprootcomment = new IssueComments();
-                    temprootcomment.Comment = rootcause;
-                    IssueViewModels.UpdateSPComment(obaissue.IssueKey, rootcomment.CommentType, rootcomment.CommentDate.ToString(), temprootcomment.dbComment);
-                    obaissue.RootCauseCommentList.Clear();
-                    obaissue.RootCauseCommentList.Add(temprootcomment);
-                }
+
+                var temprootcomment = new IssueComments();
+                temprootcomment.Comment = rootcause;
+                IssueViewModels.UpdateSPComment(obaissue.IssueKey, rootcomment.CommentType, rootcomment.CommentDate.ToString(), temprootcomment.dbComment);
+                obaissue.RootCauseCommentList.Clear();
+                obaissue.RootCauseCommentList.Add(temprootcomment);
+
             }
             else
             {
@@ -2615,20 +2690,6 @@ namespace Prometheus.Models
                 obaissue.RootCauseCommentList.Add(rootcomment);
             }
             
-        }
-
-        private static void UpdateCorrectiveAction(IssueViewModels obaissue, string correctiveinfo)
-        {
-            if (obaissue.CorrectiveActions.Count > 0)
-            {
-                if (obaissue.CorrectiveActions[0].CommentList.Count == 0)
-                {
-                    var tempcomment = new IssueComments();
-                    tempcomment.Comment = correctiveinfo;
-                    IssueViewModels.StoreIssueComment(obaissue.CorrectiveActions[0].IssueKey, tempcomment.dbComment, obaissue.Assignee, COMMENTTYPE.Description);
-                    obaissue.CorrectiveActions[0].CommentList.Add(tempcomment);
-                }
-            }
         }
 
         private static void UpdateOBAAttachement(IssueViewModels obaissue, string attachment, Controller ctrl)
@@ -2665,10 +2726,11 @@ namespace Prometheus.Models
         private static List<RawDMR> RetrieveDMRFromITDB(string OBAUpdateTime, Dictionary<string, IssueViewModels> DMRDict, Controller ctrl)
         {
             var ret = new List<RawDMR>();
-            var onemonthago = DateTime.Parse(OBAUpdateTime).AddMonths(-1).ToString("yyyy-MM-dd HH:mm:ss");
+            var sql = @"select a.DMR_ID,Created_at,Prod_Line,Defect_Qty,Inspected_Qty,Actual_Problem,Justification,a.Remark,File_URL from dbo.DMR_Detail_List_View a (nolock) 
+                        left join View_OQC_Function_60_Approval_Remark b with (nolock) on b.DMR_ID = a.DMR_ID 
+                         where a.Created_at > '<CreateTime>' and b.Remark like '%[RCCA]%'";
 
-            var sql = "select DMR_ID,Created_at,Prod_Line,Defect_Qty,Inspected_Qty,Actual_Problem,Justification,Remark,File_URL from dbo.DMR_Detail_List_View where Created_at > '<CreateTime>'";
-            sql = sql.Replace("<CreateTime>", onemonthago);
+            sql = sql.Replace("<CreateTime>", OBAUpdateTime);
             var dbret = DBUtility.ExeFAISqlWithRes(sql);
 
             foreach (var line in dbret)
@@ -2701,30 +2763,25 @@ namespace Prometheus.Models
                     }
                     catch (Exception ex) { }
                 }//end if
-                else if (!string.IsNullOrEmpty(dmrid) && DMRDict.ContainsKey(dmrid))
-                {
-                    var obaissue = DMRDict[dmrid];
-                    var tempdmr = new RawDMR();
-                    tempdmr.DMR_ID = dmrid;
-                    tempdmr.RootCause = Conver2Str(line[6]);
-                    tempdmr.CorrectiveAction = Conver2Str(line[7]);
-                    tempdmr.Attachment = Conver2Str(line[8]);
+                //else if (!string.IsNullOrEmpty(dmrid) && DMRDict.ContainsKey(dmrid))
+                //{
+                //    var obaissue = DMRDict[dmrid];
+                //    var tempdmr = new RawDMR();
+                //    tempdmr.DMR_ID = dmrid;
+                //    tempdmr.RootCause = Conver2Str(line[6]);
+                //    tempdmr.CorrectiveAction = Conver2Str(line[7]);
+                //    tempdmr.Attachment = Conver2Str(line[8]);
 
-                    if (!string.IsNullOrEmpty(tempdmr.RootCause))
-                    {
-                        UpdateOBARootCause(obaissue, tempdmr.RootCause);
-                    }
+                //    if (!string.IsNullOrEmpty(tempdmr.RootCause))
+                //    {
+                //        UpdateOBARootCause(obaissue, tempdmr.RootCause);
+                //    }
 
-                    if (!string.IsNullOrEmpty(tempdmr.CorrectiveAction))
-                    {
-                        UpdateCorrectiveAction(obaissue, tempdmr.CorrectiveAction);
-                    }
-
-                    if (!string.IsNullOrEmpty(tempdmr.Attachment) && File.Exists(tempdmr.Attachment))
-                    {
-                        UpdateOBAAttachement(obaissue, tempdmr.Attachment, ctrl);
-                    }
-                }
+                //    if (!string.IsNullOrEmpty(tempdmr.Attachment) && File.Exists(tempdmr.Attachment))
+                //    {
+                //        UpdateOBAAttachement(obaissue, tempdmr.Attachment, ctrl);
+                //    }
+                //}
             }//end foreach
 
             return ret;
@@ -2813,12 +2870,18 @@ namespace Prometheus.Models
             UserViewModels.RegisterUserAuto(vm.Assignee);
             SendOBAEvent(vm, "created",ctrl, true);
 
-            CreateRMASubIssue(RMASubIssueType.CONTAINMENTACTION, "Cotainment Action for OBA " + vm.FinisarDMR, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(14),ISSUESUBTYPE.CONTAINMENT.ToString());
-            CreateRMASubIssue(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for OBA " + vm.FinisarDMR, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(28),ISSUESUBTYPE.CORRECTIVE.ToString());
+            //CreateRMASubIssue(RMASubIssueType.CONTAINMENTACTION, "Cotainment Action for OBA " + vm.FinisarDMR, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(14),ISSUESUBTYPE.CONTAINMENT.ToString());
+            //CreateRMASubIssue(RMASubIssueType.CORRECTIVEACTION, "Corrective Action for OBA " + vm.FinisarDMR, vm.ProjectKey, vm.IssueKey, vm.Assignee, vm.Reporter, vm.DueDate.AddDays(28),ISSUESUBTYPE.CORRECTIVE.ToString());
 
             var comment = new IssueComments();
-            comment.Comment = "ROOTCAUSE: to be edited";
+            comment.Comment = IssueCommentEmpty.TOBEEDIT;
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, vm.Assignee, COMMENTTYPE.ContainmentAction);
+            comment = new IssueComments();
+            comment.Comment = IssueCommentEmpty.TOBEEDIT;
             IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, vm.Assignee, COMMENTTYPE.RootCause);
+            comment = new IssueComments();
+            comment.Comment = IssueCommentEmpty.TOBEEDIT;
+            IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, vm.Assignee, COMMENTTYPE.CorrectiveAction);
         }
 
         private static void SendOBAEvent(IssueViewModels vm, string operate, Controller ctrl, bool nocheck = false)
@@ -2843,7 +2906,7 @@ namespace Prometheus.Models
                 toaddrs.Add(vm.Assignee);
                 toaddrs.Add(vm.Reporter);
                 EmailUtility.SendEmail(ctrl, "WUXI Engineering System", toaddrs, content);
-                new System.Threading.ManualResetEvent(false).WaitOne(200);
+                new System.Threading.ManualResetEvent(false).WaitOne(50);
             }
         }
 
@@ -2863,7 +2926,7 @@ namespace Prometheus.Models
             }
 
             var OBAUpdateTime = RetrieveOBAUpdateTime();
-            var DMRDict = RetrieveExistDMRDict(ctrl);
+            var DMRDict = RetrieveExistDMRDict(ctrl,DateTime.Now.AddDays(-14).ToString("yyyy-MM-dd HH:mm:ss"),DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             var dmrlist = RetrieveDMRFromITDB(OBAUpdateTime, DMRDict,ctrl);
             var currentdbdmrfilter = new Dictionary<string, bool>();
             foreach (var dmr in dmrlist)
@@ -3222,6 +3285,448 @@ namespace Prometheus.Models
 
             return ret;
         }
+        #endregion
+
+        #region WAFERCOOR
+        public static void RefreshWaferCoordByDate(Controller ctrl, string date)
+        {
+            var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+            string datestring = date;
+
+            var coordsrcfolder = syscfgdict["WAFERCOORD"];
+            
+            var coordsrcfiles = DirectoryEnumerateFiles(ctrl, coordsrcfolder+"\\"+ datestring);
+            if(coordsrcfiles.Count > 0)
+            {
+                string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+                if (!DirectoryExists(ctrl, imgdir))
+                {
+                    Directory.CreateDirectory(imgdir);
+                }
+                var new_data = new Dictionary<string, WaferCoordRAWData>();
+                foreach (var srcf in coordsrcfiles)
+                {
+                    var filename = Path.GetFileName(srcf);
+                    var testtime = File.GetLastWriteTime(srcf).ToString("yyyy-MM-dd HH:mm:ss");
+                    try
+                    {
+                        var desfile = imgdir + filename;
+                        FileCopy(ctrl, srcf, desfile, true);
+                        if (FileExist(ctrl, desfile))
+                        {
+                            var data = RetrieveDataFromExcelWithAuth(ctrl, desfile,null, 9);
+                            var tmp = SaveWaferCoordData(data, testtime, coordsrcfolder, ctrl);
+                            new_data.Intersect(tmp).ToList().ForEach(x => new_data.Remove(x.Key));
+                            new_data = new_data.Concat(tmp).ToDictionary(x => x.Key, x => x.Value);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        var logInfo = "\r\nSolveWaferCoordData Exception: " + ex.Message;
+                        logthdinfo(logInfo, "wafercoordtrace");
+                    }
+                }
+                if (new_data.Count > 0)
+                {
+                    var wafer_coords = WaferCoordRAWData.GetWaferInfoByKeys(new_data);
+                    for (var i = 1; i <= Math.Ceiling(wafer_coords.Count / 10.0); i++)
+                    {
+                        var tmp = wafer_coords.Skip((i - 1) * 10).Take(10).ToList();
+                        WaferCoordRAWData.CreateWaferCoordData(tmp);
+                    }
+                }
+            }
+        }
+
+        public static Dictionary<string, WaferCoordRAWData> SaveWaferCoordData(List<List<string>> data, string date, string attfolder, Controller ctrl)
+        {
+            var res = new Dictionary<string, WaferCoordRAWData>();
+            if (data.Count == 0)
+                return res;
+            if (!data[0][0].ToUpper().Contains("LOCATION"))
+                return res;
+            var test_time = date;
+            var idx = 0;
+            var sn_arr = new List<string>();
+            var coord_arr = new List<string>();
+            var all_coords = new Dictionary<string, WaferCoordRAWData>();
+            var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            foreach(var line in data[1])
+            {
+                if (!string.IsNullOrEmpty(line))
+                {
+                    if(data[2][idx].Split(new char[] { ',' }).Length >= 2)
+                    {
+                        var tmp = new WaferCoordRAWData();
+                        tmp.SN = line;
+                        tmp.Coord_X = Convert.ToInt32(data[2][idx].Split(new char[] { ',' })[0]).ToString();
+                        tmp.Coord_Y = Convert.ToInt32(data[2][idx].Split(new char[] { ',' })[1]).ToString();
+                        tmp.TestTime = test_time;
+                        tmp.SyncTime = now;
+                        if (!all_coords.ContainsKey(tmp.SN + ":" + tmp.Coord_X + ":" + tmp.Coord_Y))
+                        {
+                            all_coords.Add(tmp.SN + ":" + tmp.Coord_X + ":" + tmp.Coord_Y, tmp);
+                        }
+                        idx++;
+                    }
+                }
+            }
+            if(all_coords.Count > 0)
+            {
+                res = SolveWaferCoordData(all_coords);
+            }
+            return res;
+        }
+
+        public static Dictionary<string, WaferCoordRAWData> SolveWaferCoordData(Dictionary<string, WaferCoordRAWData> data)
+        {
+            var res = new List<WaferCoordRAWData>();
+            var exist_data = WaferCoordRAWData.GetWaferCoordData("'" + string.Join("','", data.Keys) + "'");
+            exist_data.Keys.ToList().ForEach(key => data.Remove(key));
+            return data;
+        }
+
+        public static void RefreshWaferCoord(Controller ctrl)
+        {
+            //pre
+            var zero_day = Convert.ToDateTime("2018-04-23 00:00:00");
+            var end_day = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd 23:59:59"));
+            var min_testtime = WaferCoordRAWData.GetSyncMinTestTime();
+            if (!string.IsNullOrEmpty(min_testtime))
+            {
+                end_day = Convert.ToDateTime(min_testtime).AddDays(-1);
+            }
+            var tmp_day = Convert.ToDateTime(zero_day);
+            while(tmp_day <= end_day)
+            {
+                RefreshWaferCoordByDate(ctrl, tmp_day.ToString("yyyyMMdd"));
+                tmp_day = Convert.ToDateTime(tmp_day).AddDays(+1);
+            }
+            //next
+            var max_testtime = WaferCoordRAWData.GetSyncMaxTestTime();
+            zero_day = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd"));
+            end_day = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd 23:59:59"));
+            if (!string.IsNullOrEmpty(max_testtime))
+            {
+                zero_day = Convert.ToDateTime(max_testtime);
+            }
+            tmp_day = Convert.ToDateTime(zero_day);
+            while (tmp_day <= end_day)
+            {
+                RefreshWaferCoordByDate(ctrl, tmp_day.ToString("yyyyMMdd"));
+                tmp_day = Convert.ToDateTime(tmp_day).AddDays(+1);
+            }
+        }
+
+        #endregion
+
+        #region VCSELRMA
+        private static void SolveVcselRMAData(Controller ctrl,string vcselrmafile)
+        {
+                var existrmasn = VcselRMAData.GetAllVcselRMASN();
+                var vcselpndict = VcselPNData.RetrieveVcselPNInfo();
+
+                var idx = 0;
+                var data = RetrieveDataFromExcelWithAuth(ctrl, vcselrmafile, "Master list");
+                var vcselrmalist = new List<VcselRMAData>();
+
+                foreach (var line in data)
+                {
+                    if (idx == 0)
+                    {
+                        idx = idx + 1;
+                        continue;
+                    }
+
+                    var sn = line[10];
+                    if (!existrmasn.ContainsKey(sn))
+                    {
+                        existrmasn.Add(sn, true);
+
+                        var tempvm = new VcselRMAData();
+                        tempvm.SN = sn;
+                        tempvm.PN = line[8];
+                        tempvm.PNDesc = line[9];
+                        tempvm.VcselPN = line[11];
+                        if (vcselpndict.ContainsKey(tempvm.VcselPN))
+                        {
+                            tempvm.VcselType = vcselpndict[tempvm.VcselPN].Rate;
+                        }
+                        else
+                        {
+                            tempvm.VcselType = "OTHERS";
+                        }
+                        tempvm.RMANum = line[0];
+                        tempvm.Customer = line[1];
+                        tempvm.ProductType = line[2];
+                        tempvm.ShipDate = line[3];
+                        tempvm.RMAOpenDate = line[4];
+
+                        vcselrmalist.Add(tempvm);
+                    }//not exist
+                }//end foreach
+
+                if (vcselrmalist.Count > 0)
+                {
+                    var snlist = new List<string>();
+                    foreach (var item in vcselrmalist)
+                    {
+                        snlist.Add(item.SN);
+                    }
+
+                    var snwaferdict = BIDataUtility.RetrieveBIWaferBySN_SNDict(snlist);
+                    foreach (var item in vcselrmalist)
+                    {
+                        if (snwaferdict.ContainsKey(item.SN))
+                        {
+                            item.Wafer = snwaferdict[item.SN].Key;
+                            item.BuildDate = DateTime.Parse(snwaferdict[item.SN].Value);
+
+                            item.StoreVcselRMA();
+                        }
+                    }//end foreach
+                }
+
+                foreach (var item in vcselrmalist)
+                {
+                    if (!string.IsNullOrEmpty(item.Wafer))
+                    {
+                        WaferSNMap.UpdateWaferInfo(item.Wafer);
+                    }
+                }
+        }
+
+        private static void SolveMailStoneData(Controller ctrl, string vcselrmafile)
+        {
+            var idx = 0;
+            var data = RetrieveDataFromExcelWithAuth(ctrl, vcselrmafile, "Changes milestone");
+            var milestonelist = new List<EngineeringMileStone>();
+
+            foreach (var line in data)
+            {
+                if (idx == 0)
+                {
+                    idx = idx + 1;
+                    continue;
+                }
+
+                var tempvm = new EngineeringMileStone();
+                tempvm.ActionDate = DateTime.Parse(line[2]);
+                tempvm.Location = line[3];
+                tempvm.ActionDetail = line[0] + " # " + line[4];
+                tempvm.AppendInfo = line[0];
+                if (string.IsNullOrEmpty(tempvm.AppendInfo))
+                {
+                    tempvm.AppendInfo = "OTHERS";
+                }
+                milestonelist.Add(tempvm);
+            }
+
+            EngineeringMileStone.UpdateVcselMileStone(milestonelist);
+        }
+
+        public static void RefreshVcselRMAData(Controller ctrl)
+        {
+            var syscfg = CfgUtility.GetSysConfig(ctrl);
+            var vcselrmafile = ExternalDataCollector.DownloadShareFile(syscfg["VCSELRMASHARE"], ctrl);
+            if (vcselrmafile != null && ExternalDataCollector.FileExist(ctrl, vcselrmafile))
+            {
+                SolveVcselRMAData(ctrl, vcselrmafile);
+                SolveMailStoneData(ctrl, vcselrmafile);
+            }//end if
+        }
+
+        #endregion
+
+        #region MONITOROQMJO
+        private static Dictionary<string, bool> RetrieveOpeningOQMJo()
+        {
+            var oqmlist = new Dictionary<string, bool>();
+            var sql = "select JONumber from JOBaseInfo where BRKey = 'OQM' and JORealStatus = 'OPEN'";
+            var dbret = DBUtility.ExeNebulaSqlWithRes(sql, null);
+            {
+                foreach (var line in dbret)
+                {
+                    var jo = Conver2Str(line[0]);
+                    if (!string.IsNullOrEmpty(jo) && !oqmlist.ContainsKey(jo))
+                    { oqmlist.Add(jo, true); }
+                }
+            }
+            return oqmlist;
+        }
+
+        public static Dictionary<string, string> RetrieveSNFromJo(Dictionary<string, bool> oqmjolist)
+        {
+            var snlist = new Dictionary<string, string>();
+
+            StringBuilder sb1 = new StringBuilder(10 * (snlist.Count + 5));
+            sb1.Append("('");
+            foreach (var line in oqmjolist)
+            {
+                sb1.Append(line.Key + "','");
+            }
+            var tempstr1 = sb1.ToString();
+            var jocond = tempstr1.Substring(0, tempstr1.Length - 2) + ")";
+
+            var sql = @" select c.ContainerName,m.MfgOrderName from [InsiteDB].[insite].[Container] c (nolock) 
+                            left join[InsiteDB].[insite].[MfgOrder] m(nolock) on m.MfgOrderId = c.MfgOrderId
+                            where m.MfgOrderName  in <jocond>";
+            sql = sql.Replace("<jocond>", jocond);
+            var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                var sn = Conver2Str(line[0]);
+                var jo = Conver2Str(line[1]);
+                if (!snlist.ContainsKey(sn) && sn.Length <= 7)
+                {
+                    snlist.Add(sn, jo);
+                }
+            }
+            return snlist;
+        }
+
+        public static List<string> RetrieveDCTableFromSn(string sn)
+        {
+            var ret = new List<string>();
+            var dctabledict = new Dictionary<string, bool>();
+
+            var sql = @" select ddr.DataCollectionDefName from insitedb.insite.DataCollectionDefBase ddr  (nolock)
+	                    inner join insitedb.insite.TxnMap tm with(noloCK) ON tm.DataCollectionDefinitionBaseId = ddr.DataCollectionDefBaseId
+	                    inner join insitedb.insite.spec sp with(nolock) on sp.specid =  tm.specid
+	                    inner join InsiteDB.insite.WorkflowStep ws (nolock)on  ws.specbaseid = sp.specbaseid
+	                    inner join InsiteDB.insite.Workflow w (nolock)on w.WorkflowID = ws.WorkflowID
+                        inner join InsiteDB.insite.Product p(nolock) on w.WorkflowBaseId = p.WorkflowBaseId
+	                    inner join [InsiteDB].[insite].[Container] c(nolock) on c.ProductId = p.ProductId
+                        where c.ContainerName = '<ContainerName>' and ddr.DataCollectionDefName is not null";
+            sql = sql.Replace("<ContainerName>", sn);
+            var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                var dc = Conver2Str(line[0]).ToUpper();
+                if (dc.Length > 4 && dc.Substring(0, 4).Contains("DCD_"))
+                {
+                    var realdc = "";
+                    if (dc.Contains("DCD_Module_Initialization_0811".ToUpper()))
+                    { realdc = "dc_initial"; }
+                    else
+                    { realdc = "dc_" + dc.Substring(4); }
+
+                    if (!dctabledict.ContainsKey(realdc)) {
+                        dctabledict.Add(realdc, true);
+                    }
+                }//end if
+            }//end foreach
+            ret.AddRange(dctabledict.Keys);
+            return ret;
+        }
+
+        public static List<ProjectTestData> RetrieveLatestSNTestResult(string sn,string defaultpj)
+        {
+            var dctablelist = RetrieveDCTableFromSn(sn);
+            var testdatalist = new List<ProjectTestData>();
+
+            foreach (var dctable in dctablelist)
+            {
+                var sql = @"select top 1 a.<DCTABLE>HistoryId,a.ModuleSerialNum, a.WhichTest, a.ModuleType, a.ErrAbbr, a.TestTimeStamp, a.TestStation,a.assemblypartnum 
+                               from insite.<DCTABLE> a (nolock) where a.ModuleSerialNum = '<ModuleSerialNum>' order by  testtimestamp DESC";
+                sql = sql.Replace("<DCTABLE>", dctable).Replace("<ModuleSerialNum>", sn);
+                var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+                foreach (var item in dbret)
+                {
+                    var tempdata = new ProjectTestData(defaultpj, Convert.ToString(item[0]), Convert.ToString(item[1])
+                                        ,Convert.ToString(item[2]), Convert.ToString(item[3]), Convert.ToString(item[4])
+                                        , Convert.ToString(item[5]), Convert.ToString(item[6]), Convert.ToString(item[7]));
+                    testdatalist.Add(tempdata);
+                }
+            }
+
+            testdatalist.Sort(delegate (ProjectTestData obj1, ProjectTestData obj2)
+            {
+                return obj2.TestTimeStamp.CompareTo(obj1.TestTimeStamp);
+            });
+
+            var ret = new List<ProjectTestData>();
+            ret.Add(testdatalist[0]);
+            return ret;
+        }
+
+        public static void SolveOQMSN(string sn, string jo,string asignee, string defaultpj, Controller ctrl)
+        {
+
+            var testdata = RetrieveLatestSNTestResult(sn,defaultpj);
+            if (testdata.Count > 0)
+            {
+                var td = testdata[0];
+
+                if (string.Compare(td.ErrAbbr, "PASS", true) == 0)
+                {
+                    var desc = "Module " + td.ModuleSerialNum + " latest status is: pass on " + td.WhichTest + " @ " + td.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss");
+                    IssueViewModels.CloseIssueAutomaticlly(td.ModuleSerialNum, desc, ctrl);
+                }
+                else
+                {
+                    var issues = IssueViewModels.RetrieveIssueBySN(td.ModuleSerialNum, ctrl);
+                    foreach (var item in issues)
+                    {
+                        if (item.ReportDate.Equals(td.TestTimeStamp))
+                        { return; }
+                    }
+
+                    var desc = "Module " + td.ModuleSerialNum + " latest status is: failed on " + td.WhichTest + " @ " + td.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss");
+                    IssueViewModels.CloseIssueAutomaticlly(td.ModuleSerialNum, desc, ctrl);
+
+                    var now = DateTime.Now;
+                    var vm = new IssueViewModels();
+                    vm.ProjectKey = defaultpj;
+                    vm.IssueKey = td.DataID;
+                    vm.IssueType = ISSUETP.Task;
+                    vm.Summary = "OQM Task: "+ td.ModuleSerialNum + " failed for " + td.ErrAbbr + " @ " + td.WhichTest + " "+ td.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss");
+                    vm.ModuleSN = td.ModuleSerialNum;
+                    vm.ErrAbbr = td.ErrAbbr;
+                    vm.Priority = ISSUEPR.Major;
+                    vm.DueDate = td.TestTimeStamp.AddDays(7);
+                    vm.ReportDate = td.TestTimeStamp;
+                    vm.Assignee = asignee;
+                    vm.Reporter = asignee;
+                    vm.Creator = asignee;
+                    vm.Resolution = Resolute.Pending;
+                    vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+                    vm.RelativePeoples = "";
+                    vm.StoreIssue();
+
+                    var comment = new IssueComments();
+                    comment.Comment = "JO Distribution: http://wuxinpi.china.ads.finisar.com:8082/BRTrace/JODetail?JONum="+jo+"&Step=3";
+                    IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, vm.Assignee, COMMENTTYPE.Description);
+
+                    SendOBAEvent(vm, "created", ctrl, true);
+                }
+            }
+        }
+
+        public static void RefreshOQMJo(Controller ctrl)
+        {
+            var oqmlist = RetrieveOpeningOQMJo();
+            if (oqmlist.Count > 0)
+            {
+                var snlist = RetrieveSNFromJo(oqmlist);
+                if(snlist.Count > 0)
+                {
+                    var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+                    var OBAAdmin = syscfgdict["OBAADMIN"];
+                    var OBADefaultPJ = syscfgdict["OBADEFAULTPJ"];
+
+                    foreach (var snjo in snlist)
+                    {
+                        try
+                        {
+                            SolveOQMSN(snjo.Key, snjo.Value, OBAAdmin, OBADefaultPJ, ctrl);
+                        }
+                        catch (Exception ex) { }
+                    }
+                }//end if
+            }//end if
+        }
+
         #endregion
     }
 }

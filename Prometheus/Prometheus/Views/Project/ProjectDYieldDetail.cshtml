@@ -5,16 +5,6 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-
-
-<div class="row">
-    <div class="col-xs-12">&nbsp;</div>
-</div>
-
-<div class="row">
-    <div class="col-xs-12">&nbsp;</div>
-</div>
-
 <div class="row">
     <div class="col-xs-1 text-right">
         <img src="~/Content/images/PJ/Yield.png" style="height:45px; width:45px">
@@ -49,8 +39,8 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-xs-12">&nbsp;</div>
+<div class="row text-center">
+    <h3>@ViewBag.sDate</h3>
 </div>
 
 
@@ -220,263 +210,260 @@
     </div>
 
     <div class="row" style="font-size:18px"><strong>&nbsp;&nbsp;Test Result Pie Chart</strong></div>
-        <div class="row">
-            <div class="col-xs-12">&nbsp;</div>
-        </div>
+    <div class="row">
+        <div class="col-xs-12">&nbsp;</div>
+    </div>
 
-        <script src="~/Scripts/highcharts.js"></script>
-        <script src="~/Scripts/exporting.js"></script>
+    <div class="row">
+        <div class="col-xs-12">
 
-        <div class="row">
-            <div class="col-xs-12">
+            <div class="col-xs-6 text-left">
+                @if (ViewBag.fchartscript != null)
+                {
+                    <div id="ffailurepie" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                    @Html.Raw(ViewBag.fchartscript)
+                }
 
-                <div class="col-xs-6 text-left">
-                    @if (ViewBag.fchartscript != null)
-                    {
-                        @Html.Raw(ViewBag.fchartscript)
-                        <div id="ffailurepie" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-                    }
-
-                </div>
-                <div class="col-xs-6 text-left">
-                    @if (ViewBag.fychartscript != null)
-                    {
-                        @Html.Raw(ViewBag.fychartscript)
-                        <div id="fyfailurepie" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-                    }
-                </div>
+            </div>
+            <div class="col-xs-6 text-left">
+                @if (ViewBag.fychartscript != null)
+                {
+                    <div id="fyfailurepie" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                    @Html.Raw(ViewBag.fychartscript)
+                }
             </div>
         </div>
+    </div>
 
-        <div class="row">
-            <div class="col-xs-12">&nbsp;</div>
-        </div>
+    <div class="row">
+        <div class="col-xs-12">&nbsp;</div>
+    </div>
 
-        <div class="row" style="font-size:18px"><strong>&nbsp;&nbsp;First Test Result</strong></div>
-        <div class="row">
-            <div class="col-xs-12">&nbsp;</div>
-        </div>
+    <div class="row" style="font-size:18px"><strong>&nbsp;&nbsp;First Test Result</strong></div>
+    <div class="row">
+        <div class="col-xs-12">&nbsp;</div>
+    </div>
 
-        <div class="row">
-            <div class="col-xs-12">
-                <table id="fpfailuretb" class="display" cellspacing="0">
-                    <thead>
-                        <tr style="color:white;">
-                            <th>ErrAbbr</th>
-                            @foreach (var item in Model.FirstYields)
-                            {
-                                <th>@item.WhichTest</th>
-                            }
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        @{
-                            var eklist = new List<string>();
-                            foreach (var error in Model.FErrorMap.Keys)
-                            {
-                                eklist.Add(error);
-                            }
-
-                            foreach (var error in eklist)
-                            {
-                                <tr style="height:20px;">
-                                    <td>@error</td>
-                                    @foreach (var test in Model.FirstYields)
-                                    {
-                                        var val = Prometheus.Models.ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, Model.FErrorMap);
-                                        <td>@val</td>
-                                    }
-                                </tr>
-                            }
+    <div class="row">
+        <div class="col-xs-12">
+            <table id="fpfailuretb" class="display" cellspacing="0">
+                <thead>
+                    <tr style="color:white;">
+                        <th>ErrAbbr</th>
+                        @foreach (var item in Model.FirstYields)
+                        {
+                            <th>@item.WhichTest</th>
                         }
-                    </tbody>
-                </table>
-                <script type="text/javascript">
-                                $(document).ready(function() {
-                                    $('#fpfailuretb').DataTable({
-                                        'iDisplayLength': 10,
-                                        'aLengthMenu': [[10, 20, 30, -1],
-                                                        [10, 20, 30, "All"]],
-                                        "bAutoWidth": false,
-                                        "aaSorting": [],
-                                        "order": []
-                                    });
-                                            } );
-                </script>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @{
+                        var eklist = new List<string>();
+                        foreach (var error in Model.FErrorMap.Keys)
+                        {
+                            eklist.Add(error);
+                        }
+
+                        foreach (var error in eklist)
+                        {
+                            <tr style="height:20px;">
+                                <td>@error</td>
+                                @foreach (var test in Model.FirstYields)
+                                {
+                                    var val = Prometheus.Models.ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, Model.FErrorMap);
+                                    <td>@val</td>
+                                }
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $('#fpfailuretb').DataTable({
+                        'iDisplayLength': 10,
+                        'aLengthMenu': [[10, 20, 30, -1],
+                        [10, 20, 30, "All"]],
+                        "bAutoWidth": false,
+                        "aaSorting": [],
+                        "order": []
+                    });
+                });
+            </script>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">&nbsp;</div>
+    </div>
+
+    <div class="row" style="font-size:18px"><strong>&nbsp;&nbsp;Final Test Result</strong></div>
+    <div class="row">
+        <div class="col-xs-12">&nbsp;</div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <table id="flfailuretable" class="display" cellspacing="0">
+                <thead>
+                    <tr style="color:white;">
+                        <th>ErrAbbr</th>
+                        @foreach (var item in Model.LastYields)
+                        {
+                            <th>@item.WhichTest</th>
+                        }
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @{
+                        eklist = new List<string>();
+                        foreach (var error in Model.LErrorMap.Keys)
+                        {
+                            eklist.Add(error);
+                        }
+
+                        foreach (var error in eklist)
+                        {
+                            <tr style="height:20px;">
+                                <td>@error</td>
+                                @foreach (var test in Model.LastYields)
+                                {
+                                    var val = Prometheus.Models.ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, Model.LErrorMap);
+                                    <td>@val</td>
+                                }
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $('#flfailuretable').DataTable({
+                        'iDisplayLength': 10,
+                        'aLengthMenu': [[10, 20, 30, -1],
+                        [10, 20, 30, "All"]],
+                        "bAutoWidth": false,
+                        "aaSorting": [],
+                        "order": []
+                    });
+                });
+            </script>
+        </div>
+    </div>
+
+
+
+    <div class="row">
+        <div class="col-xs-12">&nbsp;</div>
+    </div>
+
+    <div class="row" style="font-size:18px"><strong>&nbsp;&nbsp;SN Trace Result</strong></div>
+    <div class="row">
+        <div class="col-xs-12">&nbsp;</div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <table id="snfailuretable" class="display" cellspacing="0">
+                <thead>
+                    <tr style="color:white;">
+                        <th>ErrAbbr</th>
+                        @foreach (var item in Model.SNYields)
+                        {
+                            <th>@item.WhichTest</th>
+                        }
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @{
+                        eklist = new List<string>();
+                        foreach (var error in Model.SNErrorMap.Keys)
+                        {
+                            eklist.Add(error);
+                        }
+
+                        foreach (var error in eklist)
+                        {
+                            <tr style="height:20px;">
+                                <td>@error</td>
+                                @foreach (var test in Model.SNYields)
+                                {
+                                    var val = Prometheus.Models.ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, Model.SNErrorMap);
+                                    <td>@val</td>
+                                }
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $('#snfailuretable').DataTable({
+                        'iDisplayLength': 10,
+                        'aLengthMenu': [[10, 20, 30, -1],
+                        [10, 20, 30, "All"]],
+                        "bAutoWidth": false,
+                        "aaSorting": [],
+                        "order": []
+                    });
+                });
+            </script>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-xs-12">&nbsp;</div>
+    </div>
+
+    <div class="row" style="font-size:18px"><strong>&nbsp;&nbsp;Defect Pareto</strong></div>
+    <div class="row">
+        <div class="col-xs-12">&nbsp;</div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+
+            <div class="col-xs-6 text-left">
+                @if (ViewBag.fparetoscript != null)
+                {
+                    <div id="fparetochart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                    @Html.Raw(ViewBag.fparetoscript)
+                }
+            </div>
+            <div class="col-xs-6 text-left">
+                @if (ViewBag.fyparetoscript != null)
+                {
+                    <div id="fyparetochart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                    @Html.Raw(ViewBag.fyparetoscript)
+                }
             </div>
         </div>
+    </div>
 
-                    <div class="row">
-                        <div class="col-xs-12">&nbsp;</div>
-                    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="col-xs-6 text-left">
+                @if (ViewBag.rchartscript != null)
+                {
+                    <div id="rfailurepie" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                    @Html.Raw(ViewBag.rchartscript)
+                }
+            </div>
+            <div class="col-xs-6 text-left">
+                @if (ViewBag.rparetoscript != null)
+                {
+                    <div id="rparetochart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                    @Html.Raw(ViewBag.rparetoscript)
+                }
+            </div>
 
-                    <div class="row" style="font-size:18px"><strong>&nbsp;&nbsp;Final Test Result</strong></div>
-                    <div class="row">
-                        <div class="col-xs-12">&nbsp;</div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <table id="flfailuretable" class="display" cellspacing="0">
-                                <thead>
-                                    <tr style="color:white;">
-                                        <th>ErrAbbr</th>
-                                        @foreach (var item in Model.LastYields)
-                                        {
-                                            <th>@item.WhichTest</th>
-                                        }
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-                                    @{
-                                        eklist = new List<string>();
-                                        foreach (var error in Model.LErrorMap.Keys)
-                                        {
-                                            eklist.Add(error);
-                                        }
-
-                                        foreach (var error in eklist)
-                                        {
-                                            <tr style="height:20px;">
-                                                <td>@error</td>
-                                                @foreach (var test in Model.LastYields)
-                                                {
-                                                    var val = Prometheus.Models.ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, Model.LErrorMap);
-                                                    <td>@val</td>
-                                                }
-                                            </tr>
-                                        }
-                                    }
-                                </tbody>
-                            </table>
-                            <script type="text/javascript">
-                                $(document).ready(function() {
-                                    $('#flfailuretable').DataTable({
-                                        'iDisplayLength': 10,
-                                        'aLengthMenu': [[10, 20, 30, -1],
-                                                        [10, 20, 30, "All"]],
-                                        "bAutoWidth": false,
-                                        "aaSorting": [],
-                                        "order": []
-                                    });
-                                            } );
-                            </script>
-                        </div>
-                    </div>
-
-
-
-                    <div class="row">
-                        <div class="col-xs-12">&nbsp;</div>
-                    </div>
-
-                    <div class="row" style="font-size:18px"><strong>&nbsp;&nbsp;SN Trace Result</strong></div>
-                    <div class="row">
-                        <div class="col-xs-12">&nbsp;</div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <table id="snfailuretable" class="display" cellspacing="0">
-                                <thead>
-                                    <tr style="color:white;">
-                                        <th>ErrAbbr</th>
-                                        @foreach (var item in Model.SNYields)
-                                        {
-                                            <th>@item.WhichTest</th>
-                                        }
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-                                    @{
-                                        eklist = new List<string>();
-                                        foreach (var error in Model.SNErrorMap.Keys)
-                                        {
-                                            eklist.Add(error);
-                                        }
-
-                                        foreach (var error in eklist)
-                                        {
-                                            <tr style="height:20px;">
-                                                <td>@error</td>
-                                                @foreach (var test in Model.SNYields)
-                                                {
-                                                    var val = Prometheus.Models.ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, Model.SNErrorMap);
-                                                    <td>@val</td>
-                                                }
-                                            </tr>
-                                        }
-                                    }
-                                </tbody>
-                            </table>
-                            <script type="text/javascript">
-                                $(document).ready(function() {
-                                    $('#snfailuretable').DataTable({
-                                        'iDisplayLength': 10,
-                                        'aLengthMenu': [[10, 20, 30, -1],
-                                                        [10, 20, 30, "All"]],
-                                        "bAutoWidth": false,
-                                        "aaSorting": [],
-                                        "order": []
-                                    });
-                                            } );
-                            </script>
-                        </div>
-                    </div>
-
-
-                    <div class="row">
-                        <div class="col-xs-12">&nbsp;</div>
-                    </div>
-
-                    <div class="row" style="font-size:18px"><strong>&nbsp;&nbsp;Defect Pareto</strong></div>
-                    <div class="row">
-                        <div class="col-xs-12">&nbsp;</div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-xs-12">
-
-                            <div class="col-xs-6 text-left">
-                                @if (ViewBag.fparetoscript != null)
-                                {
-                                    @Html.Raw(ViewBag.fparetoscript)
-                                    <div id="fparetochart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-                                }
-                            </div>
-                            <div class="col-xs-6 text-left">
-                                    @if (ViewBag.fyparetoscript != null)
-                                    {
-                                        @Html.Raw(ViewBag.fyparetoscript)
-                                        <div id="fyparetochart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-                                    }
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <div class="col-xs-6 text-left">
-                                @if (ViewBag.rchartscript != null)
-                                {
-                                    @Html.Raw(ViewBag.rchartscript)
-                                    <div id="rfailurepie" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-                                }
-                            </div>
-                            <div class="col-xs-6 text-left">
-                                @if (ViewBag.rparetoscript != null)
-                                {
-                                    @Html.Raw(ViewBag.rparetoscript)
-                                    <div id="rparetochart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-                                }
-                            </div>
-                            
-                        </div>
-                    </div>
-                                        }
+        </div>
+    </div>
+}
 
 
 

@@ -19,7 +19,23 @@ $(function () {
         tooltip: {
             pointFormat: '{series.name} <b>{point.y:,.0f}</b>'
   },
-  series: [#NAMEVALUEPAIRS#]
+  series: [#NAMEVALUEPAIRS#],
+        exporting: {
+            menuItemDefinitions: {
+                fullscreen: {
+                    onclick: function () {
+                              $('##ElementID#').parent().toggleClass('chart-modal');
+                              $('##ElementID#').highcharts().reflow();
+                    },
+                    text: 'Full Screen'
+                }
+            },
+            buttons: {
+                contextButton: {
+                    menuItems: ['fullscreen','printChart','separator','downloadPNG','downloadJPEG','downloadPDF','downloadSVG']
+                }
+            }
+        }
   });
   });
 </script>

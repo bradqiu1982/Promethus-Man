@@ -39,10 +39,9 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-xs-12">&nbsp;</div>
+<div class="row text-center">
+    <h3>@(ViewBag.sDate +" ~ "+ViewBag.eDate)</h3>
 </div>
-
 
 @if (Model != null)
 {
@@ -86,7 +85,19 @@
                                     <th>Yield</th>
                                     @foreach (var item in Model.FirstYields)
                                     {
-                                        <td>@((item.Yield * 100.0).ToString("0.00"))%</td>
+                                        if (!string.IsNullOrEmpty(item.StartDate)
+                                            && !string.IsNullOrEmpty(item.EndDate))
+                                        {
+                                            var sdate = DateTime.Parse(item.StartDate).ToString("yyyy-MM-dd");
+                                            var edate = DateTime.Parse(item.EndDate).ToString("yyyy-MM-dd");
+                                            var pjkey = Model.ProjectKey;
+                                            var site = item.WhichTest;
+                                            <td><a href="/Project/ProjectStations?pjkey=@(pjkey)&whichtest=@(site)&StartTime=@(sdate)&EndTime=@(edate)" target="_blank">@((item.Yield * 100.0).ToString("0.00"))%</a></td>
+                                        }
+                                        else
+                                        {
+                                            <td>@((item.Yield * 100.0).ToString("0.00"))%</td>
+                                        }
                                     }
                                     <td>@((Model.FirstYield * 100.0).ToString("0.00"))%</td>
                                 </tr>
@@ -140,7 +151,19 @@
                                     <th>Yield</th>
                                     @foreach (var item in Model.LastYields)
                                     {
-                                        <td>@((item.Yield * 100.0).ToString("0.00"))%</td>
+                                        if (!string.IsNullOrEmpty(item.StartDate)
+                                            && !string.IsNullOrEmpty(item.EndDate))
+                                        {
+                                            var sdate = DateTime.Parse(item.StartDate).ToString("yyyy-MM-dd");
+                                            var edate = DateTime.Parse(item.EndDate).ToString("yyyy-MM-dd");
+                                            var pjkey = Model.ProjectKey;
+                                            var site = item.WhichTest;
+                                            <td><a href="/Project/ProjectStations?pjkey=@(pjkey)&whichtest=@(site)&StartTime=@(sdate)&EndTime=@(edate)" target="_blank">@((item.Yield * 100.0).ToString("0.00"))%</a></td>
+                                        }
+                                        else
+                                        {
+                                            <td>@((item.Yield * 100.0).ToString("0.00"))%</td>
+                                        }
                                     }
                                     <td>@((Model.LastYield * 100.0).ToString("0.00"))%</td>
                                 </tr>
@@ -214,25 +237,22 @@
             <div class="col-xs-12">&nbsp;</div>
         </div>
 
-    <script src="~/Scripts/highcharts.js"></script>
-    <script src="~/Scripts/exporting.js"></script>
-
     <div class="row">
         <div class="col-xs-12">
 
                     <div class="col-xs-6 text-left">
                         @if (ViewBag.fchartscript != null)
                         {
-                            @Html.Raw(ViewBag.fchartscript)
                             <div id="ffailurepie" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                            @Html.Raw(ViewBag.fchartscript)
                         }
                         
                     </div>
                     <div class="col-xs-6 text-left">
                         @if (ViewBag.fychartscript != null)
                         {
-                            @Html.Raw(ViewBag.fychartscript)
                             <div id="fyfailurepie" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                            @Html.Raw(ViewBag.fychartscript)
                         }
                     </div>
         </div>
@@ -432,15 +452,15 @@
                                     <div class="col-xs-6 text-left">
                                         @if (ViewBag.fparetoscript != null)
                                         {
-                                            @Html.Raw(ViewBag.fparetoscript)
                                             <div id="fparetochart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                                            @Html.Raw(ViewBag.fparetoscript)
                                         }
                                     </div>
                                     <div class="col-xs-6 text-left">
                                             @if (ViewBag.fyparetoscript != null)
                                             {
-                                                @Html.Raw(ViewBag.fyparetoscript)
                                                 <div id="fyparetochart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                                                @Html.Raw(ViewBag.fyparetoscript)
                                             }
                                     </div>
                         </div>
@@ -451,15 +471,15 @@
                             <div class="col-xs-6 text-left">
                                 @if (ViewBag.rchartscript != null)
                                 {
-                                    @Html.Raw(ViewBag.rchartscript)
                                     <div id="rfailurepie" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                                    @Html.Raw(ViewBag.rchartscript)
                                 }
                             </div>
                             <div class="col-xs-6 text-left">
                                 @if (ViewBag.rparetoscript != null)
                                 {
-                                    @Html.Raw(ViewBag.rparetoscript)
                                     <div id="rparetochart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                                    @Html.Raw(ViewBag.rparetoscript)
                                 }
                             </div>
                             

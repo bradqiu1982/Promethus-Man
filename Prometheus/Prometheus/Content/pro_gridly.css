@@ -1,0 +1,24 @@
+﻿.grid_container{
+    position: relative;
+}
+
+.grid_container .brick{
+    opacity: 1;
+    position: relative;
+}
+
+.grid_container .brick .dragging{
+    opacity: 0.8;
+}
+
+.un_grid_container {
+    position: relative;
+}
+
+.edit-pro-grid {
+    font-size: 30px;
+    color: #8a8a8a;
+    margin-top: -20px;
+    margin-right: 15px;
+    cursor: pointer;
+}

@@ -11,8 +11,8 @@
 else
 {
     <script type="text/javascript">
-            $(document).ready(function () {
-                npireadmode();
+        $(document).ready(function () {
+            npireadmode();
         });
     </script>
 }
@@ -133,6 +133,7 @@ else
 <hr />
 
 <script src="../../ckeditor/ckeditor.js"></script>
+<script src="~/Scripts/autocompletefill.js"></script>
 
 @using (Html.BeginForm("UpdateQuality", "Issue", FormMethod.Post, new { enctype = "multipart/form-data", id = "issueform", name = "issueform" }))
 {
@@ -145,7 +146,11 @@ else
                 <div class="col-xs-6">
                     <label class="control-label col-xs-2" for="projectlist">Project<font color="red">*</font></label>
                     <div class="col-xs-10">
-                        @Html.DropDownList("projectlist", null, new { @id = "projectlist", @class = "form-control", @readonly = "readonly" })
+                        <input class="form-control" id="projectlist" name="projectlist"
+                               type="text" value="@(string.IsNullOrEmpty(Model.ProjectKey)?"":Model.ProjectKey)" readonly />
+                        <script type="text/javascript">
+                            autoCompleteFill('projectlist', @Html.Raw(ViewBag.projectlist));
+                        </script>
                     </div>
                 </div>
                 <div class="col-xs-6">
@@ -168,14 +173,12 @@ else
                 <div class="col-xs-6">
                     <label class="control-label col-xs-2" for="assigneelist">Assignee</label>
                     <div class="col-xs-10">
-                        @if (ViewBag.isassignee != null && ViewBag.isassignee)
-                        {
-                            @Html.DropDownList("assigneelist", null, new { @id = "assigneelist", @class = "form-control" })
-                        }
-                        else
-                        {
-                            @Html.DropDownList("assigneelist", null, new { @id = "assigneelist", @class = "form-control", @readonly = "readonly" })
-                        }
+                        <input class="form-control" id="assigneelist" name="assigneelist" 
+                               @((ViewBag.isassignee != null && ViewBag.isassignee)?"":"readonly")
+                               type="text" value="@(string.IsNullOrEmpty(Model.Assignee)?Model.Reporter:Model.Assignee)" />
+                        <script type="text/javascript">
+                                autoCompleteFill('assigneelist', @Html.Raw(ViewBag.AllUserList));
+                        </script>
                     </div>
                 </div>
 
@@ -270,7 +273,7 @@ else
                 </div>
 
                 <div class="col-xs-6">
-                    <label class="control-label col-xs-2">Creator</label>
+                    <label class="control-label col-xs-2">Last Updater</label>
                     <div class="col-xs-10">
                         @if (Model != null && !string.IsNullOrEmpty(Model.Reporter))
                         {
@@ -373,73 +376,6 @@ else
             {
                 <hr />
             }
-
-            @if (Model.ContainmentActions.Count > 0)
-            {
-                <div class="form-group">
-                    <div class="col-xs-12">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Containment Actions</h3>
-                            </div>
-                            <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
-                                <div class="row">
-                                    <div class="col-xs-4">Summary</div>
-                                    <div class="col-xs-2">Status</div>
-                                    <div class="col-xs-2">Asignee</div>
-                                    <div class="col-xs-2">DueDate</div>
-                                    <div class="col-xs-2"></div>
-                                </div>
-                                @foreach (var item in Model.ContainmentActions)
-                                {
-                                    <div class="row">
-                                        <div class="col-xs-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace("[Containment]", "")</a></div>
-                                        <div class="col-xs-2">@item.Resolution</div>
-                                        <div class="col-xs-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
-                                        <div class="col-xs-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
-                                        <div class="col-xs-2"></div>
-                                    </div>
-                                }
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            }
-
-            @if (Model.CorrectiveActions.Count > 0)
-            {
-                <div class="form-group">
-                    <div class="col-xs-12">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Corrective Actions</h3>
-                            </div>
-                            <div class="panel-body" style="overflow-y: scroll;overflow-x: scroll;">
-                                <div class="row">
-                                    <div class="col-xs-4">Summary</div>
-                                    <div class="col-xs-2">Status</div>
-                                    <div class="col-xs-2">Asignee</div>
-                                    <div class="col-xs-2">DueDate</div>
-                                    <div class="col-xs-2"></div>
-                                </div>
-                                @foreach (var item in Model.CorrectiveActions)
-                                {
-                                    <div class="row">
-                                        <div class="col-xs-4"><a href="/Issue/UpdateIssue?issuekey=@item.IssueKey">@item.Summary.Replace("[Corrective]", "")</a></div>
-                                        <div class="col-xs-2">@item.Resolution</div>
-                                        <div class="col-xs-2"><a href="/User/UserCenter?username=@item.Assignee">@item.Assignee.Split(new char[] { '@' })[0]</a></div>
-                                        <div class="col-xs-2">@item.DueDate.ToString("yyyy-MM-dd")</div>
-                                        <div class="col-xs-2"></div>
-                                    </div>
-                                }
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            }
-
 
             @if (Model != null && Model.AttachList.Count > 0)
             {

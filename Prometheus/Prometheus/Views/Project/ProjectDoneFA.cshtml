@@ -44,12 +44,8 @@
     <div class="col-xs-12">&nbsp;</div>
 </div>
 
-<script src="~/Scripts/highcharts.js"></script>
-<script src="~/Scripts/exporting.js"></script>
-
 @if (ViewBag.chartscript != null)
 {
-    @Html.Raw(ViewBag.chartscript)
 
     <div class="row">
         <div class="col-xs-2"></div>
@@ -58,6 +54,7 @@
         </div>
         <div class="col-xs-2"></div>
     </div>
+    @Html.Raw(ViewBag.chartscript)
 }
 
 <div class="row">
@@ -81,8 +78,8 @@
                     <td>Assignee</td>
                     <td>Failure Desc</td>
                     <td>Tester</td>
-                    <td>Date</td>
-                    <td>ClosedDate</td>
+                    <td data-type="string">Date</td>
+                    <td data-type="string">ClosedDate</td>
                     <td><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></td>
                     <td>LYT</td>
                 </tr>
@@ -135,10 +132,10 @@
                         </td>
                         <td>@item.TestData.TestStation</td>
                         <td>
-                            @item.IssueData.ReportDate.ToString("MM/dd")
+                            @item.IssueData.ReportDate.ToString("yy-MM-dd")
                         </td>
                         <td>
-                            @item.IssueData.ResolvedDate.ToString("MM/dd HH:mm")
+                            @item.IssueData.ResolvedDate.ToString("yy-MM-dd")
                         </td>
                         <td>
                             @if (item.IssueData.AttachList.Count > 0)
@@ -163,8 +160,8 @@
                     $('#pndatatable').DataTable({
                         'iDisplayLength': 50,
                         'aLengthMenu': [[20, 50, 100, -1],
-                                        [20, 50, 100, "All"]],
-                        "aaSorting": [],
+                            [20, 50, 100, "All"]],
+                        'aaSorting': [],
                         "order": []
                     });
                 })

@@ -7,13 +7,12 @@
 @if (Model != null)
 {
     <div class="row">
-        <div class="col-xs-5">
-            <h2>@Model.ProjectKey Burn-In @Model.EndDate.ToString("yyyy-MM-dd") Yield</h2>
+        <div class="col-xs-8">
+            <h3>@Model.ProjectKey Burn-In Yield (@(ViewBag.sDate + " ~ " + ViewBag.eDate))</h3>
         </div>
         <div class="col-xs-2">
-            <h2><a data-toggle="tooltip" title="Goto Burn-in Main Page" href="/BurnIn/ProjectBIWeeklyYield?ProjectKey=@(Model.ProjectKey)&Weeks=@(ViewBag.Weeks)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h2>
+            <h3><a data-toggle="tooltip" title="Goto Burn-in Main Page" href="/BurnIn/ProjectBIWeeklyYield?ProjectKey=@(Model.ProjectKey)&Weeks=@(ViewBag.Weeks)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></h3>
         </div>
-        <div class="col-xs-5"></div>
     </div>
 }
 else
@@ -72,10 +71,7 @@ else
             </div>
         </div>
     </div>
-
-    <script src="~/Scripts/highcharts.js"></script>
-    <script src="~/Scripts/exporting.js"></script>
-
+    
     if (ViewBag.rchartscript != null)
     {
     <div class="row">
@@ -90,8 +86,8 @@ else
                     <div class="col-xs-6 text-left">
                         @if (ViewBag.rchartscript != null)
                         {
-                            @Html.Raw(ViewBag.rchartscript)
                             <div id="rfailurepie" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                            @Html.Raw(ViewBag.rchartscript)
                         }
 
                     </div>
@@ -160,8 +156,8 @@ else
                                     <div class="col-xs-6 text-left">
                                         @if (ViewBag.rparetoscript != null)
                                         {
-                                            @Html.Raw(ViewBag.rparetoscript)
                                             <div id="rparetochart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                                            @Html.Raw(ViewBag.rparetoscript)
                                         }
                                     </div>
                                     <div class="col-xs-3 text-left"></div>

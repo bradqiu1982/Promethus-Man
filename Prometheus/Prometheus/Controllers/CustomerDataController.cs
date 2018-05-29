@@ -14,7 +14,6 @@ using System.Diagnostics;
 namespace Prometheus.Controllers
 {
 
-
     public class CustomerDataController : Controller
     {
         public ActionResult CommitVcselData()
@@ -57,17 +56,14 @@ namespace Prometheus.Controllers
             }
         }
 
-
-        [HttpPost, ActionName("CommitVcselData")]
-        [ValidateAntiForgeryToken]
-        public ActionResult CommitVcselDataPost()
+        private string RetriveCommitFile()
         {
             var wholefn = "";
             try
             {
-                if (!string.IsNullOrEmpty(Request.Form["VcselFileName"]))
+                if (!string.IsNullOrEmpty(Request.Form["RMAFileName"]))
                 {
-                    var customereportfile = Request.Form["VcselFileName"];
+                    var customereportfile = Request.Form["RMAFileName"];
                     var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_");
 
                     foreach (string fl in Request.Files)
@@ -95,6 +91,21 @@ namespace Prometheus.Controllers
                         }//end if
                     }//end foreach
 
+                }//end if
+            }
+            catch (Exception ex)
+            { }
+
+            return wholefn;
+        }
+
+
+        [HttpPost, ActionName("CommitVcselData")]
+        [ValidateAntiForgeryToken]
+        public ActionResult CommitVcselDataPost()
+        {
+            var wholefn = RetriveCommitFile();
+
                     if (!string.IsNullOrEmpty(wholefn))
                     {
                         var data = RetrieveDataFromExcelWithAuth(this,wholefn);
@@ -106,12 +117,56 @@ namespace Prometheus.Controllers
                         }
                     }
 
-                }//end if
-            }
-            catch (Exception ex)
-            {  }
-
             return View();
+        }
+
+        public ActionResult CommitVcselPNInfo()
+        {
+            return View();
+        }
+
+        [HttpPost, ActionName("CommitVcselPNInfo")]
+        [ValidateAntiForgeryToken]
+        public ActionResult CommitVcselPNInfoPost()
+        {
+            var wholefn = RetriveCommitFile();
+
+            if (!string.IsNullOrEmpty(wholefn))
+            {
+                var data = RetrieveDataFromExcelWithAuth(this, wholefn);
+                if (data.Count > 0 && string.Compare(data[0][6], "BOM PN", true) == 0)
+                {
+                    foreach (var line in data)
+                    {
+                        var PN = line[6];
+                        var CH = line[2];
+                        var Rate = line[3];
+                        if (!string.IsNullOrEmpty(line[7]))
+                        {
+                            CH = CH + "_" + line[7];
+                        }
+
+                        if (!string.IsNullOrEmpty(PN)
+                            && !string.IsNullOrEmpty(CH)
+                            && !string.IsNullOrEmpty(Rate))
+                        {
+                            if (Rate.ToUpper().Contains("28G"))
+                            {
+                                VcselPNData.UpdateVPnInfo(PN, "25G", CH);
+                            }
+                            else
+                            {
+                                VcselPNData.UpdateVPnInfo(PN, Rate, CH);
+                            }
+                        }//end if
+                    }//end foreach
+                }
+                else
+                {
+                    return RedirectToAction("CommitVcselPNInfo");
+                }
+            }
+            return RedirectToAction("ViewAll","Project");
         }
 
         [HttpPost, ActionName("ConfirmVcselData")]
@@ -301,40 +356,7 @@ namespace Prometheus.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult CommitFADataPost()
         {
-            var wholefn = "";
-            try
-            {
-                if (!string.IsNullOrEmpty(Request.Form["RMAFileName"]))
-                {
-                    var customereportfile = Request.Form["RMAFileName"];
-                    var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                    foreach (string fl in Request.Files)
-                    {
-                        if (fl != null && Request.Files[fl].ContentLength > 0)
-                        {
-                            string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                            string datestring = DateTime.Now.ToString("yyyyMMdd");
-                            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
-
-                            if (!Directory.Exists(imgdir))
-                            {
-                                Directory.CreateDirectory(imgdir);
-                            }
-
-                            fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
-                            Request.Files[fl].SaveAs(imgdir + fn);
-
-                            if (fn.Contains(originalname))
-                            {
-                                wholefn = imgdir + fn;
-                                break;
-                            }
-                        }//end if
-                    }//end foreach
+            var wholefn = RetriveCommitFile();
 
                     if (!string.IsNullOrEmpty(wholefn))
                     {
@@ -373,9 +395,10 @@ namespace Prometheus.Controllers
                             }
 
                             var firstengineer = "";
+                            var role = string.IsNullOrEmpty(pj.TransferFlg) ? ProjectViewModels.ENGROLE : ProjectViewModels.MEROLE;
                             foreach (var m in pj.MemberList)
                             {
-                                if (string.Compare(m.Role, ProjectViewModels.ENGROLE) == 0)
+                                if (string.Compare(m.Role, role) == 0)
                                 {
                                     firstengineer = m.Name;
                                     break;
@@ -450,10 +473,6 @@ namespace Prometheus.Controllers
                         }
                     }//end if
 
-                }//end if
-            }
-            catch (Exception ex) { }
-
             return RedirectToAction("ViewAll", "Project");
         }
 
@@ -465,40 +484,7 @@ namespace Prometheus.Controllers
         {
             var projlist = ProjectViewModels.RetrieveAllProjectKey();
 
-            var wholefn = "";
-            try
-            {
-                if (!string.IsNullOrEmpty(Request.Form["RMAFileName"]))
-                {
-                    var customereportfile = Request.Form["RMAFileName"];
-                    var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                    foreach (string fl in Request.Files)
-                    {
-                        if (fl != null && Request.Files[fl].ContentLength > 0)
-                        {
-                            string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                            string datestring = DateTime.Now.ToString("yyyyMMdd");
-                            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
-
-                            if (!Directory.Exists(imgdir))
-                            {
-                                Directory.CreateDirectory(imgdir);
-                            }
-
-                            fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
-                            Request.Files[fl].SaveAs(imgdir + fn);
-
-                            if (fn.Contains(originalname))
-                            {
-                                wholefn = imgdir + fn;
-                                break;
-                            }
-                        }//end if
-                    }//end foreach
+            var wholefn = RetriveCommitFile();
 
                     if (!string.IsNullOrEmpty(wholefn))
                     {
@@ -598,11 +584,6 @@ namespace Prometheus.Controllers
                         }
                     }
 
-                }//end if
-            }
-            catch (Exception ex)
-            { }
-
             return View();
         }
 
@@ -615,40 +596,8 @@ namespace Prometheus.Controllers
         {
             var projlist = ProjectViewModels.RetrieveAllProjectKey();
 
-            var wholefn = "";
-            try
-            {
-                if (!string.IsNullOrEmpty(Request.Form["RMAFileName"]))
-                {
-                    var customereportfile = Request.Form["RMAFileName"];
-                    var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+            var wholefn = RetriveCommitFile();
 
-                    foreach (string fl in Request.Files)
-                    {
-                        if (fl != null && Request.Files[fl].ContentLength > 0)
-                        {
-                            string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                            string datestring = DateTime.Now.ToString("yyyyMMdd");
-                            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
-
-                            if (!Directory.Exists(imgdir))
-                            {
-                                Directory.CreateDirectory(imgdir);
-                            }
-
-                            fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
-                            Request.Files[fl].SaveAs(imgdir + fn);
-
-                            if (fn.Contains(originalname))
-                            {
-                                wholefn = imgdir + fn;
-                                break;
-                            }
-                        }//end if
-                    }//end foreach
 
                     if (!string.IsNullOrEmpty(wholefn))
                     {
@@ -755,11 +704,6 @@ namespace Prometheus.Controllers
                         }
                     }
 
-                }//end if
-            }
-            catch (Exception ex)
-            { }
-
             return View();
         }
 
@@ -769,40 +713,7 @@ namespace Prometheus.Controllers
         {
             var projlist = ProjectViewModels.RetrieveAllProjectKey();
 
-            var wholefn = "";
-            try
-            {
-                if (!string.IsNullOrEmpty(Request.Form["RMAFileName"]))
-                {
-                    var customereportfile = Request.Form["RMAFileName"];
-                    var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                    foreach (string fl in Request.Files)
-                    {
-                        if (fl != null && Request.Files[fl].ContentLength > 0)
-                        {
-                            string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                            string datestring = DateTime.Now.ToString("yyyyMMdd");
-                            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
-
-                            if (!Directory.Exists(imgdir))
-                            {
-                                Directory.CreateDirectory(imgdir);
-                            }
-
-                            fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
-                            Request.Files[fl].SaveAs(imgdir + fn);
-
-                            if (fn.Contains(originalname))
-                            {
-                                wholefn = imgdir + fn;
-                                break;
-                            }
-                        }//end if
-                    }//end foreach
+            var wholefn = RetriveCommitFile();
 
                     if (!string.IsNullOrEmpty(wholefn))
                     {
@@ -903,11 +814,6 @@ namespace Prometheus.Controllers
                         }
                     }
 
-                }//end if
-            }
-            catch (Exception ex)
-            { }
-
             return View();
         }
 
@@ -917,40 +823,7 @@ namespace Prometheus.Controllers
         {
             var projlist = ProjectViewModels.RetrieveAllProjectKey();
 
-            var wholefn = "";
-            try
-            {
-                if (!string.IsNullOrEmpty(Request.Form["RMAFileName"]))
-                {
-                    var customereportfile = Request.Form["RMAFileName"];
-                    var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                    foreach (string fl in Request.Files)
-                    {
-                        if (fl != null && Request.Files[fl].ContentLength > 0)
-                        {
-                            string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                            string datestring = DateTime.Now.ToString("yyyyMMdd");
-                            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
-
-                            if (!Directory.Exists(imgdir))
-                            {
-                                Directory.CreateDirectory(imgdir);
-                            }
-
-                            fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
-                            Request.Files[fl].SaveAs(imgdir + fn);
-
-                            if (fn.Contains(originalname))
-                            {
-                                wholefn = imgdir + fn;
-                                break;
-                            }
-                        }//end if
-                    }//end foreach
+            var wholefn = RetriveCommitFile();
 
                     if (!string.IsNullOrEmpty(wholefn))
                     {
@@ -1046,11 +919,6 @@ namespace Prometheus.Controllers
                             return View("ConfirmRelData", realdata);
                         }
                     }
-
-                }//end if
-            }
-            catch (Exception ex)
-            { }
 
             return View();
         }
@@ -1718,40 +1586,7 @@ namespace Prometheus.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult CommitUserMatrixPost()
         {
-            var wholefn = "";
-            try
-            {
-                if (!string.IsNullOrEmpty(Request.Form["RMAFileName"]))
-                {
-                    var customereportfile = Request.Form["RMAFileName"];
-                    var originalname = Path.GetFileNameWithoutExtension(customereportfile).Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                    foreach (string fl in Request.Files)
-                    {
-                        if (fl != null && Request.Files[fl].ContentLength > 0)
-                        {
-                            string fn = Path.GetFileName(Request.Files[fl].FileName).Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                            string datestring = DateTime.Now.ToString("yyyyMMdd");
-                            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
-
-                            if (!Directory.Exists(imgdir))
-                            {
-                                Directory.CreateDirectory(imgdir);
-                            }
-
-                            fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
-                            Request.Files[fl].SaveAs(imgdir + fn);
-
-                            if (fn.Contains(originalname))
-                            {
-                                wholefn = imgdir + fn;
-                                break;
-                            }
-                        }//end if
-                    }//end foreach
+            var wholefn = RetriveCommitFile();
 
                     int idx = 0;
                     if (!string.IsNullOrEmpty(wholefn))
@@ -1769,11 +1604,6 @@ namespace Prometheus.Controllers
                             }
                         }//end if
                     }//end if
-
-                }//end if
-            }
-            catch (Exception ex)
-            { }
 
             return View();
         }
@@ -1857,14 +1687,14 @@ namespace Prometheus.Controllers
         {
             var ret = new List<string>();
             var allreldata = ExternalDataCollector.RetrieveAllIQEData();
-            var line = "ID,Product line,IQC missing?(Y/N),Category,Horizontal spread(Y/N),PN,Description,Supplier,Issue,Status,RCCA,Evidence,Owner,IQE,Due Data";
+            var line = "ID,Product line,IQC missing?(Y/N),Category,Horizontal spread(Y/N),RISK ASSESSMENT,PN,Description,Supplier,Issue,Status,RCCA,Evidence,Owner,IQE,Due Data";
             ret.Add(line);
 
             foreach (var item in allreldata)
             {
                 var line1 = string.Empty;
                 line1 = "\"" + item.AppV_A.ToString().Replace("\"", "") + "\"," + "\"" + item.AppV_B.Replace("\"", "") + "\"," + "\"" + item.AppV_C.Replace("\"", "") + "\","
-                    + "\"" + item.AppV_D.Replace("\"", "") + "\"," + "\"" + item.AppV_E.Replace("\"", "") + "\"," + "\"" + item.AppV_F.Replace("\"", "") + "\","
+                    + "\"" + item.AppV_D.Replace("\"", "") + "\"," + "\"" + item.AppV_E.Replace("\"", "") + "\"," + "\"" + item.AppV_Q.Replace("\"", "") + "\"," + "\"" + item.AppV_F.Replace("\"", "") + "\","
                     + "\"" + item.AppV_G.Replace("\"", "") + "\"," + "\"" + item.AppV_H.Replace("\"", "") + "\"," + "\"" + item.AppV_I.Replace("\"", "") + "\","
                     + "\"" + item.AppV_J.Replace("\"", "") + "\"," + "\"" + item.AppV_K.Replace("\"", "") + "\"," + "\"" + item.AppV_L.Replace("\"", "") + "\","
                     + "\"" + item.AppV_M.Replace("\"", "") + "\"," + "\"" + item.AppV_N.Replace("\"", "") + "\"," + "\"" + item.AppV_O.Replace("\"", "") + "\",";
@@ -1903,6 +1733,246 @@ namespace Prometheus.Controllers
         {
             var vm = WaferRecord.RetrieveWaferRecord();
             return View(vm);
+        }
+
+        public ActionResult ReviewWaferCoordData(string sn = "", string sdate="", string edate ="")
+        {
+            if (string.IsNullOrEmpty(sdate))
+            {
+                sdate = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd 00:00:00");
+            }
+            else
+            {
+                sdate = Convert.ToDateTime(sdate).ToString("yyyy-MM-dd 00:00:00");
+            }
+            if (string.IsNullOrEmpty(edate))
+            {
+                edate = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd 23:59:59");
+            }
+            else
+            {
+                edate = Convert.ToDateTime(edate).ToString("yyyy-MM-dd 23:59:59");
+            }
+            var sn_str = "";
+            if (!string.IsNullOrEmpty(sn))
+            {
+                sn_str = "'" + string.Join("','", sn.Split(new char[] { ';', ',' })) + "'";
+            }
+            var data = WaferCoordRAWData.GetWaferCoordData("", sn_str, sdate, edate);
+            ViewBag.data = data;
+            ViewBag.skey = sn;
+            ViewBag.sdate = Convert.ToDateTime(sdate).ToString("yyyy-MM-dd");
+            ViewBag.edate = Convert.ToDateTime(edate).ToString("yyyy-MM-dd");
+            return View();
+        }
+
+        [HttpPost]
+        public JsonResult UpdateWaferCoordData()
+        {
+            var id = Request.Form["id"];
+            var bin = Request.Form["bin"];
+            var waferno = Request.Form["waferno"];
+            var x = Request.Form["x"];
+            var y = Request.Form["y"];
+
+            var res = new JsonResult();
+            if (!string.IsNullOrEmpty(id) && !string.IsNullOrEmpty(bin))
+            {
+                WaferCoordRAWData.UpdateWaferCoordData(id, waferno, x, y, bin);
+                res.Data = new { success = true };
+            }
+            else
+            {
+                res.Data = new { success = false };
+            }
+            return res;
+
+        }
+        [HttpPost]
+        public JsonResult InvaidWaferCoordData()
+        {
+            var id = Request.Form["id"];
+            var status = WaferCoordDataStatus.Invalid;
+            var res = new JsonResult();
+            if (!string.IsNullOrEmpty(id))
+            {
+                WaferCoordRAWData.InvalidWaferCoordData(id, status);
+                res.Data = new { success = true };
+            }
+            else
+            {
+                res.Data = new { success = false };
+            }
+            return res;
+        }
+
+        [HttpPost]
+        public JsonResult BatchUpdateWaferCoordData()
+        {
+            var ids = Request.Form["ids"];
+            var bin = Request.Form["bin"];
+            var res = new JsonResult();
+            if(!string.IsNullOrEmpty(ids) && !string.IsNullOrEmpty(bin))
+            {
+                var ids_arr = ids.Split(new char[] { ',', ';' }).ToList();
+                WaferCoordRAWData.BatchUpdateWaferCoordData(ids_arr, bin);
+                res.Data = new { success = true };
+            }
+            else
+            {
+                res.Data = new { success = false };
+            }
+
+            return res;
+        }
+
+        public ActionResult NeoMapData(string sn = "", string wafer_no = "", string coord_x = "", string coord_y = "")
+        {
+            var data = new List<Dictionary<string, string>>();
+            if(!string.IsNullOrEmpty(sn) || !string.IsNullOrEmpty(coord_x) 
+                    || !string.IsNullOrEmpty(coord_y)){
+                data = NeoMAPVM.GetNeomapDataByConditions(sn, wafer_no, coord_x, coord_y);
+            }
+            ViewBag.sn = sn;
+            ViewBag.wafer_no = wafer_no;
+            ViewBag.coord_x = coord_x;
+            ViewBag.coord_y = coord_y;
+            ViewBag.data = data;
+
+            return View();
+        }
+
+        public ActionResult DownLoadATETestData()
+        {
+            var ModuleFamily = ProjectTestData.RetrieveModuleFamily();
+            ViewBag.ModuleFamily = Newtonsoft.Json.JsonConvert.SerializeObject(ModuleFamily);
+            return View();
+        }
+
+        public ActionResult RealATETestData(string mdtype, string starttime, string endtime,string filtered)
+        {
+            if (string.IsNullOrEmpty(mdtype)
+                || string.IsNullOrEmpty(starttime)
+                || string.IsNullOrEmpty(endtime)) {
+                return RedirectToAction("DownLoadATETestData", "CustomerData");
+            }
+
+            var sdate = DateTime.Parse(DateTime.Parse(starttime).ToString("yyyy-MM-dd") + " 00:00:00");
+            var edate = DateTime.Parse(DateTime.Parse(endtime).ToString("yyyy-MM-dd") + " 23:59:59");
+            var pndict = new Dictionary<string, bool>();
+            var atedatalist = new List<ProjectTestData>();
+            if (!string.IsNullOrEmpty(filtered))
+            {
+                atedatalist = ATEUtility.FilteredATEData(mdtype, sdate, edate, pndict);
+            }
+            else
+            {
+                atedatalist = ATEUtility.RetrieveATEData(mdtype, sdate, edate,pndict);
+            }
+
+            if (atedatalist.Count > 0)
+            {
+                var pndescdict = MESUtility.RetrievePNDescByPn(new List<string>(pndict.Keys));
+                var sb = ATEUtility.PrePareATEData(atedatalist, pndescdict);
+
+                string datestring = DateTime.Now.ToString("yyyyMMdd");
+                string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+                if (!Directory.Exists(imgdir))
+                {
+                    Directory.CreateDirectory(imgdir);
+                }
+
+                var family = atedatalist[0].ModuleType.Replace(" ", "_").Replace("#", "").Replace("'", "")
+                            .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                var fn = "ATE_"+family+"_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+                var filename = imgdir + fn;
+                System.IO.File.WriteAllText(filename, sb.ToString(), Encoding.UTF8);
+                return File(filename, "application/vnd.ms-excel", fn);
+            }
+
+            return RedirectToAction("DownLoadATETestData", "CustomerData");
+        }
+
+        public ActionResult JOMesProgress(string jo)
+        {
+            ViewBag.JO = "";
+            if (!string.IsNullOrEmpty(jo))
+            {
+                ViewBag.JO = jo;
+            }
+            return View();
+        }
+
+        public JsonResult JOMesProgressAJAX()
+        {
+            var jo = Request.Form["jo"];
+            var statuslist = JOMesStatus.RetrieveJOMesStaus(jo);
+            var colorarray = new string[] {"#4572A7", "#AA4643", "#89A54E", "#80699B", "#3D96AE",
+                                                "#DB843D", "#92A8CD", "#A47D7C", "#B5CA92" };
+            var colorlist = colorarray.ToList();
+
+            var wfcntdict = new Dictionary<string, int>();
+            var wflist = new List<string>();
+            foreach (var item in statuslist)
+            {
+                if (wfcntdict.ContainsKey(item.WorkFlowStep))
+                {
+                    wfcntdict[item.WorkFlowStep] = wfcntdict[item.WorkFlowStep] + 1;
+                }
+                else
+                {
+                    wflist.Add(item.WorkFlowStep);
+                    wfcntdict.Add(item.WorkFlowStep, 1);
+                }
+            }
+
+            var cidx = 0;
+            var datalist = new List<object>();
+            foreach (var key in wflist)
+            {
+                datalist.Add(new {
+                    x = cidx,
+                    y = wfcntdict[key],
+                    color = colorlist[cidx % colorlist.Count]
+                });
+                cidx = cidx + 1;
+            }
+
+            var dataLabels = new
+            {
+                enabled = true,
+                color = "#FFFFFF",
+                align = "center",
+                format = "{point.y}"
+            };
+
+            var allx = new { data = wflist };
+            var ally = new { title = "Amount" };
+            var alldata = new List<object>();
+            alldata.Add(new {
+                name = "module",
+                data = datalist,
+                dataLabels = dataLabels
+            });
+
+            var jodistribution = new
+            {
+                id = "jomesstatus",
+                title = jo + " Distribution",
+                coltype = "normal",
+                xAxis = allx,
+                yAxis = ally,
+                data = alldata,
+                data2export = statuslist
+            };
+
+            var ret = new JsonResult();
+            ret.Data = new {
+                success = true,
+                jodistribution = jodistribution
+            };
+            return ret;
         }
 
     }

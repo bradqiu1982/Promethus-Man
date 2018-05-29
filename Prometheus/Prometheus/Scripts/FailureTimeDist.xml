@@ -1,0 +1,80 @@
+﻿<script type="text/javascript">
+  $(function () {
+
+      $('##ElementID#').highcharts({
+        chart:{
+          type: 'scatter'
+        },
+        title:{
+          text:'#Title#'
+        },
+        xAxis: {
+            crosshair: true,
+            type : 'datetime',
+            title:{
+              text: ''
+            }
+        },
+        yAxis: {
+                  title: {
+                      text: 'Amount'
+                  },
+                  min: 0,
+                  max: #AmountMAX#
+            }, 
+        plotOptions: {
+            scatter:{
+                marker: {
+                    radius: 5,
+                    states: {
+                        hover: {
+                            enabled: true,
+                            lineColor: 'rgb(100,100,100)'
+                        },
+                    width:15,
+                    height:15
+                    }
+                },
+                states: {
+                    hover: {
+                        marker: {
+                            enabled: true
+                        }
+                    }
+                }
+             }
+        },
+        legend:{
+          itemStyle:{
+            fontSize:'10px'
+          }
+        },
+        tooltip: {
+            useHTML: true,
+            formatter: function() {
+                    var mydate = moment(this.x).format('YYYY-MM-DD');
+                    return '<b>' +this.series.name+ '</b><br/> ' + mydate + ' ' + this.y;
+            }
+        },
+        series:[#DATA#],
+        exporting: {
+            menuItemDefinitions: {
+                fullscreen: {
+                    onclick: function () {
+                              $('##ElementID#').parent().toggleClass('chart-modal');
+                              $('##ElementID#').highcharts().reflow();
+                    },
+                    text: 'Full Screen'
+                }
+            },
+            buttons: {
+                contextButton: {
+                    menuItems: ['fullscreen','printChart','separator','downloadPNG','downloadJPEG','downloadPDF','downloadSVG']
+                }
+            }
+        }
+      });
+  });
+</script>
+
+

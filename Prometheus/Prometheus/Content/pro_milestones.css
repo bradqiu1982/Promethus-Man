@@ -1,0 +1,76 @@
+html,body{
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+body{
+}
+
+.body-content{
+    height: 100%;
+}
+
+.glyphicon {
+    font-size: inherit;
+    width: auto;
+}
+
+.v-container{
+
+}
+
+.v-filter{
+    padding-bottom: 5px;
+    border-bottom: 1px solid #aaa;
+}
+.v-box{
+    height: 400px;
+}
+
+.m-label{
+    height: 34px;
+    text-align: right;
+    padding: 8px 5%;
+}
+
+.bs-callout {
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #eee;
+  border-left-width: 5px;
+  border-radius: 3px;
+}
+.bs-callout-info{
+    border-left-color: #1b809e;
+}
+.bs-callout-danger{
+    border-left-color: #ce4844;
+}
+.bs-callout-warning {
+    border-left-color: #aa6708;
+}
+.action-lists{
+    padding-left: 5%;
+    width: 95%;
+}
+.span-right{
+    float: right;
+}
+.add-action,.show-action{
+    margin-left: 5%;
+    font-size: 24px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+.public-actions,.edit-actions,.invalid-actions{
+    cursor: pointer;
+}
+
+.private-icon{
+    transform: rotateY(-180deg); 
+}
+.l-content{
+    margin-left: 5px;
+}

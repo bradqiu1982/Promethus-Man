@@ -1,0 +1,205 @@
+﻿
+@{
+    ViewBag.Title = "DashboardDetail";
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
+}
+
+<link href="~/Content/idashboard.css" rel="stylesheet" type="text/css" />
+<script src="~/Scripts/idashboard.js" type="text/javascript"></script>
+<script>
+    $(function () {
+        IDashboard.detail();
+    })
+</script>
+<div class="row">
+    <div class="nav navbar-nav navbar-left">
+        <img src="~/Content/images/ucicon/ILearnIcons.png" style="height:40px; width:40px">
+    </div>
+    <div class="nav navbar-nav navbar-left">
+        <ol class="breadcrumb">
+            <li><a href="/User/UserCenter?username=@(ViewBag.RealUserID)">@ViewBag.UserName Center</a></li>
+            <li><a href="/User/IDashbaord">I DashBord</a></li>
+            <li class="active">@ViewBag.cUserName</li>
+        </ol>
+    </div>
+</div>
+<ul class="nav nav-pills nav-stacked col-xs-2">
+    <li><a href="/User/ILearn">I Learn</a></li>
+    <li><a href="/User/WeeklyReportList">Weekly Report</a></li>
+    <li><a href="/User/WeeklyReportShare">Weekly Report Share</a></li>
+    <li class="active"><a href="/User/IDashboard">I Dashboard</a></li>
+    <li><a href="/User/ILearn">Training</a></li>
+    <li><a href="/User/ILearn">I Share</a></li>
+</ul>
+<div class="col-xs-10">
+    <h3>@(ViewBag.type + "(" + ViewBag.sdate + "~" + ViewBag.edate + ")")</h3>
+    @if (ViewBag.type != Prometheus.Models.DashboardType.DebugTree)
+    {
+        <h4>New</h4>
+        <table class="table table-hover table-striped datatable">
+            <thead>
+                <tr>
+                    <th>ProjectKey</th>
+                    <th>Summary</th>
+                    <th>Status</th>
+                    <th>ReportDate</th>
+                    <th>ResolvedDate</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (ViewBag.o_data.Count > 0)
+                {
+                    foreach (var item in ViewBag.o_data)
+                    {
+                        var resolve_date = Convert.ToDateTime(item.Value.ResolvedDate).ToString("yyyy-MM-dd");
+
+                        <tr>
+                            <td><a href="/Project/ProjectDetail?ProjectKey=@item.Value.ProjectKey">@item.Value.ProjectKey</a></td>
+                            <td><a href="/Issue/UpdateIssue?issuekey=@item.Key">@item.Value.Summary</a></td>
+                            <td>@item.Value.Resolution</td>
+                            <td>@(Convert.ToDateTime(item.Value.ReportDate).ToString("yyyy-MM-dd"))</td>
+                            <td>@(string.Compare(resolve_date, "1982-05-06") == 0 ? "" : resolve_date)</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+        <h4>Closed</h4>
+        <table class="table table-hover table-striped datatable">
+            <thead>
+                <tr>
+                    <th>ProjectKey</th>
+                    <th>Summary</th>
+                    <th>Status</th>
+                    <th>ReportDate</th>
+                    <th>ResolvedDate</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (ViewBag.c_data.Count > 0)
+                {
+                    foreach (var item in ViewBag.c_data)
+                    {
+                        var resolve_date = Convert.ToDateTime(item.Value.ResolvedDate).ToString("yyyy-MM-dd");
+
+                        <tr>
+                            <td><a href="/Project/ProjectDetail?ProjectKey=@item.Value.ProjectKey">@item.Value.ProjectKey</a></td>
+                            <td><a href="/Issue/UpdateIssue?issuekey=@item.Key">@item.Value.Summary</a></td>
+                            <td>@item.Value.Resolution</td>
+                            <td>@(Convert.ToDateTime(item.Value.ReportDate).ToString("yyyy-MM-dd"))</td>
+                            <td>@(string.Compare(resolve_date, "1982-05-06") == 0 ? "" : resolve_date)</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <table class="table table-hover table-striped datatable">
+            <thead>
+                <tr>
+                    <th>Project</th>
+                    <th>OrignalCode</th>
+                    <th>ShortDesc</th>
+                    <th>Summary</th>
+                    <th>Detail</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (ViewBag.d_data.Count > 0)
+                {
+                    foreach (var item in ViewBag.d_data)
+                    {
+                        <tr>
+                            <td><a href="/Project/ProjectDetail?ProjectKey=@item.Value.ProjectKey">@item.Value.ProjectKey</a></td>
+                            <td><a href="/Project/UpdateProjectError?ErrorKey=@item.Value.ErrorKey">@item.Value.OrignalCode</a></td>
+                            <td>@item.Value.ShortDesc</td>
+                            <td>@item.Value.AnalyzeTitle.Comment</td>
+                            <td><a class="analysis-detail" data-id="@item.Value.AnalyzeID"><span class="glyphicon glyphicon-tasks"></span></a></td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    }
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.datatable').DataTable({
+            'iDisplayLength': 25,
+            'aLengthMenu': [[25, 50, 100, -1],
+            [25, 50, 100, "All"]],
+            "aaSorting": [],
+            "order": []
+        });
+    });
+</script>
+<div class="modal fade" id="analysis-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title" id="myLargeModalLabel">Analysis Detail</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row form-group">
+                    <label class="col-xs-2">Analysis Title</label>
+                    <div class="col-xs-8" id="display-title">
+                        <input type="text" class="form-control" id="span-title" name="span-title" readonly />
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">FailureDetail</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row" id="des-info">FailureDetail</div>
+                        <div class="row">
+                            <div class="col-xs-4 col-xs-offset-5">
+                                Reporter: <span id="des-reporter"></span>
+                            </div>
+                            <div class="col-xs-3">
+                                <span id="des-datetime"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">RootCause</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row" id="rc-info">RootCause</div>
+                        <div class="row">
+                            <div class="col-xs-4 col-xs-offset-5">
+                                Reporter: <span id="rc-reporter"></span>
+                            </div>
+                            <div class="col-xs-3">
+                                <span id="rc-datetime"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Result</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row" id="res-info">Result</div>
+                        <div class="row">
+                            <div class="col-xs-4 col-xs-offset-5">
+                                Reporter: <span id="res-reporter"></span>
+                            </div>
+                            <div class="col-xs-3">
+                                <span id="res-datetime"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

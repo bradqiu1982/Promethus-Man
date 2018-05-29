@@ -15,7 +15,6 @@
 <script type="text/javascript" src="~/Scripts/bootstrap-tagsinput/bootstrap3-typeahead.js"></script>
 
 <script type="text/javascript" src="~/Scripts/burnin.js"></script>
-<script type="text/javascript" src="~/Scripts/jquery-bootstrap-loading.js"></script>
 
 <script type="text/javascript">
     $(function () {
@@ -84,7 +83,7 @@
                     <label class="col-xs-3">Wafer#</label>
                     <div class="col-xs-7">
                         <input type="text" class="wafer-no" data-provide="typeahead"
-                               id="wf-no" name="wf-no" autocomplete="off" placeholder="Wafer #">
+                               id="wf-no" name="wf-no" autocomplete="off" placeholder="Wafer #" value="@ViewBag.DefaultWafer">
                     </div>
                 </div>
                 <div class="row row-margin">

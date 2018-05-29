@@ -285,9 +285,11 @@ namespace Prometheus.Models
         public string Resolution { set; get; }
 
         public string TestStation { set; get; }
+
+        //this parameter already exist for modulesn
         public string ModuleSerialNum { set; get; }
         public string tErrAbbr { set; get; }
-        
+
         public List<string> NAttachList { set; get; }
         public List<string> NInternalAttachList { set; get; }
         public List<string> NCustomAttachList { set; get; }
@@ -405,10 +407,10 @@ namespace Prometheus.Models
                     {
                         analysiscommentlist.Add(item);
                     }
-                    else if (string.Compare(item.CommentType,COMMENTTYPE.ContainmentAction) == 0) {
+                    else if (string.Compare(item.CommentType, COMMENTTYPE.ContainmentAction) == 0) {
                         containmentactionlist.Add(item);
                     }
-                    else if (string.Compare(item.CommentType,COMMENTTYPE.CorrectiveAction) == 0) {
+                    else if (string.Compare(item.CommentType, COMMENTTYPE.CorrectiveAction) == 0) {
                         correctiveactionlist.Add(item);
                     }
                     else
@@ -785,6 +787,36 @@ namespace Prometheus.Models
                 .Replace("<FinisarModel>", FinisarModel).Replace("<ECustomer>", ECustomer)
                 .Replace("<CRMANUM>", CRMANUM).Replace("<CReport>", CReport).Replace("<ModuleSN>", ModuleSN).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        public static List<IssueViewModels> RetrieveRMAWithTestTime(string pjkey)
+        {
+            var sql = @"SELECT i.ModuleSN,r.RMAFailureCode,p.TestTimeStamp,i.IssueKey FROM [NPITrace].[dbo].[Issue] i (NOLOCK) 
+                         left join [NPITrace].[dbo].[IssueRMA] r with (nolock) on i.IssueKey = r.IssueKey 
+                         left join [NPITrace].[dbo].[ProjectTestData] p with (nolock) on i.ModuleSN = p.ModuleSerialNum 
+                         where i.ProjectKey = @pjkey and i.IssueType = @IssueType and r.RMAFailureCode <> '' order by p.ModuleSerialNum,p.TestTimeStamp desc";
+            var dict = new Dictionary<string, string>();
+            dict.Add("@pjkey", pjkey);
+            dict.Add("@IssueType", ISSUETP.RMA);
+            var ret = new List<IssueViewModels>();
+            var sndict = new Dictionary<string, bool>();
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, dict);
+            foreach (var line in dbret)
+            {
+                var sn = Convert.ToString(line[0]);
+
+                if (!sndict.ContainsKey(sn))
+                {
+                    sndict.Add(sn, true);
+                    var tempvm = new IssueViewModels();
+                    tempvm.ModuleSN = sn;
+                    tempvm.RMAFailureCode = Convert.ToString(line[1]);
+                    tempvm.ReportDate = Convert.ToDateTime(line[2]);
+                    tempvm.IssueKey = Convert.ToString(line[3]);
+                    ret.Add(tempvm);
+                }
+            }
+            return ret;
         }
 
         private void RetrieveRMA()
@@ -1357,6 +1389,24 @@ namespace Prometheus.Models
             }
 
             return retdict;
+        }
+
+        public static Dictionary<string, string> RetrieveIssueBySNs(string sncond)
+        {
+            var ret = new Dictionary<string, string>();
+            var sql = "select ModuleSN,IssueKey from Issue where ModuleSN in <sncond> and IssueType='<IssueType>'";
+            sql = sql.Replace("<sncond>", sncond).Replace("<IssueType>", ISSUETP.RMA);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var sn = Convert.ToString(line[0]);
+                var key = Convert.ToString(line[1]);
+                if (!ret.ContainsKey(sn))
+                {
+                    ret.Add(sn, key);
+                }
+            }
+            return ret;
         }
 
         public static List<IssueViewModels> RetrieveIssueBySN(string sn, Controller ctrl)

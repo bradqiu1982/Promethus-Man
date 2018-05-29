@@ -4,28 +4,36 @@ var ProMilestones = function(){
             id: 'pro-charts',
             title: 'Project Detail',
             xAxis: {
-                data: ['2017-01', '2017-02', '2017-03', '2017-04', '2017-05', '2017-06', '2017-07', '2017-08', '2017-09', '2017-10', '2017-11', '2017-12', '2018-01', '2018-02', '2018-03', '2018-04', '2018-05']
+                data: ['2016-08', '2016-09', '2016-10', '2016-11', '2016-12', '2017-01', '2017-02', '2017-03', '2017-04', '2017-05', '2017-06', '2017-07', '2017-08', '2017-09', '2017-10', '2017-11', '2017-12', '2018-01', '2018-02', '2018-03', '2018-04', '2018-05']
             },
-            yAxis: {
-                0: {
+            yAxis: [
+                {
                     title: 'Yield (%)',
                     min: 0,
                     max: 100,
                 },
-                1: {
+                 {
                     title: 'Amount',
-                },
-            },
+                }
+            ],
             data: {
-                yield_data:{
-                    name: 'Yield',
+                fyield_data:{
+                    name: 'Final Yield',
                     color: '#5CB85C',
-                    data:[94.5, 91, 94.5, 97, 94.5, 94.5, 91, 94.5, 97, 94.5, 95, 94.5, 92, 94.5, 85, 94.5, 93]
+                    data: [94.5, 91, 94.5, 97, 94.5, 94.5, 91, 94.5, 97, 94.5, 94.5, 91, 94.5, 97, 94.5, 95, 94.5, 92, 94.5, 85, 94.5, 93]
+                },
+                fpyield_data: {
+                    name: 'First Yield',
+                    data: [94.5, 91, 94.5, 97, 94.5, 94.5, 91, 94.5, 97, 94.5, 94.5, 91, 94.5, 97, 94.5, 95, 94.5, 92, 94.5, 85, 94.5, 93]
+                },
+                snyield_data:{
+                    name: 'SN Yield',
+                    data: [94.5, 91, 94.5, 97, 94.5, 94.5, 91, 94.5, 97, 94.5, 94.5, 91, 94.5, 97, 94.5, 95, 94.5, 92, 94.5, 85, 94.5, 93]
                 },
                 amount_data:{
                     name: 'Amount',
                     color: '#ff3399',
-                    data:[900, 1120, 1091, 809, 1293, 900, 1120, 1091, 809, 1293, 1001, 800, 987, 920, 1120, 1032, 1409]
+                    data: [1091, 809, 1293, 1001, 800, 900, 1120, 1091, 809, 1293, 900, 1120, 1091, 809, 1293, 1001, 800, 987, 920, 1120, 1032, 1409]
                 },
                 rma_data:{
                     name: 'RMA',
@@ -53,11 +61,11 @@ var ProMilestones = function(){
                     ]
                 },
                 plotBands:[{
-                    color: '#efffff',
-                    from: -0.5,
-                    to: 0.5,
+                    color: '#4FADF3',
+                    from: 14.5,
+                    to: 15.5,
                     label: {
-                        text: '* action',
+                        text: '* action a',
                         style: {
                             color: '#000',
                             fontSize: '0px',
@@ -65,10 +73,23 @@ var ProMilestones = function(){
                         y: 50.0,
                         align:'left'
                     },
-                },{
+                }, {
+                    color: '#4FADF3',
+                    from: 14.5,
+                    to: 15.5,
+                    label: {
+                        text: '* Add public action b',
+                        style: {
+                            color: '#000',
+                            fontSize: '0px',
+                        },
+                        y: 65.0,
+                        align: 'left'
+                    },
+                }, {
                     color: '#ffffef',
-                    from: 1.5,
-                    to: 2.5,
+                    from: 16.5,
+                    to: 17.5,
                     label: {
                         text: '* Add public action',
                         style: {
@@ -80,8 +101,8 @@ var ProMilestones = function(){
                     },
                 },{
                     color: '#ffefff',
-                    from: 2.5,
-                    to: 3.5,
+                    from: 17.5,
+                    to: 18.5,
                     label: {
                         text: '* Add public action',
                         style: {
@@ -95,15 +116,30 @@ var ProMilestones = function(){
             }
         };
         $('.date').datepicker({ autoclose: true });
+
+
+        var options = {
+            loadingTips: "load data.....",
+            backgroundColor: "#aaa",
+            borderColor: "#fff",
+            opacity: 0.8,
+            borderColor: "#fff",
+            TipsColor: "#000",
+        }
+        $.bootstrapLoading.start(options);
+
         $.post('/Project/GetProMileStoneData',
         {
-            pKey: $.trim($('#pKey').val())
+            pKey: $.trim($('#pKey').val()),
+            sDate: $.trim($('#sdate').val()),
+            eDate: $.trim($('#edate').val()),
+            withPrivate: $.trim($('#withprivate').val())
         }, function (output) {
-            output = {
-                data: chartdata
-            };
             drawchart(output.data);
-         })
+            $.bootstrapLoading.end();
+        })
+
+
         $('body').on('click', '.add-action', function(){
             $('#m-actionid').val('');
             $('#m-date').val('');
@@ -166,6 +202,7 @@ var ProMilestones = function(){
         })
 
         $('body').on('click', '.public-actions', function () {
+            $('#withprivate').val('FALSE');
             var actionid = $(this).parent().parent().attr("data-actionid");
             var ispublish = $(this).attr('data-ispublish');
             $.post('/Project/UpdateProMileStone', {
@@ -179,6 +216,13 @@ var ProMilestones = function(){
                     alert("Failed to operate");
                 }
             })
+        })
+        
+        $('body').on('click', '.show-action', function () {
+            var sDate = $.trim($('#sdate').val());
+            var eDate = $.trim($('#edate').val());
+            var pKey = $.trim($('#pKey').val());
+            window.location.href = "/Project/ProjectMileStone?ProjectKey=" + pKey + "&sDate=" + sDate + "&eDate=" + eDate + "&withprivate=TRUE";
         })
 
         $('body').on('click', '#btn-search', function(){
@@ -209,9 +253,9 @@ var ProMilestones = function(){
                     plotBands: data.data.plotBands,
                     events: {
                         afterSetExtremes: function (event) {
-                            if (event.max < 8) {    
+                            if ((event.max - event.min) < 7) {
                                 $(this.options.plotBands).each(function () {
-                                    this.label.style.fontSize = '14px';
+                                    this.label.style.fontSize = '12px';
                                 });
                                 this.chart.xAxis[0].update();
                             }
@@ -238,17 +282,39 @@ var ProMilestones = function(){
                     opposite: true,
                 }],
                 series: [{
-                    name: data.data.yield_data.name,
+                    name: data.data.fyield_data.name,
                     dataLabels: {
                         enabled: true,
-                        color: data.data.yield_data.color,
+                        color: data.data.fyield_data.color,
                     },
                     marker: {
                         radius: 2
                     },
-                    enableMouseTracking: false,
-                    data: data.data.yield_data.data
-                },{
+                    data: data.data.fyield_data.data
+                },
+                {
+                    name: data.data.fpyield_data.name,
+                    visible: false,
+                    dataLabels: {
+                        enabled: true
+                    },
+                    marker: {
+                        radius: 2
+                    },
+                    data: data.data.fpyield_data.data
+                },
+                {
+                    name: data.data.snyield_data.name,
+                    visible: false,
+                    dataLabels: {
+                        enabled: true
+                    },
+                    marker: {
+                        radius: 2
+                    },
+                    data: data.data.snyield_data.data
+                },
+                {
                     type: 'line',
                     yAxis: 1,
                     name: data.data.amount_data.name,
@@ -265,7 +331,9 @@ var ProMilestones = function(){
                     dataLabels:{
                         enabled: true,
                         align: 'left',
-                        verticalAlign: 'middle',
+                        allowOverlap: true,
+                        padding: 0,
+                        useHTML:true,
                         formatter: function(){
                             return this.point.name;
                         },
@@ -293,15 +361,15 @@ var ProMilestones = function(){
                         exportdata: {
                             onclick: function () {
                                 var filename = data.title + '.csv';
-                                var outputCSV = 'Date,Output,Yield\r\n';
+                                var outputCSV = 'Date,Output,Final Yield,First Pass Yield,SN Yield\r\n';
                                 $(data.xAxis.data).each(function (i, val) {
                                     outputCSV += val + "," + data.data.amount_data.data[i]
-                                        + "," + data.data.yield_data.data[i] + ",\r\n";
+                                        + "," + data.data.fyield_data.data[i] + "," + data.data.fpyield_data.data[i] + "," + data.data.snyield_data.data[i] + ",\r\n";
                                 });
                                 outputCSV += "\r\n\r\n";
                                 outputCSV += "Date,RMA RootCause,\r\n";
                                 $(data.data.rma_data.data).each(function (i, val) {
-                                    outputCSV += data.xAxis.data[val.x] + "," + val.name + ",\r\n";
+                                    outputCSV += val.date + "," + val.name + ",\r\n";
                                 });
                                 outputCSV += "\r\n\r\n";
                                 outputCSV += "Date,MileStones,\r\n";

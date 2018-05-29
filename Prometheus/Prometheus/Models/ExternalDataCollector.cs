@@ -3638,7 +3638,7 @@ namespace Prometheus.Models
 
             testdatalist.Sort(delegate (ProjectTestData obj1, ProjectTestData obj2)
             {
-                return obj1.TestTimeStamp.CompareTo(obj2.TestTimeStamp);
+                return obj2.TestTimeStamp.CompareTo(obj1.TestTimeStamp);
             });
 
             var ret = new List<ProjectTestData>();

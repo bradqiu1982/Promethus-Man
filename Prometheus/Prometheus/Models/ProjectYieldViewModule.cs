@@ -308,42 +308,27 @@ namespace Prometheus.Models
             return ret;
         }
 
-        private static List<DateTime> RetrieveDateSpanByMonth(string startdate,string enddate)
+        public static List<DateTime> RetrieveDateSpanByMonth(string startdate,string enddate)
         {
             var ret = new List<DateTime>();
-            var sdate = DateTime.Parse(DateTime.Parse(startdate).ToString("yyyy-MM-dd") + " 07:30:00");
+            var sdate = DateTime.Parse(DateTime.Parse(startdate).ToString("yyyy-MM") + "-01 00:00:00");
+            
+            var temptimepoint = sdate;
+            var edate = DateTime.Parse(DateTime.Parse(enddate).ToString("yyyy-MM-dd") + " 23:59:59");
+
             ret.Add(sdate);
 
-            var temptimepoint = sdate;
-            var edate = DateTime.Parse(enddate);
-
-            temptimepoint = temptimepoint.AddMonths(1);
-            temptimepoint = DateTime.Parse(temptimepoint.ToString("yyyy-MM") + "-01 07:30:00");
-
-
-            if (temptimepoint > edate)
-            {
-                ret.Add(DateTime.Parse(DateTime.Parse(enddate).ToString("yyyy-MM-dd") + " 07:30:00"));
-                return ret;
-            }
-            else
-            {
-                ret.Add(temptimepoint);
-            }
-
-            while (temptimepoint < edate)
+            while (true)
             {
                 temptimepoint = temptimepoint.AddMonths(1);
                 if (temptimepoint > edate)
                 {
-                    ret.Add(DateTime.Parse(DateTime.Parse(enddate).ToString("yyyy-MM-dd") + " 07:30:00"));
-                    return ret;
+                    ret.Add(edate);
+                    break;
                 }
-                else
-                {
-                    ret.Add(DateTime.Parse(temptimepoint.ToString("yyyy-MM-dd") + " 07:30:00"));
-                }
+                ret.Add(temptimepoint);
             }
+
             return ret;
         }
 
@@ -957,7 +942,7 @@ namespace Prometheus.Models
 
             for (int idx = startidx; idx < ldate.Count - 1; idx++)
             {
-                var temp = GetYieldByDateRange(pjkey, ldate[idx].ToString(), ldate[idx + 1].ToString(), pvm,mycache);
+                var temp = GetYieldByDateRange(pjkey, ldate[idx].ToString(), ldate[idx + 1].AddMinutes(-1).ToString(), pvm,mycache);
                 if (temp.RealTimeYields.Count > 0)
                 {
                     ret.Add(temp);

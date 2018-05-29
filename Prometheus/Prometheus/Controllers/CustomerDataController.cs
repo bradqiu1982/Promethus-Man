@@ -1849,49 +1849,6 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        public StringBuilder PrePareATEData(List<ProjectTestData> atelist, Dictionary<string,string> pndescdict)
-        {
-            StringBuilder sb1 = new StringBuilder(300 * (atelist.Count+1));
-            sb1.Append("SN,WhichTest,Failure,TestTimestamp,Station,Module Family,PN,PN Desc,Spend Time(in hour)\r\n");
-            foreach (var item in atelist)
-            {
-                var pndesc = "";
-                if (pndescdict.ContainsKey(item.PN))
-                { pndesc = pndescdict[item.PN]; }
-
-                sb1.Append("\"" + item.ModuleSerialNum.ToString().Replace("\"", "") + "\"," + "\"" + item.WhichTest.Replace("\"", "") + "\"," + "\"" + item.ErrAbbr.Replace("\"", "") + "\","
-                    + "\"" + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss") + "\"," + "\"" + item.TestStation.Replace("\"", "") + "\"," + "\"" + item.ModuleType.Replace("\"", "") + "\","
-                    + "\"" + item.PN.Replace("\"", "") + "\"," + "\"" + pndesc.Replace("\"", "") + "\"," + "\"" + item.JO.Replace("\"", "") + "\",\r\n");
-            }
-            return sb1;
-        }
-
-        public static List<ProjectTestData> FilteredATEData(string mdtype, DateTime sdate, DateTime edate, Dictionary<string, bool> pndict)
-        {
-            var ret = new List<ProjectTestData>();
-            var rawdata = ATEUtility.RetrieveATEData(mdtype, sdate, edate, pndict);
-            if (rawdata.Count > 0)
-            {
-                var allpndict = new Dictionary<string, bool>();
-                var previousdata = ATEUtility.RetrieveATEData(mdtype, sdate.AddMonths(-2), sdate, allpndict);
-                var filterdict = new Dictionary<string, bool>();
-                foreach (var item in previousdata)
-                {
-                    if (!filterdict.ContainsKey(item.ModuleSerialNum + ":::" + item.WhichTest)) {
-                        filterdict.Add(item.ModuleSerialNum + ":::" + item.WhichTest, true);
-                    }
-                }
-                foreach (var item in rawdata)
-                {
-                    if (!filterdict.ContainsKey(item.ModuleSerialNum + ":::" + item.WhichTest))
-                    {
-                        ret.Add(item);
-                    }
-                }
-            }
-            return ret;
-        }
-
         public ActionResult RealATETestData(string mdtype, string starttime, string endtime,string filtered)
         {
             if (string.IsNullOrEmpty(mdtype)
@@ -1906,7 +1863,7 @@ namespace Prometheus.Controllers
             var atedatalist = new List<ProjectTestData>();
             if (!string.IsNullOrEmpty(filtered))
             {
-                atedatalist = FilteredATEData(mdtype, sdate, edate, pndict);
+                atedatalist = ATEUtility.FilteredATEData(mdtype, sdate, edate, pndict);
             }
             else
             {
@@ -1916,7 +1873,7 @@ namespace Prometheus.Controllers
             if (atedatalist.Count > 0)
             {
                 var pndescdict = MESUtility.RetrievePNDescByPn(new List<string>(pndict.Keys));
-                var sb = PrePareATEData(atedatalist, pndescdict);
+                var sb = ATEUtility.PrePareATEData(atedatalist, pndescdict);
 
                 string datestring = DateTime.Now.ToString("yyyyMMdd");
                 string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";

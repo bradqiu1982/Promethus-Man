@@ -532,7 +532,7 @@ namespace Prometheus.Controllers
             return ret;
         }
 
-        public ActionResult WaferDistribution()
+        public ActionResult WaferDistribution(string defaultwafer)
         {
             var vcseltypelist = VcselBGDVM.VcselTypeList();
 
@@ -548,6 +548,10 @@ namespace Prometheus.Controllers
             mathlist.Add("No Rectification");
             
             ViewBag.mathrectlist = CreateSelectList(mathlist, "");
+
+            ViewBag.DefaultWafer = "";
+            if (!string.IsNullOrEmpty(defaultwafer))
+            { ViewBag.DefaultWafer = defaultwafer; }
 
             return View();
         }

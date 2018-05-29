@@ -1478,9 +1478,9 @@ Create Table [dbo].[ProjectMileStones](
 	[Action] NVARCHAR (MAX) DEFAULT ('') NOT NULL,
 	[IsPublish] [tinyint] DEFAULT (1) NOT NULL, -- 1: public 2: private
 	[Status] [tinyint] DEFAULT (1) NOT NULL,	-- 1: valid 2: invalid
-	[AddDate] DATE DEFAULT ('') NOT NULL,
-	[CreateTime] DATETIME DEFAULT ('') NOT NULL,
-	[UpdateTime] DATETIME DEFAULT ('') NOT NULL,
+	[AddDate] DATETIME DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[CreateTime] DATETIME DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[UpdateTime] DATETIME DEFAULT ('1982-05-06 10:00:00') NOT NULL,
     [APVal1] NVARCHAR (50)  DEFAULT ('') NOT NULL,
     [APVal2] NVARCHAR (200)  DEFAULT ('') NOT NULL,
     [APVal3] NVARCHAR (MAX)  DEFAULT ('') NOT NULL,

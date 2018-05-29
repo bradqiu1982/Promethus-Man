@@ -338,7 +338,206 @@ namespace Prometheus.Controllers
             return ret;
         }
 
+        public static int DaysToMonth(double days)
+        {
+            var ret = 3;
+            if (days <= 90)
+                ret = 3;
+            else if (days > 90 && days <= 180)
+                ret = 6;
+            else if (days > 180 && days <= 360)
+                ret = 12;
+            else if (days > 360 && days <= 540)
+                ret = 18;
+            else if (days > 540 && days <= 720)
+                ret = 24;
+            else if (days > 720 && days <= 900)
+                ret = 30;
+            else if (days > 900 && days <= 1080)
+                ret = 36;
+            else if (days > 1080)
+                ret = 48;
 
+            return ret;
+        }
+
+        public JsonResult VcselVSTimeData()
+        {
+            //<month,<type,count>>
+            var rmavsshipdate = new Dictionary<string, Dictionary<string, int>>();
+            //<type,sumlist>
+            var typesumlist = new Dictionary<string, List<double>>();
+            //<type,countlist>
+            var typecntlist = new Dictionary<string, List<int>>();
+
+            var alldata = VcselRMAData.RetrievAllDataASC();
+            var typedict = new Dictionary<string, bool>();
+            var monthxlist = (new string[] {"3","6","12","18","24","30","36","48" }).ToList();
+
+            foreach (var item in alldata)
+            {
+                if (!typedict.ContainsKey(item.VcselType))
+                {
+                    typedict.Add(item.VcselType, true);
+                }
+
+                try
+                {
+                    var rdate = DateTime.Parse(item.RMAOpenDate);
+                    var sdate = DateTime.Parse(item.ShipDate);
+                    var vsmonth = DaysToMonth((rdate - sdate).TotalDays).ToString();
+                    if (rmavsshipdate.ContainsKey(vsmonth))
+                    {
+                        var temptypedict = rmavsshipdate[vsmonth];
+                        temptypedict["ALL_TYPE"] = temptypedict["ALL_TYPE"] + 1;
+                        if (temptypedict.ContainsKey(item.VcselType))
+                        {
+                            temptypedict[item.VcselType] = temptypedict[item.VcselType] + 1;
+                        }
+                        else
+                        {
+                            temptypedict.Add(item.VcselType,1);
+                        }
+                    }
+                    else
+                    {
+                        var temptypedict = new Dictionary<string,int>();
+                        temptypedict.Add("ALL_TYPE",1);
+                        temptypedict.Add(item.VcselType, 1);
+                        rmavsshipdate.Add(vsmonth, temptypedict);
+                    }
+                }
+                catch (Exception ex) { }
+            }//end foreach
+
+            typedict.Add("ALL_TYPE", true);
+
+            //fill the whole struct
+            foreach (var m in monthxlist)
+            {
+                if (rmavsshipdate.ContainsKey(m))
+                {
+                    var rmaship = rmavsshipdate[m];
+                    foreach (var t in typedict)
+                    {
+                        if (!rmaship.ContainsKey(t.Key))
+                        {
+                            rmaship.Add(t.Key, 0);
+                        }
+                    }
+                }
+                else
+                {
+                    var temptypedict = new Dictionary<string, int>();
+                    foreach (var t in typedict)
+                    {
+                        temptypedict.Add(t.Key, 0);
+                    }
+                    rmavsshipdate.Add(m, temptypedict);
+                }
+            }
+
+
+            foreach (var m in monthxlist)
+            {
+                //has data of this month
+                var temptypedict = rmavsshipdate[m];
+                foreach (var t in typedict)
+                {
+                    if (typesumlist.ContainsKey(t.Key))
+                    {
+                        var tempsumlist = typesumlist[t.Key];
+                        if (tempsumlist.Count == 0)
+                        {
+                            tempsumlist.Add(temptypedict[t.Key]);
+                        }
+                        else
+                        {
+                            var lastval = tempsumlist[tempsumlist.Count - 1]+ temptypedict[t.Key];
+                            tempsumlist.Add(lastval);
+                        }
+                    }
+                    else
+                    {
+                        var tempsumlist = new List<double>();
+                        tempsumlist.Add(temptypedict[t.Key]);
+                        typesumlist.Add(t.Key, tempsumlist);
+                    }
+
+                    if (!typecntlist.ContainsKey(t.Key))
+                    {
+                        var tempcntlist = new List<int>();
+                        tempcntlist.Add(temptypedict[t.Key]);
+                        typecntlist.Add(t.Key, tempcntlist);
+                    }
+                    else
+                    {
+                        typecntlist[t.Key].Add(temptypedict[t.Key]);
+                    }
+                }//end foreach
+            }//end foreach
+            
+            var rmashipchartdata = new List<object>();
+            foreach (var kv in typecntlist)
+            {
+                rmashipchartdata.Add(new {
+                    name = kv.Key+" Failure",
+                    data = kv.Value
+                });
+            }
+
+            var rmaaccudata = new List<object>();
+            foreach (var kv in typesumlist)
+            {
+                var last = kv.Value.Last();
+                if (last != 0.0)
+                {
+                    var templist = new List<double>();
+                    foreach (var c in kv.Value)
+                    {
+                        templist.Add(Math.Round(c / last * 100.0, 2));
+                    }
+                    rmaaccudata.Add(new
+                    {
+                        name = kv.Key + " accu",
+                        data = templist
+                    });
+                }
+            }
+
+            var sxaxisdata = new List<string>();
+            for (var midx=0;midx < monthxlist.Count;midx++)
+            {
+                if (midx == 0)
+                    sxaxisdata.Add("in " + monthxlist[midx] + " M");
+                else
+                    sxaxisdata.Add("From " + monthxlist[midx - 1] + " To " + monthxlist[midx] + " M");
+            }
+
+            var cxaxisdata = new List<string>();
+            for (var midx = 0; midx < monthxlist.Count; midx++)
+            {
+                cxaxisdata.Add("in " + monthxlist[midx] + " M");
+            }
+
+            var ret = new JsonResult();
+            ret.Data = new {
+                success = true,
+                shipdatedata = new {
+                    id = "rmavshipdate",
+                    title = "VCSEL RMA Failure vs Ship Date",
+                    xaxis = sxaxisdata,
+                    data = rmashipchartdata
+                },
+                accumulatedata = new {
+                    id = "rmaaccumulatedata",
+                    title = "VCSEL RMA Accumulate Failure Rate vs Time",
+                    xaxis = cxaxisdata,
+                    data = rmaaccudata
+                }
+            };
+            return ret;
+        }
 
         public ActionResult MonthlyVcsel()
         {

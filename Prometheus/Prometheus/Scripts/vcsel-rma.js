@@ -10,6 +10,13 @@ var VCSEL_RMA = function(){
             }
         });
 
+        $.post('/DataAnalyze/VcselVSTimeData', {}, function (output) {
+            if (output.success) {
+                drawshipline(output.shipdatedata);
+                drawshipline(output.accumulatedata);
+            }
+        });
+
         $.post('/DataAnalyze/VcselRMAMileStoneData', {}, function (output) {
             if (output.success) {
                 drawcolumn(output.vcsel_milestone);
@@ -25,6 +32,69 @@ var VCSEL_RMA = function(){
 
     }
 
+    var drawshipline = function(line_data)
+    {
+        var options = {
+            chart: {
+                type: 'line'
+            },
+            title: {
+                text: line_data.title
+            },
+            xAxis: {
+                categories: line_data.xaxis
+            },
+            yAxis: {
+                title: {
+                    text: 'Failures'
+                }
+            },
+            series: line_data.data,
+            exporting: {
+                menuItemDefinitions: {
+                    fullscreen: {
+                        onclick: function () {
+                            $('#' + line_data.id).parent().toggleClass('chart-modal');
+                            $('#' + line_data.id).highcharts().reflow();
+                        },
+                        text: 'Full Screen'
+                    },
+                    exportdata: {
+                        onclick: function () {
+                            var filename = line_data.title + '.csv';
+                            var outputCSV = 'xAxis\r\n';
+                            $(line_data.xaxis).each(function (i, val) {
+                                    outputCSV += val + "," ;
+                            })
+                            outputCSV += "\r\n";
+                            $(line_data.data).each(function (i, val) {
+                                outputCSV += val.name + "\r\n";
+                                $(val.data).each(function (i, sval) { 
+                                    outputCSV += sval + ",";
+                                })
+                                outputCSV += "\r\n";
+                            })
+
+                            var blobby = new Blob([outputCSV], { type: 'text/csv;chartset=utf-8' });
+                            $(exportLink).attr({
+                                'download': filename,
+                                'href': window.URL.createObjectURL(blobby),
+                                'target': '_blank'
+                            });
+                            exportLink.click();
+                        },
+                        text: 'Export Data'
+                    }
+                },
+                buttons: {
+                    contextButton: {
+                        menuItems: ['fullscreen', 'exportdata', 'printChart', 'separator', 'downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
+                    }
+                }
+            }
+        };
+        Highcharts.chart(line_data.id, options);
+    }
 
     var drawline = function(line_data){
         var options = {

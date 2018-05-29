@@ -2688,7 +2688,7 @@ namespace Prometheus.Controllers
             {
                 var datalist = new List<string>();
                 var pvm = ProjectViewModels.N_RetrieveProjectInfo(projectkey);
-                var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(projectkey, sDate, eDate, pvm, HttpContext.Cache);
+                var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(projectkey, sDate, eDate, pvm[0], HttpContext.Cache);
                 var firstdatalist = new List<KeyValuePair<string, int>>();
                 var fpy = yieldvm.FirstYield * 100;
                 var fy = yieldvm.LastYield * 100;

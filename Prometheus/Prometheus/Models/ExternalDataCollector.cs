@@ -941,6 +941,22 @@ namespace Prometheus.Models
             return sb.ToString().ToUpper();
         }
 
+        public static string RetrieveProjectKeyFromSN(string SN)
+        {
+            var sql = "select top 1 ProjectKey from ProjectTestData where ModuleSerialNum = @ModuleSerialNum";
+            var dict = new Dictionary<string, string>();
+            dict.Add("@ModuleSerialNum", SN);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, dict);
+            if (dbret.Count > 0)
+            {
+                return Conver2Str(dbret[0][0]);
+            }
+
+            sql = 
+
+            return string.Empty;
+        }
+
         private static void Try2CreateRMA(RMARAWData rawdata,Dictionary<string,string> usermatrix
             , Dictionary<string, string> rmaissuedict, Dictionary<string, bool> allpjdict,Controller ctrl)
         {
@@ -953,7 +969,16 @@ namespace Prometheus.Models
                 if (string.Compare(usermatrix[analyser], USERDEPART.NPI, true) == 0)
                 {
                     var pjk = RMSpectialCh(rawdata.AppV_N);
-                    if (allpjdict.ContainsKey(pjk))
+                    if (!allpjdict.ContainsKey(pjk))
+                    {
+                        pjk = RetrieveProjectKeyFromSN(rawdata.AppV_I);
+                    }
+                    if (string.IsNullOrEmpty(pjk))
+                    {
+                        pjk = "CQE";
+                    }
+
+                    if (!string.IsNullOrEmpty(pjk))
                     {
                         var oneweekago = DateTime.Now.AddDays(-7);
                         var issueopendate = DateTime.Parse(rawdata.AppV_P);

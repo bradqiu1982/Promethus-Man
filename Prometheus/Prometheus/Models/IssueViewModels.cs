@@ -1092,6 +1092,13 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
+        public static void UpdateRealAssign(string updater,string issuekey) {
+            var sql = "update Issue set Assignee = '<Assignee>' where IssueKey = '<IssueKey>'";
+            sql = sql.Replace("<IssueKey>", issuekey).Replace("<Assignee>", updater);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+
         public void UpdateAlertEmailDate()
         {
             var sql = "update Issue set AlertEmailUpdateDate = '<AlertEmailUpdateDate>' where IssueKey = '<IssueKey>'";

@@ -845,6 +845,8 @@ namespace Prometheus.Controllers
             {
                 if (vm.IssueClosed())
                 {
+                    IssueViewModels.UpdateRealAssign(updater, originaldata.IssueKey);
+
                     var realissue = IssueViewModels.RetrieveIssueByIssueKey(vm.IssueKey, this);
                     if (realissue.Summary.Contains(CRITICALERRORTYPE.LYTTASK) || realissue.Summary.Contains(CRITICALERRORTYPE.LYTTASK1))
                     {
@@ -2051,6 +2053,8 @@ namespace Prometheus.Controllers
             {
                 if (vm.IssueClosed())
                 {
+                    IssueViewModels.UpdateRealAssign(updater, originaldata.IssueKey);
+
                     var realissue = IssueViewModels.RetrieveIssueByIssueKey(vm.IssueKey, this);
                     realissue.CloseIssue();
                     ProjectErrorViewModels.UpdateSovledIssueCount(realissue.ProjectKey, realissue.ErrAbbr);
@@ -2503,6 +2507,8 @@ namespace Prometheus.Controllers
             {
                 if (vm.IssueClosed())
                 {
+                    IssueViewModels.UpdateRealAssign(updater, originaldata.IssueKey);
+
                     UserKPIVM.AddUserDailyRank(vm.IssueKey, vm.Assignee, UserRankType.BASE
                         , "Close RMA Task: " + vm.Summary, "/Issue/UpdateIssue?issuekey=" + vm.IssueKey, 4);
 
@@ -3122,6 +3128,8 @@ namespace Prometheus.Controllers
             {
                 if (vm.IssueClosed() )
                 {
+                    IssueViewModels.UpdateRealAssign(updater, originaldata.IssueKey);
+
                     UserKPIVM.AddUserDailyRank(vm.IssueKey, vm.Assignee, UserRankType.BASE
                         , "Close OBA Task: " + vm.Summary, "/Issue/UpdateIssue?issuekey=" + vm.IssueKey, 4);
 
@@ -3386,6 +3394,8 @@ namespace Prometheus.Controllers
             {
                 if (vm.IssueClosed())
                 {
+                    IssueViewModels.UpdateRealAssign(updater, originaldata.IssueKey);
+
                     UserKPIVM.AddUserDailyRank(vm.IssueKey, vm.Assignee, UserRankType.BASE
                         , "Close Quaulity Task: " + vm.Summary, "/Issue/UpdateIssue?issuekey=" + vm.IssueKey, 2);
 

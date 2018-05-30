@@ -826,7 +826,7 @@ namespace Prometheus.Models
                 allpjdict.Add(pjk, true);
             }
 
-            var usermatrix = UserMatrixVM.RetrieveUserMatrixDepart(); //user depart
+            //var usermatrix = UserMatrixVM.RetrieveUserMatrixDepart(); //user depart
 
             var rmaattaches = RetrieveRMACloseAttach(); //all rma attach
             var solvedrmanum = new Dictionary<string, bool>();
@@ -854,7 +854,7 @@ namespace Prometheus.Models
                         foreach (var rawdata in rmarawdatas)
                         {
                             UpdateRMAData(rawdata);
-                            Try2CreateRMA(rawdata, usermatrix, rmaissuedict, allpjdict,ctrl);
+                            Try2CreateRMA(rawdata, rmaissuedict, allpjdict,ctrl);
                         }
 
                         if (rmarawdatas.Count > 0)
@@ -952,22 +952,38 @@ namespace Prometheus.Models
                 return Conver2Str(dbret[0][0]);
             }
 
-            sql = 
+            var pnpndes = MESUtility.RetrievePnPndescFromSN((new string[] { SN }).ToList());
+            if (pnpndes.Count == 0)
+            {
+                return string.Empty;
+            }
+            
+            sql = "select top 1 ProjectKey from ProjectTestData where PN = @PN";
+            dict = new Dictionary<string, string>();
+            dict.Add("@PN", pnpndes.ElementAt(0).Value.Key);
+            dbret = DBUtility.ExeLocalSqlWithRes(sql, null, dict);
+            if (dbret.Count > 0)
+            {
+                return Conver2Str(dbret[0][0]);
+            }
+
+            var pndes = pnpndes.ElementAt(0).Value.Value;
+            var pnpjkey = ProjectViewModels.PN2PJKey();
+            var pns = pnpjkey.Keys.ToList();
+            foreach (var pn in pns)
+            {
+                if (pndes.Contains(pn))
+                {
+                    return pnpjkey[pn];
+                }
+            }
 
             return string.Empty;
         }
 
-        private static void Try2CreateRMA(RMARAWData rawdata,Dictionary<string,string> usermatrix
+        private static void Try2CreateRMA(RMARAWData rawdata
             , Dictionary<string, string> rmaissuedict, Dictionary<string, bool> allpjdict,Controller ctrl)
         {
-            var analyser = rawdata.AppV_O.ToUpper();
-            if(!rawdata.AppV_O.Contains("@"))
-                analyser = (rawdata.AppV_O.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
-
-            if (usermatrix.ContainsKey(analyser))
-            {
-                if (string.Compare(usermatrix[analyser], USERDEPART.NPI, true) == 0)
-                {
                     var pjk = RMSpectialCh(rawdata.AppV_N);
                     if (!allpjdict.ContainsKey(pjk))
                     {
@@ -992,7 +1008,7 @@ namespace Prometheus.Models
                                 {
                                     rmaissuedict[rawdata.AppV_B] = rmaissuedict[rawdata.AppV_B] + ":" + rawdata.AppV_I.ToUpper();
                                     //create RMA issue
-                                    CreateRMAIssue(rawdata,ctrl);
+                                    CreateRMAIssue(rawdata,pjk,ctrl);
                                     //reopen project
                                     ProjectViewModels.UpdateProjectStatus(pjk, ProjectStatus.Open);
                                 }
@@ -1001,14 +1017,13 @@ namespace Prometheus.Models
                             {
                                 rmaissuedict.Add(rawdata.AppV_B, rawdata.AppV_I);
                                 //create RMA issue
-                                CreateRMAIssue(rawdata,ctrl);
+                                CreateRMAIssue(rawdata,pjk,ctrl);
                                 //reopen project
                                 ProjectViewModels.UpdateProjectStatus(pjk, ProjectStatus.Open);
                             }//check whether issue exist
                         }//issue open in one week
                     }// Product type is exist in system
-                }//analyse is in NPI Department
-            }//analyser in usermatrisx
+
         }
 
         //private static void CreateRMASubIssue(string presum, string sum, string pjkey, string parentkey, string analyser, string reporter, DateTime duedate,string moretag)
@@ -1031,10 +1046,10 @@ namespace Prometheus.Models
         //    IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.Task.ToString(),moretag);
         //}
 
-        private static void CreateRMAIssue(RMARAWData rawdata,Controller ctrl)
+        private static void CreateRMAIssue(RMARAWData rawdata,string pjkey,Controller ctrl)
         {
             var vm = new IssueViewModels();
-            vm.ProjectKey = RMSpectialCh(rawdata.AppV_N);
+            vm.ProjectKey = pjkey;
             vm.IssueKey = IssueViewModels.GetUniqKey();
             vm.IssueType = ISSUETP.RMA;
 
@@ -1086,17 +1101,28 @@ namespace Prometheus.Models
 
 
             vm.ReportDate = DateTime.Now;
-            vm.Assignee = (rawdata.AppV_O.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
-            if (vm.Assignee.Length > 200)
-            {
-                vm.Assignee = vm.Assignee.Substring(0, 198);
+
+            if (string.IsNullOrEmpty(rawdata.AppV_O)) {
+                vm.Assignee = "STEVEN.QIU@FINISAR.COM";
+            }
+            else{
+                vm.Assignee = (rawdata.AppV_O.Replace(" ", ".") + "@FINISAR.COM").ToUpper();
+                if (vm.Assignee.Length > 200)
+                {
+                    vm.Assignee = vm.Assignee.Substring(0, 198);
+                }
+            }
+            if (string.IsNullOrEmpty(rawdata.AppV_AG)){
+                vm.Reporter = "STEVEN.QIU@FINISAR.COM";
+            }
+            else {
+                vm.Reporter = (rawdata.AppV_AG.Replace(" ", ".") + "@FINISAR.COM").ToUpper(); ;
+                if (vm.Reporter.Length > 200)
+                {
+                    vm.Reporter = vm.Reporter.Substring(0, 198);
+                }
             }
 
-            vm.Reporter = (rawdata.AppV_AG.Replace(" ", ".") + "@FINISAR.COM").ToUpper(); ;
-            if (vm.Reporter.Length > 200)
-            {
-                vm.Reporter = vm.Reporter.Substring(0, 198);
-            }
 
             vm.Resolution = Resolute.Pending;
 

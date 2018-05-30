@@ -990,6 +990,21 @@ namespace Prometheus.Models
 
             DBUtility.ExeLocalSqlNoRes(sql, param);
         }
+
+        public static Dictionary<string, string> PN2PJKey()
+        {
+            var ret = new Dictionary<string, string>();
+            var sql = "select PN,ProjectKey from ProjectPn";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var pn = Convert.ToString(line[0]);
+                var pjkey = Convert.ToString(line[1]);
+                if (!ret.ContainsKey(pn))
+                { ret.Add(pn, pjkey); }
+            }
+            return ret;
+        }
         
     }
 }

@@ -46,6 +46,18 @@ namespace Prometheus.Models
             return debugging;
         }
 
+        public static string ConstructCond(List<string> condlist)
+        {
+            StringBuilder sb1 = new StringBuilder(10 * (condlist.Count + 5));
+            sb1.Append("('");
+            foreach (var line in condlist)
+            {
+                sb1.Append(line + "','");
+            }
+            var tempstr1 = sb1.ToString();
+            return tempstr1.Substring(0, tempstr1.Length - 2) + ")";
+        }
+
         public static SqlConnection GetLocalConnector()
         {
             var conn = new SqlConnection();

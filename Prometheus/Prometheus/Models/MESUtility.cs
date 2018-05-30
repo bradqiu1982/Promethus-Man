@@ -1604,6 +1604,27 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static Dictionary<string,KeyValuePair<string,string>> RetrievePnPndescFromSN(List<string> snlist)
+        {
+            var ret = new Dictionary<string, KeyValuePair<string, string>>();
+
+            var sql = @" select c.ContainerName,pb.ProductName,p.[Description] from [InsiteDB].[insite].[Container] c (nolock)
+                     left join [InsiteDB].[insite].[Product] p with (nolock) on c.ProductId =p.ProductId
+                     left join [InsiteDB].[insite].[ProductBase] pb with (nolock) on p.ProductBaseId = pb.ProductBaseId  
+                     where c.ContainerName in <sncond>";
+            var sncond = DBUtility.ConstructCond(snlist);
+            sql = sql.Replace("<sncond>", sncond);
+            var dbret = DBUtility.ExeMESSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                var sn = Convert.ToString(line[0]);
+                if (!ret.ContainsKey(sn))
+                {
+                    ret.Add(sn, new KeyValuePair<string, string>(Convert.ToString(line[1]),Convert.ToString(line[2])));
+                }
+            }
+            return ret;
+        }
 
     }
 }

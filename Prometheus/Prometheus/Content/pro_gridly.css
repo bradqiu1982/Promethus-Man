@@ -5,6 +5,7 @@
 .grid_container .brick{
     opacity: 1;
     position: relative;
+    cursor: move;
 }
 
 .grid_container .brick .dragging{

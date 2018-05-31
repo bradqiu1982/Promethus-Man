@@ -586,6 +586,14 @@ namespace Prometheus.Controllers
             var retdata = VcselBGDVM.RetrieveVcselMonthlyData(startdate, enddate, vtype);
             var testylist = (List<testtypeyield>)retdata[0];
             var testflist = (List<TestFailureColumn>)retdata[1];
+            testylist.Sort(delegate (testtypeyield obj1, testtypeyield obj2)
+            {
+                return obj2.TestType.CompareTo(obj1.TestType);
+            });
+            testflist.Sort(delegate (TestFailureColumn obj1, TestFailureColumn obj2)
+            {
+                return obj2.TestType.CompareTo(obj1.TestType);
+            });
 
             foreach (var item in testylist)
             {
@@ -1299,7 +1307,10 @@ namespace Prometheus.Controllers
                 //fieldname,wafer,boxlist
                 var fieldboxlist = (Dictionary<string, Dictionary<string, List<string>>>)retdata[0];
                 var testflist = (List<TestFailureColumn>)retdata[1];
-
+                testflist.Sort(delegate (TestFailureColumn obj1, TestFailureColumn obj2)
+                {
+                    return obj2.TestType.CompareTo(obj1.TestType);
+                });
                 //var fieldrawlist = (Dictionary<string, Dictionary<string, List<string>>>)retdata[3];
 
                 var yieldarray = new List<object>();

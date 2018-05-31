@@ -57,6 +57,7 @@ var BurnIn = function(){
                     }
                 }
             });
+            defaultsearch();
         });
 
         function searchdata()
@@ -150,10 +151,14 @@ var BurnIn = function(){
             searchdata();
         })
 
-        var mywafer = $.trim($('#wf-no').tagsinput('items'));
-        if (mywafer != '')
-        {
-            searchdata();
+        function defaultsearch() {
+            var wf_no = $.trim($('#wf-no').tagsinput('items'));
+            if (wf_no == '') {
+                wf_no = $.trim($('#wf-no').parent().find('input').eq(0).val());
+            }
+            if (wf_no != '') {
+                searchdata();
+            }
         }
 
         $('body').on('click', '#btn-wf-download', function () {

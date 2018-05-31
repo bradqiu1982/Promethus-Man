@@ -164,14 +164,14 @@ var VCSEL_RMA = function(){
             },
             series: [{
                 name: line_data.data.cdata.name,
-                color: line_data.data.cdata.color,
+                color: '#ff3399',
                 type: 'column',
                 data: line_data.data.cdata.data,
                 yAxis: 1
             },{
                 name: line_data.data.data.name,
                 dataLabels: {
-                    enabled: true,
+                    enabled: false,
                     color: line_data.data.data.color,
                 },
                 marker: {

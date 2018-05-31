@@ -1453,25 +1453,93 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<BITestResultDataField> RetrieveWaferData(string wf_no)
+        public static void RetrieveWaferData(string wf_no, System.IO.FileStream fw)
         {
-            var ret = new List<BITestResultDataField>();
+
             var sql = @"SELECT SN,TestName,TestTimeStamp,PN,Wafer,JO,Channel,SLOPE,PO_LD,PO_Uniformity,THOLD,Delta_PO_LD,Delta_SLOPE
                         , Delta_THOLD, Delta_PO_Uniformity, ProductName FROM BITestResultDataField where Wafer = @Wafer";
             var dict = new Dictionary<string, string>();
             dict.Add("@Wafer", wf_no);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, dict);
+
+            var sb = new StringBuilder(120 * 10000);
+            var title = "SN,TestName,TestTimeStamp,PN,Wafer,JO,Channel,SLOPE,PO_LD,PO_Uniformity,THOLD,Delta_PO_LD,Delta_SLOPE,Delta_THOLD, Delta_PO_Uniformity, ProductName";
+            sb.Append(title + "\r\n");
+
+            var idx = 0;
             foreach (var line in dbret)
             {
-                var tempvm = new BITestResultDataField(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToDateTime(line[2])
+                var item = new BITestResultDataField(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToDateTime(line[2])
                     , Convert.ToString(line[3]), Convert.ToString(line[4]), Convert.ToString(line[5])
                     , Convert.ToString(line[6]), Convert.ToDouble(line[7]), Convert.ToDouble(line[8])
                     , Convert.ToDouble(line[9]), Convert.ToDouble(line[10]), Convert.ToDouble(line[11])
                     , Convert.ToDouble(line[12]), Convert.ToDouble(line[13]), Convert.ToDouble(line[14])
                     , Convert.ToString(line[15]));
-                ret.Add(tempvm);
+
+                var line1 = "\"" + item.SN.ToString().Replace("\"", "") + "\"," + "\"" + item.TestName.Replace("\"", "") + "\"," + "\"" + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss").Replace("\"", "") + "\"," + "\"" + item.PN.Replace("\"", "") + "\","
+                    + "\"" + item.Wafer.Replace("\"", "") + "\"," + "\"" + item.JO.Replace("\"", "") + "\"," + "\"" + item.Channel.Replace("\"", "") + "\","
+                    + "\"" + item.SLOPE.ToString().Replace("\"", "") + "\"," + "\"" + item.PO_LD.ToString().Replace("\"", "") + "\"," + "\"" + item.PO_Uniformity.ToString().Replace("\"", "") + "\","
+                    + "\"" + item.THOLD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_PO_LD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_SLOPE.ToString().Replace("\"", "") + "\","
+                    + "\"" + item.Delta_THOLD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_PO_Uniformity.ToString().Replace("\"", "") + "\"," + "\"" + item.ProductName.Replace("\"", "") + "\",";
+                sb.Append(line1 + "\r\n");
+                idx = idx + 1;
+
+                if (idx > 0 && idx % 10000 == 0)
+                {
+                    var bt = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+                    fw.Write(bt, 0, bt.Count());
+                    sb.Clear();
+                }
             }
-            return ret;
+            var bt1 = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+            fw.Write(bt1, 0, bt1.Count());
+
+        }
+
+        public static void RetrieveWaferDataByMonth(string month,System.IO.FileStream fw)
+        {
+            var starttime = DateTime.Parse(month + "/01" + " 00:00:00");
+            var endtime = starttime.AddMonths(1);
+
+            var sql = @"SELECT SN,TestName,TestTimeStamp,PN,Wafer,JO,Channel,SLOPE,PO_LD,PO_Uniformity,THOLD,Delta_PO_LD,Delta_SLOPE
+                        , Delta_THOLD, Delta_PO_Uniformity, ProductName FROM BITestResultDataField where TestTimeStamp >= @starttime and TestTimeStamp < @endtime";
+            var dict = new Dictionary<string, string>();
+            dict.Add("@starttime", starttime.ToString("yyyy-MM-dd HH:mm:ss"));
+            dict.Add("@endtime", endtime.ToString("yyyy-MM-dd HH:mm:ss"));
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, dict);
+
+            var sb = new StringBuilder(120*10000);
+            var title = "SN,TestName,TestTimeStamp,PN,Wafer,JO,Channel,SLOPE,PO_LD,PO_Uniformity,THOLD,Delta_PO_LD,Delta_SLOPE,Delta_THOLD, Delta_PO_Uniformity, ProductName";
+            sb.Append(title + "\r\n");
+
+            var idx = 0;
+            foreach (var line in dbret)
+            {
+                var item = new BITestResultDataField(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToDateTime(line[2])
+                    , Convert.ToString(line[3]), Convert.ToString(line[4]), Convert.ToString(line[5])
+                    , Convert.ToString(line[6]), Convert.ToDouble(line[7]), Convert.ToDouble(line[8])
+                    , Convert.ToDouble(line[9]), Convert.ToDouble(line[10]), Convert.ToDouble(line[11])
+                    , Convert.ToDouble(line[12]), Convert.ToDouble(line[13]), Convert.ToDouble(line[14])
+                    , Convert.ToString(line[15]));
+
+                var line1 = "\"" + item.SN.ToString().Replace("\"", "") + "\"," + "\"" + item.TestName.Replace("\"", "") + "\"," + "\"" + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss").Replace("\"", "") + "\"," + "\"" + item.PN.Replace("\"", "") + "\","
+                    + "\"" + item.Wafer.Replace("\"", "") + "\"," + "\"" + item.JO.Replace("\"", "") + "\"," + "\"" + item.Channel.Replace("\"", "") + "\","
+                    + "\"" + item.SLOPE.ToString().Replace("\"", "") + "\"," + "\"" + item.PO_LD.ToString().Replace("\"", "") + "\"," + "\"" + item.PO_Uniformity.ToString().Replace("\"", "") + "\","
+                    + "\"" + item.THOLD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_PO_LD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_SLOPE.ToString().Replace("\"", "") + "\","
+                    + "\"" + item.Delta_THOLD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_PO_Uniformity.ToString().Replace("\"", "") + "\"," + "\"" + item.ProductName.Replace("\"", "") + "\",";
+                sb.Append(line1 + "\r\n");
+                idx = idx + 1;
+
+                if (idx > 0 && idx % 10000 == 0)
+                {
+                    var bt = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+                    fw.Write(bt, 0, bt.Count());
+                    sb.Clear();
+                }
+            }
+            var bt1 = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+            fw.Write(bt1, 0, bt1.Count());
         }
 
         public static List<object> CBOXFromRaw(string rawdata, double llimit, double hlimit,bool nooutlier)

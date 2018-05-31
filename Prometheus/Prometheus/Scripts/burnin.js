@@ -37,6 +37,12 @@ var BurnIn = function(){
                 }
              })
         })
+
+        $('body').on('click', '#btn-wf-download', function () {
+            var wafer_no = $.trim($('#m-wf-no').val());
+            $('#boxplot-alert').modal('hide');
+            window.open("/DataAnalyze/DownLoadWaferByMonth?" + "month=" + wafer_no);
+        })
     }
 
     var distribution = function(){
@@ -203,6 +209,17 @@ var BurnIn = function(){
                 }
 
             }],
+            plotOptions: {
+                series: {
+                    cursor: 'pointer',
+                    events: {
+                        click: function (event) {
+                            $('#m-wf-no').val(event.point.category);
+                            $('#boxplot-alert').modal('show')
+                        }
+                    }
+                }
+            },
             series: [{
                  name: line_data.cdata.name,
                  color: '#12cc92',
@@ -214,13 +231,15 @@ var BurnIn = function(){
                     name: line_data.data.data.name,
                     type: 'line',
                     dataLabels: {
-                        enabled: true,
+                        enabled: false,
                         color: line_data.data.data.color,
+                        allowOverlap: true,
+                        padding: 0,
                     },
                     marker: {
                         radius: 2
                     },
-                    enableMouseTracking: false,
+                    enableMouseTracking: true,
                     data: line_data.data.data.data,
                     color: '#ffa500'
                 }

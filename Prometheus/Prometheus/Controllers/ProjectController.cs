@@ -6495,7 +6495,7 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
-            ExternalDataCollector.RefreshRMAData(this);
+            //ExternalDataCollector.RefreshRMAData(this);
             //ATEUtility.EmailATETestDailyData("SFP+ TUNABLE", this);
 
             //var pndict = new Dictionary<string, bool>();

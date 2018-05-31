@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Text.RegularExpressions;
+using System.Text;
 
 namespace Prometheus.Controllers
 {
@@ -3789,12 +3790,24 @@ namespace Prometheus.Controllers
 
                 var lines = PrepeareRMAReport(ProjectKey, StartDate, EndDate);
 
-                var wholefile = "";
+                var sb = new StringBuilder(120 * lines.Count);
                 foreach (var l in lines)
                 {
-                    wholefile = wholefile + l + "\r\n";
+                    sb.Append( l + "\r\n");
                 }
-                System.IO.File.WriteAllText(filename, wholefile,System.Text.Encoding.UTF8);
+
+                var fw = System.IO.File.OpenWrite(filename);
+                var CHUNK_STRING_LENGTH = 30000;
+                while (sb.Length > CHUNK_STRING_LENGTH)
+                {
+                    var bt = System.Text.Encoding.UTF8.GetBytes(sb.ToString(0, CHUNK_STRING_LENGTH));
+                    fw.Write(bt, 0, bt.Count());
+                    sb.Remove(0, CHUNK_STRING_LENGTH);
+                }
+
+                var bt1 = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+                fw.Write(bt1, 0, bt1.Count());
+                fw.Close();
 
                 return File(filename, "application/vnd.ms-excel", fn);
             }
@@ -3910,12 +3923,24 @@ namespace Prometheus.Controllers
 
             var lines = PrepeareAllRMAReport(ProjectKey, StartDate, EndDate);
 
-            var wholefile = "";
+            var sb = new StringBuilder(120 * lines.Count);
             foreach (var l in lines)
             {
-                wholefile = wholefile + l + "\r\n";
+                sb.Append( l + "\r\n");
             }
-            System.IO.File.WriteAllText(filename, wholefile, System.Text.Encoding.UTF8);
+
+            var fw = System.IO.File.OpenWrite(filename);
+            var CHUNK_STRING_LENGTH = 30000;
+            while (sb.Length > CHUNK_STRING_LENGTH)
+            {
+                var bt = System.Text.Encoding.UTF8.GetBytes(sb.ToString(0, CHUNK_STRING_LENGTH));
+                fw.Write(bt, 0, bt.Count());
+                sb.Remove(0, CHUNK_STRING_LENGTH);
+            }
+
+            var bt1 = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+            fw.Write(bt1, 0, bt1.Count());
+            fw.Close();
 
             return File(filename, "application/vnd.ms-excel", fn);
         }
@@ -4017,12 +4042,23 @@ namespace Prometheus.Controllers
             }
             var lines = PrepeareAllOBAReport(ProjectKey, StartDate, EndDate);
 
-            var wholefile = "";
+            var sb = new StringBuilder(120 * lines.Count);
             foreach (var l in lines)
             {
-                wholefile = wholefile + l + "\r\n";
+                sb.Append( l + "\r\n");
             }
-            System.IO.File.WriteAllText(filename, wholefile, System.Text.Encoding.UTF8);
+            var fw = System.IO.File.OpenWrite(filename);
+            var CHUNK_STRING_LENGTH = 30000;
+            while (sb.Length > CHUNK_STRING_LENGTH)
+            {
+                var bt = System.Text.Encoding.UTF8.GetBytes(sb.ToString(0, CHUNK_STRING_LENGTH));
+                fw.Write(bt, 0, bt.Count());
+                sb.Remove(0, CHUNK_STRING_LENGTH);
+            }
+
+            var bt1 = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+            fw.Write(bt1, 0, bt1.Count());
+            fw.Close();
 
             return File(filename, "application/vnd.ms-excel", fn);
         }
@@ -4124,12 +4160,23 @@ namespace Prometheus.Controllers
             }
             var lines = PrepeareAllQualityReport(ProjectKey, StartDate, EndDate);
 
-            var wholefile = "";
+            var sb = new StringBuilder(120 * lines.Count);
             foreach (var l in lines)
             {
-                wholefile = wholefile + l + "\r\n";
+                sb.Append( l + "\r\n");
             }
-            System.IO.File.WriteAllText(filename, wholefile, System.Text.Encoding.UTF8);
+            var fw = System.IO.File.OpenWrite(filename);
+            var CHUNK_STRING_LENGTH = 30000;
+            while (sb.Length > CHUNK_STRING_LENGTH)
+            {
+                var bt = System.Text.Encoding.UTF8.GetBytes(sb.ToString(0, CHUNK_STRING_LENGTH));
+                fw.Write(bt, 0, bt.Count());
+                sb.Remove(0, CHUNK_STRING_LENGTH);
+            }
+
+            var bt1 = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+            fw.Write(bt1, 0, bt1.Count());
+            fw.Close();
 
             return File(filename, "application/vnd.ms-excel", fn);
 

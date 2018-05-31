@@ -1566,12 +1566,24 @@ namespace Prometheus.Controllers
 
             var lines = PrepeareVcselReport();
 
-            var wholefile = "";
+            var sb = new StringBuilder(120 * lines.Count);
             foreach (var l in lines)
             {
-                wholefile = wholefile + l + "\r\n";
+                sb.Append(l + "\r\n");
             }
-            System.IO.File.WriteAllText(filename, wholefile,Encoding.UTF8);
+
+            var fw = System.IO.File.OpenWrite(filename);
+            var CHUNK_STRING_LENGTH = 30000;
+            while (sb.Length > CHUNK_STRING_LENGTH)
+            {
+                var bt = System.Text.Encoding.UTF8.GetBytes(sb.ToString(0, CHUNK_STRING_LENGTH));
+                fw.Write(bt, 0, bt.Count());
+                sb.Remove(0, CHUNK_STRING_LENGTH);
+            }
+
+            var bt1 = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+            fw.Write(bt1, 0, bt1.Count());
+            fw.Close();
 
             return File(filename, "application/vnd.ms-excel", fn);
         }
@@ -1673,12 +1685,24 @@ namespace Prometheus.Controllers
 
             var lines = PrepeareAllRELReport();
 
-            var wholefile = "";
+            var sb = new StringBuilder(120 * lines.Count);
             foreach (var l in lines)
             {
-                wholefile = wholefile + l + "\r\n";
+                sb.Append(l + "\r\n");
             }
-            System.IO.File.WriteAllText(filename, wholefile,Encoding.UTF8);
+
+            var fw = System.IO.File.OpenWrite(filename);
+            var CHUNK_STRING_LENGTH = 30000;
+            while (sb.Length > CHUNK_STRING_LENGTH)
+            {
+                var bt = System.Text.Encoding.UTF8.GetBytes(sb.ToString(0, CHUNK_STRING_LENGTH));
+                fw.Write(bt, 0, bt.Count());
+                sb.Remove(0, CHUNK_STRING_LENGTH);
+            }
+
+            var bt1 = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+            fw.Write(bt1, 0, bt1.Count());
+            fw.Close();
 
             return File(filename, "application/vnd.ms-excel", fn);
         }
@@ -1719,12 +1743,23 @@ namespace Prometheus.Controllers
 
             var lines = PrepeareAllIQEReport();
 
-            var wholefile = "";
+            var sb = new StringBuilder(120 * lines.Count);
             foreach (var l in lines)
             {
-                wholefile = wholefile + l + "\r\n";
+                sb.Append(l + "\r\n");
             }
-            System.IO.File.WriteAllText(filename, wholefile,Encoding.UTF8);
+            var fw = System.IO.File.OpenWrite(filename);
+            var CHUNK_STRING_LENGTH = 30000;
+            while (sb.Length > CHUNK_STRING_LENGTH)
+            {
+                var bt = System.Text.Encoding.UTF8.GetBytes(sb.ToString(0, CHUNK_STRING_LENGTH));
+                fw.Write(bt, 0, bt.Count());
+                sb.Remove(0, CHUNK_STRING_LENGTH);
+            }
+
+            var bt1 = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+            fw.Write(bt1, 0, bt1.Count());
+            fw.Close();
 
             return File(filename, "application/vnd.ms-excel", fn);
         }
@@ -1887,7 +1922,20 @@ namespace Prometheus.Controllers
 
                 var fn = "ATE_"+family+"_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
                 var filename = imgdir + fn;
-                System.IO.File.WriteAllText(filename, sb.ToString(), Encoding.UTF8);
+
+                var fw = System.IO.File.OpenWrite(filename);
+                var CHUNK_STRING_LENGTH = 30000;
+                while (sb.Length > CHUNK_STRING_LENGTH)
+                {
+                    var bt = System.Text.Encoding.UTF8.GetBytes(sb.ToString(0, CHUNK_STRING_LENGTH));
+                    fw.Write(bt, 0, bt.Count());
+                    sb.Remove(0, CHUNK_STRING_LENGTH);
+                }
+
+                var bt1 = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+                fw.Write(bt1, 0, bt1.Count());
+                fw.Close();
+
                 return File(filename, "application/vnd.ms-excel", fn);
             }
 

@@ -595,6 +595,9 @@ namespace Prometheus.Controllers
                 return obj2.TestType.CompareTo(obj1.TestType);
             });
 
+            var allydata = new Dictionary<string,double>();
+            var allcdata = new Dictionary<string, double>();
+
             foreach (var item in testylist)
             {
                 if (item.DYield.Count > 0)
@@ -609,13 +612,34 @@ namespace Prometheus.Controllers
                     var cydata = new List<double>();
                     foreach (var dy in item.DYield)
                     {
-                        xdata.Add(Convert.ToDateTime(dy.date).ToString("yyyy/MM"));
+                        var x = Convert.ToDateTime(dy.date).ToString("yyyy/MM");
+                        xdata.Add(x);
                         ydata.Add(Math.Round(dy.yield, 2));
                         cydata.Add(dy.totle);
+
+                        if (!allydata.ContainsKey(x))
+                        {
+                            allydata.Add(x, Math.Round(dy.yield, 2));
+                        }
+                        else
+                        {
+                            allydata[x] = Math.Round((allydata[x] / 100.0) * (dy.yield / 100.0) * 100.0, 2);
+                        }
+
+                        if (!allcdata.ContainsKey(x))
+                        {
+                            allcdata.Add(x,dy.totle);
+                        }
+                        else
+                        {
+                            if (dy.totle > allcdata[x])
+                            {
+                                allcdata[x] = dy.totle;
+                            }
+                        }
                     }
 
                     var xAxis = new { data = xdata };
-
                     var yAxis = new
                     {
                         title = "Yield (%)",
@@ -668,6 +692,82 @@ namespace Prometheus.Controllers
                         cdata = cdata
                     });
                 }
+            }
+
+            //all yield
+            if (allydata.Count > 0)
+            {
+                var allxdata = allydata.Keys.ToList();
+                allxdata.Sort(delegate (string obj1, string obj2)
+                {
+                    var dobj1 = DateTime.Parse(obj1 + "/01");
+                    var dobj2 = DateTime.Parse(obj2 + "/01");
+                    return dobj1.CompareTo(dobj2);
+                });
+
+                var realy = new List<double>();
+                var realc = new List<double>();
+                foreach (var x in allxdata)
+                {
+                    realy.Add(allydata[x]);
+                    realc.Add(allcdata[x]);
+                }
+
+                var id = "y_totleyield_id";
+                var title = "VCSEL TOTLE YIELD";
+                var xAxis = new { data = allxdata };
+
+                var yAxis = new
+                {
+                    title = "Yield (%)",
+                    min = 85.0,
+                    max = 100.0
+                };
+
+                var min = new
+                {
+                    name = "Min",
+                    color = "#F0AD4E",
+                    data = 94,
+                    style = "dash"
+                };
+
+                var max = new
+                {
+                    name = "Max",
+                    color = "#C9302C",
+                    data = 98,
+                    style = "solid"
+                };
+
+                var data = new
+                {
+                    name = "Yield",
+                    color = "#ffa500",
+                    data = realy
+                };
+
+                var combinedata = new
+                {
+                    min = min,
+                    max = max,
+                    data = data
+                };
+
+                var cdata = new
+                {
+                    name = "Test Modules",
+                    data = realc
+                };
+                yieldarray.Insert(0,new
+                {
+                    id = id,
+                    title = title,
+                    xAxis = xAxis,
+                    yAxis = yAxis,
+                    data = combinedata,
+                    cdata = cdata
+                });
             }
 
             foreach(var item in testflist)
@@ -1766,27 +1866,6 @@ namespace Prometheus.Controllers
             }
         }
 
-        private List<string> PrepeareAllWaferData(string wf_no)
-        {
-            var ret = new List<string>();
-            var allreldata = VcselBGDVM.RetrieveWaferData(wf_no);
-            var line = "SN,TestName,TestTimeStamp,PN,Wafer,JO,Channel,SLOPE,PO_LD,PO_Uniformity,THOLD,Delta_PO_LD,Delta_SLOPE,Delta_THOLD, Delta_PO_Uniformity, ProductName";
-            ret.Add(line);
-
-            foreach (var item in allreldata)
-            {
-                var line1 = string.Empty;
-                line1 = "\"" + item.SN.ToString().Replace("\"", "") + "\"," + "\"" + item.TestName.Replace("\"", "") + "\"," + "\"" + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss").Replace("\"", "") + "\"," + "\"" + item.PN.Replace("\"", "") + "\"," 
-                    + "\"" + item.Wafer.Replace("\"", "") + "\"," + "\"" + item.JO.Replace("\"", "") + "\"," + "\"" + item.Channel.Replace("\"", "") + "\","
-                    + "\"" + item.SLOPE.ToString().Replace("\"", "") + "\"," + "\"" + item.PO_LD.ToString().Replace("\"", "") + "\"," + "\"" + item.PO_Uniformity.ToString().Replace("\"", "") + "\","
-                    + "\"" + item.THOLD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_PO_LD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_SLOPE.ToString().Replace("\"", "") + "\","
-                    + "\"" + item.Delta_THOLD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_PO_Uniformity.ToString().Replace("\"", "") + "\"," + "\"" + item.ProductName.Replace("\"", "") + "\",";
-                ret.Add(line1);
-            }
-
-            return ret;
-        }
-
         public ActionResult DownLoadWafer(string wf_no)
         {
             string datestring = DateTime.Now.ToString("yyyyMMdd");
@@ -1799,14 +1878,28 @@ namespace Prometheus.Controllers
             var fn = "Wafer_"+wf_no+"_TestData_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
             var filename = imgdir + fn;
 
-            var lines = PrepeareAllWaferData(wf_no);
+            var fw = System.IO.File.OpenWrite(filename);
+            VcselBGDVM.RetrieveWaferData(wf_no,fw);
+            fw.Close();
 
-            var wholefile = "";
-            foreach (var l in lines)
+            return File(filename, "application/vnd.ms-excel", fn);
+        }
+
+        public ActionResult DownLoadWaferByMonth(string month)
+        {
+            string datestring = DateTime.Now.ToString("yyyyMMdd");
+            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+            if (!System.IO.Directory.Exists(imgdir))
             {
-                wholefile = wholefile + l + "\r\n";
+                System.IO.Directory.CreateDirectory(imgdir);
             }
-            System.IO.File.WriteAllText(filename, wholefile, Encoding.UTF8);
+
+            var fn = "Wafer_" + month.Replace("/","-") + "_TestData_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+            var filename = imgdir + fn;
+
+            var fw = System.IO.File.OpenWrite(filename);
+            VcselBGDVM.RetrieveWaferDataByMonth(month,fw);
+            fw.Close();
 
             return File(filename, "application/vnd.ms-excel", fn);
         }

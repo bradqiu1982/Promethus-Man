@@ -60,7 +60,19 @@ namespace Prometheus.Models
 
                 var fn = "ATE_" + family + "_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
                 var filename = imgdir + fn;
-                System.IO.File.WriteAllText(filename, sb.ToString(), Encoding.UTF8);
+
+                var fw = System.IO.File.OpenWrite(filename);
+                var CHUNK_STRING_LENGTH = 30000;
+                while (sb.Length > CHUNK_STRING_LENGTH)
+                {
+                    var bt = System.Text.Encoding.UTF8.GetBytes(sb.ToString(0, CHUNK_STRING_LENGTH));
+                    fw.Write(bt, 0, bt.Count());
+                    sb.Remove(0, CHUNK_STRING_LENGTH);
+                }
+
+                var bt1 = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+                fw.Write(bt1, 0, bt1.Count());
+                fw.Close();
 
                 EmailUtility.SendEmail(ctrl, "ATE Daily Test Data - " + mdtype, towho
                     , "Daily Test Data\r\nFYI", true, filename);

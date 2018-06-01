@@ -685,7 +685,7 @@ namespace Prometheus.Controllers
                 }
 
                 var id = "y_totleyield_id";
-                var title = "VCSEL TOTLE YIELD";
+                var title = "VCSEL TOTAL YIELD";
                 var xAxis = new { data = allxdata };
                 var yAxis = new
                 { title = "Yield (%)", min = 85.0, max = 100.0 };

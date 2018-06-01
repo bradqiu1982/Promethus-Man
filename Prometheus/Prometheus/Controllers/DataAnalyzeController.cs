@@ -582,6 +582,7 @@ namespace Prometheus.Controllers
 
             var yieldarray = new List<object>();
             var failurearray = new List<object>();
+            var totlearray = new List<object>();
 
             var retdata = VcselBGDVM.RetrieveVcselMonthlyData(startdate, enddate, vtype);
             var testylist = (List<testtypeyield>)retdata[0];
@@ -641,46 +642,16 @@ namespace Prometheus.Controllers
 
                     var xAxis = new { data = xdata };
                     var yAxis = new
-                    {
-                        title = "Yield (%)",
-                        min = 85.0,
-                        max = 100.0
-                    };
-
+                    { title = "Yield (%)",min = 85.0,max = 100.0 };
                     var min = new
-                    {
-                        name = "Min",
-                        color= "#F0AD4E",
-                        data=94,
-                        style= "dash"
-                    };
-
+                    { name = "Min",color= "#F0AD4E",data=94,style= "dash" };
                     var max = new
-                    {
-                        name = "Max",
-                        color = "#C9302C",
-                        data = 98,
-                        style = "solid"
-                    };
-
+                    { name = "Max", color = "#C9302C", data = 98, style = "solid" };
                     var data = new
-                    {
-                        name = "Yield",
-                        color = "#ffa500",
-                        data = ydata
-                    };
-
-                    var combinedata = new {
-                        min = min,
-                        max = max,
-                        data = data
-                    };
-
+                    { name = "Yield", color = "#ffa500", data = ydata };
+                    var combinedata = new { min = min, max = max, data = data };
                     var cdata = new
-                    {
-                        name = "Test Modules",
-                        data = cydata
-                    };
+                    { name = "Test Modules", data = cydata };
 
                     yieldarray.Add(new
                     {
@@ -716,50 +687,20 @@ namespace Prometheus.Controllers
                 var id = "y_totleyield_id";
                 var title = "VCSEL TOTLE YIELD";
                 var xAxis = new { data = allxdata };
-
                 var yAxis = new
-                {
-                    title = "Yield (%)",
-                    min = 85.0,
-                    max = 100.0
-                };
-
+                { title = "Yield (%)", min = 85.0, max = 100.0 };
                 var min = new
-                {
-                    name = "Min",
-                    color = "#F0AD4E",
-                    data = 94,
-                    style = "dash"
-                };
-
+                { name = "Min", color = "#F0AD4E", data = 94, style = "dash" };
                 var max = new
-                {
-                    name = "Max",
-                    color = "#C9302C",
-                    data = 98,
-                    style = "solid"
-                };
-
+                { name = "Max", color = "#C9302C", data = 98, style = "solid" };
                 var data = new
-                {
-                    name = "Yield",
-                    color = "#ffa500",
-                    data = realy
-                };
-
+                { name = "Yield", color = "#ffa500", data = realy };
                 var combinedata = new
-                {
-                    min = min,
-                    max = max,
-                    data = data
-                };
-
+                { min = min,  max = max, data = data };
                 var cdata = new
-                {
-                    name = "Test Modules",
-                    data = realc
-                };
-                yieldarray.Insert(0,new
+                { name = "Test Modules", data = realc };
+
+                totlearray.Add(new
                 {
                     id = id,
                     title = title,
@@ -830,11 +771,70 @@ namespace Prometheus.Controllers
                 }
             }
 
+            var totlefailure = (List<DateWaferFailureColumn>)retdata[3];
+            if (totlefailure.Count > 0)
+            {
+                var id = "f_all_id";
+
+                var lastdidx = totlefailure.Count - 1;
+                var title = Convert.ToDateTime(totlefailure[0].xkey).ToString("yyyy/MM") + " ~ " + Convert.ToDateTime(totlefailure[lastdidx].xkey).ToString("yyyy/MM") + " Total Faliure Mode";
+                var xdata = new List<string>();
+                var ydata = new List<FailureColumnData>();
+                var count = 0;
+                foreach (var f_item in totlefailure)
+                {
+                    xdata.Add(Convert.ToDateTime(f_item.xkey).ToString("yyyy/MM"));
+                    count = (f_item.DateColSeg.Count > count) ? f_item.DateColSeg.Count : count;
+                }
+                var num = totlefailure.Count;
+                var n = 1;
+                for (var i = count - 1; i >= 0; i--)
+                {
+                    var ydata_tmp = new List<FailureColumnSeg>();
+                    for (var m = 0; m < num; m++)
+                    {
+                        if (i < totlefailure[m].DateColSeg.Count)
+                        {
+                            ydata_tmp.Add(totlefailure[m].DateColSeg[i]);
+                        }
+                        else
+                        {
+                            var tempvm = new FailureColumnSeg();
+                            tempvm.name = "";
+                            tempvm.y = 0;
+                            tempvm.color = "#000";
+                            ydata_tmp.Add(tempvm);
+                        }
+                    }
+                    ydata.Add(new FailureColumnData() { index = n, data = ydata_tmp });
+                    n++;
+                }
+                var xAxis = new { data = xdata };
+
+                var yAxis = new
+                {
+                    title = "(%)",
+                    min = 0.0,
+                    max = 100.0
+                };
+
+                totlearray.Add(new
+                {
+                    id = id,
+                    coltype = "normal",
+                    title = title,
+                    xAxis = xAxis,
+                    yAxis = yAxis,
+                    data = ydata
+                });
+            }
+
             var ret = new JsonResult();
             ret.Data = new { success = true,
                 yieldarray = yieldarray,
                 failurearray = failurearray,
                 colors = retdata[2],
+                totlearray = totlearray
             };
             return ret;
         }

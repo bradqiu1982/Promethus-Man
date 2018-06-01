@@ -190,6 +190,120 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static Dictionary<string, DateWaferFailureColumn> RetrieveTotleFailure(DateTime startdate, DateTime enddate, string vtype, Dictionary<string, bool> allfailure)
+        {
+            var ret = new Dictionary<string, DateWaferFailureColumn>();
+                        
+            var sql = "select StartDate,VTYPE,Failure,Num from VcselMonthData where VTYPE like @VTYPE and StartDate >= @sdate and StartDate < @edate";
+            var dict = new Dictionary<string, string>();
+            dict.Add("@VTYPE", "%_" + vtype);
+            dict.Add("@sdate", startdate.ToString("yyyy-MM-dd HH:mm:ss"));
+            dict.Add("@edate", enddate.ToString("yyyy-MM-dd HH:mm:ss"));
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, dict);
+            foreach (var line in dbret)
+            {
+                var sdate = Convert.ToDateTime(line[0]).ToString("yyyy-MM-dd");
+                var testtype = Convert.ToString(line[1]).Replace("_" + vtype, "");
+                var failure = Convert.ToString(line[2]);
+                var num = Convert.ToInt32(line[3]);
+                if (string.Compare(failure, "pass", true) != 0)
+                {
+                    if (ret.ContainsKey(sdate))
+                    {
+                        var tempvm = ret[sdate];
+                        tempvm.total = tempvm.total + num;
+                        tempvm.xkey = sdate;
+
+                        var failureexist = false;
+                        foreach (var item in tempvm.DateColSeg)
+                        {
+                            if (string.Compare(item.name, failure, true) == 0)
+                            {
+                                item.y = item.y + num;
+                                failureexist = true;
+                                break;
+                            }
+                        }
+
+                        if (!failureexist)
+                        {
+                            var tempfailure = new FailureColumnSeg();
+                            tempfailure.name = failure;
+                            tempfailure.y = num;
+                                                
+                            tempvm.DateColSeg.Add(tempfailure);
+                        }
+                    }
+                    else
+                    {
+                        var tempfailure = new FailureColumnSeg();
+                        tempfailure.name = failure;
+                        tempfailure.y = num;
+
+                        var tempvm = new DateWaferFailureColumn();
+                        tempvm.total = tempvm.total + num;
+                        tempvm.DateColSeg.Add(tempfailure);
+                        tempvm.xkey = sdate;
+
+                        ret.Add(sdate, tempvm);
+                    }
+                }//all fail
+            }//foreach
+
+            var datelist = ret.Keys.ToList();
+
+            
+
+            foreach (var d in datelist)
+            {
+                var tempvm = ret[d];
+                var tempfailurelist = tempvm.DateColSeg;
+                tempfailurelist.Sort(delegate (FailureColumnSeg obj1, FailureColumnSeg obj2) {
+                    return obj2.y.CompareTo(obj1.y);
+                });
+
+                tempfailurelist = VcselBGDVM.AlignmentFailureOthers(tempvm.DateColSeg, tempvm.total);
+                tempvm.DateColSeg.Clear();
+                tempvm.DateColSeg.AddRange(tempfailurelist);
+                foreach (var item in tempfailurelist)
+                {
+                    if (!allfailure.ContainsKey(item.name))
+                    { allfailure.Add(item.name, true); }
+                }
+            }
+
+            var failurekeylist = allfailure.Keys.ToList();
+
+            foreach (var d in datelist)
+            {
+                foreach (var fk in failurekeylist)
+                { allfailure[fk] = true; }
+
+                var tempvm = ret[d];
+                var tempfailurelist = new List<FailureColumnSeg>();
+                foreach (var item in tempvm.DateColSeg)
+                {
+                    allfailure[item.name] = false;
+                    item.y = Math.Round((double)item.y / tempvm.total * 100.0, 3);
+                    tempfailurelist.Add(item);
+                }
+                foreach (var kv in allfailure)
+                {
+                    if (kv.Value)
+                    {
+                        var tempf = new FailureColumnSeg();
+                        tempf.name = kv.Key;
+                        tempf.y = 0.0;
+                        tempfailurelist.Add(tempf);
+                    }
+                }
+                tempvm.DateColSeg.Clear();
+                tempvm.DateColSeg.AddRange(tempfailurelist);
+            }//end foreach
+
+            return ret;
+        }
+
         public DateTime StartDate { set; get; }
         //TEST_RATE_CHANNEL
         public string VTYPE { set; get; }
@@ -1018,6 +1132,9 @@ namespace Prometheus.Models
 
     public class DateWaferFailureColumn
     {
+        public DateWaferFailureColumn()
+        { total = 0.0; }
+
         public string xkey { set; get; }
 
         private List<FailureColumnSeg> colseglist = new List<FailureColumnSeg>();
@@ -1356,10 +1473,39 @@ namespace Prometheus.Models
 
                 testflist.Add(temptestf);
             }//end foreach
-            
+
+            var allfailure = new Dictionary<string, bool>();
+            var totalret = VcselMonthData.RetrieveTotleFailure(sdate, edate, vtype, allfailure);
+            foreach (var fkv in allfailure)
+            {
+                if (!name_colors.ContainsKey(fkv.Key))
+                {
+                    name_colors.Add(fkv.Key, colors[color_idx % colors.Count]);
+                    color_idx++;
+                }
+            }
+            var totledatewafercolumlist = new List<DateWaferFailureColumn>();
+            var totledatelist = totalret.Keys.ToList();
+            totledatelist.Sort(delegate (string obj1, string obj2)
+            {
+                var d1 = DateTime.Parse(obj1);
+                var d2 = DateTime.Parse(obj2);
+                return d1.CompareTo(d2);
+            });
+            foreach (var d in totledatelist)
+            {
+                foreach (var item in totalret[d].DateColSeg)
+                {
+                    item.color = name_colors[item.name];
+                }
+                totledatewafercolumlist.Add(totalret[d]);
+            }
+
             ret.Add(testylist);
             ret.Add(testflist);
             ret.Add(name_colors);
+            ret.Add(totledatewafercolumlist);
+
             return ret;
         }
 

@@ -14,6 +14,19 @@ var BurnIn = function(){
                  if (output.success) {
                      $('.v-content').empty();
                      var appendstr = "";
+
+                     appendstr = '<div class="col-xs-6">' +
+                        '<div class="v-box" id="' + output.totlearray[0].id + '"></div>' +
+                        '</div>';
+                    $('.v-content').append(appendstr);
+                    drawline(output.totlearray[0]);
+
+                    appendstr = '<div class="col-xs-6">' +
+                            '<div class="v-box" id="' + output.totlearray[1].id + '"></div>' +
+                            '</div>';
+                    $('.v-content').append(appendstr);
+                    drawcolumn(output.totlearray[1]);
+
                      $.each(output.yieldarray, function (i, val) {
                          appendstr = '<div class="col-xs-6">' +
                                 '<div class="v-box" id="'+val.id+'"></div>' +

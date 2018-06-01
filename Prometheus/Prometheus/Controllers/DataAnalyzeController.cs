@@ -1882,7 +1882,16 @@ namespace Prometheus.Controllers
             VcselBGDVM.RetrieveWaferData(wf_no,fw);
             fw.Close();
 
-            return File(filename, "application/vnd.ms-excel", fn);
+            try
+            {
+                var fzip = new ICSharpCode.SharpZipLib.Zip.FastZip();
+                fzip.CreateZip(imgdir + fn.Replace(".csv", ".zip"), imgdir, false, fn);
+                return File(filename.Replace(".csv", ".zip"), "application/vnd.zip", fn.Replace(".csv", ".zip"));
+            }
+            catch (Exception ex)
+            {
+                return File(filename, "application/vnd.ms-excel", fn);
+            }
         }
 
         public ActionResult DownLoadWaferByMonth(string month,string vtype)
@@ -1917,7 +1926,16 @@ namespace Prometheus.Controllers
 
             fw.Close();
 
-            return File(filename, "application/vnd.ms-excel", fn);
+            try
+            {
+                var fzip = new ICSharpCode.SharpZipLib.Zip.FastZip();
+                fzip.CreateZip(imgdir+fn.Replace(".csv", ".zip"), imgdir, false, fn);
+                return File(filename.Replace(".csv", ".zip"), "application/vnd.zip", fn.Replace(".csv", ".zip"));
+            }
+            catch (Exception ex)
+            {
+                return File(filename, "application/vnd.ms-excel", fn);
+            }
         }
 
         private void preparetxotestdata(List<string> waferlist,string leftcond, string leftfield, string rightcond, string rightfield)

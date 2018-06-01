@@ -1,0 +1,74 @@
+﻿
+@{
+    ViewBag.Title = "ClosedProjects";
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
+}
+
+<div class="row" style="margin-top:1%">
+    <div class="nav navbar-nav navbar-left">
+        <img src="~/Content/images/ucicon/IProjectIcons.png" style="height:40px; width:40px">
+    </div>
+    <div class="nav navbar-nav navbar-left">
+        <ol class="breadcrumb" style="width:600px">
+            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
+            <li class="active">Closed Projects</li>
+        </ol>
+    </div>
+</div>
+<div>
+    <table id="datatable" class="display" cellspacing="0">
+        <thead>
+            <tr>
+                <td>ProjectName</td>
+                <td>UserName</td>
+                <td>DateTime</td>
+                <td>Operation</td>
+            </tr>
+        </thead>
+        <tbody>
+            @if (ViewBag.data.Count > 0)
+            {
+                foreach (var item in ViewBag.data)
+                {
+                    <tr>
+                        <td>
+                            <a href="/Project/ProjectDetail?ProjectKey=@item["ProjectKey"]">@item["ProjectKey"]</a>
+                        </td>
+                        <td>@(!string.IsNullOrEmpty(item["UserName"]) ? item["UserName"].Split(new char[] { '@' })[0] : "")</td>
+                        <td>@(!string.IsNullOrEmpty(item["Date"]) ? Convert.ToDateTime(item["Date"]).ToString("yyyy -MM-dd HH:mm:ss") : "")</td>
+                        <td><a class="cursor-pointer reopen-project" data-pkey="@item["ProjectKey"]">Reopen</a></td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#datatable').DataTable({
+                'iDisplayLength': 20,
+                'aLengthMenu': [[20, 50, 100, -1],
+                                [20, 50, 100, "All"]],
+                "aaSorting": [],
+                "order": []
+            });
+        })
+        $(function () {
+            $('body').on("click", ".reopen-project", function () {
+                if (!confirm("Really to Reopen this project?")) {
+                    return false;
+                }
+                var pkey = $(this).attr("data-pkey");
+                $.post("/Project/ReopenProject", {
+                    pkey: pkey
+                }, function (output) {
+                    if (output.success) {
+                        window.location.reload();
+                    }
+                    else {
+                        alert("Failed to Reopen");
+                    }
+                })
+            })
+        })
+    </script>
+</div>

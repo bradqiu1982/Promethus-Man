@@ -8,7 +8,7 @@
 }
 
 <div class="row">
-    <div class="col-xs-7" data-toggle="modal" data-target="#myModal">
+    <div class="col-xs-6" data-toggle="modal" data-target="#myModal">
         <div class="nav navbar-nav navbar-left">
             <img src="~/Content/images/ucicon/IProjectIcons.png" style="height:40px; width:40px">
         </div>
@@ -21,12 +21,13 @@
     <div class="col-xs-3" data-intro = "Search specify product here." data-step="1" >
         @Html.DropDownList("pjfilterlist", null, new { @id = "pjfilterlist", @class = "form-control", @style = "font-family:'Arial Narrow';border-color:#006DC0;", @onchange = "ShowProjectDetail()" })
     </div>
-    <div class="col-xs-1">
+    <div class="col-xs-3">
         @if ((ViewBag.IsSuper != null && ViewBag.IsSuper)
                 || (ViewBag.IsManage != null && ViewBag.IsManage))
         {
-            <button class="btn btn-default" type="button" 
+            <button class="btn btn-default btn-sm" type="button" 
                     onclick="LoadProject()" data-intro="Add or delete product here." data-step="2">Load Projects</button>
+            <a class="btn btn-danger btn-sm" href="/Project/ClosedProjects">Closed Projects</a>
         }
     </div>
     <script type="text/javascript">
@@ -122,7 +123,11 @@
                                                 <div class="col-xs-1"></div>
                                                 <div class="col-xs-11">
                                                     <input type="button" class="btn btn-success btn-sm edit-project" data-pkey="@item.ProjectKey" value="Edit" />
-                                                    <input type="button" class="btn btn-danger btn-sm close-project" data-pkey="@item.ProjectKey" value="Close" />
+                                                    @if ((ViewBag.IsSuper != null && ViewBag.IsSuper)
+                                                            || (ViewBag.IsManage != null && ViewBag.IsManage))
+                                                    {
+                                                        <input type="button" class="btn btn-danger btn-sm close-project" data-pkey="@item.ProjectKey" value="Close" />
+                                                    }
                                                 </div>
                                             </div>
                                             }
@@ -141,7 +146,11 @@
                                                 <div class="col-xs-1"></div>
                                                 <div class="col-xs-11">
 					                                <input type="button" class="btn btn-success btn-sm edit-project" data-pkey="@item.ProjectKey" value="Edit" />
-                                                    <input type="button" class="btn btn-danger btn-sm close-project" data-pkey="@item.ProjectKey" value="Close" />
+                                                    @if ((ViewBag.IsSuper != null && ViewBag.IsSuper)
+                                                            || (ViewBag.IsManage != null && ViewBag.IsManage))
+                                                    {
+                                                        <input type="button" class="btn btn-danger btn-sm close-project" data-pkey="@item.ProjectKey" value="Close" />
+                                                    }
                                                 </div>
                                             </div>
                                             }

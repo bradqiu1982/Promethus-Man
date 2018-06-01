@@ -120,6 +120,7 @@ namespace Prometheus.Models
         public static int ICare = 3;
         public static int CancelICare = 4;
         public static int ModifyDueDate = 5;
+        public static int OpenOrCloseProject = 6;
     }
 
     public class ModifyDueDateConstant

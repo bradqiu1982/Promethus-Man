@@ -8992,9 +8992,56 @@ namespace Prometheus.Controllers
             var pKey = Request.Form["pKey"];
             ProjectViewModels.UpdateProjectStatus(pKey, ProjectStatus.Close);
 
+
+            LogVM.WriteLog(updater.ToUpper(), pKey, DetermineCompName(Request.UserHostName),
+                    Request.Url.ToString(), "Project", "Close Project", "", LogType.OpenOrCloseProject, Log4NetLevel.Info, "");
+
             var res = new JsonResult();
             res.Data = new { success = true };
             return res;
+        }
+
+        [HttpPost]
+        public JsonResult ReopenProject()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            var mycache = HttpContext.Cache;
+            mycache.Remove(updater + "_pjlist_CUST");
+
+            var pKey = Request.Form["pKey"];
+            ProjectViewModels.UpdateProjectStatus(pKey, ProjectStatus.Open);
+
+            LogVM.WriteLog(updater.ToUpper(), pKey, DetermineCompName(Request.UserHostName),
+                    Request.Url.ToString(), "Project", "ReOpen Project", "", LogType.OpenOrCloseProject, Log4NetLevel.Info, "");
+
+            var res = new JsonResult();
+            res.Data = new { success = true };
+            return res;
+        }
+        public ActionResult ClosedProjects()
+        {
+
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "Project");
+                ck.Add("logonredirectact", "ClosedProjects");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
+
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            ViewBag.data = ProjectViewModels.GetClosedProjects();
+
+            return View();
         }
     }
 

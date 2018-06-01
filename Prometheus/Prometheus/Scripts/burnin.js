@@ -40,8 +40,9 @@ var BurnIn = function(){
 
         $('body').on('click', '#btn-wf-download', function () {
             var wafer_no = $.trim($('#m-wf-no').val());
+            var vcseltype = $.trim($('#vcseltypeselectlist').val());
             $('#boxplot-alert').modal('hide');
-            window.open("/DataAnalyze/DownLoadWaferByMonth?" + "month=" + wafer_no);
+            window.open("/DataAnalyze/DownLoadWaferByMonth?" + "month=" + wafer_no + "&vtype=" + vcseltype);
         })
     }
 

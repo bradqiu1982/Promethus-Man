@@ -1885,7 +1885,7 @@ namespace Prometheus.Controllers
             return File(filename, "application/vnd.ms-excel", fn);
         }
 
-        public ActionResult DownLoadWaferByMonth(string month)
+        public ActionResult DownLoadWaferByMonth(string month,string vtype)
         {
             string datestring = DateTime.Now.ToString("yyyyMMdd");
             string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
@@ -1893,12 +1893,28 @@ namespace Prometheus.Controllers
             {
                 System.IO.Directory.CreateDirectory(imgdir);
             }
+            var rate = vtype.Split(new string[] { "_" }, StringSplitOptions.RemoveEmptyEntries)[0];
+            var ch = vtype.Split(new string[] { "_" }, StringSplitOptions.RemoveEmptyEntries)[1];
+            var pninfolist = VcselPNData.RetrieveVcselPNInfo().Values.ToList();
+            var pnlist = new List<string>();
+            foreach (var p in pninfolist)
+            {
+                if (string.Compare(p.Rate, rate, true) == 0
+                    && string.Compare(p.Channel, ch, true) == 0)
+                {
+                    pnlist.Add(p.PN);
+                }
+            }
 
-            var fn = "Wafer_" + month.Replace("/","-") + "_TestData_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+            var fn = "Wafer_" + month.Replace("/","-")+"_"+vtype + "_TestData_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
             var filename = imgdir + fn;
 
             var fw = System.IO.File.OpenWrite(filename);
-            VcselBGDVM.RetrieveWaferDataByMonth(month,fw);
+            if (pnlist.Count > 0)
+            {
+               VcselBGDVM.RetrieveWaferDataByMonth(month,pnlist,fw);
+            }
+
             fw.Close();
 
             return File(filename, "application/vnd.ms-excel", fn);

@@ -1496,13 +1496,23 @@ namespace Prometheus.Models
 
         }
 
-        public static void RetrieveWaferDataByMonth(string month,System.IO.FileStream fw)
+        public static void RetrieveWaferDataByMonth(string month,List<string> pnlist,System.IO.FileStream fw)
         {
+            var pncond = "('";
+            foreach (var p in pnlist)
+            {
+                pncond = pncond + p + "','";
+            }
+            pncond = pncond.Substring(0, pncond.Length - 2) + ")";
+
+
             var starttime = DateTime.Parse(month + "/01" + " 00:00:00");
             var endtime = starttime.AddMonths(1);
 
             var sql = @"SELECT SN,TestName,TestTimeStamp,PN,Wafer,JO,Channel,SLOPE,PO_LD,PO_Uniformity,THOLD,Delta_PO_LD,Delta_SLOPE
-                        , Delta_THOLD, Delta_PO_Uniformity, ProductName FROM BITestResultDataField where TestTimeStamp >= @starttime and TestTimeStamp < @endtime";
+                        , Delta_THOLD, Delta_PO_Uniformity, ProductName FROM BITestResultDataField
+                        where TestTimeStamp >= @starttime and TestTimeStamp < @endtime and Wafer <> '' and ProductName in <pncond>";
+            sql = sql.Replace("<pncond>", pncond);
             var dict = new Dictionary<string, string>();
             dict.Add("@starttime", starttime.ToString("yyyy-MM-dd HH:mm:ss"));
             dict.Add("@endtime", endtime.ToString("yyyy-MM-dd HH:mm:ss"));

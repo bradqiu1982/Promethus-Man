@@ -74,8 +74,22 @@ namespace Prometheus.Models
                 fw.Write(bt1, 0, bt1.Count());
                 fw.Close();
 
-                EmailUtility.SendEmail(ctrl, "ATE Daily Test Data - " + mdtype, towho
+                try
+                {
+                    var fzip = new ICSharpCode.SharpZipLib.Zip.FastZip();
+                    fzip.CreateZip(imgdir + fn.Replace(".csv", ".zip"), imgdir, false, fn);
+                    try { System.IO.File.Delete(filename); } catch (Exception ex) { }
+                    EmailUtility.SendEmail(ctrl, "ATE Daily Test Data - " + mdtype, towho
+                    , "Daily Test Data\r\nFYI", true, filename.Replace(".csv", ".zip"));
+                }
+                catch (Exception ex)
+                {
+                    if (!System.IO.File.Exists(filename))
+                    { System.IO.File.WriteAllText(filename, "Fail to download data."); }
+                    EmailUtility.SendEmail(ctrl, "ATE Daily Test Data - " + mdtype, towho
                     , "Daily Test Data\r\nFYI", true, filename);
+                }
+                
                 new System.Threading.ManualResetEvent(false).WaitOne(500);
             }
 

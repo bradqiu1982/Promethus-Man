@@ -1886,10 +1886,13 @@ namespace Prometheus.Controllers
             {
                 var fzip = new ICSharpCode.SharpZipLib.Zip.FastZip();
                 fzip.CreateZip(imgdir + fn.Replace(".csv", ".zip"), imgdir, false, fn);
+                try { System.IO.File.Delete(filename); } catch (Exception ex) { }
                 return File(filename.Replace(".csv", ".zip"), "application/vnd.zip", fn.Replace(".csv", ".zip"));
             }
             catch (Exception ex)
             {
+                if (!System.IO.File.Exists(filename))
+                { System.IO.File.WriteAllText(filename, "Fail to download data."); }
                 return File(filename, "application/vnd.ms-excel", fn);
             }
         }
@@ -1930,10 +1933,13 @@ namespace Prometheus.Controllers
             {
                 var fzip = new ICSharpCode.SharpZipLib.Zip.FastZip();
                 fzip.CreateZip(imgdir+fn.Replace(".csv", ".zip"), imgdir, false, fn);
+                try { System.IO.File.Delete(filename); } catch (Exception ex) { }
                 return File(filename.Replace(".csv", ".zip"), "application/vnd.zip", fn.Replace(".csv", ".zip"));
             }
             catch (Exception ex)
             {
+                if (!System.IO.File.Exists(filename))
+                { System.IO.File.WriteAllText(filename, "Fail to download data."); }
                 return File(filename, "application/vnd.ms-excel", fn);
             }
         }

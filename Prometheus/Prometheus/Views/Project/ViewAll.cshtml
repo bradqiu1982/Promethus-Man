@@ -18,17 +18,19 @@
             </ol>
         </div>
     </div>
-    <div class="col-xs-3" data-intro = "Search specify product here." data-step="1" >
-        @Html.DropDownList("pjfilterlist", null, new { @id = "pjfilterlist", @class = "form-control", @style = "font-family:'Arial Narrow';border-color:#006DC0;", @onchange = "ShowProjectDetail()" })
-    </div>
     <div class="col-xs-3">
         @if ((ViewBag.IsSuper != null && ViewBag.IsSuper)
                 || (ViewBag.IsManage != null && ViewBag.IsManage))
         {
-            <button class="btn btn-default btn-sm" type="button" 
-                    onclick="LoadProject()" data-intro="Add or delete product here." data-step="2">Load Projects</button>
+            <button class="btn btn-default btn-sm" type="button"
+                    onclick="LoadProject()" data-intro="Add or delete product here." data-step="2">
+                Load Projects
+            </button>
             <a class="btn btn-danger btn-sm" href="/Project/ClosedProjects">Closed Projects</a>
         }
+    </div>
+    <div class="col-xs-3" data-intro="Search specify product here." data-step="1">
+        @Html.DropDownList("pjfilterlist", null, new { @id = "pjfilterlist", @class = "form-control", @style = "font-family:'Arial Narrow';border-color:#006DC0;", @onchange = "ShowProjectDetail()" })
     </div>
     <script type="text/javascript">
         function ShowProjectDetail() {
@@ -36,8 +38,7 @@
                 window.location.href = '/Project/ProjectDetail?ProjectKey=' + document.getElementById("pjfilterlist").value;
             }
         }
-        function LoadProject()
-        {
+        function LoadProject() {
             window.location.href = '/Project/LoadProjects';
         }
         $('body').on('click', '.close-project', function () {

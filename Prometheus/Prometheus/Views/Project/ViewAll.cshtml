@@ -18,15 +18,15 @@
             </ol>
         </div>
     </div>
-    <div class="col-xs-3">
+    <div class="col-xs-3 text-right">
         @if ((ViewBag.IsSuper != null && ViewBag.IsSuper)
                 || (ViewBag.IsManage != null && ViewBag.IsManage))
         {
-            <button class="btn btn-default btn-sm" type="button"
+            <button class="btn btn-success" type="button"
                     onclick="LoadProject()" data-intro="Add or delete product here." data-step="2">
                 Load Projects
             </button>
-            <a class="btn btn-danger btn-sm" href="/Project/ClosedProjects">Closed Projects</a>
+            <a class="btn btn-danger" href="/Project/ClosedProjects">Closed Projects</a>
         }
     </div>
     <div class="col-xs-3" data-intro="Search specify product here." data-step="1">

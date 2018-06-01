@@ -92,7 +92,7 @@
                                 var edate = DateTime.Parse(item.EndDate).ToString("yyyy-MM-dd");
                                 var pjkey = Model.ProjectKey;
                                 var site = item.WhichTest;
-                                <td><a href="/Project/ProjectStations?pjkey=@(pjkey)&whichtest=@(site)&StartTime=@(sdate)&EndTime=@(edate)" target="_blank">@((item.Yield * 100.0).ToString("0.00"))%</a></td>
+                                <td><a href="/Project/ProjectStations?ProjectKey=@(pjkey)&whichtest=@(site)&StartTime=@(sdate)&EndTime=@(edate)" target="_blank">@((item.Yield * 100.0).ToString("0.00"))%</a></td>
                             }
                             else
                             {
@@ -158,7 +158,7 @@
                                 var edate = DateTime.Parse(item.EndDate).ToString("yyyy-MM-dd");
                                 var pjkey = Model.ProjectKey;
                                 var site = item.WhichTest;
-                                <td><a href="/Project/ProjectStations?pjkey=@(pjkey)&whichtest=@(site)&StartTime=@(sdate)&EndTime=@(edate)" target="_blank">@((item.Yield * 100.0).ToString("0.00"))%</a></td>
+                                <td><a href="/Project/ProjectStations?ProjectKey=@(pjkey)&whichtest=@(site)&StartTime=@(sdate)&EndTime=@(edate)" target="_blank">@((item.Yield * 100.0).ToString("0.00"))%</a></td>
                             }
                             else
                             {

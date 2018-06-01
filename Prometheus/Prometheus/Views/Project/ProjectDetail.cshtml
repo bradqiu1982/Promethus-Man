@@ -50,7 +50,7 @@
     <div class="nav navbar-nav navbar-right">
         @if (Model != null)
         {
-            <a class="btn btn-info" href="/Project/Transfer?PJKey=@Model.ProjectKey" data-toggle="tooltip"  title="Transfer project to other group">Transfer</a>
+            <a class="btn btn-info" href="/Project/Transfer?ProjectKey=@Model.ProjectKey" data-toggle="tooltip"  title="Transfer project to other group">Transfer</a>
             <a class="btn btn-info" href="/Project/EditProject?ProjectKey=@Model.ProjectKey" data-intro="Edit project here." data-step="@(istep++)"> Edit</a>
 	        <input type="button" class="btn btn-danger" id="close-project" name="close-project" value="Close" />
         }

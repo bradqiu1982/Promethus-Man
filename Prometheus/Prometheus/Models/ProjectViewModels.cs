@@ -1005,6 +1005,33 @@ namespace Prometheus.Models
             }
             return ret;
         }
+
+        public static List<Dictionary<string, string>> GetClosedProjects()
+        {
+            var sql = @"select p.ProjectKey, tmp_a.UserName, tmp_a.Date from Project as p left join
+                    (select * from Log where ID in 
+	                    (select max(ID) from Log where LogType = @logtype group by ProjectKey)
+                    ) as tmp_a on p.ProjectKey = tmp_a.ProjectKey 
+                    where p.APVal5 = @status order by tmp_a.Date Desc";
+            var param = new Dictionary<string, string>();
+            param.Add("@logtype", LogType.OpenOrCloseProject.ToString());
+            param.Add("@status", ProjectStatus.Close);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
+            var res = new List<Dictionary<string, string>>();
+            if(dbret.Count > 0)
+            {
+                foreach(var item in dbret)
+                {
+                    var tmp = new Dictionary<string, string>();
+                    tmp.Add("ProjectKey", Convert.ToString(item[0]));
+                    tmp.Add("UserName", Convert.ToString(item[1]));
+                    tmp.Add("Date", Convert.ToString(item[2]));
+                    res.Add(tmp);
+                }
+            }
+
+            return res;
+        }
         
     }
 }

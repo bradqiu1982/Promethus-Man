@@ -711,6 +711,8 @@ namespace Prometheus.Controllers
                 });
             }
 
+            var errorcodedict = CfgUtility.GetBurnInErrorConfig(this);
+
             foreach(var item in testflist)
             {
                 if(item.DateColSeg.Count > 0)
@@ -737,6 +739,10 @@ namespace Prometheus.Controllers
                             if (i < item.DateColSeg[m].DateColSeg.Count)
                             {
                                 ydata_tmp.Add(item.DateColSeg[m].DateColSeg[i]);
+                                if (!errorcodedict.ContainsKey(item.DateColSeg[m].DateColSeg[i].name))
+                                {
+                                    errorcodedict.Add(item.DateColSeg[m].DateColSeg[i].name, item.DateColSeg[m].DateColSeg[i].name);
+                                }
                             }
                             else
                             {
@@ -796,6 +802,10 @@ namespace Prometheus.Controllers
                         if (i < totlefailure[m].DateColSeg.Count)
                         {
                             ydata_tmp.Add(totlefailure[m].DateColSeg[i]);
+                            if (!errorcodedict.ContainsKey(totlefailure[m].DateColSeg[i].name))
+                            {
+                                errorcodedict.Add(totlefailure[m].DateColSeg[i].name, totlefailure[m].DateColSeg[i].name);
+                            }
                         }
                         else
                         {
@@ -834,7 +844,8 @@ namespace Prometheus.Controllers
                 yieldarray = yieldarray,
                 failurearray = failurearray,
                 colors = retdata[2],
-                totlearray = totlearray
+                totlearray = totlearray,
+                errorcodedict = errorcodedict
             };
             return ret;
         }
@@ -1762,6 +1773,7 @@ namespace Prometheus.Controllers
                     }
                 }//end foreach
 
+                var errorcodedict = CfgUtility.GetBurnInErrorConfig(this);
 
                 foreach (var item in testflist)
                 {
@@ -1807,6 +1819,11 @@ namespace Prometheus.Controllers
                                 {
                                     item.DateColSeg[m].DateColSeg[i].y = Math.Round(item.DateColSeg[m].DateColSeg[i].y, 4);
                                     ydata_tmp.Add(item.DateColSeg[m].DateColSeg[i]);
+
+                                    if (!errorcodedict.ContainsKey(item.DateColSeg[m].DateColSeg[i].name))
+                                    {
+                                        errorcodedict.Add(item.DateColSeg[m].DateColSeg[i].name, item.DateColSeg[m].DateColSeg[i].name);
+                                    }
                                 }
                                 else
                                 {
@@ -1851,6 +1868,7 @@ namespace Prometheus.Controllers
                     boxarray = boxarray,
                     failurearray = failurearray,
                     colors = retdata[2],
+                    errorcodedict = errorcodedict
                 };
                 return ret;
             }

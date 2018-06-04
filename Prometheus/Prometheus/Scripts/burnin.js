@@ -42,9 +42,15 @@ var BurnIn = function(){
                          drawcolumn(val);
                      })
                      $('.v-content').append('<div class="v-lengend row"></div>');
+                     var idx = 1;
                      var colorStr = "";
                      $.each(output.colors, function (i, val) {
-                         colorStr = '<span class="span-fm label label-success" style="background-color: '+val+'">'+i+'</span>';
+                         colorStr = '<span class="span-fm label label-success" style="background-color: ' + val + '">' + output.errorcodedict[i] + '</span>';
+                         if (idx % 5 == 0)
+                         {
+                             colorStr = colorStr+'<br/>'
+                         }
+                         idx = idx + 1;
                          $('.v-lengend').append(colorStr);
                      })
                 }
@@ -156,9 +162,15 @@ var BurnIn = function(){
                          drawcolumn(val);
                      })
                      $('.v-content').append('<div class="v-lengend row"></div>');
+
+                     var idx = 1;
                      var colorStr = "";
                      $.each(output.colors, function (i, val) {
-                         colorStr = '<span class="span-fm label label-success" style="background-color: ' + val + '">' + i + '</span>';
+                         colorStr = '<span class="span-fm label label-success" style="background-color: ' + val + '">' + output.errorcodedict[i] + '</span>';
+                         if (idx % 5 == 0) {
+                             colorStr = colorStr + '<br/>'
+                         }
+                         idx = idx + 1;
                          $('.v-lengend').append(colorStr);
                      })
 

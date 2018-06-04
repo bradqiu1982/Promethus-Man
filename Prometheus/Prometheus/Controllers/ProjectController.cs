@@ -222,6 +222,31 @@ namespace Prometheus.Controllers
 
         }
 
+
+        public void SetIE8Flag(Dictionary<string,string> dict)
+        {
+            ViewBag.isie8 = false;
+            ViewBag.showie8modal = false;
+            var browse = Request.Browser;
+            if (string.Compare(browse.Browser, "IE", true) == 0
+                && (string.Compare(browse.Version, "7.0", true) == 0
+                || string.Compare(browse.Version, "8.0", true) == 0))
+            {
+                ViewBag.isie8 = true;
+            }
+
+            if (ViewBag.isie8)
+            {
+                if (!dict.ContainsKey("showie8modal"))
+                {
+                    var ck = new Dictionary<string, string>();
+                    ck.Add("showie8modal", "TRUE");
+                    CookieUtility.SetCookie(this, ck);
+                    ViewBag.showie8modal = true;
+                }//END IF
+            }//END IF
+        }
+
         // GET: Project
         public ActionResult ViewAll()
         {
@@ -244,7 +269,6 @@ namespace Prometheus.Controllers
             //logthdinfo("cookie  " + (msec2 - msec1).ToString());
 
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
-
             var mycache = HttpContext.Cache;
 
             UserAuth(updater);
@@ -452,6 +476,8 @@ namespace Prometheus.Controllers
 
             ViewBag.uProModules = uProModules;
             ViewBag.Default_Modules = pmvm.AllModules;
+
+            SetIE8Flag(ckdict);
 
             return View(projlist);
         }

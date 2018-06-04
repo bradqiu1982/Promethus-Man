@@ -411,6 +411,30 @@ namespace Prometheus.Controllers
             return sBuilder.ToString();
         }
 
+        public void SetIE8Flag(Dictionary<string, string> dict)
+        {
+            ViewBag.isie8 = false;
+            ViewBag.showie8modal = false;
+            var browse = Request.Browser;
+            if (string.Compare(browse.Browser, "IE", true) == 0
+                && (string.Compare(browse.Version, "7.0", true) == 0
+                || string.Compare(browse.Version, "8.0", true) == 0))
+            {
+                ViewBag.isie8 = true;
+            }
+
+            if (ViewBag.isie8)
+            {
+                if (!dict.ContainsKey("showie8modal"))
+                {
+                    var ck = new Dictionary<string, string>();
+                    ck.Add("showie8modal", "TRUE");
+                    CookieUtility.SetCookie(this, ck);
+                    ViewBag.showie8modal = true;
+                }//END IF
+            }//END IF
+        }
+
         public ActionResult UserCenter(string username, string month, string smartkey = null)
         {
             if (smartkey != null)
@@ -521,6 +545,8 @@ namespace Prometheus.Controllers
                 {
                     ViewBag.month = month;
                 }
+
+                SetIE8Flag(ckdict);
 
                 return View();
             }

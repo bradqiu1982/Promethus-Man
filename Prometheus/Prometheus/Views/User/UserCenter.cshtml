@@ -7,6 +7,48 @@
 <div class="row uc-header">
     <h2>@ViewBag.UserName Center</h2>
 </div>
+
+@if (ViewBag.showie8modal)
+{
+    <script type="text/javascript">
+        $(function () {
+            $('#forie8modal').modal('show');
+        });
+
+        function closeie8modal() {
+            $("#forie8modal").modal('hide');
+            return false;
+        }
+    </script>
+
+    <div class="modal" id="forie8modal" tabindex="-1" role="dialog" aria-labelledby="forie8modalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content ie8popup">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="forie8modalLabel">To IE8 User</h4>
+                </div>
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-10">
+                        <label>Please Update to IE10+ or FireFox to get better user experience</label>
+                    </div>
+                    <div class="col-md-1"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-10">
+                        <img src="~/Content/images/mainpage.png" style="height:200px;width:auto;">
+                    </div>
+                    <div class="col-md-1"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" onclick="closeie8modal()">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 <div class="row uc-content">
     <div class="uc-column uc-column-first">
         <div data-toggle="modal" data-target="#myModal">

@@ -1800,11 +1800,11 @@ namespace Prometheus.Controllers
                             {
                                 tempmax = tempmax + fitem.y;
                             }
-                            if (tempmax > 3.0) ymax = 5.0;
-                            if (tempmax > 5.0) ymax = 10.0;
-                            if (tempmax > 10.0) ymax = 15.0;
-                            if (tempmax > 15.0) ymax = 20.0;
-                            if (tempmax > 20.0) ymax = 100.0;
+                            if (tempmax > 3.0) ymax = (5.0 > ymax)?5.0:ymax;
+                            if (tempmax > 5.0) ymax = (10.0 > ymax)?10.0:ymax;
+                            if (tempmax > 10.0) ymax = (15.0 > ymax)?15.0:ymax;
+                            if (tempmax > 15.0) ymax = (20.0 > ymax)?20.0:ymax;
+                            if (tempmax > 20.0) ymax = (25.0 > ymax)?25.0:ymax;
                         }
 
                         var num = item.DateColSeg.Count;

@@ -108,6 +108,34 @@ namespace Prometheus.Controllers
                 shippeddatalist.Add(dppm.ShippedQty);
             }
 
+            var plotbands = new List<object>();
+
+            var latestwaferlist = VcselRMAData.RetrieveLatestWafer(rate);
+            if (latestwaferlist.Count > 0)
+            {
+                var latestwafer = latestwaferlist[0].Wafer;
+                var from = 0.0;
+                var to = 0.0;
+                var idx = 0.0;
+                foreach (var item in xdatalist)
+                {
+                    if (string.Compare(item,latestwafer,true) == 0)
+                    {
+                        from = idx - 0.5;
+                        to = idx + 0.5;
+                        break;
+                    }
+                    idx = idx + 1.0;
+                }
+                plotbands.Add(
+                    new {
+                        color = "#00b050",
+                        from = from,
+                        to = to,
+                    }
+                    );
+            }
+
             var xAxis = new {
                 data = xdatalist
             };
@@ -133,7 +161,8 @@ namespace Prometheus.Controllers
                 title = "Vcsel RMA Dppm",
                 xAxis = xAxis,
                 yAxis = yAxis,
-                data = alldata
+                data = alldata,
+                plotbands = plotbands
             };
 
             var ret = new JsonResult();

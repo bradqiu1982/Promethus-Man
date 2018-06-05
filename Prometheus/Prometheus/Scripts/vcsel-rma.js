@@ -106,7 +106,8 @@ var VCSEL_RMA = function(){
                 text: line_data.title
             },
             xAxis: {
-                categories: line_data.xAxis.data
+                categories: line_data.xAxis.data,
+                plotBands: line_data.plotbands
             },
             yAxis: [{
                 title: {
@@ -216,6 +217,7 @@ var VCSEL_RMA = function(){
                 }
             }
         };
+        console.log(options);
         Highcharts.chart(line_data.id, options);
     }
 

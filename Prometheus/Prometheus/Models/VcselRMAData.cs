@@ -149,6 +149,29 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static List<VcselRMAData> RetrieveLatestWafer(string rate)
+        {
+            var ret = new List<VcselRMAData>();
+            var wdict = new Dictionary<string, bool>();
+            var sql = "select top 1 Wafer from VcselRMAData ";
+            if (!string.IsNullOrEmpty(rate.Trim()))
+            {
+                sql = sql + "  where VcselType = '<VcselType>'  ";
+                sql = sql.Replace("<VcselType>", rate);
+            }
+            sql = sql + " order by RMAOpenDate DESC";
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var tempvm = new VcselRMAData();
+                tempvm.Wafer = Convert.ToString(line[0]);
+                ret.Add(tempvm);
+            }
+            return ret;
+        }
+
+
         public static List<VcselRMAData> RetrievAllDataASC()
         {
             var ret = new List<VcselRMAData>();

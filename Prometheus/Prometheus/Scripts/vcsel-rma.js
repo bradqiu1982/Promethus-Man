@@ -217,7 +217,7 @@ var VCSEL_RMA = function(){
                 }
             }
         };
-        console.log(options);
+
         Highcharts.chart(line_data.id, options);
     }
 

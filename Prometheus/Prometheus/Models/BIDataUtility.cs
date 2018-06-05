@@ -1860,31 +1860,61 @@ namespace Prometheus.Models
         //            if (WaferNum.Length > 3)
         //            {
         //                var fidx = WaferNum.IndexOf("-");
-                        //if (fidx != -1 && WaferNum.Length >= (fidx + 3))
-                        //{
-                        //    WaferNum = WaferNum.Substring(0, fidx + 3);
-                        //}
-    //            }
-    //            var PN = Convert.ToString(line[2]);
-    //            if (!string.IsNullOrEmpty(WaferNum) && !string.IsNullOrEmpty(PN))
-    //            {
-    //                var key = PN + ":::" + WaferNum;
-    //                if (ret.ContainsKey(key))
-    //                {
-    //                    ret[key].Add(SN);
-    //                }
-    //                else
-    //                {
-    //                    var templist = new List<string>();
-    //                    templist.Add(SN);
-    //                    ret.Add(key, templist);
-    //                }
-    //            }//end if
-    //        }//end foreach
-    //    }//end if
+        //if (fidx != -1 && WaferNum.Length >= (fidx + 3))
+        //{
+        //    WaferNum = WaferNum.Substring(0, fidx + 3);
+        //}
+        //            }
+        //            var PN = Convert.ToString(line[2]);
+        //            if (!string.IsNullOrEmpty(WaferNum) && !string.IsNullOrEmpty(PN))
+        //            {
+        //                var key = PN + ":::" + WaferNum;
+        //                if (ret.ContainsKey(key))
+        //                {
+        //                    ret[key].Add(SN);
+        //                }
+        //                else
+        //                {
+        //                    var templist = new List<string>();
+        //                    templist.Add(SN);
+        //                    ret.Add(key, templist);
+        //                }
+        //            }//end if
+        //        }//end foreach
+        //    }//end if
 
-    //    return ret;
-    //}
+        //    return ret;
+        //}
+
+        private static List<List<object>> SN2Wafer(string sncond1)
+        {
+            var sql = @"SELECT distinct c.ContainerName as SerialName,isnull(dc.[ParamValueString],'') as WaferLot,pb.productname MaterialPN  ,hml.MfgDate
+                    FROM InsiteDB.insite.container c with (nolock) 
+                    left join InsiteDB.insite.currentStatus cs (nolock) on c.currentStatusId = cs.currentStatusId 
+                    left join InsiteDB.insite.workflowstep ws(nolock) on  cs.WorkflowStepId = ws.WorkflowStepId 
+                    left join InsiteDB.insite.componentRemoveHistory crh with (nolock) on crh.historyId = c.containerId 
+                    left join InsiteDB.insite.removeHistoryDetail rhd on rhd.componentRemoveHistoryId = crh.componentRemoveHistoryId 
+                    left join InsiteDB.insite.starthistorydetail  shd(nolock) on c.containerid=shd.containerId and shd.historyId <> shd.containerId 
+                    left join InsiteDB.insite.container co (nolock) on co.containerid=shd.historyId 
+                    left join InsiteDB.insite.historyMainline hml with (nolock) on c.containerId = hml.containerId 
+                    left join InsiteDB.insite.componentIssueHistory cih with (nolock) on  hml.historyMainlineId=cih.historyMainlineId 
+                    left join InsiteDB.insite.issueHistoryDetail ihd with (nolock) on cih.componentIssueHistoryId = ihd.componentIssueHistoryId 
+                    left join InsiteDB.insite.issueActualsHistory iah with (nolock) on  ihd.issueHistoryDetailId = iah.issueHistoryDetailId 
+                    left join InsiteDB.insite.RemoveHistoryDetail rem with (nolock) on iah.IssueActualsHistoryId = rem.IssueActualsHistoryId 
+                    left join InsiteDB.insite.RemovalReason re with (nolock) on rem.RemovalReasonId = re.RemovalReasonId 
+                    left join InsiteDB.insite.container cFrom with (nolock) on iah.fromContainerId = cFrom.containerId 
+                    left join InsiteDB.insite.product p with (nolock) on  cFrom.productId = p.productId 
+                    left join InsiteDB.insite.productBase pb with (nolock) on p.productBaseId  = pb.productBaseId 
+                    left join InsiteDB.insite.historyMainline hmll with (nolock)on cFrom.OriginalcontainerId=hmll.historyid 
+                    left join InsiteDB.insite.product pp with (nolock) on c.productid=pp.productid 
+                    left join InsiteDB.insite.productfamily pf (nolock) on  pp.productFamilyId = pf.productFamilyId 
+                    left join InsiteDB.insite.productbase pbb with (nolock) on pp.productbaseid=pbb.productbaseid 
+                    left join InsiteDB.insite.dc_AOC_ManualInspection dc (nolock) on hmll.[HistoryMainlineId]=dc.[HistoryMainlineId] 
+                    WHERE dc.parametername='Trace_ID' and p.description like '%VCSEL%' and dc.[ParamValueString] like '%-%'and c.containername in <SNCOND> order by pb.productname,c.ContainerName,hml.MfgDate DESC";
+
+            sql = sql.Replace("<SNCOND>", sncond1);
+            return DBUtility.ExeRealMESSqlWithRes(sql);
+        }
 
     public static Dictionary<string,KeyValuePair<string,string>> RetrieveBIWaferBySN_SNDict(List<string> snlist)
         {
@@ -1902,32 +1932,8 @@ namespace Prometheus.Models
                 var tempstr1 = sb1.ToString();
                 var sncond1 = tempstr1.Substring(0, tempstr1.Length - 2) + ")";
 
-                var sql = @"SELECT distinct c.ContainerName as SerialName,isnull(dc.[ParamValueString],'') as WaferLot,pb.productname MaterialPN  ,hml.MfgDate
-                        FROM InsiteDB.insite.container c with (nolock) 
-                        left join InsiteDB.insite.currentStatus cs (nolock) on c.currentStatusId = cs.currentStatusId 
-                        left join InsiteDB.insite.workflowstep ws(nolock) on  cs.WorkflowStepId = ws.WorkflowStepId 
-                        left join InsiteDB.insite.componentRemoveHistory crh with (nolock) on crh.historyId = c.containerId 
-                        left join InsiteDB.insite.removeHistoryDetail rhd on rhd.componentRemoveHistoryId = crh.componentRemoveHistoryId 
-                        left join InsiteDB.insite.starthistorydetail  shd(nolock) on c.containerid=shd.containerId and shd.historyId <> shd.containerId 
-                        left join InsiteDB.insite.container co (nolock) on co.containerid=shd.historyId 
-                        left join InsiteDB.insite.historyMainline hml with (nolock) on c.containerId = hml.containerId 
-                        left join InsiteDB.insite.componentIssueHistory cih with (nolock) on  hml.historyMainlineId=cih.historyMainlineId 
-                        left join InsiteDB.insite.issueHistoryDetail ihd with (nolock) on cih.componentIssueHistoryId = ihd.componentIssueHistoryId 
-                        left join InsiteDB.insite.issueActualsHistory iah with (nolock) on  ihd.issueHistoryDetailId = iah.issueHistoryDetailId 
-                        left join InsiteDB.insite.RemoveHistoryDetail rem with (nolock) on iah.IssueActualsHistoryId = rem.IssueActualsHistoryId 
-                        left join InsiteDB.insite.RemovalReason re with (nolock) on rem.RemovalReasonId = re.RemovalReasonId 
-                        left join InsiteDB.insite.container cFrom with (nolock) on iah.fromContainerId = cFrom.containerId 
-                        left join InsiteDB.insite.product p with (nolock) on  cFrom.productId = p.productId 
-                        left join InsiteDB.insite.productBase pb with (nolock) on p.productBaseId  = pb.productBaseId 
-                        left join InsiteDB.insite.historyMainline hmll with (nolock)on cFrom.OriginalcontainerId=hmll.historyid 
-                        left join InsiteDB.insite.product pp with (nolock) on c.productid=pp.productid 
-                        left join InsiteDB.insite.productfamily pf (nolock) on  pp.productFamilyId = pf.productFamilyId 
-                        left join InsiteDB.insite.productbase pbb with (nolock) on pp.productbaseid=pbb.productbaseid 
-                        left join InsiteDB.insite.dc_AOC_ManualInspection dc (nolock) on hmll.[HistoryMainlineId]=dc.[HistoryMainlineId] 
-                        WHERE dc.parametername='Trace_ID' and p.description like '%VCSEL%' and dc.[ParamValueString] like '%-%'and c.containername in <SNCOND> order by pb.productname,c.ContainerName,hml.MfgDate DESC";
+                var dbret = SN2Wafer(sncond1);
 
-                sql = sql.Replace("<SNCOND>", sncond1);
-                var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
                 foreach (var line in dbret)
                 {
                     var SN = Convert.ToString(line[0]);
@@ -1948,6 +1954,21 @@ namespace Prometheus.Models
                 }//end foreach
             }//end if
 
+            return ret;
+        }
+
+        public static Dictionary<string, string> RetrieveSNMaterial(string sncond)
+        {
+            var ret = new Dictionary<string, string>();
+            var dbret = SN2Wafer(sncond);
+
+            foreach (var line in dbret)
+            {
+                var SN = Convert.ToString(line[0]);
+                var MPn = Convert.ToString(line[2]);
+                if (!ret.ContainsKey(SN))
+                { ret.Add(SN, MPn); }
+            }//end foreach
             return ret;
         }
 

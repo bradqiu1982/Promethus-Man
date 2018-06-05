@@ -86,3 +86,5 @@ KPIGROUP2:::ALEX.CHEN@FINISAR.COM;LEON.REN@FINISAR.COM;SEAN.PENG@FINISAR.COM;ZHA
 
 WAFERCOORD:::\\wux-fs02\Production_Test_Data\OSA_ME\OGP\WUX-E81000068
 VCSELRMASHARE:::\\wux-fs\public\Quality\10.Quality case summary\Customer Quality Case Summary\RMA & Complaint New\VCSEL Issue Tracking Master List.xlsx
+FINISARSHIPDATA:::\\wux-file01\Public\ERP_Report\WXI\Planning\Finisar - OTS for WUXI.csv
+

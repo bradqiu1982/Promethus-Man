@@ -1500,3 +1500,27 @@ Create Table [dbo].[UserProjectModuleMatrix](
     [APVal3] NVARCHAR (MAX)  DEFAULT ('') NOT NULL,
     [APVal4] DATETIME       DEFAULT ('') NOT NULL
 );
+
+CREATE TABLE [dbo].[FsrShipData] (
+    [ShipID]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[ShipQty]   FLOAT DEFAULT (0.0) NOT NULL,
+	[PN]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[ProdDesc]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[MarketFamily]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Configuration]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[VcselType]   NVARCHAR (100) DEFAULT ('') NOT NULL,
+	[ShipDate]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[CustomerNum]   NVARCHAR (100) DEFAULT ('') NOT NULL,
+	[Customer1]   NVARCHAR (300) DEFAULT ('') NOT NULL,
+	[Customer2]   NVARCHAR (300) DEFAULT ('') NOT NULL,
+	[OrderedDate]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[DelieveNum]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[Appv_1]   FLOAT DEFAULT (0.0) NOT NULL,
+	[Appv_2]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Appv_3]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Appv_4]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[Appv_5]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+	);
+
+alter table [NPITrace].[dbo].[FsrShipData] alter column DelieveNum NVARCHAR (MAX)   NOT NULL;
+alter table [NPITrace].[dbo].[FsrShipData]  add default '' for DelieveNum;

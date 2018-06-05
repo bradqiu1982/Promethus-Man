@@ -63,6 +63,7 @@ public class Upload : IHttpHandler {
                     IssueViewModels.StoreIssueAttachment(dict["issuekey"], url);
                 }
             }
+
             if (string.Compare(type, "json") != 0)
             {
                 context.Response.Write("<script>window.parent.CKEDITOR.tools.callFunction(" + CKEditorFuncNum + ", \"" + url + "\"" + ");</script>");

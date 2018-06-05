@@ -39,7 +39,21 @@ CKEDITOR.editorConfig = function( config ) {
     config.pasteFromWordRemoveFontStyles = false;
     config.ForcePasteAsPlainText = false;
     config.image_previewText = '';
-    config.filebrowserUploadUrl = '/userfiles/Upload.ashx?command=QuickUpload';
+
+    config.allowedContent = {
+        $1: {
+            // Use the ability to specify elements as an object.
+            elements: CKEDITOR.dtd,
+            attributes: true,
+            styles: true,
+            classes: true
+        }
+    };
+    config.disallowedContent = 'script; *[on*]';
+    config.pasteFilter = null;
+    config.uploadUrl = '/userfiles/Upload.ashx?command=QuickUpload&type=Files&responseType=json';
+    //config.filebrowserUploadUrl = '/userfiles/Upload.ashx?command=QuickUpload';
     config.extraPlugins = 'html5video';
+    config.extraPlugins = 'uploadfile';
 };
  

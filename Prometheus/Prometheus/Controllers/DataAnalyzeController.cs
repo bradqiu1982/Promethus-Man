@@ -77,6 +77,112 @@ namespace Prometheus.Controllers
             return pslist;
         }
 
+        public ActionResult ShipmentData()
+        {
+            return View();
+        }
+
+        ////<date,<customer,int>>
+        private object GetShipmentChartData(Dictionary<string, Dictionary<string, double>> shipdata,string rate)
+        {
+            var id = "shipdata_" + rate + "_id";
+            var shipdatelist = shipdata.Keys.ToList();
+            shipdatelist.Sort(delegate (string obj1, string obj2)
+            {
+                var d1 = DateTime.Parse(obj1 + "-01 00:00:00");
+                var d2 = DateTime.Parse(obj2 + "-01 00:00:00");
+                return d1.CompareTo(d2);
+            });
+
+            var namelist = shipdata[shipdatelist[0]].Keys.ToList();
+
+            var lastdidx = shipdatelist.Count - 1;
+            var title = shipdatelist[0] + " ~ " + shipdatelist[lastdidx] + " Shipment Distribution (" + rate + ")";
+            var xdata = new List<string>();
+            var ydata = new List<object>();
+
+            foreach (var f_item in shipdatelist)
+            {
+                xdata.Add(f_item);
+            }
+            var xAxis = new { data = xdata };
+
+            var yAxis = new
+            {
+                title = "Amount"
+            };
+
+            foreach (var name in namelist)
+            {
+                var namecnt = new List<double>();
+                foreach (var kv in shipdata)
+                {
+                    namecnt.Add(kv.Value[name]);
+                }
+
+                ydata.Add(new
+                {
+                    name = name,
+                    data = namecnt
+                });
+            }
+
+            return new
+            {
+                id = id,
+                title = title,
+                xAxis = xAxis,
+                yAxis = yAxis,
+                data = ydata
+            };
+        }
+
+        public JsonResult ShipmentDistribution()
+        {
+            var ssdate = Request.Form["sdate"];
+            var sedate = Request.Form["edate"];
+            var startdate = DateTime.Now;
+            var enddate = DateTime.Now;
+
+            if (!string.IsNullOrEmpty(ssdate) && !string.IsNullOrEmpty(sedate))
+            {
+                var sdate = DateTime.Parse(Request.Form["sdate"]);
+                var edate = DateTime.Parse(Request.Form["edate"]);
+                if (sdate < edate)
+                {
+                    startdate = DateTime.Parse(sdate.ToString("yyyy-MM") + "-01 00:00:00");
+                    enddate = DateTime.Parse(edate.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(1).AddSeconds(-1);
+                }
+                else
+                {
+                    startdate = DateTime.Parse(edate.ToString("yyyy-MM") + "-01 00:00:00");
+                    enddate = DateTime.Parse(sdate.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(1).AddSeconds(-1);
+                }
+            }
+            else
+            {
+                startdate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(-6);
+                enddate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(1).AddSeconds(-1);
+            }
+
+            //<date,<customer,int>>
+            var shipdata25g = FsrShipData.RetrieveShipDataByMonth("25G", SHIPPRODTYPE.PARALLEL, startdate.ToString("yyyy-MM-dd HH:mm:ss"), enddate.ToString("yyyy-MM-dd HH:mm:ss"), this);
+            var shipdata14g = FsrShipData.RetrieveShipDataByMonth("14G", SHIPPRODTYPE.PARALLEL, startdate.ToString("yyyy-MM-dd HH:mm:ss"), enddate.ToString("yyyy-MM-dd HH:mm:ss"), this);
+            var shipdataarray = new List<object>();
+            if (shipdata25g.Count > 0)
+            { shipdataarray.Add(GetShipmentChartData(shipdata25g,"25G")); }
+            if (shipdata14g.Count > 0)
+            { shipdataarray.Add(GetShipmentChartData(shipdata14g,"10G_14G")); }
+
+            var ret = new JsonResult();
+            ret.Data = new
+            {
+                success = true,
+                shipdataarray = shipdataarray
+            };
+            return ret;
+        }
+
         public ActionResult VcselRMA(string rate)
         {
             var defval = " ";
@@ -594,18 +700,18 @@ namespace Prometheus.Controllers
                 if (sdate < edate)
                 {
                     startdate = DateTime.Parse(sdate.ToString("yyyy-MM") + "-01 00:00:00");
-                    enddate = DateTime.Parse(edate.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(1).AddDays(-1);
+                    enddate = DateTime.Parse(edate.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(1).AddSeconds(-1);
                 }
                 else
                 {
                     startdate = DateTime.Parse(edate.ToString("yyyy-MM") + "-01 00:00:00");
-                    enddate = DateTime.Parse(sdate.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(1).AddDays(-1);
+                    enddate = DateTime.Parse(sdate.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(1).AddSeconds(-1);
                 }
             }
             else
             {
                 startdate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(-6);
-                enddate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM") + "-01 00:00:00").AddDays(-1);
+                enddate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(1).AddSeconds(-1);
             }
 
 

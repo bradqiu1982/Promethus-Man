@@ -13,76 +13,6 @@ using System.Web.Routing;
 
 namespace Prometheus.Models
 {
-
-    public class FsrShipData
-    {
-
-
-        public FsrShipData(string id, int qty, string pn, string pndesc, string family, string cfg
-            , DateTime shipdate, string custnum, string cust1, string cust2, DateTime orddate,string delievenum)
-        {
-            ShipID = id;
-            ShipQty = qty;
-            PN = pn;
-            ProdDesc = pndesc;
-            MarketFamily = family;
-            Configuration = cfg;
-            ShipDate = shipdate;
-            CustomerNum = custnum;
-            Customer1 = cust1;
-            Customer2 = cust2;
-            OrderedDate = orddate;
-            VcselType = string.Empty;
-            DelieveNum = delievenum;
-        }
-
-        public static Dictionary<string, bool> RetrieveAllShipID()
-        {
-            var ret = new Dictionary<string, bool>();
-            var sql = "select distinct ShipID from FsrShipData";
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
-            foreach (var line in dbret)
-            { ret.Add(Convert.ToString(line[0]),true); }
-            return ret;
-        }
-
-        public void StoreShipData()
-        {
-            var sql = @"insert into FsrShipData(ShipID,ShipQty,PN,ProdDesc,MarketFamily,Configuration,VcselType,ShipDate,CustomerNum,Customer1,Customer2,OrderedDate,DelieveNum) values(
-                        @ShipID,@ShipQty,@PN,@ProdDesc,@MarketFamily,@Configuration,@VcselType,@ShipDate,@CustomerNum,@Customer1,@Customer2,@OrderedDate,@DelieveNum)";
-            var dict = new Dictionary<string, string>();
-            dict.Add("@ShipID", ShipID);
-            dict.Add("@ShipQty", ShipQty.ToString());
-            dict.Add("@PN", PN);
-            dict.Add("@ProdDesc", ProdDesc);
-            dict.Add("@MarketFamily", MarketFamily);
-            dict.Add("@Configuration", Configuration);
-            dict.Add("@VcselType", VcselType);
-            dict.Add("@ShipDate", ShipDate.ToString("yyyy-MM-dd HH:mm:ss"));
-            dict.Add("@CustomerNum", CustomerNum);
-            dict.Add("@Customer1", Customer1);
-            dict.Add("@Customer2", Customer2);
-            dict.Add("@OrderedDate", OrderedDate.ToString("yyyy-MM-dd HH:mm:ss"));
-            dict.Add("@DelieveNum", DelieveNum);
-
-            DBUtility.ExeLocalSqlNoRes(sql, dict);
-        }
-
-        public string ShipID { set; get; }
-        public double ShipQty { set; get; }
-        public string PN { set; get; }
-        public string ProdDesc { set; get; }
-        public string MarketFamily { set; get; }
-        public string Configuration { set; get; }
-        public string VcselType { set; get; }
-        public DateTime ShipDate { set; get; }
-        public string CustomerNum { set; get; }
-        public string Customer1 { set; get; }
-        public string Customer2 { set; get; }
-        public DateTime OrderedDate { set; get; }
-        public string DelieveNum { set; get; }
-    }
-
     public class RMAMAPDATATYPE
     {
         public static string ATTACH = "ATTACH";
@@ -3884,7 +3814,7 @@ namespace Prometheus.Models
             return newpnsndict;
         }
 
-        public static Dictionary<string,string> PN2MPn(Dictionary<string, string> pnsndict)
+        public static Dictionary<string,string> PN2MPn(Dictionary<string, string> pnsndict,Dictionary<string,string> pnwaferdict)
         {
             var sb = new StringBuilder();
             sb.Append("('");
@@ -3911,17 +3841,22 @@ namespace Prometheus.Models
             }//end foreach
 
             var newpnsndict =  CableSN2RealSN(pnsndict);
+            pnsndict.Clear();
 
             sb = new StringBuilder();
             sb.Append("('");
             foreach (var kv in newpnsndict)
             {
+                pnsndict.Add(kv.Key, kv.Value);
+
                 if (!string.IsNullOrEmpty(kv.Value))
                 {
                     sb.Append(kv.Value + "','");
                 }
             }
             var sncond = sb.ToString(0, sb.Length - 2) + ")";
+
+            var snwaferdict = new Dictionary<string, string>();
 
             var snmpndict = BIDataUtility.RetrieveSNMaterial(sncond);
 
@@ -3932,7 +3867,8 @@ namespace Prometheus.Models
                 {
                     if (!ret.ContainsKey(pnsn.Key))
                     {
-                        ret.Add(pnsn.Key, snmpndict[pnsn.Value]);
+                        ret.Add(pnsn.Key, snmpndict[pnsn.Value].MPN);
+                        pnwaferdict.Add(pnsn.Key, snmpndict[pnsn.Value].Wafer);
                     }
                 }
             }
@@ -3957,6 +3893,29 @@ namespace Prometheus.Models
             return ret;
         }
 
+        private static string RetrieveRateFromDesc(string desc)
+        {
+            if (desc.Contains("GBPS,"))
+            {
+                try
+                {
+                    var splitstr = desc.Split(new string[] { "GBPS," }, StringSplitOptions.RemoveEmptyEntries);
+                    var xsplitstr = splitstr[0].Split(new string[] { "X" }, StringSplitOptions.RemoveEmptyEntries);
+                    var rate = Convert.ToDouble(xsplitstr[xsplitstr.Length - 1]);
+                    if (rate < 12.0)
+                    { return "10G"; }
+                    if (rate >= 12.0 && rate < 20.0)
+                    { return "14G"; }
+                    if (rate >= 20.0 && rate < 30.0)
+                    { return "25G"; }
+                    if (rate >= 30.0)
+                    { return "48G"; }
+                }
+                catch (Exception ex) { }
+            }
+            return string.Empty;
+        }
+
         public static void RefreshShipData(Controller ctrl)
         {
             var syscfg = CfgUtility.GetSysConfig(ctrl);
@@ -3973,7 +3932,7 @@ namespace Prometheus.Models
                 foreach (var line in data)
                 {
                     try {
-                        var shipid = Convert2Str(line[8]) +"-"+ Convert2Str(line[9]);
+                        var shipid = Convert2Str(line[8]) +"-"+ Convert2Str(line[9])+"-"+ Convert2Str(line[14]);
                         if (!shipiddict.ContainsKey(shipid))
                         {
                             var cpo = Convert2Str(line[5]).ToUpper();
@@ -4007,8 +3966,9 @@ namespace Prometheus.Models
                         }//end if
                     } catch (Exception ex) { }
                 }//end foreach
+                var pnwaferdict = new Dictionary<string, string>();
 
-                var pn_mpn_dict = PN2MPn(pnsndict);
+                var pn_mpn_dict = PN2MPn(pnsndict,pnwaferdict);
                 var pn_vtype_dict = PN2VType(pn_mpn_dict);
                 foreach (var item in shipdatalist)
                 {
@@ -4016,10 +3976,27 @@ namespace Prometheus.Models
                     {
                         item.VcselType = pn_vtype_dict[item.PN];
                     }
+                    if (pnsndict.ContainsKey(item.PN))
+                    {
+                        item.SN = pnsndict[item.PN];
+                    }
+                    if (pnwaferdict.ContainsKey(item.PN))
+                    {
+                        item.Wafer = pnwaferdict[item.PN];
+                    }
                 }
 
+                var storedid = new Dictionary<string, bool>();
                 foreach (var item in shipdatalist)
                 {
+                    if (storedid.ContainsKey(item.ShipID))
+                    { continue; }
+
+                    storedid.Add(item.ShipID, true);
+                    if (string.IsNullOrEmpty(item.VcselType))
+                    {
+                        item.VcselType = RetrieveRateFromDesc(item.ProdDesc.ToUpper());
+                    }
                     item.StoreShipData();
                 }
             }//end if

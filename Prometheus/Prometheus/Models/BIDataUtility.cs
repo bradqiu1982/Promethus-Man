@@ -35,6 +35,21 @@ namespace Prometheus.Models
         public string jo { set; get; }
     }
 
+    public class SNWaferData {
+        public SNWaferData(string sn, string wafer, DateTime lastdate, string mpn)
+        {
+            SN = sn;
+            Wafer = wafer;
+            LastActive = lastdate;
+            MPN = mpn;
+        }
+
+        public string SN { set; get; }
+        public string Wafer { set; get; }
+        public DateTime LastActive { set; get; }
+        public string MPN { set; get; }
+    }
+
     public class BITestResult
     {
         public BITestResult()
@@ -1957,17 +1972,30 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static Dictionary<string, string> RetrieveSNMaterial(string sncond)
+        public static Dictionary<string, SNWaferData> RetrieveSNMaterial(string sncond)
         {
-            var ret = new Dictionary<string, string>();
+            var ret = new Dictionary<string, SNWaferData>();
             var dbret = SN2Wafer(sncond);
 
             foreach (var line in dbret)
             {
                 var SN = Convert.ToString(line[0]);
+
+
+                var WaferNum = Convert.ToString(line[1]);
+                if (WaferNum.Length > 3)
+                {
+                    var fidx = WaferNum.IndexOf("-");
+                    if (fidx != -1 && WaferNum.Length >= (fidx + 3))
+                    {
+                        WaferNum = WaferNum.Substring(0, fidx + 3);
+                    }
+                }
                 var MPn = Convert.ToString(line[2]);
+                var lastactivedate = Convert.ToDateTime(line[3]);
+
                 if (!ret.ContainsKey(SN))
-                { ret.Add(SN, MPn); }
+                { ret.Add(SN, new SNWaferData(SN,WaferNum,lastactivedate,MPn)); }
             }//end foreach
             return ret;
         }

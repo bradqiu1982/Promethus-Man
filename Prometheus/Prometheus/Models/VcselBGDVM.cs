@@ -1119,6 +1119,12 @@ namespace Prometheus.Models
     }
 
     public class FailureColumnSeg{
+        public FailureColumnSeg()
+        {
+            name = string.Empty;
+            y = 0.0;
+            color = string.Empty;
+        }
         public string name { set; get; }
         public double y { set; get; }
         public string color { set; get; }

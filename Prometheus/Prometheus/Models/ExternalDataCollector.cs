@@ -1339,6 +1339,127 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
+        public static Dictionary<string, int> RetrieveRMACntByMonth(string sdate, string edate, string rate)
+        {
+            var ret = new Dictionary<string, int>();
+            var sql = "select AppV_AC from RMABackupData where AppV_AC >= @sdate and AppV_AC <=@edate ";
+
+            if (string.Compare(rate, VCSELRATE.r14G, true) == 0)
+            { sql = sql + " and ( AppV_AH = '" + VCSELRATE.r14G + "' or AppV_AH = '" + VCSELRATE.r10G + "')"; }
+            else
+            { sql = sql + " and AppV_AH = '" + rate + "'"; }
+
+            var dict = new Dictionary<string, string>();
+            dict.Add("@sdate", sdate);
+            dict.Add("@edate", edate);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, dict);
+            foreach (var line in dbret)
+            {
+                var m = Convert.ToDateTime(line[0]).ToString("yyyy-MM");
+                if (ret.ContainsKey(m))
+                {
+                    ret[m] = ret[m] + 1;
+                }
+                else
+                {
+                    ret.Add(m, 1);
+                }
+            }
+            return ret;
+        }
+
+        public static void UpdateRMABackUPDataRate()
+        {
+            var orginalsndict = new Dictionary<string, string>();
+            var sql = "select distinct AppV_I from [NPITrace].[dbo].[RMABackupData] where len(AppV_I) = 7 and AppV_AH = ''";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var sn = Convert.ToString(line[0]);
+                orginalsndict.Add(sn, sn);
+            }
+
+            if (orginalsndict.Count == 0)
+            { return; }
+
+            var sb = new StringBuilder();
+            sb.Append("('");
+            foreach (var kv in orginalsndict)
+            {
+                if (!string.IsNullOrEmpty(kv.Value))
+                {
+                    sb.Append(kv.Value + "','");
+                }
+            }
+            var sncond = sb.ToString(0, sb.Length - 2) + ")";
+
+            var subsndict = new Dictionary<string, string>();
+            sql = @"SELECT  max([FromContainer]),ToContainer
+                        FROM [PDMS].[dbo].[ComponentIssueSummary] where ToContainer in <sncond> and len([FromContainer]) = 7 group by ToContainer";
+            sql = sql.Replace("<sncond>", sncond);
+            dbret = DBUtility.ExeMESReportSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                var tosn = Convert.ToString(line[1]);
+                var fromsn = Convert.ToString(line[0]);
+                if (!subsndict.ContainsKey(tosn))
+                {
+                    subsndict.Add(tosn, fromsn);
+                }
+            }
+
+            var orignalsnlist = orginalsndict.Keys.ToList();
+            foreach (var s in orignalsnlist)
+            {
+                if (subsndict.ContainsKey(s))
+                {
+                    orginalsndict[s] = subsndict[s];
+                }
+            }
+
+            sb = new StringBuilder();
+            sb.Append("('");
+            foreach (var kv in orginalsndict)
+            {
+                if (!string.IsNullOrEmpty(kv.Value))
+                {
+                    sb.Append(kv.Value + "','");
+                }
+            }
+            sncond = sb.ToString(0, sb.Length - 2) + ")";
+
+            var snmpndict = BIDataUtility.RetrieveSNMaterial(sncond);
+            if (snmpndict.Count == 0)
+            { return; }
+
+            var newsnmpndict = new Dictionary<string, string>();
+            foreach (var kv in orginalsndict)
+            {
+                if (snmpndict.ContainsKey(kv.Value))
+                { newsnmpndict.Add(kv.Key, snmpndict[kv.Value].MPN); }
+            }
+
+            var snratedict = new Dictionary<string, string>();
+            var pnratedict = VcselPNData.RetrieveVcselPNInfo();
+            foreach (var kv in newsnmpndict)
+            {
+                if (pnratedict.ContainsKey(kv.Value))
+                {
+                    snratedict.Add(kv.Key, pnratedict[kv.Value].Rate);
+                }
+            }
+
+            sql = "update RMABackupData set AppV_AH = @rate where AppV_I = @sn";
+            var sdict = new Dictionary<string, string>();
+            foreach (var kv in snratedict)
+            {
+                sdict.Clear();
+                sdict.Add("@sn", kv.Key);
+                sdict.Add("@rate", kv.Value);
+                DBUtility.ExeLocalSqlNoRes(sql, sdict);
+            }
+        }
+
         #endregion
 
         #region IQC

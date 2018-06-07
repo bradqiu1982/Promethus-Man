@@ -83,7 +83,7 @@ namespace Prometheus.Controllers
         }
 
         ////<date,<customer,int>>
-        private object GetShipmentChartData(Dictionary<string, Dictionary<string, double>> shipdata,Dictionary<string,int> rmacntdict, string rate)
+        private object GetShipmentChartData(Dictionary<string, Dictionary<string, double>> shipdata,Dictionary<string,int> vcselrmacntdict, Dictionary<string, int> allrmacntdict, string rate)
         {
             var id = "shipdata_" + rate + "_id";
             var shipdatelist = shipdata.Keys.ToList();
@@ -141,9 +141,9 @@ namespace Prometheus.Controllers
             var ddata = new List<double>();
             foreach (var x in shipdatelist)
             {
-                if (rmacntdict.ContainsKey(x))
+                if (vcselrmacntdict.ContainsKey(x))
                 {
-                    ddata.Add(Math.Round((double)rmacntdict[x] / datecntdict[x] * 1000000, 0));
+                    ddata.Add(Math.Round((double)vcselrmacntdict[x] / datecntdict[x] * 1000000, 0));
                 }
                 else
                 {
@@ -153,6 +153,26 @@ namespace Prometheus.Controllers
             ydata.Add(new
             {
                 name = "VCSEL RMA DPPM",
+                type = "line",
+                data = ddata,
+                yAxis = 1
+            });
+
+            ddata = new List<double>();
+            foreach (var x in shipdatelist)
+            {
+                if (allrmacntdict.ContainsKey(x))
+                {
+                    ddata.Add(Math.Round((double)allrmacntdict[x] / datecntdict[x] * 1000000, 0));
+                }
+                else
+                {
+                    ddata.Add(0.0);
+                }
+            }
+            ydata.Add(new
+            {
+                name = "ALL RMA DPPM",
                 type = "line",
                 data = ddata,
                 yAxis = 1
@@ -202,13 +222,15 @@ namespace Prometheus.Controllers
             var shipdataarray = new List<object>();
             if (shipdata25g.Count > 0)
             {
-                var rmacntdict = VcselRMAData.RetrieveRMACntByMonth(startdate.ToString("yyyy-MM-dd HH:mm:ss"), enddate.ToString("yyyy-MM-dd HH:mm:ss"), VCSELRATE.r25G);
-                shipdataarray.Add(GetShipmentChartData(shipdata25g, rmacntdict, VCSELRATE.r25G));
+                var vcselrmacntdict = VcselRMAData.RetrieveRMACntByMonth(startdate.ToString("yyyy-MM-dd HH:mm:ss"), enddate.ToString("yyyy-MM-dd HH:mm:ss"), VCSELRATE.r25G);
+                var allrmacntdict = ExternalDataCollector.RetrieveRMACntByMonth(startdate.ToString("yyyy-MM-dd HH:mm:ss"), enddate.ToString("yyyy-MM-dd HH:mm:ss"), VCSELRATE.r25G);
+                shipdataarray.Add(GetShipmentChartData(shipdata25g, vcselrmacntdict, allrmacntdict, VCSELRATE.r25G));
             }
             if (shipdata14g.Count > 0)
             {
-                var rmacntdict = VcselRMAData.RetrieveRMACntByMonth(startdate.ToString("yyyy-MM-dd HH:mm:ss"), enddate.ToString("yyyy-MM-dd HH:mm:ss"), VCSELRATE.r14G);
-                shipdataarray.Add(GetShipmentChartData(shipdata14g, rmacntdict, "10G_14G"));
+                var vcselrmacntdict = VcselRMAData.RetrieveRMACntByMonth(startdate.ToString("yyyy-MM-dd HH:mm:ss"), enddate.ToString("yyyy-MM-dd HH:mm:ss"), VCSELRATE.r14G);
+                var allrmacntdict = ExternalDataCollector.RetrieveRMACntByMonth(startdate.ToString("yyyy-MM-dd HH:mm:ss"), enddate.ToString("yyyy-MM-dd HH:mm:ss"), VCSELRATE.r25G);
+                shipdataarray.Add(GetShipmentChartData(shipdata14g, vcselrmacntdict, allrmacntdict, "10G_14G"));
             }
 
             var ret = new JsonResult();

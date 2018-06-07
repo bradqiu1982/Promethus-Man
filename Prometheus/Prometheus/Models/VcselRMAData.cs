@@ -125,10 +125,10 @@ namespace Prometheus.Models
             var ret = new Dictionary<string, int>();
             var sql = "select ShipDate from VcselRMAData where ShipDate >= @sdate and ShipDate <=@edate ";
 
-            if (string.Compare(rate, VCSELRATE.r25G, true) == 0)
-            { sql = sql + " and VcselType = '"+ VCSELRATE.r25G + "'"; }
+            if (string.Compare(rate, VCSELRATE.r14G, true) == 0)
+            { sql = sql + " and ( VcselType = '" + VCSELRATE.r14G + "' or VcselType = '" + VCSELRATE.r10G + "')"; }
             else
-            { sql = sql + " and VcselType <> '"+ VCSELRATE.r25G + "' and VcselType <> ''"; }
+            { sql = sql + " and VcselType = '" + rate + "'"; }
 
             var dict = new Dictionary<string, string>();
             dict.Add("@sdate", sdate);

@@ -24,6 +24,13 @@
             })
         })
 
+        $('body').on('click', '#btn-download', function () {
+            var sdate = $.trim($('#sdate').val());
+            var edate = $.trim($('#edate').val());
+            var myurl = '/DataAnalyze/DownloadShipmentData?sdate=' + sdate + '&edate=' + edate;
+            window.open(myurl, '_blank');
+        })
+        
     }
 
     var drawcolumn = function (col_data) {
@@ -86,7 +93,7 @@
                             var outputCSV = ' ,Customer,Ship QTY\r\n';
                             $(col_data.xAxis.data).each(function (i, val) {
                                 $(col_data.data).each(function () {
-                                    if (this.name != '' && this.data[i] != 0) {
+                                    if (this.name != '' && (this.data[i] != 0 || this.name.indexOf('DPPM')>=0)) {
                                         outputCSV += val + "," + this.name + "," + this.data[i] + ",\r\n";
                                     }
                                 });

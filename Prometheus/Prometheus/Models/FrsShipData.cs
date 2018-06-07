@@ -106,10 +106,11 @@ namespace Prometheus.Models
             var ret = new Dictionary<string, Dictionary<string, double>>();
             var custdict = CfgUtility.GetShipCustConfig(ctrl, producttype);
             var sql = @"select ShipQty,Customer1,Customer2,ShipDate from FsrShipData where ShipDate >= @sdate and ShipDate <= @edate and Configuration = @producttype ";
-            if (string.Compare(rate, VCSELRATE.r25G, true) == 0)
-            { sql = sql + " and VcselType = '"+ VCSELRATE.r25G + "'"; }
+            
+            if(string.Compare(rate, VCSELRATE.r14G, true) == 0)
+            { sql = sql + " and ( VcselType = '"+ VCSELRATE.r14G + "' or VcselType = '"+ VCSELRATE.r10G + "')"; }
             else
-            { sql = sql + " and VcselType <> '"+ VCSELRATE.r25G + "' and VcselType <> ''"; }
+            { sql = sql + " and VcselType = '"+ rate + "'"; }
 
             var dict = new Dictionary<string, string>();
             dict.Add("@sdate", sdate);
@@ -158,6 +159,35 @@ namespace Prometheus.Models
                         custcntdict.Add(c, 0.0);
                     }
                 }
+            }
+
+            return ret;
+        }
+
+        public static List<FsrShipData> RetrieveAllShipDataByMonth(string sdate, string edate, Controller ctrl)
+        {
+            var ret = new List<FsrShipData>();
+            var custdict = CfgUtility.GetAllCustConfig(ctrl);
+            var sql = @"select ShipID,ShipQty,PN,ProdDesc,MarketFamily,Configuration,ShipDate,CustomerNum,Customer1,Customer2,OrderedDate,DelieveNum,VcselType
+                         from FsrShipData where ShipDate >= @sdate and ShipDate <= @edate order by ShipDate ASC";
+
+            var dict = new Dictionary<string, string>();
+            dict.Add("@sdate", sdate);
+            dict.Add("@edate", edate);
+
+            var realcustdict = new Dictionary<string, bool>();
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, dict);
+            foreach (var line in dbret)
+            {
+                var cust1 = Convert.ToString(line[8]).ToUpper();
+                var cust2 = Convert.ToString(line[9]).ToUpper();
+                var realcust = RetrieveCustome(cust1, cust2, custdict);
+                var tempvm = new FsrShipData(Convert.ToString(line[0]), Convert.ToInt32(line[1]), Convert.ToString(line[2])
+                    , Convert.ToString(line[3]), Convert.ToString(line[4]), Convert.ToString(line[5])
+                    , Convert.ToDateTime(line[6]), Convert.ToString(line[7]), realcust
+                    , Convert.ToString(line[9]), Convert.ToDateTime(line[10]), Convert.ToString(line[11]));
+                tempvm.VcselType = Convert.ToString(line[12]);
+                ret.Add(tempvm);
             }
 
             return ret;

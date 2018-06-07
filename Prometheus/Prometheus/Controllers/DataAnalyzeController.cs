@@ -108,7 +108,7 @@ namespace Prometheus.Controllers
             var namelist = shipdata[shipdatelist[0]].Keys.ToList();
 
             var lastdidx = shipdatelist.Count - 1;
-            var title = shipdatelist[0] + " ~ " + shipdatelist[lastdidx] + " Shipment Distribution (" + rate + ")";
+            var title = shipdatelist[0] + " ~ " + shipdatelist[lastdidx] + " Shipment Distribution vs DPPM (" + rate + ")";
             var xdata = new List<string>();
             var ydata = new List<object>();
 
@@ -152,7 +152,7 @@ namespace Prometheus.Controllers
             }
             ydata.Add(new
             {
-                name = "DPPM",
+                name = "VCSEL RMA DPPM",
                 type = "line",
                 data = ddata,
                 yAxis = 1
@@ -218,6 +218,69 @@ namespace Prometheus.Controllers
                 shipdataarray = shipdataarray
             };
             return ret;
+        }
+
+        private void PrepareShipmentData(System.IO.FileStream fw, string ssdate, string sedate)
+        {
+            var startdate = DateTime.Now;
+            var enddate = DateTime.Now;
+
+            if (!string.IsNullOrEmpty(ssdate) && !string.IsNullOrEmpty(sedate))
+            {
+                var sdate = DateTime.Parse(ssdate);
+                var edate = DateTime.Parse(sedate);
+                if (sdate < edate)
+                {
+                    startdate = DateTime.Parse(sdate.ToString("yyyy-MM") + "-01 00:00:00");
+                    enddate = DateTime.Parse(edate.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(1).AddSeconds(-1);
+                }
+                else
+                {
+                    startdate = DateTime.Parse(edate.ToString("yyyy-MM") + "-01 00:00:00");
+                    enddate = DateTime.Parse(sdate.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(1).AddSeconds(-1);
+                }
+            }
+            else
+            {
+                startdate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(-6);
+                enddate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM") + "-01 00:00:00").AddMonths(1).AddSeconds(-1);
+            }
+
+            var shipdata = FsrShipData.RetrieveAllShipDataByMonth(startdate.ToString("yyyy-MM-dd HH:mm:ss"), enddate.ToString("yyyy-MM-dd HH:mm:ss"), this);
+            var sb = new StringBuilder(shipdata.Count*200);
+            sb.Append("ShipID,ShipQty,PN,ProdDesc,MarketFamily,Configuration,ShipDate,CustomerNum,Customer1,Customer2,OrderedDate,DelieveNum,VcselType,\r\n");
+            foreach (var item in shipdata)
+            {
+                sb.Append("\"" + item.ShipID.Replace("\"", "") + "\"," + "\"" + item.ShipQty.ToString().Replace("\"", "") + "\"," + "\"" + item.PN.Replace("\"", "") + "\","
+                    + "\"" + item.ProdDesc.Replace("\"", "") + "\"," + "\"" + item.MarketFamily.Replace("\"", "") + "\"," + "\"" + item.Configuration.Replace("\"", "") + "\"," 
+                    + "\"" + item.ShipDate.ToString("yyyy-MM-dd HH:mm:ss").Replace("\"", "") + "\"," + "\"" + item.CustomerNum.Replace("\"", "") 
+                    + "\"," + "\"" + item.Customer1.Replace("\"", "") + "\"," + "\"" + item.Customer2.Replace("\"", "") + "\","
+                    + "\"" + item.OrderedDate.ToString("yyyy-MM-dd HH:mm:ss").Replace("\"", "") + "\"," + "\"" + item.DelieveNum.Replace("\"", "") + "\"," 
+                    + "\"" + item.VcselType.Replace("\"", "") + "\",\r\n");
+            }
+
+            var bt = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+            fw.Write(bt, 0, bt.Count());
+            sb.Clear();
+        }
+
+        public ActionResult DownloadShipmentData(string sdate,string edate)
+        {
+            string datestring = DateTime.Now.ToString("yyyyMMdd");
+            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+            if (!System.IO.Directory.Exists(imgdir))
+            {
+                System.IO.Directory.CreateDirectory(imgdir);
+            }
+
+            var fn = "shipment_"+sdate+"-"+edate+"_" + "_data_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+            var filename = imgdir + fn;
+
+            var fw = System.IO.File.OpenWrite(filename);
+            PrepareShipmentData(fw,sdate,edate);
+            fw.Close();
+
+            return File(filename, "application/vnd.ms-excel", fn);
         }
 
         public ActionResult VcselRMA(string rate)

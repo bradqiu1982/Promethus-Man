@@ -152,7 +152,7 @@ namespace Prometheus.Controllers
                         {
                             if (Rate.ToUpper().Contains("28G"))
                             {
-                                VcselPNData.UpdateVPnInfo(PN, "25G", CH);
+                                VcselPNData.UpdateVPnInfo(PN, VCSELRATE.r25G, CH);
                             }
                             else
                             {

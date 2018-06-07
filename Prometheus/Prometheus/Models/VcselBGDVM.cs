@@ -7,6 +7,13 @@ using System.Web.Mvc;
 
 namespace Prometheus.Models
 {
+    public class VCSELRATE {
+        public static string r25G = "25G";
+        public static string r10G = "10G";
+        public static string r14G = "14G";
+        public static string r48G = "48G";
+    }
+
     public class VcselPNData
     {
         public VcselPNData()

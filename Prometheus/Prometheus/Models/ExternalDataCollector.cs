@@ -3903,13 +3903,13 @@ namespace Prometheus.Models
                     var xsplitstr = splitstr[0].Split(new string[] { "X" }, StringSplitOptions.RemoveEmptyEntries);
                     var rate = Convert.ToDouble(xsplitstr[xsplitstr.Length - 1]);
                     if (rate < 12.0)
-                    { return "10G"; }
+                    { return VCSELRATE.r10G; }
                     if (rate >= 12.0 && rate < 20.0)
-                    { return "14G"; }
+                    { return VCSELRATE.r14G; }
                     if (rate >= 20.0 && rate < 30.0)
-                    { return "25G"; }
+                    { return VCSELRATE.r25G; }
                     if (rate >= 30.0)
-                    { return "48G"; }
+                    { return VCSELRATE.r48G; }
                 }
                 catch (Exception ex) { }
             }

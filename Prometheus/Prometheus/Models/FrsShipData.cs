@@ -105,11 +105,11 @@ namespace Prometheus.Models
         {
             var ret = new Dictionary<string, Dictionary<string, double>>();
             var custdict = CfgUtility.GetShipCustConfig(ctrl, producttype);
-            var sql = @"select ShipQty,Customer1,Customer2,ShipDate from FsrShipData where ShipDate >= @sdate && ShipDate <= @edate and Configuration = @producttype ";
-            if (string.Compare(rate, "25G", true) == 0)
-            { sql = sql + " and VcselType = '25G'"; }
+            var sql = @"select ShipQty,Customer1,Customer2,ShipDate from FsrShipData where ShipDate >= @sdate and ShipDate <= @edate and Configuration = @producttype ";
+            if (string.Compare(rate, VCSELRATE.r25G, true) == 0)
+            { sql = sql + " and VcselType = '"+ VCSELRATE.r25G + "'"; }
             else
-            { sql = sql + " and VcselType <> '25G' and VcselType <> ''"; }
+            { sql = sql + " and VcselType <> '"+ VCSELRATE.r25G + "' and VcselType <> ''"; }
 
             var dict = new Dictionary<string, string>();
             dict.Add("@sdate", sdate);

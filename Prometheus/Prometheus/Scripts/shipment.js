@@ -14,7 +14,7 @@
                     var appendstr = "";
 
                     $.each(output.shipdataarray, function (i, val) {
-                        appendstr = '<div class="col-xs-6">' +
+                        appendstr = '<div class="col-xs-12">' +
                                '<div class="v-box" id="' + val.id + '"></div>' +
                                '</div>';
                         $('.v-content').append(appendstr);
@@ -41,15 +41,27 @@
             legend: {
                 enabled: true,
             },
-            yAxis: {
+            yAxis: [{
                 title: {
                     text: col_data.yAxis.title
+                },
+                stackLabels: {
+                    enabled: true,
+                    style: {
+                        fontWeight: 'bold',
+                        color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                    }
                 }
-            },
+            }, {
+                opposite: true,
+                title: {
+                    text: 'DPPM'
+                }
+            }],
             tooltip: {
                 headerFormat: '',
                 pointFormatter: function () {
-                    return (this.y == 0) ? '' : '<span>' + this.name + '</span>: <b>' + this.y + '%</b><br/>';
+                    return (this.y == 0) ? '' : '<span>' + this.series.name + '</span>: <b>' + this.y + '</b><br/>';
                 },
                 shared: true
             },
@@ -74,8 +86,8 @@
                             var outputCSV = ' ,Customer,Ship QTY\r\n';
                             $(col_data.xAxis.data).each(function (i, val) {
                                 $(col_data.data).each(function () {
-                                    if (this.data[i].name != '' && this.data[i].y != 0) {
-                                        outputCSV += val + "," + this.data[i].name + "," + this.data[i].y + ",\r\n";
+                                    if (this.name != '' && this.data[i] != 0) {
+                                        outputCSV += val + "," + this.name + "," + this.data[i] + ",\r\n";
                                     }
                                 });
                             })

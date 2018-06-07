@@ -103,7 +103,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static Dictionary<string, int> RetriveWaferCountDict()
+        public static Dictionary<string, int> RetrieveWaferCountDict()
         {
             var ret = new Dictionary<string, int>();
             var sql = "select count(*) as cnt,Wafer from VcselRMAData group by Wafer";
@@ -115,6 +115,35 @@ namespace Prometheus.Models
                 if (!ret.ContainsKey(wafer))
                 {
                     ret.Add(wafer, cnt);
+                }
+            }
+            return ret;
+        }
+
+        public static Dictionary<string, int> RetrieveRMACntByMonth(string sdate, string edate,string rate)
+        {
+            var ret = new Dictionary<string, int>();
+            var sql = "select ShipDate from VcselRMAData where ShipDate >= @sdate and ShipDate <=@edate ";
+
+            if (string.Compare(rate, VCSELRATE.r25G, true) == 0)
+            { sql = sql + " and VcselType = '"+ VCSELRATE.r25G + "'"; }
+            else
+            { sql = sql + " and VcselType <> '"+ VCSELRATE.r25G + "' and VcselType <> ''"; }
+
+            var dict = new Dictionary<string, string>();
+            dict.Add("@sdate", sdate);
+            dict.Add("@edate", edate);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, dict);
+            foreach (var line in dbret)
+            {
+                var m = Convert.ToDateTime(line[0]).ToString("yyyy-MM");
+                if (ret.ContainsKey(m))
+                {
+                    ret[m] = ret[m] + 1;
+                }
+                else
+                {
+                    ret.Add(m, 1);
                 }
             }
             return ret;
@@ -418,7 +447,7 @@ namespace Prometheus.Models
             var ret = new List<VcselRMADPPM>();
 
             var wlist = VcselRMAData.RetrieveDistinctWaferListASC(rate);
-            var rmacntdict = VcselRMAData.RetriveWaferCountDict();
+            var rmacntdict = VcselRMAData.RetrieveWaferCountDict();
             var wafercntdict = WaferSNMap.RetriveWaferCountDict();
             foreach (var w in wlist)
             {

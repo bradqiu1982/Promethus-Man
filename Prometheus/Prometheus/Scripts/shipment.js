@@ -75,6 +75,52 @@
             plotOptions: {
                 column: {
                     stacking: 'normal'
+                },
+                series: {
+                    cursor: 'pointer',
+                    events: {
+                        click: function (event) {
+                            var datestr = event.point.category;
+                            var rate = col_data.rate
+                            $('#waferval').html(datestr);
+                            //$('#waferyield').attr('href', '/DataAnalyze/WaferDistribution?defaultwafer=' + wafer);
+                            //$('#wafertestdata').attr('href', '/DataAnalyze/DownLoadWafer?wf_no=' + wafer);
+                            $.post('/DataAnalyze/RetrieveVcselRMARawDataByMonth',
+                                {
+                                    datestr: datestr,
+                                    rate:rate
+                                },
+                                function (outputdata) {
+                                    $('#ramrawbody').empty();
+                                    $.each(outputdata.waferdatalist, function (i, val) {
+                                        var rmalink = '<td> </td>';
+                                        if (val.IssueKey != '') {
+                                            rmalink = '<td><a href="/Issue/UpdateIssue?issuekey=' + val.IssueKey + '" target="_blank" >Report</a></td>'
+                                        }
+                                        var waferlink = '<td> </td>';
+                                        if (val.Wafer != '')
+                                        {
+                                            waferlink = '<td><a href="/DataAnalyze/WaferDistribution?defaultwafer=' + val.Wafer + '" target="_blank" >' + val.Wafer + '</a></td>'
+                                        }
+                                        var appendstr = '<tr>' +
+                                            '<td>' + (i + 1) + '</td>' +
+                                            '<td>' + val.SN + '</td>' +
+                                            '<td>' + val.PN + '</td>' +
+                                            waferlink +
+                                            '<td>' + val.VcselType + '</td>' +
+                                            '<td>' + val.ProductType + '</td>' +
+                                            '<td>' + val.ShipDate + '</td>' +
+                                            '<td>' + val.RMAOpenDate + '</td>' +
+                                            '<td>' + val.Customer + '</td>' +
+                                            rmalink
+                                            + '</tr>';
+                                        $('#ramrawbody').append(appendstr);
+                                    });
+                                    $('#rmarawdata').modal('show')
+                                })
+
+                        }
+                    }
                 }
             },
             series: col_data.data,

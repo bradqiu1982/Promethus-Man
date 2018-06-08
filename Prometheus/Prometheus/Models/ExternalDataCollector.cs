@@ -817,6 +817,8 @@ namespace Prometheus.Models
 
             var sixmonthago = DateTime.Now.AddMonths(-6);
 
+            var alldata = new List<RMARAWData>();
+
             var idx = 0;
             foreach (var line in data)
             {
@@ -833,16 +835,9 @@ namespace Prometheus.Models
                             {
                                 continue;
                             }
-                        }
 
-                        foreach (var rawdata in rmarawdatas)
-                        {
-                            UpdateRMAData(rawdata);
-                            Try2CreateRMA(rawdata, rmaissuedict, allpjdict,ctrl);
-                        }
+                            alldata.AddRange(rmarawdatas);
 
-                        if (rmarawdatas.Count > 0)
-                        {
                             if (solvedrmanum.ContainsKey(rmarawdatas[0].AppV_B))
                             {
                                 continue;
@@ -855,6 +850,26 @@ namespace Prometheus.Models
                 }//end if
                 idx = idx + 1;
             }//foreach
+
+            var csnfsndict = new Dictionary<string, string>();
+            foreach (var rawdata in alldata)
+            {
+                if (!csnfsndict.ContainsKey(rawdata.AppV_I))
+                { csnfsndict.Add(rawdata.AppV_I, rawdata.AppV_I); }
+            }
+
+            var newcsnfsndict = ConvertCSN2FSN(csnfsndict);
+
+            foreach (var rawdata in alldata)
+            {
+                if (newcsnfsndict.ContainsKey(rawdata.AppV_I))
+                {
+                    rawdata.AppV_I = newcsnfsndict[rawdata.AppV_I];
+                }
+                UpdateRMAData(rawdata);
+                Try2CreateRMA(rawdata, rmaissuedict, allpjdict,ctrl);
+            }
+
         }
 
         private static void StoreRMAAttachs(string rmacloseattachfolder,string RMANum, Dictionary<string, Dictionary<string, bool>> rmaattaches,Controller ctrl)
@@ -1457,6 +1472,63 @@ namespace Prometheus.Models
                 sdict.Add("@sn", kv.Key);
                 sdict.Add("@rate", kv.Value);
                 DBUtility.ExeLocalSqlNoRes(sql, sdict);
+            }
+        }
+
+        private static Dictionary<string, string> ConvertCSN2FSN(Dictionary<string, string> originalsndict)
+        {
+            var sb = new StringBuilder();
+            sb.Append("('");
+            foreach (var kv in originalsndict)
+            {
+                if (!string.IsNullOrEmpty(kv.Value))
+                {
+                    sb.Append(kv.Value + "','");
+                }
+            }
+            var sncond = sb.ToString(0, sb.Length - 2) + ")";
+
+            var sql = "SELECT ContainerName,CustomerSerialNum FROM Container where CustomerSerialNum in <sncond>";
+            sql = sql.Replace("<sncond>", sncond);
+            var dbret = DBUtility.ExeMESSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                var csn = Convert.ToString(line[1]);
+                var fsn = Convert.ToString(line[0]);
+                if (originalsndict.ContainsKey(csn))
+                {
+                    originalsndict[csn] = fsn;
+                }
+            }
+            return originalsndict;
+        }
+
+        public static void UpdateRMABackUPSN()
+        {
+            var orginalsndict = new Dictionary<string, string>();
+            var sql = "select distinct AppV_I from [NPITrace].[dbo].[RMABackupData] where AppV_AH = ''";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var sn = Convert.ToString(line[0]);
+                orginalsndict.Add(sn, sn);
+            }
+
+            if (orginalsndict.Count == 0)
+            { return; }
+
+            var csnfsndict = ConvertCSN2FSN(orginalsndict);
+            sql = "update RMABackupData set AppV_I = @fsn where AppV_I = @csn";
+            var sdict = new Dictionary<string, string>();
+            foreach (var kv in csnfsndict)
+            {
+                sdict.Clear();
+                if (string.Compare(kv.Key, kv.Value, true) != 0)
+                {
+                    sdict.Add("@csn", kv.Key);
+                    sdict.Add("@fsn", kv.Value);
+                    DBUtility.ExeLocalSqlNoRes(sql, sdict);
+                }
             }
         }
 

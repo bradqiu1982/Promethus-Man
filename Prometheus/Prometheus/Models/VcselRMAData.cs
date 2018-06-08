@@ -103,6 +103,65 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static List<VcselRMAData> RetrieveWaferRawDataByMonth(string sdate,string edate,string rate)
+        {
+            var ret = new List<VcselRMAData>();
+            var sql = "select SN,BuildDate,Wafer,PN,PNDesc,VcselPN,VcselType,ProductType,ShipDate,RMAOpenDate,RMANum,Customer from VcselRMAData where ShipDate >= @sdate and ShipDate <= @edate ";
+            if (rate.Contains(VCSELRATE.r14G))
+            { sql = sql + " and ( VcselType = '" + VCSELRATE.r14G + "' or VcselType = '" + VCSELRATE.r10G + "')"; }
+            else
+            { sql = sql + " and VcselType = '" + rate + "'"; }
+
+            var dict = new Dictionary<string, string>();
+            dict.Add("@sdate", sdate);
+            dict.Add("@edate", edate);
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, dict);
+            foreach (var line in dbret)
+            {
+                var tempvm = new VcselRMAData();
+                tempvm.SN = Convert.ToString(line[0]);
+                tempvm.BuildDate = Convert.ToDateTime(line[1]);
+                tempvm.Wafer = Convert.ToString(line[2]);
+
+                tempvm.PN = Convert.ToString(line[3]);
+                tempvm.PNDesc = Convert.ToString(line[4]);
+                tempvm.VcselPN = Convert.ToString(line[5]);
+                tempvm.VcselType = Convert.ToString(line[6]);
+
+                tempvm.ProductType = Convert.ToString(line[7]);
+                tempvm.ShipDate = Convert.ToString(line[8]);
+                tempvm.RMAOpenDate = Convert.ToString(line[9]);
+                tempvm.RMANum = Convert.ToString(line[10]);
+                tempvm.Customer = Convert.ToString(line[11]);
+
+                ret.Add(tempvm);
+            }
+
+            if (ret.Count > 0)
+            {
+                var sncond = "('";
+                foreach (var item in ret)
+                {
+                    if (!string.IsNullOrEmpty(item.SN))
+                    {
+                        sncond = sncond + item.SN + "','";
+                    }
+                }
+                sncond = sncond.Substring(0, sncond.Length - 2) + ")";
+                var snkeydict = IssueViewModels.RetrieveIssueBySNs(sncond);
+                foreach (var item in ret)
+                {
+                    if (snkeydict.ContainsKey(item.SN))
+                    {
+                        item.IssueKey = snkeydict[item.SN];
+                    }
+                }
+            }
+
+            return ret;
+        }
+
         public static Dictionary<string, int> RetrieveWaferCountDict()
         {
             var ret = new Dictionary<string, int>();

@@ -158,25 +158,25 @@ namespace Prometheus.Controllers
                 yAxis = 1
             });
 
-            ddata = new List<double>();
-            foreach (var x in shipdatelist)
-            {
-                if (allrmacntdict.ContainsKey(x))
-                {
-                    ddata.Add(Math.Round((double)allrmacntdict[x] / datecntdict[x] * 1000000, 0));
-                }
-                else
-                {
-                    ddata.Add(0.0);
-                }
-            }
-            ydata.Add(new
-            {
-                name = "ALL RMA DPPM",
-                type = "line",
-                data = ddata,
-                yAxis = 1
-            });
+            //ddata = new List<double>();
+            //foreach (var x in shipdatelist)
+            //{
+            //    if (allrmacntdict.ContainsKey(x))
+            //    {
+            //        ddata.Add(Math.Round((double)allrmacntdict[x] / datecntdict[x] * 1000000, 0));
+            //    }
+            //    else
+            //    {
+            //        ddata.Add(0.0);
+            //    }
+            //}
+            //ydata.Add(new
+            //{
+            //    name = "ALL RMA DPPM",
+            //    type = "line",
+            //    data = ddata,
+            //    yAxis = 1
+            //});
 
             return new
             {
@@ -184,7 +184,8 @@ namespace Prometheus.Controllers
                 title = title,
                 xAxis = xAxis,
                 yAxis = yAxis,
-                data = ydata
+                data = ydata,
+                rate = rate
             };
         }
 
@@ -405,6 +406,18 @@ namespace Prometheus.Controllers
         {
             var wafer = Request.Form["wafer"];
             var waferdatalist = VcselRMAData.RetrieveWaferRawData(wafer);
+            var ret = new JsonResult();
+            ret.Data = new { waferdatalist = waferdatalist };
+            return ret;
+        }
+
+        public JsonResult RetrieveVcselRMARawDataByMonth()
+        {
+            var datestr = Request.Form["datestr"];
+            var rate = Request.Form["rate"];
+            var sdate = datestr + "-01 00:00:00";
+            var edate = DateTime.Parse(sdate).AddMonths(1).AddSeconds(-1).ToString("yyyy-MM-dd HH:mm:ss");
+            var waferdatalist = VcselRMAData.RetrieveWaferRawDataByMonth(sdate, edate, rate);
             var ret = new JsonResult();
             ret.Data = new { waferdatalist = waferdatalist };
             return ret;

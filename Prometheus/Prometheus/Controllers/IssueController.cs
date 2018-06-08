@@ -1874,15 +1874,18 @@ namespace Prometheus.Controllers
                 if (string.Compare(originaldata.Resolution, Request.Form["resolutionlist"].ToString(), true) != 0
                     && IssueClosed(Request.Form["resolutionlist"].ToString()))
                 {
-                    if ((originaldata.RootCauseCommentList.Count > 0
-                        && originaldata.RootCauseCommentList[0].Comment.Contains(IssueCommentEmpty.TOBEEDIT)
-                        && originaldata.RootCauseCommentList[0].Comment.Length < 30
-                        )
-                        || (originaldata.RootCauseCommentList.Count == 0))
+                    if (string.IsNullOrEmpty(Request.Form["rootcauseeditor"]))
                     {
-                        closeauth = false;
-                        SetNoticeInfo("To close bug, root cause is necessary!");
-                    }
+                        if ((originaldata.RootCauseCommentList.Count > 0
+                            && originaldata.RootCauseCommentList[0].Comment.Contains(IssueCommentEmpty.TOBEEDIT)
+                            && originaldata.RootCauseCommentList[0].Comment.Length < 30
+                            )
+                            || (originaldata.RootCauseCommentList.Count == 0))
+                        {
+                            closeauth = false;
+                            SetNoticeInfo("To close bug, root cause is necessary!");
+                        }
+                    }//root cause not come at same time
                 }
             }
             else
@@ -2373,19 +2376,22 @@ namespace Prometheus.Controllers
                 if (string.Compare(originaldata.Resolution, Request.Form["resolutionlist"].ToString(), true) != 0
                     && IssueClosed(Request.Form["resolutionlist"].ToString()))
                 {
-                    if ((originaldata.RootCauseCommentList.Count > 0
-                        && originaldata.RootCauseCommentList[0].Comment.Contains(IssueCommentEmpty.TOBEEDIT)
-                        && originaldata.RootCauseCommentList[0].Comment.Length < 30
-                        )
-                        || (
-                            originaldata.ContainmentActionList.Count > 0
-                            && originaldata.ContainmentActionList[0].Comment.Contains(IssueCommentEmpty.TOBEEDIT)
-                            && originaldata.ContainmentActionList[0].Comment.Length < 30
-                        ))
+                    if (string.IsNullOrEmpty(Request.Form["rootcauseeditor"]))
                     {
-                        closeauth = false;
-                        SetNoticeInfo("To close task, root cause and containment action is necessary!");
-                    }
+                        if ((originaldata.RootCauseCommentList.Count > 0
+                            && originaldata.RootCauseCommentList[0].Comment.Contains(IssueCommentEmpty.TOBEEDIT)
+                            && originaldata.RootCauseCommentList[0].Comment.Length < 30
+                            )
+                            || (
+                                originaldata.ContainmentActionList.Count > 0
+                                && originaldata.ContainmentActionList[0].Comment.Contains(IssueCommentEmpty.TOBEEDIT)
+                                && originaldata.ContainmentActionList[0].Comment.Length < 30
+                            ))
+                        {
+                            closeauth = false;
+                            SetNoticeInfo("To close task, root cause and containment action is necessary!");
+                        }
+                    }//root cause not come at same time
                 }
             }
             else
@@ -3007,19 +3013,22 @@ namespace Prometheus.Controllers
                 if (string.Compare(originaldata.Resolution, Request.Form["resolutionlist"].ToString(), true) != 0
                     && IssueClosed(Request.Form["resolutionlist"].ToString()))
                 {
-                    if ((originaldata.RootCauseCommentList.Count > 0
-                        && originaldata.RootCauseCommentList[0].Comment.Contains(IssueCommentEmpty.TOBEEDIT)
-                        && originaldata.RootCauseCommentList[0].Comment.Length < 30
-                        )
-                        || (
-                            originaldata.ContainmentActionList.Count > 0
-                            && originaldata.ContainmentActionList[0].Comment.Contains(IssueCommentEmpty.TOBEEDIT)
-                            && originaldata.ContainmentActionList[0].Comment.Length < 30
-                        ))
+                    if (string.IsNullOrEmpty(Request.Form["rootcauseeditor"]))
                     {
-                        closeauth = false;
-                        SetNoticeInfo("To close task, root cause and containment action is necessary!");
-                    }
+                        if ((originaldata.RootCauseCommentList.Count > 0
+                            && originaldata.RootCauseCommentList[0].Comment.Contains(IssueCommentEmpty.TOBEEDIT)
+                            && originaldata.RootCauseCommentList[0].Comment.Length < 30
+                            )
+                            || (
+                                originaldata.ContainmentActionList.Count > 0
+                                && originaldata.ContainmentActionList[0].Comment.Contains(IssueCommentEmpty.TOBEEDIT)
+                                && originaldata.ContainmentActionList[0].Comment.Length < 30
+                            ))
+                        {
+                            closeauth = false;
+                            SetNoticeInfo("To close task, root cause and containment action is necessary!");
+                        }
+                    }//root cause not come at same time
                 }
             }
             else

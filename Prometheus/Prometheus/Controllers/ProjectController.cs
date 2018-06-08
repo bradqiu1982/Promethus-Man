@@ -1288,8 +1288,10 @@ namespace Prometheus.Controllers
 
                 if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
                 {
-                    var vm = ProjectViewModels.RetrieveOneProject(realkey);
+                    var vmlist = ProjectViewModels.RetrieveOneProject(realkey);
+                    if (vmlist.Count == 0) { return RedirectToAction("CreateProject", "Project"); }
 
+                    var vm = vmlist[0];
                     var asilist = UserViewModels.RetrieveAllUser();
                     ViewBag.AllUserList = "[\"" + string.Join("\",\"", asilist.ToArray()) + "\"]";
 
@@ -1460,10 +1462,10 @@ namespace Prometheus.Controllers
             var waferyieldexceptlist = Request.Form["WaferYieldExceptList"];
             ProjectViewModels.UpdateProjectExcept(projectmodel.ProjectKey, waferyieldexceptlist, ProjectExceptType.WAFERYIELDEXCEPT);
 
-            var oldpjdata = ProjectViewModels.RetrieveOneProject(projectmodel.ProjectKey);
+            var oldpjdata = ProjectViewModels.RetrieveOneProjectWithClose(projectmodel.ProjectKey);
 
-            bool databondingchange = DataBondingChanged(oldpjdata, projectmodel);
-            bool pnbondingchg = PNBondingChanged(oldpjdata, projectmodel);
+            bool databondingchange = DataBondingChanged(oldpjdata[0], projectmodel);
+            bool pnbondingchg = PNBondingChanged(oldpjdata[0], projectmodel);
 
             projectmodel.StoreProject();
 
@@ -1482,7 +1484,7 @@ namespace Prometheus.Controllers
             {
                 if (projectmodel.TabList.Count == 0)
                 {
-                    projectmodel.TabList = oldpjdata.TabList;
+                    projectmodel.TabList = oldpjdata[0].TabList;
                 }
 
 
@@ -1547,10 +1549,14 @@ namespace Prometheus.Controllers
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
                 UserAuth(updater);
 
-                var vm = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                var vmlist = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                if (vmlist.Count == 0) { return View(); }
 
-                if (vm != null)
+                var vm = vmlist[0];
+                if (vmlist.Count > 0)
                 {
+                    vm = vmlist[0];
+
                     var startdate = DateTime.Now.AddDays(-7);
                     var enddate = DateTime.Now.ToString();
                     if (startdate.DayOfWeek != DayOfWeek.Thursday)
@@ -1753,11 +1759,11 @@ namespace Prometheus.Controllers
             var vm = IssueViewModels.RetrieveSptIssue(this, ProjectKey);
             ViewBag.rules = ProjectCriticalErrorVM.RetrievePJCriticalError(ProjectKey, null);
 
-            var ProjectInfo = ProjectViewModels.RetrieveOneProject(ProjectKey);
+            var pjlist = ProjectViewModels.RetrieveOneProject(ProjectKey);
             var pqeFlag = false;
-            if (ProjectInfo.MemberList.Count > 0)
+            if (pjlist.Count > 0)
             {
-                foreach (var pqe in ProjectInfo.MemberList)
+                foreach (var pqe in pjlist[0].MemberList)
                 {
                     if (string.Compare(pqe.Role, Prometheus.Models.ProjectViewModels.PQEROLE) == 0)
                     {
@@ -2028,8 +2034,10 @@ namespace Prometheus.Controllers
                 ViewBag.PJKey = ProjectKey;
 
                 var vmlist = IssueViewModels.RetrieveNPIPROCIssue(ProjectKey, this);
-                var pj = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                var pjlist = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                if (pjlist.Count == 0) { return View(); }
 
+                var pj = pjlist[0];
                 var ckdict = CookieUtility.UnpackCookie(this);
                 var updater = "";
                 if (ckdict.ContainsKey("logonuser"))
@@ -2371,7 +2379,9 @@ namespace Prometheus.Controllers
                 var retestdatalist = new List<KeyValuePair<string, int>>();
                 var fytestdatalist = new List<KeyValuePair<string, int>>();
 
-                var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                var pvmlist = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                if (pvmlist.Count == 0) { return View(); }
+                var pvm = pvmlist[0];
                 var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, sdate.ToString(), edate.ToString(), pvm, HttpContext.Cache);
 
                 if (yieldvm.FirstYields.Count > 0)
@@ -3122,7 +3132,9 @@ namespace Prometheus.Controllers
                 var retestdatalist = new List<KeyValuePair<string, int>>();
                 var fytestdatalist = new List<KeyValuePair<string, int>>();
 
-                var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                var pvmlist = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                if (pvmlist.Count == 0) { return View(); }
+                var pvm = pvmlist[0];
                 var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, sdate.ToString(), edate.ToString(), pvm, HttpContext.Cache);
 
                 if (yieldvm.FirstYields.Count > 0)
@@ -3402,7 +3414,10 @@ namespace Prometheus.Controllers
                 var retestdatalist = new List<KeyValuePair<string, int>>();
                 var fytestdatalist = new List<KeyValuePair<string, int>>();
 
-                var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                var pvmlist = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                if (pvmlist.Count == 0) { return View(); }
+                var pvm = pvmlist[0];
+
                 var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, sdate.ToString(), edate.ToString(), pvm, HttpContext.Cache);
 
                 if (yieldvm.FirstYields.Count > 0)
@@ -3658,7 +3673,10 @@ namespace Prometheus.Controllers
 
         private void ProjectBRTypeYield(string ProjectKey, string BRNUM, string BRType)
         {
-            var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
+            var pvmlist = ProjectViewModels.RetrieveOneProject(ProjectKey);
+            if (pvmlist.Count == 0) { return; }
+            var pvm = pvmlist[0];
+
             var vmlist = ProjectYieldViewModule.GetYieldByBRNum(ProjectKey, BRNUM, pvm, HttpContext.Cache, BRType);
 
             ViewBag.PJKey = ProjectKey;
@@ -3816,7 +3834,10 @@ namespace Prometheus.Controllers
                 ViewBag.BRNUM = CurrentBR;
                 ViewBag.BRType = BRType;
 
-                var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                var pvmlist = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                if (pvmlist.Count == 0) { return View(); }
+                var pvm = pvmlist[0];
+
                 var vmlist = ProjectYieldViewModule.GetYieldByBRNum(ProjectKey, CurrentBR, pvm, HttpContext.Cache, BRType);
                 if (vmlist.Count > 0)
                 {
@@ -4091,7 +4112,9 @@ namespace Prometheus.Controllers
 
                 ViewBag.pjkey = ProjectKey;
 
-                var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                var pvmlist = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                if (pvmlist.Count == 0) { return View(); }
+                var pvm = pvmlist[0];
 
                 var vmlist = new List<ProjectYieldViewModule>();
                 var tempret = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, StartDate, EndDate, pvm, HttpContext.Cache);
@@ -4622,7 +4645,10 @@ namespace Prometheus.Controllers
                 var retestdatalist = new List<KeyValuePair<string, int>>();
                 var fytestdatalist = new List<KeyValuePair<string, int>>();
 
-                var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                var pvmlist = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                if (pvmlist.Count == 0) { return View(); }
+                var pvm = pvmlist[0];
+
                 var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, StartDate, EndDate, pvm, HttpContext.Cache);
 
                 if (yieldvm.FirstYields.Count > 0)
@@ -4915,7 +4941,7 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(key))
             {
                 var vm = ProjectErrorViewModels.RetrieveErrorByErrorKey(key, this);
-                var AllPJMember = ProjectViewModels.RetrieveOneProject(vm[0].ProjectKey).AllPJMember;
+                var AllPJMember = ProjectViewModels.RetrieveOneProjectWithClose(vm[0].ProjectKey)[0].AllPJMember;
 
                 ViewBag.PJKey = vm[0].ProjectKey;
 
@@ -5014,7 +5040,7 @@ namespace Prometheus.Controllers
 
                 ViewBag.PJKey = vm[0].ProjectKey;
 
-                var AllPJMember = ProjectViewModels.RetrieveOneProject(vm[0].ProjectKey).AllPJMember;
+                var AllPJMember = ProjectViewModels.RetrieveOneProjectWithClose(vm[0].ProjectKey)[0].AllPJMember;
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
                 if (AllPJMember.ToUpper().Contains(updater.ToUpper()))
                 {
@@ -5151,7 +5177,7 @@ namespace Prometheus.Controllers
                 ProjectErrorViewModels.StoreErrorComment(vm.ErrorKey, vm.dbDescription, PJERRORCOMMENTTYPE.Description, vm.Reporter, currenttime);
 
                 var updatevm = ProjectErrorViewModels.RetrieveErrorByErrorKey(vm.ErrorKey, this);
-                var pjmems = ProjectViewModels.RetrieveOneProject(updatevm[0].ProjectKey).MemberList;
+                var pjmems = ProjectViewModels.RetrieveOneProjectWithClose(updatevm[0].ProjectKey)[0].MemberList;
                 var towho = new List<string>();
                 foreach (var w in pjmems)
                 {
@@ -5292,7 +5318,7 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(errorkey) && !string.IsNullOrEmpty(filename))
             {
                 var tempvm = ProjectErrorViewModels.RetrieveErrorByErrorKey(errorkey, this);
-                var AllPJMember = ProjectViewModels.RetrieveOneProject(tempvm[0].ProjectKey).AllPJMember;
+                var AllPJMember = ProjectViewModels.RetrieveOneProjectWithClose(tempvm[0].ProjectKey)[0].AllPJMember;
                 var ckdict = CookieUtility.UnpackCookie(this);
                 var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
 
@@ -6521,7 +6547,7 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
-            ExternalDataCollector.RefreshShipData(this);
+            ExternalDataCollector.UpdateRMABackUPDataRate();
 
             //ExternalDataCollector.RefreshRMAData(this);
             //ATEUtility.EmailATETestDailyData("SFP+ TUNABLE", this);
@@ -7380,7 +7406,7 @@ namespace Prometheus.Controllers
 
             var PJKey = ckdict["PJKey"];
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
-            var pj = ProjectViewModels.RetrieveOneProject(PJKey);
+            var pj = ProjectViewModels.RetrieveOneProjectWithClose(PJKey)[0];
             var pm = "";
             foreach (var m in pj.MemberList)
             {
@@ -8595,12 +8621,12 @@ namespace Prometheus.Controllers
         {
             var pro_info = ProjectViewModels.RetrieveOneProject(ProjectKey);
             ViewBag.MeList = string.Empty;
-            if (pro_info != null)
+            if (pro_info.Count > 0)
             {
-                if (pro_info.MemberList.Count > 0)
+                if (pro_info[0].MemberList.Count > 0)
                 {
                     var melist = new List<string>();
-                    foreach (var mem in pro_info.MemberList)
+                    foreach (var mem in pro_info[0].MemberList)
                     {
                         if (string.Compare(mem.Role, ProjectViewModels.MEROLE, true) == 0)
                         {
@@ -8635,8 +8661,8 @@ namespace Prometheus.Controllers
             }
             else
             {
-                var pro_info = ProjectViewModels.RetrieveOneProject(pkey);
-                if (string.Compare(pro_info.MeListStr, melist, true) != 0)
+                var pro_info = ProjectViewModels.RetrieveOneProjectWithClose(pkey);
+                if (string.Compare(pro_info[0].MeListStr, melist, true) != 0)
                 {
                     //update project me
                     var n_melist = melist.Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries).ToList();
@@ -8760,7 +8786,7 @@ namespace Prometheus.Controllers
             var eDate = Request.Form["eDate"];
             var withPrivate = Request.Form["withPrivate"];
 
-            var pvm = ProjectViewModels.RetrieveOneProject(pKey);
+            var pvm = ProjectViewModels.RetrieveOneProjectWithClose(pKey)[0];
 
             var requestmonth = 18;
             var action_data = new List<ProjectMileStonesVM>();

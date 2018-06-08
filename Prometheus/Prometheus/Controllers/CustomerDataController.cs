@@ -375,10 +375,12 @@ namespace Prometheus.Controllers
                                 continue;
 
                             var pjkey = RMSpectialCh(pjname);
-                            var pj = ProjectViewModels.RetrieveOneProject(pjkey);
+                            var pjlist = ProjectViewModels.RetrieveOneProject(pjkey);
 
-                            if (pj == null)
+                            if (pjlist.Count == 0)
                                 continue;
+
+                            var pj = pjlist[0];
 
                             if (currentpj == null)
                                 currentpj = pj;

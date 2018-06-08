@@ -130,7 +130,13 @@ namespace Prometheus.Models
 
             try
             {
-                var vm = ProjectViewModels.RetrieveOneProject(projectkey);
+                var vmlist = ProjectViewModels.RetrieveOneProject(projectkey);
+                if (vmlist.Count == 0) {
+                    ResetUpdatePJLock(projectkey);
+                    return;
+                }
+                var vm = vmlist[0];
+
                 if (vm.TabList.Count > 0
                     && vm.PNList.Count > 0
                     && vm.StationList.Count > 0)
@@ -166,7 +172,14 @@ namespace Prometheus.Models
 
             try
             {
-                var vm = ProjectViewModels.RetrieveOneProject(projectkey);
+                var vmlist = ProjectViewModels.RetrieveOneProject(projectkey);
+                if (vmlist.Count == 0)
+                {
+                    ResetUpdatePJLock(projectkey);
+                    return;
+                }
+                var vm = vmlist[0];
+
                 if (vm.SumDatasetList.Count > 0
                     && vm.MDIDList.Count > 0)
                 {
@@ -201,7 +214,14 @@ namespace Prometheus.Models
 
             try
             {
-                var vm = ProjectViewModels.RetrieveOneProject(projectkey);
+                var vmlist = ProjectViewModels.RetrieveOneProject(projectkey);
+                if (vmlist.Count == 0)
+                {
+                    ResetUpdatePJLock(projectkey);
+                    return;
+                }
+                var vm = vmlist[0];
+
                 var OSATabList = OSAFailureVM.RetrieveAllOSAFailureVM(projectkey);
                 if (OSATabList.Count > 0
                     && vm.PNList.Count > 0)

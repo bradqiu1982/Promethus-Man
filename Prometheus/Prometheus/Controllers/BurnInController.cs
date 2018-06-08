@@ -299,7 +299,11 @@ namespace Prometheus.Controllers
 
                 var retestdatalist = new List<KeyValuePair<string, int>>();
 
-                var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                var pvmlist = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                if (pvmlist.Count == 0)
+                { return View(); }
+
+                var pvm = pvmlist[0];
                 var yieldvm = ProjectBIYieldViewModule.GetYieldByDateRange(ProjectKey, sdate.ToString(), edate.ToString(), pvm);
 
                 if (yieldvm.LastYields.Count > 0)
@@ -465,7 +469,11 @@ namespace Prometheus.Controllers
                 
                 var retestdatalist = new List<KeyValuePair<string, int>>();
 
-                var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                var pvmlist = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                if (pvmlist.Count == 0)
+                { return View(); }
+
+                var pvm = pvmlist[0];
                 var yieldvm = ProjectBIYieldViewModule.GetYieldByDateRange(ProjectKey, sdate.ToString(), edate.ToString(), pvm);
 
                 if (yieldvm.LastYields.Count > 0)
@@ -541,7 +549,10 @@ namespace Prometheus.Controllers
             {
                 ViewBag.pjkey = ProjectKey;
 
-                var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                var pvmlist = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                if (pvmlist.Count == 0)
+                { return View(); }
+                var pvm = pvmlist[0];
 
                 var vmlist = new List<ProjectBIYieldViewModule>();
                 var tempret = ProjectBIYieldViewModule.GetYieldByDateRange(ProjectKey, StartDate, EndDate, pvm);
@@ -635,7 +646,11 @@ namespace Prometheus.Controllers
 
                 var retestdatalist = new List<KeyValuePair<string, int>>();
 
-                var pvm = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                var pvmlist = ProjectViewModels.RetrieveOneProject(ProjectKey);
+                if (pvmlist.Count == 0)
+                { return View(); }
+
+                var pvm = pvmlist[0];
                 var yieldvm = ProjectBIYieldViewModule.GetYieldByDateRange(ProjectKey, StartDate, EndDate, pvm);
 
                 if (yieldvm.LastYields.Count > 0)

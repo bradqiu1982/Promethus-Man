@@ -159,7 +159,10 @@ namespace Prometheus.Models
 
         public static void LoadMesWorkflow(string PJKey,Controller ctrl)
         {
-            var pvm = ProjectViewModels.RetrieveOneProject(PJKey);
+            var pvmlist = ProjectViewModels.RetrieveOneProject(PJKey);
+            if (pvmlist.Count == 0) { return; }
+            var pvm = pvmlist[0];
+
             var pncond = PNCondition(pvm.PNList);
             if (!string.IsNullOrEmpty(pncond))
             {
@@ -369,7 +372,9 @@ namespace Prometheus.Models
         private static List<string> RetrieveAllProductIDs(string PJKey)
         {
             var ret = new List<string>();
-            var pvm = ProjectViewModels.RetrieveOneProject(PJKey);
+            var pvmlist = ProjectViewModels.RetrieveOneProject(PJKey);
+            if (pvmlist.Count == 0) { return ret; }
+            var pvm = pvmlist[0];
             var pncond = PNCondition(pvm.PNList);
             if (!string.IsNullOrEmpty(pncond))
             {

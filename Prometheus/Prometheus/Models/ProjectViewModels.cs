@@ -795,31 +795,58 @@ namespace Prometheus.Models
         }
 
 
-        public static ProjectViewModels RetrieveOneProject(string key)
+        public static List<ProjectViewModels> RetrieveOneProject(string key)
         {
+            var ret = new List<ProjectViewModels>();
             var sql = "select ProjectKey,ProjectName,StartDate,FinishRate,Description,APVal1,APVal2,ProjectType,APVal4 from Project where APVal5 <> 'Close' and ProjectKey = '<ProjectKey>' and validate = 1";
             sql = sql.Replace("<ProjectKey>", key);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             if (dbret.Count > 0)
             {
-                var ret = new ProjectViewModels(Convert.ToString(dbret[0][0])
+                var tempvm = new ProjectViewModels(Convert.ToString(dbret[0][0])
                     , Convert.ToString(dbret[0][1]), Convert.ToString(dbret[0][2])
                     , Convert.ToDouble(dbret[0][3]), Convert.ToString(dbret[0][4])
                     , Convert.ToString(dbret[0][5]), Convert.ToString(dbret[0][6])
                     , Convert.ToString(dbret[0][7]), Convert.ToString(dbret[0][8]));
 
-                ret.MemberList = RetrieveProjectMembers(key);
-                ret.TabList = RetrieveProjectMesTable(key);
-                ret.PNList = RetrieveProjectPn(key);
-                ret.StationList = RetrieveProjectStation(key);
-                ret.MDIDList = RetrieveProjectModelID(key);
-                ret.SumDatasetList = RetrieveProjectSumDataSet(key);
-                return ret;
+                tempvm.MemberList = RetrieveProjectMembers(key);
+                tempvm.TabList = RetrieveProjectMesTable(key);
+                tempvm.PNList = RetrieveProjectPn(key);
+                tempvm.StationList = RetrieveProjectStation(key);
+                tempvm.MDIDList = RetrieveProjectModelID(key);
+                tempvm.SumDatasetList = RetrieveProjectSumDataSet(key);
+                ret.Add(tempvm);
             }
-            else
-                return null;
 
+            return ret;
         }
+
+        public static List<ProjectViewModels> RetrieveOneProjectWithClose(string key)
+        {
+            var ret = new List<ProjectViewModels>();
+            var sql = "select ProjectKey,ProjectName,StartDate,FinishRate,Description,APVal1,APVal2,ProjectType,APVal4 from Project where ProjectKey = '<ProjectKey>' and validate = 1";
+            sql = sql.Replace("<ProjectKey>", key);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            if (dbret.Count > 0)
+            {
+                var tempvm = new ProjectViewModels(Convert.ToString(dbret[0][0])
+                    , Convert.ToString(dbret[0][1]), Convert.ToString(dbret[0][2])
+                    , Convert.ToDouble(dbret[0][3]), Convert.ToString(dbret[0][4])
+                    , Convert.ToString(dbret[0][5]), Convert.ToString(dbret[0][6])
+                    , Convert.ToString(dbret[0][7]), Convert.ToString(dbret[0][8]));
+
+                tempvm.MemberList = RetrieveProjectMembers(key);
+                tempvm.TabList = RetrieveProjectMesTable(key);
+                tempvm.PNList = RetrieveProjectPn(key);
+                tempvm.StationList = RetrieveProjectStation(key);
+                tempvm.MDIDList = RetrieveProjectModelID(key);
+                tempvm.SumDatasetList = RetrieveProjectSumDataSet(key);
+                ret.Add(tempvm);
+            }
+
+            return ret;
+        }
+
 
         public static List<ProjectViewModels> RetrieveAllProject()
         {
@@ -828,9 +855,9 @@ namespace Prometheus.Models
             foreach (var key in keys)
             {
                 var r = RetrieveOneProject(key);
-                if (r != null)
+                if (r.Count>0)
                 {
-                    ret.Add(r);
+                    ret.Add(r[0]);
                 }
             }
             return ret;

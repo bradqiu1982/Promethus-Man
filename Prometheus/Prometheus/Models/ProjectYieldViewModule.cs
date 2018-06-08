@@ -902,11 +902,10 @@ namespace Prometheus.Models
         {
             var ret = new List<ProjectYieldViewModule>();
 
-            var pvm = ProjectViewModels.RetrieveOneProject(pjkey);
-            if (pvm == null)
-            {
-                return ret;
-            }
+            var pvmlist = ProjectViewModels.RetrieveOneProject(pjkey);
+            if (pvmlist.Count == 0)
+            { return ret; }
+            var pvm = pvmlist[0];
             var  ldate = RetrieveDateSpanByWeek(pvm.StartDate.ToString(), DateTime.Now.ToString());
 
             var startidx = 0;
@@ -931,7 +930,11 @@ namespace Prometheus.Models
         {
             var ret = new List<ProjectYieldViewModule>();
 
-            var pvm = ProjectViewModels.RetrieveOneProject(pjkey);
+            var pvmlist = ProjectViewModels.RetrieveOneProject(pjkey);
+            if (pvmlist.Count == 0)
+            { return ret; }
+            var pvm = pvmlist[0];
+
             var ldate = RetrieveDateSpanByMonth(pvm.StartDate.ToString(), DateTime.Now.ToString());
 
             var startidx = 0;
@@ -954,7 +957,10 @@ namespace Prometheus.Models
         public static List<ProjectYieldViewModule> GetYieldByDay(string pjkey,string starttime,string endtime, Cache mycache)
         {
             var ret = new List<ProjectYieldViewModule>();
-            var pvm = ProjectViewModels.RetrieveOneProject(pjkey);
+            var pvmlist = ProjectViewModels.RetrieveOneProject(pjkey);
+            if (pvmlist.Count == 0)
+            { return ret; }
+            var pvm = pvmlist[0];
 
             var stime = DateTime.Parse(starttime);
             var etime = DateTime.Parse(endtime);

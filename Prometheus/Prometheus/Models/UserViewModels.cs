@@ -195,7 +195,7 @@ namespace Prometheus.Models
                 foreach (var pj in pjs)
                 {
                     var onepj = ProjectViewModels.RetrieveOneProject(pj);
-                    if (onepj!=null && !dict.ContainsKey(pj))
+                    if (onepj.Count > 0 && !dict.ContainsKey(pj))
                     {
                         dict.Add(pj, true);
                     }

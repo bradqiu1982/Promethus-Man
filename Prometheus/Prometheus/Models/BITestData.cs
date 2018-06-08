@@ -374,7 +374,9 @@ namespace Prometheus.Models
 
             try
             {
-                var vm = ProjectViewModels.RetrieveOneProject(projectkey);
+                var vmlist = ProjectViewModels.RetrieveOneProject(projectkey);
+                if (vmlist.Count == 0) { return; }
+                var vm = vmlist[0];
                 if (vm.PNList.Count > 0)
                 {
                     string lastupdatetime = BITestData.RetrieveLatestTimeOfLocalBI(projectkey);
@@ -408,7 +410,9 @@ namespace Prometheus.Models
 
             try
             {
-                var vm = ProjectViewModels.RetrieveOneProject(projectkey);
+                var vmlist = ProjectViewModels.RetrieveOneProject(projectkey);
+                if (vmlist.Count == 0) { return; }
+                var vm = vmlist[0];
                 BIDataUtility.RetrievePjWaferAllData(ctrl,vm);
                 ResetUpdatePJLock(projectkey);
             }

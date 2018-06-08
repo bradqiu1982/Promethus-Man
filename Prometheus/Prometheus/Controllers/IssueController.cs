@@ -430,15 +430,19 @@ namespace Prometheus.Controllers
                 {
                     ViewBag.authrized = false;
                 }
-                var pj = ProjectViewModels.RetrieveOneProject(ret.ProjectKey);
-                foreach (var item in pj.MemberList)
+                var pj = ProjectViewModels.RetrieveOneProjectWithClose(ret.ProjectKey);
+                if (pj.Count > 0)
                 {
-                    if (string.Compare(item.Name, updater, true) == 0)
+                    foreach (var item in pj[0].MemberList)
                     {
-                        ViewBag.authrized = true;
-                        break;
+                        if (string.Compare(item.Name, updater, true) == 0)
+                        {
+                            ViewBag.authrized = true;
+                            break;
+                        }
                     }
                 }
+
                 CreateAllLists(ret);
 
                 if (ret.Summary.Contains(" @Burn-In Step "))
@@ -558,9 +562,11 @@ namespace Prometheus.Controllers
 
         private List<string> PJPQE(IssueViewModels vm)
         {
-            var pj = ProjectViewModels.RetrieveOneProject(vm.ProjectKey);
+            var pj = ProjectViewModels.RetrieveOneProjectWithClose(vm.ProjectKey);
             var ret = new List<string>();
-            foreach (var item in pj.MemberList)
+            if (pj.Count == 0) { return ret; }
+
+            foreach (var item in pj[0].MemberList)
             {
                 if (string.Compare(item.Role, ProjectViewModels.PQEROLE, true) == 0)
                 {
@@ -1551,10 +1557,10 @@ namespace Prometheus.Controllers
                 ViewBag.isassignee = false;
                 var hasEditPermit = false;
 
-                var pj = ProjectViewModels.RetrieveOneProject(ret.ProjectKey);
-                if (pj != null)
+                var pj = ProjectViewModels.RetrieveOneProjectWithClose(ret.ProjectKey);
+                if (pj.Count > 0)
                 {
-                    foreach (var item in pj.MemberList)
+                    foreach (var item in pj[0].MemberList)
                     {
                         if (string.Compare(updater, item.Name, true) == 0)
                         {
@@ -1622,10 +1628,10 @@ namespace Prometheus.Controllers
                 Request.Url.ToString(), "Bug", "Update", issuekey, LogType.Task, Log4NetLevel.Info, "");
 
             var pjmemauth = false;
-            var pj = ProjectViewModels.RetrieveOneProject(originaldata.ProjectKey);
-            if (pj != null)
+            var pj = ProjectViewModels.RetrieveOneProjectWithClose(originaldata.ProjectKey);
+            if (pj.Count > 0)
             {
-                foreach (var item in pj.MemberList)
+                foreach (var item in pj[0].MemberList)
                 {
                     if (string.Compare(updater, item.Name, true) == 0)
                     {
@@ -3571,10 +3577,10 @@ namespace Prometheus.Controllers
 
             var tobeissuekey = ikeys.Split(new char[] { ',', ';' }).ToList();
             var pjmemauth = false;
-            var pj = ProjectViewModels.RetrieveOneProject(pKey);
-            if (pj != null)
+            var pj = ProjectViewModels.RetrieveOneProjectWithClose(pKey);
+            if (pj.Count > 0)
             {
-                foreach (var item in pj.MemberList)
+                foreach (var item in pj[0].MemberList)
                 {
                     if (string.Compare(updater, item.Name, true) == 0)
                     {

@@ -700,7 +700,9 @@ namespace Prometheus.Models
         {
             if (failurelist.Count > 0)
             {
-                var pj = ProjectViewModels.RetrieveOneProject(failurelist[0].ProjectKey);
+                var pjlist = ProjectViewModels.RetrieveOneProject(failurelist[0].ProjectKey);
+                if (pjlist.Count == 0) { return; }
+                var pj = pjlist[0];
                 var firstengineer = "";
                 var role = transflg ? ProjectViewModels.MEROLE : ProjectViewModels.ENGROLE;
                 foreach (var m in pj.MemberList)

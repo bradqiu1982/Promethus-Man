@@ -6262,6 +6262,7 @@ namespace Prometheus.Controllers
             try
             {
                 ExternalDataCollector.RefreshRMAData(this);
+                ExternalDataCollector.UpdateRMABackUPDataRate();
             }
             catch (Exception ex) { }
 
@@ -6313,6 +6314,14 @@ namespace Prometheus.Controllers
             catch (Exception ex) { }
 
             heartbeatlog("BITestData.PrePareLatestData");
+
+            try
+            {
+                BIDataUtility.BIOLDTestDateExplore(this);
+            }
+            catch (Exception ex) { }
+
+            heartbeatlog("BITestData.BIOLDTestDateExplore");
 
             foreach (var pjkey in pjkeylist)
             {
@@ -6547,7 +6556,10 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
-            ExternalDataCollector.UpdateRMABackUPDataRate();
+            BIDataUtility.BIOLDTestDateExplore(this);
+
+            //ExternalDataCollector.UpdateRMABackUPSN();
+            //ExternalDataCollector.UpdateRMABackUPDataRate();
 
             //ExternalDataCollector.RefreshRMAData(this);
             //ATEUtility.EmailATETestDailyData("SFP+ TUNABLE", this);

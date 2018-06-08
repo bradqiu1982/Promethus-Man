@@ -1402,6 +1402,119 @@ namespace Prometheus.Models
             catch (Exception ex) { return "1982-05-06 10:00:00"; }
         }
 
+        public static void BIOLDTestDateExplore(Controller ctrl)
+        {
+            var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+            var bitables = syscfgdict["BIAUTOTABLES"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+
+            var biexploretime = syscfgdict["BIOLDDATAEXPLORE"];
+            var bizerotime = syscfgdict["BIZEROTIME"];
+
+
+            var bioldfile = ctrl.Server.MapPath("~/userfiles") + "\\BIOLDDATA.txt";
+            if (!System.IO.File.Exists(bioldfile))
+            {
+                return;
+            }
+
+            var days = Convert.ToInt32(System.IO.File.ReadAllText(bioldfile));
+            var biexplorerealtime = DateTime.Parse(biexploretime).AddDays((double)days);
+            if (biexplorerealtime > DateTime.Parse(bizerotime))
+            {
+                return;
+            }
+
+            var starttime = biexplorerealtime.ToString("yyyy-MM-dd") + " 00:00:00";
+            var endtime = biexplorerealtime.ToString("yyyy-MM-dd") + " 23:59:59";
+
+            foreach (var bt in bitables)
+            {
+                var testresultlist = new List<BITestResult>();
+                var testresultfieldlist = new List<BITestResultDataField>();
+
+
+                var sql = "select ContainerName,ProcessStep,DateTime,Failure_Mode,Station,Work_Order,PN,Channel,SLOPE,PO_LD,PO_Uniformity,THOLD,Delta_PO_LD,Delta_SLOPE,Delta_THOLD,Delta_PO_Uniformity from <bitable> where DateTime >= '<starttime>' and DateTime <= '<endtime>' "
+                    + " and  ProcessStep is not null and PN is not null and Work_Order is not null and ContainerName is not null and Failure_Mode is not null and ContainerName <> '' "
+                    + " and Failure_Mode <> '--' and Failure_Mode <> '' and Failure_Mode is not null and Delta_PO_LD is not null and Delta_SLOPE is not null and Delta_THOLD is not null "
+                    + " and Delta_PO_Uniformity is not null  order by ContainerName,DateTime";
+
+                sql = sql.Replace("<bitable>", bt).Replace("<starttime>", starttime).Replace("<endtime>", endtime);
+
+
+                var previoussn = string.Empty;
+                var dataid = string.Empty;
+
+                var dbret = DBUtility.ExeAutoSqlWithRes(sql);
+                if (dbret.Count == 0)
+                {
+                    continue;
+                }
+
+                foreach (var line in dbret)
+                {
+                    try
+                    {
+                        var sn = Convert.ToString(line[0]);
+                        var testname = Convert.ToString(line[1]);
+                        var testtime = DateTime.Parse(ConvertToDateStr(line[2]));
+                        var failure = Convert.ToString(line[3]);
+                        var station = Convert.ToString(line[4]);
+                        var jo = Convert.ToString(line[5]);
+                        var pn = Convert.ToString(line[6]);
+                        var ch = Convert.ToString(line[7]);
+                        var slope = Convert.ToDouble(line[8]);
+                        var pold = Convert.ToDouble(line[9]);
+                        var pouniformity = Convert.ToDouble(line[10]);
+                        var thold = Convert.ToDouble(line[11]);
+                        var dpold = Convert.ToDouble(line[12]);
+                        var dslope = Convert.ToDouble(line[13]);
+                        var dthold = Convert.ToDouble(line[14]);
+                        var dpouniformity = Convert.ToDouble(line[15]);
+
+                        if (string.Compare(previoussn, sn + ":" + testname, true) != 0)
+                        {
+                            previoussn = sn + ":" + testname;
+                            dataid = IssueViewModels.GetUniqKey();
+                            var tempresult = new BITestResult(sn, testname, station, failure, testtime, pn, jo, bt, dataid);
+                            testresultlist.Add(tempresult);
+                        }
+
+                        var tempfield = new BITestResultDataField(sn, testname, testtime, pn, jo, ch, slope, pold, pouniformity, thold, dpold, dslope, dthold, dpouniformity, dataid);
+                        testresultfieldlist.Add(tempfield);
+                    }
+                    catch (Exception ex) { }
+
+                }//end foreach
+
+                var snwaferdict = new Dictionary<string, BISNRelation>();
+                RetrieveBIWaferBySN(testresultlist, snwaferdict);
+
+                foreach (var item in testresultlist)
+                {
+                    if (snwaferdict.ContainsKey(item.SN))
+                    {
+                        item.Wafer = snwaferdict[item.SN].wafer;
+                        item.ProductName = snwaferdict[item.SN].productname;
+                    }
+                }//end foreach
+                foreach (var item in testresultfieldlist)
+                {
+                    if (snwaferdict.ContainsKey(item.SN))
+                    {
+                        item.Wafer = snwaferdict[item.SN].wafer;
+                        item.ProductName = snwaferdict[item.SN].productname;
+                    }
+                }
+
+                StoreBITestResult(testresultlist);
+                StoreBITestResultDateField(testresultfieldlist);
+
+            }//end foreach
+
+            days = days + 1;
+            System.IO.File.WriteAllText(bioldfile, days.ToString());
+        }
+
         public static void LoadBITestDateFromAuto(Controller ctrl)
         {
             var syscfgdict = CfgUtility.GetSysConfig(ctrl);

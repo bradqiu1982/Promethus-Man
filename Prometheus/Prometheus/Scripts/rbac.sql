@@ -9,6 +9,7 @@ CREATE TABLE [dbo].[n_Function](
     [Name] [nvarchar](200) NOT NULL,
     [MenuID] [int] NOT NULL,
     [Url] [nvarchar](200) NOT NULL,
+    [ImgUrl] [nvarchar](200) NOT NULL,
     [Status] [int] NOT NULL,
     [CreateAt] [datetime] NOT NULL,
     [UpdateAt] [datetime] NOT NULL,
@@ -73,6 +74,7 @@ CREATE TABLE [dbo].[n_Menu](
     [ID] [int] IDENTITY(1,1) NOT NULL,
     [Name] [nvarchar](50) NOT NULL,
     [Url] [nvarchar](200) NOT NULL,
+    [ImgUrl] [nvarchar](200) NOT NULL,
     [ParentID] [int] NOT NULL,
     [OrderID] [int] NOT NULL,
     [Status] [int] NOT NULL,
@@ -161,13 +163,13 @@ EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'1 valid 0 inva
 GO
 
 CREATE TABLE [dbo].[n_RolePermission](
-    [ID] [int] IDENTITY(1,1) NOT NULL,
-    [RoleID] [int] NOT NULL,
-    [Type] [int] NOT NULL,
-    [SourceID] [int] NOT NULL,
-    [OperationID] [int] NOT NULL,
-    [CreateAt] [datetime] NOT NULL,
-    [UpdateAt] [datetime] NOT NULL
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[RoleID] [int] NOT NULL,
+	[MenuID] [int] NOT NULL,
+	[FunctionID] [int] NOT NULL,
+	[OperationID] [int] NOT NULL,
+	[CreateAt] [datetime] NOT NULL,
+	[UpdateAt] [datetime] NOT NULL
 ) ON [PRIMARY]
 
 GO
@@ -175,21 +177,20 @@ GO
 ALTER TABLE [dbo].[n_RolePermission] ADD  CONSTRAINT [DF_n_RolePermission_RoleID]  DEFAULT ((0)) FOR [RoleID]
 GO
 
-ALTER TABLE [dbo].[n_RolePermission] ADD  CONSTRAINT [DF_n_RolePermission_Type]  DEFAULT ((0)) FOR [Type]
+ALTER TABLE [dbo].[n_RolePermission] ADD  CONSTRAINT [DF_n_RolePermission_Type]  DEFAULT ((0)) FOR [MenuID]
 GO
 
-ALTER TABLE [dbo].[n_RolePermission] ADD  CONSTRAINT [DF_n_RolePermission_SourceID]  DEFAULT ((0)) FOR [SourceID]
+ALTER TABLE [dbo].[n_RolePermission] ADD  CONSTRAINT [DF_n_RolePermission_SourceID]  DEFAULT ((0)) FOR [FunctionID]
 GO
 
 ALTER TABLE [dbo].[n_RolePermission] ADD  CONSTRAINT [DF_n_RolePermission_OperationID]  DEFAULT ((0)) FOR [OperationID]
 GO
 
-EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'1 Menu 2 Operation 0 Common' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'n_RolePermission', @level2type=N'COLUMN',@level2name=N'Type'
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'1 Menu 2 Operation 0 Common' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'n_RolePermission', @level2type=N'COLUMN',@level2name=N'MenuID'
 GO
 
-EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'MenuID/FuncID' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'n_RolePermission', @level2type=N'COLUMN',@level2name=N'SourceID'
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'MenuID/FuncID' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'n_RolePermission', @level2type=N'COLUMN',@level2name=N'FunctionID'
 GO
-
 
 CREATE TABLE [dbo].[n_User](
     [ID] [int] IDENTITY(1,1) NOT NULL,
@@ -234,4 +235,24 @@ ALTER TABLE [dbo].[n_UserGroup] ADD  CONSTRAINT [DF_n_UserGroup_Status]  DEFAULT
 GO
 
 EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'1 valid 0 invalid' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'n_UserGroup', @level2type=N'COLUMN',@level2name=N'Status'
+GO
+
+CREATE TABLE [dbo].[n_UserPermissionRequest](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[UserID] [int] NOT NULL,
+	[MenuID] [int] NOT NULL,
+	[FunctionID] [int] NOT NULL,
+	[OperationID] [int] NOT NULL,
+	[Comment] [nvarchar](max) NOT NULL,
+	[Status] [tinyint] NOT NULL,
+	[Approver] [int] NOT NULL,
+	[Operator] [int] NOT NULL,
+	[CreateAt] [datetime] NOT NULL,
+	[UpdateAt] [datetime] NOT NULL,
+ CONSTRAINT [PK_n_UserPermissionRequest] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
 GO

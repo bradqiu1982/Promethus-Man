@@ -9,9 +9,8 @@ using System.Web.Routing;
 
 namespace Prometheus.Controllers
 {
-    public class BurnInController : Controller
+    public class BurnInController : BaseController
     {
-
         public static void ProjectWeeklyTrend(Controller ctrl, string ProjectKey,int Weeks)
         {
             var vmlist = ProjectBIYieldViewModule.GetYieldByWeeks(ProjectKey, Weeks);
@@ -136,6 +135,18 @@ namespace Prometheus.Controllers
         // GET: BurnIn
         public ActionResult BurnInMainPage(string ProjectKey)
         {
+            UserPermit();
+            if (!ViewBag.Login)
+            {
+                return RedirectToLogin("BurnInMainPage", "BurnIn");
+            }
+
+            var redirecturl = RedirectTo(Request);
+            if (redirecturl != Request.RawUrl)
+            {
+                return Redirect(redirecturl);
+            }
+
             if (!string.IsNullOrEmpty(ProjectKey))
             {
                 ViewBag.pjkey = ProjectKey;

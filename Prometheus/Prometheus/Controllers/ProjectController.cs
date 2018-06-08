@@ -14,7 +14,7 @@ using System.Net;
 
 namespace Prometheus.Controllers
 {
-    public class ProjectController : Controller
+    public class ProjectController : BaseController
     {
         private static void logthdinfo(string info)
         {
@@ -1485,6 +1485,18 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectIssues(string ProjectKey)
         {
+            UserPermit();
+            if (!ViewBag.Login)
+            {
+                return RedirectToLogin("ProjectIssues", "Project");
+            }
+
+            var redirecturl = RedirectTo(Request);
+            if (redirecturl != Request.RawUrl)
+            {
+                return Redirect(redirecturl);
+            }
+
             if (ProjectKey != null)
             {
                 ViewBag.PJKey = ProjectKey;
@@ -1637,6 +1649,18 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectFA(string ProjectKey)
         {
+            UserPermit();
+            if (!ViewBag.Login)
+            {
+                return RedirectToLogin("Project", "ProjectFA");
+            }
+
+            var redirecturl = RedirectTo(Request);
+            if (redirecturl != Request.RawUrl)
+            {
+                return Redirect(redirecturl);
+            }
+
             if (!string.IsNullOrEmpty(ProjectKey))
             {
                 ViewBag.PJKey = ProjectKey;
@@ -1692,6 +1716,18 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectSptTask(string ProjectKey)
         {
+            UserPermit();
+            if (!ViewBag.Login)
+            {
+                return RedirectToLogin("ProjectSptTask", "Project");
+            }
+
+            var redirecturl = RedirectTo(Request);
+            if (redirecturl != Request.RawUrl)
+            {
+                return Redirect(redirecturl);
+            }
+
             var ckdict = CookieUtility.UnpackCookie(this);
             if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
             {
@@ -1750,6 +1786,19 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectError(string ProjectKey)
         {
+
+            UserPermit();
+            if (!ViewBag.Login)
+            {
+                return RedirectToLogin("ProjectError", "GroupList");
+            }
+
+            var redirecturl = RedirectTo(Request);
+            if (redirecturl != Request.RawUrl)
+            {
+                return Redirect(redirecturl);
+            }
+
             if (!string.IsNullOrEmpty(ProjectKey))
             {
                 ViewBag.PJKey = ProjectKey;
@@ -1997,6 +2046,18 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectNPI(string ProjectKey)
         {
+            UserPermit();
+            if (!ViewBag.Login)
+            {
+                return RedirectToLogin("ProjectNPI", "Project");
+            }
+
+            var redirecturl = RedirectTo(Request);
+            if (redirecturl != Request.RawUrl)
+            {
+                return Redirect(redirecturl);
+            }
+
             if (ProjectKey != null)
             {
                 ViewBag.PJKey = ProjectKey;
@@ -2197,6 +2258,18 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectYieldMain(string ProjectKey)
         {
+            UserPermit();
+            if (!ViewBag.Login)
+            {
+                return RedirectToLogin("Project", "ProjectYieldMain");
+            }
+
+            var redirecturl = RedirectTo(Request);
+            if (redirecturl != Request.RawUrl)
+            {
+                return Redirect(redirecturl);
+            }
+
             var sarray = new string[] { "8", "16", "24", "32", "40", "48", "56" };
             var slist = new List<string>();
             slist.Add("Weekly Yield Trend");
@@ -2557,6 +2630,18 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectRMAStatus(string ProjectKey, string sDate= "", string eDate = "")
         {
+            UserPermit();
+            if (!ViewBag.Login)
+            {
+                return RedirectToLogin("Project", "ProjectRMAStatus");
+            }
+
+            var redirecturl = RedirectTo(Request);
+            if (redirecturl != Request.RawUrl)
+            {
+                return Redirect(redirecturl);
+            }
+
             ViewBag.pKey = null;
             ViewBag.sDate = string.IsNullOrEmpty(sDate) ? DateTime.Now.AddMonths(-6).ToString("yyyy-MM-dd") : sDate;
             ViewBag.eDate = string.IsNullOrEmpty(eDate) ? DateTime.Now.ToString("yyyy-MM-dd") : eDate;
@@ -2605,6 +2690,18 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectReliability(string ProjectKey, string sDate = "", string eDate = "")
         {
+            UserPermit();
+            if (!ViewBag.Login)
+            {
+                return RedirectToLogin("ProjectIssues", "Project");
+            }
+
+            var redirecturl = RedirectTo(Request);
+            if (redirecturl != Request.RawUrl)
+            {
+                return Redirect(redirecturl);
+            }
+
             ViewBag.pKey = null;
             ViewBag.sDate = string.IsNullOrEmpty(sDate) ? DateTime.Now.AddMonths(-6).ToString("yyyy-MM-dd") : sDate;
             ViewBag.eDate = string.IsNullOrEmpty(eDate) ? DateTime.Now.ToString("yyyy-MM-dd") : eDate;
@@ -7094,6 +7191,18 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectDash(string ProjectKey)
         {
+            UserPermit();
+            if (!ViewBag.Login)
+            {
+                return RedirectToLogin("ProjectDash", "Project");
+            }
+
+            var redirecturl = RedirectTo(Request);
+            if (redirecturl != Request.RawUrl)
+            {
+                return Redirect(redirecturl);
+            }
+
             var PJKey = ProjectKey;
             if (!string.IsNullOrEmpty(PJKey))
             {
@@ -8337,6 +8446,18 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectStations(string ProjectKey, string whichtest,string StartTime,string EndTime)
         {
+            UserPermit();
+            if (!ViewBag.Login)
+            {
+                return RedirectToLogin("ProjectStations", "Project");
+            }
+
+            var redirecturl = RedirectTo(Request);
+            if (redirecturl != Request.RawUrl)
+            {
+                return Redirect(redirecturl);
+            }
+
             var pjkey = ProjectKey;
             ViewBag.PJKey = pjkey;
 
@@ -8624,20 +8745,20 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectMileStone(string ProjectKey, string sDate = "", string eDate = "",string withprivate="")
         {
-            var ckdict = CookieUtility.UnpackCookie(this);
-            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
-            {
 
-            }
-            else
+            UserPermit();
+            if (!ViewBag.Login)
             {
-                var ck = new Dictionary<string, string>();
-                ck.Add("logonredirectctrl", "Project");
-                ck.Add("logonredirectact", "ProjectMileStone");
-                CookieUtility.SetCookie(this, ck);
-                return RedirectToAction("LoginUser", "User");
+                return RedirectToLogin("ProjectMileStone", "Project");
             }
-            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            var redirecturl = RedirectTo(Request);
+            if (redirecturl != Request.RawUrl)
+            {
+                return Redirect(redirecturl);
+            }
+
+            var updater = ViewBag.UserData.Email;
 
             ViewBag.actionlist = ProjectMileStonesVM.GetProjectMileStones4Owner(ProjectKey, updater);
             ViewBag.sDate = sDate;

@@ -214,7 +214,7 @@
                             })
                         }
                         if (output.aMembers.length > 0) {
-                            autoCompleteFill('eg-memlist', output.aMembers);
+                            autoCompleteFill('eg-memlist', output.aMembers, 1);
                         }
                     }
                 });
@@ -234,18 +234,18 @@
                 return false;
             }
             $.post('/Permission/EditGroupMember',
-                {
-                    gId: gId,
-                    uIds: uIds
-                }, function (output) {
-                    if (output.success) {
-                        $('#' + gId).children().eq(3).children().eq(0).html(uIds.length);
-                        $('#modal-edit-member').modal('hide');
-                    }
-                    else {
-                        alert("Failed to edit group members");
-                    }
-                })
+            {
+                gId: gId,
+                uIds: uIds
+            }, function (output) {
+                if (output.success) {
+                    $('#' + gId).children().eq(3).children().eq(0).html(uIds.length);
+                    $('#modal-edit-member').modal('hide');
+                }
+                else {
+                    alert("Failed to edit group members");
+                }
+            })
         })
         $('body').on('click', '.edit-grole', function () {
             var gid = $(this).attr('data-id');
@@ -259,15 +259,15 @@
                         if (output.gRoles.length > 0) {
                             $.each(output.gRoles, function (i, val) {
                                 $('.group-roles').append(
-                                    '<div class="group-role-panel" data-val="' + val.ID + '" data-name="' + val.Name + '">' +
-                                    '<span>' + val.Name + '</span>' +
+                                    '<div class="group-role-panel" data-val="' + val.RoleID + '" data-name="' + val.RoleName + '">' +
+                                    '<span>' + val.RoleName + '</span>' +
                                     '<span class="glyphicon glyphicon-remove del-group-role"></span>' +
                                     '</div >'
                                 );
                             })
                         }
                         if (output.aRoles.length > 0) {
-                            autoCompleteFill('er-rolelist', output.aRoles);
+                            autoCompleteFill('er-rolelist', output.aRoles, 2);
                         }
                     }
                 });
@@ -284,19 +284,251 @@
                 return false;
             }
             $.post('/Permission/EditGroupRole',
-                {
-                    gId: gId,
-                    rIds: rIds
-                }, function (output) {
-                    if (output.success) {
-                        $('#modal-edit-role').modal('hide');
+            {
+                gId: gId,
+                rIds: rIds
+            }, function (output) {
+                if (output.success) {
+                    $('#modal-edit-role').modal('hide');
+                }
+                else {
+                    alert("Failed to edit group role");
+                }
+            })
+        })
+        function autoCompleteFill(id, values, type) {
+            $('#' + id).autoComplete('destroy');
+            $('#' + id).autoComplete({
+                minChars: 0,
+                source: function (term, suggest) {
+                    var choices = values;
+                    var suggestions = [];
+                    $.each(choices, function (i, val) {
+                        if (type == 1) {
+                            if (~(val.ID + ' ' + val.Name).toLowerCase().indexOf(term))
+                                suggestions.push(val);
+                        }
+                        else {
+                            if (~(val.RoleID + ' ' + val.Name).toLowerCase().indexOf(term))
+                                suggestions.push(val);
+                        }
+                    })
+                    suggest(suggestions);
+                },
+                renderItem: function (item, search) {
+                    search = search.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+                    var re = new RegExp("(" + search.split(' ').join('|') + ")", "gi");
+                    return '<div class="autocomplete-suggestion" data-value="' + item.ID + '" data-name="' + item.Name + '"> ' + item.Name.replace(re, "<b>$1</b>") + '</div>';
+                },
+                onSelect: function (e, term, item) {
+                    var panel_container = "";
+                    var group_container = "";
+                    var del_class = "";
+                    if (type == 1) {
+                        panel_container = "group-member-panel";
+                        group_container = "group-members";
+                        del_class = "del-group-member";
                     }
                     else {
-                        alert("Failed to edit group role");
+                        panel_container = "group-role-panel";
+                        group_container = "group-roles";
+                        del_class = "del-group-role";
+                    }
+                    var flg = false;
+                    $('.' + panel_container).each(function () {
+                        if ($(this).attr('data-val') == item.data('value')) {
+                            flg = true;
+                            return;
+                        }
+                    });
+                    if (!flg) {
+                        $('.' + group_container).append(
+                            '<div class="' + panel_container+'" data-val="' + item.data('value') + '" data-name="' + item.data('name') + '">' +
+                            '<span>' + item.data('name') + '</span>' +
+                            '<span class="glyphicon glyphicon-remove ' + del_class+'"></span>' +
+                            '</div >'
+                        );
+                    }
+                }
+            });
+        }
+    }
+    var rolelist = function () {
+        $.post('/Permission/GetRolePermission',
+        {
+            rid: ''
+        }, function (output) {
+            if (output.success) {
+                if (output.rPermissions.length > 0) {
+                    $.each(output.rPermissions, function (i, val) {
+                        $('.r-permissions').append(
+                            '<div class="role-permission-panel" data-ids="' + val.MenuID + '_' + val.FunctionID + '_' + val.OperationID + '">' +
+                            '<span>' + val.MenuName + ' | ' + val.FunctionName + ' | ' + val.OperationName + '</span>' +
+                            '<span class="glyphicon glyphicon-remove del-role-permission"></span>' +
+                            '</div >'
+                        );
+                    })
+                }
+                if (output.mList.length > 0) {
+                    autoCompleteFill('m-mid', output.mList, 1);
+                }
+                if (output.oList.length > 0) {
+                    autoCompleteFill('m-oid', output.oList, 3);
+                }
+            }
+        })
+        $('body').on('click', '#btn-add-role', function () {
+            $('#m-name').val('');
+            $('#m-comment').val('');
+            $('#m-oid').val('');
+            $('#m-rid').val('');
+            $('#m-mid').val('');
+            $('#m-fid').val('');
+            $('.r-permissions').empty();
+            $('#modal-edit-role').modal('show');
+        })
+        $('body').on('click', '.role-permissions', function () {
+            var rid = $(this).data("id");
+            $('#m-rid').val(rid);
+            $('#m-name').val($(this).parent().parent().children().eq(1).html());
+            $('#m-comment').val($(this).parent().parent().children().eq(3).html());
+            $('#m-mid').val('');
+            $('#m-fid').val('');
+            $('#m-oid').val('');
+            $('.r-permissions').empty();
+            $.post('/Permission/GetRolePermission',
+            {
+                rid: rid
+            }, function (output) {
+                if (output.success) {
+                    if (output.rPermissions.length > 0) {
+                        $.each(output.rPermissions, function (i, val) {
+                            $('.r-permissions').append(
+                                '<div class="role-permission-panel" data-ids="' + val.MenuID + '_' + val.FunctionID + '_' + val.OperationID + '">' +
+                                '<span>' + val.MenuName + ' | ' + val.FunctionName + ' | ' + val.OperationName + '</span>' +
+                                '<span class="glyphicon glyphicon-remove del-role-permission"></span>' +
+                                '</div >'
+                            );
+                        })
+                    }
+                    $('#modal-edit-role').modal('show');
+                }
+            })
+        })
+        $('body').on('click', '.edit-role', function () {
+            var rid = $(this).attr('data-id');
+            $('#m-rid').val(rid);
+            $('#m-name').val($(this).parent().parent().children().eq(1).html());
+            $('#m-comment').val($(this).parent().parent().children().eq(3).html());
+            $('#m-mid').val('');
+            $('#m-fid').val('');
+            $('#m-oid').val('');
+            $('.r-permissions').empty();
+            $.post('/Permission/GetRolePermission',
+            {
+                rid: rid
+            }, function (output) {
+                if (output.success) {
+                    if (output.rPermissions.length > 0) {
+                        $.each(output.rPermissions, function (i, val) {
+                            $('.r-permissions').append(
+                                '<div class="role-permission-panel" data-ids="' + val.MenuID + '_' + val.FunctionID + '_' + val.OperationID + '">' +
+                                '<span>' + val.MenuName + ' | ' + val.FunctionName + ' | ' + val.OperationName + '</span>' +
+                                '<span class="glyphicon glyphicon-remove del-role-permission"></span>' +
+                                '</div >'
+                            );
+                        })
+                    }
+                    $('#modal-edit-role').modal('show');
+                }
+            });
+        })
+        $('body').on('click', '.del-role', function () {
+            if (!confirm("Really to delete this role?")) {
+                return false;
+            }
+            var rid = $(this).attr('data-id');
+            $.post('/Permission/DelRole',
+            {
+                rId: rid
+            }, function (output) {
+                if (output.success) {
+                    window.location.reload();
+                }
+                else {
+                    alert("Failed to Delete");
+                }
+            })
+        })
+        $('body').on('click', '#m-btn-search', function () {
+            var keywords = $.trim($('#tb-search').val());
+            if (keywords == "") {
+                alert("Please input search keywords!");
+                return false;
+            }
+            window.location.href = '/Permission/RoleList?pageno=1&keywords=' + keywords;
+        })
+        $('body').on('click', '.pages', function () {
+            var keywords = $.trim($('#tb-search').val());
+            if (keywords != "") {
+                window.location.href = '/Permission/RoleList?pageno=' + $(this).attr('data-data') + "&keywords=" + keywords;
+            }
+            else {
+                window.location.href = '/Permission/RoleList?pageno=' + $(this).attr('data-data');
+            }
+        })
+        $('body').on('click', '.del-role-permission', function () {
+            $(this).parent().remove();
+        })
+        $('body').on('click', '#m-btn-submit', function () {
+            var mIds = new Array();
+            var rId = $('#m-rid').val();
+            var rName = $('#m-name').val();
+            var comment = $('#m-comment').val();
+            if (rName == "") {
+                alert("Please input role name");
+                return false;
+            }
+            $('.role-permission-panel').each(function () {
+                mIds.push($(this).attr('data-ids'));
+            });
+            if (mIds.length <= 0) {
+                alert("Please add permissions!");
+                return false;
+            }
+            if (rId == '') {
+                $.post('/Permission/AddRole',
+                {
+                    rName: rName,
+                    mIds: mIds,
+                    comment: comment
+                }, function (output) {
+                    if (output.success) {
+                        window.location.reload();
+                    }
+                    else {
+                        alert("Failed to add Role");
                     }
                 })
+            }
+            else {
+                $.post('/Permission/EditRole',
+                {
+                    rId: rId,
+                    rName: rName,
+                    mIds: mIds,
+                    comment: comment
+                }, function (output) {
+                    if (output.success) {
+                        window.location.reload();
+                    }
+                    else {
+                        alert("Failed to edit role");
+                    }
+                })
+            }
         })
-        function autoCompleteFill(id, values) {
+        function autoCompleteFill(id, values, mflg) {
             $('#' + id).autoComplete('destroy');
             $('#' + id).autoComplete({
                 minChars: 0,
@@ -316,48 +548,88 @@
                 },
                 onSelect: function (e, term, item) {
                     var flg = false;
-                    $('.group-member-panel').each(function () {
-                        if ($(this).attr('data-val') == item.data('value')) {
-                            flg = true;
-                            return;
+                    $('#' + id).val(item.data('name'));
+                    if (mflg == 1) {
+                        //menu select
+                        $('#m-ids').attr('data-mid', item.data('value'));
+                        $('#m-ids').attr('data-mname', item.data('name'));
+                        // function source
+                        $.post('/Permission/GetMenuFunctions', {
+                            mid: item.data('value')
+                        }, function (output) {
+                            if (output.success) {
+                                autoCompleteFill('m-fid', output.mFunctions, 2);
+                            }
+                        })
+                    }
+                    else if (mflg == 2) {
+                        //function select
+                        $('#m-ids').attr('data-fid', item.data('value'));
+                        $('#m-ids').attr('data-fname', item.data('name'));
+                    }
+                    else if (mflg == 3) {
+                        // operation select
+                        $('#m-ids').attr('data-oid', item.data('value'));
+                        $('#m-ids').attr('data-oname', item.data('name'));
+                    }
+                    var mid = $('#m-ids').attr('data-mid');
+                    var fid = $('#m-ids').attr('data-fid');
+                    var oid = $('#m-ids').attr('data-oid');
+                    if (mid != '' && fid != '' && oid != '') {
+                        var mids = mid + '_' + fid + '_' + oid;
+                        $('.role-permission-panel').each(function () {
+                            if ($(this).attr('data-ids') == mids ) {
+                                flg = true;
+                                return;
+                            }
+                        });
+                        if (!flg) {
+                            var mnames = $('#m-ids').attr('data-mname') + ' | ' + $('#m-ids').attr('data-fname') + ' | ' + $('#m-ids').attr('data-oname');
+                            $('.r-permissions').append(
+                                '<div class="role-permission-panel" data-ids="' + mids + '">' +
+                                '<span>' + mnames + '</span>' +
+                                '<span class="glyphicon glyphicon-remove del-role-permission"></span>' +
+                                '</div >'
+                            );
                         }
-                    });
-                    if (!flg) {
-                        $('.group-members').append(
-                            '<div class="group-member-panel" data-val="' + item.data('value') + '" data-name="' + item.data('name') + '">' +
-                            '<span>' + item.data('name') + '</span>' +
-                            '<span class="glyphicon glyphicon-remove del-group-member"></span>' +
-                            '</div >'
-                        );
+
+                        $('#m-ids').attr('data-mid', '');
+                        $('#m-ids').attr('data-fid', '');
+                        $('#m-ids').attr('data-oid', '');
+                        $('#m-ids').attr('data-mname', '');
+                        $('#m-ids').attr('data-fname', '');
+                        $('#m-ids').attr('data-oname', '');
+                        $('#m-mid').val('');
+                        $('#m-fid').val('');
+                        $('#m-oid').val('');
                     }
                 }
             });
         }
     }
-    var rolelist = function () {
-
-    }
     var menus = function () {
+        $.post('/Permission/GetMenuList',
+        {}, function (output) {
+            if (output.success) {
+                autoCompleteFill('modal-pid', output.Menus)
+            }
+        })
         $('body').on('click', '#btn-add-menu', function () {
             $('#m-mid').val('');
             $('#modal-name').val('');
             $('#modal-url').val('');
+            $('#modal-imgurl').val('');
             $('#modal-pid').val('');
             $('#modal-oid').val('');
             $('#m-title').html('Add Menu');
-            //$.post('/Permission/GetAllMenus',
-            //{
-
-            //}, function () {
-
-            //})
             $('#modal-add-menu').modal('show');
         })
         $('body').on('click', '#m-btn-submit', function () {
             var mid = $('#m-mid').val();
             var name = $('#modal-name').val();
             var url = $('#modal-url').val();
-            var pid = $('#modal-pid').val();
+            var imgurl = $('#modal-imgurl').val();
+            var pid = $('#modal-pid').data('id');
             var oid = $('#modal-oid').val();
             if (name == '') {
                 alert("Please input Menu Name!");
@@ -375,6 +647,7 @@
                 $.post('/Permission/AddMenu', {
                     name: name,
                     url: url,
+                    imgurl: imgurl,
                     pid: pid,
                     oid: oid
                 }, function (output) {
@@ -391,6 +664,7 @@
                     mid: mid,
                     name: name,
                     url: url,
+                    imgurl: imgurl,
                     pid: pid,
                     oid: oid
                 }, function (output) {
@@ -434,13 +708,15 @@
             var mid = $(this).attr('data-id');
             var name = $(this).parent().parent().children().eq(1).html();
             var url = $(this).parent().parent().children().eq(2).html();
-            var pid = $(this).parent().parent().children().eq(3).attr("data-pid");
-            var oid = $(this).parent().parent().children().eq(4).html();
-            var pname = $(this).parent().parent().children().eq(3).html();
+            var imgurl = $(this).parent().parent().children().eq(3).html();
+            var pid = $(this).parent().parent().children().eq(4).attr("data-pid");
+            var oid = $(this).parent().parent().children().eq(5).html();
+            var pname = $(this).parent().parent().children().eq(4).html();
 
             $('#m-mid').val(mid);
             $('#modal-name').val(name);
             $('#modal-url').val(url);
+            $('#modal-imgurl').val(imgurl);
             $('#modal-pid').val(pname);
             $('#modal-pid').attr("data-pid", pid);
             $('#modal-oid').val(oid);
@@ -456,9 +732,33 @@
             }
             window.location.href = '/Permission/Menus?pageno=1&keywords=' + keywords;
         })
+        function autoCompleteFill(id, values) {
+            $('#' + id).autoComplete({
+                minChars: 0,
+                source: function (term, suggest) {
+                    var choices = values;
+                    var suggestions = [];
+                    $.each(choices, function (i, val) {
+                        if (~(val.ID + ' ' + val.Name).toLowerCase().indexOf(term))
+                            suggestions.push(val);
+                    })
+                    suggest(suggestions);
+                },
+                renderItem: function (item, search) {
+                    search = search.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+                    var re = new RegExp("(" + search.split(' ').join('|') + ")", "gi");
+                    return '<div class="autocomplete-suggestion" data-value="' + item.ID + '" data-name="' + item.Name + '"> ' + item.Name.replace(re, "<b>$1</b>") + '</div>';
+                },
+                onSelect: function (e, term, item) {
+                    $('#' + id).attr('data-id', item.data('value'));
+                    $('#' + id).val(item.data('name'));
+                }
+            });
+        }
     }
     var functions = function () {
         $.post('/Permission/GetMenuList', {
+            type: 1
         }, function (output) {
             if (output.success) {
                 autoCompleteFill('modal-menulist', output.Menus);
@@ -468,6 +768,7 @@
             $('#m-fid').val('');
             $('#modal-name').val('');
             $('#modal-url').val('');
+            $('#modal-imgurl').val('');
             $('#modal-menulist').val('');
             $('#modal-menulist').attr('data-id', '');
             $('#m-title').html('Add Function');
@@ -477,6 +778,7 @@
             var fid = $('#m-fid').val();
             var name = $('#modal-name').val();
             var url = $('#modal-url').val();
+            var imgurl = $('#modal-imgurl').val();
             var mid = $('#modal-menulist').attr('data-id');
             if (name == '') {
                 alert("Please input Function Name!");
@@ -494,6 +796,7 @@
                 $.post('/Permission/AddFunction', {
                     name: name,
                     url: url,
+                    imgurl: imgurl,
                     mid: mid
                 }, function (output) {
                     if (output.success) {
@@ -509,6 +812,7 @@
                     fid: fid,
                     name: name,
                     url: url,
+                    imgurl: imgurl,
                     mid: mid
                 }, function (output) {
                     if (output.success) {
@@ -551,12 +855,14 @@
             var fid = $(this).attr('data-id');
             var name = $(this).parent().parent().children().eq(1).html();
             var url = $(this).parent().parent().children().eq(3).html();
+            var imgurl = $(this).parent().parent().children().eq(4).html();
             var mid = $(this).parent().parent().children().eq(2).attr("data-id");
             var mname = $(this).parent().parent().children().eq(2).html();
 
             $('#m-fid').val(fid);
             $('#modal-name').val(name);
             $('#modal-url').val(url);
+            $('#modal-imgurl').val(imgurl);
             $('#modal-menulist').val(mname);
             $('#modal-menulist').attr("data-id", mid);
 
@@ -683,7 +989,201 @@
         })
 
     }
+    var applyforpermission = function () {
+        $.post('/Permission/GetRolePermission',
+        {
+            rid: ''
+        }, function (output) {
+            if (output.success) {
+                if (output.rPermissions.length > 0) {
+                    $.each(output.rPermissions, function (i, val) {
+                        $('.r-permissions').append(
+                            '<div class="role-permission-panel" data-ids="' + val.MenuID + '_' + val.FunctionID + '_' + val.OperationID + '">' +
+                            '<span>' + val.MenuName + ' | ' + val.FunctionName + ' | ' + val.OperationName + '</span>' +
+                            '<span class="glyphicon glyphicon-remove del-role-permission"></span>' +
+                            '</div >'
+                        );
+                    })
+                }
+                if (output.mList.length > 0) {
+                    autoCompleteFill('mid', output.mList, 1);
+                }
+                if (output.oList.length > 0) {
+                    autoCompleteFill('oid', output.oList, 3);
+                }
+            }
+        })
+        $('body').on('click', '#btn-submit', function () {
+            var comment = $('#comment').val();
+            var Ids = new Array();
+            $('.role-permission-panel').each(function () {
+                Ids.push($(this).attr('data-ids'));
+            });
 
+            if (Ids.length == 0) {
+                alert("Please select permission");
+                return false;
+            }
+
+            $.post('/Permission/AddUserPermissionRequest',
+            {
+                Ids: Ids,
+                comment: comment,
+            }, function (output) {
+                if (output.success) {
+                    window.location.href = '/Permission/PermissionRequest';
+                }
+                else {
+                    alert('Failed to apply');
+                }
+            })
+        })
+        $('body').on('click', '.del-role-permission', function () {
+            $(this).parent().remove();
+        })
+        $('body').on('click', '#btn-cancel', function () {
+            window.location.reload();
+        })
+        function autoCompleteFill(id, values, mflg) {
+            $('#' + id).autoComplete('destroy');
+            $('#' + id).autoComplete({
+                minChars: 0,
+                source: function (term, suggest) {
+                    var choices = values;
+                    var suggestions = [];
+                    $.each(choices, function (i, val) {
+                        if (~(val.ID + ' ' + val.Name).toLowerCase().indexOf(term))
+                            suggestions.push(val);
+                    })
+                    suggest(suggestions);
+                },
+                renderItem: function (item, search) {
+                    search = search.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+                    var re = new RegExp("(" + search.split(' ').join('|') + ")", "gi");
+                    return '<div class="autocomplete-suggestion" data-value="' + item.ID + '" data-name="' + item.Name + '"> ' + item.Name.replace(re, "<b>$1</b>") + '</div>';
+                },
+                onSelect: function (e, term, item) {
+                    var flg = false;
+                    $('#' + id).val(item.data('name'));
+                    if (mflg == 1) {
+                        //menu select
+                        $('#ids').attr('data-mid', item.data('value'));
+                        $('#ids').attr('data-mname', item.data('name'));
+                        // function source
+                        $.post('/Permission/GetMenuFunctions', {
+                            mid: item.data('value')
+                        }, function (output) {
+                            if (output.success) {
+                                autoCompleteFill('fid', output.mFunctions, 2);
+                            }
+                        })
+                    }
+                    else if (mflg == 2) {
+                        //function select
+                        $('#ids').attr('data-fid', item.data('value'));
+                        $('#ids').attr('data-fname', item.data('name'));
+                    }
+                    else if (mflg == 3) {
+                        // operation select
+                        $('#ids').attr('data-oid', item.data('value'));
+                        $('#ids').attr('data-oname', item.data('name'));
+                    }
+                    var mid = $('#ids').attr('data-mid');
+                    var fid = $('#ids').attr('data-fid');
+                    var oid = $('#ids').attr('data-oid');
+                    if (mid != '' && fid != '' && oid != '') {
+                        var mids = mid + '_' + fid + '_' + oid;
+                        $('.role-permission-panel').each(function () {
+                            if ($(this).attr('data-ids') == mids) {
+                                flg = true;
+                                return;
+                            }
+                        });
+                        if (!flg) {
+                            var mnames = $('#ids').attr('data-mname') + ' | ' + $('#ids').attr('data-fname') + ' | ' + $('#ids').attr('data-oname');
+                            $('.r-permissions').append(
+                                '<div class="role-permission-panel" data-ids="' + mids + '">' +
+                                '<span>' + mnames + '</span>' +
+                                '<span class="glyphicon glyphicon-remove del-role-permission"></span>' +
+                                '</div >'
+                            );
+                        }
+
+                        $('#ids').attr('data-mid', '');
+                        $('#ids').attr('data-fid', '');
+                        $('#ids').attr('data-oid', '');
+                        $('#ids').attr('data-mname', '');
+                        $('#ids').attr('data-fname', '');
+                        $('#ids').attr('data-oname', '');
+                        $('#mid').val('');
+                        $('#fid').val('');
+                        $('#oid').val('');
+                    }
+                }
+            });
+        }
+    }
+    var permissionrequest = function () {
+        $('body').on('click', '.upr-approve', function () {
+            var id = $(this).attr("data-id");
+            $.post('/Permission/ApprovePermissionRequest',
+            {
+                id: id
+            }, function (output) {
+                if (output.success) {
+                    window.location.reload();
+                }
+                else {
+                    alert("Failed");
+                }
+            })
+        })
+        $('body').on('click', '.upr-deny', function () {
+            var id = $(this).attr("data-id");
+            $.post('/Permission/DenyPermissionRequest',
+                {
+                    id: id
+                }, function (output) {
+                    if (output.success) {
+                        window.location.reload();
+                    }
+                    else {
+                        alert("Failed");
+                    }
+                })
+        })
+        $('body').on('click', '.upr-complete', function () {
+            var id = $(this).attr("data-id");
+            $.post('/Permission/CompletePermissionRequest',
+                {
+                    id: id
+                }, function (output) {
+                    if (output.success) {
+                        window.location.reload();
+                    }
+                    else {
+                        alert("Failed: You have not operate this request!");
+                    }
+                })
+        })
+        $('body').on('click', '#m-btn-search', function () {
+            var keywords = $.trim($('#tb-search').val());
+            if (keywords == "") {
+                alert("Please input search keywords!");
+                return false;
+            }
+            window.location.href = '/Permission/PermissionRequest?pageno=1&keywords=' + keywords;
+        })
+        $('body').on('click', '.pages', function () {
+            var keywords = $.trim($('#tb-search').val());
+            if (keywords != "") {
+                window.location.href = '/Permission/PermissionRequest?pageno=' + $(this).attr('data-data') + "&keywords=" + keywords;
+            }
+            else {
+                window.location.href = '/Permission/PermissionRequest?pageno=' + $(this).attr('data-data');
+            }
+        })
+    }
     
     return {
         memberlist: function () {
@@ -703,6 +1203,12 @@
         },
         operations: function () {
             operations();
+        },
+        applyforpermission: function () {
+            applyforpermission();
+        },
+        permissionrequest: function () {
+            permissionrequest();
         }
     }
 }();

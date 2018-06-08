@@ -7,7 +7,7 @@ namespace Prometheus.Models
 {
     public class PageVM
     {
-
+        public static int PageSize = 10;
     }
     public class RBACStatus
     {
@@ -15,34 +15,77 @@ namespace Prometheus.Models
         public static int ValidStatus = 1;
         public static int NoVerifiedStatus = 2;
     }
+
+    public class PermissionRequestStatus
+    {
+        public static int Invalid = 0;
+        public static int Pending = 1;
+        public static int Approved = 2;
+        public static int Complete = 3;
+        public static int Deny = 4;
+        public static int Cancel = 5;
+        public static Dictionary<int, string> Msg = new Dictionary<int, string>()
+        {
+            { 0, "Invalid"},
+            { 1, "Pending"},
+            { 2, "Approved"},
+            { 3, "Complete"},
+            { 4, "Deny"},
+            { 5, "Cancel"},
+        };
+    }
+
+    public class PermissionOperateUrl
+    {
+        public static string Approve = "/Permission/ApprovePermissionRequest";
+        public static string Deny = "/Permission/DenyPermissionRequest";
+        public static string Complete = "/Permission/CompletePermissionRequest";
+    }
+
     public class UserGroupRolePermissionVM
     {
         public int UserID { set; get; }
+        public string Email { set; get; }
         public int GroupID { set; get; }
         public int RoleID { set; get; }
-        public int Type { set; get; }
-        public int SourceID { set; get; }
+        public int MenuID { set; get; }
+        public int FunctionID { set; get; }
         public int OperationID { set; get; }
         public int PermissionID { set; get; }
         public string MenuUrl { set; get; }
         public string FunctionUrl { set; get; }
 
-        public static List<UserGroupRolePermissionVM> GetUserGroupRolePermission(int uId)
+        public string MenuName { set; get; }
+        public int ParentID { set; get; }
+
+        public static List<UserGroupRolePermissionVM> GetUserGroupRolePermission(int uId, int mId = 0, int fId = 0)
         {
-            var sql = @"select nu.ID as UserID, ngr.GroupID,
-                    nrp.RoleID, nrp.Type, nrp.SourceID,
+            var sql = @"select nu.ID as UserID, nu.Email, ngr.GroupID,
+                    nrp.RoleID, nrp.MenuID, nrp.FunctionID,
                     nrp.OperationID, nrp.ID as PermissionID,
-                    nm.Url as MenuUrl, nf.Url as FunctionUrl
+                    nm.Url as MenuUrl, nf.Url as FunctionUrl, 
+                    nm.Name as MenuName, nm.ParentID
                     from n_User as nu 
                     left join n_UserGroup as nug on (nu.ID = nug.UserID and nug.Status = 1)
-                    left join n_GroupRole as ngr on (nug.ID = ngr.GroupID and ngr.Status = 1)
+                    left join n_GroupRole as ngr on (nug.GroupID = ngr.GroupID and ngr.Status = 1)
                     left join n_RolePermission as nrp on nrp.RoleID = ngr.RoleID
-                    left join n_Menu as nm on (nrp.Type = 1 and nrp.SourceID = nm.ID)
-                    left join n_Function as nf on (nrp.Type = 2 and nrp.SourceID = nf.ID)
+                    left join n_Menu as nm on (nm.Status = 1 and nrp.MenuID = nm.ID)
+                    left join n_Function as nf on (nf.Status = 1 and nrp.FunctionID = nf.ID)
                     left join n_Operation as no on (no.Status = 1 and nrp.OperationID = no.ID)
                     where nu.ID = @uId";
             var param = new Dictionary<string, string>();
             param.Add("@uId", uId.ToString());
+            if(mId != 0)
+            {
+                sql += " and nrp.MenuID = @mId ";
+                param.Add("@mId", mId.ToString());
+            }
+            if(fId != 0)
+            {
+                sql += " and nrp.FunctionID = @fId ";
+                param.Add("@fId", fId.ToString());
+            }
+            sql += " order by nm.ParentID, nm.OrderID ";
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
             var res = new List<UserGroupRolePermissionVM>();
             if(dbret.Count > 0)
@@ -51,14 +94,17 @@ namespace Prometheus.Models
                 {
                     var tmp = new UserGroupRolePermissionVM();
                     tmp.UserID = Convert.ToInt32(item[0]);
-                    tmp.GroupID = Convert.ToInt32(item[1]);
-                    tmp.RoleID = Convert.ToInt32(item[2]);
-                    tmp.Type = Convert.ToInt32(item[3]);
-                    tmp.SourceID = Convert.ToInt32(item[4]);
-                    tmp.OperationID = Convert.ToInt32(item[5]);
-                    tmp.PermissionID = Convert.ToInt32(item[6]);
-                    tmp.MenuUrl = Convert.ToString(item[7]);
-                    tmp.FunctionUrl = Convert.ToString(item[8]);
+                    tmp.Email = Convert.ToString(item[1]);
+                    tmp.GroupID = !string.IsNullOrEmpty(Convert.ToString(item[2])) ? Convert.ToInt32(item[2]) : 0;
+                    tmp.RoleID = !string.IsNullOrEmpty(Convert.ToString(item[3])) ? Convert.ToInt32(item[3]) : 0;
+                    tmp.MenuID = !string.IsNullOrEmpty(Convert.ToString(item[4])) ? Convert.ToInt32(item[4]) : 0;
+                    tmp.FunctionID = !string.IsNullOrEmpty(Convert.ToString(item[5])) ? Convert.ToInt32(item[5]) : 0;
+                    tmp.OperationID = !string.IsNullOrEmpty(Convert.ToString(item[6])) ? Convert.ToInt32(item[6]) : 0;
+                    tmp.PermissionID = !string.IsNullOrEmpty(Convert.ToString(item[7])) ? Convert.ToInt32(item[7]) : 0;
+                    tmp.MenuUrl = Convert.ToString(item[8]);
+                    tmp.FunctionUrl = Convert.ToString(item[9]);
+                    tmp.MenuName = Convert.ToString(item[10]);
+                    tmp.ParentID = Convert.ToInt32(item[11]);
                     res.Add(tmp);
                 }
             }
@@ -189,8 +235,8 @@ namespace Prometheus.Models
         {
             var sql = @"select nu.ID, nu.Name, nu.Email, nu.JobNum, nu.Tel,
                 nu.CreateAt, nu.UpdateAt
-                from n_User as nu left join n_UserGroup as nug 
-                on nug.UserID = nu.ID where nu.Status = @ValidStatus";
+                from n_User as nu 
+                where nu.Status = @ValidStatus";
             var param = new Dictionary<string, string>();
             param.Add("@ValidStatus", RBACStatus.ValidStatus.ToString());
             if (!string.IsNullOrEmpty(keywords))
@@ -433,12 +479,22 @@ namespace Prometheus.Models
         public string CreateAt { set; get; }
         public string UpdateAt { set; get; }
 
-        public static List<NRoleVM> GetRoleList(string status)
+        public static List<NRoleVM> GetRoleList(string status, string rName = "", string keywords = "")
         {
             var sql = @"select ID, Name, Status, Comment, CreateAt, UpdateAt 
                         from n_Role where Status = @Status";
             var param = new Dictionary<string, string>();
             param.Add("@Status", string.IsNullOrEmpty(status) ? RBACStatus.ValidStatus.ToString() : status);
+            if (!string.IsNullOrEmpty(keywords))
+            {
+                sql += " and (Name like @keywords or Comment like @keywords) ";
+                param.Add("@keywords", keywords);
+            }
+            if (!string.IsNullOrEmpty(rName))
+            {
+                sql += " and Name = @Name ";
+                param.Add("@Name", rName);
+            }
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
             var res = new List<NRoleVM>();
             if(dbret.Count > 0)
@@ -479,8 +535,9 @@ namespace Prometheus.Models
                 sql += "Comment = @Comment, ";
                 param.Add("@Comment", role.Comment);
             }
-            sql += "UpdateAt = @UpdateAt ";
+            sql += "UpdateAt = @UpdateAt where ID = @ID";
             param.Add("@UpdateAt", now);
+            param.Add("@ID", role.ID.ToString());
 
             DBUtility.ExeLocalSqlNoRes(sql, param);
         }
@@ -621,6 +678,7 @@ namespace Prometheus.Models
         public int ID { set; get; }
         public string Name { set; get; }
         public string Url { set; get; }
+        public string ImgUrl { set; get; }
         public int ParentID { set; get; }
         public int OrderID { set; get; }
         public string Status { set; get; }
@@ -630,12 +688,13 @@ namespace Prometheus.Models
         public static void AddMenu(NMenuVM menu)
         {
             var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            var sql = @"insert into n_Menu (Name, Url, ParentID, OrderID, 
+            var sql = @"insert into n_Menu (Name, Url, ImgUrl, ParentID, OrderID, 
                     Status, CreateAt, UpdateAt) values(
-                    @Name, @Url, @ParentID, @OrderID, @Status, @CreateAt, @UpdateAt)";
+                    @Name, @Url, @ImgUrl, @ParentID, @OrderID, @Status, @CreateAt, @UpdateAt)";
             var param = new Dictionary<string, string>();
             param.Add("@Name", menu.Name);
             param.Add("@Url", menu.Url);
+            param.Add("@ImgUrl", menu.ImgUrl);
             param.Add("@ParentID", menu.ParentID.ToString());
             param.Add("@OrderID", menu.OrderID.ToString());
             param.Add("@Status", menu.Status);
@@ -659,6 +718,11 @@ namespace Prometheus.Models
                 sql += "Url = @Url, ";
                 param.Add("@Url", menu.Url);
             }
+            if (!string.IsNullOrEmpty(menu.ImgUrl))
+            {
+                sql += "ImgUrl = @ImgUrl, ";
+                param.Add("@ImgUrl", menu.ImgUrl);
+            }
             if (menu.ParentID != 0)
             {
                 sql += "ParentID = @ParentID, ";
@@ -680,11 +744,11 @@ namespace Prometheus.Models
 
             DBUtility.ExeLocalSqlNoRes(sql, param);
         }
-        public static List<NMenuVM> GetMenuList(string keywords = "", int mId = 0)
+        public static List<NMenuVM> GetMenuList(string keywords = "", int mId = 0, int type = 0)
         {
             var sql = @"select m1.ID, m1.Name, m1.Url, m1.ParentID, 
                     m1.OrderID, m1.Status, m1.CreateAt, m1.UpdateAt, 
-                    m2.Name as ParentMenu
+                    m2.Name as ParentMenu, m1.ImgUrl
                     from n_Menu as m1 left join n_Menu as m2 
                     on m1.ParentID = m2.ID
                     where m1.Status = @Status ";
@@ -699,6 +763,10 @@ namespace Prometheus.Models
             {
                 sql += " and ID = @mId";
                 param.Add("@mId", mId.ToString());
+            }
+            if(type == 1)
+            {
+                sql += " and m1.ParentID != '0' ";
             }
             sql += " order by m1.ParentID, m1.OrderID";
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
@@ -717,6 +785,7 @@ namespace Prometheus.Models
                     tmp.CreateAt = Convert.ToString(item[6]);
                     tmp.UpdateAt = Convert.ToString(item[7]);
                     tmp.ParentMenu = Convert.ToString(item[8]);
+                    tmp.ImgUrl = Convert.ToString(item[9]);
                     res.Add(tmp);
                 }
             }
@@ -727,7 +796,8 @@ namespace Prometheus.Models
         public static NMenuVM GetMenuInfoByUrl(string mUrl)
         {
             var sql = @"select ID, Name, Url, ParentID, OrderID, Status, 
-                    CreateAt, UpdateAt from n_Menu where Url = @mUrl and Status = @Status";
+                    CreateAt, UpdateAt, ImgUrl 
+                    from n_Menu where Url = @mUrl and Status = @Status";
             var param = new Dictionary<string, string>();
             param.Add("@mUrl", mUrl);
             param.Add("@Status", RBACStatus.ValidStatus.ToString());
@@ -744,6 +814,42 @@ namespace Prometheus.Models
                 res.Status = Convert.ToString(item[5]);
                 res.CreateAt = Convert.ToString(item[6]);
                 res.UpdateAt = Convert.ToString(item[7]);
+                res.ImgUrl = Convert.ToString(item[8]);
+            }
+            return res;
+        }
+
+        public static List<NMenuVM> GetMenuListByFuncUrl(string fUrl)
+        {
+            var sql = @"select nm1.ID, nm1.Name, nm1.Url, nm1.ImgUrl, 
+                    nm1.ParentID, nm1.OrderID, nm1.Status, nm1.CreateAt, nm1.UpdateAt
+                    from n_function as nf 
+                    inner join n_Menu as nm on nf.MenuID = nm.ID
+                    inner join n_Menu as nm1 on nm.ParentID = nm1.ParentID
+                    where nf.Url = @fUrl and nm1.Status = @Status
+                    order by nm1.OrderID ";
+            var param = new Dictionary<string, string>();
+            param.Add("@fUrl", fUrl);
+            param.Add("@Status", RBACStatus.ValidStatus.ToString());
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
+            var res = new List<NMenuVM>();
+            if(dbret.Count > 0)
+            {
+                foreach(var item in dbret)
+                {
+                    var tmp = new NMenuVM();
+                    tmp.ID = Convert.ToInt32(item[0]);
+                    tmp.Name = Convert.ToString(item[1]);
+                    tmp.Url = Convert.ToString(item[2]);
+                    tmp.ImgUrl = Convert.ToString(item[3]);
+                    tmp.ParentID = Convert.ToInt32(item[4]);
+                    tmp.OrderID = Convert.ToInt32(item[5]);
+                    tmp.Status = Convert.ToString(item[6]);
+                    tmp.CreateAt = Convert.ToString(item[7]);
+                    tmp.UpdateAt = Convert.ToString(item[8]);
+                    res.Add(tmp);
+                }
             }
             return res;
         }
@@ -755,6 +861,7 @@ namespace Prometheus.Models
         public string Name { set; get; }
         public int MenuID { set; get; }
         public string Url { set; get; }
+        public string ImgUrl { set; get; }
         public string Status { set; get; }
         public string CreateAt { set; get; }
         public string UpdateAt { set; get; }
@@ -763,19 +870,20 @@ namespace Prometheus.Models
         public static void AddFunction(NFunctionVM fun)
         {
             var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            var sql = @"insert into n_Function (Name, MenuID, Url,
+            var sql = @"insert into n_Function (Name, MenuID, Url, ImgUrl,
                     Status, CreateAt, UpdateAt) values(
-                    @Name, @MenuID, @Url, @Status, @CreateAt, @UpdateAt)";
+                    @Name, @MenuID, @Url, @ImgUrl, @Status, @CreateAt, @UpdateAt)";
             var param = new Dictionary<string, string>();
             param.Add("@Name", fun.Name);
             param.Add("@MenuID", fun.MenuID.ToString());
             param.Add("@Url", fun.Url);
+            param.Add("@ImgUrl", fun.ImgUrl);
             param.Add("@Status", fun.Status);
             param.Add("@CreateAt", now);
             param.Add("@UpdateAt", now);
 
             DBUtility.ExeLocalSqlNoRes(sql, param);
-        }
+        } 
 
         public static void UpdateFunction(NFunctionVM fun)
         {
@@ -797,6 +905,11 @@ namespace Prometheus.Models
                 sql += "Url = @Url, ";
                 param.Add("@Url", fun.Url);
             }
+            if (!string.IsNullOrEmpty(fun.ImgUrl))
+            {
+                sql += "ImgUrl = @ImgUrl, ";
+                param.Add("@ImgUrl", fun.ImgUrl);
+            }
             if (!string.IsNullOrEmpty(fun.Status))
             {
                 sql += "Status = @Status, ";
@@ -809,10 +922,10 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql, param);
         }
 
-        public static List<NFunctionVM> GetFunctionList(string keywords = "", int fId = 0)
+        public static List<NFunctionVM> GetFunctionList(string keywords = "", string mId = "", string fId = "")
         {
             var sql = @"select nf.ID, nf.Name, nf.MenuID, nf.Url, nf.Status, 
-                    nf.CreateAt, nf.UpdateAt, nm.Name as MenuName
+                    nf.CreateAt, nf.UpdateAt, nm.Name as MenuName, nf.ImgUrl
                     from n_Function as nf left join n_Menu as nm on nf.MenuID = nm.ID
                     where nf.Status = @Status";
             var param = new Dictionary<string, string>();
@@ -822,10 +935,15 @@ namespace Prometheus.Models
                 sql += " and (nf.Name like @Keywords or nm.Name like @Keywords)";
                 param.Add("@Keywords", "%" + keywords + "%");
             }
-            if(fId != 0)
+            if(!string.IsNullOrEmpty(fId))
             {
                 sql += " and nf.ID = @fId";
-                param.Add("@fId", fId.ToString());
+                param.Add("@fId", fId);
+            }
+            if (!string.IsNullOrEmpty(mId))
+            {
+                sql += " and nf.MenuID = @mId";
+                param.Add("@mId", mId);
             }
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
             var res = new List<NFunctionVM>();
@@ -842,6 +960,7 @@ namespace Prometheus.Models
                     tmp.CreateAt = Convert.ToString(item[5]);
                     tmp.UpdateAt = Convert.ToString(item[6]);
                     tmp.MenuName = Convert.ToString(item[7]);
+                    tmp.ImgUrl = Convert.ToString(item[8]);
                     res.Add(tmp);
                 }
             }
@@ -849,8 +968,11 @@ namespace Prometheus.Models
         }
         public static NFunctionVM GetFunctionInfoByUrl(string fUrl)
         {
-            var sql = @"select ID, Name, MenuID, Url, Status, 
-                    CreateAt, UpdateAt from n_Function where Url = @fUrl and Status = @Status";
+            var sql = @"select nf.ID, nf.Name, nf.MenuID, nf.Url, nf.Status, 
+                    nf.CreateAt, nf.UpdateAt, nf.ImgUrl, nm.Name as MenuName 
+                    from n_Function as nf
+                    left join n_Menu as nm on nf.MenuID = nm.ID
+                    where nf.Url = @fUrl and nf.Status = @Status";
             var param = new Dictionary<string, string>();
             param.Add("@fUrl", fUrl);
             param.Add("@Status", RBACStatus.ValidStatus.ToString());
@@ -866,6 +988,8 @@ namespace Prometheus.Models
                 res.Status = Convert.ToString(item[4]);
                 res.CreateAt = Convert.ToString(item[5]);
                 res.UpdateAt = Convert.ToString(item[6]);
+                res.ImgUrl = Convert.ToString(item[7]);
+                res.MenuName = Convert.ToString(item[8]);
             }
             return res;
         }
@@ -951,22 +1075,12 @@ namespace Prometheus.Models
 
     }
 
-    public class NOperationPermissionVM
-    {
-        public int ID { set; get; }
-        public int Type { set; get; }
-        public int SourceID { set; get; }
-        public int OperationID { set; get; }
-        public string CreateAt { set; get; }
-        public string UpdateAt { set; get; }
-    }
-
     public class NRolePermissionVM
     {
         public int ID { set; get; }
         public int RoleID { set; get; }
-        public int Type { set; get; }
-        public int SourceID { set; get; }
+        public int MenuID { set; get; }
+        public int FunctionID { set; get; }
         public int OperationID { set; get; }
         public string CreateAt { set; get; }
         public string UpdateAt { set; get; }
@@ -974,22 +1088,22 @@ namespace Prometheus.Models
         public string MenuName { set; get; }
         public string FunctionName { set; get; }
         public string OperationName { set; get; }
-        public static Dictionary<string, List<NRolePermissionVM>> GetRolePermission(int rId = 0)
+        public static Dictionary<string, List<NRolePermissionVM>> GetRolePermission(string rId = "")
         {
-            var sql = @"select nrp.ID, nrp.RoleID, nrp.Type, nrp.SourceID,
+            var sql = @"select nrp.ID, nrp.RoleID, nrp.MenuID, nrp.FunctionID,
                 nrp.OperationID, nrp.CreateAt, nrp.UpdateAt, nr.Name as RoleName,
                 nm.Name as MenuName, nf.Name as FunctionName, no.Name as OperationName 
                 from n_RolePermission as nrp 
                 left join n_Role as nr on (nr.Status = 1 and nrp.RoleID = nr.ID)
-                left join n_Menu as nm on (nm.Status = 1 and nrp.Type = 1 and nrp.SourceID  = nr.ID)
-                left join n_Function as nf on (nf.Status = 1 and nrp.Type = 2 and nrp.SourceID = nf.ID)
+                left join n_Menu as nm on (nm.Status = 1 and nm.ID = nrp.MenuID)
+                left join n_Function as nf on (nf.Status = 1 and nrp.FunctionID = nf.ID)
                 left join n_Operation as no on (no.Status = 1 and nrp.OperationID = no.ID)
                 where 1 = 1";
             var param = new Dictionary<string, string>();
-            if(rId != 0)
+            if(!string.IsNullOrEmpty(rId))
             {
                 sql += " and nrp.RoleID = @rId ";
-                param.Add("@rId", rId.ToString());
+                param.Add("@rId", rId);
             }
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
             var res = new Dictionary<string, List<NRolePermissionVM>>();
@@ -1000,8 +1114,8 @@ namespace Prometheus.Models
                     var tmp = new NRolePermissionVM();
                     tmp.ID = Convert.ToInt32(item[0]);
                     tmp.RoleID = Convert.ToInt32(item[1]);
-                    tmp.Type = Convert.ToInt32(item[2]);
-                    tmp.SourceID = Convert.ToInt32(item[3]);
+                    tmp.MenuID = Convert.ToInt32(item[2]);
+                    tmp.FunctionID = Convert.ToInt32(item[3]);
                     tmp.OperationID = Convert.ToInt32(item[4]);
                     tmp.CreateAt = Convert.ToString(item[5]);
                     tmp.UpdateAt = Convert.ToString(item[6]);
@@ -1028,22 +1142,22 @@ namespace Prometheus.Models
         public static void AddRolePermission(List<NRolePermissionVM> rolepermissions)
         {
             var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            var sql = @"insert into n_RolePermission (RoleID, Type, SourceID, OperationID,
+            var sql = @"insert into n_RolePermission (RoleID, MenuID, FunctionID, OperationID,
                         CreateAt, UpdateAt) values ";
             var param = new Dictionary<string, string>();
             var idx = 0;
             foreach(var item in rolepermissions)
             {
-                sql += "(@RoleID_"+idx+ ", @Type_" + idx + ", @SourceID_" + idx + ", @OperationID_" + idx + ", @CreateAt_" + idx + ", @UpdateAt_" + idx + "),";
+                sql += "(@RoleID_"+idx+ ", @MenuID_" + idx + ", @FunctionID_" + idx + ", @OperationID_" + idx + ", @CreateAt_" + idx + ", @UpdateAt_" + idx + "),";
                 param.Add("@RoleID_" + idx, item.RoleID.ToString());
-                param.Add("@Type_" + idx, item.Type.ToString());
-                param.Add("@SourceID_" + idx, item.SourceID.ToString());
+                param.Add("@MenuID_" + idx, item.MenuID.ToString());
+                param.Add("@FunctionID_" + idx, item.FunctionID.ToString());
                 param.Add("@OperationID_" + idx, item.OperationID.ToString());
                 param.Add("@CreateAt_" + idx, now);
                 param.Add("@UpdateAt_" + idx, now);
                 idx++;
             }
-            sql = sql.Substring(0, sql.Length - 2);
+            sql = sql.Substring(0, sql.Length - 1);
             DBUtility.ExeLocalSqlNoRes(sql, param);
         }
         public static void DeleteRolePermissionByRoleID(int rId)
@@ -1059,6 +1173,185 @@ namespace Prometheus.Models
             sql.Replace("<ids>", ids);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
+
+    }
+
+    public class NUserPermissionRequestVM
+    {
+        public int ID { set; get; }
+        public int UserID { set; get; }
+        public int MenuID { set; get; }
+        public int FunctionID { set; get; }
+        public int OperationID { set; get; }
+        public string Comment { set; get; }
+        public int Status { set; get; }
+        public int Approver { set; get; }
+        public int Operator { set; get; }
+        public string CreateAt { set; get; }
+        public string UpdateAt { set; get; }
+        public string UserName { set; get; }
+        public string MenuName { set; get; }
+        public string FunctionName { set; get; }
+        public string OperationName { set; get; }
+
+        public static List<NUserPermissionRequestVM> GetUserPermissionRequest(int uId = 0, int Status = 0, int id = 0, int mId = 0, int fId = 0, int oId = 0, string keywords = "")
+        {
+            var sql = @"select upr.ID, upr.UserID, upr.MenuID, upr.FunctionID, upr.OperationID, 
+                    upr.Status, upr.Comment, upr.CreateAt, upr.UpdateAt, nu.Name as UserName,
+                    nm.Name as MenuName, nf.Name as FunctionName, no.Name as OperationName
+                    from n_UserPermissionRequest as upr 
+                    left join n_User as nu on nu.ID = upr.UserID
+                    left join n_Menu as nm on nm.ID = upr.MenuID
+                    left join n_Function as nf on nf.ID = upr.FunctionID
+                    left join n_Operation as no on no.ID = upr.OperationID
+                    where 1 = 1 ";
+            var param = new Dictionary<string, string>();
+            if(uId != 0)
+            {
+                sql += " and upr.UserId = @uId ";
+                param.Add("@uId", uId.ToString());
+            }
+            if(Status != 0)
+            {
+                sql += " and upr.Status = @Status ";
+                param.Add("@Status", Status.ToString());
+            }
+            if(id != 0)
+            {
+                sql += " and upr.ID = @Id";
+                param.Add("@Id", id.ToString());
+            }
+            if (mId != 0)
+            {
+                sql += " and upr.MenuID = @mId";
+                param.Add("@mId", mId.ToString());
+            }
+            if (fId != 0)
+            {
+                sql += " and upr.FunctionID = @fId";
+                param.Add("@fId", fId.ToString());
+            }
+            if (oId != 0)
+            {
+                sql += " and upr.OperationID = @oId";
+                param.Add("@oId", oId.ToString());
+            }
+            if (!string.IsNullOrEmpty(keywords))
+            {
+                if(string.Compare(keywords, PermissionRequestStatus.Msg[1], true) == 0)
+                {
+                    sql += " and upr.Status = 1 ";
+                }
+                else if(string.Compare(keywords, PermissionRequestStatus.Msg[2], true) == 0)
+                {
+                    sql += " and upr.Status = 2 ";
+                }
+                else if (string.Compare(keywords, PermissionRequestStatus.Msg[3], true) == 0)
+                {
+                    sql += " and upr.Status = 3 ";
+                }
+                else if (string.Compare(keywords, PermissionRequestStatus.Msg[4], true) == 0)
+                {
+                    sql += " and upr.Status = 4 ";
+                }
+                else if (string.Compare(keywords, PermissionRequestStatus.Msg[5], true) == 0)
+                {
+                    sql += " and upr.Status = 5 ";
+                }
+                else
+                {
+                    sql += @" and (nu.Name like @Keywords or nm.Name like @Keywords or nf.Name like @Keywords ) ";
+                    param.Add("@Keywords", "%" + keywords + "%");
+                }
+            }
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
+            var res = new List<NUserPermissionRequestVM>();
+            if(dbret.Count > 0)
+            {
+                foreach(var item in dbret)
+                {
+                    var tmp = new NUserPermissionRequestVM();
+                    tmp.ID = Convert.ToInt32(item[0]);
+                    tmp.UserID = Convert.ToInt32(item[1]);
+                    tmp.MenuID = Convert.ToInt32(item[2]);
+                    tmp.FunctionID = Convert.ToInt32(item[3]);
+                    tmp.OperationID = Convert.ToInt32(item[4]);
+                    tmp.Status = Convert.ToInt32(item[5]);
+                    tmp.Comment = Convert.ToString(item[6]);
+                    tmp.CreateAt = Convert.ToString(item[7]);
+                    tmp.UpdateAt = Convert.ToString(item[8]);
+                    tmp.UserName = Convert.ToString(item[9]);
+                    tmp.MenuName = Convert.ToString(item[10]);
+                    tmp.FunctionName = Convert.ToString(item[11]);
+                    tmp.OperationName = Convert.ToString(item[12]);
+                    res.Add(tmp);
+                }
+            }
+            return res;
+        }
+
+        public static void UpdateUserPermissionRequestStatus(int Id, int Status, int uId)
+        {
+            var sql = @"update n_UserPermissionRequest set Status = @Status,
+                        ";
+            var param = new Dictionary<string, string>();
+            param.Add("@Status", Status.ToString());
+            if(Status == PermissionRequestStatus.Approved 
+                || Status == PermissionRequestStatus.Deny)
+            {
+                sql += " Approver = @Approver, ";
+                param.Add("@Approver", uId.ToString());
+            }
+            else if (Status == PermissionRequestStatus.Complete)
+            {
+                sql += " Operator = @Operator, ";
+                param.Add("@Operator", uId.ToString());
+            }
+            sql += "UpdateAt = @uTime where ID = @Id ";
+            param.Add("@uTime", DateTime.Now.ToString("yyyy-MM-dd"));
+            param.Add("@Id", Id.ToString());
+
+
+            DBUtility.ExeLocalSqlNoRes(sql, param);
+        }
+
+        public static void AddUserPermissionRequest(List<NUserPermissionRequestVM> upr_list)
+        {
+            var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            var sql = @"insert into n_UserPermissionRequest(UserID, MenuID, 
+                FunctionID, OperationID, Status, Comment, Approver, 
+                Operator, CreateAt, UpdateAt) values ";
+            var param = new Dictionary<string, string>();
+            var idx = 0;
+            foreach (var item in upr_list)
+            {
+                var exist = GetUserPermissionRequest(item.UserID, 0, 0, item.MenuID, item.FunctionID, item.OperationID);
+                if(exist.Count > 0)
+                {
+                    continue;
+                }
+                sql += "(@UserID_" + idx + ", @MenuID_" + idx + ", @FunctionID_" 
+                    + idx + ", @OperationID_" + idx + ",  @Status_" + idx + ",  @Comment_" 
+                    + idx + ", @Approver_" + idx + ",  @Operator_" + idx + ",  @CreateAt_" 
+                    + idx + ", @UpdateAt_" + idx + "),";
+                param.Add("@UserID_" + idx, item.UserID.ToString());
+                param.Add("@MenuID_" + idx, item.MenuID.ToString());
+                param.Add("@FunctionID_" + idx, item.FunctionID.ToString());
+                param.Add("@OperationID_" + idx, item.OperationID.ToString());
+                param.Add("@Status_" + idx, PermissionRequestStatus.Pending.ToString());
+                param.Add("@Comment_" + idx, item.Comment);
+                param.Add("@Approver_" + idx, "0");
+                param.Add("@Operator_" + idx, "0");
+                param.Add("@CreateAt_" + idx, now);
+                param.Add("@UpdateAt_" + idx, now);
+                idx++;
+            }
+            sql = sql.Substring(0, sql.Length - 1);
+            DBUtility.ExeLocalSqlNoRes(sql, param);
+
+        }
+
+        
     }
 
 }

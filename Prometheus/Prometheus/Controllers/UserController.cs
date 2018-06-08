@@ -21,9 +21,35 @@ namespace Prometheus.Controllers
 {
     public class UserController : Controller
     {
+        private string RedirectTo(HttpRequestBase request)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                var exist_data = NUserVM.GetUserInfo(updater);
+                if(exist_data.ID != 0)
+                {
+                    var func_info = NFunctionVM.GetFunctionInfoByUrl(request.RawUrl.Split(new string[] { "?" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+                    var rp_info = new List<UserGroupRolePermissionVM>();
+                    if(func_info.ID != 0)
+                    {
+                        rp_info = UserGroupRolePermissionVM.GetUserGroupRolePermission(exist_data.ID, func_info.MenuID, func_info.ID);
+                        if(rp_info.Count > 0)
+                        {
+                            return request.RawUrl;
+                        }
+                    }
+                    return "/Permission/ApplyForPermission?url=" + request.RawUrl;
+                }
+            }
+
+            return request.RawUrl;
+        }
 
         private void UserAuth(string username)
         {
+
             var userdict = UserMatrixVM.RetrieveUserMatrixAuth();
             if (userdict.ContainsKey(username.ToUpper()))
             {
@@ -521,7 +547,6 @@ namespace Prometheus.Controllers
                 {
                     ViewBag.month = month;
                 }
-
                 return View();
             }
             else
@@ -529,7 +554,6 @@ namespace Prometheus.Controllers
                 return RedirectToAction("LoginUser", "User");
             }
         }
-
 
         private List<IssueViewModels> FilterSubIssue(List<IssueViewModels> tobefiter, List<IssueViewModels> allissue)
         {
@@ -603,7 +627,7 @@ namespace Prometheus.Controllers
                 ViewBag.pendinglist = FilterSubIssue(pendinglist, alllist);
                 ViewBag.workinglist = FilterSubIssue(workinglist, alllist);
                 ViewBag.donelist = FilterSubIssue(donelist, alllist);
-
+                
                 return View();
             }
             else
@@ -2688,7 +2712,7 @@ namespace Prometheus.Controllers
             {
                 var datalist = new List<string>();
                 var pvm = ProjectViewModels.N_RetrieveProjectInfo(projectkey);
-                var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(projectkey, sDate, eDate, pvm, HttpContext.Cache);
+                var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(projectkey, sDate, eDate, pvm[0], HttpContext.Cache);
                 var firstdatalist = new List<KeyValuePair<string, int>>();
                 var fpy = yieldvm.FirstYield * 100;
                 var fy = yieldvm.LastYield * 100;

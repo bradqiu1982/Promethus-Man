@@ -50,6 +50,24 @@ namespace Prometheus.Models
             var sql = "insert into UserTable(UserName,PassWD,UpdateDate,databackuptm) values(N'<UserName>','<PassWD>','<UpdateDate>','<databackuptm>')";
             sql = sql.Replace("<UserName>", Email.ToUpper()).Replace("<PassWD>", Password).Replace("<UpdateDate>", UpdateDate.ToString()).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
+
+            //insert into n_user
+            var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            sql = @"insert into n_User(Name, Password, Email, Tel, JobNum, 
+                Status, CreateAt, UpdateAt) values(@Name, @Password, @Email,
+                @Tel, @JobNum, @Status, @CreateAt, @UpdateAt)";
+
+            var param = new Dictionary<string, string>();
+            param.Add("@Name", Email.ToUpper().Split(new string[] {"@"}, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " "));
+            param.Add("@Password", Password);
+            param.Add("@Email", Email.ToUpper());
+            param.Add("@Tel", "");
+            param.Add("@JobNum", "1");
+            param.Add("@Status", RBACStatus.ValidStatus.ToString());
+            param.Add("@CreateAt", now);
+            param.Add("@UpdateAt", now);
+
+            DBUtility.ExeLocalSqlNoRes(sql, param);
         }
 
         public static UserViewModels RetrieveUser(string username)
@@ -96,6 +114,13 @@ namespace Prometheus.Models
             var sql = "update UserTable set PassWD = '<PassWD>' where UserName = N'<UserName>'";
             sql = sql.Replace("<UserName>", username.ToUpper()).Replace("<PassWD>", pwd);
             DBUtility.ExeLocalSqlNoRes(sql);
+
+            //update n_user Password
+            sql = @"update n_User set Password = @pwd where Email = @Email ";
+            var param = new Dictionary<string, string>();
+            param.Add("@pwd", pwd);
+            param.Add("@Email", username.ToUpper());
+            DBUtility.ExeLocalSqlNoRes(sql, param);
         }
 
         public static List<string> RetrieveAllUser()

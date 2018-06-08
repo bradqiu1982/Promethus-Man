@@ -15,6 +15,8 @@
     <div class="col-sm-2">
         <nav class="nav-sidebar">
             <ul class="nav">
+                <li><a href="/Permission/ApplyForPermission">Apply For Permission</a></li>
+                <li><a href="/Permission/PermissionRequest">Permission Request</a></li>
                 <li><a href="/Permission/MemberList">Members</a></li>
                 <li><a href="/Permission/GroupList">Groups</a></li>
                 <li class="active"><a href="/Permission/RoleList">Roles</a></li>
@@ -55,7 +57,8 @@
                         <tr>
                             <th>ID</th>
                             <th>Name</th>
-                            <th>Permissions</th>
+                            <th>Permission</th>
+                            <th>Comment</th>
                             <th>Operation</th>
                         </tr>
                     </thead>
@@ -67,7 +70,8 @@
                                 <tr>
                                     <td>@item.ID</td>
                                     <td>@item.Name</td>
-                                    <td><a class="role-permissions">Permission</a></td>
+                                    <td><a data-id="@item.ID" class="role-permissions">Detail</a></td>
+                                    <td>@item.Comment</td>
                                     <td>
                                         <a data-id="@item.ID" class="edit-role">Edit</a>
                                         <a data-id="@item.ID" class="del-role">Delete</a>
@@ -82,7 +86,7 @@
         </div>
     </div>
 </div>
-<div class="modal fade" id="modal-add-role" tabindex="-1" role="dialog">
+<div class="modal fade" id="modal-edit-role" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -91,14 +95,46 @@
             </div>
             <div class="modal-body">
                 <input type="hidden" id="m-rid" name="m-rid" />
+                <input type="hidden" id="m-ids" name="m-ids" 
+                       data-mid="" data-fid="" data-oid="" 
+                       data-mname="" data-fname="" data-oname="" />
                 <div class="row m-row">
                     <label class="col-xs-3">Role Name</label>
                     <div class="col-xs-9">
-                        <input type="text" class="form-control" id="modal-name" name="modal-name" />
+                        <input type="text" class="form-control" id="m-name" name="m-name" />
                     </div>
                 </div>
                 <div class="row m-row">
-
+                    <span class="col-xs-3">Permissions</span>
+                </div>
+                <div class="row m-row">
+                    <label class="col-xs-3">Menu</label>
+                    <div class="col-xs-9">
+                        <input type="text" class="form-control autocomplete-input" id="m-mid" name="m-mid" autocomplete="off" placeholder="Please Please select Menus." />
+                    </div>
+                </div>
+                <div class="row m-row">
+                    <label class="col-xs-3">Function</label>
+                    <div class="col-xs-9">
+                        <input type="text" class="form-control autocomplete-input" id="m-fid" name="m-fid" autocomplete="off" placeholder="Please Please select Functions." />
+                    </div>
+                </div>
+                <div class="row m-row">
+                    <label class="col-xs-3">Operation</label>
+                    <div class="col-xs-9">
+                        <input type="text" class="form-control autocomplete-input" id="m-oid" name="m-oid" autocomplete="off" placeholder="Please Please select Operations." />
+                    </div>
+                </div>
+                <div class="row m-row">
+                    <label class="col-xs-3">Role Permissions</label>
+                    <div class="col-xs-9 r-permissions">
+                    </div>
+                </div>
+                <div class="row m-row">
+                    <label class="col-xs-3">Comment</label>
+                    <div class="col-xs-9">
+                        <textarea class="form-control" rows="2" id="m-comment" name="m-comment"></textarea>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">

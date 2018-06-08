@@ -1,0 +1,84 @@
+﻿
+@{
+    ViewBag.Title = "ApplyForPermission";
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
+}
+
+<link href="~/Content/UserPermission.css" rel="stylesheet" />
+<script src="~/Scripts/permission.js" type="text/javascript"></script>
+<script>
+    $(function () {
+        UserPermission.applyforpermission();
+    })
+</script>
+<div class="row">
+    <div class="col-xs-2">
+        <nav class="nav-sidebar">
+            <ul class="nav">
+                @if(ViewBag.MenuList.Count > 0)
+                {
+                    foreach(var item in ViewBag.MenuList)
+                    {
+                        <li class="@(ViewBag.CurrentMenu != null && ViewBag.CurrentMenu == item.MenuID ? "active":"")"><a href="@item.MenuUrl">@item.MenuName</a></li>
+                    }
+                }
+            </ul>
+        </nav>
+    </div>
+    <div class="col-xs-10">
+        <div class="row">
+            <div class="nav navbar-nav navbar-left">
+                <ol class="breadcrumb">
+                    <li><a href="javascript:;">Permission</a></li>
+                    <li class="active">Apply For Permission</li>
+                </ol>
+            </div>
+        </div>
+        @if (ViewBag.func != null)
+        {
+            <div class="bs-callout bs-callout-danger">
+                <h4>You don't have @ViewBag.func.Name permission</h4>
+                <p>You can follow the next operation to apply for it.</p>
+            </div>
+        }
+        <input type="hidden" id="ids" name="ids" data-mid="@(ViewBag.func != null ?ViewBag.func.MenuID:"")" 
+               data-fid="@(ViewBag.func != null ?ViewBag.func.ID:"")" data-oid="" 
+               data-mname="@(ViewBag.func != null ?ViewBag.func.MenuName:"")" 
+               data-fname="@(ViewBag.func != null ?ViewBag.func.Name:"")" data-oname="" />
+        <div class="row m-row">
+            <label class="col-xs-3">Menu</label>
+            <div class="col-xs-9">
+                <input type="text" class="form-control autocomplete-input" id="mid" 
+                       name="mid" autocomplete="off" value="@(ViewBag.func != null ?ViewBag.func.MenuName:"")" placeholder="Please Please select Menus." />
+            </div>
+        </div>
+        <div class="row m-row">
+            <label class="col-xs-3">Function</label>
+            <div class="col-xs-9">
+                <input type="text" class="form-control autocomplete-input" id="fid" 
+                       name="fid" autocomplete="off" value="@(ViewBag.func != null ?ViewBag.func.Name:"")" placeholder="Please Please select Functions." />
+            </div>
+        </div>
+        <div class="row m-row">
+            <label class="col-xs-3">Operation</label>
+            <div class="col-xs-9">
+                <input type="text" class="form-control autocomplete-input" id="oid" name="oid" autocomplete="off" placeholder="Please Please select Operations." />
+            </div>
+        </div>
+        <div class="row m-row">
+            <label class="col-xs-3">Role Permissions</label>
+            <div class="col-xs-9 r-permissions">
+            </div>
+        </div>
+        <div class="row m-row">
+            <label class="col-xs-3">Comment</label>
+            <div class="col-xs-9">
+                <textarea class="form-control" rows="2" id="comment" name="comment"></textarea>
+            </div>
+        </div>
+        <div class="row m-row">
+            <input type="button" class="btn btn-warning btn-cancel" id="btn-cancel" name="btn-cancel" value="Cancel" />
+            <input type="button" class="btn btn-success btn-submit" id="btn-submit" name="btn-submit" value="Submit" />
+        </div>
+    </div>
+</div>

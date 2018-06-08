@@ -7,17 +7,23 @@ using Prometheus.Models;
 
 namespace Prometheus.Controllers
 {
-    public class PermissionController : Controller
+    public class PermissionController : BaseController
     {
-        // GET: Permission
-        public ActionResult Index()
-        {
-            return View();
-        }
-
         public ActionResult GroupList(int pageno = 1, string keywords = "")
         {
-            var pagesize = 2;
+            UserPermit();
+            if (!ViewBag.Login)
+            {
+                return RedirectToLogin("Permission", "GroupList");
+            }
+
+            var redirecturl = RedirectTo(Request);
+            if (redirecturl != Request.RawUrl)
+            {
+                return Redirect(redirecturl);
+            }
+
+            var pagesize = PageVM.PageSize;
             var GroupList = NGroupVM.GetGroups(keywords);
             var totalcnt = GroupList.Count;
             var totalpage = (int)Math.Ceiling((double)totalcnt / pagesize);
@@ -81,7 +87,19 @@ namespace Prometheus.Controllers
 
         public ActionResult MemberList(int pageno = 1, string keywords = "")
         {
-            var pagesize = 2;
+            UserPermit();
+            if (!ViewBag.Login)
+            {
+                return RedirectToLogin("Permission", "MemberList");
+            }
+
+            var redirecturl = RedirectTo(Request);
+            if (redirecturl != Request.RawUrl)
+            {
+                return Redirect(redirecturl);
+            }
+
+            var pagesize = PageVM.PageSize;
             var MemberList = NUserVM.GetUsersList(keywords);
             var totalcnt = MemberList.Count;
             var totalpage = (int)Math.Ceiling((double)totalcnt / pagesize);
@@ -126,6 +144,7 @@ namespace Prometheus.Controllers
             return res;
 
         }
+
         [HttpPost]
         public JsonResult UpdateMember()
         {
@@ -179,7 +198,6 @@ namespace Prometheus.Controllers
             }
             foreach (var uid in del_uIds)
             {
-
                 NUserGroupVM.DeleteGroupMember(gId, Convert.ToInt32(uid));
             }
             var res = new JsonResult();
@@ -208,7 +226,7 @@ namespace Prometheus.Controllers
             var a_rIds = new List<int>();
             foreach (var role in gRoles)
             {
-                a_rIds.Add(Convert.ToInt32(role.ID));
+                a_rIds.Add(Convert.ToInt32(role.RoleID));
             }
             var add_rIds = n_rIds.Except(a_rIds).ToList();
             var del_rIds = a_rIds.Except(n_rIds).ToList();
@@ -228,7 +246,19 @@ namespace Prometheus.Controllers
         
         public ActionResult Menus(int pageno = 1, string keywords = "")
         {
-            var pagesize = 2;
+            UserPermit();
+            if (!ViewBag.Login)
+            {
+                return RedirectToLogin("Permission", "Menus");
+            }
+
+            var redirecturl = RedirectTo(Request);
+            if (redirecturl != Request.RawUrl)
+            {
+                return Redirect(redirecturl);
+            }
+
+            var pagesize = PageVM.PageSize;
             var Menus = NMenuVM.GetMenuList(keywords);
             var totalcnt = Menus.Count;
             var totalpage = (int)Math.Ceiling((double)totalcnt / pagesize);
@@ -247,11 +277,13 @@ namespace Prometheus.Controllers
         {
             var name = Request.Form["name"];
             var url = Request.Form["url"];
+            var imgurl = Request.Form["imgurl"];
             var pid = string.IsNullOrEmpty(Request.Form["pid"]) ? 0 : Convert.ToInt32(Request.Form["pid"]);
             var oid = string.IsNullOrEmpty(Request.Form["oid"]) ? 0 : Convert.ToInt32(Request.Form["oid"]);
             var menu = new NMenuVM();
             menu.Name = name;
             menu.Url = url;
+            menu.ImgUrl = imgurl;
             menu.ParentID = pid;
             menu.OrderID = oid;
             menu.Status = RBACStatus.ValidStatus.ToString();
@@ -269,12 +301,14 @@ namespace Prometheus.Controllers
             var mid = Convert.ToInt32(Request.Form["mid"]);
             var name = Request.Form["name"];
             var url = Request.Form["url"];
+            var imgurl = Request.Form["imgurl"];
             var pid = string.IsNullOrEmpty(Request.Form["pid"]) ? 0 : Convert.ToInt32(Request.Form["pid"]);
             var oid = string.IsNullOrEmpty(Request.Form["oid"]) ? 0 : Convert.ToInt32(Request.Form["oid"]);
             var menu = new NMenuVM();
             menu.ID = mid;
             menu.Name = name;
             menu.Url = url;
+            menu.ImgUrl = imgurl;
             menu.ParentID = pid;
             menu.OrderID = oid;
             menu.UpdateAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
@@ -300,7 +334,19 @@ namespace Prometheus.Controllers
 
         public ActionResult Functions(int pageno = 1, string keywords = "")
         {
-            var pagesize = 2;
+            UserPermit();
+            if (!ViewBag.Login)
+            {
+                return RedirectToLogin("Permission", "Functions");
+            }
+
+            var redirecturl = RedirectTo(Request);
+            if (redirecturl != Request.RawUrl)
+            {
+                return Redirect(redirecturl);
+            }
+
+            var pagesize = PageVM.PageSize;
             var Funcs = NFunctionVM.GetFunctionList(keywords);
             var totalcnt = Funcs.Count;
             var totalpage = (int)Math.Ceiling((double)totalcnt / pagesize);
@@ -317,8 +363,8 @@ namespace Prometheus.Controllers
         [HttpPost]
         public JsonResult GetMenuList()
         {
-
-            var Menus = NMenuVM.GetMenuList();
+            var type = (Request.Form["type"] == null) ? 0 : Convert.ToInt32(Request.Form["type"]);
+            var Menus = NMenuVM.GetMenuList(string.Empty, 0, type);
             var res = new JsonResult();
             res.Data = new { success = true, Menus = Menus };
             return res;
@@ -329,10 +375,12 @@ namespace Prometheus.Controllers
         {
             var name = Request.Form["name"];
             var url = Request.Form["url"];
+            var imgurl = Request.Form["imgurl"];
             var mid = Convert.ToInt32(Request.Form["mid"]);
             var func = new NFunctionVM();
             func.Name = name;
             func.Url = url;
+            func.ImgUrl = imgurl;
             func.MenuID = mid;
             func.Status = RBACStatus.ValidStatus.ToString();
             func.CreateAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
@@ -363,11 +411,13 @@ namespace Prometheus.Controllers
             var fid = Convert.ToInt32(Request.Form["fid"]);
             var name = Request.Form["name"];
             var url = Request.Form["url"];
+            var imgurl = Request.Form["imgurl"];
             var mid = Convert.ToInt32(Request.Form["mid"]);
             var func = new NFunctionVM();
             func.ID = fid;
             func.Name = name;
             func.Url = url;
+            func.ImgUrl = imgurl;
             func.MenuID = mid;
             func.UpdateAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             NFunctionVM.UpdateFunction(func);
@@ -378,7 +428,19 @@ namespace Prometheus.Controllers
 
         public ActionResult Operations(int pageno = 1, string keywords = "")
         {
-            var pagesize = 2;
+            UserPermit();
+            if (!ViewBag.Login)
+            {
+                return RedirectToLogin("Permission", "Operations");
+            }
+
+            var redirecturl = RedirectTo(Request);
+            if (redirecturl != Request.RawUrl)
+            {
+                return Redirect(redirecturl);
+            }
+
+            var pagesize = PageVM.PageSize;
             var Operations = NOperationVM.GetOperationList(keywords);
             var totalcnt = Operations.Count;
             var totalpage = (int)Math.Ceiling((double)totalcnt / pagesize);
@@ -439,7 +501,357 @@ namespace Prometheus.Controllers
 
         public ActionResult RoleList(int pageno = 1, string keywords = "")
         {
+            UserPermit();
+            if (!ViewBag.Login)
+            {
+                return RedirectToLogin("Permission", "RoleList");
+            }
+
+            var redirecturl = RedirectTo(Request);
+            if (redirecturl != Request.RawUrl)
+            {
+                return Redirect(redirecturl);
+            }
+
+
+            var pagesize = PageVM.PageSize;
+            var rolelist = NRoleVM.GetRoleList(RBACStatus.ValidStatus.ToString(), string.Empty, keywords);
+            var totalcnt = rolelist.Count;
+            var totalpage = (int)Math.Ceiling((double)totalcnt / pagesize);
+            var pageNo = totalpage < pageno ? totalpage : pageno;
+
+            ViewBag.Roles = (totalcnt > 0) ? rolelist.Skip((pageNo - 1) * pagesize).Take(pagesize) : null;
+            ViewBag.TotalCnt = totalcnt;
+            ViewBag.TotalPage = totalpage;
+            ViewBag.PageNo = pageNo;
+            ViewBag.Keywords = keywords;
+
             return View();
+        }
+
+        [HttpPost]
+        public JsonResult GetRolePermission()
+        {
+            var rid = Request.Form["rid"];
+            var rpList = new List<NRolePermissionVM>();
+            var mList = new List<NMenuVM>();
+            var oList = new List<NOperationVM>();
+            if (string.IsNullOrEmpty(rid))
+            {
+                mList = NMenuVM.GetMenuList(string.Empty, 0, 1);
+                oList = NOperationVM.GetOperationList();
+            }
+            else
+            {
+                var rpList_tmp = NRolePermissionVM.GetRolePermission(rid);
+                rpList = rpList_tmp[rid];
+            }
+
+            var res = new JsonResult();
+            res.Data = new {
+                success = true,
+                rPermissions = rpList,
+                mList = mList,
+                oList = oList,
+            };
+            return res;
+        }
+
+        [HttpPost]
+        public JsonResult GetMenuFunctions()
+        {
+            var mid = Request.Form["mid"];
+            var mFunctions = NFunctionVM.GetFunctionList("", mid);
+
+            var res = new JsonResult();
+            res.Data = new {
+                success = true,
+                mFunctions = mFunctions,
+            };
+            return res;
+        }
+
+        [HttpPost]
+        public JsonResult AddRole()
+        {
+            var rName = Request.Form["rName"];
+            var mIds = Request.Form["mIds[]"];
+            var comment = Request.Form["comment"];
+            var res = new JsonResult();
+            var exist_data = NRoleVM.GetRoleList("", rName);
+            if(exist_data.Count > 0)
+            {
+                res.Data = new
+                {
+                    success = false,
+                    msg = "This RoleName has already exist",
+                };
+                return res;
+            }
+
+            var role = new NRoleVM();
+            role.Name = rName;
+            role.Comment = comment;
+            role.Status = RBACStatus.ValidStatus.ToString();
+            NRoleVM.AddRole(role);
+
+            exist_data = NRoleVM.GetRoleList("", rName);
+            var rId = exist_data[0].ID;
+            var mids_arr = mIds.Split(new string[] { ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
+            var rp_list = new List<NRolePermissionVM>();
+            foreach (var item in mids_arr)
+            {
+                var ids = item.Split(new string[] { "_"}, StringSplitOptions.RemoveEmptyEntries);
+                var rpermission = new NRolePermissionVM();
+                rpermission.RoleID = rId;
+                rpermission.MenuID = Convert.ToInt32(ids[0]);
+                rpermission.FunctionID = Convert.ToInt32(ids[1]);
+                rpermission.OperationID = Convert.ToInt32(ids[2]);
+                rp_list.Add(rpermission);
+            }
+            NRolePermissionVM.AddRolePermission(rp_list);
+            res.Data = new
+            {
+                success = true
+            };
+            return res;
+        }
+
+        [HttpPost]
+        public JsonResult EditRole()
+        {
+            var rId = Request.Form["rId"];
+            var rName = Request.Form["rName"];
+            var mIds = Request.Form["mIds[]"];
+            var comment = Request.Form["comment"];
+
+            var role = new NRoleVM();
+            role.ID = Convert.ToInt32(rId);
+            role.Name = rName;
+            role.Comment = comment;
+            NRoleVM.UpdateRole(role);
+
+            NRolePermissionVM.DeleteRolePermissionByRoleID(role.ID);
+            var mids_arr = mIds.Split(new string[] { ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
+            var rp_list = new List<NRolePermissionVM>();
+            foreach (var item in mids_arr)
+            {
+                var ids = item.Split(new string[] { "_" }, StringSplitOptions.RemoveEmptyEntries);
+                var rpermission = new NRolePermissionVM();
+                rpermission.RoleID = role.ID;
+                rpermission.MenuID = Convert.ToInt32(ids[0]);
+                rpermission.FunctionID = Convert.ToInt32(ids[1]);
+                rpermission.OperationID = Convert.ToInt32(ids[2]);
+                rp_list.Add(rpermission);
+            }
+            NRolePermissionVM.AddRolePermission(rp_list);
+            var res = new JsonResult();
+            res.Data = new
+            {
+                success = true,
+            };
+
+            return res;
+        }
+
+        [HttpPost]
+        public JsonResult DelRole()
+        {
+            var rid = Request.Form["rId"];
+            var res = new JsonResult();
+            if (!string.IsNullOrEmpty(rid))
+            {
+                var role = new NRoleVM();
+                role.ID = Convert.ToInt32(rid);
+                role.Status = RBACStatus.InValidStatus.ToString();
+                NRoleVM.UpdateRole(role);
+                res.Data = new { success = true };
+            }
+            else
+            {
+                res.Data = new { success = false };
+            }
+            return res;
+        }
+
+        public ActionResult ApplyForPermission(string url)
+        {
+            UserPermit();
+            if (!ViewBag.Login)
+            {
+                return RedirectToLogin("Permission", "ApplyForPermission");
+            }
+
+            var redirecturl = RedirectTo(Request);
+            if (redirecturl != Request.RawUrl)
+            {
+                return Redirect(redirecturl);
+            }
+            if (! string.IsNullOrEmpty(url))
+            {
+                var uri = url.Split(new string[] { "?" }, StringSplitOptions.RemoveEmptyEntries)[0];
+                var cur_uri = Request.RawUrl.Split(new string[] { "?" }, StringSplitOptions.RemoveEmptyEntries)[0];
+                ViewBag.func = (uri == cur_uri) ? null : NFunctionVM.GetFunctionInfoByUrl(uri);
+            }
+
+            return View();
+        }
+
+        public ActionResult PermissionRequest(int pageno = 1, string keywords = "")
+        {
+            UserPermit();
+            if (!ViewBag.Login)
+            {
+                return RedirectToLogin("Permission", "PermissionRequest");
+            }
+
+            var redirecturl = RedirectTo(Request);
+            if (redirecturl != Request.RawUrl)
+            {
+                return Redirect(redirecturl);
+            }
+
+            var pagesize = PageVM.PageSize;
+
+            ViewBag.Approve_Flg = HasPermission(ViewBag.UserData.ID, PermissionOperateUrl.Approve);
+            ViewBag.Deny_Flg = HasPermission(ViewBag.UserData.ID, PermissionOperateUrl.Deny);
+            ViewBag.Complete_Flg = HasPermission(ViewBag.UserData.ID, PermissionOperateUrl.Complete);
+
+            var search_uid = ViewBag.UserData.ID;
+            if(ViewBag.Approve_Flg || ViewBag.Deny_Flg || ViewBag.Complete_Flg)
+            {
+                search_uid = 0;
+            }
+            var prList = (List<NUserPermissionRequestVM>)NUserPermissionRequestVM.GetUserPermissionRequest(search_uid, 0, 0, 0, 0, 0, keywords);
+            var totalcnt = prList.Count;
+            var totalpage = (int)Math.Ceiling((double)totalcnt / pagesize);
+            var pageNo = totalpage < pageno ? totalpage : pageno;
+
+
+            ViewBag.Data = (totalcnt > 0) ? prList.Skip((pageNo - 1) * pagesize).Take(pagesize) : null;
+            ViewBag.TotalCnt = totalcnt;
+            ViewBag.TotalPage = totalpage;
+            ViewBag.PageNo = pageNo;
+            ViewBag.Keywords = keywords;
+
+            return View();
+        }
+
+        private bool HasPermission(int uId, string url)
+        {
+            var func_info = NFunctionVM.GetFunctionInfoByUrl(url.Split(new string[] { "?" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+            var rp_info = new List<UserGroupRolePermissionVM>();
+            if (func_info.ID != 0)
+            {
+                rp_info = UserGroupRolePermissionVM.GetUserGroupRolePermission(uId, func_info.MenuID, func_info.ID);
+                if (rp_info.Count > 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        [HttpPost]
+        public JsonResult AddUserPermissionRequest()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var uName = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            var exist_data = NUserVM.GetUserInfo(uName);
+            var res = new JsonResult();
+            if (exist_data.ID != 0)
+            {
+                var Ids = Request.Form["Ids[]"];
+                var comment = Request.Form["comment"];
+
+                var ids_arr = Ids.Split(new string[] { ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
+                var upr_list = new List<NUserPermissionRequestVM>();
+                foreach (var item in ids_arr)
+                {
+                    var ids = item.Split(new string[] { "_" }, StringSplitOptions.RemoveEmptyEntries);
+                    var upr = new NUserPermissionRequestVM();
+                    upr.UserID = exist_data.ID;
+                    upr.MenuID = Convert.ToInt32(ids[0]);
+                    upr.FunctionID = Convert.ToInt32(ids[1]);
+                    upr.OperationID = Convert.ToInt32(ids[2]);
+                    upr.Comment = comment;
+                    upr_list.Add(upr);
+                }
+                NUserPermissionRequestVM.AddUserPermissionRequest(upr_list);
+                res.Data = new { success = true };
+            }
+            else
+            {
+                res.Data = new { success = false };
+            }
+
+            return res;
+        }
+
+        [HttpPost]
+        public JsonResult ApprovePermissionRequest()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var uName = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            var exist_data = NUserVM.GetUserInfo(uName);
+            var res = new JsonResult();
+            if (exist_data.ID != 0)
+            {
+                var id = Convert.ToInt32(Request.Form["id"]);
+                NUserPermissionRequestVM.UpdateUserPermissionRequestStatus(id, PermissionRequestStatus.Approved, exist_data.ID);
+                res.Data = new { success = true };
+            }
+            else
+            {
+                res.Data = new { success = false };
+            }
+            return res;
+        }
+
+        [HttpPost]
+        public JsonResult DenyPermissionRequest()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var uName = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            var exist_data = NUserVM.GetUserInfo(uName);
+            var res = new JsonResult();
+            if (exist_data.ID != 0)
+            {
+                var id = Convert.ToInt32(Request.Form["id"]);
+                NUserPermissionRequestVM.UpdateUserPermissionRequestStatus(id, PermissionRequestStatus.Deny, exist_data.ID);
+                res.Data = new { success = true };
+            }
+            else
+            {
+                res.Data = new { success = false };
+            }
+            return res;
+        }
+
+        [HttpPost]
+        public JsonResult CompletePermissionRequest()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var uName = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            var exist_data = NUserVM.GetUserInfo(uName);
+            var res = new JsonResult();
+            if (exist_data.ID != 0)
+            {
+                var id = Convert.ToInt32(Request.Form["id"]);
+                var permit_data = NUserPermissionRequestVM.GetUserPermissionRequest(exist_data.ID);
+                if(permit_data.Count > 0)
+                {
+                    var permit_exist = UserGroupRolePermissionVM.GetUserGroupRolePermission(permit_data[0].UserID, permit_data[0].MenuID, permit_data[0].FunctionID);
+                    if (permit_exist.Count > 0)
+                    {
+                        NUserPermissionRequestVM.UpdateUserPermissionRequestStatus(id, PermissionRequestStatus.Complete, exist_data.ID);
+                        res.Data = new { success = true };
+                        return res;
+                    }
+                }
+            }
+            res.Data = new { success = false };
+            return res;
         }
     }
 }

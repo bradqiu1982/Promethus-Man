@@ -1425,7 +1425,7 @@ namespace Prometheus.Models
             }
 
             var starttime = biexplorerealtime.ToString("yyyy-MM-dd") + " 00:00:00";
-            var endtime = biexplorerealtime.ToString("yyyy-MM-dd") + " 23:59:59";
+            var endtime = biexplorerealtime.AddDays(1).ToString("yyyy-MM-dd") + " 23:59:59";
 
             foreach (var bt in bitables)
             {
@@ -1511,7 +1511,7 @@ namespace Prometheus.Models
 
             }//end foreach
 
-            days = days + 1;
+            days = days + 2;
             System.IO.File.WriteAllText(bioldfile, days.ToString());
         }
 

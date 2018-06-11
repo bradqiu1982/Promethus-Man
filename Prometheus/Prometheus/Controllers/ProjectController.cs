@@ -6556,7 +6556,7 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
-            BIDataUtility.BIOLDTestDateExplore(this);
+            //BIDataUtility.BIOLDTestDateExplore(this);
 
             //ExternalDataCollector.UpdateRMABackUPSN();
             //ExternalDataCollector.UpdateRMABackUPDataRate();

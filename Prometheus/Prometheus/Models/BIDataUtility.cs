@@ -1393,6 +1393,28 @@ namespace Prometheus.Models
             }
         }
 
+        private static DateTime RetrieveLatestTimeStampOfHTOLBITable()
+        {
+            var sql = "select top 1 TestTimeStamp from BIHTOLTestResult order by TestTimeStamp DESC";
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            if (dbret.Count > 0)
+            {
+                try
+                {
+                    return DateTime.Parse(Convert.ToString(dbret[0][0]));
+                }
+                catch (Exception ex)
+                {
+                    return DateTime.Now;
+                }
+            }
+            else
+            {
+                return DateTime.Now;
+            }
+        }
+
         private static string ConvertToDateStr(object datestr)
         {
             try
@@ -1607,7 +1629,118 @@ namespace Prometheus.Models
             }//end foreach
         }
 
-        private static void StoreBITestResult(List<BITestResult> testresultlist)
+        public static void LoadHTOLTestData(Controller ctrl)
+        {
+            var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+            var bitables = new List<string>();
+            bitables.Add("dbo.v_BIHTOLOutput");
+
+            var bihtoltime = syscfgdict["BIHTOLZEROTIME"];
+           
+            var bihtolfile = ctrl.Server.MapPath("~/userfiles") + "\\BIHTOLDATA.txt";
+            if (!System.IO.File.Exists(bihtolfile))
+            {
+                return;
+            }
+
+            var days = Convert.ToInt32(System.IO.File.ReadAllText(bihtolfile));
+            var biexplorerealtime = DateTime.Parse(bihtoltime).AddDays((double)days);
+            if (biexplorerealtime > DateTime.Now)
+            {
+                return;
+            }
+
+            var starttime = biexplorerealtime.ToString("yyyy-MM-dd") + " 00:00:00";
+            var endtime = biexplorerealtime.AddDays(4).ToString("yyyy-MM-dd") + " 23:59:59";
+
+            foreach (var bt in bitables)
+            {
+                var testresultlist = new List<BITestResult>();
+                var testresultfieldlist = new List<BITestResultDataField>();
+
+
+                var sql = "select ContainerName,ProcessStep,DateTime,Failure_Mode,Station,Work_Order,PN,Channel,SLOPE,PO_LD,PO_Uniformity,THOLD,Delta_PO_LD,Delta_SLOPE,Delta_THOLD,Delta_PO_Uniformity from <bitable> where DateTime >= '<starttime>' and DateTime <= '<endtime>' "
+                    + " and  ProcessStep is not null and PN is not null and Work_Order is not null and ContainerName is not null and Failure_Mode is not null and ContainerName <> '' "
+                    + " and Failure_Mode <> '--' and Failure_Mode <> '' and Failure_Mode is not null and Delta_PO_LD is not null and Delta_SLOPE is not null and Delta_THOLD is not null "
+                    + " and Delta_PO_Uniformity is not null  order by ContainerName,DateTime";
+
+                sql = sql.Replace("<bitable>", bt).Replace("<starttime>", starttime).Replace("<endtime>", endtime);
+
+                var previoussn = string.Empty;
+                var dataid = string.Empty;
+
+                var dbret = DBUtility.ExeAutoSqlWithRes(sql);
+                if (dbret.Count == 0)
+                {
+                    continue;
+                }
+
+                foreach (var line in dbret)
+                {
+                    try
+                    {
+                        var sn = Convert.ToString(line[0]);
+                        var testname = Convert.ToString(line[1]);
+                        var testtime = DateTime.Parse(ConvertToDateStr(line[2]));
+                        var failure = Convert.ToString(line[3]);
+                        var station = Convert.ToString(line[4]);
+                        var jo = Convert.ToString(line[5]);
+                        var pn = Convert.ToString(line[6]);
+                        var ch = Convert.ToString(line[7]);
+                        var slope = Convert.ToDouble(line[8]);
+                        var pold = Convert.ToDouble(line[9]);
+                        var pouniformity = Convert.ToDouble(line[10]);
+                        var thold = Convert.ToDouble(line[11]);
+                        var dpold = Convert.ToDouble(line[12]);
+                        var dslope = Convert.ToDouble(line[13]);
+                        var dthold = Convert.ToDouble(line[14]);
+                        var dpouniformity = Convert.ToDouble(line[15]);
+
+                        if (string.Compare(previoussn, sn + ":" + testname, true) != 0)
+                        {
+                            previoussn = sn + ":" + testname;
+                            dataid = IssueViewModels.GetUniqKey();
+                            var tempresult = new BITestResult(sn, testname, station, failure, testtime, pn, jo, bt, dataid);
+                            testresultlist.Add(tempresult);
+                        }
+
+                        var tempfield = new BITestResultDataField(sn, testname, testtime, pn, jo, ch, slope, pold, pouniformity, thold, dpold, dslope, dthold, dpouniformity, dataid);
+                        testresultfieldlist.Add(tempfield);
+                    }
+                    catch (Exception ex) { }
+
+                }//end foreach
+
+                var snwaferdict = new Dictionary<string, BISNRelation>();
+                RetrieveBIWaferBySN(testresultlist, snwaferdict);
+
+                foreach (var item in testresultlist)
+                {
+                    if (snwaferdict.ContainsKey(item.SN.Split('_')[0]))
+                    {
+                        item.Wafer = snwaferdict[item.SN.Split('_')[0]].wafer;
+                        item.ProductName = snwaferdict[item.SN.Split('_')[0]].productname;
+                    }
+                }//end foreach
+                foreach (var item in testresultfieldlist)
+                {
+                    if (snwaferdict.ContainsKey(item.SN.Split('_')[0]))
+                    {
+                        item.Wafer = snwaferdict[item.SN.Split('_')[0]].wafer;
+                        item.ProductName = snwaferdict[item.SN.Split('_')[0]].productname;
+                    }
+                }
+
+                StoreBITestResult(testresultlist,"BIHTOLTestResult");
+                StoreBITestResultDateField(testresultfieldlist, "BIHTOLTestResultDataField");
+
+            }//end foreach
+
+            days = days + 5;
+            System.IO.File.WriteAllText(bihtolfile, days.ToString());
+        }
+
+        private static void StoreBITestResult(List<BITestResult> testresultlist,string deftab = "BITestResult")
         {
             //BITestResult
             var datatable = new System.Data.DataTable();
@@ -1632,7 +1765,7 @@ namespace Prometheus.Models
                 datatable.Rows.Add(temprow);
             }
 
-            WriteDBWithTable(datatable, "BITestResult");
+            WriteDBWithTable(datatable, deftab);
 
             //datatable.Columns.Add("SN", typeof(string));
             //datatable.Columns.Add("TestName", typeof(string));
@@ -1649,7 +1782,7 @@ namespace Prometheus.Models
             //datatable.Columns.Add("Appv_4", typeof(DateTime));
         }
 
-        private static void StoreBITestResultDateField(List<BITestResultDataField> testresultfieldlist)
+        private static void StoreBITestResultDateField(List<BITestResultDataField> testresultfieldlist,string deftab = "BITestResultDataField")
         {
             //BITestResultDataField
             var datatable = new System.Data.DataTable();
@@ -1673,7 +1806,7 @@ namespace Prometheus.Models
                 datatable.Rows.Add(temprow);
             }
 
-            WriteDBWithTable(datatable, "BITestResultDataField");
+            WriteDBWithTable(datatable, deftab);
 
             //datatable.Columns.Add("SN", typeof(string));
             //datatable.Columns.Add("TestName", typeof(string));
@@ -2279,8 +2412,8 @@ namespace Prometheus.Models
             var sndict = new Dictionary<string, bool>();
             foreach (var item in testresultlist)
             {
-                if (!sndict.ContainsKey(item.SN))
-                { sndict.Add(item.SN, true); }
+                if (!sndict.ContainsKey(item.SN.Split('_')[0]))
+                { sndict.Add(item.SN.Split('_')[0], true); }
             }
             var snlist = sndict.Keys.ToList();
             var startidx = 0;

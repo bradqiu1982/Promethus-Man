@@ -381,6 +381,7 @@ namespace Prometheus.Models
         public string Status { set; get; }
         public string CreateAt { set; get; }
         public string UpdateAt { set; get; }
+        public string GroupName { set; get; }
 
         public static List<NUserVM> GetUsersByGroupID(int gId = 0)
         {
@@ -464,7 +465,6 @@ namespace Prometheus.Models
 
             DBUtility.ExeLocalSqlNoRes(sql, param);
         }
-
         public static void InsertGroupMember(int gId, int uId)
         {
             var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
@@ -478,6 +478,35 @@ namespace Prometheus.Models
             param.Add("@uTime", now);
             DBUtility.ExeLocalSqlNoRes(sql, param);
 
+        }
+        public static List<NUserGroupVM> GetMemberGroup(int uId)
+        {
+            var sql = @"select nug.ID, nug.UserID, nug.GroupID, nug.Status, 
+                nug.CreateAt, nug.UpdateAt, ng.Name as GroupName
+                from n_UserGroup as nug 
+                left join n_Group as ng on nug.GroupID = ng.ID
+                where nug.UserID = @uId 
+                and nug.Status = 1 and ng.Status = 1";
+            var param = new Dictionary<string, string>();
+            param.Add("@uId", uId.ToString());
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
+            var res = new List<NUserGroupVM>();
+            if (dbret.Count > 0)
+            {
+                foreach (var item in dbret)
+                {
+                    var tmp = new NUserGroupVM();
+                    tmp.ID = Convert.ToInt32(item[0]);
+                    tmp.UserID = Convert.ToInt32(item[1]);
+                    tmp.GroupID = Convert.ToInt32(item[2]);
+                    tmp.Status = Convert.ToString(item[3]);
+                    tmp.CreateAt = Convert.ToString(item[4]);
+                    tmp.UpdateAt = Convert.ToString(item[5]);
+                    tmp.GroupName = Convert.ToString(item[6]);
+                    res.Add(tmp);
+                }
+            }
+            return res;
         }
     }
 

@@ -832,7 +832,7 @@ namespace Prometheus.Controllers
 
             return res;
         }
-
+         
         private void SendAlertEmail(string type, string updater, string requester, List<string> n_operator=null)
         {
             string scheme = Url.RequestContext.HttpContext.Request.Url.Scheme;
@@ -856,6 +856,31 @@ namespace Prometheus.Controllers
 
             EmailUtility.SendEmail(this, "【" + type + "】Permission Request", toaddrs, content);
             new System.Threading.ManualResetEvent(false).WaitOne(200);
+        }
+
+        [HttpPost]
+        public JsonResult GetMemberGroups()
+        {
+            var res = new JsonResult();
+            var uid = Request.Form["uid"];
+            if (string.IsNullOrEmpty(uid))
+            {
+                res.Data = new
+                {
+                    success = false
+                };
+            }
+            else
+            {
+                var data = NUserGroupVM.GetMemberGroup(Convert.ToInt32(uid));
+                res.Data = new
+                {
+                    success = true,
+                    data = data
+                };
+            }
+
+            return res;
         }
     }
 }

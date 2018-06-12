@@ -102,6 +102,23 @@
             }
             window.location.href = '/Permission/MemberList?pageno=1&keywords=' + keywords;
         })
+        $('body').on('click', '.show-groups', function () {
+            var uid = $(this).data('id');
+            $.post('/Permission/GetMemberGroups',
+            {
+                uid: uid
+            }, function (output) {
+                if (output.success) {
+                    $("#m-groups").empty();
+                    var appendStr = "";
+                    $.each(output.data, function (i, val) {
+                        appendStr += "<tr><td>" + (i + 1) + "</td><td>" + val.GroupName + "</td></tr>";
+                    });
+                    $("#m-groups").append(appendStr);
+                    $("#modal-groups").modal("show");
+                }
+            })
+        })
     }
     var grouplist = function () {
         $('body').on('click', '#btn-add-group', function () {

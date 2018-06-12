@@ -50,13 +50,19 @@
     text-align: left;
     cursor: pointer;
 }
-.edit-op, .del-op, 
-.upr-approve, .upr-deny, .upr-complete, 
+.edit-op, .del-op, .show-groups,
+.upr-approve, .upr-deny, .upr-complete,
 .edit-menu, .del-menu, .edit-func, .del-func,
 .edit-member, .del-member, .edit-group, .del-group,
 .edit-gmember, .edit-grole, .edit-role, .del-role,
 .role-permissions {
     cursor: pointer;
+}
+
+.m-groups{
+    min-height: 120px;
+    max-height: 300px;
+    overflow-y: auto;
 }
 
 .group-members, .all-members-panel, .group-roles, .r-permissions {

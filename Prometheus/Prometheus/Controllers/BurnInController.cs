@@ -135,17 +135,11 @@ namespace Prometheus.Controllers
         // GET: BurnIn
         public ActionResult BurnInMainPage(string ProjectKey)
         {
-            UserPermit();
-            if (!ViewBag.Login)
-            {
-                return RedirectToLogin("BurnInMainPage", "BurnIn");
-            }
-
-            var redirecturl = RedirectTo(Request);
-            if (redirecturl != Request.RawUrl)
-            {
-                return Redirect(redirecturl);
-            }
+            //var checkresult = CheckLoginAndPermit(Request, "BurnIn", "BurnInMainPage");
+            //if (checkresult.GetType() != (new Boolean()).GetType())
+            //{
+            //    return (ActionResult)checkresult;
+            //}
 
             if (!string.IsNullOrEmpty(ProjectKey))
             {

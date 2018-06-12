@@ -1485,17 +1485,11 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectIssues(string ProjectKey)
         {
-            UserPermit();
-            if (!ViewBag.Login)
-            {
-                return RedirectToLogin("ProjectIssues", "Project");
-            }
-
-            var redirecturl = RedirectTo(Request);
-            if (redirecturl != Request.RawUrl)
-            {
-                return Redirect(redirecturl);
-            }
+            //var checkresult = CheckLoginAndPermit(Request, "Project", "ProjectIssues");
+            //if (checkresult.GetType() != (new Boolean()).GetType())
+            //{
+            //    return (ActionResult)checkresult;
+            //}
 
             if (ProjectKey != null)
             {
@@ -1649,17 +1643,11 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectFA(string ProjectKey)
         {
-            UserPermit();
-            if (!ViewBag.Login)
-            {
-                return RedirectToLogin("Project", "ProjectFA");
-            }
-
-            var redirecturl = RedirectTo(Request);
-            if (redirecturl != Request.RawUrl)
-            {
-                return Redirect(redirecturl);
-            }
+            //var checkresult = CheckLoginAndPermit(Request, "Project", "ProjectFA");
+            //if (checkresult.GetType() != (new Boolean()).GetType())
+            //{
+            //    return (ActionResult)checkresult;
+            //}
 
             if (!string.IsNullOrEmpty(ProjectKey))
             {
@@ -1716,17 +1704,11 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectSptTask(string ProjectKey)
         {
-            UserPermit();
-            if (!ViewBag.Login)
-            {
-                return RedirectToLogin("ProjectSptTask", "Project");
-            }
-
-            var redirecturl = RedirectTo(Request);
-            if (redirecturl != Request.RawUrl)
-            {
-                return Redirect(redirecturl);
-            }
+            //var checkresult = CheckLoginAndPermit(Request, "Project", "ProjectSptTask");
+            //if (checkresult.GetType() != (new Boolean()).GetType())
+            //{
+            //    return (ActionResult)checkresult;
+            //}
 
             var ckdict = CookieUtility.UnpackCookie(this);
             if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
@@ -1786,12 +1768,11 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectError(string ProjectKey)
         {
-
-            UserPermit();
-            if (!ViewBag.Login)
-            {
-                return RedirectToLogin("ProjectError", "GroupList");
-            }
+            //var checkresult = CheckLoginAndPermit(Request, "Project", "ProjectError");
+            //if (checkresult.GetType() != (new Boolean()).GetType())
+            //{
+            //    return (ActionResult)checkresult;
+            //}
 
             var redirecturl = RedirectTo(Request);
             if (redirecturl != Request.RawUrl)
@@ -2046,17 +2027,11 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectNPI(string ProjectKey)
         {
-            UserPermit();
-            if (!ViewBag.Login)
-            {
-                return RedirectToLogin("ProjectNPI", "Project");
-            }
-
-            var redirecturl = RedirectTo(Request);
-            if (redirecturl != Request.RawUrl)
-            {
-                return Redirect(redirecturl);
-            }
+            //var checkresult = CheckLoginAndPermit(Request, "Project", "ProjectNPI");
+            //if (checkresult.GetType() != (new Boolean()).GetType())
+            //{
+            //    return (ActionResult)checkresult;
+            //}
 
             if (ProjectKey != null)
             {
@@ -2258,17 +2233,11 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectYieldMain(string ProjectKey)
         {
-            UserPermit();
-            if (!ViewBag.Login)
-            {
-                return RedirectToLogin("Project", "ProjectYieldMain");
-            }
-
-            var redirecturl = RedirectTo(Request);
-            if (redirecturl != Request.RawUrl)
-            {
-                return Redirect(redirecturl);
-            }
+            //var checkresult = CheckLoginAndPermit(Request, "Project", "ProjectYieldMain");
+            //if (checkresult.GetType() != (new Boolean()).GetType())
+            //{
+            //    return (ActionResult)checkresult;
+            //}
 
             var sarray = new string[] { "8", "16", "24", "32", "40", "48", "56" };
             var slist = new List<string>();
@@ -2630,11 +2599,11 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectRMAStatus(string ProjectKey, string sDate= "", string eDate = "")
         {
-            UserPermit();
-            if (!ViewBag.Login)
-            {
-                return RedirectToLogin("Project", "ProjectRMAStatus");
-            }
+            //var checkresult = CheckLoginAndPermit(Request, "Project", "ProjectRMAStatus");
+            //if (checkresult.GetType() != (new Boolean()).GetType())
+            //{
+            //    return (ActionResult)checkresult;
+            //}
 
             var redirecturl = RedirectTo(Request);
             if (redirecturl != Request.RawUrl)
@@ -2690,17 +2659,11 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectReliability(string ProjectKey, string sDate = "", string eDate = "")
         {
-            UserPermit();
-            if (!ViewBag.Login)
-            {
-                return RedirectToLogin("ProjectIssues", "Project");
-            }
-
-            var redirecturl = RedirectTo(Request);
-            if (redirecturl != Request.RawUrl)
-            {
-                return Redirect(redirecturl);
-            }
+            //var checkresult = CheckLoginAndPermit(Request, "Project", "ProjectIssues");
+            //if (checkresult.GetType() != (new Boolean()).GetType())
+            //{
+            //    return (ActionResult)checkresult;
+            //}
 
             ViewBag.pKey = null;
             ViewBag.sDate = string.IsNullOrEmpty(sDate) ? DateTime.Now.AddMonths(-6).ToString("yyyy-MM-dd") : sDate;
@@ -7191,17 +7154,11 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectDash(string ProjectKey)
         {
-            UserPermit();
-            if (!ViewBag.Login)
-            {
-                return RedirectToLogin("ProjectDash", "Project");
-            }
-
-            var redirecturl = RedirectTo(Request);
-            if (redirecturl != Request.RawUrl)
-            {
-                return Redirect(redirecturl);
-            }
+            //var checkresult = CheckLoginAndPermit(Request, "Project", "ProjectDash");
+            //if (checkresult.GetType() != (new Boolean()).GetType())
+            //{
+            //    return (ActionResult)checkresult;
+            //}
 
             var PJKey = ProjectKey;
             if (!string.IsNullOrEmpty(PJKey))
@@ -8446,17 +8403,11 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectStations(string ProjectKey, string whichtest,string StartTime,string EndTime)
         {
-            UserPermit();
-            if (!ViewBag.Login)
-            {
-                return RedirectToLogin("ProjectStations", "Project");
-            }
-
-            var redirecturl = RedirectTo(Request);
-            if (redirecturl != Request.RawUrl)
-            {
-                return Redirect(redirecturl);
-            }
+            //var checkresult = CheckLoginAndPermit(Request, "Project", "ProjectStations");
+            //if (checkresult.GetType() != (new Boolean()).GetType())
+            //{
+            //    return (ActionResult)checkresult;
+            //}
 
             var pjkey = ProjectKey;
             ViewBag.PJKey = pjkey;
@@ -8745,18 +8696,11 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectMileStone(string ProjectKey, string sDate = "", string eDate = "",string withprivate="")
         {
-
-            UserPermit();
-            if (!ViewBag.Login)
-            {
-                return RedirectToLogin("ProjectMileStone", "Project");
-            }
-
-            var redirecturl = RedirectTo(Request);
-            if (redirecturl != Request.RawUrl)
-            {
-                return Redirect(redirecturl);
-            }
+            //var checkresult = CheckLoginAndPermit(Request, "Project", "ProjectMileStone");
+            //if (checkresult.GetType() != (new Boolean()).GetType())
+            //{
+            //    return (ActionResult)checkresult;
+            //}
 
             var updater = ViewBag.UserData.Email;
 

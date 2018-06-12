@@ -58,8 +58,13 @@ namespace Prometheus.Models
         public string MenuName { set; get; }
         public int ParentID { set; get; }
 
-        public static List<UserGroupRolePermissionVM> GetUserGroupRolePermission(int uId, int mId = 0, int fId = 0)
+        public static List<UserGroupRolePermissionVM> GetUserGroupRolePermission(int uId = 0, int mId = 0, int fId = 0, string Email = "")
         {
+            var res = new List<UserGroupRolePermissionVM>();
+            //if (uId == 0 && string.IsNullOrEmpty(Email))
+            //{
+            //    return res;
+            //}
             var sql = @"select nu.ID as UserID, nu.Email, ngr.GroupID,
                     nrp.RoleID, nrp.MenuID, nrp.FunctionID,
                     nrp.OperationID, nrp.ID as PermissionID,
@@ -72,9 +77,18 @@ namespace Prometheus.Models
                     left join n_Menu as nm on (nm.Status = 1 and nrp.MenuID = nm.ID)
                     left join n_Function as nf on (nf.Status = 1 and nrp.FunctionID = nf.ID)
                     left join n_Operation as no on (no.Status = 1 and nrp.OperationID = no.ID)
-                    where nu.ID = @uId";
+                    where 1 = 1 ";
             var param = new Dictionary<string, string>();
-            param.Add("@uId", uId.ToString());
+            if(uId != 0)
+            {
+                sql += " and nu.ID = @uId";
+                param.Add("@uId", uId.ToString());
+            }
+            if (!string.IsNullOrEmpty(Email))
+            {
+                sql += " and nu.Email = @Email";
+                param.Add("@Email", Email);
+            }
             if(mId != 0)
             {
                 sql += " and nrp.MenuID = @mId ";
@@ -87,7 +101,6 @@ namespace Prometheus.Models
             }
             sql += " order by nm.ParentID, nm.OrderID ";
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
-            var res = new List<UserGroupRolePermissionVM>();
             if(dbret.Count > 0)
             {
                 foreach(var item in dbret)
@@ -110,8 +123,6 @@ namespace Prometheus.Models
             }
             return res;
         }
-
-
     }
 
     public class NUserVM
@@ -1189,6 +1200,7 @@ namespace Prometheus.Models
         public int Operator { set; get; }
         public string CreateAt { set; get; }
         public string UpdateAt { set; get; }
+        public string Email { set; get; }
         public string UserName { set; get; }
         public string MenuName { set; get; }
         public string FunctionName { set; get; }
@@ -1198,7 +1210,7 @@ namespace Prometheus.Models
         {
             var sql = @"select upr.ID, upr.UserID, upr.MenuID, upr.FunctionID, upr.OperationID, 
                     upr.Status, upr.Comment, upr.CreateAt, upr.UpdateAt, nu.Name as UserName,
-                    nm.Name as MenuName, nf.Name as FunctionName, no.Name as OperationName
+                    nm.Name as MenuName, nf.Name as FunctionName, no.Name as OperationName, nu.Email
                     from n_UserPermissionRequest as upr 
                     left join n_User as nu on nu.ID = upr.UserID
                     left join n_Menu as nm on nm.ID = upr.MenuID
@@ -1284,6 +1296,7 @@ namespace Prometheus.Models
                     tmp.MenuName = Convert.ToString(item[10]);
                     tmp.FunctionName = Convert.ToString(item[11]);
                     tmp.OperationName = Convert.ToString(item[12]);
+                    tmp.Email = Convert.ToString(item[13]);
                     res.Add(tmp);
                 }
             }
@@ -1327,6 +1340,11 @@ namespace Prometheus.Models
             {
                 var exist = GetUserPermissionRequest(item.UserID, 0, 0, item.MenuID, item.FunctionID, item.OperationID);
                 if(exist.Count > 0)
+                {
+                    continue;
+                }
+                var hasPermit = UserGroupRolePermissionVM.GetUserGroupRolePermission(item.UserID, item.MenuID, item.FunctionID);
+                if(hasPermit.Count > 0)
                 {
                     continue;
                 }

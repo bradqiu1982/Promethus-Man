@@ -1125,6 +1125,9 @@
     }
     var permissionrequest = function () {
         $('body').on('click', '.upr-approve', function () {
+            if (!confirm("You will approve this request, are you really do this operation?")) {
+                return false;
+            }
             var id = $(this).attr("data-id");
             $.post('/Permission/ApprovePermissionRequest',
             {
@@ -1139,32 +1142,35 @@
             })
         })
         $('body').on('click', '.upr-deny', function () {
+            if (!confirm("You will Deny this request, are you really do this operation?")) {
+                return false;
+            }
             var id = $(this).attr("data-id");
             $.post('/Permission/DenyPermissionRequest',
-                {
-                    id: id
-                }, function (output) {
-                    if (output.success) {
-                        window.location.reload();
-                    }
-                    else {
-                        alert("Failed");
-                    }
-                })
+            {
+                id: id
+            }, function (output) {
+                if (output.success) {
+                    window.location.reload();
+                }
+                else {
+                    alert("Failed");
+                }
+            })
         })
         $('body').on('click', '.upr-complete', function () {
             var id = $(this).attr("data-id");
             $.post('/Permission/CompletePermissionRequest',
-                {
-                    id: id
-                }, function (output) {
-                    if (output.success) {
-                        window.location.reload();
-                    }
-                    else {
-                        alert("Failed: You have not operate this request!");
-                    }
-                })
+            {
+                id: id
+            }, function (output) {
+                if (output.success) {
+                    window.location.reload();
+                }
+                else {
+                    alert("Failed: You have not operate this request!");
+                }
+            })
         })
         $('body').on('click', '#m-btn-search', function () {
             var keywords = $.trim($('#tb-search').val());

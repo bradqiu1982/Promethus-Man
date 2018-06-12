@@ -82,5 +82,23 @@ namespace Prometheus.Controllers
             CookieUtility.SetCookie(this, ck);
             return RedirectToAction("LoginUser", "User");
         }
+
+        public object CheckLoginAndPermit(HttpRequestBase request, string ctrl, string method)
+        {
+            UserPermit();
+            
+            if (!ViewBag.Login)
+            {
+                return RedirectToLogin(ctrl, method);
+            }
+
+            var redirecturl = RedirectTo(request);
+            if (redirecturl != Request.RawUrl)
+            {
+                return Redirect(redirecturl);
+            }
+
+            return true;
+        }
     }
 }

@@ -4,6 +4,13 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Prometheus.Models;
+using System.Web.Routing;
+using System.Text;
+using System.Net.Mail;
+using System.IO;
+using System.Threading;
+using System.Web.Caching;
+using System.Net;
 
 namespace Prometheus.Controllers
 {
@@ -11,16 +18,10 @@ namespace Prometheus.Controllers
     {
         public ActionResult GroupList(int pageno = 1, string keywords = "")
         {
-            UserPermit();
-            if (!ViewBag.Login)
+            var checkresult = CheckLoginAndPermit(Request, "Permission", "GroupList");
+            if (checkresult.GetType() != (new Boolean()).GetType())
             {
-                return RedirectToLogin("Permission", "GroupList");
-            }
-
-            var redirecturl = RedirectTo(Request);
-            if (redirecturl != Request.RawUrl)
-            {
-                return Redirect(redirecturl);
+                return (ActionResult)checkresult;
             }
 
             var pagesize = PageVM.PageSize;
@@ -87,18 +88,11 @@ namespace Prometheus.Controllers
 
         public ActionResult MemberList(int pageno = 1, string keywords = "")
         {
-            UserPermit();
-            if (!ViewBag.Login)
+            var checkresult = CheckLoginAndPermit(Request, "Permission", "MemberList");
+            if (checkresult.GetType() != (new Boolean()).GetType())
             {
-                return RedirectToLogin("Permission", "MemberList");
+                return (ActionResult)checkresult;
             }
-
-            var redirecturl = RedirectTo(Request);
-            if (redirecturl != Request.RawUrl)
-            {
-                return Redirect(redirecturl);
-            }
-
             var pagesize = PageVM.PageSize;
             var MemberList = NUserVM.GetUsersList(keywords);
             var totalcnt = MemberList.Count;
@@ -246,18 +240,11 @@ namespace Prometheus.Controllers
         
         public ActionResult Menus(int pageno = 1, string keywords = "")
         {
-            UserPermit();
-            if (!ViewBag.Login)
+            var checkresult = CheckLoginAndPermit(Request, "Permission", "Menus");
+            if (checkresult.GetType() != (new Boolean()).GetType())
             {
-                return RedirectToLogin("Permission", "Menus");
+                return (ActionResult)checkresult;
             }
-
-            var redirecturl = RedirectTo(Request);
-            if (redirecturl != Request.RawUrl)
-            {
-                return Redirect(redirecturl);
-            }
-
             var pagesize = PageVM.PageSize;
             var Menus = NMenuVM.GetMenuList(keywords);
             var totalcnt = Menus.Count;
@@ -334,18 +321,11 @@ namespace Prometheus.Controllers
 
         public ActionResult Functions(int pageno = 1, string keywords = "")
         {
-            UserPermit();
-            if (!ViewBag.Login)
+            var checkresult = CheckLoginAndPermit(Request, "Permission", "Functions");
+            if (checkresult.GetType() != (new Boolean()).GetType())
             {
-                return RedirectToLogin("Permission", "Functions");
+                return (ActionResult)checkresult;
             }
-
-            var redirecturl = RedirectTo(Request);
-            if (redirecturl != Request.RawUrl)
-            {
-                return Redirect(redirecturl);
-            }
-
             var pagesize = PageVM.PageSize;
             var Funcs = NFunctionVM.GetFunctionList(keywords);
             var totalcnt = Funcs.Count;
@@ -428,16 +408,10 @@ namespace Prometheus.Controllers
 
         public ActionResult Operations(int pageno = 1, string keywords = "")
         {
-            UserPermit();
-            if (!ViewBag.Login)
+            var checkresult = CheckLoginAndPermit(Request, "Permission", "Operations");
+            if (checkresult.GetType() != (new Boolean()).GetType())
             {
-                return RedirectToLogin("Permission", "Operations");
-            }
-
-            var redirecturl = RedirectTo(Request);
-            if (redirecturl != Request.RawUrl)
-            {
-                return Redirect(redirecturl);
+                return (ActionResult)checkresult;
             }
 
             var pagesize = PageVM.PageSize;
@@ -501,18 +475,11 @@ namespace Prometheus.Controllers
 
         public ActionResult RoleList(int pageno = 1, string keywords = "")
         {
-            UserPermit();
-            if (!ViewBag.Login)
+            var checkresult = CheckLoginAndPermit(Request, "Permission", "RoleList");
+            if (checkresult.GetType() != (new Boolean()).GetType())
             {
-                return RedirectToLogin("Permission", "RoleList");
+                return (ActionResult)checkresult;
             }
-
-            var redirecturl = RedirectTo(Request);
-            if (redirecturl != Request.RawUrl)
-            {
-                return Redirect(redirecturl);
-            }
-
 
             var pagesize = PageVM.PageSize;
             var rolelist = NRoleVM.GetRoleList(RBACStatus.ValidStatus.ToString(), string.Empty, keywords);
@@ -676,17 +643,12 @@ namespace Prometheus.Controllers
 
         public ActionResult ApplyForPermission(string url)
         {
-            UserPermit();
-            if (!ViewBag.Login)
+            var checkresult = CheckLoginAndPermit(Request, "Permission", "ApplyForPermission");
+            if (checkresult.GetType() != (new Boolean()).GetType())
             {
-                return RedirectToLogin("Permission", "ApplyForPermission");
+                return (ActionResult)checkresult;
             }
 
-            var redirecturl = RedirectTo(Request);
-            if (redirecturl != Request.RawUrl)
-            {
-                return Redirect(redirecturl);
-            }
             if (! string.IsNullOrEmpty(url))
             {
                 var uri = url.Split(new string[] { "?" }, StringSplitOptions.RemoveEmptyEntries)[0];
@@ -699,16 +661,10 @@ namespace Prometheus.Controllers
 
         public ActionResult PermissionRequest(int pageno = 1, string keywords = "")
         {
-            UserPermit();
-            if (!ViewBag.Login)
+            var checkresult = CheckLoginAndPermit(Request, "Permission", "PermissionRequest");
+            if (checkresult.GetType() != (new Boolean()).GetType())
             {
-                return RedirectToLogin("Permission", "PermissionRequest");
-            }
-
-            var redirecturl = RedirectTo(Request);
-            if (redirecturl != Request.RawUrl)
-            {
-                return Redirect(redirecturl);
+                return (ActionResult)checkresult;
             }
 
             var pagesize = PageVM.PageSize;
@@ -759,6 +715,7 @@ namespace Prometheus.Controllers
             var uName = ckdict["logonuser"].Split(new char[] { '|' })[0];
             var exist_data = NUserVM.GetUserInfo(uName);
             var res = new JsonResult();
+            var success_flg = false;
             if (exist_data.ID != 0)
             {
                 var Ids = Request.Form["Ids[]"];
@@ -778,13 +735,10 @@ namespace Prometheus.Controllers
                     upr_list.Add(upr);
                 }
                 NUserPermissionRequestVM.AddUserPermissionRequest(upr_list);
-                res.Data = new { success = true };
-            }
-            else
-            {
-                res.Data = new { success = false };
+                success_flg = true;
             }
 
+            res.Data = new { success = success_flg };
             return res;
         }
 
@@ -795,16 +749,34 @@ namespace Prometheus.Controllers
             var uName = ckdict["logonuser"].Split(new char[] { '|' })[0];
             var exist_data = NUserVM.GetUserInfo(uName);
             var res = new JsonResult();
+            var success_flg = false;
             if (exist_data.ID != 0)
             {
                 var id = Convert.ToInt32(Request.Form["id"]);
-                NUserPermissionRequestVM.UpdateUserPermissionRequestStatus(id, PermissionRequestStatus.Approved, exist_data.ID);
-                res.Data = new { success = true };
+                var permit_data = NUserPermissionRequestVM.GetUserPermissionRequest(0, 0, id);
+                if (permit_data.Count > 0)
+                {
+                    NUserPermissionRequestVM.UpdateUserPermissionRequestStatus(id, PermissionRequestStatus.Approved, exist_data.ID);
+                    //search operate user
+                    var func_info = NFunctionVM.GetFunctionInfoByUrl(PermissionOperateUrl.Complete);
+                    var permit_list = UserGroupRolePermissionVM.GetUserGroupRolePermission(0, func_info.MenuID, func_info.ID);
+                    var operator_list = new List<string>();
+                    if (permit_list.Count > 0)
+                    {
+                        foreach(var item in permit_list)
+                        {
+                            if (!operator_list.Contains(item.Email))
+                            {
+                                operator_list.Add(item.Email);
+                            }
+                        }
+                    }
+                    //send alert email
+                    SendAlertEmail("Approved", uName, permit_data[0].Email, operator_list);
+                    success_flg = true;
+                }
             }
-            else
-            {
-                res.Data = new { success = false };
-            }
+            res.Data = new { success = success_flg };
             return res;
         }
 
@@ -815,16 +787,20 @@ namespace Prometheus.Controllers
             var uName = ckdict["logonuser"].Split(new char[] { '|' })[0];
             var exist_data = NUserVM.GetUserInfo(uName);
             var res = new JsonResult();
+            var success_flg = false;
             if (exist_data.ID != 0)
             {
                 var id = Convert.ToInt32(Request.Form["id"]);
-                NUserPermissionRequestVM.UpdateUserPermissionRequestStatus(id, PermissionRequestStatus.Deny, exist_data.ID);
-                res.Data = new { success = true };
+                var permit_data = NUserPermissionRequestVM.GetUserPermissionRequest(0, 0, id);
+                if(permit_data.Count > 0)
+                {
+                    NUserPermissionRequestVM.UpdateUserPermissionRequestStatus(id, PermissionRequestStatus.Deny, exist_data.ID);
+                    //send alert email
+                    SendAlertEmail("Denied", uName, permit_data[0].Email);
+                    success_flg = true;
+                }
             }
-            else
-            {
-                res.Data = new { success = false };
-            }
+            res.Data = new { success = success_flg };
             return res;
         }
 
@@ -835,23 +811,51 @@ namespace Prometheus.Controllers
             var uName = ckdict["logonuser"].Split(new char[] { '|' })[0];
             var exist_data = NUserVM.GetUserInfo(uName);
             var res = new JsonResult();
+            var success_flg = false;
             if (exist_data.ID != 0)
             {
                 var id = Convert.ToInt32(Request.Form["id"]);
-                var permit_data = NUserPermissionRequestVM.GetUserPermissionRequest(exist_data.ID);
+                var permit_data = NUserPermissionRequestVM.GetUserPermissionRequest(0, 0, id);
                 if(permit_data.Count > 0)
                 {
                     var permit_exist = UserGroupRolePermissionVM.GetUserGroupRolePermission(permit_data[0].UserID, permit_data[0].MenuID, permit_data[0].FunctionID);
                     if (permit_exist.Count > 0)
                     {
                         NUserPermissionRequestVM.UpdateUserPermissionRequestStatus(id, PermissionRequestStatus.Complete, exist_data.ID);
-                        res.Data = new { success = true };
-                        return res;
+                        //send alert email
+                        SendAlertEmail("Completed", uName, permit_data[0].Email);
+                        success_flg = true;
                     }
                 }
             }
-            res.Data = new { success = false };
+            res.Data = new { success = success_flg };
+
             return res;
+        }
+
+        private void SendAlertEmail(string type, string updater, string requester, List<string> n_operator=null)
+        {
+            string scheme = Url.RequestContext.HttpContext.Request.Url.Scheme;
+            string validatestr = Url.Action("ApplyForPermission", "Permission", null, scheme);
+
+            var netcomputername = EmailUtility.RetrieveCurrentMachineName();
+
+            validatestr = validatestr.Replace("//localhost", "//" + netcomputername);
+
+            var content = "This request has been " + type + " by " + updater + " :\r\n " + validatestr;
+
+            var toaddrs = new List<string>();
+            toaddrs.Add(updater);
+            toaddrs.Add(requester);
+            if(n_operator != null && n_operator.Count > 0)
+            {
+                toaddrs.AddRange(n_operator);
+            }
+
+            toaddrs = new List<string> { "yan.shi@finisar.com" };
+
+            EmailUtility.SendEmail(this, "【" + type + "】Permission Request", toaddrs, content);
+            new System.Threading.ManualResetEvent(false).WaitOne(200);
         }
     }
 }

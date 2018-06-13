@@ -6123,7 +6123,7 @@ namespace Prometheus.Controllers
                         return;
                     }
 
-                    sundaylog("start computer " + vcselbgdzeropoint.ToString("yyyy-MM-dd HH:mm:ss") + " Monthly data");
+                    sundaylog("start computer BURN IN " + vcselbgdzeropoint.ToString("yyyy-MM-dd HH:mm:ss") + " Monthly data");
                     VcselBGDVM.StartVcselBGDComputer(vcselbgdzeropoint, vcselpninfo,this);
                     vcselbgdzeropoint = vcselbgdzeropoint.AddMonths(1);
                 }
@@ -6137,6 +6137,40 @@ namespace Prometheus.Controllers
 
                 times = times + 1;
                 if (times > 10)
+                {
+                    break;
+                }
+            }//end while
+
+            var htolbgdzeropoint = DateTime.Parse(glbcfg["HTOLBIGDATAZEROPOINT"]);
+
+            while (true)
+            {
+                if (!VcselMonthData.MonthDataExist(htolbgdzeropoint,"HTOLMonthData")
+                    || (thismonth == htolbgdzeropoint.Month && DateTime.Now.Year == htolbgdzeropoint.Year)
+                    || (thismonth - 1 == htolbgdzeropoint.Month && DateTime.Now.Year == htolbgdzeropoint.Year))
+                {
+                    var currenttime = DateTime.Now;
+                    if (currenttime.Hour > 18 || htolbgdzeropoint > currenttime)
+                    {
+                        sundaylog("Sunday Report End for time....");
+                        return;
+                    }
+
+                    sundaylog("start computer HTOL " + htolbgdzeropoint.ToString("yyyy-MM-dd HH:mm:ss") + " Monthly data");
+                    VcselBGDVM.StartHTOLBGDComputer(htolbgdzeropoint, vcselpninfo, this);
+                    htolbgdzeropoint = htolbgdzeropoint.AddMonths(1);
+                }
+                else
+                {
+                    //EXIST SUCH DATA
+                    sundaylog(htolbgdzeropoint.ToString("yyyy-MM-dd HH:mm:ss") + " Monthly data exist");
+                    htolbgdzeropoint = htolbgdzeropoint.AddMonths(1);
+                    continue;
+                }
+
+                times = times + 1;
+                if (times > 12)
                 {
                     break;
                 }
@@ -6322,6 +6356,14 @@ namespace Prometheus.Controllers
             catch (Exception ex) { }
 
             heartbeatlog("BITestData.BIOLDTestDateExplore");
+
+            try
+            {
+                BIDataUtility.LoadHTOLTestData(this);
+            }
+            catch (Exception ex) { }
+
+            heartbeatlog("BITestData.LoadHTOLTestData");
 
             foreach (var pjkey in pjkeylist)
             {
@@ -6556,6 +6598,18 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
+            try
+            {
+                var vcselpninfo = VcselPNData.RetrieveVcselPNInfo();
+                VcselBGDVM.StartHTOLBGDComputer(DateTime.Parse("2017-09-01 00:00:00"), vcselpninfo, this);
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message);
+            }
+
+            //BIDataUtility.LoadHTOLTestData(this);
+
             //BIDataUtility.BIOLDTestDateExplore(this);
 
             //ExternalDataCollector.UpdateRMABackUPSN();

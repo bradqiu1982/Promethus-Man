@@ -1393,7 +1393,7 @@ namespace Prometheus.Models
             }
         }
 
-        private static DateTime RetrieveLatestTimeStampOfHTOLBITable()
+        private static DateTime RetrieveLatestTimeStampOfHTOLBITable(string zerotime)
         {
             var sql = "select top 1 TestTimeStamp from BIHTOLTestResult order by TestTimeStamp DESC";
 
@@ -1406,12 +1406,12 @@ namespace Prometheus.Models
                 }
                 catch (Exception ex)
                 {
-                    return DateTime.Now;
+                    return DateTime.Parse(zerotime);
                 }
             }
             else
             {
-                return DateTime.Now;
+                return DateTime.Parse(zerotime);
             }
         }
 
@@ -1636,35 +1636,34 @@ namespace Prometheus.Models
             bitables.Add("dbo.v_BIHTOLOutput");
 
             var bihtoltime = syscfgdict["BIHTOLZEROTIME"];
-           
-            var bihtolfile = ctrl.Server.MapPath("~/userfiles") + "\\BIHTOLDATA.txt";
-            if (!System.IO.File.Exists(bihtolfile))
-            {
-                return;
-            }
 
-            var days = Convert.ToInt32(System.IO.File.ReadAllText(bihtolfile));
-            var biexplorerealtime = DateTime.Parse(bihtoltime).AddDays((double)days);
-            if (biexplorerealtime > DateTime.Now)
-            {
-                return;
-            }
+            //var bihtolfile = ctrl.Server.MapPath("~/userfiles") + "\\BIHTOLDATA.txt";
+            //if (!System.IO.File.Exists(bihtolfile))
+            //{
+            //    return;
+            //}
+            //var days = Convert.ToInt32(System.IO.File.ReadAllText(bihtolfile));
+            //var biexplorerealtime = DateTime.Parse(bihtoltime).AddDays((double)days);
+            //if (biexplorerealtime > DateTime.Now)
+            //{
+            //    return;
+            //}
+            //var starttime = biexplorerealtime.ToString("yyyy-MM-dd") + " 00:00:00";
+            //var endtime = biexplorerealtime.AddDays(29).ToString("yyyy-MM-dd") + " 23:59:59";
 
-            var starttime = biexplorerealtime.ToString("yyyy-MM-dd") + " 00:00:00";
-            var endtime = biexplorerealtime.AddDays(4).ToString("yyyy-MM-dd") + " 23:59:59";
+            var starttime = RetrieveLatestTimeStampOfHTOLBITable(bihtoltime).ToString("yyyy-MM-dd HH:mm:ss");
 
             foreach (var bt in bitables)
             {
                 var testresultlist = new List<BITestResult>();
                 var testresultfieldlist = new List<BITestResultDataField>();
 
-
-                var sql = "select ContainerName,ProcessStep,DateTime,Failure_Mode,Station,Work_Order,PN,Channel,SLOPE,PO_LD,PO_Uniformity,THOLD,Delta_PO_LD,Delta_SLOPE,Delta_THOLD,Delta_PO_Uniformity from <bitable> where DateTime >= '<starttime>' and DateTime <= '<endtime>' "
+                var sql = "select ContainerName,ProcessStep,DateTime,Failure_Mode,Station,Work_Order,PN,Channel,SLOPE,PO_LD,PO_Uniformity,THOLD,Delta_PO_LD,Delta_SLOPE,Delta_THOLD,Delta_PO_Uniformity from <bitable> where DateTime > '<starttime>' "
                     + " and  ProcessStep is not null and PN is not null and Work_Order is not null and ContainerName is not null and Failure_Mode is not null and ContainerName <> '' "
                     + " and Failure_Mode <> '--' and Failure_Mode <> '' and Failure_Mode is not null and Delta_PO_LD is not null and Delta_SLOPE is not null and Delta_THOLD is not null "
                     + " and Delta_PO_Uniformity is not null  order by ContainerName,DateTime";
 
-                sql = sql.Replace("<bitable>", bt).Replace("<starttime>", starttime).Replace("<endtime>", endtime);
+                sql = sql.Replace("<bitable>", bt).Replace("<starttime>", starttime);
 
                 var previoussn = string.Empty;
                 var dataid = string.Empty;
@@ -1714,12 +1713,16 @@ namespace Prometheus.Models
                 var snwaferdict = new Dictionary<string, BISNRelation>();
                 RetrieveBIWaferBySN(testresultlist, snwaferdict);
 
+                var newtestresultlist = new List<BITestResult>();
+                var newtestresultfieldlist = new List<BITestResultDataField>();
+
                 foreach (var item in testresultlist)
                 {
                     if (snwaferdict.ContainsKey(item.SN.Split('_')[0]))
                     {
                         item.Wafer = snwaferdict[item.SN.Split('_')[0]].wafer;
                         item.ProductName = snwaferdict[item.SN.Split('_')[0]].productname;
+                        newtestresultlist.Add(item);
                     }
                 }//end foreach
                 foreach (var item in testresultfieldlist)
@@ -1728,16 +1731,17 @@ namespace Prometheus.Models
                     {
                         item.Wafer = snwaferdict[item.SN.Split('_')[0]].wafer;
                         item.ProductName = snwaferdict[item.SN.Split('_')[0]].productname;
+                        newtestresultfieldlist.Add(item);
                     }
                 }
 
-                StoreBITestResult(testresultlist,"BIHTOLTestResult");
-                StoreBITestResultDateField(testresultfieldlist, "BIHTOLTestResultDataField");
+                StoreBITestResult(newtestresultlist, "BIHTOLTestResult");
+                StoreBITestResultDateField(newtestresultfieldlist, "BIHTOLTestResultDataField");
 
             }//end foreach
 
-            days = days + 5;
-            System.IO.File.WriteAllText(bihtolfile, days.ToString());
+            //days = days + 30;
+            //System.IO.File.WriteAllText(bihtolfile, days.ToString());
         }
 
         private static void StoreBITestResult(List<BITestResult> testresultlist,string deftab = "BITestResult")

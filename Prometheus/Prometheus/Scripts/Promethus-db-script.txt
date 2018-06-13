@@ -1571,3 +1571,42 @@ CREATE TABLE [dbo].[BIHTOLTestResultDataField] (
 	[Appv_5]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
 	[databackuptm]   DATETIME       DEFAULT ('2017-07-18 10:00:00') NOT NULL
 	);
+
+	
+	CREATE TABLE [dbo].[HTOLMonthData] (
+    [StartDate]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[VTYPE]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Failure]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Num]   NVARCHAR (126) DEFAULT ('0') NOT NULL,
+	[UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	);
+
+	CREATE TABLE [dbo].[HTOLVcselTimeRange] (
+	[WaferNo]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+    [StartDate]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[EndDate]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	);
+
+	CREATE TABLE [dbo].[HTOLWaferTestSum] (
+    [WaferNo]    NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[WhichTest]    NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[VTYPE]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Failure]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Num]   NVARCHAR (126) DEFAULT ('0') NOT NULL,
+	[DataIDs]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	);
+
+
+	CREATE TABLE [dbo].[HTOLWaferBGDField] (
+    [WaferNo]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[FieldName]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[BoxData]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[DataType] NVARCHAR (200) DEFAULT ('') NOT NULL
+	);
+
+
+
+

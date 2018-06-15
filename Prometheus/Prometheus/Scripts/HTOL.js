@@ -20,7 +20,7 @@
                                '<div class="v-box" id="' + val.id + '"></div>' +
                                '</div>';
                         $('.v-content').append(appendstr);
-                        drawline(val);
+                        drawline(val,false);
                     })
                     $.each(output.failurearray, function (i, val) {
                         appendstr = '<div class="col-xs-6">' +
@@ -126,7 +126,7 @@
                             '<div class="v-box" id="' + val.id + '"></div>' +
                             '</div>';
                         $('.v-content').append(appendstr);
-                        drawline(val);
+                        drawline(val,true);
                     })
 
                     $.each(output.boxarray, function (i, val) {
@@ -166,6 +166,12 @@
             searchdata();
         })
 
+        $('body').on('click', '#editreport', function () {
+            var reportid = 'HTOL_' + $.trim($('#m-wf-no').val());
+            $('#boxplot-alert').modal('hide');
+            window.open("/DataAnalyze/ModifyWaferReport?" + "reportid=" + reportid);
+        })
+
         function defaultsearch() {
             var wf_no = $.trim($('#wf-no').tagsinput('items'));
             if (wf_no == '') {
@@ -189,7 +195,7 @@
             window.open("/DataAnalyze/DownLoadHTOL?" + "wf_no=" + wafer_no);
         })
     }
-    var drawline = function (line_data) {
+    var drawline = function (line_data,forwafer) {
         var options = {
             chart: {
                 zoomType: 'xy',
@@ -231,7 +237,23 @@
                     events: {
                         click: function (event) {
                             $('#m-wf-no').val(event.point.category);
-                            $('#boxplot-alert').modal('show')
+                            if (forwafer) {
+                                var reportid = 'HTOL_' + event.point.category;
+                                $.post('/DataAnalyze/RetrieveWaferReport', {
+                                    reportid: reportid
+                                }, function (output) {
+                                    if (output.success) {
+                                        $('#rc-info').html(output.report.content);
+                                        $('#rc-reporter').html(output.report.reporter);
+                                        $('#rc-datetime').html(output.report.time);
+                                    }
+                                    $('#boxplot-alert').modal('show');
+                                });
+                            }
+                            else {
+                                $('#boxplot-alert').modal('show');
+                            }
+
                         }
                     }
                 }

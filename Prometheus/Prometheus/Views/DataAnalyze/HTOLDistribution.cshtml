@@ -133,19 +133,44 @@
     <a id="exportLink"></a>
 </div>
 <div class="modal fade" id="boxplot-alert" tabindex="-1" role="dialog" style="margin-top:10%">
-    <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Download Wafer Test Data</h4>
+                <h4 class="modal-title">Wafer Analyze</h4>
             </div>
             <div class="modal-body">
                 <input type="hidden" name="m-wf-no" id="m-wf-no">
-                <p>Downloading current wafer test data spend some time. Do you want to continue?</p>
+                <div class="row" style="padding-left:10px;padding-bottom:10px;">
+                    <button type="button" class="btn btn-primary" id="btn-wf-download" name="btn-wf-download">Download Wafer Data</button>
+                </div>
+                <div class="row" style="padding:10px;">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title" style="display:inline-block">Report</h3>
+                            @if (!string.IsNullOrEmpty(ViewBag.Updater))
+                            {
+                                <span id="editreport" name="editreport" class="glyphicon glyphicon-edit" style="display:inline-block;float:right;color:#428bca;font-size:22px;cursor:pointer;"></span>
+                            }
+                        </div>
+                        <div class="panel-body">
+                            <div class="row" id="rc-info" style="padding-left:10px;padding-right:10px;">Report</div>
+                        </div>
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-xs-3 col-xs-offset-6">
+                                    Reporter: <span id="rc-reporter">System</span>
+                                </div>
+                                <div class="col-xs-3">
+                                    <span id="rc-datetime">@DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="btn-wf-download" name="btn-wf-download">YES</button>
-                <button type="button" class="btn btn-danger" id="btn-wf-cancel" name="btn-wf-cancel" data-dismiss="modal">NO</button>
+                <button type="button" class="btn btn-danger" id="btn-wf-cancel" name="btn-wf-cancel" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using Prometheus.Models;
 using System.Text;
+using System.Web.Routing;
 
 namespace Prometheus.Controllers
 {
@@ -76,6 +77,129 @@ namespace Prometheus.Controllers
 
             return pslist;
         }
+
+        private static string resizeimg(string imgstr)
+        {
+            var srcidx = imgstr.IndexOf("src=\"");
+            var srceidx = imgstr.IndexOf("\"", srcidx + 6);
+            var srcstr = imgstr.Substring(srcidx, (srceidx + 1 - srcidx));
+            return "<div style=\"text-align: center;\">" + "<img " + srcstr + " style=\"max-width: 90%; height: auto;\" /></div>";
+        }
+        public static string ResizeImageFromHtml(string src)
+        {
+            var startidx = 0;
+            while (src.IndexOf("<img", startidx) != -1)
+            {
+                var imgsidx = src.IndexOf("<img", startidx);
+                var imgeidx = src.IndexOf(">", imgsidx);
+                if (imgeidx != -1)
+                {
+                    startidx = imgeidx;
+                    imgeidx = imgeidx + 1;
+                    var imgstr = src.Substring(imgsidx, (imgeidx - imgsidx));
+                    var nimgstr = resizeimg(imgstr);
+                    src = src.Remove(imgsidx, imgeidx - imgsidx).Insert(imgsidx, nimgstr);
+                }
+                else
+                {
+                    startidx = imgsidx + 3;
+                }
+            }
+            return src.Replace("</img>", "");
+        }
+
+        public JsonResult RetrieveWaferReport()
+        {
+            var id = Request.Form["reportid"];
+            var wreportlist = IssueViewModels.RetrieveWaferReport(id);
+            if (wreportlist.Count == 0)
+            {
+                var tempvm = new IssueComments();
+                tempvm.Comment = "TO BE EDIT";
+                IssueViewModels.StoreIssueComment(id, tempvm.dbComment, "System", COMMENTTYPE.Description);
+
+                var report = new
+                {
+                    time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    reporter = "System",
+                    content = "TO BE EDIT"
+                };
+                
+                var ret = new JsonResult();
+                ret.Data = new
+                {
+                    success = true,
+                    report = report
+                };
+                return ret;
+            }
+            else
+            {
+                var report = new
+                {
+                    time = wreportlist[0].CommentDate.ToString("yyyy-MM-dd HH:mm:ss"),
+                    reporter = wreportlist[0].Reporter.ToUpper().Replace("@FINISAR.COM", ""),
+                    content = ResizeImageFromHtml(wreportlist[0].Comment)
+                };
+                var ret = new JsonResult();
+                ret.Data = new
+                {
+                    success = true,
+                    report = report
+                };
+                return ret;
+            }
+        }
+
+        public ActionResult ModifyWaferReport(string reportid)
+        {
+            var wreportlist = IssueViewModels.RetrieveWaferReport(reportid);
+            if (wreportlist.Count > 0)
+            {
+                return View(wreportlist[0]);
+            }
+            return View();
+        }
+
+        [HttpPost, ActionName("ModifyWaferReport")]
+        [ValidateAntiForgeryToken]
+        public ActionResult ModifyWaferReportPost()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            var reportid = Request.Form["HIssueKey"];
+            var commenttype = Request.Form["HType"];
+            var commentdate = Request.Form["HDate"];
+
+
+            if (!string.IsNullOrEmpty(Request.Form["editor1"]))
+            {
+                var tempcommment = new IssueComments();
+                tempcommment.Comment = SeverHtmlDecode.Decode(this, Request.Form["editor1"]);
+                IssueViewModels.UpdateWaferReport(reportid, tempcommment.dbComment,updater);
+            }
+            else
+            {
+                var tempcommment = new IssueComments();
+                tempcommment.Comment = "<p>To Be Edit</p>";
+                IssueViewModels.UpdateWaferReport(reportid, tempcommment.dbComment,updater);
+            }
+
+            if (reportid.Contains("HTOL_"))
+            {
+                var dict = new RouteValueDictionary();
+                dict.Add("defaultwafer", reportid.Replace("HTOL_", ""));
+                return RedirectToAction("HTOLDistribution", "DataAnalyze", dict);
+            }
+            else
+            {
+                var dict = new RouteValueDictionary();
+                dict.Add("defaultwafer", reportid.Replace("BURNIN_", ""));
+                return RedirectToAction("WaferDistribution", "DataAnalyze", dict);
+            }
+        }
+
 
         public ActionResult ShipmentData()
         {
@@ -1305,6 +1429,18 @@ namespace Prometheus.Controllers
 
         public ActionResult WaferDistribution(string defaultwafer, string defaultdate, string defaulttype)
         {
+            
+            var ckdict = CookieUtility.UnpackCookie(this);
+            ViewBag.Updater = "";
+            if (ckdict.ContainsKey("logonuser"))
+            {
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                var syscfg = CfgUtility.GetSysConfig(this);
+                var biteam = syscfg["BITEAM"].ToUpper();
+                if (biteam.Contains(updater))
+                { ViewBag.Updater = updater; }
+            }
+
             var vcseltypelist = VcselBGDVM.VcselTypeList();
 
             var nvcseltypelist = new List<string>();
@@ -1338,6 +1474,17 @@ namespace Prometheus.Controllers
 
         public ActionResult HTOLDistribution(string defaultwafer,string defaultdate,string defaulttype)
         {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            ViewBag.Updater = "";
+            if (ckdict.ContainsKey("logonuser"))
+            {
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+                var syscfg = CfgUtility.GetSysConfig(this);
+                var biteam = syscfg["BITEAM"].ToUpper();
+                if (biteam.Contains(updater))
+                { ViewBag.Updater = updater; }
+            }
+
             var vcseltypelist = VcselBGDVM.VcselTypeList("HTOLWaferTestSum");
 
             var nvcseltypelist = new List<string>();

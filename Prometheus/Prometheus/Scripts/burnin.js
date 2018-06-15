@@ -19,7 +19,7 @@ var BurnIn = function(){
                         '<div class="v-box" id="' + output.totlearray[0].id + '"></div>' +
                         '</div>';
                     $('.v-content').append(appendstr);
-                    drawline(output.totlearray[0]);
+                    drawline(output.totlearray[0],false);
 
                     appendstr = '<div class="col-xs-6">' +
                             '<div class="v-box" id="' + output.totlearray[1].id + '"></div>' +
@@ -32,7 +32,7 @@ var BurnIn = function(){
                                 '<div class="v-box" id="'+val.id+'"></div>' +
                                 '</div>';
                          $('.v-content').append(appendstr);
-                         drawline(val);
+                         drawline(val,false);
                      })
                      $.each(output.failurearray, function (i, val) {
                          appendstr = '<div class="col-xs-6">' +
@@ -141,7 +141,7 @@ var BurnIn = function(){
                              '<div class="v-box" id="' + val.id + '"></div>' +
                              '</div>';
                          $('.v-content').append(appendstr);
-                         drawline(val);
+                         drawline(val,true);
                      })
 
                      $.each(output.boxarray, function (i, val) {
@@ -190,6 +190,12 @@ var BurnIn = function(){
             searchdata();
         })
 
+        $('body').on('click', '#editreport', function () {
+            var reportid = 'BURNIN_' + $.trim($('#m-wf-no').val());
+            $('#boxplot-alert').modal('hide');
+            window.open("/DataAnalyze/ModifyWaferReport?" + "reportid=" + reportid);
+        })
+        
         function defaultsearch() {
             var wf_no = $.trim($('#wf-no').tagsinput('items'));
             if (wf_no == '') {
@@ -213,7 +219,7 @@ var BurnIn = function(){
             window.open("/DataAnalyze/DownLoadWafer?" + "wf_no=" + wafer_no);
         })
     }
-    var drawline = function(line_data){
+    var drawline = function(line_data,forwafer){
         var options = {
             chart: {
                 zoomType: 'xy',
@@ -255,7 +261,23 @@ var BurnIn = function(){
                     events: {
                         click: function (event) {
                             $('#m-wf-no').val(event.point.category);
-                            $('#boxplot-alert').modal('show')
+                            if (forwafer) {
+                                var reportid = 'BURNIN_' + event.point.category;
+                                $.post('/DataAnalyze/RetrieveWaferReport', {
+                                    reportid: reportid
+                                }, function (output) {
+                                    if (output.success) {
+                                        $('#rc-info').html(output.report.content);
+                                        $('#rc-reporter').html(output.report.reporter);
+                                        $('#rc-datetime').html(output.report.time);
+                                    }
+                                    $('#boxplot-alert').modal('show');
+                                });
+                            }
+                            else {
+                                $('#boxplot-alert').modal('show');
+                            }
+
                         }
                     }
                 }

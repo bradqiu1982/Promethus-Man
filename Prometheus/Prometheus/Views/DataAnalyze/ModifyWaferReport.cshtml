@@ -1,7 +1,7 @@
 ﻿@model Prometheus.Models.IssueComments
 
 @{
-    ViewBag.Title = "UpdateTaskComment";
+    ViewBag.Title = "ModifyWaferReport";
     Layout = "~/Views/Shared/_LayoutNew.cshtml";
 
     var isie = false;
@@ -23,67 +23,65 @@
     </script>
 }
 
-
-
 <div class="row">
     <div class="nav navbar-nav navbar-left">
         <img src="~/Content/images/PJ/Task.png" style="height:35px; width:35px;margin-right: 15px;">
     </div>
     <div class="nav navbar-nav navbar-left">
         <ol class="breadcrumb" style="width:600px">
-            <li><a data-toggle="tooltip" title="Goto ViewAll" href="/Project/ViewAll">All Projects</a></li>
-            <li><a data-toggle="tooltip" title="Goto Task" href="/Issue/UpdateIssue?issuekey=@(Model.IssueKey)">Update Task</a></li>
-            <li class="active">Update Task Comment</li>
+            <li class="active">Update Wafer Report</li>
         </ol>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-xs-12">&nbsp;</div>
-</div>
-
-<script src="../../ckeditor/ckeditor.js"></script>
-
-@using (Html.BeginForm("ModifyIssueComment", "Issue", FormMethod.Post, new { enctype = "multipart/form-data" }))
+@if (Model != null)
 {
-    @Html.AntiForgeryToken()
-    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-
     <div class="row">
-        <div class="col-xs-12">
+        <div class="col-xs-12">&nbsp;</div>
+    </div>
 
-            <div class="form-group">
-                <div MYTP="orange" style="font-family:'Arial Narrow';font-size:18px"><strong>&nbsp;&nbsp;Comment</strong></div>
-            </div>
+    <script src="../../ckeditor/ckeditor.js"></script>
 
-            <div class="form-group">
-                <div>
-                    <textarea name="editor1" id="editor1" rows="10" cols="80">@Model.Comment</textarea>
-                    <script>
-                        CKEDITOR.replace('editor1', { htmlEncodeOutput: true, skin: 'moono-lisa' });
-                    </script>
+    using (Html.BeginForm("ModifyWaferReport", "DataAnalyze", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="row">
+            <div class="col-xs-12">
+
+                <div class="form-group">
+                    <div MYTP="orange" style="font-family:'Arial Narrow';font-size:18px"><strong>&nbsp;&nbsp;Comment</strong></div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-xs-12">
-                        <div class="col-xs-2">
-                            <span class="btn btn-success btn-file" id="choosefile6">
-                                Editor Attachment <input type="file" name="file6" id="file6" runat="server" onchange="ShowFileNames6(this)" />
-                            </span>
-                        </div>
-                        <div class="col-xs-1">
-                            @if (!isie)
-                            {
-                                <button class="btn btn-video maineditor-video" type="button"><span class="glyphicon glyphicon-facetime-video home-video-icon" style="text-align:center;"></span></button>
-                            }
-                        </div>
-                        <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
-                        <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
-                        <div class="col-xs-7"></div>
+                <div class="form-group">
+                    <div>
+                        <textarea name="editor1" id="editor1" rows="10" cols="80">@Model.Comment</textarea>
+                        <script>
+                        CKEDITOR.replace('editor1', { htmlEncodeOutput: true, skin: 'moono-lisa' });
+                        </script>
                     </div>
-                    <script type="text/javascript">
+                </div>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="col-xs-2">
+                                <span class="btn btn-success btn-file" id="choosefile6">
+                                    Editor Attachment <input type="file" name="file6" id="file6" runat="server" onchange="ShowFileNames6(this)" />
+                                </span>
+                            </div>
+                            <div class="col-xs-1">
+                                @if (!isie)
+                                {
+                                    <button class="btn btn-video maineditor-video" type="button"><span class="glyphicon glyphicon-facetime-video home-video-icon" style="text-align:center;"></span></button>
+                                }
+                            </div>
+                            <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Save User Info" onclick="SaveUserContent()"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span></button>*@</div>
+                            <div class="col-xs-1">@*<button class="form-control" type="button" data-toggle="tooltip" title="Retrieve User Info" onclick="UserCacheContent()"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>*@</div>
+                            <div class="col-xs-7"></div>
+                        </div>
+                        <script type="text/javascript">
                         function ShowFileNames6(oFile) {
                             ajaxFileUpload();
                         }
@@ -108,39 +106,39 @@
                             )
                             return false;
                         }
-                    </script>
+                        </script>
+                    </div>
                 </div>
-            </div>
 
-        </div>
-    </div>
-    <div class="row">
-        <input class="form-control text-box single-line" value="@(Model.IssueKey)" id="HIssueKey" name="HIssueKey" type="hidden" />
-    </div>
-    <div class="row">
-        <input class="form-control text-box single-line" value="@(Model.CommentType)" id="HType" name="HType" type="hidden" />
-    </div>
-    <div class="row">
-        <input class="form-control text-box single-line" value="@(Model.CommentDate.ToString())" id="HDate" name="HDate" type="hidden" />
-    </div>
-    <div class="row">
-        <div class="col-xs-12">
-            <div class="form-group">
-                <div class="col-xs-3">
-                    <input type="submit" value="Submit" class="btn btn-primary" />
-                </div>
-                <div class="col-xs-9">
-                </div>
             </div>
         </div>
-    </div>
-}
+        <div class="row">
+            <input class="form-control text-box single-line" value="@(Model.IssueKey)" id="HIssueKey" name="HIssueKey" type="hidden" />
+        </div>
+        <div class="row">
+            <input class="form-control text-box single-line" value="@(Model.CommentType)" id="HType" name="HType" type="hidden" />
+        </div>
+        <div class="row">
+            <input class="form-control text-box single-line" value="@(Model.CommentDate.ToString())" id="HDate" name="HDate" type="hidden" />
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <div class="col-xs-3">
+                        <input type="submit" value="Submit" class="btn btn-primary" />
+                    </div>
+                    <div class="col-xs-9">
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 
-@if (!isie)
-{
-    @Html.Partial("~/Views/Shared/_VideoRecordModal.cshtml")
+    if (!isie)
+    {
+        @Html.Partial("~/Views/Shared/_VideoRecordModal.cshtml")
 
-    <script type="text/javascript">
+        <script type="text/javascript">
 
         $(function () {
             $('body').on('click', '.m-video-upload', function () {
@@ -182,9 +180,9 @@
                 }
             })
     })
-    </script>
+        </script>
+    }
+
+
 }
-
-
-
 

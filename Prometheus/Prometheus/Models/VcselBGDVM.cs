@@ -169,7 +169,8 @@ namespace Prometheus.Models
                 }
             }
         }
-
+        
+        //<testname,<date,<failure,cnt>>>
         public static Dictionary<string, Dictionary<string, Dictionary<string, int>>> RetrieveMonthlyData(DateTime startdate, DateTime enddate, string vtype, string defTab = "VcselMonthData")
         {
             var ret = new Dictionary<string, Dictionary<string, Dictionary<string, int>>>();
@@ -567,13 +568,6 @@ namespace Prometheus.Models
             var tempstr = sb.ToString();
             var dataids = tempstr.Substring(0, tempstr.Length - 2) + ")";
 
-            //var dataids = "('";
-            //foreach (var line in waferdata)
-            //{
-            //    dataids = dataids + line.DataID + "','";
-            //}
-            //dataids = dataids.Substring(0, dataids.Length - 2) + ")";
-
             CleanWaferData(wafer,defTab);
 
             foreach (var typevaluekv in keydict)
@@ -611,6 +605,7 @@ namespace Prometheus.Models
             return ret;
         }
 
+        //<testname,<wafer,<failure,cnt>>>
         public static Dictionary<string, Dictionary<string, Dictionary<string,int>>> RetriveWaferFailure(List<string> wflist,string vtype, string defTab = "WaferTestSum")
         {
             var ret = new Dictionary<string, Dictionary<string, Dictionary<string, int>>>();
@@ -1150,19 +1145,12 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql, dict);
         }
 
-        public static Dictionary<string,Dictionary<string,List<string>>> RetriveWaferFieldData(List<string> wflist,bool withfaileddata,bool isbox,string vtype)
+        //<fieldname,<wafer,datalist>>
+        public static Dictionary<string,Dictionary<string,List<string>>> RetriveBURNINHTOLFieldData(List<string> wflist,bool withfaileddata
+            ,string vtype,string defTab = "WaferBGDField" ,string defTab2 = "WaferTestSum")
         {
-            var datatype = "";
-            if (isbox)
-            {
-                datatype = WAFERFIELDDATATYPE.ALLBOX;
-                if (!withfaileddata) datatype = WAFERFIELDDATATYPE.PASSBOX;
-            }
-            else
-            {
-                datatype = WAFERFIELDDATATYPE.ALLRAW;
-                if (!withfaileddata) datatype = WAFERFIELDDATATYPE.PASSRAW;
-            }
+            var datatype  = WAFERFIELDDATATYPE.ALLRAW;
+            if (!withfaileddata) datatype = WAFERFIELDDATATYPE.PASSRAW;
 
            var ret = new Dictionary<string, Dictionary<string, List<string>>>();
 
@@ -1175,11 +1163,11 @@ namespace Prometheus.Models
             var tempstr = sb.ToString();
             var waferids = tempstr.Substring(0, tempstr.Length - 2) + ")";
 
-            var sql = @"select w.WaferNo,w.FieldName,w.BoxData  from WaferBGDField w
-                        left join (select distinct WaferNo,VTYPE from WaferTestSum ) s on s.WaferNo = w.WaferNo
+            var sql = @"select w.WaferNo,w.FieldName,w.BoxData  from <defTab> w
+                        left join (select distinct WaferNo,VTYPE from <defTab2> ) s on s.WaferNo = w.WaferNo
                         where w.WaferNo in <WAFERCOND> and DataType = '<DataType>'  ";
 
-            sql = sql.Replace("<DataType>",datatype).Replace("<WAFERCOND>", waferids);
+            sql = sql.Replace("<defTab>", defTab).Replace("<defTab2>", defTab2).Replace("<DataType>",datatype).Replace("<WAFERCOND>", waferids);
 
             if (!string.IsNullOrEmpty(vtype))
             {
@@ -1518,9 +1506,9 @@ namespace Prometheus.Models
         //    SolveDataByWafer(waferdict, VcselPNInfo, ctrl);
         //}
 
-        public static List<string> VcselTypeList()
+        public static List<string> VcselTypeList(string defTab = "WaferTestSum")
         {
-            return WaferTestSum.VcselTypeList();
+            return WaferTestSum.VcselTypeList(defTab);
         }
 
         public static List<string> VcselTestList()
@@ -1714,24 +1702,134 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<string> WaferNOList()
-        {
-            return VcselTimeRange.WaferNOList();
-        }
-
-        public static List<object> RetrieveWaferData(List<string> wflist,bool withfaileddata, string vtype = "",bool isbox=true)
+        public static List<object> RetrieveHTOLMonthlyData(DateTime sdate, DateTime edate, string vtype, Dictionary<string, bool> testnamedict)
         {
             var ret = new List<object>();
-            var boxdata = WaferBGDField.RetriveWaferFieldData(wflist, withfaileddata, isbox, vtype);
-            //var rawdata = WaferBGDField.RetriveWaferRawData(wflist, vtype);
 
-            var waferfaile =  WaferTestSum.RetriveWaferFailure(wflist,vtype);
+            //<testname,<date,<failure,cnt>>>
+            var alldata = VcselMonthData.RetrieveMonthlyData(sdate, edate, vtype, "HTOLMonthData");
+
+            var testylist = new List<testtypeyield>();
+            var testflist = new List<TestFailureColumn>();
+
+
+            var name_colors = new Dictionary<string, string>();
+            var colors = FMColor();
+            var color_idx = 0;
+
+            foreach (var testkv in alldata)
+            {
+                if (!testnamedict.ContainsKey(testkv.Key.ToUpper()))
+                { continue; }
+                    
+                var dateylist = new List<DateYield>();
+                var dateflist = new List<DateWaferFailureColumn>();
+
+                foreach (var datekv in testkv.Value)
+                {
+                    var pass = 0;
+                    var fail = 0;
+
+                    var failseglist = new List<FailureColumnSeg>();
+                    var totalfailurecount = 0.0;
+
+                    foreach (var failurekv in datekv.Value)
+                    {
+                        if (failurekv.Key.ToUpper().Contains("PASS"))
+                        {
+                            pass = failurekv.Value;
+                        }
+                        else
+                        {
+                            fail = fail + failurekv.Value;
+
+                            var tempfailcolseg = new FailureColumnSeg();
+                            tempfailcolseg.name = failurekv.Key;
+                            tempfailcolseg.y = failurekv.Value;
+                            //tempfailcolseg.color = (name_colors.ContainsKey(failurekv.Key)?name_colors[failurekv.Key]:"#000");
+                            failseglist.Add(tempfailcolseg);
+                            totalfailurecount = totalfailurecount + tempfailcolseg.y;
+                        }
+                    }//end foreach
+                    double yield = (double)pass / ((double)pass + fail) * 100.0;
+                    dateylist.Add(new DateYield(datekv.Key, yield, (double)(pass + fail)));
+
+                    failseglist.Sort(delegate (FailureColumnSeg obj1, FailureColumnSeg obj2)
+                    {
+                        return obj2.y.CompareTo(obj1.y);
+                    });
+
+                    var alignmentedfailseglist = AlignmentFailureOthers(failseglist, totalfailurecount);
+                    foreach (var item in alignmentedfailseglist)
+                    {
+                        if (!name_colors.ContainsKey(item.name))
+                        {
+                            name_colors.Add(item.name, colors[color_idx % colors.Count]);
+                            item.color = colors[color_idx % colors.Count];
+                            color_idx++;
+                        }
+                        else
+                        {
+                            item.color = name_colors[item.name];
+                        }
+                        item.y = Math.Round(item.y / totalfailurecount * 100, 3);
+                    }
+
+
+                    var datefailcol = new DateWaferFailureColumn();
+                    datefailcol.xkey = datekv.Key;
+                    datefailcol.DateColSeg = alignmentedfailseglist;
+
+                    dateflist.Add(datefailcol);
+                }//end foreach
+
+                dateylist.Sort(delegate (DateYield obj1, DateYield obj2) {
+                    return DateTime.Parse(obj1.date).CompareTo(DateTime.Parse(obj2.date));
+                });
+
+                dateflist.Sort(delegate (DateWaferFailureColumn obj1, DateWaferFailureColumn obj2)
+                {
+                    return DateTime.Parse(obj1.xkey).CompareTo(DateTime.Parse(obj2.xkey));
+                });
+
+                var temptesty = new testtypeyield();
+                temptesty.TestType = testkv.Key;
+                temptesty.DYield = dateylist;
+
+                testylist.Add(temptesty);
+
+                var temptestf = new TestFailureColumn();
+                temptestf.TestType = testkv.Key;
+                temptestf.DateColSeg = dateflist;
+
+                testflist.Add(temptestf);
+
+            }//end foreach
+
+            ret.Add(testylist);
+            ret.Add(testflist);
+            ret.Add(name_colors);
+
+            return ret;
+        }
+
+        public static List<string> WaferNOList(string defTab = "VcselTimeRange")
+        {
+            return VcselTimeRange.WaferNOList(defTab);
+        }
+
+        public static List<object> RetrieveBURNINWaferData(List<string> wflist,bool withfaileddata, string vtype = "")
+        {
+            var ret = new List<object>();
+            var boxdata = WaferBGDField.RetriveBURNINHTOLFieldData(wflist, withfaileddata, vtype);
+
+            var waferfailure =  WaferTestSum.RetriveWaferFailure(wflist,vtype);
             var name_colors = new Dictionary<string, string>();
             var colors = FMColor();
             var color_idx = 0;
             var testflist = new List<TestFailureColumn>();
 
-            foreach (var testkv in waferfaile)
+            foreach (var testkv in waferfailure)
             {
                 var waferflist = new List<DateWaferFailureColumn>();
                 foreach (var waferkv in testkv.Value)
@@ -1804,17 +1902,120 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static void RetrieveWaferData(string wf_no, System.IO.FileStream fw)
+        public static List<object> RetrieveHTOLWaferData(List<string> wflist, bool withfaileddata, Dictionary<string, bool> testnamedict, Dictionary<string, bool> fieldnamedict, string vtype = "")
+        {
+            var ret = new List<object>();
+
+            //<fieldname,<wafer,datalist>>
+            var boxdata = WaferBGDField.RetriveBURNINHTOLFieldData(wflist, withfaileddata, vtype, "HTOLWaferBGDField", "HTOLWaferTestSum");
+            var newboxdata = new Dictionary<string, Dictionary<string, List<string>>>();
+            foreach (var kv in boxdata)
+            {
+                if (fieldnamedict.ContainsKey(kv.Key))
+                {
+                    newboxdata.Add(kv.Key, kv.Value);
+                }
+            }
+
+            //<testname,<wafer,<failure,cnt>>>
+            var waferfailure = WaferTestSum.RetriveWaferFailure(wflist, vtype, "HTOLWaferTestSum");
+            var name_colors = new Dictionary<string, string>();
+            var colors = FMColor();
+            var color_idx = 0;
+            var testflist = new List<TestFailureColumn>();
+
+            foreach (var testkv in waferfailure)
+            {
+                if (!testnamedict.ContainsKey(testkv.Key.ToUpper()))
+                { continue; }
+
+                var waferflist = new List<DateWaferFailureColumn>();
+                foreach (var waferkv in testkv.Value)
+                {
+                    var failseglist = new List<FailureColumnSeg>();
+                    var totalcount = 0.0;
+
+                    foreach (var failurekv in waferkv.Value)
+                    {
+                        if (failurekv.Key.ToUpper().Contains("PASS"))
+                        {
+                            totalcount = totalcount + failurekv.Value;
+                        }
+                        else
+                        {
+                            var tempfailcolseg = new FailureColumnSeg();
+                            tempfailcolseg.name = failurekv.Key;
+                            tempfailcolseg.y = failurekv.Value;
+                            failseglist.Add(tempfailcolseg);
+                            totalcount = totalcount + tempfailcolseg.y;
+                        }
+                    }//end foreach
+                    failseglist.Sort(delegate (FailureColumnSeg obj1, FailureColumnSeg obj2)
+                    {
+                        return obj2.y.CompareTo(obj1.y);
+                    });
+
+                    foreach (var item in failseglist)
+                    {
+                        if (!name_colors.ContainsKey(item.name))
+                        {
+                            name_colors.Add(item.name, colors[color_idx % colors.Count]);
+                            item.color = colors[color_idx % colors.Count];
+                            color_idx++;
+                        }
+                        else
+                        {
+                            item.color = name_colors[item.name];
+                        }
+                        item.y = Math.Round(item.y / totalcount * 100, 3);
+                    }
+
+                    var waferf = new DateWaferFailureColumn();
+                    waferf.xkey = waferkv.Key;
+                    waferf.DateColSeg = failseglist;
+                    waferf.total = totalcount;
+
+                    waferflist.Add(waferf);
+
+                }//end foreach
+
+                var temptestf = new TestFailureColumn();
+                temptestf.TestType = testkv.Key;
+                waferflist.Sort(delegate (DateWaferFailureColumn obj1, DateWaferFailureColumn obj2) {
+                    return obj1.xkey.CompareTo(obj2.xkey);
+                });
+                temptestf.DateColSeg = waferflist;
+
+                testflist.Add(temptestf);
+            }//end foreach
+
+            testflist.Sort(delegate (TestFailureColumn obj1, TestFailureColumn obj2)
+            {
+                return obj2.TestType.CompareTo(obj1.TestType);
+            });
+            ret.Add(newboxdata);
+            ret.Add(testflist);
+            ret.Add(name_colors);
+
+            return ret;
+        }
+
+        public static void RetrieveBURNINHTOLDataByWafer(string wf_no, System.IO.FileStream fw, string defTab = "BITestResultDataField", string defTab2 = "BITestResult")
         {
 
-            var sql = @"SELECT SN,TestName,TestTimeStamp,PN,Wafer,JO,Channel,SLOPE,PO_LD,PO_Uniformity,THOLD,Delta_PO_LD,Delta_SLOPE
-                        , Delta_THOLD, Delta_PO_Uniformity, ProductName FROM BITestResultDataField where Wafer = @Wafer";
+            var sql = @"SELECT bf.SN,bf.TestName,bf.TestTimeStamp,bf.PN,bf.Wafer,bf.JO,bf.Channel,bf.SLOPE,bf.PO_LD,bf.PO_Uniformity,bf.THOLD,bf.Delta_PO_LD,bf.Delta_SLOPE
+                        , bf.Delta_THOLD, bf.Delta_PO_Uniformity, bf.ProductName, br.Failure FROM <defTab> bf 
+                         left join <defTab2> br on br.DataID = bf.DataID 
+                         where bf.Wafer = @Wafer";
+
+            sql = sql.Replace("<defTab>", defTab).Replace("<defTab2>", defTab2);
+
             var dict = new Dictionary<string, string>();
             dict.Add("@Wafer", wf_no);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, dict);
 
             var sb = new StringBuilder(120 * 10000);
-            var title = "SN,TestName,TestTimeStamp,PN,Wafer,JO,Channel,SLOPE,PO_LD,PO_Uniformity,THOLD,Delta_PO_LD,Delta_SLOPE,Delta_THOLD, Delta_PO_Uniformity, ProductName";
+            var title = "SN,TestName,Failure,TestTimeStamp,PN,Wafer,JO,Channel,SLOPE,PO_LD,PO_Uniformity,THOLD,Delta_PO_LD,Delta_SLOPE,Delta_THOLD, Delta_PO_Uniformity, ProductName";
             sb.Append(title + "\r\n");
 
             var idx = 0;
@@ -1826,8 +2027,10 @@ namespace Prometheus.Models
                     , Convert.ToDouble(line[9]), Convert.ToDouble(line[10]), Convert.ToDouble(line[11])
                     , Convert.ToDouble(line[12]), Convert.ToDouble(line[13]), Convert.ToDouble(line[14])
                     , Convert.ToString(line[15]));
+                var failure = Convert.ToString(line[16]);
 
-                var line1 = "\"" + item.SN.ToString().Replace("\"", "") + "\"," + "\"" + item.TestName.Replace("\"", "") + "\"," + "\"" + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss").Replace("\"", "") + "\"," + "\"" + item.PN.Replace("\"", "") + "\","
+                var line1 = "\"" + item.SN.ToString().Replace("\"", "") + "\"," + "\"" + item.TestName.Replace("\"", "") + "\"," + "\"" + failure.Replace("\"", "")
+                    + "\"," + "\"" + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss").Replace("\"", "") + "\"," + "\"" + item.PN.Replace("\"", "") + "\","
                     + "\"" + item.Wafer.Replace("\"", "") + "\"," + "\"" + item.JO.Replace("\"", "") + "\"," + "\"" + item.Channel.Replace("\"", "") + "\","
                     + "\"" + item.SLOPE.ToString().Replace("\"", "") + "\"," + "\"" + item.PO_LD.ToString().Replace("\"", "") + "\"," + "\"" + item.PO_Uniformity.ToString().Replace("\"", "") + "\","
                     + "\"" + item.THOLD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_PO_LD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_SLOPE.ToString().Replace("\"", "") + "\","
@@ -1847,7 +2050,7 @@ namespace Prometheus.Models
 
         }
 
-        public static void RetrieveWaferDataByMonth(string month,List<string> pnlist,System.IO.FileStream fw)
+        public static void RetrieveBURNINHTOLDataByMonth(string month,List<string> pnlist,System.IO.FileStream fw,string defTab = "BITestResultDataField",string defTab2= "BITestResult")
         {
             var pncond = "('";
             foreach (var p in pnlist)
@@ -1856,14 +2059,15 @@ namespace Prometheus.Models
             }
             pncond = pncond.Substring(0, pncond.Length - 2) + ")";
 
-
             var starttime = DateTime.Parse(month + "/01" + " 00:00:00");
             var endtime = starttime.AddMonths(1);
 
-            var sql = @"SELECT SN,TestName,TestTimeStamp,PN,Wafer,JO,Channel,SLOPE,PO_LD,PO_Uniformity,THOLD,Delta_PO_LD,Delta_SLOPE
-                        , Delta_THOLD, Delta_PO_Uniformity, ProductName FROM BITestResultDataField
-                        where TestTimeStamp >= @starttime and TestTimeStamp < @endtime and Wafer <> '' and ProductName in <pncond>";
-            sql = sql.Replace("<pncond>", pncond);
+            var sql = @"SELECT bf.SN,bf.TestName,bf.TestTimeStamp,bf.PN,bf.Wafer,bf.JO,bf.Channel,bf.SLOPE,bf.PO_LD,bf.PO_Uniformity,bf.THOLD,bf.Delta_PO_LD,bf.Delta_SLOPE
+                        , bf.Delta_THOLD, bf.Delta_PO_Uniformity, bf.ProductName, br.Failure FROM <defTab> bf 
+                        left join <defTab2> br on br.DataID = bf.DataID 
+                        where bf.TestTimeStamp >= @starttime and bf.TestTimeStamp < @endtime and bf.Wafer <> '' and bf.ProductName in <pncond>";
+
+            sql = sql.Replace("<defTab>",defTab).Replace("<defTab2>", defTab2).Replace("<pncond>", pncond);
             var dict = new Dictionary<string, string>();
             dict.Add("@starttime", starttime.ToString("yyyy-MM-dd HH:mm:ss"));
             dict.Add("@endtime", endtime.ToString("yyyy-MM-dd HH:mm:ss"));
@@ -1871,7 +2075,7 @@ namespace Prometheus.Models
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, dict);
 
             var sb = new StringBuilder(120*10000);
-            var title = "SN,TestName,TestTimeStamp,PN,Wafer,JO,Channel,SLOPE,PO_LD,PO_Uniformity,THOLD,Delta_PO_LD,Delta_SLOPE,Delta_THOLD, Delta_PO_Uniformity, ProductName";
+            var title = "SN,TestName,Failure,TestTimeStamp,PN,Wafer,JO,Channel,SLOPE,PO_LD,PO_Uniformity,THOLD,Delta_PO_LD,Delta_SLOPE,Delta_THOLD, Delta_PO_Uniformity, ProductName";
             sb.Append(title + "\r\n");
 
             var idx = 0;
@@ -1883,8 +2087,10 @@ namespace Prometheus.Models
                     , Convert.ToDouble(line[9]), Convert.ToDouble(line[10]), Convert.ToDouble(line[11])
                     , Convert.ToDouble(line[12]), Convert.ToDouble(line[13]), Convert.ToDouble(line[14])
                     , Convert.ToString(line[15]));
+                var failure = Convert.ToString(line[16]);
 
-                var line1 = "\"" + item.SN.ToString().Replace("\"", "") + "\"," + "\"" + item.TestName.Replace("\"", "") + "\"," + "\"" + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss").Replace("\"", "") + "\"," + "\"" + item.PN.Replace("\"", "") + "\","
+                var line1 = "\"" + item.SN.ToString().Replace("\"", "") + "\"," + "\"" + item.TestName.Replace("\"", "") + "\"," + "\"" + failure.Replace("\"", "")
+                    + "\"," + "\"" + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss").Replace("\"", "") + "\"," + "\"" + item.PN.Replace("\"", "") + "\","
                     + "\"" + item.Wafer.Replace("\"", "") + "\"," + "\"" + item.JO.Replace("\"", "") + "\"," + "\"" + item.Channel.Replace("\"", "") + "\","
                     + "\"" + item.SLOPE.ToString().Replace("\"", "") + "\"," + "\"" + item.PO_LD.ToString().Replace("\"", "") + "\"," + "\"" + item.PO_Uniformity.ToString().Replace("\"", "") + "\","
                     + "\"" + item.THOLD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_PO_LD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_SLOPE.ToString().Replace("\"", "") + "\","
@@ -1902,6 +2108,7 @@ namespace Prometheus.Models
             var bt1 = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
             fw.Write(bt1, 0, bt1.Count());
         }
+
 
         public static List<object> CBOXFromRaw(string rawdata, double llimit, double hlimit,bool nooutlier)
         {

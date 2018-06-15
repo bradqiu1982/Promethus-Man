@@ -1,22 +1,27 @@
 ﻿
 @{
-    ViewBag.Title = "MonthlyVcsel";
+    ViewBag.Title = "HTOLDistribution";
     Layout = "~/Views/Shared/_LayoutNew.cshtml";
 }
 
 <link type="text/css" rel="stylesheet" href="~/Content/bootstrap-datepicker/bootstrap-datepicker.min.css" />
 <link type="text/css" rel="stylesheet" href="~/Scripts/jquery-autocomplete/jquery.auto-complete.css" />
 <link type="text/css" rel="stylesheet" href="~/Content/burnin.css" />
+<link type="text/css" rel="stylesheet" href="~/Scripts/bootstrap-tagsinput/bootstrap-tagsinput.css" />
 
 <script type="text/javascript" src="~/Scripts/jquery-autocomplete/jquery.auto-complete.min.js"></script>
 <script type="text/javascript" src="~/Scripts/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
-<script type="text/javascript" src="~/Scripts/burnin.js"></script>
-<script type="text/javascript">
-        $(function(){
-            BurnIn.init();
-        })
-</script>
 
+<script type="text/javascript" src="~/Scripts/bootstrap-tagsinput/bootstrap-tagsinput.js"></script>
+<script type="text/javascript" src="~/Scripts/bootstrap-tagsinput/bootstrap3-typeahead.js"></script>
+
+<script type="text/javascript" src="~/Scripts/HTOL.js"></script>
+
+<script type="text/javascript">
+    $(function () {
+        HTOL.distribution();
+    })
+</script>
 
 <div class="row">
     <div class="nav navbar-nav navbar-left">
@@ -24,15 +29,14 @@
     </div>
     <div class="nav navbar-nav navbar-left">
         <ol class="breadcrumb" style="width:600px">
-            <li class="active">VCSEL YIELD</li>
+            <li class="active">HTOL Wafer Distribution</li>
         </ol>
     </div>
 </div>
-
 <div class="row">
     <nav class="col-xs-2 nav-sidebar">
         <ul class="nav">
-            <li class="active">
+            <li>
                 <a href="/DataAnalyze/MonthlyVcsel">
                     <span class="item-show">BurnIn Yield</span>
                 </a>
@@ -47,7 +51,7 @@
                     <span class="item-show">HTOL Yield</span>
                 </a>
             </li>
-            <li>
+            <li class="active">
                 <a href="/DataAnalyze/HTOLDistribution">
                     <span class="item-show">HTOL Wafer</span>
                 </a>
@@ -65,8 +69,8 @@
         </ul>
     </nav>
     <div class="col-xs-10">
-        <div class="v-container">
-            <div class="v-filter">
+        <div class="w-container">
+            <div class="w-filter">
                 <div class="row row-margin">
                     <label class="col-xs-3">Date Period</label>
                     <div class="col-xs-3">
@@ -92,12 +96,29 @@
                     </div>
                 </div>
                 <div class="row row-margin">
+                    <label class="col-xs-3">Wafer#</label>
+                    <div class="col-xs-7">
+                        <input type="text" class="wafer-no" data-provide="typeahead"
+                               id="wf-no" name="wf-no" autocomplete="off" placeholder="Wafer #" value="@ViewBag.DefaultWafer">
+                    </div>
+                </div>
+                <div class="row row-margin">
                     <label class="col-xs-3">Wafer Type</label>
                     <div class="col-xs-3">
                         @Html.DropDownList("vcseltypeselectlist", null, new { @id = "vcseltypeselectlist", @class = "form-control" })
                     </div>
-                    <div class="col-xs-1"></div>
-                    <div class="col-xs-3 box-search">
+                    <div class="col-xs-3">
+                        <div class="col-xs-6">
+                            @Html.DropDownList("mathrectlist", null, new { @id = "mathrectlist", @class = "form-control" })
+                        </div>
+                        <div class="col-xs-6">
+                            <select class="form-control" id="outlier" name="outlier">
+                                <option value="YES" selected>With Outlier</option>
+                                <option value="NO">No Outlier</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-xs-1 box-search" style="padding-left:0">
                         <input type="button" class="btn btn-success" name="btn-search" id="btn-search" value="Search">
                     </div>
                 </div>
@@ -106,21 +127,21 @@
             </div>
         </div>
     </div>
-    <div class="hidden">
-        <a id="exportLink"></a>
-    </div>
 </div>
 
+<div class="hidden">
+    <a id="exportLink"></a>
+</div>
 <div class="modal fade" id="boxplot-alert" tabindex="-1" role="dialog" style="margin-top:10%">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Download monthly Test Data</h4>
+                <h4 class="modal-title">Download Wafer Test Data</h4>
             </div>
             <div class="modal-body">
                 <input type="hidden" name="m-wf-no" id="m-wf-no">
-                <p>Downloading current month test data spend some time. Do you want to continue?</p>
+                <p>Downloading current wafer test data spend some time. Do you want to continue?</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" id="btn-wf-download" name="btn-wf-download">YES</button>
@@ -129,3 +150,5 @@
         </div>
     </div>
 </div>
+
+

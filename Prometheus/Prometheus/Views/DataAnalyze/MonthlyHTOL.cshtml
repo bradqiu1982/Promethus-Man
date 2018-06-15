@@ -1,8 +1,9 @@
 ﻿
 @{
-    ViewBag.Title = "MonthlyVcsel";
+    ViewBag.Title = "MonthlyHTOL";
     Layout = "~/Views/Shared/_LayoutNew.cshtml";
 }
+
 
 <link type="text/css" rel="stylesheet" href="~/Content/bootstrap-datepicker/bootstrap-datepicker.min.css" />
 <link type="text/css" rel="stylesheet" href="~/Scripts/jquery-autocomplete/jquery.auto-complete.css" />
@@ -10,10 +11,10 @@
 
 <script type="text/javascript" src="~/Scripts/jquery-autocomplete/jquery.auto-complete.min.js"></script>
 <script type="text/javascript" src="~/Scripts/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
-<script type="text/javascript" src="~/Scripts/burnin.js"></script>
+<script type="text/javascript" src="~/Scripts/HTOL.js"></script>
 <script type="text/javascript">
         $(function(){
-            BurnIn.init();
+            HTOL.init();
         })
 </script>
 
@@ -24,7 +25,7 @@
     </div>
     <div class="nav navbar-nav navbar-left">
         <ol class="breadcrumb" style="width:600px">
-            <li class="active">VCSEL YIELD</li>
+            <li class="active">HTOL YIELD</li>
         </ol>
     </div>
 </div>
@@ -32,7 +33,7 @@
 <div class="row">
     <nav class="col-xs-2 nav-sidebar">
         <ul class="nav">
-            <li class="active">
+            <li>
                 <a href="/DataAnalyze/MonthlyVcsel">
                     <span class="item-show">BurnIn Yield</span>
                 </a>
@@ -42,7 +43,7 @@
                     <span class="item-show">BurnIn Wafer</span>
                 </a>
             </li>
-            <li>
+            <li class="active">
                 <a href="/DataAnalyze/MonthlyHTOL">
                     <span class="item-show">HTOL Yield</span>
                 </a>
@@ -129,3 +130,5 @@
         </div>
     </div>
 </div>
+
+

@@ -6129,6 +6129,13 @@ namespace Prometheus.Controllers
                 }
                 else
                 {
+                    var currenttime = DateTime.Now;
+                    if (currenttime.Hour > 18 || vcselbgdzeropoint > currenttime)
+                    {
+                        sundaylog("Sunday Report End for time....");
+                        return;
+                    }
+
                     //EXIST SUCH DATA
                     sundaylog(vcselbgdzeropoint.ToString("yyyy-MM-dd HH:mm:ss")+" Monthly data exist");
                     vcselbgdzeropoint = vcselbgdzeropoint.AddMonths(1);
@@ -6136,7 +6143,7 @@ namespace Prometheus.Controllers
                 }
 
                 times = times + 1;
-                if (times > 10)
+                if (times > 26)
                 {
                     break;
                 }
@@ -6163,6 +6170,13 @@ namespace Prometheus.Controllers
                 }
                 else
                 {
+                    var currenttime = DateTime.Now;
+                    if (currenttime.Hour > 18 || htolbgdzeropoint > currenttime)
+                    {
+                        sundaylog("Sunday Report End for time....");
+                        return;
+                    }
+
                     //EXIST SUCH DATA
                     sundaylog(htolbgdzeropoint.ToString("yyyy-MM-dd HH:mm:ss") + " Monthly data exist");
                     htolbgdzeropoint = htolbgdzeropoint.AddMonths(1);
@@ -6170,7 +6184,7 @@ namespace Prometheus.Controllers
                 }
 
                 times = times + 1;
-                if (times > 12)
+                if (times > 26)
                 {
                     break;
                 }
@@ -6333,13 +6347,13 @@ namespace Prometheus.Controllers
             }
             catch (Exception ex) { }
 
-            heartbeatlog("LoadBITestDateFromAuto");
+            heartbeatlog("RefreshOQMJo");
 
             try {
                 ExternalDataCollector.RefreshOQMJo(this);
             }
             catch (Exception ex) { }
-            heartbeatlog("RefreshOQMJo");
+            heartbeatlog("LoadBITestDateFromAuto");
 
             try
             {
@@ -6347,7 +6361,7 @@ namespace Prometheus.Controllers
             }
             catch (Exception ex) { }
 
-            heartbeatlog("BITestData.PrePareLatestData");
+            heartbeatlog("BITestData.BIOLDTestDateExplore");
 
             try
             {
@@ -6355,7 +6369,7 @@ namespace Prometheus.Controllers
             }
             catch (Exception ex) { }
 
-            heartbeatlog("BITestData.BIOLDTestDateExplore");
+            heartbeatlog("BITestData.LoadHTOLTestData");
 
             try
             {
@@ -6363,7 +6377,7 @@ namespace Prometheus.Controllers
             }
             catch (Exception ex) { }
 
-            heartbeatlog("BITestData.LoadHTOLTestData");
+            heartbeatlog("BITestData.PrePareLatestData");
 
             foreach (var pjkey in pjkeylist)
             {
@@ -6598,15 +6612,25 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
-            try
-            {
-                var vcselpninfo = VcselPNData.RetrieveVcselPNInfo();
-                VcselBGDVM.StartHTOLBGDComputer(DateTime.Parse("2017-09-01 00:00:00"), vcselpninfo, this);
-            }
-            catch (Exception ex)
-            {
-                System.Windows.MessageBox.Show(ex.Message);
-            }
+
+            //var vcselpninfo = VcselPNData.RetrieveVcselPNInfo();
+            //var sdate = DateTime.Parse("2017-09-01 00:00:00");
+            //for (var idx = 0; idx < 10; idx++)
+            //{
+            //    if (!VcselMonthData.MonthDataExist(sdate, "HTOLMonthData"))
+            //    {
+            //        try
+            //        {
+            //            VcselBGDVM.StartHTOLBGDComputer(sdate, vcselpninfo, this);
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            System.Windows.MessageBox.Show(ex.Message);
+            //        }
+            //    }
+
+            //    sdate = sdate.AddMonths(1);
+            //}
 
             //BIDataUtility.LoadHTOLTestData(this);
 

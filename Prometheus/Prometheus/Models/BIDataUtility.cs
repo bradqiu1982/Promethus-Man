@@ -1447,7 +1447,7 @@ namespace Prometheus.Models
             }
 
             var starttime = biexplorerealtime.ToString("yyyy-MM-dd") + " 00:00:00";
-            var endtime = biexplorerealtime.AddDays(1).ToString("yyyy-MM-dd") + " 23:59:59";
+            var endtime = biexplorerealtime.AddDays(4).ToString("yyyy-MM-dd") + " 23:59:59";
 
             foreach (var bt in bitables)
             {
@@ -1493,9 +1493,10 @@ namespace Prometheus.Models
                         var dthold = Convert.ToDouble(line[14]);
                         var dpouniformity = Convert.ToDouble(line[15]);
 
-                        if (string.Compare(previoussn, sn + ":" + testname, true) != 0)
+                        var uniqusn = sn + ":" + testname + ":" + testtime.ToString("yyyy-MM-dd HH:mm:ss");
+                        if (string.Compare(previoussn, uniqusn, true) != 0)
                         {
-                            previoussn = sn + ":" + testname;
+                            previoussn = uniqusn;
                             dataid = IssueViewModels.GetUniqKey();
                             var tempresult = new BITestResult(sn, testname, station, failure, testtime, pn, jo, bt, dataid);
                             testresultlist.Add(tempresult);
@@ -1533,7 +1534,7 @@ namespace Prometheus.Models
 
             }//end foreach
 
-            days = days + 2;
+            days = days + 5;
             System.IO.File.WriteAllText(bioldfile, days.ToString());
         }
 
@@ -1588,9 +1589,10 @@ namespace Prometheus.Models
                         var dthold = Convert.ToDouble(line[14]);
                         var dpouniformity = Convert.ToDouble(line[15]);
 
-                        if (string.Compare(previoussn, sn + ":" + testname, true) != 0)
+                        var uniqusn = sn + ":" + testname + ":" + testtime.ToString("yyyy-MM-dd HH:mm:ss");
+                        if (string.Compare(previoussn, uniqusn, true) != 0)
                         {
-                            previoussn = sn+":"+testname;
+                            previoussn = uniqusn;
                             dataid = IssueViewModels.GetUniqKey();
                             var tempresult = new BITestResult(sn, testname, station, failure,testtime, pn, jo, bt,dataid);
                             testresultlist.Add(tempresult);
@@ -1637,20 +1639,6 @@ namespace Prometheus.Models
 
             var bihtoltime = syscfgdict["BIHTOLZEROTIME"];
 
-            //var bihtolfile = ctrl.Server.MapPath("~/userfiles") + "\\BIHTOLDATA.txt";
-            //if (!System.IO.File.Exists(bihtolfile))
-            //{
-            //    return;
-            //}
-            //var days = Convert.ToInt32(System.IO.File.ReadAllText(bihtolfile));
-            //var biexplorerealtime = DateTime.Parse(bihtoltime).AddDays((double)days);
-            //if (biexplorerealtime > DateTime.Now)
-            //{
-            //    return;
-            //}
-            //var starttime = biexplorerealtime.ToString("yyyy-MM-dd") + " 00:00:00";
-            //var endtime = biexplorerealtime.AddDays(29).ToString("yyyy-MM-dd") + " 23:59:59";
-
             var starttime = RetrieveLatestTimeStampOfHTOLBITable(bihtoltime).ToString("yyyy-MM-dd HH:mm:ss");
 
             foreach (var bt in bitables)
@@ -1695,9 +1683,10 @@ namespace Prometheus.Models
                         var dthold = Convert.ToDouble(line[14]);
                         var dpouniformity = Convert.ToDouble(line[15]);
 
-                        if (string.Compare(previoussn, sn + ":" + testname, true) != 0)
+                        var uniqusn = sn + ":" + testname + ":" + testtime.ToString("yyyy-MM-dd HH:mm:ss");
+                        if (string.Compare(previoussn, uniqusn, true) != 0)
                         {
-                            previoussn = sn + ":" + testname;
+                            previoussn = uniqusn;
                             dataid = IssueViewModels.GetUniqKey();
                             var tempresult = new BITestResult(sn, testname, station, failure, testtime, pn, jo, bt, dataid);
                             testresultlist.Add(tempresult);
@@ -1740,9 +1729,121 @@ namespace Prometheus.Models
 
             }//end foreach
 
-            //days = days + 30;
-            //System.IO.File.WriteAllText(bihtolfile, days.ToString());
         }
+
+        //public static void LoadHTOLTestDataPreLoad(Controller ctrl)
+        //{
+        //    var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+        //    var bitables = new List<string>();
+        //    bitables.Add("dbo.v_BIHTOLOutput");
+
+        //    var bihtoltime = syscfgdict["BIHTOLZEROTIME"];
+
+        //    var bihtolfile = ctrl.Server.MapPath("~/userfiles") + "\\BIHTOLDATA.txt";
+        //    if (!System.IO.File.Exists(bihtolfile))
+        //    {
+        //        return;
+        //    }
+        //    var days = Convert.ToInt32(System.IO.File.ReadAllText(bihtolfile));
+        //    var biexplorerealtime = DateTime.Parse(bihtoltime).AddDays((double)days);
+        //    if (biexplorerealtime > DateTime.Now)
+        //    {
+        //        return;
+        //    }
+        //    var starttime = biexplorerealtime.ToString("yyyy-MM-dd") + " 00:00:00";
+        //    var endtime = biexplorerealtime.AddDays(29).ToString("yyyy-MM-dd") + " 23:59:59";
+
+        //    foreach (var bt in bitables)
+        //    {
+        //        var testresultlist = new List<BITestResult>();
+        //        var testresultfieldlist = new List<BITestResultDataField>();
+
+        //        var sql = "select ContainerName,ProcessStep,DateTime,Failure_Mode,Station,Work_Order,PN,Channel,SLOPE,PO_LD,PO_Uniformity,THOLD,Delta_PO_LD,Delta_SLOPE,Delta_THOLD,Delta_PO_Uniformity from <bitable> where DateTime >= '<starttime>' and DateTime <= '<endtime>' "
+        //            + " and  ProcessStep is not null and PN is not null and Work_Order is not null and ContainerName is not null and Failure_Mode is not null and ContainerName <> '' "
+        //            + " and Failure_Mode <> '--' and Failure_Mode <> '' and Failure_Mode is not null and Delta_PO_LD is not null and Delta_SLOPE is not null and Delta_THOLD is not null "
+        //            + " and Delta_PO_Uniformity is not null  order by ContainerName,DateTime";
+
+        //        sql = sql.Replace("<bitable>", bt).Replace("<starttime>", starttime).Replace("<endtime>", endtime);
+
+        //        var previoussn = string.Empty;
+        //        var dataid = string.Empty;
+
+        //        var dbret = DBUtility.ExeAutoSqlWithRes(sql);
+        //        if (dbret.Count == 0)
+        //        {
+        //            continue;
+        //        }
+
+        //        foreach (var line in dbret)
+        //        {
+        //            try
+        //            {
+        //                var sn = Convert.ToString(line[0]);
+        //                var testname = Convert.ToString(line[1]);
+        //                var testtime = DateTime.Parse(ConvertToDateStr(line[2]));
+        //                var failure = Convert.ToString(line[3]);
+        //                var station = Convert.ToString(line[4]);
+        //                var jo = Convert.ToString(line[5]);
+        //                var pn = Convert.ToString(line[6]);
+        //                var ch = Convert.ToString(line[7]);
+        //                var slope = Convert.ToDouble(line[8]);
+        //                var pold = Convert.ToDouble(line[9]);
+        //                var pouniformity = Convert.ToDouble(line[10]);
+        //                var thold = Convert.ToDouble(line[11]);
+        //                var dpold = Convert.ToDouble(line[12]);
+        //                var dslope = Convert.ToDouble(line[13]);
+        //                var dthold = Convert.ToDouble(line[14]);
+        //                var dpouniformity = Convert.ToDouble(line[15]);
+
+        //                var uniqusn = sn + ":" + testname + ":" + testtime.ToString("yyyy-MM-dd HH:mm:ss");
+        //                if (string.Compare(previoussn, uniqusn, true) != 0)
+        //                {
+        //                    previoussn = uniqusn;
+        //                    dataid = IssueViewModels.GetUniqKey();
+        //                    var tempresult = new BITestResult(sn, testname, station, failure, testtime, pn, jo, bt, dataid);
+        //                    testresultlist.Add(tempresult);
+        //                }
+
+        //                var tempfield = new BITestResultDataField(sn, testname, testtime, pn, jo, ch, slope, pold, pouniformity, thold, dpold, dslope, dthold, dpouniformity, dataid);
+        //                testresultfieldlist.Add(tempfield);
+        //            }
+        //            catch (Exception ex) { }
+
+        //        }//end foreach
+
+        //        var snwaferdict = new Dictionary<string, BISNRelation>();
+        //        RetrieveBIWaferBySN(testresultlist, snwaferdict);
+
+        //        var newtestresultlist = new List<BITestResult>();
+        //        var newtestresultfieldlist = new List<BITestResultDataField>();
+
+        //        foreach (var item in testresultlist)
+        //        {
+        //            if (snwaferdict.ContainsKey(item.SN.Split('_')[0]))
+        //            {
+        //                item.Wafer = snwaferdict[item.SN.Split('_')[0]].wafer;
+        //                item.ProductName = snwaferdict[item.SN.Split('_')[0]].productname;
+        //                newtestresultlist.Add(item);
+        //            }
+        //        }//end foreach
+        //        foreach (var item in testresultfieldlist)
+        //        {
+        //            if (snwaferdict.ContainsKey(item.SN.Split('_')[0]))
+        //            {
+        //                item.Wafer = snwaferdict[item.SN.Split('_')[0]].wafer;
+        //                item.ProductName = snwaferdict[item.SN.Split('_')[0]].productname;
+        //                newtestresultfieldlist.Add(item);
+        //            }
+        //        }
+
+        //        StoreBITestResult(newtestresultlist, "BIHTOLTestResult");
+        //        StoreBITestResultDateField(newtestresultfieldlist, "BIHTOLTestResultDataField");
+
+        //    }//end foreach
+
+        //    days = days + 30;
+        //    System.IO.File.WriteAllText(bihtolfile, days.ToString());
+        //}
 
         private static void StoreBITestResult(List<BITestResult> testresultlist,string deftab = "BITestResult")
         {

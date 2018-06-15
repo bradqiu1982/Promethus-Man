@@ -250,6 +250,18 @@ namespace Prometheus.Models
             SharedTag = "";
         }
 
+        public static DateTime ConvertDate(object d)
+        {
+            try
+            {
+                return DateTime.Parse(Convert.ToString(d));
+            }
+            catch (Exception ex)
+            {
+                return DateTime.Now;
+            }
+        }
+
         public IssueViewModels(string pk, string ik, string it, string sum, string pri, string ddate, string rsdate, string rtdate, string assign, string rt, string resolute, string pik, string rpeople)
         {
             ProjectKey = pk;
@@ -257,9 +269,9 @@ namespace Prometheus.Models
             IssueType = it;
             Summary = sum;
             Priority = pri;
-            DueDate = DateTime.Parse(ddate);
-            ResolvedDate = DateTime.Parse(rsdate);
-            ReportDate = DateTime.Parse(rtdate);
+            DueDate = ConvertDate(ddate);
+            ResolvedDate = ConvertDate(rsdate);
+            ReportDate = ConvertDate(rtdate);
             Assignee = assign;
             Reporter = rt;
             Resolution = resolute;
@@ -794,7 +806,7 @@ namespace Prometheus.Models
             var sql = @"SELECT i.ModuleSN,r.RMAFailureCode,p.TestTimeStamp,i.IssueKey FROM [NPITrace].[dbo].[Issue] i (NOLOCK) 
                          left join [NPITrace].[dbo].[IssueRMA] r with (nolock) on i.IssueKey = r.IssueKey 
                          left join [NPITrace].[dbo].[ProjectTestData] p with (nolock) on i.ModuleSN = p.ModuleSerialNum 
-                         where i.ProjectKey = @pjkey and i.IssueType = @IssueType and r.RMAFailureCode <> '' order by p.ModuleSerialNum,p.TestTimeStamp desc";
+                         where i.ProjectKey = @pjkey and i.IssueType = @IssueType and r.RMAFailureCode <> '' and p.TestTimeStamp is not null order by p.ModuleSerialNum,p.TestTimeStamp desc";
             var dict = new Dictionary<string, string>();
             dict.Add("@pjkey", pjkey);
             dict.Add("@IssueType", ISSUETP.RMA);
@@ -811,7 +823,7 @@ namespace Prometheus.Models
                     var tempvm = new IssueViewModels();
                     tempvm.ModuleSN = sn;
                     tempvm.RMAFailureCode = Convert.ToString(line[1]);
-                    tempvm.ReportDate = Convert.ToDateTime(line[2]);
+                    tempvm.ReportDate = ConvertDate(line[2]);
                     tempvm.IssueKey = Convert.ToString(line[3]);
                     ret.Add(tempvm);
                 }

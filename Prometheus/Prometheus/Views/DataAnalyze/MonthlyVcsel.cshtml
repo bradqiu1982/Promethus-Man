@@ -112,19 +112,28 @@
 </div>
 
 <div class="modal fade" id="boxplot-alert" tabindex="-1" role="dialog" style="margin-top:10%">
-    <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Download monthly Test Data</h4>
+                <h4 class="modal-title">Data Link</h4>
             </div>
             <div class="modal-body">
                 <input type="hidden" name="m-wf-no" id="m-wf-no">
-                <p>Downloading current month test data spend some time. Do you want to continue?</p>
+                <div class="row">
+                    <div class="col-xs-2"></div>
+                    <div class="col-xs-3">
+                        <button type="button" class="btn btn-primary" id="btn-wf-download" name="btn-wf-download">Monthly Test Data</button>
+                    </div>
+                    <div class="col-xs-2"></div>
+                    <div class="col-xs-3">
+                        <button type="button" class="btn btn-primary" id="btn-mt-yield" name="btn-mt-yield">Wafer Yield In Month</button>
+                    </div>
+                    <div class="col-xs-2"></div>
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="btn-wf-download" name="btn-wf-download">YES</button>
-                <button type="button" class="btn btn-danger" id="btn-wf-cancel" name="btn-wf-cancel" data-dismiss="modal">NO</button>
+                <button type="button" class="btn btn-danger" id="btn-wf-cancel" name="btn-wf-cancel" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

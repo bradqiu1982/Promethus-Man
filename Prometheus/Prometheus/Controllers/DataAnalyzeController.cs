@@ -1303,7 +1303,7 @@ namespace Prometheus.Controllers
             return ret;
         }
 
-        public ActionResult WaferDistribution(string defaultwafer)
+        public ActionResult WaferDistribution(string defaultwafer, string defaultdate, string defaulttype)
         {
             var vcseltypelist = VcselBGDVM.VcselTypeList();
 
@@ -1311,7 +1311,10 @@ namespace Prometheus.Controllers
             nvcseltypelist.Add(" ");
             nvcseltypelist.AddRange(vcseltypelist);
 
-            ViewBag.vcseltypeselectlist = CreateSelectList(nvcseltypelist, "");
+            var deftype = "";
+            if (!string.IsNullOrEmpty(defaulttype))
+            { deftype = defaulttype; }
+            ViewBag.vcseltypeselectlist = CreateSelectList(nvcseltypelist, deftype);
 
             var mathlist = new List<string>();
             mathlist.Add("Only Pass Data");
@@ -1324,10 +1327,16 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(defaultwafer))
             { ViewBag.DefaultWafer = defaultwafer; }
 
+            ViewBag.DefaultDate = "";
+            if (!string.IsNullOrEmpty(defaultdate))
+            {
+                ViewBag.DefaultDate = defaultdate;
+            }
+
             return View();
         }
 
-        public ActionResult HTOLDistribution(string defaultwafer)
+        public ActionResult HTOLDistribution(string defaultwafer,string defaultdate,string defaulttype)
         {
             var vcseltypelist = VcselBGDVM.VcselTypeList("HTOLWaferTestSum");
 
@@ -1335,7 +1344,11 @@ namespace Prometheus.Controllers
             nvcseltypelist.Add(" ");
             nvcseltypelist.AddRange(vcseltypelist);
 
-            ViewBag.vcseltypeselectlist = CreateSelectList(nvcseltypelist, "");
+            var deftype = "";
+            if (!string.IsNullOrEmpty(defaulttype))
+            { deftype = defaulttype; }
+
+            ViewBag.vcseltypeselectlist = CreateSelectList(nvcseltypelist, deftype);
 
             var mathlist = new List<string>();
             mathlist.Add("Only Pass Data");
@@ -1347,6 +1360,11 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(defaultwafer))
             { ViewBag.DefaultWafer = defaultwafer; }
 
+            ViewBag.DefaultDate = "";
+            if (!string.IsNullOrEmpty(defaultdate))
+            {
+                ViewBag.DefaultDate = defaultdate;
+            }
             return View();
         }
 
@@ -1924,6 +1942,7 @@ namespace Prometheus.Controllers
                         var xdata = new List<string>();
                         var ydata = new List<double>();
                         var cydata = new List<double>();
+                        var ymin = 100.0;
 
                         var count = 0;
                         foreach (var f_item in item.DateColSeg)
@@ -1945,7 +1964,10 @@ namespace Prometheus.Controllers
                             {
                                 failpercent = failpercent + fitem.y;
                             }
-                            ydata.Add(100.0 - failpercent);
+                            var tempy = 100.0 - failpercent;
+                            ydata.Add(tempy);
+                            if (tempy < ymin)
+                            { ymin = tempy; }
                             cydata.Add(wfitem.total);
                         }
 
@@ -1955,7 +1977,7 @@ namespace Prometheus.Controllers
                         var yAxis = new
                         {
                             title = "Yield (%)",
-                            min = 85.0,
+                            min = ymin,
                             max = 100.0
                         };
 

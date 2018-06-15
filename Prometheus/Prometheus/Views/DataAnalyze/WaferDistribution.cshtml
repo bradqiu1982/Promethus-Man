@@ -76,7 +76,7 @@
                         <div class="input-group date" data-date=""
                              data-date-format="yyyy-mm">
                             <input type="text" class="form-control"
-                                   id="sdate" name="sdate" value="" readonly>
+                                   id="sdate" name="sdate" value="@ViewBag.DefaultDate" readonly>
                             <span class="input-group-addon">
                                 <span class="glyphicon glyphicon-th"></span>
                             </span>
@@ -87,7 +87,7 @@
                         <div class="input-group date" data-date=""
                              data-date-format="yyyy-mm">
                             <input type="text" class="form-control"
-                                   id="edate" name="edate" value="" readonly>
+                                   id="edate" name="edate" value="@ViewBag.DefaultDate" readonly>
                             <span class="input-group-addon">
                                 <span class="glyphicon glyphicon-th"></span>
                             </span>
@@ -102,11 +102,11 @@
                     </div>
                 </div>
                 <div class="row row-margin">
-                    <label class="col-xs-3">Wafer Type</label>
+                    <label class="col-xs-2">Wafer Type</label>
                     <div class="col-xs-3">
                         @Html.DropDownList("vcseltypeselectlist", null, new { @id = "vcseltypeselectlist", @class = "form-control" })
                     </div>
-                    <div class="col-xs-3">
+                    <div class="col-xs-4">
                         <div class="col-xs-6">
                             @Html.DropDownList("mathrectlist", null, new { @id = "mathrectlist", @class = "form-control" })
                         </div>

@@ -63,6 +63,13 @@ var BurnIn = function(){
             $('#boxplot-alert').modal('hide');
             window.open("/DataAnalyze/DownLoadWaferByMonth?" + "month=" + wafer_no + "&vtype=" + vcseltype);
         })
+
+        $('body').on('click', '#btn-mt-yield', function () {
+            var wafer_no = $.trim($('#m-wf-no').val());
+            var wf_type = $.trim($('#vcseltypeselectlist').val());
+            $('#boxplot-alert').modal('hide');
+            window.open("/DataAnalyze/WaferDistribution?" + "defaultdate=" + wafer_no + "&defaulttype=" + wf_type);
+        })
     }
 
     var distribution = function(){
@@ -189,6 +196,13 @@ var BurnIn = function(){
                 wf_no = $.trim($('#wf-no').parent().find('input').eq(0).val());
             }
             if (wf_no != '') {
+                searchdata();
+            }
+
+            var sdate = $.trim($('#sdate').val());
+            var edate = $.trim($('#edate').val());
+            if(sdate != '' && edate != '')
+            {
                 searchdata();
             }
         }
@@ -411,17 +425,17 @@ var BurnIn = function(){
                     text: boxplot_data.yAxis.title
                 }
             },
-            plotOptions: {
-                series: {
-                    cursor: 'pointer',
-                    events: {
-                        click: function (event) {
-                            $('#m-wf-no').val(event.point.category);
-                            $('#boxplot-alert').modal('show')
-                        }
-                    }
-                }
-            },
+            //plotOptions: {
+            //    series: {
+            //        cursor: 'pointer',
+            //        events: {
+            //            click: function (event) {
+            //                $('#m-wf-no').val(event.point.category);
+            //                $('#boxplot-alert').modal('show')
+            //            }
+            //        }
+            //    }
+            //},
 
             series: [{
                 name: boxplot_data.data.name,
@@ -505,17 +519,17 @@ var BurnIn = function(){
                 }
 
             }],
-            plotOptions: {
-                series: {
-                    cursor: 'pointer',
-                    events: {
-                        click: function (event) {
-                            $('#m-wf-no').val(event.point.category);
-                            $('#boxplot-alert').modal('show')
-                        }
-                    }
-                }
-            },
+            //plotOptions: {
+            //    series: {
+            //        cursor: 'pointer',
+            //        events: {
+            //            click: function (event) {
+            //                $('#m-wf-no').val(event.point.category);
+            //                $('#boxplot-alert').modal('show')
+            //            }
+            //        }
+            //    }
+            //},
 
             series: [{
                 name: dbboxplot_data.left.data.name,

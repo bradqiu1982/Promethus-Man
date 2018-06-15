@@ -1605,6 +1605,9 @@ namespace Prometheus.Models
 
                 }//end foreach
 
+                var newtestresultlist = new List<BITestResult>();
+                var newtestresultfieldlist = new List<BITestResultDataField>();
+
                 var snwaferdict = new Dictionary<string, BISNRelation>();
                 RetrieveBIWaferBySN(testresultlist, snwaferdict);
 
@@ -1614,6 +1617,7 @@ namespace Prometheus.Models
                     {
                         item.Wafer = snwaferdict[item.SN].wafer;
                         item.ProductName = snwaferdict[item.SN].productname;
+                        newtestresultlist.Add(item);
                     }
                 }//end foreach
                 foreach (var item in testresultfieldlist)
@@ -1622,11 +1626,12 @@ namespace Prometheus.Models
                     {
                         item.Wafer = snwaferdict[item.SN].wafer;
                         item.ProductName = snwaferdict[item.SN].productname;
+                        newtestresultfieldlist.Add(item);
                     }
                 }
 
-                StoreBITestResult(testresultlist);
-                StoreBITestResultDateField(testresultfieldlist);
+                StoreBITestResult(newtestresultlist);
+                StoreBITestResultDateField(newtestresultfieldlist);
 
             }//end foreach
         }

@@ -1398,7 +1398,7 @@ namespace Prometheus.Models
             foreach (var kv in waferdict)
             {
                 var wafertestdata = RetrieveBITestData(kv.Key);
-                if (wafertestdata.Count > 200)
+                if (wafertestdata.Count > 20)
                 {
                     WaferTestSum.UpdateWaferTestData(kv.Key, wafertestdata, VcselPNInfo);
                     WaferBGDField.UpdateWaferFields(kv.Key, wafertestdata,ctrl);

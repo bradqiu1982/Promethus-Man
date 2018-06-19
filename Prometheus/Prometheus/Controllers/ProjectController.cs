@@ -14,7 +14,7 @@ using System.Net;
 
 namespace Prometheus.Controllers
 {
-    public class ProjectController : Controller
+    public class ProjectController : BaseController
     {
         private static void logthdinfo(string info)
         {
@@ -1513,6 +1513,12 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectIssues(string ProjectKey)
         {
+            //var checkresult = CheckLoginAndPermit(Request, "Project", "ProjectIssues");
+            //if (checkresult.GetType() != (new Boolean()).GetType())
+            //{
+            //    return (ActionResult)checkresult;
+            //}
+
             if (ProjectKey != null)
             {
                 ViewBag.PJKey = ProjectKey;
@@ -1669,6 +1675,12 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectFA(string ProjectKey)
         {
+            //var checkresult = CheckLoginAndPermit(Request, "Project", "ProjectFA");
+            //if (checkresult.GetType() != (new Boolean()).GetType())
+            //{
+            //    return (ActionResult)checkresult;
+            //}
+
             if (!string.IsNullOrEmpty(ProjectKey))
             {
                 ViewBag.PJKey = ProjectKey;
@@ -1724,6 +1736,12 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectSptTask(string ProjectKey)
         {
+            //var checkresult = CheckLoginAndPermit(Request, "Project", "ProjectSptTask");
+            //if (checkresult.GetType() != (new Boolean()).GetType())
+            //{
+            //    return (ActionResult)checkresult;
+            //}
+
             var ckdict = CookieUtility.UnpackCookie(this);
             if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
             {
@@ -2029,6 +2047,12 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectNPI(string ProjectKey)
         {
+            //var checkresult = CheckLoginAndPermit(Request, "Project", "ProjectNPI");
+            //if (checkresult.GetType() != (new Boolean()).GetType())
+            //{
+            //    return (ActionResult)checkresult;
+            //}
+
             if (ProjectKey != null)
             {
                 ViewBag.PJKey = ProjectKey;
@@ -2231,6 +2255,12 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectYieldMain(string ProjectKey)
         {
+            //var checkresult = CheckLoginAndPermit(Request, "Project", "ProjectYieldMain");
+            //if (checkresult.GetType() != (new Boolean()).GetType())
+            //{
+            //    return (ActionResult)checkresult;
+            //}
+
             var sarray = new string[] { "8", "16", "24", "32", "40", "48", "56" };
             var slist = new List<string>();
             slist.Add("Weekly Yield Trend");
@@ -2641,6 +2671,12 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectReliability(string ProjectKey, string sDate = "", string eDate = "")
         {
+            //var checkresult = CheckLoginAndPermit(Request, "Project", "ProjectIssues");
+            //if (checkresult.GetType() != (new Boolean()).GetType())
+            //{
+            //    return (ActionResult)checkresult;
+            //}
+
             ViewBag.pKey = null;
             ViewBag.sDate = string.IsNullOrEmpty(sDate) ? DateTime.Now.AddMonths(-6).ToString("yyyy-MM-dd") : sDate;
             ViewBag.eDate = string.IsNullOrEmpty(eDate) ? DateTime.Now.ToString("yyyy-MM-dd") : eDate;
@@ -7238,6 +7274,12 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectDash(string ProjectKey)
         {
+            //var checkresult = CheckLoginAndPermit(Request, "Project", "ProjectDash");
+            //if (checkresult.GetType() != (new Boolean()).GetType())
+            //{
+            //    return (ActionResult)checkresult;
+            //}
+
             var PJKey = ProjectKey;
             if (!string.IsNullOrEmpty(PJKey))
             {
@@ -8481,6 +8523,12 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectStations(string ProjectKey, string whichtest,string StartTime,string EndTime)
         {
+            //var checkresult = CheckLoginAndPermit(Request, "Project", "ProjectStations");
+            //if (checkresult.GetType() != (new Boolean()).GetType())
+            //{
+            //    return (ActionResult)checkresult;
+            //}
+
             var pjkey = ProjectKey;
             ViewBag.PJKey = pjkey;
 

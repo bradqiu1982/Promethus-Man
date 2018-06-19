@@ -1,0 +1,158 @@
+﻿.nav-sidebar {
+    width: 100%;
+    padding: 8px 0;
+    border-right: 1px solid #ddd;
+}
+
+.nav-sidebar a {
+    color: #333;
+    -webkit-transition: all 0.08s linear;
+    -moz-transition: all 0.08s linear;
+    -o-transition: all 0.08s linear;
+    transition: all 0.08s linear;
+    -webkit-border-radius: 4px 0 0 4px;
+    -moz-border-radius: 4px 0 0 4px;
+    border-radius: 4px 0 0 4px;
+}
+
+.nav-sidebar .active a {
+    cursor: default;
+    background-color: #428bca;
+    color: #fff;
+    text-shadow: 1px 1px 1px #666;
+}
+
+.nav-sidebar .active a:hover {
+    background-color: #428bca;
+}
+
+.nav-sidebar .text-overflow a,
+.nav-sidebar .text-overflow .media-body {
+    white-space: nowrap;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+}
+
+.m-row{
+    margin-bottom: 5px;
+}
+.pages{
+    cursor: pointer;
+}
+.tb-total{
+    padding: 6px 12px;
+}
+.search-container{
+    float: right;
+}
+.input-group-addon{
+    text-align: left;
+    cursor: pointer;
+}
+.edit-op, .del-op, .show-groups,
+.upr-approve, .upr-deny, .upr-complete,
+.edit-menu, .del-menu, .edit-func, .del-func,
+.edit-member, .del-member, .edit-group, .del-group,
+.edit-gmember, .edit-grole, .edit-role, .del-role,
+.role-permissions {
+    cursor: pointer;
+}
+
+.m-groups{
+    min-height: 120px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.group-members, .all-members-panel, .group-roles, .r-permissions {
+    background-color: #efefef;
+    min-height: 200px;
+    margin-left: 15px;
+    padding-top: 5px;
+    padding-right: 5px;
+    width: 70%;
+}
+.group-member-panel, .member-panel, .group-role-panel, .role-panel, .role-permission-panel {
+    color: #fff;
+    min-width: 100px;
+    background-color: #5cb85c;
+    border-color: #4cae4c;
+    border-radius: 3px;
+    padding: 5px 10px;
+    margin: 2px;
+    display: inline-block;
+}
+.member-panel:hover, .role-panel:hover, .permission-panel:hover {
+    background-color: #337ab7;
+    border-color: #2e6da4;
+}
+
+.del-group-member, .del-group-role, .del-role-permission {
+    float: right;
+    margin-top: 2px;
+    margin-right: 10px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Common styles for all types */
+.bs-callout {
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #eee;
+    border-left-width: 5px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.bs-callout h4 {
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+.bs-callout p:last-child {
+    margin-bottom: 0;
+}
+
+.bs-callout code {
+    border-radius: 3px;
+}
+
+/* Tighten up space between multiple callouts */
+.bs-callout + .bs-callout {
+    margin-top: -5px;
+}
+
+/* Variations */
+.bs-callout-danger {
+    border-left-color: #ce4844;
+}
+
+.bs-callout-danger h4 {
+    color: #ce4844;
+}
+
+.bs-callout-warning {
+    /*border-left-color: #aa6708;*/
+}
+
+.bs-callout-warning h4 {
+    color: #aa6708;
+}
+
+.bs-callout-info {
+    /*border-left-color: #1b809e;*/
+}
+
+.bs-callout-info h4 {
+    color: #1b809e;
+}
+
+.bs-callout-green {
+    border-left-color: #5cb85c;
+}
+
+.bs-callout-yellow {
+    border-left-color: #aa6708;
+}

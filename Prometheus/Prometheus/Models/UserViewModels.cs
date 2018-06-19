@@ -50,6 +50,49 @@ namespace Prometheus.Models
             var sql = "insert into UserTable(UserName,PassWD,UpdateDate,databackuptm) values(N'<UserName>','<PassWD>','<UpdateDate>','<databackuptm>')";
             sql = sql.Replace("<UserName>", Email.ToUpper()).Replace("<PassWD>", Password).Replace("<UpdateDate>", UpdateDate.ToString()).Replace("<databackuptm>", DateTime.Now.ToString());
             DBUtility.ExeLocalSqlNoRes(sql);
+
+            //insert into n_user
+            var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            sql = @"insert into n_User(Name, Password, Email, Tel, JobNum, 
+                Status, CreateAt, UpdateAt) values(@Name, @Password, @Email,
+                @Tel, @JobNum, @Status, @CreateAt, @UpdateAt)";
+
+            var name = Email.ToUpper().Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", " ");
+
+            var param = new Dictionary<string, string>();
+            param.Add("@Name", name);
+            param.Add("@Password", Password);
+            param.Add("@Email", Email.ToUpper());
+            param.Add("@Tel", "");
+            param.Add("@JobNum", "1");
+            param.Add("@Status", RBACStatus.ValidStatus.ToString());
+            param.Add("@CreateAt", now);
+            param.Add("@UpdateAt", now);
+            DBUtility.ExeLocalSqlNoRes(sql, param);
+
+            sql = "select ID from n_user where Name = @Name";
+            param = new Dictionary<string, string>();
+            param.Add("@Name", name);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            if (dbret.Count > 0)
+            {
+                var userid = Convert.ToInt32(dbret[0][0]);
+
+                sql = "select ID from n_Group where Name = 'General Group'";
+                dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+                if (dbret.Count > 0)
+                {
+                    var ggid = Convert.ToInt32(dbret[0][0]);
+                    sql = "insert into n_UserGroup(UserID,GroupID,Status,CreateAt,UpdateAt) values(@UserID,@GroupID,1,@CreateAt,@UpdateAt)";
+                    param = new Dictionary<string, string>();
+                    param.Add("@UserID", userid.ToString());
+                    param.Add("@GroupID",ggid.ToString());
+                    param.Add("@CreateAt",now);
+                    param.Add("@UpdateAt",now);
+                    DBUtility.ExeLocalSqlNoRes(sql, param);
+                }//has ggid
+            }//has username
+
         }
 
         public static UserViewModels RetrieveUser(string username)
@@ -96,6 +139,13 @@ namespace Prometheus.Models
             var sql = "update UserTable set PassWD = '<PassWD>' where UserName = N'<UserName>'";
             sql = sql.Replace("<UserName>", username.ToUpper()).Replace("<PassWD>", pwd);
             DBUtility.ExeLocalSqlNoRes(sql);
+
+            //update n_user Password
+            sql = @"update n_User set Password = @pwd where Email = @Email ";
+            var param = new Dictionary<string, string>();
+            param.Add("@pwd", pwd);
+            param.Add("@Email", username.ToUpper());
+            DBUtility.ExeLocalSqlNoRes(sql, param);
         }
 
         public static List<string> RetrieveAllUser()

@@ -1,0 +1,143 @@
+﻿
+@{
+    ViewBag.Title = "Menus";
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
+}
+<link href="~/Content/UserPermission.css" rel="stylesheet" />
+<script src="~/Scripts/permission.js" type="text/javascript"></script>
+<script>
+    $(function () {
+        UserPermission.menus();
+    })
+</script>
+
+<div class="row">
+    <div class="col-sm-2">
+        <nav class="nav-sidebar">
+            <ul class="nav">
+                <li><a href="/Permission/ApplyForPermission">Apply For Permission</a></li>
+                <li><a href="/Permission/PermissionRequest">Permission Request</a></li>
+                <li><a href="/Permission/MemberList">Members</a></li>
+                <li><a href="/Permission/GroupList">Groups</a></li>
+                <li><a href="/Permission/RoleList">Roles</a></li>
+                <li class="active"><a href="/Permission/Menus">Menus</a></li>
+                <li><a href="/Permission/Functions">Functions</a></li>
+                <li><a href="/Permission/Operations">Operation</a></li>
+                @*<li class="nav-divider"></li>*@
+            </ul>
+        </nav>
+    </div>
+    <div class="col-sm-10">
+        <div class="row">
+            <div class="nav navbar-nav navbar-left">
+                <ol class="breadcrumb">
+                    <li><a href="javascript:;">Permission</a></li>
+                    <li class="active">Menus</li>
+                </ol>
+            </div>
+        </div>
+        <div class="row">
+            <div class="m-op m-row">
+                <input type="button" class="btn btn-success" id="btn-add-menu" name="btn-add-menu" value="Add Menu" />
+            </div>
+            <div class="m-content">
+                <table class="table table-condensed">
+                    <caption>
+                        <div class="col-xs-4 tb-total">
+                            <span>Total: @ViewBag.TotalCnt</span>
+                        </div>
+                        <div class="search-container col-xs-4">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="tb-search" name="tb-search" placeholder="Search Keys" value="@ViewBag.Keywords" />
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-search" id="m-btn-search"></span></span>
+                            </div>
+                        </div>
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Url</th>
+                            <th>ImgUrl</th>
+                            <th>ParentID</th>
+                            <th>OrderID</th>
+                            <th>Operation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.Menus != null)
+                        {
+                            foreach (var item in ViewBag.Menus)
+                            {
+                                <tr>
+                                    <td>@item.ID</td>
+                                    <td>@item.Name</td>
+                                    <td>@item.Url</td>
+                                    <td>@item.ImgUrl</td>
+                                    <td>@item.ParentMenu</td>
+                                    <td>@item.OrderID</td>
+                                    <td>
+                                        <a data-id="@item.ID" class="edit-menu">Edit</a>
+                                        <a data-id="@item.ID" class="del-menu">Delete</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+                @Html.Partial("~/Views/Shared/_Pagination.cshtml")
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modal-add-menu" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="m-title">Add Menu</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="m-mid" name="m-mid" />
+                <div class="row m-row">
+                    <label class="col-xs-3">Name</label>
+                    <div class="col-xs-9">
+                        <input type="text" class="form-control" id="modal-name" name="modal-name" />
+                    </div>
+                </div>
+                <div class="row m-row">
+                    <label class="col-xs-3">Url</label>
+                    <div class="col-xs-9">
+                        <input type="text" class="form-control" id="modal-url" name="modal-url" />
+                    </div>
+                </div>
+                <div class="row m-row">
+                    <label class="col-xs-3">ImgUrl</label>
+                    <div class="col-xs-9">
+                        <input type="text" class="form-control" id="modal-imgurl" name="modal-imgurl" />
+                    </div>
+                </div>
+                <div class="row m-row">
+                    <label class="col-xs-3">ParentMenu</label>
+                    <div class="col-xs-9">
+                        <input type="text" class="form-control autocomplete-input" id="modal-pid" name="modal-pid" autocomplete="off" placeholder="Please Please select ParentMenu." />
+                    </div>
+                </div>
+                <div class="row m-row">
+                    <label class="col-xs-3">Order</label>
+                    <div class="col-xs-9">
+                        <input type="text" class="form-control" id="modal-oid" name="modal-oid" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="m-btn-submit">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

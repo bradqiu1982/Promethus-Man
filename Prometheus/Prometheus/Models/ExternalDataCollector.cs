@@ -3855,6 +3855,10 @@ namespace Prometheus.Models
 
             foreach (var dctable in dctablelist)
             {
+                if (dctable.Contains("OQCPARALLEL")
+                    || dctable.Contains("AOC_MANUALINSPECTION"))
+                { continue; }
+
                 var sql = @"select top 1 a.<DCTABLE>HistoryId,a.ModuleSerialNum, a.WhichTest, a.ModuleType, a.ErrAbbr, a.TestTimeStamp, a.TestStation,a.assemblypartnum 
                                from insite.<DCTABLE> a (nolock) where a.ModuleSerialNum = '<ModuleSerialNum>' order by  testtimestamp DESC";
                 sql = sql.Replace("<DCTABLE>", dctable).Replace("<ModuleSerialNum>", sn);

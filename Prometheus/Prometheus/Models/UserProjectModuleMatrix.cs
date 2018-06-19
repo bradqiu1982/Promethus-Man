@@ -26,7 +26,7 @@ namespace Prometheus.Models
             Task = new ProjectModuleUnitVM();
             RMA = new ProjectModuleUnitVM();
             DebugTree = new ProjectModuleUnitVM();
-            BurnIn = new ProjectModuleUnitVM();
+            //BurnIn = new ProjectModuleUnitVM();
             SptTask = new ProjectModuleUnitVM();
             NPI = new ProjectModuleUnitVM();
             Station = new ProjectModuleUnitVM();
@@ -75,12 +75,12 @@ namespace Prometheus.Models
             DebugTree.Visible = true;
             AllModules.Add(DebugTree.Key, DebugTree);
 
-            BurnIn.Key = "BurnIn";
-            BurnIn.Url = "/BurnIn/BurnInMainPage";
-            BurnIn.ImgUrl = "/Content/images/PJ/BI.png";
-            BurnIn.isTooltip = true;
-            BurnIn.Visible = false;
-            AllModules.Add(BurnIn.Key, BurnIn);
+            //BurnIn.Key = "BurnIn";
+            //BurnIn.Url = "/BurnIn/BurnInMainPage";
+            //BurnIn.ImgUrl = "/Content/images/PJ/BI.png";
+            //BurnIn.isTooltip = true;
+            //BurnIn.Visible = false;
+            //AllModules.Add(BurnIn.Key, BurnIn);
             
             SptTask.Key = "Critical Task";
             SptTask.Url = "/Project/ProjectSptTask";
@@ -131,7 +131,7 @@ namespace Prometheus.Models
         public ProjectModuleUnitVM Task { set; get; }
         public ProjectModuleUnitVM RMA { set; get; }
         public ProjectModuleUnitVM DebugTree { set; get; }
-        public ProjectModuleUnitVM BurnIn { set; get; }
+        //public ProjectModuleUnitVM BurnIn { set; get; }
 
         public ProjectModuleUnitVM SptTask { set; get; }
         public ProjectModuleUnitVM NPI { set; get; }

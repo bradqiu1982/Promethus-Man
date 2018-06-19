@@ -190,19 +190,19 @@ namespace Prometheus.Controllers
                 }
 
 
-                //var rmacount = mycache.Get(item.ProjectKey + "_rmact_CUST");
-                //if (rmacount == null)
-                //{
-                //    var rmadone = IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Done);
-                //    var rmatotal = rmadone + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Pending)
-                //        + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Working);
-                //    item.PendingRMACount = rmadone.ToString() + "/" + rmatotal.ToString();
-                //    mycache.Insert(item.ProjectKey + "_rmact_CUST", item.PendingRMACount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
-                //}
-                //else
-                //{
-                //    item.PendingRMACount = Convert.ToString(rmacount);
-                //}
+                var rmacount = mycache.Get(item.ProjectKey + "_rmact_CUST");
+                if (rmacount == null)
+                {
+                    var rmadone = IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Done);
+                    var rmatotal = rmadone + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Pending)
+                        + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Working);
+                    item.PendingRMACount = rmadone.ToString() + "/" + rmatotal.ToString();
+                    mycache.Insert(item.ProjectKey + "_rmact_CUST", item.PendingRMACount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                }
+                else
+                {
+                    item.PendingRMACount = Convert.ToString(rmacount);
+                }
 
                 var sptcount = mycache.Get(item.ProjectKey + "_sptct_CUST");
                 if (sptcount == null)
@@ -389,19 +389,19 @@ namespace Prometheus.Controllers
                     item.PendingFACount = Convert.ToString(facount);
                 }
 
-                //var rmacount = mycache.Get(item.ProjectKey + "_rmact_CUST");
-                //if (rmacount == null)
-                //{
-                //    var rmadone = IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Done);
-                //    var rmatotal = rmadone + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Pending)
-                //        + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Working);
-                //    item.PendingRMACount = rmadone.ToString() + "/" + rmatotal.ToString();
-                //    mycache.Insert(item.ProjectKey + "_rmact_CUST", item.PendingRMACount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
-                //}
-                //else
-                //{
-                //    item.PendingRMACount = Convert.ToString(rmacount);
-                //}
+                var rmacount = mycache.Get(item.ProjectKey + "_rmact_CUST");
+                if (rmacount == null)
+                {
+                    var rmadone = IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Done);
+                    var rmatotal = rmadone + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Pending)
+                        + IssueViewModels.RetrieveRMACountByProjectKey(item.ProjectKey, Resolute.Working);
+                    item.PendingRMACount = rmadone.ToString() + "/" + rmatotal.ToString();
+                    mycache.Insert(item.ProjectKey + "_rmact_CUST", item.PendingRMACount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                }
+                else
+                {
+                    item.PendingRMACount = Convert.ToString(rmacount);
+                }
 
                 var sptcount = mycache.Get(item.ProjectKey + "_sptct_CUST");
                 if(sptcount == null)
@@ -434,7 +434,13 @@ namespace Prometheus.Controllers
                 }
                 else
                 {
-                    pro_modules = user_pro_module[item.ProjectKey].SortData;
+                    foreach (var tempvm in user_pro_module[item.ProjectKey].SortData)
+                    {
+                        if (pmvm.AllModules.ContainsKey(tempvm.key))
+                        {
+                            pro_modules.Add(tempvm);
+                        }
+                    }
                 }
                 uProModules.Add(item.ProjectKey, pro_modules);
             }
@@ -1645,6 +1651,20 @@ namespace Prometheus.Controllers
                         vm.PendingRMACount = Convert.ToString(rmacount);
                     }
 
+                    var sptcount = mycache.Get(vm.ProjectKey + "_sptct_CUST");
+                    if (sptcount == null)
+                    {
+
+                        var sptopen = IssueViewModels.RetrieveSptCountIssue(vm.ProjectKey, ISSUESUBTYPE.CrititalFailureTask, 1);
+                        var sptdone = IssueViewModels.RetrieveSptCountIssue(vm.ProjectKey, ISSUESUBTYPE.CrititalFailureTask, 0);
+                        var nonspt = IssueViewModels.RetrieveSptCountIssue(vm.ProjectKey, ISSUESUBTYPE.NonCrititalFailureTask, 0);
+                        vm.PendingSptCount = (sptdone + nonspt).ToString() + "/" + (sptopen + sptdone + nonspt).ToString();
+                        mycache.Insert(vm.ProjectKey + "_sptct_CUST", vm.PendingSptCount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                    }
+                    else
+                    {
+                        vm.PendingSptCount = Convert.ToString(sptcount);
+                    }
                 }
 
                 var user_pro_module = UserProjectModuleMatrix.GetUserProjectModuleMatrix(updater, ProjectKey);
@@ -1662,7 +1682,13 @@ namespace Prometheus.Controllers
                 }
                 else
                 {
-                    pro_modules = user_pro_module[ProjectKey].SortData;
+                    foreach (var item in user_pro_module[ProjectKey].SortData)
+                    {
+                        if (pmvm.AllModules.ContainsKey(item.key))
+                        {
+                            pro_modules.Add(item);
+                        }
+                    }
                 }
 
                 ViewBag.Default_Modules = pmvm.AllModules;

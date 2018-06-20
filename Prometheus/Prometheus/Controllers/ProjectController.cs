@@ -6439,17 +6439,17 @@ namespace Prometheus.Controllers
             }
             catch (Exception ex) { }
 
-            heartbeatlog("BITestData.PrePareLatestData");
+            //heartbeatlog("BITestData.PrePareLatestData");
 
-            foreach (var pjkey in pjkeylist)
-            {
-                try
-                {
-                    BITestData.PrePareLatestData(this, pjkey);
-                }
-                catch (Exception ex)
-                { }
-            }
+            //foreach (var pjkey in pjkeylist)
+            //{
+            //    try
+            //    {
+            //        BITestData.PrePareLatestData(this, pjkey);
+            //    }
+            //    catch (Exception ex)
+            //    { }
+            //}
 
             heartbeatlog("ProcessData.LoadMesWorkflow");
 

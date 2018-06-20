@@ -369,57 +369,57 @@ namespace Prometheus.Models
 
         public static void PrePareLatestData(Controller ctrl, string projectkey)
         {
-            if (UpdatePJLockUsing(projectkey))
-                return;
+            //if (UpdatePJLockUsing(projectkey))
+            //    return;
 
-            try
-            {
-                var vmlist = ProjectViewModels.RetrieveOneProject(projectkey);
-                if (vmlist.Count == 0) { return; }
-                var vm = vmlist[0];
-                if (vm.PNList.Count > 0)
-                {
-                    string lastupdatetime = BITestData.RetrieveLatestTimeOfLocalBI(projectkey);
-                    if (!string.IsNullOrEmpty(lastupdatetime))
-                    {
-                        var vlast = DateTime.Parse(lastupdatetime);
-                        vlast = vlast.AddMinutes(18);
-                        if (vlast < DateTime.Now)
-                        {
-                            BIDataUtility.UpdateProjectData(ctrl,vm);
-                        }
-                    }
-                    else
-                    {
-                        BIDataUtility.UpdateProjectData(ctrl,vm);
-                    }
-                }
+            //try
+            //{
+            //    var vmlist = ProjectViewModels.RetrieveOneProject(projectkey);
+            //    if (vmlist.Count == 0) { return; }
+            //    var vm = vmlist[0];
+            //    if (vm.PNList.Count > 0)
+            //    {
+            //        string lastupdatetime = BITestData.RetrieveLatestTimeOfLocalBI(projectkey);
+            //        if (!string.IsNullOrEmpty(lastupdatetime))
+            //        {
+            //            var vlast = DateTime.Parse(lastupdatetime);
+            //            vlast = vlast.AddMinutes(18);
+            //            if (vlast < DateTime.Now)
+            //            {
+            //                BIDataUtility.UpdateProjectData(ctrl,vm);
+            //            }
+            //        }
+            //        else
+            //        {
+            //            BIDataUtility.UpdateProjectData(ctrl,vm);
+            //        }
+            //    }
 
-                ResetUpdatePJLock(projectkey);
-            }
-            catch (Exception ex)
-            {
-                ResetUpdatePJLock(projectkey);
-            }
+            //    ResetUpdatePJLock(projectkey);
+            //}
+            //catch (Exception ex)
+            //{
+            //    ResetUpdatePJLock(projectkey);
+            //}
         }
 
         public static void RetrieveWaferDataFromMes (Controller ctrl, string projectkey)
         {
-            if (UpdatePJLockUsing(projectkey))
-                return;
+            //if (UpdatePJLockUsing(projectkey))
+            //    return;
 
-            try
-            {
-                var vmlist = ProjectViewModels.RetrieveOneProject(projectkey);
-                if (vmlist.Count == 0) { return; }
-                var vm = vmlist[0];
-                BIDataUtility.RetrievePjWaferAllData(ctrl,vm);
-                ResetUpdatePJLock(projectkey);
-            }
-            catch (Exception ex)
-            {
-                ResetUpdatePJLock(projectkey);
-            }
+            //try
+            //{
+            //    var vmlist = ProjectViewModels.RetrieveOneProject(projectkey);
+            //    if (vmlist.Count == 0) { return; }
+            //    var vm = vmlist[0];
+            //    BIDataUtility.RetrievePjWaferAllData(ctrl,vm);
+            //    ResetUpdatePJLock(projectkey);
+            //}
+            //catch (Exception ex)
+            //{
+            //    ResetUpdatePJLock(projectkey);
+            //}
         }
     }
 }

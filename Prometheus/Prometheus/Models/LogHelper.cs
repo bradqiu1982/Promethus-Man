@@ -3,69 +3,16 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
-using log4net;
 
-[assembly: log4net.Config.XmlConfigurator(Watch = true)]
 namespace Prometheus.Models
 {
-    public class LogHelper
+    public class Log4NetLevel
     {
-        public static void WriteLog(string logContent, Dictionary<string, string> cusProperties)
-        {
-            foreach(KeyValuePair<string, string> property in cusProperties)
-            {
-                log4net.LogicalThreadContext.Properties[property.Key] = property.Value;
-            }
-            WriteLog(null, logContent, Log4NetLevel.Error);
-        }
-        
-        public static void WriteLog(string logContent, Log4NetLevel log4Level, Dictionary<string, string> cusProperties)
-        {
-            foreach (KeyValuePair<string, string> property in cusProperties)
-            {
-                log4net.LogicalThreadContext.Properties[property.Key] = property.Value;
-            }
-            WriteLog(null, logContent, log4Level);
-        }
-        
-        public static void WriteLog(Type type, string logContent, Log4NetLevel log4Level)
-        {
-            ILog log = type == null ? LogManager.GetLogger("") : LogManager.GetLogger(type);
-
-            switch (log4Level)
-            {
-                case Log4NetLevel.Warn:
-                    log.Warn(logContent);
-                    break;
-                case Log4NetLevel.Debug:
-                    log.Debug(logContent);
-                    break;
-                case Log4NetLevel.Info:
-                    log.Info(logContent);
-                    break;
-                case Log4NetLevel.Fatal:
-                    log.Fatal(logContent);
-                    break;
-                case Log4NetLevel.Error:
-                    log.Error(logContent);
-                    break;
-            }
-        }
-
-    }
-
-    public enum Log4NetLevel
-    {
-        [Description("Warning")]
-        Warn = 1,
-        [Description("Debug")]
-        Debug = 2,
-        [Description("Info")]
-        Info = 3,
-        [Description("Fatal")]
-        Fatal = 4,
-        [Description("Error")]
-        Error = 5
+        public static string Warn = "WARNING";
+        public static string Debug = "DEBUG";
+        public static string Info = "INFO";
+        public static string Fatal = "FATAL";
+        public static string Error = "ERROR";
     }
     
     public class LogVM
@@ -83,19 +30,47 @@ namespace Prometheus.Models
         public string Message { set; get; }
         public string Date { set; get; }
 
-        public static void WriteLog(string uName, string pKey, string machine, string url, 
-                string oModule, string op, string iKey, int lType, Log4NetLevel lLevel, string msg)
+        public static bool IsDebug()
         {
-            var dic = new Dictionary<string, string>();
-            dic.Add("uname", uName);
-            dic.Add("pkey", pKey);
-            dic.Add("machine", machine);
-            dic.Add("url", url);
-            dic.Add("module", oModule);
-            dic.Add("operate", op);
-            dic.Add("ikey", iKey);
-            dic.Add("ltype", lType.ToString());
-            LogHelper.WriteLog(msg, lLevel, dic);
+            bool debugging = false;
+#if DEBUG
+            debugging = true;
+#else
+            debugging = false;
+#endif
+            return debugging;
+        }
+
+        public static void WriteLog(string uName, string pKey, string machine, string url, 
+                string oModule, string op, string iKey, int lType, string lLevel, string msg)
+        {
+            try
+            {
+                if (!IsDebug())
+                {
+                    var dic = new Dictionary<string, string>();
+                    dic.Add("@uname", uName);
+                    dic.Add("@pkey", pKey);
+                    dic.Add("@machine", machine);
+                    dic.Add("@url", url);
+                    dic.Add("@module", oModule);
+                    dic.Add("@operate", op);
+                    dic.Add("@ikey", iKey);
+                    dic.Add("@ltype", lType.ToString());
+                    dic.Add("@llevel", lLevel);
+                    dic.Add("@msg", msg);
+                    dic.Add("@date", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+                    dic.Add("@apval1","" );
+                    dic.Add("@apval2", "");
+                    dic.Add("@apval3", "");
+
+                    var sql = @"INSERT INTO Log ([UserName],[ProjectKey],[Machine],[Url],[OperateModule],[Operate],[IssueKey],[LogType],[LogLevel],[Message],[Date],[APVal1],[APVal2],[APVal3])  
+                                  VALUES(@uname, @pkey, @machine, @url, @module, @operate, @ikey, @ltype, @llevel, @msg, @date, @apval1, @apval2, @apval3)";
+
+                    DBUtility.ExeLocalSqlNoRes(sql, dic);
+                }
+            }
+            catch (Exception ex) { }
         }
 
         public static int GetChangeDueDateLogCnt(string iKey, int lType)
@@ -121,6 +96,7 @@ namespace Prometheus.Models
         public static int CancelICare = 4;
         public static int ModifyDueDate = 5;
         public static int OpenOrCloseProject = 6;
+        public static int Login = 7;
     }
 
     public class ModifyDueDateConstant

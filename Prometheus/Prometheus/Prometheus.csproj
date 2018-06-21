@@ -51,8 +51,9 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net">
-      <HintPath>..\packages\log4net-2.0.8\bin\net\4.5\release\log4net.dll</HintPath>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
@@ -73,12 +74,24 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="PresentationFramework" />
+    <Reference Include="RestSharp, Version=106.2.1.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.106.2.1\lib\net452\RestSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.4\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Cors, Version=5.2.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Cors.5.2.4\lib\net45\System.Web.Cors.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Web.DynamicData" />
@@ -88,8 +101,12 @@
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Abstractions" />
     <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
+    <Reference Include="System.Web.Http, Version=5.2.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.4\lib\net45\System.Web.Http.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Http.Cors, Version=5.2.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Cors.5.2.4\lib\net45\System.Web.Http.Cors.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Web.Http.WebHost, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -208,6 +225,7 @@
     <Compile Include="Controllers\DBManageController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\IssueController.cs" />
+    <Compile Include="Controllers\PermissionController.cs" />
     <Compile Include="Controllers\PJReportController.cs" />
     <Compile Include="Controllers\ProjectController.cs" />
     <Compile Include="Controllers\ShareDataController.cs" />
@@ -216,6 +234,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\ATEUtility.cs" />
+    <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Models\BIDataUtility.cs" />
     <Compile Include="Models\BITestData.cs" />
     <Compile Include="Models\CfgUtility.cs" />
@@ -223,10 +242,15 @@
     <Compile Include="Models\DashBoardViewModels.cs" />
     <Compile Include="Models\DBUtility.cs" />
     <Compile Include="Models\EmailUtility.cs" />
+    <Compile Include="Models\EngineeringMileStone.cs" />
     <Compile Include="Models\ExcelReader.cs" />
     <Compile Include="Models\ExternalDataCollector.cs" />
+    <Compile Include="Models\FrsShipData.cs" />
+    <Compile Include="Models\HighChartsByNode.cs" />
+    <Compile Include="Models\IDashboardVM.cs" />
     <Compile Include="Models\IssueIcareVM.cs" />
     <Compile Include="Models\IssueViewModels.cs" />
+    <Compile Include="Models\JOMesStatus.cs" />
     <Compile Include="Models\JsMindVM.cs" />
     <Compile Include="Models\LogHelper.cs" />
     <Compile Include="Models\MachineVM.cs" />
@@ -245,6 +269,7 @@
     <Compile Include="Models\ProjectErrorViewModels.cs" />
     <Compile Include="Models\ProjectEvent.cs" />
     <Compile Include="Models\ProjectFAViewModules.cs" />
+    <Compile Include="Models\ProjectMileStonesVM.cs" />
     <Compile Include="Models\ProjectTestData.cs" />
     <Compile Include="Models\ProjectViewModels.cs" />
     <Compile Include="Models\ProjectYieldViewModule.cs" />
@@ -254,13 +279,18 @@
     <Compile Include="Models\TechVideoVM.cs" />
     <Compile Include="Models\UserBlogVM.cs" />
     <Compile Include="Models\UserCacheVM.cs" />
+    <Compile Include="Models\UserGroupRolePermissionVM.cs" />
     <Compile Include="Models\UserGroupVM.cs" />
     <Compile Include="Models\UserIssueViewModels.cs" />
     <Compile Include="Models\UserKPIVM.cs" />
     <Compile Include="Models\UserMatrixVM.cs" />
+    <Compile Include="Models\UserProjectModuleMatrix.cs" />
     <Compile Include="Models\UserRankViewModel.cs" />
     <Compile Include="Models\UserViewModels.cs" />
+    <Compile Include="Models\VcselBGDVM.cs" />
+    <Compile Include="Models\VcselRMAData.cs" />
     <Compile Include="Models\VcselViewModel.cs" />
+    <Compile Include="Models\WaferCoordRAWData.cs" />
     <Compile Include="Models\WebPageVM.cs" />
     <Compile Include="Models\WeeklyReportShareVM.cs" />
     <Compile Include="Models\WeeklyReportVM.cs" />
@@ -270,6 +300,7 @@
   <ItemGroup>
     <Content Include="ckeditor\adapters\jquery.js" />
     <Content Include="ckeditor\build-config.js" />
+    <Content Include="ckeditor\CHANGES.md" />
     <Content Include="ckeditor\ckeditor.js" />
     <Content Include="ckeditor\config.js" />
     <Content Include="ckeditor\contents.css" />
@@ -343,6 +374,7 @@
     <Content Include="ckeditor\lang\vi.js" />
     <Content Include="ckeditor\lang\zh-cn.js" />
     <Content Include="ckeditor\lang\zh.js" />
+    <Content Include="ckeditor\LICENSE.md" />
     <Content Include="ckeditor\plugins\a11yhelp\dialogs\a11yhelp.js" />
     <Content Include="ckeditor\plugins\a11yhelp\dialogs\lang\af.js" />
     <Content Include="ckeditor\plugins\a11yhelp\dialogs\lang\ar.js" />
@@ -460,9 +492,12 @@
     <Content Include="ckeditor\plugins\pagebreak\images\pagebreak.gif" />
     <Content Include="ckeditor\plugins\pastefromword\filter\default.js" />
     <Content Include="ckeditor\plugins\preview\preview.html" />
+    <Content Include="ckeditor\plugins\scayt\CHANGELOG.md" />
     <Content Include="ckeditor\plugins\scayt\dialogs\dialog.css" />
     <Content Include="ckeditor\plugins\scayt\dialogs\options.js" />
     <Content Include="ckeditor\plugins\scayt\dialogs\toolbar.css" />
+    <Content Include="ckeditor\plugins\scayt\LICENSE.md" />
+    <Content Include="ckeditor\plugins\scayt\README.md" />
     <Content Include="ckeditor\plugins\scayt\skins\moono-lisa\scayt.css" />
     <Content Include="ckeditor\plugins\showblocks\images\block_address.png" />
     <Content Include="ckeditor\plugins\showblocks\images\block_blockquote.png" />
@@ -589,13 +624,17 @@
     <Content Include="ckeditor\plugins\templates\templates\images\template1.gif" />
     <Content Include="ckeditor\plugins\templates\templates\images\template2.gif" />
     <Content Include="ckeditor\plugins\templates\templates\images\template3.gif" />
+    <Content Include="ckeditor\plugins\uploadfile\plugin.js" />
     <Content Include="ckeditor\plugins\widget\images\handle.png" />
     <Content Include="ckeditor\plugins\wsc\dialogs\ciframe.html" />
     <Content Include="ckeditor\plugins\wsc\dialogs\tmpFrameset.html" />
     <Content Include="ckeditor\plugins\wsc\dialogs\wsc.css" />
     <Content Include="ckeditor\plugins\wsc\dialogs\wsc.js" />
     <Content Include="ckeditor\plugins\wsc\dialogs\wsc_ie.js" />
+    <Content Include="ckeditor\plugins\wsc\LICENSE.md" />
+    <Content Include="ckeditor\plugins\wsc\README.md" />
     <Content Include="ckeditor\plugins\wsc\skins\moono-lisa\wsc.css" />
+    <Content Include="ckeditor\README.md" />
     <Content Include="ckeditor\samples\css\samples.css" />
     <Content Include="ckeditor\samples\img\github-top.png" />
     <Content Include="ckeditor\samples\img\header-bg.png" />
@@ -610,6 +649,7 @@
     <Content Include="ckeditor\samples\old\appendto.html" />
     <Content Include="ckeditor\samples\old\assets\inlineall\logo.png" />
     <Content Include="ckeditor\samples\old\assets\outputxhtml\outputxhtml.css" />
+    <Content Include="ckeditor\samples\old\assets\posteddata.php" />
     <Content Include="ckeditor\samples\old\assets\sample.jpg" />
     <Content Include="ckeditor\samples\old\assets\uilanguages\languages.js" />
     <Content Include="ckeditor\samples\old\datafiltering.html" />
@@ -617,6 +657,7 @@
     <Content Include="ckeditor\samples\old\dialog\dialog.html" />
     <Content Include="ckeditor\samples\old\divreplace.html" />
     <Content Include="ckeditor\samples\old\enterkey\enterkey.html" />
+    <Content Include="ckeditor\samples\old\htmlwriter\assets\outputforflash\outputforflash.fla" />
     <Content Include="ckeditor\samples\old\htmlwriter\assets\outputforflash\outputforflash.swf" />
     <Content Include="ckeditor\samples\old\htmlwriter\assets\outputforflash\swfobject.js" />
     <Content Include="ckeditor\samples\old\htmlwriter\outputforflash.html" />
@@ -632,6 +673,7 @@
     <Content Include="ckeditor\samples\old\replacebycode.html" />
     <Content Include="ckeditor\samples\old\sample.css" />
     <Content Include="ckeditor\samples\old\sample.js" />
+    <Content Include="ckeditor\samples\old\sample_posteddata.php" />
     <Content Include="ckeditor\samples\old\tabindex.html" />
     <Content Include="ckeditor\samples\old\toolbar\toolbar.html" />
     <Content Include="ckeditor\samples\old\uicolor.html" />
@@ -639,7 +681,11 @@
     <Content Include="ckeditor\samples\old\wysiwygarea\fullpage.html" />
     <Content Include="ckeditor\samples\old\xhtmlstyle.html" />
     <Content Include="ckeditor\samples\toolbarconfigurator\css\fontello.css" />
+    <Content Include="ckeditor\samples\toolbarconfigurator\font\config.json" />
+    <Content Include="ckeditor\samples\toolbarconfigurator\font\fontello.eot" />
     <Content Include="ckeditor\samples\toolbarconfigurator\font\fontello.svg" />
+    <Content Include="ckeditor\samples\toolbarconfigurator\font\fontello.ttf" />
+    <Content Include="ckeditor\samples\toolbarconfigurator\font\fontello.woff" />
     <Content Include="ckeditor\samples\toolbarconfigurator\font\LICENSE.txt" />
     <Content Include="ckeditor\samples\toolbarconfigurator\index.html" />
     <Content Include="ckeditor\samples\toolbarconfigurator\js\abstracttoolbarmodifier.js" />
@@ -649,6 +695,7 @@
     <Content Include="ckeditor\samples\toolbarconfigurator\lib\codemirror\codemirror.css" />
     <Content Include="ckeditor\samples\toolbarconfigurator\lib\codemirror\codemirror.js" />
     <Content Include="ckeditor\samples\toolbarconfigurator\lib\codemirror\javascript.js" />
+    <Content Include="ckeditor\samples\toolbarconfigurator\lib\codemirror\LICENSE" />
     <Content Include="ckeditor\samples\toolbarconfigurator\lib\codemirror\neo.css" />
     <Content Include="ckeditor\samples\toolbarconfigurator\lib\codemirror\show-hint.css" />
     <Content Include="ckeditor\samples\toolbarconfigurator\lib\codemirror\show-hint.js" />
@@ -673,6 +720,7 @@
     <Content Include="ckeditor\skins\moono-lisa\images\lock.png" />
     <Content Include="ckeditor\skins\moono-lisa\images\refresh.png" />
     <Content Include="ckeditor\skins\moono-lisa\images\spinner.gif" />
+    <Content Include="ckeditor\skins\moono-lisa\readme.md" />
     <Content Include="ckeditor\styles.js" />
     <Content Include="Content\bootstrap-3.3.7\css\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-3.3.7\css\bootstrap-theme.min.css" />
@@ -682,14 +730,26 @@
     <Content Include="Content\bootstrap-3.3.7\js\bootstrap.js" />
     <Content Include="Content\bootstrap-3.3.7\js\bootstrap.min.js" />
     <Content Include="Content\bootstrap-3.3.7\js\npm.js" />
+    <Content Include="Content\bootstrap-datepicker\bootstrap-datepicker.css" />
+    <Content Include="Content\bootstrap-datepicker\bootstrap-datepicker.min.css" />
+    <Content Include="Content\bootstrap-datepicker\bootstrap-datepicker.standalone.css" />
+    <Content Include="Content\bootstrap-datepicker\bootstrap-datepicker.standalone.min.css" />
+    <Content Include="Content\bootstrap-datepicker\bootstrap-datepicker3.css" />
+    <Content Include="Content\bootstrap-datepicker\bootstrap-datepicker3.min.css" />
+    <Content Include="Content\bootstrap-datepicker\bootstrap-datepicker3.standalone.css" />
+    <Content Include="Content\bootstrap-datepicker\bootstrap-datepicker3.standalone.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\burnin.css" />
     <Content Include="Content\common.css" />
+    <Content Include="Content\FAIntroduce.mp4" />
     <Content Include="Content\Finisar.PNG">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Content\idashboard.css" />
     <Content Include="Content\images\add_column.png" />
+    <Content Include="Content\images\dataloading.gif" />
     <Content Include="Content\images\end.png" />
     <Content Include="Content\images\favicon.ico" />
     <Content Include="Content\images\FinisarBuilding.jpg" />
@@ -706,11 +766,13 @@
     <Content Include="Content\images\icon\LowYield.png" />
     <Content Include="Content\images\icon\Upload.png" />
     <Content Include="Content\images\Loading.gif" />
+    <Content Include="Content\images\mainpage.png" />
     <Content Include="Content\images\ocap_warn.png" />
     <Content Include="Content\images\PJ\BI.png" />
     <Content Include="Content\images\PJ\DebugTreeicon.png" />
     <Content Include="Content\images\PJ\FA.png" />
     <Content Include="Content\images\PJ\IQC.png" />
+    <Content Include="Content\images\PJ\milestone.png" />
     <Content Include="Content\images\PJ\NPIProcess.png" />
     <Content Include="Content\images\PJ\OBA.png" />
     <Content Include="Content\images\PJ\PM.png" />
@@ -720,6 +782,7 @@
     <Content Include="Content\images\PJ\Spt.png" />
     <Content Include="Content\images\PJ\station.png" />
     <Content Include="Content\images\PJ\Task.png" />
+    <Content Include="Content\images\PJ\Transfer.png" />
     <Content Include="Content\images\PJ\Yield.png" />
     <Content Include="Content\images\search.png" />
     <Content Include="Content\images\sort_asc.png" />
@@ -748,20 +811,39 @@
     <Content Include="Content\images\usercenter\ITag.png" />
     <Content Include="Content\images\usercenter\MyStatus.png" />
     <Content Include="Content\images\videoloading.gif" />
+    <Content Include="Content\jquery.gridly.css" />
     <Content Include="Content\jsmind.css" />
     <Content Include="Content\Layout.css" />
     <Content Include="Content\Login.css" />
     <Content Include="Content\projectstation.css" />
+    <Content Include="Content\pro_gridly.css" />
+    <Content Include="Content\pro_milestones.css" />
     <Content Include="Content\technicalvideo.css" />
+    <Content Include="Content\UserPermission.css" />
     <Content Include="Content\videorecorder.css" />
+    <Content Include="Content\wafercoorddata.css" />
     <Content Include="Scripts\autocompletefill.js" />
+    <Content Include="Scripts\bootstrap-datepicker\bootstrap-datepicker.js" />
+    <Content Include="Scripts\bootstrap-datepicker\bootstrap-datepicker.min.js" />
+    <Content Include="Scripts\bootstrap-tagsinput\bootstrap-tagsinput.css" />
+    <Content Include="Scripts\bootstrap-tagsinput\bootstrap-tagsinput.js" />
+    <Content Include="Scripts\bootstrap-tagsinput\bootstrap-tagsinput.min.js" />
+    <Content Include="Scripts\bootstrap-tagsinput\bootstrap3-typeahead.js" />
+    <Content Include="Scripts\bootstrap-tagsinput\bootstrap3-typeahead.min.js" />
+    <Content Include="Scripts\burnin.js" />
     <Content Include="Scripts\exporting.js" />
     <Content Include="Scripts\FailureTimeDist.xml" />
     <Content Include="Scripts\highcharts-more.js" />
     <Content Include="Scripts\highcharts.js" />
+    <Content Include="Scripts\HTOL.js" />
+    <Content Include="Scripts\idashboard.js" />
+    <Content Include="Scripts\JoMesStatus.js" />
     <Content Include="Scripts\jquery-autocomplete\jquery.auto-complete.css" />
     <Content Include="Scripts\jquery-autocomplete\jquery.auto-complete.js" />
     <Content Include="Scripts\jquery-autocomplete\jquery.auto-complete.min.js" />
+    <Content Include="Scripts\jquery-bootstrap-loading.js" />
+    <Content Include="Scripts\jquery-gridly\jquery.gridly.js" />
+    <Content Include="Scripts\jquery.1.12.4\jquery-1.12.4.min.js" />
     <Content Include="Scripts\jquery.flexdatalist.min.css" />
     <Content Include="Content\themes\base\accordion.css" />
     <Content Include="Content\themes\base\all.css" />
@@ -895,28 +977,21 @@
     <Content Include="Content\bootstrap-3.3.7\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="Content\bootstrap-3.3.7\fonts\glyphicons-halflings-regular.woff" />
     <Content Include="Content\bootstrap-3.3.7\fonts\glyphicons-halflings-regular.woff2" />
-    <Content Include="ckeditor\CHANGES.md" />
-    <Content Include="ckeditor\LICENSE.md" />
-    <Content Include="ckeditor\plugins\scayt\CHANGELOG.md" />
-    <Content Include="ckeditor\plugins\scayt\LICENSE.md" />
-    <Content Include="ckeditor\plugins\scayt\README.md" />
-    <Content Include="ckeditor\plugins\wsc\LICENSE.md" />
-    <Content Include="ckeditor\plugins\wsc\README.md" />
-    <Content Include="ckeditor\README.md" />
-    <Content Include="ckeditor\samples\old\assets\posteddata.php" />
-    <Content Include="ckeditor\samples\old\htmlwriter\assets\outputforflash\outputforflash.fla" />
-    <Content Include="ckeditor\samples\old\sample_posteddata.php" />
-    <Content Include="ckeditor\samples\toolbarconfigurator\font\config.json" />
-    <Content Include="ckeditor\samples\toolbarconfigurator\font\fontello.eot" />
-    <Content Include="ckeditor\samples\toolbarconfigurator\font\fontello.ttf" />
-    <Content Include="ckeditor\samples\toolbarconfigurator\font\fontello.woff" />
-    <Content Include="ckeditor\samples\toolbarconfigurator\lib\codemirror\LICENSE" />
-    <Content Include="ckeditor\skins\moono-lisa\readme.md" />
+    <Content Include="Content\bootstrap-datepicker\bootstrap-datepicker.css.map" />
+    <Content Include="Content\bootstrap-datepicker\bootstrap-datepicker.min.css.map" />
+    <Content Include="Content\bootstrap-datepicker\bootstrap-datepicker.standalone.css.map" />
+    <Content Include="Content\bootstrap-datepicker\bootstrap-datepicker.standalone.min.css.map" />
+    <Content Include="Content\bootstrap-datepicker\bootstrap-datepicker3.css.map" />
+    <Content Include="Content\bootstrap-datepicker\bootstrap-datepicker3.min.css.map" />
+    <Content Include="Content\bootstrap-datepicker\bootstrap-datepicker3.standalone.css.map" />
+    <Content Include="Content\bootstrap-datepicker\bootstrap-datepicker3.standalone.min.css.map" />
     <None Include="Properties\PublishProfiles\Test.pubxml" />
     <Content Include="Scripts\burn_in_pn_list.xlsx" />
     <Content Include="Scripts\intro\arial-narrow_d0eb64ed2b91fe9a67f7800c1b14868b.ttf" />
     <Content Include="Scripts\intro\arial-narrow_d0eb64ed2b91fe9a67f7800c1b14868b.woff" />
     <Content Include="Scripts\25G_Wireless_TOSA_failure_code_map_file.xlsx" />
+    <Content Include="Scripts\bootstrap-tagsinput\bootstrap-tagsinput.min.js.map" />
+    <Content Include="Scripts\burnin-errorcode.cfg" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\HeartBeat.exe" />
     <Content Include="Scripts\heartbeat.txt" />
@@ -987,22 +1062,33 @@
     <Content Include="Scripts\NormalDistribution.xml" />
     <Content Include="Scripts\NormalDistribution1.xml" />
     <Content Include="Scripts\NormalDistributionCombine.xml" />
+    <Content Include="Scripts\offline-exporting.js" />
     <Content Include="Scripts\oldie.js" />
     <Content Include="Scripts\ParetoChart.xml">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Scripts\permission.js" />
     <Content Include="Scripts\PieChart.xml" />
+    <Content Include="Scripts\PieChart4FF.xml" />
     <Content Include="Scripts\placeholders.min.js" />
+    <Content Include="Scripts\project.js" />
     <Content Include="Scripts\Prometheus.js" />
     <Content Include="Scripts\Promethus-db-script.txt" />
     <Content Include="Scripts\PromethusCfg.txt" />
+    <Content Include="Scripts\pro_gridly.js" />
+    <Content Include="Scripts\pro_milestones.js" />
+    <Content Include="Scripts\rbac-data.sql" />
+    <Content Include="Scripts\rbac.sql" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
+    <Content Include="Scripts\shipment.js" />
     <Content Include="Scripts\StandardPJList.txt" />
     <Content Include="Scripts\SuperYield.xml" />
     <Content Include="Scripts\technicalvideo.js" />
+    <Content Include="Scripts\vcsel-rma.js" />
     <Content Include="Scripts\VideoRecorderJs-master\dist\recorderWorker.js" />
     <Content Include="Scripts\VideoRecorderJs-master\dist\VideoRecorderJS.min.js" />
+    <Content Include="Scripts\wafercoorddata.js" />
     <Content Include="Scripts\weeklyreport.js" />
     <Content Include="Scripts\_references.js" />
     <Content Include="Scripts\ColumnChart.xml" />
@@ -1174,7 +1260,6 @@
     <Content Include="Scripts\npidepartmentmachine.cfg" />
     <Content Include="Views\User\WeeklyReport.cshtml" />
     <Content Include="Views\User\WeeklyReportList.cshtml" />
-    <Content Include="Views\Shared\_Layout - Copy.cshtml" />
     <Content Include="Views\Shared\_Icare.cshtml" />
     <Content Include="Views\CustomerData\CommitFAData.cshtml" />
     <Content Include="Scripts\Standard FA Data.xlsx" />
@@ -1192,6 +1277,38 @@
     <Content Include="Views\Shared\_ProjectMenus.cshtml" />
     <Content Include="Views\Shared\_VideoRecordModal.cshtml" />
     <Content Include="Views\User\TechnicalVideo.cshtml" />
+    <Content Include="Views\User\GetKPI.cshtml" />
+    <Content Include="Views\CustomerData\CommitVcselPNInfo.cshtml" />
+    <Content Include="Scripts\VCSEL Type.xlsx" />
+    <Content Include="Views\DataAnalyze\MonthlyVcsel.cshtml" />
+    <Content Include="Views\DataAnalyze\WaferDistribution.cshtml" />
+    <Content Include="Views\User\IDashboard.cshtml" />
+    <Content Include="Views\CustomerData\ReviewWaferCoordData.cshtml" />
+    <Content Include="Views\User\DashboardDetail.cshtml" />
+    <Content Include="Views\Project\ProjectBRTestDataDetail.cshtml" />
+    <Content Include="Views\Project\ProjectSNTestDataDetail.cshtml" />
+    <Content Include="Views\Project\ProjectTestDataDetail.cshtml" />
+    <Content Include="Views\CustomerData\NeoMapData.cshtml" />
+    <Content Include="Views\DataAnalyze\VcselRMA.cshtml" />
+    <Content Include="Views\Project\Transfer.cshtml" />
+    <Content Include="Views\CustomerData\DownLoadATETestData.cshtml" />
+    <Content Include="Views\CustomerData\JOMesProgress.cshtml" />
+    <Content Include="Views\Project\ProjectMileStone.cshtml" />
+    <Content Include="Views\Project\ClosedProjects.cshtml" />
+    <Content Include="Scripts\ShipCustomer.cfg" />
+    <Content Include="Views\DataAnalyze\ShipmentData.cshtml" />
+    <Content Include="Views\DataAnalyze\MonthlyHTOL.cshtml" />
+    <Content Include="Views\DataAnalyze\HTOLDistribution.cshtml" />
+    <Content Include="Views\DataAnalyze\ModifyWaferReport.cshtml" />
+    <Content Include="Views\Permission\ApplyForPermission.cshtml" />
+    <Content Include="Views\Permission\Functions.cshtml" />
+    <Content Include="Views\Permission\GroupList.cshtml" />
+    <Content Include="Views\Permission\MemberList.cshtml" />
+    <Content Include="Views\Permission\Menus.cshtml" />
+    <Content Include="Views\Permission\Operations.cshtml" />
+    <Content Include="Views\Permission\PermissionRequest.cshtml" />
+    <Content Include="Views\Permission\RoleList.cshtml" />
+    <Content Include="Views\Shared\_Pagination.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1286,7 +1403,6 @@
     <Folder Include="ckeditor\plugins\uicolor\dialogs\" />
     <Folder Include="ckeditor\plugins\uicolor\icons\hidpi\" />
     <Folder Include="ckeditor\plugins\uicolor\lang\" />
-    <Folder Include="ckeditor\plugins\uploadfile\" />
     <Folder Include="ckeditor\plugins\xml\" />
     <Folder Include="ckeditor\samples\old\autogrow\" />
     <Folder Include="ckeditor\samples\old\bbcode\" />

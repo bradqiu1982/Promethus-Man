@@ -1027,41 +1027,21 @@ GO
 
 CREATE TABLE [dbo].[Log](
     [ID] [int] IDENTITY(1,1) NOT NULL,
-    [UserName] [nvarchar](50) NOT NULL,
-    [ProjectKey] [nvarchar](50) NOT NULL,
-    [Machine] [nvarchar](50) NOT NULL,
-    [Url] [nvarchar](200) NOT NULL,
-    [OperateModule] [nvarchar](50) NOT NULL,
-    [Operate] [nvarchar](200) NOT NULL,
-    [IssueKey] [nvarchar](50) NOT NULL,
-    [LogType] [tinyint] NOT NULL,
-    [LogLevel] [nvarchar](50) NOT NULL,
-    [Message] [nvarchar](200) NOT NULL,
-    [Date] [datetime] NOT NULL,
-    [APVal1] [nvarchar](max) NOT NULL,
-    [APVal2] [nvarchar](max) NOT NULL,
-    [APVal3] [nvarchar](max) NOT NULL
-) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
-
-GO
-
-ALTER TABLE [dbo].[Log] ADD  CONSTRAINT [DF_Log_ProjectKey]  DEFAULT ('') FOR [ProjectKey]
-GO
-
-ALTER TABLE [dbo].[Log] ADD  CONSTRAINT [DF_Log_IssueKey]  DEFAULT ('') FOR [IssueKey]
-GO
-
-ALTER TABLE [dbo].[Log] ADD  CONSTRAINT [DF_Log_LogType]  DEFAULT (0) FOR [LogType]
-GO
-
-ALTER TABLE [dbo].[Log] ADD  CONSTRAINT [DF_Log_LogLevel]  DEFAULT ('') FOR [LogLevel]
-GO
-
-ALTER TABLE [dbo].[Log] ADD  CONSTRAINT [DF_Log_Message]  DEFAULT ('') FOR [Message]
-GO
-
-EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'0: Default 1: Task 2: Debug Tree' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'Log', @level2type=N'COLUMN',@level2name=N'LogType'
-GO
+    [UserName] [nvarchar](200) DEFAULT ('')  NOT NULL,
+    [ProjectKey] [nvarchar](200) DEFAULT ('')  NOT NULL,
+    [Machine] [nvarchar](200) DEFAULT ('')  NOT NULL,
+    [Url] [nvarchar](MAX) DEFAULT ('')  NOT NULL,
+    [OperateModule] [nvarchar](100) DEFAULT ('')  NOT NULL,
+    [Operate] [nvarchar](200) DEFAULT ('')  NOT NULL,
+    [IssueKey] [nvarchar](100) DEFAULT ('')  NOT NULL,
+    [LogType] [tinyint]  DEFAULT (0) NOT NULL,
+    [LogLevel] [nvarchar](100)  DEFAULT ('')  NOT NULL,
+    [Message] [nvarchar](MAX)  DEFAULT ('') NOT NULL,
+    [Date] [datetime]  DEFAULT ('1982-05-06 10:00:00')  NOT NULL,
+    [APVal1] [nvarchar](max)  DEFAULT ('')  NOT NULL,
+    [APVal2] [nvarchar](max) DEFAULT ('')  NOT NULL,
+    [APVal3] [nvarchar](max) DEFAULT ('')  NOT NULL
+) ;
 
 /****** Object:  Table [dbo].[WeeklyReport]    Script Date: 11/1/2017 4:37:46 PM ******/
 SET ANSI_NULLS ON
@@ -1351,7 +1331,7 @@ GO
 CREATE TABLE [dbo].[WeeklyReportShare](
 	[ID] [int] IDENTITY(1,1) NOT NULL,
 	[IssueKey] [nvarchar](50) DEFAULT ('') NOT NULL,
-	[UserName] [nvarchar](50) DEFAULT ('') NOT NULL,
+	[UserName] [nvarchar](200) DEFAULT ('') NOT NULL,
 	[Status] [int] DEFAULT (1) NOT NULL,
 	[CreateTime] [datetime] DEFAULT ('') NOT NULL,
 	[UpdateTime] [datetime] DEFAULT ('') NOT NULL,

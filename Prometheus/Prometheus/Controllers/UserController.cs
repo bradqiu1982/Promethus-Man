@@ -252,6 +252,9 @@ namespace Prometheus.Controllers
                 ck.Add("logonredirectctrl", "");
                 CookieUtility.SetCookie(this, ck);
 
+                LogVM.WriteLog(username.ToUpper(), "ALL", DetermineCompName(Request.UserHostName),
+                                   "/"+ logonredirectctrl+"/"+ logonredirectact, logonredirectctrl, "Login", "", LogType.Login, Log4NetLevel.Info, "");
+
                 return RedirectToAction(logonredirectact, logonredirectctrl);
             }
             else
@@ -261,6 +264,9 @@ namespace Prometheus.Controllers
                 var ck = new Dictionary<string, string>();
                 ck.Add("logonuser", logonuser);
                 CookieUtility.SetCookie(this, ck);
+
+                LogVM.WriteLog(username.ToUpper(), "ALL", DetermineCompName(Request.UserHostName),
+                                   "/User/UserCenter", "User", "Login", "", LogType.Login, Log4NetLevel.Info, "");
 
                 return RedirectToAction("UserCenter", "User");
             }

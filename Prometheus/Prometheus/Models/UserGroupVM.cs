@@ -99,9 +99,12 @@ namespace Prometheus.Models
                 }//end foreach
             }//end foreach
 
-            foreach (var kv in tempdict)
+            var plist = tempdict.Keys.ToList();
+            plist.Sort();
+
+            foreach (var kv in plist)
             {
-                ret = ret + ";" + kv.Key;
+                ret = ret + ";" + kv;
             }//end foreach
 
             return ret;

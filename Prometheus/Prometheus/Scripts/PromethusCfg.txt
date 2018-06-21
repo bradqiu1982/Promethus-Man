@@ -1,4 +1,4 @@
-﻿PROJECTTYPE:::Parallel;Tunable;Telecom;LineCard;OSA;QM;Others
+﻿PROJECTTYPE:::Parallel;Tunable;Telecom;LineCard;OSA;QM;WSS;Others
 SHAREFOLDERUSER:::brad.qiu
 SHAREFOLDERDOMIN:::china
 SHAREFOLDERPWD:::wangle@345678

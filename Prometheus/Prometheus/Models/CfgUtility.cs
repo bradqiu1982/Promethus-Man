@@ -193,25 +193,48 @@ namespace Prometheus.Models
 
         public static Dictionary<string, string> GetStandardPJList(Controller ctrl)
         {
-            var lines = System.IO.File.ReadAllLines(ctrl.Server.MapPath("~/Scripts/StandardPJList.txt"));
             var ret = new Dictionary<string, string>();
-            foreach (var line in lines)
+            var sql = "select distinct ProjectName from [NebulaTrace].[dbo].[ProjectVM]";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
             {
-                if (line.Contains("##"))
-                {
-                    continue;
-                }
-
-                if (line.Contains(":::"))
-                {
-                    var kvpair = line.Split(new string[] { ":::" }, StringSplitOptions.RemoveEmptyEntries);
-                    if (!ret.ContainsKey(kvpair[0].Trim()))
+                try {
+                    var pjname = Convert.ToString(line[0]);
+                    if (pjname.Contains("/"))
                     {
-                        ret.Add(kvpair[0].Trim(), kvpair[1].Trim());
+                        var idx = pjname.IndexOf("/") + 1;
+                        pjname = pjname.Substring(idx);                        
                     }
-                }//end if
-            }//end foreach
+
+                    if (!ret.ContainsKey(pjname))
+                    {
+                        ret.Add(pjname, pjname);
+                    }
+
+                } catch (Exception ex) { }
+            }
+
             return ret;
+
+            //var lines = System.IO.File.ReadAllLines(ctrl.Server.MapPath("~/Scripts/StandardPJList.txt"));
+            //var ret = new Dictionary<string, string>();
+            //foreach (var line in lines)
+            //{
+            //    if (line.Contains("##"))
+            //    {
+            //        continue;
+            //    }
+
+            //    if (line.Contains(":::"))
+            //    {
+            //        var kvpair = line.Split(new string[] { ":::" }, StringSplitOptions.RemoveEmptyEntries);
+            //        if (!ret.ContainsKey(kvpair[0].Trim()))
+            //        {
+            //            ret.Add(kvpair[0].Trim(), kvpair[1].Trim());
+            //        }
+            //    }//end if
+            //}//end foreach
+            //return ret;
         }
 
         public static Dictionary<string, string> GetNPIMachine(Controller ctrl)

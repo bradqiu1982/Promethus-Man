@@ -114,6 +114,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Web.Routing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web.Services" />
@@ -292,6 +293,7 @@
     <Compile Include="Models\VcselViewModel.cs" />
     <Compile Include="Models\WaferCoordRAWData.cs" />
     <Compile Include="Models\WebPageVM.cs" />
+    <Compile Include="Models\WebsiteToImage.cs" />
     <Compile Include="Models\WeeklyReportShareVM.cs" />
     <Compile Include="Models\WeeklyReportVM.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

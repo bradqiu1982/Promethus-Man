@@ -123,7 +123,7 @@
                     var appendstr = "";
                     $.each(output.yieldarray, function (i, val) {
                         appendstr = '<div class="col-xs-6">' +
-                            '<div class="v-box" id="' + val.id + '"></div>' +
+                            '<div class="v-box" id="' + val.id + '" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>' +
                             '</div>';
                         $('.v-content').append(appendstr);
                         drawline(val,true);
@@ -131,7 +131,7 @@
 
                     $.each(output.boxarray, function (i, val) {
                             appendstr = '<div class="col-xs-12">' +
-                          '<div class="v-box" id="' + val.id + '"></div>' +
+                          '<div class="v-box" id="' + val.id + '" style="min-width: 310px; height: 400px; max-width: auto; margin: 10 auto"></div>' +
                           '</div>';
                             $('.v-content').append(appendstr);
                             drawboxplot(val);
@@ -139,12 +139,12 @@
 
                     $.each(output.failurearray, function (i, val) {
                         appendstr = '<div class="col-xs-6">' +
-                               '<div class="v-box" id="' + val.id + '"></div>' +
+                               '<div class="v-box" id="' + val.id + '" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>' +
                                '</div>';
                         $('.v-content').append(appendstr);
                         drawcolumn(val);
                     })
-                    $('.v-content').append('<div class="v-lengend row"></div>');
+                    $('.v-content').append('<div  id="v-lengend" name="v-lengend" class="v-lengend row"></div>');
 
                     var idx = 1;
                     var colorStr = "";
@@ -156,6 +156,8 @@
                         idx = idx + 1;
                         $('.v-lengend').append(colorStr);
                     })
+
+                    $('#loadcomplete').html('TRUE');
 
                 }
                 $.bootstrapLoading.end();

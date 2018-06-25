@@ -1,7 +1,8 @@
 ﻿var HTOL = function () {
     var show = function () {
         $('.date').datepicker({ autoclose: true, viewMode: "months", minViewMode: "months" });
-        $('body').on('click', '#btn-search', function () {
+
+        function searchdata(){
             var sdate = $.trim($('#sdate').val());
             var edate = $.trim($('#edate').val());
             var wf_type = $.trim($('#vcseltypeselectlist').val());
@@ -40,9 +41,21 @@
                         idx = idx + 1;
                         $('.v-lengend').append(colorStr);
                     })
+
+                    setTimeout(function () {
+                        $('#loadcomplete').html('TRUE');
+                    }, 10000);
                 }
             })
+        }
+
+        $('body').on('click', '#btn-search', function () {
+            searchdata();
         })
+
+        $(function () {
+            searchdata();
+        });
 
         $('body').on('click', '#btn-wf-download', function () {
             var wafer_no = $.trim($('#m-wf-no').val());
@@ -157,7 +170,9 @@
                         $('.v-lengend').append(colorStr);
                     })
 
-                    $('#loadcomplete').html('TRUE');
+                    setTimeout(function () {
+                        $('#loadcomplete').html('TRUE');
+                    }, 10000);
 
                 }
                 $.bootstrapLoading.end();

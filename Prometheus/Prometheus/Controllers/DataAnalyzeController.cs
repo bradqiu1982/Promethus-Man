@@ -933,17 +933,23 @@ namespace Prometheus.Controllers
             return ret;
         }
 
-        public ActionResult MonthlyVcsel()
+        public ActionResult MonthlyVcsel(string defaulttype)
         {
+            var vtype = "";
+            if (!string.IsNullOrEmpty(defaulttype)) { vtype = defaulttype; }
+
             var vcseltypelist = VcselBGDVM.VcselTypeList();
-            ViewBag.vcseltypeselectlist = CreateSelectList(vcseltypelist, "");
+            ViewBag.vcseltypeselectlist = CreateSelectList(vcseltypelist, vtype);
             return View();
         }
 
-        public ActionResult MonthlyHTOL()
+        public ActionResult MonthlyHTOL(string defaulttype)
         {
+            var vtype = "";
+            if (!string.IsNullOrEmpty(defaulttype)) { vtype = defaulttype; }
+
             var vcseltypelist = VcselBGDVM.VcselTypeList("HTOLWaferTestSum");
-            ViewBag.vcseltypeselectlist = CreateSelectList(vcseltypelist, "");
+            ViewBag.vcseltypeselectlist = CreateSelectList(vcseltypelist, vtype);
             return View();
         }
 

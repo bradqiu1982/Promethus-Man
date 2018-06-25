@@ -54,16 +54,32 @@ namespace Prometheus.Models
                 Application.DoEvents();
             }
 
+            //var updateElement = browser.Document.GetElementById("loadcomplete");
             var startkick = DateTime.Now;
-            while (browser.Document.GetElementById("loadcomplete").InnerHtml.Equals("FALSE"))
-            {
-                Application.DoEvents();
-                var endkick = DateTime.Now;
-                if ((endkick - startkick).TotalSeconds > 30)
+            //if (updateElement != null)
+            //{
+            //    while (browser.Document.GetElementById("loadcomplete").InnerHtml.Equals("FALSE"))
+            //    {
+            //        Application.DoEvents();
+            //        var endkick = DateTime.Now;
+            //        if ((endkick - startkick).TotalSeconds > 20)
+            //        {
+            //            break;
+            //        }
+            //    }
+            //}
+            //else
+            //{
+                while (true)
                 {
-                    break;
+                    Application.DoEvents();
+                    var endkick = DateTime.Now;
+                    if ((endkick - startkick).TotalSeconds > 10)
+                    {
+                        break;
+                    }
                 }
-            }
+            //}
 
             DrawWebPage(browser);
 

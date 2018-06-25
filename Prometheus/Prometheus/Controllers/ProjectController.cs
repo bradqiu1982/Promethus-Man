@@ -6810,13 +6810,15 @@ namespace Prometheus.Controllers
             return View("HeartBeat");
         }
 
-        public ActionResult HeartBeat3()
+        private void VCSELBGDReport()
         {
-
-            try
+            var urls = new List<string>();
+            urls.Add("http://localhost/DataAnalyze/MonthlyHTOL?defaulttype=14G_1x4");
+            urls.Add("http://localhost/DataAnalyze/MonthlyVcsel?defaulttype=25G_1x12");
+            
+            var fns = new List<string>();
+            foreach (var url in urls)
             {
-                //http://localhost/DataAnalyze/HTOLDistribution?defaultwafer=180815-60
-
                 string datestring = DateTime.Now.ToString("yyyyMMdd");
                 string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
                 if (!System.IO.Directory.Exists(imgdir))
@@ -6825,10 +6827,24 @@ namespace Prometheus.Controllers
                 }
                 var fn = "HTOL_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg";
                 var filename = imgdir + fn;
-                var url = "http://localhost/DataAnalyze/HTOLDistribution?defaultwafer=180815-60";
-                //var url = "http://www.highcharts.com/demo/combo-dual-axes";
                 WebsiteToImage websiteToImage = new WebsiteToImage(url, filename);
                 websiteToImage.Generate();
+                fns.Add(filename);
+            }
+            var imgfns = new List<string>();
+            foreach (var f in fns)
+            {
+                if (System.IO.File.Exists(f)){ imgfns.Add(f); }
+            }
+
+        }
+
+        public ActionResult HeartBeat3()
+        {
+
+            try
+            {
+                VCSELBGDReport();
 
                 //ExternalDataCollector.RefreshOBAFromDMR(this);
                 //ExternalDataCollector.RefreshNeoMAPData(this);

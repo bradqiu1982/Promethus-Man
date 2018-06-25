@@ -6415,13 +6415,14 @@ namespace Prometheus.Controllers
                 ExternalDataCollector.RefreshOQMJo(this);
             }
             catch (Exception ex) { }
-            heartbeatlog("LoadBITestDateFromAuto");
 
-            try
-            {
-                BIDataUtility.LoadBITestDateFromAuto(this);
-            }
-            catch (Exception ex) { }
+            //heartbeatlog("LoadBITestDateFromAuto");
+
+            //try
+            //{
+            //    BIDataUtility.LoadBITestDateFromAuto(this);
+            //}
+            //catch (Exception ex) { }
 
             heartbeatlog("BITestData.BIOLDTestDateExplore");
 
@@ -6821,6 +6822,21 @@ namespace Prometheus.Controllers
 
             try
             {
+                //http://localhost/DataAnalyze/HTOLDistribution?defaultwafer=180815-60
+
+                string datestring = DateTime.Now.ToString("yyyyMMdd");
+                string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+                if (!System.IO.Directory.Exists(imgdir))
+                {
+                    System.IO.Directory.CreateDirectory(imgdir);
+                }
+                var fn = "HTOL_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg";
+                var filename = imgdir + fn;
+                var url = "http://localhost/DataAnalyze/HTOLDistribution?defaultwafer=180815-60";
+
+                WebsiteToImage websiteToImage = new WebsiteToImage(url, filename);
+                websiteToImage.Generate();
+
                 //ExternalDataCollector.RefreshOBAFromDMR(this);
                 //ExternalDataCollector.RefreshNeoMAPData(this);
             }

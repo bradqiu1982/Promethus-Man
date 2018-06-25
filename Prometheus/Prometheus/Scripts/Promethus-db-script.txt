@@ -1590,3 +1590,14 @@ CREATE TABLE [dbo].[BIHTOLTestResultDataField] (
 
 
 
+delete from [NPITrace].[dbo].[BITestResult] where BITable = 'dbo.v_BITopazOutput' and DataID in(
+select did from (
+select SN+TestName+format(TestTimeStamp, 'yyyy-MM-dd HH:mm:ss') tempkey,count(SN+TestName+format(TestTimeStamp, 'yyyy-MM-dd HH:mm:ss')) cnt,MAX(DataID) did from [NPITrace].[dbo].[BITestResult]  where TestTimeStamp < '2018-06-01 00:00:00' and BITable = 'dbo.v_BITopazOutput'  group by (SN+TestName+format(TestTimeStamp, 'yyyy-MM-dd HH:mm:ss'))
+) as subquery where cnt > 1
+)
+
+delete from [NPITrace].[dbo].[BITestResultDataField] where DataID in(
+select did from (
+select SN+TestName+format(TestTimeStamp, 'yyyy-MM-dd HH:mm:ss') tempkey,count(SN+TestName+format(TestTimeStamp, 'yyyy-MM-dd HH:mm:ss')) cnt,MAX(DataID) did from [NPITrace].[dbo].[BITestResult]  where TestTimeStamp < '2018-06-01 00:00:00' and BITable = 'dbo.v_BITopazOutput'  group by (SN+TestName+format(TestTimeStamp, 'yyyy-MM-dd HH:mm:ss'))
+) as subquery where cnt > 1
+)

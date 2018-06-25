@@ -6276,7 +6276,8 @@ namespace Prometheus.Controllers
                 return View();
             }
 
-            if (DateTime.Now.DayOfWeek == DayOfWeek.Sunday)
+            if (DateTime.Now.DayOfWeek == DayOfWeek.Sunday 
+                || DateTime.Now.DayOfWeek == DayOfWeek.Tuesday)
             {
                 if (!System.IO.File.Exists(sundayreportDone))
                 {
@@ -6416,19 +6417,11 @@ namespace Prometheus.Controllers
             }
             catch (Exception ex) { }
 
-            //heartbeatlog("LoadBITestDateFromAuto");
-
-            //try
-            //{
-            //    BIDataUtility.LoadBITestDateFromAuto(this);
-            //}
-            //catch (Exception ex) { }
-
-            heartbeatlog("BITestData.BIOLDTestDateExplore");
+            heartbeatlog("LoadBITestDateFromAuto");
 
             try
             {
-                BIDataUtility.BIOLDTestDateExplore(this);
+                BIDataUtility.LoadBITestDateFromAuto(this);
             }
             catch (Exception ex) { }
 
@@ -6833,7 +6826,7 @@ namespace Prometheus.Controllers
                 var fn = "HTOL_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg";
                 var filename = imgdir + fn;
                 var url = "http://localhost/DataAnalyze/HTOLDistribution?defaultwafer=180815-60";
-
+                //var url = "http://www.highcharts.com/demo/combo-dual-axes";
                 WebsiteToImage websiteToImage = new WebsiteToImage(url, filename);
                 websiteToImage.Generate();
 

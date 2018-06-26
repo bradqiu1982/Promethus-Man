@@ -715,7 +715,7 @@ namespace Prometheus.Models
         }
 
 
-        private static List<double> RetrieveBIFieldData(string fieldname, string idcond, Controller ctrl,bool withfaileddata)
+        private static List<double> RetrieveBIFieldData(string fieldname, List<BITestResult> waferdata, Controller ctrl,bool withfaileddata)
         {
             var glbcfg = CfgUtility.GetSysConfig(ctrl);
             
@@ -724,26 +724,54 @@ namespace Prometheus.Models
 
 
             var rawdata = new List<double>();
-            var sql = "select <fieldname> from BITestResultDataField where <fieldname> <> 0 and DataID in <idcond>";
 
-
-            if (!withfaileddata)
+            var splitdata = new List<List<BITestResult>>();
+            var templist = new List<BITestResult>();
+            foreach (var item in waferdata)
             {
-                sql = @"select bf.<fieldname> from BITestResultDataField bf 
-                        left join BITestResult br on bf.DataID = br.DataID
-                        where bf.<fieldname> <> 0 and bf.DataID in <idcond> and br.Failure = 'Pass'";
-            }
-
-            sql = sql.Replace("<fieldname>", fieldname).Replace("<idcond>", idcond);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
-            foreach (var line in dbret)
-            {
-                var val = Convert.ToDouble(line[0]);
-                if (val > lowlimit && val < highlimit)
+                templist.Add(item);
+                if (templist.Count >= 5000)
                 {
-                    rawdata.Add(val);
+                    splitdata.Add(templist);
+                    templist = new List<BITestResult>();
                 }
             }
+            if (templist.Count > 0)
+            {
+                splitdata.Add(templist);
+            }
+
+            foreach (var sdata in splitdata)
+            {
+                StringBuilder sb = new StringBuilder(36 * 5010);
+                sb.Append("('");
+                foreach (var line in sdata)
+                {
+                    sb.Append(line.DataID + "','");
+                }
+                var tempstr = sb.ToString();
+                var idcond = tempstr.Substring(0, tempstr.Length - 2) + ")";
+
+                var sql = "select <fieldname> from BITestResultDataField where <fieldname> <> 0 and DataID in <idcond>";
+                if (!withfaileddata)
+                {
+                    sql = @"select bf.<fieldname> from BITestResultDataField bf 
+                            left join BITestResult br on bf.DataID = br.DataID
+                            where bf.<fieldname> <> 0 and bf.DataID in <idcond> and br.Failure = 'Pass'";
+                }
+
+                sql = sql.Replace("<fieldname>", fieldname).Replace("<idcond>", idcond);
+                var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+                foreach (var line in dbret)
+                {
+                    var val = Convert.ToDouble(line[0]);
+                    if (val > lowlimit && val < highlimit)
+                    {
+                        rawdata.Add(val);
+                    }
+                }
+            }
+
             return rawdata;
         }
 
@@ -779,7 +807,7 @@ namespace Prometheus.Models
             return rawdata;
         }
 
-        private static Dictionary<string, List<double>> RetrieveBIFieldDataSNDict(string fieldname, string idcond, Controller ctrl,bool withfaileddata)
+        private static Dictionary<string, List<double>> RetrieveBIFieldDataSNDict(string fieldname, List<BITestResult> waferdata, Controller ctrl,bool withfaileddata)
         {
             var glbcfg = CfgUtility.GetSysConfig(ctrl);
             
@@ -787,36 +815,65 @@ namespace Prometheus.Models
             var  highlimit = Convert.ToDouble(glbcfg[fieldname + "_LIMIT"].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
             
             var rawdata = new Dictionary<string, List<double>>();
-            var sql = "select <fieldname>,SN from BITestResultDataField where <fieldname> <> 0 and DataID in <idcond>";
-    
-            if (!withfaileddata)
-            {
-                sql = @"select bf.<fieldname>,bf.SN from BITestResultDataField bf 
-                        left join BITestResult br on bf.DataID = br.DataID
-                        where bf.<fieldname> <> 0 and bf.DataID in <idcond> and br.Failure = 'Pass'";
-            }
 
-            sql = sql.Replace("<fieldname>", fieldname).Replace("<idcond>", idcond);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
-            foreach (var line in dbret)
+            var splitdata = new List<List<BITestResult>>();
+            var templist = new List<BITestResult>();
+            foreach (var item in waferdata)
             {
-                var val = Convert.ToDouble(line[0]);
-                var sn = Convert.ToString(line[1]);
-
-                if (val > lowlimit && val < highlimit)
+                templist.Add(item);
+                if (templist.Count >= 5000)
                 {
-                    if (rawdata.ContainsKey(sn))
-                    {
-                        rawdata[sn].Add(val);
-                    }
-                    else
-                    {
-                        var templist = new List<double>();
-                        templist.Add(val);
-                        rawdata.Add(sn, templist);
-                    }
+                    splitdata.Add(templist);
+                    templist = new List<BITestResult>();
                 }
             }
+            if (templist.Count > 0)
+            {
+                splitdata.Add(templist);
+            }
+
+            foreach (var sdata in splitdata)
+            {
+                StringBuilder sb = new StringBuilder(36 * 5010);
+                sb.Append("('");
+                foreach (var line in sdata)
+                {
+                    sb.Append(line.DataID + "','");
+                }
+                var tempstr = sb.ToString();
+                var idcond = tempstr.Substring(0, tempstr.Length - 2) + ")";
+
+                var sql = "select <fieldname>,SN from BITestResultDataField where <fieldname> <> 0 and DataID in <idcond>";
+    
+                if (!withfaileddata)
+                {
+                    sql = @"select bf.<fieldname>,bf.SN from BITestResultDataField bf 
+                            left join BITestResult br on bf.DataID = br.DataID
+                            where bf.<fieldname> <> 0 and bf.DataID in <idcond> and br.Failure = 'Pass'";
+                }
+
+                sql = sql.Replace("<fieldname>", fieldname).Replace("<idcond>", idcond);
+                var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+                foreach (var line in dbret)
+                {
+                    var val = Convert.ToDouble(line[0]);
+                    var sn = Convert.ToString(line[1]);
+
+                    if (val > lowlimit && val < highlimit)
+                    {
+                        if (rawdata.ContainsKey(sn))
+                        {
+                            rawdata[sn].Add(val);
+                        }
+                        else
+                        {
+                            var tempvallist = new List<double>();
+                            tempvallist.Add(val);
+                            rawdata.Add(sn, tempvallist);
+                        }
+                    }
+                }
+            }//end foreach
 
             return rawdata;
         }
@@ -959,10 +1016,10 @@ namespace Prometheus.Models
             return cbox;
         }
 
-        private static void SolveNormalField(string wafer, string fieldname, string idcond, Controller ctrl,bool withfaileddata)
+        private static void SolveNormalField(string wafer, string fieldname, List<BITestResult> waferdata, Controller ctrl,bool withfaileddata)
         {
-            var rawdata = RetrieveBIFieldData(fieldname, idcond, ctrl, withfaileddata);
-            if (rawdata.Count < 100) {
+            var rawdata = RetrieveBIFieldData(fieldname, waferdata, ctrl, withfaileddata);
+            if (rawdata.Count < 30) {
                 return;
             }
             //var boxdata = GetBoxData(rawdata);
@@ -985,10 +1042,10 @@ namespace Prometheus.Models
             AddHTOLRawData(wafer, testname+"*"+fieldname, computeddata, withfaileddata);
         }
 
-        private static void SolveComputeField(string wafer, string fieldname, string idcond, Controller ctrl,bool withfaileddata)
+        private static void SolveComputeField(string wafer, string fieldname, List<BITestResult> waferdata, Controller ctrl,bool withfaileddata)
         {
-            var rawdata = RetrieveBIFieldDataSNDict(fieldname, idcond, ctrl, withfaileddata);
-            if (rawdata.Count < 20)
+            var rawdata = RetrieveBIFieldDataSNDict(fieldname, waferdata, ctrl, withfaileddata);
+            if (rawdata.Count < 30)
             {
                 return;
             }
@@ -1034,18 +1091,9 @@ namespace Prometheus.Models
 
         public static void UpdateWaferFields(string wafer, List<BITestResult> waferdata, Controller ctrl,bool withfaileddata = true)
         {
-            StringBuilder sb = new StringBuilder(36 * (waferdata.Count + 1));
-            sb.Append("('");
-            foreach (var line in waferdata)
-            {
-                sb.Append(line.DataID + "','");
-            }
-            var tempstr = sb.ToString();
-            var idcond = tempstr.Substring(0, tempstr.Length - 2) + ")";
-
-            SolveNormalField(wafer, "Delta_PO_LD", idcond, ctrl, withfaileddata);
-            SolveNormalField(wafer, "Delta_PO_Uniformity", idcond, ctrl, withfaileddata);
-            SolveComputeField(wafer, "Delta_PO_LD", idcond, ctrl, withfaileddata);
+            SolveNormalField(wafer, "Delta_PO_LD", waferdata, ctrl, withfaileddata);
+            SolveNormalField(wafer, "Delta_PO_Uniformity", waferdata, ctrl, withfaileddata);
+            SolveComputeField(wafer, "Delta_PO_LD", waferdata, ctrl, withfaileddata);
         }
 
         public static void UpdateHTOLWaferFields(string wafer, List<BITestResult> waferdata, Controller ctrl, bool withfaileddata = true)

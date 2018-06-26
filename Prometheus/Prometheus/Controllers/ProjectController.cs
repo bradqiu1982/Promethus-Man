@@ -6812,41 +6812,14 @@ namespace Prometheus.Controllers
             return View("HeartBeat");
         }
 
-        private void VCSELBGDReport()
-        {
-            var urls = new List<string>();
-            urls.Add("http://localhost/DataAnalyze/MonthlyHTOL?defaulttype=14G_1x4");
-            urls.Add("http://localhost/DataAnalyze/MonthlyVcsel?defaulttype=25G_1x12");
-            
-            var fns = new List<string>();
-            foreach (var url in urls)
-            {
-                string datestring = DateTime.Now.ToString("yyyyMMdd");
-                string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
-                if (!System.IO.Directory.Exists(imgdir))
-                {
-                    System.IO.Directory.CreateDirectory(imgdir);
-                }
-                var fn = "HTOL_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg";
-                var filename = imgdir + fn;
-                WebsiteToImage websiteToImage = new WebsiteToImage(url, filename);
-                websiteToImage.Generate();
-                fns.Add(filename);
-            }
-            var imgfns = new List<string>();
-            foreach (var f in fns)
-            {
-                if (System.IO.File.Exists(f)){ imgfns.Add(f); }
-            }
 
-        }
 
         public ActionResult HeartBeat3()
         {
 
             try
             {
-                VCSELBGDReport();
+                VcselBGDVM.SendVCSELBGDReport(this);
 
                 //ExternalDataCollector.RefreshOBAFromDMR(this);
                 //ExternalDataCollector.RefreshNeoMAPData(this);

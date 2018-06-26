@@ -2192,6 +2192,77 @@ namespace Prometheus.Models
             ret.Add(outlierlist);
             return ret;
         }
+
+        private static string Path2ImgTag(string filename)
+        {
+            var ret = "";
+            var splitstr = filename.Split(new string[] { "userfiles" }, StringSplitOptions.RemoveEmptyEntries);
+            var url = "http://wuxinpi.china.ads.finisar.com/" + "userfiles" + splitstr[1].Replace("\\", "/");
+            ret = "<div style='text-align: center;'>" + "<img src='" + url + "' style='max-width: 90%; height: auto;' /></div>";
+            return ret;
+        }
+
+        public static void SendVCSELBGDReport(Controller ctrl)
+        {
+            var cfgdict = CfgUtility.GetSysConfig(ctrl);
+
+            var ToWho = new List<string>();
+
+            var links = "";
+            var urls = new List<string>();
+
+            if (cfgdict.ContainsKey("VCSELREPORTTYPE"))
+            {
+                var BITypes = cfgdict["VCSELREPORTTYPE"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var t in BITypes)
+                {
+                    var u = "http://wuxinpi.china.ads.finisar.com/DataAnalyze/MonthlyVcsel?defaulttype=" + t.Trim();
+                    urls.Add(u);
+                    links = links + "<p>" + u + "</p>";
+                }
+
+                ToWho = CfgUtility.GetSysConfig(ctrl)["BIBGDREPORTRECIEVER"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            }
+
+            if (cfgdict.ContainsKey("HTOLREPORTTYPE"))
+            {
+                var HTOLTypes = cfgdict["HTOLREPORTTYPE"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var t in HTOLTypes)
+                {
+                    var u = "http://wuxinpi.china.ads.finisar.com/DataAnalyze/MonthlyHTOL?defaulttype=" + t.Trim();
+                    urls.Add(u);
+                    links = links + "<p>" + u + "</p>";
+                }
+
+                ToWho = CfgUtility.GetSysConfig(ctrl)["BIBGDREPORTRECIEVER"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            }
+
+            var fns = new List<string>();
+            foreach (var url in urls)
+            {
+                string datestring = DateTime.Now.ToString("yyyyMMdd");
+                string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+                if (!System.IO.Directory.Exists(imgdir))
+                {
+                    System.IO.Directory.CreateDirectory(imgdir);
+                }
+                var fn = "HTOL_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg";
+                var filename = imgdir + fn;
+                WebsiteToImage websiteToImage = new WebsiteToImage(url, filename);
+                websiteToImage.Generate();
+                fns.Add(filename);
+            }
+
+            var imgtags = new List<string>();
+            foreach (var f in fns)
+            {
+                if (System.IO.File.Exists(f)) { imgtags.Add(Path2ImgTag(f)); }
+            }
+
+            var content = EmailUtility.CreateImgHtml("Hi Guys", "Below is an burnin report from engineering system:", links, imgtags);
+            EmailUtility.SendEmail(ctrl, "WUXI ENGINEERING SYSTEM BURN-IN REPORT", ToWho, content);
+            new System.Threading.ManualResetEvent(false).WaitOne(1000);
+        }
     }
 
 }

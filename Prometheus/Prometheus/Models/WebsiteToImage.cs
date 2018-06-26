@@ -54,32 +54,42 @@ namespace Prometheus.Models
                 Application.DoEvents();
             }
 
-            //var updateElement = browser.Document.GetElementById("loadcomplete");
+            var updateElement = browser.Document.GetElementById("loadcomplete");
             var startkick = DateTime.Now;
-            //if (updateElement != null)
-            //{
-            //    while (browser.Document.GetElementById("loadcomplete").InnerHtml.Equals("FALSE"))
-            //    {
-            //        Application.DoEvents();
-            //        var endkick = DateTime.Now;
-            //        if ((endkick - startkick).TotalSeconds > 20)
-            //        {
-            //            break;
-            //        }
-            //    }
-            //}
-            //else
-            //{
-                while (true)
+            if (updateElement != null)
+            {
+                while (browser.Document.GetElementById("loadcomplete").InnerHtml.Equals("FALSE"))
                 {
                     Application.DoEvents();
                     var endkick = DateTime.Now;
-                    if ((endkick - startkick).TotalSeconds > 10)
+                    if ((endkick - startkick).TotalSeconds > 20)
                     {
                         break;
                     }
                 }
-            //}
+
+                while (true)
+                {
+                    Application.DoEvents();
+                    var endkick = DateTime.Now;
+                    if ((endkick - startkick).TotalSeconds > 3)
+                    {
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                while (true)
+                {
+                    Application.DoEvents();
+                    var endkick = DateTime.Now;
+                    if ((endkick - startkick).TotalSeconds > 15)
+                    {
+                        break;
+                    }
+                }
+            }
 
             DrawWebPage(browser);
 

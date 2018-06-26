@@ -242,6 +242,33 @@ namespace Prometheus.Models
             return content;
         }
 
+        public static string CreateImgHtml(string greetig, string description, string comment, List<string> imgs)
+        {
+            var content = "<!DOCTYPE html>";
+            content += "<html>";
+            content += "<head>";
+            content += "<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />";
+            content += "<title></title>";
+            content += "</head>";
+            content += "<body>";
+            content += "<div><p>" + greetig + ",</p></div>";
+            content += "<div><p>" + description + ".</p></div>";
+            if (!string.IsNullOrEmpty(comment))
+            {
+                content += "<div><p>" + comment + "</p>";
+            }
+            foreach (var item in imgs)
+            {
+                content += item;
+            }
+            content += "<br><br>";
+            content += "<div><p style='font-size: 12px; font-style: italic;'>This is a system generated message, please do not reply to this email.</p></div>";
+            content += "</body>";
+            content += "</html>";
+
+            return content;
+        }
+
         public static string RetrieveCurrentMachineName()
         {
             var netcomputername = "wuxinpi.china.ads.finisar.com";

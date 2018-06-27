@@ -252,6 +252,11 @@ namespace Prometheus.Controllers
                 ck.Add("logonredirectctrl", "");
                 CookieUtility.SetCookie(this, ck);
 
+                if (logonredirectact.ToUpper().Contains("UPDATEISSUE") && ckdict.ContainsKey("issuekey"))
+                {
+                    logonredirectact = logonredirectact + "?issuekey=" + ckdict["issuekey"];
+                }
+
                 LogVM.WriteLog(username.ToUpper(), "ALL", DetermineCompName(Request.UserHostName),
                                    "/"+ logonredirectctrl+"/"+ logonredirectact, logonredirectctrl, "Login", "", LogType.Login, Log4NetLevel.Info, "");
 

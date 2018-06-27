@@ -587,7 +587,13 @@ namespace Prometheus.Models
 
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
-            { ret.Add(Convert.ToString(line[0])); }
+            {
+                var vt = Convert.ToString(line[0]);
+                if (!string.IsNullOrEmpty(vt))
+                {
+                    ret.Add(vt);
+                }
+            }
             ret.Sort();
             return ret;
         }

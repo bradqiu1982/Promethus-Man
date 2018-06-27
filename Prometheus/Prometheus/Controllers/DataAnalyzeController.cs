@@ -1008,6 +1008,7 @@ namespace Prometheus.Controllers
             {
                 if (item.DYield.Count > 0)
                 {
+                    var ymin = 95.0;
                     var id = "y_" + item.TestType.Replace(" ", "_") + "_id";
 
                     var lastdidx = item.DYield.Count - 1;
@@ -1022,6 +1023,9 @@ namespace Prometheus.Controllers
                         xdata.Add(x);
                         ydata.Add(Math.Round(dy.yield, 2));
                         cydata.Add(dy.totle);
+
+                        if (dy.yield < ymin)
+                        { ymin = dy.yield; }
 
                         if (!allydata.ContainsKey(x))
                         {
@@ -1047,7 +1051,7 @@ namespace Prometheus.Controllers
 
                     var xAxis = new { data = xdata };
                     var yAxis = new
-                    { title = "Yield (%)",min = 85.0,max = 100.0 };
+                    { title = "Yield (%)",min = ymin,max = 100.0 };
                     var min = new
                     { name = "Min",color= "#F0AD4E",data=94,style= "dash" };
                     var max = new
@@ -1073,6 +1077,7 @@ namespace Prometheus.Controllers
             //all yield
             if (allydata.Count > 0)
             {
+                var ymin = 95.0;
                 var allxdata = allydata.Keys.ToList();
                 allxdata.Sort(delegate (string obj1, string obj2)
                 {
@@ -1086,6 +1091,8 @@ namespace Prometheus.Controllers
                 foreach (var x in allxdata)
                 {
                     realy.Add(allydata[x]);
+                    if (allydata[x] < ymin)
+                    { ymin = allydata[x]; }
                     realc.Add(allcdata[x]);
                 }
 
@@ -1093,7 +1100,7 @@ namespace Prometheus.Controllers
                 var title = "VCSEL TOTAL YIELD";
                 var xAxis = new { data = allxdata };
                 var yAxis = new
-                { title = "Yield (%)", min = 85.0, max = 100.0 };
+                { title = "Yield (%)", min = ymin, max = 100.0 };
                 var min = new
                 { name = "Min", color = "#F0AD4E", data = 94, style = "dash" };
                 var max = new
@@ -1309,7 +1316,7 @@ namespace Prometheus.Controllers
             {
                 if (item.DYield.Count > 0)
                 {
-                    var ymin = 100.0;
+                    var ymin = 95.0;
                     var id = "y_" + item.TestType.Replace(" ", "_") + "_id";
 
                     var lastdidx = item.DYield.Count - 1;
@@ -2095,7 +2102,7 @@ namespace Prometheus.Controllers
                         var xdata = new List<string>();
                         var ydata = new List<double>();
                         var cydata = new List<double>();
-                        var ymin = 100.0;
+                        var ymin = 95.0;
 
                         var count = 0;
                         foreach (var f_item in item.DateColSeg)
@@ -2628,7 +2635,7 @@ namespace Prometheus.Controllers
                         var xdata = new List<string>();
                         var ydata = new List<double>();
                         var cydata = new List<double>();
-                        var ymin = 100.0;
+                        var ymin = 95.0;
 
                         var count = 0;
                         foreach (var f_item in item.DateColSeg)

@@ -1015,8 +1015,13 @@ namespace Prometheus.Models
             cbox.lower = lower;
             cbox.upper = upper;
             max = upper + (upper - lower) * 1.5;
+            if (max > rawdata[rawdata.Count - 1])
+            { max = rawdata[rawdata.Count - 1]; }
             cbox.max = (max < hlimit)?max:hlimit;
+
             min = lower - (upper - lower) * 1.5;
+            if (min < rawdata[0])
+            { min = rawdata[0]; }
             cbox.min = (min > llimit)?min:llimit;
 
             return cbox;

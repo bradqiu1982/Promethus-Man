@@ -385,11 +385,22 @@ var ProMilestones = function(){
                                 exportLink.click();
                             },
                             text: 'Export Data'
+                        },
+                        datalabel: {
+                            onclick: function () {
+                                var labelflag = !this.series[0].options.dataLabels.enabled;
+                                $.each(this.series, function (idx, val) {
+                                    var opt = val.options;
+                                    opt.dataLabels.enabled = labelflag;
+                                    val.update(opt);
+                                })
+                            },
+                            text: 'Data Label'
                         }
                     },
                     buttons: {
                         contextButton: {
-                            menuItems: ['fullscreen', 'exportdata', 'printChart', 'separator', 'downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
+                            menuItems: ['fullscreen', 'exportdata', 'datalabel', 'printChart', 'separator', 'downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
                         }
                     }
                 }

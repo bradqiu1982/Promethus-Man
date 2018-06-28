@@ -6179,7 +6179,7 @@ namespace Prometheus.Controllers
                     || (thismonth-1 == vcselbgdzeropoint.Month && DateTime.Now.Year == vcselbgdzeropoint.Year))
                 {
                     var currenttime = DateTime.Now;
-                    if (currenttime.Hour > 7 || vcselbgdzeropoint > currenttime)
+                    if (currenttime.Hour > 18 || vcselbgdzeropoint > currenttime)
                     {
                         sundaylog("Sunday Report End for time....");
                         return;
@@ -6192,7 +6192,7 @@ namespace Prometheus.Controllers
                 else
                 {
                     var currenttime = DateTime.Now;
-                    if (currenttime.Hour > 7 || vcselbgdzeropoint > currenttime)
+                    if (currenttime.Hour > 18 || vcselbgdzeropoint > currenttime)
                     {
                         sundaylog("Sunday Report End for time....");
                         return;
@@ -6220,7 +6220,7 @@ namespace Prometheus.Controllers
                     || (thismonth - 1 == htolbgdzeropoint.Month && DateTime.Now.Year == htolbgdzeropoint.Year))
                 {
                     var currenttime = DateTime.Now;
-                    if (currenttime.Hour > 7 || htolbgdzeropoint > currenttime)
+                    if (currenttime.Hour > 18 || htolbgdzeropoint > currenttime)
                     {
                         sundaylog("Sunday Report End for time....");
                         return;
@@ -6233,7 +6233,7 @@ namespace Prometheus.Controllers
                 else
                 {
                     var currenttime = DateTime.Now;
-                    if (currenttime.Hour > 7 || htolbgdzeropoint > currenttime)
+                    if (currenttime.Hour > 18 || htolbgdzeropoint > currenttime)
                     {
                         sundaylog("Sunday Report End for time....");
                         return;
@@ -6277,8 +6277,6 @@ namespace Prometheus.Controllers
             }
 
             if (DateTime.Now.DayOfWeek == DayOfWeek.Sunday 
-                || DateTime.Now.DayOfWeek == DayOfWeek.Thursday
-                || DateTime.Now.DayOfWeek == DayOfWeek.Wednesday
                 || DateTime.Now.DayOfWeek == DayOfWeek.Friday)
             {
                 if (!System.IO.File.Exists(sundayreportDone))

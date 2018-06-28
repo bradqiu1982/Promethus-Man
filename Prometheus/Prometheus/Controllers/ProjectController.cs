@@ -6211,6 +6211,7 @@ namespace Prometheus.Controllers
                 }
             }//end while
 
+            times = 0;
             var htolbgdzeropoint = DateTime.Parse(glbcfg["HTOLBIGDATAZEROPOINT"]);
 
             while (true)

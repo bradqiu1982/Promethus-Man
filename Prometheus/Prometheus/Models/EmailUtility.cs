@@ -61,8 +61,15 @@ namespace Prometheus.Models
                 var message = new MailMessage();
                 if (!string.IsNullOrEmpty(attachpath))
                 {
-                    var attach = new Attachment(attachpath);
-                    message.Attachments.Add(attach);
+                    var atts = attachpath.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var att in atts)
+                    {
+                        if (System.IO.File.Exists(att))
+                        {
+                            var attach = new Attachment(att);
+                            message.Attachments.Add(attach);
+                        }
+                    }
                 }
 
                 message.IsBodyHtml = isHtml;

@@ -320,7 +320,6 @@ namespace Prometheus.Models
             }
             sql += " order by Assignee, Wk asc; SET DATEFIRST 7;";
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
-            DBUtility.ExeLocalSqlNoRes(sql);
             var res = new Dictionary<string, IssueList4DashboardWithWeek>();
             if (dbret.Count > 0)
             {

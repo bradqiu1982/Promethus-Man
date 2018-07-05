@@ -242,6 +242,7 @@ namespace Prometheus.Controllers
                 && !string.IsNullOrEmpty(ckdict["logonredirectctrl"]))
             {
                 var logonredirectact = ckdict["logonredirectact"];
+                var logonredirectact1 = ckdict["logonredirectact"];
                 var logonredirectctrl = ckdict["logonredirectctrl"];
 
                 //verify user information
@@ -252,13 +253,13 @@ namespace Prometheus.Controllers
                 ck.Add("logonredirectctrl", "");
                 CookieUtility.SetCookie(this, ck);
 
-                if (logonredirectact.ToUpper().Contains("UPDATEISSUE") && ckdict.ContainsKey("issuekey"))
+                if (logonredirectact1.ToUpper().Contains("UPDATEISSUE") && ckdict.ContainsKey("issuekey"))
                 {
-                    logonredirectact = logonredirectact + "?issuekey=" + ckdict["issuekey"];
+                    logonredirectact1 = logonredirectact1 + "?issuekey=" + ckdict["issuekey"];
                 }
 
                 LogVM.WriteLog(username.ToUpper(), "ALL", DetermineCompName(Request.UserHostName),
-                                   "/"+ logonredirectctrl+"/"+ logonredirectact, logonredirectctrl, "Login", "", LogType.Login, Log4NetLevel.Info, "");
+                                   "/"+ logonredirectctrl+"/"+ logonredirectact1, logonredirectctrl, "Login", "", LogType.Login, Log4NetLevel.Info, "");
 
                 return RedirectToAction(logonredirectact, logonredirectctrl);
             }

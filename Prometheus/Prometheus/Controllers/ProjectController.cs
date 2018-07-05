@@ -6277,8 +6277,9 @@ namespace Prometheus.Controllers
                 return View();
             }
 
-            if (DateTime.Now.DayOfWeek == DayOfWeek.Sunday 
-                || DateTime.Now.DayOfWeek == DayOfWeek.Friday)
+            if (DateTime.Now.DayOfWeek == DayOfWeek.Sunday
+                || DateTime.Now.DayOfWeek == DayOfWeek.Tuesday
+                || DateTime.Now.DayOfWeek == DayOfWeek.Thursday)
             {
                 if (!System.IO.File.Exists(sundayreportDone))
                 {

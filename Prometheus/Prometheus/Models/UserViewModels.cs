@@ -73,7 +73,7 @@ namespace Prometheus.Models
             sql = "select ID from n_user where Name = @Name";
             param = new Dictionary<string, string>();
             param.Add("@Name", name);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null,param);
             if (dbret.Count > 0)
             {
                 var userid = Convert.ToInt32(dbret[0][0]);

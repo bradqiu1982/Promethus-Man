@@ -6182,7 +6182,7 @@ namespace Prometheus.Controllers
                     if (currenttime.Hour > 18 || vcselbgdzeropoint > currenttime)
                     {
                         sundaylog("Sunday Report End for time....");
-                        return;
+                        break;
                     }
 
                     sundaylog("start computer BURN IN " + vcselbgdzeropoint.ToString("yyyy-MM-dd HH:mm:ss") + " Monthly data");
@@ -6195,7 +6195,7 @@ namespace Prometheus.Controllers
                     if (currenttime.Hour > 18 || vcselbgdzeropoint > currenttime)
                     {
                         sundaylog("Sunday Report End for time....");
-                        return;
+                        break;
                     }
 
                     //EXIST SUCH DATA

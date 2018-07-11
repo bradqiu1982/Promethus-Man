@@ -6214,6 +6214,8 @@ namespace Prometheus.Controllers
             times = 0;
             var htolbgdzeropoint = DateTime.Parse(glbcfg["HTOLBIGDATAZEROPOINT"]);
 
+            VcselBGDVM.ClearHTOLDataWithPostBurnInFailure();
+
             while (true)
             {
                 if (!VcselMonthData.MonthDataExist(htolbgdzeropoint,"HTOLMonthData")

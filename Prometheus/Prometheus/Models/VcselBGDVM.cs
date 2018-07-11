@@ -1390,7 +1390,7 @@ namespace Prometheus.Models
         {
             var ret = new List<BITestResult>();
 
-            var sql = "select SN,TestName,Failure,Wafer,ProductName,DataID from <defTab> where TestTimeStamp >= @startdate and TestTimeStamp < @enddate and ProductName <> '' and Wafer <> '' order by TestTimeStamp desc";
+            var sql = "select SN,TestName,Failure,Wafer,ProductName,DataID from <defTab> where TestTimeStamp >= @startdate and TestTimeStamp < @enddate and ProductName <> '' and Wafer <> '' and Appv_1 <> 'DELETE' order by TestTimeStamp desc";
             sql = sql.Replace("<defTab>", defTab);
 
             var dict = new Dictionary<string, string>();
@@ -1423,7 +1423,7 @@ namespace Prometheus.Models
         {
             var ret = new List<BITestResult>();
 
-            var sql = "select SN,TestName,Failure,Wafer,ProductName,DataID from <defTab> where ProductName <> '' and Wafer = @Wafer order by TestTimeStamp desc";
+            var sql = "select SN,TestName,Failure,Wafer,ProductName,DataID from <defTab> where ProductName <> '' and Wafer = @Wafer  and Appv_1 <> 'DELETE' order by TestTimeStamp desc";
             sql = sql.Replace("<defTab>", defTab);
 
             var dict = new Dictionary<string, string>();
@@ -1510,6 +1510,16 @@ namespace Prometheus.Models
             SolveDataByWafer(waferdict, VcselPNInfo,ctrl);
         }
 
+        public static void ClearHTOLDataWithPostBurnInFailure()
+        {
+            var threemonthagao = DateTime.Now.AddMonths(-3);
+            var sql = @"update [NPITrace].[dbo].[BIHTOLTestResult] set Appv_1 = 'DELETE' where SN in(
+                  select SN from [NPITrace].[dbo].[BIHTOLTestResult] where  (SN+'_'+  convert(varchar, TestTimeStamp, 120))  in (
+                  SELECT distinct SN+'_'+  convert(varchar, MAX(TestTimeStamp), 120) as cname
+                  FROM [NPITrace].[dbo].[BIHTOLTestResult] where TestName = 'Post Burn In' and TestTimeStamp > '<CLEARSTARTTIME>' group by SN)  and Failure <> 'Pass' and TestName = 'Post Burn In') and TestName = 'Post HTOL Burn In'";
+            sql = sql.Replace("<CLEARSTARTTIME>", threemonthagao.ToString("yyyy-MM-dd HH:mm:ss"));
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
 
         public static void StartHTOLBGDComputer(DateTime StartDate, Dictionary<string, VcselPNData> VcselPNInfo, Controller ctrl)
         {

@@ -228,6 +228,7 @@
                 title: {
                     text: line_data.yAxis.title
                 },
+                startOnTick: false,
                 min: line_data.yAxis.min,
                 max: line_data.yAxis.max,
                 plotLines: [{

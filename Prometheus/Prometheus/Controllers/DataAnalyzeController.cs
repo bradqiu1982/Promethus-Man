@@ -2672,7 +2672,7 @@ namespace Prometheus.Controllers
                         var yAxis = new
                         {
                             title = "Yield (%)",
-                            min = ymin,
+                            min = ((int)(ymin/10.0))*10.0,
                             max = 100.0
                         };
 

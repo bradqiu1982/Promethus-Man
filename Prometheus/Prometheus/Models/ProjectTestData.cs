@@ -48,6 +48,8 @@ namespace Prometheus.Models
 
         public string JO { set; get; }
 
+        public string TestTimeStr { get { return TestTimeStamp.ToString("yy/MM/dd HH:mm:ss"); } }
+
         public static ConcurrentDictionary<string, bool> UpdateLockUsing = new ConcurrentDictionary<string, bool>();
         public static bool UpdatePJLockUsing(string pjkey)
         {

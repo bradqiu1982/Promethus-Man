@@ -1,4 +1,5 @@
 ﻿using Prometheus.Controllers;
+using Prometheus.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -2988,6 +2989,7 @@ namespace Prometheus.Models
                             tempdmr.ModuleSN = splitstr[0];
                         }
                         ret.Add(tempdmr);
+                        DMRDict.Add(dmrid, new IssueViewModels());
                     }
                     catch (Exception ex) { }
                 }//end if
@@ -3878,18 +3880,15 @@ namespace Prometheus.Models
             });
 
             var ret = new List<ProjectTestData>();
-            ret.Add(testdatalist[0]);
+            if (testdatalist.Count > 0)
+            {
+                ret.Add(testdatalist[0]);
+            }
             return ret;
         }
 
-        public static void SolveOQMSN(string sn, string jo,string asignee, string defaultpj, Controller ctrl)
+        public static void BuildOQMTaskBaseOnTestData(ProjectTestData td,string jo, string asignee, string defaultpj, Controller ctrl)
         {
-
-            var testdata = RetrieveLatestSNTestResult(sn,defaultpj);
-            if (testdata.Count > 0)
-            {
-                var td = testdata[0];
-
                 if (string.Compare(td.ErrAbbr, "PASS", true) == 0)
                 {
                     var desc = "Module " + td.ModuleSerialNum + " latest status is: pass on " + td.WhichTest + " @ " + td.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss");
@@ -3929,12 +3928,25 @@ namespace Prometheus.Models
                     vm.RelativePeoples = "";
                     vm.StoreIssue();
 
-                    var comment = new IssueComments();
-                    comment.Comment = "JO Distribution: http://wuxinpi.china.ads.finisar.com:8082/BRTrace/JODetail?JONum="+jo+"&Step=3";
-                    IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, "system", COMMENTTYPE.Description);
+                    if (!string.IsNullOrEmpty(jo))
+                    {
+                        var comment = new IssueComments();
+                        comment.Comment = "JO Distribution: http://wuxinpi.china.ads.finisar.com:8082/BRTrace/JODetail?JONum="+jo+"&Step=3";
+                        IssueViewModels.StoreIssueComment(vm.IssueKey, comment.dbComment, "system", COMMENTTYPE.Description);
+                    }
 
                     SendOBAEvent(vm, "created", ctrl, true);
                 }
+        }
+
+        public static void SolveOQMSN(string sn, string jo,string asignee, string defaultpj, Controller ctrl)
+        {
+
+            var testdata = RetrieveLatestSNTestResult(sn,defaultpj);
+            if (testdata.Count > 0)
+            {
+                var td = testdata[0];
+                BuildOQMTaskBaseOnTestData(td,jo,asignee,defaultpj,ctrl);
             }
         }
 

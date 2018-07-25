@@ -16,6 +16,116 @@ namespace Prometheus.Controllers
 
     public class CustomerDataController : Controller
     {
+        public ActionResult SNLatestTestStauts()
+        {
+            return View();
+        }
+
+        public JsonResult QuerySNStatus()
+        {
+            var marks = Request.Form["marks"];
+            List<string> SNList = (List<string>)Newtonsoft.Json.JsonConvert.DeserializeObject(marks, (new List<string>()).GetType());
+            var withoqm = Request.Form["OQM"];
+
+            var syscfgdict = CfgUtility.GetSysConfig(this);
+            var OBAAdmin = syscfgdict["OBAADMIN"];
+            var OBADefaultPJ = syscfgdict["OBADEFAULTPJ"];
+
+            var sntestdatas = new List<ProjectTestData>();
+            foreach (var sn in SNList)
+            {
+                var tempret = ExternalDataCollector.RetrieveLatestSNTestResult(sn, OBADefaultPJ);
+                if (tempret.Count > 0)
+                {
+                    tempret[0].ErrAbbr = tempret[0].ErrAbbr.ToUpper();
+                    sntestdatas.AddRange(tempret);
+                }
+            }
+
+            if (string.Compare(withoqm, "TRUE") == 0)
+            {
+                foreach (var td in sntestdatas)
+                {
+                    try
+                    {
+                        ExternalDataCollector.BuildOQMTaskBaseOnTestData(td, null, OBAAdmin, OBADefaultPJ, this);
+                    }
+                    catch (Exception ex) { }
+                }//end foreach
+            }//end if
+
+            var ret = new JsonResult();
+            ret.Data = new
+            {
+                sucess = true,
+                data = sntestdatas
+            };
+            return ret;
+
+        }
+
+        private List<string> PrepeareSNLatestReport()
+        {
+            var marks = Request.Form["marks"];
+            List<string> SNList = (List<string>)Newtonsoft.Json.JsonConvert.DeserializeObject(marks, (new List<string>()).GetType());
+            var sntestdatas = new List<ProjectTestData>();
+            foreach (var sn in SNList)
+            {
+                var tempret = ExternalDataCollector.RetrieveLatestSNTestResult(sn, " ");
+                if (tempret.Count > 0)
+                {
+                    tempret[0].ErrAbbr = tempret[0].ErrAbbr.ToUpper();
+                    sntestdatas.AddRange(tempret);
+                }
+            }
+
+
+            var ret = new List<string>();
+            var line = "SN,Which Test,Failure,Test Time,Test Station,PN,Module Type";
+            ret.Add(line);
+
+            foreach (var item in sntestdatas)
+            {
+                var line1 = string.Empty;
+                line1 = "\"" + item.ModuleSerialNum.ToString().Replace("\"", "") + "\"," + "\"" + item.WhichTest.Replace("\"", "") + "\"," + "\"" + item.ErrAbbr.Replace("\"", "") + "\","
+                    + "\"" + item.TestTimeStr.Replace("\"", "") + "\"," + "\"" + item.TestStation.Replace("\"", "") + "\"," + "\"" + item.PN.Replace("\"", "") + "\"," + "\"" + item.ModuleType.Replace("\"", "") + "\",";
+                ret.Add(line1);
+            }
+
+            return ret;
+        }
+
+        public JsonResult DownloadSNLatestStatus()
+        {
+            string datestring = DateTime.Now.ToString("yyyyMMdd");
+            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+            if (!Directory.Exists(imgdir))
+            {
+                Directory.CreateDirectory(imgdir);
+            }
+
+            var fn = "SN_Latest_Status_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+            var filename = imgdir + fn;
+            var url = "/userfiles/docs/" + datestring + "/" + fn;
+
+            var lines = PrepeareSNLatestReport();
+
+            var wholefile = "";
+            foreach (var l in lines)
+            {
+                wholefile = wholefile + l + "\r\n";
+            }
+            System.IO.File.WriteAllText(filename, wholefile, Encoding.UTF8);
+
+            var ret = new JsonResult();
+            ret.Data = new
+            {
+                sucess = true,
+                data = url
+            };
+            return ret;
+        }
+
         public ActionResult CommitVcselData()
         {
             return View();

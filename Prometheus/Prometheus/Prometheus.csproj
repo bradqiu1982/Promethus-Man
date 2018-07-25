@@ -820,6 +820,7 @@
     <Content Include="Content\projectstation.css" />
     <Content Include="Content\pro_gridly.css" />
     <Content Include="Content\pro_milestones.css" />
+    <Content Include="Content\snlatestteststatus.css" />
     <Content Include="Content\technicalvideo.css" />
     <Content Include="Content\UserPermission.css" />
     <Content Include="Content\videorecorder.css" />
@@ -1084,6 +1085,7 @@
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\shipment.js" />
+    <Content Include="Scripts\snlatestteststatus.js" />
     <Content Include="Scripts\StandardPJList.txt" />
     <Content Include="Scripts\SuperYield.xml" />
     <Content Include="Scripts\technicalvideo.js" />
@@ -1311,6 +1313,7 @@
     <Content Include="Views\Permission\PermissionRequest.cshtml" />
     <Content Include="Views\Permission\RoleList.cshtml" />
     <Content Include="Views\Shared\_Pagination.cshtml" />
+    <Content Include="Views\CustomerData\SNLatestTestStauts.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -6672,7 +6672,7 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
-
+            ExternalDataCollector.RefreshOBAFromDMR(this);
             //var vcselpninfo = VcselPNData.RetrieveVcselPNInfo();
             //var sdate = DateTime.Parse("2017-09-01 00:00:00");
             //for (var idx = 0; idx < 10; idx++)

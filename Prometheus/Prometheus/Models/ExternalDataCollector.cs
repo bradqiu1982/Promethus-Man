@@ -790,6 +790,7 @@ namespace Prometheus.Models
             if (!data[0][0].ToUpper().Contains("FIELD RETURN"))
                 return;
 
+            logthdinfo("retrieve all exist rma task");
             var allrmaissue = IssueViewModels.RetrieveAllIssueTypeIssue("NONE", "NONE", ISSUETP.RMA, ctrl); //rma issues
             var rmaissuedict = new Dictionary<string, string>();
             foreach (var issue in allrmaissue)
@@ -813,6 +814,7 @@ namespace Prometheus.Models
 
             //var usermatrix = UserMatrixVM.RetrieveUserMatrixDepart(); //user depart
 
+            logthdinfo("retrieve all exist rma attachment");
             var rmaattaches = RetrieveRMACloseAttach(); //all rma attach
             var solvedrmanum = new Dictionary<string, bool>();
 
@@ -843,7 +845,10 @@ namespace Prometheus.Models
                             {
                                 continue;
                             }
+
+
                             StoreRMAAttachs(rmacloseattachfolder, rmarawdatas[0].AppV_B, rmaattaches,ctrl); //retrieve rma attach and store them
+
                             solvedrmanum.Add(rmarawdatas[0].AppV_B,true);
                         }
                     }
@@ -867,8 +872,11 @@ namespace Prometheus.Models
                 {
                     rawdata.AppV_I = newcsnfsndict[rawdata.AppV_I];
                 }
+
                 UpdateRMAData(rawdata);
+
                 Try2CreateRMA(rawdata, rmaissuedict, allpjdict,ctrl);
+
             }
 
         }

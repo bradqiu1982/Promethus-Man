@@ -2969,11 +2969,9 @@ namespace Prometheus.Models
                     tempvm.RetrieveReliability();
                 }
 
-                tempvm.RetrieveComment(ctrl);
-
-                tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey, ctrl);
-
-                tempvm.RetrieveAttachment(tempvm.IssueKey);
+                //tempvm.RetrieveComment(ctrl);
+                //tempvm.SubIssues = RetrieveSubIssue(tempvm.IssueKey, ctrl);
+                //tempvm.RetrieveAttachment(tempvm.IssueKey);
 
                 ret.Add(tempvm);
             }

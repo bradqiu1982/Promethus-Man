@@ -21,23 +21,52 @@ namespace Prometheus.Controllers
             return View();
         }
 
+
         public JsonResult QuerySNStatus()
         {
             var marks = Request.Form["marks"];
             List<string> SNList = (List<string>)Newtonsoft.Json.JsonConvert.DeserializeObject(marks, (new List<string>()).GetType());
             var withoqm = Request.Form["OQM"];
 
+            var fsnlist = new List<string>();
+            var csnlist = new List<string>();
+            foreach (var s in SNList)
+            {
+                if (s.Length > 7)
+                {
+                    csnlist.Add(s);
+                }
+                else
+                {
+                    fsnlist.Add(s);
+                }
+            }
+
+            var fsncsndict = new Dictionary<string, string>();
+            if (csnlist.Count > 0)
+            {
+                fsncsndict = ExternalDataCollector.FsnCsnMap(csnlist);
+                if (fsncsndict.Count > 0)
+                {
+                    fsnlist.AddRange(fsncsndict.Keys.ToList());
+                }
+            }
+
             var syscfgdict = CfgUtility.GetSysConfig(this);
             var OBAAdmin = syscfgdict["OBAADMIN"];
             var OBADefaultPJ = syscfgdict["OBADEFAULTPJ"];
 
             var sntestdatas = new List<ProjectTestData>();
-            foreach (var sn in SNList)
+            foreach (var sn in fsnlist)
             {
                 var tempret = ExternalDataCollector.RetrieveLatestSNTestResult(sn, OBADefaultPJ);
                 if (tempret.Count > 0)
                 {
                     tempret[0].ErrAbbr = tempret[0].ErrAbbr.ToUpper();
+                    if (fsncsndict.ContainsKey(tempret[0].ModuleSerialNum))
+                    {
+                        tempret[0].CSN = fsncsndict[tempret[0].ModuleSerialNum];
+                    }
                     sntestdatas.AddRange(tempret);
                 }
             }
@@ -68,13 +97,41 @@ namespace Prometheus.Controllers
         {
             var marks = Request.Form["marks"];
             List<string> SNList = (List<string>)Newtonsoft.Json.JsonConvert.DeserializeObject(marks, (new List<string>()).GetType());
+
+            var fsnlist = new List<string>();
+            var csnlist = new List<string>();
+            foreach (var s in SNList)
+            {
+                if (s.Length > 7)
+                {
+                    csnlist.Add(s);
+                }
+                else
+                {
+                    fsnlist.Add(s);
+                }
+            }
+            var fsncsndict = new Dictionary<string, string>();
+            if (csnlist.Count > 0)
+            {
+                fsncsndict = ExternalDataCollector.FsnCsnMap(csnlist);
+                if (fsncsndict.Count > 0)
+                {
+                    fsnlist.AddRange(fsncsndict.Keys.ToList());
+                }
+            }
+
             var sntestdatas = new List<ProjectTestData>();
-            foreach (var sn in SNList)
+            foreach (var sn in fsnlist)
             {
                 var tempret = ExternalDataCollector.RetrieveLatestSNTestResult(sn, " ");
                 if (tempret.Count > 0)
                 {
                     tempret[0].ErrAbbr = tempret[0].ErrAbbr.ToUpper();
+                    if (fsncsndict.ContainsKey(tempret[0].ModuleSerialNum))
+                    {
+                        tempret[0].CSN = fsncsndict[tempret[0].ModuleSerialNum];
+                    }
                     sntestdatas.AddRange(tempret);
                 }
             }

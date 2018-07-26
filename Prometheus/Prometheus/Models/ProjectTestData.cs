@@ -11,7 +11,9 @@ namespace Prometheus.Models
     public class ProjectTestData
     {
         public ProjectTestData()
-        { }
+        {
+            CSN = "";
+        }
 
         public ProjectTestData(string pk, string did, string sn, string wtest, string mt, string err, string testtime, string station, string p)
         {
@@ -25,6 +27,7 @@ namespace Prometheus.Models
             TestStation = station;
             PN = p;
             JO = string.Empty;
+            CSN = "";
         }
 
         public ProjectTestData(string pk, string sn, string wtest, string err, string testtime)
@@ -34,6 +37,7 @@ namespace Prometheus.Models
             WhichTest = wtest;
             ErrAbbr = err;
             TestTimeStamp = DateTime.Parse(testtime);
+            CSN = "";
         }
 
         public string ProjectKey { set; get; }
@@ -49,6 +53,8 @@ namespace Prometheus.Models
         public string JO { set; get; }
 
         public string TestTimeStr { get { return TestTimeStamp.ToString("yy/MM/dd HH:mm:ss"); } }
+
+        public string CSN { set; get; }
 
         public static ConcurrentDictionary<string, bool> UpdateLockUsing = new ConcurrentDictionary<string, bool>();
         public static bool UpdatePJLockUsing(string pjkey)

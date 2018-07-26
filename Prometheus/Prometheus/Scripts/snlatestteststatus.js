@@ -72,10 +72,10 @@
                for (idx = 0; idx < datacont; idx++) {
                    var line = output.data[idx];
                    if (line.ErrAbbr != "PASS") {
-                       $("#WaferTableID").append('<tr class="NGBKG"><td>' + line.ModuleSerialNum + '</td><td>' + line.WhichTest  + '</td><td>' + line.ErrAbbr + '</td><td>' + line.TestTimeStr + '</td><td>' + line.TestStation + '</td><td>' + line.PN + '</td><td>' + line.ModuleType + '</td></tr>');
+                       $("#WaferTableID").append('<tr class="NGBKG"><td>' + line.ModuleSerialNum + '</td><td>' + line.WhichTest + '</td><td>' + line.ErrAbbr + '</td><td>' + line.TestTimeStr + '</td><td>' + line.TestStation + '</td><td>' + line.PN + '</td><td>' + line.CSN + '</td><td>' + line.ModuleType + '</td></tr>');
                    }
                    else {
-                       $("#WaferTableID").append('<tr class="GOODBKG"><td>' + line.ModuleSerialNum + '</td><td>' + line.WhichTest + '</td><td>' + line.ErrAbbr + '</td><td>' + line.TestTimeStr + '</td><td>' + line.TestStation + '</td><td>' + line.PN + '</td><td>' + line.ModuleType + '</td></tr>');
+                       $("#WaferTableID").append('<tr class="GOODBKG"><td>' + line.ModuleSerialNum + '</td><td>' + line.WhichTest + '</td><td>' + line.ErrAbbr + '</td><td>' + line.TestTimeStr + '</td><td>' + line.TestStation + '</td><td>' + line.PN + '</td><td>' + line.CSN + '</td><td>' + line.ModuleType + '</td></tr>');
                    }
                }
                $.bootstrapLoading.end();

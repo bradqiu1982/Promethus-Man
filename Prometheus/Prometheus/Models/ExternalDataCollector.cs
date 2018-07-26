@@ -3895,6 +3895,33 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static Dictionary<string, string> FsnCsnMap(List<string> csnlist)
+        {
+            var ret = new Dictionary<string, string>();
+
+            var csncond = " ('";
+            foreach (var item in csnlist)
+            {
+                csncond = csncond + item + "','";
+            }
+            csncond = csncond.Substring(0, csncond.Length - 2);
+            csncond = csncond + ") ";
+
+            var sql = "select ContainerName,CustomerSerialNum FROM [InsiteDB].[insite].[Container] where CustomerSerialNum in <csncond>";
+            sql = sql.Replace("<csncond>", csncond);
+            var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                var fsn = Convert.ToString(line[0]);
+                var csn = Convert.ToString(line[1]);
+                if (!ret.ContainsKey(fsn))
+                {
+                    ret.Add(fsn, csn);
+                }
+            }//end foreach
+            return ret;
+        }
+
         public static void BuildOQMTaskBaseOnTestData(ProjectTestData td,string jo, string asignee, string defaultpj, Controller ctrl)
         {
                 if (string.Compare(td.ErrAbbr, "PASS", true) == 0)

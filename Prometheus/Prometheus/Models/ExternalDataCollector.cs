@@ -818,7 +818,7 @@ namespace Prometheus.Models
             var rmaattaches = RetrieveRMACloseAttach(); //all rma attach
             var solvedrmanum = new Dictionary<string, bool>();
 
-            var sixmonthago = DateTime.Now.AddMonths(-6);
+            var sixmonthago = DateTime.Now.AddMonths(-3);
 
             var alldata = new List<RMARAWData>();
 

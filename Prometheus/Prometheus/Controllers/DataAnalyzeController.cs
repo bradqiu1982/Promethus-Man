@@ -2676,11 +2676,19 @@ namespace Prometheus.Controllers
                             max = 100.0
                         };
 
+                        var tempmin = 94.0;
+                        var tempmax = 98.0;
+                        if (item.TestType.Contains("HTOL"))
+                        {
+                            tempmin = 98.0;
+                            tempmax = 100.0;
+                        }
+
                         var min = new
                         {
                             name = "Min",
                             color = "#F0AD4E",
-                            data = 94,
+                            data = tempmin,
                             style = "dash"
                         };
 
@@ -2688,7 +2696,7 @@ namespace Prometheus.Controllers
                         {
                             name = "Max",
                             color = "#C9302C",
-                            data = 98,
+                            data = tempmax,
                             style = "solid"
                         };
 

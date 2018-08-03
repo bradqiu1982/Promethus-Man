@@ -9056,35 +9056,61 @@ namespace Prometheus.Controllers
             }
 
 
-            var plotcolor = (new string[] {"#8CC9F7","#BEEBDF","#FDEEC3","#F6B0B0","#EC88F4"
-                , "#4FADF3","#12CC92","#FA9604","#ED6161","#EF46FC" }).ToList();
-            var labelylist = (new int[] { 50, 64, 78, 92, 106 }).ToList();
+            //var plotcolor = (new string[] {"#8CC9F7","#BEEBDF","#FDEEC3","#F6B0B0","#EC88F4"
+            //    , "#4FADF3","#12CC92","#FA9604","#ED6161","#EF46FC" }).ToList();
+            //var labelylist = (new int[] { 50, 64, 78, 92, 106 }).ToList();
 
-            var cidx = 0;
-            var plotarray = new List<object>();
+            //var cidx = 0;
+            //var plotarray = new List<object>();
+            //foreach (var item in action_data)
+            //{
+            //    var mstr = DateTime.Parse(item.AddDate).ToString("yyyy-MM");
+            //    plotarray.Add(
+            //        new
+            //        {
+            //            color = plotcolor[alldatedict[mstr] % plotcolor.Count],
+            //            from = alldatedict[mstr] - 0.5,
+            //            to = alldatedict[mstr] + 0.5,
+            //            label = new
+            //            {
+            //                //text = "* " + item.Action+ "--" + item.UserName.Split(new string[] {"@"},StringSplitOptions.RemoveEmptyEntries)[0],
+            //                text = "* " + item.Action,
+            //                style = new
+            //                {
+            //                    color = "#000",
+            //                    fontSize = (alldatelist.Count < 7) ? "12px" : "0px"
+            //                },
+            //                y = labelylist[cidx % labelylist.Count],
+            //                align = "left"
+            //            },
+            //        });
+            //    cidx = cidx + 1;
+            //}
+
+            var milestonedict = new Dictionary<string, string>();
             foreach (var item in action_data)
             {
                 var mstr = DateTime.Parse(item.AddDate).ToString("yyyy-MM");
-                plotarray.Add(
-                    new
-                    {
-                        color = plotcolor[alldatedict[mstr] % plotcolor.Count],
-                        from = alldatedict[mstr] - 0.5,
-                        to = alldatedict[mstr] + 0.5,
-                        label = new
-                        {
-                            //text = "* " + item.Action+ "--" + item.UserName.Split(new string[] {"@"},StringSplitOptions.RemoveEmptyEntries)[0],
-                            text = "* " + item.Action,
-                            style = new
-                            {
-                                color = "#000",
-                                fontSize = (alldatelist.Count < 7) ? "12px" : "0px"
-                            },
-                            y = labelylist[cidx % labelylist.Count],
-                            align = "left"
-                        },
-                    });
-                cidx = cidx + 1;
+                if (milestonedict.ContainsKey(mstr))
+                {
+                    var info = item.Action + "--" + item.UserName.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0];
+                    milestonedict[mstr] = milestonedict[mstr] + "<br/>" + info;
+                }
+                else
+                {
+                    var info = item.Action + "--" + item.UserName.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0];
+                    milestonedict.Add(mstr,info);
+                }
+            }
+
+            var milestonearray = new List<object>();
+            foreach (var kv in milestonedict)
+            {
+                milestonearray.Add(new {
+                    x = alldatedict[kv.Key],
+                    y = 105,
+                    name = kv.Value
+                });
             }
 
             var yAxis = new List<object>();
@@ -9153,7 +9179,11 @@ namespace Prometheus.Controllers
                                          color = "#00b050",
                                          data = rmaarray
                                      },
-                                     plotBands = plotarray
+                                     milestone = new {
+                                         data = milestonearray
+                                     }
+                                     //,
+                                     //plotBands = plotarray
                                  }
                              }
                             };

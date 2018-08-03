@@ -250,30 +250,35 @@ var ProMilestones = function(){
                 },
                 xAxis: {
                     categories: data.xAxis.data,
-                    plotBands: data.data.plotBands,
-                    events: {
-                        afterSetExtremes: function (event) {
-                            if ((event.max - event.min) < 7) {
-                                $(this.options.plotBands).each(function () {
-                                    this.label.style.fontSize = '12px';
-                                });
-                                this.chart.xAxis[0].update();
-                            }
-                            else {
-                                $(this.options.plotBands).each(function () {
-                                    this.label.style.fontSize = '0px';
-                                });
-                                this.chart.xAxis[0].update();
-                            }
-                        }
-                    }
+                    //plotBands: data.data.plotBands,
+                    //events: {
+                    //    afterSetExtremes: function (event) {
+                    //        if ((event.max - event.min) < 7) {
+                    //            $(this.options.plotBands).each(function () {
+                    //                this.label.style.fontSize = '12px';
+                    //            });
+                    //            this.chart.xAxis[0].update();
+                    //        }
+                    //        else {
+                    //            $(this.options.plotBands).each(function () {
+                    //                this.label.style.fontSize = '0px';
+                    //            });
+                    //            this.chart.xAxis[0].update();
+                    //        }
+                    //    }
+                    //}
                 },
                 yAxis: [{
                     title: {
                         text: data.yAxis[0].title
                     },
                     min: data.yAxis[0].min,
-                    max: data.yAxis[0].max
+                    max: 105,
+                    plotLines: [{
+                        value: 105,
+                        color: '#F0AD4E',
+                        width: 1
+                    }]
                 },
                 {
                     title: {
@@ -348,7 +353,25 @@ var ProMilestones = function(){
                         symbol: 'diamond'
                     },
                     data: data.data.rma_data.data
-                }],
+                },
+                {
+                    type: 'scatter',
+                    name: 'Milestone',
+                    marker: {
+                        radius: 6,
+                        symbol:'circle',
+                        fillColor:'#fff',
+                        lineColor:'#ffc000',
+                        lineWidth:2
+                    },
+                    tooltip: {
+                        useHTML:true,
+                        headerFormat:'<span style="font-size: 10px">{point.x}</span><br/>',
+                        pointFormat:'{point.name}'
+                    },
+                    data:data.data.milestone.data
+                }
+                ],
                 exporting: {
                     menuItemDefinitions: {
                         fullscreen: {
@@ -373,8 +396,8 @@ var ProMilestones = function(){
                                 });
                                 outputCSV += "\r\n\r\n";
                                 outputCSV += "Date,MileStones,\r\n";
-                                $(data.data.plotBands).each(function () {
-                                    outputCSV += data.xAxis.data[this.from + 0.5] + "," + this.label.text.replace("<br/>", " ") + ",\r\n";
+                                $(data.data.milestone.data).each(function (i,val) {
+                                    outputCSV += data.xAxis.data[val.x] + "," + val.name.replace("<br/>", " ") + ",\r\n";
                                 });
                                 var blobby = new Blob([outputCSV], { type: 'text/csv;chartset=utf-8' });
                                 $(exportLink).attr({

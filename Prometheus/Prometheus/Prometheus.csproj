@@ -240,6 +240,7 @@
     <Compile Include="Models\BITestData.cs" />
     <Compile Include="Models\CfgUtility.cs" />
     <Compile Include="Models\CookieUtility.cs" />
+    <Compile Include="Models\CPKAlgorithm.cs" />
     <Compile Include="Models\DashBoardViewModels.cs" />
     <Compile Include="Models\DBUtility.cs" />
     <Compile Include="Models\EmailUtility.cs" />

@@ -994,11 +994,67 @@ namespace Prometheus.Controllers
             var testflist = (List<TestFailureColumn>)retdata[1];
             testylist.Sort(delegate (testtypeyield obj1, testtypeyield obj2)
             {
-                return obj2.TestType.CompareTo(obj1.TestType);
+                if (obj1.TestType.ToUpper().Contains("PRE BURN IN"))
+                {
+                    if (obj2.TestType.ToUpper().Contains("POST BURN IN")
+                    || obj2.TestType.ToUpper().Contains("POST HTOL BURN IN"))
+                    {
+                        return -1;
+                    }
+                }
+                else if (obj1.TestType.ToUpper().Contains("POST BURN IN"))
+                {
+                    if (obj2.TestType.ToUpper().Contains("PRE BURN IN"))
+                    {
+                        return 1;
+                    }
+
+                    if (obj2.TestType.ToUpper().Contains("POST HTOL BURN IN"))
+                    {
+                        return -1;
+                    }
+                }
+                else if (obj1.TestType.ToUpper().Contains("POST HTOL BURN IN"))
+                {
+                    if (obj2.TestType.ToUpper().Contains("PRE BURN IN")
+                    || obj2.TestType.ToUpper().Contains("POST BURN IN"))
+                    {
+                        return 1;
+                    }
+                }
+                return obj1.TestType.CompareTo(obj2.TestType);
             });
             testflist.Sort(delegate (TestFailureColumn obj1, TestFailureColumn obj2)
             {
-                return obj2.TestType.CompareTo(obj1.TestType);
+                if (obj1.TestType.ToUpper().Contains("PRE BURN IN"))
+                {
+                    if (obj2.TestType.ToUpper().Contains("POST BURN IN")
+                    || obj2.TestType.ToUpper().Contains("POST HTOL BURN IN"))
+                    {
+                        return -1;
+                    }
+                }
+                else if (obj1.TestType.ToUpper().Contains("POST BURN IN"))
+                {
+                    if (obj2.TestType.ToUpper().Contains("PRE BURN IN"))
+                    {
+                        return 1;
+                    }
+
+                    if (obj2.TestType.ToUpper().Contains("POST HTOL BURN IN"))
+                    {
+                        return -1;
+                    }
+                }
+                else if (obj1.TestType.ToUpper().Contains("POST HTOL BURN IN"))
+                {
+                    if (obj2.TestType.ToUpper().Contains("PRE BURN IN")
+                    || obj2.TestType.ToUpper().Contains("POST BURN IN"))
+                    {
+                        return 1;
+                    }
+                }
+                return obj1.TestType.CompareTo(obj2.TestType);
             });
 
             var allydata = new Dictionary<string,double>();
@@ -1305,11 +1361,67 @@ namespace Prometheus.Controllers
             var testflist = (List<TestFailureColumn>)retdata[1];
             testylist.Sort(delegate (testtypeyield obj1, testtypeyield obj2)
             {
-                return obj2.TestType.CompareTo(obj1.TestType);
+                if (obj1.TestType.ToUpper().Contains("PRE BURN IN"))
+                {
+                    if (obj2.TestType.ToUpper().Contains("POST BURN IN")
+                    || obj2.TestType.ToUpper().Contains("POST HTOL BURN IN"))
+                    {
+                        return -1;
+                    }
+                }
+                else if (obj1.TestType.ToUpper().Contains("POST BURN IN"))
+                {
+                    if (obj2.TestType.ToUpper().Contains("PRE BURN IN"))
+                    {
+                        return 1;
+                    }
+
+                    if (obj2.TestType.ToUpper().Contains("POST HTOL BURN IN"))
+                    {
+                        return -1;
+                    }
+                }
+                else if (obj1.TestType.ToUpper().Contains("POST HTOL BURN IN"))
+                {
+                    if (obj2.TestType.ToUpper().Contains("PRE BURN IN")
+                    || obj2.TestType.ToUpper().Contains("POST BURN IN"))
+                    {
+                        return 1;
+                    }
+                }
+                return obj1.TestType.CompareTo(obj2.TestType);
             });
             testflist.Sort(delegate (TestFailureColumn obj1, TestFailureColumn obj2)
             {
-                return obj2.TestType.CompareTo(obj1.TestType);
+                if (obj1.TestType.ToUpper().Contains("PRE BURN IN"))
+                {
+                    if (obj2.TestType.ToUpper().Contains("POST BURN IN")
+                    || obj2.TestType.ToUpper().Contains("POST HTOL BURN IN"))
+                    {
+                        return -1;
+                    }
+                }
+                else if (obj1.TestType.ToUpper().Contains("POST BURN IN"))
+                {
+                    if (obj2.TestType.ToUpper().Contains("PRE BURN IN"))
+                    {
+                        return 1;
+                    }
+
+                    if (obj2.TestType.ToUpper().Contains("POST HTOL BURN IN"))
+                    {
+                        return -1;
+                    }
+                }
+                else if (obj1.TestType.ToUpper().Contains("POST HTOL BURN IN"))
+                {
+                    if (obj2.TestType.ToUpper().Contains("PRE BURN IN")
+                    || obj2.TestType.ToUpper().Contains("POST BURN IN"))
+                    {
+                        return 1;
+                    }
+                }
+                return obj1.TestType.CompareTo(obj2.TestType);
             });
 
             foreach (var item in testylist)
@@ -2078,10 +2190,73 @@ namespace Prometheus.Controllers
 
                 //fieldname,wafer,boxlist
                 var fieldboxlist = (Dictionary<string, Dictionary<string, List<string>>>)retdata[0];
+                var fieldorderlist = fieldboxlist.Keys.ToList();
+                fieldorderlist.Sort(delegate (string obj1, string obj2)
+                {
+                    if (obj1.ToUpper().Contains("PRE BURN IN"))
+                    {
+                        if (obj2.ToUpper().Contains("POST BURN IN")
+                        || obj2.ToUpper().Contains("POST HTOL BURN IN"))
+                        {
+                            return -1;
+                        }
+                    }
+                    else if (obj1.ToUpper().Contains("POST BURN IN"))
+                    {
+                        if (obj2.ToUpper().Contains("PRE BURN IN"))
+                        {
+                            return 1;
+                        }
+
+                        if (obj2.ToUpper().Contains("POST HTOL BURN IN"))
+                        {
+                            return -1;
+                        }
+                    }
+                    else if (obj1.ToUpper().Contains("POST HTOL BURN IN"))
+                    {
+                        if (obj2.ToUpper().Contains("PRE BURN IN")
+                        || obj2.ToUpper().Contains("POST BURN IN"))
+                        {
+                            return 1;
+                        }
+                    }
+
+                    return obj1.CompareTo(obj2);
+                });
+
                 var testflist = (List<TestFailureColumn>)retdata[1];
                 testflist.Sort(delegate (TestFailureColumn obj1, TestFailureColumn obj2)
                 {
-                    return obj2.TestType.CompareTo(obj1.TestType);
+                    if (obj1.TestType.ToUpper().Contains("PRE BURN IN"))
+                    {
+                        if (obj2.TestType.ToUpper().Contains("POST BURN IN")
+                        || obj2.TestType.ToUpper().Contains("POST HTOL BURN IN"))
+                        {
+                            return -1;
+                        }
+                    }
+                    else if (obj1.TestType.ToUpper().Contains("POST BURN IN"))
+                    {
+                        if (obj2.TestType.ToUpper().Contains("PRE BURN IN"))
+                        {
+                            return 1;
+                        }
+
+                        if (obj2.TestType.ToUpper().Contains("POST HTOL BURN IN"))
+                        {
+                            return -1;
+                        }
+                    }
+                    else if (obj1.TestType.ToUpper().Contains("POST HTOL BURN IN"))
+                    {
+                        if (obj2.TestType.ToUpper().Contains("PRE BURN IN")
+                        || obj2.TestType.ToUpper().Contains("POST BURN IN"))
+                        {
+                            return 1;
+                        }
+                    }
+                    return obj1.TestType.CompareTo(obj2.TestType);
                 });
                 //var fieldrawlist = (Dictionary<string, Dictionary<string, List<string>>>)retdata[3];
 
@@ -2190,9 +2365,12 @@ namespace Prometheus.Controllers
                 }//end foreach
 
 
-                foreach (var fieldkv in fieldboxlist)
+                //foreach (var fieldkv in fieldboxlist)
+                foreach(var fname in fieldorderlist)
                 {
-                    var fieldname = fieldkv.Key;
+                    var fieldname = fname;
+                    var fieldval = fieldboxlist[fname];
+
                     var xaxisdata = new List<string>();
 
                     var ldatadata = new List<List<double>>();
@@ -2212,11 +2390,11 @@ namespace Prometheus.Controllers
                         //xaxisdata.Add(wf);
                         //foreach (var box in wfkv.Value)
 
-                        if (!fieldkv.Value.ContainsKey(x)) continue;
+                        if (!fieldval.ContainsKey(x)) continue;
 
                         var wf = x;
                         xaxisdata.Add(wf);
-                        var boxdict = fieldkv.Value[x];
+                        var boxdict = fieldval[x];
                         foreach (var box in boxdict)
                         {
                             if (box.Contains("#V"))
@@ -2609,12 +2787,74 @@ namespace Prometheus.Controllers
                 //fieldname,wafer,boxlist
                 var fieldboxlist = (Dictionary<string, Dictionary<string, List<string>>>)retdata[0];
                 var fieldorderlist = fieldboxlist.Keys.ToList();
-                fieldorderlist.Sort(); fieldorderlist.Reverse();
+                //fieldorderlist.Sort(); fieldorderlist.Reverse();
+                fieldorderlist.Sort(delegate (string obj1, string obj2)
+                {
+                    if (obj1.ToUpper().Contains("PRE BURN IN"))
+                    {
+                        if (obj2.ToUpper().Contains("POST BURN IN")
+                        || obj2.ToUpper().Contains("POST HTOL BURN IN"))
+                        {
+                            return -1;
+                        }
+                    }
+                    else if (obj1.ToUpper().Contains("POST BURN IN"))
+                    {
+                        if (obj2.ToUpper().Contains("PRE BURN IN"))
+                        {
+                            return 1;
+                        }
+
+                        if (obj2.ToUpper().Contains("POST HTOL BURN IN"))
+                        {
+                            return -1;
+                        }
+                    }
+                    else if (obj1.ToUpper().Contains("POST HTOL BURN IN"))
+                    {
+                        if (obj2.ToUpper().Contains("PRE BURN IN")
+                        || obj2.ToUpper().Contains("POST BURN IN"))
+                        {
+                            return 1;
+                        }
+                    }
+
+                    return obj1.CompareTo(obj2);
+                    });
 
                 var testflist = (List<TestFailureColumn>)retdata[1];
                 testflist.Sort(delegate (TestFailureColumn obj1, TestFailureColumn obj2)
                 {
-                    return obj2.TestType.CompareTo(obj1.TestType);
+                    if (obj1.TestType.ToUpper().Contains("PRE BURN IN"))
+                    {
+                        if (obj2.TestType.ToUpper().Contains("POST BURN IN")
+                        || obj2.TestType.ToUpper().Contains("POST HTOL BURN IN"))
+                        {
+                            return -1;
+                        }
+                    }
+                    else if (obj1.TestType.ToUpper().Contains("POST BURN IN"))
+                    {
+                        if (obj2.TestType.ToUpper().Contains("PRE BURN IN"))
+                        {
+                            return 1;
+                        }
+
+                        if (obj2.TestType.ToUpper().Contains("POST HTOL BURN IN"))
+                        {
+                            return -1;
+                        }
+                    }
+                    else if (obj1.TestType.ToUpper().Contains("POST HTOL BURN IN"))
+                    {
+                        if (obj2.TestType.ToUpper().Contains("PRE BURN IN")
+                        || obj2.TestType.ToUpper().Contains("POST BURN IN"))
+                        {
+                            return 1;
+                        }
+                    }
+
+                    return obj1.TestType.CompareTo(obj2.TestType);
                 });
                 
 

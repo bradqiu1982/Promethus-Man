@@ -229,8 +229,9 @@
                     text: line_data.yAxis.title
                 },
                 startOnTick: false,
+                endOnTick: false,
                 min: line_data.yAxis.min,
-                max: line_data.yAxis.max,
+                max: 110,
                 plotLines: [{
                     value: line_data.data.min.data,
                     color: line_data.data.min.color,
@@ -246,7 +247,8 @@
                 opposite: true,
                 title: {
                     text: 'Amount'
-                }
+                },
+                gridLineWidth:0
 
             }],
             plotOptions: {

@@ -183,17 +183,19 @@ namespace Prometheus.Models
                             var hours = (double)(pjdatalist[pjdatalist.Count - 1].TestTimeStamp - pjdatalist[0].TestTimeStamp).TotalSeconds / 3600.0;
                             if (string.IsNullOrEmpty(errid))
                             {
-                                var testdata = new ProjectTestData("TEMP", pjdatalist[0].DataID, pjdatalist[0].ModuleSerialNum, pjdatalist[0].WhichTest.Replace("_setup","")+ "/" + pjdatalist[0].JO, pjdatalist[0].ModuleType
-                                    , "PASS", pjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss")  , pjdatalist[0].TestStation, pjdatalist[0].PN);
-
+                                //var testdata = new ProjectTestData("TEMP", pjdatalist[0].DataID, pjdatalist[0].ModuleSerialNum, pjdatalist[0].WhichTest.Replace("_setup","")+ "/" + pjdatalist[0].JO, pjdatalist[0].ModuleType
+                                //    , "PASS", pjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss")  , pjdatalist[0].TestStation, pjdatalist[0].PN);
+                                var testdata = new ProjectTestData("TEMP", pjdatalist[0].DataID, pjdatalist[0].ModuleSerialNum, pjdatalist[0].WhichTest.Replace("_setup", ""), pjdatalist[0].ModuleType
+                                    , "PASS", pjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), pjdatalist[0].TestStation, pjdatalist[0].PN);
                                 testdata.JO = (Math.Round(hours,3)).ToString();
                                 ret.Add(testdata);
                             }
                             else
                             {
-                                var testdata = new ProjectTestData("TEMP", errid, pjdatalist[0].ModuleSerialNum, pjdatalist[0].WhichTest.Replace("_setup", "") + "/" + pjdatalist[0].JO, pjdatalist[0].ModuleType
+                                //var testdata = new ProjectTestData("TEMP", errid, pjdatalist[0].ModuleSerialNum, pjdatalist[0].WhichTest.Replace("_setup", "") + "/" + pjdatalist[0].JO, pjdatalist[0].ModuleType
+                                //    , err, pjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), pjdatalist[0].TestStation, pjdatalist[0].PN);
+                                var testdata = new ProjectTestData("TEMP", errid, pjdatalist[0].ModuleSerialNum, pjdatalist[0].WhichTest.Replace("_setup", ""), pjdatalist[0].ModuleType
                                     , err, pjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), pjdatalist[0].TestStation, pjdatalist[0].PN);
-                                
                                 testdata.JO = (Math.Round(hours, 3)).ToString();
                                 ret.Add(testdata);
                             }
@@ -203,14 +205,14 @@ namespace Prometheus.Models
                       
                         //(string pk, string did, string sn, string wtest, string mt, string err, string testtime, string station, string p)
                         var tempdata = new ProjectTestData("TEMP", tempdatasetid, sn, ds, mdtype, status, stdtime, station, pn);
-                        tempdata.JO = state;
+                        //tempdata.JO = state;
                         pjdatalist.Add(tempdata);
                     }
                     else
                     {
                         //(string pk, string did, string sn, string wtest, string mt, string err, string testtime, string station, string p)
                         var tempdata = new ProjectTestData("TEMP", tempdatasetid, sn , ds, mdtype, status, stdtime, station, pn);
-                        tempdata.JO = state;
+                        //tempdata.JO = state;
                         pjdatalist.Add(tempdata);
                     }
 

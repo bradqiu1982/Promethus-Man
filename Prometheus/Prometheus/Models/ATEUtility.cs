@@ -98,7 +98,7 @@ namespace Prometheus.Models
         public static StringBuilder PrePareATEData(List<ProjectTestData> atelist, Dictionary<string, string> pndescdict)
         {
             StringBuilder sb1 = new StringBuilder(300 * (atelist.Count + 1));
-            sb1.Append("SN,WhichTest,Failure,TestTimestamp,Station,Module Family,PN,PN Desc,Spend Time(in hour)\r\n");
+            sb1.Append("SN,WhichTest,Failure,TestTimestamp,Station,Module Family,PN,PN Desc,JO,Spend Time(in hour)\r\n");
             foreach (var item in atelist)
             {
                 var pndesc = "";
@@ -107,7 +107,7 @@ namespace Prometheus.Models
 
                 sb1.Append("\"" + item.ModuleSerialNum.ToString().Replace("\"", "") + "\"," + "\"" + item.WhichTest.Replace("\"", "") + "\"," + "\"" + item.ErrAbbr.Replace("\"", "") + "\","
                     + "\"" + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss") + "\"," + "\"" + item.TestStation.Replace("\"", "") + "\"," + "\"" + item.ModuleType.Replace("\"", "") + "\","
-                    + "\"" + item.PN.Replace("\"", "") + "\"," + "\"" + pndesc.Replace("\"", "") + "\"," + "\"" + item.JO.Replace("\"", "") + "\",\r\n");
+                    + "\"" + item.PN.Replace("\"", "") + "\"," + "\"" + pndesc.Replace("\"", "") + "\"," + "\"" + item.JO.Replace("\"", "") + "\"," + "\"" + item.CSN.Replace("\"", "") + "\",\r\n");
             }
             return sb1;
         }
@@ -116,7 +116,7 @@ namespace Prometheus.Models
         {
             var ret = new List<ProjectTestData>();
 
-            var sql = @"SELECT a.MFR_SN,d.DATASET_NAME,c.FAMILY,d.STATUS,d.END_TIME,d.STATION,a.MFR_PN,d.ROUTE_ID,d.dataset_id,b.state FROM PARTS a   
+            var sql = @"SELECT a.MFR_SN,d.DATASET_NAME,c.FAMILY,d.STATUS,d.END_TIME,d.STATION,a.MFR_PN,d.ROUTE_ID,d.dataset_id,b.state,b.JOB_ID FROM PARTS a   
                         INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX  
                         INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID 
                         INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID   
@@ -151,6 +151,7 @@ namespace Prometheus.Models
                     var temprouteid = Convert.ToString(item[7]);
                     var tempdatasetid = Convert.ToString(item[8]);
                     var state = Convert.ToString(item[9]);
+                    var jobid = Convert.ToString(item[10]);
 
                     var setupflag = false;
                     if (ds.ToUpper().Contains("_SETUP"))
@@ -183,20 +184,20 @@ namespace Prometheus.Models
                             var hours = (double)(pjdatalist[pjdatalist.Count - 1].TestTimeStamp - pjdatalist[0].TestTimeStamp).TotalSeconds / 3600.0;
                             if (string.IsNullOrEmpty(errid))
                             {
-                                //var testdata = new ProjectTestData("TEMP", pjdatalist[0].DataID, pjdatalist[0].ModuleSerialNum, pjdatalist[0].WhichTest.Replace("_setup","")+ "/" + pjdatalist[0].JO, pjdatalist[0].ModuleType
-                                //    , "PASS", pjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss")  , pjdatalist[0].TestStation, pjdatalist[0].PN);
+                                
                                 var testdata = new ProjectTestData("TEMP", pjdatalist[0].DataID, pjdatalist[0].ModuleSerialNum, pjdatalist[0].WhichTest.Replace("_setup", ""), pjdatalist[0].ModuleType
                                     , "PASS", pjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), pjdatalist[0].TestStation, pjdatalist[0].PN);
-                                testdata.JO = (Math.Round(hours,3)).ToString();
+                                testdata.CSN = (Math.Round(hours,3)).ToString();
+                                testdata.JO = pjdatalist[0].JO;
                                 ret.Add(testdata);
                             }
                             else
                             {
-                                //var testdata = new ProjectTestData("TEMP", errid, pjdatalist[0].ModuleSerialNum, pjdatalist[0].WhichTest.Replace("_setup", "") + "/" + pjdatalist[0].JO, pjdatalist[0].ModuleType
-                                //    , err, pjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), pjdatalist[0].TestStation, pjdatalist[0].PN);
+                                
                                 var testdata = new ProjectTestData("TEMP", errid, pjdatalist[0].ModuleSerialNum, pjdatalist[0].WhichTest.Replace("_setup", ""), pjdatalist[0].ModuleType
                                     , err, pjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), pjdatalist[0].TestStation, pjdatalist[0].PN);
-                                testdata.JO = (Math.Round(hours, 3)).ToString();
+                                testdata.CSN = (Math.Round(hours, 3)).ToString();
+                                testdata.JO = pjdatalist[0].JO;
                                 ret.Add(testdata);
                             }
                         }
@@ -205,14 +206,14 @@ namespace Prometheus.Models
                       
                         //(string pk, string did, string sn, string wtest, string mt, string err, string testtime, string station, string p)
                         var tempdata = new ProjectTestData("TEMP", tempdatasetid, sn, ds, mdtype, status, stdtime, station, pn);
-                        //tempdata.JO = state;
+                        tempdata.JO = jobid;
                         pjdatalist.Add(tempdata);
                     }
                     else
                     {
                         //(string pk, string did, string sn, string wtest, string mt, string err, string testtime, string station, string p)
                         var tempdata = new ProjectTestData("TEMP", tempdatasetid, sn , ds, mdtype, status, stdtime, station, pn);
-                        //tempdata.JO = state;
+                        tempdata.JO = jobid;
                         pjdatalist.Add(tempdata);
                     }
 
@@ -285,7 +286,7 @@ namespace Prometheus.Models
                     mdcond = mdcond.Substring(0, mdcond.Length - 4) + ")";
 
 
-                    var s  = "SELECT a.MFR_SN,d.DATASET_NAME,c.FAMILY,d.STATUS,d.END_TIME,d.STATION,a.MFR_PN,d.ROUTE_ID,d.dataset_id FROM PARTS a INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID WHERE <mdcond> and d.END_TIME > '<TIMECOND>'  ORDER BY d.ROUTE_ID,d.dataset_id DESC,d.END_TIME DESC";
+                    var s  = "SELECT a.MFR_SN,d.DATASET_NAME,c.FAMILY,d.STATUS,d.END_TIME,d.STATION,a.MFR_PN,d.ROUTE_ID,d.dataset_id,b.JOB_ID FROM PARTS a INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID WHERE <mdcond> and d.END_TIME > '<TIMECOND>'  ORDER BY d.ROUTE_ID,d.dataset_id DESC,d.END_TIME DESC";
                     var sndict = new Dictionary<string, bool>();
                     var sql = s.Replace("<TIMECOND>", vm.StartDate.ToString("yyyyMMddhhmmss")).Replace("<mdcond>", mdcond);
 
@@ -303,7 +304,8 @@ namespace Prometheus.Models
                                 var status = Convert.ToString(item[3]);
                                 var ds = Convert.ToString(item[1]);
                                 var temprouteid = Convert.ToString(item[7]);
-                            var tempdatasetid = Convert.ToString(item[8]);
+                                var tempdatasetid = Convert.ToString(item[8]);
+                                var jobid = Convert.ToString(item[9]);
 
                             if (string.Compare(currentroutid, temprouteid) != 0)
                             {
@@ -363,6 +365,7 @@ namespace Prometheus.Models
                                             , Convert.ToString(item[1]), Convert.ToString(item[2]), Convert.ToString(item[3]).ToUpper()
                                             , stdtime, Convert.ToString(item[5]), Convert.ToString(item[6]));
                                 tempdata.DataID = tempdatasetid;
+                                tempdata.JO = jobid;
 
                                 pjdatalist.Add(tempdata);
                             }
@@ -496,7 +499,7 @@ namespace Prometheus.Models
                     mdcond = mdcond.Substring(0, mdcond.Length - 4) + ")";
 
 
-                    var s = "SELECT a.MFR_SN,d.DATASET_NAME,c.FAMILY,d.STATUS,d.END_TIME,d.STATION,a.MFR_PN,d.ROUTE_ID,d.dataset_id FROM PARTS a INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID WHERE <mdcond> and d.END_TIME > '<TIMECOND>'  ORDER BY d.ROUTE_ID,d.dataset_id DESC,d.END_TIME DESC";
+                    var s = "SELECT a.MFR_SN,d.DATASET_NAME,c.FAMILY,d.STATUS,d.END_TIME,d.STATION,a.MFR_PN,d.ROUTE_ID,d.dataset_id,b.JOB_ID FROM PARTS a INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID WHERE <mdcond> and d.END_TIME > '<TIMECOND>'  ORDER BY d.ROUTE_ID,d.dataset_id DESC,d.END_TIME DESC";
                     var sndict = new Dictionary<string, bool>();
                     var sql = s.Replace("<TIMECOND>", DateTime.Parse(starttime).ToString("yyyyMMddhhmmss")).Replace("<mdcond>", mdcond);
 
@@ -514,6 +517,7 @@ namespace Prometheus.Models
                             var ds = Convert.ToString(item[1]);
                             var temprouteid = Convert.ToString(item[7]);
                             var tempdatasetid = Convert.ToString(item[8]);
+                            var jobid = Convert.ToString(item[9]);
 
                             if (string.Compare(currentroutid, temprouteid) != 0)
                             {
@@ -574,6 +578,7 @@ namespace Prometheus.Models
                                             , Convert.ToString(item[1]), Convert.ToString(item[2]), Convert.ToString(item[3]).ToUpper()
                                             , stdtime, Convert.ToString(item[5]), Convert.ToString(item[6]));
                                 tempdata.DataID = tempdatasetid;
+                                tempdata.JO = jobid;
 
                                 pjdatalist.Add(tempdata);
                             }

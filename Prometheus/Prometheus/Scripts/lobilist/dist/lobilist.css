@@ -364,12 +364,15 @@
 .lobilists .lobilist-item:hover {
   background-color: rgba(0, 0, 0, 0.02);
 }
+
 .lobilists .lobilist-item-title {
   font-weight: 600;
   font-size: 16px;
+  cursor:pointer;
 }
 .lobilists .lobilist-item-description {
   font-style: italic;
+  cursor:pointer;
 }
 .lobilists .lobilist-item-duedate {
   position: absolute;
@@ -378,7 +381,19 @@
   font-style: italic;
   color: #777777;
   font-size: 85%;
+  cursor:pointer;
 }
+
+.lobilists .lobilist-item-assignee {
+  position: absolute;
+  top: 2px;
+  left: 120px;
+  font-style: italic;
+  color: #777777;
+  font-size: 85%;
+  cursor:pointer;
+}
+
 .lobilists .lobilist-check {
   position: absolute;
   left: 12px;

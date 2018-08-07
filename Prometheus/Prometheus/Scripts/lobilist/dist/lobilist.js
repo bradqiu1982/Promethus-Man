@@ -309,6 +309,7 @@ $(function () {
             $form[0].title.value = $item.find('.lobilist-item-title').html();
             $form[0].description.value = $item.find('.lobilist-item-description').html() || '';
             $form[0].dueDate.value = $item.find('.lobilist-item-duedate').html() || '';
+            $form[0].assignee.value = $item.find('.lobilist-item-assignee').html() || '';
             return me;
         },
 
@@ -452,6 +453,14 @@ $(function () {
                     placeholder: 'Due Date'
                 })
             ).appendTo($form);
+            $('<div class="form-group">').append(
+                $('<input>', {
+                    'type': 'text',
+                    name: 'assignee',
+                    'class': 'form-control',
+                    placeholder: 'Assignee'
+                })
+            ).appendTo($form);
             var $ft = $('<div class="lobilist-form-footer">');
             $('<button>', {
                 'class': 'btn btn-primary btn-sm btn-add-todo',
@@ -493,11 +502,17 @@ $(function () {
                 return;
             }
 
+            if (!me.$form[0].assignee.value) {
+                me._showFormError('assignee', 'assignee can not be empty');
+                return;
+            }
+
             me.saveOrUpdateItem({
                 id: me.$form[0].id.value,
                 title: me.$form[0].title.value,
                 description:me. $form[0].description.value,
-                dueDate: me.$form[0].dueDate.value
+                dueDate: me.$form[0].dueDate.value,
+                assignee: me.$form[0].assignee.value
             });
             me.$form.addClass('hide');
             me.$footer.removeClass('hide');
@@ -814,6 +829,13 @@ $(function () {
                     html: item.dueDate
                 }));
             }
+            if (item.assignee)
+            {
+                $li.append($('<div>', {
+                    'class': 'lobilist-item-assignee',
+                    html: item.assignee
+                }));
+            }
             $li = me._addItemControls($li);
             if (item.done) {
                 $li.find('input[type=checkbox]').prop('checked', true);
@@ -871,12 +893,16 @@ $(function () {
             $li.find('.lobilist-item-title').html(item.title);
             $li.find('.lobilist-item-description').remove();
             $li.find('.lobilist-item-duedate').remove();
+            $li.find('.lobilist-item-assignee').remove();
 
             if (item.description) {
                 $li.append('<div class="lobilist-item-description">' + item.description + '</div>');
             }
             if (item.dueDate) {
                 $li.append('<div class="lobilist-item-duedate">' + item.dueDate + '</div>');
+            }
+            if (item.assignee) {
+                $li.append('<div class="lobilist-item-assignee">' + item.assignee + '</div>');
             }
             $li.data('lobiListItem', item);
             $.extend(me.$items[item.id], item);
@@ -1153,6 +1179,7 @@ $(function () {
             title: '',
             description: '',
             dueDate: '',
+            assignee: '',
             done: false
         },
 

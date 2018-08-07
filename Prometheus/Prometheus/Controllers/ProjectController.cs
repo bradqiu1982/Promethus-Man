@@ -7300,6 +7300,24 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        private bool IsProjectMem(string pjkey)
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser"))
+            {
+                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0].ToUpper();
+                var memlist = ProjectViewModels.RetrieveProjectMembers(pjkey);
+                foreach (var item in memlist)
+                {
+                    if (item.Name.ToUpper().Contains(updater))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         public ActionResult ProjectDash(string ProjectKey)
         {
             //var checkresult = CheckLoginAndPermit(Request, "Project", "ProjectDash");
@@ -7327,6 +7345,20 @@ namespace Prometheus.Controllers
                 }
 
                 ViewBag.PJKey = PJKey;
+
+                ViewBag.IsPJMember = "FALSE";
+                if (IsProjectMem(PJKey))
+                {
+                    ViewBag.IsPJMember = "TRUE";
+                }
+
+                var memlist = ProjectViewModels.RetrieveProjectMembers(PJKey);
+                var memstrlist = new List<string>();
+                foreach (var m in memlist)
+                {
+                    memstrlist.Add(m.Name.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+                }
+                ViewBag.pjmemlist = "[\"" + string.Join("\",\"", memstrlist.ToArray()) + "\"]";
 
                 var ck1 = new Dictionary<string, string>();
                 ck1.Add("PJKey", PJKey);
@@ -7370,7 +7402,8 @@ namespace Prometheus.Controllers
                             id = item.IssueKey,
                             title = item.Summary.Replace(CRITICALERRORTYPE.PMTASK, "").Trim() + "  <a href='/Issue/UpdateIssue?issuekey=" + item.IssueKey + "' target='_blank'>Detail</a>",
                             description = item.CommentList.Count > 0 ? item.CommentList[0].Comment : string.Empty,
-                            dueDate = item.DueDate.ToString("yyyy-MM-dd")
+                            dueDate = item.DueDate.ToString("yyyy-MM-dd"),
+                            assignee = item.Assignee.Split(new string[] { "@" },StringSplitOptions.RemoveEmptyEntries)[0]
                         });
                 }
 
@@ -7383,7 +7416,8 @@ namespace Prometheus.Controllers
                             id = item.IssueKey,
                             title = item.Summary.Replace(CRITICALERRORTYPE.PMTASK, "").Trim() + "  <a href='/Issue/UpdateIssue?issuekey=" + item.IssueKey + "' target='_blank'>Detail</a>",
                             description = item.CommentList.Count > 0 ? item.CommentList[0].Comment : string.Empty,
-                            dueDate = item.DueDate.ToString("yyyy-MM-dd")
+                            dueDate = item.DueDate.ToString("yyyy-MM-dd"),
+                            assignee = item.Assignee.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0]
                         });
                 }
 
@@ -7396,7 +7430,8 @@ namespace Prometheus.Controllers
                             id = item.IssueKey,
                             title = item.Summary.Replace(CRITICALERRORTYPE.PMTASK, "").Trim() + "  <a href='/Issue/UpdateIssue?issuekey=" + item.IssueKey + "' target='_blank'>Detail</a>",
                             description = item.CommentList.Count > 0 ? item.CommentList[0].Comment : string.Empty,
-                            dueDate = item.DueDate.ToString("yyyy-MM-dd")
+                            dueDate = item.DueDate.ToString("yyyy-MM-dd"),
+                            assignee = item.Assignee.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0]
                         });
                 }
             }
@@ -7451,12 +7486,12 @@ namespace Prometheus.Controllers
             {
                 if (it.Contains("id="))
                 {
-                    ret.IssueKey = it.Replace("id=", "").Trim();
+                    ret.IssueKey = Request.Form["id"];//it.Replace("id=", "").Trim();
                 }
 
                 if (it.Contains("title="))
                 {
-                    ret.Summary = SeverHtmlDecode.Decode(this, it.Replace("title=", "")).Replace("'", "").Replace("+", " ").Trim();
+                    ret.Summary = Request.Form["title"];//SeverHtmlDecode.Decode(this, it.Replace("title=", "")).Replace("'", "").Replace("+", " ").Trim();
                 }
 
                 if (it.Contains("description="))
@@ -7467,7 +7502,7 @@ namespace Prometheus.Controllers
                     }
                     else
                     {
-                        ret.Description = SeverHtmlDecode.Decode(this, it.Replace("description=", "")).Replace("'", "").Replace("+", " ").Trim();
+                        ret.Description = Request.Form["description"];//SeverHtmlDecode.Decode(this, it.Replace("description=", "")).Replace("'", "").Replace("+", " ").Trim();
                     }
                 }
 
@@ -7475,14 +7510,23 @@ namespace Prometheus.Controllers
                 {
                     try
                     {
-                        ret.DueDate = DateTime.Parse(SeverHtmlDecode.Decode(this, it.Replace("dueDate=", "")).Replace("'", "").Trim() + " 10:00:00");
+                        ret.DueDate = DateTime.Parse(Request.Form["dueDate"] + " 10:00:00"); //DateTime.Parse(SeverHtmlDecode.Decode(this, it.Replace("dueDate=", "")).Replace("'", "").Trim() + " 10:00:00");
+                    }
+                    catch (Exception ex) { ret.Summary = string.Empty; }
+                }
+
+                if (it.Contains("assignee="))
+                {
+                    try
+                    {
+                        ret.Assignee = Request.Form["assignee"];
                     }
                     catch (Exception ex) { ret.Summary = string.Empty; }
                 }
 
                 if (it.Contains("listId="))
                 {
-                    ret.DataID = SeverHtmlDecode.Decode(this, it.Replace("listId=", "")).Replace("'", "").Trim();
+                    ret.DataID = Request.Form["listId"];//SeverHtmlDecode.Decode(this, it.Replace("listId=", "")).Replace("'", "").Trim();
                 }
 
             }
@@ -7567,17 +7611,17 @@ namespace Prometheus.Controllers
             var PJKey = ckdict["PJKey"];
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
             var pj = ProjectViewModels.RetrieveOneProjectWithClose(PJKey)[0];
-            var pm = "";
-            foreach (var m in pj.MemberList)
-            {
-                if (string.Compare(m.Role, ProjectViewModels.PMROLE) == 0)
-                {
-                    pm = m.Name;
-                    break;
-                }
-            }
+            //var pm = "";
+            //foreach (var m in pj.MemberList)
+            //{
+            //    if (string.Compare(m.Role, ProjectViewModels.PMROLE) == 0)
+            //    {
+            //        pm = m.Name;
+            //        break;
+            //    }
+            //}
 
-            var task = CreatePMTask(PJKey, vm.Summary, vm.DueDate.ToString(), pm, updater, vm.Description);
+            var task = CreatePMTask(PJKey, vm.Summary, vm.DueDate.ToString(), vm.Assignee, updater, vm.Description);
             var res = new JsonResult();
             res.Data = new { success = true, id = task.IssueKey };
             return res;
@@ -7587,6 +7631,7 @@ namespace Prometheus.Controllers
         public JsonResult TodoListUpdate()
         {
             var vm = ListOperateParse();
+
             if (string.IsNullOrEmpty(vm.Summary))
             {
                 var res1 = new JsonResult();
@@ -7615,9 +7660,10 @@ namespace Prometheus.Controllers
                     }
                 }
 
-                if (!vm.DueDate.Equals(realissue.DueDate))
+                if (!vm.DueDate.Equals(realissue.DueDate)||!vm.Assignee.Equals(realissue.Assignee))
                 {
                     realissue.DueDate = vm.DueDate;
+                    realissue.Assignee = vm.Assignee;
                     realissue.UpdateIssue();
                 }
             }

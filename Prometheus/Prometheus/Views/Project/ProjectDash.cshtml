@@ -41,11 +41,20 @@
     <div class="bs-example">
         <div id="todo-lists-basic-demo"></div>
     </div>
-
+    <input type="text" class="hide" id="ispjmember" name="ispjmember" value="@(ViewBag.IsPJMember)">
     <script type="text/javascript">
 
     $(function () {
         //Basic example
+        var ispjmember = $('#ispjmember').val();
+        var todoremove = false;
+        var todoedit = false;
+        if (ispjmember == 'TRUE')
+        {
+            todoremove = true;
+            todoedit = true;
+        }
+
         $('#todo-lists-basic-demo').lobiList({
             actions: {
                 load: '/Project/InitPJMGTask?PJKey=@ViewBag.PJKey',
@@ -53,7 +62,9 @@
                 delete: '/Project/TodoListDelete',
                 update: '/Project/TodoListUpdate',
                 move: '/Project/TodoListMove'
-            }
+            },
+            enableTodoRemove: todoremove,
+            enableTodoEdit: todoedit
         });
     });
 
@@ -66,6 +77,19 @@
             dateFormat: 'yy-mm-dd'
         });
 
+        var $assigneeInput = $list.$el.find('form [name=assignee]');
+        $assigneeInput.autoComplete({
+            minChars: 0,
+            source: function (term, suggest) {
+                term = term.toLowerCase();
+                var choices = @Html.Raw(ViewBag.pjmemlist);
+                var suggestions = [];
+                for (i = 0; i < choices.length; i++)
+                    if (~choices[i].toLowerCase().indexOf(term)) suggestions.push(choices[i]);
+                suggest(suggestions);
+            }
+        });
+
         $list = $('#mydoinglist').data('lobiList');
         $dueDateInput = $list.$el.find('form [name=dueDate]');
         $dueDateInput.datepicker({
@@ -73,6 +97,19 @@
             changeYear: true,
             dateFormat: 'yy-mm-dd'
         });
+        $assigneeInput = $list.$el.find('form [name=assignee]');
+        $assigneeInput.autoComplete({
+            minChars: 0,
+            source: function (term, suggest) {
+                term = term.toLowerCase();
+                var choices = @Html.Raw(ViewBag.pjmemlist);
+                var suggestions = [];
+                for (i = 0; i < choices.length; i++)
+                    if (~choices[i].toLowerCase().indexOf(term)) suggestions.push(choices[i]);
+                suggest(suggestions);
+            }
+        });
+
 
         $list = $('#mydonelist').data('lobiList');
         $dueDateInput = $list.$el.find('form [name=dueDate]');
@@ -81,6 +118,19 @@
             changeYear: true,
             dateFormat: 'yy-mm-dd'
         });
+        $assigneeInput = $list.$el.find('form [name=assignee]');
+        $assigneeInput.autoComplete({
+            minChars: 0,
+            source: function (term, suggest) {
+                term = term.toLowerCase();
+                var choices = @Html.Raw(ViewBag.pjmemlist);
+                var suggestions = [];
+                for (i = 0; i < choices.length; i++)
+                    if (~choices[i].toLowerCase().indexOf(term)) suggestions.push(choices[i]);
+                suggest(suggestions);
+            }
+        });
+
     });
     </script>
 

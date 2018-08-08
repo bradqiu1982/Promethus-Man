@@ -7,6 +7,16 @@
   width: 360px;
   margin-right: 16px;
 }
+
+.lobilists .lobilist-wrapper-bg {
+  display: inline-block;
+  float: left;
+  border: 1px solid transparent;
+  margin-bottom: 16px;
+  width: 720px;
+  margin-right: 16px;
+}
+
 .lobilists .lobilist {
   max-height: 100%;
   overflow: auto;
@@ -352,6 +362,19 @@
   color: #9d9d9d;
   line-height: 16px;
 }
+
+.task-actions {
+  position: absolute;
+  top: 5px;
+  right: 16px;
+  text-align: center;
+  white-space: nowrap;
+  font-size: 20px;
+  color: #FFF;
+  line-height: 16px;
+   cursor:pointer;
+}
+
 .lobilists .lobilist-item .todo-action {
   display: inline-block;
   width: 16px;
@@ -381,7 +404,6 @@
   font-style: italic;
   color: #777777;
   font-size: 85%;
-  cursor:pointer;
 }
 
 .lobilists .lobilist-item-assignee {
@@ -391,7 +413,6 @@
   font-style: italic;
   color: #777777;
   font-size: 85%;
-  cursor:pointer;
 }
 
 .lobilists .lobilist-check {
@@ -454,6 +475,7 @@
   height: 400px;
 }
 .lobilists.single-line .lobilist-wrapper,
+.lobilists.single-line .lobilist-wrapper-bg,
 .lobilists.single-line .lobilist-placeholder {
   float: none;
   white-space: normal;

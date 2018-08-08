@@ -55,6 +55,10 @@ $(function () {
                 me.$hasGeneratedId = true;
             }
             var $wrapper = $('<div class="lobilist-wrapper"></div>');
+            if (me.$options.id == 'mydoinglist') {
+                $wrapper = $('<div class="lobilist-wrapper-bg"></div>');
+            }
+
             var $div = $('<div id="'+me.$options.id+'" class="lobilist"></div>').appendTo($wrapper);
             if (!me.$hasGeneratedId){
                 $div.attr('data-db-id', me.$options.id);
@@ -73,7 +77,7 @@ $(function () {
             }
             me.$form = me._createForm();
             me.$body.append(me.$ul, me.$form);
-            me.$footer = me._createFooter();
+            //me.$footer = me._createFooter();
             if (me.$globalOptions.sortable) {
                 me._enableSorting();
             }
@@ -179,25 +183,30 @@ $(function () {
             if (me._triggerEvent('beforeItemDelete', [me, item]) === false) {
                 return me
             }
-            if (me.$globalOptions.actions.delete) {
-                return me._sendAjax(me.$globalOptions.actions.delete, {
-                    data: item,
-                    method: 'POST',
-                    cache: false
-                })
-                    //res is JSON object of format
-                    .done(function (res) {
-                        if (res.success) {
-                            me._removeItemFromList(item);
-                        } else {
-                            if (errorCallback && typeof errorCallback === 'function') {
-                                errorCallback(res)
+
+            if (confirm('Do you really want to delete this task?'))
+            {
+                if (me.$globalOptions.actions.delete) {
+                    return me._sendAjax(me.$globalOptions.actions.delete, {
+                        data: item,
+                        method: 'POST',
+                        cache: false
+                    })
+                        //res is JSON object of format
+                        .done(function (res) {
+                            if (res.success) {
+                                me._removeItemFromList(item);
+                            } else {
+                                if (errorCallback && typeof errorCallback === 'function') {
+                                    errorCallback(res)
+                                }
                             }
-                        }
-                    });
-            } else {
-                me._removeItemFromList(item);
+                        });
+                } else {
+                    me._removeItemFromList(item);
+                }
             }
+
             return me;
         },
 
@@ -377,26 +386,37 @@ $(function () {
             var $header = $('<div>', {
                 'class': 'lobilist-header'
             });
-            var $actions = $('<div>', {
-                'class': 'lobilist-actions'
-            }).appendTo($header);
-            if (me.$options.controls && me.$options.controls.length > 0) {
-                if (me.$options.controls.indexOf('styleChange') > -1) {
-                    $actions.append(me._createDropdownForStyleChange());
-                }
 
-                if (me.$options.controls.indexOf('edit') > -1) {
-                    $actions.append(me._createEditTitleButton());
-                    $actions.append(me._createFinishTitleEditing());
-                    $actions.append(me._createCancelTitleEditing());
-                }
-                if (me.$options.controls.indexOf('add') > -1) {
-                    $actions.append(me._createAddNewButton());
-                }
-                if (me.$options.controls.indexOf('remove') > -1) {
-                    $actions.append(me._createCloseButton());
-                }
+            if (me.$options.id == 'mydoinglist') {
+                $header.append($('<div>', {
+                    'class': 'task-actions',
+                    html: '<i class="glyphicon glyphicon-plus" style="font-size:20px;"></i>'
+                }).click(function () {
+                    alert('try to create task');
+                }));
             }
+
+            //var $actions = $('<div>', {
+            //    'class': 'lobilist-actions'
+            //}).appendTo($header);
+
+            //if (me.$options.controls && me.$options.controls.length > 0) {
+            //    if (me.$options.controls.indexOf('styleChange') > -1) {
+            //        $actions.append(me._createDropdownForStyleChange());
+            //    }
+
+            //    if (me.$options.controls.indexOf('edit') > -1) {
+            //        $actions.append(me._createEditTitleButton());
+            //        $actions.append(me._createFinishTitleEditing());
+            //        $actions.append(me._createCancelTitleEditing());
+            //    }
+            //    if (me.$options.controls.indexOf('add') > -1) {
+            //        $actions.append(me._createAddNewButton());
+            //    }
+            //    if (me.$options.controls.indexOf('remove') > -1) {
+            //        $actions.append(me._createCloseButton());
+            //    }
+            //}
             me.$el.append($header);
             return $header;
         },
@@ -664,7 +684,6 @@ $(function () {
             });
             return $btn;
         },
-
         _createCloseButton: function () {
 			var me = this;
             var $btn = $('<button>', {
@@ -766,31 +785,31 @@ $(function () {
                         if (me != oldList){
                             delete oldList.$items[item.id];
                             me.$items[item.id] = item;
-                            if (me.$title[0].innerText.indexOf('DONE') != -1) {
-                                var mymoveurl = me.$globalOptions.actions.move;
-                                var myid = item.id;
-                                var myoldlist = oldList.$title[0].innerText;
-                                var mynewlist = me.$title[0].innerText;
+                            //if (me.$title[0].innerText.indexOf('DONE') != -1) {
+                            //    var mymoveurl = me.$globalOptions.actions.move;
+                            //    var myid = item.id;
+                            //    var myoldlist = oldList.$title[0].innerText;
+                            //    var mynewlist = me.$title[0].innerText;
 
-                                $('#reportmarkmodal').modal({ backdrop: 'static' });
-                                $('#reportmarkmodal').on('hide.bs.modal', function (e) {
-                                    var reportmark = document.getElementById("wkrptmarklist").value;
-                                    if (reportmark.indexOf('Please') != -1)
-                                    {
-                                        reportmark = '';
-                                    }
-                                    if (mymoveurl)
-                                    {
-                                        $.ajax(mymoveurl, {
-                                            data: 'id=' + myid + '&oldlist=' + myoldlist + '&newlist=' + mynewlist + '&reportmark=' + reportmark,
-                                            method: 'POST',
-                                            cache: false
-                                        });
-                                    }
-                                });
-                            }
-                            else
-                            {
+                            //    $('#reportmarkmodal').modal({ backdrop: 'static' });
+                            //    $('#reportmarkmodal').on('hide.bs.modal', function (e) {
+                            //        var reportmark = document.getElementById("wkrptmarklist").value;
+                            //        if (reportmark.indexOf('Please') != -1)
+                            //        {
+                            //            reportmark = '';
+                            //        }
+                            //        if (mymoveurl)
+                            //        {
+                            //            $.ajax(mymoveurl, {
+                            //                data: 'id=' + myid + '&oldlist=' + myoldlist + '&newlist=' + mynewlist + '&reportmark=' + reportmark,
+                            //                method: 'POST',
+                            //                cache: false
+                            //            });
+                            //        }
+                            //    });
+                            //}
+                            //else
+                            //{
                                 if (me.$globalOptions.actions.move) {
                                      $.ajax(me.$globalOptions.actions.move, {
                                         data: 'id=' + item.id + '&oldlist=' + oldList.$title[0].innerText + '&newlist=' + me.$title[0].innerText,
@@ -798,7 +817,7 @@ $(function () {
                                         cache: false
                                     });
                                     }
-                            }
+                            //}
                         }
 
                         me._triggerEvent('afterItemReorder', [me, oldList, currentIndex, oldIndex, item, $todo]);
@@ -1011,9 +1030,15 @@ $(function () {
          */
         _handleSortable: function () {
             var me = this;
+
+            var wrappclass = '.lobilist-wrapper';
+            if (me.$options.id == 'mydoinglist') {
+                wrappclass = '.lobilist-wrapper-bg';
+            }
+
             if (me.$options.sortable) {
                 me.$el.sortable({
-                    items: '.lobilist-wrapper',
+                    items: wrappclass,
                     handle: '.lobilist-header',
                     cursor: 'move',
                     placeholder: 'lobilist-placeholder',

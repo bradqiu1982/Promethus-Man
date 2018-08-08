@@ -7382,30 +7382,27 @@ namespace Prometheus.Controllers
         [HttpGet]
         public JsonResult InitPJMGTask(string PJKey)
         {
-            var vm = IssueViewModels.RetrievePMTask(PJKey, Resolute.Pending, this);
-            var list1 = IssueViewModels.RetrievePMTask(PJKey, Resolute.Working, this);
+            var vm = IssueViewModels.RetrievePMTask(PJKey, Resolute.Working, this);
             var list2 = IssueViewModels.RetrievePMTask(PJKey, Resolute.Done, this);
-            vm.AddRange(list1);
             vm.AddRange(list2);
 
-            var pendinglist = new List<object>();
             var donginglist = new List<object>();
             var donelist = new List<object>();
 
             foreach (var item in vm)
             {
-                if (string.Compare(item.Resolution, Resolute.Pending, true) == 0)
-                {
-                    pendinglist.Add(
-                        new
-                        {
-                            id = item.IssueKey,
-                            title = item.Summary.Replace(CRITICALERRORTYPE.PMTASK, "").Trim() + "  <a href='/Issue/UpdateIssue?issuekey=" + item.IssueKey + "' target='_blank'>Detail</a>",
-                            description = item.CommentList.Count > 0 ? item.CommentList[0].Comment : string.Empty,
-                            dueDate = item.DueDate.ToString("yyyy-MM-dd"),
-                            assignee = item.Assignee.Split(new string[] { "@" },StringSplitOptions.RemoveEmptyEntries)[0]
-                        });
-                }
+                //if (string.Compare(item.Resolution, Resolute.Pending, true) == 0)
+                //{
+                //    pendinglist.Add(
+                //        new
+                //        {
+                //            id = item.IssueKey,
+                //            title = item.Summary.Replace(CRITICALERRORTYPE.PMTASK, "").Trim() + "  <a href='/Issue/UpdateIssue?issuekey=" + item.IssueKey + "' target='_blank'>Detail</a>",
+                //            description = item.CommentList.Count > 0 ? item.CommentList[0].Comment : string.Empty,
+                //            dueDate = item.DueDate.ToString("yyyy-MM-dd"),
+                //            assignee = item.Assignee.Split(new string[] { "@" },StringSplitOptions.RemoveEmptyEntries)[0]
+                //        });
+                //}
 
                 if (string.Compare(item.Resolution, Resolute.Working, true) == 0
                     || string.Compare(item.Resolution, Resolute.Reopen, true) == 0)
@@ -7414,7 +7411,7 @@ namespace Prometheus.Controllers
                         new
                         {
                             id = item.IssueKey,
-                            title = item.Summary.Replace(CRITICALERRORTYPE.PMTASK, "").Trim() + "  <a href='/Issue/UpdateIssue?issuekey=" + item.IssueKey + "' target='_blank'>Detail</a>",
+                            title = item.Summary.Replace(CRITICALERRORTYPE.PMTASK, "").Trim(),
                             description = item.CommentList.Count > 0 ? item.CommentList[0].Comment : string.Empty,
                             dueDate = item.DueDate.ToString("yyyy-MM-dd"),
                             assignee = item.Assignee.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0]
@@ -7428,7 +7425,7 @@ namespace Prometheus.Controllers
                         new
                         {
                             id = item.IssueKey,
-                            title = item.Summary.Replace(CRITICALERRORTYPE.PMTASK, "").Trim() + "  <a href='/Issue/UpdateIssue?issuekey=" + item.IssueKey + "' target='_blank'>Detail</a>",
+                            title = item.Summary.Replace(CRITICALERRORTYPE.PMTASK, "").Trim(),
                             description = item.CommentList.Count > 0 ? item.CommentList[0].Comment : string.Empty,
                             dueDate = item.DueDate.ToString("yyyy-MM-dd"),
                             assignee = item.Assignee.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0]
@@ -7437,16 +7434,16 @@ namespace Prometheus.Controllers
             }
 
             var mylists = new List<object>();
-            mylists.Add(
-                new
-                {
-                    id = "mytobelist",
-                    title = "TODO",
-                    defaultStyle = "lobilist-warning",
-                    controls = false,
-                    useCheckboxes = false,
-                    items = pendinglist
-                });
+            //mylists.Add(
+            //    new
+            //    {
+            //        id = "mytobelist",
+            //        title = "TODO",
+            //        defaultStyle = "lobilist-warning",
+            //        controls = false,
+            //        useCheckboxes = false,
+            //        items = pendinglist
+            //    });
 
             mylists.Add(
                 new
@@ -7573,7 +7570,7 @@ namespace Prometheus.Controllers
             vm.Assignee = asignee;
             vm.Reporter = creator;
             vm.Creator = creator;
-            vm.Resolution = Resolute.Pending;
+            vm.Resolution = Resolute.Working;
             vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
             vm.Description = desc;
             vm.StoreIssue();
@@ -7593,7 +7590,7 @@ namespace Prometheus.Controllers
                 return res1;
             }
 
-            if (string.Compare(vm.DataID, "mytobelist", true) != 0)
+            if (string.Compare(vm.DataID, "mydoinglist", true) != 0)
             {
                 var res1 = new JsonResult();
                 res1.Data = new { success = false };
@@ -7701,21 +7698,25 @@ namespace Prometheus.Controllers
             {
                 if (it.Contains("id="))
                 {
-                    ret.Add(it.Replace("id=", "").Trim());
+                    //ret.Add(it.Replace("id=", "").Trim());
+                    ret.Add(Request.Form["id"]);
                 }
 
                 if (it.Contains("oldlist="))
                 {
-                    ret.Add(SeverHtmlDecode.Decode(this, it.Replace("oldlist=", "")).Replace("'", "").Trim());
+                    //ret.Add(SeverHtmlDecode.Decode(this, it.Replace("oldlist=", "")).Replace("'", "").Trim());
+                    ret.Add(Request.Form["oldlist"]);
                 }
 
                 if (it.Contains("newlist="))
                 {
-                    ret.Add(SeverHtmlDecode.Decode(this, it.Replace("newlist=", "")).Replace("'", "").Trim());
+                    //ret.Add(SeverHtmlDecode.Decode(this, it.Replace("newlist=", "")).Replace("'", "").Trim());
+                    ret.Add(Request.Form["newlist"]);
                 }
                 if (it.Contains("reportmark="))
                 {
-                    ret.Add(it.Replace("reportmark=", "").Trim());
+                    //ret.Add(it.Replace("reportmark=", "").Trim());
+                    ret.Add(Request.Form["reportmark"]);
                 }
             }
             return ret;

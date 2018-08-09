@@ -4530,5 +4530,35 @@ namespace Prometheus.Controllers
             return ret;
         }
 
+
+        public JsonResult UpdateTaskAttachment(string id)
+        {
+            var uploads = Request.Files[0];
+            string tempfn = System.IO.Path.GetFileName(uploads.FileName);
+
+            string datestring = DateTime.Now.ToString("yyyyMMdd");
+            string imgdir = Server.MapPath("..") + "\\userfiles\\docs\\" + datestring + "\\";
+            if (!Directory.Exists(imgdir))
+            {
+                Directory.CreateDirectory(imgdir);
+            }
+
+            var fn = Path.GetFileNameWithoutExtension(tempfn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(tempfn);
+            fn = fn.Replace(" ", "_").Replace("#", "").Replace("'", "")
+                        .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+            uploads.SaveAs(imgdir + fn);
+            var url = "/userfiles/docs/" + datestring + "/" + fn;
+            url = "<div><a href='" + url + "' target='_blank'>" + fn + "</a></div>";
+
+            var ret = new JsonResult();
+            ret.Data = new
+            {
+                success = true,
+                url = url
+            };
+            return ret;
+        }
+
     }
 }

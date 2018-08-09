@@ -392,7 +392,7 @@ $(function () {
                     'class': 'task-actions',
                     html: '<i class="glyphicon glyphicon-plus" style="font-size:20px;"></i>'
                 }).click(function () {
-                    alert('try to create task');
+                    $('#createtaskmodal').modal({ backdrop: 'static' });
                 }));
             }
 

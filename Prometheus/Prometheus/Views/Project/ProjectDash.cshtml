@@ -1,7 +1,7 @@
 ﻿
 @{
     ViewBag.Title = "ProjectDash";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
 }
 
 <div class="row">
@@ -42,6 +42,9 @@
         <div id="todo-lists-basic-demo"></div>
     </div>
     <input type="text" class="hide" id="ispjmember" name="ispjmember" value="@(ViewBag.IsPJMember)">
+    <input type="text" class="hide" id="pjkey" name="pjkey" value="@(ViewBag.PJKey)">
+    <input type="text" class="hide" id="currentissuekey" name="currentissuekey" value="@(ViewBag.PJKey)">
+
     <script type="text/javascript">
 
     $(function () {
@@ -67,22 +70,52 @@
         });
 
         $('body').on('click', '.lobilist-item-title, .lobilist-item-description', function(){
-            alert($(this).attr('class'));
-            alert($(this).parent().attr('data-id'));
+            var id = $(this).parent().attr('data-id');
+            $('#currentissuekey').val(id);
+            $('#taskdetailmodal').modal('show');
         });
+
+        $('body').on('click', '#ct_btn', function(){
+            var pjkey = $('#pjkey').val();
+            var title = $('#summary_ct').val();
+            var description = $('#description_ct').val();
+            var duedate = $('#duedate_ct').val();
+            var assignee = $('#assignee_ct').val();
+
+            if(title == '' || duedate == '' || assignee == '')
+            {
+                alert('title,duedate,assignee should not be empty!');
+                return false;
+            }
+
+            $('#createtaskmodal').modal('hide');
+            $.post('/Project/TodoListAdd',{
+                pjkey:pjkey,
+                title:title,
+                duedate:duedate,
+                assignee:assignee,
+                description:description
+            },function(output){
+                $('#summary_ct').val('');
+                $('#description_ct').val('');
+                $('#duedate_ct').val('');
+                $('#assignee_ct').val('');
+                window.location.reload();
+            });
+        });
+
+
+
     });
 
     $(document).ready(function () {
-        var $list = $('#mytobelist').data('lobiList');
-        var $dueDateInput = $list.$el.find('form [name=dueDate]');
-        $dueDateInput.datepicker({
+        $('#duedate_ct').datepicker({
             changeMonth: true,
             changeYear: true,
             dateFormat: 'yy-mm-dd'
         });
 
-        var $assigneeInput = $list.$el.find('form [name=assignee]');
-        $assigneeInput.autoComplete({
+        $('#assignee_ct').autoComplete({
             minChars: 0,
             source: function (term, suggest) {
                 term = term.toLowerCase();
@@ -93,51 +126,190 @@
                 suggest(suggestions);
             }
         });
-
-        $list = $('#mydoinglist').data('lobiList');
-        $dueDateInput = $list.$el.find('form [name=dueDate]');
-        $dueDateInput.datepicker({
-            changeMonth: true,
-            changeYear: true,
-            dateFormat: 'yy-mm-dd'
-        });
-        $assigneeInput = $list.$el.find('form [name=assignee]');
-        $assigneeInput.autoComplete({
-            minChars: 0,
-            source: function (term, suggest) {
-                term = term.toLowerCase();
-                var choices = @Html.Raw(ViewBag.pjmemlist);
-                var suggestions = [];
-                for (i = 0; i < choices.length; i++)
-                    if (~choices[i].toLowerCase().indexOf(term)) suggestions.push(choices[i]);
-                suggest(suggestions);
-            }
-        });
-
-
-        $list = $('#mydonelist').data('lobiList');
-        $dueDateInput = $list.$el.find('form [name=dueDate]');
-        $dueDateInput.datepicker({
-            changeMonth: true,
-            changeYear: true,
-            dateFormat: 'yy-mm-dd'
-        });
-        $assigneeInput = $list.$el.find('form [name=assignee]');
-        $assigneeInput.autoComplete({
-            minChars: 0,
-            source: function (term, suggest) {
-                term = term.toLowerCase();
-                var choices = @Html.Raw(ViewBag.pjmemlist);
-                var suggestions = [];
-                for (i = 0; i < choices.length; i++)
-                    if (~choices[i].toLowerCase().indexOf(term)) suggestions.push(choices[i]);
-                suggest(suggestions);
-            }
-        });
-
-
     });
+
+        function UpdateIssueLink()
+        {
+            var id = $('#currentissuekey').val();
+            if(id != '')
+            {
+                window.open('/Issue/UpdateIssue?IssueKey='+id,'_blank');
+            }
+        }
+
+        function LinkOtherTasks()
+        {
+        
+        }
+
+        function UploadAttach()
+        {
+            var id = $('#currentissuekey').val();
+            $.ajaxFileUpload(
+                {
+                    url: '/Issue/UpdateTaskAttachment?id='+id,
+                    secureuri: false,
+                    fileElementId: 'file3',
+                    dataType: 'json',
+                    success: function (data, status) {
+                        $('#taskattachments').append(data.url);
+                    },
+                    error: function (e) {
+                        alert(e);
+                    }
+                });
+        }
+
     </script>
+
+    <div class="modal" id="createtaskmodal" tabindex="-1" role="dialog" aria-labelledby="createtaskmodalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="createtaskmodalLabel">Create Task</h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <input class="form-control" type="text" id="summary_ct" name="summary_ct" placeholder="Task Summary" style="min-width:540px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <input class="form-control" type="text" id="duedate_ct" name="duedate_ct" placeholder="Due Date">
+                            </div>
+                            <div class="col-xs-6">
+                                <input class="form-control" type="text" id="assignee_ct" name="assignee_ct" placeholder="Assignee">
+                            </div>
+                        </div>
+                    </div>
+   
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <textarea class="form-control" type="text" id="description_ct" name="description_ct" placeholder="Description" rows="2"  style="min-width:540px;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+                    <button type="button" id="ct_btn" name="ct_btn" class="btn btn-primary">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="taskdetailmodal" tabindex="-1" role="dialog" aria-labelledby="taskdetailmodalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="taskdetailmodalLabel">Task Detail</h4>
+                    <div class="task-btn-link">
+                        <button class="btn bg-info" id="updateissuelink" name="updateissuelink" onclick="UpdateIssueLink()">Edit Task</button>
+                        <button class="btn bg-info" id="linkothertasks" name="linkothertasks" onclick="LinkOtherTasks()">Link Other Task</button>
+                    </div>
+                </div>
+
+                <div class="modal-body">
+                    <div class="panel">
+                        <div class="TaskTitle">
+                            <div class="TaskLabel">This is a PM Task</div>
+                        </div>
+                        <div class="TaskField">
+                            <div class="TaskLabel">Asignee</div>
+                            <div class="TaskLabelVal" id="taskassignee" name="taskassignee">ALEX.CHEN</div>
+                        </div>
+                        <div class="TaskField">
+                            <div class="TaskLabel">Due Data</div>
+                            <div class="TaskLabelVal" id="taskduedate" name="taskduedate">2018-08-18</div>
+                        </div>
+                        <div class="TaskField">
+                            <div class="TaskLabel">Resolution</div>
+                            <div class="TaskLabelVal" id="taskresolution" name="taskresolution">Done</div>
+                        </div>
+                        <div class="TaskDescription">
+                            <div class="TaskLabel">Description</div>
+                            <div class="TaskLabelVal" id="taskdesc" name="taskdesc">This is the description</div>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="TaskTitle">
+                            <div class="TaskLabel">Related Task</div>
+                        </div>
+
+                        <table class="table table-hover table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Summary</th>
+                                    <th>Assignee</th>
+                                    <th>Due Date</th>
+                                    <th>Remark</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="RelatedTask" name="RelatedTask">
+                                <tr>
+                                    <td><input type="text" class="form-control" id="linksummary" name="linksummary" placeholder="Summary" value=""></td>
+                                    <td><input type="text" class="form-control" id="linkassignee" name="linkassignee" placeholder="Asignee" value=""></td>
+                                    <td><input type="text" class="form-control" id="linkduedate" name="linkduedate" placeholder="Due Date" value=""></td>
+                                    <td><input type="text" class="form-control" id="linkdesc" name="linkdesc" placeholder="Description" value=""></td>
+                                    <td></td>
+                                    <td><button class="btn btn-success" id="addlinktaskbtn" name="addlinktaskbtn">Add</button></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="panel">
+                        <div class="TaskTitle">
+                            <div class="TaskLabel">Attachments</div>
+                            <div class="TaskLabelVal">
+                                <span class="btn btn-default btn-file" id="choosefile3" style="padding:0px;background-color:transparent !important;border-color:transparent !important;">
+                                    <img src="~/Content/images/icon/Upload.png" MYTP="HOVER" style="height:20px; width:34px"> <input type="file" name="files3" id="file3" runat="server" onchange="UploadAttach()" />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div id="taskattachments" name="taskattachments"></div>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="TaskTitle">
+                            <div class="TaskLabel">Remark</div>
+                        </div>
+                        <div class="form-group">
+                            <div id="taskcomments"></div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-xs-10"><input type="text" class="form-control" id="taskremark" name="taskremark" placeholder="Remark" value=""></div>
+                                <div class="col-xs-2">
+                                    <button class="btn btn-success" id="taskremarkbtn" name="taskremarkbtn">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     @*<div class="modal" id="reportmarkmodal" tabindex="-1" role="dialog" aria-labelledby="reportmarkmodalLabel2">
         <div class="modal-dialog" role="document">

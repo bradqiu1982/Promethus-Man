@@ -7391,19 +7391,6 @@ namespace Prometheus.Controllers
 
             foreach (var item in vm)
             {
-                //if (string.Compare(item.Resolution, Resolute.Pending, true) == 0)
-                //{
-                //    pendinglist.Add(
-                //        new
-                //        {
-                //            id = item.IssueKey,
-                //            title = item.Summary.Replace(CRITICALERRORTYPE.PMTASK, "").Trim() + "  <a href='/Issue/UpdateIssue?issuekey=" + item.IssueKey + "' target='_blank'>Detail</a>",
-                //            description = item.CommentList.Count > 0 ? item.CommentList[0].Comment : string.Empty,
-                //            dueDate = item.DueDate.ToString("yyyy-MM-dd"),
-                //            assignee = item.Assignee.Split(new string[] { "@" },StringSplitOptions.RemoveEmptyEntries)[0]
-                //        });
-                //}
-
                 if (string.Compare(item.Resolution, Resolute.Working, true) == 0
                     || string.Compare(item.Resolution, Resolute.Reopen, true) == 0)
                 {
@@ -7582,45 +7569,17 @@ namespace Prometheus.Controllers
         [HttpPost]
         public JsonResult TodoListAdd()
         {
-            var vm = ListOperateParse();
-            if (string.IsNullOrEmpty(vm.Summary))
-            {
-                var res1 = new JsonResult();
-                res1.Data = new { success = false };
-                return res1;
-            }
-
-            if (string.Compare(vm.DataID, "mydoinglist", true) != 0)
-            {
-                var res1 = new JsonResult();
-                res1.Data = new { success = false };
-                return res1;
-            }
-
             var ckdict = CookieUtility.UnpackCookie(this);
-            if (!ckdict.ContainsKey("PJKey"))
-            {
-                var res1 = new JsonResult();
-                res1.Data = new { success = false };
-                return res1;
-            }
-
-            var PJKey = ckdict["PJKey"];
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
-            var pj = ProjectViewModels.RetrieveOneProjectWithClose(PJKey)[0];
-            //var pm = "";
-            //foreach (var m in pj.MemberList)
-            //{
-            //    if (string.Compare(m.Role, ProjectViewModels.PMROLE) == 0)
-            //    {
-            //        pm = m.Name;
-            //        break;
-            //    }
-            //}
-
-            var task = CreatePMTask(PJKey, vm.Summary, vm.DueDate.ToString(), vm.Assignee, updater, vm.Description);
+            var pjkey = Request.Form["pjkey"];
+            var summary = Request.Form["title"];
+            var desc = Request.Form["description"];
+            var duedate = Request.Form["duedate"] + " 10:00:00";
+            var assignee = Request.Form["assignee"]+"@FINISAR.COM";
+           
+            var task = CreatePMTask(pjkey, summary, duedate, assignee, updater, desc);
             var res = new JsonResult();
-            res.Data = new { success = true, id = task.IssueKey };
+            res.Data = new { success = true };
             return res;
         }
 
@@ -7673,15 +7632,8 @@ namespace Prometheus.Controllers
         [HttpPost]
         public JsonResult TodoListDelete()
         {
-            var vm = ListOperateParse();
-            if (string.IsNullOrEmpty(vm.Summary))
-            {
-                var res1 = new JsonResult();
-                res1.Data = new { success = false };
-                return res1;
-            }
-
-            IssueViewModels.RemoveIssue(vm.IssueKey, this);
+            var id = Request.Form["id"];
+            IssueViewModels.RemoveIssue(id, this);
 
             var res = new JsonResult();
             res.Data = new { success = true };
@@ -7725,29 +7677,21 @@ namespace Prometheus.Controllers
         [HttpPost]
         public JsonResult TodoListMove()
         {
-            var ret = MoveOperateParse();
-            if (ret.Count >= 3
-                && !string.IsNullOrEmpty(ret[0])
-                && !string.IsNullOrEmpty(ret[2]))
+            var id = Request.Form["id"];
+            var newlist = Request.Form["newlist"];
+
+            var realissue = IssueViewModels.RetrieveIssueByIssueKey(id, this);
+            if (realissue != null)
             {
-                var realissue = IssueViewModels.RetrieveIssueByIssueKey(ret[0], this);
-                if (realissue != null)
+                if (string.Compare(newlist, "DOING", true) == 0)
                 {
-                    if (string.Compare(ret[2], "TODO", true) == 0)
-                    {
-                        realissue.Resolution = Resolute.Pending;
-                        realissue.UpdateIssue();
-                    }
-                    if (string.Compare(ret[2], "DOING", true) == 0)
-                    {
-                        realissue.Resolution = Resolute.Working;
-                        realissue.UpdateIssue();
-                    }
-                    if (string.Compare(ret[2], "DONE", true) == 0)
-                    {
-                        realissue.Resolution = Resolute.Done;
-                        realissue.UpdateIssue();
-                    }
+                    realissue.Resolution = Resolute.Working;
+                    realissue.UpdateIssue();
+                }
+                if (string.Compare(newlist, "DONE", true) == 0)
+                {
+                    realissue.Resolution = Resolute.Done;
+                    realissue.UpdateIssue();
                 }
             }
 

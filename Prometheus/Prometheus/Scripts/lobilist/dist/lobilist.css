@@ -375,6 +375,15 @@
    cursor:pointer;
 }
 
+.task-btn-link {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  text-align: center;
+  line-height: 16px;
+  cursor:pointer;
+}
+
 .lobilists .lobilist-item .todo-action {
   display: inline-block;
   width: 16px;
@@ -492,4 +501,22 @@
 }
 .lobilists:after {
   clear: both;
+}
+
+.TaskTitle {
+    font-weight:600;
+}
+
+.TaskLabel {
+    display:inline-block;
+}
+
+.TaskLabelVal {
+    display:inline-block;
+    position:absolute;
+    left:160px;
+}
+
+.TaskDescription {
+    font-style:italic;
 }

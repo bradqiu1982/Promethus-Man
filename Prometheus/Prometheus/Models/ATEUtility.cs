@@ -97,6 +97,10 @@ namespace Prometheus.Models
 
         public static StringBuilder PrePareATEData(List<ProjectTestData> atelist, Dictionary<string, string> pndescdict)
         {
+            var stationdict = new Dictionary<string, double>();
+            var whichtestspend = new Dictionary<string, double>();
+            var whichtestcount = new Dictionary<string, int>();
+
             StringBuilder sb1 = new StringBuilder(300 * (atelist.Count + 1));
             sb1.Append("SN,WhichTest,Failure,TestTimestamp,Station,Module Family,PN,PN Desc,JO,Spend Time(in hour)\r\n");
             foreach (var item in atelist)
@@ -108,7 +112,41 @@ namespace Prometheus.Models
                 sb1.Append("\"" + item.ModuleSerialNum.ToString().Replace("\"", "") + "\"," + "\"" + item.WhichTest.Replace("\"", "") + "\"," + "\"" + item.ErrAbbr.Replace("\"", "") + "\","
                     + "\"" + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss") + "\"," + "\"" + item.TestStation.Replace("\"", "") + "\"," + "\"" + item.ModuleType.Replace("\"", "") + "\","
                     + "\"" + item.PN.Replace("\"", "") + "\"," + "\"" + pndesc.Replace("\"", "") + "\"," + "\"" + item.JO.Replace("\"", "") + "\"," + "\"" + item.CSN.Replace("\"", "") + "\",\r\n");
+
+                var spendtime = Convert.ToDouble(item.CSN);
+                if (stationdict.ContainsKey(item.TestStation))
+                { stationdict[item.TestStation] = stationdict[item.TestStation] + spendtime; }
+                else
+                { stationdict.Add(item.TestStation, spendtime); }
+
+                if (whichtestspend.ContainsKey(item.WhichTest))
+                { whichtestspend[item.WhichTest] = whichtestspend[item.WhichTest] + spendtime;
+                    whichtestcount[item.WhichTest] = whichtestcount[item.WhichTest] + 1;
+                }
+                else
+                { whichtestspend.Add(item.WhichTest, spendtime);
+                    whichtestcount.Add(item.WhichTest, 1);
+                }
             }
+
+            if (stationdict.Count > 0)
+            {
+                sb1.Append("\"Station\",\"Spend Time\",\r\n");
+                foreach (var kv in stationdict)
+                {
+                    sb1.Append("\"" + kv.Key.Replace("\"", "") + "\"," + "\"" + kv.Value.ToString().Replace("\"", "") + "\",\r\n");
+                }
+            }
+
+            if (whichtestspend.Count > 0)
+            {
+                sb1.Append("\"Which Test\",\"Spend Time\",\"Test Times\",\r\n");
+                foreach (var kv in whichtestspend)
+                {
+                    sb1.Append("\"" + kv.Key.Replace("\"", "") + "\"," + "\"" + kv.Value.ToString().Replace("\"", "") + "\"," + "\"" + whichtestcount[kv.Key].ToString().Replace("\"", "") + "\",\r\n");
+                }
+            }
+
             return sb1;
         }
 

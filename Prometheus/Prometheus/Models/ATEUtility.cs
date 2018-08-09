@@ -120,7 +120,7 @@ namespace Prometheus.Models
                         INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX  
                         INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID 
                         INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID   
-                        WHERE c.FAMILY = '<family>' and d.END_TIME >= '<starttime>' and d.END_TIME <= '<endtime>' AND b.state <> 'GOLDEN'  ORDER BY a.MFR_SN,d.END_TIME ASC";
+                        WHERE c.FAMILY = '<family>' and d.END_TIME >= '<starttime>' and d.END_TIME <= '<endtime>' AND b.state <> 'GOLDEN'  and d.invalid_flag <> '1' ORDER BY a.MFR_SN,d.start_time ASC";
             sql = sql.Replace("<family>", family).Replace("<starttime>", startdate.ToString("yyyyMMddHHmmss")).Replace("<endtime>", enddate.ToString("yyyyMMddHHmmss"));
 
             var currentroutid = "";
@@ -182,25 +182,28 @@ namespace Prometheus.Models
                             }//end foreach
 
                             var hours = (double)(pjdatalist[pjdatalist.Count - 1].TestTimeStamp - pjdatalist[0].TestTimeStamp).TotalSeconds / 3600.0;
-                            if (string.IsNullOrEmpty(errid))
+                            if (hours != 0.0)
                             {
+                                if (string.IsNullOrEmpty(errid))
+                                {
                                 
-                                var testdata = new ProjectTestData("TEMP", pjdatalist[0].DataID, pjdatalist[0].ModuleSerialNum, pjdatalist[0].WhichTest.Replace("_setup", ""), pjdatalist[0].ModuleType
-                                    , "PASS", pjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), pjdatalist[0].TestStation, pjdatalist[0].PN);
-                                testdata.CSN = (Math.Round(hours,3)).ToString();
-                                testdata.JO = pjdatalist[0].JO;
-                                ret.Add(testdata);
-                            }
-                            else
-                            {
+                                    var testdata = new ProjectTestData("TEMP", pjdatalist[0].DataID, pjdatalist[0].ModuleSerialNum, pjdatalist[0].WhichTest.Replace("_setup", ""), pjdatalist[0].ModuleType
+                                        , "PASS", pjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), pjdatalist[0].TestStation, pjdatalist[0].PN);
+                                    testdata.CSN = (Math.Round(hours,3)).ToString();
+                                    testdata.JO = pjdatalist[0].JO;
+                                    ret.Add(testdata);
+                                }
+                                else
+                                {
                                 
-                                var testdata = new ProjectTestData("TEMP", errid, pjdatalist[0].ModuleSerialNum, pjdatalist[0].WhichTest.Replace("_setup", ""), pjdatalist[0].ModuleType
-                                    , err, pjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), pjdatalist[0].TestStation, pjdatalist[0].PN);
-                                testdata.CSN = (Math.Round(hours, 3)).ToString();
-                                testdata.JO = pjdatalist[0].JO;
-                                ret.Add(testdata);
-                            }
-                        }
+                                    var testdata = new ProjectTestData("TEMP", errid, pjdatalist[0].ModuleSerialNum, pjdatalist[0].WhichTest.Replace("_setup", ""), pjdatalist[0].ModuleType
+                                        , err, pjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), pjdatalist[0].TestStation, pjdatalist[0].PN);
+                                    testdata.CSN = (Math.Round(hours, 3)).ToString();
+                                    testdata.JO = pjdatalist[0].JO;
+                                    ret.Add(testdata);
+                                }
+                            }//end if hour != 0.0
+                        }//end if pjdatalist.Count > 0
 
                         pjdatalist.Clear();
                       

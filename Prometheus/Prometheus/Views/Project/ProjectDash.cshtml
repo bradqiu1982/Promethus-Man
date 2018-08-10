@@ -71,8 +71,96 @@
 
         $('body').on('click', '.lobilist-item-title, .lobilist-item-description', function(){
             var id = $(this).parent().attr('data-id');
-            $('#currentissuekey').val(id);
-            $('#taskdetailmodal').modal('show');
+
+            $.post('/Issue/PMTaskDetail',{
+                id:id
+            },function(output){
+                if(output.success)
+                {   
+                    $('#currentissuekey').val(id);
+                    $('#taskattachments').empty();
+                    $('#RelatedTask').empty();
+                    $('#taskcomments').empty();
+                    $('#taskremark').val('');
+
+                    {
+                        var appendstr = "";
+                        appendstr += '<tr>';
+                        appendstr += '<td><input type="text" class="form-control" id="linksummary" name="linksummary" placeholder="Summary" value=""></td>';
+                        appendstr += '<td><input type="text" class="form-control" id="linkassignee" name="linkassignee" placeholder="Asignee" value=""></td>';
+                        appendstr += '<td><input type="text" class="form-control" id="linkduedate" name="linkduedate" placeholder="Due Date" value=""></td>';
+                        appendstr += '<td><input type="text" class="form-control" id="linkdesc" name="linkdesc" placeholder="Description" value=""></td>';
+                        appendstr += '<td></td>';
+                        appendstr += '<td><button class="btn btn-success" id="addlinktaskbtn" name="addlinktaskbtn" onclick="CreateLinkTask()">Add</button></td>';
+                        appendstr += '<td></td>';
+                        appendstr += '</tr>';
+                        $('#RelatedTask').append(appendstr);
+                    }
+
+                    $('#tasktitle').html(output.taskinfo.tasktitle);
+                    $('#taskassignee').html(output.taskinfo.taskassignee);
+                    $('#taskduedate').html(output.taskinfo.taskduedate);
+                    $('#taskresolution').html(output.taskinfo.taskresolution);
+
+                    $.each(output.attachlist, function (i, val) {
+                        var link = '<div><a href="' + val.url + '" target="_blank">' + val.fn + '</a></div>';
+                        $('#taskattachments').append(link);
+                    });
+
+                    $.each(output.linktasklist, function (i, val) {
+                        var appendstr = '<tr>';
+                        appendstr += '<td>'+val.tasktitle+'</td>';
+                        appendstr += '<td>'+val.taskassignee+'</td>';
+                        appendstr += '<td>'+val.taskduedate+'</td>';
+                        appendstr += '<td><input type="text" class="form-control" id="'+val.taskid+'_desc" name="'+val.taskid+'_desc" placeholder="Description" value="'+val.taskdesc+'"></td>';
+                        appendstr += '<td><input type="text" readonly="readonly" class="form-control" id="'+val.taskid+'_status" name="'+val.taskid+'_status" placeholder="Status" value="'+val.taskresolution+'"></td>';
+                        appendstr += '<td><button class="btn btn-success" id="addlinktaskbtn" name="addlinktaskbtn" onclick="SaveLinkDesc(\''+val.taskid+'\')">Save</button></td>';
+                        appendstr += '<td><button class="btn btn-success" id="addlinktaskbtn" name="addlinktaskbtn" onclick="DoneLinkTask(\''+val.taskid+'\')">Done</button></td>';
+                        appendstr += '</tr>'
+                        $('#RelatedTask').append(appendstr);
+                    });
+
+                    $.each(output.commentlist, function (i, val) {
+                        var appendstr = '';
+                        appendstr += '<div class="well" mytp="HOVER" style="margin-bottom:2px;padding-bottom:2px;margin-top:2px;padding-top:2px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px;border-top-width:0px">';
+                        appendstr += '<div class="row" mytp="HOVER" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">';
+                        appendstr += '<div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">';
+                        appendstr += '<div class="col-xs-6">';
+                        appendstr += '<div class="col-xs-9">'+val.reporter+'&nbsp;&nbsp;'+val.commentdate+'</div>';
+                        appendstr += '</div>';
+                        appendstr += '<div class="col-xs-6"></div>';
+                        appendstr += '</div>';
+                        appendstr += '<div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">';
+                        appendstr += '<div class="col-xs-1"></div>';
+                        appendstr += '<div class="col-xs-11">'+val.content+'</div>';
+                        appendstr += '</div>';
+                        appendstr += '</div>';
+                        appendstr += '</div>';
+                        $('#taskcomments').append(appendstr);
+                    });
+
+                    $('#taskdetailmodal').modal('show');
+
+                    $('#linkduedate').datepicker({
+                        changeMonth: true,
+                        changeYear: true,
+                        dateFormat: 'yy-mm-dd'
+                    });
+
+                    $('#linkassignee').autoComplete({
+                        minChars: 0,
+                        source: function (term, suggest) {
+                            term = term.toLowerCase();
+                            var choices = @Html.Raw(ViewBag.pjmemlist);
+                            var suggestions = [];
+                            for (i = 0; i < choices.length; i++)
+                                if (~choices[i].toLowerCase().indexOf(term)) suggestions.push(choices[i]);
+                            suggest(suggestions);
+                        }
+                    });
+                }
+            });
+
         });
 
         $('body').on('click', '#ct_btn', function(){
@@ -126,6 +214,24 @@
                 suggest(suggestions);
             }
         });
+
+        @*$('#linkduedate').datepicker({
+            changeMonth: true,
+            changeYear: true,
+            dateFormat: 'yy-mm-dd'
+        });
+
+        $('#linkassignee').autoComplete({
+            minChars: 0,
+            source: function (term, suggest) {
+                term = term.toLowerCase();
+                var choices = @Html.Raw(ViewBag.pjmemlist);
+                var suggestions = [];
+                for (i = 0; i < choices.length; i++)
+                    if (~choices[i].toLowerCase().indexOf(term)) suggestions.push(choices[i]);
+                suggest(suggestions);
+            }
+        });*@
     });
 
         function UpdateIssueLink()
@@ -137,7 +243,7 @@
             }
         }
 
-        function LinkOtherTasks()
+        function LinkExistTasks()
         {
         
         }
@@ -152,12 +258,123 @@
                     fileElementId: 'file3',
                     dataType: 'json',
                     success: function (data, status) {
-                        $('#taskattachments').append(data.url);
+                        var link = '<div><a href="' + data.url + '" target="_blank">' + data.fn + '</a></div>';
+                        $('#taskattachments').append(link);
                     },
                     error: function (e) {
                         alert(e);
                     }
                 });
+        }
+
+        function CreateLinkTask()
+        {
+            var pjkey = $('#pjkey').val();
+            var title = $('#linksummary').val();
+            var description = $('#linkdesc').val();
+            var duedate = $('#linkduedate').val();
+            var assignee = $('#linkassignee').val();
+            var originalid = $('#currentissuekey').val();
+
+            if(title == '' || duedate == '' || assignee == '')
+            {
+                alert('Link Task title,duedate,assignee should not be empty!');
+                return false;
+            }
+            
+            $('#linksummary').val('');
+            $('#linkdesc').val('');
+            $('#linkduedate').val('');
+            $('#linkassignee').val('');
+            
+            $.post('/Project/CreateLinkTask',{
+                pjkey:pjkey,
+                title:title,
+                duedate:duedate,
+                assignee:assignee,
+                originalid:originalid,
+                description:description
+            },function(output){
+                if(output.success)
+                {
+                    var appendstr = '<tr>';
+                    appendstr += '<td>'+output.task.Summary+'</td>';
+                    appendstr += '<td>'+output.task.Assignee+'</td>';
+                    appendstr += '<td>'+output.task.DueDateStr+'</td>';
+                    appendstr += '<td><input type="text" class="form-control" id="'+output.task.IssueKey+'_desc" name="'+output.task.IssueKey+'_desc" placeholder="Description" value="'+output.task.Description+'"></td>';
+                    appendstr += '<td><input type="text" readonly="readonly" class="form-control" id="'+output.task.IssueKey+'_status" name="'+output.task.IssueKey+'_status" placeholder="Status" value="'+output.task.Resolution+'"></td>';
+                    appendstr += '<td><button class="btn btn-success" id="addlinktaskbtn" name="addlinktaskbtn" onclick="SaveLinkDesc(\''+output.task.IssueKey+'\')">Save</button></td>';
+                    appendstr += '<td><button class="btn btn-success" id="addlinktaskbtn" name="addlinktaskbtn" onclick="DoneLinkTask(\''+output.task.IssueKey+'\')">Done</button></td>';
+                    appendstr += '</tr>'
+                    $('#RelatedTask').append(appendstr);
+                }
+            });
+        }
+
+        function SaveLinkDesc(id)
+        {
+            var desc = $('#'+id+'_desc').val();
+            if(desc != '')
+            {
+                $.post('/Project/AddPMLinkTaskRemark',{
+                    id:id,
+                    taskremark:desc
+                },function(){
+                
+                })
+            }
+        }
+
+        function DoneLinkTask(id)
+        {
+            if(id != '')
+            {
+                $.post('/Project/ClosePMLinkTask',{
+                    id:id
+                },function(output){
+                    if(output.success)
+                    {
+                        $('#'+id+'_status').val('Done');
+                    }
+                })
+            }
+        }
+
+        function SaveTaskRemark()
+        {
+            var id = $('#currentissuekey').val();
+            var taskremark = $('#taskremark').val();
+            if(taskremark != '')
+            {
+                $.post('/Project/AddPMTaskRemark',{
+                    id:id,
+                    taskremark:taskremark
+                },
+                function(output)
+                {
+                    if(output.success)
+                    {
+                        var taskremark = $('#taskremark').val('');
+
+                        var appendstr = '';
+                        appendstr += '<div class="well" mytp="HOVER" style="margin-bottom:2px;padding-bottom:2px;margin-top:2px;padding-top:2px;background-color:transparent !important;border-left-color:#006DC0;border-top-color:transparent !important;border-right-color:transparent !important;border-bottom-color:transparent !important;border-top-left-radius:0px;border-bottom-left-radius:0px;border-top-width:0px">';
+                        appendstr += '<div class="row" mytp="HOVER" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">';
+                        appendstr += '<div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">';
+                        appendstr += '<div class="col-xs-6">';
+                        appendstr += '<div class="col-xs-9">'+output.remark.Reporter+'&nbsp;&nbsp;'+output.remark.CommentDateStr+'</div>';
+                        appendstr += '</div>';
+                        appendstr += '<div class="col-xs-6"></div>';
+                        appendstr += '</div>';
+                        appendstr += '<div class="row" style="margin-top:2px;margin-bottom:2px;padding-top:2px;padding-bottom:2px;">';
+                        appendstr += '<div class="col-xs-1"></div>';
+                        appendstr += '<div class="col-xs-11">'+output.remark.Comment+'</div>';
+                        appendstr += '</div>';
+                        appendstr += '</div>';
+                        appendstr += '</div>';
+                        $('#taskcomments').append(appendstr);
+                    }
+                });
+            }
         }
 
     </script>
@@ -214,14 +431,14 @@
                     <h4 class="modal-title" id="taskdetailmodalLabel">Task Detail</h4>
                     <div class="task-btn-link">
                         <button class="btn bg-info" id="updateissuelink" name="updateissuelink" onclick="UpdateIssueLink()">Edit Task</button>
-                        <button class="btn bg-info" id="linkothertasks" name="linkothertasks" onclick="LinkOtherTasks()">Link Other Task</button>
+                        <button class="btn bg-info" id="linkexisttasks" name="linkexisttasks" onclick="LinkExistTasks()">Link Exist Task</button>
                     </div>
                 </div>
 
                 <div class="modal-body">
                     <div class="panel">
                         <div class="TaskTitle">
-                            <div class="TaskLabel">This is a PM Task</div>
+                            <div class="TaskLabel" id="tasktitle" name="tasktitle">This is a PM Task</div>
                         </div>
                         <div class="TaskField">
                             <div class="TaskLabel">Asignee</div>
@@ -234,10 +451,6 @@
                         <div class="TaskField">
                             <div class="TaskLabel">Resolution</div>
                             <div class="TaskLabelVal" id="taskresolution" name="taskresolution">Done</div>
-                        </div>
-                        <div class="TaskDescription">
-                            <div class="TaskLabel">Description</div>
-                            <div class="TaskLabelVal" id="taskdesc" name="taskdesc">This is the description</div>
                         </div>
                     </div>
 
@@ -259,15 +472,6 @@
                                 </tr>
                             </thead>
                             <tbody id="RelatedTask" name="RelatedTask">
-                                <tr>
-                                    <td><input type="text" class="form-control" id="linksummary" name="linksummary" placeholder="Summary" value=""></td>
-                                    <td><input type="text" class="form-control" id="linkassignee" name="linkassignee" placeholder="Asignee" value=""></td>
-                                    <td><input type="text" class="form-control" id="linkduedate" name="linkduedate" placeholder="Due Date" value=""></td>
-                                    <td><input type="text" class="form-control" id="linkdesc" name="linkdesc" placeholder="Description" value=""></td>
-                                    <td></td>
-                                    <td><button class="btn btn-success" id="addlinktaskbtn" name="addlinktaskbtn">Add</button></td>
-                                    <td></td>
-                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -291,15 +495,15 @@
                             <div class="TaskLabel">Remark</div>
                         </div>
                         <div class="form-group">
-                            <div id="taskcomments"></div>
-                        </div>
-                        <div class="form-group">
                             <div class="row">
                                 <div class="col-xs-10"><input type="text" class="form-control" id="taskremark" name="taskremark" placeholder="Remark" value=""></div>
                                 <div class="col-xs-2">
-                                    <button class="btn btn-success" id="taskremarkbtn" name="taskremarkbtn">Save</button>
+                                    <button class="btn btn-success" id="taskremarkbtn" name="taskremarkbtn" onclick="SaveTaskRemark()">Save</button>
                                 </div>
                             </div>
+                        </div>
+                        <div class="form-group">
+                            <div id="taskcomments"></div>
                         </div>
                     </div>
                 </div>

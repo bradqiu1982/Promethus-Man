@@ -7461,61 +7461,6 @@ namespace Prometheus.Controllers
             return res;
         }
 
-        private IssueViewModels ListOperateParse()
-        {
-            var ret = new IssueViewModels();
-            var jsonStringData = new System.IO.StreamReader(Request.InputStream).ReadToEnd();
-            var items = jsonStringData.Split(new string[] { "&" }, StringSplitOptions.RemoveEmptyEntries);
-            foreach (var it in items)
-            {
-                if (it.Contains("id="))
-                {
-                    ret.IssueKey = Request.Form["id"];//it.Replace("id=", "").Trim();
-                }
-
-                if (it.Contains("title="))
-                {
-                    ret.Summary = Request.Form["title"];//SeverHtmlDecode.Decode(this, it.Replace("title=", "")).Replace("'", "").Replace("+", " ").Trim();
-                }
-
-                if (it.Contains("description="))
-                {
-                    if (string.IsNullOrEmpty(it.Replace("description=", "")))
-                    {
-                        ret.Description = string.Empty;
-                    }
-                    else
-                    {
-                        ret.Description = Request.Form["description"];//SeverHtmlDecode.Decode(this, it.Replace("description=", "")).Replace("'", "").Replace("+", " ").Trim();
-                    }
-                }
-
-                if (it.Contains("dueDate="))
-                {
-                    try
-                    {
-                        ret.DueDate = DateTime.Parse(Request.Form["dueDate"] + " 10:00:00"); //DateTime.Parse(SeverHtmlDecode.Decode(this, it.Replace("dueDate=", "")).Replace("'", "").Trim() + " 10:00:00");
-                    }
-                    catch (Exception ex) { ret.Summary = string.Empty; }
-                }
-
-                if (it.Contains("assignee="))
-                {
-                    try
-                    {
-                        ret.Assignee = Request.Form["assignee"];
-                    }
-                    catch (Exception ex) { ret.Summary = string.Empty; }
-                }
-
-                if (it.Contains("listId="))
-                {
-                    ret.DataID = Request.Form["listId"];//SeverHtmlDecode.Decode(this, it.Replace("listId=", "")).Replace("'", "").Trim();
-                }
-
-            }
-            return ret;
-        }
 
         private static void SendTaskEvent(IssueViewModels vm, string comment, Controller ctrl)
         {
@@ -7566,6 +7511,34 @@ namespace Prometheus.Controllers
             return vm;
         }
 
+        private IssueViewModels _CreateLinkTask(string pjkey, string summary, string duedate, string asignee, string creator, string desc,string originalid)
+        {
+            var vm = new IssueViewModels();
+            vm.ProjectKey = pjkey;
+            vm.IssueKey = IssueViewModels.GetUniqKey();
+            vm.IssueType = ISSUETP.Task;
+            vm.Summary = summary;
+            vm.Priority = ISSUEPR.Major;
+            vm.DueDate = DateTime.Parse(duedate);
+            vm.ReportDate = DateTime.Now;
+            vm.Assignee = asignee;
+            vm.Reporter = creator;
+            vm.Creator = creator;
+            vm.Resolution = Resolute.Working;
+            vm.ResolvedDate = DateTime.Parse("1982-05-06 01:01:01");
+            vm.Description = desc;
+            vm.StoreIssue();
+            IssueTypeVM.SaveIssueType(vm.IssueKey, ISSUESUBTYPE.Task.ToString(), ISSUESUBTYPE.Task.ToString());
+
+            var irs = new IssueRelationShipVM();
+            irs.MasterIssueKey = originalid;
+            irs.SlaveIssueKey = vm.IssueKey;
+            IssueRelationShipVM.UpdateIssueRelationShip(irs);
+
+            SendTaskEvent(vm, desc, this);
+            return vm;
+        }
+
         [HttpPost]
         public JsonResult TodoListAdd()
         {
@@ -7583,51 +7556,138 @@ namespace Prometheus.Controllers
             return res;
         }
 
-        [HttpPost]
-        public JsonResult TodoListUpdate()
+        public JsonResult CreateLinkTask()
         {
-            var vm = ListOperateParse();
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+            var pjkey = Request.Form["pjkey"];
+            var summary = Request.Form["title"];
+            var desc = Request.Form["description"];
+            var duedate = Request.Form["duedate"] + " 10:00:00";
+            var assignee = Request.Form["assignee"] + "@FINISAR.COM";
+            var originalid = Request.Form["originalid"];
 
-            if (string.IsNullOrEmpty(vm.Summary))
+            var task = _CreateLinkTask(pjkey, summary, duedate, assignee, updater, desc, originalid);
+            task.Summary = "<a href='/Issue/UpdateIssue?issuekey=" + task.IssueKey + "' target='_blank'>" + task.Summary + "</a>";
+            task.Assignee = Request.Form["assignee"];
+            var res = new JsonResult();
+            res.Data = new {
+                success = true,
+                task = task
+            };
+            return res;
+        }
+
+        public JsonResult AddPMTaskRemark()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            var id = Request.Form["id"];
+            var taskremark = Request.Form["taskremark"];
+            var tempcomment = new IssueComments();
+            tempcomment.IssueKey = id;
+            tempcomment.Comment = taskremark;
+            tempcomment.Reporter = updater.Split(new char[] { '@' })[0];
+            tempcomment.CommentDate = DateTime.Now;
+
+            IssueViewModels.StoreIssueComment(id, tempcomment.dbComment, updater, COMMENTTYPE.Description);
+
+            var res = new JsonResult();
+            res.Data = new
             {
-                var res1 = new JsonResult();
-                res1.Data = new { success = false };
-                return res1;
-            }
+                success = true,
+                remark = tempcomment
+            };
+            return res;
+        }
 
-            var realissue = IssueViewModels.RetrieveIssueByIssueKey(vm.IssueKey, this);
+        public JsonResult AddPMLinkTaskRemark()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+
+            var id = Request.Form["id"];
+            var taskremark = Request.Form["taskremark"];
+            var tempcomment = new IssueComments();
+            tempcomment.IssueKey = id;
+            tempcomment.Comment = taskremark;
+            tempcomment.Reporter = updater.Split(new char[] { '@' })[0];
+            tempcomment.CommentDate = DateTime.Now;
+
+            IssueViewModels.StoreIssueComment(id, tempcomment.dbComment, updater, COMMENTTYPE.InternalReport);
+
+            var res = new JsonResult();
+            res.Data = new
+            {
+                success = true
+            };
+            return res;
+        }
+
+        public JsonResult ClosePMLinkTask()
+        {
+            var id = Request.Form["id"];
+            var realissue = IssueViewModels.RetrieveIssueByIssueKey(id, this);
             if (realissue != null)
             {
-                if (!string.IsNullOrEmpty(vm.Description))
-                {
-                    if (realissue.CommentList.Count == 0)
-                    {
-                        var ckdict = CookieUtility.UnpackCookie(this);
-                        var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
-                        var com = new IssueComments();
-                        com.Comment = vm.Description;
-                        IssueViewModels.StoreIssueComment(realissue.IssueKey, com.dbComment, updater, COMMENTTYPE.Description);
-                    }
-                    else
-                    {
-                        realissue.CommentList[0].Comment = vm.Description;
-                        IssueViewModels.UpdateSPComment(realissue.IssueKey, realissue.CommentList[0].CommentType
-                            , realissue.CommentList[0].CommentDate.ToString("yyyy-MM-dd HH:mm:ss"), realissue.CommentList[0].dbComment);
-                    }
-                }
-
-                if (!vm.DueDate.Equals(realissue.DueDate)||!vm.Assignee.Equals(realissue.Assignee))
-                {
-                    realissue.DueDate = vm.DueDate;
-                    realissue.Assignee = vm.Assignee;
-                    realissue.UpdateIssue();
-                }
+                realissue.Resolution = Resolute.Done;
+                realissue.UpdateIssue();
             }
 
             var res = new JsonResult();
-            res.Data = new { success = true };
+            res.Data = new
+            {
+                success = true
+            };
             return res;
         }
+
+        //[HttpPost]
+        //public JsonResult TodoListUpdate()
+        //{
+        //    var vm = ListOperateParse();
+
+        //    if (string.IsNullOrEmpty(vm.Summary))
+        //    {
+        //        var res1 = new JsonResult();
+        //        res1.Data = new { success = false };
+        //        return res1;
+        //    }
+
+        //    var realissue = IssueViewModels.RetrieveIssueByIssueKey(vm.IssueKey, this);
+        //    if (realissue != null)
+        //    {
+        //        if (!string.IsNullOrEmpty(vm.Description))
+        //        {
+        //            if (realissue.CommentList.Count == 0)
+        //            {
+        //                var ckdict = CookieUtility.UnpackCookie(this);
+        //                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
+        //                var com = new IssueComments();
+        //                com.Comment = vm.Description;
+        //                IssueViewModels.StoreIssueComment(realissue.IssueKey, com.dbComment, updater, COMMENTTYPE.Description);
+        //            }
+        //            else
+        //            {
+        //                realissue.CommentList[0].Comment = vm.Description;
+        //                IssueViewModels.UpdateSPComment(realissue.IssueKey, realissue.CommentList[0].CommentType
+        //                    , realissue.CommentList[0].CommentDate.ToString("yyyy-MM-dd HH:mm:ss"), realissue.CommentList[0].dbComment);
+        //            }
+        //        }
+
+        //        if (!vm.DueDate.Equals(realissue.DueDate)||!vm.Assignee.Equals(realissue.Assignee))
+        //        {
+        //            realissue.DueDate = vm.DueDate;
+        //            realissue.Assignee = vm.Assignee;
+        //            realissue.UpdateIssue();
+        //        }
+        //    }
+
+        //    var res = new JsonResult();
+        //    res.Data = new { success = true };
+        //    return res;
+        //}
 
         [HttpPost]
         public JsonResult TodoListDelete()
@@ -7641,38 +7701,6 @@ namespace Prometheus.Controllers
             return res;
         }
 
-        private List<string> MoveOperateParse()
-        {
-            var ret = new List<string>();
-            var jsonStringData = new System.IO.StreamReader(Request.InputStream).ReadToEnd();
-            var items = jsonStringData.Split(new string[] { "&" }, StringSplitOptions.RemoveEmptyEntries);
-            foreach (var it in items)
-            {
-                if (it.Contains("id="))
-                {
-                    //ret.Add(it.Replace("id=", "").Trim());
-                    ret.Add(Request.Form["id"]);
-                }
-
-                if (it.Contains("oldlist="))
-                {
-                    //ret.Add(SeverHtmlDecode.Decode(this, it.Replace("oldlist=", "")).Replace("'", "").Trim());
-                    ret.Add(Request.Form["oldlist"]);
-                }
-
-                if (it.Contains("newlist="))
-                {
-                    //ret.Add(SeverHtmlDecode.Decode(this, it.Replace("newlist=", "")).Replace("'", "").Trim());
-                    ret.Add(Request.Form["newlist"]);
-                }
-                if (it.Contains("reportmark="))
-                {
-                    //ret.Add(it.Replace("reportmark=", "").Trim());
-                    ret.Add(Request.Form["reportmark"]);
-                }
-            }
-            return ret;
-        }
 
         [HttpPost]
         public JsonResult TodoListMove()

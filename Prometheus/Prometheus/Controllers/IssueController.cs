@@ -466,7 +466,7 @@ namespace Prometheus.Controllers
                     ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
                 }
                 
-                ViewBag.RelationLinks = IssueRelationShipVM.GetIssueRelationShip(key);
+                ViewBag.RelationLinks = IssueRelationShipVM.GetIssueRelationShip(key,this);
 
                 GetNoticeInfo();
 
@@ -1598,7 +1598,7 @@ namespace Prometheus.Controllers
                 {
                     ViewBag.tobechoosetags = ShareDocVM.RetrieveShareTags(this);
                 }
-                ViewBag.RelationLinks = IssueRelationShipVM.GetIssueRelationShip(key);
+                ViewBag.RelationLinks = IssueRelationShipVM.GetIssueRelationShip(key,this);
 
                 GetNoticeInfo();
 
@@ -4416,7 +4416,7 @@ namespace Prometheus.Controllers
                     }
                 }
             }
-            var SlaveLinks = IssueRelationShipVM.GetIssueRelationShip(IssueKey);
+            var SlaveLinks = IssueRelationShipVM.GetIssueRelationShip(IssueKey,this);
             if (SlaveLinks.Count > 0)
             {
                 foreach (var item in SlaveLinks)
@@ -4549,16 +4549,107 @@ namespace Prometheus.Controllers
 
             uploads.SaveAs(imgdir + fn);
             var url = "/userfiles/docs/" + datestring + "/" + fn;
-            url = "<div><a href='" + url + "' target='_blank'>" + fn + "</a></div>";
+            IssueViewModels.StoreIssueAttachment(id, url);
 
             var ret = new JsonResult();
             ret.Data = new
             {
                 success = true,
-                url = url
+                url = url,
+                fn = fn
             };
             return ret;
         }
+
+        public JsonResult PMTaskDetail()
+        {
+            var id = Request.Form["id"];
+            var issue = IssueViewModels.RetrieveIssueByIssueKey(id, this);
+            if (issue.Summary.Contains(CRITICALERRORTYPE.PMTASK))
+            {
+                var linktasks = IssueRelationShipVM.GetIssueRelationShip(id,this);
+
+                var taskinfo = new {
+                    tasktitle = issue.Summary,
+                    taskassignee = issue.Assignee.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0],
+                    taskduedate = issue.DueDateStr,
+                    taskresolution = issue.Resolution
+                };
+
+                var linktasklist = new List<object>();
+                foreach (var item in issue.SubIssues)
+                {
+                    var desc = "";
+                    if (item.InternalReportCommentList.Count > 0)
+                    { desc = item.InternalReportCommentList[item.InternalReportCommentList.Count - 1].Comment; }
+
+                    linktasklist.Add(new {
+                        taskid = item.IssueKey,
+                        tasktitle = "<a href='/Issue/UpdateIssue?issuekey=" + item.IssueKey+"' target='_blank'>"+item.Summary+"</a>",
+                        taskassignee = item.Assignee.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0],
+                        taskduedate = item.DueDateStr,
+                        taskresolution = item.Resolution,
+                        taskdesc = desc
+                    });
+                }
+
+                foreach (var item in linktasks)
+                {
+                    var desc = "";
+                    if (item.InternalReportCommentList.Count > 0)
+                    { desc = item.InternalReportCommentList[item.InternalReportCommentList.Count - 1].Comment; }
+
+                    linktasklist.Add(new
+                    {
+                        taskid = item.IssueKey,
+                        tasktitle = "<a href='/Issue/UpdateIssue?issuekey=" + item.IssueKey + "' target='_blank'>" + item.Summary + "</a>",
+                        taskassignee = item.Assignee.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0],
+                        taskduedate = item.DueDateStr,
+                        taskresolution = item.Resolution,
+                        taskdesc = desc
+                    });
+                }
+
+                var attachlist = new List<object>();
+                foreach (var attach in issue.AttachList)
+                {
+                    var splitstr = attach.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+                    var fn = splitstr[splitstr.Length - 1];
+                    attachlist.Add(new {
+                        url = attach,
+                        fn = fn
+                    });
+                }
+
+                var commentlist = new List<object>();
+                foreach (var comment in issue.CommentList)
+                {
+                    commentlist.Add(new
+                    {
+                        reporter = comment.Reporter.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0],
+                        commentdate = comment.CommentDateStr,
+                        content = comment.Comment
+                    });
+                }
+
+                var ret = new JsonResult();
+                ret.Data = new {
+                    success = true,
+                    taskinfo = taskinfo,
+                    linktasklist = linktasklist,
+                    attachlist = attachlist,
+                    commentlist = commentlist
+                };
+                return ret;
+            }
+            else
+            {
+                var ret = new JsonResult();
+                ret.Data = new { success = false };
+                return ret;
+            }
+        }
+
 
     }
 }

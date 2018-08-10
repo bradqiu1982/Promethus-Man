@@ -228,6 +228,17 @@ namespace Prometheus.Models
         public string Reporter { set; get; }
 
         public DateTime CommentDate { set; get; }
+        public string CommentDateStr
+        {
+            get
+            {
+                try
+                {
+                    return CommentDate.ToString("yyyy-MM-dd HH:mm:ss");
+                }
+                catch (Exception ex) { return string.Empty; }
+            }
+        }
     }
 
     public class IssueViewModels
@@ -289,6 +300,14 @@ namespace Prometheus.Models
         public string Summary { set; get; }
         public string Priority { set; get; }
         public DateTime DueDate { set; get; }
+        public string DueDateStr { get {
+                try
+                {
+                    return DueDate.ToString("yyyy-MM-dd");
+                }
+                catch (Exception ex) { return string.Empty; }
+            } }
+
         public DateTime ResolvedDate { set; get; }
         public DateTime ReportDate { set; get; }
         public string Assignee { set; get; }
@@ -1847,7 +1866,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        private void RetrieveComment(Controller ctrl)
+        public void RetrieveComment(Controller ctrl)
         {
             var tempclist = new List<IssueComments>();
             var csql = "select IssueKey,Comment,Reporter,CommentDate,CommentType from IssueComments where IssueKey = '<IssueKey>' and Removed <> 'TRUE' order by CommentDate ASC";
@@ -4637,7 +4656,7 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql, param);
         }
 
-        public static List<IssueViewModels> GetIssueRelationShip(string mIssueKey)
+        public static List<IssueViewModels> GetIssueRelationShip(string mIssueKey,Controller ctrl)
         {
             var sql = @"select i.IssueKey, i.ProjectKey, i.Summary, 
                     i.Assignee, i.DueDate, i.Reporter, i.IssueType, i.ModuleSN, i.ErrAbbr, i.Priority, 
@@ -4659,6 +4678,9 @@ namespace Prometheus.Models
                     tmp.Assignee = Convert.ToString(item[3]);
                     tmp.DueDate = Convert.ToDateTime(item[4]);
                     tmp.Resolution = Convert.ToString(item[10]);
+
+                    tmp.RetrieveComment(ctrl);
+
                     res.Add(tmp);
                 }
             }

@@ -158,7 +158,7 @@ namespace Prometheus.Models
                         INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX  
                         INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID 
                         INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID   
-                        WHERE c.FAMILY = '<family>' and d.END_TIME >= '<starttime>' and d.END_TIME <= '<endtime>' AND b.state <> 'GOLDEN'  and d.invalid_flag <> '1' ORDER BY a.MFR_SN,d.start_time ASC";
+                        WHERE c.FAMILY = '<family>' and d.END_TIME >= '<starttime>' and d.END_TIME <= '<endtime>' AND b.state <> 'GOLDEN' ORDER BY a.MFR_SN,d.start_time ASC";
             sql = sql.Replace("<family>", family).Replace("<starttime>", startdate.ToString("yyyyMMddHHmmss")).Replace("<endtime>", enddate.ToString("yyyyMMddHHmmss"));
 
             var currentroutid = "";
@@ -327,7 +327,10 @@ namespace Prometheus.Models
                     mdcond = mdcond.Substring(0, mdcond.Length - 4) + ")";
 
 
-                    var s  = "SELECT a.MFR_SN,d.DATASET_NAME,c.FAMILY,d.STATUS,d.END_TIME,d.STATION,a.MFR_PN,d.ROUTE_ID,d.dataset_id,b.JOB_ID FROM PARTS a INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID WHERE <mdcond> and d.END_TIME > '<TIMECOND>'  ORDER BY d.ROUTE_ID,d.dataset_id DESC,d.END_TIME DESC";
+                    var s  = @"SELECT a.MFR_SN,d.DATASET_NAME,c.FAMILY,d.STATUS,d.END_TIME,d.STATION,a.MFR_PN,d.ROUTE_ID,d.dataset_id,b.JOB_ID FROM PARTS a 
+                                INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID 
+                                INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID 
+                                WHERE <mdcond> and d.END_TIME > '<TIMECOND>'  AND b.state <> 'GOLDEN'  ORDER BY d.ROUTE_ID,d.dataset_id DESC,d.start_time DESC";
                     var sndict = new Dictionary<string, bool>();
                     var sql = s.Replace("<TIMECOND>", vm.StartDate.ToString("yyyyMMddhhmmss")).Replace("<mdcond>", mdcond);
 
@@ -540,7 +543,10 @@ namespace Prometheus.Models
                     mdcond = mdcond.Substring(0, mdcond.Length - 4) + ")";
 
 
-                    var s = "SELECT a.MFR_SN,d.DATASET_NAME,c.FAMILY,d.STATUS,d.END_TIME,d.STATION,a.MFR_PN,d.ROUTE_ID,d.dataset_id,b.JOB_ID FROM PARTS a INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID WHERE <mdcond> and d.END_TIME > '<TIMECOND>'  ORDER BY d.ROUTE_ID,d.dataset_id DESC,d.END_TIME DESC";
+                    var s = @"SELECT a.MFR_SN,d.DATASET_NAME,c.FAMILY,d.STATUS,d.END_TIME,d.STATION,a.MFR_PN,d.ROUTE_ID,d.dataset_id,b.JOB_ID FROM PARTS a 
+                            INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX 
+                            INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID 
+                            INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID WHERE <mdcond> and d.END_TIME > '<TIMECOND>'  AND b.state <> 'GOLDEN'  ORDER BY d.ROUTE_ID,d.dataset_id DESC,d.start_time DESC";
                     var sndict = new Dictionary<string, bool>();
                     var sql = s.Replace("<TIMECOND>", DateTime.Parse(starttime).ToString("yyyyMMddhhmmss")).Replace("<mdcond>", mdcond);
 

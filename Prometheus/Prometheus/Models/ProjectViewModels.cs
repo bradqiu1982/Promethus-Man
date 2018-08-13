@@ -525,6 +525,7 @@ namespace Prometheus.Models
         public string PendingFACount { set; get; }
         public string PendingRMACount { set; get; }
         public string PendingSptCount { set; get; }
+        public string DebugTreeCount { set; get; }
 
         private void StoreProjectBaseInfo()
         {

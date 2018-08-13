@@ -218,6 +218,24 @@ namespace Prometheus.Controllers
                 {
                     item.PendingSptCount = Convert.ToString(sptcount);
                 }
+
+                var debugcount = mycache.Get(item.ProjectKey + "_dbgct_CUST");
+                if (debugcount == null)
+                {
+                    var dbgcnt = 0;
+                    var dbgdata = ProjectErrorViewModels.RetrieveErrorByPJKey(item.ProjectKey, this);
+                    foreach (var dbg in dbgdata)
+                    {
+                        dbgcnt += dbg.FailureDetailCommentList.Count;
+                    }
+                    item.DebugTreeCount = Convert.ToString(dbgcnt);
+                    mycache.Insert(item.ProjectKey + "_dbgct_CUST", item.DebugTreeCount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                }
+                else
+                {
+                    item.DebugTreeCount = Convert.ToString(debugcount);
+                }
+                
             }
 
         }
@@ -417,6 +435,24 @@ namespace Prometheus.Controllers
                 {
                     item.PendingSptCount = Convert.ToString(sptcount);
                 }
+
+                var debugcount = mycache.Get(item.ProjectKey + "_dbgct_CUST");
+                if (debugcount == null)
+                {
+                    var dbgcnt = 0;
+                    var vm = ProjectErrorViewModels.RetrieveErrorByPJKey(item.ProjectKey, this);
+                    foreach (var dbg in vm)
+                    {
+                        dbgcnt += dbg.FailureDetailCommentList.Count;
+                    }
+                    item.DebugTreeCount = Convert.ToString(dbgcnt);
+                    mycache.Insert(item.ProjectKey + "_dbgct_CUST", item.DebugTreeCount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                }
+                else
+                {
+                    item.DebugTreeCount = Convert.ToString(debugcount);
+                }
+
                 var user_pro_module = UserProjectModuleMatrix.GetUserProjectModuleMatrix(updater, item.ProjectKey);
                 var pro_modules = new List<ProjectSortVM>();
                 if (user_pro_module.Count == 0)
@@ -1665,6 +1701,24 @@ namespace Prometheus.Controllers
                     {
                         vm.PendingSptCount = Convert.ToString(sptcount);
                     }
+
+                    var debugcount = mycache.Get(vm.ProjectKey + "_dbgct_CUST");
+                    if (debugcount == null)
+                    {
+                        var dbgcnt = 0;
+                        var dbgdata = ProjectErrorViewModels.RetrieveErrorByPJKey(vm.ProjectKey, this);
+                        foreach (var dbg in dbgdata)
+                        {
+                            dbgcnt += dbg.FailureDetailCommentList.Count;
+                        }
+                        vm.DebugTreeCount = Convert.ToString(dbgcnt);
+                        mycache.Insert(vm.ProjectKey + "_dbgct_CUST", vm.DebugTreeCount, null, DateTime.Now.AddHours(4), Cache.NoSlidingExpiration);
+                    }
+                    else
+                    {
+                        vm.DebugTreeCount = Convert.ToString(debugcount);
+                    }
+
                 }
 
                 var user_pro_module = UserProjectModuleMatrix.GetUserProjectModuleMatrix(updater, ProjectKey);

@@ -4397,7 +4397,7 @@ namespace Prometheus.Controllers
 
             var searchlist = new List<object>();
             var linklist = new List<object>();
-            if (!string.IsNullOrEmpty(searchkey))
+            if (!string.IsNullOrEmpty(searchkey) && !string.IsNullOrEmpty(IssueKey))
             {
                 var Searchs = IssueViewModels.GetIssuesByKeys(IssueKey, searchkey);
                 if (Searchs.Count > 0)
@@ -4409,8 +4409,9 @@ namespace Prometheus.Controllers
                             {
                                 id = item.IssueKey,
                                 title = "[" + item.ProjectKey + "]  <a href='/Issue/UpdateIssue?issuekey=" + item.IssueKey + "' target='_blank'>" + item.Summary + "</a>",
-                                description = "Assignee: " + item.Assignee.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0],
-                                dueDate = item.DueDate.ToString("yyyy-MM-dd")
+                                description = "",
+                                dueDate = item.DueDate.ToString("yyyy-MM-dd"),
+                                assignee = item.Assignee.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0]
                             }
                         );
                     }
@@ -4426,8 +4427,9 @@ namespace Prometheus.Controllers
                         {
                             id = item.IssueKey,
                             title = "[" + item.ProjectKey + "]  <a href='/Issue/UpdateIssue?issuekey=" + item.IssueKey + "' target='_blank'>" + item.Summary + "</a>",
-                            description = "Assignee: " + item.Assignee.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0],
-                            dueDate = item.DueDate.ToString("yyyy-MM-dd")
+                            description = "",
+                            dueDate = item.DueDate.ToString("yyyy-MM-dd"),
+                            assignee = item.Assignee.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0]
                         }
                     );
                 }

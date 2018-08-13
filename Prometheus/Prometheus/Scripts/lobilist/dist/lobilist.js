@@ -810,9 +810,17 @@ $(function () {
                             //}
                             //else
                             //{
-                                if (me.$globalOptions.actions.move) {
+                            if (me.$globalOptions.actions.move) {
+                                    var param = '';
+                                    if (me.$globalOptions.actions.move.indexOf('MoveTaskLink') != -1) {
+                                        param = 'masterid=' + $('#currentissuekey').val() + '&slaveid=' + item.id;
+                                    }
+                                    else {
+                                        param = 'id=' + item.id + '&newlist=' + me.$options.id;
+                                    }
+
                                      $.ajax(me.$globalOptions.actions.move, {
-                                        data: 'id=' + item.id + '&oldlist=' + oldList.$title[0].innerText + '&newlist=' + me.$title[0].innerText,
+                                         data: param,
                                         method: 'POST',
                                         cache: false
                                     });

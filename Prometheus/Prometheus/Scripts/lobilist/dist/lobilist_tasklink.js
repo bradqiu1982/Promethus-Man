@@ -790,6 +790,12 @@ $(function () {
                     html: item.dueDate
                 }));
             }
+            if (item.assignee) {
+                $li.append($('<div>', {
+                    'class': 'lobilist-item-assignee',
+                    html: item.assignee
+                }));
+            }
             $li = me._addItemControls($li);
             if (item.done) {
                 $li.find('input[type=checkbox]').prop('checked', true);
@@ -1129,6 +1135,7 @@ $(function () {
             title: '',
             description: '',
             dueDate: '',
+            assignee:'',
             done: false
         },
 

@@ -43,40 +43,16 @@
     </div>
     <input type="text" class="hide" id="ispjmember" name="ispjmember" value="@(ViewBag.IsPJMember)">
     <input type="text" class="hide" id="pjkey" name="pjkey" value="@(ViewBag.PJKey)">
-    <input type="text" class="hide" id="currentissuekey" name="currentissuekey" value="@(ViewBag.PJKey)">
+    <input type="text" class="hide" id="currentissuekey" name="currentissuekey" value="">
 
     <script type="text/javascript">
-
-    $(function () {
-        //Basic example
-        var ispjmember = $('#ispjmember').val();
-        var todoremove = false;
-        if (ispjmember == 'TRUE')
+        function refreshdetailmodal(id)
         {
-            todoremove = true;
-        }
-
-        $('#todo-lists-basic-demo').lobiList({
-            actions: {
-                load: '/Project/InitPJMGTask?PJKey=@ViewBag.PJKey',
-                insert: '/Project/TodoListAdd',
-                delete: '/Project/TodoListDelete',
-                update: '/Project/TodoListUpdate',
-                move: '/Project/TodoListMove'
-            },
-            enableTodoRemove: todoremove,
-            enableTodoEdit: false,
-            controls:[]
-        });
-
-        $('body').on('click', '.lobilist-item-title, .lobilist-item-description', function(){
-            var id = $(this).parent().attr('data-id');
-
             $.post('/Issue/PMTaskDetail',{
                 id:id
             },function(output){
                 if(output.success)
-                {   
+                {
                     $('#currentissuekey').val(id);
                     $('#taskattachments').empty();
                     $('#RelatedTask').empty();
@@ -160,7 +136,34 @@
                     });
                 }
             });
+        }
 
+
+    $(function () {
+        //Basic example
+        var ispjmember = $('#ispjmember').val();
+        var todoremove = false;
+        if (ispjmember == 'TRUE')
+        {
+            todoremove = true;
+        }
+
+        $('#todo-lists-basic-demo').lobiList({
+            actions: {
+                load: '/Project/InitPJMGTask?PJKey=@ViewBag.PJKey',
+                insert: '/Project/TodoListAdd',
+                delete: '/Project/TodoListDelete',
+                update: '/Project/TodoListUpdate',
+                move: '/Project/TodoListMove'
+            },
+            enableTodoRemove: todoremove,
+            enableTodoEdit: false,
+            controls:[]
+        });
+
+        $('body').on('click', '.lobilist-item-title, .lobilist-item-description', function(){
+            var id = $(this).parent().attr('data-id');
+            refreshdetailmodal(id);
         });
 
         $('body').on('click', '#ct_btn', function(){
@@ -215,23 +218,6 @@
             }
         });
 
-        @*$('#linkduedate').datepicker({
-            changeMonth: true,
-            changeYear: true,
-            dateFormat: 'yy-mm-dd'
-        });
-
-        $('#linkassignee').autoComplete({
-            minChars: 0,
-            source: function (term, suggest) {
-                term = term.toLowerCase();
-                var choices = @Html.Raw(ViewBag.pjmemlist);
-                var suggestions = [];
-                for (i = 0; i < choices.length; i++)
-                    if (~choices[i].toLowerCase().indexOf(term)) suggestions.push(choices[i]);
-                suggest(suggestions);
-            }
-        });*@
     });
 
         function UpdateIssueLink()
@@ -245,7 +231,24 @@
 
         function LinkExistTasks()
         {
-        
+            $('#taskdetailmodal').modal('hide');
+
+            $('#searchkey').val('')
+            $('#demoparent').empty();
+            $('#demoparent').append('<div id="linktask-demo"></div>');
+
+            var id = $('#currentissuekey').val();
+            $('#linktask-demo').lobiList({
+                actions: {
+                    load: '/Issue/InitTaskLink?IssueKey='+id+'&searchkey=',
+                    move: '/Issue/MoveTaskLink'
+                },
+                enableTodoRemove: false,
+                enableTodoEdit: false,
+                controls: []
+            });
+
+            $('#linktaskmodal').modal({ backdrop: 'static' });
         }
 
         function UploadAttach()
@@ -281,12 +284,12 @@
                 alert('Link Task title,duedate,assignee should not be empty!');
                 return false;
             }
-            
+
             $('#linksummary').val('');
             $('#linkdesc').val('');
             $('#linkduedate').val('');
             $('#linkassignee').val('');
-            
+
             $.post('/Project/CreateLinkTask',{
                 pjkey:pjkey,
                 title:title,
@@ -320,7 +323,7 @@
                     id:id,
                     taskremark:desc
                 },function(){
-                
+
                 })
             }
         }
@@ -515,27 +518,75 @@
         </div>
     </div>
 
-    @*<div class="modal" id="reportmarkmodal" tabindex="-1" role="dialog" aria-labelledby="reportmarkmodalLabel2">
-        <div class="modal-dialog" role="document">
+    <div class="modal" id="linktaskmodal" tabindex="-1" role="dialog" aria-labelledby="linktaskmodalLabel">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="reportmarkmodalLabel2">Automatic Report Mark</h4>
+                    <h4 class="modal-title" id="linktaskmodalLabel">Link Task</h4>
                 </div>
+                <br>
                 <div class="row">
-                    <div class="col-xs-1"></div>
-                    <div class="col-xs-10">
-                        @if (ViewBag.wkrptmarklist != null)
-                        {
-                            @Html.DropDownList("wkrptmarklist", null, new { @id = "wkrptmarklist", @class = "form-control" })
-                        }
+                    <div class="bs-example" style="text-align:center">
+                        <div class="col-lg-1">
+                        </div>
+                        <div class="col-lg-4">
+                            <input class="form-control" id="searchkey" name="searchkey">
+                        </div>
+                        <div class="col-lg-2">
+                            <button type="button" class="form-control" id="btn-search" style="background-color:#006DC0;height:35px;color:white;">Search Task</button>
+                        </div>
                     </div>
-                    <div class="col-xs-1"></div>
+                </div>
+                <br>
+                <div class="row">
+                    <div id="demoparent" class="bs-example" style="text-align:center">
+                        <div id="linktask-demo"></div>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+                    <button type="button" class="btn btn-success" onclick="refreshlinktask()">Close</button>
                 </div>
             </div>
         </div>
-    </div>*@
+        <script type="text/javascript">
+            function refreshlinktask()
+            {
+                $('#linktaskmodal').modal('hide');
+                var id = $('#currentissuekey').val();
+                refreshdetailmodal(id);
+            }
+
+            $('body').on('click', '#btn-search', function () {
+                if ($('#searchkey').val() == ''){ return false; }
+                $('#demoparent').empty();
+                $('#demoparent').append('<div id="linktask-demo"></div>');
+
+                var id = $('#currentissuekey').val();
+                $('#linktask-demo').lobiList({
+                    actions: {
+                        load: '/Issue/InitTaskLink?IssueKey='+id+'&searchkey=' + $('#searchkey').val(),
+                        move: '/Issue/MoveTaskLink'
+                    },
+                    enableTodoRemove: false,
+                    enableTodoEdit: false,
+                    controls: []
+                });
+            })
+
+            //$(function () {
+            //    var id = $('#currentissuekey').val();
+            //    $('#linktask-demo').lobiList({
+            //        actions: {
+            //            load: '/Issue/InitTaskLink?IssueKey='+id+'&searchkey=',
+            //            move: '/Issue/MoveTaskLink'
+            //        },
+            //        enableTodoRemove: false,
+            //        enableTodoEdit: false,
+            //        controls: []
+            //    });
+            //});
+        </script>
+    </div>
+
 }
 

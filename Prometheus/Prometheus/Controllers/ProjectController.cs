@@ -7643,51 +7643,6 @@ namespace Prometheus.Controllers
             return res;
         }
 
-        //[HttpPost]
-        //public JsonResult TodoListUpdate()
-        //{
-        //    var vm = ListOperateParse();
-
-        //    if (string.IsNullOrEmpty(vm.Summary))
-        //    {
-        //        var res1 = new JsonResult();
-        //        res1.Data = new { success = false };
-        //        return res1;
-        //    }
-
-        //    var realissue = IssueViewModels.RetrieveIssueByIssueKey(vm.IssueKey, this);
-        //    if (realissue != null)
-        //    {
-        //        if (!string.IsNullOrEmpty(vm.Description))
-        //        {
-        //            if (realissue.CommentList.Count == 0)
-        //            {
-        //                var ckdict = CookieUtility.UnpackCookie(this);
-        //                var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
-        //                var com = new IssueComments();
-        //                com.Comment = vm.Description;
-        //                IssueViewModels.StoreIssueComment(realissue.IssueKey, com.dbComment, updater, COMMENTTYPE.Description);
-        //            }
-        //            else
-        //            {
-        //                realissue.CommentList[0].Comment = vm.Description;
-        //                IssueViewModels.UpdateSPComment(realissue.IssueKey, realissue.CommentList[0].CommentType
-        //                    , realissue.CommentList[0].CommentDate.ToString("yyyy-MM-dd HH:mm:ss"), realissue.CommentList[0].dbComment);
-        //            }
-        //        }
-
-        //        if (!vm.DueDate.Equals(realissue.DueDate)||!vm.Assignee.Equals(realissue.Assignee))
-        //        {
-        //            realissue.DueDate = vm.DueDate;
-        //            realissue.Assignee = vm.Assignee;
-        //            realissue.UpdateIssue();
-        //        }
-        //    }
-
-        //    var res = new JsonResult();
-        //    res.Data = new { success = true };
-        //    return res;
-        //}
 
         [HttpPost]
         public JsonResult TodoListDelete()
@@ -7711,12 +7666,12 @@ namespace Prometheus.Controllers
             var realissue = IssueViewModels.RetrieveIssueByIssueKey(id, this);
             if (realissue != null)
             {
-                if (string.Compare(newlist, "DOING", true) == 0)
+                if (string.Compare(newlist, "mydoinglist", true) == 0)
                 {
                     realissue.Resolution = Resolute.Working;
                     realissue.UpdateIssue();
                 }
-                if (string.Compare(newlist, "DONE", true) == 0)
+                if (string.Compare(newlist, "mydonelist", true) == 0)
                 {
                     realissue.Resolution = Resolute.Done;
                     realissue.UpdateIssue();

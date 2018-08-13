@@ -2123,6 +2123,75 @@ namespace Prometheus.Controllers
             return RedirectToAction("DownLoadATETestData", "CustomerData");
         }
 
+        private StringBuilder PrepareProcessData(string ProjectKey,string sdate,string edate)
+        {
+            var procdata = ProcessData.RetrieveProcessDataSummaryByTime(ProjectKey,sdate, edate);
+            StringBuilder sb1 = new StringBuilder(60 * (procdata.Count + 1));
+            sb1.Append("Workflow Name,Input,Output,Yield,\r\n");
+
+            foreach (var kv in procdata)
+            {
+                var yield = ((double)kv.Value.MoveOutQty / (double)kv.Value.MoveInQty * 100.0).ToString("0.00");
+                sb1.Append("\"" + kv.Value.WorkflowStepName.Replace("\"", "") + "\"," + "\"" + kv.Value.MoveInQty.ToString() + "\"," + "\"" + kv.Value.MoveOutQty.ToString() + "\"," + "\"" + yield + "\",\r\n");
+            }
+            return sb1;
+        }
+
+        public ActionResult DownloadProcessData(string ProjectKey, string StartDate, string EndDate)
+        {
+            var sdate = DateTime.Parse(StartDate + " 00:00:00");
+            var edate = DateTime.Parse(EndDate + " 00:00:00");
+            if (sdate > edate)
+            {
+                sdate = DateTime.Parse(EndDate + " 00:00:00");
+                edate = DateTime.Parse(StartDate + " 23:59:59");
+            }
+            else
+            {
+                sdate = DateTime.Parse(StartDate + " 00:00:00");
+                edate = DateTime.Parse(EndDate + " 23:59:59");
+            }
+
+            var sb =PrepareProcessData(ProjectKey, sdate.ToString("yyyy-MM-dd HH:mm:ss"),edate.ToString("yyyy-MM-dd HH:mm:ss"));
+
+            string datestring = DateTime.Now.ToString("yyyyMMdd");
+            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+            if (!Directory.Exists(imgdir))
+            {
+                Directory.CreateDirectory(imgdir);
+            }
+
+            var fn = ProjectKey+"Process_Data_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+            var filename = imgdir + fn;
+
+            var fw = System.IO.File.OpenWrite(filename);
+            var CHUNK_STRING_LENGTH = 30000;
+            while (sb.Length > CHUNK_STRING_LENGTH)
+            {
+                var bt = System.Text.Encoding.UTF8.GetBytes(sb.ToString(0, CHUNK_STRING_LENGTH));
+                fw.Write(bt, 0, bt.Count());
+                sb.Remove(0, CHUNK_STRING_LENGTH);
+            }
+
+            var bt1 = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+            fw.Write(bt1, 0, bt1.Count());
+            fw.Close();
+
+            //try
+            //{
+            //    var fzip = new ICSharpCode.SharpZipLib.Zip.FastZip();
+            //    fzip.CreateZip(imgdir + fn.Replace(".csv", ".zip"), imgdir, false, fn);
+            //    try { System.IO.File.Delete(filename); } catch (Exception ex) { }
+            //    return File(filename.Replace(".csv", ".zip"), "application/vnd.zip", fn.Replace(".csv", ".zip"));
+            //}
+            //catch (Exception ex)
+            //{
+            //    if (!System.IO.File.Exists(filename))
+            //    { System.IO.File.WriteAllText(filename, "Fail to download data."); }
+                return File(filename, "application/vnd.ms-excel", fn);
+            //}
+        }
+
         public ActionResult JOMesProgress(string jo)
         {
             ViewBag.JO = "";

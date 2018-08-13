@@ -695,7 +695,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        private static List<string> RetrieveProcessWithSequence(string PJKey, string starttime, string endtime)
+        public static List<string> RetrieveProcessWithSequence(string PJKey, string starttime, string endtime)
         {
             var ret = new List<string>();
             var uniqukey = new Dictionary<string, bool>();
@@ -916,6 +916,51 @@ namespace Prometheus.Models
                                 detailinfo[item.WorkflowStepName].Add(tempcomm);
                             }
                         }//end if
+                    }
+                    if (tempmove.MoveInQty != 0)
+                    {
+                        ret.Add(item.WorkflowStepName, tempmove);
+                    }
+                }
+            }
+
+            return ret;
+        }
+
+        public static Dictionary<string, ProjectMoveHistory> RetrieveProcessDataSummaryByTime(string PJKey,string starttime,string endtime)
+        {
+            var ret = new Dictionary<string, ProjectMoveHistory>();
+
+            var lastweekprocessdata = RetrieveProcessDataByTime(PJKey, starttime, endtime);
+            foreach (var item in lastweekprocessdata)
+            {
+                if (ret.ContainsKey(item.WorkflowStepName))
+                {
+                    if (item.TxnTypeName == TXNTYPENAME.MoveStd)
+                    {
+                        ret[item.WorkflowStepName].MoveOutQty = ret[item.WorkflowStepName].MoveOutQty + item.MoveOutQty;
+                        ret[item.WorkflowStepName].MoveInQty = ret[item.WorkflowStepName].MoveInQty + item.MoveOutQty;
+                    }
+                    else if (item.TxnTypeName == TXNTYPENAME.MoveNonStd)
+                    {
+                        ret[item.WorkflowStepName].MoveInQty = ret[item.WorkflowStepName].MoveInQty + item.MoveOutQty;
+                    }
+                }
+                else
+                {
+                    var tempmove = new ProjectMoveHistory();
+                    tempmove.MoveOutQty = 0;
+                    tempmove.MoveInQty = 0;
+                    tempmove.WorkflowStepName = item.WorkflowStepName;
+
+                    if (item.TxnTypeName == TXNTYPENAME.MoveStd)
+                    {
+                        tempmove.MoveOutQty = item.MoveOutQty;
+                        tempmove.MoveInQty = item.MoveOutQty;
+                    }
+                    else if (item.TxnTypeName == TXNTYPENAME.MoveNonStd)
+                    {
+                        tempmove.MoveInQty = item.MoveOutQty;
                     }
                     if (tempmove.MoveInQty != 0)
                     {

@@ -280,13 +280,13 @@
 
                 <tbody>
                     @{
-                        var eklist = new List<string>();
-                        foreach (var error in Model.FErrorMap.Keys)
-                        {
-                            eklist.Add(error);
-                        }
+                        //var eklist = new List<string>();
+                        //foreach (var error in Model.FErrorMap.Keys)
+                        //{
+                        //    eklist.Add(error);
+                        //}
 
-                        foreach (var error in eklist)
+                        foreach (var error in ViewBag.ferrorkeylist)
                         {
                             <tr style="height:20px;">
                                 <td>@error</td>
@@ -339,13 +339,13 @@
 
                 <tbody>
                     @{
-                        eklist = new List<string>();
-                        foreach (var error in Model.LErrorMap.Keys)
-                        {
-                            eklist.Add(error);
-                        }
+                        //eklist = new List<string>();
+                        //foreach (var error in Model.LErrorMap.Keys)
+                        //{
+                        //    eklist.Add(error);
+                        //}
 
-                        foreach (var error in eklist)
+                        foreach (var error in ViewBag.rerrorkeylist)
                         {
                             <tr style="height:20px;">
                                 <td>@error</td>
@@ -400,13 +400,13 @@
 
                 <tbody>
                     @{
-                        eklist = new List<string>();
-                        foreach (var error in Model.SNErrorMap.Keys)
-                        {
-                            eklist.Add(error);
-                        }
+                        //eklist = new List<string>();
+                        //foreach (var error in Model.SNErrorMap.Keys)
+                        //{
+                        //    eklist.Add(error);
+                        //}
 
-                        foreach (var error in eklist)
+                        foreach (var error in ViewBag.snerrorkeylist)
                         {
                             <tr style="height:20px;">
                                 <td>@error</td>

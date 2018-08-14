@@ -2489,6 +2489,10 @@ namespace Prometheus.Controllers
                 var retestdatalist = new List<KeyValuePair<string, int>>();
                 var fytestdatalist = new List<KeyValuePair<string, int>>();
 
+                ViewBag.ferrorkeylist = new List<string>();
+                ViewBag.rerrorkeylist = new List<string>();
+                ViewBag.snerrorkeylist = new List<string>();
+
                 var pvmlist = ProjectViewModels.RetrieveOneProject(ProjectKey);
                 if (pvmlist.Count == 0) { return View(); }
                 var pvm = pvmlist[0];
@@ -2526,10 +2530,13 @@ namespace Prometheus.Controllers
 
                     firstdatalist = piedatadict.ToList();
 
+
+
                     piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.FirstYields[yieldvm.FirstYields.Count - 1].WhichTest, yieldvm.FErrorMap);
 
                     if(piedatadict.Count > 0)
                     {
+                        
                         var namevaluepair = "";
                         var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
                         foreach(var item in piedatadict_tmp)
@@ -2537,6 +2544,7 @@ namespace Prometheus.Controllers
                             if(item.Value > 0)
                             {
                                 namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                                ViewBag.ferrorkeylist.Add(item.Key);
                             }
                         }
                         namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
@@ -2588,6 +2596,7 @@ namespace Prometheus.Controllers
                     piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.SNYields[yieldvm.SNYields.Count - 1].WhichTest, yieldvm.SNErrorMap);
                     if (piedatadict.Count > 0)
                     {
+                        
                         var namevaluepair = "";
                         var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
                         foreach (var item in piedatadict_tmp)
@@ -2595,6 +2604,7 @@ namespace Prometheus.Controllers
                             if (item.Value > 0)
                             {
                                 namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                                ViewBag.snerrorkeylist.Add(item.Key);
                             }
                         }
                         namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
@@ -2644,6 +2654,7 @@ namespace Prometheus.Controllers
 
                     if(piedatadict.Count > 0)
                     {
+                        
                         var namevaluepair = "";
                         var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
                         foreach(var item in piedatadict_tmp)
@@ -2651,6 +2662,7 @@ namespace Prometheus.Controllers
                             if(item.Value > 0)
                             {
                                 namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                                ViewBag.rerrorkeylist.Add(item.Key);
                             }
                         }
                         namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
@@ -3253,6 +3265,10 @@ namespace Prometheus.Controllers
                 var pvm = pvmlist[0];
                 var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, sdate.ToString(), edate.ToString(), pvm, HttpContext.Cache);
 
+                    ViewBag.ferrorkeylist = new List<string>();
+                    ViewBag.rerrorkeylist = new List<string>();
+                    ViewBag.snerrorkeylist = new List<string>();
+
                 if (yieldvm.FirstYields.Count > 0)
                 {
                     var piedatadict = new Dictionary<string, int>();
@@ -3296,6 +3312,7 @@ namespace Prometheus.Controllers
                             if(item.Value > 0)
                             {
                                 namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                                ViewBag.ferrorkeylist.Add(item.Key);
                             }
                         }
                         namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
@@ -3313,57 +3330,6 @@ namespace Prometheus.Controllers
 
                 }
 
-
-                //if (yieldvm.LastYields.Count > 0)
-                //{
-                //    var piedatadict = new Dictionary<string, int>();
-                //    var eklist = new List<string>();
-                //    foreach (var error in yieldvm.LErrorMap.Keys)
-                //    {
-                //        eklist.Add(error);
-                //    }
-
-                //    foreach (var error in eklist)
-                //    {
-                //        if (string.Compare(error, "PASS", true) != 0)
-                //        {
-                //            foreach (var test in yieldvm.LastYields)
-                //            {
-                //                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.LErrorMap);
-
-                //                if (piedatadict.ContainsKey(error))
-                //                {
-                //                    var preval = piedatadict[error];
-                //                    piedatadict[error] = preval + val;
-                //                }
-                //                else
-                //                {
-                //                    piedatadict.Add(error, val);
-                //                }
-                //            }
-                //        }
-                //    }
-
-                //    retestdatalist = piedatadict.ToList();
-
-                //    piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.LastYields[yieldvm.LastYields.Count - 1].WhichTest, yieldvm.LErrorMap);
-
-                //    var keys = piedatadict.Keys;
-                //    var namevaluepair = "";
-                //    foreach (var k in keys)
-                //    {
-                //        if (piedatadict[k] > 0)
-                //            namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
-                //    }
-
-                //    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                //    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
-                //    ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
-                //        .Replace("#Title#", "Final Failure")
-                //        .Replace("#SERIESNAME#", "RFailure")
-                //        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
-                //}
 
                 if (yieldvm.SNYields.Count > 0)
                 {
@@ -3408,6 +3374,7 @@ namespace Prometheus.Controllers
                             if(item.Value > 0)
                             {
                                 namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                                ViewBag.snerrorkeylist.Add(item.Key);
                             }
                         }
                         namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
@@ -3466,6 +3433,7 @@ namespace Prometheus.Controllers
                             if (item.Value > 0)
                             {
                                 namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                                ViewBag.rerrorkeylist.Add(item.Key);
                             }
                         }
                         namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
@@ -3530,6 +3498,10 @@ namespace Prometheus.Controllers
                 var retestdatalist = new List<KeyValuePair<string, int>>();
                 var fytestdatalist = new List<KeyValuePair<string, int>>();
 
+                ViewBag.ferrorkeylist = new List<string>();
+                ViewBag.rerrorkeylist = new List<string>();
+                ViewBag.snerrorkeylist = new List<string>();
+
                 var pvmlist = ProjectViewModels.RetrieveOneProject(ProjectKey);
                 if (pvmlist.Count == 0) { return View(); }
                 var pvm = pvmlist[0];
@@ -3579,6 +3551,7 @@ namespace Prometheus.Controllers
                             if (item.Value > 0)
                             {
                                 namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                                ViewBag.ferrorkeylist.Add(item.Key);
                             }
                         }
 
@@ -3596,57 +3569,6 @@ namespace Prometheus.Controllers
                     }
                 }
 
-
-                //if (yieldvm.LastYields.Count > 0)
-                //{
-                //    var piedatadict = new Dictionary<string, int>();
-                //    var eklist = new List<string>();
-                //    foreach (var error in yieldvm.LErrorMap.Keys)
-                //    {
-                //        eklist.Add(error);
-                //    }
-
-                //    foreach (var error in eklist)
-                //    {
-                //        if (string.Compare(error, "PASS", true) != 0)
-                //        {
-                //            foreach (var test in yieldvm.LastYields)
-                //            {
-                //                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.LErrorMap);
-
-                //                if (piedatadict.ContainsKey(error))
-                //                {
-                //                    var preval = piedatadict[error];
-                //                    piedatadict[error] = preval + val;
-                //                }
-                //                else
-                //                {
-                //                    piedatadict.Add(error, val);
-                //                }
-                //            }
-                //        }
-                //    }
-
-                //    retestdatalist = piedatadict.ToList();
-
-                //    piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.LastYields[yieldvm.LastYields.Count - 1].WhichTest, yieldvm.LErrorMap);
-
-                //    var keys = piedatadict.Keys;
-                //    var namevaluepair = "";
-                //    foreach (var k in keys)
-                //    {
-                //        if (piedatadict[k] > 0)
-                //            namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
-                //    }
-
-                //    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                //    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
-                //    ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
-                //        .Replace("#Title#", "Final Failure")
-                //        .Replace("#SERIESNAME#", "RFailure")
-                //        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
-                //}
 
                 if (yieldvm.SNYields.Count > 0)
                 {
@@ -3690,6 +3612,7 @@ namespace Prometheus.Controllers
                             if (item.Value > 0)
                             {
                                 namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                                ViewBag.snerrorkeylist.Add(item.Key);
                             }
                         }
                         namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
@@ -3749,6 +3672,7 @@ namespace Prometheus.Controllers
                             if (item.Value > 0)
                             {
                                 namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                                ViewBag.rerrorkeylist.Add(item.Key);
                             }
                         }
 
@@ -3961,6 +3885,10 @@ namespace Prometheus.Controllers
                     var retestdatalist = new List<KeyValuePair<string, int>>();
                     var fytestdatalist = new List<KeyValuePair<string, int>>();
 
+                    ViewBag.ferrorkeylist = new List<string>();
+                    ViewBag.rerrorkeylist = new List<string>();
+                    ViewBag.snerrorkeylist = new List<string>();
+
                     var yieldvm = vmlist[0];
 
                     if (yieldvm.FirstYields.Count > 0)
@@ -4005,6 +3933,7 @@ namespace Prometheus.Controllers
                                 if (item.Value > 0)
                                 {
                                     namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                                    ViewBag.ferrorkeylist.Add(item.Key);
                                 }
                             }
 
@@ -4023,57 +3952,6 @@ namespace Prometheus.Controllers
                         }
                     }
 
-
-                    //if (yieldvm.LastYields.Count > 0)
-                    //{
-                    //    var piedatadict = new Dictionary<string, int>();
-                    //    var eklist = new List<string>();
-                    //    foreach (var error in yieldvm.LErrorMap.Keys)
-                    //    {
-                    //        eklist.Add(error);
-                    //    }
-
-                    //    foreach (var error in eklist)
-                    //    {
-                    //        if (string.Compare(error, "PASS", true) != 0)
-                    //        {
-                    //            foreach (var test in yieldvm.LastYields)
-                    //            {
-                    //                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.LErrorMap);
-
-                    //                if (piedatadict.ContainsKey(error))
-                    //                {
-                    //                    var preval = piedatadict[error];
-                    //                    piedatadict[error] = preval + val;
-                    //                }
-                    //                else
-                    //                {
-                    //                    piedatadict.Add(error, val);
-                    //                }
-                    //            }
-                    //        }
-                    //    }
-
-                    //    retestdatalist = piedatadict.ToList();
-
-                    //    piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.LastYields[yieldvm.LastYields.Count - 1].WhichTest, yieldvm.LErrorMap);
-
-                    //    var keys = piedatadict.Keys;
-                    //    var namevaluepair = "";
-                    //    foreach (var k in keys)
-                    //    {
-                    //        if (piedatadict[k] > 0)
-                    //            namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
-                    //    }
-
-                    //    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                    //    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
-                    //    ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
-                    //        .Replace("#Title#", "Final Failure")
-                    //        .Replace("#SERIESNAME#", "RFailure")
-                    //        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
-                    //}
 
                     if (yieldvm.SNYields.Count > 0)
                     {
@@ -4117,6 +3995,7 @@ namespace Prometheus.Controllers
                                 if (item.Value > 0)
                                 {
                                     namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                                    ViewBag.snerrorkeylist.Add(item.Key);
                                 }
                             }
 
@@ -4177,6 +4056,7 @@ namespace Prometheus.Controllers
                                 if (item.Value > 0)
                                 {
                                     namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                                    ViewBag.rerrorkeylist.Add(item.Key);
                                 }
                             }
 
@@ -4761,6 +4641,10 @@ namespace Prometheus.Controllers
                 var retestdatalist = new List<KeyValuePair<string, int>>();
                 var fytestdatalist = new List<KeyValuePair<string, int>>();
 
+                ViewBag.ferrorkeylist = new List<string>();
+                ViewBag.rerrorkeylist = new List<string>();
+                ViewBag.snerrorkeylist = new List<string>();
+
                 var pvmlist = ProjectViewModels.RetrieveOneProject(ProjectKey);
                 if (pvmlist.Count == 0) { return View(); }
                 var pvm = pvmlist[0];
@@ -4809,6 +4693,7 @@ namespace Prometheus.Controllers
                             if (item.Value > 0)
                             {
                                 namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                                ViewBag.ferrorkeylist.Add(item.Key);
                             }
                         }
 
@@ -4828,57 +4713,6 @@ namespace Prometheus.Controllers
                     }
                 }
 
-
-                //if (yieldvm.LastYields.Count > 0)
-                //{
-                //    var piedatadict = new Dictionary<string, int>();
-                //    var eklist = new List<string>();
-                //    foreach (var error in yieldvm.LErrorMap.Keys)
-                //    {
-                //        eklist.Add(error);
-                //    }
-
-                //    foreach (var error in eklist)
-                //    {
-                //        if (string.Compare(error, "PASS", true) != 0)
-                //        {
-                //            foreach (var test in yieldvm.LastYields)
-                //            {
-                //                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.LErrorMap);
-
-                //                if (piedatadict.ContainsKey(error))
-                //                {
-                //                    var preval = piedatadict[error];
-                //                    piedatadict[error] = preval + val;
-                //                }
-                //                else
-                //                {
-                //                    piedatadict.Add(error, val);
-                //                }
-                //            }
-                //        }
-                //    }
-
-                //    retestdatalist = piedatadict.ToList();
-
-                //    piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.LastYields[yieldvm.LastYields.Count - 1].WhichTest, yieldvm.LErrorMap);
-
-                //    var keys = piedatadict.Keys;
-                //    var namevaluepair = "";
-                //    foreach (var k in keys)
-                //    {
-                //        if (piedatadict[k] > 0)
-                //            namevaluepair = namevaluepair + "{ name:'" + k + "',y:" + piedatadict[k].ToString() + "},";
-                //    }
-
-                //    namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                //    var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart.xml"));
-                //    ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
-                //        .Replace("#Title#", "Final Failure")
-                //        .Replace("#SERIESNAME#", "RFailure")
-                //        .Replace("#NAMEVALUEPAIRS#", namevaluepair);
-                //}
 
                 if (yieldvm.SNYields.Count > 0)
                 {
@@ -4922,6 +4756,7 @@ namespace Prometheus.Controllers
                             if (item.Value > 0)
                             {
                                 namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                                ViewBag.snerrorkeylist.Add(item.Key);
                             }
                         }
 
@@ -4982,6 +4817,7 @@ namespace Prometheus.Controllers
                             if (item.Value > 0)
                             {
                                 namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                                ViewBag.rerrorkeylist.Add(item.Key);
                             }
                         }
 

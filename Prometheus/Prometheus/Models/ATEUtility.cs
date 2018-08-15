@@ -220,7 +220,7 @@ namespace Prometheus.Models
                             }//end foreach
 
                             var hours = (double)(pjdatalist[pjdatalist.Count - 1].TestTimeStamp - pjdatalist[0].TestTimeStamp).TotalSeconds / 3600.0;
-                            if (hours != 0.0)
+                            if (hours > 0.001 && hours < 20)
                             {
                                 if (string.IsNullOrEmpty(errid))
                                 {

@@ -1452,6 +1452,28 @@ namespace Prometheus.Models
             return ret;
         }
 
+        private static bool IsWaferSpend6Month(string wafer,DateTime endtime)
+        {
+            var ret = false;
+            try
+            {
+                var sql = "select top 1 TestTimeStamp from BITestResult where Wafer = @Wafer order by TestTimeStamp asc";
+                var dict = new Dictionary<string, string>();
+                dict.Add("@Wafer", wafer);
+
+                var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, dict);
+                if (dbret.Count == 0) { return ret; }
+                var starttime = Convert.ToDateTime(dbret[0][0]);
+
+                if ((endtime - starttime).Days > 180)
+                { ret = true; }
+            }
+            catch (Exception ex) { }
+
+            return ret;
+        }
+
+
         private static void SolveDataByWafer(Dictionary<string, bool> waferdict, Dictionary<string, VcselPNData> VcselPNInfo, Controller ctrl)
         {
             foreach (var kv in waferdict)
@@ -1487,10 +1509,21 @@ namespace Prometheus.Models
         {
             var EndDate = StartDate.AddMonths(1);
             var monthlytestdata = RetrieveBITestData(StartDate, EndDate);
+
+            var waferspend6monthdict = new Dictionary<string, bool>();
+            foreach (var data in monthlytestdata)
+            {
+                if (!waferspend6monthdict.ContainsKey(data.Wafer))
+                {
+                    var yesno = IsWaferSpend6Month(data.Wafer, StartDate);
+                    waferspend6monthdict.Add(data.Wafer, yesno);
+                }
+            }
+
             var filteddata = new List<BITestResult>();
             foreach(var item in monthlytestdata)
             {
-                if (VcselPNInfo.ContainsKey(item.ProductName))
+                if (VcselPNInfo.ContainsKey(item.ProductName) && !waferspend6monthdict[item.Wafer])
                 {
                     filteddata.Add(item);
                 }

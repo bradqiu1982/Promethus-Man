@@ -6339,6 +6339,13 @@ namespace Prometheus.Controllers
             //    { }
             //}
 
+            heartbeatlog("ExternalDataCollector.RefreshShipData");
+            try
+            {
+                ExternalDataCollector.RefreshShipData(this);
+            }
+            catch (Exception ex) { }
+
             heartbeatlog("ProcessData.LoadMesWorkflow");
 
             foreach (var pjkey in pjkeylist)

@@ -2283,7 +2283,7 @@ namespace Prometheus.Models
                     tempdata.x = Convert.ToInt32(line[0]);
                     tempdata.y = Convert.ToInt32(line[1]);
                     tempdata.value = Convert.ToDouble(line[2]);
-                    if (real2db[datafield].ToUpper().Contains("PWR"))
+                    if (real2db[datafield].ToUpper().Contains("PWR") || datafield.ToUpper().Contains("PWR"))
                     {
                         tempdata.value = 10*Math.Log10(tempdata.value * 1000);
                     }

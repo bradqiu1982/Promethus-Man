@@ -10,10 +10,27 @@
     xAxis:{
         },
     yAxis:{
-            min:#YMIN#,
-            max:#YMAX#
         },
-     series: [#SERIESVALUE#],
+     series: [{
+                name: '#BOXNAME#',
+                data: #BOXDATA#,
+                tooltip: {
+                    headerFormat: '<em>{point.key}</em><br/>'
+                }
+            },
+            {
+                name: 'Outlier',
+                type: 'scatter',
+                data: #OUTLIERDATA#,
+                marker: {
+                    lineWidth: 1,
+                    radius: 2
+                },
+                tooltip: {
+                    headerFormat: '',
+                    pointFormat: "{point.y}"
+                }
+            }],
         exporting: {
             menuItemDefinitions: {
                 fullscreen: {

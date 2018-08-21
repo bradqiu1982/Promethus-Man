@@ -3552,6 +3552,7 @@ namespace Prometheus.Controllers
             return View();
         }
 
+
         private void HeatMap4NeoMap(List<NeoMapDataWithPos> vm, string querycond, string datafield, bool left)
         {
                 var DATAFIELDNAME = datafield.Replace(TXOQUERYCOND.NEOMAP, "");
@@ -3810,84 +3811,6 @@ namespace Prometheus.Controllers
         }
 
 
-        private void NEONormalDistributeCombineChart(CleanDataWithStdDev lfilteddata, CleanDataWithStdDev rfilteddata
-            , string lquerycond, string rquerycond, string datafield)
-        {
-            var lds = GetNormalDistrData(lfilteddata, 1.0);
-            var rds = GetNormalDistrData(rfilteddata, lds.yrate);
-
-            var xmax = lds.xmax > rds.xmax ? lds.xmax : rds.xmax;
-            var xmin = lds.xmin < rds.xmin ? lds.xmin : rds.xmin;
-            var ymax = lds.ymax > rds.ymax ? lds.ymax : rds.ymax;
-            var ymin = lds.ymin < rds.ymin ? lds.ymin : rds.ymin;
-            var amount = lds.AmountMAX > rds.AmountMAX ? lds.AmountMAX : rds.AmountMAX;
-
-            var DATAFIELDNAME = datafield.Replace(TXOQUERYCOND.NEOMAP, "").Replace(TXOQUERYCOND.BURNIN, "").Replace(TXOQUERYCOND.TEST, "");
-            var Title = DATAFIELDNAME+ " Normal Distribution";
-            var ElementID = "combinenormaldistr";
-
-            var scritpttxt = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/NormalDistributionCombine.xml"));
-            scritpttxt = scritpttxt.Replace("#ElementID#", ElementID)
-                    .Replace("#Title#", Title)
-                    .Replace("#DATAFIELDNAME#", DATAFIELDNAME)
-                    .Replace("#XMIN#", xmin.ToString())
-                    .Replace("#XMAX#", xmax.ToString())
-                    .Replace("#YMIN#", ymin.ToString())
-                    .Replace("#YMAX#", ymax.ToString())
-                    .Replace("#LMEAN#", lds.mean.ToString("f6"))
-                    .Replace("#RMEAN#", rds.mean.ToString("f6"))
-                    .Replace("#LStDev#", lds.stddev.ToString("f6"))
-                    .Replace("#RStDev#", rds.stddev.ToString("f6"))
-                    .Replace("#LStDevLeft#", lds.left3sigma.ToString())
-                    .Replace("#RStDevLeft#", rds.left3sigma.ToString())
-                    .Replace("#LStDevRight#", lds.right3sigma.ToString())
-                    .Replace("#RStDevRight#", rds.right3sigma.ToString())
-                    .Replace("#LYVALUES#", lds.YVALUES)
-                    .Replace("#RYVALUES#", rds.YVALUES)
-                    .Replace("#LSERIESNAME#", lquerycond)
-                    .Replace("#RSERIESNAME#", rquerycond)
-                    .Replace("#AmountMAX#", amount.ToString())
-                    .Replace("#LYVALUES2#", lds.YVALUES2)
-                    .Replace("#RYVALUES2#", rds.YVALUES2)
-                    .Replace("#LSERIESNAME2#", lquerycond + "-freq")
-                    .Replace("#RSERIESNAME2#", rquerycond + "-freq");
-
-            ViewBag.combinenormaldistr = scritpttxt;
-        }
-
-        private void NEOBoxPlotCombine(CleanDataWithStdDev lvm, CleanDataWithStdDev rvm
-            , string lquerycond, string rquerycond, string datafield)
-        {
-            //{name: '#SERIESNAME#',data: [#YVALUES#]}
-
-            var lboxdata = GetBoxPlotData(lvm);
-            var rboxdata = GetBoxPlotData(rvm);
-
-            var DATAFIELDNAME = datafield.Replace(TXOQUERYCOND.NEOMAP, "").Replace(TXOQUERYCOND.BURNIN, "").Replace(TXOQUERYCOND.TEST, "");
-            var Title =  DATAFIELDNAME + " Box Plot";
-
-            var LYVALUES = lboxdata.Min.ToString() + "," + lboxdata.LowerQuart.ToString() + "," + lboxdata.Mean.ToString() + "," + lboxdata.UpperQuart.ToString() + "," + lboxdata.Max.ToString();
-            var RYVALUES = rboxdata.Min.ToString() + "," + rboxdata.LowerQuart.ToString() + "," + rboxdata.Mean.ToString() + "," + rboxdata.UpperQuart.ToString() + "," + rboxdata.Max.ToString();
-
-            var min = lboxdata.Min < rboxdata.Min ? lboxdata.Min : rboxdata.Min;
-            var max = lboxdata.Max > rboxdata.Max ? lboxdata.Max : rboxdata.Max;
-
-            var lseriesstr = "{name: '#SERIESNAME#',data: [[#YVALUES#]]}";
-            var rseriesstr = "{name: '#SERIESNAME#',data: [[#YVALUES#]]}";
-            var mainseriesstr = lseriesstr.Replace("#SERIESNAME#", lquerycond).Replace("#YVALUES#", LYVALUES) + ","
-                                + rseriesstr.Replace("#SERIESNAME#", rquerycond).Replace("#YVALUES#", RYVALUES);
-
-            var ElementID = "combineboxplot";
-
-            var scritpttxt = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/BoxPlot.xml"));
-            scritpttxt = scritpttxt.Replace("#ElementID#", ElementID)
-                    .Replace("#Title#", Title)
-                    .Replace("#YMIN#", min.ToString())
-                    .Replace("#YMAX#", max.ToString())
-                    .Replace("#SERIESVALUE#", mainseriesstr);
-
-            ViewBag.combineboxplot = scritpttxt;
-         }
 
         private void NEONormalDistributeChart(CleanDataWithStdDev filteddata, string querycond, string datafield, bool left)
         {
@@ -4035,14 +3958,44 @@ namespace Prometheus.Controllers
         private void NEOBoxPlot(CleanDataWithStdDev filteddata, string querycond, string datafield, bool left)
         {
             //{name: '#SERIESNAME#',data: [#YVALUES#]}
-            var boxdata = GetBoxPlotData(filteddata);
+            var cbox = WaferBGDField.GetBoxData(filteddata.FiltedList, -9999.0, 9999.0);
+            var outlierlist = new List<VXVal>();
+            var rad = new System.Random(DateTime.Now.Second);
+            var idx = 0;
+            foreach (var data in filteddata.FiltedList)
+            {
+                if ((data > -9999.0 && data < cbox.min)
+                    || (data < 9999.0 && data > cbox.max))
+                {
+                    var tempdata = new VXVal();
+                    tempdata.ival = data;
+                    if (idx % 2 == 0)
+                    { tempdata.x = rad.NextDouble() / 5.0; }
+                    else
+                    { tempdata.x = 0 - rad.NextDouble() / 5.0; }
+                    outlierlist.Add(tempdata);
+                    idx = idx + 1;
+                }
+            }
 
             var DATAFIELDNAME = datafield.Replace(TXOQUERYCOND.NEOMAP, "").Replace(TXOQUERYCOND.BURNIN, "").Replace(TXOQUERYCOND.TEST, "");
             var Title = querycond + " " + DATAFIELDNAME + " Box Plot";
 
-            var YVALUES = boxdata.Min.ToString() + "," + boxdata.LowerQuart.ToString() + "," + boxdata.Mean.ToString() + "," + boxdata.UpperQuart.ToString() + "," + boxdata.Max.ToString();
-            var seriesstr = "{name: '#SERIESNAME#',data: [[#YVALUES#]]}";
-            seriesstr = seriesstr.Replace("#SERIESNAME#", DATAFIELDNAME).Replace("#YVALUES#", YVALUES);
+            var YVALUES = cbox.min.ToString() + "," + cbox.lower.ToString() + "," + cbox.mean.ToString() + "," + cbox.upper.ToString() + "," + cbox.max.ToString();
+            var boxplotdata ="[[#YVALUES#]]";
+            boxplotdata = boxplotdata.Replace("#YVALUES#", YVALUES);
+
+            var outlierdatalist = "[#OUTLIERVAL#]";
+            var outlierval = "";
+            foreach (var item in outlierlist)
+            {
+                outlierval += "[" + item.x + "," + item.ival + "],";
+            }
+            if (outlierlist.Count > 0)
+            {
+                outlierval = outlierval.Substring(0, outlierval.Length - 1);
+            }
+            outlierdatalist = outlierdatalist.Replace("#OUTLIERVAL#", outlierval);
 
             var ElementID = "leftboxplot";
             if (!left)
@@ -4050,12 +4003,12 @@ namespace Prometheus.Controllers
                 ElementID = "rightboxplot";
             }
 
-            var scritpttxt = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/BoxPlot.xml"));
+            var scritpttxt = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/BoxPlotNeomap.xml"));
             scritpttxt = scritpttxt.Replace("#ElementID#", ElementID)
                     .Replace("#Title#", Title)
-                    .Replace("#YMIN#", boxdata.Min.ToString())
-                    .Replace("#YMAX#", boxdata.Max.ToString())
-                    .Replace("#SERIESVALUE#", seriesstr);
+                    .Replace("#BOXNAME#", DATAFIELDNAME)
+                    .Replace("#BOXDATA#", boxplotdata)
+                    .Replace("#OUTLIERDATA#", outlierdatalist);
 
             if (left)
             {
@@ -4218,40 +4171,6 @@ namespace Prometheus.Controllers
             }
         }
 
-        private void NeoMapDataAnalysisCombine(string lquerycond, string ldatafield, string rquerycond, string rdatafield)
-        {
-            var lvm = ExternalDataCollector.RetrieveNeoMapData(lquerycond, ldatafield);
-            var rvm = ExternalDataCollector.RetrieveNeoMapData(rquerycond, rdatafield);
-            if (lvm.Count > 2)
-            {
-                HeatMap4NeoMap(lvm, lquerycond, ldatafield,true);
-            }
-
-            if (rvm.Count > 2)
-            {
-                HeatMap4NeoMap(rvm, rquerycond, rdatafield, false);
-            }
-            if (rvm.Count > 5 && lvm.Count > 5)
-            {
-                var lrawlist = new List<double>();
-                var rrawlist = new List<double>();
-                foreach (var item in lvm)
-                {
-                    lrawlist.Add(item.value);
-                }
-                foreach (var item in rvm)
-                {
-                    rrawlist.Add(item.value);
-                }
-
-                var lfilteddata = GetCleanDataWithStdDev(lrawlist);
-                var rfilteddata = GetCleanDataWithStdDev(rrawlist);
-
-                NEONormalDistributeCombineChart(lfilteddata, rfilteddata, lquerycond, rquerycond, ldatafield);
-                NEOBoxPlotCombine(lfilteddata, rfilteddata, lquerycond, rquerycond, ldatafield);
-            }
-        }
-
         private void DataSolveWithSide(string cond,string field,Dictionary<string,bool> waferdict, Dictionary<string, bool> bijodict,bool left) 
         {
             if (!string.IsNullOrEmpty(cond)
@@ -4314,64 +4233,6 @@ namespace Prometheus.Controllers
             }
         }
 
-        private void DataSolveCombine(string leftcond, string leftfield
-            , string rightcond, string rightfield, Dictionary<string, bool> waferdict, Dictionary<string, bool> bijodict)
-        {
-                var lcondtype = TXOQUERYTYPE.BR;
-                var rcondtype = TXOQUERYTYPE.BR;
-
-                if (waferdict.ContainsKey(leftcond))
-                {
-                    lcondtype = TXOQUERYTYPE.WAFER;
-                }
-                else if (bijodict.ContainsKey(leftcond))
-                {
-                    lcondtype = TXOQUERYTYPE.JO;
-                }
-
-                if (waferdict.ContainsKey(rightcond))
-                {
-                    rcondtype = TXOQUERYTYPE.WAFER;
-                }
-                else if (bijodict.ContainsKey(rightcond))
-                {
-                    rcondtype = TXOQUERYTYPE.JO;
-                }
-
-            if (string.Compare(lcondtype, rcondtype) == 0)
-            {
-                if (lcondtype.Contains(TXOQUERYTYPE.BR))
-                {
-
-                }
-                else if (lcondtype.Contains(TXOQUERYTYPE.JO))
-                {
-
-                }
-                else if (lcondtype.Contains(TXOQUERYTYPE.WAFER))
-                {
-                    if (leftfield.Contains(TXOQUERYCOND.NEOMAP))
-                    {
-                        NeoMapDataAnalysisCombine(leftcond, leftfield, rightcond, rightfield);
-                    }
-                }
-            }
-            else
-            {
-                if (lcondtype.Contains(TXOQUERYTYPE.BR))
-                {
-                    
-                }
-                else if (lcondtype.Contains(TXOQUERYTYPE.JO))
-                {
-
-                }
-                else if (lcondtype.Contains(TXOQUERYTYPE.WAFER))
-                {
-                    
-                }
-            }
-        }
 
         [HttpPost, ActionName("TXOTestData")]
         [ValidateAntiForgeryToken]
@@ -4398,22 +4259,9 @@ namespace Prometheus.Controllers
             var waferlist = waferdict.Keys.ToList();
             var bijolist = bijodict.Keys.ToList();
 
-            //if (!string.IsNullOrEmpty(leftcond)
-            //        && !string.IsNullOrEmpty(leftfield)
-            //        && !string.IsNullOrEmpty(rightcond)
-            //        && !string.IsNullOrEmpty(rightfield)
-            //        && !leftcond.ToUpper().Contains("PLEASE")
-            //        && !rightcond.ToUpper().Contains("PLEASE")
-            //        && string.Compare(leftfield, rightfield) == 0)
-            //{
-            //    DataSolveCombine(leftcond, leftfield
-            //        , rightcond, rightfield, waferdict, bijodict);
-            //}
-            //else
-            //{
-                DataSolveWithSide(leftcond, leftfield, waferdict,bijodict, true);
-                DataSolveWithSide(rightcond, rightfield, waferdict, bijodict, false);
-            //}
+
+            DataSolveWithSide(leftcond, leftfield, waferdict,bijodict, true);
+            DataSolveWithSide(rightcond, rightfield, waferdict, bijodict, false);
 
             var ckdict = CookieUtility.UnpackCookie(this);
             var updater = ckdict["logonuser"].Split(new char[] { '|' })[0];
@@ -4422,6 +4270,74 @@ namespace Prometheus.Controllers
 
             waferlist.AddRange(bijolist);
             preparetxotestdata(waferlist,"", "", "", "");
+            return View();
+        }
+
+
+        private void prepareneomapviewlist(List<string> waferlist)
+        {
+            var tempcondlist = new List<string>();
+            tempcondlist.AddRange(waferlist);
+            ViewBag.queryvallist = tempcondlist;
+
+            var datafieldlist = ExternalDataCollector.NeoMapMainFieldNameList();
+            var selectlist = new List<string>();
+            selectlist.Add("Please select data field");
+            selectlist.AddRange(datafieldlist);
+            var selectcontrol = CreateSelectList(selectlist, "");
+            selectcontrol[0].Disabled = true;
+            selectcontrol[0].Selected = true;
+            ViewBag.leftdatafieldlist = selectcontrol;
+
+            selectlist = new List<string>();
+            selectlist.Add("Please select data field");
+            selectlist.AddRange(datafieldlist);
+            selectcontrol = CreateSelectList(selectlist, "");
+            selectcontrol[0].Disabled = true;
+            selectcontrol[0].Selected = true;
+            ViewBag.rightdatafieldlist = selectcontrol;
+        }
+
+        private void NeoMapDataSolveWithSide(string cond, string field, bool left)
+        {
+            if (!string.IsNullOrEmpty(cond)
+            && !cond.ToUpper().Contains("PLEASE")
+            && !string.IsNullOrEmpty(field))
+            {
+                NeoMapDataAnalysis(cond, field, left);
+            }
+        }
+
+        public ActionResult NeoMapDataAnalysis()
+        {
+            var waferdict = ExternalDataCollector.RetrieveNeoMapWaferList();
+            var waferlist = waferdict.Keys.ToList();
+            waferlist.Sort();waferlist.Reverse();
+            prepareneomapviewlist(waferlist);
+            return View();
+        }
+
+        [HttpPost, ActionName("NeoMapDataAnalysis")]
+        [ValidateAntiForgeryToken]
+        public ActionResult NeoMapDataAnalysisPost()
+        {
+            var leftcond = Request.Form["leftquerylist"].Trim();
+            var leftfield = Request.Form["leftdatafieldlist"];
+            var rightcond = Request.Form["rightquerylist"].Trim();
+            var rightfield = Request.Form["rightdatafieldlist"];
+
+            if (leftfield != null)
+                leftfield = leftfield.Trim();
+            if (rightfield != null)
+                rightfield = rightfield.Trim();
+
+            NeoMapDataSolveWithSide(leftcond, leftfield,true);
+            NeoMapDataSolveWithSide(rightcond, rightfield,false);
+
+            var waferdict = ExternalDataCollector.RetrieveNeoMapWaferList();
+            var waferlist = waferdict.Keys.ToList();
+            waferlist.Sort();waferlist.Reverse();
+            prepareneomapviewlist(waferlist);
             return View();
         }
 

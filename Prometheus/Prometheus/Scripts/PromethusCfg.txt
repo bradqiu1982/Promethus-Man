@@ -1,7 +1,7 @@
 ﻿PROJECTTYPE:::Parallel;Tunable;Telecom;LineCard;OSA;QM;WSS;Others
 SHAREFOLDERUSER:::brad.qiu
 SHAREFOLDERDOMIN:::china
-SHAREFOLDERPWD:::wangle@345678
+SHAREFOLDERPWD:::wangle@456789
 APPEMAILADRESS:::WXNPI.Trace@finisar.com
 APPEMAILPWD:::abc@12345
 #EMAILSERVER:::wmail.finisar.com

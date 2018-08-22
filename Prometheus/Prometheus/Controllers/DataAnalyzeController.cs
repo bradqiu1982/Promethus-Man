@@ -3572,11 +3572,12 @@ namespace Prometheus.Controllers
 
             var VALUEMIN = vm[0].value;
             var VALUEMAX = vm[0].value;
-                
+
+            var sb = new StringBuilder(30 * vm.Count);
 
             foreach (var item in vm)
             {
-                MAPDATA = MAPDATA+"[" +item.x.ToString()+","+item.y.ToString()+","+item.value.ToString()+ "],";
+                sb.Append("[" +item.x.ToString()+","+item.y.ToString()+","+item.value.ToString()+ "],");
 
                 if (item.x < xmin)
                     xmin = item.x;
@@ -3594,6 +3595,8 @@ namespace Prometheus.Controllers
                 if (item.value < VALUEMIN)
                     VALUEMIN = item.value;
             }
+
+            MAPDATA = sb.ToString();
             if (MAPDATA.Length > 6)
                 MAPDATA = MAPDATA.Substring(0, MAPDATA.Length - 1);
 
@@ -3682,11 +3685,14 @@ namespace Prometheus.Controllers
 
 
             var YVALUES = string.Empty;
+
+            var sb = new StringBuilder(30 * count);
             for (var idx = 0; idx < count; idx++)
             {
-                YVALUES = YVALUES + "[" + valuelist[idx].ToString() + "," + (ylist[idx] / rate).ToString() + "],";
+                sb.Append("[" + valuelist[idx].ToString() + "," + (ylist[idx] / rate).ToString() + "],");
             }
 
+            YVALUES = sb.ToString();
             YVALUES = YVALUES.Substring(0, YVALUES.Length - 1);
 
             ymin = ymin / rate;
@@ -3992,12 +3998,14 @@ namespace Prometheus.Controllers
 
             var outlierdatalist = "[#OUTLIERVAL#]";
             var outlierval = "";
+            var sb = new StringBuilder(30 * outlierlist.Count);
             foreach (var item in outlierlist)
             {
-                outlierval += "[" + item.x + "," + item.ival + "],";
+                sb.Append("[" + item.x + "," + item.ival + "],");
             }
             if (outlierlist.Count > 0)
             {
+                outlierval = sb.ToString();
                 outlierval = outlierval.Substring(0, outlierval.Length - 1);
             }
             outlierdatalist = outlierdatalist.Replace("#OUTLIERVAL#", outlierval);

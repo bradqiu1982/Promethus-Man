@@ -1601,3 +1601,12 @@ select did from (
 select SN+TestName+format(TestTimeStamp, 'yyyy-MM-dd HH:mm:ss') tempkey,count(SN+TestName+format(TestTimeStamp, 'yyyy-MM-dd HH:mm:ss')) cnt,MAX(DataID) did from [NPITrace].[dbo].[BITestResult]  where TestTimeStamp < '2018-06-01 00:00:00' and BITable = 'dbo.v_BITopazOutput'  group by (SN+TestName+format(TestTimeStamp, 'yyyy-MM-dd HH:mm:ss'))
 ) as subquery where cnt > 1
 )
+
+
+	CREATE TABLE [dbo].[NeoMapChartCache] (
+    [WaferNo]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[FieldName]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[ChartType]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Chart]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[UpdateTime]   DATETIME  DEFAULT ('1982-05-06 10:00:00') NOT NULL
+	);

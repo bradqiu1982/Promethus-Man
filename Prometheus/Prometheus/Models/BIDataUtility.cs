@@ -2883,7 +2883,7 @@ namespace Prometheus.Models
                     +" ,[Final_Power_On_Align_CH2nd],[Final_Power_On_Align_CH3rd],[Final_Power_On_Align_CH4th]"
                     +" ,[Tx1_Power_For_Second],[Tx2_Power_For_Second],[Tx3_Power_For_Second],[Tx4_Power_For_Second]"
                     +"  from[Parallel].[dbo].[Parallel_LensAligner]"
-                    + "  where Data_Time > '<TestTimeStamp>' and Process_Mode = 'Lens Alignment' and Tx_Power_Name_For_Second = 'Check PostUV TxPower (dBm)'";
+                    + "  where Data_Time > '<TestTimeStamp>' and Process_Mode = 'Lens Alignment' and ( Tx_Power_Name_For_Second = 'Check PostUV TxPower (dBm)' or Tx_Power_Name_For_Second = 'Check PreUV TxPower (dBm)')";
             sql = sql.Replace("<TestTimeStamp>", prolatesttime);
 
             var dbret = DBUtility.ExeAutoSqlWithRes(sql);

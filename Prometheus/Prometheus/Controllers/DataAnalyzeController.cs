@@ -3555,67 +3555,70 @@ namespace Prometheus.Controllers
 
         private void HeatMap4NeoMap(List<NeoMapDataWithPos> vm, string querycond, string datafield, bool left)
         {
-                var DATAFIELDNAME = datafield.Replace(TXOQUERYCOND.NEOMAP, "");
-                var Title = querycond + " " + datafield.Replace(TXOQUERYCOND.NEOMAP, "") + " Heat Map";
-                var ElementID = "lefthotscript";
-                if (!left)
-                {
-                    ElementID = "righthotscript";
-                }
+            var DATAFIELDNAME = datafield.Replace(TXOQUERYCOND.NEOMAP, "");
+            var Title = querycond + " " + datafield.Replace(TXOQUERYCOND.NEOMAP, "") + " Heat Map";
+            var ElementID = "lefthotscript";
+            if (!left)
+            {
+                ElementID = "righthotscript";
+            }
 
-                var MAPDATA = string.Empty;
-                var xmin = vm[0].x;
-                var xmax = vm[0].x;
+            var MAPDATA = string.Empty;
+            var xmin = vm[0].x;
+            var xmax = vm[0].x;
 
-                var ymin = vm[0].y;
-                var ymax = vm[0].y;
+            var ymin = vm[0].y;
+            var ymax = vm[0].y;
 
-                var VALUEMIN = vm[0].value;
-                var VALUEMAX = vm[0].value;
+            var VALUEMIN = vm[0].value;
+            var VALUEMAX = vm[0].value;
                 
 
-                foreach (var item in vm)
-                {
-                    MAPDATA = MAPDATA+"[" +item.x.ToString()+","+item.y.ToString()+","+item.value.ToString()+ "],";
+            foreach (var item in vm)
+            {
+                MAPDATA = MAPDATA+"[" +item.x.ToString()+","+item.y.ToString()+","+item.value.ToString()+ "],";
 
-                    if (item.x < xmin)
-                        xmin = item.x;
-                    if (item.x > xmax)
-                        xmax = item.x;
+                if (item.x < xmin)
+                    xmin = item.x;
+                if (item.x > xmax)
+                    xmax = item.x;
 
-                    if (item.y < ymin)
-                        ymin = item.y;
-                    if (item.y > ymax)
-                        ymax = item.y;
+                if (item.y < ymin)
+                    ymin = item.y;
+                if (item.y > ymax)
+                    ymax = item.y;
 
-                    if (item.value > VALUEMAX)
-                        VALUEMAX = item.value;
+                if (item.value > VALUEMAX)
+                    VALUEMAX = item.value;
 
-                    if (item.value < VALUEMIN)
-                        VALUEMIN = item.value;
-                }
-                if (MAPDATA.Length > 6)
-                    MAPDATA = MAPDATA.Substring(0, MAPDATA.Length - 1);
+                if (item.value < VALUEMIN)
+                    VALUEMIN = item.value;
+            }
+            if (MAPDATA.Length > 6)
+                MAPDATA = MAPDATA.Substring(0, MAPDATA.Length - 1);
 
-                var scritpttxt = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/HotMap.xml"));
-                scritpttxt = scritpttxt.Replace("#ElementID#", ElementID)
-                        .Replace("#Title#", Title)
-                        .Replace("#XMIN#", xmin.ToString())
-                        .Replace("#XMAX#", xmax.ToString())
-                        .Replace("#YMIN#", ymin.ToString())
-                        .Replace("#YMAX#", ymax.ToString())
-                        .Replace("#DATAFIELDNAME#", DATAFIELDNAME)
-                        .Replace("#MAPDATA#", MAPDATA)
-                        .Replace("#VALUEMAX#", VALUEMAX.ToString())
-                        .Replace("#VALUEMIN#", VALUEMIN.ToString());
-                if (left)
-                {
-                    ViewBag.lefthotscript = scritpttxt;
-                }
-                else
-                {
-                    ViewBag.righthotscript = scritpttxt;
-                }
+            var scritpttxt = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/HotMap.xml"));
+            scritpttxt = scritpttxt.Replace("#ElementID#", ElementID)
+                    .Replace("#Title#", Title)
+                    .Replace("#XMIN#", xmin.ToString())
+                    .Replace("#XMAX#", xmax.ToString())
+                    .Replace("#YMIN#", ymin.ToString())
+                    .Replace("#YMAX#", ymax.ToString())
+                    .Replace("#DATAFIELDNAME#", DATAFIELDNAME)
+                    .Replace("#MAPDATA#", MAPDATA)
+                    .Replace("#VALUEMAX#", VALUEMAX.ToString())
+                    .Replace("#VALUEMIN#", VALUEMIN.ToString());
+
+            NeoMapChartCache.UpdateChart(querycond, datafield, NEOMAPCHARTTYPE.HOTMAP, scritpttxt);
+            
+            if (left)
+            {
+                ViewBag.lefthotscript = scritpttxt;
+            }
+            else
+            {
+                ViewBag.righthotscript = scritpttxt;
+            }
         }
 
         private NormalDistributionData GetNormalDistrData(CleanDataWithStdDev rawdata,double comparerate)
@@ -3845,6 +3848,8 @@ namespace Prometheus.Controllers
                     .Replace("#SERIESNAME2#", SERIESNAME2)
                     .Replace("#YVALUES2#", ds.YVALUES2);
 
+            NeoMapChartCache.UpdateChart(querycond, datafield, NEOMAPCHARTTYPE.NORMALDIS, scritpttxt);
+
             if (left)
             {
                 ViewBag.leftnormaldistr = scritpttxt;
@@ -4010,6 +4015,8 @@ namespace Prometheus.Controllers
                     .Replace("#BOXDATA#", boxplotdata)
                     .Replace("#OUTLIERDATA#", outlierdatalist);
 
+            NeoMapChartCache.UpdateChart(querycond, datafield, NEOMAPCHARTTYPE.BOXPLOT, scritpttxt);
+
             if (left)
             {
                 ViewBag.leftboxplot = scritpttxt;
@@ -4022,20 +4029,51 @@ namespace Prometheus.Controllers
 
         private void NeoMapDataAnalysis(string querycond, string datafield,bool left)
         {
-            var vm = ExternalDataCollector.RetrieveNeoMapData(querycond, datafield);
-            if (vm.Count > 5)
+            var chartlist = NeoMapChartCache.RetrieveCharts(querycond, datafield);
+            if (chartlist.Count > 0)
             {
-                HeatMap4NeoMap(vm, querycond, datafield, left);
-
-                var rawlist = new List<double>();
-                foreach (var item in vm)
+                foreach (var item in chartlist)
                 {
-                    rawlist.Add(item.value);
+                    if (item.ChartType.Contains(NEOMAPCHARTTYPE.HOTMAP))
+                    {
+                        if (left)
+                        { ViewBag.lefthotscript = item.Chart.Replace("#right","#left");}
+                        else
+                        {ViewBag.righthotscript = item.Chart.Replace("#left","#right" ); }
+                    }
+                    if (item.ChartType.Contains(NEOMAPCHARTTYPE.NORMALDIS))
+                    {
+                        if (left)
+                        { ViewBag.leftnormaldistr = item.Chart.Replace("#right", "#left"); }
+                        else
+                        { ViewBag.rightnormaldistr = item.Chart.Replace("#left", "#right"); }
+                    }
+                    if (item.ChartType.Contains(NEOMAPCHARTTYPE.BOXPLOT))
+                    {
+                        if (left)
+                        { ViewBag.leftboxplot = item.Chart.Replace("#right", "#left"); }
+                        else
+                        { ViewBag.rightboxplot = item.Chart.Replace("#left", "#right"); }
+                    }
                 }
-                var filteddata = GetCleanDataWithStdDev(rawlist);
+            }
+            else
+            {
+                var vm = ExternalDataCollector.RetrieveNeoMapData(querycond, datafield);
+                if (vm.Count > 500)
+                {
+                    HeatMap4NeoMap(vm, querycond, datafield, left);
 
-                NEONormalDistributeChart(filteddata, querycond, datafield, left);
-                NEOBoxPlot(filteddata, querycond, datafield,left);
+                    var rawlist = new List<double>();
+                    foreach (var item in vm)
+                    {
+                        rawlist.Add(item.value);
+                    }
+                    var filteddata = GetCleanDataWithStdDev(rawlist);
+
+                    NEONormalDistributeChart(filteddata, querycond, datafield, left);
+                    NEOBoxPlot(filteddata, querycond, datafield,left);
+                }
             }
         }
 

@@ -41,7 +41,7 @@ namespace Prometheus.Models
             var edate = DateTime.Parse(onedayagon.ToString("yyyy-MM-dd") + " 23:59:59");
 
             var pndict = new Dictionary<string, bool>();
-            var atedatalist = ATEUtility.FilteredATEData(mdtype, sdate, edate, pndict);
+            var atedatalist = ATEUtility.FilteredATEData(mdtype, sdate, edate, pndict,ctrl);
 
             if (atedatalist.Count > 0)
             {
@@ -150,25 +150,15 @@ namespace Prometheus.Models
             return sb1;
         }
 
-        public static List<ProjectTestData> RetrieveATEData(string family,DateTime startdate,DateTime enddate,Dictionary<string,bool> pndict)
+        private static List<ProjectTestData> RetrieveValidATETestData(string pjname,List<List<object>> dbret, Dictionary<string, bool> pndict, Controller ctrl)
         {
             var ret = new List<ProjectTestData>();
-
-            var sql = @"SELECT a.MFR_SN,d.DATASET_NAME,c.FAMILY,d.STATUS,d.END_TIME,d.STATION,a.MFR_PN,d.ROUTE_ID,d.dataset_id,b.state,b.JOB_ID FROM PARTS a   
-                        INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX  
-                        INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID 
-                        INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID   
-                        WHERE c.FAMILY = '<family>' and d.END_TIME >= '<starttime>' and d.END_TIME <= '<endtime>' AND b.state <> 'GOLDEN' ORDER BY a.MFR_SN,d.start_time ASC";
-            sql = sql.Replace("<family>", family).Replace("<starttime>", startdate.ToString("yyyyMMddHHmmss")).Replace("<endtime>", enddate.ToString("yyyyMMddHHmmss"));
 
             var currentroutid = "";
             var currentstation = "";
             var currentsn = "";
 
-            var pjdatalist = new List<ProjectTestData>();
-
-            var dbret = DBUtility.ExeATESqlWithRes(sql);
-
+            var temppjdatalist = new List<ProjectTestData>();
             foreach (var item in dbret)
             {
                 try
@@ -188,8 +178,7 @@ namespace Prometheus.Models
 
                     var temprouteid = Convert.ToString(item[7]);
                     var tempdatasetid = Convert.ToString(item[8]);
-                    var state = Convert.ToString(item[9]);
-                    var jobid = Convert.ToString(item[10]);
+                    var jobid = Convert.ToString(item[9]);
 
                     var setupflag = false;
                     if (ds.ToUpper().Contains("_SETUP"))
@@ -204,11 +193,11 @@ namespace Prometheus.Models
                         currentstation = station;
                         currentsn = sn;
 
-                        if (pjdatalist.Count > 0)
+                        if (temppjdatalist.Count > 0)
                         {
                             var err = "";
                             var errid = "";
-                            foreach (var line in pjdatalist)
+                            foreach (var line in temppjdatalist)
                             {
                                 if (string.Compare(line.ErrAbbr, "PASS", true) != 0
                                     && string.Compare(line.ErrAbbr, "INFO", true) != 0)
@@ -219,43 +208,43 @@ namespace Prometheus.Models
                                 }
                             }//end foreach
 
-                            var hours = (double)(pjdatalist[pjdatalist.Count - 1].TestTimeStamp - pjdatalist[0].TestTimeStamp).TotalSeconds / 3600.0;
+                            var hours = (double)(temppjdatalist[temppjdatalist.Count - 1].TestTimeStamp - temppjdatalist[0].TestTimeStamp).TotalSeconds / 3600.0;
                             if (hours > 0.001 && hours < 20)
                             {
                                 if (string.IsNullOrEmpty(errid))
                                 {
                                 
-                                    var testdata = new ProjectTestData("TEMP", pjdatalist[0].DataID, pjdatalist[0].ModuleSerialNum, pjdatalist[0].WhichTest.Replace("_setup", ""), pjdatalist[0].ModuleType
-                                        , "PASS", pjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), pjdatalist[0].TestStation, pjdatalist[0].PN);
+                                    var testdata = new ProjectTestData(pjname, temppjdatalist[0].DataID, temppjdatalist[0].ModuleSerialNum, temppjdatalist[0].WhichTest.Replace("_setup", ""), temppjdatalist[0].ModuleType
+                                        , "PASS", temppjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), temppjdatalist[0].TestStation, temppjdatalist[0].PN);
                                     testdata.CSN = (Math.Round(hours,3)).ToString();
-                                    testdata.JO = pjdatalist[0].JO;
+                                    testdata.JO = temppjdatalist[0].JO;
                                     ret.Add(testdata);
                                 }
                                 else
                                 {
                                 
-                                    var testdata = new ProjectTestData("TEMP", errid, pjdatalist[0].ModuleSerialNum, pjdatalist[0].WhichTest.Replace("_setup", ""), pjdatalist[0].ModuleType
-                                        , err, pjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), pjdatalist[0].TestStation, pjdatalist[0].PN);
+                                    var testdata = new ProjectTestData(pjname, errid, temppjdatalist[0].ModuleSerialNum, temppjdatalist[0].WhichTest.Replace("_setup", ""), temppjdatalist[0].ModuleType
+                                        , err, temppjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), temppjdatalist[0].TestStation, temppjdatalist[0].PN);
                                     testdata.CSN = (Math.Round(hours, 3)).ToString();
-                                    testdata.JO = pjdatalist[0].JO;
+                                    testdata.JO = temppjdatalist[0].JO;
                                     ret.Add(testdata);
                                 }
                             }//end if hour != 0.0
                         }//end if pjdatalist.Count > 0
 
-                        pjdatalist.Clear();
+                        temppjdatalist.Clear();
                       
                         //(string pk, string did, string sn, string wtest, string mt, string err, string testtime, string station, string p)
-                        var tempdata = new ProjectTestData("TEMP", tempdatasetid, sn, ds, mdtype, status, stdtime, station, pn);
+                        var tempdata = new ProjectTestData(pjname, tempdatasetid, sn, ds, mdtype, status, stdtime, station, pn);
                         tempdata.JO = jobid;
-                        pjdatalist.Add(tempdata);
+                        temppjdatalist.Add(tempdata);
                     }
                     else
                     {
                         //(string pk, string did, string sn, string wtest, string mt, string err, string testtime, string station, string p)
-                        var tempdata = new ProjectTestData("TEMP", tempdatasetid, sn , ds, mdtype, status, stdtime, station, pn);
+                        var tempdata = new ProjectTestData(pjname, tempdatasetid, sn , ds, mdtype, status, stdtime, station, pn);
                         tempdata.JO = jobid;
-                        pjdatalist.Add(tempdata);
+                        temppjdatalist.Add(tempdata);
                     }
 
                 }
@@ -264,16 +253,33 @@ namespace Prometheus.Models
             }
 
             return ret;
+
         }
 
-        public static List<ProjectTestData> FilteredATEData(string mdtype, DateTime sdate, DateTime edate, Dictionary<string, bool> pndict)
+        public static List<ProjectTestData> RetrieveATEData(string family,DateTime startdate,DateTime enddate,Dictionary<string,bool> pndict,Controller ctrl)
+        {
+            var sql = @"SELECT a.MFR_SN,d.DATASET_NAME,c.FAMILY,d.STATUS,d.END_TIME,d.STATION,a.MFR_PN,d.ROUTE_ID,d.dataset_id,b.JOB_ID FROM PARTS a   
+                        INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX  
+                        INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID 
+                        INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID   
+                        WHERE c.FAMILY = '<family>' and d.END_TIME >= '<starttime>' and d.END_TIME <= '<endtime>' AND b.state <> 'GOLDEN' ORDER BY a.MFR_SN,d.start_time ASC";
+            sql = sql.Replace("<family>", family).Replace("<starttime>", startdate.ToString("yyyyMMddHHmmss")).Replace("<endtime>", enddate.ToString("yyyyMMddHHmmss"));
+
+            var dbret = DBUtility.ExeATESqlWithRes(sql);
+            return RetrieveValidATETestData("TEMP",dbret,pndict,ctrl);
+
+        }
+
+
+
+        public static List<ProjectTestData> FilteredATEData(string mdtype, DateTime sdate, DateTime edate, Dictionary<string, bool> pndict, Controller ctrl)
         {
             var ret = new List<ProjectTestData>();
-            var rawdata = ATEUtility.RetrieveATEData(mdtype, sdate, edate, pndict);
+            var rawdata = ATEUtility.RetrieveATEData(mdtype, sdate, edate, pndict,ctrl);
             if (rawdata.Count > 0)
             {
                 var allpndict = new Dictionary<string, bool>();
-                var previousdata = ATEUtility.RetrieveATEData(mdtype, sdate.AddMonths(-2), sdate, allpndict);
+                var previousdata = ATEUtility.RetrieveATEData(mdtype, sdate.AddMonths(-2), sdate, allpndict,ctrl);
                 var filterdict = new Dictionary<string, bool>();
                 foreach (var item in previousdata)
                 {
@@ -298,7 +304,7 @@ namespace Prometheus.Models
             return Guid.NewGuid().ToString("N");
         }
 
-        public static void StartProjectBonding(ProjectViewModels vm)
+        public static void StartProjectBonding(ProjectViewModels vm,Controller ctrl)
         {
             try
             {
@@ -312,12 +318,14 @@ namespace Prometheus.Models
                     var dsdict = new Dictionary<string, bool>();
                     foreach (var item in vm.SumDatasetList)
                     {
-                        dsdict.Add(item.Station, true);
+                        if (!dsdict.ContainsKey(item.Station.Trim().ToUpper()))
+                        {
+                            dsdict.Add(item.Station.Trim().ToUpper(), true);
+                        }
                     }
 
-                    var failurelist = new List<ProjectTestData>();
-                    
-
+                    //var failurelist = new List<ProjectTestData>();
+                    //var sndict = new Dictionary<string, bool>();
                     //(c.MODEL_ID like 'FTLX6871%' or c.MODEL_ID like 'FTLX6872%' or c.MODEL_ID like 'FTLX6672%')
                     var mdcond = "(";
                     foreach (var w in vm.MDIDList)
@@ -326,132 +334,151 @@ namespace Prometheus.Models
                     }
                     mdcond = mdcond.Substring(0, mdcond.Length - 4) + ")";
 
-
                     var s  = @"SELECT a.MFR_SN,d.DATASET_NAME,c.FAMILY,d.STATUS,d.END_TIME,d.STATION,a.MFR_PN,d.ROUTE_ID,d.dataset_id,b.JOB_ID FROM PARTS a 
                                 INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID 
                                 INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID 
-                                WHERE <mdcond> and d.END_TIME > '<TIMECOND>'  AND b.state <> 'GOLDEN'  ORDER BY d.ROUTE_ID,d.dataset_id DESC,d.start_time DESC";
-                    var sndict = new Dictionary<string, bool>();
+                                WHERE <mdcond> and d.END_TIME > '<TIMECOND>'  AND b.state <> 'GOLDEN'  ORDER BY d.ROUTE_ID,d.dataset_id DESC,d.start_time ASC";
+                    
                     var sql = s.Replace("<TIMECOND>", vm.StartDate.ToString("yyyyMMddhhmmss")).Replace("<mdcond>", mdcond);
 
 
-                    var currentroutid = "";
-                    var currentroutedsnames = new List<TempDataSetItem>();
-                    var pjdatalist = new List<ProjectTestData>();
-
+                    //var currentroutid = "";
+                    //var currentroutedsnames = new List<TempDataSetItem>();
+                    //var pjdatalist = new List<ProjectTestData>();
+                    
                     var dbret = DBUtility.ExeATESqlWithRes(sql);
-
-                        foreach (var item in dbret)
-                        {
-                            try
-                            {
-                                var status = Convert.ToString(item[3]);
-                                var ds = Convert.ToString(item[1]);
-                                var temprouteid = Convert.ToString(item[7]);
-                                var tempdatasetid = Convert.ToString(item[8]);
-                                var jobid = Convert.ToString(item[9]);
-
-                            if (string.Compare(currentroutid, temprouteid) != 0)
-                            {
-                                currentroutid = temprouteid;
-
-                                if (pjdatalist.Count > 0)
-                                {
-                                    FindErrAbbr(pjdatalist, currentroutedsnames, dsdict);
-
-                                    foreach (var pjdata in pjdatalist)
-                                    {
-                                        pjdata.StoreProjectTestData();
-                                    }
-
-                                    if (string.Compare(pjdatalist[0].ErrAbbr, "PASS", true) != 0)
-                                    {
-                                        if (!sndict.ContainsKey(pjdatalist[0].ModuleSerialNum))
-                                        {
-                                            sndict.Add(pjdatalist[0].ModuleSerialNum, true);
-
-                                            failurelist.Add(pjdatalist[0]);
-
-                                            var ekey = ProjectErrorViewModels.GetUniqKey();
-                                            var pjerror = new ProjectErrorViewModels(vm.ProjectKey, ekey, pjdatalist[0].ErrAbbr, "", 1);
-                                            pjerror.Reporter = "System";
-                                            pjerror.Description = "";
-                                            pjerror.AddandUpdateProjectError();
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if (!sndict.ContainsKey(pjdatalist[0].ModuleSerialNum))
-                                        {
-                                            sndict.Add(pjdatalist[0].ModuleSerialNum, true);
-                                        }
-                                    }
-
-                                }//end if (tempdata != null)
-
-                                pjdatalist.Clear();
-                                currentroutedsnames.Clear();
-                                currentroutedsnames.Add(new TempDataSetItem(ds, status,tempdatasetid));
-                            }
-                            else //if (tempdata != null)
-                            {
-                                currentroutedsnames.Add(new TempDataSetItem(ds, status,tempdatasetid));
-                            }
-
-                            if (dsdict.ContainsKey(ds))
-                            {
-                                var spdatetime = Convert.ToString(item[4]);
-                                var stdtime = spdatetime.Substring(0, 4) + "-" + spdatetime.Substring(4, 2) + "-" + spdatetime.Substring(6, 2) + " "
-                                                  + spdatetime.Substring(8, 2) + ":" + spdatetime.Substring(10, 2) + ":" + spdatetime.Substring(12, 2);
-
-                                //(string pk, string did, string sn, string wtest, string mt, string err, string testtime, string station, string p)
-                                var tempdata = new ProjectTestData(vm.ProjectKey, GetUniqKey(), Convert.ToString(item[0])
-                                            , Convert.ToString(item[1]), Convert.ToString(item[2]), Convert.ToString(item[3]).ToUpper()
-                                            , stdtime, Convert.ToString(item[5]), Convert.ToString(item[6]));
-                                tempdata.DataID = tempdatasetid;
-                                tempdata.JO = jobid;
-
-                                pjdatalist.Add(tempdata);
-                            }
-
-                        }
-                            catch (Exception ex)
-                            { }
-                        }//end for each
-
-                    if (pjdatalist.Count > 0)
+                    var pndict = new Dictionary<string, bool>();
+                    var pjdatalist = RetrieveValidATETestData(vm.ProjectKey, dbret, pndict, ctrl);
+                    foreach (var item in pjdatalist)
                     {
-                        FindErrAbbr(pjdatalist, currentroutedsnames, dsdict);
-
-                        foreach (var pjdata in pjdatalist)
+                        if (dsdict.ContainsKey(item.WhichTest.Trim().ToUpper()))
                         {
-                            pjdata.StoreProjectTestData();
-                        }
-
-                        if (string.Compare(pjdatalist[0].ErrAbbr, "PASS", true) != 0)
-                        {
-                            if (!sndict.ContainsKey(pjdatalist[0].ModuleSerialNum))
+                            if (string.Compare(item.ErrAbbr, "PASS", true) != 0)
                             {
-                                sndict.Add(pjdatalist[0].ModuleSerialNum, true);
-
-                                failurelist.Add(pjdatalist[0]);
-
                                 var ekey = ProjectErrorViewModels.GetUniqKey();
                                 var pjerror = new ProjectErrorViewModels(vm.ProjectKey, ekey, pjdatalist[0].ErrAbbr, "", 1);
                                 pjerror.Reporter = "System";
                                 pjerror.Description = "";
                                 pjerror.AddandUpdateProjectError();
                             }
-                        }
-                        else
-                        {
-                            if (!sndict.ContainsKey(pjdatalist[0].ModuleSerialNum))
-                            {
-                                sndict.Add(pjdatalist[0].ModuleSerialNum, true);
-                            }
-                        }
 
-                    }//end if (tempdata != null)
+                            item.StoreProjectTestData();
+                        }
+                    }
+
+
+
+                //        foreach (var item in dbret)
+                //        {
+                //            try
+                //            {
+                //                var status = Convert.ToString(item[3]);
+                //                var ds = Convert.ToString(item[1]);
+                //                var temprouteid = Convert.ToString(item[7]);
+                //                var tempdatasetid = Convert.ToString(item[8]);
+                //                var jobid = Convert.ToString(item[9]);
+
+                    //            if (string.Compare(currentroutid, temprouteid) != 0)
+                    //            {
+                    //                currentroutid = temprouteid;
+
+                    //                if (pjdatalist.Count > 0)
+                    //                {
+                    //                    FindErrAbbr(pjdatalist, currentroutedsnames, dsdict);
+
+                    //                    foreach (var pjdata in pjdatalist)
+                    //                    {
+                    //                        pjdata.StoreProjectTestData();
+                    //                    }
+
+                    //                    if (string.Compare(pjdatalist[0].ErrAbbr, "PASS", true) != 0)
+                    //                    {
+                    //                        if (!sndict.ContainsKey(pjdatalist[0].ModuleSerialNum))
+                    //                        {
+                    //                            sndict.Add(pjdatalist[0].ModuleSerialNum, true);
+
+                    //                            failurelist.Add(pjdatalist[0]);
+
+                    //                            var ekey = ProjectErrorViewModels.GetUniqKey();
+                    //                            var pjerror = new ProjectErrorViewModels(vm.ProjectKey, ekey, pjdatalist[0].ErrAbbr, "", 1);
+                    //                            pjerror.Reporter = "System";
+                    //                            pjerror.Description = "";
+                    //                            pjerror.AddandUpdateProjectError();
+                    //                        }
+                    //                    }
+                    //                    else
+                    //                    {
+                    //                        if (!sndict.ContainsKey(pjdatalist[0].ModuleSerialNum))
+                    //                        {
+                    //                            sndict.Add(pjdatalist[0].ModuleSerialNum, true);
+                    //                        }
+                    //                    }
+
+                    //                }//end if (tempdata != null)
+
+                    //                pjdatalist.Clear();
+                    //                currentroutedsnames.Clear();
+                    //                currentroutedsnames.Add(new TempDataSetItem(ds, status,tempdatasetid));
+                    //            }
+                    //            else //if (tempdata != null)
+                    //            {
+                    //                currentroutedsnames.Add(new TempDataSetItem(ds, status,tempdatasetid));
+                    //            }
+
+                    //            if (dsdict.ContainsKey(ds))
+                    //            {
+                    //                var spdatetime = Convert.ToString(item[4]);
+                    //                var stdtime = spdatetime.Substring(0, 4) + "-" + spdatetime.Substring(4, 2) + "-" + spdatetime.Substring(6, 2) + " "
+                    //                                  + spdatetime.Substring(8, 2) + ":" + spdatetime.Substring(10, 2) + ":" + spdatetime.Substring(12, 2);
+
+                    //                //(string pk, string did, string sn, string wtest, string mt, string err, string testtime, string station, string p)
+                    //                var tempdata = new ProjectTestData(vm.ProjectKey, GetUniqKey(), Convert.ToString(item[0])
+                    //                            , Convert.ToString(item[1]), Convert.ToString(item[2]), Convert.ToString(item[3]).ToUpper()
+                    //                            , stdtime, Convert.ToString(item[5]), Convert.ToString(item[6]));
+                    //                tempdata.DataID = tempdatasetid;
+                    //                tempdata.JO = jobid;
+
+                    //                pjdatalist.Add(tempdata);
+                    //            }
+
+                    //        }
+                    //            catch (Exception ex)
+                    //            { }
+                    //        }//end for each
+
+                    //    if (pjdatalist.Count > 0)
+                    //    {
+                    //        FindErrAbbr(pjdatalist, currentroutedsnames, dsdict);
+
+                    //        foreach (var pjdata in pjdatalist)
+                    //        {
+                    //            pjdata.StoreProjectTestData();
+                    //        }
+
+                    //        if (string.Compare(pjdatalist[0].ErrAbbr, "PASS", true) != 0)
+                    //        {
+                    //            if (!sndict.ContainsKey(pjdatalist[0].ModuleSerialNum))
+                    //            {
+                    //                sndict.Add(pjdatalist[0].ModuleSerialNum, true);
+
+                    //                failurelist.Add(pjdatalist[0]);
+
+                    //                var ekey = ProjectErrorViewModels.GetUniqKey();
+                    //                var pjerror = new ProjectErrorViewModels(vm.ProjectKey, ekey, pjdatalist[0].ErrAbbr, "", 1);
+                    //                pjerror.Reporter = "System";
+                    //                pjerror.Description = "";
+                    //                pjerror.AddandUpdateProjectError();
+                    //            }
+                    //        }
+                    //        else
+                    //        {
+                    //            if (!sndict.ContainsKey(pjdatalist[0].ModuleSerialNum))
+                    //            {
+                    //                sndict.Add(pjdatalist[0].ModuleSerialNum, true);
+                    //            }
+                    //        }
+
+                    //    }//end if (tempdata != null)
 
                 }// if model list > 0
 
@@ -464,58 +491,58 @@ namespace Prometheus.Models
         }
 
 
-        public static void FindErrAbbr(List<ProjectTestData> pjdatalist, List<TempDataSetItem> currentroutedsnames, Dictionary<string, bool> dsdict)
-        {
-            var startidx = 0;
+        //public static void FindErrAbbr(List<ProjectTestData> pjdatalist, List<TempDataSetItem> currentroutedsnames, Dictionary<string, bool> dsdict)
+        //{
+        //    var startidx = 0;
 
-            foreach (var pjdata in pjdatalist)
-            {
-                if (string.Compare(pjdata.ErrAbbr, "PASS", true) == 0)
-                {
-                    continue;
-                }
+        //    foreach (var pjdata in pjdatalist)
+        //    {
+        //        if (string.Compare(pjdata.ErrAbbr, "PASS", true) == 0)
+        //        {
+        //            continue;
+        //        }
 
-                bool found = false;
-                var maindatasetid = Convert.ToInt64(pjdata.DataID);
+        //        bool found = false;
+        //        var maindatasetid = Convert.ToInt64(pjdata.DataID);
 
-                for (var idx = startidx; idx < currentroutedsnames.Count; idx++)
-                {
-                    if (string.Compare(currentroutedsnames[idx].Status, "PASS", true) != 0
-                        && string.Compare(currentroutedsnames[idx].Status, "INFO", true) != 0
-                        && !dsdict.ContainsKey(currentroutedsnames[idx].DatasetName))
-                    {
-                        var subdatasetid = Convert.ToInt64(currentroutedsnames[idx].DatasetID);
-                        if (subdatasetid < maindatasetid)
-                        {
-                            pjdata.ErrAbbr = currentroutedsnames[idx].DatasetName;
-                            pjdata.DataID = currentroutedsnames[idx].DatasetID;
-                            found = true;
+        //        for (var idx = startidx; idx < currentroutedsnames.Count; idx++)
+        //        {
+        //            if (string.Compare(currentroutedsnames[idx].Status, "PASS", true) != 0
+        //                && string.Compare(currentroutedsnames[idx].Status, "INFO", true) != 0
+        //                && !dsdict.ContainsKey(currentroutedsnames[idx].DatasetName))
+        //            {
+        //                var subdatasetid = Convert.ToInt64(currentroutedsnames[idx].DatasetID);
+        //                if (subdatasetid < maindatasetid)
+        //                {
+        //                    pjdata.ErrAbbr = currentroutedsnames[idx].DatasetName;
+        //                    pjdata.DataID = currentroutedsnames[idx].DatasetID;
+        //                    found = true;
                             
-                        }
-                    }
+        //                }
+        //            }
 
-                    if (dsdict.ContainsKey(currentroutedsnames[idx].DatasetName))
-                    {
-                        var nextdatasetid = Convert.ToInt64(currentroutedsnames[idx].DatasetID);
-                        if ((nextdatasetid < maindatasetid) && found)
-                        {
-                            startidx = idx+1;
-                            break;
-                        }
-                    }
+        //            if (dsdict.ContainsKey(currentroutedsnames[idx].DatasetName))
+        //            {
+        //                var nextdatasetid = Convert.ToInt64(currentroutedsnames[idx].DatasetID);
+        //                if ((nextdatasetid < maindatasetid) && found)
+        //                {
+        //                    startidx = idx+1;
+        //                    break;
+        //                }
+        //            }
 
-                    ////find the stard position of next indivition dataset
-                    //for (var tmpidx = startidx; tmpidx < currentroutedsnames.Count; tmpidx++)
-                    //{
-                    //    if (dsdict.ContainsKey(currentroutedsnames[tmpidx].DatasetName))
-                    //    {
-                    //        startidx = tmpidx;
-                    //        break;
-                    //    }
-                    //}//end for
-                }
-            }
-        }
+        //            ////find the stard position of next indivition dataset
+        //            //for (var tmpidx = startidx; tmpidx < currentroutedsnames.Count; tmpidx++)
+        //            //{
+        //            //    if (dsdict.ContainsKey(currentroutedsnames[tmpidx].DatasetName))
+        //            //    {
+        //            //        startidx = tmpidx;
+        //            //        break;
+        //            //    }
+        //            //}//end for
+        //        }
+        //    }
+        //}
 
 
         public static void UpdateProjectData(ProjectViewModels vm, string starttime,Controller ctrl)
@@ -528,7 +555,10 @@ namespace Prometheus.Models
                     var dsdict = new Dictionary<string, bool>();
                     foreach (var item in vm.SumDatasetList)
                     {
-                        dsdict.Add(item.Station, true);
+                        if (!dsdict.ContainsKey(item.Station.Trim().ToUpper()))
+                        {
+                            dsdict.Add(item.Station.Trim().ToUpper(), true);
+                        }
                     }
 
                     var failurelist = new List<ProjectTestData>();
@@ -542,132 +572,164 @@ namespace Prometheus.Models
                     }
                     mdcond = mdcond.Substring(0, mdcond.Length - 4) + ")";
 
-
                     var s = @"SELECT a.MFR_SN,d.DATASET_NAME,c.FAMILY,d.STATUS,d.END_TIME,d.STATION,a.MFR_PN,d.ROUTE_ID,d.dataset_id,b.JOB_ID FROM PARTS a 
                             INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX 
                             INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID 
-                            INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID WHERE <mdcond> and d.END_TIME > '<TIMECOND>'  AND b.state <> 'GOLDEN'  ORDER BY d.ROUTE_ID,d.dataset_id DESC,d.start_time DESC";
-                    var sndict = new Dictionary<string, bool>();
+                            INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID WHERE <mdcond> and d.END_TIME > '<TIMECOND>'  AND b.state <> 'GOLDEN'  ORDER BY d.ROUTE_ID,d.dataset_id DESC,d.start_time ASC";
+
                     var sql = s.Replace("<TIMECOND>", DateTime.Parse(starttime).ToString("yyyyMMddhhmmss")).Replace("<mdcond>", mdcond);
 
-                    var currentroutid = "";
-                    var currentroutedsnames = new List<TempDataSetItem>();
-                    var pjdatalist = new List<ProjectTestData>();
+                    //var currentroutid = "";
+                    //var currentroutedsnames = new List<TempDataSetItem>();
+                    //var pjdatalist = new List<ProjectTestData>();
 
+                    
                     var dbret = DBUtility.ExeATESqlWithRes(sql);
 
-                    foreach (var item in dbret)
+                    var sndict = new Dictionary<string, bool>();
+                    var pndict = new Dictionary<string, bool>();
+                    var pjdatalist = RetrieveValidATETestData(vm.ProjectKey, dbret, pndict, ctrl);
+                    pjdatalist.Reverse();
+
+                    foreach (var item in pjdatalist)
                     {
-                        try
+                        if (dsdict.ContainsKey(item.WhichTest.Trim().ToUpper()))
                         {
-                            var status = Convert.ToString(item[3]);
-                            var ds = Convert.ToString(item[1]);
-                            var temprouteid = Convert.ToString(item[7]);
-                            var tempdatasetid = Convert.ToString(item[8]);
-                            var jobid = Convert.ToString(item[9]);
-
-                            if (string.Compare(currentroutid, temprouteid) != 0)
+                            if (string.Compare(item.ErrAbbr, "PASS", true) != 0)
                             {
-                                currentroutid = temprouteid;
-
-                                if (pjdatalist.Count > 0)
-                                {
-                                    FindErrAbbr(pjdatalist, currentroutedsnames, dsdict);
-
-                                    foreach (var pjdata in pjdatalist)
-                                    {
-                                        pjdata.StoreProjectTestData();
-                                    }
-
-                                    if (string.Compare(pjdatalist[0].ErrAbbr, "PASS", true) != 0)
-                                    {
-                                        if (!sndict.ContainsKey(pjdatalist[0].ModuleSerialNum))
-                                        {
-                                            sndict.Add(pjdatalist[0].ModuleSerialNum, true);
-
-                                            failurelist.Add(pjdatalist[0]);
-
-                                            var ekey = ProjectErrorViewModels.GetUniqKey();
-                                            var pjerror = new ProjectErrorViewModels(vm.ProjectKey, ekey, pjdatalist[0].ErrAbbr, "", 1);
-                                            pjerror.Reporter = "System";
-                                            pjerror.Description = "";
-                                            pjerror.AddandUpdateProjectError();
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if (!sndict.ContainsKey(pjdatalist[0].ModuleSerialNum))
-                                        {
-                                            sndict.Add(pjdatalist[0].ModuleSerialNum, true);
-                                            passlist.Add(pjdatalist[0]);
-                                        }
-                                    }
-
-                                }//end if (tempdata != null)
-
-                                pjdatalist.Clear();
-                                currentroutedsnames.Clear();
-                                currentroutedsnames.Add(new TempDataSetItem(ds, status,tempdatasetid));
-                            }
-                            else //if (tempdata != null)
-                            {
-                                currentroutedsnames.Add(new TempDataSetItem(ds, status,tempdatasetid));
-                            }
-
-                            if (dsdict.ContainsKey(ds))
-                            {
-                                var spdatetime = Convert.ToString(item[4]);
-                                var stdtime = spdatetime.Substring(0, 4) + "-" + spdatetime.Substring(4, 2) + "-" + spdatetime.Substring(6, 2) + " "
-                                                  + spdatetime.Substring(8, 2) + ":" + spdatetime.Substring(10, 2) + ":" + spdatetime.Substring(12, 2);
-
-                                //(string pk, string did, string sn, string wtest, string mt, string err, string testtime, string station, string p)
-                                var tempdata = new ProjectTestData(vm.ProjectKey, GetUniqKey(), Convert.ToString(item[0])
-                                            , Convert.ToString(item[1]), Convert.ToString(item[2]), Convert.ToString(item[3]).ToUpper()
-                                            , stdtime, Convert.ToString(item[5]), Convert.ToString(item[6]));
-                                tempdata.DataID = tempdatasetid;
-                                tempdata.JO = jobid;
-
-                                pjdatalist.Add(tempdata);
-                            }
-                        }
-                        catch (Exception ex)
-                        { }
-                    }//end for each
-
-                    if (pjdatalist.Count > 0)
-                    {
-                        FindErrAbbr(pjdatalist, currentroutedsnames, dsdict);
-
-                        foreach (var pjdata in pjdatalist)
-                        {
-                            pjdata.StoreProjectTestData();
-                        }
-
-                        if (string.Compare(pjdatalist[0].ErrAbbr, "PASS", true) != 0)
-                        {
-                            if (!sndict.ContainsKey(pjdatalist[0].ModuleSerialNum))
-                            {
-                                sndict.Add(pjdatalist[0].ModuleSerialNum, true);
-
-                                failurelist.Add(pjdatalist[0]);
-
                                 var ekey = ProjectErrorViewModels.GetUniqKey();
                                 var pjerror = new ProjectErrorViewModels(vm.ProjectKey, ekey, pjdatalist[0].ErrAbbr, "", 1);
                                 pjerror.Reporter = "System";
                                 pjerror.Description = "";
                                 pjerror.AddandUpdateProjectError();
                             }
-                        }
-                        else
-                        {
-                            if (!sndict.ContainsKey(pjdatalist[0].ModuleSerialNum))
-                            {
-                                sndict.Add(pjdatalist[0].ModuleSerialNum, true);
-                                passlist.Add(pjdatalist[0]);
-                            }
-                        }
 
-                    }//end if (tempdata != null)
+                            if (!sndict.ContainsKey(item.ModuleSerialNum))
+                            {
+                                sndict.Add(item.ModuleSerialNum, true);
+                                if (string.Compare(item.ErrAbbr, "PASS", true) != 0)
+                                { failurelist.Add(item); }
+                                else
+                                { passlist.Add(item); }
+                            }
+
+                            item.StoreProjectTestData();
+                        }//end if
+                    }//end foreach
+
+
+                    //foreach (var item in dbret)
+                    //{
+                    //    try
+                    //    {
+                    //        var status = Convert.ToString(item[3]);
+                    //        var ds = Convert.ToString(item[1]);
+                    //        var temprouteid = Convert.ToString(item[7]);
+                    //        var tempdatasetid = Convert.ToString(item[8]);
+                    //        var jobid = Convert.ToString(item[9]);
+
+                    //        if (string.Compare(currentroutid, temprouteid) != 0)
+                    //        {
+                    //            currentroutid = temprouteid;
+
+                    //            if (pjdatalist.Count > 0)
+                    //            {
+                    //                FindErrAbbr(pjdatalist, currentroutedsnames, dsdict);
+
+                    //                foreach (var pjdata in pjdatalist)
+                    //                {
+                    //                    pjdata.StoreProjectTestData();
+                    //                }
+
+                    //                if (string.Compare(pjdatalist[0].ErrAbbr, "PASS", true) != 0)
+                    //                {
+                    //                    if (!sndict.ContainsKey(pjdatalist[0].ModuleSerialNum))
+                    //                    {
+                    //                        sndict.Add(pjdatalist[0].ModuleSerialNum, true);
+
+                    //                        failurelist.Add(pjdatalist[0]);
+
+                    //                        var ekey = ProjectErrorViewModels.GetUniqKey();
+                    //                        var pjerror = new ProjectErrorViewModels(vm.ProjectKey, ekey, pjdatalist[0].ErrAbbr, "", 1);
+                    //                        pjerror.Reporter = "System";
+                    //                        pjerror.Description = "";
+                    //                        pjerror.AddandUpdateProjectError();
+                    //                    }
+                    //                }
+                    //                else
+                    //                {
+                    //                    if (!sndict.ContainsKey(pjdatalist[0].ModuleSerialNum))
+                    //                    {
+                    //                        sndict.Add(pjdatalist[0].ModuleSerialNum, true);
+                    //                        passlist.Add(pjdatalist[0]);
+                    //                    }
+                    //                }
+
+                    //            }//end if (tempdata != null)
+
+                    //            pjdatalist.Clear();
+                    //            currentroutedsnames.Clear();
+                    //            currentroutedsnames.Add(new TempDataSetItem(ds, status,tempdatasetid));
+                    //        }
+                    //        else //if (tempdata != null)
+                    //        {
+                    //            currentroutedsnames.Add(new TempDataSetItem(ds, status,tempdatasetid));
+                    //        }
+
+                    //        if (dsdict.ContainsKey(ds))
+                    //        {
+                    //            var spdatetime = Convert.ToString(item[4]);
+                    //            var stdtime = spdatetime.Substring(0, 4) + "-" + spdatetime.Substring(4, 2) + "-" + spdatetime.Substring(6, 2) + " "
+                    //                              + spdatetime.Substring(8, 2) + ":" + spdatetime.Substring(10, 2) + ":" + spdatetime.Substring(12, 2);
+
+                    //            //(string pk, string did, string sn, string wtest, string mt, string err, string testtime, string station, string p)
+                    //            var tempdata = new ProjectTestData(vm.ProjectKey, GetUniqKey(), Convert.ToString(item[0])
+                    //                        , Convert.ToString(item[1]), Convert.ToString(item[2]), Convert.ToString(item[3]).ToUpper()
+                    //                        , stdtime, Convert.ToString(item[5]), Convert.ToString(item[6]));
+                    //            tempdata.DataID = tempdatasetid;
+                    //            tempdata.JO = jobid;
+
+                    //            pjdatalist.Add(tempdata);
+                    //        }
+                    //    }
+                    //    catch (Exception ex)
+                    //    { }
+                    //}//end for each
+
+                    //if (pjdatalist.Count > 0)
+                    //{
+                    //    FindErrAbbr(pjdatalist, currentroutedsnames, dsdict);
+
+                    //    foreach (var pjdata in pjdatalist)
+                    //    {
+                    //        pjdata.StoreProjectTestData();
+                    //    }
+
+                    //    if (string.Compare(pjdatalist[0].ErrAbbr, "PASS", true) != 0)
+                    //    {
+                    //        if (!sndict.ContainsKey(pjdatalist[0].ModuleSerialNum))
+                    //        {
+                    //            sndict.Add(pjdatalist[0].ModuleSerialNum, true);
+
+                    //            failurelist.Add(pjdatalist[0]);
+
+                    //            var ekey = ProjectErrorViewModels.GetUniqKey();
+                    //            var pjerror = new ProjectErrorViewModels(vm.ProjectKey, ekey, pjdatalist[0].ErrAbbr, "", 1);
+                    //            pjerror.Reporter = "System";
+                    //            pjerror.Description = "";
+                    //            pjerror.AddandUpdateProjectError();
+                    //        }
+                    //    }
+                    //    else
+                    //    {
+                    //        if (!sndict.ContainsKey(pjdatalist[0].ModuleSerialNum))
+                    //        {
+                    //            sndict.Add(pjdatalist[0].ModuleSerialNum, true);
+                    //            passlist.Add(pjdatalist[0]);
+                    //        }
+                    //    }
+
+                    //}//end if (tempdata != null)
 
                     if (vm.FinishRating < 90 && DateTime.Parse(starttime) != vm.StartDate)
                     {

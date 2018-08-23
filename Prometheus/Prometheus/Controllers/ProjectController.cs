@@ -1204,7 +1204,7 @@ namespace Prometheus.Controllers
             }
 
             BIDataUtility.StartProjectBonding(this, projectmodel);
-            ATEUtility.StartProjectBonding(projectmodel);
+            ATEUtility.StartProjectBonding(projectmodel,this);
 
 
             

@@ -2067,11 +2067,11 @@ namespace Prometheus.Controllers
             var atedatalist = new List<ProjectTestData>();
             if (!string.IsNullOrEmpty(filtered))
             {
-                atedatalist = ATEUtility.FilteredATEData(mdtype, sdate, edate, pndict);
+                atedatalist = ATEUtility.FilteredATEData(mdtype, sdate, edate, pndict,this);
             }
             else
             {
-                atedatalist = ATEUtility.RetrieveATEData(mdtype, sdate, edate,pndict);
+                atedatalist = ATEUtility.RetrieveATEData(mdtype, sdate, edate,pndict,this);
             }
 
             if (atedatalist.Count > 0)

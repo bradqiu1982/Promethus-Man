@@ -2328,6 +2328,9 @@ namespace Prometheus.Models
         public static Dictionary<string, SNWaferData> RetrieveSNMaterial(string sncond)
         {
             var ret = new Dictionary<string, SNWaferData>();
+            if (sncond.Length == 1)
+            { return ret; }
+
             var dbret = SN2Wafer(sncond);
 
             foreach (var line in dbret)

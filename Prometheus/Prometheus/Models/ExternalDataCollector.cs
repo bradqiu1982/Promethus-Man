@@ -1415,6 +1415,9 @@ namespace Prometheus.Models
                     sb.Append(kv.Value + "','");
                 }
             }
+            if (sb.ToString().Length == 2)
+            { return; }
+
             var sncond = sb.ToString(0, sb.Length - 2) + ")";
 
             var subsndict = new Dictionary<string, string>();
@@ -1450,6 +1453,9 @@ namespace Prometheus.Models
                     sb.Append(kv.Value + "','");
                 }
             }
+            if (sb.ToString().Length == 2)
+            { return; }
+
             sncond = sb.ToString(0, sb.Length - 2) + ")";
 
             var snmpndict = BIDataUtility.RetrieveSNMaterial(sncond);
@@ -4028,6 +4034,9 @@ namespace Prometheus.Models
                     sb.Append(kv.Value + "','");
                 }
             }
+            if (sb.ToString().Length == 2)
+            { return newpnsndict; }
+
             var sncond = sb.ToString(0, sb.Length - 2) + ")";
 
             var sql = @"SELECT  max([FromContainer]),ToContainer
@@ -4066,23 +4075,28 @@ namespace Prometheus.Models
             {
                 sb.Append(kv.Key + "','");
             }
-            var pncond = sb.ToString(0, sb.Length - 2) + ")";
 
-            var sql = @" select max(c.ContainerName),pb.productname from InsiteDB.insite.container  c (nolock) 
-	                     left join InsiteDB.insite.product p on c.productId = p.productId 
-	                     left join InsiteDB.insite.productbase pb on pb.productbaseid = p.productbaseid 
-	                     where pb.productname in <pncond> and len(c.ContainerName) = 7 group by pb.productname";
-            sql = sql.Replace("<pncond>", pncond);
-            var dbret = DBUtility.ExeMESSqlWithRes(sql);
-            foreach (var line in dbret)
+            if(sb.ToString().Length != 2)
             {
-                var sn = Convert.ToString(line[0]);
-                var pn = Convert.ToString(line[1]);
-                if (pnsndict.ContainsKey(pn))
+                var pncond = sb.ToString(0, sb.Length - 2) + ")";
+
+                var sql = @" select max(c.ContainerName),pb.productname from InsiteDB.insite.container  c (nolock) 
+	                         left join InsiteDB.insite.product p on c.productId = p.productId 
+	                         left join InsiteDB.insite.productbase pb on pb.productbaseid = p.productbaseid 
+	                         where pb.productname in <pncond> and len(c.ContainerName) = 7 group by pb.productname";
+                sql = sql.Replace("<pncond>", pncond);
+                var dbret = DBUtility.ExeMESSqlWithRes(sql);
+                foreach (var line in dbret)
                 {
-                    pnsndict[pn] = sn;
-                }
-            }//end foreach
+                    var sn = Convert.ToString(line[0]);
+                    var pn = Convert.ToString(line[1]);
+                    if (pnsndict.ContainsKey(pn))
+                    {
+                        pnsndict[pn] = sn;
+                    }
+                }//end foreach
+            }
+
 
             var newpnsndict =  CableSN2RealSN(pnsndict);
             pnsndict.Clear();

@@ -154,6 +154,8 @@ namespace Prometheus.Models
         {
             var ret = new List<ProjectTestData>();
 
+            var atetesttimelimit = CfgUtility.GetATETestTimeLimit(ctrl);
+
             var currentroutid = "";
             var currentstation = "";
             var currentsn = "";
@@ -209,16 +211,43 @@ namespace Prometheus.Models
                             }//end foreach
 
                             var hours = (double)(temppjdatalist[temppjdatalist.Count - 1].TestTimeStamp - temppjdatalist[0].TestTimeStamp).TotalSeconds / 3600.0;
-                            if (hours > 0.001 && hours < 20)
+                            if (hours > 0 && hours < 20)
                             {
+                                
                                 if (string.IsNullOrEmpty(errid))
                                 {
-                                
-                                    var testdata = new ProjectTestData(pjname, temppjdatalist[0].DataID, temppjdatalist[0].ModuleSerialNum, temppjdatalist[0].WhichTest.Replace("_setup", ""), temppjdatalist[0].ModuleType
-                                        , "PASS", temppjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), temppjdatalist[0].TestStation, temppjdatalist[0].PN);
-                                    testdata.CSN = (Math.Round(hours,3)).ToString();
-                                    testdata.JO = temppjdatalist[0].JO;
-                                    ret.Add(testdata);
+                                    var wt = temppjdatalist[0].WhichTest.Replace("_setup", "");
+
+                                    var matched = false;
+                                    if (atetesttimelimit.ContainsKey(mdtype))
+                                    {
+                                        if (atetesttimelimit[mdtype].ContainsKey(wt.ToLower()))
+                                        {
+                                            matched = true;
+                                        }
+                                    }
+
+                                    if (matched)
+                                    {
+                                        var low = atetesttimelimit[mdtype][wt.ToLower()].low;
+                                        var high = atetesttimelimit[mdtype][wt.ToLower()].high;
+                                        if (hours > low && hours < high)
+                                        {
+                                            var testdata = new ProjectTestData(pjname, temppjdatalist[0].DataID, temppjdatalist[0].ModuleSerialNum, wt, temppjdatalist[0].ModuleType
+                                                , "PASS", temppjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), temppjdatalist[0].TestStation, temppjdatalist[0].PN);
+                                            testdata.CSN = (Math.Round(hours, 3)).ToString();
+                                            testdata.JO = temppjdatalist[0].JO;
+                                            ret.Add(testdata);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        var testdata = new ProjectTestData(pjname, temppjdatalist[0].DataID, temppjdatalist[0].ModuleSerialNum,wt, temppjdatalist[0].ModuleType
+                                            , "PASS", temppjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), temppjdatalist[0].TestStation, temppjdatalist[0].PN);
+                                        testdata.CSN = (Math.Round(hours,3)).ToString();
+                                        testdata.JO = temppjdatalist[0].JO;
+                                        ret.Add(testdata);
+                                    }
                                 }
                                 else
                                 {

@@ -91,6 +91,18 @@ namespace Prometheus.Models
         }
     }
 
+    public class LIMITVAL
+    {
+        public LIMITVAL(double l, double h)
+        {
+            low = l;
+            high = h;
+        }
+
+        public double low { set; get; }
+        public double high { set; get; }
+    }
+
     public class CfgUtility
     {
         public static Dictionary<string, string> GetSysConfig(Controller ctrl)
@@ -257,6 +269,61 @@ namespace Prometheus.Models
                     }
                 }//end if
             }//end foreach
+            return ret;
+        }
+
+        public static Dictionary<string,Dictionary<string, LIMITVAL>> GetATETestTimeLimit(Controller ctrl)
+        {
+            var lines = System.IO.File.ReadAllLines(ctrl.Server.MapPath("~/Scripts/atetesttimelimit.cfg"));
+            var tempdict = new Dictionary<string, string>();
+            foreach (var line in lines)
+            {
+                if (line.Contains("##"))
+                {
+                    continue;
+                }
+
+                if (line.Contains(":::"))
+                {
+                    var kvpair = line.Split(new string[] { ":::" }, StringSplitOptions.RemoveEmptyEntries);
+                    if (!tempdict.ContainsKey(kvpair[0].Trim()))
+                    {
+                        tempdict.Add(kvpair[0].Trim().ToUpper(), kvpair[1].Trim());
+                    }
+                }//end if
+            }//end foreach
+
+            var ret = new Dictionary<string, Dictionary<string, LIMITVAL>>();
+            var sectionlist = tempdict["SECTION"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            foreach (var mdt in sectionlist)
+            {
+                if (tempdict.ContainsKey(mdt))
+                {
+                    var tempkey = tempdict[mdt];
+                    var limitdict = new Dictionary<string, LIMITVAL>();
+
+                    foreach (var line in lines)
+                    {
+                        if (line.Contains(tempkey + ":::"))
+                        {
+                            var limitlist = line.Replace(tempkey + ":::", "").Split(new string[] { "#" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                            if (limitlist.Count == 3)
+                            {
+                                try
+                                {
+                                    limitdict.Add(limitlist[0], new LIMITVAL(Convert.ToDouble(limitlist[1]), Convert.ToDouble(limitlist[2])));
+                                }
+                                catch (Exception ex) { }
+                            }//end if
+                        }//end contains
+                    }//end foreach
+                    if (!ret.ContainsKey(mdt))
+                    {
+                        ret.Add(mdt, limitdict);
+                    }
+                }//end if mdt
+            }//end foreach
+
             return ret;
         }
 

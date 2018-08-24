@@ -95,11 +95,33 @@ var VCSEL_RMA = function(){
                             })
                         },
                         text: 'Data Label'
+                    },
+                    copycharts: {
+                        onclick: function () {
+                            var svg = this.getSVG({
+                                chart: {
+                                    width: this.chartWidth,
+                                    height: this.chartHeight
+                                }
+                            });
+                            var c = document.createElement('canvas');
+                            c.width = this.chartWidth;
+                            c.height = this.chartHeight;
+                            canvg(c, svg);
+                            var dataURL = c.toDataURL("image/png");
+                            //var imgtag = '<img src="' + dataURL + '"/>';
+
+                            var img = new Image();
+                            img.src = dataURL;
+
+                            copyImgToClipboard(img);
+                        },
+                        text: 'copy 2 clipboard'
                     }
                 },
                 buttons: {
                     contextButton: {
-                        menuItems: ['fullscreen', 'exportdata', 'datalabel', 'printChart', 'separator', 'downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
+                        menuItems: ['fullscreen', 'exportdata', 'datalabel', 'copycharts', 'printChart', 'separator', 'downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
                     }
                 }
             }
@@ -230,11 +252,33 @@ var VCSEL_RMA = function(){
                             })
                         },
                         text: 'Data Label'
+                    },
+                    copycharts: {
+                        onclick: function () {
+                            var svg = this.getSVG({
+                                chart: {
+                                    width: this.chartWidth,
+                                    height: this.chartHeight
+                                }
+                            });
+                            var c = document.createElement('canvas');
+                            c.width = this.chartWidth;
+                            c.height = this.chartHeight;
+                            canvg(c, svg);
+                            var dataURL = c.toDataURL("image/png");
+                            //var imgtag = '<img src="' + dataURL + '"/>';
+
+                            var img = new Image();
+                            img.src = dataURL;
+
+                            copyImgToClipboard(img);
+                        },
+                        text: 'copy 2 clipboard'
                     }
                 },
                 buttons: {
                     contextButton: {
-                        menuItems: ['fullscreen', 'exportdata', 'datalabel', 'printChart', 'separator', 'downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
+                        menuItems: ['fullscreen', 'exportdata', 'datalabel', 'copycharts', 'printChart', 'separator', 'downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
                     }
                 }
             }
@@ -331,11 +375,33 @@ var VCSEL_RMA = function(){
                             })
                         },
                         text: 'Data Label'
+                    },
+                    copycharts: {
+                        onclick: function () {
+                            var svg = this.getSVG({
+                                chart: {
+                                    width: this.chartWidth,
+                                    height: this.chartHeight
+                                }
+                            });
+                            var c = document.createElement('canvas');
+                            c.width = this.chartWidth;
+                            c.height = this.chartHeight;
+                            canvg(c, svg);
+                            var dataURL = c.toDataURL("image/png");
+                            //var imgtag = '<img src="' + dataURL + '"/>';
+
+                            var img = new Image();
+                            img.src = dataURL;
+
+                            copyImgToClipboard(img);
+                        },
+                        text: 'copy 2 clipboard'
                     }
                 },
                 buttons: {
                     contextButton: {
-                        menuItems: ['fullscreen', 'exportdata', 'datalabel', 'printChart', 'separator', 'downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
+                        menuItems: ['fullscreen', 'exportdata', 'datalabel', 'copycharts', 'printChart', 'separator', 'downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
                     }
                 }
             }

@@ -848,6 +848,91 @@ namespace Prometheus.Models
             return res;
         }
 
+        public static List<JsMindVM> GetProjectErrorByPJKey(string PJKey, Controller ctrl)
+        {
+
+            var sql = @"select pe.ProjectKey, ec.ErrorKey, ec.Comment, ec.Reporter, 
+                ec.CommentDate, ec.CommentType, ec.APVal2, ec.AnalyzeID,pe.OrignalCode from ErrorComments as ec 
+                inner join ProjectError as pe on ec.ErrorKey = pe.ErrorKey 
+                where pe.ProjectKey = @ProjectKey and ec.APVal1 <> 'delete' and ec.AnalyzeID <> '';";
+            var param = new Dictionary<string, string>();
+            param.Add("@ProjectKey", PJKey);
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
+            var comments = new Dictionary<string, List<ErrorComments>>();
+            var proErrList = new Dictionary<string, Dictionary<string, List<ErrorComments>>>();
+            foreach (var r in dbret)
+            {
+                var tempcomment = new ErrorComments();
+                tempcomment.ErrorKey = Convert.ToString(r[1]);
+                tempcomment.dbComment = Convert.ToString(r[2]);
+                tempcomment.Reporter = Convert.ToString(r[3]);
+                tempcomment.CommentDate = DateTime.Parse(Convert.ToString(r[4]));
+                tempcomment.CommentType = Convert.ToString(r[5]);
+                tempcomment.ResultClosed = Convert.ToString(r[6]);
+
+                var tmpCommentList = new List<ErrorComments>();
+                tmpCommentList.Add(tempcomment);
+                var tmpcom = RepairBase64Image4IE(tmpCommentList, ctrl);
+
+                //var projectkey = Convert.ToString(r[0]);
+                var orgcode = Convert.ToString(r[8]);
+                var analysiskey = Convert.ToString(r[7]);
+
+                if (proErrList.ContainsKey(orgcode))
+                {
+                    if (proErrList[orgcode].ContainsKey(analysiskey))
+                    {
+                        proErrList[orgcode][analysiskey].Add(tmpcom[0]);
+                    }
+                    else
+                    {
+                        proErrList[orgcode].Add(analysiskey, tmpcom);
+                    }
+
+                }
+                else
+                {
+                    var tmpcomList = new Dictionary<string, List<ErrorComments>>();
+                    tmpcomList.Add(analysiskey, tmpcom);
+                    proErrList.Add(orgcode, tmpcomList);
+                }
+            }
+
+            var res = new List<JsMindVM>();
+            var root = new JsMindVM("1", true, PJKey, string.Empty, MINDCOLOR.RootColor);
+            res.Add(root);
+            foreach (var pro in proErrList)
+            {
+                res.Add(new JsMindVM(pro.Key, false, pro.Key, "1", MINDCOLOR.ProColor));
+                var idx = 1;
+                foreach (var analysis in pro.Value)
+                {
+                    if (analysis.Value.Count < 3)
+                    {
+                        continue;
+                    }
+                    var topic = string.Empty;
+                    foreach (var item in analysis.Value)
+                    {
+                        if (item.CommentType == PJERRORCOMMENTTYPE.AnalyzeTitle)
+                        {
+                            topic = item.Comment;
+                            break;
+                        }
+                    }
+                    if (string.IsNullOrEmpty(topic))
+                    {
+                        topic = "Analysis " + idx;
+                        idx++;
+                    }
+                    res.Add(new JsMindVM(analysis.Key, false, topic, pro.Key, MINDCOLOR.AnalysisColor));
+                }
+            }
+
+            return res;
+        }
+
         public static List<ErrorComments> RetrieveErrorCommentsByAnalyzeID(string AnalyzeID, Controller ctrl)
         {
             var ret = new List<ErrorComments>();

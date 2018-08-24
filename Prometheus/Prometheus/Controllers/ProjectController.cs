@@ -8059,6 +8059,42 @@ namespace Prometheus.Controllers
 
         }
 
+        public ActionResult ProjectDebugTreeMind(string ProjectKey)
+        {
+            ViewBag.PJKey = ProjectKey;
+            ViewBag.ProjectKey = ProjectKey;
+
+            ViewBag.isie8 = false;
+            var browse = Request.Browser;
+            if (string.Compare(browse.Browser, "IE", true) == 0
+                && (string.Compare(browse.Version, "7.0", true) == 0
+                || string.Compare(browse.Version, "8.0", true) == 0))
+            {
+                ViewBag.isie8 = true;
+            }
+
+            return View();
+        }
+
+        [HttpPost]
+        public JsonResult ProjectDebugTreeData()
+        {
+            var PJKey = Request.Form["ProjectKey"];
+            var data = ProjectErrorViewModels.GetProjectErrorByPJKey(PJKey, this);
+
+            var res = new JsonResult();
+            res.Data = new
+            {
+                success = true,
+                jm_data = data
+            };
+
+            return res;
+
+        }
+
+
+
         public JsonResult RetrieveErrorCommentsByAnalyzeID()
         {
             var id = Request.Form["id"];

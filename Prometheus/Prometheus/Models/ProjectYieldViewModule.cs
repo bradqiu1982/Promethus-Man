@@ -925,6 +925,27 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static List<ProjectYieldViewModule> GetYieldByWeeks(string pjkey,string startdate,string enddate, Cache mycache)
+        {
+            var ret = new List<ProjectYieldViewModule>();
+
+            var pvmlist = ProjectViewModels.RetrieveOneProject(pjkey);
+            if (pvmlist.Count == 0)
+            { return ret; }
+            var pvm = pvmlist[0];
+            var ldate = RetrieveDateSpanByWeek(startdate, enddate);
+
+            var startidx = 0;
+            for (int idx = startidx; idx < ldate.Count - 1; idx++)
+            {
+                var temp = GetYieldByDateRange(pjkey, ldate[idx].ToString(), ldate[idx + 1].ToString(), pvm, mycache);
+                if (temp.RealTimeYields.Count > 0)
+                {
+                    ret.Add(temp);
+                }
+            }
+            return ret;
+        }
 
         public static List<ProjectYieldViewModule> GetYieldByMonth(string pjkey, Cache mycache,int Months)
         {

@@ -2320,6 +2320,178 @@ namespace Prometheus.Controllers
             }
         }
 
+        
+        public static void ProjectWeeklyTrend2(Controller ctrl,string startdate,string enddate, string ProjectKey)
+        {
+            ctrl.ViewBag.Weeks = "1";
+
+            ctrl.ViewBag.PJKey = ProjectKey;
+
+            var vmlist = ProjectYieldViewModule.GetYieldByWeeks(ProjectKey,startdate,enddate, ctrl.HttpContext.Cache);
+            if (vmlist.Count > 0)
+            {
+                var ChartxAxisValues = "";
+                //var ChartSearies = "";
+
+                var ftimelist = new List<string>();
+                var famountlist = new List<int>();
+                var fyieldlist = new List<double>();
+                var ryieldlist = new List<double>();
+                var rtyieldlist = new List<double>();
+                var snyieldlist = new List<double>();
+                var maxamout = 0;
+
+                foreach (var item in vmlist)
+                {
+                    ftimelist.Add(item.EndDate.ToString("yyyy-MM-dd"));
+
+                    fyieldlist.Add(item.FirstYield * 100.0);
+                    ryieldlist.Add(item.LastYield * 100.0);
+                    rtyieldlist.Add(item.RealTimeYield * 100.0);
+                    snyieldlist.Add(item.SNYield * 100);
+
+                    var tempfamount = 0;
+                    foreach (var d in item.FirstYields)
+                    {
+                        if (d.InputCount > tempfamount) { tempfamount = d.InputCount; }
+                        if (d.InputCount > maxamout) { maxamout = d.InputCount; }
+                    }
+                    famountlist.Add(tempfamount);
+                }
+
+                //xaxis
+                foreach (var item in ftimelist)
+                {
+                    ChartxAxisValues = ChartxAxisValues + "'" + item + "',";
+                }
+                ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
+
+
+                //yaxis
+                //ChartSearies = "{name:'First Yield',data:[<fvalue>]},{name:'Retest Yield',data:[<cvalue>]}";
+
+                var famout = "";
+                foreach (var item in famountlist)
+                {
+                    famout = famout + item.ToString() + ",";
+                }
+                famout = famout.Substring(0, famout.Length - 1);
+
+                var ftempvalue = "";
+                foreach (var item in fyieldlist)
+                {
+                    ftempvalue = ftempvalue + item.ToString("0.00") + ",";
+                }
+                ftempvalue = ftempvalue.Substring(0, ftempvalue.Length - 1);
+                //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
+
+                var rttempvalue = "";
+                foreach (var item in rtyieldlist)
+                {
+                    rttempvalue = rttempvalue + item.ToString("0.00") + ",";
+                }
+                rttempvalue = rttempvalue.Substring(0, rttempvalue.Length - 1);
+
+                var sntempvalue = "";
+                foreach (var item in snyieldlist)
+                {
+                    sntempvalue = sntempvalue + item.ToString("0.00") + ",";
+                }
+                sntempvalue = sntempvalue.Substring(0, sntempvalue.Length - 1);
+
+                var rtempvalue = "";
+                foreach (var item in ryieldlist)
+                {
+                    rtempvalue = rtempvalue + item.ToString("0.00") + ",";
+                }
+                rtempvalue = rtempvalue.Substring(0, rtempvalue.Length - 1);
+                //ChartSearies = ChartSearies.Replace("<cvalue>", tempvalue);
+
+                var FINALTOOLTIP = "";
+                var REALTIMETOOLTIP = "";
+
+
+                for (var idx = 0; idx < rtyieldlist.Count; idx++)
+                {
+                    FINALTOOLTIP = FINALTOOLTIP + "'<!doctype html><table>"
+                        + "<tr><td><b>FPY</b></td><td>" + fyieldlist[idx].ToString("0.00") + "&#37;</td></tr>"
+                        + "<tr><td><b>FY</b></td><td>" + ryieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
+
+                    foreach (var d in vmlist[idx].LastYields)
+                    {
+                        FINALTOOLTIP = FINALTOOLTIP + "<tr><td><b>" + d.WhichTest + "</b></td><td>Input:</td><td>" + d.InputCount.ToString() + "</td><td>Output:</td><td>" + d.OutputCount.ToString() + "</td></tr>";
+                    }
+
+                    FINALTOOLTIP = FINALTOOLTIP + "</table>'";
+                    FINALTOOLTIP = FINALTOOLTIP + ",";
+                }
+                FINALTOOLTIP = FINALTOOLTIP.Substring(0, FINALTOOLTIP.Length - 1);
+
+
+                for (var idx = 0; idx < rtyieldlist.Count; idx++)
+                {
+                    REALTIMETOOLTIP = REALTIMETOOLTIP + "'<!doctype html><table>"
+                        + "<tr><td><b>Realtime Yield</b></td><td>" + rtyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
+                    foreach (var d in vmlist[idx].RealTimeYields)
+                    {
+                        REALTIMETOOLTIP = REALTIMETOOLTIP + "<tr><td><b>" + d.WhichTest + "</b></td><td>Input:</td><td>" + d.InputCount.ToString() + "</td><td>Output:</td><td>" + d.OutputCount.ToString() + "</td></tr>";
+                    }
+                    REALTIMETOOLTIP = REALTIMETOOLTIP + "</table>'";
+                    REALTIMETOOLTIP = REALTIMETOOLTIP + ",";
+                }
+                REALTIMETOOLTIP = REALTIMETOOLTIP.Substring(0, REALTIMETOOLTIP.Length - 1);
+
+                var SNTOOLTIP = "";
+                for (var idx = 0; idx < snyieldlist.Count; idx++)
+                {
+                    SNTOOLTIP = SNTOOLTIP + "'<!doctype html><table>"
+                        + "<tr><td><b>SN Trace Yield</b></td><td>" + snyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
+                    foreach (var d in vmlist[idx].SNYields)
+                    {
+                        SNTOOLTIP = SNTOOLTIP + "<tr><td><b>" + d.WhichTest + "</b></td><td>Input:</td><td>" + d.InputCount.ToString() + "</td><td>Output:</td><td>" + d.OutputCount.ToString() + "</td></tr>";
+                    }
+                    SNTOOLTIP = SNTOOLTIP + "</table>'";
+                    SNTOOLTIP = SNTOOLTIP + ",";
+                }
+                SNTOOLTIP = SNTOOLTIP.Substring(0, SNTOOLTIP.Length - 1);
+
+                //rederect url
+                var reurl = "window.location.href = '/Project/ProjectWYieldDetail?ProjectKey=" + ProjectKey + "'" + "+'&EndDate='+this.category" + "+'&Weeks=1'";
+
+                var tempscript = System.IO.File.ReadAllText(ctrl.Server.MapPath("~/Scripts/SuperYield.xml"));
+                ctrl.ViewBag.chartscript = tempscript.Replace("#ElementID#", "weeklyyield")
+                    .Replace("#Title#", "Weekly Yield Trend")
+                    .Replace("#ChartxAxisValues#", ChartxAxisValues)
+                    .Replace("#XAxisTitle#", "Date")
+                    .Replace("#AmountMAX#", maxamout.ToString())
+                    .Replace("#FirstAmount#", famout)
+                    .Replace("#FirstYield#", ftempvalue)
+                    .Replace("#RetestYield#", rtempvalue)
+                    .Replace("#RealTimeYield#", rttempvalue)
+                    .Replace("#SNYield#", sntempvalue)
+                    .Replace("#FINALTOOLTIP#", FINALTOOLTIP)
+                    .Replace("#REALTIMETOOLTIP#", REALTIMETOOLTIP)
+                    .Replace("#SNTOOLTIP#", SNTOOLTIP)
+                    .Replace("#REDIRECTURL#", reurl);
+
+            }
+        }
+
+        public ActionResult ProjectPeriodWeekYield(string ProjectKey, string StartDate, string EndDate)
+        {
+            if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(StartDate) && !string.IsNullOrEmpty(EndDate))
+            {
+                var sDate = Convert.ToDateTime(StartDate).ToString("yyyy-MM-dd");
+                var eDate = Convert.ToDateTime(EndDate).ToString("yyyy-MM-dd");
+                ViewBag.PJKey = ProjectKey;
+                ViewBag.pjkey = ProjectKey;
+
+                ProjectWeeklyTrend2(this, sDate + " 00:00:01", eDate + " 23:59:59", ProjectKey);
+                return View("ProjectYield");
+            }
+            return View("ProjectYield");
+        }
+
         public ActionResult ProjectYield(string ProjectKey, int Weeks)
         {
             if (ProjectKey != null)
@@ -4105,7 +4277,6 @@ namespace Prometheus.Controllers
                 ViewBag.sDate = Convert.ToDateTime(StartDate).ToString("yyyy-MM-dd");
                 ViewBag.eDate = Convert.ToDateTime(EndDate).ToString("yyyy-MM-dd");
                 ViewBag.PJKey = ProjectKey;
-
                 ViewBag.pjkey = ProjectKey;
 
                 var pvmlist = ProjectViewModels.RetrieveOneProject(ProjectKey);

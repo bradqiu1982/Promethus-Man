@@ -258,6 +258,7 @@
     <Compile Include="Models\MachineVM.cs" />
     <Compile Include="Models\MESUtility.cs" />
     <Compile Include="App_Start\MYStaticFileHandler.cs" />
+    <Compile Include="Models\NeoMapChartCache.cs" />
     <Compile Include="Models\NeoMAPVM.cs" />
     <Compile Include="Models\NormalDistributeAlg.cs" />
     <Compile Include="Models\OSAFailureVM.cs" />
@@ -779,6 +780,7 @@
     <Content Include="Content\images\PJ\NPIProcess.png" />
     <Content Include="Content\images\PJ\OBA.png" />
     <Content Include="Content\images\PJ\PM.png" />
+    <Content Include="Content\images\PJ\projectmind.png" />
     <Content Include="Content\images\PJ\quailty.png" />
     <Content Include="Content\images\PJ\REL.png" />
     <Content Include="Content\images\PJ\RMA.png" />
@@ -826,6 +828,7 @@
     <Content Include="Content\UserPermission.css" />
     <Content Include="Content\videorecorder.css" />
     <Content Include="Content\wafercoorddata.css" />
+    <Content Include="Scripts\ATETestTimeBaseLine.cfg" />
     <Content Include="Scripts\autocompletefill.js" />
     <Content Include="Scripts\bootstrap-datepicker\bootstrap-datepicker.js" />
     <Content Include="Scripts\bootstrap-datepicker\bootstrap-datepicker.min.js" />
@@ -834,7 +837,10 @@
     <Content Include="Scripts\bootstrap-tagsinput\bootstrap-tagsinput.min.js" />
     <Content Include="Scripts\bootstrap-tagsinput\bootstrap3-typeahead.js" />
     <Content Include="Scripts\bootstrap-tagsinput\bootstrap3-typeahead.min.js" />
+    <Content Include="Scripts\BoxPlotNeomap.xml" />
     <Content Include="Scripts\burnin.js" />
+    <Content Include="Scripts\canvg.js" />
+    <Content Include="Scripts\copy2clipboard.js" />
     <Content Include="Scripts\exporting.js" />
     <Content Include="Scripts\FailureTimeDist.xml" />
     <Content Include="Scripts\highcharts-more.js" />
@@ -1315,6 +1321,8 @@
     <Content Include="Views\Permission\RoleList.cshtml" />
     <Content Include="Views\Shared\_Pagination.cshtml" />
     <Content Include="Views\CustomerData\SNLatestTestStauts.cshtml" />
+    <Content Include="Views\DataAnalyze\NeoMapDataAnalysis.cshtml" />
+    <Content Include="Views\Project\ProjectDebugTreeMind.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

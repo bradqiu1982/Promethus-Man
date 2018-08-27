@@ -274,7 +274,7 @@ namespace Prometheus.Models
 
         public static Dictionary<string,Dictionary<string, LIMITVAL>> GetATETestTimeLimit(Controller ctrl)
         {
-            var lines = System.IO.File.ReadAllLines(ctrl.Server.MapPath("~/Scripts/atetesttimelimit.cfg"));
+            var lines = System.IO.File.ReadAllLines(ctrl.Server.MapPath("~/Scripts/ATETestTimeBaseLine.cfg"));
             var tempdict = new Dictionary<string, string>();
             foreach (var line in lines)
             {

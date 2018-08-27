@@ -255,6 +255,7 @@
     <Compile Include="Models\JOMesStatus.cs" />
     <Compile Include="Models\JsMindVM.cs" />
     <Compile Include="Models\LogHelper.cs" />
+    <Compile Include="Models\MachineUserMap.cs" />
     <Compile Include="Models\MachineVM.cs" />
     <Compile Include="Models\MESUtility.cs" />
     <Compile Include="App_Start\MYStaticFileHandler.cs" />

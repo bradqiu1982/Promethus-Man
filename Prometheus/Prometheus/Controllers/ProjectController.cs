@@ -9371,6 +9371,13 @@ namespace Prometheus.Controllers
 
             return View();
         }
+
+        public ActionResult RefreshITASSET()
+        {
+            ExternalDataCollector.RefreshITASSET(this);
+            return View("HeartBeat");
+        }
+
     }
 
 }

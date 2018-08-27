@@ -4260,5 +4260,42 @@ namespace Prometheus.Models
             }//end if
         }
         #endregion
+
+
+        public static void RefreshITASSET(Controller ctrl)
+        {
+            var cfg = CfgUtility.GetSysConfig(ctrl);
+            var fs = ExternalDataCollector.DirectoryEnumerateFiles(ctrl, cfg["ITASSET"]);
+            var machinemap = new Dictionary<string, string>();
+            foreach (var f in fs)
+            {
+                var des = DownloadShareFile(f, ctrl);
+                if (!string.IsNullOrEmpty(des) && File.Exists(des))
+                {
+                    var datas = RetrieveDataFromExcelWithAuth(ctrl, des);
+                    foreach (var line in datas)
+                    {
+                        var machine = line[1].Replace("/", "").Trim().ToUpper();
+                        var name = line[0].Replace("/", "").Trim().ToUpper();
+                        if (!string.IsNullOrEmpty(machine)
+                            && !string.IsNullOrEmpty(name)
+                            && string.Compare(machine, "NA") != 0
+                            && string.Compare(name, "NA") != 0)
+                        {
+                            if (!machinemap.ContainsKey(machine))
+                            {
+                                machinemap.Add(machine, name);
+                            }
+                        }
+                    }
+                }//end if
+            }//end foreach
+
+            foreach (var kv in machinemap)
+            {
+                MachineUserMap.AddMachineUserMap(kv.Key, kv.Value);
+            }
+        }
+
     }
 }

@@ -4196,6 +4196,7 @@ namespace Prometheus.Models
                             var cpo = Convert2Str(line[5]).ToUpper();
                             var makebuy = Convert2Str(line[27]).ToUpper();
                             var family = Convert2Str(line[30]);
+                            var orderqty = Convert.ToInt32(line[13]);
                             var shipqty = Convert.ToInt32(line[14]);
                             var pn = Convert2Str(line[10]);
 
@@ -4217,11 +4218,16 @@ namespace Prometheus.Models
                                     pnsndict.Add(pn, string.Empty);
                                 }
 
-                                shipdatalist.Add(new FsrShipData(shipid,shipqty,pn,pndesc,family,cfg
-                                    ,shipdate,customernum,customer1,customer2,ordereddate, delievenum));
+                                shipdatalist.Add(new FsrShipData(shipid, shipqty, pn, pndesc, family, cfg
+                                    , shipdate, customernum, customer1, customer2, ordereddate, delievenum, orderqty));
 
                             }//end if
                         }//end if
+                        //else
+                        //{
+                        //    var orderqty = Convert.ToInt32(line[13]);
+                        //    FsrShipData.UpdateOrderQty(shipid, orderqty);
+                        //}
                     } catch (Exception ex) { }
                 }//end foreach
                 var pnwaferdict = new Dictionary<string, string>();
@@ -4291,9 +4297,31 @@ namespace Prometheus.Models
                 }//end if
             }//end foreach
 
+            var sb = new StringBuilder((machinemap.Count+1) * 40);
+            sb.Append("('");
             foreach (var kv in machinemap)
             {
-                MachineUserMap.AddMachineUserMap(kv.Key, kv.Value);
+                sb.Append(kv.Value + "@finisar.com" + "','");
+            }
+
+            var leveldict = new Dictionary<string, string>();
+            var emailcond = sb.ToString();
+            if (emailcond.Length != 2)
+            {
+                emailcond = emailcond.Substring(0, emailcond.Length - 2);
+                emailcond = emailcond + ")";
+                leveldict = MachineUserMap.LoadUserLevel(emailcond);
+            }
+
+            foreach (var kv in machinemap)
+            {
+                var level = "";
+                if (leveldict.ContainsKey(kv.Value))
+                {
+                    level = leveldict[kv.Value];
+                }
+
+                MachineUserMap.AddMachineUserMap(kv.Key, kv.Value,level);
             }
         }
 

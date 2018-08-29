@@ -1610,3 +1610,10 @@ select SN+TestName+format(TestTimeStamp, 'yyyy-MM-dd HH:mm:ss') tempkey,count(SN
 	[Chart]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
 	[UpdateTime]   DATETIME  DEFAULT ('1982-05-06 10:00:00') NOT NULL
 	);
+
+
+	CREATE TABLE [dbo].[machineusermap] (
+    [machine]   NVARCHAR (300)   DEFAULT ('')  NOT NULL,
+    [username]   NVARCHAR (300)   DEFAULT ('')  NOT NULL,
+	[level] NVARCHAR (100)    DEFAULT ('') NOT NULL
+);

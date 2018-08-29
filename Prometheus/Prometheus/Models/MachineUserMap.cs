@@ -13,7 +13,7 @@ namespace Prometheus.Models
             username = "";
         }
 
-        public static void AddMachineUserMap(string machine, string username)
+        public static void AddMachineUserMap(string machine, string username,string level)
         {
             var sql = "delete from machineusermap where machine = '<machine>'";
             sql = sql.Replace("<machine>", machine);
@@ -21,10 +21,12 @@ namespace Prometheus.Models
 
             var tempname = username.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].ToUpper().Trim();
 
-            sql = "insert into machineusermap(machine,username) values(@machine,@username)";
+            sql = "insert into machineusermap(machine,username,level) values(@machine,@username,@level)";
             var param = new Dictionary<string, string>();
             param.Add("@machine", machine.ToUpper().Trim());
             param.Add("@username", tempname.ToUpper().Trim());
+            param.Add("@level", level);
+
             DBUtility.ExeLocalSqlNoRes(sql, param);
         }
 
@@ -56,6 +58,63 @@ namespace Prometheus.Models
                 }
             }
             return ret;
+        }
+
+        public static Dictionary<string, string> LoadUserLevel(string emailcond)
+        {
+            var ret = new Dictionary<string, string>();
+
+            var sql = "select Email_Address,Job_Level FROM [Oracle_Data].[dbo].[ALL_Active_User_List] where Email_Address in <emailcond> and Email_Address is not null and Job_Level is not null";
+            sql = sql.Replace("<emailcond>", emailcond);
+            var dbret = DBUtility.ExeFAISqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var usename = Convert.ToString(line[0]).Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].ToUpper();
+                var level = Convert.ToString(line[1]);
+                if (!ret.ContainsKey(usename))
+                {
+                    ret.Add(usename, level);
+                }
+            }
+
+            return ret;
+        }
+
+        public static bool IsSeniorEmployee(string machine, string username)
+        {
+            var sql = "select machine,username,level from machineusermap where machine = '<machine>' ";
+            sql = sql.Replace("<machine>", machine);
+
+            if (!string.IsNullOrEmpty(username))
+            {
+                sql = sql + " or username = '<username>'";
+                sql = sql.Replace("<username>", username.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].ToUpper());
+            }
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            if (dbret.Count == 0)
+            {
+                return true;
+            }
+
+            try
+            {
+                foreach (var line in dbret)
+                {
+                    var level = Convert.ToString(line[2]);
+                    if (!string.IsNullOrEmpty(level) && level.Length > 1)
+                    {
+                        var lv = Convert.ToInt32(level.Substring(1));
+                        if (lv >= 7 || lv == 0)
+                        {
+                            return true;
+                        }
+                    }//end if
+                }//en foreach
+            }
+            catch (Exception ex) { }
+
+            return false;
         }
 
         public string machine { set; get; }

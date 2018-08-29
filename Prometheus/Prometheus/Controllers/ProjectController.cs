@@ -9378,6 +9378,12 @@ namespace Prometheus.Controllers
             return View("HeartBeat");
         }
 
+        public ActionResult RefreshShipData()
+        {
+            ExternalDataCollector.RefreshShipData(this);
+            return View("HeartBeat");
+        }
+
     }
 
 }

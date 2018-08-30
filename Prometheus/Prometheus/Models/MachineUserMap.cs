@@ -13,7 +13,7 @@ namespace Prometheus.Models
             username = "";
         }
 
-        public static void AddMachineUserMap(string machine, string username,string level)
+        public static void AddMachineUserMap(string machine, string username,string level,string leader)
         {
             var sql = "delete from machineusermap where machine = '<machine>'";
             sql = sql.Replace("<machine>", machine);
@@ -21,11 +21,12 @@ namespace Prometheus.Models
 
             var tempname = username.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].ToUpper().Trim();
 
-            sql = "insert into machineusermap(machine,username,level) values(@machine,@username,@level)";
+            sql = "insert into machineusermap(machine,username,level,leader) values(@machine,@username,@level,@leader)";
             var param = new Dictionary<string, string>();
             param.Add("@machine", machine.ToUpper().Trim());
             param.Add("@username", tempname.ToUpper().Trim());
             param.Add("@level", level);
+            param.Add("@leader", leader);
 
             DBUtility.ExeLocalSqlNoRes(sql, param);
         }
@@ -60,20 +61,26 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static Dictionary<string, string> LoadUserLevel(string emailcond)
+        public static Dictionary<string, KeyValuePair<string,string>> LoadUserLevel(string emailcond)
         {
-            var ret = new Dictionary<string, string>();
+            var ret = new Dictionary<string, KeyValuePair<string, string>>();
 
-            var sql = "select Email_Address,Job_Level FROM [Oracle_Data].[dbo].[ALL_Active_User_List] where Email_Address in <emailcond> and Email_Address is not null and Job_Level is not null";
+            var sql = "select Email_Address,Job_Level,Manager FROM [Oracle_Data].[dbo].[ALL_Active_User_List] where Email_Address in <emailcond> and Email_Address is not null and Job_Level is not null";
             sql = sql.Replace("<emailcond>", emailcond);
             var dbret = DBUtility.ExeFAISqlWithRes(sql, null);
             foreach (var line in dbret)
             {
                 var usename = Convert.ToString(line[0]).Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0].ToUpper();
                 var level = Convert.ToString(line[1]);
+                var manager = "";
+                if (line[2] != null)
+                {
+                    manager = Convert.ToString(line[2]);
+                }
+
                 if (!ret.ContainsKey(usename))
                 {
-                    ret.Add(usename, level);
+                    ret.Add(usename, new KeyValuePair<string, string>(level,manager));
                 }
             }
 

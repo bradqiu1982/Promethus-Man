@@ -4304,7 +4304,7 @@ namespace Prometheus.Models
                 sb.Append(kv.Value + "@finisar.com" + "','");
             }
 
-            var leveldict = new Dictionary<string, string>();
+            var leveldict = new Dictionary<string, KeyValuePair<string,string>>();
             var emailcond = sb.ToString();
             if (emailcond.Length != 2)
             {
@@ -4316,12 +4316,14 @@ namespace Prometheus.Models
             foreach (var kv in machinemap)
             {
                 var level = "";
+                var leader = "";
                 if (leveldict.ContainsKey(kv.Value))
                 {
-                    level = leveldict[kv.Value];
+                    level = leveldict[kv.Value].Key;
+                    leader = leveldict[kv.Value].Value;
                 }
 
-                MachineUserMap.AddMachineUserMap(kv.Key, kv.Value,level);
+                MachineUserMap.AddMachineUserMap(kv.Key, kv.Value,level, leader);
             }
         }
 

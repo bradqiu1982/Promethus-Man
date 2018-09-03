@@ -23,7 +23,6 @@ namespace Prometheus.Models
     {
         public CPKData()
         {
-            CPKResult = CPKRESULT.EMPTY;
             Mean = 0.0;
             Stdev = 0.0;
 
@@ -31,65 +30,64 @@ namespace Prometheus.Models
             RobustStdev = 0.0;
 
             Ca = 0.0;
-
-            Cpu = 0.0;
-            Cpl = 0.0;
             Cp = 0.0;
 
-            Cpk_3s = 0.0;
             Cpk_ca = 0.0;
             Cpk_robust = 0.0;
+            IsNormalProbability = 0.0;
+            DPPM_robust = 0.0;
         }
-
-        public string CPKResult { set; get; }
 
         public double Mean { set; get; }
         public double Stdev { set; get; }
 
-        public double RobustMean { set; get; }
-        public double RobustStdev { set; get; }
+        private double RobustMean { set; get; }
+        private double RobustStdev { set; get; }
 
-        public double Ca { set; get; }
+        private double Ca { set; get; }
+        private double Cp { set; get; }
 
-        public double Cpu { set; get; }
-        public double Cpl { set; get; }
-        public double Cp { set; get; }
+        //private double Cpk_3s { set; get; }
 
-        public double Cpk_3s { set; get; }
+        public double IsNormalProbability { set; get; }
         public double Cpk_ca { set; get; }
         public double Cpk_robust { set; get; }
-
+        public double DPPM_robust { set; get; }
 
         public static void Test()
         {
             var rawdata = new List<double>();
 
-            //var sql = "SELECT [TxPower]  FROM [NPITrace].[dbo].[ModuleTXOData] WHERE TestName= 'ersetup' and TestTimeStamp > '2018-08-10 00:00:00' and TestTimeStamp < '2018-08-11 00:00:00' and PN='1220278'";
-            var sql = "SELECT [TxPower]  FROM [NPITrace].[dbo].[ModuleTXOData] WHERE TestTimeStamp > '2018-08-10 00:00:00' and TestTimeStamp < '2018-08-10 13:00:00' and TXPower > -0.5 and TXPower < 0.5";
+            var sql = "SELECT [TxPower]  FROM [NPITrace].[dbo].[ModuleTXOData] WHERE TestName= 'ersetup' and TestTimeStamp > '2018-08-10 00:00:00' and TestTimeStamp < '2018-08-11 00:00:00' and PN='1220278'";
+            //var sql = "SELECT [TxPower]  FROM [NPITrace].[dbo].[ModuleTXOData] WHERE TestTimeStamp > '2018-08-10 00:00:00' and TestTimeStamp < '2018-08-10 13:00:00' and TXPower > -0.5 and TXPower < 0.5";
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
             { rawdata.Add(Math.Round(Convert.ToDouble(line[0]), 3)); }
 
-            rawdata.Sort();
+            var ax = "";
+            var hist = new MathNet.Numerics.Statistics.Histogram(rawdata, 50);
+            for (var idx = 0; idx < 50; idx++)
+            {
+                var item = hist[idx];
+                ax = ax + idx + "," + item.Count + "   ";
+            }
 
+            var cpk = CPKData.GetCpk(rawdata, "1.3", "-3.0");
+
+            var p = cpk[0].IsNormalProbability;
+        }
+
+        private static double IsNormal(List<double> rawdata)
+        {
+            rawdata.Sort();
             var mean = Statistics.Mean(rawdata);
             var stdev = Statistics.StandardDeviation(rawdata);
-
-            var normal = new NormalDistribution(mean,stdev);
+            var normal = new NormalDistribution(mean, stdev);
             var sample = new Sample(rawdata);
             var isnormal = sample.KolmogorovSmirnovTest(normal);
-
-            //var ax = "";
-            //var hist = new MathNet.Numerics.Statistics.Histogram(rawdata, 10);
-            //for (var idx = 0; idx < 10; idx++)
-            //{
-            //    var item = hist[idx];
-            //    ax = ax + idx + "," + item.Count+"   ";
-            //}
-
-            var p = isnormal.Probability;
-            var pv = Math.Round(p, 5);
+            return isnormal.Probability;
         }
+
 
         public static List<CPKData> GetCpk(List<double> rawdata, string highlimit, string lowlimit)
         {
@@ -104,11 +102,11 @@ namespace Prometheus.Models
 
             var tempvm = new CPKData();
             tempvm.Mean = MeanVal(rawdata);
-            tempvm.Stdev = StandardDeviation(rawdata, tempvm.Mean);
+            tempvm.Stdev = StandardDeviation(rawdata);
+            tempvm.IsNormalProbability = Math.Round(IsNormal(rawdata),5);
 
             if (!string.IsNullOrEmpty(highlimit) && !string.IsNullOrEmpty(lowlimit))
             {
-                tempvm.CPKResult = CPKRESULT.CPK;
                 var hlimit = Convert.ToDouble(highlimit);
                 var llimit = Convert.ToDouble(lowlimit);
 
@@ -118,34 +116,30 @@ namespace Prometheus.Models
 
                 tempvm.Cp = (hlimit - llimit) / (6.0 * tempvm.Stdev);
 
-                var cpk3s1 = (hlimit - tempvm.Mean) / (3.0 * tempvm.Stdev);
-                var cpk3s2 = (tempvm.Mean - llimit) / (3.0 * tempvm.Stdev);
-                tempvm.Cpk_3s = cpk3s1;
-                if (cpk3s2 < tempvm.Cpk_3s)
-                { tempvm.Cpk_3s = cpk3s2; }
+                //var cpk3s1 = (hlimit - tempvm.Mean) / (3.0 * tempvm.Stdev);
+                //var cpk3s2 = (tempvm.Mean - llimit) / (3.0 * tempvm.Stdev);
+                //tempvm.Cpk_3s = cpk3s1;
+                //if (cpk3s2 < tempvm.Cpk_3s)
+                //{ tempvm.Cpk_3s = cpk3s2; }
 
                 tempvm.Cpk_ca = tempvm.Cp * (1.0 - tempvm.Ca);
 
             }
             else if (!string.IsNullOrEmpty(highlimit))
             {
-                tempvm.CPKResult = CPKRESULT.CPU;
                 var hlimit = Convert.ToDouble(highlimit);
-                tempvm.Cpu = (hlimit - tempvm.Mean) / (3.0 * tempvm.Stdev);
+                tempvm.Cpk_ca = (hlimit - tempvm.Mean) / (3.0 * tempvm.Stdev);
 
             }
             else if (!string.IsNullOrEmpty(lowlimit))
             {
-                tempvm.CPKResult = CPKRESULT.CPL;
                 var llimit = Convert.ToDouble(lowlimit);
-                tempvm.Cpl = (tempvm.Mean - llimit) / (3.0 * tempvm.Stdev);
+                tempvm.Cpk_ca = (tempvm.Mean - llimit) / (3.0 * tempvm.Stdev);
             }
 
-            var robustckp = GetRobustCpk(rawdata, highlimit, lowlimit);
-            if (robustckp.Count > 0)
-            {
-                tempvm.Cpk_robust = robustckp.Min();
-            }
+            Normal n = new Normal();
+            tempvm.Cpk_robust = GetRobustCpk(rawdata, highlimit, lowlimit,n);
+            tempvm.DPPM_robust = Math.Round(GetDPPM(tempvm.Cpk_robust, n),0);
 
             ret.Add(tempvm);
             return ret;
@@ -153,26 +147,15 @@ namespace Prometheus.Models
 
         public static double MeanVal(List<double> data)
         {
-            var sum = 0.0;
-            foreach (var val in data)
-                sum = sum + val;
-            return sum / data.Count;
+            return Statistics.Mean(data);
         }
-        public static double StandardDeviation(List<double> data, double mean)
+        public static double StandardDeviation(List<double> data)
         {
-            double sumDeviation = 0.0;
-            int dataSize = data.Count;
-
-            for (int i = 0; i < dataSize; i++)
-                sumDeviation = sumDeviation + (data[i] - mean) * (data[i] - mean);
-
-            return Math.Sqrt(sumDeviation / (dataSize - 1));
+            return Statistics.StandardDeviation(data);
         }
 
-        private static List<double> GetRobustCpk(List<double> rawdata, string highlimit, string lowlimit)
+        private static double GetRobustCpk(List<double> rawdata, string highlimit, string lowlimit, Normal n)
         {
-            Normal n = new Normal();
-
             var quantilesDouble = GetDataQuantiles(rawdata.Count, n);
 
             var rCpks = new List<double>();
@@ -180,11 +163,7 @@ namespace Prometheus.Models
                 rCpks.Add(GetRobustCPKWithSingleSpec(rawdata, quantilesDouble, Convert.ToDouble(highlimit), "USL"));
             if (!string.IsNullOrEmpty(lowlimit))
                 rCpks.Add(GetRobustCPKWithSingleSpec(rawdata, quantilesDouble, Convert.ToDouble(lowlimit), "LSL"));
-            //if (rCpks.Count != 0)
-            //{
-            //    // Math.Round(rCpks.Min(), 2).ToString();
-            //}
-            return rCpks;
+            return rCpks.Min();
         }
 
         private static List<double> GetDataQuantiles(int qty, Normal n)
@@ -227,6 +206,11 @@ namespace Prometheus.Models
             var sig = quantiles[loc] + (LSL - data[loc]) / slopes[loc];
             sig = Math.Abs(sig) / 3;
             return sig;
+        }
+
+        private static double GetDPPM(double cpk, Normal n)
+        {
+            return (1 - n.CumulativeDistribution(3 * cpk)) * 1000000;
         }
 
     }

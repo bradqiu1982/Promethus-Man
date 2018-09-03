@@ -852,6 +852,10 @@
     <Content Include="Scripts\burnin.js" />
     <Content Include="Scripts\canvg.js" />
     <Content Include="Scripts\copy2clipboard.js" />
+    <Content Include="Scripts\datatables\buttons.dataTables.min.css" />
+    <Content Include="Scripts\datatables\buttons.html5.min.js" />
+    <Content Include="Scripts\datatables\dataTables.buttons.min.js" />
+    <Content Include="Scripts\datatables\jszip.min.js" />
     <Content Include="Scripts\exporting.js" />
     <Content Include="Scripts\FailureTimeDist.xml" />
     <Content Include="Scripts\highcharts-more.js" />

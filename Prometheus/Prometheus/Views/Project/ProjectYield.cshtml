@@ -52,3 +52,12 @@
     </div>
     @Html.Raw(ViewBag.chartscript)
 }
+
+@if (ViewBag.brchartscript != null)
+{
+
+    <div class="row">
+            <div id="bryield" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+    </div>
+    @Html.Raw(ViewBag.brchartscript)
+}

@@ -862,6 +862,44 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static List<ProjectYieldViewModule> GetBRYieldByTime(string pjkey, string startdate, string enddate, ProjectViewModels pvm)
+        {
+
+            var ret = new List<ProjectYieldViewModule>();
+
+            var brdict = new Dictionary<string,bool>();
+            var sql = "select distinct APPV1 from ProjectTestData where ProjectKey = @ProjectKey and TestTimeStamp >= @startdate and TestTimeStamp <= @enddate and APPV1 like '%-SBR%'";
+            var param = new Dictionary<string, string>();
+            param.Add("@ProjectKey", pjkey);
+            param.Add("@startdate", startdate);
+            param.Add("@enddate", enddate);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, param);
+            foreach (var line in dbret)
+            {
+                var jo = Convert.ToString(line[0]);
+                var josplit = jo.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                if (josplit.Count >= 3 && josplit[1].ToUpper().Contains("SBR"))
+                {
+                    var sbr = josplit[1].Trim().ToUpper();
+                    if (!brdict.ContainsKey(sbr))
+                    { brdict.Add(sbr,true); }
+                }
+            }
+
+            if (brdict.Count > 0)
+            {
+                var brlist = brdict.Keys.ToList();
+                brlist.Sort();
+
+                foreach (var br in brlist)
+                {
+                    ret.AddRange(GetYieldByBRNum(pjkey,br,pvm,null,YIELDTYPE.BR));
+                }
+            }
+
+            return ret;
+        }
+
         public static List<ProjectYieldViewModule> GetYieldByBRNum(string pjkey, string BRNUM, ProjectViewModels pvm, Cache mycache, string yieldtype)
         {
             var retlist = new List<ProjectYieldViewModule>();

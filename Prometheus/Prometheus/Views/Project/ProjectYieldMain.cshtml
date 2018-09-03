@@ -56,6 +56,19 @@
         @Html.Raw(ViewBag.chartscript)
         }
 
+        @if (ViewBag.brchartscript != null)
+        {
+
+            <div class="row">
+                <div class="col-xs-1"></div>
+                <div class="col-xs-10">
+                    <div id="bryield" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                </div>
+                <div class="col-xs-1"></div>
+            </div>
+            @Html.Raw(ViewBag.brchartscript)
+        }
+
 
         <hr style="border-color:#006DC0;" />
 
@@ -91,9 +104,10 @@
                         <input class="form-control text-box single-line" id="EndDate" placeholder="End Date" name="EndDate" type="text" value="" />
                     </div>
                     <div class="col-xs-5">
-                        <div class="col-xs-4"><button class="btn btn-success" type="button" style="width:75px" onclick="ShowPeriodYield()">In Period</button></div>
-                        <div class="col-xs-4"><button class="btn btn-success" type="button" style="width:75px" onclick="ShowDailyYield()">In Days</button></div>
-                        <div class="col-xs-4"><button class="btn btn-success" type="button" style="width:75px" onclick="ShowPeriodWeekYield()">In Weeks</button></div>
+                        <div class="col-xs-3"><button class="btn btn-success" type="button" style="width:75px" onclick="ShowPeriodYield()">In Period</button></div>
+                        <div class="col-xs-3"><button class="btn btn-success" type="button" style="width:75px" onclick="ShowDailyYield()">In Days</button></div>
+                        <div class="col-xs-3"><button class="btn btn-success" type="button" style="width:75px" onclick="ShowPeriodWeekYield()">In Weeks</button></div>
+                        <div class="col-xs-3"><button class="btn btn-success" type="button" style="width:75px" onclick="ShowPeriodSBRYield()">In SBRs</button></div>
                     </div>
                     <div class="col-xs-1"></div>
                 </div>
@@ -181,6 +195,13 @@
             {
                 if (document.getElementById("StartDate").value && document.getElementById("EndDate").value) {
                     window.location.href = '/Project/ProjectPeriodWeekYield?ProjectKey=@ViewBag.pjkey' + '&StartDate=' + document.getElementById("StartDate").value + '&EndDate=' + document.getElementById("EndDate").value;
+                }
+            }
+
+            function ShowPeriodSBRYield()
+            {
+                if (document.getElementById("StartDate").value && document.getElementById("EndDate").value) {
+                    window.location.href = '/Project/ProjectPeriodSBRsYield?ProjectKey=@ViewBag.pjkey' + '&StartDate=' + document.getElementById("StartDate").value + '&EndDate=' + document.getElementById("EndDate").value;
                 }
             }
 

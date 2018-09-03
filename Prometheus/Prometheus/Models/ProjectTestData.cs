@@ -20,7 +20,7 @@ namespace Prometheus.Models
             ProjectKey = pk;
             DataID = did;
             ModuleSerialNum = sn;
-            WhichTest = wtest;
+            WhichTest = wtest.ToUpper();
             ModuleType = mt;
             ErrAbbr = err;
             TestTimeStamp = DateTime.Parse(testtime);
@@ -34,7 +34,7 @@ namespace Prometheus.Models
         {
             ProjectKey = pk;
             ModuleSerialNum = sn;
-            WhichTest = wtest;
+            WhichTest = wtest.ToUpper();
             ErrAbbr = err;
             TestTimeStamp = DateTime.Parse(testtime);
             CSN = "";

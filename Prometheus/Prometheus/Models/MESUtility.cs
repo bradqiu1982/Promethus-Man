@@ -878,6 +878,11 @@ namespace Prometheus.Models
                         {
                             try
                             {
+                                if (item[1] == null)
+                                { continue; }
+                                var sn = Convert.ToString(item[1]).Trim();
+                                if (string.IsNullOrEmpty(sn))
+                                { continue; }
 
                                 var tempdata = new ProjectTestData(vm.ProjectKey, Convert.ToString(item[0]), Convert.ToString(item[1])
                                         ,s.Key, Convert.ToString(item[3]), Convert.ToString(item[4])
@@ -1444,6 +1449,11 @@ namespace Prometheus.Models
                     {
                         try
                         {
+                            if (item[1] == null)
+                            { continue; }
+                            var sn = Convert.ToString(item[1]).Trim();
+                            if (string.IsNullOrEmpty(sn))
+                            { continue; }
 
                             var tempdata = new ProjectTestData(vm.ProjectKey, Convert.ToString(item[0]), Convert.ToString(item[1])
                                     ,s.Key, Convert.ToString(item[3]), Convert.ToString(item[4])

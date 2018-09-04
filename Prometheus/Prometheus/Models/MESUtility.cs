@@ -1639,5 +1639,11 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static List<double> GetTestData(string pnlist, string mestab, string param, string startdate, string enddate, bool onlypass)
+        {
+            var ret = new List<double>();
+            return ret;
+        }
+
     }
 }

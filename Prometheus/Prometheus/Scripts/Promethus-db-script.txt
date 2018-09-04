@@ -1618,3 +1618,17 @@ select SN+TestName+format(TestTimeStamp, 'yyyy-MM-dd HH:mm:ss') tempkey,count(SN
 	[level] NVARCHAR (100)    DEFAULT ('') NOT NULL,
 	[leader] NVARCHAR (300)    DEFAULT ('') NOT NULL
 );
+
+
+CREATE TABLE [dbo].[CPKCache] (
+    [PJName]   NVARCHAR (MAX)   DEFAULT ('')  NOT NULL,
+    [MESTab]   NVARCHAR (MAX)   DEFAULT ('')  NOT NULL,
+	[PNDesc] NVARCHAR (MAX)    DEFAULT ('') NOT NULL,
+	[Param]  NVARCHAR (MAX)    DEFAULT ('') NOT NULL,
+	[LowLimit] NVARCHAR (MAX)    DEFAULT ('') NOT NULL,
+	[HighLimit] NVARCHAR (MAX)    DEFAULT ('') NOT NULL,
+	[Appv_1]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Appv_2]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Appv_3]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[Appv_4]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+);

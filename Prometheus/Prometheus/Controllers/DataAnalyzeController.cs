@@ -4828,5 +4828,117 @@ namespace Prometheus.Controllers
             return View();
         }
 
+
+        public ActionResult CPKAnalysis()
+        {
+            var yesnolist = new List<string>();
+            yesnolist.Add("NO");
+            yesnolist.Add("YES");
+            ViewBag.allpasslist = CreateSelectList(yesnolist, "");
+
+            var dblist = new List<string>();
+            dblist.Add("MES");
+            dblist.Add("ATE");
+            ViewBag.databaselist = CreateSelectList(dblist, "");
+
+            return View();
+        }
+
+        public JsonResult GetStandardPJList()
+        {
+            var cfgpjdict = CfgUtility.GetStandardPJList(this);
+            var inputpj = CPKCache.RetrievePJList();
+            var pjdata = cfgpjdict.Keys.ToList();
+            foreach (var pj in inputpj)
+            {
+                if (!cfgpjdict.ContainsKey(pj))
+                {
+                    pjdata.Add(pj);
+                }
+            }
+            pjdata.Sort();
+
+            var ret = new JsonResult();
+            ret.Data = new { pjdata = pjdata };
+            return ret;
+        }
+        
+        public JsonResult GetMESTabPN()
+        {
+            var pj = Request.Form["pj"];
+            var mestablist = CPKCache.RetrieveMESTabList(pj);
+            var pnlist = CPKCache.RetrieveMESPNDesList(pj);
+
+            var ret = new JsonResult();
+            ret.Data = new {
+                    mestablist = mestablist,
+                    pnlist = pnlist };
+            return ret;
+        }
+
+        public JsonResult GetMESParam()
+        {
+            var mestab = Request.Form["mestab"];
+            var paramlist = CPKCache.RetrieveMESParamList(mestab);
+
+            var ret = new JsonResult();
+            ret.Data = new
+            {
+                paramlist = paramlist
+            };
+            return ret;
+        }
+
+        public JsonResult GetMESLimit()
+        {
+            var param = Request.Form["param"];
+            var lowlimitlist = CPKCache.RetrieveMESLowLimitList(param);
+            var highlimitlist = CPKCache.RetrieveMESHighLimitList(param);
+            var ret = new JsonResult();
+            ret.Data = new
+            {
+                lowlimitlist = lowlimitlist,
+                highlimitlist = highlimitlist
+            };
+            return ret;
+        }
+
+        public JsonResult QueryCPK()
+        {
+            var pj = Request.Form["pj"];
+            var mestab = Request.Form["mestab"].ToUpper().Replace("DC_","");
+            var param = Request.Form["param"];
+            var lowlimit = Request.Form["lowlimit"];
+            var highlimit = Request.Form["highlimit"];
+            var startdate = Request.Form["startdate"];
+            var enddate = Request.Form["enddate"];
+            var pnlist = Request.Form["pnlist"];
+
+            var pass = Request.Form["pass"];
+            var database = Request.Form["database"];
+
+            
+            bool onlypass = false;
+            if (string.Compare(pass, "YES", true) == 0)
+            { onlypass = true; }
+
+            var rawdata = new List<double>();
+            if (string.Compare(database, "MES", true) == 0)
+            {
+                rawdata = MESUtility.GetTestData(pnlist, mestab, param, startdate, enddate, onlypass);
+            }
+            else
+            {
+                rawdata = ATEUtility.GetTestData(pnlist,mestab,param, startdate, enddate, onlypass);
+            }
+
+            CPKCache.UpdateCPKParams(pj, mestab, pnlist, param, lowlimit, highlimit);
+
+            var ret = new JsonResult();
+            ret.Data = new
+            {};
+            return ret;
+        }
+
     }
 }

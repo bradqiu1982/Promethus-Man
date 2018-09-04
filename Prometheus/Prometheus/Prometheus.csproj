@@ -251,6 +251,7 @@
     <Compile Include="Models\CfgUtility.cs" />
     <Compile Include="Models\CookieUtility.cs" />
     <Compile Include="Models\CPKAlgorithm.cs" />
+    <Compile Include="Models\CPKCache.cs" />
     <Compile Include="Models\DashBoardViewModels.cs" />
     <Compile Include="Models\DBUtility.cs" />
     <Compile Include="Models\EmailUtility.cs" />
@@ -852,6 +853,7 @@
     <Content Include="Scripts\burnin.js" />
     <Content Include="Scripts\canvg.js" />
     <Content Include="Scripts\copy2clipboard.js" />
+    <Content Include="Scripts\cpkanalysis.js" />
     <Content Include="Scripts\datatables\buttons.dataTables.min.css" />
     <Content Include="Scripts\datatables\buttons.html5.min.js" />
     <Content Include="Scripts\datatables\dataTables.buttons.min.js" />
@@ -1338,6 +1340,7 @@
     <Content Include="Views\CustomerData\SNLatestTestStauts.cshtml" />
     <Content Include="Views\DataAnalyze\NeoMapDataAnalysis.cshtml" />
     <Content Include="Views\Project\ProjectDebugTreeMind.cshtml" />
+    <Content Include="Views\DataAnalyze\CPKAnalysis.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

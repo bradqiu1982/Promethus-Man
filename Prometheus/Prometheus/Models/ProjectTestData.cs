@@ -487,7 +487,7 @@ namespace Prometheus.Models
             foreach (var item in dbret)
             {
                 var key = Convert.ToString(item[0]);
-                var key2 = Convert.ToString(item[1]);
+                var key2 = Convert.ToString(item[1]).ToUpper();
                 if (!ret.ContainsKey(key+":"+ key2))
                 {
                     ret.Add(key + ":" + key2, true);

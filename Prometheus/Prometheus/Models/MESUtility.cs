@@ -1725,6 +1725,7 @@ namespace Prometheus.Models
                             minlist.Add(currentvallist.Min());
                             maxlist.Add(currentvallist.Max());
                         }
+                        currentsn = sn;
                         currentvallist.Clear();
 
                         currentvallist.Add(val);
@@ -1734,6 +1735,12 @@ namespace Prometheus.Models
                         currentvallist.Add(val);
                     }
                 } catch (Exception ex) { }
+            }
+
+            if (currentvallist.Count > 0)
+            {
+                minlist.Add(currentvallist.Min());
+                maxlist.Add(currentvallist.Max());
             }
 
             var ret = new List<object>();

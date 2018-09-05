@@ -13,6 +13,7 @@
         });
 
         $(function () {
+            initpj();
             fillproject();
         });
 
@@ -22,16 +23,11 @@
             $('#mestablelist').val('');
             $('#pnlist').val('');
             $('#queryparam').val('');
+            $('#cornid').val('');
             $('#lowlimit').val('');
             $('#highlimit').val('');
             $('#StartDate').val('');
             $('#EndDate').val('');
-                
-            $('#mestablelist').attr('readonly', true);
-            $('#pnlist').attr('readonly', true);
-            $('#queryparam').attr('readonly', true);
-            $('#lowlimit').attr('readonly', true);
-            $('#highlimit').attr('readonly', true);
         }
 
         function initmes()
@@ -39,10 +35,12 @@
             $('#mestablelist').val('');
             $('#pnlist').val('');
             $('#queryparam').val('');
+            $('#cornid').val('');
             $('#lowlimit').val('');
             $('#highlimit').val('');
 
             $('#queryparam').attr('readonly', true);
+            $('#cornid').attr('readonly', true);
             $('#lowlimit').attr('readonly', true);
             $('#highlimit').attr('readonly', true);
         }
@@ -50,19 +48,29 @@
         function initparam()
         {
             $('#queryparam').val('');
+            $('#cornid').val('');
             $('#lowlimit').val('');
             $('#highlimit').val('');
 
+            $('#cornid').attr('readonly', true);
             $('#lowlimit').attr('readonly', true);
             $('#highlimit').attr('readonly', true);
         }
 
         function fillproject()
         {
-            initpj();
+            $('#mestablelist').attr('readonly', true);
+            $('#pnlist').attr('readonly', true);
+            $('#queryparam').attr('readonly', true);
+            $('#cornid').attr('readonly', true);
+            $('#lowlimit').attr('readonly', true);
+            $('#highlimit').attr('readonly', true);
 
             $.post('/DataAnalyze/GetStandardPJList', {}, function (output)
             {
+                if ($('#projectlist').data('autocomplete') || $('#projectlist').data('uiAutocomplete')) {
+                    $('#projectlist').autoComplete("destroy");
+                }
                 $('#projectlist').autoComplete({
                     minChars: 0,
                     source: function (term, suggest) {
@@ -108,6 +116,9 @@
                     { pj:pj },
                     function (output)
                     {
+                        if ($('#mestablelist').data('autocomplete') || $('#mestablelist').data('uiAutocomplete')) {
+                            $('#mestablelist').autoComplete("destroy");
+                        }
                         $('#mestablelist').autoComplete({
                             minChars: 0,
                             source: function (term, suggest) {
@@ -170,6 +181,9 @@
                 $.post('/DataAnalyze/GetMESParam',
                     { mestab: mestab },
                     function (output) {
+                        if ($('#queryparam').data('autocomplete') || $('#queryparam').data('uiAutocomplete')) {
+                            $('#queryparam').autoComplete("destroy");
+                        }
                         $('#queryparam').autoComplete({
                             minChars: 0,
                             source: function (term, suggest) {
@@ -196,7 +210,7 @@
             }
         });
 
-        $('#lowlimit,#highlimit').focus(function (event) {
+        $('#lowlimit,#highlimit,#cornid').focus(function (event) {
             var readonly = $('#lowlimit').attr('readonly');
             var param = $('#queryparam').val();
             if (param != '' && readonly)
@@ -207,6 +221,7 @@
 
         function enablelimit()
         {
+            $('#cornid').val('');
             $('#lowlimit').val('');
             $('#highlimit').val('');
             var param = $('#queryparam').val();
@@ -215,6 +230,24 @@
                 $.post('/DataAnalyze/GetMESLimit',
                     { param: param },
                     function (output) {
+                        if ($('#cornid').data('autocomplete') || $('#cornid').data('uiAutocomplete'))
+                        {
+                            $('#cornid').autoComplete("destroy");
+                            $('#lowlimit').autoComplete("destroy");
+                            $('#highlimit').autoComplete("destroy");
+                        }
+
+                        $('#cornid').autoComplete({
+                            minChars: 0,
+                            source: function (term, suggest) {
+                                term = term.toLowerCase();
+                                var choices = output.cornlist;
+                                var suggestions = [];
+                                for (i = 0; i < choices.length; i++)
+                                    if (~choices[i].toLowerCase().indexOf(term)) suggestions.push(choices[i]);
+                                suggest(suggestions);
+                            }
+                        });
                         $('#lowlimit').autoComplete({
                             minChars: 0,
                             source: function (term, suggest) {
@@ -239,6 +272,7 @@
                         });
                     });
             }
+            $('#cornid').attr('readonly', false);
             $('#lowlimit').attr('readonly', false);
             $('#highlimit').attr('readonly', false);
         }
@@ -249,6 +283,7 @@
             var mestab = $('#mestablelist').val();
             var param = $('#queryparam').val();
             var lowlimit = $('#lowlimit').val();
+            var cornid = $('#cornid').val();
             var highlimit = $('#highlimit').val();
             var startdate = $('#StartDate').val();
             var enddate = $('#EndDate').val();
@@ -256,12 +291,18 @@
             var pnlist = $.trim($('#pnlist').tagsinput('items'));
             if (pnlist == '') {
                 pnlist = $.trim($('#pnlist').parent().find('input').eq(0).val());
+                if (pnlist.indexOf(',') != -1)
+                {
+                    alert('Character , should not exist in PN DES!');
+                    return false;
+                }
             }
 
             if (pj == ''
                 || mestab == ''
                 || param == ''
                 || (lowlimit == '' && highlimit == '')
+                || cornid == ''
                 || startdate == ''
                 || enddate == ''
                 || pnlist == '') {
@@ -276,6 +317,7 @@
                 pj: pj,
                 mestab: mestab,
                 param: param,
+                cornid: cornid,
                 lowlimit: lowlimit,
                 highlimit: highlimit,
                 startdate: startdate,
@@ -285,7 +327,7 @@
                 database: databaselist
             },
             function (output) {
-
+                fillproject();
             });
         });
 

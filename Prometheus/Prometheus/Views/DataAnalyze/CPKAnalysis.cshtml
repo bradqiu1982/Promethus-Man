@@ -1,6 +1,6 @@
 ﻿
 @{
-    ViewBag.Title = "CPK Analysis";
+    ViewBag.Title = "Smart CPK";
     Layout = "~/Views/Shared/_LayoutNew.cshtml";
 }
 
@@ -24,7 +24,7 @@
 <div class="row" style="margin-top:2%">
     <ol class="breadcrumb" style="width:600px">
         <li>Data Analysis</li>
-        <li class="active">CPK Analysis</li>
+        <li class="active">Smart CPK</li>
     </ol>
 </div>
 
@@ -69,6 +69,23 @@
         <div class="form-group">
             <div class="row">
                 <div class="col-xs-6">
+                    <label class="control-label col-xs-2">CornID</label>
+                    <div class="col-xs-10">
+                        <input class="form-control text-box single-line" id="cornid" name="cornid" type="text" value="" readonly />
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-2">Only PASS</label>
+                    <div class="col-xs-10">
+                        @Html.DropDownList("allpasslist", null, new { @id = "allpasslist", @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-xs-6">
                     <label class="control-label col-xs-2">Low Limit</label>
                     <div class="col-xs-10">
                         <input class="form-control text-box single-line" id="lowlimit" name="lowlimit" type="text" value="" readonly />
@@ -103,12 +120,6 @@
         <div class="form-group">
             <div class="row">
                 <div class="col-xs-6">
-                    <label class="control-label col-xs-2">Only PASS</label>
-                    <div class="col-xs-10">
-                        @Html.DropDownList("allpasslist", null, new { @id = "allpasslist", @class = "form-control" })
-                    </div>
-                </div>
-                <div class="col-xs-6">
                     <label class="control-label col-xs-2">Database</label>
                     <div class="col-xs-7">
                         @Html.DropDownList("databaselist", null, new { @id = "databaselist", @class = "form-control" })
@@ -116,6 +127,8 @@
                     <div class="col-xs-3">
                         <button class="btn btn-primary" id="QueryCPK" name="QueryCPK">Get CPK</button>
                     </div>
+                </div>
+                <div class="col-xs-6">
                </div>
             </div>
         </div>
@@ -152,7 +165,7 @@
                     </div>
                 </div>
                 <div class="col-xs-6">
-                    <label class="control-label col-xs-4">General CPK</label>
+                    <label class="control-label col-xs-4">Download</label>
                     <div class="col-xs-8">
 
                     </div>
@@ -162,13 +175,45 @@
         <div class="form-group">
             <div class="row">
                 <div class="col-xs-6">
-                    <label class="control-label col-xs-4">Robust CPK</label>
+                    <label class="control-label col-xs-4">General CPK(min)</label>
                     <div class="col-xs-8">
 
                     </div>
                 </div>
                 <div class="col-xs-6">
-                    <label class="control-label col-xs-4">Robust DPPM</label>
+                    <label class="control-label col-xs-4">General CPK(max)</label>
+                    <div class="col-xs-8">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-4">Robust CPK(min)</label>
+                    <div class="col-xs-8">
+
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-4">Robust CPK(max)</label>
+                    <div class="col-xs-8">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-4">Robust DPPM(min)</label>
+                    <div class="col-xs-8">
+
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-4">Robust DPPM(max)</label>
                     <div class="col-xs-8">
 
                     </div>

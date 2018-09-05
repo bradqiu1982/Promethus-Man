@@ -889,9 +889,14 @@ namespace Prometheus.Models
             }
         }
 
-        public static List<double> GetTestData(string pnlist, string mestab, string param, string startdate, string enddate, bool onlypass)
+        public static List<object> GetTestData(string pndesc, string mestab, string param,string cornid, string startdate, string enddate, bool onlypass)
         {
-            var ret = new List<double>();
+            var ret = new List<object>();
+            var pncond = MESUtility.GetPNCondFromPNDesc(pndesc);
+            if (string.IsNullOrEmpty(pncond))
+            { return ret; }
+
+
             return ret;
         }
 

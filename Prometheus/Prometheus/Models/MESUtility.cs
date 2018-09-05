@@ -1639,10 +1639,143 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static List<double> GetTestData(string pnlist, string mestab, string param, string startdate, string enddate, bool onlypass)
+        private static List<string> GetPNsFromPNDesc(List<string> pns)
         {
-            var ret = new List<double>();
+            var ret = new List<string>();
+            if (pns.Count == 0)
+            { return ret; }
+
+            var cond = "";
+            foreach (var pn in pns)
+            {
+                if (!IsDigitsOnly(pn.Trim()))
+                {
+                    if (string.IsNullOrEmpty(cond))
+                    {
+                        cond = " c.Description like '%" + pn.Trim() + "%' ";
+                    }
+                    else
+                    {
+                        cond = cond + " or c.Description like '%" + pn.Trim() + "%' ";
+                    }
+                }
+            }
+
+            if (string.IsNullOrEmpty(cond))
+            { return ret; }
+
+            var sql = "select DISTINCT p.ProductName from insite.Product c (nolock) left join insite.ProductBase p on c.ProductBaseId = p.ProductBaseId where " + cond;
+            var dbret = DBUtility.ExeMESSqlWithRes(sql);
+
+            foreach (var line in dbret)
+            {
+                var pn = Convert.ToString(line[0]);
+                ret.Add(pn);
+            }
+
             return ret;
+        }
+
+        public static string GetPNCondFromPNDesc(string pndesc)
+        {
+            var pncond = "";
+
+            var pns = pndesc.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            var pnnumlist = GetPNsFromPNDesc(pns);
+            foreach (var pn in pns)
+            {
+                if (IsDigitsOnly(pn.Trim()))
+                {
+                    pnnumlist.Add(pn);
+                }
+            }
+            if (pnnumlist.Count == 0)
+            { return pncond; }
+
+            var sb = new StringBuilder(pnnumlist.Count * 30);
+            sb.Append("('");
+            foreach (var pn in pnnumlist)
+            {
+                sb.Append(pn + "','");
+            }
+            pncond = sb.ToString();
+            pncond = pncond.Substring(0, pncond.Length - 2) + ")";
+
+            return pncond;
+        }
+
+        public static List<object> GetMinMaxList(List<List<object>> dbret)
+        {
+            var minlist = new List<double>();
+            var maxlist = new List<double>();
+
+            var currentvallist = new List<double>();
+            var currentsn = "";
+
+            foreach (var line in dbret)
+            {
+                try
+                {
+                    var sn = Convert.ToString(line[0]);
+                    var val = Convert.ToDouble(line[1]);
+                    if (string.Compare(sn, currentsn, true) != 0)
+                    {
+                        if (currentvallist.Count > 0)
+                        {
+                            minlist.Add(currentvallist.Min());
+                            maxlist.Add(currentvallist.Max());
+                        }
+                        currentvallist.Clear();
+
+                        currentvallist.Add(val);
+                    }
+                    else
+                    {
+                        currentvallist.Add(val);
+                    }
+                } catch (Exception ex) { }
+            }
+
+            var ret = new List<object>();
+            ret.Add(minlist);
+            ret.Add(maxlist);
+            return ret;
+        }
+
+        public static List<object> GetTestData(string pndesc, string mestab, string param,string cornid, string startdate, string enddate, bool onlypass)
+        {
+            var ret = new List<object>();
+            var pncond = GetPNCondFromPNDesc(pndesc);
+            if (string.IsNullOrEmpty(pncond))
+            { return ret; }
+
+            var sql = "";
+            if (onlypass)
+            {
+                sql = @"select top 100000 dc.[ModuleSerialNum],dce.[<DATAFIELDPARAMETER>] from [InsiteDB].[insite].[dce_<MESTABNAME>_main] dce 
+                        left join [InsiteDB].[insite].[dc_<MESTABNAME>] dc on dc.dc_<MESTABNAME>HistoryId = dce.ParentHistoryID
+                        where dc.ErrAbbr = 'pass' and dc.TestTimeStamp > '<STARTDATE>' and dc.TestTimeStamp < '<ENDDATE>' 
+                        and dc.[ModuleSerialNum] is not null and dce.CornerID like '<CORNID>' and dc.AssemblyPartNum in <PNCOND>
+                        order by dc.TestTimeStamp desc,dc.[ModuleSerialNum]";
+            }
+            else
+            {
+                sql = @"select top 100000 dc.[ModuleSerialNum],dce.[<DATAFIELDPARAMETER>] from [InsiteDB].[insite].[dce_<MESTABNAME>_main] dce 
+                        left join [InsiteDB].[insite].[dc_<MESTABNAME>] dc on dc.dc_<MESTABNAME>HistoryId = dce.ParentHistoryID 
+                        where dc.TestTimeStamp > '<STARTDATE>'  and dc.TestTimeStamp < '<ENDDATE>' and dc.[ModuleSerialNum] is not null 
+                        and dce.CornerID like '<CORNID>' and dc.AssemblyPartNum in <PNCOND> 
+                        order by dc.TestTimeStamp desc,dc.[ModuleSerialNum]";
+            }
+
+            sql = sql.Replace("<DATAFIELDPARAMETER>", param).Replace("<MESTABNAME>", mestab)
+                .Replace("<STARTDATE>", startdate + " 00:00:00").Replace("<ENDDATE>", enddate + " 23:59:59")
+                .Replace("<CORNID>", cornid).Replace("<PNCOND>", pncond);
+
+            var dbret = DBUtility.ExeMESSqlWithRes(sql);
+            if (dbret.Count == 0)
+            { return ret; }
+
+            return GetMinMaxList(dbret);
         }
 
     }

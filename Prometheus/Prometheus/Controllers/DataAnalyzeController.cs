@@ -4848,16 +4848,21 @@ namespace Prometheus.Controllers
         {
             var cfgpjdict = CfgUtility.GetStandardPJList(this);
             var inputpj = CPKCache.RetrievePJList();
-            var pjdata = cfgpjdict.Keys.ToList();
             foreach (var pj in inputpj)
             {
-                if (!cfgpjdict.ContainsKey(pj))
+                if (cfgpjdict.ContainsKey(pj))
                 {
-                    pjdata.Add(pj);
+                    cfgpjdict.Remove(pj);
                 }
             }
+            var pjdata = cfgpjdict.Keys.ToList();
             pjdata.Sort();
 
+            foreach (var pj in inputpj)
+            {
+                pjdata.Insert(0,pj);
+            }
+            
             var ret = new JsonResult();
             ret.Data = new { pjdata = pjdata };
             return ret;
@@ -4892,11 +4897,13 @@ namespace Prometheus.Controllers
         public JsonResult GetMESLimit()
         {
             var param = Request.Form["param"];
+            var cornlist = CPKCache.RetrieveCornIDList(param);
             var lowlimitlist = CPKCache.RetrieveMESLowLimitList(param);
             var highlimitlist = CPKCache.RetrieveMESHighLimitList(param);
             var ret = new JsonResult();
             ret.Data = new
             {
+                cornlist = cornlist,
                 lowlimitlist = lowlimitlist,
                 highlimitlist = highlimitlist
             };
@@ -4906,8 +4913,9 @@ namespace Prometheus.Controllers
         public JsonResult QueryCPK()
         {
             var pj = Request.Form["pj"];
-            var mestab = Request.Form["mestab"].ToUpper().Replace("DC_","");
+            var mestab = Request.Form["mestab"].ToUpper().Trim();
             var param = Request.Form["param"];
+            var cornid = Request.Form["cornid"];
             var lowlimit = Request.Form["lowlimit"];
             var highlimit = Request.Form["highlimit"];
             var startdate = Request.Form["startdate"];
@@ -4917,27 +4925,57 @@ namespace Prometheus.Controllers
             var pass = Request.Form["pass"];
             var database = Request.Form["database"];
 
+            if (mestab.IndexOf("DC_") == 0)
+            {
+                mestab = mestab.Substring(3);
+            }
+
             
             bool onlypass = false;
             if (string.Compare(pass, "YES", true) == 0)
             { onlypass = true; }
 
-            var rawdata = new List<double>();
+            var rawdata = new List<object>();
             if (string.Compare(database, "MES", true) == 0)
             {
-                rawdata = MESUtility.GetTestData(pnlist, mestab, param, startdate, enddate, onlypass);
+                rawdata = MESUtility.GetTestData(pnlist, mestab, param, cornid, startdate, enddate, onlypass);
             }
             else
             {
-                rawdata = ATEUtility.GetTestData(pnlist,mestab,param, startdate, enddate, onlypass);
+                rawdata = ATEUtility.GetTestData(pnlist,mestab,param, cornid, startdate, enddate, onlypass);
             }
 
-            CPKCache.UpdateCPKParams(pj, mestab, pnlist, param, lowlimit, highlimit);
+            if (rawdata.Count == 0)
+            {
+                var ret = new JsonResult();
+                ret.Data = new
+                {
+                    success = false
+                };
+                return ret;
+            }
 
-            var ret = new JsonResult();
-            ret.Data = new
-            {};
-            return ret;
+            var minlist = (List<double>)rawdata[0];
+            var maxlist = (List<double>)rawdata[1];
+
+            if(minlist.Count < 100)
+            {
+                var ret = new JsonResult();
+                ret.Data = new
+                {
+                    success = false
+                };
+                return ret;
+            }
+
+            CPKCache.UpdateCPKParams(pj, mestab, pnlist, param,cornid, lowlimit, highlimit,database);
+
+            var allret = new JsonResult();
+            allret.Data = new
+            {
+                success = true
+            };
+            return allret;
         }
 
     }

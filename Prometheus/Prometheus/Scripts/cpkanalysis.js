@@ -30,6 +30,7 @@
             $('#EndDate').val('');
             $('.cpkoutcla').val('');
             $('.v-content').empty();
+            $('#sourcedata').attr('href', '#');
         }
 
         function initmes()
@@ -331,6 +332,7 @@
             function (output) {
                 $('.cpkoutcla').val('');
                 $('.v-content').empty();
+                $('#sourcedata').attr('href', '#');
 
                 if (output.success) {
                     $('#datafrom').val(output.datafrom);
@@ -357,6 +359,8 @@
 
                     $('#cpkmin').val(output.cpkmin);
                     $('#cpkmax').val(output.cpkmax);
+                    $('#cpkmax').val(output.cpkmax);
+                    $('#sourcedata').attr('href', output.sourcedata);
 
                     $.each(output.chartlist, function (i, val) {
                          appendstr = '<div class="col-xs-12">' +

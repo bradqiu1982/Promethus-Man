@@ -4910,6 +4910,49 @@ namespace Prometheus.Controllers
             return ret;
         }
 
+        private string DownLoadCPKSourceData(List<double> minlist,List<double> maxlist,string param)
+        {
+            string datestring = DateTime.Now.ToString("yyyyMMdd");
+            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+            if (!System.IO.Directory.Exists(imgdir))
+            {
+                System.IO.Directory.CreateDirectory(imgdir);
+            }
+
+            var fn = param.Replace(" ","_") + "_sourcedata_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+            var filename = imgdir + fn;
+
+            var sb = new StringBuilder((minlist.Count + maxlist.Count) * 30);
+            sb.Append(param + ",\r\n");
+
+            foreach (var data in minlist)
+            {
+                sb.Append(data.ToString() + ",min,\r\n");
+            }
+            foreach (var data in maxlist)
+            {
+                sb.Append(data.ToString() + ",max,\r\n");
+            }
+
+            var bt = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+
+            var fw = System.IO.File.OpenWrite(filename);
+            fw.Write(bt, 0, bt.Count());
+            fw.Close();
+
+            var url = "/userfiles/docs/" + datestring + "/" + fn;
+            try
+            {
+                var fzip = new ICSharpCode.SharpZipLib.Zip.FastZip();
+                fzip.CreateZip(imgdir + fn.Replace(".csv", ".zip"), imgdir, false, fn);
+                url = "/userfiles/docs/" + datestring + "/" + fn.Replace(".csv", ".zip");
+            }
+            catch (Exception ex)
+            {}
+            return url;
+        }
+
+
         public JsonResult QueryCPK()
         {
             var pj = Request.Form["pj"];
@@ -5000,6 +5043,8 @@ namespace Prometheus.Controllers
             title = param + " Max Dataset Histogram";
             chartlist.Add(HistogramChart.GetChartData(id, title, lowlimit, highlimit, maxlist));
 
+            var sourcedata = DownLoadCPKSourceData(minlist, maxlist, param);
+
             var allret = new JsonResult();
             allret.Data = new
             {
@@ -5031,7 +5076,8 @@ namespace Prometheus.Controllers
 
                 cpkmin = cpkmindata.Cpk_final,
                 cpkmax = cpkmaxdata.Cpk_final,
-                chartlist = chartlist
+                chartlist = chartlist,
+                sourcedata = sourcedata
             };
             return allret;
         }

@@ -274,7 +274,7 @@ namespace Prometheus.Models
             }
         }
 
-        private static List<DateTime> RetrieveDateSpanByWeek(string startdate, string enddate)
+        private static List<DateTime> _RetrieveDateSpanByWeek(string startdate, string enddate)
         {
             var ret = new List<DateTime>();
             var sdate = DateTime.Parse(DateTime.Parse(startdate).ToString("yyyy-MM-dd") + " 07:30:00");
@@ -305,6 +305,22 @@ namespace Prometheus.Models
                 }
             }
 
+            return ret;
+        }
+
+        private static List<DateTime> RetrieveDateSpanByWeek(string startdate, string enddate)
+        {
+            var ret = _RetrieveDateSpanByWeek(startdate, enddate);
+            if(ret.Count > 2)
+            {
+                var end1 = ret[ret.Count - 2];
+                var end2 = ret[ret.Count - 1];
+                if (string.Compare(end1.ToString("yyyy-MM-dd"), end2.ToString("yyyy-MM-dd")) == 0)
+                {
+                    var lastidx = ret.Count - 1;
+                    ret.RemoveAt(lastidx);
+                }
+            }
             return ret;
         }
 
@@ -727,7 +743,8 @@ namespace Prometheus.Models
 
             var tend = DateTime.Parse(edate);
             if (tend > DateTime.Now
-                || string.Compare(tend.ToString("yyyy-MM-dd"), DateTime.Now.ToString("yyyy-MM-dd")) == 0)
+                || (string.Compare(tend.ToString("yyyy-MM-dd"), DateTime.Now.ToString("yyyy-MM-dd")) == 0
+                 && string.Compare(DateTime.Parse(startdate).ToString("yyyy-MM-dd"), DateTime.Now.ToString("yyyy-MM-dd")) == 0))
             {
                 tend = DateTime.Now;
                 enddate = tend.ToString();

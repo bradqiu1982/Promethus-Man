@@ -8,6 +8,7 @@ using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using MathNet.Numerics.Statistics;
 
 namespace Prometheus.Models
 {
@@ -1704,6 +1705,37 @@ namespace Prometheus.Models
             return pncond;
         }
 
+
+        public static List<double> FilterStrangeValue(List<double> rawdata)
+        {
+            var filter1list = new List<double>();
+            foreach (var v in rawdata)
+            {
+                if (v != -9999.0 && v != 9999.0
+                    && v != -999.0 && v != 999.0 
+                    && v != double.NaN)
+                {
+                    filter1list.Add(v);
+                }
+            }
+
+            var mean = Statistics.Mean(filter1list);
+            var stddev = Statistics.StandardDeviation(filter1list);
+
+            var min = Math.Min(mean - 6.0 * stddev, mean + 6.0 * stddev);
+            var max = Math.Max(mean - 6.0 * stddev, mean + 6.0 * stddev);
+            var filter2list = new List<double>();
+            foreach (var v in filter1list)
+            {
+                if (v >= min && v <= max)
+                {
+                    filter2list.Add(v);
+                }
+            }
+
+            return filter2list;
+        }
+
         public static List<object> GetMinMaxList(List<List<object>> dbret)
         {
             var minlist = new List<double>();
@@ -1744,8 +1776,8 @@ namespace Prometheus.Models
             }
 
             var ret = new List<object>();
-            ret.Add(minlist);
-            ret.Add(maxlist);
+            ret.Add(FilterStrangeValue(minlist));
+            ret.Add(FilterStrangeValue(maxlist));
             return ret;
         }
 

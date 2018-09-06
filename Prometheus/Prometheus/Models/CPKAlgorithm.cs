@@ -10,14 +10,6 @@ using Meta.Numerics.Statistics.Distributions;
 
 namespace Prometheus.Models
 {
-    public class CPKRESULT
-    {
-        public static string EMPTY = "EMPTY";
-        public static string CPU = "CPU";
-        public static string CPL = "CPL";
-        public static string CPK = "CPK";
-    }
-
 
     public class CPKData
     {
@@ -35,7 +27,7 @@ namespace Prometheus.Models
             Cpk_ca = 0.0;
             Cpk_robust = 0.0;
             IsNormalProbability = 0.0;
-            DPPM_robust = 0.0;
+            DPPM = 0.0;
         }
 
         public double Mean { set; get; }
@@ -52,34 +44,38 @@ namespace Prometheus.Models
         public double IsNormalProbability { set; get; }
         public double Cpk_ca { set; get; }
         public double Cpk_robust { set; get; }
-        public double DPPM_robust { set; get; }
 
-        public static void Test()
-        {
-            var rawdata = new List<double>();
-
-            var sql = "SELECT [TxPower]  FROM [NPITrace].[dbo].[ModuleTXOData] WHERE TestName= 'ersetup' and TestTimeStamp > '2018-08-10 00:00:00' and TestTimeStamp < '2018-08-11 00:00:00' and PN='1220278'";
-            //var sql = "SELECT [TxPower]  FROM [NPITrace].[dbo].[ModuleTXOData] WHERE TestTimeStamp > '2018-08-10 00:00:00' and TestTimeStamp < '2018-08-10 13:00:00' and TXPower > -0.5 and TXPower < 0.5";
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
-            foreach (var line in dbret)
-            { rawdata.Add(Math.Round(Convert.ToDouble(line[0]), 3)); }
-
-            var ax = "";
-            var hist = new MathNet.Numerics.Statistics.Histogram(rawdata, 50);
-            for (var idx = 0; idx < 50; idx++)
-            {
-                var item = hist[idx];
-                ax = ax + idx + "," + item.Count + "   ";
+        public double Cpk_final {
+            get {
+                if (IsNormalProbability > 0.05)
+                {
+                    return Cpk_ca;
+                }
+                else
+                {
+                    return Cpk_robust;
+                }
             }
-
-            var cpk = CPKData.GetCpk(rawdata, "1.3", "-3.0");
-
-            var p = cpk[0].IsNormalProbability;
         }
+        public string IsNormalStr
+        {
+            get
+            {
+                if (IsNormalProbability > 0.05)
+                {
+                    return "YES";
+                }
+                else
+                {
+                    return "NO";
+                }
+            }
+        }
+
+        public double DPPM { set; get; }
 
         private static double IsNormal(List<double> rawdata)
         {
-            rawdata.Sort();
             var mean = Statistics.Mean(rawdata);
             var stdev = Statistics.StandardDeviation(rawdata);
             var normal = new NormalDistribution(mean, stdev);
@@ -122,24 +118,33 @@ namespace Prometheus.Models
                 //if (cpk3s2 < tempvm.Cpk_3s)
                 //{ tempvm.Cpk_3s = cpk3s2; }
 
-                tempvm.Cpk_ca = tempvm.Cp * (1.0 - tempvm.Ca);
+                tempvm.Cpk_ca = Math.Round(tempvm.Cp * (1.0 - tempvm.Ca),5);
 
             }
             else if (!string.IsNullOrEmpty(highlimit))
             {
                 var hlimit = Convert.ToDouble(highlimit);
-                tempvm.Cpk_ca = (hlimit - tempvm.Mean) / (3.0 * tempvm.Stdev);
+                tempvm.Cpk_ca = Math.Round((hlimit - tempvm.Mean) / (3.0 * tempvm.Stdev),5);
 
             }
             else if (!string.IsNullOrEmpty(lowlimit))
             {
                 var llimit = Convert.ToDouble(lowlimit);
-                tempvm.Cpk_ca = (tempvm.Mean - llimit) / (3.0 * tempvm.Stdev);
+                tempvm.Cpk_ca = Math.Round((tempvm.Mean - llimit) / (3.0 * tempvm.Stdev),5);
             }
 
             Normal n = new Normal();
-            tempvm.Cpk_robust = GetRobustCpk(rawdata, highlimit, lowlimit,n);
-            tempvm.DPPM_robust = Math.Round(GetDPPM(tempvm.Cpk_robust, n),0);
+            tempvm.Cpk_robust = Math.Round(GetRobustCpk(rawdata, highlimit, lowlimit,n),5);
+
+            if (tempvm.IsNormalProbability > 0.05)
+            {
+                tempvm.DPPM = Math.Round(GetDPPM(tempvm.Cpk_ca, n), 0);
+            }
+            else
+            {
+                tempvm.DPPM = Math.Round(GetDPPM(tempvm.Cpk_robust, n),0);
+            }
+
 
             ret.Add(tempvm);
             return ret;
@@ -211,6 +216,84 @@ namespace Prometheus.Models
         private static double GetDPPM(double cpk, Normal n)
         {
             return (1 - n.CumulativeDistribution(3 * cpk)) * 1000000;
+        }
+
+    }
+
+    public class HistogramChart
+    {
+        public static object GetChartData(string id, string title, string lowlimit, string highlimit, List<double> rawdata)
+        {
+            rawdata.Sort();
+            var min = rawdata.Min();
+            var max = rawdata.Max();
+
+            double step = (max - min) / 50.0;
+            var steplist = new List<double>();
+            var startidx = Math.Round((min + 0.5 * step),5);
+            steplist.Add(startidx);
+            for (var idx = 1; idx < 50; idx++)
+            {
+                steplist.Add(Math.Round((startidx+step*idx), 5));
+            }
+
+            var hist = new MathNet.Numerics.Statistics.Histogram(rawdata, 50);
+            var frequencelist = new List<object>();
+            for (var idx = 0; idx < 50; idx++)
+            {
+                var templist = new List<double>();
+                templist.Add(steplist[idx]);
+                templist.Add(hist[idx].Count);
+                frequencelist.Add(templist);
+            }
+
+            var mean = Statistics.Mean(rawdata);
+            var stddev = Statistics.StandardDeviation(rawdata);
+            var left3stddev = Math.Min(mean - 3.0 * stddev, mean + 3.0 * stddev);
+            var right3stddev = Math.Max(mean - 3.0 * stddev, mean + 3.0 * stddev);
+
+            var lowbound = lowlimit;
+            if (string.IsNullOrEmpty(lowlimit))
+            {
+                lowbound = min.ToString();
+            }
+            var upperbound = highlimit;
+            if (string.IsNullOrEmpty(highlimit))
+            {
+                upperbound = max.ToString();
+            }
+            var alldata = new List<object>();
+            alldata.Add(new
+            {
+                name = "Frequence",
+                data = frequencelist
+            });
+
+            var xmin = left3stddev;
+            var xmax = right3stddev;
+            if (xmin > min)
+            { xmin = min; }
+            if (xmin > Convert.ToDouble(lowbound))
+            { xmin = Convert.ToDouble(lowbound); }
+
+            if (xmax < max)
+            { xmax = max; }
+            if (xmax < Convert.ToDouble(upperbound))
+            { xmax = Convert.ToDouble(upperbound); }
+
+            var ret = new {
+                id = id,
+                title = title,
+                xmin = xmin,
+                xmax = xmax,
+                mean = mean,
+                left3stddev = left3stddev,
+                right3stddev = right3stddev,
+                lowbound = lowbound,
+                upperbound = upperbound,
+                data = alldata
+            };
+            return ret;
         }
 
     }

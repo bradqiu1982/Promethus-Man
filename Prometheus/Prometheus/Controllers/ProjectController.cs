@@ -9626,11 +9626,6 @@ namespace Prometheus.Controllers
             return View("HeartBeat");
         }
 
-        public ActionResult CPK()
-        {
-            CPKData.Test();
-            return View("HeartBeat");
-        }
 
     }
 

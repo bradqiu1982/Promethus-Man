@@ -4950,6 +4950,7 @@ namespace Prometheus.Controllers
                 var ret = new JsonResult();
                 ret.Data = new
                 {
+                    msg = "Fail to get test data, please check your query condition!",
                     success = false
                 };
                 return ret;
@@ -4963,6 +4964,7 @@ namespace Prometheus.Controllers
                 var ret = new JsonResult();
                 ret.Data = new
                 {
+                    msg = "No enough data is gotten,please enlarge your query period!",
                     success = false
                 };
                 return ret;
@@ -4970,10 +4972,66 @@ namespace Prometheus.Controllers
 
             CPKCache.UpdateCPKParams(pj, mestab, pnlist, param,cornid, lowlimit, highlimit,database);
 
+            var cpkmindata = CPKData.GetCpk(minlist, highlimit, lowlimit)[0];
+            var cpkmaxdata = CPKData.GetCpk(maxlist, highlimit, lowlimit)[0];
+
+            var datafrom = "MAX DATASET";
+            var mean = cpkmaxdata.Mean;
+            var stddev = cpkmaxdata.Stdev;
+            var isnormal = cpkmaxdata.IsNormalStr;
+            var dppm = cpkmaxdata.DPPM;
+
+            var realcpk = Math.Min(cpkmindata.Cpk_final, cpkmaxdata.Cpk_final);
+            if (realcpk == cpkmindata.Cpk_final)
+            {
+                datafrom = "MIN DATASET";
+                mean = cpkmindata.Mean;
+                stddev = cpkmindata.Stdev;
+                isnormal = cpkmindata.IsNormalStr;
+                dppm = cpkmindata.DPPM;
+            }
+
+            var chartlist = new List<object>();
+            var id = "min_" + param.Replace(" ", "_").ToLower() + "_id";
+            var title = param + " Min Dataset Histogram";
+            chartlist.Add(HistogramChart.GetChartData(id, title, lowlimit, highlimit, minlist));
+
+            id = "max_" + param.Replace(" ", "_").ToLower() + "_id";
+            title = param + " Max Dataset Histogram";
+            chartlist.Add(HistogramChart.GetChartData(id, title, lowlimit, highlimit, maxlist));
+
             var allret = new JsonResult();
             allret.Data = new
             {
-                success = true
+                success = true,
+                datafrom = datafrom,
+                mean = Math.Round(mean,5),
+                stddev = Math.Round(stddev,5),
+                isnormal = isnormal,
+                realcpk = realcpk,
+                dppm = dppm,
+
+                probmin = cpkmindata.IsNormalProbability,
+                probmax = cpkmaxdata.IsNormalProbability,
+
+                gcpkmin = cpkmindata.Cpk_ca,
+                gcpkmax = cpkmaxdata.Cpk_ca,
+
+                rcpkmin = cpkmindata.Cpk_robust,
+                rcpkmax = cpkmaxdata.Cpk_robust,
+
+                meanmin = Math.Round(cpkmindata.Mean,5),
+                meanmax = Math.Round(cpkmaxdata.Mean, 5),
+
+                stddevmin = Math.Round(cpkmindata.Stdev, 5),
+                stddevmax = Math.Round(cpkmaxdata.Stdev, 5),
+
+                rdppmmin = cpkmindata.DPPM,
+                rdppmmax = cpkmaxdata.DPPM,
+
+                cpkmin = cpkmindata.Cpk_final,
+                cpkmax = cpkmaxdata.Cpk_final,
+                chartlist = chartlist
             };
             return allret;
         }

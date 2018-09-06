@@ -28,6 +28,8 @@
             $('#highlimit').val('');
             $('#StartDate').val('');
             $('#EndDate').val('');
+            $('.cpkoutcla').val('');
+            $('.v-content').empty();
         }
 
         function initmes()
@@ -327,10 +329,169 @@
                 database: databaselist
             },
             function (output) {
+                $('.cpkoutcla').val('');
+                $('.v-content').empty();
+
+                if (output.success) {
+                    $('#datafrom').val(output.datafrom);
+                    $('#isnormal').val(output.isnormal);
+                    $('#mean').val(output.mean);
+                    $('#stddev').val(output.stddev);
+                    $('#realcpk').val(output.realcpk);
+                    $('#dppm').val(output.dppm);
+
+                    $('#probmin').val(output.probmin);
+                    $('#probmax').val(output.probmax);
+                    $('#gcpkmin').val(output.gcpkmin);
+                    $('#gcpkmax').val(output.gcpkmax);
+                    $('#rcpkmin').val(output.rcpkmin);
+                    $('#rcpkmax').val(output.rcpkmax);
+                    $('#rdppmmin').val(output.rdppmmin);
+                    $('#rdppmmax').val(output.rdppmmax);
+
+                    $('#meanmin').val(output.meanmin);
+                    $('#meanmax').val(output.meanmax);
+
+                    $('#stddevmin').val(output.stddevmin);
+                    $('#stddevmax').val(output.stddevmax);
+
+                    $('#cpkmin').val(output.cpkmin);
+                    $('#cpkmax').val(output.cpkmax);
+
+                    $.each(output.chartlist, function (i, val) {
+                         appendstr = '<div class="col-xs-12">' +
+                                '<div class="v-box" id="' + val.id + '"></div>' +
+                                '</div>';
+                         $('.v-content').append(appendstr);
+                         drawcolumn(val);
+                     })
+                }
+                else {
+                    alert(output.msg);
+                }
                 fillproject();
             });
         });
 
+    }
+
+    var drawcolumn = function (col_data) {
+        var options = {
+            chart: {
+                zoomType: 'xy',
+                type: 'column'
+            },
+            title: {
+                text: col_data.title
+            },
+            xAxis: {
+                min:col_data.xmin,
+                max: col_data.xmax,
+                plotLines: [{
+                    value: col_data.mean,
+                    color: 'gray',
+                    dashStyle: 'shortdash',
+                    width: 2,
+                    label: {
+                        text: 'Mean'
+                    }
+                }, {
+                    value: col_data.left3stddev,
+                    color: 'red',
+                    dashStyle: 'shortdash',
+                    width: 2,
+                    label: {
+                        text: '3-sigma'
+                    }
+                }, {
+                    value: col_data.right3stddev,
+                    color: 'red',
+                    dashStyle: 'shortdash',
+                    width: 2,
+                    label: {
+                        text: '3-sigma'
+                    }
+                }, {
+                    value: col_data.lowbound,
+                    color: 'green',
+                    dashStyle: 'shortdash',
+                    width: 2,
+                    label: {
+                        text: 'low bound'
+                    }
+                }, {
+                    value: col_data.upperbound,
+                    color: 'green',
+                    dashStyle: 'shortdash',
+                    width: 2,
+                    label: {
+                        text: 'upper bound'
+                    }
+                }]
+            },
+            legend: {
+                enabled: false,
+            },
+            yAxis: {
+                title: {
+                    text:'Frequence'
+                }
+            },
+            tooltip: {
+                pointFormat: '{point.x} : <b>{point.y}</b>'
+            },
+            series: col_data.data,
+            exporting: {
+                menuItemDefinitions: {
+                    fullscreen: {
+                        onclick: function () {
+                            $('#' + col_data.id).parent().toggleClass('chart-modal');
+                            $('#' + col_data.id).highcharts().reflow();
+                        },
+                        text: 'Full Screen'
+                    },
+                    datalabel: {
+                        onclick: function () {
+                            var labelflag = !this.series[0].options.dataLabels.enabled;
+                            $.each(this.series, function (idx, val) {
+                                var opt = val.options;
+                                opt.dataLabels.enabled = labelflag;
+                                val.update(opt);
+                            })
+                        },
+                        text: 'Data Label'
+                    },
+                    copycharts: {
+                        onclick: function () {
+                            var svg = this.getSVG({
+                                chart: {
+                                    width: this.chartWidth,
+                                    height: this.chartHeight
+                                }
+                            });
+                            var c = document.createElement('canvas');
+                            c.width = this.chartWidth;
+                            c.height = this.chartHeight;
+                            canvg(c, svg);
+                            var dataURL = c.toDataURL("image/png");
+                            //var imgtag = '<img src="' + dataURL + '"/>';
+
+                            var img = new Image();
+                            img.src = dataURL;
+
+                            copyImgToClipboard(img);
+                        },
+                        text: 'copy 2 clipboard'
+                    }
+                },
+                buttons: {
+                    contextButton: {
+                        menuItems: ['fullscreen', 'datalabel', 'copycharts', 'printChart', 'separator', 'downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
+                    }
+                }
+            }
+        };
+        Highcharts.chart(col_data.id, options);
     }
 
     return {

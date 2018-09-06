@@ -143,31 +143,83 @@
         <div class="form-group">
             <div class="row">
                 <div class="col-xs-6">
-                    <label class="control-label col-xs-4" >Mean</label>
+                    <label class="control-label col-xs-4">Data From</label>
                     <div class="col-xs-8">
-                        
+                        <input class="form-control text-box single-line cpkoutcla" id="datafrom" name="datafrom" type="text" value="" readonly />
                     </div>
                 </div>
                 <div class="col-xs-6">
-                    <label class="control-label col-xs-4" >StdDev</label>
+                    <label class="control-label col-xs-4">Normal Distribution</label>
                     <div class="col-xs-8">
-                        
+                        <input class="form-control text-box single-line cpkoutcla" id="isnormal" name="isnormal" type="text" value="" readonly />
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-4">Mean</label>
+                    <div class="col-xs-8">
+                        <input class="form-control text-box single-line cpkoutcla" id="mean" name="mean" type="text" value="" readonly />
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-4">StdDev</label>
+                    <div class="col-xs-8">
+                        <input class="form-control text-box single-line cpkoutcla" id="stddev" name="stddev" type="text" value="" readonly />
+                    </div>
+                </div>
+
             </div>
         </div>
         <div class="form-group">
             <div class="row">
                 <div class="col-xs-6">
-                    <label class="control-label col-xs-4">Normal Probability</label>
+                    <label class="control-label col-xs-4">CPK</label>
+                    <div class="col-xs-8">
+                        <input class="form-control text-box single-line cpkoutcla" id="realcpk" name="realcpk" type="text" value="" readonly />
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-4">DPPM</label>
+                    <div class="col-xs-8">
+                        <input class="form-control text-box single-line cpkoutcla" id="dppm" name="dppm" type="text" value="" readonly />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                 <div class="col-xs-6">
+                    <label class="control-label col-xs-4">Download</label>
                     <div class="col-xs-8">
 
                     </div>
                 </div>
                 <div class="col-xs-6">
-                    <label class="control-label col-xs-4">Download</label>
+                    <label class="control-label col-xs-4">More Detail</label>
                     <div class="col-xs-8">
 
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-4">Normal Probability(min)</label>
+                    <div class="col-xs-8">
+                        <input class="form-control text-box single-line cpkoutcla" id="probmin" name="probmin" type="text" value="" readonly />
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-4">Normal Probability(max)</label>
+                    <div class="col-xs-8">
+                        <input class="form-control text-box single-line cpkoutcla" id="probmax" name="probmax" type="text" value="" readonly />
                     </div>
                 </div>
             </div>
@@ -177,13 +229,13 @@
                 <div class="col-xs-6">
                     <label class="control-label col-xs-4">General CPK(min)</label>
                     <div class="col-xs-8">
-
+                        <input class="form-control text-box single-line cpkoutcla" id="gcpkmin" name="gcpkmin" type="text" value="" readonly />
                     </div>
                 </div>
                 <div class="col-xs-6">
                     <label class="control-label col-xs-4">General CPK(max)</label>
                     <div class="col-xs-8">
-
+                        <input class="form-control text-box single-line cpkoutcla" id="gcpkmax" name="gcpkmax" type="text" value="" readonly />
                     </div>
                 </div>
             </div>
@@ -193,13 +245,13 @@
                 <div class="col-xs-6">
                     <label class="control-label col-xs-4">Robust CPK(min)</label>
                     <div class="col-xs-8">
-
+                        <input class="form-control text-box single-line cpkoutcla" id="rcpkmin" name="rcpkmin" type="text" value="" readonly />
                     </div>
                 </div>
                 <div class="col-xs-6">
                     <label class="control-label col-xs-4">Robust CPK(max)</label>
                     <div class="col-xs-8">
-
+                        <input class="form-control text-box single-line cpkoutcla" id="rcpkmax" name="rcpkmax" type="text" value="" readonly />
                     </div>
                 </div>
             </div>
@@ -207,15 +259,15 @@
         <div class="form-group">
             <div class="row">
                 <div class="col-xs-6">
-                    <label class="control-label col-xs-4">Robust DPPM(min)</label>
+                    <label class="control-label col-xs-4">Mean(min))</label>
                     <div class="col-xs-8">
-
+                        <input class="form-control text-box single-line cpkoutcla" id="meanmin" name="meanmin" type="text" value="" readonly />
                     </div>
                 </div>
                 <div class="col-xs-6">
-                    <label class="control-label col-xs-4">Robust DPPM(max)</label>
+                    <label class="control-label col-xs-4">Mean(max)</label>
                     <div class="col-xs-8">
-
+                        <input class="form-control text-box single-line cpkoutcla" id="meanmax" name="meanmax" type="text" value="" readonly />
                     </div>
                 </div>
             </div>
@@ -223,19 +275,52 @@
         <div class="form-group">
             <div class="row">
                 <div class="col-xs-6">
-                    <label class="control-label col-xs-4">General CPK</label>
+                    <label class="control-label col-xs-4">StdDev(min)</label>
                     <div class="col-xs-8">
-
+                        <input class="form-control text-box single-line cpkoutcla" id="stddevmin" name="stddevmin" type="text" value="" readonly />
                     </div>
                 </div>
                 <div class="col-xs-6">
-                    <label class="control-label col-xs-4">Robust CPK</label>
+                    <label class="control-label col-xs-4">StdDev(max)</label>
                     <div class="col-xs-8">
-
+                        <input class="form-control text-box single-line cpkoutcla" id="stddevmax" name="stddevmax" type="text" value="" readonly />
                     </div>
                 </div>
             </div>
         </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-4">Selected CPK(min)</label>
+                    <div class="col-xs-8">
+                        <input class="form-control text-box single-line cpkoutcla" id="cpkmin" name="cpkmin" type="text" value="" readonly />
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-4">Selected CPK(max)</label>
+                    <div class="col-xs-8">
+                        <input class="form-control text-box single-line cpkoutcla" id="cpkmax" name="cpkmax" type="text" value="" readonly />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-4">DPPM(min)</label>
+                    <div class="col-xs-8">
+                        <input class="form-control text-box single-line cpkoutcla" id="rdppmmin" name="rdppmmin" type="text" value="" readonly />
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-4">DPPM(max)</label>
+                    <div class="col-xs-8">
+                        <input class="form-control text-box single-line cpkoutcla" id="rdppmmax" name="rdppmmax" type="text" value="" readonly />
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
@@ -244,11 +329,11 @@
 <div class="row">
     <div class="col-xs-2" MYTP="red" style="font-family:'Arial Narrow';font-size:18px"><strong>&nbsp;&nbsp;Chart</strong></div>
     <div class="col-xs-10">
-        <div class="form-group">
-            <div class="row">
-                
+        <div class="v-container">
+            <div class="v-content">
             </div>
         </div>
     </div>
 </div>
+
 

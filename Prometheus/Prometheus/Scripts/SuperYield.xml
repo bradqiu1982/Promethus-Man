@@ -22,19 +22,21 @@ $(function () {
         },
         yAxis: [{
             title: {
-                text: 'Amount'
-            },
-            min: 0,
-            max: #AmountMAX#
-        }, {
-            title: {
                 text: 'Percent'
             },
             min: 0,
             max: 100,
-            gridLineWidth: 0,
-            tickPixelInterval: 36,
-            opposite: true
+            gridLineWidth: 1,
+            tickPixelInterval: 36
+        },
+        {
+            title: {
+                text: 'Amount'
+            },
+            min: 0,
+            max: #AmountMAX#,
+            opposite: true,
+            gridLineWidth: 0
         }],
         plotOptions: {
             column: {
@@ -95,7 +97,7 @@ $(function () {
             type: 'column',
             name: 'Input Count',
             data: [#FirstAmount#],
-            yAxis:0
+            yAxis:1
         },
         {
             type: 'line',
@@ -105,7 +107,7 @@ $(function () {
                 lineWidth: 2,
                 fillColor: 'red'
             },
-            yAxis:1
+            yAxis:0
         },
         {
             type: 'line',
@@ -115,7 +117,7 @@ $(function () {
                 lineWidth: 2,
                 fillColor: 'green'
             },
-            yAxis:1
+            yAxis:0
         },
         {
             type: 'line',
@@ -125,18 +127,18 @@ $(function () {
                 lineWidth: 2,
                 fillColor: 'orange'
             },
-            yAxis:1
+            yAxis:0
         },
         {
             type: 'line',
-            name: 'SN Trace Yield',
+            name: 'Cumm Yield',
             visible: false,
             data: [#SNYield#],
             marker: {
                 lineWidth: 2,
                 fillColor: 'purple'
             },
-            yAxis:1
+            yAxis:0
         }],
         exporting: {
             menuItemDefinitions: {

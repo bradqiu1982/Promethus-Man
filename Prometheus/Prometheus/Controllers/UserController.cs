@@ -3036,7 +3036,7 @@ namespace Prometheus.Controllers
                 for (var idx = 0; idx < snyieldlist.Count; idx++)
                 {
                     SNTOOLTIP = SNTOOLTIP + "'<!doctype html><table>"
-                        + "<tr><td><b>SN Trace Yield</b></td><td>" + snyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
+                        + "<tr><td><b>Cumm Yield</b></td><td>" + snyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
                     foreach (var d in vmlist[idx].SNYields)
                     {
                         SNTOOLTIP = SNTOOLTIP + "<tr><td><b>" + d.WhichTest + "</b></td><td>Input:</td><td>" + d.InputCount.ToString() + "</td><td>Output:</td><td>" + d.OutputCount.ToString() + "</td></tr>";

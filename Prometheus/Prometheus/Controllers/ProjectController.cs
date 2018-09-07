@@ -2288,7 +2288,7 @@ namespace Prometheus.Controllers
                 for (var idx = 0; idx < snyieldlist.Count; idx++)
                 {
                     SNTOOLTIP = SNTOOLTIP + "'<!doctype html><table>"
-                        + "<tr><td><b>SN Trace Yield</b></td><td>" + snyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
+                        + "<tr><td><b>Cumm Yield</b></td><td>" + snyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
                     foreach (var d in vmlist[idx].SNYields)
                     {
                         SNTOOLTIP = SNTOOLTIP + "<tr><td><b>" + d.WhichTest + "</b></td><td>Input:</td><td>" + d.InputCount.ToString() + "</td><td>Output:</td><td>" + d.OutputCount.ToString() + "</td></tr>";
@@ -2445,7 +2445,7 @@ namespace Prometheus.Controllers
                 for (var idx = 0; idx < snyieldlist.Count; idx++)
                 {
                     SNTOOLTIP = SNTOOLTIP + "'<!doctype html><table>"
-                        + "<tr><td><b>SN Trace Yield</b></td><td>" + snyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
+                        + "<tr><td><b>Cumm Yield</b></td><td>" + snyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
                     foreach (var d in vmlist[idx].SNYields)
                     {
                         SNTOOLTIP = SNTOOLTIP + "<tr><td><b>" + d.WhichTest + "</b></td><td>Input:</td><td>" + d.InputCount.ToString() + "</td><td>Output:</td><td>" + d.OutputCount.ToString() + "</td></tr>";
@@ -3024,7 +3024,7 @@ namespace Prometheus.Controllers
                         reurl += "+'&StartDate=" + ViewBag.sDate + "&EndDate=" + ViewBag.eDate + "&Type=SNFailure'";
                         var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart4FF.xml"));
                         ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
-                            .Replace("#Title#", "SN Trace Failure")
+                            .Replace("#Title#", "Cumm Failure")
                             .Replace("#SERIESNAME#", "SNFailure")
                             .Replace("#REDIRECTURL#", reurl)
                             .Replace("#NAMEVALUEPAIRS#", namevaluepair);
@@ -3458,7 +3458,7 @@ namespace Prometheus.Controllers
                     for (var idx = 0; idx < snyieldlist.Count; idx++)
                     {
                         SNTOOLTIP = SNTOOLTIP + "'<!doctype html><table>"
-                            + "<tr><td><b>SN Trace Yield</b></td><td>" + snyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
+                            + "<tr><td><b>Cumm Yield</b></td><td>" + snyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
                         foreach (var d in vmlist[idx].SNYields)
                         {
                             SNTOOLTIP = SNTOOLTIP + "<tr><td><b>" + d.WhichTest + "</b></td><td>Input:</td><td>" + d.InputCount.ToString() + "</td><td>Output:</td><td>" + d.OutputCount.ToString() + "</td></tr>";
@@ -3619,7 +3619,7 @@ namespace Prometheus.Controllers
                     for (var idx = 0; idx < snyieldlist.Count; idx++)
                     {
                         SNTOOLTIP = SNTOOLTIP + "'<!doctype html><table>"
-                            + "<tr><td><b>SN Trace Yield</b></td><td>" + snyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
+                            + "<tr><td><b>Cumm Yield</b></td><td>" + snyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
                         foreach (var d in vmlist[idx].SNYields)
                         {
                             SNTOOLTIP = SNTOOLTIP + "<tr><td><b>" + d.WhichTest + "</b></td><td>Input:</td><td>" + d.InputCount.ToString() + "</td><td>Output:</td><td>" + d.OutputCount.ToString() + "</td></tr>";
@@ -3796,7 +3796,7 @@ namespace Prometheus.Controllers
 
                         var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart4FF.xml"));
                         ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
-                            .Replace("#Title#", "SN Trace Failure")
+                            .Replace("#Title#", "Cumm Failure")
                             .Replace("#SERIESNAME#", "SNFailure")
                             .Replace("#REDIRECTURL#", reurl)
                             .Replace("#NAMEVALUEPAIRS#", namevaluepair);
@@ -4034,7 +4034,7 @@ namespace Prometheus.Controllers
                         
                         var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart4FF.xml"));
                         ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
-                            .Replace("#Title#", "SN Trace Failure")
+                            .Replace("#Title#", "Cumm Failure")
                             .Replace("#SERIESNAME#", "SNFailure")
                             .Replace("#REDIRECTURL#", reurl)
                             .Replace("#NAMEVALUEPAIRS#", namevaluepair);
@@ -4420,7 +4420,7 @@ namespace Prometheus.Controllers
 
                             var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart4FF.xml"));
                             ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
-                                .Replace("#Title#", "SN Trace Failure")
+                                .Replace("#Title#", "Cumm Failure")
                                 .Replace("#SERIESNAME#", "SNFailure")
                                 .Replace("#REDIRECTURL#", reurl)
                                 .Replace("#NAMEVALUEPAIRS#", namevaluepair);
@@ -4647,7 +4647,7 @@ namespace Prometheus.Controllers
                     for (var idx = 0; idx < snyieldlist.Count; idx++)
                     {
                         SNTOOLTIP = SNTOOLTIP + "'<!doctype html><table>"
-                            + "<tr><td><b>SN Trace Yield</b></td><td>" + snyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
+                            + "<tr><td><b>Cumm Yield</b></td><td>" + snyieldlist[idx].ToString("0.00") + "&#37;</td></tr>";
                         foreach (var d in vmlist[idx].SNYields)
                         {
                             SNTOOLTIP = SNTOOLTIP + "<tr><td><b>" + d.WhichTest + "</b></td><td>Input:</td><td>" + d.InputCount.ToString() + "</td><td>Output:</td><td>" + d.OutputCount.ToString() + "</td></tr>";
@@ -4909,7 +4909,7 @@ namespace Prometheus.Controllers
 
                 var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ParetoChart.xml"));
                 ViewBag.rparetoscript = tempscript.Replace("#ElementID#", "rparetochart")
-                    .Replace("#Title#", "Pareto of SN Trace Defect")
+                    .Replace("#Title#", "Pareto of Cumm Defect")
                     .Replace("#XAxisTitle#", "Defect")
                     .Replace("#ChartxAxisValues#", ChartxAxisValues)
                     .Replace("#AmountMAX#", sum.ToString())
@@ -5180,7 +5180,7 @@ namespace Prometheus.Controllers
                         
                         var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart4FF.xml"));
                         ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
-                            .Replace("#Title#", "SN Trace Failure")
+                            .Replace("#Title#", "Cumm Failure")
                             .Replace("#SERIESNAME#", "SNFailure")
                             .Replace("#REDIRECTURL#", reurl)
                             .Replace("#NAMEVALUEPAIRS#", namevaluepair);

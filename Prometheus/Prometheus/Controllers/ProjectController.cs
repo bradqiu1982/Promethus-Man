@@ -9626,7 +9626,6 @@ namespace Prometheus.Controllers
             return View("HeartBeat");
         }
 
-
     }
 
 }

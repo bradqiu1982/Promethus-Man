@@ -155,7 +155,7 @@ namespace Prometheus.Models
         {
             var ret = new List<ProjectTestData>();
 
-            var atetesttimelimit = CfgUtility.GetATETestTimeLimit(ctrl);
+            //var atetesttimelimit = CfgUtility.GetATETestTimeLimit(ctrl);
 
             var currentroutid = "";
             var currentstation = "";
@@ -212,43 +212,43 @@ namespace Prometheus.Models
                             }//end foreach
 
                             var hours = (double)(temppjdatalist[temppjdatalist.Count - 1].TestTimeStamp - temppjdatalist[0].TestTimeStamp).TotalSeconds / 3600.0;
-                            if (hours > 0 && hours < 20)
+                            if (hours > 0.01 && hours < 20)
                             {
                                 
                                 if (string.IsNullOrEmpty(errid))
                                 {
                                     var wt = temppjdatalist[0].WhichTest.Replace("_setup", "");
 
-                                    var matched = false;
-                                    if (atetesttimelimit.ContainsKey(mdtype))
-                                    {
-                                        if (atetesttimelimit[mdtype].ContainsKey(wt.ToLower()))
-                                        {
-                                            matched = true;
-                                        }
-                                    }
+                                    //var matched = false;
+                                    //if (atetesttimelimit.ContainsKey(mdtype))
+                                    //{
+                                    //    if (atetesttimelimit[mdtype].ContainsKey(wt.ToLower()))
+                                    //    {
+                                    //        matched = true;
+                                    //    }
+                                    //}
 
-                                    if (matched)
-                                    {
-                                        var low = atetesttimelimit[mdtype][wt.ToLower()].low;
-                                        var high = atetesttimelimit[mdtype][wt.ToLower()].high;
-                                        if (hours > low && hours < high)
-                                        {
+                                    //if (matched)
+                                    //{
+                                    //    var low = atetesttimelimit[mdtype][wt.ToLower()].low;
+                                    //    var high = atetesttimelimit[mdtype][wt.ToLower()].high;
+                                    //    if (hours > low && hours < high)
+                                    //    {
                                             var testdata = new ProjectTestData(pjname, temppjdatalist[0].DataID, temppjdatalist[0].ModuleSerialNum, wt, temppjdatalist[0].ModuleType
                                                 , "PASS", temppjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), temppjdatalist[0].TestStation, temppjdatalist[0].PN);
                                             testdata.CSN = (Math.Round(hours, 3)).ToString();
                                             testdata.JO = temppjdatalist[0].JO;
                                             ret.Add(testdata);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        var testdata = new ProjectTestData(pjname, temppjdatalist[0].DataID, temppjdatalist[0].ModuleSerialNum,wt, temppjdatalist[0].ModuleType
-                                            , "PASS", temppjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), temppjdatalist[0].TestStation, temppjdatalist[0].PN);
-                                        testdata.CSN = (Math.Round(hours,3)).ToString();
-                                        testdata.JO = temppjdatalist[0].JO;
-                                        ret.Add(testdata);
-                                    }
+                                    //    }
+                                    //}
+                                    //else
+                                    //{
+                                    //    var testdata = new ProjectTestData(pjname, temppjdatalist[0].DataID, temppjdatalist[0].ModuleSerialNum,wt, temppjdatalist[0].ModuleType
+                                    //        , "PASS", temppjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), temppjdatalist[0].TestStation, temppjdatalist[0].PN);
+                                    //    testdata.CSN = (Math.Round(hours,3)).ToString();
+                                    //    testdata.JO = temppjdatalist[0].JO;
+                                    //    ret.Add(testdata);
+                                    //}
                                 }
                                 else
                                 {
@@ -292,7 +292,7 @@ namespace Prometheus.Models
                         INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX  
                         INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID 
                         INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID   
-                        WHERE c.FAMILY = '<family>' and d.END_TIME >= '<starttime>' and d.END_TIME <= '<endtime>' AND b.state <> 'GOLDEN' ORDER BY a.MFR_SN,d.start_time ASC";
+                        WHERE c.FAMILY = '<family>' and d.END_TIME >= '<starttime>' and d.END_TIME <= '<endtime>' AND b.state <> 'GOLDEN' ORDER BY a.MFR_SN,d.END_TIME ASC";
             sql = sql.Replace("<family>", family).Replace("<starttime>", startdate.ToString("yyyyMMddHHmmss")).Replace("<endtime>", enddate.ToString("yyyyMMddHHmmss"));
 
             var dbret = DBUtility.ExeATESqlWithRes(sql);
@@ -367,7 +367,7 @@ namespace Prometheus.Models
                     var s  = @"SELECT a.MFR_SN,d.DATASET_NAME,c.FAMILY,d.STATUS,d.END_TIME,d.STATION,a.MFR_PN,d.ROUTE_ID,d.dataset_id,b.JOB_ID FROM PARTS a 
                                 INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID 
                                 INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID 
-                                WHERE <mdcond> and d.END_TIME > '<TIMECOND>'  AND b.state <> 'GOLDEN'  ORDER BY d.ROUTE_ID,d.dataset_id DESC,d.start_time ASC";
+                                WHERE <mdcond> and d.END_TIME > '<TIMECOND>'  AND b.state <> 'GOLDEN'  ORDER BY a.MFR_SN,d.END_TIME ASC";
                     
                     var sql = s.Replace("<TIMECOND>", vm.StartDate.ToString("yyyyMMddhhmmss")).Replace("<mdcond>", mdcond);
 
@@ -605,7 +605,7 @@ namespace Prometheus.Models
                     var s = @"SELECT a.MFR_SN,d.DATASET_NAME,c.FAMILY,d.STATUS,d.END_TIME,d.STATION,a.MFR_PN,d.ROUTE_ID,d.dataset_id,b.JOB_ID FROM PARTS a 
                             INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX 
                             INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID 
-                            INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID WHERE <mdcond> and d.END_TIME > '<TIMECOND>'  AND b.state <> 'GOLDEN'  ORDER BY d.ROUTE_ID,d.dataset_id DESC,d.start_time ASC";
+                            INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID WHERE <mdcond> and d.END_TIME > '<TIMECOND>'  AND b.state <> 'GOLDEN'  ORDER BY a.MFR_SN,d.END_TIME ASC";
 
                     var sql = s.Replace("<TIMECOND>", DateTime.Parse(starttime).ToString("yyyyMMddhhmmss")).Replace("<mdcond>", mdcond);
 

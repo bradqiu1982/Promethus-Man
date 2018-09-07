@@ -4873,11 +4873,14 @@ namespace Prometheus.Controllers
             var pj = Request.Form["pj"];
             var mestablist = CPKCache.RetrieveMESTabList(pj);
             var pnlist = CPKCache.RetrieveMESPNDesList(pj);
+            var datasource = CPKCache.RetrieveDataSource(pj);
 
             var ret = new JsonResult();
             ret.Data = new {
                     mestablist = mestablist,
-                    pnlist = pnlist };
+                    pnlist = pnlist,
+                datasource = datasource
+            };
             return ret;
         }
 
@@ -4910,7 +4913,8 @@ namespace Prometheus.Controllers
             return ret;
         }
 
-        private string DownLoadCPKSourceData(List<double> minlist,List<double> maxlist,string param)
+        private string DownLoadCPKSourceData(List<double> minlist,List<double> maxlist,string param,CPKData cpkmindata,CPKData cpkmaxdata
+                    ,string datafrom,double mean,double stddev,string isnormal,double realcpk,double dppm)
         {
             string datestring = DateTime.Now.ToString("yyyyMMdd");
             string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
@@ -4919,12 +4923,24 @@ namespace Prometheus.Controllers
                 System.IO.Directory.CreateDirectory(imgdir);
             }
 
-            var fn = param.Replace(" ","_") + "_sourcedata_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+            var fn = param.Replace(" ","_").Replace("%","").Replace(",","") + "_sourcedata_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
             var filename = imgdir + fn;
 
-            var sb = new StringBuilder((minlist.Count + maxlist.Count) * 30);
+            var sb = new StringBuilder((minlist.Count + maxlist.Count + 50) * 30);
             sb.Append(param + ",\r\n");
 
+            sb.Append("DATA FROM," + datafrom + "," + "Mean," + mean.ToString() + "," + "StdDev," + stddev.ToString()
+                + "," + "Normal Distribution," + isnormal + "," + "Select CPK," + realcpk.ToString() + "," + "DPPM," + dppm.ToString() + ",\r\n");
+
+            sb.Append("Normal Probability (min)," + cpkmindata.IsNormalProbability.ToString() + ",Normal Probability (max)," + cpkmaxdata.IsNormalProbability.ToString() + ",\r\n");
+            sb.Append("General CPK (min)," + cpkmindata.Cpk_ca.ToString() + ",General CPK (max)," + cpkmaxdata.Cpk_ca.ToString() + ",\r\n");
+            sb.Append("Robust CPK (min)," + cpkmindata.Cpk_robust.ToString() + ",Robust CPK (max)," + cpkmaxdata.Cpk_robust.ToString() + ",\r\n");
+            sb.Append("Mean (min)," + cpkmindata.Mean.ToString() + ",Mean (max)," + cpkmaxdata.Mean.ToString() + ",\r\n");
+            sb.Append("StdDev (min)," + cpkmindata.Stdev.ToString() + ",StdDev (max)," + cpkmaxdata.Stdev.ToString() + ",\r\n");
+            sb.Append("CPK (min)," + cpkmindata.Cpk_final.ToString() + ",CPK (max)," + cpkmaxdata.Cpk_final.ToString() + ",\r\n");
+            sb.Append("DPPM (min)," + cpkmindata.DPPM.ToString() + ",DPPM (max)," + cpkmaxdata.DPPM.ToString() + ",\r\n");
+
+            sb.Append("Source Data,\r\n");
             foreach (var data in minlist)
             {
                 sb.Append(data.ToString() + ",min,\r\n");
@@ -4952,8 +4968,127 @@ namespace Prometheus.Controllers
             return url;
         }
 
+        private JsonResult MESCPK(string database, bool onlypass)
+        {
+            var pj = Request.Form["pj"];
+            var mestab = Request.Form["mestab"].ToUpper().Trim();
+            if (mestab.IndexOf("DC_") == 0)
+            {
+                mestab = mestab.Substring(3);
+            }
+            var paramliststr = Request.Form["param"];
+            var cornid = Request.Form["cornid"];
+            var lowlimit = Request.Form["lowlimit"];
+            var highlimit = Request.Form["highlimit"];
+            var startdate = Request.Form["startdate"];
+            var enddate = Request.Form["enddate"];
+            var pnlist = Request.Form["pnlist"];
 
-        public JsonResult QueryCPK()
+            var cpkdatalist = new List<object>();
+            var chartlist = new List<object>();
+
+            var paramlist = paramliststr.Split(new string[] { ",", ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            foreach (var param in paramlist)
+            {
+                var rawdata = MESUtility.GetTestData(pnlist, mestab, param, cornid, startdate, enddate, onlypass);
+                if (rawdata.Count == 0)
+                {
+                    var ret = new JsonResult();
+                    ret.Data = new
+                    {
+                        msg = "Fail to get test data, please check your query condition!",
+                        success = false
+                    };
+                    return ret;
+                }
+
+                var minlist = (List<double>)rawdata[0];
+                var maxlist = (List<double>)rawdata[1];
+
+                if (minlist.Count < 100)
+                {
+                    var ret = new JsonResult();
+                    ret.Data = new
+                    {
+                        msg = "No enough data is gotten,please enlarge your query period!",
+                        success = false
+                    };
+                    return ret;
+                }
+
+                CPKCache.UpdateCPKParams(pj, mestab, pnlist, param, cornid, lowlimit, highlimit, database);
+
+                var cpkmindata = CPKData.GetCpk(minlist, highlimit, lowlimit)[0];
+                var cpkmaxdata = CPKData.GetCpk(maxlist, highlimit, lowlimit)[0];
+
+                var datafrom = "MAX DATASET";
+                var mean = cpkmaxdata.Mean;
+                var stddev = cpkmaxdata.Stdev;
+                var isnormal = cpkmaxdata.IsNormalStr;
+                var dppm = cpkmaxdata.DPPM;
+
+                var realcpk = Math.Min(cpkmindata.Cpk_final, cpkmaxdata.Cpk_final);
+                if (realcpk == cpkmindata.Cpk_final)
+                {
+                    datafrom = "MIN DATASET";
+                    mean = cpkmindata.Mean;
+                    stddev = cpkmindata.Stdev;
+                    isnormal = cpkmindata.IsNormalStr;
+                    dppm = cpkmindata.DPPM;
+                }
+
+
+                var id = "min_" + param.Replace(" ", "_").ToLower() + "_id";
+                var title = param + " Min Dataset Histogram";
+                chartlist.Add(HistogramChart.GetChartData(id, title, lowlimit, highlimit, minlist));
+
+                id = "max_" + param.Replace(" ", "_").ToLower() + "_id";
+                title = param + " Max Dataset Histogram";
+                chartlist.Add(HistogramChart.GetChartData(id, title, lowlimit, highlimit, maxlist));
+
+                var sourcedata = DownLoadCPKSourceData(minlist, maxlist, param, cpkmindata, cpkmaxdata
+                    , datafrom, mean, stddev,isnormal,realcpk,dppm);
+
+                cpkdatalist.Add(
+                    new
+                    {
+                        param = param,
+                        datafrom = datafrom,
+                        mean = Math.Round(mean, 5),
+                        stddev = Math.Round(stddev, 5),
+                        isnormal = isnormal,
+                        realcpk = realcpk,
+                        dppm = dppm,
+                        probmin = cpkmindata.IsNormalProbability,
+                        probmax = cpkmaxdata.IsNormalProbability,
+                        gcpkmin = cpkmindata.Cpk_ca,
+                        gcpkmax = cpkmaxdata.Cpk_ca,
+                        rcpkmin = cpkmindata.Cpk_robust,
+                        rcpkmax = cpkmaxdata.Cpk_robust,
+                        meanmin = Math.Round(cpkmindata.Mean, 5),
+                        meanmax = Math.Round(cpkmaxdata.Mean, 5),
+                        stddevmin = Math.Round(cpkmindata.Stdev, 5),
+                        stddevmax = Math.Round(cpkmaxdata.Stdev, 5),
+                        rdppmmin = cpkmindata.DPPM,
+                        rdppmmax = cpkmaxdata.DPPM,
+                        cpkmin = cpkmindata.Cpk_final,
+                        cpkmax = cpkmaxdata.Cpk_final,
+                        sourcedata = sourcedata
+                    });
+            }//end foreach
+ 
+            var allret = new JsonResult();
+            allret.Data = new
+            {
+                success = true,
+                cpkdatalist = cpkdatalist,
+                chartlist = chartlist
+            };
+
+            return allret;
+        }
+
+        private JsonResult ATECPK(string database, bool onlypass)
         {
             var pj = Request.Form["pj"];
             var mestab = Request.Form["mestab"].ToUpper().Trim();
@@ -4964,16 +5099,21 @@ namespace Prometheus.Controllers
             var startdate = Request.Form["startdate"];
             var enddate = Request.Form["enddate"];
             var pnlist = Request.Form["pnlist"];
+            var rawdata = ATEUtility.GetTestData(pnlist,mestab,param, cornid, startdate, enddate, onlypass);
 
+            var ret = new JsonResult();
+            ret.Data = new
+            {
+                msg = "ATE CPK is not supported now!",
+                success = false
+            };
+            return ret;
+        }
+
+        public JsonResult QueryCPK()
+        {
             var pass = Request.Form["pass"];
             var database = Request.Form["database"];
-
-            if (mestab.IndexOf("DC_") == 0)
-            {
-                mestab = mestab.Substring(3);
-            }
-
-            
             bool onlypass = false;
             if (string.Compare(pass, "YES", true) == 0)
             { onlypass = true; }
@@ -4981,106 +5121,15 @@ namespace Prometheus.Controllers
             var rawdata = new List<object>();
             if (string.Compare(database, "MES", true) == 0)
             {
-                rawdata = MESUtility.GetTestData(pnlist, mestab, param, cornid, startdate, enddate, onlypass);
+                return MESCPK(database, onlypass);
             }
             else
             {
-                rawdata = ATEUtility.GetTestData(pnlist,mestab,param, cornid, startdate, enddate, onlypass);
+                return ATECPK(database, onlypass);
             }
-
-            if (rawdata.Count == 0)
-            {
-                var ret = new JsonResult();
-                ret.Data = new
-                {
-                    msg = "Fail to get test data, please check your query condition!",
-                    success = false
-                };
-                return ret;
-            }
-
-            var minlist = (List<double>)rawdata[0];
-            var maxlist = (List<double>)rawdata[1];
-
-            if(minlist.Count < 100)
-            {
-                var ret = new JsonResult();
-                ret.Data = new
-                {
-                    msg = "No enough data is gotten,please enlarge your query period!",
-                    success = false
-                };
-                return ret;
-            }
-
-            CPKCache.UpdateCPKParams(pj, mestab, pnlist, param,cornid, lowlimit, highlimit,database);
-
-            var cpkmindata = CPKData.GetCpk(minlist, highlimit, lowlimit)[0];
-            var cpkmaxdata = CPKData.GetCpk(maxlist, highlimit, lowlimit)[0];
-
-            var datafrom = "MAX DATASET";
-            var mean = cpkmaxdata.Mean;
-            var stddev = cpkmaxdata.Stdev;
-            var isnormal = cpkmaxdata.IsNormalStr;
-            var dppm = cpkmaxdata.DPPM;
-
-            var realcpk = Math.Min(cpkmindata.Cpk_final, cpkmaxdata.Cpk_final);
-            if (realcpk == cpkmindata.Cpk_final)
-            {
-                datafrom = "MIN DATASET";
-                mean = cpkmindata.Mean;
-                stddev = cpkmindata.Stdev;
-                isnormal = cpkmindata.IsNormalStr;
-                dppm = cpkmindata.DPPM;
-            }
-
-            var chartlist = new List<object>();
-            var id = "min_" + param.Replace(" ", "_").ToLower() + "_id";
-            var title = param + " Min Dataset Histogram";
-            chartlist.Add(HistogramChart.GetChartData(id, title, lowlimit, highlimit, minlist));
-
-            id = "max_" + param.Replace(" ", "_").ToLower() + "_id";
-            title = param + " Max Dataset Histogram";
-            chartlist.Add(HistogramChart.GetChartData(id, title, lowlimit, highlimit, maxlist));
-
-            var sourcedata = DownLoadCPKSourceData(minlist, maxlist, param);
-
-            var allret = new JsonResult();
-            allret.Data = new
-            {
-                success = true,
-                datafrom = datafrom,
-                mean = Math.Round(mean,5),
-                stddev = Math.Round(stddev,5),
-                isnormal = isnormal,
-                realcpk = realcpk,
-                dppm = dppm,
-
-                probmin = cpkmindata.IsNormalProbability,
-                probmax = cpkmaxdata.IsNormalProbability,
-
-                gcpkmin = cpkmindata.Cpk_ca,
-                gcpkmax = cpkmaxdata.Cpk_ca,
-
-                rcpkmin = cpkmindata.Cpk_robust,
-                rcpkmax = cpkmaxdata.Cpk_robust,
-
-                meanmin = Math.Round(cpkmindata.Mean,5),
-                meanmax = Math.Round(cpkmaxdata.Mean, 5),
-
-                stddevmin = Math.Round(cpkmindata.Stdev, 5),
-                stddevmax = Math.Round(cpkmaxdata.Stdev, 5),
-
-                rdppmmin = cpkmindata.DPPM,
-                rdppmmax = cpkmaxdata.DPPM,
-
-                cpkmin = cpkmindata.Cpk_final,
-                cpkmax = cpkmaxdata.Cpk_final,
-                chartlist = chartlist,
-                sourcedata = sourcedata
-            };
-            return allret;
         }
+
+
 
     }
 }

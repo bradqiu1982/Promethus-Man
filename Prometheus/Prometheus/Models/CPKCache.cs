@@ -66,6 +66,21 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static string RetrieveDataSource(string pj)
+        {
+            var ret = new List<string>();
+            var sql = "select distinct DataSource from CPKCache where PJName=@PJName and DataSource <> ''";
+            var dict = new Dictionary<string, string>();
+            dict.Add("@PJName", pj);
+
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, dict);
+            foreach (var line in dbret)
+            {
+                return Convert.ToString(line[0]);
+            }
+            return "";
+        }
+
         public static List<string> RetrieveMESPNDesList(string pj)
         {
             var ret = new List<string>();

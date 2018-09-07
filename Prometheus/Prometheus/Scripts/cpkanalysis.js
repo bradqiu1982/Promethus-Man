@@ -1,6 +1,9 @@
 ﻿var CPKANALYSE = function () {
     var show = function () {
 
+        var mywafertable = null;
+        var outputdict = {};
+
         $("#StartDate").datepicker({
             changeMonth: true,
             changeYear: true,
@@ -152,6 +155,11 @@
                                 }
                             }
                         });
+
+                        if (output.datasource != '')
+                        {
+                            $('#databaselist').val(output.datasource);
+                        }
                     });
 
                 $('#mestablelist').attr('readonly', false);
@@ -280,6 +288,29 @@
             $('#highlimit').attr('readonly', false);
         }
 
+        $('body').on('click', '.cpkmorecla', function () {
+            var output = outputdict[$(this).attr('mydataid')];
+            $('.cpkoutcla').val('');
+
+            $('#probmin').val(output.probmin);
+            $('#probmax').val(output.probmax);
+            $('#gcpkmin').val(output.gcpkmin);
+            $('#gcpkmax').val(output.gcpkmax);
+            $('#rcpkmin').val(output.rcpkmin);
+            $('#rcpkmax').val(output.rcpkmax);
+            $('#rdppmmin').val(output.rdppmmin);
+            $('#rdppmmax').val(output.rdppmmax);
+            $('#meanmin').val(output.meanmin);
+            $('#meanmax').val(output.meanmax);
+            $('#stddevmin').val(output.stddevmin);
+            $('#stddevmax').val(output.stddevmax);
+            $('#cpkmin').val(output.cpkmin);
+            $('#cpkmax').val(output.cpkmax);
+            $('#cpkmax').val(output.cpkmax);
+
+            $("#cpkdetailmodal").modal("show");
+        });
+
         $('body').on('click', '#QueryCPK', function () {
 
             var pj = $('#projectlist').val();
@@ -333,34 +364,41 @@
                 $('.cpkoutcla').val('');
                 $('.v-content').empty();
                 $('#sourcedata').attr('href', '#');
+                outputdict = {};
 
                 if (output.success) {
-                    $('#datafrom').val(output.datafrom);
-                    $('#isnormal').val(output.isnormal);
-                    $('#mean').val(output.mean);
-                    $('#stddev').val(output.stddev);
-                    $('#realcpk').val(output.realcpk);
-                    $('#dppm').val(output.dppm);
 
-                    $('#probmin').val(output.probmin);
-                    $('#probmax').val(output.probmax);
-                    $('#gcpkmin').val(output.gcpkmin);
-                    $('#gcpkmax').val(output.gcpkmax);
-                    $('#rcpkmin').val(output.rcpkmin);
-                    $('#rcpkmax').val(output.rcpkmax);
-                    $('#rdppmmin').val(output.rdppmmin);
-                    $('#rdppmmax').val(output.rdppmmax);
+                    if (mywafertable) {
+                        mywafertable.destroy();
+                    }
+                    $("#WaferTableID").empty();
 
-                    $('#meanmin').val(output.meanmin);
-                    $('#meanmax').val(output.meanmax);
+                    $.each(output.cpkdatalist, function (i, val) {
+                        var appendstr = '<tr>';
+                        appendstr += '<td>' + val.param + '</td>';
+                        appendstr += '<td>' + val.datafrom + '</td>';
+                        appendstr += '<td>' + val.isnormal + '</td>';
+                        appendstr += '<td>' + val.mean + '</td>';
+                        appendstr += '<td>' + val.stddev + '</td>';
+                        appendstr += '<td>' + val.realcpk + '</td>';
+                        appendstr += '<td>' + val.dppm + '</td>';
+                        appendstr += '<td>' + '<button class="btn btn-primary cpkmorecla" mydataid="'+i+'">More</button>' + '</td>';
+                        appendstr += '<td>' + '<a class="btn btn-primary" href="' + val.sourcedata + '" id="sourcedata" name="sourcedata" target="_blank">Source Data</a>' + '</td>';
+                        appendstr += '</tr>';
+                        $("#WaferTableID").append(appendstr);
 
-                    $('#stddevmin').val(output.stddevmin);
-                    $('#stddevmax').val(output.stddevmax);
+                        outputdict['' + i] = val;
+                    });
 
-                    $('#cpkmin').val(output.cpkmin);
-                    $('#cpkmax').val(output.cpkmax);
-                    $('#cpkmax').val(output.cpkmax);
-                    $('#sourcedata').attr('href', output.sourcedata);
+                    mywafertable = $('#mywafertable').DataTable({
+                        'iDisplayLength': 50,
+                        'aLengthMenu': [[20, 50, 100, -1],
+                        [20, 50, 100, "All"]],
+                        "aaSorting": [],
+                        "order": [],
+                        dom: 'lBfrtip',
+                        buttons: ['copyHtml5', 'csv', 'excelHtml5']
+                    });
 
                     $.each(output.chartlist, function (i, val) {
                          appendstr = '<div class="col-xs-12">' +

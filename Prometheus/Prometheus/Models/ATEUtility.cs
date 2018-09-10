@@ -205,7 +205,7 @@ namespace Prometheus.Models
                                 if (string.Compare(line.ErrAbbr, "PASS", true) != 0
                                     && string.Compare(line.ErrAbbr, "INFO", true) != 0)
                                 {
-                                    err = line.WhichTest;
+                                    err = line.WhichTest.ToUpper();
                                     errid = line.DataID;
                                     break;
                                 }
@@ -217,7 +217,7 @@ namespace Prometheus.Models
                                 
                                 if (string.IsNullOrEmpty(errid))
                                 {
-                                    var wt = temppjdatalist[0].WhichTest.Replace("_setup", "");
+                                    var wt = temppjdatalist[0].WhichTest.ToUpper().Replace("_SETUP", "");
 
                                     //var matched = false;
                                     //if (atetesttimelimit.ContainsKey(mdtype))
@@ -253,7 +253,7 @@ namespace Prometheus.Models
                                 else
                                 {
                                 
-                                    var testdata = new ProjectTestData(pjname, errid, temppjdatalist[0].ModuleSerialNum, temppjdatalist[0].WhichTest.Replace("_setup", ""), temppjdatalist[0].ModuleType
+                                    var testdata = new ProjectTestData(pjname, errid, temppjdatalist[0].ModuleSerialNum, temppjdatalist[0].WhichTest.ToUpper().Replace("_SETUP", ""), temppjdatalist[0].ModuleType
                                         , err, temppjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), temppjdatalist[0].TestStation, temppjdatalist[0].PN);
                                     testdata.CSN = (Math.Round(hours, 3)).ToString();
                                     testdata.JO = temppjdatalist[0].JO;
@@ -890,13 +890,137 @@ namespace Prometheus.Models
             }
         }
 
-        public static List<object> GetTestData(string pndesc, string mestab, string param,string cornid, string startdate, string enddate, bool onlypass)
+        private static List<object> RetrieveLimit(List<object> line)
+        {
+            var ret = new List<object>();
+
+            var lowlimit = "";
+            var highlimit = "";
+            var foundlimit = false;
+
+            try
+            {
+                var value = Convert.ToString(line[1]);
+                var limit = Convert.ToString(line[2]).Replace("=", "");
+                var limitlist = limit.Split(new string[] { ">", "<" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                if (limitlist.Count > 2)
+                {
+                    foundlimit = true;
+                    if (Convert.ToDouble(limitlist[0]) < Convert.ToDouble(limitlist[1]))
+                    {
+                        lowlimit = limitlist[0];
+                        highlimit = limitlist[2];
+                    }
+                    else
+                    {
+                        lowlimit = limitlist[2];
+                        highlimit = limitlist[0];
+                    }
+                }
+                else if (limitlist.Count == 2)
+                {
+                    foundlimit = true;
+                    if (limit.Contains(">"))
+                    {
+                        if (string.Compare(value, limitlist[0]) == 0)
+                        { lowlimit = limitlist[2]; }
+                        else
+                        { highlimit = limitlist[0]; }
+                    }
+                    else
+                    {
+                        if (string.Compare(value, limitlist[0]) == 0)
+                        { highlimit = limitlist[2]; }
+                        else
+                        { lowlimit = limitlist[0]; }
+                    }
+                }
+            }
+            catch (Exception EX) { return ret; }
+
+            ret.Add(foundlimit);
+            ret.Add(lowlimit);
+            ret.Add(highlimit);
+            return ret;
+        }
+
+        public static List<object> GetTestData(string pndesc, string mestab, string param, string startdate, string enddate, bool onlypass)
         {
             var ret = new List<object>();
             var pncond = MESUtility.GetPNCondFromPNDesc(pndesc);
             if (string.IsNullOrEmpty(pncond))
             { return ret; }
 
+            var sdate = DateTime.Parse(startdate).ToString("yyyyMMdd") + "000000";
+            var edate = DateTime.Parse(enddate).ToString("yyyyMMdd") + "235959";
+
+            var sql = @"select * from ( 
+                            select  p.mfr_sn,r.data_val1,r.data_val3,r.data_val2,r.data_name from route_data r  
+                             inner join datasets d on d.dataset_id = r.dataset_id 
+                             inner join ROUTES b on b.route_id = d.route_id 
+                             inner join Parts p on p.opt_index = b.part_index 
+                             where p.mfr_pn in <pncond> and d.dataset_name = '<DataSetName>' and r.data_name like '<DataFieldName>'  
+                             and  d.start_time > '<starttime>' and d.start_time < '<endtime>' 
+                             and ( data_val3 like '%<%' or data_val3 like '%>%' ) 
+                              ORDER BY p.MFR_SN,d.start_time desc ) where ROWNUM  <= 500000";
+            if (onlypass)
+            {
+                sql = @"select * from ( 
+                            select  p.mfr_sn,r.data_val1,r.data_val3,r.data_val2,r.data_name from route_data r  
+                             inner join datasets d on d.dataset_id = r.dataset_id 
+                             inner join ROUTES b on b.route_id = d.route_id 
+                             inner join Parts p on p.opt_index = b.part_index 
+                             where p.mfr_pn in <pncond> and d.dataset_name = '<DataSetName>' and r.data_name like '<DataFieldName>'  
+                             and  d.start_time > '<starttime>' and d.start_time < '<endtime>' 
+                             and r.data_val2 = 'PASS' and ( data_val3 like '%<%' or data_val3 like '%>%' ) 
+                              ORDER BY p.MFR_SN,d.start_time desc ) where ROWNUM  <= 500000";
+            }
+
+            sql = sql.Replace("<pncond>", pncond).Replace("<DataSetName>", mestab).Replace("<DataFieldName>", param)
+                .Replace("<starttime>", sdate).Replace("<endtime>", edate);
+
+            var dbret = DBUtility.ExeATESqlWithRes(sql);
+
+            var lowlimit = "";
+            var highlimit = "";
+            var foundlimit = false;
+
+            if (dbret.Count > 0)
+            {
+                foreach (var line in dbret)
+                {
+                    var passfail = Convert.ToString(line[3]);
+                    if (passfail.ToUpper().Contains("PASS"))
+                    {
+                        var limitarray = RetrieveLimit(line.ToList());
+                        if (limitarray.Count > 0 && (bool)limitarray[0])
+                        {
+                            foundlimit = true;
+                            lowlimit = (string)limitarray[1];
+                            highlimit = (string)limitarray[2];
+                        }
+                        break;
+                    }//end if
+                }//end foreach
+
+                if (foundlimit)
+                {
+                    var realret = MESUtility.GetMinMaxList(dbret);
+                    realret.Add(lowlimit);
+                    realret.Add(highlimit);
+                    var datawithname = new List<KeyValuePair<string, string>>();
+                    foreach (var line in dbret)
+                    {
+                        try
+                        {
+                            datawithname.Add(new KeyValuePair<string, string>(Convert.ToString(line[1]), Convert.ToString(line[4])));
+                        }
+                        catch (Exception ex) { }
+                    }
+                    realret.Add(datawithname);
+                    return realret;
+                }
+            }
 
             return ret;
         }

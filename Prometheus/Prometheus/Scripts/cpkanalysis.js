@@ -124,6 +124,7 @@
                     {
                         if ($('#mestablelist').data('autocomplete') || $('#mestablelist').data('uiAutocomplete')) {
                             $('#mestablelist').autoComplete("destroy");
+                            $('#pnlist').autoComplete("pnlist");
                         }
                         $('#mestablelist').autoComplete({
                             minChars: 0,
@@ -139,27 +140,54 @@
                                 enableparam();
                             }
                         });
-
-                        $('#pnlist').tagsinput({
-                            freeInput: false,
-                            typeahead: {
-                                source: output.pnlist,
-                                minLength: 0,
-                                showHintOnFocus: true,
-                                autoSelect: false,
-                                selectOnBlur: false,
-                                changeInputOnSelect: false,
-                                changeInputOnMove: false,
-                                afterSelect: function (val) {
-                                    this.$element.val("");
-                                }
+                        $('#pnlist').autoComplete({
+                            minChars: 0,
+                            source: function (term, suggest) {
+                                term = term.toLowerCase();
+                                var choices = output.pnlist;
+                                var suggestions = [];
+                                for (i = 0; i < choices.length; i++)
+                                    if (~choices[i].toLowerCase().indexOf(term)) suggestions.push(choices[i]);
+                                suggest(suggestions);
+                            },
+                            onSelect: function (event, term, item) {
+                                enableparam();
                             }
                         });
+                        //$('#pnlist').tagsinput({
+                        //    freeInput: false,
+                        //    typeahead: {
+                        //        source: output.pnlist,
+                        //        minLength: 0,
+                        //        showHintOnFocus: true,
+                        //        autoSelect: false,
+                        //        selectOnBlur: false,
+                        //        changeInputOnSelect: false,
+                        //        changeInputOnMove: false,
+                        //        afterSelect: function (val) {
+                        //            this.$element.val("");
+                        //        }
+                        //    }
+                        //});
 
                         if (output.datasource != '')
                         {
                             $('#databaselist').val(output.datasource);
+
+                            if (output.datasource.indexOf("ATE") != -1) {
+                                $('datatablelable').html('DataSet Name');
+                                $('paramlabel').html('DataField Name');
+                            }
+                            else {
+                                var dbtl = $('datatablelable').html();
+                                if(dbtl.indexOf('DataSet Name') != -1)
+                                {
+                                    $('datatablelable').html('Data Table');
+                                    $('paramlabel').html('Parameter');
+                                }
+                            }
                         }
+
                     });
 
                 $('#mestablelist').attr('readonly', false);
@@ -321,31 +349,49 @@
             var highlimit = $('#highlimit').val();
             var startdate = $('#StartDate').val();
             var enddate = $('#EndDate').val();
+            var pnlist = $('#pnlist').val();
 
-            var pnlist = $.trim($('#pnlist').tagsinput('items'));
-            if (pnlist == '') {
-                pnlist = $.trim($('#pnlist').parent().find('input').eq(0).val());
-                if (pnlist.indexOf(',') != -1)
-                {
-                    alert('Character , should not exist in PN DES!');
+            //var pnlist = $.trim($('#pnlist').tagsinput('items'));
+            //if (pnlist == '') {
+            //    pnlist = $.trim($('#pnlist').parent().find('input').eq(0).val());
+            //    if (pnlist.indexOf(',') != -1)
+            //    {
+            //        alert('Character , should not exist in PN DES!');
+            //        return false;
+            //    }
+            //}
+
+            var databaselist = $('#databaselist').val();
+
+            if (databaselist.indexOf('MES') != -1) {
+                if (pj == ''
+                    || mestab == ''
+                    || param == ''
+                    || (lowlimit == '' && highlimit == '')
+                    || cornid == ''
+                    || startdate == ''
+                    || enddate == ''
+                    || pnlist == '') {
+                    alert('Please complete your query condition!');
+                    return false;
+                }
+            }
+            else {
+                if (pj == ''
+                    || mestab == ''
+                    || param == ''
+                    || startdate == ''
+                    || enddate == ''
+                    || pnlist == '') {
+                    alert('Please complete your query condition!');
                     return false;
                 }
             }
 
-            if (pj == ''
-                || mestab == ''
-                || param == ''
-                || (lowlimit == '' && highlimit == '')
-                || cornid == ''
-                || startdate == ''
-                || enddate == ''
-                || pnlist == '') {
-                alert('Please complete your query condition!');
-                return false;
-            }
+
 
             var allpasslist = $('#allpasslist').val();
-            var databaselist = $('#databaselist').val();
+            
 
             $.post('/DataAnalyze/QueryCPK', {
                 pj: pj,
@@ -435,7 +481,8 @@
                     dashStyle: 'shortdash',
                     width: 2,
                     label: {
-                        text: 'Mean'
+                        text: 'Mean',
+                        verticalAlign:'top'
                     }
                 }, {
                     value: col_data.left3stddev,
@@ -443,7 +490,8 @@
                     dashStyle: 'shortdash',
                     width: 2,
                     label: {
-                        text: '3-sigma'
+                        text: '3-sigma',
+                        verticalAlign: 'top'
                     }
                 }, {
                     value: col_data.right3stddev,
@@ -451,7 +499,8 @@
                     dashStyle: 'shortdash',
                     width: 2,
                     label: {
-                        text: '3-sigma'
+                        text: '3-sigma',
+                        verticalAlign: 'top'
                     }
                 }, {
                     value: col_data.lowbound,
@@ -459,7 +508,8 @@
                     dashStyle: 'shortdash',
                     width: 2,
                     label: {
-                        text: 'low bound'
+                        text: 'low bound',
+                        verticalAlign: 'top'
                     }
                 }, {
                     value: col_data.upperbound,
@@ -467,7 +517,8 @@
                     dashStyle: 'shortdash',
                     width: 2,
                     label: {
-                        text: 'upper bound'
+                        text: 'upper bound',
+                        verticalAlign: 'top'
                     }
                 }]
             },

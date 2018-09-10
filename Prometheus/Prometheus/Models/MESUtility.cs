@@ -1681,7 +1681,7 @@ namespace Prometheus.Models
         {
             var pncond = "";
 
-            var pns = pndesc.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            var pns = pndesc.Split(new string[] { ",",";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
             var pnnumlist = GetPNsFromPNDesc(pns);
             foreach (var pn in pns)
             {

@@ -33,7 +33,7 @@ public class Upload : IHttpHandler {
 
                 fn = Path.GetFileNameWithoutExtension(fn)+"-"+DateTime.Now.ToString("yyyyMMddHHmmss")+Path.GetExtension(fn);
                 fn = fn.Replace(" ", "_").Replace("#", "").Replace("'", "")
-                            .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+                            .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "").Replace(":","");
 
                 uploads.SaveAs(imgdir + fn);
                 url = "/userfiles/images/" +datestring+"/"+ fn;

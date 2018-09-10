@@ -9626,6 +9626,13 @@ namespace Prometheus.Controllers
             return View("HeartBeat");
         }
 
+
+        public ActionResult RefreshATE()
+        {
+            ProjectTestData.PrePareATELatestData("SFPGEN1", this);
+            return View("HeartBeat");
+        }
+
     }
 
 }

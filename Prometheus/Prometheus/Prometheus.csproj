@@ -1341,6 +1341,7 @@
     <Content Include="Views\DataAnalyze\NeoMapDataAnalysis.cshtml" />
     <Content Include="Views\Project\ProjectDebugTreeMind.cshtml" />
     <Content Include="Views\DataAnalyze\CPKAnalysis.cshtml" />
+    <Content Include="Views\DataAnalyze\CPKTool.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

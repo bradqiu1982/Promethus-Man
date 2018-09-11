@@ -1,0 +1,103 @@
+﻿
+@{
+    ViewBag.Title = "CPK Tool";
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
+}
+
+<link type="text/css" rel="stylesheet" href="~/Content/snlatestteststatus.css" />
+<script type="text/javascript" src="~/Scripts/jquery-bootstrap-loading.js"></script>
+<script type="text/javascript" src="~/Scripts/cpkanalysis.js"></script>
+
+<script type="text/javascript">
+    $(function () {
+        CPKANALYSE.toolinit();
+    })
+</script>
+
+<style type="text/css">
+    .bootstrap-tagsinput {
+        width: 100% !important;
+    }
+
+    th, td {
+        text-align: center;
+    }
+</style>
+
+<div class="row" style="margin-top:2%">
+    <ol class="breadcrumb" style="width:600px">
+        <li>Data Analysis</li>
+        <li><a href="/DataAnalyze/CPKAnalysis">Smart CPK</a></li>
+        <li class="active">CPK Tool</li>
+    </ol>
+</div>
+
+<div class="row" style="border-color:gray;height:90%;padding:5px;">
+    <div class="col-xs-4 mark-lists">
+        <div class="marks-title">
+            <span>Please Input Your Raw Data (One Row One Data)</span>
+        </div>
+        <textarea class="form-control marks" id="marks" style="height:87%!important"></textarea>
+        <div class="marks-submit">
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <input class="form-control" placeholder="Low Limit" id="lowlimit" name="lowlimit" type="text">
+                    </div>
+                    <div class="col-xs-6">
+                        <input class="form-control" placeholder="High Limit" id="highlimit" name="highlimit" type="text">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="total-marks label-danger col-xs-3" id="total-marks">0</div>
+                        <div class="col-xs-4">
+                            <input type="button" class="btn btn-warning btn-marks-clean" id="btn-marks-clean" value="Clean">
+                        </div>
+                        <div class="marks-op col-xs-4">
+                            <input type="button" class="btn btn-success btn-marks-submit" id="btn-marks-submit" value="Query">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="col-xs-8 mark-detail">
+        <div class="row" style="margin-left:15px;margin-right:15px;margin-top:15px;">
+            <div class="col-xs-2" MYTP="green" style="font-family:'Arial Narrow';font-size:18px"><strong>&nbsp;&nbsp;Output</strong></div>
+            <div class="col-xs-10">
+                <table class="table  table-condensed" id="mywafertable">
+                    <thead>
+                        <tr>
+                            <th>Normal Distribution</th>
+                            <th>Mean</th>
+                            <th>StdDev</th>
+                            <th>General CPK</th>
+                            <th>Robust CPK</th>
+                            <th>DPPM</th>
+                        </tr>
+                    </thead>
+                    <tbody id="WaferTableID"></tbody>
+                </table>
+            </div>
+
+        </div>
+        <hr style="border-color:#006DC0;" />
+        <div class="row" style="margin-left:15px;margin-right:15px;">
+            <div class="col-xs-1" MYTP="red" style="font-family:'Arial Narrow';font-size:18px"><strong>&nbsp;&nbsp;Chart</strong></div>
+            <div class="col-xs-11">
+                <div class="v-container">
+                    <div class="v-content">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+

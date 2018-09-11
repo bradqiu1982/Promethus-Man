@@ -392,6 +392,15 @@
 
             var allpasslist = $('#allpasslist').val();
             
+            var options = {
+                loadingTips: "Loading Data...",
+                backgroundColor: "#aaa",
+                borderColor: "#fff",
+                opacity: 0.8,
+                borderColor: "#fff",
+                TipsColor: "#000",
+            }
+            $.bootstrapLoading.start(options);
 
             $.post('/DataAnalyze/QueryCPK', {
                 pj: pj,
@@ -407,6 +416,8 @@
                 database: databaselist
             },
             function (output) {
+                $.bootstrapLoading.end();
+
                 $('.cpkoutcla').val('');
                 $('.v-content').empty();
                 $('#sourcedata').attr('href', '#');
@@ -447,7 +458,7 @@
                     });
 
                     $.each(output.chartlist, function (i, val) {
-                         appendstr = '<div class="col-xs-12">' +
+                         var appendstr = '<div class="col-xs-12">' +
                                 '<div class="v-box" id="' + val.id + '"></div>' +
                                 '</div>';
                          $('.v-content').append(appendstr);
@@ -461,6 +472,125 @@
             });
         });
 
+    }
+
+    var tool = function () {
+        var mywafertable = null;
+
+        $('#marks').focus();
+
+        $('body').on('keypress', '#marks', function (e) {
+            if (e.keyCode == 13) {
+                var all_marks = $.trim($(this).val()).split('\n');
+                var cur_marks = new Array();
+                $.each(all_marks, function (i, val) {
+                    if (val != "") {
+                            cur_marks.push(val);
+                    }
+                })
+                $('#total-marks').html(cur_marks.length);
+                $('#marks').val(cur_marks.join('\n'));
+            }
+        })
+
+        function RefreshWaferTable() {
+            var all_marks = $.trim($('#marks').val()).split('\n');
+            var cur_marks = new Array();
+            $.each(all_marks, function (i, val) {
+                if (val != "") {
+                        cur_marks.push(val);
+                }
+            })
+            if (cur_marks.length === 0) {
+                alert("查询条件不可为空！");
+                return false;
+            }
+            var lowlimit = $('#lowlimit').val();
+            var highlimit = $('#highlimit').val();
+            if (lowlimit == '' && highlimit == '')
+            {
+                alert("Please input the limit");
+                return false;
+            }
+
+            $('#marks').val(cur_marks.join('\n'));
+            var options = {
+                loadingTips: "Loading Data...",
+                backgroundColor: "#aaa",
+                borderColor: "#fff",
+                opacity: 0.8,
+                borderColor: "#fff",
+                TipsColor: "#000",
+            }
+            $.bootstrapLoading.start(options);
+            $.post('/DataAnalyze/CPKToolData',
+           {
+               marks: JSON.stringify(cur_marks),
+               lowlimit:lowlimit,
+               highlimit: highlimit
+           }, function (output) {
+               $.bootstrapLoading.end();
+               if (mywafertable) {
+                   mywafertable.destroy();
+               }
+               $("#WaferTableID").empty();
+               $('.v-content').empty();
+
+               if (output.success) {
+
+                   $.each(output.cpklist, function (i, val) {
+                       var appendstr = '<tr>';
+                       appendstr += '<td>' + val.isnormal + '</td>';
+                       appendstr += '<td>' + val.mean + '</td>';
+                       appendstr += '<td>' + val.stddev + '</td>';
+                       appendstr += '<td>' + val.gcpk + '</td>';
+                       appendstr += '<td>' + val.rcpk + '</td>';
+                       appendstr += '<td>' + val.dppm + '</td>';
+                       appendstr += '</tr>';
+                       $("#WaferTableID").append(appendstr);
+                   });
+
+                   $.each(output.chartlist, function (i, val) {
+                       var appendstr = '<div class="col-xs-12">' +
+                              '<div class="v-box" id="' + val.id + '"></div>' +
+                              '</div>';
+                       $('.v-content').append(appendstr);
+                       drawcolumn(val);
+                   })
+               }
+               else {
+                   alert(msg);
+               }
+
+               mywafertable = $('#mywafertable').DataTable({
+                   'iDisplayLength': 50,
+                   'aLengthMenu': [[20, 50, 100, -1],
+                   [20, 50, 100, "All"]],
+                   "aaSorting": [],
+                   "order": [],
+                   dom: 'lBfrtip',
+                   buttons: ['copyHtml5', 'csv', 'excelHtml5']
+               });
+
+           })
+        }
+
+
+        $('body').on('click', '#btn-marks-submit', function () {
+            RefreshWaferTable();
+        })
+
+        $('body').on('click', '#btn-marks-clean', function () {
+            $('#total-marks').html(0);
+            $('#marks').val('');
+
+            if (mywafertable) {
+                mywafertable.destroy();
+                mywafertable = null;
+            }
+            $("#WaferTableID").empty();
+            $('.v-content').empty();
+        })
     }
 
     var drawcolumn = function (col_data) {
@@ -590,6 +720,9 @@
     return {
         init: function () {
             show();
+        },
+        toolinit: function () {
+            tool();
         }
     }
 }();

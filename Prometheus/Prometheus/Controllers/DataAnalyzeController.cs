@@ -5030,8 +5030,8 @@ namespace Prometheus.Controllers
 
                 CPKCache.UpdateCPKParams(pj, mestab, pnlist, param, cornid, lowlimit, highlimit, database);
 
-                var cpkmindata = CPKData.GetCpk(minlist, highlimit, lowlimit)[0];
-                var cpkmaxdata = CPKData.GetCpk(maxlist, highlimit, lowlimit)[0];
+                var cpkmindata = CPKData.GetCpk(minlist, lowlimit, highlimit)[0];
+                var cpkmaxdata = CPKData.GetCpk(maxlist, lowlimit, highlimit)[0];
 
                 var datafrom = "MAX DATASET";
                 var mean = cpkmaxdata.Mean;
@@ -5152,8 +5152,8 @@ namespace Prometheus.Controllers
 
                 CPKCache.UpdateCPKParams(pj, mestab, pnlist, param, cornid, lowlimit, highlimit, database);
 
-                var cpkmindata = CPKData.GetCpk(minlist, highlimit, lowlimit)[0];
-                var cpkmaxdata = CPKData.GetCpk(maxlist, highlimit, lowlimit)[0];
+                var cpkmindata = CPKData.GetCpk(minlist, lowlimit, highlimit)[0];
+                var cpkmaxdata = CPKData.GetCpk(maxlist, lowlimit, highlimit)[0];
 
                 var datafrom = "MAX DATASET";
                 var mean = cpkmaxdata.Mean;
@@ -5242,7 +5242,64 @@ namespace Prometheus.Controllers
             }
         }
 
+        public ActionResult CPKTool()
+        {
+            return View();
+        }
 
+        public JsonResult CPKToolData()
+        {
+            var marks = Request.Form["marks"];
+            List<string> strdatalist = (List<string>)Newtonsoft.Json.JsonConvert.DeserializeObject(marks, (new List<string>()).GetType());
+            var vallist = new List<Double>();
+            foreach (var item in strdatalist)
+            {
+                try {
+                    vallist.Add(Convert.ToDouble(item));
+                } catch(Exception ex) { }
+            }
+            var filterlist = MESUtility.FilterStrangeValue(vallist);
+            if (filterlist.Count <= 50)
+            {
+                var failret = new JsonResult();
+                failret.Data = new {
+                    success = false,
+                    msg = "raw data count is too small to get a correct CPK"
+                };
+                return failret;
+            }
+
+            var lowlimit = Request.Form["lowlimit"];
+            var highlimit = Request.Form["highlimit"];
+
+            var cpk = CPKData.GetCpk(filterlist,lowlimit,highlimit)[0];
+
+            var chartlist = new List<object>();
+            var cpklist = new List<object>();
+
+            var id = "raw_data_id";
+            var title = "Dataset Histogram";
+            chartlist.Add(HistogramChart.GetChartData(id, title, lowlimit, highlimit, filterlist));
+
+            cpklist.Add(new
+            {
+                isnormal = cpk.IsNormalStr,
+                mean = Math.Round(cpk.Mean,5),
+                stddev = Math.Round(cpk.Stdev,5),
+                gcpk = cpk.Cpk_ca,
+                rcpk = cpk.Cpk_robust,
+                dppm = cpk.DPPM
+            });
+
+            var ret = new JsonResult();
+            ret.Data = new
+            {
+                success = true,
+                cpklist = cpklist,
+                chartlist = chartlist
+            };
+            return ret;
+        }
 
     }
 }

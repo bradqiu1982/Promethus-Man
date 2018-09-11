@@ -962,7 +962,7 @@ namespace Prometheus.Models
                              where p.mfr_pn in <pncond> and d.dataset_name = '<DataSetName>' and r.data_name like '<DataFieldName>'  
                              and  d.start_time > '<starttime>' and d.start_time < '<endtime>' 
                              and ( data_val3 like '%<%' or data_val3 like '%>%' ) 
-                              ORDER BY p.MFR_SN,d.start_time desc ) where ROWNUM  <= 500000";
+                              ORDER BY p.MFR_SN,d.start_time desc ) where ROWNUM  <= 1000000";
             if (onlypass)
             {
                 sql = @"select * from ( 
@@ -973,7 +973,7 @@ namespace Prometheus.Models
                              where p.mfr_pn in <pncond> and d.dataset_name = '<DataSetName>' and r.data_name like '<DataFieldName>'  
                              and  d.start_time > '<starttime>' and d.start_time < '<endtime>' 
                              and r.data_val2 = 'PASS' and ( data_val3 like '%<%' or data_val3 like '%>%' ) 
-                              ORDER BY p.MFR_SN,d.start_time desc ) where ROWNUM  <= 500000";
+                              ORDER BY p.MFR_SN,d.start_time desc ) where ROWNUM  <= 1000000";
             }
 
             sql = sql.Replace("<pncond>", pncond).Replace("<DataSetName>", mestab).Replace("<DataFieldName>", param)

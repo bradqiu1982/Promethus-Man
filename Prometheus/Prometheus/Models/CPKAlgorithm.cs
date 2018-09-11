@@ -85,7 +85,7 @@ namespace Prometheus.Models
         }
 
 
-        public static List<CPKData> GetCpk(List<double> rawdata, string highlimit, string lowlimit)
+        public static List<CPKData> GetCpk(List<double> rawdata, string lowlimit, string highlimit)
         {
             if (string.IsNullOrEmpty(highlimit) && string.IsNullOrEmpty(lowlimit))
             {

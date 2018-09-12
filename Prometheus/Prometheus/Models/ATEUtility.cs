@@ -103,7 +103,7 @@ namespace Prometheus.Models
             var whichtestcount = new Dictionary<string, int>();
 
             StringBuilder sb1 = new StringBuilder(300 * (atelist.Count + 1));
-            sb1.Append("SN,WhichTest,Failure,TestTimestamp,Station,Module Family,PN,PN Desc,JO,Spend Time(in hour)\r\n");
+            sb1.Append("SN,WhichTest,Failure,TestTimestamp,Station,Module Family,PN,PN Desc,JO,Spend Time(in hour),DataName\r\n");
             foreach (var item in atelist)
             {
                 var pndesc = "";
@@ -112,9 +112,10 @@ namespace Prometheus.Models
 
                 sb1.Append("\"" + item.ModuleSerialNum.ToString().Replace("\"", "") + "\"," + "\"" + item.WhichTest.Replace("\"", "") + "\"," + "\"" + item.ErrAbbr.Replace("\"", "") + "\","
                     + "\"" + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss") + "\"," + "\"" + item.TestStation.Replace("\"", "") + "\"," + "\"" + item.ModuleType.Replace("\"", "") + "\","
-                    + "\"" + item.PN.Replace("\"", "") + "\"," + "\"" + pndesc.Replace("\"", "") + "\"," + "\"" + item.JO.Replace("\"", "") + "\"," + "\"" + item.CSN.Replace("\"", "") + "\",\r\n");
+                    + "\"" + item.PN.Replace("\"", "") + "\"," + "\"" + pndesc.Replace("\"", "") + "\"," + "\"" + item.JO.Replace("\"", "") + "\"," + "\"" + item.SpendTime.Replace("\"", "") + "\"," 
+                    + "\"" + item.ATEDataName.Replace("\"", "") + "\",\r\n");
 
-                var spendtime = Convert.ToDouble(item.CSN);
+                var spendtime = Convert.ToDouble(item.SpendTime);
                 if (stationdict.ContainsKey(item.TestStation))
                 { stationdict[item.TestStation] = stationdict[item.TestStation] + spendtime; }
                 else
@@ -148,10 +149,43 @@ namespace Prometheus.Models
                 }
             }
 
+            var fsndict = new Dictionary<string, bool>();
+            var failuredict =new Dictionary<string, double>();
+            foreach (var item in atelist)
+            {
+                if (!fsndict.ContainsKey(item.ModuleSerialNum))
+                {
+                    fsndict.Add(item.ModuleSerialNum, true);
+
+                    if (!string.IsNullOrEmpty(item.ATEDataName))
+                    {
+                        if (failuredict.ContainsKey(item.ATEDataName))
+                        {
+                            failuredict[item.ATEDataName] += 1.0;
+                        }
+                        else
+                        {
+                            failuredict.Add(item.ATEDataName, 1.0);
+                        }
+                    }//end if
+
+                }//end if
+            }//end foreach
+
+            if (failuredict.Count > 0)
+            {
+                sb1.Append("\"Failure Rate\",\r\n");
+                foreach (var kv in failuredict)
+                {
+                    sb1.Append("\"" + kv.Key.Replace("\"", "") + "\"," + "\"" + (kv.Value.ToString()+"#"+ fsndict.Count.ToString()).Replace("\"", "") + "\","
+                        + "\"" + Math.Round(kv.Value/(double)fsndict.Count*100,2).ToString().Replace("\"", "")+"%" + "\",\r\n");
+                }
+            }
+
             return sb1;
         }
 
-        private static List<ProjectTestData> RetrieveValidATETestData(string pjname,List<List<object>> dbret, Dictionary<string, bool> pndict, Controller ctrl)
+        private static List<ProjectTestData> RetrieveValidATETestData(string pjname,List<List<object>> dbret, Dictionary<string, bool> pndict, Controller ctrl,bool withdataname=false)
         {
             var ret = new List<ProjectTestData>();
 
@@ -236,7 +270,7 @@ namespace Prometheus.Models
                                     //    {
                                             var testdata = new ProjectTestData(pjname, temppjdatalist[0].DataID, temppjdatalist[0].ModuleSerialNum, wt, temppjdatalist[0].ModuleType
                                                 , "PASS", temppjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), temppjdatalist[0].TestStation, temppjdatalist[0].PN);
-                                            testdata.CSN = (Math.Round(hours, 3)).ToString();
+                                            testdata.SpendTime = (Math.Round(hours, 3)).ToString();
                                             testdata.JO = temppjdatalist[0].JO;
                                             ret.Add(testdata);
                                     //    }
@@ -245,7 +279,7 @@ namespace Prometheus.Models
                                     //{
                                     //    var testdata = new ProjectTestData(pjname, temppjdatalist[0].DataID, temppjdatalist[0].ModuleSerialNum,wt, temppjdatalist[0].ModuleType
                                     //        , "PASS", temppjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), temppjdatalist[0].TestStation, temppjdatalist[0].PN);
-                                    //    testdata.CSN = (Math.Round(hours,3)).ToString();
+                                    //    testdata.SpendTime = (Math.Round(hours,3)).ToString();
                                     //    testdata.JO = temppjdatalist[0].JO;
                                     //    ret.Add(testdata);
                                     //}
@@ -255,8 +289,10 @@ namespace Prometheus.Models
                                 
                                     var testdata = new ProjectTestData(pjname, errid, temppjdatalist[0].ModuleSerialNum, temppjdatalist[0].WhichTest.ToUpper().Replace("_SETUP", ""), temppjdatalist[0].ModuleType
                                         , err, temppjdatalist[0].TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), temppjdatalist[0].TestStation, temppjdatalist[0].PN);
-                                    testdata.CSN = (Math.Round(hours, 3)).ToString();
+                                    testdata.SpendTime = (Math.Round(hours, 3)).ToString();
                                     testdata.JO = temppjdatalist[0].JO;
+                                    if (withdataname)
+                                    { testdata.ATEDataName = FailDataNameStr(errid); }
                                     ret.Add(testdata);
                                 }
                             }//end if hour != 0.0
@@ -286,17 +322,17 @@ namespace Prometheus.Models
 
         }
 
-        public static List<ProjectTestData> RetrieveATEData(string family,DateTime startdate,DateTime enddate,Dictionary<string,bool> pndict,Controller ctrl)
+        public static List<ProjectTestData> RetrieveATEData(string family,DateTime startdate,DateTime enddate,Dictionary<string,bool> pndict,Controller ctrl,bool withdataname=true)
         {
             var sql = @"SELECT a.MFR_SN,d.DATASET_NAME,c.FAMILY,d.STATUS,d.END_TIME,d.STATION,a.MFR_PN,d.ROUTE_ID,d.dataset_id,b.JOB_ID FROM PARTS a   
                         INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX  
                         INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID 
                         INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID   
-                        WHERE c.FAMILY = '<family>' and d.END_TIME >= '<starttime>' and d.END_TIME <= '<endtime>' AND b.state <> 'GOLDEN' ORDER BY a.MFR_SN,d.END_TIME ASC";
+                        WHERE c.FAMILY = '<family>' and d.start_time >= '<starttime>' and d.start_time <= '<endtime>' AND b.state <> 'GOLDEN' ORDER BY a.MFR_SN,d.start_time ASC";
             sql = sql.Replace("<family>", family).Replace("<starttime>", startdate.ToString("yyyyMMddHHmmss")).Replace("<endtime>", enddate.ToString("yyyyMMddHHmmss"));
 
             var dbret = DBUtility.ExeATESqlWithRes(sql);
-            return RetrieveValidATETestData("TEMP",dbret,pndict,ctrl);
+            return RetrieveValidATETestData("TEMP",dbret,pndict,ctrl, withdataname);
 
         }
 
@@ -309,7 +345,7 @@ namespace Prometheus.Models
             if (rawdata.Count > 0)
             {
                 var allpndict = new Dictionary<string, bool>();
-                var previousdata = ATEUtility.RetrieveATEData(mdtype, sdate.AddMonths(-2), sdate, allpndict,ctrl);
+                var previousdata = ATEUtility.RetrieveATEData(mdtype, sdate.AddMonths(-2), sdate, allpndict,ctrl,false);
                 var filterdict = new Dictionary<string, bool>();
                 foreach (var item in previousdata)
                 {
@@ -367,7 +403,7 @@ namespace Prometheus.Models
                     var s  = @"SELECT a.MFR_SN,d.DATASET_NAME,c.FAMILY,d.STATUS,d.END_TIME,d.STATION,a.MFR_PN,d.ROUTE_ID,d.dataset_id,b.JOB_ID FROM PARTS a 
                                 INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID 
                                 INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID 
-                                WHERE <mdcond> and d.END_TIME > '<TIMECOND>'  AND b.state <> 'GOLDEN'  ORDER BY a.MFR_SN,d.END_TIME ASC";
+                                WHERE <mdcond> and d.start_time > '<TIMECOND>'  AND b.state <> 'GOLDEN'  ORDER BY a.MFR_SN,d.start_time ASC";
                     
                     var sql = s.Replace("<TIMECOND>", vm.StartDate.ToString("yyyyMMddhhmmss")).Replace("<mdcond>", mdcond);
 
@@ -605,7 +641,7 @@ namespace Prometheus.Models
                     var s = @"SELECT a.MFR_SN,d.DATASET_NAME,c.FAMILY,d.STATUS,d.END_TIME,d.STATION,a.MFR_PN,d.ROUTE_ID,d.dataset_id,b.JOB_ID FROM PARTS a 
                             INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX 
                             INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID 
-                            INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID WHERE <mdcond> and d.END_TIME > '<TIMECOND>'  AND b.state <> 'GOLDEN'  ORDER BY a.MFR_SN,d.END_TIME ASC";
+                            INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID WHERE <mdcond> and d.start_time > '<TIMECOND>'  AND b.state <> 'GOLDEN'  ORDER BY a.MFR_SN,d.start_time ASC";
 
                     var sql = s.Replace("<TIMECOND>", DateTime.Parse(starttime).ToString("yyyyMMddhhmmss")).Replace("<mdcond>", mdcond);
 
@@ -840,6 +876,18 @@ namespace Prometheus.Models
             }
 
             return ret;
+        }
+
+        private static string FailDataNameStr(string datasetid)
+        {
+            var sql = "select * from(select data_name from route_data where dataset_id = '<DataSetID>' AND data_val2 = 'FAIL') where rownum <= 1";
+            sql = sql.Replace("<DataSetID>", datasetid);
+            var dbret = DBUtility.ExeATESqlWithRes(sql);
+            if (dbret.Count > 0)
+            {
+                return Convert.ToString(dbret[0][0]);
+            }
+            return "";
         }
 
         private static void CreateSystemIssues(List<ProjectTestData> failurelist, bool transflg = false)

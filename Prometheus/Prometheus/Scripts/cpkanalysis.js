@@ -124,7 +124,7 @@
                     {
                         if ($('#mestablelist').data('autocomplete') || $('#mestablelist').data('uiAutocomplete')) {
                             $('#mestablelist').autoComplete("destroy");
-                            $('#pnlist').autoComplete("pnlist");
+                            $('#pnlist').autoComplete("destroy");
                         }
                         $('#mestablelist').autoComplete({
                             minChars: 0,
@@ -175,15 +175,15 @@
                             $('#databaselist').val(output.datasource);
 
                             if (output.datasource.indexOf("ATE") != -1) {
-                                $('datatablelable').html('DataSet Name');
-                                $('paramlabel').html('DataField Name');
+                                $('#datatablelable').text('DataSet Name');
+                                $('#paramlabel').text('DataField Name');
                             }
                             else {
-                                var dbtl = $('datatablelable').html();
+                                var dbtl = $('#datatablelable').text();
                                 if(dbtl.indexOf('DataSet Name') != -1)
                                 {
-                                    $('datatablelable').html('Data Table');
-                                    $('paramlabel').html('Parameter');
+                                    $('#datatablelable').text('Data Table');
+                                    $('#paramlabel').text('Parameter');
                                 }
                             }
                         }

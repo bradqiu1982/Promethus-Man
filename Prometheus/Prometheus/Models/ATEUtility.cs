@@ -1013,7 +1013,7 @@ namespace Prometheus.Models
                     {
                         try
                         {
-                            datawithname.Add(new KeyValuePair<string, string>(Convert.ToString(line[1]), Convert.ToString(line[4])));
+                            datawithname.Add(new KeyValuePair<string, string>(Convert.ToString(line[1]), Convert.ToString(line[4])+","+ Convert.ToString(line[0])));
                         }
                         catch (Exception ex) { }
                     }

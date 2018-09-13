@@ -87,7 +87,8 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static bool IsSeniorEmployee(string machine, string username)
+
+        public static bool IsLxEmployee(string machine, string username,int x)
         {
             var sql = "select machine,username,level from machineusermap where machine = '<machine>' ";
             sql = sql.Replace("<machine>", machine);
@@ -112,7 +113,7 @@ namespace Prometheus.Models
                     if (!string.IsNullOrEmpty(level) && level.Length > 1)
                     {
                         var lv = Convert.ToInt32(level.Substring(1));
-                        if (lv >= 7 || lv == 0)
+                        if (lv >= x || lv == 0)
                         {
                             return true;
                         }

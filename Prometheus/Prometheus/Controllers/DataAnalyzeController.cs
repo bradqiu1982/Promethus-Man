@@ -224,11 +224,14 @@ namespace Prometheus.Controllers
             }
             string IP = Request.UserHostName;
             string compName = DetermineCompName(IP);
-            if (!MachineUserMap.IsSeniorEmployee(compName, username))
+            if (!MachineUserMap.IsLxEmployee(compName, username,8))
             {
                 return RedirectToAction("UserCenter", "User");
             }
+            LogVM.WriteLog(username.ToUpper(), "ALL", compName,
+                                   "/DataAnalyze/ShipmentData", "DataAnalyze", "View", "", LogType.Default, Log4NetLevel.Warn, "ShipmentData");
 
+            ViewBag.IsL9Employee = MachineUserMap.IsLxEmployee(compName, username, 9);
             return View();
         }
 
@@ -545,6 +548,19 @@ namespace Prometheus.Controllers
 
         public ActionResult DownloadShipmentData(string sdate,string edate)
         {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var username = "";
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+                username = ckdict["logonuser"].Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0];
+            }
+            string IP = Request.UserHostName;
+            string compName = DetermineCompName(IP);
+            if (!MachineUserMap.IsLxEmployee(compName, username, 9))
+            {
+                return RedirectToAction("UserCenter", "User");
+            }
+
             string datestring = DateTime.Now.ToString("yyyyMMdd");
             string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
             if (!System.IO.Directory.Exists(imgdir))
@@ -559,11 +575,27 @@ namespace Prometheus.Controllers
             PrepareShipmentData(fw,sdate,edate);
             fw.Close();
 
+            LogVM.WriteLog(username.ToUpper(), "ALL", compName,
+                       "/DataAnalyze/DownloadShipmentData", "DataAnalyze", "DownLoad", "", LogType.Default, Log4NetLevel.Warn, "DownloadShipmentData");
+
             return File(filename, "application/vnd.ms-excel", fn);
         }
 
         public ActionResult VcselRMA(string rate)
         {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            var username = "";
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+                username = ckdict["logonuser"].Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries)[0];
+            }
+            string IP = Request.UserHostName;
+            string compName = DetermineCompName(IP);
+            if (!MachineUserMap.IsLxEmployee(compName, username, 7))
+            {
+                return RedirectToAction("UserCenter", "User");
+            }
+
             var defval = " ";
             if (!string.IsNullOrEmpty(rate))
             { defval = rate; }
@@ -574,6 +606,9 @@ namespace Prometheus.Controllers
             ratelist.AddRange(rlist);
 
             ViewBag.vcselratelist = CreateSelectList(ratelist, defval);
+
+            LogVM.WriteLog(username.ToUpper(), "ALL", compName,
+                                   "/DataAnalyze/VcselRMA", "DataAnalyze", "View", "", LogType.Default, Log4NetLevel.Warn, "VcselRMA");
 
             return View();
         }

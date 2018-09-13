@@ -141,27 +141,27 @@
                         },
                         text: 'Full Screen'
                     },
-                    exportdata: {
-                        onclick: function () {
-                            var filename = col_data.title + '.csv';
-                            var outputCSV = ' ,Customer,Ship QTY\r\n';
-                            $(col_data.xAxis.data).each(function (i, val) {
-                                $(col_data.data).each(function () {
-                                    if (this.name != '' && (this.data[i] != 0 || this.name.indexOf('DPPM')>=0)) {
-                                        outputCSV += val + "," + this.name + "," + this.data[i] + ",\r\n";
-                                    }
-                                });
-                            })
-                            var blobby = new Blob([outputCSV], { type: 'text/csv;chartset=utf-8' });
-                            $(exportLink).attr({
-                                'download': filename,
-                                'href': window.URL.createObjectURL(blobby),
-                                'target': '_blank'
-                            });
-                            exportLink.click();
-                        },
-                        text: 'Export Data'
-                    },
+                    //exportdata: {
+                    //    onclick: function () {
+                    //        var filename = col_data.title + '.csv';
+                    //        var outputCSV = ' ,Customer,Ship QTY\r\n';
+                    //        $(col_data.xAxis.data).each(function (i, val) {
+                    //            $(col_data.data).each(function () {
+                    //                if (this.name != '' && (this.data[i] != 0 || this.name.indexOf('DPPM')>=0)) {
+                    //                    outputCSV += val + "," + this.name + "," + this.data[i] + ",\r\n";
+                    //                }
+                    //            });
+                    //        })
+                    //        var blobby = new Blob([outputCSV], { type: 'text/csv;chartset=utf-8' });
+                    //        $(exportLink).attr({
+                    //            'download': filename,
+                    //            'href': window.URL.createObjectURL(blobby),
+                    //            'target': '_blank'
+                    //        });
+                    //        exportLink.click();
+                    //    },
+                    //    text: 'Export Data'
+                    //},
                     datalabel: {
                         onclick: function () {
                             var labelflag = !this.series[0].options.dataLabels.enabled;
@@ -198,7 +198,7 @@
                 },
                 buttons: {
                     contextButton: {
-                        menuItems: ['fullscreen', 'exportdata', 'datalabel', 'copycharts', 'printChart', 'separator', 'downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
+                        menuItems: ['fullscreen', 'datalabel', 'copycharts', 'printChart', 'separator', 'downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
                     }
                 }
             }
@@ -255,27 +255,27 @@
                         },
                         text: 'Full Screen'
                     },
-                    exportdata: {
-                        onclick: function () {
-                            var filename = col_data.title + '.csv';
-                            var outputCSV = ' ,Customer,Order QTY\r\n';
-                            $(col_data.xAxis.data).each(function (i, val) {
-                                $(col_data.data).each(function () {
-                                    if (this.name != '' && (this.data[i] != 0 || this.name.indexOf('DPPM') >= 0)) {
-                                        outputCSV += val + "," + this.name + "," + this.data[i] + ",\r\n";
-                                    }
-                                });
-                            })
-                            var blobby = new Blob([outputCSV], { type: 'text/csv;chartset=utf-8' });
-                            $(exportLink).attr({
-                                'download': filename,
-                                'href': window.URL.createObjectURL(blobby),
-                                'target': '_blank'
-                            });
-                            exportLink.click();
-                        },
-                        text: 'Export Data'
-                    },
+                    //exportdata: {
+                    //    onclick: function () {
+                    //        var filename = col_data.title + '.csv';
+                    //        var outputCSV = ' ,Customer,Order QTY\r\n';
+                    //        $(col_data.xAxis.data).each(function (i, val) {
+                    //            $(col_data.data).each(function () {
+                    //                if (this.name != '' && (this.data[i] != 0 || this.name.indexOf('DPPM') >= 0)) {
+                    //                    outputCSV += val + "," + this.name + "," + this.data[i] + ",\r\n";
+                    //                }
+                    //            });
+                    //        })
+                    //        var blobby = new Blob([outputCSV], { type: 'text/csv;chartset=utf-8' });
+                    //        $(exportLink).attr({
+                    //            'download': filename,
+                    //            'href': window.URL.createObjectURL(blobby),
+                    //            'target': '_blank'
+                    //        });
+                    //        exportLink.click();
+                    //    },
+                    //    text: 'Export Data'
+                    //},
                     datalabel: {
                         onclick: function () {
                             var labelflag = !this.series[0].options.dataLabels.enabled;
@@ -312,7 +312,7 @@
                 },
                 buttons: {
                     contextButton: {
-                        menuItems: ['fullscreen', 'exportdata', 'datalabel', 'copycharts', 'printChart', 'separator', 'downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
+                        menuItems: ['fullscreen', 'datalabel', 'copycharts', 'printChart', 'separator', 'downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
                     }
                 }
             }

@@ -1412,8 +1412,7 @@ namespace Prometheus.Models
                 && vm.PNList.Count > 0)
             {
 
-                var failurelist = new List<ProjectTestData>();
-                var passlist = new List<ProjectTestData>();
+                var dataidlist = new List<string>();
 
                 bool bondinged = false;
                 if (ProjectTestData.RetrieveLatestTimeOfLocalProject(vm.ProjectKey) != null)
@@ -1442,7 +1441,7 @@ namespace Prometheus.Models
                         starttime = realstarttime;
                     }
 
-                    var sndict = new Dictionary<string, bool>();
+                    
                     var sql = s.Value.Replace("<TIMECOND>", "and TestTimeStamp > '" + starttime + "' and TestTimeStamp < '"+ endtime + "'");
                     //var sql = s.Value.Replace("<TIMECOND>", "and TestTimeStamp > '" + starttime + "' and TestTimeStamp < '" + DateTime.Parse(starttime).AddDays(3).ToString("yyyy-MM-dd HH:mm:ss") + "'");
                     var dbret = DBUtility.ExeMESSqlWithRes(sql);
@@ -1464,25 +1463,9 @@ namespace Prometheus.Models
                             if (!bondinged)
                             {
                                 tempdata.StoreProjectTestData();
+                                dataidlist.Add(tempdata.DataID);
 
-                                if (!sndict.ContainsKey(tempdata.ModuleSerialNum))
-                                {
-                                    sndict.Add(tempdata.ModuleSerialNum, true);
-                                    if (string.Compare(tempdata.ErrAbbr, "PASS", true) != 0)
-                                    {
-                                        var ekey = ProjectErrorViewModels.GetUniqKey();
-                                        var pjerror = new ProjectErrorViewModels(vm.ProjectKey, ekey, tempdata.ErrAbbr, "", 1);
-                                        pjerror.Reporter = "System";
-                                        pjerror.Description = "";
-                                        pjerror.AddandUpdateProjectError();
 
-                                        failurelist.Add(tempdata);
-                                    }
-                                    else
-                                    {
-                                        passlist.Add(tempdata);
-                                    }
-                                }
                             }
                             else
                             {
@@ -1491,58 +1474,72 @@ namespace Prometheus.Models
                                     bondingeddatadict.Add(tempdata.DataID,true);
 
                                     tempdata.StoreProjectTestData();
+                                    dataidlist.Add(tempdata.DataID);
 
-                                    if (!sndict.ContainsKey(tempdata.ModuleSerialNum))
-                                    {
-                                        sndict.Add(tempdata.ModuleSerialNum, true);
-                                        if (string.Compare(tempdata.ErrAbbr, "PASS", true) != 0)
-                                        {
-                                            var ekey = ProjectErrorViewModels.GetUniqKey();
-                                            var pjerror = new ProjectErrorViewModels(vm.ProjectKey, ekey, tempdata.ErrAbbr, "", 1);
-                                            pjerror.Reporter = "System";
-                                            pjerror.Description = "";
-                                            pjerror.AddandUpdateProjectError();
-
-                                            failurelist.Add(tempdata);
-                                        }
-                                        else
-                                        {
-                                            passlist.Add(tempdata);
-                                        }
-                                    }
                                 }
                             }
                         }
                         catch (Exception ex)
                         { }
                     }
-                }
+                }//end foreach
 
-                if (vm.FinishRating < 90 && DateTime.Parse(starttime) != vm.StartDate)
+                if (dataidlist.Count > 0)
                 {
-                    //use latest failure cover previous failure
-                    foreach (var item in failurelist)
+                    var failurelist = new List<ProjectTestData>();
+                    var passlist = new List<ProjectTestData>();
+                    var sndict = new Dictionary<string, bool>();
+
+                    var rawdata = ProjectTestData.RetrieveProjectTestDataByDataIDList(dataidlist);
+                    foreach (var tempdata in rawdata)
                     {
-                        IssueViewModels.CloseIssueAutomaticllyWithFailedSN(item.ProjectKey, item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), ctrl);
+                        if (!sndict.ContainsKey(tempdata.ModuleSerialNum))
+                        {
+                            sndict.Add(tempdata.ModuleSerialNum, true);
+                            if (string.Compare(tempdata.ErrAbbr, "PASS", true) != 0)
+                            {
+                                var ekey = ProjectErrorViewModels.GetUniqKey();
+                                var pjerror = new ProjectErrorViewModels(vm.ProjectKey, ekey, tempdata.ErrAbbr, "", 1);
+                                pjerror.Reporter = "System";
+                                pjerror.Description = "";
+                                pjerror.AddandUpdateProjectError();
+
+                                failurelist.Add(tempdata);
+                            }
+                            else
+                            {
+                                passlist.Add(tempdata);
+                            }
+                        }//end if
+                    }//end foreach
+
+
+                    if (vm.FinishRating < 90 && DateTime.Parse(starttime) != vm.StartDate)
+                    {
+                        //use latest failure cover previous failure
+                        foreach (var item in failurelist)
+                        {
+                            IssueViewModels.CloseIssueAutomaticllyWithFailedSN(item.ProjectKey, item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), ctrl);
+                        }
+
+                        CreateSystemIssues(failurelist, ctrl, true, !string.IsNullOrEmpty(vm.TransferFlg));
+                    }
+                    else
+                    {
+                        CreateSystemIssues(failurelist, ctrl, false);
                     }
 
-                    CreateSystemIssues(failurelist, ctrl, true, !string.IsNullOrEmpty(vm.TransferFlg));
-                }
-                else
-                {
-                    CreateSystemIssues(failurelist, ctrl, false);
-                }
-
-                if (vm.FinishRating < 90 && DateTime.Parse(starttime) != vm.StartDate)
-                {
-                    //use pass sn cover previous failure
-                    foreach (var item in passlist)
+                    if (vm.FinishRating < 90 && DateTime.Parse(starttime) != vm.StartDate)
                     {
-                        IssueViewModels.CloseIssueAutomaticlly(item.ProjectKey,item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), ctrl);
-                    }
-                }
+                        //use pass sn cover previous failure
+                        foreach (var item in passlist)
+                        {
+                            IssueViewModels.CloseIssueAutomaticlly(item.ProjectKey,item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), ctrl);
+                        }
+                    }                    
+                }//end if
                 
-            }
+            }//end if
 
 
             }

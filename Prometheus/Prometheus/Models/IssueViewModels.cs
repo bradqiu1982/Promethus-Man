@@ -3821,76 +3821,92 @@ namespace Prometheus.Models
 
         public static void CloseIssueAutomaticlly(string pjkey, string SN, string whichtest, string tester, string datestr, Controller ctrl)
         {
-            var issues = IssueViewModels.RRetrieveFABySN(pjkey, SN, whichtest, ctrl);
-            foreach (var tobedata in issues)
+            try
             {
-                bool customercomm = false;
-                foreach (var item in tobedata.CommentList)
+                var issues = IssueViewModels.RRetrieveFABySN(pjkey, SN, whichtest, ctrl);
+                foreach (var tobedata in issues)
                 {
-                    if (string.Compare(item.Reporter, "system", true) != 0)
+                    bool customercomm = false;
+                    foreach (var item in tobedata.CommentList)
                     {
-                        customercomm = true;
-                        break;
+                        if (string.Compare(item.Reporter, "system", true) != 0)
+                        {
+                            customercomm = true;
+                            break;
+                        }
                     }
-                }
 
-                if (!customercomm)
-                {
-                    tobedata.Resolution = Resolute.AutoClose;
-                    tobedata.Description = "Module " + SN + " passed " + whichtest + " test @" + tester + " @" + datestr;
-                    tobedata.UpdateIssue();
-                    tobedata.CloseIssue();
-                    if (!string.IsNullOrEmpty(tobedata.ErrAbbr))
+                    if (!customercomm)
                     {
-                        ProjectErrorViewModels.UpdateProjectAutoCloseCount(1, tobedata.ProjectKey, tobedata.ErrAbbr);
-                    }
-                }
+                        var sourcedata = ProjectTestData.RetrieveProjectTestData(tobedata.IssueKey);
+                        if (sourcedata.Count > 0 && (DateTime.Parse(datestr) > sourcedata[0].TestTimeStamp))
+                        {
+                            tobedata.Resolution = Resolute.AutoClose;
+                            tobedata.Description = "Module " + SN + " passed " + whichtest + " test @" + tester + " @" + datestr;
+                            tobedata.UpdateIssue();
+                            tobedata.CloseIssue();
+                            if (!string.IsNullOrEmpty(tobedata.ErrAbbr))
+                            {
+                                ProjectErrorViewModels.UpdateProjectAutoCloseCount(1, tobedata.ProjectKey, tobedata.ErrAbbr);
+                            }
+                        }//end if
+                    }//end if
+                }//end foreach
             }
+            catch (Exception ex) { }
         }
 
         public static void CloseIssueAutomaticllyWithFailedSN(string pjkey, string SN, string whichtest, string tester, string datestr, Controller ctrl)
         {
-            var issues = IssueViewModels.RRetrieveFABySN(pjkey, SN, whichtest, ctrl);
-            foreach (var tobedata in issues)
+            try
             {
-                bool customercomm = false;
-                foreach (var item in tobedata.CommentList)
+                var issues = IssueViewModels.RRetrieveFABySN(pjkey, SN, whichtest, ctrl);
+                foreach (var tobedata in issues)
                 {
-                    if (string.Compare(item.Reporter, "system", true) != 0)
+                    bool customercomm = false;
+                    foreach (var item in tobedata.CommentList)
                     {
-                        customercomm = true;
-                        break;
+                        if (string.Compare(item.Reporter, "system", true) != 0)
+                        {
+                            customercomm = true;
+                            break;
+                        }
                     }
-                }
 
-                if (!customercomm)
-                {
-                    tobedata.Resolution = Resolute.AutoClose;
-                    tobedata.Description = "Module " + SN + " faild for " + whichtest + " test @" + tester + " @" + datestr + " again";
-                    tobedata.UpdateIssue();
-                    tobedata.CloseIssue();
-                    if (!string.IsNullOrEmpty(tobedata.ErrAbbr))
+                    if (!customercomm)
                     {
-                        ProjectErrorViewModels.UpdateProjectAutoCloseCount(1, tobedata.ProjectKey, tobedata.ErrAbbr);
-                    }
-                }
+                        var sourcedata = ProjectTestData.RetrieveProjectTestData(tobedata.IssueKey);
+                        if (sourcedata.Count > 0 && (DateTime.Parse(datestr) > sourcedata[0].TestTimeStamp))
+                        {
+                            tobedata.Resolution = Resolute.AutoClose;
+                            tobedata.Description = "Module " + SN + " faild for " + whichtest + " test @" + tester + " @" + datestr + " again";
+                            tobedata.UpdateIssue();
+                            tobedata.CloseIssue();
+                            if (!string.IsNullOrEmpty(tobedata.ErrAbbr))
+                            {
+                                ProjectErrorViewModels.UpdateProjectAutoCloseCount(1, tobedata.ProjectKey, tobedata.ErrAbbr);
+                            }
+                        }//end if
+                    }//end if
+                }//end foreach
             }
+            catch (Exception ex) { }
         }
 
         public static void CloseDupIssueAutomaticlly(string pjkey, string SN, string datestr)
         {
-            var issues = IssueViewModels.RRetrieveDupFABySN(pjkey, SN, datestr);
-            foreach (var tobedata in issues)
-            {
-                tobedata.Resolution = Resolute.AutoClose;
-                tobedata.Description = "Module " + SN + " is closed automaticlly for duplication reason " + " @" + DateTime.Now.ToString();
-                tobedata.UpdateIssue();
-                tobedata.CloseIssue();
-                if (!string.IsNullOrEmpty(tobedata.ErrAbbr))
-                {
-                    ProjectErrorViewModels.UpdateProjectAutoCloseCount(1, tobedata.ProjectKey, tobedata.ErrAbbr);
-                }
-            }
+            //var issues = IssueViewModels.RRetrieveDupFABySN(pjkey, SN, datestr);
+            //foreach (var tobedata in issues)
+            //{
+            //    tobedata.Resolution = Resolute.AutoClose;
+            //    tobedata.Description = "Module " + SN + " is closed automaticlly for duplication reason " + " @" + DateTime.Now.ToString();
+            //    tobedata.UpdateIssue();
+            //    tobedata.CloseIssue();
+            //    if (!string.IsNullOrEmpty(tobedata.ErrAbbr))
+            //    {
+            //        ProjectErrorViewModels.UpdateProjectAutoCloseCount(1, tobedata.ProjectKey, tobedata.ErrAbbr);
+            //    }
+            //}
         }
 
         public static void CloseBIIssueAutomaticlly(List<BITestData> passlist)

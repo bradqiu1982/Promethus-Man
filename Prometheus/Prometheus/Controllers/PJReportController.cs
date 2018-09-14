@@ -231,7 +231,7 @@ namespace Prometheus.Controllers
                 //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
 
                 var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ParetoChart.xml"));
-                ViewBag.rparetoscript = tempscript.Replace("#ElementID#", "rparetochart")
+                ViewBag.snparetoscript = tempscript.Replace("#ElementID#", "rparetochart")
                     .Replace("#Title#", "Pareto of Final Defect")
                     .Replace("#XAxisTitle#", "Defect")
                     .Replace("#ChartxAxisValues#", ChartxAxisValues)
@@ -243,7 +243,7 @@ namespace Prometheus.Controllers
             }
             else
             {
-                ViewBag.rparetoscript = string.Empty;
+                ViewBag.snparetoscript = string.Empty;
             }
         }
 
@@ -505,18 +505,18 @@ namespace Prometheus.Controllers
                     if (string.Compare(reptype, PJReportType.MonthlyPareto) == 0)
                     {
                         MonthlyPareto(pjkey);
-                        if (!string.IsNullOrEmpty(this.ViewBag.rparetoscript))
+                        if (!string.IsNullOrEmpty(this.ViewBag.snparetoscript))
                         {
                             if (pjreportdict.ContainsKey(pjkey))
                             {
-                                pjreportdict[pjkey].MonthlyPareto = ViewBag.rparetoscript.Replace("rparetochart", pjkey + "rparetochart");
-                                ViewBag.rparetoscript = null;
+                                pjreportdict[pjkey].MonthlyPareto = ViewBag.snparetoscript.Replace("rparetochart", pjkey + "rparetochart");
+                                ViewBag.snparetoscript = null;
                             }
                             else
                             {
                                 var reportitem = new PJReportItem();
-                                reportitem.MonthlyPareto = ViewBag.rparetoscript.Replace("rparetochart", pjkey + "rparetochart");
-                                ViewBag.rparetoscript = null;
+                                reportitem.MonthlyPareto = ViewBag.snparetoscript.Replace("rparetochart", pjkey + "rparetochart");
+                                ViewBag.snparetoscript = null;
                                 pjreportdict.Add(pjkey, reportitem);
                             }
                         }

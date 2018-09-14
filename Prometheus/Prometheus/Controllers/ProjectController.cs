@@ -2872,6 +2872,80 @@ namespace Prometheus.Controllers
             return View();
         }
 
+        private List<object> RetrievePieChartFromYieldVM(List<TestYield> testyield, Dictionary<string, TestDataErrorSum> errormap,string reurl,string id,string title,string serialname)
+        {
+            var ret = new List<object>();
+
+            var piedatadict = new Dictionary<string, int>();
+            var eklist = new List<string>();
+            foreach (var error in errormap.Keys)
+            {
+                eklist.Add(error);
+            }
+
+            foreach (var error in eklist)
+            {
+                if (string.Compare(error, "PASS", true) != 0)
+                {
+                    foreach (var test in testyield)
+                    {
+                        var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, errormap);
+
+                        if (piedatadict.ContainsKey(error))
+                        {
+                            var preval = piedatadict[error];
+                            piedatadict[error] = preval + val;
+                        }
+                        else
+                        {
+                            piedatadict.Add(error, val);
+                        }
+                    }
+                }
+            }
+
+            List<KeyValuePair<string,int>> paretosrcdata = piedatadict.ToList();
+            ret.Add(paretosrcdata);
+
+            var errorkeylist = new List<string>();
+
+            //piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", testyield[testyield.Count - 1].WhichTest, errormap);
+            if (piedatadict.Count > 0)
+            {
+                var namevaluepair = "";
+                var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
+                foreach (var item in piedatadict_tmp)
+                {
+                    if (item.Value > 0)
+                    {
+                        namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
+                        errorkeylist.Add(item.Key);
+                    }
+                }
+
+                ret.Add(errorkeylist);
+
+                namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
+
+                var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart4FF.xml"));
+                tempscript = tempscript.Replace("#ElementID#", id)
+                    .Replace("#Title#", title)
+                    .Replace("#SERIESNAME#", serialname)
+                    .Replace("#REDIRECTURL#", reurl)
+                    .Replace("#NAMEVALUEPAIRS#", namevaluepair);
+
+                ret.Add(tempscript);
+            }
+            else
+            {
+                ret.Add(errorkeylist);
+                ret.Add("");
+            }
+
+            return ret;
+
+        }
+
         public ActionResult ProjectWYieldDetail(string ProjectKey, string EndDate, string Weeks)
         {
             ViewBag.Weeks = Weeks;
@@ -2897,13 +2971,13 @@ namespace Prometheus.Controllers
                 ViewBag.sDate = Convert.ToDateTime(sdate).ToString("yyyy-MM-dd"); ;
                 ViewBag.eDate = Convert.ToDateTime(edate).ToString("yyyy-MM-dd"); ;
 
-                var firstdatalist = new List<KeyValuePair<string, int>>();
-                var retestdatalist = new List<KeyValuePair<string, int>>();
-                var fytestdatalist = new List<KeyValuePair<string, int>>();
+                var firstparetodatalist = new List<KeyValuePair<string, int>>();
+                var snparetodatalist = new List<KeyValuePair<string, int>>();
+                var fyparetodatalist = new List<KeyValuePair<string, int>>();
 
                 ViewBag.ferrorkeylist = new List<string>();
-                ViewBag.rerrorkeylist = new List<string>();
                 ViewBag.snerrorkeylist = new List<string>();
+                ViewBag.fyerrorkeylist = new List<string>();
 
                 var pvmlist = ProjectViewModels.RetrieveOneProject(ProjectKey);
                 if (pvmlist.Count == 0) { return View(); }
@@ -2912,196 +2986,66 @@ namespace Prometheus.Controllers
 
                 if (yieldvm.FirstYields.Count > 0)
                 {
-                    var piedatadict = new Dictionary<string, int>();
-                    var eklist = new List<string>();
-                    foreach (var error in yieldvm.FErrorMap.Keys)
-                    {
-                        eklist.Add(error);
-                    }
-
-                    foreach (var error in eklist)
-                    {
-                        if (string.Compare(error, "PASS", true) != 0)
-                        {
-                            foreach (var test in yieldvm.FirstYields)
-                            {
-                                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.FErrorMap);
-
-                                if (piedatadict.ContainsKey(error))
-                                {
-                                    var preval = piedatadict[error];
-                                    piedatadict[error] = preval + val;
-                                }
-                                else
-                                {
-                                    piedatadict.Add(error, val);
-                                }
-                            }
-                        }
-                    }
-
-                    firstdatalist = piedatadict.ToList();
-
-
-
-                    piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.FirstYields[yieldvm.FirstYields.Count - 1].WhichTest, yieldvm.FErrorMap);
-
-                    if(piedatadict.Count > 0)
-                    {
-                        
-                        var namevaluepair = "";
-                        var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
-                        foreach(var item in piedatadict_tmp)
-                        {
-                            if(item.Value > 0)
-                            {
-                                namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
-                                ViewBag.ferrorkeylist.Add(item.Key);
-                            }
-                        }
-                        namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                        var reurl = "window.location.href = '/Project/ProjectTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
-                        reurl += "+'&StartDate=" + ViewBag.sDate + "&EndDate=" + ViewBag.eDate + "&Type=FirstFailure'";
-                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart4FF.xml"));
-                        ViewBag.fchartscript = tempscript.Replace("#ElementID#", "ffailurepie")
-                            .Replace("#Title#", "First Failure")
-                            .Replace("#SERIESNAME#", "FFailure")
-                            .Replace("#REDIRECTURL#", reurl)
-                            .Replace("#NAMEVALUEPAIRS#", namevaluepair);
-                    }
+                    var reurl = "window.location.href = '/Project/ProjectTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
+                    reurl += "+'&StartDate=" + ViewBag.sDate + "&EndDate=" + ViewBag.eDate + "&Type=FirstFailure'";
+                    var pieret = RetrievePieChartFromYieldVM(yieldvm.FirstYields, yieldvm.FErrorMap, reurl, "ffailurepie", "First Failure", "FFailure");
+                    firstparetodatalist = (List<KeyValuePair<string, int>>) pieret[0];
+                    ViewBag.ferrorkeylist = (List<string>)pieret[1];
+                    ViewBag.fchartscript = (string)pieret[2];
                 }
-
 
                 if (yieldvm.SNYields.Count > 0)
                 {
-                    var piedatadict = new Dictionary<string, int>();
-                    var eklist = new List<string>();
-                    foreach (var error in yieldvm.SNErrorMap.Keys)
-                    {
-                        eklist.Add(error);
-                    }
+                    var reurl = "window.location.href = '/Project/ProjectSNTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
+                    reurl += "+'&StartDate=" + ViewBag.sDate + "&EndDate=" + ViewBag.eDate + "&Type=SNFailure'";
 
-                    foreach (var error in eklist)
-                    {
-                        if (string.Compare(error, "PASS", true) != 0)
-                        {
-                            foreach (var test in yieldvm.SNYields)
-                            {
-                                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.SNErrorMap);
-
-                                if (piedatadict.ContainsKey(error))
-                                {
-                                    var preval = piedatadict[error];
-                                    piedatadict[error] = preval + val;
-                                }
-                                else
-                                {
-                                    piedatadict.Add(error, val);
-                                }
-                            }
-                        }
-                    }
-
-                    retestdatalist = piedatadict.ToList();
-
-                    piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.SNYields[yieldvm.SNYields.Count - 1].WhichTest, yieldvm.SNErrorMap);
-                    if (piedatadict.Count > 0)
-                    {
-                        
-                        var namevaluepair = "";
-                        var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
-                        foreach (var item in piedatadict_tmp)
-                        {
-                            if (item.Value > 0)
-                            {
-                                namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
-                                ViewBag.snerrorkeylist.Add(item.Key);
-                            }
-                        }
-                        namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-                        var reurl = "window.location.href = '/Project/ProjectSNTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
-                        reurl += "+'&StartDate=" + ViewBag.sDate + "&EndDate=" + ViewBag.eDate + "&Type=SNFailure'";
-                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart4FF.xml"));
-                        ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
-                            .Replace("#Title#", "Cumm Failure")
-                            .Replace("#SERIESNAME#", "SNFailure")
-                            .Replace("#REDIRECTURL#", reurl)
-                            .Replace("#NAMEVALUEPAIRS#", namevaluepair);
-                    }
+                    var pieret = RetrievePieChartFromYieldVM(yieldvm.SNYields, yieldvm.SNErrorMap, reurl, "snfailurepie", "Cumm Failure", "SNFailure");
+                    snparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
+                    ViewBag.snerrorkeylist = (List<string>)pieret[1];
+                    ViewBag.snchartscript = (string)pieret[2];
                 }
 
                 if (yieldvm.LastYields.Count > 0)
                 {
-                    var piedatadict = new Dictionary<string, int>();
-                    var eklist = new List<string>();
-                    foreach (var error in yieldvm.LErrorMap.Keys)
-                    {
-                        eklist.Add(error);
-                    }
+                    var reurl = "window.location.href = '/Project/ProjectTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
+                    reurl += "+'&StartDate=" + ViewBag.sDate + "&EndDate=" + ViewBag.eDate + "&Type=FinalFailure'";
 
-                    foreach (var error in eklist)
-                    {
-                        if (string.Compare(error, "PASS", true) != 0)
-                        {
-                            foreach (var test in yieldvm.LastYields)
-                            {
-                                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.LErrorMap);
-
-                                if (piedatadict.ContainsKey(error))
-                                {
-                                    var preval = piedatadict[error];
-                                    piedatadict[error] = preval + val;
-                                }
-                                else
-                                {
-                                    piedatadict.Add(error, val);
-                                }
-                            }
-                        }
-                    }
-
-                    fytestdatalist = piedatadict.ToList();
-                    piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.LastYields[yieldvm.LastYields.Count - 1].WhichTest, yieldvm.LErrorMap);
-
-                    if(piedatadict.Count > 0)
-                    {
-                        
-                        var namevaluepair = "";
-                        var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
-                        foreach(var item in piedatadict_tmp)
-                        {
-                            if(item.Value > 0)
-                            {
-                                namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
-                                ViewBag.rerrorkeylist.Add(item.Key);
-                            }
-                        }
-                        namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-                        var reurl = "window.location.href = '/Project/ProjectTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
-                        reurl += "+'&StartDate=" + ViewBag.sDate + "&EndDate=" + ViewBag.eDate + "&Type=FinalFailure'";
-                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart4FF.xml"));
-                        ViewBag.fychartscript = tempscript.Replace("#ElementID#", "fyfailurepie")
-                            .Replace("#Title#", "Final Failure")
-                            .Replace("#SERIESNAME#", "RFailure")
-                            .Replace("#REDIRECTURL#", reurl)
-                            .Replace("#NAMEVALUEPAIRS#", namevaluepair);
-                    }
+                    var pieret = RetrievePieChartFromYieldVM(yieldvm.LastYields, yieldvm.LErrorMap, reurl, "fyfailurepie", "Final Failure", "FYFailure");
+                    fyparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
+                    ViewBag.fyerrorkeylist = (List<string>)pieret[1];
+                    ViewBag.fychartscript = (string)pieret[2];
                 }
 
-                if (firstdatalist.Count > 0)
+
+
+                if (firstparetodatalist.Count > 0)
                 {
-                    firsttestparetofun(firstdatalist, ProjectKey, sdate.ToString(), edate.ToString());
+                    firsttestparetofun(firstparetodatalist, ProjectKey, sdate.ToString(), edate.ToString());
                 }
 
-                if (retestdatalist.Count > 0)
+                if (snparetodatalist.Count > 0)
                 {
-                    retestparetofun(retestdatalist, ProjectKey, sdate.ToString(), edate.ToString());
+                    sntestparetofun(snparetodatalist, ProjectKey, sdate.ToString(), edate.ToString());
                 }
 
-                if (fytestdatalist.Count > 0)
+                if (fyparetodatalist.Count > 0)
                 {
-                    fytparetofun(fytestdatalist, ProjectKey, sdate.ToString(), edate.ToString());
+                    fytparetofun(fyparetodatalist, ProjectKey, sdate.ToString(), edate.ToString());
+                }
+
+                var realtimeparetodatalist = new List<KeyValuePair<string, int>>();
+                ViewBag.rlterrorkeylist = new List<string>();
+                if (yieldvm.RealTimeYields.Count > 0)
+                {
+                    var reurl = "window.location.href = '#'";
+                    var pieret = RetrievePieChartFromYieldVM(yieldvm.RealTimeYields, yieldvm.RLTErrorMap, reurl, "rltfailurepie", "RealTime Failure", "RealTimeFailure");
+                    realtimeparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
+                    ViewBag.rlterrorkeylist = (List<string>)pieret[1];
+                    ViewBag.rltchartscript = (string)pieret[2];
+                }
+                if (realtimeparetodatalist.Count > 0)
+                {
+                    rltparetofun(realtimeparetodatalist, ProjectKey, sdate.ToString(), edate.ToString());
                 }
 
                 return View(yieldvm);
@@ -3668,9 +3612,9 @@ namespace Prometheus.Controllers
                 var sdate = edate.AddDays(-1);
                 ViewBag.sDate = Convert.ToDateTime(sdate).ToString("yyyy-MM-dd");
                 ViewBag.eDate = Convert.ToDateTime(edate).ToString("yyyy-MM-dd");
-                var firstdatalist = new List<KeyValuePair<string, int>>();
-                var retestdatalist = new List<KeyValuePair<string, int>>();
-                var fytestdatalist = new List<KeyValuePair<string, int>>();
+                var firstparetodatalist = new List<KeyValuePair<string, int>>();
+                var snparetodatalist = new List<KeyValuePair<string, int>>();
+                var fyparetodatalist = new List<KeyValuePair<string, int>>();
 
                 var pvmlist = ProjectViewModels.RetrieveOneProject(ProjectKey);
                 if (pvmlist.Count == 0) { return View(); }
@@ -3678,203 +3622,70 @@ namespace Prometheus.Controllers
                 var yieldvm = ProjectYieldViewModule.GetYieldByDateRange(ProjectKey, sdate.ToString(), edate.ToString(), pvm, HttpContext.Cache);
 
                     ViewBag.ferrorkeylist = new List<string>();
-                    ViewBag.rerrorkeylist = new List<string>();
+                    ViewBag.fyerrorkeylist = new List<string>();
                     ViewBag.snerrorkeylist = new List<string>();
 
                 if (yieldvm.FirstYields.Count > 0)
                 {
-                    var piedatadict = new Dictionary<string, int>();
-                    var eklist = new List<string>();
-                    foreach (var error in yieldvm.FErrorMap.Keys)
-                    {
-                        eklist.Add(error);
-                    }
-
-                    foreach (var error in eklist)
-                    {
-                        if (string.Compare(error, "PASS", true) != 0)
-                        {
-                            foreach (var test in yieldvm.FirstYields)
-                            {
-                                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.FErrorMap);
-
-                                if (piedatadict.ContainsKey(error))
-                                {
-                                    var preval = piedatadict[error];
-                                    piedatadict[error] = preval + val;
-                                }
-                                else
-                                {
-                                    piedatadict.Add(error, val);
-                                }
-                            }
-                        }
-                    }
-
-                    firstdatalist = piedatadict.ToList();
-
-                    piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.FirstYields[yieldvm.FirstYields.Count - 1].WhichTest, yieldvm.FErrorMap);
-
-                    if (piedatadict.Count > 0)
-                    {
-                        var namevaluepair = "";
-                        var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
-                        foreach(var item in piedatadict_tmp)
-                        {
-                            if(item.Value > 0)
-                            {
-                                namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
-                                ViewBag.ferrorkeylist.Add(item.Key);
-                            }
-                        }
-                        namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                        var reurl = "window.location.href = '/Project/ProjectTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
-                        reurl += "+'&StartDate=" + ViewBag.sDate + "&EndDate=" + ViewBag.eDate + "&Type=FirstFailure'";
-
-                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart4FF.xml"));
-                        ViewBag.fchartscript = tempscript.Replace("#ElementID#", "ffailurepie")
-                            .Replace("#Title#", "First Failure")
-                            .Replace("#SERIESNAME#", "FFailure")
-                            .Replace("#REDIRECTURL#", reurl)
-                            .Replace("#NAMEVALUEPAIRS#", namevaluepair);
-                    }
-
+                    var reurl = "window.location.href = '/Project/ProjectTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
+                    reurl += "+'&StartDate=" + ViewBag.sDate + "&EndDate=" + ViewBag.eDate + "&Type=FirstFailure'";
+                    var pieret = RetrievePieChartFromYieldVM(yieldvm.FirstYields, yieldvm.FErrorMap, reurl, "ffailurepie", "First Failure", "FFailure");
+                    firstparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
+                    ViewBag.ferrorkeylist = (List<string>)pieret[1];
+                    ViewBag.fchartscript = (string)pieret[2];
                 }
-
 
                 if (yieldvm.SNYields.Count > 0)
                 {
-                    var piedatadict = new Dictionary<string, int>();
-                    var eklist = new List<string>();
-                    foreach (var error in yieldvm.SNErrorMap.Keys)
-                    {
-                        eklist.Add(error);
-                    }
+                    var reurl = "window.location.href = '/Project/ProjectSNTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
+                    reurl += "+'&StartDate=" + ViewBag.sDate + "&EndDate=" + ViewBag.eDate + "&Type=SNFailure'";
 
-                    foreach (var error in eklist)
-                    {
-                        if (string.Compare(error, "PASS", true) != 0)
-                        {
-                            foreach (var test in yieldvm.SNYields)
-                            {
-                                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.SNErrorMap);
-
-                                if (piedatadict.ContainsKey(error))
-                                {
-                                    var preval = piedatadict[error];
-                                    piedatadict[error] = preval + val;
-                                }
-                                else
-                                {
-                                    piedatadict.Add(error, val);
-                                }
-                            }
-                        }
-                    }
-
-                    retestdatalist = piedatadict.ToList();
-
-                    piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.SNYields[yieldvm.SNYields.Count - 1].WhichTest, yieldvm.SNErrorMap);
-
-                    if(piedatadict.Count > 0)
-                    {
-                        var namevaluepair = "";
-                        var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
-                        foreach(var item in piedatadict_tmp)
-                        {
-                            if(item.Value > 0)
-                            {
-                                namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
-                                ViewBag.snerrorkeylist.Add(item.Key);
-                            }
-                        }
-                        namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                        var reurl = "window.location.href = '/Project/ProjectSNTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
-                        reurl += "+'&StartDate=" + ViewBag.sDate + "&EndDate=" + ViewBag.eDate + "&Type=SNFailure'";
-
-                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart4FF.xml"));
-                        ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
-                            .Replace("#Title#", "Cumm Failure")
-                            .Replace("#SERIESNAME#", "SNFailure")
-                            .Replace("#REDIRECTURL#", reurl)
-                            .Replace("#NAMEVALUEPAIRS#", namevaluepair);
-                    }
+                    var pieret = RetrievePieChartFromYieldVM(yieldvm.SNYields, yieldvm.SNErrorMap, reurl, "snfailurepie", "Cumm Failure", "SNFailure");
+                    snparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
+                    ViewBag.snerrorkeylist = (List<string>)pieret[1];
+                    ViewBag.snchartscript = (string)pieret[2];
                 }
 
                 if (yieldvm.LastYields.Count > 0)
                 {
-                    var piedatadict = new Dictionary<string, int>();
-                    var eklist = new List<string>();
-                    foreach (var error in yieldvm.LErrorMap.Keys)
-                    {
-                        eklist.Add(error);
-                    }
+                    var reurl = "window.location.href = '/Project/ProjectTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
+                    reurl += "+'&StartDate=" + ViewBag.sDate + "&EndDate=" + ViewBag.eDate + "&Type=FinalFailure'";
 
-                    foreach (var error in eklist)
-                    {
-                        if (string.Compare(error, "PASS", true) != 0)
-                        {
-                            foreach (var test in yieldvm.LastYields)
-                            {
-                                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.LErrorMap);
-
-                                if (piedatadict.ContainsKey(error))
-                                {
-                                    var preval = piedatadict[error];
-                                    piedatadict[error] = preval + val;
-                                }
-                                else
-                                {
-                                    piedatadict.Add(error, val);
-                                }
-                            }
-                        }
-                    }
-
-                    fytestdatalist = piedatadict.ToList();
-                    piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.LastYields[yieldvm.LastYields.Count - 1].WhichTest, yieldvm.LErrorMap);
-
-                    if (piedatadict.Count > 0)
-                    {
-                        var namevaluepair = "";
-                        var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
-                        foreach (var item in piedatadict_tmp)
-                        {
-                            if (item.Value > 0)
-                            {
-                                namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
-                                ViewBag.rerrorkeylist.Add(item.Key);
-                            }
-                        }
-                        namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                        var reurl = "window.location.href = '/Project/ProjectTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
-                        reurl += "+'&StartDate=" + ViewBag.sDate + "&EndDate=" + ViewBag.eDate + "&Type=FinalFailure'";
-
-                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart4FF.xml"));
-                        ViewBag.fychartscript = tempscript.Replace("#ElementID#", "fyfailurepie")
-                            .Replace("#Title#", "Final Failure")
-                            .Replace("#SERIESNAME#", "RFailure")
-                            .Replace("#REDIRECTURL#", reurl)
-                            .Replace("#NAMEVALUEPAIRS#", namevaluepair);
-                    }
+                    var pieret = RetrievePieChartFromYieldVM(yieldvm.LastYields, yieldvm.LErrorMap, reurl, "fyfailurepie", "Final Failure", "FYFailure");
+                    fyparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
+                    ViewBag.fyerrorkeylist = (List<string>)pieret[1];
+                    ViewBag.fychartscript = (string)pieret[2];
                 }
 
-                if (firstdatalist.Count > 0)
+
+                if (firstparetodatalist.Count > 0)
                 {
-                    firsttestparetofun(firstdatalist, ProjectKey, sdate.ToString(), edate.ToString());
+                    firsttestparetofun(firstparetodatalist, ProjectKey, sdate.ToString(), edate.ToString());
                 }
 
-                if (retestdatalist.Count > 0)
+                if (snparetodatalist.Count > 0)
                 {
-                    retestparetofun(retestdatalist, ProjectKey, sdate.ToString(), edate.ToString());
+                    sntestparetofun(snparetodatalist, ProjectKey, sdate.ToString(), edate.ToString());
                 }
 
-                if (fytestdatalist.Count > 0)
+                if (fyparetodatalist.Count > 0)
                 {
-                    fytparetofun(fytestdatalist, ProjectKey, sdate.ToString(), edate.ToString());
+                    fytparetofun(fyparetodatalist, ProjectKey, sdate.ToString(), edate.ToString());
+                }
+
+                var realtimeparetodatalist = new List<KeyValuePair<string, int>>();
+                ViewBag.rlterrorkeylist = new List<string>();
+                if (yieldvm.RealTimeYields.Count > 0)
+                {
+                    var reurl = "window.location.href = '#'";
+                    var pieret = RetrievePieChartFromYieldVM(yieldvm.RealTimeYields, yieldvm.RLTErrorMap, reurl, "rltfailurepie", "RealTime Failure", "RealTimeFailure");
+                    realtimeparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
+                    ViewBag.rlterrorkeylist = (List<string>)pieret[1];
+                    ViewBag.rltchartscript = (string)pieret[2];
+                }
+                if (realtimeparetodatalist.Count > 0)
+                {
+                    rltparetofun(realtimeparetodatalist, ProjectKey, sdate.ToString(), edate.ToString());
                 }
 
                 return View(yieldvm);
@@ -3906,12 +3717,12 @@ namespace Prometheus.Controllers
                 ViewBag.sDate = Convert.ToDateTime(sdate).ToString("yyyy-MM-dd");
                 ViewBag.eDate = Convert.ToDateTime(edate).ToString("yyyy-MM-dd");
 
-                var firstdatalist = new List<KeyValuePair<string, int>>();
-                var retestdatalist = new List<KeyValuePair<string, int>>();
-                var fytestdatalist = new List<KeyValuePair<string, int>>();
+                var firstparetodatalist = new List<KeyValuePair<string, int>>();
+                var snparetodatalist = new List<KeyValuePair<string, int>>();
+                var fyparetodatalist = new List<KeyValuePair<string, int>>();
 
                 ViewBag.ferrorkeylist = new List<string>();
-                ViewBag.rerrorkeylist = new List<string>();
+                ViewBag.fyerrorkeylist = new List<string>();
                 ViewBag.snerrorkeylist = new List<string>();
 
                 var pvmlist = ProjectViewModels.RetrieveOneProject(ProjectKey);
@@ -3922,200 +3733,64 @@ namespace Prometheus.Controllers
 
                 if (yieldvm.FirstYields.Count > 0)
                 {
-                    var piedatadict = new Dictionary<string, int>();
-                    var eklist = new List<string>();
-                    foreach (var error in yieldvm.FErrorMap.Keys)
-                    {
-                        eklist.Add(error);
-                    }
-
-                    foreach (var error in eklist)
-                    {
-                        if (string.Compare(error, "PASS", true) != 0)
-                        {
-                            foreach (var test in yieldvm.FirstYields)
-                            {
-                                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.FErrorMap);
-
-                                if (piedatadict.ContainsKey(error))
-                                {
-                                    var preval = piedatadict[error];
-                                    piedatadict[error] = preval + val;
-                                }
-                                else
-                                {
-                                    piedatadict.Add(error, val);
-                                }
-                            }
-                        }
-                    }
-
-                    firstdatalist = piedatadict.ToList();
-
-                    piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.FirstYields[yieldvm.FirstYields.Count - 1].WhichTest, yieldvm.FErrorMap);
-
-                    if (piedatadict.Count > 0)
-                    {
-                        var namevaluepair = "";
-                        var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
-                        foreach (var item in piedatadict_tmp)
-                        {
-                            if (item.Value > 0)
-                            {
-                                namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
-                                ViewBag.ferrorkeylist.Add(item.Key);
-                            }
-                        }
-
-                        namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                        var reurl = "window.location.href = '/Project/ProjectTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
-                        reurl += "+'&StartDate=" + ViewBag.sDate + "&EndDate=" + ViewBag.eDate + "&Type=FirstFailure'";
-                        
-                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart4FF.xml"));
-                        ViewBag.fchartscript = tempscript.Replace("#ElementID#", "ffailurepie")
-                            .Replace("#Title#", "First Failure")
-                            .Replace("#SERIESNAME#", "FFailure")
-                            .Replace("#REDIRECTURL#", reurl)
-                            .Replace("#NAMEVALUEPAIRS#", namevaluepair);
-                    }
+                    var reurl = "window.location.href = '/Project/ProjectTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
+                    reurl += "+'&StartDate=" + ViewBag.sDate + "&EndDate=" + ViewBag.eDate + "&Type=FirstFailure'";
+                    var pieret = RetrievePieChartFromYieldVM(yieldvm.FirstYields, yieldvm.FErrorMap, reurl, "ffailurepie", "First Failure", "FFailure");
+                    firstparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
+                    ViewBag.ferrorkeylist = (List<string>)pieret[1];
+                    ViewBag.fchartscript = (string)pieret[2];
                 }
-
 
                 if (yieldvm.SNYields.Count > 0)
                 {
-                    var piedatadict = new Dictionary<string, int>();
-                    var eklist = new List<string>();
-                    foreach (var error in yieldvm.SNErrorMap.Keys)
-                    {
-                        eklist.Add(error);
-                    }
+                    var reurl = "window.location.href = '/Project/ProjectSNTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
+                    reurl += "+'&StartDate=" + ViewBag.sDate + "&EndDate=" + ViewBag.eDate + "&Type=SNFailure'";
 
-                    foreach (var error in eklist)
-                    {
-                        if (string.Compare(error, "PASS", true) != 0)
-                        {
-                            foreach (var test in yieldvm.SNYields)
-                            {
-                                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.SNErrorMap);
-
-                                if (piedatadict.ContainsKey(error))
-                                {
-                                    var preval = piedatadict[error];
-                                    piedatadict[error] = preval + val;
-                                }
-                                else
-                                {
-                                    piedatadict.Add(error, val);
-                                }
-                            }
-                        }
-                    }
-
-                    retestdatalist = piedatadict.ToList();
-
-                    piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.SNYields[yieldvm.SNYields.Count - 1].WhichTest, yieldvm.SNErrorMap);
-                    if (piedatadict.Count > 0)
-                    {
-                        var namevaluepair = "";
-                        var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
-                        foreach (var item in piedatadict_tmp)
-                        {
-                            if (item.Value > 0)
-                            {
-                                namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
-                                ViewBag.snerrorkeylist.Add(item.Key);
-                            }
-                        }
-                        namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                        var reurl = "window.location.href = '/Project/ProjectSNTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
-                        reurl += "+'&StartDate=" + ViewBag.sDate + "&EndDate=" + ViewBag.eDate + "&Type=SNFailure'";
-                        
-                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart4FF.xml"));
-                        ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
-                            .Replace("#Title#", "Cumm Failure")
-                            .Replace("#SERIESNAME#", "SNFailure")
-                            .Replace("#REDIRECTURL#", reurl)
-                            .Replace("#NAMEVALUEPAIRS#", namevaluepair);
-
-                    }
+                    var pieret = RetrievePieChartFromYieldVM(yieldvm.SNYields, yieldvm.SNErrorMap, reurl, "snfailurepie", "Cumm Failure", "SNFailure");
+                    snparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
+                    ViewBag.snerrorkeylist = (List<string>)pieret[1];
+                    ViewBag.snchartscript = (string)pieret[2];
                 }
 
                 if (yieldvm.LastYields.Count > 0)
                 {
-                    var piedatadict = new Dictionary<string, int>();
-                    var eklist = new List<string>();
-                    foreach (var error in yieldvm.LErrorMap.Keys)
-                    {
-                        eklist.Add(error);
-                    }
+                    var reurl = "window.location.href = '/Project/ProjectTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
+                    reurl += "+'&StartDate=" + ViewBag.sDate + "&EndDate=" + ViewBag.eDate + "&Type=FinalFailure'";
 
-                    foreach (var error in eklist)
-                    {
-                        if (string.Compare(error, "PASS", true) != 0)
-                        {
-                            foreach (var test in yieldvm.LastYields)
-                            {
-                                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.LErrorMap);
-
-                                if (piedatadict.ContainsKey(error))
-                                {
-                                    var preval = piedatadict[error];
-                                    piedatadict[error] = preval + val;
-                                }
-                                else
-                                {
-                                    piedatadict.Add(error, val);
-                                }
-                            }
-                        }
-                    }
-
-                    fytestdatalist = piedatadict.ToList();
-                    piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.LastYields[yieldvm.LastYields.Count - 1].WhichTest, yieldvm.LErrorMap);
-
-                    if (piedatadict.Count > 0)
-                    {
-                        var namevaluepair = "";
-                        var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
-                        foreach (var item in piedatadict_tmp)
-                        {
-                            if (item.Value > 0)
-                            {
-                                namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
-                                ViewBag.rerrorkeylist.Add(item.Key);
-                            }
-                        }
-
-                        namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                        var reurl = "window.location.href = '/Project/ProjectTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
-                        reurl += "+'&StartDate=" + ViewBag.sDate + "&EndDate=" + ViewBag.eDate + "&Type=FinalFailure'";
-
-                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart4FF.xml"));
-                        ViewBag.fychartscript = tempscript.Replace("#ElementID#", "fyfailurepie")
-                            .Replace("#Title#", "Final Failure")
-                            .Replace("#SERIESNAME#", "RFailure")
-                            .Replace("#REDIRECTURL#", reurl)
-                            .Replace("#NAMEVALUEPAIRS#", namevaluepair);
-
-                    }
+                    var pieret = RetrievePieChartFromYieldVM(yieldvm.LastYields, yieldvm.LErrorMap, reurl, "fyfailurepie", "Final Failure", "FYFailure");
+                    fyparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
+                    ViewBag.fyerrorkeylist = (List<string>)pieret[1];
+                    ViewBag.fychartscript = (string)pieret[2];
                 }
 
-                if (firstdatalist.Count > 0)
+                if (firstparetodatalist.Count > 0)
                 {
-                    firsttestparetofun(firstdatalist, ProjectKey, sdate.ToString(), edate.ToString());
+                    firsttestparetofun(firstparetodatalist, ProjectKey, sdate.ToString(), edate.ToString());
                 }
 
-                if (retestdatalist.Count > 0)
+                if (snparetodatalist.Count > 0)
                 {
-                    retestparetofun(retestdatalist, ProjectKey, sdate.ToString(), edate.ToString());
+                    sntestparetofun(snparetodatalist, ProjectKey, sdate.ToString(), edate.ToString());
                 }
 
-                if (fytestdatalist.Count > 0)
+                if (fyparetodatalist.Count > 0)
                 {
-                    fytparetofun(fytestdatalist, ProjectKey, sdate.ToString(), edate.ToString());
+                    fytparetofun(fyparetodatalist, ProjectKey, sdate.ToString(), edate.ToString());
+                }
+
+                var realtimeparetodatalist = new List<KeyValuePair<string, int>>();
+                ViewBag.rlterrorkeylist = new List<string>();
+                if (yieldvm.RealTimeYields.Count > 0)
+                {
+                    var reurl = "window.location.href = '#'";
+                    var pieret = RetrievePieChartFromYieldVM(yieldvm.RealTimeYields, yieldvm.RLTErrorMap, reurl, "rltfailurepie", "RealTime Failure", "RealTimeFailure");
+                    realtimeparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
+                    ViewBag.rlterrorkeylist = (List<string>)pieret[1];
+                    ViewBag.rltchartscript = (string)pieret[2];
+                }
+                if (realtimeparetodatalist.Count > 0)
+                {
+                    rltparetofun(realtimeparetodatalist, ProjectKey, sdate.ToString(), edate.ToString());
                 }
 
                 return View(yieldvm);
@@ -4295,213 +3970,77 @@ namespace Prometheus.Controllers
                 var vmlist = ProjectYieldViewModule.GetYieldByBRNum(ProjectKey, CurrentBR, pvm, HttpContext.Cache, BRType);
                 if (vmlist.Count > 0)
                 {
-                    var firstdatalist = new List<KeyValuePair<string, int>>();
-                    var retestdatalist = new List<KeyValuePair<string, int>>();
-                    var fytestdatalist = new List<KeyValuePair<string, int>>();
+                    var firstparetodatalist = new List<KeyValuePair<string, int>>();
+                    var snparetodatalist = new List<KeyValuePair<string, int>>();
+                    var fyparetodatalist = new List<KeyValuePair<string, int>>();
 
                     ViewBag.ferrorkeylist = new List<string>();
-                    ViewBag.rerrorkeylist = new List<string>();
+                    ViewBag.fyerrorkeylist = new List<string>();
                     ViewBag.snerrorkeylist = new List<string>();
 
                     var yieldvm = vmlist[0];
 
                     if (yieldvm.FirstYields.Count > 0)
                     {
-                        var piedatadict = new Dictionary<string, int>();
-                        var eklist = new List<string>();
-                        foreach (var error in yieldvm.FErrorMap.Keys)
-                        {
-                            eklist.Add(error);
-                        }
-
-                        foreach (var error in eklist)
-                        {
-                            if (string.Compare(error, "PASS", true) != 0)
-                            {
-                                foreach (var test in yieldvm.FirstYields)
-                                {
-                                    var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.FErrorMap);
-
-                                    if (piedatadict.ContainsKey(error))
-                                    {
-                                        var preval = piedatadict[error];
-                                        piedatadict[error] = preval + val;
-                                    }
-                                    else
-                                    {
-                                        piedatadict.Add(error, val);
-                                    }
-                                }
-                            }
-                        }
-
-                        firstdatalist = piedatadict.ToList();
-
-                        piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.FirstYields[yieldvm.FirstYields.Count - 1].WhichTest, yieldvm.FErrorMap);
-                        if (piedatadict.Count > 0)
-                        {
-                            var namevaluepair = "";
-                            var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
-                            foreach (var item in piedatadict_tmp)
-                            {
-                                if (item.Value > 0)
-                                {
-                                    namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
-                                    ViewBag.ferrorkeylist.Add(item.Key);
-                                }
-                            }
-
-                            namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                            var reurl = "window.location.href = '/Project/ProjectBRTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
-                            reurl += "+'&BRNUM=" + ViewBag.BRNUM + "&BRType=" + ViewBag.BRType + "&Type=FirstFailure'";
-
-                            var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart4FF.xml"));
-                            ViewBag.fchartscript = tempscript.Replace("#ElementID#", "ffailurepie")
-                                .Replace("#Title#", "First Failure")
-                                .Replace("#SERIESNAME#", "FFailure")
-                                .Replace("#REDIRECTURL#", reurl)
-                                .Replace("#NAMEVALUEPAIRS#", namevaluepair);
-
-                        }
+                        var reurl = "window.location.href = '/Project/ProjectBRTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
+                        reurl += "+'&BRNUM=" + ViewBag.BRNUM + "&BRType=" + ViewBag.BRType + "&Type=FirstFailure'";
+                        var pieret = RetrievePieChartFromYieldVM(yieldvm.FirstYields, yieldvm.FErrorMap, reurl, "ffailurepie", "First Failure", "FFailure");
+                        firstparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
+                        ViewBag.ferrorkeylist = (List<string>)pieret[1];
+                        ViewBag.fchartscript = (string)pieret[2];
                     }
-
 
                     if (yieldvm.SNYields.Count > 0)
                     {
-                        var piedatadict = new Dictionary<string, int>();
-                        var eklist = new List<string>();
-                        foreach (var error in yieldvm.SNErrorMap.Keys)
-                        {
-                            eklist.Add(error);
-                        }
+                        var reurl = "window.location.href = '/Project/ProjectBRTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
+                        reurl += "+'&BRNUM=" + ViewBag.BRNUM + "&BRType=" + ViewBag.BRType + "&Type=SNFailure'";
 
-                        foreach (var error in eklist)
-                        {
-                            if (string.Compare(error, "PASS", true) != 0)
-                            {
-                                foreach (var test in yieldvm.SNYields)
-                                {
-                                    var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.SNErrorMap);
-
-                                    if (piedatadict.ContainsKey(error))
-                                    {
-                                        var preval = piedatadict[error];
-                                        piedatadict[error] = preval + val;
-                                    }
-                                    else
-                                    {
-                                        piedatadict.Add(error, val);
-                                    }
-                                }
-                            }
-                        }
-
-                        retestdatalist = piedatadict.ToList();
-
-                        piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.SNYields[yieldvm.SNYields.Count - 1].WhichTest, yieldvm.SNErrorMap);
-                        if (piedatadict.Count > 0)
-                        {
-                            var namevaluepair = "";
-                            var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
-                            foreach (var item in piedatadict_tmp)
-                            {
-                                if (item.Value > 0)
-                                {
-                                    namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
-                                    ViewBag.snerrorkeylist.Add(item.Key);
-                                }
-                            }
-
-                            namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                            var reurl = "window.location.href = '/Project/ProjectBRTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
-                            reurl += "+'&BRNUM=" + ViewBag.BRNUM + "&BRType=" + ViewBag.BRType + "&Type=SNFailure'";
-
-                            var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart4FF.xml"));
-                            ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
-                                .Replace("#Title#", "Cumm Failure")
-                                .Replace("#SERIESNAME#", "SNFailure")
-                                .Replace("#REDIRECTURL#", reurl)
-                                .Replace("#NAMEVALUEPAIRS#", namevaluepair);
-
-                        }
+                        var pieret = RetrievePieChartFromYieldVM(yieldvm.SNYields, yieldvm.SNErrorMap, reurl, "snfailurepie", "Cumm Failure", "SNFailure");
+                        snparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
+                        ViewBag.snerrorkeylist = (List<string>)pieret[1];
+                        ViewBag.snchartscript = (string)pieret[2];
                     }
 
                     if (yieldvm.LastYields.Count > 0)
                     {
-                        var piedatadict = new Dictionary<string, int>();
-                        var eklist = new List<string>();
-                        foreach (var error in yieldvm.LErrorMap.Keys)
-                        {
-                            eklist.Add(error);
-                        }
+                        var reurl = "window.location.href = '/Project/ProjectBRTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
+                        reurl += "+'&BRNUM=" + ViewBag.BRNUM + "&BRType=" + ViewBag.BRType + "&Type=FinalFailure'";
 
-                        foreach (var error in eklist)
-                        {
-                            if (string.Compare(error, "PASS", true) != 0)
-                            {
-                                foreach (var test in yieldvm.LastYields)
-                                {
-                                    var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.LErrorMap);
-
-                                    if (piedatadict.ContainsKey(error))
-                                    {
-                                        var preval = piedatadict[error];
-                                        piedatadict[error] = preval + val;
-                                    }
-                                    else
-                                    {
-                                        piedatadict.Add(error, val);
-                                    }
-                                }
-                            }
-                        }
-
-                        fytestdatalist = piedatadict.ToList();
-
-                        piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.LastYields[yieldvm.LastYields.Count - 1].WhichTest, yieldvm.LErrorMap);
-                        if (piedatadict.Count > 0)
-                        {
-                            var namevaluepair = "";
-                            var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
-                            foreach (var item in piedatadict_tmp)
-                            {
-                                if (item.Value > 0)
-                                {
-                                    namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
-                                    ViewBag.rerrorkeylist.Add(item.Key);
-                                }
-                            }
-
-                            namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                            var reurl = "window.location.href = '/Project/ProjectBRTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
-                            reurl += "+'&BRNUM=" + ViewBag.BRNUM + "&BRType=" + ViewBag.BRType + "&Type=FinalFailure'";
-
-                            var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart4FF.xml"));
-                            ViewBag.fychartscript = tempscript.Replace("#ElementID#", "fyfailurepie")
-                                .Replace("#Title#", "Final Failure")
-                                .Replace("#SERIESNAME#", "RFailure")
-                                .Replace("#REDIRECTURL#", reurl)
-                                .Replace("#NAMEVALUEPAIRS#", namevaluepair);
-
-                        }
+                        var pieret = RetrievePieChartFromYieldVM(yieldvm.LastYields, yieldvm.LErrorMap, reurl, "fyfailurepie", "Final Failure", "FYFailure");
+                        fyparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
+                        ViewBag.fyerrorkeylist = (List<string>)pieret[1];
+                        ViewBag.fychartscript = (string)pieret[2];
                     }
 
-                    if (firstdatalist.Count > 0)
+
+                    if (firstparetodatalist.Count > 0)
                     {
-                        firsttestparetofun(firstdatalist, ProjectKey,null,null, "BR");
+                        firsttestparetofun(firstparetodatalist, ProjectKey,null,null, "BR");
                     }
 
-                    if (retestdatalist.Count > 0)
+                    if (snparetodatalist.Count > 0)
                     {
-                        retestparetofun(retestdatalist, ProjectKey, null, null, "BR");
+                        sntestparetofun(snparetodatalist, ProjectKey, null, null, "BR");
                     }
 
-                    if (fytestdatalist.Count > 0)
+                    if (fyparetodatalist.Count > 0)
                     {
-                        fytparetofun(fytestdatalist, ProjectKey, null, null, "BR");
+                        fytparetofun(fyparetodatalist, ProjectKey, null, null, "BR");
+                    }
+
+                    var realtimeparetodatalist = new List<KeyValuePair<string, int>>();
+                    ViewBag.rlterrorkeylist = new List<string>();
+                    if (yieldvm.RealTimeYields.Count > 0)
+                    {
+                        var reurl = "window.location.href = '#'";
+                        var pieret = RetrievePieChartFromYieldVM(yieldvm.RealTimeYields, yieldvm.RLTErrorMap, reurl, "rltfailurepie", "RealTime Failure", "RealTimeFailure");
+                        realtimeparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
+                        ViewBag.rlterrorkeylist = (List<string>)pieret[1];
+                        ViewBag.rltchartscript = (string)pieret[2];
+                    }
+                    if (realtimeparetodatalist.Count > 0)
+                    {
+                        rltparetofun(realtimeparetodatalist, ProjectKey, null, null, "BR");
                     }
 
                     return View(yieldvm);
@@ -4801,34 +4340,34 @@ namespace Prometheus.Controllers
             }
         }
 
-        private void retestparetofun(List<KeyValuePair<string, int>> retestdatalist, string ProjectKey, string StartDate, string EndDate, string type="")
+        private void sntestparetofun(List<KeyValuePair<string, int>> snparetodatalist, string ProjectKey, string StartDate, string EndDate, string type="")
         {
-            if (retestdatalist.Count > 0)
+            if (snparetodatalist.Count > 0)
             {
                 var peralist = new List<ParetoData>();
 
-                if (retestdatalist.Count > 1)
+                if (snparetodatalist.Count > 1)
                 {
-                    retestdatalist.Sort(delegate (KeyValuePair<string, int> pair1, KeyValuePair<string, int> pair2)
+                    snparetodatalist.Sort(delegate (KeyValuePair<string, int> pair1, KeyValuePair<string, int> pair2)
                     {
                         return pair2.Value.CompareTo(pair1.Value);
                     });
                 }
 
                 var sum = 0;
-                for (var i = 0; i < retestdatalist.Count; i++)
+                for (var i = 0; i < snparetodatalist.Count; i++)
                 {
-                    sum = sum + retestdatalist[i].Value;
+                    sum = sum + snparetodatalist[i].Value;
                 }
 
                 var otherpercent = 0.0;
 
-                for (var i = 0; i < retestdatalist.Count; i++)
+                for (var i = 0; i < snparetodatalist.Count; i++)
                 {
-                    if (retestdatalist.Count > 5 && peralist.Count > 0 && peralist[peralist.Count - 1].sumpercent > 0.95)
+                    if (snparetodatalist.Count > 5 && peralist.Count > 0 && peralist[peralist.Count - 1].sumpercent > 0.95)
                     {
-                        otherpercent = otherpercent + retestdatalist[i].Value / (double)sum;
-                        if (i == (retestdatalist.Count - 1))
+                        otherpercent = otherpercent + snparetodatalist[i].Value / (double)sum;
+                        if (i == (snparetodatalist.Count - 1))
                         {
                             var tempperato = new ParetoData();
                             tempperato.key = "Other";
@@ -4841,17 +4380,17 @@ namespace Prometheus.Controllers
                     else
                     {
                         var tempperato = new ParetoData();
-                        tempperato.key = retestdatalist[i].Key;
+                        tempperato.key = snparetodatalist[i].Key;
                         if (i == 0)
                         {
-                            tempperato.count = retestdatalist[i].Value;
+                            tempperato.count = snparetodatalist[i].Value;
                             tempperato.percent = tempperato.count / (double)sum;
                             tempperato.sumpercent = tempperato.percent;
                             peralist.Add(tempperato);
                         }
                         else
                         {
-                            tempperato.count = retestdatalist[i].Value;
+                            tempperato.count = snparetodatalist[i].Value;
                             tempperato.percent = tempperato.count / (double)sum;
                             tempperato.sumpercent = peralist[peralist.Count - 1].sumpercent + tempperato.percent;
                             peralist.Add(tempperato);
@@ -4908,7 +4447,7 @@ namespace Prometheus.Controllers
                 }
 
                 var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ParetoChart.xml"));
-                ViewBag.rparetoscript = tempscript.Replace("#ElementID#", "rparetochart")
+                ViewBag.snparetoscript = tempscript.Replace("#ElementID#", "snparetochart")
                     .Replace("#Title#", "Pareto of Cumm Defect")
                     .Replace("#XAxisTitle#", "Defect")
                     .Replace("#ChartxAxisValues#", ChartxAxisValues)
@@ -4920,34 +4459,34 @@ namespace Prometheus.Controllers
             }
         }
 
-        private void fytparetofun(List<KeyValuePair<string, int>> retestdatalist, string ProjectKey,string StartDate,string EndDate, string type="")
+        private void fytparetofun(List<KeyValuePair<string, int>> fyparetodatalist, string ProjectKey,string StartDate,string EndDate, string type="")
         {
-            if (retestdatalist.Count > 0)
+            if (fyparetodatalist.Count > 0)
             {
                 var peralist = new List<ParetoData>();
 
-                if (retestdatalist.Count > 1)
+                if (fyparetodatalist.Count > 1)
                 {
-                    retestdatalist.Sort(delegate (KeyValuePair<string, int> pair1, KeyValuePair<string, int> pair2)
+                    fyparetodatalist.Sort(delegate (KeyValuePair<string, int> pair1, KeyValuePair<string, int> pair2)
                     {
                         return pair2.Value.CompareTo(pair1.Value);
                     });
                 }
 
                 var sum = 0;
-                for (var i = 0; i < retestdatalist.Count; i++)
+                for (var i = 0; i < fyparetodatalist.Count; i++)
                 {
-                    sum = sum + retestdatalist[i].Value;
+                    sum = sum + fyparetodatalist[i].Value;
                 }
 
                 var otherpercent = 0.0;
 
-                for (var i = 0; i < retestdatalist.Count; i++)
+                for (var i = 0; i < fyparetodatalist.Count; i++)
                 {
-                    if (retestdatalist.Count > 5 && peralist.Count > 0 && peralist[peralist.Count - 1].sumpercent > 0.95)
+                    if (fyparetodatalist.Count > 5 && peralist.Count > 0 && peralist[peralist.Count - 1].sumpercent > 0.95)
                     {
-                        otherpercent = otherpercent + retestdatalist[i].Value / (double)sum;
-                        if (i == (retestdatalist.Count - 1))
+                        otherpercent = otherpercent + fyparetodatalist[i].Value / (double)sum;
+                        if (i == (fyparetodatalist.Count - 1))
                         {
                             var tempperato = new ParetoData();
                             tempperato.key = "Other";
@@ -4960,17 +4499,17 @@ namespace Prometheus.Controllers
                     else
                     {
                         var tempperato = new ParetoData();
-                        tempperato.key = retestdatalist[i].Key;
+                        tempperato.key = fyparetodatalist[i].Key;
                         if (i == 0)
                         {
-                            tempperato.count = retestdatalist[i].Value;
+                            tempperato.count = fyparetodatalist[i].Value;
                             tempperato.percent = tempperato.count / (double)sum;
                             tempperato.sumpercent = tempperato.percent;
                             peralist.Add(tempperato);
                         }
                         else
                         {
-                            tempperato.count = retestdatalist[i].Value;
+                            tempperato.count = fyparetodatalist[i].Value;
                             tempperato.percent = tempperato.count / (double)sum;
                             tempperato.sumpercent = peralist[peralist.Count - 1].sumpercent + tempperato.percent;
                             peralist.Add(tempperato);
@@ -5039,6 +4578,125 @@ namespace Prometheus.Controllers
             }
         }
 
+        private void rltparetofun(List<KeyValuePair<string, int>> realtimeparetodatalist, string ProjectKey, string StartDate, string EndDate, string type = "")
+        {
+            if (realtimeparetodatalist.Count > 0)
+            {
+                var peralist = new List<ParetoData>();
+
+                if (realtimeparetodatalist.Count > 1)
+                {
+                    realtimeparetodatalist.Sort(delegate (KeyValuePair<string, int> pair1, KeyValuePair<string, int> pair2)
+                    {
+                        return pair2.Value.CompareTo(pair1.Value);
+                    });
+                }
+
+                var sum = 0;
+                for (var i = 0; i < realtimeparetodatalist.Count; i++)
+                {
+                    sum = sum + realtimeparetodatalist[i].Value;
+                }
+
+                var otherpercent = 0.0;
+
+                for (var i = 0; i < realtimeparetodatalist.Count; i++)
+                {
+                    if (realtimeparetodatalist.Count > 5 && peralist.Count > 0 && peralist[peralist.Count - 1].sumpercent > 0.95)
+                    {
+                        otherpercent = otherpercent + realtimeparetodatalist[i].Value / (double)sum;
+                        if (i == (realtimeparetodatalist.Count - 1))
+                        {
+                            var tempperato = new ParetoData();
+                            tempperato.key = "Other";
+                            tempperato.count = (int)(otherpercent * sum);
+                            tempperato.percent = otherpercent;
+                            tempperato.sumpercent = 1.0;
+                            peralist.Add(tempperato);
+                        }
+                    }
+                    else
+                    {
+                        var tempperato = new ParetoData();
+                        tempperato.key = realtimeparetodatalist[i].Key;
+                        if (i == 0)
+                        {
+                            tempperato.count = realtimeparetodatalist[i].Value;
+                            tempperato.percent = tempperato.count / (double)sum;
+                            tempperato.sumpercent = tempperato.percent;
+                            peralist.Add(tempperato);
+                        }
+                        else
+                        {
+                            tempperato.count = realtimeparetodatalist[i].Value;
+                            tempperato.percent = tempperato.count / (double)sum;
+                            tempperato.sumpercent = peralist[peralist.Count - 1].sumpercent + tempperato.percent;
+                            peralist.Add(tempperato);
+                        }
+                    }
+                }
+
+                //xaxis
+                var ChartxAxisValues = "";
+
+                foreach (var item in peralist)
+                {
+                    ChartxAxisValues = ChartxAxisValues + "'" + item.key + "',";
+                }
+                ChartxAxisValues = ChartxAxisValues.Substring(0, ChartxAxisValues.Length - 1);
+
+
+                //yaxis
+                //var ChartSearies = "{name:'Defect',data:[<fvalue>]}";
+
+                var pcountvalue = "";
+                foreach (var item in peralist)
+                {
+                    pcountvalue = pcountvalue + item.count.ToString() + ",";
+                }
+                pcountvalue = pcountvalue.Substring(0, pcountvalue.Length - 1);
+
+                var ppecentvalue = "";
+                foreach (var item in peralist)
+                {
+                    ppecentvalue = ppecentvalue + (item.sumpercent * 100).ToString("0.0") + ",";
+                }
+                ppecentvalue = ppecentvalue.Substring(0, ppecentvalue.Length - 1);
+
+                var abpecentvalue = "";
+                foreach (var item in peralist)
+                {
+                    abpecentvalue = abpecentvalue + (item.percent * 100).ToString("0.0") + ",";
+                }
+                abpecentvalue = abpecentvalue.Substring(0, abpecentvalue.Length - 1);
+
+                //ChartSearies = ChartSearies.Replace("<fvalue>", tempvalue);
+
+                var reurl = "";
+                if (string.Compare(type, "BR", true) == 0)
+                {
+                    reurl = "window.location.href = '/Project/ProjectBRTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.category";
+                    reurl += "+'&BRNUM=" + ViewBag.BRNUM + "&BRType=" + ViewBag.BRType + "&Type=FinalFailure'";
+                }
+                else
+                {
+                    reurl = "window.location.href = '/Project/ProjectTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.category";
+                    reurl += "+'&StartDate=" + ViewBag.sDate + "&EndDate=" + ViewBag.eDate + "&Type=FinalFailure'";
+                }
+
+                var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ParetoChart.xml"));
+                ViewBag.rltparetoscript = tempscript.Replace("#ElementID#", "rltparetochart")
+                    .Replace("#Title#", "Pareto of RealTime Yield Defect")
+                    .Replace("#XAxisTitle#", "Defect")
+                    .Replace("#ChartxAxisValues#", ChartxAxisValues)
+                    .Replace("#AmountMAX#", sum.ToString())
+                    .Replace("#PCount#", pcountvalue)
+                    .Replace("#ABPercent#", abpecentvalue)
+                    .Replace("#PPercent#", ppecentvalue)
+                    .Replace("#REDIRECTURL#", reurl);
+            }
+        }
+
         public ActionResult ProjectPYieldDetail(string ProjectKey, string StartDate, string EndDate)
         {
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(StartDate) && !string.IsNullOrEmpty(EndDate))
@@ -5050,12 +4708,12 @@ namespace Prometheus.Controllers
                 ViewBag.sDate = Convert.ToDateTime(StartDate).ToString("yyyy-MM-dd");
                 ViewBag.eDate = Convert.ToDateTime(EndDate).ToString("yyyy-MM-dd");
 
-                var firstdatalist = new List<KeyValuePair<string, int>>();
-                var retestdatalist = new List<KeyValuePair<string, int>>();
-                var fytestdatalist = new List<KeyValuePair<string, int>>();
+                var firstparetodatalist = new List<KeyValuePair<string, int>>();
+                var snparetodatalist = new List<KeyValuePair<string, int>>();
+                var fyparetodatalist = new List<KeyValuePair<string, int>>();
 
                 ViewBag.ferrorkeylist = new List<string>();
-                ViewBag.rerrorkeylist = new List<string>();
+                ViewBag.fyerrorkeylist = new List<string>();
                 ViewBag.snerrorkeylist = new List<string>();
 
                 var pvmlist = ProjectViewModels.RetrieveOneProject(ProjectKey);
@@ -5066,202 +4724,65 @@ namespace Prometheus.Controllers
 
                 if (yieldvm.FirstYields.Count > 0)
                 {
-                    var piedatadict = new Dictionary<string, int>();
-                    var eklist = new List<string>();
-                    foreach (var error in yieldvm.FErrorMap.Keys)
-                    {
-                        eklist.Add(error);
-                    }
-
-                    foreach (var error in eklist)
-                    {
-                        if (string.Compare(error, "PASS", true) != 0)
-                        {
-                            foreach (var test in yieldvm.FirstYields)
-                            {
-                                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.FErrorMap);
-
-                                if (piedatadict.ContainsKey(error))
-                                {
-                                    var preval = piedatadict[error];
-                                    piedatadict[error] = preval + val;
-                                }
-                                else
-                                {
-                                    piedatadict.Add(error, val);
-                                }
-                            }
-                        }
-                    }
-
-                    firstdatalist = piedatadict.ToList();
-
-                    piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.FirstYields[yieldvm.FirstYields.Count - 1].WhichTest, yieldvm.FErrorMap);
-                    if (piedatadict.Count > 0)
-                    {
-                        var namevaluepair = "";
-                        var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
-                        foreach (var item in piedatadict_tmp)
-                        {
-                            if (item.Value > 0)
-                            {
-                                namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
-                                ViewBag.ferrorkeylist.Add(item.Key);
-                            }
-                        }
-
-                        namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                        var reurl = "window.location.href = '/Project/ProjectTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
-                        reurl += "+'&StartDate=" + ViewBag.sDate + "&EndDate=" + ViewBag.eDate + "&Type=FirstFailure'";
-
-
-                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart4FF.xml"));
-                        ViewBag.fchartscript = tempscript.Replace("#ElementID#", "ffailurepie")
-                            .Replace("#Title#", "First Failure")
-                            .Replace("#SERIESNAME#", "FFailure")
-                            .Replace("#REDIRECTURL#", reurl)
-                            .Replace("#NAMEVALUEPAIRS#", namevaluepair);
-
-                    }
+                    var reurl = "window.location.href = '/Project/ProjectTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
+                    reurl += "+'&StartDate=" + ViewBag.sDate + "&EndDate=" + ViewBag.eDate + "&Type=FirstFailure'";
+                    var pieret = RetrievePieChartFromYieldVM(yieldvm.FirstYields, yieldvm.FErrorMap, reurl, "ffailurepie", "First Failure", "FFailure");
+                    firstparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
+                    ViewBag.ferrorkeylist = (List<string>)pieret[1];
+                    ViewBag.fchartscript = (string)pieret[2];
                 }
-
 
                 if (yieldvm.SNYields.Count > 0)
                 {
-                    var piedatadict = new Dictionary<string, int>();
-                    var eklist = new List<string>();
-                    foreach (var error in yieldvm.SNErrorMap.Keys)
-                    {
-                        eklist.Add(error);
-                    }
+                    var reurl = "window.location.href = '/Project/ProjectSNTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
+                    reurl += "+'&StartDate=" + ViewBag.sDate + "&EndDate=" + ViewBag.eDate + "&Type=SNFailure'";
 
-                    foreach (var error in eklist)
-                    {
-                        if (string.Compare(error, "PASS", true) != 0)
-                        {
-                            foreach (var test in yieldvm.SNYields)
-                            {
-                                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.SNErrorMap);
-
-                                if (piedatadict.ContainsKey(error))
-                                {
-                                    var preval = piedatadict[error];
-                                    piedatadict[error] = preval + val;
-                                }
-                                else
-                                {
-                                    piedatadict.Add(error, val);
-                                }
-                            }
-                        }
-                    }
-
-                    retestdatalist = piedatadict.ToList();
-
-                    piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.SNYields[yieldvm.SNYields.Count - 1].WhichTest, yieldvm.SNErrorMap);
-                    if (piedatadict.Count > 0)
-                    {
-                        var namevaluepair = "";
-                        var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
-                        foreach (var item in piedatadict_tmp)
-                        {
-                            if (item.Value > 0)
-                            {
-                                namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
-                                ViewBag.snerrorkeylist.Add(item.Key);
-                            }
-                        }
-
-                        namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                        var reurl = "window.location.href = '/Project/ProjectSNTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
-                        reurl += "+'&StartDate=" + ViewBag.sDate + "&EndDate=" + ViewBag.eDate + "&Type=SNFailure'";
-                        
-                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart4FF.xml"));
-                        ViewBag.rchartscript = tempscript.Replace("#ElementID#", "rfailurepie")
-                            .Replace("#Title#", "Cumm Failure")
-                            .Replace("#SERIESNAME#", "SNFailure")
-                            .Replace("#REDIRECTURL#", reurl)
-                            .Replace("#NAMEVALUEPAIRS#", namevaluepair);
-
-                    }
+                    var pieret = RetrievePieChartFromYieldVM(yieldvm.SNYields, yieldvm.SNErrorMap, reurl, "snfailurepie", "Cumm Failure", "SNFailure");
+                    snparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
+                    ViewBag.snerrorkeylist = (List<string>)pieret[1];
+                    ViewBag.snchartscript = (string)pieret[2];
                 }
 
                 if (yieldvm.LastYields.Count > 0)
                 {
-                    var piedatadict = new Dictionary<string, int>();
-                    var eklist = new List<string>();
-                    foreach (var error in yieldvm.LErrorMap.Keys)
-                    {
-                        eklist.Add(error);
-                    }
+                    var reurl = "window.location.href = '/Project/ProjectTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
+                    reurl += "+'&StartDate=" + ViewBag.sDate + "&EndDate=" + ViewBag.eDate + "&Type=FinalFailure'";
 
-                    foreach (var error in eklist)
-                    {
-                        if (string.Compare(error, "PASS", true) != 0)
-                        {
-                            foreach (var test in yieldvm.LastYields)
-                            {
-                                var val = ProjectYieldViewModule.RetrieveErrorCount(error, test.WhichTest, yieldvm.LErrorMap);
-
-                                if (piedatadict.ContainsKey(error))
-                                {
-                                    var preval = piedatadict[error];
-                                    piedatadict[error] = preval + val;
-                                }
-                                else
-                                {
-                                    piedatadict.Add(error, val);
-                                }
-                            }
-                        }
-                    }
-
-                    fytestdatalist = piedatadict.ToList();
-
-                    piedatadict["PASS"] = ProjectYieldViewModule.RetrieveErrorCount("PASS", yieldvm.LastYields[yieldvm.LastYields.Count - 1].WhichTest, yieldvm.LErrorMap);
-                    if (piedatadict.Count > 0)
-                    {
-                        var namevaluepair = "";
-                        var piedatadict_tmp = piedatadict.OrderByDescending(x => x.Value);
-                        foreach (var item in piedatadict_tmp)
-                        {
-                            if (item.Value > 0)
-                            {
-                                namevaluepair = namevaluepair + "{ name:'" + item.Key + "',y:" + item.Value.ToString() + "},";
-                                ViewBag.rerrorkeylist.Add(item.Key);
-                            }
-                        }
-
-                        namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
-
-                        var reurl = "window.location.href = '/Project/ProjectTestDataDetail?ProjectKey=" + ProjectKey + "'" + "+'&FM='+this.name";
-                        reurl += "+'&StartDate=" + ViewBag.sDate + "&EndDate=" + ViewBag.eDate + "&Type=FinalFailure'";
-
-                        var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/PieChart4FF.xml"));
-                        ViewBag.fychartscript = tempscript.Replace("#ElementID#", "fyfailurepie")
-                            .Replace("#Title#", "Final Failure")
-                            .Replace("#SERIESNAME#", "RFailure")
-                            .Replace("#REDIRECTURL#", reurl)
-                            .Replace("#NAMEVALUEPAIRS#", namevaluepair);
-
-                    }
+                    var pieret = RetrievePieChartFromYieldVM(yieldvm.LastYields, yieldvm.LErrorMap, reurl, "fyfailurepie", "Final Failure", "FYFailure");
+                    fyparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
+                    ViewBag.fyerrorkeylist = (List<string>)pieret[1];
+                    ViewBag.fychartscript = (string)pieret[2];
                 }
 
-                if (firstdatalist.Count > 0)
+
+                if (firstparetodatalist.Count > 0)
                 {
-                    firsttestparetofun(firstdatalist, ProjectKey,StartDate,EndDate);
+                    firsttestparetofun(firstparetodatalist, ProjectKey,StartDate,EndDate);
                 }
 
-                if (retestdatalist.Count > 0)
+                if (snparetodatalist.Count > 0)
                 {
-                    retestparetofun(retestdatalist, ProjectKey, StartDate, EndDate);
+                    sntestparetofun(snparetodatalist, ProjectKey, StartDate, EndDate);
                 }
 
-                if (fytestdatalist.Count > 0)
+                if (fyparetodatalist.Count > 0)
                 {
-                    fytparetofun(fytestdatalist, ProjectKey, StartDate, EndDate);
+                    fytparetofun(fyparetodatalist, ProjectKey, StartDate, EndDate);
+                }
+
+                var realtimeparetodatalist = new List<KeyValuePair<string, int>>();
+                ViewBag.rlterrorkeylist = new List<string>();
+                if (yieldvm.RealTimeYields.Count > 0)
+                {
+                    var reurl = "window.location.href = '#'";
+                    var pieret = RetrievePieChartFromYieldVM(yieldvm.RealTimeYields, yieldvm.RLTErrorMap, reurl, "rltfailurepie", "RealTime Failure", "RealTimeFailure");
+                    realtimeparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
+                    ViewBag.rlterrorkeylist = (List<string>)pieret[1];
+                    ViewBag.rltchartscript = (string)pieret[2];
+                }
+                if (realtimeparetodatalist.Count > 0)
+                {
+                    rltparetofun(realtimeparetodatalist, ProjectKey, StartDate, EndDate);
                 }
 
                 return View(yieldvm);

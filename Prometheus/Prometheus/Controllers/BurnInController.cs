@@ -261,7 +261,7 @@ namespace Prometheus.Controllers
                 }
 
                 var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ParetoChart.xml"));
-                ViewBag.rparetoscript = tempscript.Replace("#ElementID#", "rparetochart")
+                ViewBag.snparetoscript = tempscript.Replace("#ElementID#", "rparetochart")
                     .Replace("#Title#", "Pareto of Final Defect")
                     .Replace("#XAxisTitle#", "Defect")
                     .Replace("#ChartxAxisValues#", ChartxAxisValues)

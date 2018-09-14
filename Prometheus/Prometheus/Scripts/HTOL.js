@@ -207,10 +207,22 @@
         }
 
         $('body').on('click', '#btn-wf-download', function () {
-            var wafer_no = $.trim($('#m-wf-no').val());
-            $('#boxplot-alert').modal('hide');
-            window.open("/DataAnalyze/DownLoadHTOL?" + "wf_no=" + wafer_no);
+            var wafer_no = $.trim($('#dl_wafers').val());
+            if (wafer_no != '')
+            {
+                $('#boxplot-alert').modal('hide');
+                window.open("/DataAnalyze/DownLoadHTOL?" + "wf_no=" + wafer_no + "&withfilter=false");
+            }
         })
+
+        $('body').on('click', '#btn-wf-fdownload', function () {
+            var wafer_no = $.trim($('#dl_wafers').val());
+            if (wafer_no != '') {
+                $('#boxplot-alert').modal('hide');
+                window.open("/DataAnalyze/DownLoadHTOL?" + "wf_no=" + wafer_no + "&withfilter=true");
+            }
+        })
+
     }
     var drawline = function (line_data,forwafer) {
         var options = {
@@ -258,6 +270,7 @@
                         click: function (event) {
                             $('#m-wf-no').val(event.point.category);
                             if (forwafer) {
+                                $('#dl_wafers').val(event.point.category + ';');
                                 var reportid = 'HTOL_' + event.point.category;
                                 $.post('/DataAnalyze/RetrieveWaferReport', {
                                     reportid: reportid

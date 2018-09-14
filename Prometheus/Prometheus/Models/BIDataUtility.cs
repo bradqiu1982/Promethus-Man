@@ -160,6 +160,8 @@ namespace Prometheus.Models
             Delta_PO_Uniformity = dpouniformity;
             Wafer = wafer;
             ProductName = productname;
+            Appv_3 = "";
+            Appv_4 = "";
         }
 
         private void Init()

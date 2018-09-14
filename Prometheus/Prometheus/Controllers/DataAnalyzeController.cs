@@ -3338,7 +3338,8 @@ namespace Prometheus.Controllers
                 return ret;
             }
         }
-        public ActionResult DownLoadWafer(string wf_no)
+
+        public ActionResult DownLoadWafer(string wf_no,string withfilter)
         {
             string datestring = DateTime.Now.ToString("yyyyMMdd");
             string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
@@ -3347,11 +3348,15 @@ namespace Prometheus.Controllers
                 System.IO.Directory.CreateDirectory(imgdir);
             }
 
-            var fn = "Wafer_"+wf_no+"_TestData_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+            var fn = "Wafer_TestData_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
             var filename = imgdir + fn;
 
             var fw = System.IO.File.OpenWrite(filename);
-            VcselBGDVM.RetrieveBURNINHTOLDataByWafer(wf_no,fw);
+
+            var filter = false;
+            if (!string.IsNullOrEmpty(withfilter) && string.Compare(withfilter, "true", true) == 0)
+            { filter = true; }
+            VcselBGDVM.RetrieveBURNINHTOLDataByWaferWithFilter(wf_no, fw,filter);
             fw.Close();
 
             try
@@ -3369,7 +3374,7 @@ namespace Prometheus.Controllers
             }
         }
 
-        public ActionResult DownLoadHTOL(string wf_no)
+        public ActionResult DownLoadHTOL(string wf_no,string withfilter)
         {
             string datestring = DateTime.Now.ToString("yyyyMMdd");
             string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
@@ -3378,11 +3383,15 @@ namespace Prometheus.Controllers
                 System.IO.Directory.CreateDirectory(imgdir);
             }
 
-            var fn = "HTOL_" + wf_no + "_TestData_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+            var fn = "HTOL_TestData_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
             var filename = imgdir + fn;
 
+            var filter = false;
+            if (!string.IsNullOrEmpty(withfilter) && string.Compare(withfilter, "true", true) == 0)
+            { filter = true; }
+
             var fw = System.IO.File.OpenWrite(filename);
-            VcselBGDVM.RetrieveBURNINHTOLDataByWafer(wf_no, fw, "BIHTOLTestResultDataField", "BIHTOLTestResult");
+            VcselBGDVM.RetrieveBURNINHTOLDataByWaferWithFilter(wf_no, fw,filter, "BIHTOLTestResultDataField", "BIHTOLTestResult");
             fw.Close();
 
             try

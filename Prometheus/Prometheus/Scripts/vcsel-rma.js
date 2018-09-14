@@ -162,7 +162,7 @@ var VCSEL_RMA = function(){
                             var wafer = event.point.category;
                             $('#waferval').html(wafer);
                             $('#waferyield').attr('href', '/DataAnalyze/WaferDistribution?defaultwafer='+wafer);
-                            $('#wafertestdata').attr('href', '/DataAnalyze/DownLoadWafer?wf_no='+wafer);
+                            $('#wafertestdata').attr('href', '/DataAnalyze/DownLoadWafer?wf_no=' + wafer + '&withfilter=false');
                             $.post('/DataAnalyze/RetrieveVcselRMARawData',
                                 {
                                     wafer: wafer

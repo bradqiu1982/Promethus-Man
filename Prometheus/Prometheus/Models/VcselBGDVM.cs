@@ -2102,54 +2102,162 @@ namespace Prometheus.Models
             return ret;
         }
 
-        public static void RetrieveBURNINHTOLDataByWafer(string wf_no, System.IO.FileStream fw, string defTab = "BITestResultDataField", string defTab2 = "BITestResult")
+        //public static void RetrieveBURNINHTOLDataByWafer(string wf_no, System.IO.FileStream fw, string defTab = "BITestResultDataField", string defTab2 = "BITestResult")
+        //{
+
+        //    var sql = @"SELECT bf.SN,bf.TestName,bf.TestTimeStamp,bf.PN,bf.Wafer,bf.JO,bf.Channel,bf.SLOPE,bf.PO_LD,bf.PO_Uniformity,bf.THOLD,bf.Delta_PO_LD,bf.Delta_SLOPE
+        //                , bf.Delta_THOLD, bf.Delta_PO_Uniformity, bf.ProductName, br.Failure FROM <defTab> bf 
+        //                 left join <defTab2> br on br.DataID = bf.DataID 
+        //                 where bf.Wafer = @Wafer";
+
+        //    sql = sql.Replace("<defTab>", defTab).Replace("<defTab2>", defTab2);
+
+        //    var dict = new Dictionary<string, string>();
+        //    dict.Add("@Wafer", wf_no);
+        //    var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, dict);
+
+        //    var sb = new StringBuilder(120 * 10000);
+        //    var title = "SN,TestName,Failure,TestTimeStamp,PN,Wafer,JO,Channel,SLOPE,PO_LD,PO_Uniformity,THOLD,Delta_PO_LD,Delta_SLOPE,Delta_THOLD, Delta_PO_Uniformity, ProductName";
+        //    sb.Append(title + "\r\n");
+
+        //    var idx = 0;
+        //    foreach (var line in dbret)
+        //    {
+        //        var item = new BITestResultDataField(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToDateTime(line[2])
+        //            , Convert.ToString(line[3]), Convert.ToString(line[4]), Convert.ToString(line[5])
+        //            , Convert.ToString(line[6]), Convert.ToDouble(line[7]), Convert.ToDouble(line[8])
+        //            , Convert.ToDouble(line[9]), Convert.ToDouble(line[10]), Convert.ToDouble(line[11])
+        //            , Convert.ToDouble(line[12]), Convert.ToDouble(line[13]), Convert.ToDouble(line[14])
+        //            , Convert.ToString(line[15]));
+        //        var failure = Convert.ToString(line[16]);
+
+        //        var line1 = "\"" + item.SN.ToString().Replace("\"", "") + "\"," + "\"" + item.TestName.Replace("\"", "") + "\"," + "\"" + failure.Replace("\"", "")
+        //            + "\"," + "\"" + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss").Replace("\"", "") + "\"," + "\"" + item.PN.Replace("\"", "") + "\","
+        //            + "\"" + item.Wafer.Replace("\"", "") + "\"," + "\"" + item.JO.Replace("\"", "") + "\"," + "\"" + item.Channel.Replace("\"", "") + "\","
+        //            + "\"" + item.SLOPE.ToString().Replace("\"", "") + "\"," + "\"" + item.PO_LD.ToString().Replace("\"", "") + "\"," + "\"" + item.PO_Uniformity.ToString().Replace("\"", "") + "\","
+        //            + "\"" + item.THOLD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_PO_LD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_SLOPE.ToString().Replace("\"", "") + "\","
+        //            + "\"" + item.Delta_THOLD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_PO_Uniformity.ToString().Replace("\"", "") + "\"," + "\"" + item.ProductName.Replace("\"", "") + "\",";
+        //        sb.Append(line1 + "\r\n");
+        //        idx = idx + 1;
+
+        //        if (idx > 0 && idx % 10000 == 0)
+        //        {
+        //            var bt = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+        //            fw.Write(bt, 0, bt.Count());
+        //            sb.Clear();
+        //        }
+        //    }
+        //    var bt1 = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+        //    fw.Write(bt1, 0, bt1.Count());
+
+        //}
+
+        public static void RetrieveBURNINHTOLDataByWaferWithFilter(string wf_no, System.IO.FileStream fw,bool filter, string defTab = "BITestResultDataField", string defTab2 = "BITestResult")
         {
+            var wfs = wf_no.Split(new[] { ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
+
+            var sb1 = new StringBuilder();
+            sb1.Append("('");
+            foreach (var w in wfs)
+            {
+                sb1.Append(w + "','");
+            }
+            var WAFERCOND = sb1.ToString();
+            WAFERCOND = WAFERCOND.Substring(0, WAFERCOND.Length - 2) + ")";
 
             var sql = @"SELECT bf.SN,bf.TestName,bf.TestTimeStamp,bf.PN,bf.Wafer,bf.JO,bf.Channel,bf.SLOPE,bf.PO_LD,bf.PO_Uniformity,bf.THOLD,bf.Delta_PO_LD,bf.Delta_SLOPE
-                        , bf.Delta_THOLD, bf.Delta_PO_Uniformity, bf.ProductName, br.Failure FROM <defTab> bf 
+                        , bf.Delta_THOLD, bf.Delta_PO_Uniformity, bf.ProductName, br.Failure,bf.DataID FROM <defTab> bf 
                          left join <defTab2> br on br.DataID = bf.DataID 
-                         where bf.Wafer = @Wafer";
+                         where bf.Wafer in <WAFERCOND> and br.Appv_1 <> 'DELETE' order by bf.Wafer,bf.SN,bf.TestTimeStamp DESC";
 
-            sql = sql.Replace("<defTab>", defTab).Replace("<defTab2>", defTab2);
-
-            var dict = new Dictionary<string, string>();
-            dict.Add("@Wafer", wf_no);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, dict);
-
-            var sb = new StringBuilder(120 * 10000);
-            var title = "SN,TestName,Failure,TestTimeStamp,PN,Wafer,JO,Channel,SLOPE,PO_LD,PO_Uniformity,THOLD,Delta_PO_LD,Delta_SLOPE,Delta_THOLD, Delta_PO_Uniformity, ProductName";
-            sb.Append(title + "\r\n");
-
-            var idx = 0;
-            foreach (var line in dbret)
+            sql = sql.Replace("<defTab>", defTab).Replace("<defTab2>", defTab2).Replace("<WAFERCOND>", WAFERCOND);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            if (!filter)
             {
-                var item = new BITestResultDataField(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToDateTime(line[2])
-                    , Convert.ToString(line[3]), Convert.ToString(line[4]), Convert.ToString(line[5])
-                    , Convert.ToString(line[6]), Convert.ToDouble(line[7]), Convert.ToDouble(line[8])
-                    , Convert.ToDouble(line[9]), Convert.ToDouble(line[10]), Convert.ToDouble(line[11])
-                    , Convert.ToDouble(line[12]), Convert.ToDouble(line[13]), Convert.ToDouble(line[14])
-                    , Convert.ToString(line[15]));
-                var failure = Convert.ToString(line[16]);
+                var sb = new StringBuilder(120 * 10000);
+                var title = "Wafer,SN,TestName,Failure,TestTimeStamp,PN,JO,Channel,SLOPE,PO_LD,PO_Uniformity,THOLD,Delta_PO_LD,Delta_SLOPE,Delta_THOLD, Delta_PO_Uniformity, ProductName";
+                sb.Append(title + "\r\n");
 
-                var line1 = "\"" + item.SN.ToString().Replace("\"", "") + "\"," + "\"" + item.TestName.Replace("\"", "") + "\"," + "\"" + failure.Replace("\"", "")
-                    + "\"," + "\"" + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss").Replace("\"", "") + "\"," + "\"" + item.PN.Replace("\"", "") + "\","
-                    + "\"" + item.Wafer.Replace("\"", "") + "\"," + "\"" + item.JO.Replace("\"", "") + "\"," + "\"" + item.Channel.Replace("\"", "") + "\","
-                    + "\"" + item.SLOPE.ToString().Replace("\"", "") + "\"," + "\"" + item.PO_LD.ToString().Replace("\"", "") + "\"," + "\"" + item.PO_Uniformity.ToString().Replace("\"", "") + "\","
-                    + "\"" + item.THOLD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_PO_LD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_SLOPE.ToString().Replace("\"", "") + "\","
-                    + "\"" + item.Delta_THOLD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_PO_Uniformity.ToString().Replace("\"", "") + "\"," + "\"" + item.ProductName.Replace("\"", "") + "\",";
-                sb.Append(line1 + "\r\n");
-                idx = idx + 1;
-
-                if (idx > 0 && idx % 10000 == 0)
+                var idx = 0;
+                foreach (var line in dbret)
                 {
-                    var bt = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
-                    fw.Write(bt, 0, bt.Count());
-                    sb.Clear();
-                }
-            }
-            var bt1 = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
-            fw.Write(bt1, 0, bt1.Count());
+                    var item = new BITestResultDataField(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToDateTime(line[2])
+                        , Convert.ToString(line[3]), Convert.ToString(line[4]), Convert.ToString(line[5])
+                        , Convert.ToString(line[6]), Convert.ToDouble(line[7]), Convert.ToDouble(line[8])
+                        , Convert.ToDouble(line[9]), Convert.ToDouble(line[10]), Convert.ToDouble(line[11])
+                        , Convert.ToDouble(line[12]), Convert.ToDouble(line[13]), Convert.ToDouble(line[14])
+                        , Convert.ToString(line[15]));
+                    var failure = Convert.ToString(line[16]);
+                    var dataid = Convert.ToString(line[17]);
 
+                    var line1 = "\"" + item.Wafer.Replace("\"", "") + "\"," +"\"" + item.SN.ToString().Replace("\"", "") + "\"," + "\"" + item.TestName.Replace("\"", "") + "\"," + "\"" + failure.Replace("\"", "")+ "\","
+                         + "\"" + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss").Replace("\"", "") + "\"," + "\"" + item.PN.Replace("\"", "") + "\","
+                        +  "\"" + item.JO.Replace("\"", "") + "\"," + "\"" + item.Channel.Replace("\"", "") + "\","
+                        + "\"" + item.SLOPE.ToString().Replace("\"", "") + "\"," + "\"" + item.PO_LD.ToString().Replace("\"", "") + "\"," + "\"" + item.PO_Uniformity.ToString().Replace("\"", "") + "\","
+                        + "\"" + item.THOLD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_PO_LD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_SLOPE.ToString().Replace("\"", "") + "\","
+                        + "\"" + item.Delta_THOLD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_PO_Uniformity.ToString().Replace("\"", "") + "\"," + "\"" + item.ProductName.Replace("\"", "") + "\",";
+                    sb.Append(line1 + "\r\n");
+                    idx = idx + 1;
+
+                    if (idx > 0 && idx % 10000 == 0)
+                    {
+                        var bt = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+                        fw.Write(bt, 0, bt.Count());
+                        sb.Clear();
+                    }
+                }
+                var bt1 = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+                fw.Write(bt1, 0, bt1.Count());
+            }
+            else
+            {
+                var sndict = new Dictionary<string, bool>();
+                var filterdata = new List<BITestResultDataField>();
+                foreach (var line in dbret)
+                {
+                    var item = new BITestResultDataField(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToDateTime(line[2])
+                        , Convert.ToString(line[3]), Convert.ToString(line[4]), Convert.ToString(line[5])
+                        , Convert.ToString(line[6]), Convert.ToDouble(line[7]), Convert.ToDouble(line[8])
+                        , Convert.ToDouble(line[9]), Convert.ToDouble(line[10]), Convert.ToDouble(line[11])
+                        , Convert.ToDouble(line[12]), Convert.ToDouble(line[13]), Convert.ToDouble(line[14])
+                        , Convert.ToString(line[15]));
+                    item.Appv_3 = Convert.ToString(line[16]);
+                    item.Appv_4 = Convert.ToString(line[17]);
+
+                    if (!sndict.ContainsKey(item.SN+"::"+item.TestName))
+                    {
+                       sndict.Add(item.SN + "::" + item.TestName, true);
+                       filterdata.Add(item);
+                    }
+                }
+
+                var sb = new StringBuilder(120 * 10000);
+                var title = "Wafer,SN,TestName,Failure,TestTimeStamp,PN,JO,Channel,SLOPE,PO_LD,PO_Uniformity,THOLD,Delta_PO_LD,Delta_SLOPE,Delta_THOLD, Delta_PO_Uniformity, ProductName";
+                sb.Append(title + "\r\n");
+
+                var idx = 0;
+                foreach (var item in filterdata)
+                {
+                    var line1 = "\"" + item.Wafer.Replace("\"", "") + "\"," + "\"" + item.SN.ToString().Replace("\"", "") + "\"," + "\"" + item.TestName.Replace("\"", "") + "\"," + "\"" + item.Appv_3.Replace("\"", "") + "\","
+                         + "\"" + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss").Replace("\"", "") + "\"," + "\"" + item.PN.Replace("\"", "") + "\","
+                        + "\"" + item.JO.Replace("\"", "") + "\"," + "\"" + item.Channel.Replace("\"", "") + "\","
+                        + "\"" + item.SLOPE.ToString().Replace("\"", "") + "\"," + "\"" + item.PO_LD.ToString().Replace("\"", "") + "\"," + "\"" + item.PO_Uniformity.ToString().Replace("\"", "") + "\","
+                        + "\"" + item.THOLD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_PO_LD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_SLOPE.ToString().Replace("\"", "") + "\","
+                        + "\"" + item.Delta_THOLD.ToString().Replace("\"", "") + "\"," + "\"" + item.Delta_PO_Uniformity.ToString().Replace("\"", "") + "\"," + "\"" + item.ProductName.Replace("\"", "") + "\",";
+                    sb.Append(line1 + "\r\n");
+                    idx = idx + 1;
+
+                    if (idx > 0 && idx % 10000 == 0)
+                    {
+                        var bt = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+                        fw.Write(bt, 0, bt.Count());
+                        sb.Clear();
+                    }
+                }
+                var bt1 = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+                fw.Write(bt1, 0, bt1.Count());
+
+            }//end else
         }
 
         public static void RetrieveBURNINHTOLDataByMonth(string month,List<string> pnlist,System.IO.FileStream fw,string defTab = "BITestResultDataField",string defTab2= "BITestResult")

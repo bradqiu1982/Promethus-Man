@@ -2744,7 +2744,7 @@ namespace Prometheus.Controllers
             return View();
         }
 
-        public ActionResult ProjectYieldMain(string ProjectKey)
+        public ActionResult ProjectYieldMain(string ProjectKey,string PStartDate,string PEndDate)
         {
             //var checkresult = CheckLoginAndPermit(Request, "Project", "ProjectYieldMain");
             //if (checkresult.GetType() != (new Boolean()).GetType())
@@ -2793,7 +2793,20 @@ namespace Prometheus.Controllers
                 }
 
                 var detailinfo = new Dictionary<string, List<ProjectMoveHistory>>();
-                var procdata = ProcessData.RetrieveLastWeekProcessData(ProjectKey, detailinfo);
+                var procdata = new Dictionary<string, ProjectMoveHistory>();
+                if (!string.IsNullOrEmpty(PStartDate) && !string.IsNullOrEmpty(PEndDate))
+                {
+                    var startdate = DateTime.Parse(PStartDate).ToString("yyyy-MM-dd") + " 07:30:00";
+                    var enddate = DateTime.Parse(PEndDate).ToString("yyyy-MM-dd") + " 07:30:00";
+                    procdata = ProcessData.RetrieveLastWeekProcessDataByDate(ProjectKey, startdate, enddate, detailinfo);
+                }
+                else
+                {
+                    var startdate = ProcessData.RetrieveLastWeek().ToString("yyyy-MM-dd") + " 07:30:00";
+                    var enddate = DateTime.Now.ToString("yyyy-MM-dd") + " 07:30:00";
+                    procdata =ProcessData.RetrieveLastWeekProcessDataByDate(ProjectKey,startdate,enddate, detailinfo);
+                }
+
                 var processdatatable = new List<ProjectMoveHistory>();
                 foreach (var proc in allprocname)
                 {

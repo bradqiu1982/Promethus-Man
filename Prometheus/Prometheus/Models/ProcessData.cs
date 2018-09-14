@@ -817,7 +817,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        private static DateTime RetrieveLastWeek()
+        public static DateTime RetrieveLastWeek()
         {
             var currentday = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd")+ " 07:30:00");
 
@@ -846,13 +846,10 @@ namespace Prometheus.Models
             return RetrieveProcessWithSequence(PJKey, starttime, endtime);
         }
 
-        public static Dictionary<string, ProjectMoveHistory> RetrieveLastWeekProcessData(string PJKey,Dictionary<string,List<ProjectMoveHistory>> detailinfo)
+        public static Dictionary<string, ProjectMoveHistory> RetrieveLastWeekProcessDataByDate(string PJKey,string startdate,string enddate,Dictionary<string,List<ProjectMoveHistory>> detailinfo)
         {
             var ret = new Dictionary<string, ProjectMoveHistory>();
-
-            var starttime = RetrieveLastWeek().ToString("yyyy-MM-dd") + " 07:30:00";
-            var endtime =  DateTime.Now.ToString("yyyy-MM-dd") + " 07:30:00";
-            var lastweekprocessdata =  RetrieveProcessDataByTime(PJKey, starttime, endtime);
+            var lastweekprocessdata =  RetrieveProcessDataByTime(PJKey, startdate, enddate);
             foreach (var item in lastweekprocessdata)
             {
                 if (ret.ContainsKey(item.WorkflowStepName))

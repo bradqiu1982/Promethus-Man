@@ -258,7 +258,7 @@
         <hr style="border-color:#006DC0;" />
 
         <div class="row" style="font-family:'Arial Narrow'">
-            <div class="col-xs-2" MYTP="orange" style="font-size:18px">DownLoad Process Data</div>
+            <div class="col-xs-2" MYTP="orange" style="font-size:18px">Process By Date</div>
             <div class="col-xs-2">
                 <input class="form-control text-box single-line" id="StartDateDL" placeholder="Start Date" name="StartDateDL" type="text" value="" style="margin-left:6px" />
             </div>
@@ -267,10 +267,14 @@
                 <input class="form-control text-box single-line" id="EndDateDL" placeholder="End Date" name="EndDateDL" type="text" value="" />
             </div>
             <div class="col-xs-2">
+                <div class="col-xs-9"><button class="btn btn-success" type="button" style="width:75px" onclick="processyieldbydate()">Yield</button></div>
+                <div class="col-xs-3 text-center"></div>
+            </div>
+            <div class="col-xs-2">
                 <div class="col-xs-9"><button class="btn btn-success" type="button" style="width:75px" onclick="downloadprocessdata()">Download</button></div>
                 <div class="col-xs-3 text-center"></div>
             </div>
-            <div class="col-xs-3">
+            <div class="col-xs-1">
             </div>
             <script type="text/javascript">
                 function downloadprocessdata()
@@ -279,6 +283,13 @@
                     {
                         var myurl = "/CustomerData/DownloadProcessData?ProjectKey=@ViewBag.pjkey" + "&StartDate=" + document.getElementById("StartDateDL").value + "&EndDate=" + document.getElementById("EndDateDL").value;
                         window.open(myurl, '_blank');
+                    }
+                    return false;
+                }
+                function processyieldbydate() {
+                    if (document.getElementById("StartDateDL").value && document.getElementById("EndDateDL").value) {
+                        var myurl = "/Project/ProjectYieldMain?ProjectKey=@ViewBag.pjkey" + "&PStartDate=" + document.getElementById("StartDateDL").value + "&PEndDate=" + document.getElementById("EndDateDL").value;
+                        window.location.href = myurl;
                     }
                     return false;
                 }

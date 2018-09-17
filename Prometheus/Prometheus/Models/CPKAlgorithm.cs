@@ -79,9 +79,29 @@ namespace Prometheus.Models
             var mean = Statistics.Mean(rawdata);
             var stdev = Statistics.StandardDeviation(rawdata);
             var normal = new NormalDistribution(mean, stdev);
+
             var sample = new Sample(rawdata);
             var isnormal = sample.KolmogorovSmirnovTest(normal);
-            return isnormal.Probability;
+
+            var sample2 = new Sample(rawdata);
+            var isnormal2 = sample2.ShapiroFranciaTest();
+
+            var normal3 = new NormalDistribution(mean, stdev);
+            var sample3 = new Sample(rawdata);
+            var isnormal3 = sample3.KuiperTest(normal3);
+
+            var big005 = 0;
+            if (isnormal.Probability >= 0.05)
+            { big005 += 1; }
+            if (isnormal2.Probability >= 0.05)
+            { big005 += 1; }
+            if (isnormal3.Probability >= 0.05)
+            { big005 += 1; }
+
+            if (big005 >= 2)
+            { return Math.Max(isnormal.Probability, Math.Max(isnormal2.Probability,isnormal3.Probability)); }
+            else
+            { return Math.Min(isnormal.Probability, Math.Min(isnormal2.Probability, isnormal3.Probability)); }
         }
 
 

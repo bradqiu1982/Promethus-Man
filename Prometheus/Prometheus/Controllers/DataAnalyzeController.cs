@@ -7,6 +7,7 @@ using Prometheus.Models;
 using System.Text;
 using System.Web.Routing;
 using System.Net;
+using MathNet.Numerics.Statistics;
 
 namespace Prometheus.Controllers
 {
@@ -5344,6 +5345,106 @@ namespace Prometheus.Controllers
             };
             return ret;
         }
+
+        public ActionResult TestDataDistribution()
+        {
+            var yesnolist = new List<string>();
+            yesnolist.Add("NO");
+            yesnolist.Add("YES");
+            ViewBag.allpasslist = CreateSelectList(yesnolist, "");
+            return View();
+        }
+
+        public JsonResult QueryTestDataDist()
+        {
+            var pass = Request.Form["pass"];
+            bool onlypass = false;
+            if (string.Compare(pass, "YES", true) == 0)
+            { onlypass = true; }
+
+            var pj = Request.Form["pj"];
+            var mestab = Request.Form["mestab"].ToUpper().Trim();
+            if (mestab.IndexOf("DC_") == 0)
+            {
+                mestab = mestab.Substring(3);
+            }
+            var paramliststr = Request.Form["param"].Trim();
+            var startdate = Request.Form["startdate"];
+            var enddate = Request.Form["enddate"];
+            var pnlist = Request.Form["pnlist"];
+
+
+            var rawdata = MESUtility.GetTestData2(pnlist, mestab, paramliststr, startdate, enddate, onlypass);
+            if (rawdata.Count == 0)
+            {
+                var ret = new JsonResult();
+                ret.Data = new
+                {
+                    msg = "Fail to get test data, please check your query condition!",
+                    success = false
+                };
+                return ret;
+            }
+
+            var chartdata = new List<object>();
+            var labels = new List<object>();
+
+            var plotline = new List<object>();
+            var colorlist = new string[] { "#4b96f5", "#01ff00", "#e66400", "#910000", "#1aadce","#492970", "#f28f43", "#2f7ed8", "#0d233a", "#8bbc21", "#77a1e5", "#c42525", "#a6c96a"}.ToList();
+            var idx = 0;
+            foreach (var kv in rawdata)
+            {
+                chartdata.Add(HistogramChart.GetChartData(kv.Key, kv.Value,colorlist[idx]));
+
+                chartdata.Add(NormalFit.GetChartData(kv.Key + " Fit", kv.Value, colorlist[idx]));
+
+                var mean = Statistics.Mean(kv.Value);
+                var stddev = Statistics.StandardDeviation(kv.Value);
+
+                var plotlabel = new {
+                    text = kv.Key + "_Mean"
+                };
+                plotline.Add(new {
+                    value= mean,
+                    color = colorlist[idx],
+                    dashStyle = "shortdash",
+                    width = 3,
+                    label = plotlabel
+                });
+
+                labels.Add(
+                    new {
+                            html = "<span><font color='" + colorlist[idx] + "'>"+kv.Key+" Mean:" + Math.Round(mean, 3) + " StdDev:" + Math.Round(stddev, 3) + "</font></span>",
+                            style = new {
+                                left = "20px",
+                                top = (15*(idx+1))+"px"
+                            }
+                        }
+                    );
+
+                idx = idx + 1;
+            }
+            
+            var id = paramliststr.Replace(" ", "_").Replace(";", "_").ToLower() + "_id";
+            var title = paramliststr.Replace(" ", "_").Replace(";", "_") + " Corners Distribution";
+            var outdata = new
+            {
+                id = id,
+                title = title,
+                chartdata = chartdata,
+                plotline = plotline,
+                labels = labels
+            };
+
+            var ret1 = new JsonResult();
+            ret1.Data = new
+            {
+                success = true,
+                outdata = outdata
+            };
+            return ret1;
+        }
+
 
     }
 }

@@ -1814,5 +1814,103 @@ namespace Prometheus.Models
             return GetMinMaxList(dbret);
         }
 
+        public static Dictionary<string,List<double>> GetTestData2(string pndesc, string mestab, string param, string startdate, string enddate, bool onlypass)
+        {
+            var ret = new Dictionary<string, List<double>>();
+            var pncond = GetPNCondFromPNDesc(pndesc);
+            if (string.IsNullOrEmpty(pncond))
+            { return ret; }
+
+            var sql = "";
+            if (onlypass)
+            {
+                sql = @"select top 300000 dce.[<DATAFIELDPARAMETER>],dce.CornerID from [InsiteDB].[insite].[dce_<MESTABNAME>_main] dce 
+                        left join [InsiteDB].[insite].[dc_<MESTABNAME>] dc on dc.dc_<MESTABNAME>HistoryId = dce.ParentHistoryID
+                        where dc.ErrAbbr = 'pass' and dc.TestTimeStamp > '<STARTDATE>' and dc.TestTimeStamp < '<ENDDATE>' 
+                        and dc.[ModuleSerialNum] is not null  and dc.AssemblyPartNum in <PNCOND>
+                        order by dc.TestTimeStamp desc,dc.[ModuleSerialNum]";
+            }
+            else
+            {
+                sql = @"select top 300000 dce.[<DATAFIELDPARAMETER>],dce.CornerID from [InsiteDB].[insite].[dce_<MESTABNAME>_main] dce 
+                        left join [InsiteDB].[insite].[dc_<MESTABNAME>] dc on dc.dc_<MESTABNAME>HistoryId = dce.ParentHistoryID 
+                        where dc.TestTimeStamp > '<STARTDATE>'  and dc.TestTimeStamp < '<ENDDATE>' and dc.[ModuleSerialNum] is not null 
+                         and dc.AssemblyPartNum in <PNCOND> 
+                        order by dc.TestTimeStamp desc,dc.[ModuleSerialNum]";
+            }
+
+            sql = sql.Replace("<DATAFIELDPARAMETER>", param).Replace("<MESTABNAME>", mestab)
+                .Replace("<STARTDATE>", startdate + " 00:00:00").Replace("<ENDDATE>", enddate + " 23:59:59")
+                .Replace("<PNCOND>", pncond);
+
+            var dbret = DBUtility.ExeMESSqlWithRes(sql);
+            if (dbret.Count == 0)
+            { return ret; }
+
+            foreach (var line in dbret)
+            {
+                try
+                {
+                    var val = Convert.ToDouble(line[0]);
+                    var corner = Convert.ToString(line[1]).ToUpper().Trim();
+                    if (corner.Substring(corner.Length - 1).Contains("H"))
+                    {
+                        if (ret.ContainsKey("CORN_H"))
+                        { ret["CORN_H"].Add(val); }
+                        else
+                        {
+                            var tmplist = new List<double>();
+                            tmplist.Add(val);
+                            ret.Add("CORN_H", tmplist);
+                        }
+                    }
+                    else if (corner.Substring(corner.Length - 1).Contains("C"))
+                    {
+                        if (ret.ContainsKey("CORN_C"))
+                        { ret["CORN_C"].Add(val); }
+                        else
+                        {
+                            var tmplist = new List<double>();
+                            tmplist.Add(val);
+                            ret.Add("CORN_C", tmplist);
+                        }
+                    }
+                    else if (corner.Substring(corner.Length - 1).Contains("R"))
+                    {
+                        if (ret.ContainsKey("CORN_R"))
+                        { ret["CORN_R"].Add(val); }
+                        else
+                        {
+                            var tmplist = new List<double>();
+                            tmplist.Add(val);
+                            ret.Add("CORN_R", tmplist);
+                        }
+                    }
+                    else
+                    {
+                        if (ret.ContainsKey(corner))
+                        { ret[corner].Add(val); }
+                        else
+                        {
+                            var tmplist = new List<double>();
+                            tmplist.Add(val);
+                            ret.Add(corner, tmplist);
+                        }   
+                    }
+                }
+                catch (Exception ex) { }
+            }
+
+            var newret = new Dictionary<string, List<double>>();
+            foreach (var kv in ret)
+            {
+                if (kv.Value.Count < 50)
+                { continue; }
+                newret.Add(kv.Key, FilterStrangeValue(kv.Value));
+            }
+
+            return newret;
+        }
+
     }
 }

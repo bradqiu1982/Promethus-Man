@@ -1,0 +1,121 @@
+﻿
+@{
+    ViewBag.Title = "TestDataDistribution";
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
+}
+
+<script type="text/javascript" src="~/Scripts/jquery-bootstrap-loading.js"></script>
+<script type="text/javascript" src="~/Scripts/cpkanalysis.js"></script>
+
+<script type="text/javascript">
+    $(function () {
+        CPKANALYSE.testdistinit();
+    })
+</script>
+
+<style type="text/css">
+    .bootstrap-tagsinput {
+        width: 100% !important;
+    }
+
+    th, td {
+        text-align: center;
+    }
+</style>
+
+<div class="row" style="margin-top:2%">
+    <ol class="breadcrumb" style="width:600px;display:inline-block">
+        <li>Data Analysis</li>
+        <li><a href="/DataAnalyze/CPKAnalysis">Smart CPK</a></li>
+        <li class="active">Test Data Distribution</li>
+    </ol>
+</div>
+
+<div class="row">
+    <div class="col-xs-1" MYTP="orange" style="font-family:'Arial Narrow';font-size:18px"><strong>&nbsp;&nbsp;Query</strong></div>
+    <div class="col-xs-10">
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-2">Project<font color="red">*</font></label>
+                    <div class="col-xs-10">
+                        <input class="form-control" id="projectlist" name="projectlist" type="text" value="" />
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-2" id="datatablelable" name="datatablelable">Data Table<font color="red">*</font></label>
+                    <div class="col-xs-10">
+                        <input class="form-control" id="mestablelist" name="mestablelist" type="text" value="" readonly />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-2">PN DES/PN<font color="red">*</font></label>
+                    <div class="col-xs-10">
+                        <input class="form-control" id="pnlist" name="pnlist" type="text" value="" readonly />
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-2" id="paramlabel" name="paramlabel">Parameter<font color="red">*</font></label>
+                    <div class="col-xs-10">
+                        <input class="form-control" id="queryparam" name="queryparam" type="text" value="" readonly />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-2">Start<font color="red">*</font></label>
+                    <div class="col-xs-10">
+                        <input class="form-control text-box single-line" id="StartDate" placeholder="Start Date" name="StartDate" type="text" value="" />
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-2">End<font color="red">*</font></label>
+                    <div class="col-xs-10">
+                        <input class="form-control text-box single-line" id="EndDate" placeholder="End Date" name="EndDate" type="text" value="" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-xs-6">
+                    <label class="control-label col-xs-2">Only PASS</label>
+                    <div class="col-xs-7">
+                        @Html.DropDownList("allpasslist", null, new { @id = "allpasslist", @name = "allpasslist", @class = "form-control" })
+                    </div>
+                    <div class="col-xs-3">
+                        <button class="btn btn-primary" id="QueryDistribution" name="QueryDistribution">Get Chart</button>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-1"></div>
+</div>
+
+<hr style="border-color:#006DC0;" />
+
+<div class="row">
+    <div class="col-xs-1" MYTP="red" style="font-family:'Arial Narrow';font-size:18px"><strong>&nbsp;&nbsp;Chart</strong></div>
+    <div class="col-xs-10">
+        <div class="v-container">
+            <div class="v-content">
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-1"></div>
+</div>
+
+

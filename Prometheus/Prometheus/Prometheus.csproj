@@ -860,6 +860,7 @@
     <Content Include="Scripts\datatables\jszip.min.js" />
     <Content Include="Scripts\exporting.js" />
     <Content Include="Scripts\FailureTimeDist.xml" />
+    <Content Include="Scripts\highcharts-modal.js" />
     <Content Include="Scripts\highcharts-more.js" />
     <Content Include="Scripts\highcharts.js" />
     <Content Include="Scripts\HTOL.js" />
@@ -1342,6 +1343,7 @@
     <Content Include="Views\Project\ProjectDebugTreeMind.cshtml" />
     <Content Include="Views\DataAnalyze\CPKAnalysis.cshtml" />
     <Content Include="Views\DataAnalyze\CPKTool.cshtml" />
+    <Content Include="Views\DataAnalyze\TestDataDistribution.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

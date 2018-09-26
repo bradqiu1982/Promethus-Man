@@ -593,6 +593,236 @@
         })
     }
 
+    var dist = function () {
+        $("#StartDate").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            dateFormat: 'yy-mm-dd'
+        });
+        $("#EndDate").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            dateFormat: 'yy-mm-dd'
+        });
+
+        $(function () {
+            initpj();
+            fillproject();
+        });
+
+        function initpj() {
+            $('#projectlist').val('');
+            $('#mestablelist').val('');
+            $('#pnlist').val('');
+            $('#queryparam').val('');
+            $('#StartDate').val('');
+            $('#EndDate').val('');
+            $('.v-content').empty();
+
+        }
+
+        function initmes() {
+            $('#mestablelist').val('');
+            $('#pnlist').val('');
+            $('#queryparam').val('');
+            $('#queryparam').attr('readonly', true);
+        }
+
+        function initparam() {
+            $('#queryparam').val('');
+        }
+
+        function fillproject() {
+            $('#mestablelist').attr('readonly', true);
+            $('#pnlist').attr('readonly', true);
+            $('#queryparam').attr('readonly', true);
+
+            $.post('/DataAnalyze/GetStandardPJList', {}, function (output) {
+                if ($('#projectlist').data('autocomplete') || $('#projectlist').data('uiAutocomplete')) {
+                    $('#projectlist').autoComplete("destroy");
+                }
+                $('#projectlist').autoComplete({
+                    minChars: 0,
+                    source: function (term, suggest) {
+                        term = term.toLowerCase();
+                        var choices = output.pjdata;
+                        var suggestions = [];
+                        for (i = 0; i < choices.length; i++)
+                            if (~choices[i].toLowerCase().indexOf(term)) suggestions.push(choices[i]);
+                        suggest(suggestions);
+                    },
+                    onSelect: function (event, term, item) {
+                        enablemestabpn();
+                    }
+                });
+            })
+        }
+
+        $('#projectlist').keyup(function (event) {
+            if (event.keyCode === 13) {
+                enablemestabpn();
+            }
+        });
+
+        $('#mestablelist,#pnlist').focus(function (event) {
+            var pj = $('#projectlist').val();
+            var readonly = $('#mestablelist').attr('readonly');
+            if (pj != '' && readonly) {
+                enablemestabpn();
+            }
+        });
+
+        function enablemestabpn() {
+            var pj = $('#projectlist').val();
+            if (pj != '') {
+                initmes();
+
+                $.post('/DataAnalyze/GetMESTabPN',
+                    { pj: pj },
+                    function (output) {
+                        if ($('#mestablelist').data('autocomplete') || $('#mestablelist').data('uiAutocomplete')) {
+                            $('#mestablelist').autoComplete("destroy");
+                            $('#pnlist').autoComplete("destroy");
+                        }
+                        $('#mestablelist').autoComplete({
+                            minChars: 0,
+                            source: function (term, suggest) {
+                                term = term.toLowerCase();
+                                var choices = output.mestablist;
+                                var suggestions = [];
+                                for (i = 0; i < choices.length; i++)
+                                    if (~choices[i].toLowerCase().indexOf(term)) suggestions.push(choices[i]);
+                                suggest(suggestions);
+                            },
+                            onSelect: function (event, term, item) {
+                                enableparam();
+                            }
+                        });
+                        $('#pnlist').autoComplete({
+                            minChars: 0,
+                            source: function (term, suggest) {
+                                term = term.toLowerCase();
+                                var choices = output.pnlist;
+                                var suggestions = [];
+                                for (i = 0; i < choices.length; i++)
+                                    if (~choices[i].toLowerCase().indexOf(term)) suggestions.push(choices[i]);
+                                suggest(suggestions);
+                            },
+                            onSelect: function (event, term, item) {
+                                enableparam();
+                            }
+                        });
+                    });
+
+                $('#mestablelist').attr('readonly', false);
+                $('#pnlist').attr('readonly', false);
+            }
+        }
+
+        $('#mestablelist').keyup(function (event) {
+            if (event.keyCode === 13) {
+                enableparam();
+            }
+        });
+
+        $('#queryparam').focus(function (event) {
+            var mestab = $('#mestablelist').val();
+            var readonly = $('#queryparam').attr('readonly');
+            if (mestab != '' && readonly) {
+                enableparam();
+            }
+        });
+
+        function enableparam() {
+            var mestab = $('#mestablelist').val();
+            if (mestab != '') {
+                //alert('enableparam()');
+
+                initparam();
+
+                $.post('/DataAnalyze/GetMESParam',
+                    { mestab: mestab },
+                    function (output) {
+                        if ($('#queryparam').data('autocomplete') || $('#queryparam').data('uiAutocomplete')) {
+                            $('#queryparam').autoComplete("destroy");
+                        }
+                        $('#queryparam').autoComplete({
+                            minChars: 0,
+                            source: function (term, suggest) {
+                                term = term.toLowerCase();
+                                var choices = output.paramlist;
+                                var suggestions = [];
+                                for (i = 0; i < choices.length; i++)
+                                    if (~choices[i].toLowerCase().indexOf(term)) suggestions.push(choices[i]);
+                                suggest(suggestions);
+                            }
+                        });
+                    });
+
+                $('#queryparam').attr('readonly', false);
+            }
+        }
+
+        $('body').on('click', '#QueryDistribution', function () {
+
+            var pj = $('#projectlist').val();
+            var mestab = $('#mestablelist').val();
+            var param = $('#queryparam').val();
+            var startdate = $('#StartDate').val();
+            var enddate = $('#EndDate').val();
+            var pnlist = $('#pnlist').val();
+
+            if (pj == ''
+                || mestab == ''
+                || param == ''
+                || startdate == ''
+                || enddate == ''
+                || pnlist == '') {
+                alert('Please complete your query condition!');
+                return false;
+            }
+
+            var allpasslist = $('#allpasslist').val();
+
+            var options = {
+                loadingTips: "Loading Data...",
+                backgroundColor: "#aaa",
+                borderColor: "#fff",
+                opacity: 0.8,
+                borderColor: "#fff",
+                TipsColor: "#000",
+            }
+            $.bootstrapLoading.start(options);
+
+            $.post('/DataAnalyze/QueryTestDataDist', {
+                pj: pj,
+                mestab: mestab,
+                param: param,
+                startdate: startdate,
+                enddate: enddate,
+                pnlist: pnlist,
+                pass: allpasslist
+            },
+            function (output) {
+                $.bootstrapLoading.end();
+
+                $('.v-content').empty();
+
+                if (output.success) {
+                        var appendstr = '<div class="col-xs-12">' +
+                               '<div class="v-box" id="' + output.outdata.id + '"></div>' +
+                               '</div>';
+                        $('.v-content').append(appendstr);
+                        drawdist(output.outdata);
+                }
+                else {
+                    alert(output.msg);
+                }
+                fillproject();
+            });
+        });
+    }
+
     var drawcolumn = function (col_data) {
         var options = {
             chart: {
@@ -717,12 +947,105 @@
         Highcharts.chart(col_data.id, options);
     }
 
+    var drawdist = function (col_data) {
+        var options = {
+            chart: {
+                zoomType: 'xy',
+                type: 'column'
+            },
+            title: {
+                text: col_data.title
+            },
+            xAxis: {
+                title:{
+                    text:'Value'
+                },
+                plotLines: col_data.plotline
+            },
+            legend: {
+                enabled: true,
+            },
+            yAxis:[ {
+                title: {
+                    text: 'Frequence'
+                }
+            },
+            {
+                opposite: true,
+                title: {
+                    text: 'Fit'
+                }
+            }],
+            labels: {
+                items: col_data.labels,
+                style: { position: "relative" }
+            },
+            tooltip: {
+                pointFormat: '{point.x} : <b>{point.y}</b>'
+            },
+            series: col_data.chartdata,
+            exporting: {
+                menuItemDefinitions: {
+                    fullscreen: {
+                        onclick: function () {
+                            $('#' + col_data.id).parent().toggleClass('chart-modal');
+                            $('#' + col_data.id).highcharts().reflow();
+                        },
+                        text: 'Full Screen'
+                    },
+                    datalabel: {
+                        onclick: function () {
+                            var labelflag = !this.series[0].options.dataLabels.enabled;
+                            $.each(this.series, function (idx, val) {
+                                var opt = val.options;
+                                opt.dataLabels.enabled = labelflag;
+                                val.update(opt);
+                            })
+                        },
+                        text: 'Data Label'
+                    },
+                    copycharts: {
+                        onclick: function () {
+                            var svg = this.getSVG({
+                                chart: {
+                                    width: this.chartWidth,
+                                    height: this.chartHeight
+                                }
+                            });
+                            var c = document.createElement('canvas');
+                            c.width = this.chartWidth;
+                            c.height = this.chartHeight;
+                            canvg(c, svg);
+                            var dataURL = c.toDataURL("image/png");
+                            //var imgtag = '<img src="' + dataURL + '"/>';
+
+                            var img = new Image();
+                            img.src = dataURL;
+
+                            copyImgToClipboard(img);
+                        },
+                        text: 'copy 2 clipboard'
+                    }
+                },
+                buttons: {
+                    contextButton: {
+                        menuItems: ['fullscreen', 'datalabel', 'copycharts', 'printChart', 'separator', 'downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
+                    }
+                }
+            }
+        };
+        Highcharts.chart(col_data.id, options);
+    }
+
     return {
         init: function () {
             show();
         },
         toolinit: function () {
             tool();
+        },
+        testdistinit: function () {
+            dist();
         }
     }
 }();

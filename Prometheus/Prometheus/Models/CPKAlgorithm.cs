@@ -316,5 +316,67 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static object GetChartData(string title, List<double> rawdata,string color)
+        {
+            rawdata.Sort();
+            var min = rawdata.Min();
+            var max = rawdata.Max();
+
+            double step = (max - min) / 50.0;
+            var steplist = new List<double>();
+            var startidx = Math.Round((min + 0.5 * step), 5);
+            steplist.Add(startidx);
+            for (var idx = 1; idx < 50; idx++)
+            {
+                steplist.Add(Math.Round((startidx + step * idx), 5));
+            }
+
+            var hist = new MathNet.Numerics.Statistics.Histogram(rawdata, 50);
+            var frequencelist = new List<object>();
+            for (var idx = 0; idx < 50; idx++)
+            {
+                var templist = new List<double>();
+                templist.Add(steplist[idx]);
+                templist.Add(hist[idx].Count);
+                frequencelist.Add(templist);
+            }
+
+            return new
+            {
+                name = title,
+                data = frequencelist,
+                color = color,
+                pointWidth = 10
+            };
+        }
     }
+
+    public class NormalFit
+    {
+        public static object GetChartData(string title, List<double> rawdata, string color)
+        {
+            rawdata.Sort();
+            var mean = Statistics.Mean(rawdata);
+            var stddev = Statistics.StandardDeviation(rawdata);
+
+            var fitlist = new List<object>();
+            for (var idx = 0; idx < rawdata.Count; idx++)
+            {
+                var templist = new List<double>();
+                templist.Add(rawdata[idx]);
+                templist.Add(NormalDistributeAlg.getY(rawdata[idx],stddev,mean));
+                fitlist.Add(templist);
+            }
+
+            return new
+            {
+                type = "line",
+                name = title,
+                data = fitlist,
+                color = color,
+                yAxis = 1
+            };
+        }
+    }
+
 }

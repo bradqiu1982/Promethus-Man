@@ -430,6 +430,89 @@ namespace Prometheus.Controllers
             };
         }
 
+
+        private object GetOTDChartData(List<FsrShipData> otddata, string rate, string producttype)
+        {
+            var id = "otddata_" + rate + "_id";
+            var title = producttype + " Monthly OTD Bills Distribution (" + rate + ")";
+
+            var ordernumdict = new Dictionary<string, double>();
+            var otdnumdict = new Dictionary<string, double>();
+            var otddict = new Dictionary<string, double>();
+
+            foreach (var data in otddata)
+            {
+                var orderdatekey = data.OrderedDate.ToString("yyyy-MM");
+                if (ordernumdict.ContainsKey(orderdatekey))
+                { ordernumdict[orderdatekey] += 1; }
+                else
+                { ordernumdict.Add(orderdatekey, 1); }
+
+                if (data.ShipDate <= data.OPD)
+                {
+                    if (otdnumdict.ContainsKey(orderdatekey))
+                    { otdnumdict[orderdatekey] += 1; }
+                    else
+                    { otdnumdict.Add(orderdatekey, 1); }
+                }
+            }
+
+            var orderkeys = ordernumdict.Keys.ToList();
+            foreach (var o in orderkeys)
+            {
+                if (otdnumdict.ContainsKey(o))
+                { otddict.Add(o, Math.Round(otdnumdict[o] / ordernumdict[o] * 100.0, 2)); }
+                else
+                { otddict.Add(o, 0.0); }
+            }
+
+            orderkeys.Sort(delegate (string obj1, string obj2)
+            {
+                var d1 = DateTime.Parse(obj1 + "-01 00:00:00");
+                var d2 = DateTime.Parse(obj2 + "-01 00:00:00");
+                return d1.CompareTo(d2);
+            });
+
+            var xdata = new List<string>();
+            var ordernumchartdata = new List<double>();
+            var otdchartdata = new List<double>();
+            foreach (var k in orderkeys)
+            {
+                xdata.Add(k);
+                ordernumchartdata.Add(otdnumdict[k]);
+                otdchartdata.Add(otddict[k]);
+            }
+
+            var ordernumchart = new
+            {
+                type = "column",
+                name = "orders bills",
+                data = ordernumchartdata,
+                yAxis = 1
+            };
+
+            var otdchart = new
+            {
+                type = "line",
+                name = "ODT rate",
+                data = otdchartdata,
+                dataLabels= new {
+                enabled = true
+                }
+            };
+
+            var chartdata = new List<object>();
+            chartdata.Add(ordernumchart);
+            chartdata.Add(otdchart);
+
+            return new {
+                id = id,
+                title = title,
+                xdata = xdata,
+                chartdata = chartdata
+            };
+        }
+
         public JsonResult ShipmentDistribution()
         {
             var ssdate = Request.Form["sdate"];
@@ -493,12 +576,25 @@ namespace Prometheus.Controllers
                 orderdataarray.Add(GetOrderQtyChartData(orderdata14g, "10G_14G", SHIPPRODTYPE.PARALLEL));
             }
 
+            var otdarray = new List<object>();
+            var otd25g = FsrShipData.RetrieveOTDByMonth(VCSELRATE.r25G, SHIPPRODTYPE.PARALLEL, startdate.ToString("yyyy-MM-dd HH:mm:ss"), enddate.ToString("yyyy-MM-dd HH:mm:ss"), this);
+            var otd14g = FsrShipData.RetrieveOTDByMonth(VCSELRATE.r14G, SHIPPRODTYPE.PARALLEL, startdate.ToString("yyyy-MM-dd HH:mm:ss"), enddate.ToString("yyyy-MM-dd HH:mm:ss"), this);
+            if (otd25g.Count > 0)
+            {
+                otdarray.Add(GetOTDChartData(otd25g, VCSELRATE.r25G, SHIPPRODTYPE.PARALLEL));
+            }
+            if (otd14g.Count > 0)
+            {
+                otdarray.Add(GetOTDChartData(otd14g, "10G_14G", SHIPPRODTYPE.PARALLEL));
+            }
+
             var ret = new JsonResult();
             ret.Data = new
             {
                 success = true,
                 shipdataarray = shipdataarray,
-                orderdataarray = orderdataarray
+                orderdataarray = orderdataarray,
+                otdarray = otdarray
             };
             return ret;
         }
@@ -531,13 +627,13 @@ namespace Prometheus.Controllers
 
             var shipdata = FsrShipData.RetrieveAllShipDataByMonth(startdate.ToString("yyyy-MM-dd HH:mm:ss"), enddate.ToString("yyyy-MM-dd HH:mm:ss"), this);
             var sb = new StringBuilder(shipdata.Count*200);
-            sb.Append("ShipID,ShipQty,PN,ProdDesc,MarketFamily,Configuration,ShipDate,CustomerNum,Customer1,Customer2,OrderedDate,DelieveNum,VcselType,\r\n");
+            sb.Append("ShipID,ShipQty,PN,ProdDesc,MarketFamily,Configuration,ShipDate,Original Promise Date,CustomerNum,Customer1,Customer2,OrderedDate,DelieveNum,VcselType,\r\n");
             foreach (var item in shipdata)
             {
                 sb.Append("\"" + item.ShipID.Replace("\"", "") + "\"," + "\"" + item.ShipQty.ToString().Replace("\"", "") + "\"," + "\"" + item.PN.Replace("\"", "") + "\","
                     + "\"" + item.ProdDesc.Replace("\"", "") + "\"," + "\"" + item.MarketFamily.Replace("\"", "") + "\"," + "\"" + item.Configuration.Replace("\"", "") + "\"," 
-                    + "\"" + item.ShipDate.ToString("yyyy-MM-dd HH:mm:ss").Replace("\"", "") + "\"," + "\"" + item.CustomerNum.Replace("\"", "") 
-                    + "\"," + "\"" + item.Customer1.Replace("\"", "") + "\"," + "\"" + item.Customer2.Replace("\"", "") + "\","
+                    + "\"" + item.ShipDate.ToString("yyyy-MM-dd HH:mm:ss").Replace("\"", "") + "\","+ "\"" + item.OPD.ToString("yyyy-MM-dd HH:mm:ss").Replace("\"", "") + "\"," 
+                    + "\"" + item.CustomerNum.Replace("\"", "") + "\"," + "\"" + item.Customer1.Replace("\"", "") + "\"," + "\"" + item.Customer2.Replace("\"", "") + "\","
                     + "\"" + item.OrderedDate.ToString("yyyy-MM-dd HH:mm:ss").Replace("\"", "") + "\"," + "\"" + item.DelieveNum.Replace("\"", "") + "\"," 
                     + "\"" + item.VcselType.Replace("\"", "") + "\",\r\n");
             }

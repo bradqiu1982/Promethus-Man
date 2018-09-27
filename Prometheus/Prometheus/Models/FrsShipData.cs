@@ -25,8 +25,11 @@ namespace Prometheus.Models
 
     public class FsrShipData
     {
+        public FsrShipData()
+        { }
+
         public FsrShipData(string id, int qty, string pn, string pndesc, string family, string cfg
-            , DateTime shipdate, string custnum, string cust1, string cust2, DateTime orddate, string delievenum,int orderqty)
+            , DateTime shipdate, string custnum, string cust1, string cust2, DateTime orddate, string delievenum,int orderqty,DateTime opd)
         {
             ShipID = id;
             ShipQty = qty;
@@ -44,6 +47,7 @@ namespace Prometheus.Models
             SN = string.Empty;
             Wafer = string.Empty;
             OrderQty = orderqty;
+            OPD = opd;
         }
 
         public static Dictionary<string, bool> RetrieveAllShipID()
@@ -58,8 +62,8 @@ namespace Prometheus.Models
 
         public void StoreShipData()
         {
-            var sql = @"insert into FsrShipData(ShipID,ShipQty,PN,ProdDesc,MarketFamily,Configuration,VcselType,ShipDate,CustomerNum,Customer1,Customer2,OrderedDate,DelieveNum,SN,Wafer,Appv_1) values(
-                        @ShipID,@ShipQty,@PN,@ProdDesc,@MarketFamily,@Configuration,@VcselType,@ShipDate,@CustomerNum,@Customer1,@Customer2,@OrderedDate,@DelieveNum,@SN,@Wafer,@OrderQty)";
+            var sql = @"insert into FsrShipData(ShipID,ShipQty,PN,ProdDesc,MarketFamily,Configuration,VcselType,ShipDate,CustomerNum,Customer1,Customer2,OrderedDate,DelieveNum,SN,Wafer,Appv_1,Appv_5) values(
+                        @ShipID,@ShipQty,@PN,@ProdDesc,@MarketFamily,@Configuration,@VcselType,@ShipDate,@CustomerNum,@Customer1,@Customer2,@OrderedDate,@DelieveNum,@SN,@Wafer,@OrderQty,@OPD)";
             var dict = new Dictionary<string, string>();
             dict.Add("@ShipID", ShipID);
             dict.Add("@ShipQty", ShipQty.ToString());
@@ -77,7 +81,16 @@ namespace Prometheus.Models
             dict.Add("@SN", SN);
             dict.Add("@Wafer", Wafer);
             dict.Add("@OrderQty", OrderQty.ToString());
+            dict.Add("@OPD", OPD.ToString("yyyy-MM-dd HH:mm:ss"));
+            DBUtility.ExeLocalSqlNoRes(sql, dict);
+        }
 
+        public static void UpdateOPD(string shipid, string OPD)
+        {
+            var sql = "update FsrShipData set Appv_5=@OPD where ShipID=@ShipID";
+            var dict = new Dictionary<string, string>();
+            dict.Add("@ShipID", shipid);
+            dict.Add("@OPD", OPD);
             DBUtility.ExeLocalSqlNoRes(sql, dict);
         }
 
@@ -238,11 +251,50 @@ namespace Prometheus.Models
             return ret;
         }
 
+        public static List<FsrShipData> RetrieveOTDByMonth(string rate, string producttype, string sdate, string edate, Controller ctrl)
+        {
+            var ret = new List<FsrShipData>();
+            var sql = @"select ShipDate,Appv_5,PN,ProdDesc,OrderedDate from FsrShipData where OrderedDate >= @sdate and OrderedDate <= @edate and Configuration = @producttype ";
+
+            if (string.Compare(rate, VCSELRATE.r14G, true) == 0)
+            {
+                sql = sql + " and ( VcselType = '" + VCSELRATE.r14G + "' or VcselType = '" + VCSELRATE.r10G + "')";
+            }
+            else
+            {
+                sql = sql + " and VcselType = '" + rate + "'";
+            }
+
+            var dict = new Dictionary<string, string>();
+            dict.Add("@sdate", sdate);
+            dict.Add("@edate", edate);
+            dict.Add("@producttype", producttype);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null, dict);
+            foreach (var line in dbret)
+            {
+                var tempvm = new FsrShipData();
+                tempvm.ShipDate = Convert.ToDateTime(line[0]);
+                tempvm.OPD = Convert.ToDateTime(line[1]);
+                tempvm.PN = Convert.ToString(line[2]);
+                tempvm.ProdDesc = Convert.ToString(line[3]);
+                tempvm.OrderedDate = Convert.ToDateTime(line[4]);
+
+                if (string.Compare(tempvm.OPD.ToString("yyyy-MM"), "1982-05") == 0)
+                { continue; }
+
+                ret.Add(tempvm);
+            }
+
+            return ret;
+        }
+
+
+
         public static List<FsrShipData> RetrieveAllShipDataByMonth(string sdate, string edate, Controller ctrl)
         {
             var ret = new List<FsrShipData>();
             var custdict = CfgUtility.GetAllCustConfig(ctrl);
-            var sql = @"select ShipID,ShipQty,PN,ProdDesc,MarketFamily,Configuration,ShipDate,CustomerNum,Customer1,Customer2,OrderedDate,DelieveNum,VcselType,Appv_1 
+            var sql = @"select ShipID,ShipQty,PN,ProdDesc,MarketFamily,Configuration,ShipDate,CustomerNum,Customer1,Customer2,OrderedDate,DelieveNum,VcselType,Appv_1,Appv_5 
                          from FsrShipData where ShipDate >= @sdate and ShipDate <= @edate order by ShipDate ASC";
 
             var dict = new Dictionary<string, string>();
@@ -259,7 +311,7 @@ namespace Prometheus.Models
                 var tempvm = new FsrShipData(Convert.ToString(line[0]), Convert.ToInt32(line[1]), Convert.ToString(line[2])
                     , Convert.ToString(line[3]), Convert.ToString(line[4]), Convert.ToString(line[5])
                     , Convert.ToDateTime(line[6]), Convert.ToString(line[7]), realcust
-                    , Convert.ToString(line[9]), Convert.ToDateTime(line[10]), Convert.ToString(line[11]),Convert.ToInt32(line[13]));
+                    , Convert.ToString(line[9]), Convert.ToDateTime(line[10]), Convert.ToString(line[11]),Convert.ToInt32(line[13]),Convert.ToDateTime(line[14]));
                 tempvm.VcselType = Convert.ToString(line[12]);
                 ret.Add(tempvm);
             }
@@ -283,5 +335,6 @@ namespace Prometheus.Models
         public string SN { set; get; }
         public string Wafer { set; get; }
         public double OrderQty { set; get; }
+        public DateTime OPD { set; get; }
     }
 }

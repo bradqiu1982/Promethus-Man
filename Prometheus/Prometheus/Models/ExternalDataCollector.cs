@@ -4187,6 +4187,8 @@ namespace Prometheus.Models
                 var shipdatalist = new List<FsrShipData>();
                 var pnsndict = new Dictionary<string, string>();
 
+                var opddict = new Dictionary<string, string>();
+
                 foreach (var line in data)
                 {
                     try {
@@ -4209,7 +4211,10 @@ namespace Prometheus.Models
                                 var customer1 = Convert2Str(line[4]);
                                 var customer2 = Convert2Str(line[6]);
                                 var pndesc = Convert2Str(line[12]);
+
+                                var opd = Convert.ToDateTime(line[17]);
                                 var shipdate = Convert.ToDateTime(line[19]);
+
                                 var cfg = Convert2Str(line[32]);
                                 var delievenum = Convert2Str(line[24]);
 
@@ -4219,7 +4224,7 @@ namespace Prometheus.Models
                                 }
 
                                 shipdatalist.Add(new FsrShipData(shipid, shipqty, pn, pndesc, family, cfg
-                                    , shipdate, customernum, customer1, customer2, ordereddate, delievenum, orderqty));
+                                    , shipdate, customernum, customer1, customer2, ordereddate, delievenum, orderqty,opd));
 
                             }//end if
                         }//end if
@@ -4263,6 +4268,7 @@ namespace Prometheus.Models
                     }
                     item.StoreShipData();
                 }
+
             }//end if
         }
         #endregion

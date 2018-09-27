@@ -5482,6 +5482,8 @@ namespace Prometheus.Controllers
                 return ret;
             }
 
+            CPKCache.UpdateCPKParams(pj, mestab, pnlist, paramliststr, "", "", "", "MES");
+
             var chartdata = new List<object>();
             var labels = new List<object>();
 

@@ -5131,8 +5131,8 @@ namespace Prometheus.Controllers
             }
             var paramliststr = Request.Form["param"];
             var cornid = Request.Form["cornid"];
-            var lowlimit = Request.Form["lowlimit"];
-            var highlimit = Request.Form["highlimit"];
+            var lowlimit = Request.Form["lowlimit"].Split(new string[] { ",", ";" }, StringSplitOptions.None).ToList();
+            var highlimit = Request.Form["highlimit"].Split(new string[] { ",", ";" }, StringSplitOptions.None).ToList();
             var startdate = Request.Form["startdate"];
             var enddate = Request.Form["enddate"];
             var pnlist = Request.Form["pnlist"];
@@ -5140,7 +5140,21 @@ namespace Prometheus.Controllers
             var cpkdatalist = new List<object>();
             var chartlist = new List<object>();
 
+            var idx = 0;
             var paramlist = paramliststr.Split(new string[] { ",", ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            if ((paramlist.Count != lowlimit.Count)
+                || (paramlist.Count != highlimit.Count))
+            {
+                var ret = new JsonResult();
+                ret.Data = new
+                {
+                    msg = "parameter list should match limit list one by one!",
+                    success = false
+                };
+                return ret;
+            }
+
             foreach (var param in paramlist)
             {
                 var rawdata = MESUtility.GetTestData(pnlist, mestab, param, cornid, startdate, enddate, onlypass);
@@ -5169,10 +5183,10 @@ namespace Prometheus.Controllers
                     return ret;
                 }
 
-                CPKCache.UpdateCPKParams(pj, mestab, pnlist, param, cornid, lowlimit, highlimit, database);
+                CPKCache.UpdateCPKParams(pj, mestab, pnlist, param, cornid, lowlimit[idx].Trim(), highlimit[idx].Trim(), database);
 
-                var cpkmindata = CPKData.GetCpk(minlist, lowlimit, highlimit)[0];
-                var cpkmaxdata = CPKData.GetCpk(maxlist, lowlimit, highlimit)[0];
+                var cpkmindata = CPKData.GetCpk(minlist, lowlimit[idx].Trim(), highlimit[idx].Trim())[0];
+                var cpkmaxdata = CPKData.GetCpk(maxlist, lowlimit[idx].Trim(), highlimit[idx].Trim())[0];
 
                 var datafrom = "MAX DATASET";
                 var mean = cpkmaxdata.Mean;
@@ -5193,11 +5207,11 @@ namespace Prometheus.Controllers
 
                 var id = "min_" + param.Replace(" ", "_").ToLower() + "_id";
                 var title = param + " Min Dataset Histogram";
-                chartlist.Add(HistogramChart.GetChartData(id, title, lowlimit, highlimit, minlist));
+                chartlist.Add(HistogramChart.GetChartData(id, title, lowlimit[idx].Trim(), highlimit[idx].Trim(), minlist));
 
                 id = "max_" + param.Replace(" ", "_").ToLower() + "_id";
                 title = param + " Max Dataset Histogram";
-                chartlist.Add(HistogramChart.GetChartData(id, title, lowlimit, highlimit, maxlist));
+                chartlist.Add(HistogramChart.GetChartData(id, title, lowlimit[idx].Trim(), highlimit[idx].Trim(), maxlist));
 
                 var sourcedata = DownLoadCPKSourceData(minlist, maxlist, param, cpkmindata, cpkmaxdata
                     , datafrom, mean, stddev,isnormal,realcpk,dppm);
@@ -5228,6 +5242,8 @@ namespace Prometheus.Controllers
                         cpkmax = cpkmaxdata.Cpk_final,
                         sourcedata = sourcedata
                     });
+
+                idx = idx + 1;
             }//end foreach
  
             var allret = new JsonResult();

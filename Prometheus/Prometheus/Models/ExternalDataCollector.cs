@@ -4174,11 +4174,32 @@ namespace Prometheus.Models
             return string.Empty;
         }
 
+        private static Dictionary<string, bool> RetrieveAllParallelPN()
+        {
+            var ret = new Dictionary<string, bool>();
+            var sql = @"select distinct pb.ProductName from [InsiteDB].[insite].[ProductFamily] pf
+                          left join [InsiteDB].[insite].[Product] pd on pd.ProductFamilyId = pf.ProductFamilyId
+                          left join [InsiteDB].[insite].[ProductBase] pb on pb.ProductBaseId = pd.ProductBaseId
+                          where  pf.ProductFamilyName like 'Parallel%'  and pd.[Description] is not null  and pb.ProductName is not null 
+                          and ( pd.[Description] not like 'LEN%' and pd.[Description] not like 'Shell%')";
+            var dbret = DBUtility.ExeMESSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                try
+                {
+                    ret.Add(Convert.ToString(line[0]), true);
+                }
+                catch (Exception ex) { }
+            }
+            return ret;
+        }
+
         public static void RefreshShipData(Controller ctrl)
         {
             var syscfg = CfgUtility.GetSysConfig(ctrl);
             var shipsrcfile = syscfg["FINISARSHIPDATA"];
             var shipdesfile = DownloadShareFile(shipsrcfile,ctrl);
+            var parallelpndict = RetrieveAllParallelPN();
 
             if (!string.IsNullOrEmpty(shipdesfile))
             {
@@ -4203,9 +4224,17 @@ namespace Prometheus.Models
                             var pn = Convert2Str(line[10]);
 
                             if (!cpo.Contains("RMA") && !cpo.Contains("STOCK")
-                                && makebuy.Contains("MAKE") && !string.IsNullOrEmpty(family)
+                                && makebuy.Contains("MAKE") 
                                 && shipqty > 0 && !string.IsNullOrEmpty(pn))
                             {
+                                var cfg = Convert2Str(line[32]);
+                                if (string.IsNullOrEmpty(cfg))
+                                {
+                                    if (!parallelpndict.ContainsKey(pn))
+                                    { continue; }
+                                    cfg = "PARALLEL";
+                                }
+
                                 var ordereddate = Convert.ToDateTime(line[2]);
                                 var customernum = Convert2Str(line[3]);
                                 var customer1 = Convert2Str(line[4]);
@@ -4215,7 +4244,7 @@ namespace Prometheus.Models
                                 var opd = Convert.ToDateTime(line[17]);
                                 var shipdate = Convert.ToDateTime(line[19]);
 
-                                var cfg = Convert2Str(line[32]);
+                                
                                 var delievenum = Convert2Str(line[24]);
 
                                 if (!pnsndict.ContainsKey(pn))

@@ -10,6 +10,11 @@ DECLARE @Subject  nvarchar(255);
 SET @Subject = N'\\Wux-d80008792\D\newbak\NPITrace'+ REPLACE(REPLACE(REPLACE(CONVERT(varchar,GETDATE(), 20),'-',''),':',''),' ','') +N'.bak';
 BACKUP DATABASE [NPITrace]  TO DISK =  @Subject;
 
+clean dup row 
+alter table FsrShipData add myid  int  identity(1,1)
+DELETE FROM [FsrShipData] where myid not in ( SELECT MIN(myid) as RowId FROM [FsrShipData]  GROUP BY ShipID )
+alter table [FsrShipData] drop column myid
+
 
 CREATE TABLE [dbo].[UserMatrix] (
     [UserName]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,

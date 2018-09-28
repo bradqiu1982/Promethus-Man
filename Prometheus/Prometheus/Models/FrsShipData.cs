@@ -254,13 +254,13 @@ namespace Prometheus.Models
         public static List<FsrShipData> RetrieveOTDByMonth(string rate, string producttype, string sdate, string edate, Controller ctrl)
         {
             var ret = new List<FsrShipData>();
-            var sql = @"select ShipDate,Appv_5,PN,ProdDesc,OrderedDate from FsrShipData where OrderedDate >= @sdate and OrderedDate <= @edate and Configuration = @producttype ";
+            var sql = @"select ShipDate,Appv_5,PN,ProdDesc from FsrShipData where Appv_5 >= @sdate and Appv_5 <= @edate and Configuration = @producttype ";
 
             if (string.Compare(rate, VCSELRATE.r14G, true) == 0)
             {
                 sql = sql + " and ( VcselType = '" + VCSELRATE.r14G + "' or VcselType = '" + VCSELRATE.r10G + "')";
             }
-            else
+            else if (string.Compare(rate, VCSELRATE.r25G, true) == 0)
             {
                 sql = sql + " and VcselType = '" + rate + "'";
             }
@@ -277,7 +277,6 @@ namespace Prometheus.Models
                 tempvm.OPD = Convert.ToDateTime(line[1]);
                 tempvm.PN = Convert.ToString(line[2]);
                 tempvm.ProdDesc = Convert.ToString(line[3]);
-                tempvm.OrderedDate = Convert.ToDateTime(line[4]);
 
                 if (string.Compare(tempvm.OPD.ToString("yyyy-MM"), "1982-05") == 0)
                 { continue; }

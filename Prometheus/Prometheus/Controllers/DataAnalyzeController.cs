@@ -442,7 +442,7 @@ namespace Prometheus.Controllers
 
             foreach (var data in otddata)
             {
-                var orderdatekey = data.OrderedDate.ToString("yyyy-MM");
+                var orderdatekey = data.OPD.ToString("yyyy-MM");
                 if (ordernumdict.ContainsKey(orderdatekey))
                 { ordernumdict[orderdatekey] += 1; }
                 else
@@ -479,7 +479,7 @@ namespace Prometheus.Controllers
             foreach (var k in orderkeys)
             {
                 xdata.Add(k);
-                ordernumchartdata.Add(otdnumdict[k]);
+                ordernumchartdata.Add(ordernumdict[k]);
                 otdchartdata.Add(otddict[k]);
             }
 
@@ -586,6 +586,11 @@ namespace Prometheus.Controllers
             if (otd14g.Count > 0)
             {
                 otdarray.Add(GetOTDChartData(otd14g, "10G_14G", SHIPPRODTYPE.PARALLEL));
+            }
+            var otdall = FsrShipData.RetrieveOTDByMonth("", SHIPPRODTYPE.PARALLEL, startdate.ToString("yyyy-MM-dd HH:mm:ss"), enddate.ToString("yyyy-MM-dd HH:mm:ss"), this);
+            if (otdall.Count > 0)
+            {
+                otdarray.Add(GetOTDChartData(otdall, "ALL", SHIPPRODTYPE.PARALLEL));
             }
 
             var ret = new JsonResult();

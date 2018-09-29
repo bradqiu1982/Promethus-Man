@@ -1106,9 +1106,12 @@ namespace Prometheus.Controllers
         private void RetrievePNs(ProjectViewModels projectmodel)
         {
             projectmodel.PNs = Request.Form["PNs"];
-            if (!string.IsNullOrEmpty(Request.Form["OSAPNs"]))
+            if (string.Compare(projectmodel.ProjectType, ProjectTypeInf.OSA) == 0)
             {
-                projectmodel.PNs = Request.Form["OSAPNs"];
+                if (!string.IsNullOrEmpty(Request.Form["OSAPNs"]))
+                {
+                    projectmodel.PNs = Request.Form["OSAPNs"];
+                }
             }
         }
 

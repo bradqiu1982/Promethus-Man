@@ -254,7 +254,8 @@ namespace Prometheus.Models
         public static List<FsrShipData> RetrieveOTDByMonth(string rate, string producttype, string sdate, string edate, Controller ctrl)
         {
             var ret = new List<FsrShipData>();
-            var sql = @"select ShipDate,Appv_5,PN,ProdDesc from FsrShipData where Appv_5 >= @sdate and Appv_5 <= @edate and Configuration = @producttype ";
+            var sql = @"select ShipDate,Appv_5,PN,ProdDesc from FsrShipData where Appv_5 >= @sdate and Appv_5 <= @edate and Configuration = @producttype 
+                        and Customer1  not like '%FINISAR%' and Customer2 not like  '%FINISAR%' ";
 
             if (string.Compare(rate, VCSELRATE.r14G, true) == 0)
             {

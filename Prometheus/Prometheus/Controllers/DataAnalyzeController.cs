@@ -5520,16 +5520,16 @@ namespace Prometheus.Controllers
                 var mean = Statistics.Mean(kv.Value);
                 var stddev = Statistics.StandardDeviation(kv.Value);
 
-                var plotlabel = new {
-                    text = kv.Key + "_Mean"
-                };
-                plotline.Add(new {
-                    value= mean,
-                    color = colorlist[idx],
-                    dashStyle = "shortdash",
-                    width = 3,
-                    label = plotlabel
-                });
+                //var plotlabel = new {
+                //    text = kv.Key + "_Mean"
+                //};
+                //plotline.Add(new {
+                //    value= mean,
+                //    color = colorlist[idx],
+                //    dashStyle = "shortdash",
+                //    width = 3,
+                //    label = plotlabel
+                //});
 
                 labels.Add(
                     new {

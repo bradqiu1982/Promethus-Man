@@ -2720,6 +2720,69 @@ namespace Prometheus.Controllers
                 }
             }
 
+            var attachtag = string.Empty;
+            for (var i = 0; i < 200; i++)
+            {
+                if (Request.Form["attachtagcheck" + i] != null)
+                {
+                    attachtag = attachtag + Request.Form["attachtagcheck" + i] + ";";
+                }
+            }
+
+            var urls = ReceiveRMAFiles();
+            var gottenattach = false;
+            if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
+            {
+                var attachementfile = Request.Form["attachmentupload"];
+                var originalfilename1 = Path.GetFileName(attachementfile);
+                var originalname1 = Path.GetFileNameWithoutExtension(attachementfile)
+                    .Replace(" ", "_").Replace("#", "").Replace("'", "")
+                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                var url = "";
+                foreach (var r in urls)
+                {
+                    if (r.Contains(originalname1))
+                    {
+                        url = r;
+                        break;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(url))
+                {
+                    gottenattach = true;
+
+                    IssueViewModels.StoreIssueAttachment(originaldata.IssueKey, url);
+                    StoreAttachComment(this, originaldata.IssueKey, originalfilename1, url, updater);
+
+                    if (!string.IsNullOrEmpty(attachtag))
+                    {
+                        var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+                        var dockey = tempkeys[tempkeys.Length - 1];
+                        ShareDocVM.ShareDoc(originaldata.ProjectKey, ShareDocType.DOCUMENT, dockey, attachtag, updater, DateTime.Now.ToString(), "/Issue/UpdateIssue?issuekey=" + originaldata.IssueKey);
+
+                        UserKPIVM.AddUserAttachDailyRank(originaldata.IssueKey, updater, UserRankType.ADDITIONAL
+                        , "Add attachement with tag to task: " + dockey, "/Issue/UpdateIssue?issuekey=" + originaldata.IssueKey, 2, dockey, this);
+                    }
+                    else
+                    {
+                        var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+                        var dockey = tempkeys[tempkeys.Length - 1];
+
+                        UserKPIVM.AddUserAttachDailyRank(originaldata.IssueKey, updater, UserRankType.ADDITIONAL
+                        , "Add attachement to task: " + dockey, "/Issue/UpdateIssue?issuekey=" + originaldata.IssueKey, 1, dockey, this);
+                    }
+                }
+            }
+
+            if (string.Compare(originaldata.Resolution, Request.Form["resolutionlist"].ToString(), true) != 0
+                    && IssueClosed(Request.Form["resolutionlist"].ToString()) && originaldata.AttachList.Count == 0 && !gottenattach)
+            {
+                closeauth = false;
+                SetNoticeInfo("To close task, a FA report is necessary!");
+            }
+
             var originalassignee = originaldata.Assignee;
             var originaldataresolution = originaldata.Resolution;
             if (closeauth)
@@ -2747,60 +2810,6 @@ namespace Prometheus.Controllers
                 if (Request.Form["issuetagcheck" + i] != null)
                 {
                     issuetag = issuetag + Request.Form["issuetagcheck" + i] + ";";
-                }
-            }
-
-            var attachtag = string.Empty;
-            for (var i = 0; i < 200; i++)
-            {
-                if (Request.Form["attachtagcheck" + i] != null)
-                {
-                    attachtag = attachtag + Request.Form["attachtagcheck" + i] + ";";
-                }
-            }
-
-            var urls = ReceiveRMAFiles();
-
-            if (!string.IsNullOrEmpty(Request.Form["attachmentupload"]))
-            {
-                var attachementfile = Request.Form["attachmentupload"];
-                var originalfilename1 = Path.GetFileName(attachementfile);
-                var originalname1 = Path.GetFileNameWithoutExtension(attachementfile)
-                    .Replace(" ", "_").Replace("#", "").Replace("'", "")
-                    .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                var url = "";
-                foreach (var r in urls)
-                {
-                    if (r.Contains(originalname1))
-                    {
-                        url = r;
-                        break;
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(url))
-                {
-                    IssueViewModels.StoreIssueAttachment(originaldata.IssueKey, url);
-                    StoreAttachComment(this, originaldata.IssueKey, originalfilename1, url, updater);
-
-                    if (!string.IsNullOrEmpty(attachtag))
-                    {
-                        var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
-                        var dockey = tempkeys[tempkeys.Length - 1];
-                        ShareDocVM.ShareDoc(originaldata.ProjectKey, ShareDocType.DOCUMENT, dockey, attachtag, updater, DateTime.Now.ToString(), "/Issue/UpdateIssue?issuekey=" + originaldata.IssueKey);
-
-                        UserKPIVM.AddUserAttachDailyRank(originaldata.IssueKey, updater, UserRankType.ADDITIONAL
-                        , "Add attachement with tag to task: " + dockey, "/Issue/UpdateIssue?issuekey=" + originaldata.IssueKey, 2, dockey, this);
-                    }
-                    else
-                    {
-                        var tempkeys = url.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
-                        var dockey = tempkeys[tempkeys.Length - 1];
-
-                        UserKPIVM.AddUserAttachDailyRank(originaldata.IssueKey, updater, UserRankType.ADDITIONAL
-                        , "Add attachement to task: " + dockey, "/Issue/UpdateIssue?issuekey=" + originaldata.IssueKey, 1, dockey, this);
-                    }
                 }
             }
 
@@ -2839,6 +2848,7 @@ namespace Prometheus.Controllers
 
             var dict = new RouteValueDictionary();
             dict.Add("issuekey", originaldata.IssueKey);
+
             return RedirectToAction("UpdateRel", "Issue", dict);
         }
 

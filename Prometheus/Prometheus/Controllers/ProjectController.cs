@@ -939,7 +939,17 @@ namespace Prometheus.Controllers
 
                         if (tableseg && line.Contains("="))
                         {
-                            ret.Add(new ProjectMesTable("", line.Split(new char[] { '=' })[0].Trim(), line.Split(new char[] { '=' })[1].Trim().Replace("\"", "")));
+                            var stat = line.Split(new char[] { '=' })[0].Trim();
+                            var mestab = line.Split(new char[] { '=' })[1].Trim().Replace("\"", "");
+                            if (string.Compare(mestab, "Module_Initialization_0811", true) == 0)
+                            {
+                                ret.Add(new ProjectMesTable("", stat, "initial"));
+                            }
+                            else
+                            {
+                                ret.Add(new ProjectMesTable("", stat ,mestab));
+                            }
+                            
                         }
                     }
                 }

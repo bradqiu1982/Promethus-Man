@@ -71,7 +71,7 @@
                 return false;
             }
 
-            window.location.href = "/CustomerData/RealATETestData?mdtype=" + mfamily + "&starttime=" + startdate + "&endtime=" + enddate;
+            window.location.href = "/CustomerData/RealATETestData?mdtype=" + mfamily.replace("+","%2B") + "&starttime=" + startdate + "&endtime=" + enddate;
         }
 
         function DownloadFilterATE() {
@@ -83,6 +83,7 @@
                 alert("All information need to be input!");
                 return false;
             }
-            window.location.href = "/CustomerData/RealATETestData?mdtype=" + mfamily + "&starttime=" + startdate + "&endtime=" + enddate+"&filtered=true";
+
+            window.location.href = "/CustomerData/RealATETestData?mdtype=" + mfamily.replace("+","%2B") + "&starttime=" + startdate + "&endtime=" + enddate+"&filtered=true";
         }
 </script>

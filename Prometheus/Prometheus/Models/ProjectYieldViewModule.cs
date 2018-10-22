@@ -299,7 +299,15 @@ namespace Prometheus.Models
                 temptimepoint = temptimepoint.AddDays(7);
                 if (temptimepoint > edate)
                 {
-                    ret.Add(DateTime.Parse(DateTime.Parse(enddate).ToString("yyyy-MM-dd") + " 07:30:00"));
+                    if (DateTime.Parse(enddate).DayOfWeek == DayOfWeek.Thursday)
+                    {
+                        ret.Add(DateTime.Parse(DateTime.Parse(enddate).ToString("yyyy-MM-dd") + " 07:30:00"));
+                    }
+                    else
+                    {
+                        ret.Add(DateTime.Parse(enddate));
+                    }
+
                     return ret;
                 }
                 else

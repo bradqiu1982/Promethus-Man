@@ -1504,11 +1504,14 @@ namespace Prometheus.Controllers
             return RedirectToAction("UpdateRMA", "Issue", dict);
         }
 
-        private List<IssueViewModels> RetrieveSameAsIssue(string ProjectKey,string ErrAbbr)
+        private List<List<IssueViewModels>> RetrieveSameAsIssue(string ProjectKey,string ErrAbbr)
         {
+            var ret = new List<List<IssueViewModels>>();
+
             var vm = ProjectFAViewModules.RetrieveFADataWithErrAbbr(ProjectKey, ErrAbbr, this);
 
-            var tempitems = new List<IssueViewModels>();
+            var donelist = new List<IssueViewModels>();
+            var workinglist = new List<IssueViewModels>();
 
             foreach (var item in vm)
             {
@@ -1522,35 +1525,16 @@ namespace Prometheus.Controllers
                         continue;
                     }
 
-                    if (item.IssueData.CommentList.Count == 2)
-                    {
-                        var removesameasissue = false;
-                        foreach (var c in item.IssueData.CommentList)
-                        {
-                            if (c.Comment.Contains("<p>Issue Same As <a"))
-                            {
-                                removesameasissue = true;
-                                break;
-                            }
-
-                            if (c.Comment.Contains("passed")
-                                && string.Compare(c.Reporter, "System", true) == 0)
-                            {
-                                removesameasissue = true;
-                                break;
-                            }
-                        }
-                        if (removesameasissue)
-                        {
-                            continue;
-                        }
-                    }
-
-                    tempitems.Add(item.IssueData);
+                    donelist.Add(item.IssueData);
+                }
+                else if (string.Compare(item.IssueData.Resolution,Resolute.Working) == 0)
+                {
+                    workinglist.Add(item.IssueData);
                 }
             }
-
-            return tempitems;
+            ret.Add(donelist);
+            ret.Add(workinglist);
+            return ret;
         }
 
         public ActionResult UpdateBug(string issuekey)
@@ -1651,7 +1635,9 @@ namespace Prometheus.Controllers
 
                 GetNoticeInfo();
 
-                var sameaslinks = RetrieveSameAsIssue(ret.ProjectKey, ret.ErrAbbr);
+                var samelist = RetrieveSameAsIssue(ret.ProjectKey, ret.ErrAbbr);
+
+                var sameaslinks = samelist[0];
                 if (sameaslinks.Count > 0)
                 {
                     var pslist = new List<SelectListItem>();
@@ -1666,6 +1652,23 @@ namespace Prometheus.Controllers
                         pslist.Add(pitem);
                     }
                     ViewBag.DoneIssueList = pslist;
+                }
+
+                var samesolutionlist = samelist[1];
+                if (samesolutionlist.Count > 0)
+                {
+                    var pslist = new List<SelectListItem>();
+                    foreach (var item in samesolutionlist)
+                    {
+                        if (string.Compare(item.IssueKey, ret.IssueKey) == 0)
+                        { continue; }
+
+                        var pitem = new SelectListItem();
+                        pitem.Text = item.Summary;
+                        pitem.Value = item.IssueKey;
+                        pslist.Add(pitem);
+                    }
+                    ViewBag.WorkingIssueList = pslist;
                 }
 
                 return View(ret);
@@ -3679,6 +3682,50 @@ namespace Prometheus.Controllers
             dict.Add("issuekey", tobeid);
             return RedirectToAction("UpdateBug", "Issue", dict);
         }
+
+        public ActionResult SolveAsInBug(string sameid, string tobeid)
+        {
+            var targetdata = IssueViewModels.RetrieveIssueByIssueKey(sameid, this);
+            var tobedata = IssueViewModels.RetrieveIssueByIssueKey(tobeid, this);
+            if (string.Compare(tobedata.Resolution, Resolute.Pending) != 0
+                && string.Compare(tobedata.Resolution, Resolute.Working) != 0
+                && string.Compare(tobedata.Resolution, Resolute.Reopen) != 0)
+            { }
+            else
+            {
+                tobedata.Resolution = Resolute.Working;
+                tobedata.Description = "<p>Solve this issue with same solution as task: <a href=\"/Issue/UpdateIssue?issuekey=" + targetdata.IssueKey + "\">" + targetdata.Summary + "</a></p>";
+                tobedata.UpdateIssue();
+
+                foreach (var comm in targetdata.FailureDetailCommentList)
+                {
+                    if (string.Compare(comm.Reporter, "system", true) != 0 && tobedata.FailureDetailCommentList.Count == 0)
+                    {
+                        IssueViewModels.StoreIssueComment(tobedata.IssueKey, comm.dbComment, comm.Reporter, comm.CommentType);
+                    }
+                }
+                foreach (var comm in targetdata.RootCauseCommentList)
+                {
+                    if (string.Compare(comm.Reporter, "system", true) != 0 && tobedata.RootCauseCommentList.Count == 0)
+                    {
+                        IssueViewModels.StoreIssueComment(tobedata.IssueKey, comm.dbComment, comm.Reporter, comm.CommentType);
+                    }
+                }
+                foreach (var comm in targetdata.ResultCommentList)
+                {
+                    if (string.Compare(comm.Reporter, "system", true) != 0 && tobedata.ResultCommentList.Count == 0)
+                    {
+                        IssueViewModels.StoreIssueComment(tobedata.IssueKey, comm.dbComment, comm.Reporter, comm.CommentType);
+                    }
+                }
+            }
+
+            var dict = new RouteValueDictionary();
+            dict.Add("issuekey", tobeid);
+            return RedirectToAction("UpdateBug", "Issue", dict);
+        }
+
+
 
         [HttpPost, ActionName("AsignIssues")]
         [ValidateAntiForgeryToken]

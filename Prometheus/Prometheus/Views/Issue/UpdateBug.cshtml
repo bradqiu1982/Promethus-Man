@@ -1280,21 +1280,24 @@ else
     }
 
     if (ViewBag.isassignee != null && ViewBag.isassignee
-        && ViewBag.DoneIssueList != null && ViewBag.DoneIssueList.Count > 0)
+        && ViewBag.DoneIssueList != null)
     {
-        <hr style="border-color:#006DC0;" />
-        <div class="row" data-toggle="tooltip" title="Same As Task">
-            <div class="col-xs-2">
-                <button class="btn btn-success" onclick="SameAsIssue()">Same As</button>
-            </div>
-            <div class="col-xs-6">
-                @Html.DropDownList("DoneIssueList", null, new { @id = "DoneIssueList", @class = "form-control"})
-            </div>
-            <div class="col-xs-2">
-                <button class="btn btn-primary" onclick="ViewSameAsIssue()">View</button>
-            </div>
-            <div class="col-xs-2"></div>
-            <script type="text/javascript">
+
+        if (ViewBag.DoneIssueList.Count > 0)
+        {
+            <hr style="border-color:#006DC0;" />
+            <div class="row" data-toggle="tooltip" title="Same As Task">
+                <div class="col-xs-2">
+                    <button class="btn btn-success btn-sm" type="button" onclick="SameAsIssue()">Close With Same Reason</button>
+                </div>
+                <div class="col-xs-6">
+                    @Html.DropDownList("DoneIssueList", null, new { @id = "DoneIssueList", @class = "form-control" })
+                </div>
+                <div class="col-xs-2">
+                    <button class="btn btn-primary btn-sm" type="button" onclick="ViewSameAsIssue()">View</button>
+                </div>
+                <div class="col-xs-2"></div>
+                <script type="text/javascript">
                 function SameAsIssue()
                 {
                     var sameid = $('#DoneIssueList').val();
@@ -1314,8 +1317,48 @@ else
                         window.open(myurl, '_blank');
                     }
                 }
-            </script>
-        </div>
+                </script>
+            </div>
+        }
+
+        if (ViewBag.WorkingIssueList.Count > 0)
+        {
+            <hr style="border-color:#006DC0;" />
+            <div class="row" data-toggle="tooltip" title="Solve As Task">
+                <div class="col-xs-2">
+                    <button class="btn btn-success btn-sm" type="button" onclick="SolveAsIssue()">Solve With Same Action</button>
+                </div>
+                <div class="col-xs-6">
+                    @Html.DropDownList("WorkingIssueList", null, new { @id = "WorkingIssueList", @class = "form-control" })
+                </div>
+                <div class="col-xs-2">
+                    <button class="btn btn-primary btn-sm" type="button" onclick="ViewSolveAsIssue()">View</button>
+                </div>
+                <div class="col-xs-2"></div>
+                <script type="text/javascript">
+                    function SolveAsIssue()
+                {
+                    var sameid = $('#WorkingIssueList').val();
+                    var tobeid = $('#HIssueKey').val();
+                    if(sameid != '')
+                    {
+                        window.location.href = '/Issue/SolveAsInBug?sameid='+sameid+'&tobeid='+tobeid;
+                    }
+                }
+
+                function ViewSolveAsIssue()
+                {
+                    var id = $('#WorkingIssueList').val();
+                    if(id != '')
+                    {
+                        var myurl = '/Issue/UpdateBug?issuekey='+id;
+                        window.open(myurl, '_blank');
+                    }
+                }
+                </script>
+            </div>
+        }
+
     }
 
     <div class="modal" id="attachtag" tabindex="-1" role="dialog" aria-labelledby="attachtagLabel">

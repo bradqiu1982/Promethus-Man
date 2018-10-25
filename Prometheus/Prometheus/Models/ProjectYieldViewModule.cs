@@ -752,22 +752,9 @@ namespace Prometheus.Models
             ret.EndDate = DateTime.Parse(edate);
 
             var startdate = DateTime.Parse(DateTime.Parse(sdate).ToString("yyyy-MM-dd") + " 07:30:00").ToString();
-            var enddate = string.Empty;
+            var enddate = DateTime.Parse(edate).ToString("yyyy-MM-dd HH:mm:ss");
 
-            var tend = DateTime.Parse(edate);
-            if (tend > DateTime.Now
-                || (string.Compare(tend.ToString("yyyy-MM-dd"), DateTime.Now.ToString("yyyy-MM-dd")) == 0
-                 && string.Compare(DateTime.Parse(startdate).ToString("yyyy-MM-dd"), DateTime.Now.ToString("yyyy-MM-dd")) == 0))
-            {
-                tend = DateTime.Now;
-                enddate = tend.ToString();
-            }
-            else
-            {
-                enddate = DateTime.Parse(DateTime.Parse(edate).ToString("yyyy-MM-dd") + " 07:30:00").ToString();
-            }
-
-            if (startdate == enddate)
+            if (string.Compare(startdate,enddate) == 0)
             {
                 return ret;
             }

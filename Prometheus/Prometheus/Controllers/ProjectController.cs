@@ -2979,8 +2979,18 @@ namespace Prometheus.Controllers
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(EndDate))
             {
                 ViewBag.PJKey = ProjectKey;
+                var sedate = "";
+                if (string.Compare(DateTime.Parse(EndDate).ToString("yyyy-MM-dd"), DateTime.Now.ToString("yyyy-MM-dd")) == 0
+                    && DateTime.Now.DayOfWeek != DayOfWeek.Thursday)
+                {
+                    sedate = DateTime.Parse(EndDate).ToString("yyyy-MM-dd") + " 23:59:59";
+                }
+                else
+                {
+                    sedate = DateTime.Parse(EndDate).ToString("yyyy-MM-dd") + " 07:30:00";
+                }
 
-                var edate = DateTime.Parse(DateTime.Parse(EndDate).ToString("yyyy-MM-dd") + " 07:30:00");
+                var edate = DateTime.Parse(sedate);
                 var sdate = edate.AddDays(-7);
                 if (sdate.DayOfWeek != DayOfWeek.Thursday)
                 {

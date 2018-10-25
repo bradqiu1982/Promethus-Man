@@ -58,7 +58,7 @@ namespace Prometheus.Models
             var leastdatalimit = 0;
             if (dayspan >= 8)
             {
-                leastdatalimit = 60;
+                leastdatalimit = 30;
             }
             else
             {

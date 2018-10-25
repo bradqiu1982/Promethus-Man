@@ -1279,7 +1279,45 @@ else
         </div>
     }
 
-  
+    if (ViewBag.isassignee != null && ViewBag.isassignee
+        && ViewBag.DoneIssueList != null && ViewBag.DoneIssueList.Count > 0)
+    {
+        <hr style="border-color:#006DC0;" />
+        <div class="row" data-toggle="tooltip" title="Same As Task">
+            <div class="col-xs-2">
+                <button class="btn btn-success" onclick="SameAsIssue()">Same As</button>
+            </div>
+            <div class="col-xs-6">
+                @Html.DropDownList("DoneIssueList", null, new { @id = "DoneIssueList", @class = "form-control"})
+            </div>
+            <div class="col-xs-2">
+                <button class="btn btn-primary" onclick="ViewSameAsIssue()">View</button>
+            </div>
+            <div class="col-xs-2"></div>
+            <script type="text/javascript">
+                function SameAsIssue()
+                {
+                    var sameid = $('#DoneIssueList').val();
+                    var tobeid = $('#HIssueKey').val();
+                    if(sameid != '')
+                    {
+                        window.location.href = '/Issue/SameAsInBug?sameid='+sameid+'&tobeid='+tobeid;
+                    }
+                }
+
+                function ViewSameAsIssue()
+                {
+                    var id = $('#DoneIssueList').val();
+                    if(id != '')
+                    {
+                        var myurl = '/Issue/UpdateBug?issuekey='+id;
+                        window.open(myurl, '_blank');
+                    }
+                }
+            </script>
+        </div>
+    }
+
     <div class="modal" id="attachtag" tabindex="-1" role="dialog" aria-labelledby="attachtagLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">

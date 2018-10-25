@@ -1504,6 +1504,55 @@ namespace Prometheus.Controllers
             return RedirectToAction("UpdateRMA", "Issue", dict);
         }
 
+        private List<IssueViewModels> RetrieveSameAsIssue(string ProjectKey,string ErrAbbr)
+        {
+            var vm = ProjectFAViewModules.RetrieveFADataWithErrAbbr(ProjectKey, ErrAbbr, this);
+
+            var tempitems = new List<IssueViewModels>();
+
+            foreach (var item in vm)
+            {
+                if (item.IssueData.Resolution != Resolute.Pending
+                    && item.IssueData.Resolution != Resolute.Working
+                    && item.IssueData.Resolution != Resolute.Reopen)
+                {
+
+                    if (string.Compare(item.IssueData.Resolution, Resolute.AutoClose, true) == 0)
+                    {
+                        continue;
+                    }
+
+                    if (item.IssueData.CommentList.Count == 2)
+                    {
+                        var removesameasissue = false;
+                        foreach (var c in item.IssueData.CommentList)
+                        {
+                            if (c.Comment.Contains("<p>Issue Same As <a"))
+                            {
+                                removesameasissue = true;
+                                break;
+                            }
+
+                            if (c.Comment.Contains("passed")
+                                && string.Compare(c.Reporter, "System", true) == 0)
+                            {
+                                removesameasissue = true;
+                                break;
+                            }
+                        }
+                        if (removesameasissue)
+                        {
+                            continue;
+                        }
+                    }
+
+                    tempitems.Add(item.IssueData);
+                }
+            }
+
+            return tempitems;
+        }
+
         public ActionResult UpdateBug(string issuekey)
         {
             var ckdict = CookieUtility.UnpackCookie(this);
@@ -1601,6 +1650,23 @@ namespace Prometheus.Controllers
                 ViewBag.RelationLinks = IssueRelationShipVM.GetIssueRelationShip(key,this);
 
                 GetNoticeInfo();
+
+                var sameaslinks = RetrieveSameAsIssue(ret.ProjectKey, ret.ErrAbbr);
+                if (sameaslinks.Count > 0)
+                {
+                    var pslist = new List<SelectListItem>();
+                    foreach (var item in sameaslinks)
+                    {
+                        if (string.Compare(item.IssueKey, ret.IssueKey) == 0)
+                        { continue; }
+
+                        var pitem = new SelectListItem();
+                        pitem.Text = item.Summary;
+                        pitem.Value = item.IssueKey;
+                        pslist.Add(pitem);
+                    }
+                    ViewBag.DoneIssueList = pslist;
+                }
 
                 return View(ret);
             }
@@ -3575,6 +3641,43 @@ namespace Prometheus.Controllers
                 return RedirectToAction("ViewAll", "Project");
             }
 
+        }
+
+        public ActionResult SameAsInBug(string sameid, string tobeid)
+        {
+            var targetdata = IssueViewModels.RetrieveIssueByIssueKey(sameid, this);
+            var tobedata = IssueViewModels.RetrieveIssueByIssueKey(tobeid, this);
+            if (string.Compare(tobedata.Resolution, Resolute.Pending) != 0
+                && string.Compare(tobedata.Resolution, Resolute.Working) != 0
+                && string.Compare(tobedata.Resolution, Resolute.Reopen) != 0)
+            { }
+            else
+            {
+                tobedata.Resolution = Resolute.Done;
+                tobedata.Description = "<p>Issue Same As <a href=\"/Issue/UpdateIssue?issuekey=" + targetdata.IssueKey + "\">" + targetdata.Summary + "</a></p>";
+                tobedata.UpdateIssue();
+                tobedata.CloseIssue();
+
+                if (!string.IsNullOrEmpty(tobedata.ModuleSN))
+                {
+                    SameAsDBTVM.StoreSameAsIssue(targetdata.IssueKey, tobedata.IssueKey, tobedata.ModuleSN);
+                }
+
+                if (targetdata.CommentList.Count > 0)
+                {
+                    var targetcomment = targetdata.CommentList[0];
+                    if (!targetcomment.Comment.Contains("<p>"))
+                    {
+                        targetcomment.Comment = targetcomment.Comment + "<p>&nbsp;</p>";
+                    }
+                    targetcomment.Comment = targetcomment.Comment + "<div class=\"col-lg-2\">" + "<a href=\"/Issue/UpdateIssue?issuekey=" + tobeid + "\">" + tobedata.ModuleSN + "</a>" + "</div>";
+                    IssueViewModels.UpdateSPComment(targetcomment.IssueKey, targetcomment.CommentType, targetcomment.CommentDate.ToString(), targetcomment.dbComment);
+                }
+            }
+
+            var dict = new RouteValueDictionary();
+            dict.Add("issuekey", tobeid);
+            return RedirectToAction("UpdateBug", "Issue", dict);
         }
 
         [HttpPost, ActionName("AsignIssues")]

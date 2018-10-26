@@ -1522,7 +1522,7 @@ namespace Prometheus.Models
             var retdict = new List<IssueViewModels>();
 
             var cond = "";
-            cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "')";
+            cond = "('" + Resolute.Pending + "','" + Resolute.Reopen + "','" + Resolute.Working + "')";
 
             var sql = "select ProjectKey,IssueKey,IssueType,Summary,Priority,DueDate,ResolvedDate,ReportDate,Assignee,Reporter,Resolution,ParentIssueKey,RelativePeoples,ModuleSN from Issue where  APVal1 <> 'delete' and  ParentIssueKey = '' and ProjectKey = '<ProjectKey>' and ModuleSN = '<ModuleSerialNum>'  and Resolution in <cond> and Creator = 'System' and IssueType <> '<IssueType1>' and IssueType <> '<IssueType2>' order by ReportDate DESC";
             sql = sql.Replace("<ModuleSerialNum>", SN).Replace("<cond>", cond).Replace("<ProjectKey>", pjkey)
@@ -1540,7 +1540,7 @@ namespace Prometheus.Models
                     , Convert.ToString(line[11]), Convert.ToString(line[12]));
                 ret.ModuleSN = Convert.ToString(line[13]);
 
-                ret.RetrieveComment(ctrl);
+                //ret.RetrieveComment(ctrl);
                 retdict.Add(ret);
             }
 
@@ -3826,23 +3826,23 @@ namespace Prometheus.Models
                 var issues = IssueViewModels.RRetrieveFABySN(pjkey, SN, whichtest, ctrl);
                 foreach (var tobedata in issues)
                 {
-                    bool customercomm = false;
-                    foreach (var item in tobedata.CommentList)
-                    {
-                        if (string.Compare(item.Reporter, "system", true) != 0)
-                        {
-                            customercomm = true;
-                            break;
-                        }
-                    }
+                    //bool customercomm = false;
+                    //foreach (var item in tobedata.CommentList)
+                    //{
+                    //    if (string.Compare(item.Reporter, "system", true) != 0)
+                    //    {
+                    //        customercomm = true;
+                    //        break;
+                    //    }
+                    //}
 
-                    if (!customercomm)
+                    //if (!customercomm)
                     {
                         var sourcedata = ProjectTestData.RetrieveProjectTestData(tobedata.IssueKey);
                         if (sourcedata.Count > 0 && (DateTime.Parse(datestr) > sourcedata[0].TestTimeStamp))
                         {
                             tobedata.Resolution = Resolute.AutoClose;
-                            tobedata.Description = "Module " + SN + " passed " + whichtest + " test @" + tester + " @" + datestr;
+                            tobedata.Description = "Module " + SN + " retest passed " + whichtest + " test @" + tester + " @" + datestr;
                             tobedata.UpdateIssue();
                             tobedata.CloseIssue();
                             if (!string.IsNullOrEmpty(tobedata.ErrAbbr))
@@ -3856,41 +3856,65 @@ namespace Prometheus.Models
             catch (Exception ex) { }
         }
 
-        public static void CloseIssueAutomaticllyWithFailedSN(string pjkey, string SN, string whichtest, string tester, string datestr, Controller ctrl)
+        public static bool CloseIssueAutomaticllyWithFailedSN(string pjkey, string SN, string whichtest, string tester, string datestr, Controller ctrl)
         {
+            var workingflag = false;
             try
             {
                 var issues = IssueViewModels.RRetrieveFABySN(pjkey, SN, whichtest, ctrl);
                 foreach (var tobedata in issues)
                 {
-                    bool customercomm = false;
-                    foreach (var item in tobedata.CommentList)
+                    if (string.Compare(tobedata.Resolution, Resolute.Working) == 0)
                     {
-                        if (string.Compare(item.Reporter, "system", true) != 0)
+                        workingflag = true;
+
+                        tobedata.Description = "Module " + SN + " faild for " + whichtest + " test @" + tester + " @" + datestr + " again";
+                        tobedata.UpdateIssue();
+
+                        var traceviewlist = ExternalDataCollector.LoadTraceView2Local(tester, SN, whichtest, datestr, ctrl);
+                        foreach (var trace in traceviewlist)
                         {
-                            customercomm = true;
-                            break;
-                        }
+                            var traces = trace.Split(new string[] { "userfiles\\" }, StringSplitOptions.RemoveEmptyEntries);
+                            if (traces.Length == 2)
+                            {
+                                var url = "/userfiles/" + traces[1].Replace("\\", "/");
+                                IssueViewModels.StoreIssueAttachment(tobedata.IssueKey, url);
+                            }
+                        }//end foreach
+                    }
+                    else
+                    {
+                        //bool customercomm = false;
+                        //foreach (var item in tobedata.CommentList)
+                        //{
+                        //    if (string.Compare(item.Reporter, "system", true) != 0)
+                        //    {
+                        //        customercomm = true;
+                        //        break;
+                        //    }
+                        //}
+
+                        //if (!customercomm)
+                        {
+                            var sourcedata = ProjectTestData.RetrieveProjectTestData(tobedata.IssueKey);
+                            if (sourcedata.Count > 0 && (DateTime.Parse(datestr) > sourcedata[0].TestTimeStamp))
+                            {
+                                tobedata.Resolution = Resolute.AutoClose;
+                                tobedata.Description = "Module " + SN + " faild for " + whichtest + " test @" + tester + " @" + datestr + " again";
+                                tobedata.UpdateIssue();
+                                tobedata.CloseIssue();
+                                if (!string.IsNullOrEmpty(tobedata.ErrAbbr))
+                                {
+                                    ProjectErrorViewModels.UpdateProjectAutoCloseCount(1, tobedata.ProjectKey, tobedata.ErrAbbr);
+                                }
+                            }//end if
+                        }//end if
                     }
 
-                    if (!customercomm)
-                    {
-                        var sourcedata = ProjectTestData.RetrieveProjectTestData(tobedata.IssueKey);
-                        if (sourcedata.Count > 0 && (DateTime.Parse(datestr) > sourcedata[0].TestTimeStamp))
-                        {
-                            tobedata.Resolution = Resolute.AutoClose;
-                            tobedata.Description = "Module " + SN + " faild for " + whichtest + " test @" + tester + " @" + datestr + " again";
-                            tobedata.UpdateIssue();
-                            tobedata.CloseIssue();
-                            if (!string.IsNullOrEmpty(tobedata.ErrAbbr))
-                            {
-                                ProjectErrorViewModels.UpdateProjectAutoCloseCount(1, tobedata.ProjectKey, tobedata.ErrAbbr);
-                            }
-                        }//end if
-                    }//end if
                 }//end foreach
             }
             catch (Exception ex) { }
+            return workingflag;
         }
 
         public static void CloseDupIssueAutomaticlly(string pjkey, string SN, string datestr)

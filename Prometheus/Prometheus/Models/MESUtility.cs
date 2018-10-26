@@ -1516,11 +1516,18 @@ namespace Prometheus.Models
 
                     if (vm.FinishRating < 90 && DateTime.Parse(starttime) != vm.StartDate)
                     {
+                        var workingdatalist = new List<ProjectTestData>();
+
                         //use latest failure cover previous failure
                         foreach (var item in failurelist)
                         {
-                            IssueViewModels.CloseIssueAutomaticllyWithFailedSN(item.ProjectKey, item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), ctrl);
+                            var w= IssueViewModels.CloseIssueAutomaticllyWithFailedSN(item.ProjectKey, item.ModuleSerialNum, item.WhichTest, item.TestStation, item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"), ctrl);
+                            if (w)
+                            { workingdatalist.Add(item); }
                         }
+
+                        foreach (var item in workingdatalist)
+                        { failurelist.Remove(item); }
 
                         CreateSystemIssues(failurelist, ctrl, true, !string.IsNullOrEmpty(vm.TransferFlg));
                     }

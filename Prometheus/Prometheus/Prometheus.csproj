@@ -1114,6 +1114,14 @@
     <Content Include="Scripts\StandardPJList.txt" />
     <Content Include="Scripts\SuperYield.xml" />
     <Content Include="Scripts\technicalvideo.js" />
+    <Content Include="Scripts\tooltipster\css\tooltipster.bundle.css" />
+    <Content Include="Scripts\tooltipster\css\tooltipster.bundle.min.css" />
+    <Content Include="Scripts\tooltipster\css\tooltipster.main.css" />
+    <Content Include="Scripts\tooltipster\css\tooltipster.main.min.css" />
+    <Content Include="Scripts\tooltipster\js\tooltipster.bundle.js" />
+    <Content Include="Scripts\tooltipster\js\tooltipster.bundle.min.js" />
+    <Content Include="Scripts\tooltipster\js\tooltipster.main.js" />
+    <Content Include="Scripts\tooltipster\js\tooltipster.main.min.js" />
     <Content Include="Scripts\vcsel-rma.js" />
     <Content Include="Scripts\VideoRecorderJs-master\dist\recorderWorker.js" />
     <Content Include="Scripts\VideoRecorderJs-master\dist\VideoRecorderJS.min.js" />

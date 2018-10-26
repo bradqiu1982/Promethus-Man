@@ -259,12 +259,42 @@ namespace Prometheus.Controllers
                 datecntdict.Add(kv.Key, totle);
             }
 
+            var colorlist = new string[] { "#161525", "#00A0E9", "#bada55", "#1D2088" ,"#00ff00", "#fca2cf", "#E60012", "#EB6100", "#E4007F"
+                , "#CFDB00", "#8FC31F", "#22AC38", "#920783",  "#b5f2b0", "#F39800","#4e92d2" , "#FFF100"
+                , "#1bfff5", "#4f4840", "#FCC800", "#0068B7", "#6666ff", "#009B6B", "#16ff9b" }.ToList();
+
             var namelist = shipdata[shipdatelist[0]].Keys.ToList();
+
+            var custsumpair = new List<KeyValuePair<string, double>>();
+            var cidx = 0;
+            foreach (var name in namelist)
+            {
+                var namecnt = new List<double>();
+                foreach (var x in shipdatelist)
+                {
+                    namecnt.Add(shipdata[x][name]);
+                }
+                custsumpair.Add(new KeyValuePair<string, double>(name, namecnt.Sum()));
+            }
+            custsumpair.Sort(delegate (KeyValuePair<string, double> obj1, KeyValuePair<string, double> obj2)
+            {
+                return obj2.Value.CompareTo(obj1.Value);
+            });
+            var newnamelist = new List<string>();
+            foreach (var item in custsumpair)
+            {
+                newnamelist.Add(item.Key);
+            }
+            if (newnamelist.Contains("OTHERS"))
+            { newnamelist.Remove("OTHERS"); newnamelist.Insert(0, "OTHERS"); }
+
 
             var lastdidx = shipdatelist.Count - 1;
             var title = shipdatelist[0] + " ~ " + shipdatelist[lastdidx] +" "+producttype+ " Shipment Distribution vs DPPM (" + rate + ")";
             var xdata = new List<string>();
             var ydata = new List<object>();
+
+            var cussumlist = new List<double>();
 
             foreach (var f_item in shipdatelist)
             {
@@ -277,7 +307,8 @@ namespace Prometheus.Controllers
                 title = "Amount"
             };
 
-            foreach (var name in namelist)
+            cidx = 0;
+            foreach (var name in newnamelist)
             {
                 var namecnt = new List<double>();
                 foreach (var x in shipdatelist)
@@ -285,12 +316,26 @@ namespace Prometheus.Controllers
                     namecnt.Add(shipdata[x][name]);
                 }
 
+                cussumlist.Add(namecnt.Sum());
+
                 ydata.Add(new
                 {
                     name = name,
-                    data = namecnt
+                    data = namecnt,
+                    color = colorlist[cidx]
                 });
+                cidx += 1;
             }
+
+            var totalship = cussumlist.Sum();
+            var customerrate = new List<string>();
+            cidx = 0;
+            foreach (var cs in cussumlist)
+            {
+                customerrate.Add(newnamelist[cidx] + ":" + Math.Round(cs / totalship * 100.0, 2) + "%");
+                cidx += 1;
+            }
+            customerrate.Add(""); customerrate.Add(""); customerrate.Add("");
 
             var ddata = new List<double>();
             foreach (var x in shipdatelist)
@@ -339,7 +384,8 @@ namespace Prometheus.Controllers
                 xAxis = xAxis,
                 yAxis = yAxis,
                 data = ydata,
-                rate = rate
+                rate = rate,
+                customerrate = customerrate
             };
         }
 

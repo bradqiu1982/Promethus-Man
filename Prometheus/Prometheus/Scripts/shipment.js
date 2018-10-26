@@ -21,6 +21,8 @@
                         drawcolumn(val);
                     })
 
+                    $('.v-content').append('<div class="col-xs-12"><span class="mysptooltip" title="This is my span tooltip message!"></span></div>');
+
                     $.each(output.orderdataarray, function (i, val) {
                         appendstr = '<div class="col-xs-12">' +
                                '<div class="v-box" id="' + val.id + '"></div>' +
@@ -53,7 +55,34 @@
         var options = {
             chart: {
                 zoomType: 'xy',
-                type: 'column'
+                type: 'column',
+                events: {
+                    load: function () {
+                        var chart = this,
+                            legend = chart.legend;
+
+                        for (var i = 0, len = legend.allItems.length; i < len; i++) {
+                            (function(i) {
+                                var item = legend.allItems[i].legendItem;
+                                item.on('mouseover', function (e) {
+                                    if (col_data.customerrate[i] != '')
+                                    {
+                                        $('.mysptooltip').attr('style', 'position: fixed;top:'+e.y+'px;left:'+e.x+'px;')
+                                        $('.mysptooltip').tooltipster({});
+                                        $('.mysptooltip').tooltipster('content', col_data.customerrate[i]);
+                                        $('.mysptooltip').tooltipster('open');
+                                    }
+                                }).on('mouseout', function (e) {
+                                    if (col_data.customerrate[i] != '')
+                                    {
+                                        $('.mysptooltip').tooltipster('close');
+                                        $('.mysptooltip').tooltipster('destroy');
+                                    }
+                                });
+                            })(i);
+                        }
+                    }
+                }
             },
             title: {
                 text: col_data.title

@@ -1279,11 +1279,10 @@ else
         </div>
     }
 
-    if (ViewBag.isassignee != null && ViewBag.isassignee
-        && ViewBag.DoneIssueList != null)
+    if (ViewBag.isassignee != null && ViewBag.isassignee)
     {
 
-        if (ViewBag.DoneIssueList.Count > 0)
+        if (ViewBag.DoneIssueList != null && ViewBag.DoneIssueList.Count > 0)
         {
             <hr style="border-color:#006DC0;" />
             <div class="row" data-toggle="tooltip" title="Same As Task">
@@ -1321,7 +1320,7 @@ else
             </div>
         }
 
-        if (ViewBag.WorkingIssueList.Count > 0)
+        if (ViewBag.WorkingIssueList != null && ViewBag.WorkingIssueList.Count > 0)
         {
             <hr style="border-color:#006DC0;" />
             <div class="row" data-toggle="tooltip" title="Solve As Task">

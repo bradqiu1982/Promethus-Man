@@ -48,6 +48,7 @@ namespace Prometheus.Models
             Wafer = string.Empty;
             OrderQty = orderqty;
             OPD = opd;
+            OTD = "NO";
         }
 
         public static Dictionary<string, bool> RetrieveAllShipID()
@@ -254,7 +255,7 @@ namespace Prometheus.Models
         public static List<FsrShipData> RetrieveOTDByMonth(string rate, string producttype, string sdate, string edate, Controller ctrl)
         {
             var ret = new List<FsrShipData>();
-            var sql = @"select ShipDate,Appv_5,PN,ProdDesc from FsrShipData where Appv_5 >= @sdate and Appv_5 <= @edate and Configuration = @producttype 
+            var sql = @"select ShipDate,Appv_5,PN,ProdDesc,Appv_1,MarketFamily,ShipID from FsrShipData where Appv_5 >= @sdate and Appv_5 <= @edate and Configuration = @producttype 
                         and Customer1  not like '%FINISAR%' and Customer2 not like  '%FINISAR%' ";
 
             if (string.Compare(rate, VCSELRATE.r14G, true) == 0)
@@ -278,6 +279,10 @@ namespace Prometheus.Models
                 tempvm.OPD = Convert.ToDateTime(line[1]);
                 tempvm.PN = Convert.ToString(line[2]);
                 tempvm.ProdDesc = Convert.ToString(line[3]);
+                tempvm.OrderQty = Convert.ToDouble(line[4]);
+                tempvm.MarketFamily = Convert.ToString(line[5]);
+                tempvm.ShipID = Convert.ToString(line[6]);
+                tempvm.OTD = "NO";
 
                 if (string.Compare(tempvm.OPD.ToString("yyyy-MM"), "1982-05") == 0)
                 { continue; }
@@ -327,6 +332,7 @@ namespace Prometheus.Models
         public string Configuration { set; get; }
         public string VcselType { set; get; }
         public DateTime ShipDate { set; get; }
+        public string ShipDateStr { get { return ShipDate.ToString("yyyy-MM-dd"); } }
         public string CustomerNum { set; get; }
         public string Customer1 { set; get; }
         public string Customer2 { set; get; }
@@ -336,5 +342,7 @@ namespace Prometheus.Models
         public string Wafer { set; get; }
         public double OrderQty { set; get; }
         public DateTime OPD { set; get; }
+        public string OPDStr { get { return OPD.ToString("yyyy-MM-dd"); } }
+        public string OTD { set; get; }
     }
 }

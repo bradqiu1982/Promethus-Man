@@ -52,6 +52,8 @@
         
     }
 
+    var myrmatable = null;
+
     var drawcolumn = function (col_data) {
         var options = {
             chart: {
@@ -137,6 +139,9 @@
                                     rate:rate
                                 },
                                 function (outputdata) {
+                                    if (myrmatable) {
+                                        myrmatable.destroy();
+                                    }
                                     $('#ramrawbody').empty();
                                     $.each(outputdata.waferdatalist, function (i, val) {
                                         var rmalink = '<td> </td>';
@@ -162,6 +167,17 @@
                                             + '</tr>';
                                         $('#ramrawbody').append(appendstr);
                                     });
+
+                                    myrmatable = $('#myrmatable').DataTable({
+                                        'iDisplayLength': 50,
+                                        'aLengthMenu': [[20, 50, 100, -1],
+                                        [20, 50, 100, "All"]],
+                                        "aaSorting": [],
+                                        "order": [],
+                                        dom: 'lBfrtip',
+                                        buttons: ['copyHtml5', 'csv', 'excelHtml5']
+                                    });
+
                                     $('#rmarawdata').modal('show')
                                 })
 
@@ -383,6 +399,8 @@
         Highcharts.chart(col_data.id, options);
     }
 
+    var shipmenttable = null;
+
     var drawotdline = function (col_data) {
         var options = {
             chart: {
@@ -414,6 +432,48 @@
             }],
             tooltip: {
                 pointFormat: '{series.name} : <b>{point.y}</b>'
+            },
+            plotOptions: {
+                series: {
+                    cursor: 'pointer',
+                    events: {
+                        click: function (event) {
+                            var datestr = event.point.category;
+                            //var rate = col_data.rate
+                            $('#opdval').html(datestr);
+
+                            if (shipmenttable) {
+                                shipmenttable.destroy();
+                            }
+
+                            $('#shiprawbody').empty();
+
+                            $.each(col_data.orderdatadict[datestr], function (i, val) {
+                                var appendstr = '<tr>' +
+                                    '<td>' + val.ShipID + '</td>' +
+                                    '<td>' + val.OPDStr + '</td>' +
+                                    '<td>' + val.ShipDateStr + '</td>' +
+                                    '<td>' + val.OTD + '</td>' +
+                                    '<td>' + val.OrderQty + '</td>' +
+                                    '<td>' + val.MarketFamily + '</td>'
+                                    + '</tr>';
+                                $('#shiprawbody').append(appendstr);
+                            });
+
+                            shipmenttable = $('#shipmenttable').DataTable({
+                                'iDisplayLength': 50,
+                                'aLengthMenu': [[20, 50, 100, -1],
+                                [20, 50, 100, "All"]],
+                                "aaSorting": [],
+                                "order": [],
+                                dom: 'lBfrtip',
+                                buttons: ['copyHtml5', 'csv', 'excelHtml5']
+                            });
+
+                            $('#fsrshipdata').modal('show')
+                        }
+                    }
+                }
             },
             series: col_data.chartdata,
             exporting: {

@@ -225,14 +225,14 @@ namespace Prometheus.Controllers
             }
             string IP = Request.UserHostName;
             string compName = DetermineCompName(IP);
-            if (!MachineUserMap.IsLxEmployee(compName, username,8))
+            if (!MachineUserMap.IsLxEmployee(compName, username,9))
             {
                 return RedirectToAction("UserCenter", "User");
             }
             LogVM.WriteLog(username.ToUpper(), "ALL", compName,
                                    "/DataAnalyze/ShipmentData", "DataAnalyze", "View", "", LogType.Default, Log4NetLevel.Warn, "ShipmentData");
 
-            ViewBag.IsL9Employee = MachineUserMap.IsLxEmployee(compName, username, 9);
+            ViewBag.IsL9Employee = MachineUserMap.IsLxEmployee(compName, username, 10);
             return View();
         }
 
@@ -520,6 +520,7 @@ namespace Prometheus.Controllers
             var ordernumdict = new Dictionary<string, double>();
             var otdnumdict = new Dictionary<string, double>();
             var otddict = new Dictionary<string, double>();
+            var orderdatadict = new Dictionary<string, List<FsrShipData>>();
 
             foreach (var data in otddata)
             {
@@ -535,6 +536,18 @@ namespace Prometheus.Controllers
                     { otdnumdict[orderdatekey] += 1; }
                     else
                     { otdnumdict.Add(orderdatekey, 1); }
+                    data.OTD = "OTD";
+                }
+
+                if (orderdatadict.ContainsKey(orderdatekey))
+                {
+                    orderdatadict[orderdatekey].Add(data);
+                }
+                else
+                {
+                    var templist = new List<FsrShipData>();
+                    templist.Add(data);
+                    orderdatadict.Add(orderdatekey, templist);
                 }
             }
 
@@ -575,7 +588,7 @@ namespace Prometheus.Controllers
             var otdchart = new
             {
                 type = "line",
-                name = "ODT rate",
+                name = "OTD rate",
                 data = otdchartdata,
                 dataLabels= new {
                 enabled = true
@@ -590,7 +603,106 @@ namespace Prometheus.Controllers
                 id = id,
                 title = title,
                 xdata = xdata,
-                chartdata = chartdata
+                chartdata = chartdata,
+                orderdatadict = orderdatadict
+            };
+        }
+
+        private object GetOTDChartDataByQTY(List<FsrShipData> otddata, string rate, string producttype)
+        {
+            var id = "otddata_" + rate + "_qty_id";
+            var title = producttype + " Monthly OTD QTY Distribution (" + rate + ")";
+
+            var ordernumdict = new Dictionary<string, double>();
+            var otdnumdict = new Dictionary<string, double>();
+            var otddict = new Dictionary<string, double>();
+            var orderdatadict = new Dictionary<string, List<FsrShipData>>();
+
+            foreach (var data in otddata)
+            {
+                var orderdatekey = data.OPD.ToString("yyyy-MM");
+                if (ordernumdict.ContainsKey(orderdatekey))
+                { ordernumdict[orderdatekey] += data.OrderQty; }
+                else
+                { ordernumdict.Add(orderdatekey, data.OrderQty); }
+
+                if (data.ShipDate <= data.OPD)
+                {
+                    if (otdnumdict.ContainsKey(orderdatekey))
+                    { otdnumdict[orderdatekey] += data.OrderQty; }
+                    else
+                    { otdnumdict.Add(orderdatekey, data.OrderQty); }
+                    data.OTD = "OTD";
+                }
+
+                if (orderdatadict.ContainsKey(orderdatekey))
+                {
+                    orderdatadict[orderdatekey].Add(data);
+                }
+                else
+                {
+                    var templist = new List<FsrShipData>();
+                    templist.Add(data);
+                    orderdatadict.Add(orderdatekey, templist);
+                }
+            }
+
+            var orderkeys = ordernumdict.Keys.ToList();
+            foreach (var o in orderkeys)
+            {
+                if (otdnumdict.ContainsKey(o))
+                { otddict.Add(o, Math.Round(otdnumdict[o] / ordernumdict[o] * 100.0, 2)); }
+                else
+                { otddict.Add(o, 0.0); }
+            }
+
+            orderkeys.Sort(delegate (string obj1, string obj2)
+            {
+                var d1 = DateTime.Parse(obj1 + "-01 00:00:00");
+                var d2 = DateTime.Parse(obj2 + "-01 00:00:00");
+                return d1.CompareTo(d2);
+            });
+
+            var xdata = new List<string>();
+            var ordernumchartdata = new List<double>();
+            var otdchartdata = new List<double>();
+            foreach (var k in orderkeys)
+            {
+                xdata.Add(k);
+                ordernumchartdata.Add(ordernumdict[k]);
+                otdchartdata.Add(otddict[k]);
+            }
+
+            var ordernumchart = new
+            {
+                type = "column",
+                name = "orders qty",
+                data = ordernumchartdata,
+                yAxis = 1
+            };
+
+            var otdchart = new
+            {
+                type = "line",
+                name = "OTD rate",
+                data = otdchartdata,
+                dataLabels = new
+                {
+                    enabled = true
+                }
+            };
+
+            var chartdata = new List<object>();
+            chartdata.Add(ordernumchart);
+            chartdata.Add(otdchart);
+
+            return new
+            {
+                id = id,
+                title = title,
+                xdata = xdata,
+                chartdata = chartdata,
+                orderdatadict = orderdatadict
             };
         }
 
@@ -658,23 +770,28 @@ namespace Prometheus.Controllers
             }
 
             var otdarray = new List<object>();
-            var otd25g = FsrShipData.RetrieveOTDByMonth(VCSELRATE.r25G, SHIPPRODTYPE.PARALLEL, startdate.ToString("yyyy-MM-dd HH:mm:ss"), enddate.ToString("yyyy-MM-dd HH:mm:ss"), this);
-            var otd14g = FsrShipData.RetrieveOTDByMonth(VCSELRATE.r14G, SHIPPRODTYPE.PARALLEL, startdate.ToString("yyyy-MM-dd HH:mm:ss"), enddate.ToString("yyyy-MM-dd HH:mm:ss"), this);
-            if (otd25g.Count > 0)
-            {
-                otdarray.Add(GetOTDChartData(otd25g, VCSELRATE.r25G, SHIPPRODTYPE.PARALLEL));
-            }
-            if (otd14g.Count > 0)
-            {
-                otdarray.Add(GetOTDChartData(otd14g, "10G_14G", SHIPPRODTYPE.PARALLEL));
-            }
+            //var otd25g = FsrShipData.RetrieveOTDByMonth(VCSELRATE.r25G, SHIPPRODTYPE.PARALLEL, startdate.ToString("yyyy-MM-dd HH:mm:ss"), enddate.ToString("yyyy-MM-dd HH:mm:ss"), this);
+            //var otd14g = FsrShipData.RetrieveOTDByMonth(VCSELRATE.r14G, SHIPPRODTYPE.PARALLEL, startdate.ToString("yyyy-MM-dd HH:mm:ss"), enddate.ToString("yyyy-MM-dd HH:mm:ss"), this);
+            //if (otd25g.Count > 0)
+            //{
+            //    otdarray.Add(GetOTDChartData(otd25g, VCSELRATE.r25G, SHIPPRODTYPE.PARALLEL));
+            //}
+            //if (otd14g.Count > 0)
+            //{
+            //    otdarray.Add(GetOTDChartData(otd14g, "10G_14G", SHIPPRODTYPE.PARALLEL));
+            //}
             var otdall = FsrShipData.RetrieveOTDByMonth("", SHIPPRODTYPE.PARALLEL, startdate.ToString("yyyy-MM-dd HH:mm:ss"), enddate.ToString("yyyy-MM-dd HH:mm:ss"), this);
             if (otdall.Count > 0)
             {
                 otdarray.Add(GetOTDChartData(otdall, "ALL", SHIPPRODTYPE.PARALLEL));
             }
+            if (otdall.Count > 0)
+            {
+                otdarray.Add(GetOTDChartDataByQTY(otdall, "ALL", SHIPPRODTYPE.PARALLEL));
+            }
 
             var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
             ret.Data = new
             {
                 success = true,

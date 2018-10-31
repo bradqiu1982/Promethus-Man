@@ -9177,12 +9177,17 @@ namespace Prometheus.Controllers
             return View("HeartBeat");
         }
 
-        public ActionResult RefreshShipData()
+        //public ActionResult RefreshShipData()
+        //{
+        //    ExternalDataCollector.RefreshShipData(this);
+        //    return View("HeartBeat");
+        //}
+
+        public ActionResult UpdateShipTo()
         {
-            ExternalDataCollector.RefreshShipData(this);
+            ExternalDataCollector.UpdateShipTo(this);
             return View("HeartBeat");
         }
-
 
         public ActionResult RefreshATE()
         {

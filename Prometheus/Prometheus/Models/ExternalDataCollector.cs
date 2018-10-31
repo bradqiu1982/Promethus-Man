@@ -4246,6 +4246,7 @@ namespace Prometheus.Models
 
                                 
                                 var delievenum = Convert2Str(line[24]);
+                                var shipto = Convert2Str(line[33]);
 
                                 if (!pnsndict.ContainsKey(pn))
                                 {
@@ -4253,7 +4254,7 @@ namespace Prometheus.Models
                                 }
 
                                 shipdatalist.Add(new FsrShipData(shipid, shipqty, pn, pndesc, family, cfg
-                                    , shipdate, customernum, customer1, customer2, ordereddate, delievenum, orderqty,opd));
+                                    , shipdate, customernum, customer1, customer2, ordereddate, delievenum, orderqty,opd,shipto));
 
                             }//end if
                         }//end if
@@ -4300,6 +4301,34 @@ namespace Prometheus.Models
 
             }//end if
         }
+
+        public static void UpdateShipTo(Controller ctrl)
+        {
+            var syscfg = CfgUtility.GetSysConfig(ctrl);
+            var shipsrcfile = syscfg["FINISARSHIPDATA"];
+            var shipdesfile = DownloadShareFile(shipsrcfile, ctrl);
+
+            if (!string.IsNullOrEmpty(shipdesfile))
+            {
+                var shipiddict = FsrShipData.RetrieveAllShipID();
+                var data = RetrieveDataFromExcelWithAuth(ctrl, shipdesfile);
+
+                foreach (var line in data)
+                {
+                    try
+                    {
+                        var shipid = Convert2Str(line[8]) + "-" + Convert2Str(line[9]) + "-" + Convert2Str(line[14]);
+                        if (shipiddict.ContainsKey(shipid))
+                        {
+                            var shipto = Convert2Str(line[33]);
+                            FsrShipData.UpdateShipTo(shipid, shipto);
+                        }
+                    }
+                    catch (Exception ex) { }
+                }//end foreach
+            }//end if
+        }
+
         #endregion
 
 

@@ -1715,7 +1715,9 @@ namespace Prometheus.Models
             var filter1list = new List<double>();
             foreach (var v in rawdata)
             {
-                if (v != -9999.0 && v != 9999.0
+                if (v != -999999.0 && v != 999999.0
+                    && v != -99999.0 && v != 99999.0
+                    && v != -9999.0 && v != 9999.0
                     && v != -999.0 && v != 999.0 
                     && v != double.NaN)
                 {

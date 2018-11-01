@@ -5709,17 +5709,20 @@ namespace Prometheus.Controllers
             var plotline = new List<object>();
             var colorlist = new string[] { "#4b96f5", "#01ff00", "#e66400", "#910000", "#1aadce","#492970", "#f28f43", "#2f7ed8", "#0d233a", "#8bbc21", "#77a1e5", "#c42525", "#a6c96a"}.ToList();
             var idx = 0;
-            foreach (var kv in rawdata)
+            var cornlist = rawdata.Keys.ToList();
+            cornlist.Sort();
+            foreach (var c in cornlist)
             {
-                chartdata.Add(HistogramChart.GetChartData(kv.Key, kv.Value,colorlist[idx]));
+                var val = rawdata[c];
+                chartdata.Add(HistogramChart.GetChartData(c, val, colorlist[idx]));
 
-                chartdata.Add(NormalFit.GetChartData(kv.Key + " Fit", kv.Value, colorlist[idx]));
+                chartdata.Add(NormalFit.GetChartData(c + " Fit", val, colorlist[idx]));
 
-                var mean = Statistics.Mean(kv.Value);
-                var stddev = Statistics.StandardDeviation(kv.Value);
+                var mean = Statistics.Mean(val);
+                var stddev = Statistics.StandardDeviation(val);
 
                 //var plotlabel = new {
-                //    text = kv.Key + "_Mean"
+                //    text = c + "_Mean"
                 //};
                 //plotline.Add(new {
                 //    value= mean,
@@ -5731,9 +5734,9 @@ namespace Prometheus.Controllers
 
                 labels.Add(
                     new {
-                            html = "<span><font color='" + colorlist[idx] + "'>"+kv.Key+" Mean:" + Math.Round(mean, 3) + " StdDev:" + Math.Round(stddev, 3) + "</font></span>",
+                            html = "<span><font color='" + colorlist[idx] + "'>"+c+" Mean:" + Math.Round(mean, 3) + " StdDev:" + Math.Round(stddev, 3) + "</font></span>",
                             style = new {
-                                left = "20px",
+                                left = "16px",
                                 top = (15*(idx+1))+"px"
                             }
                         }

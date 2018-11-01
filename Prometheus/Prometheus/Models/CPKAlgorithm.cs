@@ -322,18 +322,20 @@ namespace Prometheus.Models
             var min = rawdata.Min();
             var max = rawdata.Max();
 
-            double step = (max - min) / 50.0;
+            var splitcnt = 100;
+
+            double step = (max - min) / (double)splitcnt;
             var steplist = new List<double>();
             var startidx = Math.Round((min + 0.5 * step), 5);
             steplist.Add(startidx);
-            for (var idx = 1; idx < 50; idx++)
+            for (var idx = 1; idx < splitcnt; idx++)
             {
                 steplist.Add(Math.Round((startidx + step * idx), 5));
             }
 
-            var hist = new MathNet.Numerics.Statistics.Histogram(rawdata, 50);
+            var hist = new MathNet.Numerics.Statistics.Histogram(rawdata, splitcnt);
             var frequencelist = new List<object>();
-            for (var idx = 0; idx < 50; idx++)
+            for (var idx = 0; idx < splitcnt; idx++)
             {
                 var templist = new List<double>();
                 templist.Add(steplist[idx]);
@@ -346,7 +348,7 @@ namespace Prometheus.Models
                 name = title,
                 data = frequencelist,
                 color = color,
-                pointWidth = 10
+                pointWidth = 5
             };
         }
     }

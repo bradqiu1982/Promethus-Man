@@ -396,7 +396,7 @@ namespace Prometheus.Models
             {
                 foreach (var s in pvm.SumDatasetList)
                 {
-                    if (yielddict.ContainsKey(s.Station))
+                    if (yielddict.ContainsKey(s.Station) && yielddict[s.Station].InputCount > 4)
                     {
                         pyvm.RealTimeYields.Add(yielddict[s.Station]);
                     }
@@ -406,7 +406,7 @@ namespace Prometheus.Models
             {
                 foreach (var s in pvm.StationList)
                 {
-                    if (yielddict.ContainsKey(s.Station))
+                    if (yielddict.ContainsKey(s.Station) && yielddict[s.Station].InputCount > 4)
                     {
                         pyvm.RealTimeYields.Add(yielddict[s.Station]);
                     }
@@ -452,7 +452,7 @@ namespace Prometheus.Models
             {
                 foreach (var s in pvm.SumDatasetList)
                 {
-                    if (yielddict.ContainsKey(s.Station))
+                    if (yielddict.ContainsKey(s.Station) && yielddict[s.Station].InputCount > 4)
                     {
                         pyvm.SNYields.Add(yielddict[s.Station]);
                     }
@@ -462,7 +462,7 @@ namespace Prometheus.Models
             {
                 foreach (var s in pvm.StationList)
                 {
-                    if (yielddict.ContainsKey(s.Station))
+                    if (yielddict.ContainsKey(s.Station) && yielddict[s.Station].InputCount > 4)
                     {
                         pyvm.SNYields.Add(yielddict[s.Station]);
                     }
@@ -512,7 +512,7 @@ namespace Prometheus.Models
             {
                 foreach (var s in pvm.SumDatasetList)
                 {
-                    if (yielddict.ContainsKey(s.Station))
+                    if (yielddict.ContainsKey(s.Station) && yielddict[s.Station].InputCount > 4)
                     {
                         pyvm.FirstYields.Add(yielddict[s.Station]);
                     }
@@ -522,7 +522,7 @@ namespace Prometheus.Models
             {
                 foreach (var s in pvm.StationList)
                 {
-                    if (yielddict.ContainsKey(s.Station))
+                    if (yielddict.ContainsKey(s.Station) && yielddict[s.Station].InputCount > 4)
                     {
                         pyvm.FirstYields.Add(yielddict[s.Station]);
                     }
@@ -646,7 +646,7 @@ namespace Prometheus.Models
             {
                 foreach (var s in pvm.SumDatasetList)
                 {
-                    if (yielddict.ContainsKey(s.Station))
+                    if (yielddict.ContainsKey(s.Station) && yielddict[s.Station].InputCount > 4)
                     {
                         pyvm.LastYields.Add(yielddict[s.Station]);
                     }
@@ -656,7 +656,7 @@ namespace Prometheus.Models
             {
                 foreach (var s in pvm.StationList)
                 {
-                    if (yielddict.ContainsKey(s.Station))
+                    if (yielddict.ContainsKey(s.Station) && yielddict[s.Station].InputCount > 4)
                     {
                         pyvm.LastYields.Add(yielddict[s.Station]);
                     }

@@ -6,8 +6,8 @@ APPEMAILADRESS:::WXNPI.Trace@finisar.com
 APPEMAILPWD:::abc@12345
 #EMAILSERVER:::wmail.finisar.com
 EMAILSERVER:::wmail.finisar.com
-RMASHAREFOLDER:::\\wux-fs\PUBLIC\Quality\10.Quality case summary\Customer Quality Case Summary\RMA & Complaint New
-RMACLOSEATTACHES:::\\wux-fs\PUBLIC\Quality\10.Quality case summary\Customer Quality Case Summary\RMA Close Data\RMA
+RMASHAREFOLDER:::\\wux-fs\PUBLIC\Quality\10.Quality case summary\Customer Quality Case Summary\13. RMA & Complaint New
+RMACLOSEATTACHES:::\\wux-fs\PUBLIC\Quality\10.Quality case summary\Customer Quality Case Summary\15. RMA Close Data\RMA
 #NeoMAPDataFolder:::\\wux-file01\Public\Wuxi Parallel NPI\NeoMAP Data
 NeoMAPDataFolder:::\\wux-fs\public\Quality\20.Report of IQA\IQC对外分享文件\MESA VCSEL Tracking\NeoMAPwaferData
 RELSHAREFOLDER:::\\Cn-file01\public\Quality\Reliability\Failure Analysis\FA-AutoTracking\SummaryTable
@@ -106,7 +106,7 @@ KPIGROUP1:::ALEX.CHEN@FINISAR.COM;LEON.REN@FINISAR.COM;SEAN.PENG@FINISAR.COM;ZHA
 KPIGROUP2:::ALEX.CHEN@FINISAR.COM;LEON.REN@FINISAR.COM;SEAN.PENG@FINISAR.COM;ZHAO.LIU@FINISAR.COM;GLORIA.LIU@FINISAR.COM;LOUIS.WANG@FINISAR.COM;TONY.LV@FINISAR.COM;TYLER.ZHANG@FINISAR.COM;MARTIN.LU@FINISAR.COM;CHANGJUN.ZHANG@FINISAR.COM;
 
 WAFERCOORD:::\\wux-fs02\Production_Test_Data\OSA_ME\OGP\WUX-E81000068
-VCSELRMASHARE:::\\wux-fs\public\Quality\10.Quality case summary\Customer Quality Case Summary\RMA & Complaint New\VCSEL Issue Tracking Master List.xlsx
+VCSELRMASHARE:::\\wux-fs\public\Quality\10.Quality case summary\Customer Quality Case Summary\13. RMA & Complaint New\VCSEL Issue Tracking Master List.xlsx
 FINISARSHIPDATA:::\\wux-file01\Public\ERP_Report\WXI\Planning\Finisar - OTS for WUXI.csv
 ITASSET:::\\wux-engsys01\d\IT_ASSET
 

@@ -28,7 +28,7 @@ namespace Prometheus.Models
     {
         public static void retrieveATEData()
         {
-            var sql = "SELECT d.ROUTE_ID,a.MFR_SN,d.DATASET_NAME,c.FAMILY,d.STATUS,d.END_TIME,d.STATION,a.MFR_PN FROM PARTS a INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID WHERE(c.MODEL_ID like 'FTLX6871%' or c.MODEL_ID like 'FTLX6872%' or c.MODEL_ID like 'FTLX6672%') and d.END_TIME > '20161119080000'  and d.DATASET_NAME IN('final', 'assembly', 'tune_rf', 'tune', 'temp_test_7up') ORDER BY d.END_TIME DESC";
+            var sql = "SELECT d.ROUTE_ID,a.MFR_SN,d.DATASET_NAME,c.FAMILY,d.STATUS,d.END_TIME,d.STATION,a.MFR_PN FROM PARTS a INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID WHERE (c.MODEL_ID like 'FTLX6871%' or c.MODEL_ID like 'FTLX6872%' or c.MODEL_ID like 'FTLX6672%') and d.END_TIME > '20161119080000'  and d.DATASET_NAME IN('final', 'assembly', 'tune_rf', 'tune', 'temp_test_7up') ORDER BY d.END_TIME DESC";
             DBUtility.ExeATESqlWithRes(sql);
         }
 
@@ -403,7 +403,7 @@ namespace Prometheus.Models
                     var s  = @"SELECT a.MFR_SN,d.DATASET_NAME,c.FAMILY,d.STATUS,d.END_TIME,d.STATION,a.MFR_PN,d.ROUTE_ID,d.dataset_id,b.JOB_ID FROM PARTS a 
                                 INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID 
                                 INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID 
-                                WHERE <mdcond> and d.start_time > '<TIMECOND>'  AND b.state <> 'GOLDEN'  ORDER BY a.MFR_SN,d.start_time ASC";
+                                WHERE (<mdcond>) and d.start_time > '<TIMECOND>'  AND b.state <> 'GOLDEN'  ORDER BY a.MFR_SN,d.start_time ASC";
                     
                     var sql = s.Replace("<TIMECOND>", vm.StartDate.ToString("yyyyMMddhhmmss")).Replace("<mdcond>", mdcond);
 
@@ -641,7 +641,7 @@ namespace Prometheus.Models
                     var s = @"SELECT a.MFR_SN,d.DATASET_NAME,c.FAMILY,d.STATUS,d.END_TIME,d.STATION,a.MFR_PN,d.ROUTE_ID,d.dataset_id,b.JOB_ID FROM PARTS a 
                             INNER JOIN ROUTES b ON a.OPT_INDEX = b.PART_INDEX 
                             INNER JOIN BOM_CONTEXT_ID c ON c.BOM_CONTEXT_ID = b.BOM_CONTEXT_ID 
-                            INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID WHERE <mdcond> and d.start_time > '<TIMECOND>'  AND b.state <> 'GOLDEN'  ORDER BY a.MFR_SN,d.start_time ASC";
+                            INNER JOIN DATASETS d ON b.ROUTE_ID = d.ROUTE_ID WHERE (<mdcond>) and d.start_time > '<TIMECOND>'  AND b.state <> 'GOLDEN'  ORDER BY a.MFR_SN,d.start_time ASC";
 
                     var sql = s.Replace("<TIMECOND>", DateTime.Parse(starttime).ToString("yyyyMMddhhmmss")).Replace("<mdcond>", mdcond);
 

@@ -3844,6 +3844,21 @@ namespace Prometheus.Models
                         where c.ContainerName = '<ContainerName>' and ddr.DataCollectionDefName is not null";
             sql = sql.Replace("<ContainerName>", sn);
             var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+            if (dbret.Count == 0)
+            {
+                sql = @"select ddr.DataCollectionDefName from insitedb.insite.DataCollectionDefBase ddr  (nolock)
+                      inner join insitedb.insite.TxnMap tm with(noloCK) ON tm.DataCollectionDefinitionBaseId = ddr.DataCollectionDefBaseId
+                      inner join insitedb.insite.spec sp with(nolock) on sp.specid =  tm.specid
+                      inner join InsiteDB.insite.WorkflowStep ws (nolock)on  ws.specbaseid = sp.specbaseid
+                      inner join InsiteDB.insite.Workflow w (nolock)on w.WorkflowID = ws.WorkflowID
+                      inner join InsiteDB.insite.WorkflowStep wss (nolock)on  wss.WorkflowId = w.WorkflowId
+                      inner join [InsiteDB].[insite].[CurrentStatus] cs (nolock) on cs.WorkflowStepId = wss.WorkflowStepId
+                      inner join [InsiteDB].[insite].[Container] c(nolock) on c.CurrentStatusId =cs.CurrentStatusId
+                    where c.ContainerName = '<ContainerName>' and ddr.DataCollectionDefName is not null";
+                sql = sql.Replace("<ContainerName>", sn);
+                dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+            }
+
             foreach (var line in dbret)
             {
                 var dc = Convert2Str(line[0]).ToUpper();

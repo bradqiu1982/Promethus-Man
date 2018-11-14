@@ -1090,6 +1090,7 @@
     <Content Include="Scripts\NormalDistribution.xml" />
     <Content Include="Scripts\NormalDistribution1.xml" />
     <Content Include="Scripts\NormalDistributionCombine.xml" />
+    <Content Include="Scripts\npitrace_db.txt" />
     <Content Include="Scripts\offline-exporting.js" />
     <Content Include="Scripts\oldie.js" />
     <Content Include="Scripts\ParetoChart.xml">

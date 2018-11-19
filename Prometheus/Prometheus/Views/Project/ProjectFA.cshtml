@@ -186,9 +186,9 @@
                     function ChooseAll(oBox) {
                         $('.checkbox-idx').each(function () {
                             var idx = $(this).attr('data-id');
-                            if ($.trim($('#HAssignee' + idx).val()) == $.trim($("#HUpdater" + idx).val())) {
+                            //if ($.trim($('#HAssignee' + idx).val()) == $.trim($("#HUpdater" + idx).val())) {
                                 $(this).prop('checked', oBox.checked);
-                            }
+                            //}
                         });
                     }
                 </script>

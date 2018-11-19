@@ -313,11 +313,11 @@ namespace Prometheus.Models
             var sql = "";
             if (firstyield)
             {
-                sql = "select ModuleSerialNum,WhichTest,ErrAbbr,TestTimeStamp from ProjectTestData where ProjectKey = '<ProjectKey>' and TestTimeStamp > '<StartDate>' and TestTimeStamp < '<EndDate>' order by ModuleSerialNum,TestTimeStamp ASC";
+                sql = "select ModuleSerialNum,WhichTest,ErrAbbr,TestTimeStamp,TestStation,PN,APPV1 from ProjectTestData where ProjectKey = '<ProjectKey>' and TestTimeStamp > '<StartDate>' and TestTimeStamp < '<EndDate>' order by ModuleSerialNum,TestTimeStamp ASC";
             }
             else
             {
-                sql = "select ModuleSerialNum,WhichTest,ErrAbbr,TestTimeStamp from ProjectTestData where ProjectKey = '<ProjectKey>' and TestTimeStamp > '<StartDate>' and TestTimeStamp < '<EndDate>' order by ModuleSerialNum,TestTimeStamp DESC";
+                sql = "select ModuleSerialNum,WhichTest,ErrAbbr,TestTimeStamp,TestStation,PN,APPV1 from ProjectTestData where ProjectKey = '<ProjectKey>' and TestTimeStamp > '<StartDate>' and TestTimeStamp < '<EndDate>' order by ModuleSerialNum,TestTimeStamp DESC";
             }
 
             sql = sql.Replace("<ProjectKey>", projectkey).Replace("<StartDate>", startdate).Replace("<EndDate>", enddate);
@@ -328,6 +328,9 @@ namespace Prometheus.Models
                 //public ProjectTestData(string pk, string sn, string wtest, string err, string testtime)
                 var tempdata = new ProjectTestData(projectkey,Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[2])
                     , Convert.ToString(item[3]));
+                tempdata.TestStation = Convert.ToString(item[4]);
+                tempdata.PN = Convert.ToString(item[5]);
+                tempdata.JO = Convert.ToString(item[6]);
                 ret.Add(tempdata);
             }
             return ret;

@@ -1768,11 +1768,20 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectFA(string ProjectKey)
         {
-            //var checkresult = CheckLoginAndPermit(Request, "Project", "ProjectFA");
-            //if (checkresult.GetType() != (new Boolean()).GetType())
-            //{
-            //    return (ActionResult)checkresult;
-            //}
+
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("logonuser") && !string.IsNullOrEmpty(ckdict["logonuser"]))
+            {
+
+            }
+            else
+            {
+                var ck = new Dictionary<string, string>();
+                ck.Add("logonredirectctrl", "User");
+                ck.Add("logonredirectact", "UserCenter");
+                CookieUtility.SetCookie(this, ck);
+                return RedirectToAction("LoginUser", "User");
+            }
 
             if (!string.IsNullOrEmpty(ProjectKey))
             {
@@ -1815,12 +1824,9 @@ namespace Prometheus.Controllers
                 var asilist = UserViewModels.RetrieveAllUser();
                 ViewBag.AllUserList = "[\"" + string.Join("\",\"", asilist.ToArray()) + "\"]";
 
-                var ckdict = CookieUtility.UnpackCookie(this);
-                if (ckdict.ContainsKey("logonuser"))
-                {
-                    ViewBag.logined = true;
-                    ViewBag.UpdaterName = ckdict["logonuser"].Split(new char[] { '|' })[0].ToUpper();
-                }
+
+                ViewBag.logined = true;
+                ViewBag.UpdaterName = ckdict["logonuser"].Split(new char[] { '|' })[0].ToUpper();
 
                 return View(vm);
             }
@@ -2974,6 +2980,10 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectWYieldDetail(string ProjectKey, string EndDate, string Weeks)
         {
+            ViewBag.fpyrawdata = "";
+            ViewBag.snrawdata = "";
+            ViewBag.fyrawdata = "";
+
             ViewBag.Weeks = Weeks;
 
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(EndDate))
@@ -3028,6 +3038,8 @@ namespace Prometheus.Controllers
                     firstparetodatalist = (List<KeyValuePair<string, int>>) pieret[0];
                     ViewBag.ferrorkeylist = (List<string>)pieret[1];
                     ViewBag.fchartscript = (string)pieret[2];
+
+                    ViewBag.fpyrawdata = "/Project/ProjectRawData?ProjectKey=" + ProjectKey + "&DataType=FPY&StartDate=" + Url.Encode(sdate.ToString("yyyy-MM-dd HH:mm:ss")) + "&EndDate=" + Url.Encode(edate.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
 
                 if (yieldvm.SNYields.Count > 0)
@@ -3039,6 +3051,8 @@ namespace Prometheus.Controllers
                     snparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
                     ViewBag.snerrorkeylist = (List<string>)pieret[1];
                     ViewBag.snchartscript = (string)pieret[2];
+
+                    ViewBag.snrawdata = "/Project/ProjectRawData?ProjectKey=" + ProjectKey + "&DataType=SN&StartDate=" + Url.Encode(sdate.ToString("yyyy-MM-dd HH:mm:ss")) + "&EndDate=" + Url.Encode(edate.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
 
                 if (yieldvm.LastYields.Count > 0)
@@ -3050,8 +3064,9 @@ namespace Prometheus.Controllers
                     fyparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
                     ViewBag.fyerrorkeylist = (List<string>)pieret[1];
                     ViewBag.fychartscript = (string)pieret[2];
-                }
 
+                    ViewBag.fyrawdata = "/Project/ProjectRawData?ProjectKey=" + ProjectKey + "&DataType=FY&StartDate=" + Url.Encode(sdate.ToString("yyyy-MM-dd HH:mm:ss")) + "&EndDate=" + Url.Encode(edate.ToString("yyyy-MM-dd HH:mm:ss"));
+                }
 
 
                 if (firstparetodatalist.Count > 0)
@@ -3637,6 +3652,10 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectDYieldDetail(string ProjectKey, string EndDate, string VStartDate, string VEndDate)
         {
+            ViewBag.fpyrawdata = "";
+            ViewBag.snrawdata = "";
+            ViewBag.fyrawdata = "";
+
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(EndDate))
             {
                 ViewBag.PJKey = ProjectKey;
@@ -3669,6 +3688,8 @@ namespace Prometheus.Controllers
                     firstparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
                     ViewBag.ferrorkeylist = (List<string>)pieret[1];
                     ViewBag.fchartscript = (string)pieret[2];
+
+                    ViewBag.fpyrawdata = "/Project/ProjectRawData?ProjectKey=" + ProjectKey + "&DataType=FPY&StartDate=" + Url.Encode(sdate.ToString("yyyy-MM-dd HH:mm:ss")) + "&EndDate=" + Url.Encode(edate.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
 
                 if (yieldvm.SNYields.Count > 0)
@@ -3680,6 +3701,8 @@ namespace Prometheus.Controllers
                     snparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
                     ViewBag.snerrorkeylist = (List<string>)pieret[1];
                     ViewBag.snchartscript = (string)pieret[2];
+
+                    ViewBag.snrawdata = "/Project/ProjectRawData?ProjectKey=" + ProjectKey + "&DataType=SN&StartDate=" + Url.Encode(sdate.ToString("yyyy-MM-dd HH:mm:ss")) + "&EndDate=" + Url.Encode(edate.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
 
                 if (yieldvm.LastYields.Count > 0)
@@ -3691,6 +3714,8 @@ namespace Prometheus.Controllers
                     fyparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
                     ViewBag.fyerrorkeylist = (List<string>)pieret[1];
                     ViewBag.fychartscript = (string)pieret[2];
+
+                    ViewBag.fyrawdata = "/Project/ProjectRawData?ProjectKey=" + ProjectKey + "&DataType=FY&StartDate=" + Url.Encode(sdate.ToString("yyyy-MM-dd HH:mm:ss")) + "&EndDate=" + Url.Encode(edate.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
 
 
@@ -3731,6 +3756,10 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectMYieldDetail(string ProjectKey, string EndDate, int Months)
         {
+            ViewBag.fpyrawdata = "";
+            ViewBag.snrawdata = "";
+            ViewBag.fyrawdata = "";
+
             ViewBag.Months = Months.ToString();
 
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(EndDate))
@@ -3775,6 +3804,8 @@ namespace Prometheus.Controllers
                     firstparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
                     ViewBag.ferrorkeylist = (List<string>)pieret[1];
                     ViewBag.fchartscript = (string)pieret[2];
+
+                    ViewBag.fpyrawdata = "/Project/ProjectRawData?ProjectKey=" + ProjectKey + "&DataType=FPY&StartDate=" + Url.Encode(sdate.ToString("yyyy-MM-dd HH:mm:ss")) + "&EndDate=" + Url.Encode(edate.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
 
                 if (yieldvm.SNYields.Count > 0)
@@ -3786,6 +3817,8 @@ namespace Prometheus.Controllers
                     snparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
                     ViewBag.snerrorkeylist = (List<string>)pieret[1];
                     ViewBag.snchartscript = (string)pieret[2];
+
+                    ViewBag.snrawdata = "/Project/ProjectRawData?ProjectKey=" + ProjectKey + "&DataType=SN&StartDate=" + Url.Encode(sdate.ToString("yyyy-MM-dd HH:mm:ss")) + "&EndDate=" + Url.Encode(edate.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
 
                 if (yieldvm.LastYields.Count > 0)
@@ -3797,6 +3830,8 @@ namespace Prometheus.Controllers
                     fyparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
                     ViewBag.fyerrorkeylist = (List<string>)pieret[1];
                     ViewBag.fychartscript = (string)pieret[2];
+
+                    ViewBag.fyrawdata = "/Project/ProjectRawData?ProjectKey=" + ProjectKey + "&DataType=FY&StartDate=" + Url.Encode(sdate.ToString("yyyy-MM-dd HH:mm:ss")) + "&EndDate=" + Url.Encode(edate.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
 
                 if (firstparetodatalist.Count > 0)
@@ -3989,6 +4024,10 @@ namespace Prometheus.Controllers
         }
         public ActionResult ProjectBRYieldDetail(string ProjectKey, string CurrentBR, string WholeBRNUM, string BRType)
         {
+            ViewBag.fpyrawdata = "";
+            ViewBag.snrawdata = "";
+            ViewBag.fyrawdata = "";
+
             if (!string.IsNullOrEmpty(ProjectKey)
                 && !string.IsNullOrEmpty(CurrentBR)
                 && !string.IsNullOrEmpty(WholeBRNUM)
@@ -4024,6 +4063,8 @@ namespace Prometheus.Controllers
                         firstparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
                         ViewBag.ferrorkeylist = (List<string>)pieret[1];
                         ViewBag.fchartscript = (string)pieret[2];
+
+                        ViewBag.fpyrawdata = "/Project/ProjectBRRawData?ProjectKey=" + ProjectKey + "&DataType=FPY&BRNUM=" + ViewBag.BRNUM + "&BRType=" + ViewBag.BRType;
                     }
 
                     if (yieldvm.SNYields.Count > 0)
@@ -4035,6 +4076,8 @@ namespace Prometheus.Controllers
                         snparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
                         ViewBag.snerrorkeylist = (List<string>)pieret[1];
                         ViewBag.snchartscript = (string)pieret[2];
+
+                        ViewBag.snrawdata = "/Project/ProjectBRRawData?ProjectKey=" + ProjectKey + "&DataType=SN&BRNUM=" + ViewBag.BRNUM + "&BRType=" + ViewBag.BRType;
                     }
 
                     if (yieldvm.LastYields.Count > 0)
@@ -4046,6 +4089,8 @@ namespace Prometheus.Controllers
                         fyparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
                         ViewBag.fyerrorkeylist = (List<string>)pieret[1];
                         ViewBag.fychartscript = (string)pieret[2];
+
+                        ViewBag.fyrawdata = "/Project/ProjectBRRawData?ProjectKey=" + ProjectKey + "&DataType=FY&BRNUM=" + ViewBag.BRNUM + "&BRType=" + ViewBag.BRType;
                     }
 
 
@@ -4735,6 +4780,10 @@ namespace Prometheus.Controllers
 
         public ActionResult ProjectPYieldDetail(string ProjectKey, string StartDate, string EndDate)
         {
+            ViewBag.fpyrawdata = "";
+            ViewBag.snrawdata = "";
+            ViewBag.fyrawdata = "";
+
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(StartDate) && !string.IsNullOrEmpty(EndDate))
             {
                 ViewBag.PJKey = ProjectKey;
@@ -4766,6 +4815,8 @@ namespace Prometheus.Controllers
                     firstparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
                     ViewBag.ferrorkeylist = (List<string>)pieret[1];
                     ViewBag.fchartscript = (string)pieret[2];
+
+                    ViewBag.fpyrawdata = "/Project/ProjectRawData?ProjectKey=" + ProjectKey + "&DataType=FPY&StartDate=" + Url.Encode(ViewBag.sDate) + "&EndDate=" + Url.Encode(ViewBag.eDate);
                 }
 
                 if (yieldvm.SNYields.Count > 0)
@@ -4777,6 +4828,8 @@ namespace Prometheus.Controllers
                     snparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
                     ViewBag.snerrorkeylist = (List<string>)pieret[1];
                     ViewBag.snchartscript = (string)pieret[2];
+
+                    ViewBag.snrawdata = "/Project/ProjectRawData?ProjectKey=" + ProjectKey + "&DataType=SN&StartDate=" + Url.Encode(ViewBag.sDate) + "&EndDate=" + Url.Encode(ViewBag.eDate);
                 }
 
                 if (yieldvm.LastYields.Count > 0)
@@ -4788,6 +4841,8 @@ namespace Prometheus.Controllers
                     fyparetodatalist = (List<KeyValuePair<string, int>>)pieret[0];
                     ViewBag.fyerrorkeylist = (List<string>)pieret[1];
                     ViewBag.fychartscript = (string)pieret[2];
+
+                    ViewBag.fyrawdata = "/Project/ProjectRawData?ProjectKey=" + ProjectKey + "&DataType=FY&StartDate=" + Url.Encode(ViewBag.sDate) + "&EndDate=" + Url.Encode(ViewBag.eDate);
                 }
 
 
@@ -9169,6 +9224,97 @@ namespace Prometheus.Controllers
             ViewBag.data = ProjectViewModels.GetClosedProjects();
 
             return View();
+        }
+
+        public ActionResult ProjectRawData(string ProjectKey, string DataType, string StartDate, string EndDate)
+        {
+            var sb = ProjectYieldViewModule.ProjectRawData(ProjectKey, DataType, StartDate, EndDate);
+
+            string datestring = DateTime.Now.ToString("yyyyMMdd");
+            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+            if (!Directory.Exists(imgdir))
+            {
+                Directory.CreateDirectory(imgdir);
+            }
+
+            var fn = ProjectKey + "_" + DataType + "_data_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+            var filename = imgdir + fn;
+
+            var fw = System.IO.File.OpenWrite(filename);
+            if (sb.Length > 0)
+            {
+                var CHUNK_STRING_LENGTH = 30000;
+                while (sb.Length > CHUNK_STRING_LENGTH)
+                {
+                    var bt = System.Text.Encoding.UTF8.GetBytes(sb.ToString(0, CHUNK_STRING_LENGTH));
+                    fw.Write(bt, 0, bt.Count());
+                    sb.Remove(0, CHUNK_STRING_LENGTH);
+                }
+
+                var bt1 = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+                fw.Write(bt1, 0, bt1.Count());
+            }
+            fw.Close();
+
+            try
+            {
+                var fzip = new ICSharpCode.SharpZipLib.Zip.FastZip();
+                fzip.CreateZip(imgdir + fn.Replace(".csv", ".zip"), imgdir, false, fn);
+                try { System.IO.File.Delete(filename); } catch (Exception ex) { }
+                return File(filename.Replace(".csv", ".zip"), "application/vnd.zip", fn.Replace(".csv", ".zip"));
+            }
+            catch (Exception ex)
+            {
+                if (!System.IO.File.Exists(filename))
+                { System.IO.File.WriteAllText(filename, "Fail to download data."); }
+                return File(filename, "application/vnd.ms-excel", fn);
+            }
+        }
+
+        public ActionResult ProjectBRRawData(string ProjectKey, string DataType, string BRNUM,string BRType)
+        {
+            var sb = ProjectYieldViewModule.ProjectBRRawData(ProjectKey, DataType, BRNUM, BRType);
+            string datestring = DateTime.Now.ToString("yyyyMMdd");
+            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+            if (!Directory.Exists(imgdir))
+            {
+                Directory.CreateDirectory(imgdir);
+            }
+
+            var br = BRNUM.Replace(" ", "_").Replace("#", "").Replace("'", "")
+                            .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+            var fn = ProjectKey+"_"+ DataType +"_"+br+ "_data_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+            var filename = imgdir + fn;
+
+            var fw = System.IO.File.OpenWrite(filename);
+            if (sb.Length > 0)
+            {
+                var CHUNK_STRING_LENGTH = 30000;
+                while (sb.Length > CHUNK_STRING_LENGTH)
+                {
+                    var bt = System.Text.Encoding.UTF8.GetBytes(sb.ToString(0, CHUNK_STRING_LENGTH));
+                    fw.Write(bt, 0, bt.Count());
+                    sb.Remove(0, CHUNK_STRING_LENGTH);
+                }
+
+                var bt1 = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+                fw.Write(bt1, 0, bt1.Count());
+            }
+            fw.Close();
+
+            try
+            {
+                var fzip = new ICSharpCode.SharpZipLib.Zip.FastZip();
+                fzip.CreateZip(imgdir + fn.Replace(".csv", ".zip"), imgdir, false, fn);
+                try { System.IO.File.Delete(filename); } catch (Exception ex) { }
+                return File(filename.Replace(".csv", ".zip"), "application/vnd.zip", fn.Replace(".csv", ".zip"));
+            }
+            catch (Exception ex)
+            {
+                if (!System.IO.File.Exists(filename))
+                { System.IO.File.WriteAllText(filename, "Fail to download data."); }
+                return File(filename, "application/vnd.ms-excel", fn);
+            }
         }
 
         public ActionResult RefreshITASSET()

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Caching;
 
@@ -855,11 +856,124 @@ namespace Prometheus.Models
                 var vm = mycache.Get(ckey);
                 if (vm == null)
                 {
-                    mycache.Insert(ckey, ret, null, DateTime.Now.AddHours(2), Cache.NoSlidingExpiration);
+                    mycache.Insert(ckey, ret, null, DateTime.Now.AddHours(1.2), Cache.NoSlidingExpiration);
                 }
             }
 
             return ret;
+        }
+
+        public static StringBuilder ProjectRawData(string pjkey, string DataType, string StartDate, string EndDate)
+        {
+            var startdate = DateTime.Parse(DateTime.Parse(StartDate).ToString("yyyy-MM-dd") + " 07:30:00").ToString();
+            var enddate = DateTime.Parse(EndDate).ToString("yyyy-MM-dd HH:mm:ss");
+
+            var datatfromstart = ProjectTestData.RetrieveProjectTestData(pjkey, startdate, DateTime.Parse(enddate).AddYears(5).ToString("yyyy-MM-dd HH:mm:ss"), false, null);
+            if (datatfromstart.Count == 0)
+            {
+                return new StringBuilder();
+            }
+
+            var trawdata = new List<ProjectTestData>();
+
+            var datawithstartend = new List<ProjectTestData>();
+            var enddatet = DateTime.Parse(enddate);
+            foreach (var item in datatfromstart)
+            {
+                if (item.TestTimeStamp <= enddatet)
+                {
+                    datawithstartend.Add(item);
+                }
+            }
+
+            var reversedatawithstartend = new List<ProjectTestData>();
+            var datacount = datawithstartend.Count - 1;
+            for (int idx = datacount; idx >= 0; idx--)
+            {
+                reversedatawithstartend.Add(datawithstartend[idx]);
+            }
+
+            var previoussnstationdict = ProjectTestData.RetrieveSNBeforeDateWithStation(pjkey, startdate, null);
+
+            if(string.Compare(DataType,"SN") == 0)
+            {
+                var sndict = new Dictionary<string, bool>();
+                foreach (var kvpair in previoussnstationdict)
+                {
+                    var endindex = kvpair.Key.LastIndexOf(':');
+                    var sn = kvpair.Key.Substring(0, endindex);
+                    if (!sndict.ContainsKey(sn))
+                    {
+                        sndict.Add(sn, true);
+                    }
+                }
+                var validatedict4snyield = new Dictionary<string, bool>();
+                foreach (var item in reversedatawithstartend)
+                {
+                    if (!sndict.ContainsKey(item.ModuleSerialNum))
+                    {
+                        if (!validatedict4snyield.ContainsKey(item.ModuleSerialNum))
+                        {
+                            validatedict4snyield.Add(item.ModuleSerialNum, true);
+                        }
+                    }
+                }
+                var filteredPjData2 = new List<ProjectTestData>();
+                foreach (var item in datatfromstart)
+                {
+                    if (validatedict4snyield.ContainsKey(item.ModuleSerialNum))
+                    {
+                        filteredPjData2.Add(item);
+                    }
+                }
+
+                trawdata = filteredPjData2;
+            }
+
+            if (string.Compare(DataType, "FPY") == 0)
+            {
+                var filteredPjData = new List<ProjectTestData>();
+                foreach (var item in reversedatawithstartend)
+                {
+                    if (!previoussnstationdict.ContainsKey(item.ModuleSerialNum + ":" + item.WhichTest))
+                    {
+                        filteredPjData.Add(item);
+                    }
+                }
+                trawdata = filteredPjData;
+            }
+
+            if (string.Compare(DataType, "FY") == 0)
+            {
+                var filteredPjData2 = new List<ProjectTestData>();
+                foreach (var item in datawithstartend)
+                {
+                    if (!previoussnstationdict.ContainsKey(item.ModuleSerialNum + ":" + item.WhichTest))
+                    {
+                        filteredPjData2.Add(item);
+                    }
+                }
+                trawdata = filteredPjData2;
+            }
+
+            var rawdata = new List<ProjectTestData>();
+            var sntestdict = new Dictionary<string, bool>();
+            foreach (var item in trawdata)
+            {
+                if (!sntestdict.ContainsKey(item.ModuleSerialNum + ":" + item.WhichTest))
+                {
+                    sntestdict.Add(item.ModuleSerialNum + ":" + item.WhichTest, true);
+                    rawdata.Add(item);
+                }
+            }
+
+            var sb = new StringBuilder((rawdata.Count + 1) * 160);
+            foreach (var item in rawdata)
+            {
+                sb.Append("\""+item.ProjectKey+"\",\""+item.ModuleSerialNum+"\",\""+item.WhichTest+"\",\""+item.ErrAbbr+"\",\""+item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss")+"\",\""+item.TestStation+"\",\""+item.PN+"\",\""+item.JO+"\",\r\n");
+            }
+            return sb;
+
         }
 
         public static ProjectYieldViewModule GetYieldByTestData(List<ProjectTestData> testdata)
@@ -951,6 +1065,35 @@ namespace Prometheus.Models
             }
 
             return retlist;
+        }
+
+        public static StringBuilder ProjectBRRawData(string pjkey, string DataType, string BRNUM, string BRType)
+        {
+            var rawdata = new List<ProjectTestData>();
+
+            var plist = ProjectTestData.RetrieveProjectTestDataByBR(pjkey, BRNUM, BRType, false, null);
+
+            var sndict = new Dictionary<string, bool>();
+            if (string.Compare(DataType, "FPY") == 0)
+            {
+                plist.Reverse();
+            }
+
+            foreach (var item in plist)
+            {
+                if (!sndict.ContainsKey(item.ModuleSerialNum + ":" + item.WhichTest))
+                {
+                    sndict.Add(item.ModuleSerialNum + ":" + item.WhichTest, true);
+                    rawdata.Add(item);
+                }
+            }
+
+            var sb = new StringBuilder((rawdata.Count + 1) * 160);
+            foreach (var item in rawdata)
+            {
+                sb.Append("\"" + item.ProjectKey + "\",\"" + item.ModuleSerialNum + "\",\"" + item.WhichTest + "\",\"" + item.ErrAbbr + "\",\"" + item.TestTimeStamp.ToString("yyyy-MM-dd HH:mm:ss") + "\",\"" + item.TestStation + "\",\"" + item.PN + "\",\"" + item.JO + "\",\r\n");
+            }
+            return sb;
         }
 
         public static List<ProjectYieldViewModule> GetYieldByWeeks(string pjkey,Cache mycache,int weeks)

@@ -617,6 +617,8 @@
             $('#queryparam').val('');
             $('#StartDate').val('');
             $('#EndDate').val('');
+            $('#lowbound').val('');
+            $('#highbound').val('');
             $('.v-content').empty();
 
         }
@@ -771,6 +773,8 @@
             var startdate = $('#StartDate').val();
             var enddate = $('#EndDate').val();
             var pnlist = $('#pnlist').val();
+            var lowbound = $('#lowbound').val();
+            var highbound = $('#highbound').val();
 
             if (pj == ''
                 || mestab == ''
@@ -801,7 +805,9 @@
                 startdate: startdate,
                 enddate: enddate,
                 pnlist: pnlist,
-                pass: allpasslist
+                pass: allpasslist,
+                lowbound: lowbound,
+                highbound: highbound
             },
             function (output) {
                 $.bootstrapLoading.end();
@@ -957,6 +963,8 @@
                 text: col_data.title
             },
             xAxis: {
+                min: col_data.xmin,
+                max: col_data.xmax,
                 title:{
                     text:'Value'
                 },

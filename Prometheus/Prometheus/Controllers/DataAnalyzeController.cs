@@ -5687,7 +5687,8 @@ namespace Prometheus.Controllers
             var startdate = Request.Form["startdate"];
             var enddate = Request.Form["enddate"];
             var pnlist = Request.Form["pnlist"];
-
+            var lowbound = Request.Form["lowbound"];
+            var highbound = Request.Form["highbound"];
 
             var rawdata = MESUtility.GetTestData2(pnlist, mestab, paramliststr, startdate, enddate, onlypass);
             if (rawdata.Count == 0)
@@ -5711,9 +5712,16 @@ namespace Prometheus.Controllers
             var idx = 0;
             var cornlist = rawdata.Keys.ToList();
             cornlist.Sort();
+            double xmin = 0;
+            double xmax = 0;
             foreach (var c in cornlist)
             {
                 var val = rawdata[c];
+                var tempmax = val.Max();
+                var tempmin = val.Min();
+                if (xmax < tempmax) { xmax = tempmax; }
+                if (xmin > tempmin) { xmin = tempmin; }
+
                 chartdata.Add(HistogramChart.GetChartData(c, val, colorlist[idx]));
 
                 chartdata.Add(NormalFit.GetChartData(c + " Fit", val, colorlist[idx]));
@@ -5732,9 +5740,51 @@ namespace Prometheus.Controllers
                 //    label = plotlabel
                 //});
 
+                if (!string.IsNullOrEmpty(lowbound))
+                {
+                    try
+                    {
+                        var bound = Convert.ToDouble(lowbound);
+                        if (xmin > bound) { xmin = bound-stddev; }
+                        var plotlabel = new
+                        {
+                            text = "low bound:"+bound
+                        };
+                        plotline.Add(new
+                        {
+                            value = bound,
+                            color = "red",
+                            width = 2,
+                            label = plotlabel
+                        });
+                    }
+                    catch (Exception ex) { }
+
+                }
+                if (!string.IsNullOrEmpty(highbound))
+                {
+                    try
+                    {
+                        var bound = Convert.ToDouble(highbound);
+                        if (xmax < bound) { xmax = bound+stddev; }
+                        var plotlabel = new
+                        {
+                            text = "high bound:" + bound
+                        };
+                        plotline.Add(new
+                        {
+                            value = bound,
+                            color = "red",
+                            width = 2,
+                            label = plotlabel
+                        });
+                    }
+                    catch (Exception ex) { }
+                }
+
                 labels.Add(
                     new {
-                            html = "<span><font color='" + colorlist[idx] + "'>"+c+" Mean:" + Math.Round(mean, 3) + " StdDev:" + Math.Round(stddev, 3) + "</font></span>",
+                            html = "<span style='font-Size:8px!important;'><font color='" + colorlist[idx] + "'>"+c+" M:" + Math.Round(mean, 3) + " S:" + Math.Round(stddev, 3) + "</font></span>",
                             style = new {
                                 left = "16px",
                                 top = (15*(idx+1))+"px"
@@ -5753,7 +5803,9 @@ namespace Prometheus.Controllers
                 title = title,
                 chartdata = chartdata,
                 plotline = plotline,
-                labels = labels
+                labels = labels,
+                xmin = xmin,
+                xmax = xmax
             };
 
             var ret1 = new JsonResult();

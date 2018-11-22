@@ -2956,6 +2956,11 @@ namespace Prometheus.Controllers
                 }
 
                 ret.Add(errorkeylist);
+                if (string.IsNullOrEmpty(namevaluepair))
+                {
+                    ret.Add("");
+                    return ret;
+                }
 
                 namevaluepair = namevaluepair.Substring(0, namevaluepair.Length - 1);
 

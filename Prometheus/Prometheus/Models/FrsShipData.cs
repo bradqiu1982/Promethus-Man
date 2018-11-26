@@ -108,23 +108,23 @@ namespace Prometheus.Models
             DBUtility.ExeLocalSqlNoRes(sql, dict);
         }
 
-        public static void UpdateOPD(string shipid, string OPD)
-        {
-            var sql = "update FsrShipData set Appv_5=@OPD where ShipID=@ShipID";
-            var dict = new Dictionary<string, string>();
-            dict.Add("@ShipID", shipid);
-            dict.Add("@OPD", OPD);
-            DBUtility.ExeLocalSqlNoRes(sql, dict);
-        }
+        //public static void UpdateOPD(string shipid, string OPD)
+        //{
+        //    var sql = "update FsrShipData set Appv_5=@OPD where ShipID=@ShipID";
+        //    var dict = new Dictionary<string, string>();
+        //    dict.Add("@ShipID", shipid);
+        //    dict.Add("@OPD", OPD);
+        //    DBUtility.ExeLocalSqlNoRes(sql, dict);
+        //}
 
-        public static void UpdateShipTo(string shipid, string shipto)
-        {
-            var sql = "update FsrShipData set Appv_2=@shipto where ShipID=@ShipID";
-            var dict = new Dictionary<string, string>();
-            dict.Add("@ShipID", shipid);
-            dict.Add("@shipto", shipto);
-            DBUtility.ExeLocalSqlNoRes(sql, dict);
-        }
+        //public static void UpdateShipTo(string shipid, string shipto)
+        //{
+        //    var sql = "update FsrShipData set Appv_2=@shipto where ShipID=@ShipID";
+        //    var dict = new Dictionary<string, string>();
+        //    dict.Add("@ShipID", shipid);
+        //    dict.Add("@shipto", shipto);
+        //    DBUtility.ExeLocalSqlNoRes(sql, dict);
+        //}
 
         public static void UpdateOrderQty(string shipid, double orderqty)
         {

@@ -9334,11 +9334,11 @@ namespace Prometheus.Controllers
         //    return View("HeartBeat");
         //}
 
-        public ActionResult UpdateShipTo()
-        {
-            ExternalDataCollector.UpdateShipTo(this);
-            return View("HeartBeat");
-        }
+        //public ActionResult UpdateShipTo()
+        //{
+        //    ExternalDataCollector.UpdateShipTo(this);
+        //    return View("HeartBeat");
+        //}
 
         public ActionResult RefreshATE()
         {

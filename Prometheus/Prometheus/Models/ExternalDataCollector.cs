@@ -4189,14 +4189,16 @@ namespace Prometheus.Models
             return string.Empty;
         }
 
-        private static Dictionary<string, bool> RetrieveAllParallelPN()
+        private static Dictionary<string, bool> RetrieveAllPN(string pg)
         {
             var ret = new Dictionary<string, bool>();
             var sql = @"select distinct pb.ProductName from [InsiteDB].[insite].[ProductFamily] pf
                           left join [InsiteDB].[insite].[Product] pd on pd.ProductFamilyId = pf.ProductFamilyId
                           left join [InsiteDB].[insite].[ProductBase] pb on pb.ProductBaseId = pd.ProductBaseId
-                          where  pf.ProductFamilyName like 'Parallel%'  and pd.[Description] is not null  and pb.ProductName is not null 
+                          where  pf.ProductFamilyName like '<productgroup>%'  and pd.[Description] is not null  and pb.ProductName is not null 
                           and ( pd.[Description] not like 'LEN%' and pd.[Description] not like 'Shell%')";
+            sql = sql.Replace("<productgroup>", pg);
+
             var dbret = DBUtility.ExeMESSqlWithRes(sql);
             foreach (var line in dbret)
             {
@@ -4214,7 +4216,12 @@ namespace Prometheus.Models
             var syscfg = CfgUtility.GetSysConfig(ctrl);
             var shipsrcfile = syscfg["FINISARSHIPDATA"];
             var shipdesfile = DownloadShareFile(shipsrcfile,ctrl);
-            var parallelpndict = RetrieveAllParallelPN();
+
+            var parallelpndict = RetrieveAllPN("Parallel");
+            var linecardpndict = RetrieveAllPN("Linecard");
+            var osapndict = RetrieveAllPN("OSA");
+            var wsspndict = RetrieveAllPN("WSS");
+            var componentpndict = RetrieveAllPN("passive");
 
             if (!string.IsNullOrEmpty(shipdesfile))
             {
@@ -4243,11 +4250,24 @@ namespace Prometheus.Models
                                 && shipqty > 0 && !string.IsNullOrEmpty(pn))
                             {
                                 var cfg = Convert2Str(line[32]);
-                                if (string.IsNullOrEmpty(cfg))
+
                                 {
-                                    if (!parallelpndict.ContainsKey(pn))
+                                    if (parallelpndict.ContainsKey(pn))
+                                    { cfg = "PARALLEL"; }
+                                    else if (osapndict.ContainsKey(pn))
+                                    { cfg = "OSA"; }
+                                    else if (wsspndict.ContainsKey(pn))
+                                    { cfg = "WSS"; }
+                                    else if (componentpndict.ContainsKey(pn))
+                                    { cfg = "COMPONENT"; }
+                                    else if (linecardpndict.ContainsKey(pn))
+                                    {
+                                        if (!cfg.ToUpper().Contains("RED-C"))
+                                        { cfg = "LINECARD"; }
+                                    }
+
+                                    if (string.IsNullOrEmpty(cfg))
                                     { continue; }
-                                    cfg = "PARALLEL";
                                 }
 
                                 var ordereddate = Convert.ToDateTime(line[2]);
@@ -4317,32 +4337,32 @@ namespace Prometheus.Models
             }//end if
         }
 
-        public static void UpdateShipTo(Controller ctrl)
-        {
-            var syscfg = CfgUtility.GetSysConfig(ctrl);
-            var shipsrcfile = syscfg["FINISARSHIPDATA"];
-            var shipdesfile = DownloadShareFile(shipsrcfile, ctrl);
+        //public static void UpdateShipTo(Controller ctrl)
+        //{
+        //    var syscfg = CfgUtility.GetSysConfig(ctrl);
+        //    var shipsrcfile = syscfg["FINISARSHIPDATA"];
+        //    var shipdesfile = DownloadShareFile(shipsrcfile, ctrl);
 
-            if (!string.IsNullOrEmpty(shipdesfile))
-            {
-                var shipiddict = FsrShipData.RetrieveAllShipID();
-                var data = RetrieveDataFromExcelWithAuth(ctrl, shipdesfile);
+        //    if (!string.IsNullOrEmpty(shipdesfile))
+        //    {
+        //        var shipiddict = FsrShipData.RetrieveAllShipID();
+        //        var data = RetrieveDataFromExcelWithAuth(ctrl, shipdesfile);
 
-                foreach (var line in data)
-                {
-                    try
-                    {
-                        var shipid = Convert2Str(line[8]) + "-" + Convert2Str(line[9]) + "-" + Convert2Str(line[14]);
-                        if (shipiddict.ContainsKey(shipid))
-                        {
-                            var shipto = Convert2Str(line[33]);
-                            FsrShipData.UpdateShipTo(shipid, shipto);
-                        }
-                    }
-                    catch (Exception ex) { }
-                }//end foreach
-            }//end if
-        }
+        //        foreach (var line in data)
+        //        {
+        //            try
+        //            {
+        //                var shipid = Convert2Str(line[8]) + "-" + Convert2Str(line[9]) + "-" + Convert2Str(line[14]);
+        //                if (shipiddict.ContainsKey(shipid))
+        //                {
+        //                    var shipto = Convert2Str(line[33]);
+        //                    FsrShipData.UpdateShipTo(shipid, shipto);
+        //                }
+        //            }
+        //            catch (Exception ex) { }
+        //        }//end foreach
+        //    }//end if
+        //}
 
         #endregion
 

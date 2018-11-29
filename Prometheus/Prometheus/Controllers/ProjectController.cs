@@ -6297,7 +6297,7 @@ namespace Prometheus.Controllers
             try
             {
                 ExternalDataCollector.RefreshRMAData(this);
-                ExternalDataCollector.UpdateRMABackUPDataRate();
+                //ExternalDataCollector.UpdateRMABackUPDataRate();
             }
             catch (Exception ex) { }
 

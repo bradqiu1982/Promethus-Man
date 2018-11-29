@@ -691,8 +691,6 @@ namespace Prometheus.Models
             var rmasrcfolder = syscfgdict["RMASHAREFOLDER"];
             var rmasrcfiles = DirectoryEnumerateFiles(ctrl, rmasrcfolder);
 
-            var rmaclosefilefoldr = syscfgdict["RMACLOSEATTACHES"];
-
             string datestring = DateTime.Now.ToString("yyyyMMdd");
             string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
             if (!DirectoryExists(ctrl, imgdir))
@@ -705,7 +703,8 @@ namespace Prometheus.Models
                 var filename = Path.GetFileName(srcf);
                 if (filename.ToUpper().Contains("RMA") 
                     && filename.ToUpper().Contains("COMPLAINT")
-                    && filename.ToUpper().Contains("NEWDATA"))
+                    && filename.ToUpper().Contains("NEWDATA")
+                    && !filename.ToUpper().Contains("$"))
                 {
                     try
                     {
@@ -718,7 +717,7 @@ namespace Prometheus.Models
                             var data = RetrieveDataFromExcelWithAuth(ctrl, desfile);
                             logthdinfo("get data count: " + data.Count.ToString());
 
-                            SolveRMAData(data, rmaclosefilefoldr, ctrl);
+                            SolveRMAData(data, ctrl);
                         }//copied file exist
                     }
                     catch (Exception ex) {
@@ -783,7 +782,7 @@ namespace Prometheus.Models
             return ret;
         }
 
-        private static void SolveRMAData(List<List<string>> data,string rmacloseattachfolder, Controller ctrl)
+        private static void SolveRMAData(List<List<string>> data,Controller ctrl)
         {
             if (data.Count == 0)
                 return;
@@ -791,7 +790,11 @@ namespace Prometheus.Models
                 return;
 
             logthdinfo("retrieve all exist rma task");
-            var allrmaissue = IssueViewModels.RetrieveAllIssueTypeIssue("NONE", "NONE", ISSUETP.RMA, ctrl); //rma issues
+
+            var startdate = DateTime.Now.AddMonths(-3).ToString("yyyy-MM-dd HH:mm:ss");
+            var enddate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            var allrmaissue = IssueViewModels.RetrieveAllIssueTypeIssue(startdate, enddate, ISSUETP.RMA, ctrl); //rma issues
+
             var rmaissuedict = new Dictionary<string, string>();
             foreach (var issue in allrmaissue)
             {
@@ -815,7 +818,7 @@ namespace Prometheus.Models
             //var usermatrix = UserMatrixVM.RetrieveUserMatrixDepart(); //user depart
 
             logthdinfo("retrieve all exist rma attachment");
-            var rmaattaches = RetrieveRMACloseAttach(); //all rma attach
+            //var rmaattaches = RetrieveRMACloseAttach(); //all rma attach
             var solvedrmanum = new Dictionary<string, bool>();
 
             var sixmonthago = DateTime.Now.AddMonths(-3);
@@ -846,8 +849,7 @@ namespace Prometheus.Models
                                 continue;
                             }
 
-
-                            StoreRMAAttachs(rmacloseattachfolder, rmarawdatas[0].AppV_B, rmaattaches,ctrl); //retrieve rma attach and store them
+                            //StoreRMAAttachs(rmacloseattachfolder, rmarawdatas[0].AppV_B, rmaattaches,ctrl); //retrieve rma attach and store them
 
                             solvedrmanum.Add(rmarawdatas[0].AppV_B,true);
                         }

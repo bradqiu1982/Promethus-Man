@@ -856,7 +856,7 @@ namespace Prometheus.Models
                 var vm = mycache.Get(ckey);
                 if (vm == null)
                 {
-                    mycache.Insert(ckey, ret, null, DateTime.Now.AddHours(1.2), Cache.NoSlidingExpiration);
+                    mycache.Insert(ckey, ret, null, DateTime.Now.AddHours(2), Cache.NoSlidingExpiration);
                 }
             }
 

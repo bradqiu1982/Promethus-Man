@@ -1592,6 +1592,41 @@ namespace Prometheus.Models
             }
         }
 
+        public static List<string> RetrieveAllPNID(List<string> pndeslist)
+        {
+            var cond = "";
+            foreach (var pn in pndeslist)
+            {
+                if (!IsDigitsOnly(pn.Trim()))
+                {
+                    if (string.IsNullOrEmpty(cond))
+                    {
+                        cond = " c.Description like '%" + pn.Trim() + "%' ";
+                    }
+                    else
+                    {
+                        cond = cond + " or c.Description like '%" + pn.Trim() + "%' ";
+                    }
+                }
+            }
+
+            if (string.IsNullOrEmpty(cond))
+            {
+                return new List<string>();
+            }
+            else
+            {
+                var ret = new List<string>();
+                var sql = "select DISTINCT c.ProductId from insite.Product c where " + cond;
+                var dbret = DBUtility.ExeMESSqlWithRes(sql);
+                foreach (var item in dbret)
+                {
+                    ret.Add(Convert.ToString(item[0]));
+                }
+                return ret;
+            }
+        }
+
         public static Dictionary<string, string> RetrievePNDescByPn(List<string> pnlist)
         {
             var ret = new Dictionary<string, string>();

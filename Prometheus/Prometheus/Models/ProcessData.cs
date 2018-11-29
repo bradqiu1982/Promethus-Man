@@ -163,6 +163,25 @@ namespace Prometheus.Models
             if (pvmlist.Count == 0) { return; }
             var pvm = pvmlist[0];
 
+            var temppnlist = new List<string>();
+            foreach (var pn in pvm.PNList)
+            { temppnlist.Add(pn.Pn); }
+
+            var mespnids = MESUtility.RetrieveAllPNID(temppnlist);
+            var localpnids = GetCurrentProjectPNID(PJKey);
+            var existflag = true;
+            foreach (var id in mespnids)
+            {
+                if (!localpnids.ContainsKey(id))
+                {
+                    existflag = false;
+                    break;
+                }
+            }
+
+            if (existflag)
+            { return; }
+
             var pncond = PNCondition(pvm.PNList);
             if (!string.IsNullOrEmpty(pncond))
             {
@@ -227,6 +246,25 @@ namespace Prometheus.Models
                     DBUtility.ExeLocalSqlNoRes(csql);
                 }
             }//end if
+        }
+
+        public static Dictionary<string,bool> GetCurrentProjectPNID(string PJKey)
+        {
+            var ret = new Dictionary<string, bool>();
+
+            var sql = "select distinct ProductId from ProjectWorkflow where ProjectKey = '<ProjectKey>'";
+            sql = sql.Replace("<ProjectKey>", PJKey);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                try
+                {
+                    ret.Add(Convert.ToString(line[0]),true);
+                }
+                catch (Exception ex) { }
+            }
+
+            return ret;
         }
 
         public static List<string> GetCurrentProjectWorkflowSteps(string PJKey)

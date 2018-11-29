@@ -6400,21 +6400,21 @@ namespace Prometheus.Controllers
                 { }
             }
 
-            heartbeatlog("BIDataUtility.LoadModuleTXOFromMESBackup");
+            //heartbeatlog("BIDataUtility.LoadModuleTXOFromMESBackup");
 
-            try
-            {
-                BIDataUtility.LoadModuleTXOFromMESBackup(this);
-            }
-            catch (Exception ex) { }
+            //try
+            //{
+            //    BIDataUtility.LoadModuleTXOFromMESBackup(this);
+            //}
+            //catch (Exception ex) { }
 
-            heartbeatlog("BIDataUtility.LoadProcessTXOFromAuto");
+            //heartbeatlog("BIDataUtility.LoadProcessTXOFromAuto");
 
-            try
-            {
-                BIDataUtility.LoadProcessTXOFromAuto(this);
-            }
-            catch (Exception ex) { }
+            //try
+            //{
+            //    BIDataUtility.LoadProcessTXOFromAuto(this);
+            //}
+            //catch (Exception ex) { }
 
             heartbeatlog("RefreshNeoMAPData");
 

@@ -6244,6 +6244,25 @@ namespace Prometheus.Controllers
             catch (Exception ex)
             { }
 
+            //load workflow every day
+            {
+                var filename = "log" + DateTime.Now.ToString("yyyy-MM-dd");
+                var wholefilename = Server.MapPath("~/userfiles") + "\\" + filename;
+                if (!System.IO.File.Exists(wholefilename))
+                {
+                    foreach (var pjkey in pjkeylist)
+                    {
+                        try
+                        {
+                            ProcessData.LoadMesWorkflow(pjkey, this);
+                        }
+                        catch (Exception ex)
+                        { }
+                    }
+                }
+            }
+
+
             heartbeatlog("heart beat start");
 
             try
@@ -6375,18 +6394,6 @@ namespace Prometheus.Controllers
                 ExternalDataCollector.RefreshShipData(this);
             }
             catch (Exception ex) { }
-
-            heartbeatlog("ProcessData.LoadMesWorkflow");
-
-            foreach (var pjkey in pjkeylist)
-            {
-                try
-                {
-                    ProcessData.LoadMesWorkflow(pjkey, this);
-                }
-                catch (Exception ex)
-                { }
-            }
 
             heartbeatlog("ProcessData.LoadMESMoveHistory");
 
@@ -6599,7 +6606,7 @@ namespace Prometheus.Controllers
 
         public ActionResult HeartBeat2()
         {
-            ExternalDataCollector.RefreshOBAFromDMR(this);
+            //ExternalDataCollector.RefreshOBAFromDMR(this);
             //var vcselpninfo = VcselPNData.RetrieveVcselPNInfo();
             //var sdate = DateTime.Parse("2017-09-01 00:00:00");
             //for (var idx = 0; idx < 10; idx++)

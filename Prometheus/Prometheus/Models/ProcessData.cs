@@ -159,34 +159,9 @@ namespace Prometheus.Models
 
         public static void LoadMesWorkflow(string PJKey,Controller ctrl)
         {
-            var syscfg = CfgUtility.GetSysConfig(ctrl);
-            var forcerefreshpj = syscfg["FORCEREFRESHWORKFLOWPJ"];
-
             var pvmlist = ProjectViewModels.RetrieveOneProject(PJKey);
             if (pvmlist.Count == 0) { return; }
             var pvm = pvmlist[0];
-
-            if (!forcerefreshpj.Contains(PJKey))
-            {
-                var temppnlist = new List<string>();
-                foreach (var pn in pvm.PNList)
-                { temppnlist.Add(pn.Pn); }
-
-                var mespnids = MESUtility.RetrieveAllPNID(temppnlist);
-                var localpnids = GetCurrentProjectPNID(PJKey);
-                var existflag = true;
-                foreach (var id in mespnids)
-                {
-                    if (!localpnids.ContainsKey(id))
-                    {
-                        existflag = false;
-                        break;
-                    }
-                }
-
-                if (existflag)
-                { return; }
-            }
 
             var pncond = PNCondition(pvm.PNList);
             if (!string.IsNullOrEmpty(pncond))

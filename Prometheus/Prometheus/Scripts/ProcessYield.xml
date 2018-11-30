@@ -47,46 +47,20 @@ $(function () {
             		useHTML: true,
       					enabled: true,
                 formatter: function(args) {
-                  var this_point_index = 0;
-                  var dataarray = this.series.data;
-                  for(var i = 0;i < dataarray.length;i++)
-                  {
-                    if(dataarray[i] === this.point)
+                  var this_point_index = this.point.x;
+                  
+                    if(this.series.name.indexOf("yield") != -1)
                     {
-                      this_point_index = i;
+                       return tooltiparray1[this_point_index];
                     }
-                  }
-                  
-                  var this_series_index = this.series.index;
-                  
-                  if(this_series_index == 0)
-                  {
-                  		return this.point.y;
-                  }
-                  
-                  if(this_series_index == 1||this_series_index == 2)
-                  {
-                  	return tooltiparray1[this_point_index];
-                  }
-                  
+                    else
+                    {
+                      return this.series.name + ' ' + this.point.y;
+                    }
+                
                   }
         			},
-        series: [{
-            type: 'column',
-            name: 'Input Count',
-            data: [#FirstAmount#],
-            yAxis:1
-        },
-        {
-            type: 'line',
-            name: 'Yield',
-            data: [#RetestYield#],
-            marker: {
-                lineWidth: 2,
-                fillColor: 'green'
-            },
-            yAxis:0
-        }],
+        series:[#series#],
         exporting: {
             menuItemDefinitions: {
                 fullscreen: {

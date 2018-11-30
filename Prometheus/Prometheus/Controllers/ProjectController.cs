@@ -2741,25 +2741,34 @@ namespace Prometheus.Controllers
 
             var idx = 0;
             var yieldlist = new List<double>();
-            var inputlist = new List<int>();
             var newxlist = new List<string>();
             var tooltips = "";
             var maxamout = 0;
+            var inputdict = new Dictionary<string, List<int>>();
+            var yielddict = new Dictionary<string, List<double>>();
+
+            //fill dict with empty list
+            foreach (var wp in wantlist)
+            {
+                if (!inputdict.ContainsKey(wp))
+                { inputdict.Add(wp,new List<int>()); }
+                if (!yielddict.ContainsKey(wp))
+                { yielddict.Add(wp, new List<double>()); }
+            }
 
             foreach (var item in proclist)
             {
-                var tempinput = 0;
                 var tempy = 1.0;
                 var temptooltip = "";
                 var hasdata = false;
+
                 foreach (var m in item)
                 {
                     if (m.MoveInQty > 10)
                     {
                         hasdata = true;
                         tempy = tempy * ((double)m.MoveOutQty / (double)m.MoveInQty);
-                        if (m.MoveInQty > tempinput)
-                        { tempinput = m.MoveInQty; }
+
                         if (m.MoveInQty > maxamout)
                         { maxamout = m.MoveInQty; }
                     }
@@ -2768,20 +2777,40 @@ namespace Prometheus.Controllers
                 if (hasdata)
                 {
                     yieldlist.Add(Math.Round(tempy * 100.0, 2));
-                    inputlist.Add(tempinput);
                     newxlist.Add(DateTime.Parse(datelist[idx]).ToString("yyyy-MM-dd"));
-
                     temptooltip = "'<!doctype html><table>"
                     + "<tr><td><b>Yield</b></td><td>" + Math.Round(tempy * 100.0,2) + "&#37;</td></tr>";
+
+                    var tempinputdict = new Dictionary<string, int>();
+                    var tempyielddict = new Dictionary<string, double>();
                     foreach (var m in item)
                     {
+                        if (string.IsNullOrEmpty(m.WorkflowStepName))
+                        { continue; }
+
                         if (m.MoveInQty > 10)
                         {
-                            temptooltip += "<tr><td><b>" + m.WorkflowStepName + "</b></td><td>Input:</td><td>" + m.MoveInQty + "</td><td>Output:</td><td>" + m.MoveOutQty + "</td></tr>";
+                            temptooltip += "<tr><td><b>" + m.WorkflowStepName + "</b></td><td>Input:</td><td>" + m.MoveInQty + "</td><td>Output:</td><td>" + m.MoveOutQty + "</td><td>Yield:</td><td>" + Math.Round(((double)m.MoveOutQty / (double)m.MoveInQty) * 100.0, 2) + " %</td></tr>";
+                            tempinputdict.Add(m.WorkflowStepName,m.MoveInQty);
+                            tempyielddict.Add(m.WorkflowStepName,Math.Round(((double)m.MoveOutQty / (double)m.MoveInQty) * 100.0, 2));
                         }
                     }
                     temptooltip += "</table>',";
                     tooltips += temptooltip;
+
+                    foreach (var wp in wantlist)
+                    {
+                        if (tempinputdict.ContainsKey(wp))
+                        {
+                            inputdict[wp].Add(tempinputdict[wp]);
+                            yielddict[wp].Add(tempyielddict[wp]);
+                        }
+                        else
+                        {
+                            inputdict[wp].Add(0);
+                            yielddict[wp].Add(0.0);
+                        }
+                    }//end foreach
                 }
                 idx++;
             }
@@ -2791,16 +2820,35 @@ namespace Prometheus.Controllers
                 tooltips = tooltips.Substring(0, tooltips.Length - 1);
             }
 
+
             if (yieldlist.Count > 0)
             {
+                var series = "";
+                foreach (var wp in wantlist)
+                {
+                    if (inputdict.ContainsKey(wp))
+                    {
+                        series += "{type: 'column',name: '"+wp+" input',data: ["+ string.Join(",", inputdict[wp]) + "],yAxis:1},";
+                    }
+                }
+
+                foreach (var wp in wantlist)
+                {
+                    if (yielddict.ContainsKey(wp))
+                    {
+                        series += "{type: 'line',visible: false, name: '" + wp+" yield', data: ["+ string.Join(",", yielddict[wp]) + "],marker: {lineWidth: 2,fillColor: 'green'},yAxis:0 },";
+                    }
+                }
+                series += "{type: 'line', name: 'Cumm yield', data: [" + string.Join(",", yieldlist) + "],marker: {lineWidth: 2,fillColor: 'green'},yAxis:0 },";
+
+
                 var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ProcessYield.xml"));
                 return tempscript.Replace("#ElementID#", "processyield_id")
                     .Replace("#Title#", pjkey + " Process Yield Trend")
                     .Replace("#ChartxAxisValues#", "'" + string.Join("','",newxlist) + "'")
                     .Replace("#XAxisTitle#", "Date")
                     .Replace("#AmountMAX#", maxamout.ToString())
-                    .Replace("#FirstAmount#", string.Join(",",inputlist))
-                    .Replace("#RetestYield#", string.Join(",",yieldlist))
+                    .Replace("#series#", series)
                     .Replace("#FINALTOOLTIP#", tooltips);
             }
             return string.Empty;

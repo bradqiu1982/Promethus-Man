@@ -1100,6 +1100,7 @@
     <Content Include="Scripts\PieChart.xml" />
     <Content Include="Scripts\PieChart4FF.xml" />
     <Content Include="Scripts\placeholders.min.js" />
+    <Content Include="Scripts\ProcessYield.xml" />
     <Content Include="Scripts\project.js" />
     <Content Include="Scripts\Prometheus.js" />
     <Content Include="Scripts\Promethus-db-script.txt" />

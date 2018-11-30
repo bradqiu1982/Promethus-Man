@@ -2718,6 +2718,94 @@ namespace Prometheus.Controllers
             }
         }
 
+        private string ProcessYieldTrend(List<Dictionary<string, ProjectMoveHistory>> processdata,List<string> datelist, string wantproc,string pjkey)
+        {
+            var proclist = new List<List<ProjectMoveHistory>>();
+            var wantlist = wantproc.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            foreach (var procdict in processdata)
+            {
+                var tempprolist = new List<ProjectMoveHistory>();
+                foreach (var wp in wantlist)
+                {
+                    if (procdict.ContainsKey(wp))
+                    {
+                        tempprolist.Add(procdict[wp]);
+                    }
+                    else
+                    {
+                        tempprolist.Add(new ProjectMoveHistory());
+                    }
+                }//end foreach
+                proclist.Add(tempprolist);
+            }//end foreach
+
+            var idx = 0;
+            var yieldlist = new List<double>();
+            var inputlist = new List<int>();
+            var newxlist = new List<string>();
+            var tooltips = "";
+            var maxamout = 0;
+
+            foreach (var item in proclist)
+            {
+                var tempinput = 0;
+                var tempy = 1.0;
+                var temptooltip = "";
+                var hasdata = false;
+                foreach (var m in item)
+                {
+                    if (m.MoveInQty > 10)
+                    {
+                        hasdata = true;
+                        tempy = tempy * ((double)m.MoveOutQty / (double)m.MoveInQty);
+                        if (m.MoveInQty > tempinput)
+                        { tempinput = m.MoveInQty; }
+                        if (m.MoveInQty > maxamout)
+                        { maxamout = m.MoveInQty; }
+                    }
+                }//en foreach
+
+                if (hasdata)
+                {
+                    yieldlist.Add(Math.Round(tempy * 100.0, 2));
+                    inputlist.Add(tempinput);
+                    newxlist.Add(DateTime.Parse(datelist[idx]).ToString("yyyy-MM-dd"));
+
+                    temptooltip = "'<!doctype html><table>"
+                    + "<tr><td><b>Yield</b></td><td>" + Math.Round(tempy * 100.0,2) + "&#37;</td></tr>";
+                    foreach (var m in item)
+                    {
+                        if (m.MoveInQty > 10)
+                        {
+                            temptooltip += "<tr><td><b>" + m.WorkflowStepName + "</b></td><td>Input:</td><td>" + m.MoveInQty + "</td><td>Output:</td><td>" + m.MoveOutQty + "</td></tr>";
+                        }
+                    }
+                    temptooltip += "</table>',";
+                    tooltips += temptooltip;
+                }
+                idx++;
+            }
+
+            if (!string.IsNullOrEmpty(tooltips))
+            {
+                tooltips = tooltips.Substring(0, tooltips.Length - 1);
+            }
+
+            if (yieldlist.Count > 0)
+            {
+                var tempscript = System.IO.File.ReadAllText(Server.MapPath("~/Scripts/ProcessYield.xml"));
+                return tempscript.Replace("#ElementID#", "processyield_id")
+                    .Replace("#Title#", pjkey + " Process Yield Trend")
+                    .Replace("#ChartxAxisValues#", "'" + string.Join("','",newxlist) + "'")
+                    .Replace("#XAxisTitle#", "Date")
+                    .Replace("#AmountMAX#", maxamout.ToString())
+                    .Replace("#FirstAmount#", string.Join(",",inputlist))
+                    .Replace("#RetestYield#", string.Join(",",yieldlist))
+                    .Replace("#FINALTOOLTIP#", tooltips);
+            }
+            return string.Empty;
+        }
+        
         public ActionResult ProjectPeriodWeekYield(string ProjectKey, string StartDate, string EndDate)
         {
             if (!string.IsNullOrEmpty(ProjectKey) && !string.IsNullOrEmpty(StartDate) && !string.IsNullOrEmpty(EndDate))
@@ -2770,6 +2858,7 @@ namespace Prometheus.Controllers
             //{
             //    return (ActionResult)checkresult;
             //}
+            var syscfg = CfgUtility.GetSysConfig(this);
 
             var sarray = new string[] { "8", "16", "24", "32", "40", "48", "56" };
             var slist = new List<string>();
@@ -2811,6 +2900,8 @@ namespace Prometheus.Controllers
                     allprocname = ProcessData.RetrieveLastWeekProcess(ProjectKey);
                 }
 
+                var processchart = syscfg["PROCESSCHART"];
+
                 var detailinfo = new Dictionary<string, List<ProjectMoveHistory>>();
                 var procdata = new Dictionary<string, ProjectMoveHistory>();
                 if (!string.IsNullOrEmpty(PStartDate) && !string.IsNullOrEmpty(PEndDate))
@@ -2818,12 +2909,65 @@ namespace Prometheus.Controllers
                     var startdate = DateTime.Parse(PStartDate).ToString("yyyy-MM-dd") + " 07:30:00";
                     var enddate = DateTime.Parse(PEndDate).ToString("yyyy-MM-dd") + " 07:30:00";
                     procdata = ProcessData.RetrieveLastWeekProcessDataByDate(ProjectKey, startdate, enddate, detailinfo);
+
+                    if (processchart.Contains(ProjectKey) && syscfg.ContainsKey(ProjectKey + "_CHART"))
+                    {
+                        var processlist = new List<Dictionary<string, ProjectMoveHistory>>();
+                        var datelist = new List<string>();
+
+                        var tempdetailinfo = new Dictionary<string, List<ProjectMoveHistory>>();
+                        var tempstartdate = ProcessData.RetrieveLastWeek(enddate).ToString("yyyy-MM-dd") + " 07:30:00";
+                        var tempenddate = enddate;
+                        var tempprocdata = ProcessData.RetrieveLastWeekProcessDataByDate(ProjectKey, tempstartdate, tempenddate, tempdetailinfo);
+                        processlist.Add(tempprocdata);
+                        datelist.Add(tempenddate);
+
+                        var psdate = DateTime.Parse(tempstartdate);
+                        for (var i = 0; i < 13; i++)
+                        {
+                            var pedate = psdate;
+                            psdate = psdate.AddDays(-7);
+                            tempprocdata = ProcessData.RetrieveLastWeekProcessDataByDate(ProjectKey, psdate.ToString("yyyy-MM-dd HH:mm:ss"), pedate.ToString("yyyy-MM-dd HH:mm:ss"), tempdetailinfo);
+                            processlist.Add(tempprocdata);
+                            datelist.Add(pedate.ToString("yyyy-MM-dd HH:mm:ss"));
+
+                            if (psdate <= DateTime.Parse(startdate))
+                            { break;}
+                        }
+
+                        processlist.Reverse();
+                        datelist.Reverse();
+                        ViewBag.processchart = ProcessYieldTrend(processlist, datelist, syscfg[ProjectKey + "_CHART"], ProjectKey);
+                    }
                 }
                 else
                 {
                     var startdate = ProcessData.RetrieveLastWeek().ToString("yyyy-MM-dd") + " 07:30:00";
                     var enddate = DateTime.Now.ToString("yyyy-MM-dd") + " 07:30:00";
                     procdata =ProcessData.RetrieveLastWeekProcessDataByDate(ProjectKey,startdate,enddate, detailinfo);
+
+                    if (processchart.Contains(ProjectKey) && syscfg.ContainsKey(ProjectKey + "_CHART"))
+                    {
+                        var tempdetailinfo = new Dictionary<string, List<ProjectMoveHistory>>();
+                        var processlist = new List<Dictionary<string, ProjectMoveHistory>>();
+                        var datelist = new List<string>();
+                        processlist.Add(procdata);
+                        datelist.Add(enddate);
+
+                        var psdate = DateTime.Parse(startdate);
+                        for (var i = 0; i < 3; i++)
+                        {
+                            var pedate = psdate;
+                            psdate = psdate.AddDays(-7);
+                            var tempprocdata = ProcessData.RetrieveLastWeekProcessDataByDate(ProjectKey, psdate.ToString("yyyy-MM-dd HH:mm:ss"), pedate.ToString("yyyy-MM-dd HH:mm:ss"), tempdetailinfo);
+                            processlist.Add(tempprocdata);
+                            datelist.Add(pedate.ToString("yyyy-MM-dd HH:mm:ss"));
+                        }
+
+                        processlist.Reverse();
+                        datelist.Reverse();
+                        ViewBag.processchart = ProcessYieldTrend(processlist, datelist, syscfg[ProjectKey + "_CHART"], ProjectKey);
+                    }
                 }
 
                 var processdatatable = new List<ProjectMoveHistory>();

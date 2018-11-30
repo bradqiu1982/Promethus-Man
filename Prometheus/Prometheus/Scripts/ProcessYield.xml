@@ -1,0 +1,110 @@
+﻿<script type="text/javascript">
+$(function () {
+
+    var tooltiparray1=[#FINALTOOLTIP#];
+    
+    $('##ElementID#').highcharts({
+        title: {
+            text: '#Title#'
+        },
+        chart:
+        {
+          alignTicks: false
+        },
+        xAxis: {
+            categories: [#ChartxAxisValues#],
+            crosshair: true,
+            title:{
+              text: '#XAxisTitle#'
+            }
+        },
+        yAxis: [
+            {
+            title: {
+                text: 'Percent'
+            },
+            min: 0,
+            max: 100,
+            gridLineWidth: 1,
+            tickPixelInterval: 36
+          },
+          {
+            title: {
+                text: 'Amount'
+            },
+            min: 0,
+            max: #AmountMAX#,
+            opposite: true,
+            gridLineWidth: 0
+        }],
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+				tooltip: {
+            		useHTML: true,
+      					enabled: true,
+                formatter: function(args) {
+                  var this_point_index = 0;
+                  var dataarray = this.series.data;
+                  for(var i = 0;i < dataarray.length;i++)
+                  {
+                    if(dataarray[i] === this.point)
+                    {
+                      this_point_index = i;
+                    }
+                  }
+                  
+                  var this_series_index = this.series.index;
+                  
+                  if(this_series_index == 0)
+                  {
+                  		return this.point.y;
+                  }
+                  
+                  if(this_series_index == 1||this_series_index == 2)
+                  {
+                  	return tooltiparray1[this_point_index];
+                  }
+                  
+                  }
+        			},
+        series: [{
+            type: 'column',
+            name: 'Input Count',
+            data: [#FirstAmount#],
+            yAxis:1
+        },
+        {
+            type: 'line',
+            name: 'Yield',
+            data: [#RetestYield#],
+            marker: {
+                lineWidth: 2,
+                fillColor: 'green'
+            },
+            yAxis:0
+        }],
+        exporting: {
+            menuItemDefinitions: {
+                fullscreen: {
+                    onclick: function () {
+                              $('##ElementID#').parent().toggleClass('chart-modal');
+                              $('##ElementID#').highcharts().reflow();
+                    },
+                    text: 'Full Screen'
+                }
+            },
+            buttons: {
+                contextButton: {
+                    menuItems: ['fullscreen','printChart','separator','downloadPNG','downloadJPEG','downloadPDF','downloadSVG']
+                }
+            }
+        }
+    });
+});
+</script>
+
+

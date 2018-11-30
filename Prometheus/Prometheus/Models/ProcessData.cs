@@ -857,6 +857,26 @@ namespace Prometheus.Models
             }
         }
 
+        public static DateTime RetrieveLastWeek(string enddate)
+        {
+            var currentday = DateTime.Parse(enddate);
+
+            if (currentday.DayOfWeek > DayOfWeek.Thursday)
+            {
+                currentday = currentday.AddDays(4 - (int)currentday.DayOfWeek);
+                return DateTime.Parse(currentday.ToString("yyyy-MM-dd") + " 07:30:00");
+            }
+            else if (currentday.DayOfWeek == DayOfWeek.Thursday)
+            {
+                currentday = currentday.AddDays(-7);
+                return DateTime.Parse(currentday.ToString("yyyy-MM-dd") + " 07:30:00");
+            }
+            else
+            {
+                currentday = currentday.AddDays(4 - ((int)currentday.DayOfWeek + 7));
+                return DateTime.Parse(currentday.ToString("yyyy-MM-dd") + " 07:30:00");
+            }
+        }
 
         public static List<string> RetrieveLastWeekProcess(string PJKey)
         {
